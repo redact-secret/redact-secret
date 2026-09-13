@@ -321,7 +321,7 @@ class BuildDeclarationsIntegrationTests(unittest.TestCase):
                 backlog_id = dimension["exception"]["backlogId"]
                 self.assertTrue(backlog_id and " " not in backlog_id, backlog_id)
 
-    def test_current_pending_dimensions_match_tracked_follow_up_issues(self) -> None:
+    def test_current_declarations_have_no_pending_dimensions(self) -> None:
         pending = {}
         for row in self.report["declarations"]:
             for dimension in row["dimensions"]:
@@ -329,16 +329,7 @@ class BuildDeclarationsIntegrationTests(unittest.TestCase):
                     continue
                 backlog_id = dimension["exception"]["backlogId"]
                 pending.setdefault(backlog_id, set()).add(f"{row['type']}.{dimension['dimension']}")
-
-        self.assertEqual(
-            pending,
-            {
-                # #190
-                "authorization-credential-host-context-breadth": {
-                    "authorization_credential.host-context"
-                },
-            },
-        )
+        self.assertEqual(pending, {})
 
     def test_structural_host_context_breadth_is_owned_by_one_representative(self) -> None:
         structural_types = {
@@ -385,8 +376,8 @@ class BuildDeclarationsIntegrationTests(unittest.TestCase):
         `MIN_AUTHORIZATION_VALUE_LENGTH`. `host-context` is a real,
         separately-unmet gap the requirement matrix names but `C/F-03` never
         claimed (see `generate-coverage-declarations.py`'s
-        `apply_known_exceptions`), so it stays pending under its own
-        generated backlog slug rather than `C/F-03`'s."""
+        `apply_known_exceptions`). Issue #190 independently closes that
+        host-context gap with type-owned canonical evidence."""
         auth = next(
             row for row in self.report["declarations"] if row["type"] == "authorization_credential"
         )
@@ -394,8 +385,23 @@ class BuildDeclarationsIntegrationTests(unittest.TestCase):
         self.assertEqual(by_dimension["positive"]["state"], "supported")
         self.assertEqual(by_dimension["boundary"]["state"], "supported")
         self.assertEqual(by_dimension["near-miss-negative"]["state"], "supported")
-        self.assertEqual(by_dimension["host-context"]["state"], "pending")
-        self.assertNotEqual(by_dimension["host-context"]["exception"]["backlogId"], "C/F-03")
+
+    def test_authorization_credential_owns_host_context_breadth(self) -> None:
+        auth = next(
+            row for row in self.report["declarations"] if row["type"] == "authorization_credential"
+        )
+        host_context = next(d for d in auth["dimensions"] if d["dimension"] == "host-context")
+        self.assertEqual(host_context["state"], "supported")
+        self.assertNotIn("classLevel", host_context)
+        self.assertTrue(
+            {
+                "authorization-host-dotenv",
+                "authorization-host-shell",
+                "authorization-host-javascript",
+                "authorization-host-log",
+                "authorization-host-markdown",
+            }.issubset(host_context["evidenceFixtureIds"])
+        )
 
     def test_authorization_credential_overlap_is_supported_by_its_own_fixture(self) -> None:
         auth = next(

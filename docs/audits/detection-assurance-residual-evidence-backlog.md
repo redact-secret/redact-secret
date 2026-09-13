@@ -13,9 +13,9 @@ under issue #118 and reconciled to their current follow-up issues by
 - **Resolved owners:** [#186](https://github.com/redact-secret/redact-secret/issues/186),
   [#187](https://github.com/redact-secret/redact-secret/issues/187),
   [#188](https://github.com/redact-secret/redact-secret/issues/188), and
-  [#189](https://github.com/redact-secret/redact-secret/issues/189).
-- **Current open owner:** [#190](https://github.com/redact-secret/redact-secret/issues/190).
-- **Status:** four gaps resolved and one remains open, deliberately outside Epic #95's tree. **Nothing in
+  [#189](https://github.com/redact-secret/redact-secret/issues/189), and
+  [#190](https://github.com/redact-secret/redact-secret/issues/190).
+- **Status:** all five historical gaps are resolved. They remain deliberately outside Epic #95's tree. **Nothing in
   this document blocks Epic #95's closeout.**
 - **Authority:** this document records deferred evidence gaps. It does not
   authorize implementation changes or any release operation.
@@ -35,14 +35,16 @@ adversarial caps) already exists and passes for that row.
 `docs/coverage/coverage-report.md`'s own generator originally computed these 5 backlog
 IDs from the corpus and declarations at the revision above — this document
 does not introduce a new gap, it gives the already-declared `backlogId` slugs
-a narrative, an exit condition, and an owner. Current declarations report one
-remaining backlog ID across one pending cell. The former five structural
+a narrative, an exit condition, and an owner. Current declarations report no
+remaining backlog IDs or pending cells. The former five structural
 `host-context` cells now resolve `supported` from one class-level
 `connection_string_password` representative, and `bearer_token.overlap` now
 resolves `supported` from its dedicated competing-candidate fixture. The new
 independent nested-assignment fixtures likewise resolve
 `contextual_secret.overlap` and `authorization_credential.overlap` without
-borrowing evidence between the sibling finding types.
+borrowing evidence between the sibling finding types. Finally,
+`authorization_credential.host-context` resolves from five positive fixtures
+owned by that type, one in each representative lexical class.
 
 ## Current reconciliation
 
@@ -52,7 +54,7 @@ borrowing evidence between the sibling finding types.
 | `bearer-token-overlap` | #136 | [#187](https://github.com/redact-secret/redact-secret/issues/187) | **Resolved:** no pending cells | The [canonical overlap fixture](../../conformance/fixtures/synchronous-corpus.json) pins the winning `bearer_token` metadata and byte range. The [candidate-contention regression](../../crates/secret-scan-core/src/detectors/mod.rs) proves both built-in detectors emit overlapping candidates, while the [policy/redaction regression](../../crates/secret-scan-core/tests/detectors_conformance.rs) pins the default redaction outcome. The regenerated [declarations](../coverage/coverage-declarations.json) and [report](../coverage/coverage-report.md) are validated by `npm run coverage:check`, and the canonical result is validated by `cargo test -p redact-secret --test canonical_corpus scan_matches_the_canonical_synchronous_corpus`. |
 | `contextual-secret-overlap` | #136 | [#188](https://github.com/redact-secret/redact-secret/issues/188) | **Resolved:** no pending cells | The independent [canonical overlap fixture](../../conformance/fixtures/synchronous-corpus.json) pins the winning `contextual_secret` metadata and byte range without borrowing its sibling finding type. The [candidate-contention regression](../../crates/secret-scan-core/src/detectors/generic_token.rs) proves two contextual candidates overlap, while the [policy/redaction regression](../../crates/secret-scan-core/tests/detectors_conformance.rs) pins the span-width tie breaker and default redaction outcome. The regenerated [declarations](../coverage/coverage-declarations.json) and [report](../coverage/coverage-report.md) are validated by `npm run coverage:check`, and the canonical result is validated by `cargo test -p redact-secret --test canonical_corpus scan_matches_the_canonical_synchronous_corpus`. |
 | `authorization-credential-overlap` | #136 | [#189](https://github.com/redact-secret/redact-secret/issues/189) | **Resolved:** no pending cells | The dedicated [canonical Token overlap fixture](../../conformance/fixtures/synchronous-corpus.json) pins the winning `authorization_credential` metadata and byte range without borrowing `contextual_secret` evidence. The [candidate-contention regression](../../crates/secret-scan-core/src/detectors/generic_token.rs) proves the structural authorization candidate overlaps a nested contextual assignment candidate, while the [policy/redaction regression](../../crates/secret-scan-core/tests/detectors_conformance.rs) pins specificity precedence and the default redaction outcome. The regenerated [declarations](../coverage/coverage-declarations.json) and [report](../coverage/coverage-report.md) are validated by `npm run coverage:check`, and the canonical result is validated by `cargo test -p redact-secret --test canonical_corpus scan_matches_the_canonical_synchronous_corpus`. |
-| `authorization-credential-host-context-breadth` | #136 | [#190](https://github.com/redact-secret/redact-secret/issues/190) | `authorization_credential.host-context` | `authorization_credential` itself supplies positive fixtures across all five representative host-context classes. |
+| `authorization-credential-host-context-breadth` | #136 | [#190](https://github.com/redact-secret/redact-secret/issues/190) | **Resolved:** no pending cells | `authorization_credential` supplies positive `dotenv`, `shell`, `javascript`, `log`, and `markdown` fixtures in the [canonical corpus](../../conformance/fixtures/synchronous-corpus.json), one in each representative lexical class. The [generator regression](../../scripts/tests/test_generate_coverage_declarations.py) proves the evidence belongs to `authorization_credential` itself; the regenerated [declarations](../coverage/coverage-declarations.json) and [report](../coverage/coverage-report.md) are validated by `npm run coverage:check`, and the canonical detector results are validated by `cargo test -p redact-secret --test canonical_corpus scan_matches_the_canonical_synchronous_corpus`. |
 
 ## Backlog
 
@@ -62,7 +64,7 @@ borrowing evidence between the sibling finding types.
 | `bearer-token-overlap` | `resolved-evidence-gap` | `bearer_token` — `overlap` | Resolved by #187: the structural Bearer candidate now contends with a wider contextual assignment candidate, wins on specificity, and is redacted under the default policy. | Demonstrated by the linked canonical fixture, direct candidate-contention regression, policy/redaction regression, generated declarations/report, coverage check, and canonical Rust conformance test in the reconciliation table above. |
 | `contextual-secret-overlap` | `resolved-evidence-gap` | `contextual_secret` — `overlap` | Resolved by #188: two `contextual_secret` candidates from nested assignments overlap, the narrower candidate wins on span width, and the default policy redacts the winning range. | Demonstrated by the linked canonical fixture, direct candidate-contention regression, policy/redaction regression, generated declarations/report, coverage check, and canonical Rust conformance test in the reconciliation table above. |
 | `authorization-credential-overlap` | `resolved-evidence-gap` | `authorization_credential` — `overlap` | Resolved by #189: a structural Token authorization candidate contends with a nested contextual assignment candidate, wins on specificity, and is redacted under the default policy. | Demonstrated by the linked canonical fixture, direct candidate-contention regression, policy/redaction regression, generated declarations/report, coverage check, and canonical Rust conformance test in the reconciliation table above. |
-| `authorization-credential-host-context-breadth` | `evidence-gap` | `authorization_credential` — `host-context` (type-level) | `authorization_credential` is a `contextual`-class type, so `evidence-requirements.md` §3 requires its *own* type-level representative-class coverage, not a borrowed one — the same rule [`host-context-classes.md`](../coverage/host-context-classes.md) §4 already applied to close `contextual_secret`'s equivalent gap via issue #111. | `authorization_credential` gains its own positive fixtures across the five representative host-context classes, following the same pattern issue #111 used for `contextual_secret` (`host-context-classes.md` §4). |
+| `authorization-credential-host-context-breadth` | `resolved-evidence-gap` | `authorization_credential` — `host-context` (type-level) | Resolved by #190: `authorization_credential` now carries its own positive evidence across all five representative lexical classes, without borrowing `contextual_secret` evidence. | Demonstrated by the linked corpus fixtures, generator regression, generated declarations/report, coverage check, and canonical Rust conformance test in the reconciliation table above. |
 
 ## Sequencing notes
 
@@ -72,8 +74,8 @@ borrowing evidence between the sibling finding types.
 - `structural-host-context-breadth` closed once on
   `connection_string_password`; no redundant fixtures were added for the
   other four structural types.
-- None of these five historical entries is a prerequisite for another; the one
-  open gap remains independently closable.
+- None of these five historical entries was a prerequisite for another; each
+  was closed independently with type- or class-owned evidence as required.
 
 ## Not in scope
 

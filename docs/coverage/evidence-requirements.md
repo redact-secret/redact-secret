@@ -103,8 +103,8 @@ what a `provider`/`structural` detector sees far less than it changes what a
 - **contextual**: the type's own name says confidence is host-context
   dependent, so this is exactly the class where context is not
   interchangeable. The requirement is at the **type level**: each contextual
-  type needs its own representative-class coverage, not a borrowed one. This
-  is a real, currently-unmet requirement — see §5.
+  type needs its own representative-class coverage, not a borrowed one. Both
+  contextual types now meet this requirement with their own evidence; see §6.
 
 Per-scheme evidence (where a type declares `schemes`) is not subject to this
 rule: a type's scheme set is small and closed (`connection_string_password`
@@ -206,11 +206,12 @@ Applying §4's matrix and §5's exception codes to the current baseline
   `source-code`, `wire-and-log`, `prose-and-markup`; see
   [`host-context-classes.md`](./host-context-classes.md) §4-5), which is
   what §3's type-level rule requires for the `contextual` class.
-  `authorization_credential` has direct positive, boundary, near-miss,
-  malformed, range, and overlap evidence. Its overlap evidence is a dedicated
-  competing-candidate fixture rather than evidence borrowed from
-  `contextual_secret`; only its type-level host-context dimension remains
-  pending under its own backlog ID.
+  Since issue [#190](https://github.com/redact-secret/redact-secret/issues/190),
+  `authorization_credential` likewise has direct positive evidence in
+  `dotenv`, `shell`, `javascript`, `log`, and `markdown`, reaching all five
+  representative classes at the type level. Its boundary, near-miss,
+  malformed, range, and overlap evidence remains direct or bounded under the
+  matrix; its overlap fixture is not borrowed from `contextual_secret`.
 
 ### `consumers` rows (9, the `binding-edge` class)
 
@@ -229,10 +230,7 @@ consumer paths currently exist on disk (`generate-coverage-inventory.py`'s
 own structural check), so none needs a `pending` exception either.
 
 **Result: every one of the 22 `types` rows and 9 `consumers` rows resolves
-under this model using evidence the corpus already has, a `no-concept` or
-`owned-elsewhere` exemption already implied by its own declared shape, or an
-honestly-labeled `pending` gap with an owning backlog item or a newly-named
-one. The only remaining pending dimension is
-`authorization_credential.host-context`, owned by issue #190. Nothing here required
-inventing a fixture, a context, or a scheme that does not already exist in
-the corpus or the baseline.**
+under this model using evidence the corpus already has or a `no-concept` or
+`owned-elsewhere` exemption implied by its own declared shape. No pending
+dimension remains. Nothing here required inventing a context or scheme that
+does not already exist in the corpus or the baseline.**
