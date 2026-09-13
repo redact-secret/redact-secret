@@ -357,15 +357,28 @@ describe("unpaired surrogates", () => {
     expect(binding.calls).toEqual(["initialize", "scan:\u{1F511}key:builtin"]);
   });
 
-  it("rejects a lone surrogate appended to an incremental sanitizer", async () => {
-    const runtime = createRedactSecretRuntime(async () => createFakeBinding());
-    await runtime.initialize();
-    const session = runtime.createIncrementalSanitizer({
-      limits: LIMITS,
-    });
+  it.each([42, "\uD800", "\uDC00"])(
+    "discards the native session on invalid incremental input (%j)",
+    async (chunk) => {
+      const binding = createFakeBinding();
+      const runtime = createRedactSecretRuntime(async () => binding);
+      await runtime.initialize();
+      const session = runtime.createIncrementalSanitizer({ limits: LIMITS });
+      session.append("🔑SYNTHETIC_REVOKED_RETAINED_TEXT");
 
-    expect(() => session.append("\uD800")).toThrowError(
-      new SecretScanError("UNPAIRED_SURROGATE"),
-    );
-  });
+      expect(() => session.append(chunk as string)).toThrowError(
+        new SecretScanError(typeof chunk === "string" ? "UNPAIRED_SURROGATE" : "INVALID_INPUT"),
+      );
+      expect(binding.calls.filter((call) => call === "abort")).toHaveLength(1);
+      expect(session.state).toBe("failed");
+      for (const operation of [
+        () => session.append("x"), () => session.append(chunk as string),
+        () => session.finalize(), () => session.abort(),
+      ]) {
+        expect(operation).toThrowError(new SecretScanError("INVALID_STATE"));
+        expect(session.state).toBe("failed");
+      }
+      expect(binding.calls.filter((call) => call === "abort")).toHaveLength(1);
+    },
+  );
 });

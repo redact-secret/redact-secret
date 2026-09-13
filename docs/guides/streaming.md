@@ -116,6 +116,13 @@ A session starts `accepting` and becomes terminally `finalized`, `aborted`, or
 unfinished session. Lifecycle misuse and limit or callback failures drop
 retained plaintext and use fixed errors.
 
+Host-side append validation also discards retained plaintext and offset state
+and moves an accepting session to `failed`. Non-string chunks raise
+`INVALID_INPUT`; lone high or low surrogates raise `UNPAIRED_SURROGATE` in
+JavaScript and `INVALID_INPUT` in Python. These errors have fixed, input-free
+messages. Every later append, finalize, or abort raises `INVALID_STATE`, even
+if the later chunk is invalid, and the session stays `failed`.
+
 Concatenate every append result and the final result in order. For accepted
 input within the limits, output and findings must match whole-input operation
 on the same logical string. Findings use absolute original-input positions;
