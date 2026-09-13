@@ -134,6 +134,71 @@ non-Node `processRss` category; Node-specific, browser, Wasm, Python,
 native-process, and streaming-buffer observations remain separate and must not
 be summed. A result with no reproducible provenance is not evidence.
 
+## Complete reproducible evaluation
+
+After building the real Node addon, browser Wasm artifact, installed Python
+wheel, and CLI binary, one command evaluates every supported product surface
+and writes the raw per-run JSON, per-run Markdown, safe mismatch files, a
+machine-readable rollup, and a consolidated baseline report:
+
+```bash
+npm run assessment:all -- --python .venv/bin/python --output-dir assessment-output
+```
+
+The default bounded suite runs `accuracy-corpus`,
+`scale-logs-small-whole`, and `scale-logs-medium-fixed4096` twice on each of
+Rust, Python, Node, browser WebAssembly (Chromium by default), and CLI. The two
+scale profiles deliberately cover a whole-input path and an incremental path.
+The CLI receives both through standard input because that is its public
+streaming boundary; its accuracy runner additionally verifies check mode over
+standard input and files, JSON output, redact mode, exit codes, and malformed
+input failure.
+
+`assessment-output/summary.json` embeds every conforming `AssessmentResult`,
+including raw timing and memory samples. `assessment-output/baseline.md` links
+the individual reports and records every unavailable memory category and its
+sampling limitation. Timing values may vary between executions. The aggregate
+instead verifies that every result has the same source commit, every accuracy
+run has the same corpus version and SHA-256, every performance run has the same
+workload-profile version and SHA-256, and every performance distribution has
+the requested repetition count.
+
+The command continues after a runner failure so it can emit inspectable
+incomplete evidence, then exits non-zero. A missing adapter, missing result,
+invalid result, skipped surface, identity mismatch, or incomplete repetition
+count therefore cannot produce a `"status": "complete"` rollup. The output
+directory must not already exist, preventing a failed run from inheriting
+stale evidence.
+
+The manually triggered
+[`Complete assessment`](../.github/workflows/complete-assessment.yml) workflow
+builds and installs the real artifacts, runs this command, places the Markdown
+baseline in the workflow summary, and uploads the complete output directory.
+It publishes nothing and is not a release gate.
+
+The first durable run of that command is committed as
+[`results/complete/baseline.md`](./results/complete/baseline.md), with its
+machine-readable rollup in
+[`results/complete/summary.json`](./results/complete/summary.json). Use a new
+output directory when reproducing it so stale files cannot satisfy a run.
+
+To choose another bounded profile, repeat `--profile`; include at least one
+`whole` and one non-`whole` profile or the rollup is incomplete. Other useful
+adapter-level reproduction commands are:
+
+```bash
+npm run assessment:node
+npm run assessment:browser -- --engine chromium
+npm run assessment:rust
+npm run assessment:python -- --python .venv/bin/python
+npm run assessment:cli -- --binary target/release/redact-secret
+npm run assessment:node:performance -- --profile scale-logs-small-whole --runs 2
+npm run assessment:browser:performance -- --profile scale-logs-medium-fixed4096 --runs 2
+npm run assessment:rust:performance -- --profile scale-logs-medium-fixed4096 --runs 2
+npm run assessment:python:performance -- --python .venv/bin/python --profile scale-logs-medium-fixed4096 --runs 2
+npm run assessment:cli:performance -- --binary target/release/redact-secret --profile scale-logs-medium-fixed4096 --runs 2
+```
+
 ## Node and browser accuracy runners
 
 - [`adapters/scoring.ts`](./adapters/scoring.ts) — pure accuracy scoring:
