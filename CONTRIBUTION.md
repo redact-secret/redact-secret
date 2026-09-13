@@ -82,6 +82,12 @@ flowchart TD
 - [Reconcile Release](.github/workflows/reconcile-release.yml) requires separate
   authorization and runs from the matching RC branch. Its source must remain
   in that branch's history; merging into `main` is not a repair prerequisite.
+- When PyPI already has a matching proper subset of the qualified wheels and
+  source distribution, `Reconcile Release` verifies every existing file by
+  SHA-256, downloads the original qualified artifacts, stages only the missing
+  files, and publishes those files on an authorized non-dry-run. Conflicting
+  files, unreadable registry state, or expired original artifacts block
+  recovery. A dry run prints the missing PyPI filenames without publishing.
 
 ## Releases
 

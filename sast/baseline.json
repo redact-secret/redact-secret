@@ -224,6 +224,13 @@
       "rationale": "Recovery tooling reads only the fixed https://pypi.org registry authority; the project/version path is derived from the original approved source after its run and inventory identity checks. It sends no credentials, has a bounded timeout, and verifies exact filenames and SHA-256 hashes before accepting an existing publication. This is intentional release-time registry verification, not a runtime core network operation or an attacker-selected URL authority.",
       "line": 47
     },
+    "e5330565a5235757": {
+      "classification": "false_positive",
+      "line": 124,
+      "path": "scripts/verify-recovery-artifact.py",
+      "rationale": "Recovery tooling reads only the fixed https://pypi.org registry authority; the project/version path is derived from the original approved source after its run and inventory identity checks. It sends no credentials, has a bounded timeout, and verifies exact filenames and SHA-256 hashes before accepting an existing publication. This is intentional release-time registry verification, not a runtime core network operation or an attacker-selected URL authority.",
+      "rule_id": "sast.rules.python.lang.security.audit.dynamic-urllib-use-detected"
+    },
     "a6ead658861ef47d": {
       "classification": "false_positive",
       "line": 274,
@@ -312,6 +319,12 @@
     },
     "fc5e8d05105ef94e": {
       "line": 389,
+      "path": ".github/workflows/reconcile-release.yml",
+      "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
+      "type": "PartialParsing"
+    },
+    "3b6ddc3b351f01c0": {
+      "line": 397,
       "path": ".github/workflows/reconcile-release.yml",
       "rationale": "The `sast.rules.yaml.github-actions.security.curl-eval` rule's `metavariable-pattern` sub-check re-parses a `run:` step's shell snippet as Bash; when the snippet contains a GitHub Actions `${{ ... }}` expression, that substring is not valid Bash and the sub-parser reports a partial-parsing error. This is an upstream rule/tool limitation against GitHub Actions expression syntax, not a defect in the workflow file -- the rule's other (successfully parsed) matches in the same file are unaffected.",
       "type": "PartialParsing"
