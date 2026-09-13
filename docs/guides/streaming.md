@@ -16,8 +16,11 @@ then emits text and findings. An append may legitimately return empty text.
 
 ## JavaScript incremental example
 
-Both installed JavaScript artifacts expose the same root API. Limits and
-findings count UTF-16 code units on Node.js and in browsers.
+Both installed JavaScript artifacts expose the same root API. Findings count
+UTF-16 code units on Node.js and in browsers. The four limit properties retain
+their existing `CodeUnits` names for compatibility, but their numeric ceilings
+are enforced by the Rust core as UTF-8 byte limits on both artifacts. Size
+non-ASCII input with `TextEncoder` when choosing those bounds.
 
 ```ts
 import { createIncrementalSanitizer, initialize } from "@redact-secret/core";

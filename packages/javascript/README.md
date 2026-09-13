@@ -150,6 +150,10 @@ const final = session.finalize();
 const safeText = first.text + second.text + final.text;
 ```
 
+The four limit fields keep their existing `CodeUnits` names for compatibility,
+but both artifacts enforce their values as UTF-8 byte ceilings in the Rust
+core. Findings and their `start`/`end` ranges still use UTF-16 code units.
+
 A session starts `accepting` and moves to the terminal `finalized` (one
 successful `finalize()`), `aborted` (`abort()`), or `failed` (a limit,
 detector, policy, or placeholder failure) state; every operation outside

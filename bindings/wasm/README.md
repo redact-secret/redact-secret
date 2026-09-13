@@ -17,6 +17,9 @@
   lifecycle (`src/incremental.rs`). Every range it reports is an absolute
   UTF-16 code-unit offset into the logical whole-session input, converted
   chunk by chunk without ever holding the whole input as one string.
+  The four legacy `CodeUnits` limit parameter names are retained for API
+  compatibility, while their values are enforced as UTF-8 byte ceilings by
+  the Rust core.
 - `initialize` is this crate's own synchronous, idempotent setup step (it
   builds and caches the built-in detector registry) — distinct from, and in
   addition to, wasm-bindgen's own generated `init()`/default export, which a
