@@ -63,6 +63,7 @@ jobs:
       contents: read
     outputs:
       full: ${{ steps.plan.outputs.full }}
+      pr: ${{ steps.plan.outputs.pr }}
 
     steps:
       - name: Check out repository
@@ -79,51 +80,56 @@ jobs:
           HEAD_SHA: ${{ github.event.pull_request.head.sha || '' }}
         run: |
           full=true
+          pr=false
           if [[ "$GITHUB_EVENT_NAME" == "pull_request" ]]; then
             full=false
             while IFS= read -r path; do
               case "$path" in
                 .github/workflows/artifact-qualification.yml|Cargo.toml|Cargo.lock)
-                  full=true
+                  pr=true
                   break
                   ;;
                 bindings/node/package.json|bindings/node/npm/*|bindings/wasm/*)
-                  full=true
+                  pr=true
                   break
                   ;;
                 crates/secret-scan-cli/*|crates/secret-scan-core/*|examples/safe-integration/*)
-                  full=true
+                  pr=true
                   break
                   ;;
                 packages/javascript/*|conformance/*)
-                  full=true
+                  pr=true
                   break
                   ;;
                 scripts/browser-harness.mjs|scripts/browser-package-harness.mjs|scripts/build-browser-artifact.mjs)
-                  full=true
+                  pr=true
                   break
                   ;;
                 scripts/check-artifact-matrix.py|scripts/consumer-harness.mjs|scripts/qualify-browser-artifact.mjs)
-                  full=true
+                  pr=true
                   break
                   ;;
                 scripts/qualify-cli-binary.mjs|scripts/qualify-node-addon.mjs|scripts/qualify-package-consumer.mjs)
-                  full=true
+                  pr=true
                   break
                   ;;
                 scripts/qualify-runtime-fixture.mjs|scripts/record-artifact-inventory.py)
-                  full=true
+                  pr=true
                   break
                   ;;
                 scripts/tests/test_check_artifact_matrix.py|scripts/tests/test_record_artifact_inventory.py)
-                  full=true
+                  pr=true
                   break
                   ;;
               esac
             done < <(git diff --name-only "$BASE_SHA" "$HEAD_SHA")
           fi
           echo "full=$full" >> "$GITHUB_OUTPUT"
-          echo "full=$full" >> "$GITHUB_STEP_SUMMARY"
+          echo "pr=$pr" >> "$GITHUB_OUTPUT"
+          {
+            echo "full=$full"
+            echo "pr=$pr"
+          } >> "$GITHUB_STEP_SUMMARY"
 
   policy:
     name: Artifact matrix policy
@@ -454,6 +460,60 @@ jobs:
             target/${{ matrix.target }}/release/redact-secret.exe
           if-no-files-found: error
 
+  pr-macos-smoke:
+    name: PR macOS artifact smoke
+    runs-on: macos-latest
+    needs:
+      - plan
+      - policy
+    if: needs.plan.outputs.pr == 'true'
+    timeout-minutes: 45
+    permissions:
+      contents: read
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+
+      - name: Set up the floor Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Set up stable Rust with the macOS ARM target
+        uses: dtolnay/rust-toolchain@6c977a6ca4077a0ceb28ffbe03f59d46e9ac8772 # v1
+        with:
+          toolchain: stable
+          targets: aarch64-apple-darwin
+
+      - name: Cache Cargo artifacts
+        uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+        with:
+          key: pr-macos-artifacts
+
+      - name: Install repository and addon dependencies
+        run: |
+          npm ci --ignore-scripts
+          npm --prefix bindings/node ci --ignore-scripts
+
+      - name: Build the JavaScript package
+        run: npm run js:build
+
+      - name: Build and qualify the macOS addon
+        working-directory: bindings/node
+        run: |
+          npx napi build --platform --release --target aarch64-apple-darwin
+          cd ../..
+          node scripts/qualify-node-addon.mjs --target aarch64-apple-darwin
+
+      - name: Build and qualify the macOS CLI
+        run: |
+          cargo build --release --locked -p redact-secret-cli --target aarch64-apple-darwin
+          node scripts/qualify-cli-binary.mjs --target aarch64-apple-darwin
+
   package-consumer-node:
     name: Installed Node package (Node ${{ matrix.node-version }})
     runs-on: ubuntu-latest
@@ -595,6 +655,7 @@ jobs:
       - node-addon
       - browser
       - cli
+      - pr-macos-smoke
       - package-consumer-node
       - package-consumer-browser
     if: always()
@@ -615,8 +676,18 @@ jobs:
           done
 
       - name: Accept a pull request that did not touch artifact inputs
-        if: needs.plan.outputs.full != 'true'
+        if: needs.plan.outputs.full != 'true' && needs.plan.outputs.pr != 'true'
         run: echo "Artifact qualification skipped; this pull request did not touch artifact inputs." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Require successful pull request artifact smoke
+        if: needs.plan.outputs.pr == 'true'
+        env:
+          PR_MACOS_RESULT: ${{ needs.pr-macos-smoke.result }}
+        run: |
+          if [[ "$PR_MACOS_RESULT" != "success" ]]; then
+            echo "Artifact inventory cannot pass because PR macOS smoke finished with '$PR_MACOS_RESULT'." >&2
+            exit 1
+          fi
 
       - name: Require successful qualification jobs
         if: needs.plan.outputs.full == 'true'

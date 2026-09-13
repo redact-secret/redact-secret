@@ -12,6 +12,10 @@ on:
 
 permissions: {}
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 env:
   # The workspace MSRV. scripts/check-rust-workspace.py requires this value to
   # match `rust-version` in Cargo.toml and to cover every resolved dependency.
