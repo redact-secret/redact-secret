@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "sourceCommit": "ffd0c3085df359680484a0e35d283e9948d2c1f7",
+  "published": false,
+  "lane": "browser",
+  "runtime": {
+    "name": "chromium",
+    "version": "153.0.8010.12"
+  },
+  "productVersion": "0.1.0-beta.1",
+  "fixture": "host-dotenv-github",
+  "packageArtifacts": [
+    {
+      "name": "@redact-secret/core",
+      "version": "0.1.0-beta.1",
+      "file": "redact-secret-core-0.1.0-beta.1.tgz",
+      "sha256": "568c68d8be8b0815482b7e25aa4401c80cb0c996afb136b5311ecda210397bce"
+    },
+    {
+      "name": "@redact-secret/node-darwin-arm64",
+      "version": "0.1.0-beta.1",
+      "file": "redact-secret-node-darwin-arm64-0.1.0-beta.1.tgz",
+      "sha256": "47e536a1b12a1717212253fea6c1aa305e796f1d55673666e3dd88ac71b40f34"
+    },
+    {
+      "name": "@redact-secret/wasm",
+      "version": "0.1.0-beta.1",
+      "file": "redact-secret-wasm-0.1.0-beta.1.tgz",
+      "sha256": "3f8527292987296a6bc7a159ff4c755131d24bf125388ce62a5a872ac225f77b"
+    }
+  ],
+  "commands": [
+    "npm install --no-audit --no-fund",
+    "node scripts/qualify-package-consumer.mjs --lane browser --engine chromium --wasm-dir <candidate-wasm-dir> --report <evidence-path>"
+  ],
+  "operations": [
+    "initialize",
+    "scan",
+    "createIncrementalSanitizer",
+    "createWebStreamSanitizer"
+  ],
+  "results": {
+    "initialize": "passed",
+    "scan": "passed",
+    "incremental": "passed",
+    "stream": "passed",
+    "engine": "chromium",
+    "engineVersion": "153.0.8010.12"
+  }
+}
