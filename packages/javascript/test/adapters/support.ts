@@ -45,6 +45,15 @@ export function bytes(text: string): Uint8Array {
 export const partitionCorpus = Object.freeze([
   Object.freeze({ id: "empty", input: "" }),
   Object.freeze({ id: "plain-ascii", input: "nothing sensitive here\n" }),
+  Object.freeze({ id: "leading-bom-only", input: "\uFEFF" }),
+  Object.freeze({
+    id: "leading-bom-secret",
+    input: "\uFEFFapi_key=SYNTHETIC_REVOKED_BOM_VALUE\n",
+  }),
+  Object.freeze({
+    id: "later-literal-bom",
+    input: "ordinary prefix \uFEFF api_key=SYNTHETIC_REVOKED_LATER_BOM\n",
+  }),
   Object.freeze({
     id: "multibyte-around-secret",
     input: "키=값 api_key=SYNTHETIC_REVOKED_ONE ünd mehr\n",

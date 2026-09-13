@@ -41,7 +41,10 @@ export interface StreamSanitizerRuntime {
 export function createStreamSanitizerRuntime(
   session: IncrementalSanitizer,
 ): StreamSanitizerRuntime {
-  const decoder = new TextDecoder("utf-8", { fatal: true });
+  const decoder = new TextDecoder("utf-8", {
+    fatal: true,
+    ignoreBOM: true,
+  });
   const findings: SecretFinding[] = [];
 
   /** Idempotent, and safe after the session has already left `accepting`. */
