@@ -5,6 +5,10 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+- Fixed performance and resource thresholds, derived from the first complete
+  cross-surface baseline, can now evaluate five-repetition RC evidence for the
+  qualified macOS arm64 environment without treating unavailable or overlapping
+  host memory metrics as zero.
 - A complete assessment command and manually triggered CI workflow now evaluate
   Rust, installed Python, Node, browser WebAssembly, and CLI artifacts against
   shared whole-input and incremental profiles, fail closed on missing or

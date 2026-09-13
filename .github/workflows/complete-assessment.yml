@@ -1,8 +1,8 @@
 name: Complete assessment
 
 # Manually builds one host's real product artifacts and records a bounded,
-# complete cross-language accuracy/performance baseline. This publishes
-# nothing and is not a release gate.
+# complete cross-language accuracy/performance assessment and evaluates fixed
+# RC acceptance criteria. This publishes nothing and is not a release gate.
 on:
   workflow_dispatch:
 
@@ -11,7 +11,7 @@ permissions: {}
 jobs:
   evaluate:
     name: Evaluate every product surface
-    runs-on: ubuntu-latest
+    runs-on: macos-15
     timeout-minutes: 60
     permissions:
       contents: read
@@ -71,11 +71,18 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Run the complete bounded assessment
-        run: npm run assessment:all -- --python .venv/bin/python --output-dir assessment-output
+        run: npm run assessment:all -- --python .venv/bin/python --runs 5 --output-dir assessment-output
+
+      - name: Evaluate the fixed RC acceptance criteria
+        run: npm run assessment:acceptance -- --summary assessment-output/summary.json --json-out assessment-output/acceptance.json --markdown-out assessment-output/acceptance.md
 
       - name: Add the consolidated baseline to the workflow summary
         if: always() && hashFiles('assessment-output/baseline.md') != ''
         run: sed -n '1,$p' assessment-output/baseline.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Add acceptance results to the workflow summary
+        if: always() && hashFiles('assessment-output/acceptance.md') != ''
+        run: sed -n '1,$p' assessment-output/acceptance.md >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload raw samples, results, and consolidated reports
         if: always()

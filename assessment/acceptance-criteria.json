@@ -1,0 +1,44 @@
+{
+  "schemaVersion": "1",
+  "criteriaId": "rc-performance-resource-v1",
+  "fixedAt": "2026-09-13",
+  "baseline": {
+    "summaryPath": "assessment/results/complete/summary.json",
+    "sourceCommit": "a356e702e59b03cf297e0af15ba0423bc8466d48",
+    "accuracyCorpusVersion": "1",
+    "accuracyCorpusHash": "9c72ab77bb1ee54c6912592c2ce3de72c0c152356283d620498aac5fe08c26d9",
+    "workloadProfilesVersion": "1",
+    "workloadProfilesHash": "b4db2cd22b4c008c9d63789df8ca2e21e697a21a84699466ea5f96c89d8e2806"
+  },
+  "minimumRepetitions": 5,
+  "environment": {
+    "id": "macos-arm64-node22-chromium",
+    "osPrefixes": ["darwin-", "macos-"],
+    "cpus": ["arm64", "aarch64"],
+    "runtimePrefixes": {
+      "rust-core": ["rustc-"],
+      "python": ["cpython-3."],
+      "node": ["node-22."],
+      "browser-wasm": ["chromium-"],
+      "cli": ["rustc "]
+    }
+  },
+  "accuracy": {
+    "truePositives": 1,
+    "falsePositives": 1,
+    "falseNegatives": 5,
+    "policyMismatches": 0
+  },
+  "performance": [
+    { "surface": "rust-core", "profileId": "scale-logs-small-whole", "maxInitializationP95Ms": 2, "maxProcessingP95Ms": 200, "minThroughputBytesPerSecond": 350000, "memoryCapsBytes": { "processRss": 8388608 } },
+    { "surface": "rust-core", "profileId": "scale-logs-medium-fixed4096", "maxInitializationP95Ms": 2, "maxProcessingP95Ms": 850, "minThroughputBytesPerSecond": 300000, "memoryCapsBytes": { "processRss": 8388608 } },
+    { "surface": "python", "profileId": "scale-logs-small-whole", "maxInitializationP95Ms": 3, "maxProcessingP95Ms": 25, "minThroughputBytesPerSecond": 3000000, "memoryCapsBytes": { "pythonHeap": 2097152, "processRss": 67108864 } },
+    { "surface": "python", "profileId": "scale-logs-medium-fixed4096", "maxInitializationP95Ms": 3, "maxProcessingP95Ms": 100, "minThroughputBytesPerSecond": 2750000, "memoryCapsBytes": { "pythonHeap": 2097152, "processRss": 67108864 } },
+    { "surface": "node", "profileId": "scale-logs-small-whole", "maxInitializationP95Ms": 5, "maxProcessingP95Ms": 25, "minThroughputBytesPerSecond": 2900000, "memoryCapsBytes": { "nodeHeap": 33554432, "nodeRss": 134217728, "nodeExternal": 8388608 } },
+    { "surface": "node", "profileId": "scale-logs-medium-fixed4096", "maxInitializationP95Ms": 5, "maxProcessingP95Ms": 100, "minThroughputBytesPerSecond": 2750000, "memoryCapsBytes": { "nodeHeap": 50331648, "nodeRss": 201326592, "nodeExternal": 8388608 } },
+    { "surface": "browser-wasm", "profileId": "scale-logs-small-whole", "maxInitializationP95Ms": 15, "maxProcessingP95Ms": 20, "minThroughputBytesPerSecond": 4000000, "memoryCapsBytes": { "browserJsHeap": 33554432 } },
+    { "surface": "browser-wasm", "profileId": "scale-logs-medium-fixed4096", "maxInitializationP95Ms": 15, "maxProcessingP95Ms": 75, "minThroughputBytesPerSecond": 4000000, "memoryCapsBytes": { "browserJsHeap": 100663296 } },
+    { "surface": "cli", "profileId": "scale-logs-small-whole", "maxInitializationP95Ms": 6, "maxProcessingP95Ms": 35, "minThroughputBytesPerSecond": 2250000, "memoryCapsBytes": { "processRss": 8388608 } },
+    { "surface": "cli", "profileId": "scale-logs-medium-fixed4096", "maxInitializationP95Ms": 6, "maxProcessingP95Ms": 110, "minThroughputBytesPerSecond": 2500000, "memoryCapsBytes": { "processRss": 8388608 } }
+  ]
+}

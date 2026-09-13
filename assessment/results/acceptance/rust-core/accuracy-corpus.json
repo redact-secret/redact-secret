@@ -1,0 +1,21 @@
+{
+  "accuracy": {
+    "falseNegatives": 5,
+    "falsePositives": 1,
+    "policyMismatches": 0,
+    "truePositives": 1
+  },
+  "profileId": "accuracy-corpus",
+  "provenance": {
+    "artifactIdentity": "redact-secret@0.1.0-beta.1",
+    "command": "cargo run -p redact-secret --example assessment_adapter -- accuracy --json-out assessment/results/acceptance/rust-core/accuracy-corpus.json --markdown-out assessment/results/acceptance/rust-core/accuracy-corpus.md --mismatches-out assessment/results/acceptance/rust-core/accuracy-corpus-mismatches.json",
+    "commit": "054076f1d3cc870a04249eb40fdce0b07f546ed2",
+    "corpusHash": "9c72ab77bb1ee54c6912592c2ce3de72c0c152356283d620498aac5fe08c26d9",
+    "corpusVersion": "1",
+    "cpu": "aarch64",
+    "os": "macos-25.5.0",
+    "runtime": "rustc-1.98.1 (48a229cea 2026-09-01)"
+  },
+  "schemaVersion": "3",
+  "surface": "rust-core"
+}
