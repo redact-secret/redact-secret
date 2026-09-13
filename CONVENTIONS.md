@@ -2,7 +2,15 @@
 
 ## Feature notes
 
-Use `_notes/features/<feature>/README.md` as a small, temporary staging page for future GitHub Wiki content. Name feature directories with short, descriptive kebab-case names.
+Keep repository Markdown as the source documentation during beta. Include
+user-facing documentation updates in each feature change, including changed
+support, examples, and limitations. Public guides live under `docs/`.
+
+Use `_notes/features/<feature>/README.md` as a small, temporary staging page for
+feature notes. Name feature directories with short, descriptive kebab-case names.
+These notes do not select a delivery platform: a separate web-app repository
+versus GitHub Wiki remains undecided. See the
+[documentation readiness checklist](docs/documentation-readiness.md).
 
 Each page has one job: let a reader understand the feature quickly. Keep only what is useful:
 

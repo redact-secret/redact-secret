@@ -39,6 +39,13 @@ Pull requests should explain the observable change, its verification, and any
 compatibility impact. By contributing, you agree that your contribution is licensed
 under the repository's [MIT License](LICENSE).
 
+During beta, repository Markdown is the documentation source. Include updates
+to the relevant user guides, examples, support statements, and limitations in
+each feature change. Use the [documentation readiness checklist](docs/documentation-readiness.md)
+to identify affected topics and record verification evidence. Before stable
+release, reconcile all required topics with the final public contracts and
+complete the delivery checks after a platform has been chosen.
+
 ## Branching strategy
 
 `rc` stands for release candidate. `main` is the integration branch. Merge normal
