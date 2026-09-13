@@ -282,6 +282,68 @@ The first bounded Rust baseline is recorded under
 `accuracy-corpus`, plus `scale-logs-small-whole` with two runs. These files
 are inspectable evidence for this surface, not a release gate.
 
+## CLI runner
+
+`npm run assessment:cli -- --binary <path>` evaluates the real, built
+`redact-secret` CLI binary
+([`crates/secret-scan-cli`](../crates/secret-scan-cli)) against
+`fixtures/accuracy-corpus.json` and emits the same `"cli"`-surface
+`AssessmentResult` contract every other runner does. The narrow
+[`../scripts/lib/assessment-cli.mjs`](../scripts/lib/assessment-cli.mjs)
+adapter only spawns the binary, feeds standard input, and reads the CLI's
+documented `--json` report and exit codes
+(`crates/secret-scan-cli/src/main.rs`); it never inspects detector or policy
+logic. `--binary` defaults to `target/release/redact-secret` — build it first
+with `cargo build --release -p redact-secret-cli`.
+
+Beyond scoring every fixture, one run also validates the parts of the public
+CLI contract the corpus alone cannot exercise: the documented exit codes (0
+clean, 1 findings, 2 usage or decoding failure), a malformed standard-input
+decode failure reported as `NOT_UTF8` and failing closed rather than becoming
+a false zero-finding success, a multi-file `--` run checked byte-for-byte
+against the same fixtures' standard-input results (file and standard-input
+parity), and `--redact` mode against every fixture with a `redact`/`block`
+finding, checked byte-for-byte against the placeholder text its own reported
+findings imply. Any of these failing aborts the run before an
+`AssessmentResult` is emitted.
+
+`npm run assessment:cli:self-test` builds the debug CLI once and runs tiny
+known-answer checks directly against that binary — a UTF-8 byte range spanning
+an astral character, redaction, a decode failure, and a usage failure — so they
+need no prebuilt release artifact. `assessment:check`'s vitest run exercises
+the same self-test via
+[`adapters/cli-adapter.test.ts`](./adapters/cli-adapter.test.ts), on the same
+terms `adapters/rust-adapter.test.ts` exercises the Rust adapter's self-test.
+
+`npm run assessment:cli:performance -- --profile <scale-id> --runs <2-100>`
+measures the same generated scale profiles. A profile's `chunkProfile` governs
+how an in-process streaming or incremental API is called, which does not
+apply across a subprocess boundary — the CLI's public host contract is one
+standard-input stream per process, so every profile's generated input is fed
+as a single write regardless of `chunkProfile`; the CLI's own incremental
+core still streams it internally. Each repetition spawns two fresh
+processes: one running `--version` alone, timed as `initialization` (process
+startup, argument parsing, and exit — nothing else), and one running `--json`
+against the generated input, timed as `processing`. Unlike the in-process
+Node, Python, and Rust runners, a CLI `processing` sample is necessarily
+*process-inclusive*: it still contains the same process-startup cost
+`initialization` measures on its own, because a subprocess boundary offers no
+way to time only the library work inside it without the product exposing new
+instrumentation. `processing` here must not be read as, or compared directly
+against, another surface's steady-state processing number.
+
+Process memory (`processRss`) is sampled in a separate, untimed repetition of
+the same `--json` invocation wrapped by `/usr/bin/time -l` (macOS) or
+`/usr/bin/time -v` (Linux) — the whole child process's maximum resident set
+size, on the same "separate untimed pass" terms
+[Installed Python package runner](#installed-python-package-runner) samples
+`pythonHeap` and `processRss`, and unavailable where no such portable wrapper
+exists (including Windows). It includes process startup, the Rust runtime,
+and the entire scan, and cannot isolate steady-state or Rust-only memory.
+Node, browser, Wasm, and Python heap categories, and the retained incremental
+buffer, are unavailable on this surface for the same reasons documented for
+the Rust library runner above.
+
 ## Beta.2 detection assessment
 
 [`results/beta.2/`](./results/beta.2/) records the fixed-corpus assessment for
@@ -296,15 +358,11 @@ conformance gate or release authorization.
 
 This item defines the schema, the corpus, the workload profiles, and the
 result contract — the common language every surface's evaluation reports
-through. The Node, browser WebAssembly, Rust library, and installed Python
-runners above execute profiles, collect real
-`accuracy` or `performance` metrics, and emit a conforming
-`AssessmentResult`; CLI accuracy and performance runners remain separate work,
-on the same terms
-`conformance/README.md`'s "What this directory is not (yet)" section
-describes for the behavioral contract. This directory adds no runtime
-instrumentation, telemetry, or public API to any product surface; `secret-scan-core`
-stays side-effect free.
+through. The Node, browser WebAssembly, Rust library, installed Python, and
+CLI runners above execute profiles, collect real `accuracy` or `performance`
+metrics, and emit a conforming `AssessmentResult`. This directory adds no
+runtime instrumentation, telemetry, or public API to any product surface;
+`secret-scan-core` stays side-effect free.
 
 ## Out of scope
 

@@ -5,6 +5,9 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+- Assessment tooling now includes a CLI binary runner, self-test command, and
+  first checked-in correctness/performance baseline with explicit process
+  startup, process-inclusive processing, and whole-process RSS measurements.
 - The fixed, separate beta.2 detection assessment now records source-, corpus-,
   runtime-, and artifact-bound Node and browser results with explicit
   denominators, safe mismatch details, and linked limitation dispositions;
