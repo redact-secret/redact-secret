@@ -23,6 +23,7 @@ import {
   type NativeFormatterCallback,
   type NativeIncrementalOptions,
   type NativeIncrementalPolicyCallback,
+  type NativeIncrementalSanitizer,
   type NativePolicyCallback,
 } from "./native.js";
 import { VERSION } from "./version.js";
@@ -289,13 +290,22 @@ export function createRedactSecretRuntime(
     options: IncrementalSanitizerOptions,
   ): IncrementalSanitizer {
     const native = active();
-    let session;
+    let session: NativeIncrementalSanitizer;
     try {
       session = native.createIncrementalSanitizer(
         toNativeIncrementalOptions(options),
       );
     } catch (thrown) {
       throw toSecretScanError(thrown, "INVALID_LIMITS");
+    }
+
+    // Host validation cannot reach the core; abort releases its buffer and index.
+    let inputFailed = false;
+
+    function requireAccepting(): void {
+      if (inputFailed || session.state !== "accepting") {
+        throw new SecretScanError("INVALID_STATE");
+      }
     }
 
     function run(
@@ -319,12 +329,29 @@ export function createRedactSecretRuntime(
 
     return Object.freeze({
       get state() {
-        return session.state;
+        return inputFailed ? "failed" : session.state;
       },
-      append: (chunk: string) =>
-        run(() => session.append(requireString(chunk)), "DETECTOR_FAILURE"),
-      finalize: () => run(() => session.finalize(), "DETECTOR_FAILURE"),
+      append: (chunk: string) => {
+        requireAccepting();
+        let text;
+        try {
+          text = requireString(chunk);
+        } catch (thrown) {
+          inputFailed = true;
+          try {
+            session.abort();
+          } finally {
+            throw toSecretScanError(thrown, "INVALID_INPUT");
+          }
+        }
+        return run(() => session.append(text), "DETECTOR_FAILURE");
+      },
+      finalize: () => {
+        requireAccepting();
+        return run(() => session.finalize(), "DETECTOR_FAILURE");
+      },
       abort: () => {
+        requireAccepting();
         try {
           session.abort();
         } catch (thrown) {

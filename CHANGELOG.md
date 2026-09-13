@@ -5,6 +5,9 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+- JavaScript and Python incremental sanitizers now treat host-side invalid
+  append input as terminal: retained plaintext and offset state are discarded,
+  the session reports `failed`, and later operations raise `INVALID_STATE`.
 - Artifact qualification inventories now carry release-readiness pointers for
   the public API/changelog review and the post-publication registry-install
   verification boundary, keeping issue #203 evidence tied to one source

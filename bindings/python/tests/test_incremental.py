@@ -241,14 +241,29 @@ def test_every_operation_after_a_failure_raises_invalid_state(operation: str) ->
     assert session.state == "failed"
 
 
-def test_append_rejects_a_non_string_chunk() -> None:
+@pytest.mark.parametrize("chunk", [42, b"bytes", "\ud800", "\udc00"])
+def test_invalid_input_is_terminal(chunk) -> None:
     session = redact_secret.IncrementalSanitizer(generous_limits())
+    retained = session.append("🔑SYNTHETIC_REVOKED_RETAINED_TEXT")
+    assert retained.text == ""
+    assert list(retained.findings) == []
     with pytest.raises(redact_secret.InvalidInputError) as excinfo:
-        session.append(b"bytes")  # type: ignore[arg-type]
+        session.append(chunk)
     assert excinfo.value.code == "INVALID_INPUT"
-    # A rejected chunk is not input: the session is unchanged and usable.
-    assert session.state == "accepting"
-    assert session.append("ok\n").text == "ok\n"
+    assert str(excinfo.value) == "Secret scan input must be a string."
+    assert excinfo.value.__cause__ is None
+    assert session.state == "failed"
+    for operation in [
+        lambda: session.append("x"),
+        lambda: session.append(chunk),
+        session.finalize,
+        session.abort,
+    ]:
+        with pytest.raises(redact_secret.InvalidStateError) as later:
+            operation()
+        assert later.value.code == "INVALID_STATE"
+        assert str(later.value) == "The incremental sanitizer is no longer accepting input."
+        assert session.state == "failed"
 
 
 def test_an_empty_session_finalizes_to_empty_output() -> None:

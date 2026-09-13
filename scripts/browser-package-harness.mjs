@@ -33,6 +33,8 @@ import {
 } from "@redact-secret/core";
 import { WebStreamSanitizer } from "@redact-secret/core/web-stream";
 
+import { qualifyIncrementalInput } from "./qualify-incremental-input.mjs";
+
 const results = [];
 let failures = 0;
 
@@ -123,6 +125,10 @@ export async function qualify(fixtures) {
   check("the package reports its documented identity", () => {
     assertEqual(RANGE_UNIT, "utf16-code-units", "RANGE_UNIT");
     assertEqual(VERSION, fixtures.version, "VERSION");
+  });
+
+  check("invalid incremental input is terminal with fixed diagnostics", () => {
+    qualifyIncrementalInput(createIncrementalSanitizer, SecretScanError);
   });
 
   const synchronous = fixtures.synchronous;

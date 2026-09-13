@@ -407,7 +407,8 @@ impl PyIncrementalResult {
 /// Lifecycle: a session starts `accepting` and accepts `append`,
 /// `finalize`, and `abort`. Exactly one successful `finalize` moves it to
 /// `finalized`; `abort` moves it to `aborted`; any limit, detector, policy,
-/// or placeholder failure moves it to `failed`. All three are terminal:
+/// or placeholder failure moves it to `failed`. Host input rejection also
+/// moves it to `failed`. All three are terminal:
 /// every later operation raises `InvalidStateError`, and every terminal
 /// transition discards the plaintext the core still retained.
 ///
@@ -420,6 +421,7 @@ impl PyIncrementalResult {
 )]
 pub(crate) struct PyIncrementalSanitizer {
     session: IncrementalSanitizer,
+    input_failed: bool,
     limits: PyIncrementalLimits,
     index: Rc<RefCell<CodePointIndex>>,
     policy_failure: Rc<Cell<Option<SecretScanErrorCode>>>,
@@ -543,6 +545,7 @@ impl PyIncrementalSanitizer {
         .map_err(map_core_error)?;
         Ok(Self {
             session,
+            input_failed: false,
             limits: *limits,
             index,
             policy_failure,
@@ -553,6 +556,9 @@ impl PyIncrementalSanitizer {
     /// `"aborted"`, or `"failed"`.
     #[getter]
     const fn state(&self) -> &'static str {
+        if self.input_failed {
+            return "failed";
+        }
         match self.session.state() {
             SessionState::Accepting => "accepting",
             SessionState::Finalized => "finalized",
@@ -577,7 +583,8 @@ impl PyIncrementalSanitizer {
     ///
     /// # Errors
     ///
-    /// Raises `InvalidInputError` when `chunk` is not a string,
+    /// Raises `InvalidInputError` when `chunk` is not a string or contains
+    /// an unpaired surrogate,
     /// `InvalidStateError` outside the `accepting` state,
     /// `InputLimitExceededError`, `BufferLimitExceededError`,
     /// `TokenLimitExceededError`, or `MultilineLimitExceededError` when a
@@ -588,8 +595,19 @@ impl PyIncrementalSanitizer {
     /// one of them is terminal and discards retained plaintext.
     #[allow(clippy::needless_pass_by_value)]
     fn append(&mut self, chunk: Bound<'_, PyAny>) -> PyResult<PyIncrementalResult> {
-        let text = extract_text(&chunk)?;
         self.require_accepting()?;
+        let text = match extract_text(&chunk) {
+            Ok(text) => text,
+            Err(error) => {
+                // Host rejection never reaches append in the core. Abort drops
+                // retained plaintext; expose this host failure as `failed`.
+                self.input_failed = true;
+                let _ = self.session.abort();
+                self.index.borrow_mut().clear();
+                self.policy_failure.set(None);
+                return Err(error);
+            }
+        };
         self.index.borrow_mut().observe(&text);
         match self.session.append(&text) {
             Ok(result) => self.finish(result, false),

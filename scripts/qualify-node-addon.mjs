@@ -57,6 +57,8 @@ import {
   packageVersion,
 } from "./qualify-runtime-fixture.mjs";
 
+import { qualifyIncrementalInput } from "./qualify-incremental-input.mjs";
+
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const ADDON_DIR = join(REPO_ROOT, "bindings", "node");
 const JS_PACKAGE_DIR = join(REPO_ROOT, "packages", "javascript");
@@ -325,6 +327,7 @@ async function integrateWithPackage() {
     // longer satisfies the binding contract the package declares.
     await api.initialize();
     await api.initialize();
+    qualifyIncrementalInput(api.createIncrementalSanitizer, api.SecretScanError);
     assertEqual(api.VERSION, expectedVersion, "the package's reported version");
     assertEqual(api.RANGE_UNIT, "utf16-code-units", "RANGE_UNIT");
 
