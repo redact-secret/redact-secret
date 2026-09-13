@@ -18,7 +18,7 @@ members = [
 ]
 
 [workspace.package]
-version = "0.1.0-beta.1"
+version = "0.1.0-beta.2"
 edition = "2024"
 rust-version = "1.88"
 license = "MIT"
@@ -29,7 +29,7 @@ publish = false
 
 [workspace.dependencies]
 # Internal crates.
-redact-secret = { path = "crates/secret-scan-core", version = "=0.1.0-beta.1" }
+redact-secret = { path = "crates/secret-scan-core", version = "=0.1.0-beta.2" }
 
 # Binding dependencies. The MSRV above is the maximum `rust-version` among the
 # packages selected by these requirements; see docs/rust-workspace.md#msrv.

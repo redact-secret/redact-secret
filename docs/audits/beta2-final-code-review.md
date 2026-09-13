@@ -3,13 +3,12 @@
 [Documentation home](../README.md) · [Release runbook](../releasing.md) · [Audit archive](README.md)
 
 - Reviewed on: 2026-09-13.
-- Source: `e77ceaf1d885c1b6f311142974cb8502d0d78d5a`, clean `main` at review start.
-- Base refresh: PR #242 was updated through `704418c47c5668ec3d32b6bf9d8fc67b612fa5fe`;
-  #234, #235, and #237 are closed on that base.
+- Source: `41637bd5f434e6c2c4b423a09a9b11162179bcfa`, clean `main` at final review.
+- Base refresh: all six findings, #234 through #239, are closed on this base.
 - Local environment: macOS arm64, Node 22.16.0, Python 3.14.7.
-- Verdict: **fix or explicitly disposition the remaining open findings below
-  before release approval**. Existing automated checks pass; they do not cover
-  these failures.
+- Verdict: **ready for `0.1.0-beta.2` candidate preparation**. Publication still
+  requires exact-RC qualification, rehearsal, SAST, publisher checks, and the
+  separate explicit release approval required by `AGENTS.md`.
 
 This review covers core pipeline/redaction and incremental retention, host input
 validation, JavaScript byte-stream adapters, Python binding failure handling,
@@ -24,15 +23,13 @@ every possible credential grammar is correct.
 | P1 (closed) | [#234: invalid incremental input cleanup](https://github.com/redact-secret/redact-secret/issues/234) | At the reviewed source, JavaScript and Python rejected invalid input before the core saw the error. Closed on the refreshed base. |
 | P1 (closed) | [#237: partial PyPI recovery](https://github.com/redact-secret/redact-secret/issues/237) | At the reviewed source, an existing version with only a matching subset of qualified files failed exact-set verification before recovery could upload missing files. Closed on the refreshed base. |
 | P2 (closed) | [#235: leading BOM preservation](https://github.com/redact-secret/redact-secret/issues/235) | At the reviewed source, the shared stream decoder removed U+FEFF, changing output and original-input finding offsets relative to whole-input scanning. Closed on the refreshed base. |
-| P2 | [#236: finding accumulation](https://github.com/redact-secret/redact-secret/issues/236) | Argument spread in `findings.push` raises a raw `RangeError` on an accepted chunk with many findings. The shared helper leaves its session accepting. |
-| P2 | [#238: unknown registry states](https://github.com/redact-secret/redact-secret/issues/238) | Failed registry queries become `unpublished` in release records; crate/PyPI recovery can also infer absence from non-200 responses. |
-| P3 | [#239: stale current-facing prose](https://github.com/redact-secret/redact-secret/issues/239) | Current architecture/workflow comments describe completed assessment and recovery work as absent, and reference obsolete branch/publication state. |
+| P2 (closed) | [#236: finding accumulation](https://github.com/redact-secret/redact-secret/issues/236) | Shared stream accumulation no longer uses argument spread; helper and installed-artifact regressions cover dense finding sets. |
+| P2 (closed) | [#238: unknown registry states](https://github.com/redact-secret/redact-secret/issues/238) | Registry lookup failures remain `unknown` and block release/recovery plans; deterministic tests cover npm, crates.io, and PyPI failures. |
+| P3 (closed) | [#239: stale current-facing prose](https://github.com/redact-secret/redact-secret/issues/239) | Current architecture, release documentation, and workflow comments were reconciled with the implemented behavior. |
 
-Open P1 findings mean address before the next release; P2 means a reproducible
-correctness or operational defect requiring a fix or explicit disposition; P3 is
-maintenance work. Issue bodies contain pinned source links, triggers, and
-acceptance criteria. No detector or runtime implementation was changed as part
-of this audit.
+No finding from this audit remains open. The issue bodies and merged fixes retain
+the pinned triggers, acceptance criteria, and regression evidence. Candidate
+qualification must still be run from the frozen RC revision.
 
 ## Reproduction evidence
 
@@ -71,9 +68,9 @@ The Node probes use a freshly compiled addon. Browser impact follows the shared
 wrapper/decoder source; this audit did not reproduce these new cases in all
 three browser engines. Those real-artifact regressions remain issue acceptance
 criteria. PyPI recovery and registry-error probes use synthetic metadata and
-offline stubs, not uploads or live outage simulation. The BOM and PyPI recovery
-defects have since been fixed on the refreshed base; the registry-error probe
-still covers open issue #238.
+offline stubs, not uploads or live outage simulation. The BOM, dense-finding,
+PyPI recovery, and registry-state defects have since been fixed on the refreshed
+base. The probes remain historical reproduction evidence for the reviewed failures.
 
 ## Existing verification
 
@@ -87,13 +84,13 @@ Passed locally against the reviewed implementation:
 - `cargo clippy --workspace --all-targets --locked -- -D warnings`.
 - Fresh Node and Python debug builds used by the probes above.
 
-The reviewed head's [SAST run](https://github.com/redact-secret/redact-secret/actions/runs/34781471881)
-was successful when checked. Its
-[artifact qualification run](https://github.com/redact-secret/redact-secret/actions/runs/34781471951)
-was initially running and was confirmed completed successfully at the final
-check, with the exact reviewed `headSha`. This is existing remote qualification
-evidence; it does not cover the newly reproduced cases. No new workflow was
-dispatched for this audit.
+The final reviewed head's [SAST run](https://github.com/redact-secret/redact-secret/actions/runs/34789837241)
+and [artifact qualification run](https://github.com/redact-secret/redact-secret/actions/runs/34789837423)
+completed successfully with exact `headSha`
+`41637bd5f434e6c2c4b423a09a9b11162179bcfa`. Artifact qualification completed
+49 jobs with no failure and includes the installed Node, browser, Python wheel,
+native addon, CLI, and inventory lanes. This integration-commit evidence does
+not replace qualification and rehearsal of the prepared RC revision.
 
 The full Python installed-wheel suite, browser engine matrix, foreign native
 targets, fresh advisory scan, and live publisher permissions were not rerun
@@ -114,9 +111,7 @@ work, implemented multi-registry recovery described as absent, and outdated
 publication/ancestry statements. Historical dated audits remain historical.
 Hashing the beta.1 candidate review is not a beta.2 API sign-off.
 
-The new release runbook consolidates actual procedures, notes current recovery
-limitations, and links beta.1 publication evidence. The contribution guide and
-documentation navigation now point to it. All six findings were filed as new
-issues after checking that no open issue already covered them; #234, #235, and
-#237 are now closed on the refreshed base. No version, branch, tag, release,
-package publication, or repository setting was changed.
+The release runbook consolidates the current procedures and links beta.1
+publication evidence. All six findings are closed on the final reviewed base.
+Version `0.1.0-beta.2` is approved for candidate preparation only; this review
+does not authorize publication, tagging, deployment, or release reconciliation.
