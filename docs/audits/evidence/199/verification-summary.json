@@ -1,0 +1,81 @@
+{
+  "issue": 199,
+  "source_revision": "5607de8973ddb83f9b61f840f67eb8534d5cea0d",
+  "recorded_on": "2026-09-13",
+  "development_version": "0.1.0-beta.1",
+  "review_host": {
+    "os": "macOS arm64 (Darwin 25.5.0)",
+    "rust": "1.98.1",
+    "node": "22.16.0",
+    "python_qualification": "CPython 3.14"
+  },
+  "corpus": {
+    "synchronous-corpus.json": {
+      "sha256": "27beff0ae10480c0e10f840be56f9cf07a2f76fa3a94b4af3c91d68ac0cc30a5",
+      "fixtures": 399,
+      "supported": 297,
+      "intentionally_unsupported": 102
+    },
+    "incremental-corpus.json": {
+      "sha256": "ce6fe020a9eb5c343ff1fbbeaeef9b8395419f4ad8cd292f7a60606d4c02d64d",
+      "fixtures": 16
+    },
+    "incremental-lifecycle-corpus.json": {
+      "sha256": "596ead5a9f3e775e303a2daddb5ff16f88865169d299f97ad6a2e0f10ffb2873",
+      "fixtures": 11
+    },
+    "unicode-conversion-corpus.json": {
+      "sha256": "15760b9f56f8f6cee0ba0d9c24bd4513114792b25072a0a90048ea7eb6244565",
+      "fixtures": 6
+    },
+    "error-codes.json": {
+      "sha256": "8871993fec427032b0df4f80b9090baebcb49a11779384b6eb2b64332830044a",
+      "codes": 15
+    }
+  },
+  "current_host_artifacts": {
+    "node_addon": {
+      "file": "bindings/node/redact-secret.darwin-arm64.node",
+      "sha256": "b8445d0f8bb4d92fcfd52a2035095754822ee38c495c19ec1e7ff19dce3e2407",
+      "result": "addon smoke and lifecycle checks, synchronous corpus, package API, and Node stream adapter passed"
+    },
+    "browser_wasm": {
+      "file": "bindings/wasm/pkg/redact_secret_wasm_bg.wasm",
+      "sha256": "c4728f456447329d3d39f4f7c7b560c7437e5c139b0018e133200b34af496e5c",
+      "result": "27 checks passed in each of Chromium, Firefox, and WebKit"
+    },
+    "python_wheel": {
+      "file": "dist/redact_secret-0.1.0b1-cp310-abi3-macosx_11_0_arm64.whl",
+      "sha256": "01db2163637d951c1e982cfae5769fcd531fd0d8c16aa506bec53c58468373ec",
+      "result": "no-index binary install, CPython 3.14 smoke, and 601 tests passed"
+    },
+    "cli": {
+      "file": "target/release/redact-secret",
+      "sha256": "c6cc9965aa2257a95fa9e681b3dc1958ef6ca8fae73f22da4e17196b13c4492b",
+      "result": "identity, exit codes, synchronous corpus, and redaction passed"
+    }
+  },
+  "checks": {
+    "npm_run_ci": "passed; 0 policy/check errors, 34 conformance schema tests, 73 assessment tests, and 110 JavaScript tests passed",
+    "cargo_test": "472 passed in 20 suites",
+    "cargo_clippy": "no issues found",
+    "node_artifact_qualification": "passed on Node 22 macOS arm64",
+    "browser_artifact_qualification": "passed in Chromium, Firefox, and WebKit",
+    "python_artifact_qualification": "601 passed on installed wheel",
+    "cli_artifact_qualification": "passed on macOS arm64"
+  },
+  "prior_full_matrix": {
+    "source_revision": "9f02fc401525381a6b02b5dd514a68df9a4f9531",
+    "workflow_run": "https://github.com/redact-secret/redact-secret/actions/runs/34615840860",
+    "jobs": 41,
+    "artifact_files": 43,
+    "passed": true,
+    "is_current_revision_evidence": false,
+    "reason": "The current synchronous corpus hash differs from the rehearsal inventory; issue #203 owns the formal same-revision RC run."
+  },
+  "follow_up_issues": [180, 200, 201, 202, 203, 204, 224],
+  "new_follow_up_issue": 224,
+  "candidate_version_approved": false,
+  "release_authorized": false,
+  "published": false
+}

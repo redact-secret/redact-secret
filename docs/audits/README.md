@@ -11,6 +11,7 @@ and its [cross-platform qualification follow-up](release-qualification-follow-up
 
 | Topic | Evidence |
 | --- | --- |
+| Public contract and cross-runtime conformance | [Current contract review](public-contract-cross-runtime-conformance.md) |
 | Candidate identity and public contract | [Review and version-approval status](candidate-public-contract-review.md) |
 | Rust migration acceptance | [Closed-issue ledger](closed-issue-acceptance-evidence-ledger.md) |
 | Core and CLI | [Boundary review](core-conformance-cli-boundary-review.md) |
