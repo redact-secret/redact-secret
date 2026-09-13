@@ -18,7 +18,10 @@ text. It does not determine whether a credential is active, expired, or valid.
 This is a family overview, not a promise to match every token each provider
 issues. Exact supported grammars and evidence are recorded in the
 [coverage report](../coverage/coverage-report.md) and
-[conformance corpus](../../conformance/README.md).
+[conformance corpus](../../conformance/README.md). The bounded, source-identified
+[detection reliability assessment](detection-reliability.md) publishes its
+denominators, results, and limitations without turning them into a universal
+accuracy claim.
 
 ## False positives and false negatives
 
