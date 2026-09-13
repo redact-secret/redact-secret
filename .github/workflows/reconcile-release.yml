@@ -371,9 +371,13 @@ jobs:
           print(module.policy()['python-distribution'], module.pep440_version(cargo_version))
           ")
 
-          status=$(curl -sS -A "redact-secret-release (https://github.com/redact-secret/redact-secret)" -o /dev/null -w '%{http_code}' "https://pypi.org/pypi/$name/$version/json")
-          if [[ "$status" == "200" ]]; then
-            python3 -B scripts/verify-recovery-artifact.py --inventory original-inventory/artifact-inventory.json --pypi "$name" --version "$version"
+          python3 -B scripts/verify-recovery-artifact.py \
+            --inventory original-inventory/artifact-inventory.json \
+            --pypi "$name" \
+            --version "$version" \
+            --pypi-report pypi-state.json
+          pypi_status=$(python3 -B -c "import json; print(json.load(open('pypi-state.json'))['status'])")
+          if [[ "$pypi_status" == "complete" ]]; then
             echo "$name@$version matches every qualified file on PyPI; nothing to reconcile."
             echo "needs_publish=false" >> "$GITHUB_OUTPUT"
             exit 0
@@ -386,9 +390,14 @@ jobs:
           fi
           find reconcile-dist -mindepth 2 -type f -exec mv -t reconcile-dist {} +
           find reconcile-dist -mindepth 1 -maxdepth 1 -type d -empty -delete
+          python3 -B scripts/verify-recovery-artifact.py \
+            --inventory original-inventory/artifact-inventory.json \
+            --pypi-report pypi-state.json \
+            --stage-pypi-missing reconcile-dist
 
           if [[ "${{ inputs.dry_run }}" == "true" ]]; then
             echo "dry run: would publish $(find reconcile-dist -type f | wc -l) file(s) to PyPI as $name@$version."
+            find reconcile-dist -maxdepth 1 -type f -printf 'dry run: missing PyPI file %f\n' | sort
             echo "needs_publish=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi

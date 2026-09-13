@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import hashlib
 import importlib.util
+import io
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -9,6 +11,7 @@ from pathlib import Path
 SCRIPT = Path(__file__).resolve().parents[1] / "verify-recovery-artifact.py"
 SPEC = importlib.util.spec_from_file_location("verify_recovery_artifact", SCRIPT)
 CHECK = importlib.util.module_from_spec(SPEC)
+sys.modules[SPEC.name] = CHECK
 SPEC.loader.exec_module(CHECK)
 
 
@@ -30,10 +33,92 @@ class RecoveryArtifactTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 CHECK.verify_files(inventory, "addon", root)
 
-    def test_pypi_requires_exact_file_set_and_checksums(self):
+    def test_pypi_distinguishes_complete_partial_absent_and_conflict(self):
         inventory = {"artifacts": [{"file": "synthetic.whl", "sha256": "a" * 64}, {"file": "synthetic.tar.gz", "sha256": "b" * 64}]}
         files = [{"filename": item["file"], "digests": {"sha256": item["sha256"]}} for item in inventory["artifacts"]]
-        CHECK.verify_pypi(inventory, {"urls": files})
-        for bad in ([], files[:1], files + [{"filename": "extra.whl", "digests": {"sha256": "c" * 64}}], [{"filename": "synthetic.whl", "digests": {"sha256": "d" * 64}}, files[1]]):
-            with self.subTest(files=bad), self.assertRaises(ValueError):
-                CHECK.verify_pypi(inventory, {"urls": bad})
+
+        complete = CHECK.verify_pypi(inventory, {"urls": files})
+        self.assertEqual(complete.status, "complete")
+        self.assertEqual(complete.missing_files, [])
+
+        partial = CHECK.verify_pypi(inventory, {"urls": files[:1]})
+        self.assertEqual(partial.status, "partial")
+        self.assertEqual(partial.existing_files, ["synthetic.whl"])
+        self.assertEqual(partial.missing_files, ["synthetic.tar.gz"])
+
+        absent = CHECK.pypi_absent(inventory)
+        self.assertEqual(absent.status, "absent")
+        self.assertEqual(absent.missing_files, ["synthetic.tar.gz", "synthetic.whl"])
+
+        conflicts = (
+            files + [{"filename": "extra.whl", "digests": {"sha256": "c" * 64}}],
+            [{"filename": "synthetic.whl", "digests": {"sha256": "d" * 64}}, files[1]],
+        )
+        for bad in conflicts:
+            with self.subTest(files=bad):
+                state = CHECK.verify_pypi(inventory, {"urls": bad})
+                self.assertEqual(state.status, "conflict")
+
+    def test_pypi_unobservable_state_is_not_publishable(self):
+        state = CHECK.pypi_unobservable("synthetic registry failure")
+        self.assertEqual(state.status, "unobservable")
+        self.assertEqual(state.reason, "synthetic registry failure")
+
+    def test_pypi_http_errors_other_than_404_are_unobservable(self):
+        inventory = {"artifacts": [{"file": "synthetic.whl", "sha256": "a" * 64}]}
+        original_urlopen = CHECK.urlopen
+
+        def fail_with_server_error(*_args, **_kwargs):
+            raise CHECK.HTTPError("https://pypi.example.invalid", 503, "unavailable", {}, io.BytesIO())
+
+        try:
+            CHECK.urlopen = fail_with_server_error
+            state = CHECK.fetch_pypi_state(inventory, "synthetic-project", "synthetic-version")
+        finally:
+            CHECK.urlopen = original_urlopen
+
+        self.assertEqual(state.status, "unobservable")
+        self.assertEqual(state.reason, "PyPI returned HTTP 503")
+
+    def test_partial_pypi_recovery_stages_only_missing_verified_files(self):
+        wheel = b"synthetic wheel bytes"
+        sdist = b"synthetic sdist bytes"
+        inventory = {
+            "artifacts": [
+                {"file": "synthetic.whl", "bytes": len(wheel), "sha256": hashlib.sha256(wheel).hexdigest()},
+                {"file": "synthetic.tar.gz", "bytes": len(sdist), "sha256": hashlib.sha256(sdist).hexdigest()},
+            ]
+        }
+        state = CHECK.verify_pypi(
+            inventory,
+            {"urls": [{"filename": "synthetic.whl", "digests": {"sha256": hashlib.sha256(wheel).hexdigest()}}]},
+        )
+        self.assertEqual(state.status, "partial")
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "synthetic.whl").write_bytes(wheel)
+            (root / "synthetic.tar.gz").write_bytes(sdist)
+
+            CHECK.stage_missing_pypi_files(inventory, state, root)
+
+            self.assertFalse((root / "synthetic.whl").exists())
+            self.assertEqual((root / "synthetic.tar.gz").read_bytes(), sdist)
+
+    def test_partial_pypi_recovery_rejects_unavailable_original_files(self):
+        wheel = b"synthetic wheel bytes"
+        sdist = b"synthetic sdist bytes"
+        inventory = {
+            "artifacts": [
+                {"file": "synthetic.whl", "bytes": len(wheel), "sha256": hashlib.sha256(wheel).hexdigest()},
+                {"file": "synthetic.tar.gz", "bytes": len(sdist), "sha256": hashlib.sha256(sdist).hexdigest()},
+            ]
+        }
+        state = CHECK.verify_pypi(
+            inventory,
+            {"urls": [{"filename": "synthetic.whl", "digests": {"sha256": hashlib.sha256(wheel).hexdigest()}}]},
+        )
+
+        with tempfile.TemporaryDirectory() as tmp:
+            with self.assertRaises(ValueError):
+                CHECK.stage_missing_pypi_files(inventory, state, Path(tmp))
