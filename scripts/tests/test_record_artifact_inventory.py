@@ -317,11 +317,33 @@ class InventoryTests(unittest.TestCase):
             "productVersion": "0.1.0-beta.1",
             "artifacts": self.collect(),
             "packageContents": {"@redact-secret/core": ["dist/index.js"]},
+            "releaseReadiness": RECORD.release_readiness_record(),
         }
         summary = RECORD.render_summary(inventory)
         self.assertIn("0" * 40, summary)
         self.assertIn("Published: no", summary)
+        self.assertIn("separate approval required", summary)
+        self.assertIn("post-publication-release-workflow", summary)
         self.assertIn("dist/index.js", summary)
+
+    def test_release_readiness_record_pins_review_and_registry_boundaries(self) -> None:
+        record = RECORD.release_readiness_record()
+        self.assertEqual(record["issue"], 203)
+        review = record["publicApiAndChangelogReview"]
+        self.assertEqual(review["status"], "required-before-release-approval")
+        self.assertEqual(
+            review["publicApiReview"]["path"],
+            "docs/audits/candidate-public-contract-review.md",
+        )
+        self.assertRegex(review["publicApiReview"]["sha256"], r"^[0-9a-f]{64}$")
+        self.assertEqual(review["changelog"]["path"], "CHANGELOG.md")
+        self.assertRegex(review["changelog"]["sha256"], r"^[0-9a-f]{64}$")
+        registry = record["registryInstallVerification"]
+        self.assertEqual(registry["status"], "post-publication-release-workflow")
+        self.assertEqual(registry["verifier"], "scripts/verify-registry-install.mjs")
+        self.assertEqual(
+            registry["authorization"], "separate release approval required"
+        )
 
 
 if __name__ == "__main__":

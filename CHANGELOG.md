@@ -5,6 +5,10 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+- Artifact qualification inventories now carry release-readiness pointers for
+  the public API/changelog review and the post-publication registry-install
+  verification boundary, keeping issue #203 evidence tied to one source
+  revision without granting release authority.
 - Executable browser and server integration examples now demonstrate
   preventive client scanning, authoritative block and warning enforcement,
   fail-closed downstream handling, and explicit transport, input, output,

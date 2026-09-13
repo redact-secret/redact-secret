@@ -45,6 +45,10 @@ FIXTURES = ROOT / "conformance" / "fixtures"
 
 NPM_PACKAGE = Path("packages") / "javascript"
 CRATE = "redact-secret"
+PUBLIC_API_REVIEW = Path("docs/audits/candidate-public-contract-review.md")
+CHANGELOG = Path("CHANGELOG.md")
+RELEASE_WORKFLOW = Path(".github/workflows/release.yml")
+REGISTRY_INSTALL_VERIFIER = Path("scripts/verify-registry-install.mjs")
 
 
 def declared_matrix() -> dict:
@@ -303,6 +307,32 @@ def incremental_corpus_fixture_count() -> int:
     return len(fixtures) if isinstance(fixtures, list) else 0
 
 
+def release_readiness_record() -> dict:
+    """Record the non-artifact review and post-publication boundaries."""
+    return {
+        "issue": 203,
+        "publicApiAndChangelogReview": {
+            "status": "required-before-release-approval",
+            "publicApiReview": {
+                "path": str(PUBLIC_API_REVIEW),
+                "sha256": digest(ROOT / PUBLIC_API_REVIEW),
+            },
+            "changelog": {
+                "path": str(CHANGELOG),
+                "sha256": digest(ROOT / CHANGELOG),
+            },
+        },
+        "registryInstallVerification": {
+            "status": "post-publication-release-workflow",
+            "workflow": str(RELEASE_WORKFLOW),
+            "verifier": str(REGISTRY_INSTALL_VERIFIER),
+            "nodeTargets": "declared node-publish-targets",
+            "browserLane": "chromium",
+            "authorization": "separate release approval required",
+        },
+    }
+
+
 def render_summary(inventory: dict) -> str:
     lines = [
         "## Qualification matrix",
@@ -311,6 +341,7 @@ def render_summary(inventory: dict) -> str:
         f"- Product version: `{inventory['productVersion']}`",
         f"- Artifacts: {len(inventory['artifacts'])} file(s)",
         "- Published: no",
+        "- Release authority: separate approval required",
         "",
         "| Family | Target | File | Bytes | SHA-256 |",
         "| --- | --- | --- | ---: | --- |",
@@ -338,6 +369,21 @@ def render_summary(inventory: dict) -> str:
             f"({corpus.get('fixtureCount', '?')} fixtures) | "
             f"{result['results']['stream']} | "
             f"`{result['reportSha256'][:16]}…` |"
+        )
+    readiness = inventory.get("releaseReadiness", {})
+    review = readiness.get("publicApiAndChangelogReview", {})
+    registry = readiness.get("registryInstallVerification", {})
+    if review or registry:
+        lines.extend(
+            [
+                "",
+                "### Release readiness boundaries",
+                "",
+                f"- Public API/changelog review: {review.get('status', 'not recorded')}",
+                f"- Registry install verification: {registry.get('status', 'not recorded')}",
+                f"- Registry verifier: `{registry.get('verifier', 'not recorded')}`",
+                "- This inventory does not authorize publication, tagging, deployment, or release approval.",
+            ]
         )
     lines.append("")
     for package, files in inventory["packageContents"].items():
@@ -401,6 +447,7 @@ def main() -> int:
         },
         "artifacts": collected,
         "installedJavaScriptQualification": qualification,
+        "releaseReadiness": release_readiness_record(),
     }
 
     arguments.out.write_text(json.dumps(inventory, indent=2) + "\n", encoding="utf-8")
