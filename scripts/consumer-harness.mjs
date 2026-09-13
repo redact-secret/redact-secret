@@ -33,21 +33,185 @@ const MIME_TYPES = {
   ".wasm": "application/wasm",
 };
 
+const INCREMENTAL_CORPUS_HELPERS = String.raw`
+const qualificationEncoder = new TextEncoder();
+const qualificationDecoder = new TextDecoder();
+
+function assertQualification(condition, message) {
+  if (!condition) throw new Error(message);
+}
+
+function assertQualificationEqual(actual, expected, message) {
+  const left = JSON.stringify(actual);
+  const right = JSON.stringify(expected);
+  if (left !== right) throw new Error(message + ": expected " + right + ", got " + left);
+}
+
+function byteOffsetToCodeUnitOffset(text, byteOffset) {
+  let bytes = 0;
+  let codeUnits = 0;
+  for (const character of text) {
+    if (bytes === byteOffset) return codeUnits;
+    const nextBytes = bytes + qualificationEncoder.encode(character).length;
+    if (nextBytes > byteOffset) {
+      throw new Error("byte offset splits a UTF-8 sequence");
+    }
+    bytes = nextBytes;
+    codeUnits += character.length;
+  }
+  if (bytes === byteOffset) return codeUnits;
+  throw new Error("byte offset is outside the input");
+}
+
+function expectedMetadata(fixture) {
+  return fixture.expected.map((entry, index) => ({
+    id: "finding-" + (index + 1),
+    detector: entry.detector,
+    type: entry.type,
+    confidence: entry.confidence,
+    start: byteOffsetToCodeUnitOffsetForFixture(fixture, entry.start),
+    end: byteOffsetToCodeUnitOffsetForFixture(fixture, entry.end),
+  }));
+}
+
+function byteOffsetToCodeUnitOffsetForFixture(fixture, byteOffset) {
+  try {
+    return byteOffsetToCodeUnitOffset(fixture.input, byteOffset);
+  } catch (error) {
+    throw new Error(fixture.id + ": invalid expected byte offset " + byteOffset + ": " + String(error && error.message || error));
+  }
+}
+
+function comparableFinding(finding) {
+  return {
+    id: finding.id,
+    detector: finding.detector,
+    type: finding.type,
+    confidence: finding.confidence,
+    action: finding.action,
+    start: finding.start,
+    end: finding.end,
+  };
+}
+
+function compareRun(label, actual, expected) {
+  assertQualificationEqual(actual.text, expected.text, label + ": concatenated text");
+  assertQualificationEqual(
+    actual.findings.map(comparableFinding),
+    expected.findings.map(comparableFinding),
+    label + ": findings, actions, ordering, identifiers, and absolute ranges",
+  );
+}
+
+function runStringPartition(api, chunks, limits) {
+  const session = api.createIncrementalSanitizer({ limits });
+  let text = "";
+  const findings = [];
+  for (const chunk of chunks) {
+    const result = session.append(chunk);
+    text += result.text;
+    findings.push(...result.findings);
+  }
+  const finalized = session.finalize();
+  text += finalized.text;
+  findings.push(...finalized.findings);
+  return { text, findings };
+}
+
+function isValidStringBoundary(input, index) {
+  if (index <= 0 || index >= input.length) return true;
+  const before = input.charCodeAt(index - 1);
+  const after = input.charCodeAt(index);
+  return !(before >= 0xd800 && before <= 0xdbff && after >= 0xdc00 && after <= 0xdfff);
+}
+
+async function qualifyIncrementalCorpus(api, corpus, sanitizeByteChunks, limits) {
+  assertQualification(corpus.offsetUnit === "utf8-byte", "incremental corpus offset unit changed");
+  assertQualification(corpus.fixtures.length >= 16, "incremental corpus unexpectedly shrank");
+  const summary = {
+    fixtures: corpus.fixtures.length,
+    stringPartitions: 0,
+    bytePartitions: 0,
+    findings: 0,
+  };
+
+  for (const fixture of corpus.fixtures) {
+    const reference = api.scanAndRedact(fixture.input);
+    assertQualificationEqual(reference.text, fixture.text, fixture.id + ": canonical redacted text");
+    const metadata = expectedMetadata(fixture);
+    assertQualificationEqual(
+      reference.findings.map(({ id, detector, type, confidence, start, end }) => ({
+        id,
+        detector,
+        type,
+        confidence,
+        start,
+        end,
+      })),
+      metadata,
+      fixture.id + ": canonical finding metadata",
+    );
+    summary.findings += reference.findings.length;
+
+    for (let boundary = 0; boundary <= fixture.input.length; boundary += 1) {
+      if (!isValidStringBoundary(fixture.input, boundary)) continue;
+      compareRun(
+        fixture.id + " valid UTF-16 boundary " + boundary,
+        runStringPartition(api, [
+          fixture.input.slice(0, boundary),
+          fixture.input.slice(boundary),
+        ], limits),
+        reference,
+      );
+      summary.stringPartitions += 1;
+    }
+    compareRun(
+      fixture.id + " one chunk per valid UTF-16 segment",
+      runStringPartition(api, Array.from(fixture.input), limits),
+      reference,
+    );
+    summary.stringPartitions += 1;
+
+    const bytes = qualificationEncoder.encode(fixture.input);
+    for (let boundary = 0; boundary <= bytes.length; boundary += 1) {
+      compareRun(
+        fixture.id + " UTF-8 byte boundary " + boundary,
+        await sanitizeByteChunks([bytes.slice(0, boundary), bytes.slice(boundary)]),
+        reference,
+      );
+      summary.bytePartitions += 1;
+    }
+    compareRun(
+      fixture.id + " one chunk per UTF-8 byte",
+      await sanitizeByteChunks(
+        Array.from({ length: bytes.length }, (_, index) => bytes.slice(index, index + 1)),
+      ),
+      reference,
+    );
+    summary.bytePartitions += 1;
+  }
+  return summary;
+}
+`;
+
 export function qualifyNode(
   consumerRoot,
   fixture,
   expectedVersion,
   integrationFixtures,
+  incrementalCorpus,
 ) {
   const source = [
     "const { Readable } = await import('node:stream');",
     "const { createIncrementalSanitizer, initialize, scan, scanAndRedact, VERSION } = await import('@redact-secret/core');",
     "const { createNodeStreamSanitizer } = await import('@redact-secret/core/node-stream');",
     "const { createServerHandler } = await import('./safe-integration/server.mjs');",
+    INCREMENTAL_CORPUS_HELPERS,
     "await initialize();",
     "const fixtureInput = process.env.REDACT_SECRET_QUALIFICATION_INPUT;",
     "if (fixtureInput === undefined) throw new Error('qualification input is missing');",
     "const integrationFixtures = JSON.parse(process.env.REDACT_SECRET_INTEGRATION_FIXTURES);",
+    "const incrementalCorpus = JSON.parse(process.env.REDACT_SECRET_INCREMENTAL_CORPUS);",
     "const findings = scan(fixtureInput);",
     `const limits = ${JSON.stringify(LIMITS)};`,
     "const incrementalInput = `${fixtureInput}\n`;",
@@ -61,6 +225,13 @@ export function qualifyNode(
     "const output = [];",
     "for await (const chunk of Readable.from([encoded.subarray(0, 1), encoded.subarray(1)]).pipe(transform)) output.push(chunk);",
     "const streamText = Buffer.concat(output).toString('utf8');",
+    "async function sanitizeByteChunks(chunks) {",
+    "  const transform = createNodeStreamSanitizer({ limits });",
+    "  const byteOutput = [];",
+    "  for await (const chunk of Readable.from(chunks).pipe(transform)) byteOutput.push(chunk);",
+    "  return { text: Buffer.concat(byteOutput).toString('utf8'), findings: transform.findings };",
+    "}",
+    "const incrementalCorpusSummary = await qualifyIncrementalCorpus({ createIncrementalSanitizer, scanAndRedact }, incrementalCorpus, sanitizeByteChunks, limits);",
     "const forwarded = [];",
     "const events = [];",
     "const body = (content) => new TextEncoder().encode(JSON.stringify({ content }));",
@@ -75,7 +246,7 @@ export function qualifyNode(
     "const eventText = JSON.stringify(events);",
     "const redactedMatch = integrationFixtures.redact.slice(redacted.findings[0].start, redacted.findings[0].end);",
     "const safeIntegration = { clean: clean.code === 'OK', redacted: redacted.code === 'OK' && forwarded[1] !== integrationFixtures.redact && !forwarded[1].includes(redactedMatch), warned: warned.code === 'SECRET_WARNING', blocked: blocked.code === 'SECRET_BLOCKED', failedClosed: failed.code === 'SCAN_FAILED', limited: limited.code === 'TRANSPORT_LIMIT_EXCEEDED', downstreamCalls: forwarded.length === 2, safeEvents: !Object.values(integrationFixtures).some((input) => eventText.includes(input)) };",
-    "console.log(JSON.stringify({ version: VERSION, findings, incremental: incrementalText === expectedIncrementalText, stream: streamText === scanAndRedact(streamInput).text, streamFindings: transform.findings.length, safeIntegration }));",
+    "console.log(JSON.stringify({ version: VERSION, findings, incremental: incrementalText === expectedIncrementalText, incrementalCorpus: incrementalCorpusSummary, stream: streamText === scanAndRedact(streamInput).text, streamFindings: transform.findings.length, safeIntegration }));",
   ].join("\n");
   const output = execFileSync(
     process.execPath,
@@ -91,6 +262,7 @@ export function qualifyNode(
             Object.entries(integrationFixtures).map(([kind, entry]) => [kind, entry.input]),
           ),
         ),
+        REDACT_SECRET_INCREMENTAL_CORPUS: JSON.stringify(incrementalCorpus),
       },
     },
   );
@@ -109,6 +281,11 @@ export function qualifyNode(
   if (!result.incremental || !result.stream || result.streamFindings < 1) {
     throw new Error("Node lane: installed incremental or stream API diverged");
   }
+  if (result.incrementalCorpus?.fixtures !== incrementalCorpus.fixtures.length) {
+    throw new Error(
+      `Node lane: incremental corpus replay was incomplete: ${JSON.stringify(result.incrementalCorpus)}`,
+    );
+  }
   if (
     Object.values(result.safeIntegration ?? {}).length !== 8 ||
     !Object.values(result.safeIntegration).every(Boolean)
@@ -121,8 +298,10 @@ export function qualifyNode(
     initialize: "passed",
     scan: "passed",
     incremental: "passed",
+    incrementalCorpus: "passed",
     stream: "passed",
     safeIntegration: "passed",
+    incrementalCorpusSummary: result.incrementalCorpus,
   };
 }
 
@@ -131,6 +310,18 @@ async function bundleForBrowser(consumerRoot) {
     bundle: true,
     format: "esm",
     platform: "browser",
+    conditions: ["browser", "import"],
+    alias: {
+      "#native": join(
+        consumerRoot,
+        "node_modules",
+        "@redact-secret",
+        "core",
+        "dist",
+        "runtime",
+        "browser.js",
+      ),
+    },
     external: [WASM_SPECIFIER],
     stdin: {
       contents: [
@@ -157,19 +348,23 @@ async function writeHarness(
   installedWasmDir,
   fixture,
   integrationFixtures,
+  incrementalCorpus,
 ) {
   await writeFile(join(root, "bundle.js"), bundleText);
   await cp(installedWasmDir, join(root, "wasm"), { recursive: true });
   const importMap = { imports: { [WASM_SPECIFIER]: "/wasm/redact_secret_wasm.js" } };
   const html = `<!doctype html>
+<meta charset="utf-8">
 <script type="importmap">${JSON.stringify(importMap)}</script>
 <script type="module">
   import "/bundle.js";
+  ${INCREMENTAL_CORPUS_HELPERS}
   (async () => {
     try {
       await window.__secretScan.initialize();
       const findings = window.__secretScan.scan(${JSON.stringify(fixture.input)});
       const limits = ${JSON.stringify(LIMITS)};
+      const incrementalCorpus = ${JSON.stringify(incrementalCorpus)};
       const incrementalInput = ${JSON.stringify(`${fixture.input}\n`)};
       const split = Math.floor(incrementalInput.length / 2);
       const session = window.__secretScan.createIncrementalSanitizer({ limits });
@@ -194,6 +389,24 @@ async function writeHarness(
         output.push(value);
       }
       const streamText = output.join("");
+      async function sanitizeByteChunks(chunks) {
+        const source = new ReadableStream({
+          start(controller) {
+            for (const chunk of chunks) controller.enqueue(chunk);
+            controller.close();
+          },
+        });
+        const byteTransform = window.__secretScan.createWebStreamSanitizer({ limits });
+        const byteReader = source.pipeThrough(byteTransform).getReader();
+        const byteOutput = [];
+        while (true) {
+          const { done, value } = await byteReader.read();
+          if (done) break;
+          byteOutput.push(value);
+        }
+        return { text: byteOutput.join(""), findings: byteTransform.findings };
+      }
+      const incrementalCorpusSummary = await qualifyIncrementalCorpus(window.__secretScan, incrementalCorpus, sanitizeByteChunks, limits);
       const integrationInputs = ${JSON.stringify(
         Object.fromEntries(
           Object.entries(integrationFixtures).map(([kind, entry]) => [kind, entry.input]),
@@ -218,6 +431,7 @@ async function writeHarness(
         version: window.__secretScan.VERSION,
         findings,
         incremental: incrementalText === window.__secretScan.scanAndRedact(incrementalInput).text,
+        incrementalCorpus: incrementalCorpusSummary,
         stream: streamText === window.__secretScan.scanAndRedact(streamInput).text,
         streamFindings: transform.findings.length,
         safeIntegration,
@@ -251,6 +465,7 @@ export async function qualifyBrowser(
   expectedVersion,
   engine = "chromium",
   integrationFixtures,
+  incrementalCorpus,
 ) {
   const bundleText = await bundleForBrowser(consumerRoot);
   const harnessRoot = await mkdtemp(join(tmpdir(), "redact-secret-consumer-browser-"));
@@ -269,6 +484,7 @@ export async function qualifyBrowser(
       join(consumerRoot, "node_modules", WASM_SPECIFIER),
       fixture,
       integrationFixtures,
+      incrementalCorpus,
     );
 
     server = serveDirectory(harnessRoot);
@@ -308,6 +524,11 @@ export async function qualifyBrowser(
         `Browser lane (${engine}): installed incremental or stream API diverged`,
       );
     }
+    if (result.incrementalCorpus?.fixtures !== incrementalCorpus.fixtures.length) {
+      throw new Error(
+        `Browser lane (${engine}): incremental corpus replay was incomplete: ${JSON.stringify(result.incrementalCorpus)}`,
+      );
+    }
     if (
       Object.values(result.safeIntegration ?? {}).length !== 4 ||
       !Object.values(result.safeIntegration).every(Boolean)
@@ -320,8 +541,10 @@ export async function qualifyBrowser(
       initialize: "passed",
       scan: "passed",
       incremental: "passed",
+      incrementalCorpus: "passed",
       stream: "passed",
       safeIntegration: "passed",
+      incrementalCorpusSummary: result.incrementalCorpus,
       engine,
       engineVersion: browser.version(),
     };

@@ -143,6 +143,8 @@ def require_installed_javascript_qualification(
     matrix: dict, results: list[dict], expected_commit: str, expected_version: str
 ) -> list[str]:
     errors: list[str] = []
+    incremental_hash = corpus_identity().get("incremental-corpus.json")
+    incremental_count = incremental_corpus_fixture_count()
     expected = {
         "node": {str(value) for value in matrix["node-support-majors"]},
         "browser": set(matrix["browser-engines"]),
@@ -174,9 +176,18 @@ def require_installed_javascript_qualification(
         if not result.get("commands"):
             errors.append(f"{label}: records no commands")
         checks = result.get("results") or {}
-        for check in ("initialize", "scan", "incremental", "stream"):
+        for check in ("initialize", "scan", "incremental", "incrementalCorpus", "stream"):
             if checks.get(check) != "passed":
                 errors.append(f"{label}: {check} did not pass")
+        corpus = result.get("incrementalCorpus") or {}
+        if corpus.get("path") != "conformance/fixtures/incremental-corpus.json":
+            errors.append(f"{label}: incremental corpus path is incomplete")
+        if corpus.get("sha256") != incremental_hash:
+            errors.append(f"{label}: incremental corpus hash does not match the inventory")
+        if corpus.get("offsetUnit") != "utf8-byte":
+            errors.append(f"{label}: incremental corpus offset unit is invalid")
+        if corpus.get("fixtureCount") != incremental_count:
+            errors.append(f"{label}: incremental corpus fixture count does not match the inventory")
         packages = result.get("packageArtifacts") or []
         names = {package.get("name") for package in packages}
         if (
@@ -285,6 +296,13 @@ def corpus_identity() -> dict[str, str]:
     }
 
 
+def incremental_corpus_fixture_count() -> int:
+    with (FIXTURES / "incremental-corpus.json").open(encoding="utf-8") as handle:
+        corpus = json.load(handle)
+    fixtures = corpus.get("fixtures")
+    return len(fixtures) if isinstance(fixtures, list) else 0
+
+
 def render_summary(inventory: dict) -> str:
     lines = [
         "## Qualification matrix",
@@ -307,15 +325,18 @@ def render_summary(inventory: dict) -> str:
             "",
             "### Installed JavaScript qualification",
             "",
-            "| Lane | Runtime | Incremental | Stream | Evidence SHA-256 |",
+            "| Lane | Runtime | Incremental corpus | Stream | Evidence SHA-256 |",
             "| --- | --- | --- | --- | --- |",
         ]
     )
     for result in inventory.get("installedJavaScriptQualification", []):
         runtime = result["runtime"]
+        corpus = result.get("incrementalCorpus") or {}
         lines.append(
             f"| {result['lane']} | {runtime['name']} {runtime['version']} | "
-            f"{result['results']['incremental']} | {result['results']['stream']} | "
+            f"{result['results']['incrementalCorpus']} "
+            f"({corpus.get('fixtureCount', '?')} fixtures) | "
+            f"{result['results']['stream']} | "
             f"`{result['reportSha256'][:16]}…` |"
         )
     lines.append("")

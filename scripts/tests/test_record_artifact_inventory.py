@@ -45,7 +45,14 @@ def installed_report(lane: str, target: str) -> dict:
             "initialize": "passed",
             "scan": "passed",
             "incremental": "passed",
+            "incrementalCorpus": "passed",
             "stream": "passed",
+        },
+        "incrementalCorpus": {
+            "path": "conformance/fixtures/incremental-corpus.json",
+            "sha256": RECORD.corpus_identity()["incremental-corpus.json"],
+            "offsetUnit": "utf8-byte",
+            "fixtureCount": RECORD.incremental_corpus_fixture_count(),
         },
         "packageArtifacts": [
             {
@@ -237,6 +244,33 @@ class InventoryTests(unittest.TestCase):
             )
         self.assertEqual(
             errors, ["installed JavaScript browser webkit: stream did not pass"]
+        )
+
+    def test_missing_installed_incremental_corpus_result_fails(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Artifacts(Path(directory)).build()
+            path = (
+                root
+                / "installed-javascript-node-20"
+                / "installed-javascript-node-20.json"
+            )
+            report = json.loads(path.read_text(encoding="utf-8"))
+            del report["results"]["incrementalCorpus"]
+            del report["incrementalCorpus"]
+            path.write_text(json.dumps(report), encoding="utf-8")
+            results, errors = RECORD.collect_installed_javascript_qualification(root)
+            errors += RECORD.require_installed_javascript_qualification(
+                MATRIX, results, SOURCE_COMMIT, PRODUCT_VERSION
+            )
+        self.assertEqual(
+            errors,
+            [
+                "installed JavaScript node 20: incrementalCorpus did not pass",
+                "installed JavaScript node 20: incremental corpus path is incomplete",
+                "installed JavaScript node 20: incremental corpus hash does not match the inventory",
+                "installed JavaScript node 20: incremental corpus offset unit is invalid",
+                "installed JavaScript node 20: incremental corpus fixture count does not match the inventory",
+            ],
         )
 
     def test_an_addon_without_a_compiled_library_fails(self) -> None:
