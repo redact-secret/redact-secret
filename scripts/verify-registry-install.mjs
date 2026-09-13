@@ -20,7 +20,7 @@
  */
 
 import { execFileSync } from "node:child_process";
-import { cp, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { cp, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -37,6 +37,12 @@ const INTEGRATION_FIXTURE_IDS = Object.freeze({
   warn: "contextual-positive-minimum-length-is-medium-confidence",
   block: "private-key-positive",
 });
+const INCREMENTAL_CORPUS_PATH = join(
+  REPO_ROOT_PATH,
+  "conformance",
+  "fixtures",
+  "incremental-corpus.json",
+);
 
 function parseArgs(argv) {
   const index = argv.indexOf("--lane");
@@ -76,6 +82,10 @@ async function buildConsumerProject(version) {
   return root;
 }
 
+async function loadIncrementalCorpus() {
+  return JSON.parse(await readFile(INCREMENTAL_CORPUS_PATH, "utf8"));
+}
+
 async function main() {
   const { lane } = parseArgs(process.argv.slice(2));
   const fixture = await loadCanonicalFixture(CANONICAL_FIXTURE_ID);
@@ -88,12 +98,19 @@ async function main() {
     ),
   );
   const expectedVersion = await packageVersion();
+  const incrementalCorpus = await loadIncrementalCorpus();
 
   let consumerRoot;
   try {
     consumerRoot = await buildConsumerProject(expectedVersion);
     if (lane === "node") {
-      qualifyNode(consumerRoot, fixture, expectedVersion, integrationFixtures);
+      qualifyNode(
+        consumerRoot,
+        fixture,
+        expectedVersion,
+        integrationFixtures,
+        incrementalCorpus,
+      );
     } else {
       await qualifyBrowser(
         consumerRoot,
@@ -101,6 +118,7 @@ async function main() {
         expectedVersion,
         "chromium",
         integrationFixtures,
+        incrementalCorpus,
       );
     }
   } finally {

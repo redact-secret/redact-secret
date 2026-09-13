@@ -50,6 +50,12 @@ const JS_PACKAGE_ROOT = join(REPO_ROOT_PATH, "packages/javascript");
 const NODE_PLATFORM_ROOT = join(REPO_ROOT_PATH, "bindings/node");
 const WASM_PACKAGE_ROOT = join(REPO_ROOT_PATH, "bindings/wasm/npm");
 const SAFE_INTEGRATION_ROOT = join(REPO_ROOT_PATH, "examples/safe-integration");
+const INCREMENTAL_CORPUS_PATH = join(
+  REPO_ROOT_PATH,
+  "conformance",
+  "fixtures",
+  "incremental-corpus.json",
+);
 const INTEGRATION_FIXTURE_IDS = Object.freeze({
   redact: CANONICAL_FIXTURE_ID,
   warn: "contextual-positive-minimum-length-is-medium-confidence",
@@ -81,6 +87,18 @@ function parseArgs(argv) {
 
 async function sha256(path) {
   return createHash("sha256").update(await readFile(path)).digest("hex");
+}
+
+async function loadIncrementalCorpus() {
+  const bytes = await readFile(INCREMENTAL_CORPUS_PATH);
+  const corpus = JSON.parse(bytes.toString("utf8"));
+  return {
+    path: "conformance/fixtures/incremental-corpus.json",
+    sha256: createHash("sha256").update(bytes).digest("hex"),
+    offsetUnit: corpus.offsetUnit,
+    fixtureCount: corpus.fixtures.length,
+    corpus,
+  };
 }
 
 function sourceCommit() {
@@ -172,6 +190,7 @@ async function main() {
     ),
   );
   const expectedVersion = await packageVersion();
+  const incrementalCorpus = await loadIncrementalCorpus();
 
   const { specifier: nodeSpecifier, dir: nodePlatformDir } =
     await assembleNodePlatformPackage();
@@ -189,13 +208,20 @@ async function main() {
     consumerRoot = await buildConsumerProject(tarballs);
     const results =
       lane === "node"
-        ? qualifyNode(consumerRoot, fixture, expectedVersion, integrationFixtures)
+        ? qualifyNode(
+            consumerRoot,
+            fixture,
+            expectedVersion,
+            integrationFixtures,
+            incrementalCorpus.corpus,
+          )
         : await qualifyBrowser(
             consumerRoot,
             fixture,
             expectedVersion,
             engine,
             integrationFixtures,
+            incrementalCorpus.corpus,
           );
     const packageArtifacts = await Promise.all(
       [
@@ -226,6 +252,12 @@ async function main() {
           integrationFixtures: Object.fromEntries(
             Object.entries(integrationFixtures).map(([kind, entry]) => [kind, entry.id]),
           ),
+          incrementalCorpus: {
+            path: incrementalCorpus.path,
+            sha256: incrementalCorpus.sha256,
+            offsetUnit: incrementalCorpus.offsetUnit,
+            fixtureCount: incrementalCorpus.fixtureCount,
+          },
           packageArtifacts,
           commands: [
             "npm install --no-audit --no-fund",

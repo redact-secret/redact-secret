@@ -260,3 +260,13 @@ UTF-8 byte offsets because the CLI reports that unit). The first two convert
 canonical offsets to UTF-16 code units with a reference conversion
 independent of the binding under test, as the Python runner does for code
 points. See [docs/qualification.md](../docs/qualification.md).
+
+The installed JavaScript package qualification also replays every fixture in
+`fixtures/incremental-corpus.json` through the packed package and its real
+Node or browser artifact dependencies (`scripts/qualify-package-consumer.mjs`).
+For each declared Node major and browser engine, the evidence report records
+the source revision, package artifact hashes, runtime, command, and
+incremental corpus hash, then proves the direct incremental API at every
+valid UTF-16 string boundary and the stream API at every UTF-8 byte boundary,
+including boundaries inside multibyte code points. Host-specific stream
+lifecycle checks remain separate from this corpus semantic equivalence pass.
