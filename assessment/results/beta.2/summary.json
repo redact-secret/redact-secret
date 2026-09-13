@@ -1,0 +1,124 @@
+{
+  "schemaVersion": 1,
+  "assessmentId": "beta.2-detection",
+  "sourceCommit": "ffd0c3085df359680484a0e35d283e9948d2c1f7",
+  "scope": {
+    "corpusVersion": "1",
+    "corpusSha256": "9c72ab77bb1ee54c6912592c2ce3de72c0c152356283d620498aac5fe08c26d9",
+    "fixtureCount": 9,
+    "categories": {
+      "logs": 3,
+      "code": 2,
+      "chat": 2,
+      "negative-text": 2
+    },
+    "expectedFindingCount": 6,
+    "negativeFixtureCount": 3
+  },
+  "artifacts": [
+    {
+      "name": "@redact-secret/core",
+      "manifestVersion": "0.1.0-beta.1",
+      "sha256": "568c68d8be8b0815482b7e25aa4401c80cb0c996afb136b5311ecda210397bce"
+    },
+    {
+      "name": "@redact-secret/node-darwin-arm64",
+      "manifestVersion": "0.1.0-beta.1",
+      "sha256": "47e536a1b12a1717212253fea6c1aa305e796f1d55673666e3dd88ac71b40f34"
+    },
+    {
+      "name": "@redact-secret/wasm",
+      "manifestVersion": "0.1.0-beta.1",
+      "sha256": "3f8527292987296a6bc7a159ff4c755131d24bf125388ce62a5a872ac225f77b"
+    }
+  ],
+  "runs": [
+    {
+      "result": "node.json",
+      "runtime": "node-22.16.0",
+      "truePositives": 1,
+      "falsePositives": 1,
+      "falseNegatives": 5,
+      "incorrectRanges": 1,
+      "policyCorrect": 1,
+      "policyEvaluable": 1,
+      "negativeFixturesWithFindings": 0
+    },
+    {
+      "result": "browser-chromium.json",
+      "runtime": "chromium-153.0.8010.12",
+      "truePositives": 1,
+      "falsePositives": 1,
+      "falseNegatives": 5,
+      "incorrectRanges": 1,
+      "policyCorrect": 1,
+      "policyEvaluable": 1,
+      "negativeFixturesWithFindings": 0
+    },
+    {
+      "result": "browser-firefox.json",
+      "runtime": "firefox-155.0",
+      "truePositives": 1,
+      "falsePositives": 1,
+      "falseNegatives": 5,
+      "incorrectRanges": 1,
+      "policyCorrect": 1,
+      "policyEvaluable": 1,
+      "negativeFixturesWithFindings": 0
+    },
+    {
+      "result": "browser-webkit.json",
+      "runtime": "webkit-26.6",
+      "truePositives": 1,
+      "falsePositives": 1,
+      "falseNegatives": 5,
+      "incorrectRanges": 1,
+      "policyCorrect": 1,
+      "policyEvaluable": 1,
+      "negativeFixturesWithFindings": 0
+    }
+  ],
+  "metricDefinitions": {
+    "falseNegatives": "Expected findings without an exact detector, type, and range match; denominator is expectedFindingCount.",
+    "falsePositives": "Actual findings without an exact detector, type, and range match; denominator is the two actual findings emitted per run.",
+    "incorrectRanges": "A missing/extra pair with the same fixture, detector, and type but different ranges; denominators are expectedFindingCount and the two actual findings emitted per run.",
+    "policyCorrect": "Exact-range true positives whose action matched the reviewed policy outcome; denominator is policyEvaluable.",
+    "negativeFixturesWithFindings": "Expected-empty fixtures that emitted at least one finding; denominator is negativeFixtureCount."
+  },
+  "dispositions": [
+    {
+      "fixtureIds": [
+        "logs-github-token",
+        "logs-unicode-astral-boundary"
+      ],
+      "status": "documented-limitation",
+      "evidence": "crates/secret-scan-core/src/detectors/github.rs:9-43",
+      "reason": "The assessment shapes have 35 suffix characters after ghp_; the detector intentionally requires the documented 36-character classic suffix. The reviewed labels remain unchanged."
+    },
+    {
+      "fixtureIds": [
+        "code-aws-access-key"
+      ],
+      "status": "documented-limitation",
+      "evidence": "crates/secret-scan-core/src/detectors/aws.rs:9-34",
+      "reason": "The assessment shape has 15 characters after AKIA; the detector intentionally requires the fixed 16-character suffix. The reviewed label remains unchanged."
+    },
+    {
+      "fixtureIds": [
+        "logs-contextual-secret-warn"
+      ],
+      "status": "documented-limitation",
+      "evidence": "crates/secret-scan-core/src/detectors/generic_token.rs:15-47,195-222",
+      "reason": "seed is outside the supported high-signal and ambiguous setting-name allowlists. Broadening those names would increase ordinary-text false positives. The reviewed label remains unchanged."
+    },
+    {
+      "fixtureIds": [
+        "chat-bearer-token"
+      ],
+      "status": "contract-disagreement",
+      "evidence": "crates/secret-scan-core/src/detectors/bearer_token.rs:99-147; crates/secret-scan-core/tests/detectors_conformance.rs:119-138",
+      "reason": "The assessment expects the Bearer scheme and value, while the stable detector contract selects and redacts only the credential value. The action is redact and no credential value remains, but the range is incorrect against the unchanged assessment label."
+    }
+  ],
+  "confirmedDetectorDefects": 0
+}

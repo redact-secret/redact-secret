@@ -282,6 +282,16 @@ The first bounded Rust baseline is recorded under
 `accuracy-corpus`, plus `scale-logs-small-whole` with two runs. These files
 are inspectable evidence for this surface, not a release gate.
 
+## Beta.2 detection assessment
+
+[`results/beta.2/`](./results/beta.2/) records the fixed-corpus assessment for
+issue #191 against locally built, digest-identified Node and browser WebAssembly
+candidate artifacts. Its JSON rollup and Markdown report state dataset scope
+and denominators, distinguish a range mismatch from ordinary-negative false
+positives, preserve the reviewed labels, and link every mismatch to its
+detector-contract disposition. The result is readiness evidence, not a
+conformance gate or release authorization.
+
 ## What this directory is not (yet)
 
 This item defines the schema, the corpus, the workload profiles, and the
