@@ -1,6 +1,6 @@
 name: Complete assessment
 
-# Manually builds one host's real product artifacts and records a bounded,
+# Manually builds one Linux host's real product artifacts and records a bounded,
 # complete cross-language accuracy/performance assessment and evaluates fixed
 # RC acceptance criteria. This publishes nothing and is not a release gate.
 on:
@@ -11,7 +11,7 @@ permissions: {}
 jobs:
   evaluate:
     name: Evaluate every product surface
-    runs-on: macos-15
+    runs-on: ubuntu-latest
     timeout-minutes: 60
     permissions:
       contents: read

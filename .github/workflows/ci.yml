@@ -4,7 +4,6 @@ on:
   pull_request:
   push:
     branches:
-      - main
       - "rc/*"
   # `Artifact qualification` calls this workflow so one commit's Rust format,
   # lint, test, MSRV, conformance, and wasm32 evidence is part of the same
@@ -12,6 +11,10 @@ on:
   workflow_call:
 
 permissions: {}
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
   # The workspace MSRV. scripts/check-rust-workspace.py requires this value to
