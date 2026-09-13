@@ -21,6 +21,6 @@ and its [cross-platform qualification follow-up](release-qualification-follow-up
 | Remediation classification | [Release gaps](release-gap-disposition.md), [deferred quality](deferred-quality-backlog.md) |
 | Earlier release readiness | [Readiness audit](release-readiness-audit.md) |
 | Independent repeat audit (#145) | [Revision-bound verdict and residual findings](repeated-release-readiness-audit.md) |
-| Detection assurance | [Closeout](detection-assurance-closeout-audit.md), [residual evidence](detection-assurance-residual-evidence-backlog.md) |
+| Detection assurance | [Epic closeout](detection-assurance-epic-closeout.md), [historical closeout](detection-assurance-closeout-audit.md), [residual evidence](detection-assurance-residual-evidence-backlog.md) |
 | Repository transfer | [Transfer evidence](repository-transfer-evidence.md) |
 | Release authority and publishers | [Recorded evidence](release-approval-and-registry-publisher-evidence.md) |
