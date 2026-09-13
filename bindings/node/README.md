@@ -19,5 +19,5 @@ N-API native addon (`napi-rs`) for Node.js. Crate: `redact-secret-node`.
   same way `bindings/python` does: mandatory limits, an explicit
   `accepting`/`finalized`/`aborted`/`failed` lifecycle, and absolute UTF-16
   offsets converted from the core's UTF-8 byte offsets without retaining the
-  input (`src/incremental.rs`). Only `bindings/wasm` still reports
-  `INCREMENTAL_UNAVAILABLE` at call time.
+  input (`src/incremental.rs`). `bindings/wasm` exposes the same real core
+  session for browser consumers.

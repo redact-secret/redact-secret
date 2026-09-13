@@ -406,7 +406,7 @@ async function qualifyNodeStreamAdapter(fixture) {
 
   const link = await linkAddon();
   try {
-    const { createIncrementalSanitizer, initialize } = await import(
+    const { createIncrementalSanitizer, initialize, scanAndRedact } = await import(
       pathToFileURL(join(JS_PACKAGE_DIR, "dist", "index.js")).href
     );
     const { NodeStreamSanitizer } = await import(pathToFileURL(entry).href);
@@ -423,10 +423,7 @@ async function qualifyNodeStreamAdapter(fixture) {
     }
 
     function oracle(text) {
-      const session = openStreamSession();
-      const appended = session.append(text);
-      const finalized = session.finalize();
-      return appended.text + finalized.text;
+      return scanAndRedact(text);
     }
 
     async function sanitize(chunks) {
@@ -444,24 +441,29 @@ async function qualifyNodeStreamAdapter(fixture) {
     const wrapped = `🔑 lead\n${FINALIZED}🔒 tail`;
     const encoded = Buffer.from(wrapped, "utf8");
     const expected = oracle(wrapped);
-    assert(expected !== wrapped, "the real addon left a known secret unredacted");
+    assert(expected.text !== wrapped, "the real addon left a known secret unredacted");
 
     const diverged = [];
     for (let boundary = 0; boundary <= encoded.length; boundary += 1) {
-      const { text } = await sanitize([
+      const actual = await sanitize([
         encoded.subarray(0, boundary),
         encoded.subarray(boundary),
       ]);
-      if (text !== expected) diverged.push(boundary);
+      if (
+        actual.text !== expected.text ||
+        JSON.stringify(actual.findings) !== JSON.stringify(expected.findings)
+      ) {
+        diverged.push(boundary);
+      }
     }
     assert(
       diverged.length === 0,
-      `${diverged.length} byte boundary(ies) diverged from the whole-input result: ${diverged
+      `${diverged.length} byte boundary(ies) had output or findings diverge from the whole-input result: ${diverged
         .slice(0, 5)
         .join(", ")}`,
     );
 
-    const finalizedOracle = oracle(FINALIZED);
+    const finalizedOracle = oracle(FINALIZED).text;
 
     {
       const { findings } = await sanitize([encoded]);

@@ -273,8 +273,8 @@ export async function qualify(fixtures) {
   // wrapped in astral-plane padding on its own lines so byte-partitioning
   // also exercises a decoder split mid-character without disturbing the
   // fixture's own line-start context. Every expectation below is
-  // self-consistent — computed from one whole-input pass of the same real
-  // session (`oracleText`) rather than a hardcoded string.
+  // self-consistent — computed from one whole-input operation on the same
+  // real artifact rather than a hardcoded string.
   const STREAM_LIMITS = {
     maxInputCodeUnits: 1_000_000,
     maxBufferedCodeUnits: 16_512,
@@ -292,11 +292,8 @@ export async function qualify(fixtures) {
     return createIncrementalSanitizer({ limits: STREAM_LIMITS });
   }
 
-  function oracleText(text) {
-    const session = openStreamSession();
-    const appended = session.append(text);
-    const finalized = session.finalize();
-    return appended.text + finalized.text;
+  function oracle(text) {
+    return scanAndRedact(text);
   }
 
   async function sanitizeChunks(chunks) {
@@ -335,27 +332,32 @@ export async function qualify(fixtures) {
   const UNRESOLVED = FULL.slice(0, -5);
   const wrapped = `🔑 lead\n${FINALIZED}🔒 tail`;
   const wrappedBytes = streamEncoder.encode(wrapped);
-  const expectedWrapped = oracleText(wrapped);
-  const finalizedOracle = oracleText(FINALIZED);
+  const expectedWrapped = oracle(wrapped);
+  const finalizedOracle = oracle(FINALIZED).text;
 
   await checkAsync(
     "the Web stream adapter matches the whole-input result at every byte boundary on the real artifact",
     async () => {
       assert(
-        expectedWrapped !== wrapped,
+        expectedWrapped.text !== wrapped,
         "the real artifact left a known secret unredacted",
       );
       const diverged = [];
       for (let boundary = 0; boundary <= wrappedBytes.length; boundary += 1) {
-        const { text } = await sanitizeChunks([
+        const actual = await sanitizeChunks([
           wrappedBytes.slice(0, boundary),
           wrappedBytes.slice(boundary),
         ]);
-        if (text !== expectedWrapped) diverged.push(boundary);
+        if (
+          actual.text !== expectedWrapped.text ||
+          JSON.stringify(actual.findings) !== JSON.stringify(expectedWrapped.findings)
+        ) {
+          diverged.push(boundary);
+        }
       }
       assert(
         diverged.length === 0,
-        `${diverged.length} boundary(ies) diverged: ${diverged.slice(0, 5).join(", ")}`,
+        `${diverged.length} boundary(ies) had output or findings diverge: ${diverged.slice(0, 5).join(", ")}`,
       );
     },
   );

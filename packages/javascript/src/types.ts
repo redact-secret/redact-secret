@@ -118,9 +118,13 @@ export interface IncrementalSecretPolicy {
  * requires. There are no environment-derived or silent defaults.
  */
 export interface IncrementalLimits {
+  /** UTF-8 byte ceiling; the legacy field name is retained for compatibility. */
   readonly maxInputCodeUnits: number;
+  /** UTF-8 byte ceiling; the legacy field name is retained for compatibility. */
   readonly maxBufferedCodeUnits: number;
+  /** UTF-8 byte ceiling; the legacy field name is retained for compatibility. */
   readonly maxTokenCodeUnits: number;
+  /** UTF-8 byte ceiling; the legacy field name is retained for compatibility. */
   readonly maxMultilineCodeUnits: number;
 }
 
