@@ -29,13 +29,12 @@ name: Release
 # dispatch handles both, so there is no separate "just publish the wrapper"
 # path to run by mistake.
 #
-# Registry publication is not transactional across five registries (npm's
-# wrapper and seven dependency packages, crates.io x2, PyPI), so
-# `record-manifest` runs `if: always()` and records the observed state of
-# each of them, the way the npm-only manifest did before. `reconcile-release.yml`
-# only reconciles the npm wrapper tag today; reconciling a partial dependency,
-# crates.io, or PyPI publication is not yet built and is not assumed by
-# anything here.
+# Registry publication is not transactional across three registries: npm
+# (the wrapper and seven dependency packages), crates.io (two crates), and
+# PyPI (one distribution). `record-manifest` runs `if: always()` and records
+# the observed state of each artifact family, so `reconcile-release.yml` can
+# repair an explicitly authorized partial publication from the original
+# qualified artifacts without rebuilding already qualified outputs.
 
 on:
   workflow_dispatch:

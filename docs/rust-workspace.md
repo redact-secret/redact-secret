@@ -47,28 +47,30 @@ bindings, and it must not reimplement detector behavior. Build it with
 
 It depends on those bindings the N-API way
 (`decision-ship-first-release-artifact-set`): an `optionalDependencies` entry
-per `bindings/node/package.json`'s `napi.targets`
+per publishable `bindings/node/package.json` `napi.targets`
 (`@redact-secret/node-<platform>`, `os`/`cpu`/`libc`-scoped so npm skips
 the ones that do not match a given install), resolved at runtime by
 `process.platform`/`process.arch` in `src/runtime/node.ts`, plus an ordinary
-`dependencies` entry on `@redact-secret/wasm`. Neither the platform
-packages nor the wasm package is published yet.
+`dependencies` entry on `@redact-secret/wasm`. The `0.1.0-beta.1` release
+record confirms publication of the facade, all six publishable native
+packages, and the wasm package; the two musl N-API addons are qualified but
+not published to npm.
 
-Publishing them is not a separate one-time action gated apart from
-`packages/javascript` itself (issue #141): `.github/workflows/release.yml`'s
-`publish-native-dependencies` and `publish-wasm-dependency` jobs pack,
-content-check, publish, and verify every dependency package from the exact
-artifact `artifact-qualification` already qualified for that commit, and the
-wrapper's own `publish` job declares both in `needs:`
-(`scripts/check-release-gate.py` enforces the edge), so it cannot become
-eligible ahead of them. `scripts/publish-dependency-package.mjs` is
-idempotent by registry state rather than by a cutover-vs-routine switch: the
-first dispatch, with nothing published yet, publishes all seven packages;
-a retry for the same version verifies matching registry content and skips
-republishing it (npm versions are immutable). A new product version publishes
-new dependency versions in the same graph. One dispatch of `Release`, gated on
-the release approval `AGENTS.md` mandates, is both the first cutover and every
-release after it -- there is no separate "publish only the wrapper" path.
+Publishing the dependency packages is not a separate one-time action gated
+apart from `packages/javascript` itself (issue #141):
+`.github/workflows/release.yml`'s `publish-native-dependencies` and
+`publish-wasm-dependency` jobs pack, content-check, publish, and verify every
+dependency package from the exact artifact `artifact-qualification` already
+qualified for that commit, and the wrapper's own `publish` job declares both
+in `needs:` (`scripts/check-release-gate.py` enforces the edge), so it cannot
+become eligible ahead of them. `scripts/publish-dependency-package.mjs` is
+idempotent by registry state rather than by a cutover-vs-routine switch: when
+a package for the requested version is absent it publishes the qualified
+artifact; when the same version is already published it verifies matching
+registry content and skips republishing it (npm versions are immutable). One
+dispatch of `Release`, gated on the release approval `AGENTS.md` mandates,
+handles both initial publication and routine releases -- there is no separate
+"publish only the wrapper" path.
 
 ## Policies
 

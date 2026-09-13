@@ -332,8 +332,19 @@ class InventoryTests(unittest.TestCase):
         review = record["publicApiAndChangelogReview"]
         self.assertEqual(review["status"], "required-before-release-approval")
         self.assertEqual(
+            review["currentPublicApiReview"]["path"],
+            "docs/audits/beta2-final-code-review.md",
+        )
+        self.assertRegex(
+            review["currentPublicApiReview"]["sha256"], r"^[0-9a-f]{64}$"
+        )
+        self.assertEqual(
             review["publicApiReview"]["path"],
             "docs/audits/candidate-public-contract-review.md",
+        )
+        self.assertEqual(
+            review["publicApiReview"]["scope"],
+            "historical-beta.1-candidate-review",
         )
         self.assertRegex(review["publicApiReview"]["sha256"], r"^[0-9a-f]{64}$")
         self.assertEqual(review["changelog"]["path"], "CHANGELOG.md")

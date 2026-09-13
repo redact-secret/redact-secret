@@ -3,11 +3,13 @@
 block a registry's state for one release manifest's source revision.
 
 `scripts/reconcile-guard.py` decides whether `source_revision` may be acted on
-at all (ancestor-of-main, a manifest exists, and it records the requested
-version). Once that gate passes, this module decides -- independently for
-each artifact `release.yml`'s `record-manifest` step already tracks in
-`registry_state` -- whether the currently observed registry state lets
-reconcile complete a partial publication safely:
+at all: it must be the RC branch tip or one of its ancestors, and it must either
+come from a matching release manifest or from an explicit `source_commit`
+override that still passes the same RC-ancestry check. Once that gate passes,
+this module decides -- independently for each artifact `release.yml`'s
+`record-manifest` step already tracks in `registry_state` -- whether the
+currently observed registry state lets reconcile complete a partial publication
+safely:
 
 - an artifact already published with content matching this source revision is
   left alone (`skip`);

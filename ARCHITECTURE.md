@@ -336,9 +336,13 @@ The protocol covers:
   provenance (commit, artifact identity, corpus version and hash, OS, CPU,
   runtime, and exact command).
 
-Building the five per-surface runners that execute a profile and emit a real
-result is separate, larger work tracked elsewhere; see
-[assessment/README.md](./assessment/README.md#what-this-directory-is-not-yet).
+The five per-surface runners are implemented under `scripts/assessment-*.mjs`
+and `crates/secret-scan-core/examples/assessment_adapter.rs`; they execute
+accuracy and performance profiles, emit conforming results, and can be
+aggregated by `npm run assessment:all`. See
+[assessment/README.md](./assessment/README.md) for the runner boundaries,
+current beta.2 evidence, and why assessment remains non-gating readiness
+evidence rather than release authorization.
 
 ## Public API and extension boundary
 
