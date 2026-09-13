@@ -160,7 +160,12 @@ jobs:
           version=$(node -p "require('./bindings/node/npm/${{ matrix.platform }}/package.json').version" 2>/dev/null || true)
           state=unknown
           if [[ -n "$package_name" && -n "$version" ]]; then
-            if npm view "$package_name@$version" version >/dev/null 2>&1; then state=published; else state=unpublished; fi
+            observed=$(node scripts/npm-registry-metadata.mjs "$package_name" "$version" 2>/dev/null || true)
+            if [[ "$observed" == "unpublished" ]]; then
+              state=unpublished
+            elif [[ -n "$observed" ]]; then
+              state=published
+            fi
           fi
           jq -n --arg artifact "npm:${package_name:-unknown}" --arg state "$state" '{($artifact): $state}' > registry-state.json
 
@@ -236,7 +241,12 @@ jobs:
           version=$(node -p "require('./bindings/wasm/npm/package.json').version" 2>/dev/null || true)
           state=unknown
           if [[ -n "$package_name" && -n "$version" ]]; then
-            if npm view "$package_name@$version" version >/dev/null 2>&1; then state=published; else state=unpublished; fi
+            observed=$(node scripts/npm-registry-metadata.mjs "$package_name" "$version" 2>/dev/null || true)
+            if [[ "$observed" == "unpublished" ]]; then
+              state=unpublished
+            elif [[ -n "$observed" ]]; then
+              state=published
+            fi
           fi
           json=$(jq -cn --arg artifact "npm:${package_name:-unknown}" --arg state "$state" '{($artifact): $state}')
           echo "registry_state_json=$json" >> "$GITHUB_OUTPUT"
@@ -321,15 +331,12 @@ jobs:
             exit 1
           fi
 
-          set +e
-          registry_result=$(npm view "$package_name@$package_version" version --json 2>&1)
-          registry_status=$?
-          set -e
-          if [[ $registry_status -eq 0 ]]; then
+          registry_result=$(node scripts/npm-registry-metadata.mjs "$package_name" "$package_version" 2>/dev/null || true)
+          if [[ -n "$registry_result" && "$registry_result" != "unpublished" ]]; then
             echo "$package_name@$package_version is already published." >&2
             exit 1
           fi
-          if [[ "$registry_result" != *'"code": "E404"'* ]]; then
+          if [[ "$registry_result" != "unpublished" ]]; then
             echo "Could not prove that $package_name@$package_version is unpublished." >&2
             exit 1
           fi
@@ -372,10 +379,11 @@ jobs:
           version=$(node -p "require('./packages/javascript/package.json').version" 2>/dev/null || true)
           state=unknown
           if [[ -n "$package_name" && -n "$version" ]]; then
-            if npm view "$package_name@$version" version >/dev/null 2>&1; then
-              state=published
-            else
+            observed=$(node scripts/npm-registry-metadata.mjs "$package_name" "$version" 2>/dev/null || true)
+            if [[ "$observed" == "unpublished" ]]; then
               state=unpublished
+            elif [[ -n "$observed" ]]; then
+              state=published
             fi
           fi
           json=$(jq -cn --arg artifact "npm:${package_name:-unknown}" --arg state "$state" '{($artifact): $state}')
@@ -422,10 +430,16 @@ jobs:
           version=$(cargo metadata --no-deps --format-version 1 --locked \
             | jq -r '.packages[] | select(.name == "redact-secret") | .version')
           for crate in redact-secret redact-secret-cli; do
-            status=$(curl -s -A "redact-secret-release (https://github.com/redact-secret/redact-secret)" -o /dev/null -w '%{http_code}' \
-              "https://crates.io/api/v1/crates/$crate/$version")
+            if ! status=$(curl -s -A "redact-secret-release (https://github.com/redact-secret/redact-secret)" -o /dev/null -w '%{http_code}' \
+              "https://crates.io/api/v1/crates/$crate/$version"); then
+              status=000
+            fi
             if [[ "$status" == "200" ]]; then
               echo "$crate@$version is already published." >&2
+              exit 1
+            fi
+            if [[ "$status" != "404" ]]; then
+              echo "Could not prove that $crate@$version is unpublished." >&2
               exit 1
             fi
           done
@@ -469,10 +483,13 @@ jobs:
           cli_state=unknown
           if [[ -n "$version" ]]; then
             for crate in redact-secret redact-secret-cli; do
-              status=$(curl -s -A "redact-secret-release (https://github.com/redact-secret/redact-secret)" -o /dev/null -w '%{http_code}' \
-                "https://crates.io/api/v1/crates/$crate/$version")
-              state=unpublished
+              if ! status=$(curl -s -A "redact-secret-release (https://github.com/redact-secret/redact-secret)" -o /dev/null -w '%{http_code}' \
+                "https://crates.io/api/v1/crates/$crate/$version"); then
+                status=000
+              fi
+              state=unknown
               [[ "$status" == "200" ]] && state=published
+              [[ "$status" == "404" ]] && state=unpublished
               if [[ "$crate" == "redact-secret" ]]; then core_state=$state; else cli_state=$state; fi
             done
           fi
@@ -552,9 +569,11 @@ jobs:
           version="${{ steps.identity.outputs.version }}"
           state=unknown
           if [[ -n "$name" && -n "$version" ]]; then
-            status=$(curl -s -A "redact-secret-release (https://github.com/redact-secret/redact-secret)" -o /dev/null -w '%{http_code}' "https://pypi.org/pypi/$name/$version/json")
-            state=unpublished
+            if ! status=$(curl -s -A "redact-secret-release (https://github.com/redact-secret/redact-secret)" -o /dev/null -w '%{http_code}' "https://pypi.org/pypi/$name/$version/json"); then
+              status=000
+            fi
             [[ "$status" == "200" ]] && state=published
+            [[ "$status" == "404" ]] && state=unpublished
           fi
           json=$(jq -cn --arg artifact "pypi:${name:-unknown}" --arg state "$state" '{($artifact): $state}')
           echo "registry_state_json=$json" >> "$GITHUB_OUTPUT"

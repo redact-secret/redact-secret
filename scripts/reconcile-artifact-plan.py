@@ -13,6 +13,8 @@ reconcile complete a partial publication safely:
   left alone (`skip`);
 - an artifact not yet published, whose qualified build artifact is still
   available to publish, is eligible (`publish`);
+- an artifact whose registry state could not be established is refused
+  (`block`);
 - an artifact already published with content that does NOT match this source
   revision is a conflicting version and reconcile refuses it (`block`);
 - an artifact not yet published whose qualified build artifact has expired --
@@ -57,6 +59,8 @@ class Observation:
     live_published: bool
     content_matches: bool = False
     artifact_available: bool = True
+    registry_observable: bool = True
+    reason: str = ""
 
 
 @dataclass(frozen=True)
@@ -67,6 +71,9 @@ class Decision:
 
 def classify(observation: Observation) -> Decision:
     """The verdict for one artifact considered on its own."""
+    if not observation.registry_observable:
+        reason = observation.reason or "registry state could not be established"
+        return Decision("block", f"registry state could not be established: {reason}")
     if observation.live_published:
         if observation.content_matches:
             return Decision("skip", "already published and matches this source revision")
@@ -116,6 +123,8 @@ def _load_observation(payload: dict) -> Observation:
         live_published=bool(payload.get("live_published", False)),
         content_matches=bool(payload.get("content_matches", False)),
         artifact_available=bool(payload.get("artifact_available", True)),
+        registry_observable=bool(payload.get("registry_observable", True)),
+        reason=str(payload.get("reason", "")),
     )
 
 

@@ -22,6 +22,7 @@ PUBLISHED_MATCHING = PLAN.Observation(live_published=True, content_matches=True)
 PUBLISHED_CONFLICTING = PLAN.Observation(live_published=True, content_matches=False)
 UNPUBLISHED_AVAILABLE = PLAN.Observation(live_published=False, artifact_available=True)
 UNPUBLISHED_EXPIRED = PLAN.Observation(live_published=False, artifact_available=False)
+UNOBSERVABLE = PLAN.Observation(live_published=False, registry_observable=False, reason="HTTP 429")
 
 
 class ClassifyTests(unittest.TestCase):
@@ -46,6 +47,12 @@ class ClassifyTests(unittest.TestCase):
         decision = PLAN.classify(UNPUBLISHED_EXPIRED)
         self.assertEqual(decision.action, "block")
         self.assertIn("expired", decision.reason)
+
+    def test_unobservable_registry_state_is_blocked(self) -> None:
+        decision = PLAN.classify(UNOBSERVABLE)
+        self.assertEqual(decision.action, "block")
+        self.assertIn("could not be established", decision.reason)
+        self.assertIn("HTTP 429", decision.reason)
 
 
 class PlanIndependentTests(unittest.TestCase):
@@ -77,6 +84,10 @@ class PlanIndependentTests(unittest.TestCase):
 
     def test_pypi_expired_artifact_is_blocked(self) -> None:
         plan = PLAN.plan_independent({"pypi:redact-secret": UNPUBLISHED_EXPIRED})
+        self.assertEqual(plan["pypi:redact-secret"].action, "block")
+
+    def test_unknown_pypi_state_blocks_publication(self) -> None:
+        plan = PLAN.plan_independent({"pypi:redact-secret": UNOBSERVABLE})
         self.assertEqual(plan["pypi:redact-secret"].action, "block")
 
 
@@ -111,6 +122,11 @@ class PlanCratePairTests(unittest.TestCase):
 
     def test_expired_core_artifact_blocks_the_cli_crate_too(self) -> None:
         plan = PLAN.plan_crate_pair(core=UNPUBLISHED_EXPIRED, cli=UNPUBLISHED_AVAILABLE)
+        self.assertEqual(plan["core"].action, "block")
+        self.assertEqual(plan["cli"].action, "block")
+
+    def test_unobservable_core_artifact_blocks_the_cli_crate_too(self) -> None:
+        plan = PLAN.plan_crate_pair(core=UNOBSERVABLE, cli=UNPUBLISHED_AVAILABLE)
         self.assertEqual(plan["core"].action, "block")
         self.assertEqual(plan["cli"].action, "block")
 
@@ -156,6 +172,24 @@ class CliTests(unittest.TestCase):
         self.assertEqual(status, 1)
         payload = json.loads(buffer.getvalue())
         self.assertEqual(payload["crate:redact-secret-cli"]["action"], "block")
+
+    def test_cli_blocks_unobservable_registry_state(self) -> None:
+        path = self._write(
+            {
+                "crate:redact-secret": {
+                    "live_published": False,
+                    "registry_observable": False,
+                    "reason": "crates.io returned HTTP 500",
+                }
+            }
+        )
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            status = PLAN.main(["--observations", str(path)])
+        self.assertEqual(status, 1)
+        payload = json.loads(buffer.getvalue())
+        self.assertEqual(payload["crate:redact-secret"]["action"], "block")
+        self.assertIn("HTTP 500", payload["crate:redact-secret"]["reason"])
 
 
 if __name__ == "__main__":

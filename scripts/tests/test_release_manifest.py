@@ -4,6 +4,7 @@ import importlib.util
 import json
 import os
 import re
+import shutil
 import subprocess
 import textwrap
 import sys
@@ -126,39 +127,128 @@ class CliTests(unittest.TestCase):
 class WorkflowOutputTests(unittest.TestCase):
     """Execute the real workflow shell with only registry commands stubbed."""
 
-    def test_registry_outputs_are_single_line_json(self) -> None:
+    def _report_steps(self) -> list[tuple[str, str]]:
         root = SCRIPT.parents[1]
         workflow = (root / ".github/workflows/release.yml").read_text()
         steps = re.split(r"^      - name: ", workflow, flags=re.M)
+        report_steps = []
+        for step in steps:
+            if not step.startswith("Report "):
+                continue
+            shell = step.split("        run: |\n", 1)[1]
+            shell = re.split(r"^  [^ ]", shell, maxsplit=1, flags=re.M)[0]
+            shell = textwrap.dedent(shell)
+            shell = re.sub(r"\$\{\{.*?\}\}", "0.1.0-beta.1", shell)
+            report_steps.append((step.splitlines()[0], shell))
+        self.assertEqual(len(report_steps), 5)
+        return report_steps
+
+    def _workflow_workspace(self, directory: Path) -> None:
+        root = SCRIPT.parents[1]
+        (directory / "scripts").symlink_to(root / "scripts", target_is_directory=True)
+        (directory / "packages").symlink_to(root / "packages", target_is_directory=True)
+        node_platform = directory / "bindings/node/npm/0.1.0-beta.1"
+        node_platform.mkdir(parents=True)
+        node_platform.joinpath("package.json").write_text(
+            json.dumps({"name": "@redact-secret/node-synthetic", "version": "0.1.0-beta.1"}),
+            encoding="utf-8",
+        )
+        wasm = directory / "bindings/wasm"
+        wasm.mkdir(parents=True)
+        wasm.joinpath("npm").symlink_to(root / "bindings/wasm/npm", target_is_directory=True)
+
+    def _write_registry_stubs(self, directory: Path) -> None:
+        real_node = shutil.which("node")
+        self.assertIsNotNone(real_node)
+        directory.joinpath("curl").write_text(
+            "#!/bin/sh\n"
+            "if [ \"${CURL_STATUS:-404}\" = transport ]; then exit 7; fi\n"
+            "printf '%s' \"${CURL_STATUS:-404}\"\n",
+            encoding="utf-8",
+        )
+        directory.joinpath("node").write_text(
+            "#!/bin/sh\n"
+            "case \"$1\" in\n"
+            "  scripts/npm-registry-metadata.mjs|*/scripts/npm-registry-metadata.mjs)\n"
+            "    case \"${NPM_METADATA_STATE:-unpublished}\" in\n"
+            "      published) printf '%040d\\n' 0 ;;\n"
+            "      unpublished) printf 'unpublished\\n' ;;\n"
+            "      malformed|failure) exit 1 ;;\n"
+            "    esac\n"
+            "    exit 0\n"
+            "    ;;\n"
+            "esac\n"
+            f"exec {real_node!s} \"$@\"\n",
+            encoding="utf-8",
+        )
+        for name in ("curl", "node"):
+            directory.joinpath(name).chmod(0o755)
+
+    def _run_report_step(self, name: str, shell: str, directory: Path, *, npm_state: str, curl_status: str) -> dict[str, str]:
+        output = directory / "output"
+        output.write_text("")
+        registry_state = directory / "registry-state.json"
+        registry_state.unlink(missing_ok=True)
+        subprocess.run(
+            ["bash", "-e", "-o", "pipefail", "-c", shell],
+            cwd=directory,
+            env={
+                **os.environ,
+                "PATH": f"{directory}:{os.environ['PATH']}",
+                "GITHUB_OUTPUT": str(output),
+                "NPM_METADATA_STATE": npm_state,
+                "CURL_STATUS": curl_status,
+            },
+            check=True,
+            capture_output=True,
+        )
+        if registry_state.exists():
+            return json.loads(registry_state.read_text())
+        lines = output.read_text().splitlines()
+        self.assertEqual(len(lines), 1, name)
+        key, value = lines[0].split("=", 1)
+        self.assertEqual(key, "registry_state_json")
+        return json.loads(value)
+
+    def test_registry_outputs_are_single_line_json(self) -> None:
         checked = 0
         with tempfile.TemporaryDirectory() as tmp:
             directory = Path(tmp)
-            for name, body in {"curl": "printf 404", "npm": "exit 1"}.items():
-                executable = directory / name
-                executable.write_text("#!/bin/sh\n" + body + "\n")
-                executable.chmod(0o755)
-            for step in steps:
-                if not step.startswith("Report ") or 'echo "registry_state_json=$json"' not in step:
-                    continue
-                with self.subTest(step=step.splitlines()[0]):
-                    shell = step.split("        run: |\n", 1)[1]
-                    shell = re.split(r"^  [^ ]", shell, maxsplit=1, flags=re.M)[0]
-                    shell = textwrap.dedent(shell)
-                    shell = re.sub(r"\$\{\{.*?\}\}", "0.1.0-beta.1", shell)
-                    output = directory / "output"
-                    output.write_text("")
-                    subprocess.run(["bash", "-e", "-o", "pipefail", "-c", shell], cwd=root,
-                                   env={**os.environ, "PATH": f"{directory}:{os.environ['PATH']}",
-                                        "GITHUB_OUTPUT": str(output)}, check=True, capture_output=True)
-                    lines = output.read_text().splitlines()
-                    self.assertEqual(len(lines), 1)
-                    key, value = lines[0].split("=", 1)
-                    self.assertEqual(key, "registry_state_json")
-                    state = json.loads(value)
+            self._workflow_workspace(directory)
+            self._write_registry_stubs(directory)
+            for name, shell in self._report_steps():
+                with self.subTest(step=name):
+                    state = self._run_report_step(name, shell, directory, npm_state="unpublished", curl_status="404")
                     self.assertTrue(state)
                     self.assertEqual(set(state.values()), {"unpublished"})
                     checked += 1
-        self.assertEqual(checked, 4)
+        self.assertEqual(checked, 5)
+
+    def test_registry_reporters_only_treat_exact_absence_as_unpublished(self) -> None:
+        cases = [
+            ("published", "200", "published"),
+            ("unpublished", "404", "unpublished"),
+            ("failure", "401", "unknown"),
+            ("failure", "403", "unknown"),
+            ("failure", "429", "unknown"),
+            ("failure", "500", "unknown"),
+            ("failure", "transport", "unknown"),
+            ("malformed", "200", "unknown"),
+        ]
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp)
+            self._workflow_workspace(directory)
+            self._write_registry_stubs(directory)
+            for npm_state, curl_status, expected in cases:
+                for name, shell in self._report_steps():
+                    with self.subTest(step=name, npm_state=npm_state, curl_status=curl_status):
+                        state = self._run_report_step(name, shell, directory, npm_state=npm_state, curl_status=curl_status)
+                        self.assertTrue(state)
+                        uses_npm_helper = name in {"Report registry state", "Report npm registry state"}
+                        step_expected = expected
+                        if npm_state == "malformed" and not uses_npm_helper:
+                            step_expected = "published"
+                        self.assertEqual(set(state.values()), {step_expected})
 
     def test_manifest_records_whole_product_when_publishers_are_skipped(self) -> None:
         root = SCRIPT.parents[1]
