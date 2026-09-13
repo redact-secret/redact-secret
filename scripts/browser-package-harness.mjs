@@ -369,6 +369,38 @@ export async function qualify(fixtures) {
   );
 
   await checkAsync(
+    "the Web stream adapter preserves BOMs while matching whole-input scanning on the real artifact",
+    async () => {
+      const bomCases = [
+        "\uFEFF",
+        `\uFEFF${FINALIZED}`,
+        `ordinary prefix \uFEFF ${FINALIZED}`,
+      ];
+      const diverged = [];
+      for (const bomCase of bomCases) {
+        const bomBytes = streamEncoder.encode(bomCase);
+        const bomExpected = oracle(bomCase);
+        for (let boundary = 0; boundary <= bomBytes.length; boundary += 1) {
+          const actual = await sanitizeChunks([
+            bomBytes.slice(0, boundary),
+            bomBytes.slice(boundary),
+          ]);
+          if (
+            actual.text !== bomExpected.text ||
+            JSON.stringify(actual.findings) !== JSON.stringify(bomExpected.findings)
+          ) {
+            diverged.push(`${JSON.stringify(bomCase)}@${boundary}`);
+          }
+        }
+      }
+      assert(
+        diverged.length === 0,
+        `${diverged.length} BOM boundary case(s) diverged: ${diverged.slice(0, 5).join(", ")}`,
+      );
+    },
+  );
+
+  await checkAsync(
     "the Web stream adapter's findings are frozen on the real artifact",
     async () => {
       const { findings } = await sanitizeChunks([wrappedBytes]);
@@ -468,6 +500,33 @@ export async function qualify(fixtures) {
         1,
         "expected exactly one finalized finding before the failure",
       );
+    },
+  );
+
+  await checkAsync(
+    "truncated UTF-8 on the real artifact rejects with INVALID_UTF8",
+    async () => {
+      const transform = new WebStreamSanitizer(openStreamSession());
+      const writer = transform.writable.getWriter();
+      const reader = transform.readable.getReader();
+      const reading = reader.read().catch((error) => error);
+
+      await writer.write(streamEncoder.encode("🔑").slice(0, 2));
+      let thrown;
+      try {
+        await writer.close();
+      } catch (error) {
+        thrown = error;
+      }
+      assert(thrown instanceof SecretScanError, "close() accepted truncated UTF-8");
+      assertEqual(thrown.code, "INVALID_UTF8", "truncated UTF-8 error code");
+
+      const readOutcome = await reading;
+      assert(
+        readOutcome instanceof SecretScanError,
+        "the reader did not observe the truncated UTF-8 failure",
+      );
+      assertEqual(readOutcome.code, "INVALID_UTF8", "truncated UTF-8 error code");
     },
   );
 

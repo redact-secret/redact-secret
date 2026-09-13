@@ -469,6 +469,37 @@ async function qualifyNodeStreamAdapter(fixture) {
     const finalizedOracle = oracle(FINALIZED).text;
 
     {
+      const bomCases = [
+        "\uFEFF",
+        `\uFEFF${FINALIZED}`,
+        `ordinary prefix \uFEFF ${FINALIZED}`,
+      ];
+      for (const bomCase of bomCases) {
+        const bomBytes = Buffer.from(bomCase, "utf8");
+        const bomExpected = oracle(bomCase);
+        const bomDiverged = [];
+        for (let boundary = 0; boundary <= bomBytes.length; boundary += 1) {
+          const actual = await sanitize([
+            bomBytes.subarray(0, boundary),
+            bomBytes.subarray(boundary),
+          ]);
+          if (
+            actual.text !== bomExpected.text ||
+            JSON.stringify(actual.findings) !== JSON.stringify(bomExpected.findings)
+          ) {
+            bomDiverged.push(boundary);
+          }
+        }
+        assert(
+          bomDiverged.length === 0,
+          `${bomDiverged.length} BOM byte boundary(ies) had output or findings diverge from the whole-input result: ${bomDiverged
+            .slice(0, 5)
+            .join(", ")}`,
+        );
+      }
+    }
+
+    {
       const { findings } = await sanitize([encoded]);
       assert(
         Object.isFrozen(findings),
@@ -499,6 +530,13 @@ async function qualifyNodeStreamAdapter(fixture) {
         !flushed.includes(UNRESOLVED),
         "malformed UTF-8 leaked retained plaintext",
       );
+    }
+
+    {
+      const transform = new NodeStreamSanitizer(openStreamSession());
+      transform.end(Buffer.from("🔑", "utf8").subarray(0, 2));
+      const [error] = await once(transform, "error");
+      assertEqual(error?.code, "INVALID_UTF8", "truncated UTF-8 error code");
     }
 
     {

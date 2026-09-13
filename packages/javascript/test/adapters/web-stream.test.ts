@@ -315,6 +315,23 @@ describe("Web stream adapter", () => {
     expect(transform.findings).toHaveLength(1);
   });
 
+  it("rejects a stream that ends mid-character", async () => {
+    const transform = new WebStreamSanitizer(await openSession());
+    const writer = transform.writable.getWriter();
+    const reader = transform.readable.getReader();
+    const reading = reader.read().catch((error: unknown) => error);
+
+    await expect(writer.write(bytes("🔑").slice(0, 2))).resolves.toBeUndefined();
+    await expect(writer.close()).rejects.toSatisfy(
+      (error: unknown) =>
+        error instanceof SecretScanError && error.code === "INVALID_UTF8",
+    );
+    await expect(reading).resolves.toSatisfy(
+      (error: unknown) =>
+        error instanceof SecretScanError && error.code === "INVALID_UTF8",
+    );
+  });
+
   it("refuses to open a stream before initialize succeeds", async () => {
     const { createWebStreamSanitizer } = await import(
       "../../src/adapters/web-stream.js"
