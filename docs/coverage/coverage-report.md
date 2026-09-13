@@ -53,7 +53,7 @@ Coverage declarations: 35.
 | Type | Detector | Behavior class | State | Scheme states | Pending dimensions |
 | --- | --- | --- | --- | --- | --- |
 | anthropic_api_key | anthropic-token | provider | supported | not-applicable | none |
-| authorization_credential | generic-token | contextual | supported | supported | host-context |
+| authorization_credential | generic-token | contextual | supported | supported | none |
 | aws_access_key_id | aws-access-key | provider | supported | not-applicable | none |
 | bearer_token | bearer-token | structural | supported | not-applicable | none |
 | cloudflare_api_token | cloudflare-token | provider | supported | not-applicable | none |
@@ -104,7 +104,7 @@ Coverage declarations: 35.
 | --- | --- | --- | --- |
 | adversarial | 35 | 0 | 0 |
 | boundary | 25 | 0 | 0 |
-| host-context | 24 | 0 | 1 |
+| host-context | 25 | 0 | 0 |
 | incremental | 3 | 7 | 0 |
 | malformed | 35 | 0 | 0 |
 | near-miss-negative | 25 | 0 | 0 |
@@ -126,4 +126,4 @@ None.
 
 ### Pending evidence dimensions
 
-- authorization_credential.host-context (`authorization-credential-host-context-breadth`)
+None.

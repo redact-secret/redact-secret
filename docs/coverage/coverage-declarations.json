@@ -2220,6 +2220,11 @@
         {
           "dimension": "positive",
           "evidenceFixtureIds": [
+            "authorization-host-dotenv",
+            "authorization-host-javascript",
+            "authorization-host-log",
+            "authorization-host-markdown",
+            "authorization-host-shell",
             "authorization-positive-basic",
             "authorization-positive-token-minimum"
           ],
@@ -2265,12 +2270,19 @@
         },
         {
           "dimension": "host-context",
-          "evidenceFixtureIds": [],
-          "exception": {
-            "backlogId": "authorization-credential-host-context-breadth",
-            "code": "pending"
-          },
-          "state": "pending"
+          "evidenceFixtureIds": [
+            "authorization-host-dotenv",
+            "authorization-host-javascript",
+            "authorization-host-log",
+            "authorization-host-markdown",
+            "authorization-host-shell",
+            "authorization-negative-unsupported-scheme",
+            "authorization-overlap-contextual-assignment",
+            "authorization-positive-basic",
+            "authorization-positive-token-minimum",
+            "contextual-negative-unqualified-random-text"
+          ],
+          "state": "supported"
         },
         {
           "classLevel": true,

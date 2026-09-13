@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 394,
+  "fixtureCount": 399,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -8292,6 +8292,116 @@
         }
       ],
       "note": "An explicit Token authorization scheme is supported at the minimum accepted value length."
+    },
+    {
+      "id": "authorization-host-dotenv",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "REQUEST_HEADERS=\"\nAuthorization: Token SYNTHETIC_REVOKED_AUTHORIZATION_CONTEXT_1234\n\"",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "authorization_credential",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 39,
+          "end": 83
+        }
+      ],
+      "note": "A multiline dotenv value supplies authorization_credential's structured-data-kv representative positive evidence."
+    },
+    {
+      "id": "authorization-host-shell",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "shell"
+      ],
+      "input": "cat <<'EOF'\nAuthorization: Token SYNTHETIC_REVOKED_AUTHORIZATION_CONTEXT_1234\nEOF",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "authorization_credential",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 33,
+          "end": 77
+        }
+      ],
+      "note": "A shell heredoc supplies authorization_credential's shell-invocation representative positive evidence."
+    },
+    {
+      "id": "authorization-host-javascript",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "javascript"
+      ],
+      "input": "const requestHeaders = `\nAuthorization: Token SYNTHETIC_REVOKED_AUTHORIZATION_CONTEXT_1234\n`;",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "authorization_credential",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 46,
+          "end": 90
+        }
+      ],
+      "note": "A JavaScript template literal supplies authorization_credential's source-code representative positive evidence."
+    },
+    {
+      "id": "authorization-host-log",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "log"
+      ],
+      "input": "request headers:\nAuthorization: Token SYNTHETIC_REVOKED_AUTHORIZATION_CONTEXT_1234\nstatus=fixture",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "authorization_credential",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 38,
+          "end": 82
+        }
+      ],
+      "note": "A line-oriented request log supplies authorization_credential's wire-and-log representative positive evidence."
+    },
+    {
+      "id": "authorization-host-markdown",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "markdown"
+      ],
+      "input": "```http\nAuthorization: Token SYNTHETIC_REVOKED_AUTHORIZATION_CONTEXT_1234\n```",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "authorization_credential",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 29,
+          "end": 73
+        }
+      ],
+      "note": "A fenced HTTP example supplies authorization_credential's prose-and-markup representative positive evidence."
     },
     {
       "id": "authorization-overlap-contextual-assignment",
