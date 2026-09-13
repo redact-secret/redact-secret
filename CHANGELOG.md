@@ -5,6 +5,10 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+- The fixed, separate beta.2 detection assessment now records source-, corpus-,
+  runtime-, and artifact-bound Node and browser results with explicit
+  denominators, safe mismatch details, and linked limitation dispositions;
+  conformance coverage is not presented as accuracy.
 - Assessment tooling now evaluates an installed Python package through both
   whole-input and incremental APIs, normalizes code-point ranges to canonical
   UTF-8 byte spans, and records the first correctness, timing, Python-allocation,
