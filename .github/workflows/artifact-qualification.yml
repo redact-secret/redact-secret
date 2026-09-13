@@ -39,24 +39,6 @@ on:
       - main
       - "rc/*"
   pull_request:
-    paths:
-      - .github/workflows/artifact-qualification.yml
-      - Cargo.toml
-      - bindings/node/package.json
-      - examples/safe-integration/**
-      - scripts/browser-harness.mjs
-      - scripts/browser-package-harness.mjs
-      - scripts/build-browser-artifact.mjs
-      - scripts/check-artifact-matrix.py
-      - scripts/consumer-harness.mjs
-      - scripts/qualify-browser-artifact.mjs
-      - scripts/qualify-cli-binary.mjs
-      - scripts/qualify-node-addon.mjs
-      - scripts/qualify-package-consumer.mjs
-      - scripts/qualify-runtime-fixture.mjs
-      - scripts/record-artifact-inventory.py
-      - scripts/tests/test_check_artifact_matrix.py
-      - scripts/tests/test_record_artifact_inventory.py
 
 permissions: {}
 
@@ -74,9 +56,79 @@ env:
   WASM_BINDGEN_VERSION: "0.2.128"
 
 jobs:
+  plan:
+    name: Artifact qualification run plan
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      full: ${{ steps.plan.outputs.full }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Decide whether this pull request needs full qualification
+        id: plan
+        shell: bash
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || '' }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || '' }}
+        run: |
+          full=true
+          if [[ "$GITHUB_EVENT_NAME" == "pull_request" ]]; then
+            full=false
+            while IFS= read -r path; do
+              case "$path" in
+                .github/workflows/artifact-qualification.yml|Cargo.toml|Cargo.lock)
+                  full=true
+                  break
+                  ;;
+                bindings/node/package.json|bindings/node/npm/*|bindings/wasm/*)
+                  full=true
+                  break
+                  ;;
+                crates/secret-scan-cli/*|crates/secret-scan-core/*|examples/safe-integration/*)
+                  full=true
+                  break
+                  ;;
+                packages/javascript/*|conformance/*)
+                  full=true
+                  break
+                  ;;
+                scripts/browser-harness.mjs|scripts/browser-package-harness.mjs|scripts/build-browser-artifact.mjs)
+                  full=true
+                  break
+                  ;;
+                scripts/check-artifact-matrix.py|scripts/consumer-harness.mjs|scripts/qualify-browser-artifact.mjs)
+                  full=true
+                  break
+                  ;;
+                scripts/qualify-cli-binary.mjs|scripts/qualify-node-addon.mjs|scripts/qualify-package-consumer.mjs)
+                  full=true
+                  break
+                  ;;
+                scripts/qualify-runtime-fixture.mjs|scripts/record-artifact-inventory.py)
+                  full=true
+                  break
+                  ;;
+                scripts/tests/test_check_artifact_matrix.py|scripts/tests/test_record_artifact_inventory.py)
+                  full=true
+                  break
+                  ;;
+              esac
+            done < <(git diff --name-only "$BASE_SHA" "$HEAD_SHA")
+          fi
+          echo "full=$full" >> "$GITHUB_OUTPUT"
+          echo "full=$full" >> "$GITHUB_STEP_SUMMARY"
+
   policy:
     name: Artifact matrix policy
     runs-on: ubuntu-latest
+    needs: plan
     permissions:
       contents: read
 
@@ -96,14 +148,20 @@ jobs:
 
   rust:
     name: Rust
-    needs: policy
+    needs:
+      - plan
+      - policy
+    if: needs.plan.outputs.full == 'true'
     permissions:
       contents: read
     uses: ./.github/workflows/ci.yml
 
   python:
     name: Python
-    needs: policy
+    needs:
+      - plan
+      - policy
+    if: needs.plan.outputs.full == 'true'
     permissions:
       contents: read
     uses: ./.github/workflows/python-wheels.yml
@@ -111,7 +169,10 @@ jobs:
   node-addon:
     name: Addon ${{ matrix.target }}
     runs-on: ${{ matrix.runner }}
-    needs: policy
+    needs:
+      - plan
+      - policy
+    if: needs.plan.outputs.full == 'true'
     timeout-minutes: 45
     permissions:
       contents: read
@@ -263,7 +324,10 @@ jobs:
   browser:
     name: Browser ${{ matrix.engine }}
     runs-on: ubuntu-latest
-    needs: policy
+    needs:
+      - plan
+      - policy
+    if: needs.plan.outputs.full == 'true'
     timeout-minutes: 30
     permissions:
       contents: read
@@ -329,7 +393,10 @@ jobs:
   cli:
     name: CLI ${{ matrix.target }}
     runs-on: ${{ matrix.runner }}
-    needs: policy
+    needs:
+      - plan
+      - policy
+    if: needs.plan.outputs.full == 'true'
     timeout-minutes: 45
     permissions:
       contents: read
@@ -390,7 +457,8 @@ jobs:
   package-consumer-node:
     name: Installed Node package (Node ${{ matrix.node-version }})
     runs-on: ubuntu-latest
-    needs: [node-addon, browser]
+    needs: [plan, node-addon, browser]
+    if: needs.plan.outputs.full == 'true'
     timeout-minutes: 20
     permissions:
       contents: read
@@ -456,7 +524,8 @@ jobs:
   package-consumer-browser:
     name: Installed browser package (${{ matrix.engine }})
     runs-on: ubuntu-latest
-    needs: [node-addon, browser]
+    needs: [plan, node-addon, browser]
+    if: needs.plan.outputs.full == 'true'
     timeout-minutes: 20
     permissions:
       contents: read
@@ -519,6 +588,8 @@ jobs:
     name: Artifact inventory
     runs-on: ubuntu-latest
     needs:
+      - plan
+      - policy
       - rust
       - python
       - node-addon
@@ -526,33 +597,83 @@ jobs:
       - cli
       - package-consumer-node
       - package-consumer-browser
+    if: always()
     permissions:
       contents: read
 
     steps:
+      - name: Require planning and policy jobs
+        env:
+          PLAN_RESULT: ${{ needs.plan.result }}
+          POLICY_RESULT: ${{ needs.policy.result }}
+        run: |
+          for result in "$PLAN_RESULT" "$POLICY_RESULT"; do
+            if [[ "$result" != "success" ]]; then
+              echo "Artifact inventory cannot pass because a required setup job finished with '$result'." >&2
+              exit 1
+            fi
+          done
+
+      - name: Accept a pull request that did not touch artifact inputs
+        if: needs.plan.outputs.full != 'true'
+        run: echo "Artifact qualification skipped; this pull request did not touch artifact inputs." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Require successful qualification jobs
+        if: needs.plan.outputs.full == 'true'
+        env:
+          POLICY_RESULT: ${{ needs.policy.result }}
+          RUST_RESULT: ${{ needs.rust.result }}
+          PYTHON_RESULT: ${{ needs.python.result }}
+          ADDON_RESULT: ${{ needs.node-addon.result }}
+          BROWSER_RESULT: ${{ needs.browser.result }}
+          CLI_RESULT: ${{ needs.cli.result }}
+          NODE_CONSUMER_RESULT: ${{ needs.package-consumer-node.result }}
+          BROWSER_CONSUMER_RESULT: ${{ needs.package-consumer-browser.result }}
+        run: |
+          for result in \
+            "$POLICY_RESULT" \
+            "$RUST_RESULT" \
+            "$PYTHON_RESULT" \
+            "$ADDON_RESULT" \
+            "$BROWSER_RESULT" \
+            "$CLI_RESULT" \
+            "$NODE_CONSUMER_RESULT" \
+            "$BROWSER_CONSUMER_RESULT"; do
+            if [[ "$result" != "success" ]]; then
+              echo "Artifact inventory cannot pass because an upstream job finished with '$result'." >&2
+              exit 1
+            fi
+          done
+
       - name: Check out repository
+        if: needs.plan.outputs.full == 'true'
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           persist-credentials: false
 
       - name: Set up Node.js
+        if: needs.plan.outputs.full == 'true'
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version: 22
           cache: npm
 
       - name: Set up stable Rust
+        if: needs.plan.outputs.full == 'true'
         uses: dtolnay/rust-toolchain@6c977a6ca4077a0ceb28ffbe03f59d46e9ac8772 # v1
         with:
           toolchain: stable
 
       - name: Install dependencies
+        if: needs.plan.outputs.full == 'true'
         run: npm ci --ignore-scripts
 
       - name: Build the JavaScript package
+        if: needs.plan.outputs.full == 'true'
         run: npm run js:build
 
       - name: Download every artifact this run produced
+        if: needs.plan.outputs.full == 'true'
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           path: qualification-artifacts
@@ -561,6 +682,7 @@ jobs:
       # SHA-256 against the source commit, and lists the contents of each
       # package a release would publish. No publication happens here.
       - name: Record the artifact inventory
+        if: needs.plan.outputs.full == 'true'
         env:
           # On a pull request `github.sha` is the synthesized merge commit,
           # which no clone can resolve; the head commit is the revision the
@@ -573,6 +695,7 @@ jobs:
             --summary "$GITHUB_STEP_SUMMARY"
 
       - name: Upload the artifact inventory
+        if: needs.plan.outputs.full == 'true'
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: artifact-inventory
