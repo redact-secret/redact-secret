@@ -20,12 +20,23 @@
  */
 
 import { execFileSync } from "node:child_process";
-import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { cp, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { CANONICAL_FIXTURE_ID, loadCanonicalFixture, packageVersion } from "./qualify-runtime-fixture.mjs";
+import {
+  CANONICAL_FIXTURE_ID,
+  REPO_ROOT_PATH,
+  loadCanonicalFixture,
+  packageVersion,
+} from "./qualify-runtime-fixture.mjs";
 import { qualifyBrowser, qualifyNode } from "./consumer-harness.mjs";
+
+const INTEGRATION_FIXTURE_IDS = Object.freeze({
+  redact: CANONICAL_FIXTURE_ID,
+  warn: "contextual-positive-minimum-length-is-medium-confidence",
+  block: "private-key-positive",
+});
 
 function parseArgs(argv) {
   const index = argv.indexOf("--lane");
@@ -57,21 +68,40 @@ async function buildConsumerProject(version) {
     "--no-audit",
     "--no-fund",
   ], { cwd: root, stdio: "inherit", shell: process.platform === "win32" });
+  await cp(
+    join(REPO_ROOT_PATH, "examples/safe-integration"),
+    join(root, "safe-integration"),
+    { recursive: true },
+  );
   return root;
 }
 
 async function main() {
   const { lane } = parseArgs(process.argv.slice(2));
   const fixture = await loadCanonicalFixture(CANONICAL_FIXTURE_ID);
+  const integrationFixtures = Object.fromEntries(
+    await Promise.all(
+      Object.entries(INTEGRATION_FIXTURE_IDS).map(async ([kind, id]) => [
+        kind,
+        await loadCanonicalFixture(id),
+      ]),
+    ),
+  );
   const expectedVersion = await packageVersion();
 
   let consumerRoot;
   try {
     consumerRoot = await buildConsumerProject(expectedVersion);
     if (lane === "node") {
-      qualifyNode(consumerRoot, fixture, expectedVersion);
+      qualifyNode(consumerRoot, fixture, expectedVersion, integrationFixtures);
     } else {
-      await qualifyBrowser(consumerRoot, fixture, expectedVersion);
+      await qualifyBrowser(
+        consumerRoot,
+        fixture,
+        expectedVersion,
+        "chromium",
+        integrationFixtures,
+      );
     }
   } finally {
     if (consumerRoot) await rm(consumerRoot, { recursive: true, force: true });

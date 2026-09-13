@@ -49,6 +49,12 @@ import { WASM_SPECIFIER, qualifyBrowser, qualifyNode } from "./consumer-harness.
 const JS_PACKAGE_ROOT = join(REPO_ROOT_PATH, "packages/javascript");
 const NODE_PLATFORM_ROOT = join(REPO_ROOT_PATH, "bindings/node");
 const WASM_PACKAGE_ROOT = join(REPO_ROOT_PATH, "bindings/wasm/npm");
+const SAFE_INTEGRATION_ROOT = join(REPO_ROOT_PATH, "examples/safe-integration");
+const INTEGRATION_FIXTURE_IDS = Object.freeze({
+  redact: CANONICAL_FIXTURE_ID,
+  warn: "contextual-positive-minimum-length-is-medium-confidence",
+  block: "private-key-positive",
+});
 
 function parseArgs(argv) {
   function value(name) {
@@ -148,12 +154,23 @@ async function buildConsumerProject(tarballs) {
     "--no-audit",
     "--no-fund",
   ], { cwd: root, stdio: "inherit" });
+  await cp(SAFE_INTEGRATION_ROOT, join(root, "safe-integration"), {
+    recursive: true,
+  });
   return root;
 }
 
 async function main() {
   const { lane, wasmDir, report, engine } = parseArgs(process.argv.slice(2));
   const fixture = await loadCanonicalFixture(CANONICAL_FIXTURE_ID);
+  const integrationFixtures = Object.fromEntries(
+    await Promise.all(
+      Object.entries(INTEGRATION_FIXTURE_IDS).map(async ([kind, id]) => [
+        kind,
+        await loadCanonicalFixture(id),
+      ]),
+    ),
+  );
   const expectedVersion = await packageVersion();
 
   const { specifier: nodeSpecifier, dir: nodePlatformDir } =
@@ -172,8 +189,14 @@ async function main() {
     consumerRoot = await buildConsumerProject(tarballs);
     const results =
       lane === "node"
-        ? qualifyNode(consumerRoot, fixture, expectedVersion)
-        : await qualifyBrowser(consumerRoot, fixture, expectedVersion, engine);
+        ? qualifyNode(consumerRoot, fixture, expectedVersion, integrationFixtures)
+        : await qualifyBrowser(
+            consumerRoot,
+            fixture,
+            expectedVersion,
+            engine,
+            integrationFixtures,
+          );
     const packageArtifacts = await Promise.all(
       [
         ["@redact-secret/core", tarballs.js],
@@ -200,6 +223,9 @@ async function main() {
               : { name: engine, version: results.engineVersion },
           productVersion: expectedVersion,
           fixture: fixture.id,
+          integrationFixtures: Object.fromEntries(
+            Object.entries(integrationFixtures).map(([kind, entry]) => [kind, entry.id]),
+          ),
           packageArtifacts,
           commands: [
             "npm install --no-audit --no-fund",
@@ -214,12 +240,14 @@ async function main() {
                   "scan",
                   "createIncrementalSanitizer",
                   "createNodeStreamSanitizer",
+                  "safeIntegration",
                 ]
               : [
                   "initialize",
                   "scan",
                   "createIncrementalSanitizer",
                   "createWebStreamSanitizer",
+                  "safeIntegration",
                 ],
           results,
         },
