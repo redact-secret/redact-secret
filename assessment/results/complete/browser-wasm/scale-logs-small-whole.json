@@ -1,0 +1,114 @@
+{
+  "schemaVersion": "3",
+  "surface": "browser-wasm",
+  "profileId": "scale-logs-small-whole",
+  "performance": {
+    "initialization": {
+      "unit": "milliseconds",
+      "samples": [
+        2.5,
+        3.2000000029802322
+      ],
+      "minimum": 2.5,
+      "median": 2.850000001490116,
+      "p95": 3.2000000029802322,
+      "maximum": 3.2000000029802322,
+      "mean": 2.850000001490116,
+      "standardDeviation": 0.3500000014901161
+    },
+    "processing": {
+      "unit": "milliseconds",
+      "samples": [
+        7.799999997019768,
+        6.799999997019768
+      ],
+      "minimum": 6.799999997019768,
+      "median": 7.299999997019768,
+      "p95": 7.799999997019768,
+      "maximum": 7.799999997019768,
+      "mean": 7.299999997019768,
+      "standardDeviation": 0.5
+    },
+    "throughput": {
+      "unit": "bytes-per-second",
+      "samples": [
+        8404358.97757012,
+        9640294.121872105
+      ],
+      "minimum": 8404358.97757012,
+      "median": 9022326.549721112,
+      "p95": 9640294.121872105,
+      "maximum": 9640294.121872105,
+      "mean": 9022326.549721112,
+      "standardDeviation": 617967.5721509922
+    },
+    "memory": {
+      "nodeHeap": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "A browser process does not expose Node heapUsed.",
+        "samplingLimit": "No samples were available."
+      },
+      "nodeRss": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "Browser pages do not expose process RSS through a standard API.",
+        "samplingLimit": "No samples were available."
+      },
+      "nodeExternal": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "Browser pages do not expose Node external memory.",
+        "samplingLimit": "No samples were available."
+      },
+      "browserJsHeap": {
+        "unit": "bytes",
+        "samples": [
+          {
+            "baselineBytes": 10000000,
+            "maximumObservedBytes": 10000000
+          },
+          {
+            "baselineBytes": 10000000,
+            "maximumObservedBytes": 10000000
+          }
+        ],
+        "samplingLimit": "Sampled immediately before and after processing; short-lived peaks between those boundaries may be missed, so maxima are observed samples, not guaranteed true peaks. performance.memory is non-standard, engine-dependent, and may be coarsened."
+      },
+      "wasmLinearMemory": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "The package intentionally keeps its WebAssembly.Memory handle private; the test harness cannot read linear-memory size without adding product instrumentation.",
+        "samplingLimit": "No samples were available."
+      },
+      "pythonHeap": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "The browser surface does not run inside a Python allocator.",
+        "samplingLimit": "No samples were available."
+      },
+      "processRss": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "Browser pages do not expose whole-process RSS through a standard API.",
+        "samplingLimit": "No samples were available."
+      },
+      "streamingBuffer": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "The public incremental session exposes lifecycle state but intentionally does not expose retained plaintext buffer size.",
+        "samplingLimit": "No samples were available."
+      }
+    }
+  },
+  "provenance": {
+    "commit": "a356e702e59b03cf297e0af15ba0423bc8466d48",
+    "artifactIdentity": "@redact-secret/wasm@0.1.0-beta.1",
+    "corpusVersion": "1",
+    "corpusHash": "b4db2cd22b4c008c9d63789df8ca2e21e697a21a84699466ea5f96c89d8e2806",
+    "os": "darwin-25.5.0",
+    "cpu": "arm64",
+    "runtime": "chromium-153.0.8010.12",
+    "command": "node scripts/assessment-browser-performance.mjs --engine chromium --artifact-dir /Users/minhokang/orca/workspaces/redact-secret/automate-reproducible-evaluation-and-record-base/bindings/wasm/pkg --profile scale-logs-small-whole --runs 2 --json-out assessment/results/complete/browser-wasm/scale-logs-small-whole.json --markdown-out assessment/results/complete/browser-wasm/scale-logs-small-whole.md"
+  }
+}

@@ -1,0 +1,114 @@
+{
+  "schemaVersion": "3",
+  "surface": "cli",
+  "profileId": "scale-logs-medium-fixed4096",
+  "performance": {
+    "initialization": {
+      "unit": "milliseconds",
+      "samples": [
+        2.186084000000001,
+        2.1267500000000155
+      ],
+      "minimum": 2.1267500000000155,
+      "median": 2.1564170000000082,
+      "p95": 2.186084000000001,
+      "maximum": 2.186084000000001,
+      "mean": 2.1564170000000082,
+      "standardDeviation": 0.029666999999992782
+    },
+    "processing": {
+      "unit": "milliseconds",
+      "samples": [
+        49.5595,
+        48.925250000000005
+      ],
+      "minimum": 48.925250000000005,
+      "median": 49.242375,
+      "p95": 49.5595,
+      "maximum": 49.5595,
+      "mean": 49.242375,
+      "standardDeviation": 0.3171249999999972
+    },
+    "throughput": {
+      "unit": "bytes-per-second",
+      "samples": [
+        5289682.099294787,
+        5358255.706409267
+      ],
+      "minimum": 5289682.099294787,
+      "median": 5323968.902852027,
+      "p95": 5358255.706409267,
+      "maximum": 5358255.706409267,
+      "mean": 5323968.902852027,
+      "standardDeviation": 34286.80355723994
+    },
+    "memory": {
+      "nodeHeap": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "The CLI is a native process, not a Node.js process.",
+        "samplingLimit": "No samples were available."
+      },
+      "nodeRss": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "The CLI is a native process, not a Node.js process.",
+        "samplingLimit": "No samples were available."
+      },
+      "nodeExternal": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "The CLI is a native process, not a Node.js process.",
+        "samplingLimit": "No samples were available."
+      },
+      "browserJsHeap": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "The CLI is a native process, not a browser JavaScript environment.",
+        "samplingLimit": "No samples were available."
+      },
+      "wasmLinearMemory": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "The CLI is a native process and does not use WebAssembly linear memory.",
+        "samplingLimit": "No samples were available."
+      },
+      "pythonHeap": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "The CLI is a native process, not a Python allocator.",
+        "samplingLimit": "No samples were available."
+      },
+      "processRss": {
+        "unit": "bytes",
+        "samples": [
+          {
+            "baselineBytes": 0,
+            "maximumObservedBytes": 2244608
+          },
+          {
+            "baselineBytes": 0,
+            "maximumObservedBytes": 2211840
+          }
+        ],
+        "samplingLimit": "A separate, untimed /usr/bin/time-wrapped repetition's whole-process maximum resident set size; it includes process startup, argument parsing, the Rust runtime, and the entire scan, and cannot isolate steady-state or Rust-only memory."
+      },
+      "streamingBuffer": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "The CLI's standard-input path streams through the incremental core, but the public contract exposes no retained plaintext buffer size.",
+        "samplingLimit": "No samples were available."
+      }
+    }
+  },
+  "provenance": {
+    "commit": "a356e702e59b03cf297e0af15ba0423bc8466d48",
+    "artifactIdentity": "redact-secret@0.1.0-beta.1",
+    "corpusVersion": "1",
+    "corpusHash": "b4db2cd22b4c008c9d63789df8ca2e21e697a21a84699466ea5f96c89d8e2806",
+    "os": "darwin-25.5.0",
+    "cpu": "arm64",
+    "runtime": "rustc 1.98.1 (48a229cea 2026-09-01)",
+    "command": "node scripts/assessment-cli-performance.mjs --binary target/release/redact-secret --profile scale-logs-medium-fixed4096 --runs 2 --json-out assessment/results/complete/cli/scale-logs-medium-fixed4096.json --markdown-out assessment/results/complete/cli/scale-logs-medium-fixed4096.md"
+  }
+}

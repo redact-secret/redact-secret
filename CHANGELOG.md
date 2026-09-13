@@ -5,6 +5,11 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+- A complete assessment command and manually triggered CI workflow now evaluate
+  Rust, installed Python, Node, browser WebAssembly, and CLI artifacts against
+  shared whole-input and incremental profiles, fail closed on missing or
+  inconsistent results, and preserve raw samples plus consolidated JSON and
+  Markdown baseline evidence with explicit measurement limitations.
 - Assessment tooling now includes a CLI binary runner, self-test command, and
   first checked-in correctness/performance baseline with explicit process
   startup, process-inclusive processing, and whole-process RSS measurements.

@@ -1,0 +1,86 @@
+name: Complete assessment
+
+# Manually builds one host's real product artifacts and records a bounded,
+# complete cross-language accuracy/performance baseline. This publishes
+# nothing and is not a release gate.
+on:
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  evaluate:
+    name: Evaluate every product surface
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+    env:
+      WASM_BINDGEN_VERSION: "0.2.128"
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+
+      - name: Set up Rust and the browser target
+        uses: dtolnay/rust-toolchain@6c977a6ca4077a0ceb28ffbe03f59d46e9ac8772 # v1
+        with:
+          toolchain: stable
+          targets: wasm32-unknown-unknown
+
+      - name: Cache Cargo artifacts
+        uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+        with:
+          key: complete-assessment
+
+      - name: Install repository and addon dependencies
+        run: |
+          npm ci --ignore-scripts
+          npm --prefix bindings/node ci --ignore-scripts
+
+      - name: Build native, browser, JavaScript, CLI, and Python artifacts
+        run: |
+          npm --prefix bindings/node run build
+          npm run js:build
+          cargo install wasm-bindgen-cli --version "$WASM_BINDGEN_VERSION" --locked
+          npm run wasm:build
+          cargo build --release --locked -p redact-secret-cli
+          python -m pip install 'maturin>=1.10,<2'
+          maturin build --release --locked -m bindings/python/Cargo.toml -o dist
+
+      - name: Install the candidate Python wheel without an index or source fallback
+        run: |
+          python -m venv .venv
+          .venv/bin/python -m pip install --no-index --no-deps --only-binary :all: \
+            --disable-pip-version-check dist/redact_secret-*.whl
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run the complete bounded assessment
+        run: npm run assessment:all -- --python .venv/bin/python --output-dir assessment-output
+
+      - name: Add the consolidated baseline to the workflow summary
+        if: always() && hashFiles('assessment-output/baseline.md') != ''
+        run: sed -n '1,$p' assessment-output/baseline.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload raw samples, results, and consolidated reports
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: complete-assessment-${{ github.sha }}
+          path: assessment-output/
+          if-no-files-found: error
