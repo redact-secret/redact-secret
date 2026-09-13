@@ -9,14 +9,15 @@
  *
  * `optionalDependencies`/`dependencies` in `packages/javascript/package.json`
  * name registry versions of `@redact-secret/node-<platform>` and
- * `@redact-secret/wasm` (issue #79) that are not published yet
- * (RB-2, issue #72, is what starts publishing `packages/javascript` at
- * all). This script substitutes local tarballs for exactly those two
- * dependency kinds via npm's `overrides`, which is the standard way to
- * exercise a real install shape without a real registry; everything else
- * about the install — `optionalDependencies` resolution, `os`/`cpu`/`libc`
- * matching, the resulting `node_modules` layout — is the real npm installer,
- * not a simulation of it.
+ * `@redact-secret/wasm` (issue #79). During candidate qualification those
+ * exact package identities are represented by local tarballs from the current
+ * source revision, even if a previous product version already exists in the
+ * registry. This script substitutes those tarballs via npm's `overrides`,
+ * which is the standard way to exercise a real install shape before
+ * publishing a new version; everything else about the install —
+ * `optionalDependencies` resolution, `os`/`cpu`/`libc` matching, the
+ * resulting `node_modules` layout — is the real npm installer, not a
+ * simulation of it.
  *
  * Preconditions (the same artifacts `qualify-node-addon.mjs` and
  * `qualify-browser-artifact.mjs` require):

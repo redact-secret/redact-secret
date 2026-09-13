@@ -46,6 +46,7 @@ FIXTURES = ROOT / "conformance" / "fixtures"
 NPM_PACKAGE = Path("packages") / "javascript"
 CRATE = "redact-secret"
 PUBLIC_API_REVIEW = Path("docs/audits/candidate-public-contract-review.md")
+CURRENT_PUBLIC_API_REVIEW = Path("docs/audits/beta2-final-code-review.md")
 CHANGELOG = Path("CHANGELOG.md")
 RELEASE_WORKFLOW = Path(".github/workflows/release.yml")
 REGISTRY_INSTALL_VERIFIER = Path("scripts/verify-registry-install.mjs")
@@ -313,9 +314,14 @@ def release_readiness_record() -> dict:
         "issue": 203,
         "publicApiAndChangelogReview": {
             "status": "required-before-release-approval",
+            "currentPublicApiReview": {
+                "path": str(CURRENT_PUBLIC_API_REVIEW),
+                "sha256": digest(ROOT / CURRENT_PUBLIC_API_REVIEW),
+            },
             "publicApiReview": {
                 "path": str(PUBLIC_API_REVIEW),
                 "sha256": digest(ROOT / PUBLIC_API_REVIEW),
+                "scope": "historical-beta.1-candidate-review",
             },
             "changelog": {
                 "path": str(CHANGELOG),
