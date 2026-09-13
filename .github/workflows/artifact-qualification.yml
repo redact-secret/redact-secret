@@ -43,6 +43,7 @@ on:
       - .github/workflows/artifact-qualification.yml
       - Cargo.toml
       - bindings/node/package.json
+      - examples/safe-integration/**
       - scripts/browser-harness.mjs
       - scripts/browser-package-harness.mjs
       - scripts/build-browser-artifact.mjs

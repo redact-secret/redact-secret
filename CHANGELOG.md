@@ -5,6 +5,11 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+- Executable browser and server integration examples now demonstrate
+  preventive client scanning, authoritative block and warning enforcement,
+  fail-closed downstream handling, and explicit transport, input, output,
+  finding-count, and concurrency limits. Candidate qualification runs them
+  against clean installs of the packed Node and browser WebAssembly artifacts.
 - Fixed performance and resource thresholds, derived from the first complete
   cross-surface baseline, can now evaluate five-repetition RC evidence for the
   qualified macOS arm64 environment without treating unavailable or overlapping

@@ -39,6 +39,12 @@ If initialization or processing fails, stop the operation. Returning raw input
 from a catch block defeats the boundary. Never log raw callback exceptions,
 input excerpts, request bodies, or `input.slice(start, end)`.
 
+For a runnable browser/server pair, see the
+[safe integration examples](../../examples/safe-integration/README.md). They
+exercise clean, redact, block, warn, failure, and limit paths, and the artifact
+qualification workflow runs them against clean installs of the packed Node and
+browser WebAssembly candidates.
+
 ## Bound resources before scanning
 
 Whole-input APIs do not impose automatic input-size or finding-count limits.
