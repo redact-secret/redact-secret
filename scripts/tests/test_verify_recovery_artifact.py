@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import importlib.util
 import io
+import json
 import sys
 import tempfile
 import unittest
@@ -79,6 +80,64 @@ class RecoveryArtifactTests(unittest.TestCase):
 
         self.assertEqual(state.status, "unobservable")
         self.assertEqual(state.reason, "PyPI returned HTTP 503")
+
+    def test_fetch_pypi_state_classifies_registry_observations(self):
+        inventory = {"artifacts": [{"file": "synthetic.whl", "sha256": "a" * 64}]}
+        original_urlopen = CHECK.urlopen
+
+        class Response:
+            def __init__(self, payload: bytes):
+                self.payload = io.BytesIO(payload)
+
+            def __enter__(self):
+                return self.payload
+
+            def __exit__(self, *_args):
+                return False
+
+        def with_urlopen(stub):
+            try:
+                CHECK.urlopen = stub
+                return CHECK.fetch_pypi_state(inventory, "synthetic-project", "synthetic-version")
+            finally:
+                CHECK.urlopen = original_urlopen
+
+        complete_payload = json.dumps(
+            {"urls": [{"filename": "synthetic.whl", "digests": {"sha256": "a" * 64}}]}
+        ).encode()
+        self.assertEqual(
+            with_urlopen(lambda *_args, **_kwargs: Response(complete_payload)).status,
+            "complete",
+        )
+        self.assertEqual(
+            with_urlopen(
+                lambda *_args, **_kwargs: (_ for _ in ()).throw(
+                    CHECK.HTTPError("https://pypi.example.invalid", 404, "missing", {}, io.BytesIO())
+                )
+            ).status,
+            "absent",
+        )
+        for status in (401, 403, 429, 500):
+            with self.subTest(status=status):
+                state = with_urlopen(
+                    lambda *_args, status=status, **_kwargs: (_ for _ in ()).throw(
+                        CHECK.HTTPError("https://pypi.example.invalid", status, "error", {}, io.BytesIO())
+                    )
+                )
+                self.assertEqual(state.status, "unobservable")
+                self.assertEqual(state.reason, f"PyPI returned HTTP {status}")
+        self.assertEqual(
+            with_urlopen(
+                lambda *_args, **_kwargs: (_ for _ in ()).throw(
+                    CHECK.URLError("synthetic transport failure")
+                )
+            ).status,
+            "unobservable",
+        )
+        self.assertEqual(
+            with_urlopen(lambda *_args, **_kwargs: Response(b"{not-json")).status,
+            "unobservable",
+        )
 
     def test_partial_pypi_recovery_stages_only_missing_verified_files(self):
         wheel = b"synthetic wheel bytes"
