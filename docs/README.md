@@ -20,6 +20,7 @@ Python, Rust, and the CLI share one deterministic Rust implementation.
 | Can I process a stream? | [Streaming](guides/streaming.md) |
 | Why did initialization or sanitization fail? | [Troubleshooting](troubleshooting.md) |
 | How do I contribute or run checks? | [Developer onboarding](onboarding.md) · [Contribution guide](../CONTRIBUTION.md) |
+| How do I prepare, publish, or recover a release? | [Release runbook](releasing.md) |
 
 JavaScript, Rust, Python, and CLI standard input all support incremental
 sanitization alongside whole-input operations. A `block` finding is replaced
@@ -33,7 +34,7 @@ list is not proof that input contains no secrets.
   and [artifact qualification](qualification.md)
 - [Detection coverage evidence](coverage/README.md)
 - [Detection reliability evidence](reference/detection-reliability.md)
-- [Review archive](audits/README.md) and [this pre-release review](audits/pre-release-code-and-docs-review.md)
+- [Review archive](audits/README.md) and [beta.2 final code review](audits/beta2-final-code-review.md)
 - [Changelog](../CHANGELOG.md), [security reporting](../SECURITY.md), and [MIT license](../LICENSE)
 - [Documentation readiness and delivery follow-up](documentation-readiness.md)
 

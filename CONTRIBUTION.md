@@ -91,6 +91,9 @@ flowchart TD
 
 ## Releases
 
+Follow the [release runbook](docs/releasing.md) for candidate preparation,
+non-publishing qualification, approval, publication, recovery, and closeout.
+
 The Rust crates, npm packages, Python distribution, and CLI share one SemVer
 version, source revision, and eventual `v{version}` tag. Follow the
 [release authority](AGENTS.md#release-authority),
@@ -100,24 +103,10 @@ does not establish that the whole product has been released. Partial publication
 requires separately authorized [Reconcile Release](.github/workflows/reconcile-release.yml)
 using the durable release manifest and matching qualified artifacts.
 
-### First beta candidate
+### Release evidence
 
-The preparation branch is `rc/0.1.0-beta.1`. The existing manifests already
-agree on `0.1.0-beta.1` (Python distribution metadata: `0.1.0b1`). The
-[candidate changelog](CHANGELOG.md) records the public contract; this is not
-a publication record or permission to publish.
-
-Before requesting final release approval:
-
-- Complete stabilization on `rc/0.1.0-beta.1` using the branch path above.
-- Resolve or explicitly disposition the residual findings in the
-  [latest readiness audit](docs/audits/repeated-release-readiness-audit.md#blocking-residual-findings-and-exact-exits):
-  partial-publication recovery, complete failed-run manifests, review and
-  qualification protection, publisher prerequisites, and SAST ownership.
-  Closed tracking issues and green CI alone do not resolve these findings.
-- Review the candidate version, public API, and changelog; run CI, Python
-  wheels, artifact qualification, and SAST against the final source revision.
-  Any further commit needs fresh qualification for that revision.
-- Obtain explicit release approval after those checks. Publish through the
-  approved workflow, verify registry installs, and retain the release manifest.
-  Use reconciliation only with separate authorization.
+The [beta.1 record](docs/releases/0.1.0-beta.1/README.md) describes the completed
+first publication and recovery. Subsequent development is recorded under
+`Unreleased` in the [changelog](CHANGELOG.md). The
+[beta.2 review](docs/audits/beta2-final-code-review.md) records the current
+pre-release findings; its verification is not approval to publish.
