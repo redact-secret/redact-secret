@@ -1,0 +1,67 @@
+[
+  {
+    "fixtureId": "logs-github-token",
+    "kind": "missing",
+    "detector": "github-token",
+    "type": "github_token",
+    "expectedRange": [
+      39,
+      78
+    ],
+    "expectedPolicy": "redact"
+  },
+  {
+    "fixtureId": "logs-contextual-secret-warn",
+    "kind": "missing",
+    "detector": "generic-token",
+    "type": "contextual_secret",
+    "expectedRange": [
+      38,
+      75
+    ],
+    "expectedPolicy": "warn"
+  },
+  {
+    "fixtureId": "code-aws-access-key",
+    "kind": "missing",
+    "detector": "aws-access-key",
+    "type": "aws_access_key_id",
+    "expectedRange": [
+      24,
+      43
+    ],
+    "expectedPolicy": "redact"
+  },
+  {
+    "fixtureId": "chat-bearer-token",
+    "kind": "extra",
+    "detector": "bearer-token",
+    "type": "bearer_token",
+    "actualRange": [
+      55,
+      88
+    ]
+  },
+  {
+    "fixtureId": "chat-bearer-token",
+    "kind": "missing",
+    "detector": "bearer-token",
+    "type": "bearer_token",
+    "expectedRange": [
+      48,
+      88
+    ],
+    "expectedPolicy": "redact"
+  },
+  {
+    "fixtureId": "logs-unicode-astral-boundary",
+    "kind": "missing",
+    "detector": "github-token",
+    "type": "github_token",
+    "expectedRange": [
+      11,
+      50
+    ],
+    "expectedPolicy": "redact"
+  }
+]

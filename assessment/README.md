@@ -176,6 +176,65 @@ builds and installs the real artifacts, runs this command, places the Markdown
 baseline in the workflow summary, and uploads the complete output directory.
 It publishes nothing and is not a release gate.
 
+## Fixed RC performance and resource acceptance
+
+[`acceptance-criteria.json`](./acceptance-criteria.json) fixes the first RC
+criteria before candidate measurement. The criteria use the first complete
+baseline at commit `a356e702e59b03cf297e0af15ba0423bc8466d48` and pin both
+corpus identities. They cover the two representative log-processing profiles:
+64 KiB whole-input and 256 KiB fixed-4096 incremental input (standard input for
+the CLI). Five repetitions are required so a two-sample exploratory baseline
+cannot be mistaken for formal acceptance evidence.
+
+The environment profile is deliberately narrow: macOS on arm64/aarch64, Node
+22, Chromium, CPython 3, and the host Rust toolchain. This is the environment
+the first measurements characterize. Evidence from another OS, architecture,
+Node major, or browser engine remains useful assessment evidence, but it cannot
+silently claim these host-qualified thresholds. Add and baseline a separately
+reviewed environment profile before accepting one.
+
+Timing ceilings are approximately twice the first observed p95, rounded upward
+to stable operational values; throughput floors are approximately half the
+first observed minimum, rounded downward. The margin accommodates ordinary
+host jitter while still detecting a material regression. Memory caps likewise
+round upward from observed maxima with category-specific headroom. Only a
+category the surface can observe is capped: Rust and CLI process RSS, Python
+allocator plus process RSS, Node heap/RSS/external memory, and Chromium's
+coarsened JavaScript heap observation. These categories can overlap and must
+not be summed. WebAssembly linear memory and retained streaming buffers remain
+unobservable without widening the product contract, so their explicit
+unavailability is preserved rather than converted to a zero or an invented
+limit.
+
+The accuracy counts are pinned to the first baseline only as a no-drift check
+across all five artifacts. This performance/resource decision does not convert
+the assessment corpus into a conformance gate or approve its known accuracy
+mismatches.
+
+After producing a fresh five-repetition complete assessment from one candidate
+revision, evaluate it with:
+
+```bash
+npm run assessment:acceptance -- \
+  --summary assessment-output/summary.json \
+  --json-out assessment-output/acceptance.json \
+  --markdown-out assessment-output/acceptance.md
+```
+
+The command validates completeness, repetitions, corpus identities, the host
+profile, accuracy parity, timing, throughput, and observable memory. It writes
+machine-readable and Markdown evidence before exiting non-zero on rejection.
+The manually triggered workflow runs the same command and uploads both the raw
+assessment and acceptance result. This readiness evidence does not select a
+version or authorize tagging, publication, deployment, or release.
+
+The first formal candidate evaluation is committed under
+[`results/acceptance/`](./results/acceptance/): the
+[`acceptance report`](./results/acceptance/acceptance.md) links its complete
+machine-readable summary, which in turn links all 15 per-surface raw results
+and reports. It used the already-fixed criteria from commit `054076f` and five
+repetitions; all 46 timing, throughput, and observable-memory checks passed.
+
 The first durable run of that command is committed as
 [`results/complete/baseline.md`](./results/complete/baseline.md), with its
 machine-readable rollup in

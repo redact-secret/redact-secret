@@ -1,0 +1,67 @@
+[
+  {
+    "detector": "github-token",
+    "expectedPolicy": "redact",
+    "expectedRange": [
+      39,
+      78
+    ],
+    "fixtureId": "logs-github-token",
+    "kind": "missing",
+    "type": "github_token"
+  },
+  {
+    "detector": "generic-token",
+    "expectedPolicy": "warn",
+    "expectedRange": [
+      38,
+      75
+    ],
+    "fixtureId": "logs-contextual-secret-warn",
+    "kind": "missing",
+    "type": "contextual_secret"
+  },
+  {
+    "detector": "aws-access-key",
+    "expectedPolicy": "redact",
+    "expectedRange": [
+      24,
+      43
+    ],
+    "fixtureId": "code-aws-access-key",
+    "kind": "missing",
+    "type": "aws_access_key_id"
+  },
+  {
+    "actualRange": [
+      55,
+      88
+    ],
+    "detector": "bearer-token",
+    "fixtureId": "chat-bearer-token",
+    "kind": "extra",
+    "type": "bearer_token"
+  },
+  {
+    "detector": "bearer-token",
+    "expectedPolicy": "redact",
+    "expectedRange": [
+      48,
+      88
+    ],
+    "fixtureId": "chat-bearer-token",
+    "kind": "missing",
+    "type": "bearer_token"
+  },
+  {
+    "detector": "github-token",
+    "expectedPolicy": "redact",
+    "expectedRange": [
+      11,
+      50
+    ],
+    "fixtureId": "logs-unicode-astral-boundary",
+    "kind": "missing",
+    "type": "github_token"
+  }
+]

@@ -1,0 +1,135 @@
+{
+  "performance": {
+    "initialization": {
+      "maximum": 0.28479200000000005,
+      "mean": 0.0655666,
+      "median": 0.011333,
+      "minimum": 0.009000000000000001,
+      "p95": 0.28479200000000005,
+      "samples": [
+        0.28479200000000005,
+        0.011333,
+        0.013208,
+        0.0095,
+        0.009000000000000001
+      ],
+      "standardDeviation": 0.10962274055979444,
+      "unit": "milliseconds"
+    },
+    "memory": {
+      "browserJsHeap": {
+        "samples": [],
+        "samplingLimit": "No samples were available.",
+        "unavailableReason": "The Rust library does not run inside a browser JavaScript heap.",
+        "unit": "bytes"
+      },
+      "nodeExternal": {
+        "samples": [],
+        "samplingLimit": "No samples were available.",
+        "unavailableReason": "The Rust library has no Node external-memory category.",
+        "unit": "bytes"
+      },
+      "nodeHeap": {
+        "samples": [],
+        "samplingLimit": "No samples were available.",
+        "unavailableReason": "The Rust library does not run inside a Node.js heap.",
+        "unit": "bytes"
+      },
+      "nodeRss": {
+        "samples": [],
+        "samplingLimit": "No samples were available.",
+        "unavailableReason": "The Rust library does not run inside a Node.js process.",
+        "unit": "bytes"
+      },
+      "processRss": {
+        "samples": [
+          {
+            "baselineBytes": 3407872,
+            "maximumObservedBytes": 3407872
+          },
+          {
+            "baselineBytes": 3522560,
+            "maximumObservedBytes": 3522560
+          },
+          {
+            "baselineBytes": 3522560,
+            "maximumObservedBytes": 3522560
+          },
+          {
+            "baselineBytes": 3538944,
+            "maximumObservedBytes": 3555328
+          },
+          {
+            "baselineBytes": 3555328,
+            "maximumObservedBytes": 3555328
+          }
+        ],
+        "samplingLimit": "Sampled immediately before and after processing; short-lived peaks between those boundaries may be missed, so maxima are observed samples, not guaranteed true peaks.",
+        "unit": "bytes"
+      },
+      "pythonHeap": {
+        "samples": [],
+        "samplingLimit": "No samples were available.",
+        "unavailableReason": "The Rust library does not run inside a Python allocator.",
+        "unit": "bytes"
+      },
+      "streamingBuffer": {
+        "samples": [],
+        "samplingLimit": "No samples were available.",
+        "unavailableReason": "The public incremental session exposes lifecycle state but intentionally does not expose retained plaintext buffer size.",
+        "unit": "bytes"
+      },
+      "wasmLinearMemory": {
+        "samples": [],
+        "samplingLimit": "No samples were available.",
+        "unavailableReason": "The Rust library surface does not use WebAssembly linear memory.",
+        "unit": "bytes"
+      }
+    },
+    "processing": {
+      "maximum": 90.537,
+      "mean": 90.1314002,
+      "median": 89.958125,
+      "minimum": 89.74891699999999,
+      "p95": 90.537,
+      "samples": [
+        90.537,
+        90.48175,
+        89.74891699999999,
+        89.931209,
+        89.958125
+      ],
+      "standardDeviation": 0.31738002139227933,
+      "unit": "milliseconds"
+    },
+    "throughput": {
+      "maximum": 730415.499052763,
+      "mean": 727324.9054552806,
+      "median": 728716.8335267104,
+      "minimum": 724057.5676242862,
+      "p95": 730415.499052763,
+      "samples": [
+        724057.5676242862,
+        724499.691926825,
+        730415.499052763,
+        728934.9351458179,
+        728716.8335267104
+      ],
+      "standardDeviation": 2558.8574062835623,
+      "unit": "bytes-per-second"
+    }
+  },
+  "profileId": "scale-logs-small-whole",
+  "provenance": {
+    "artifactIdentity": "redact-secret@0.1.0-beta.1",
+    "command": "cargo run -p redact-secret --example assessment_adapter -- performance --profile scale-logs-small-whole --runs 5 --json-out assessment/results/acceptance/rust-core/scale-logs-small-whole.json --markdown-out assessment/results/acceptance/rust-core/scale-logs-small-whole.md",
+    "commit": "054076f1d3cc870a04249eb40fdce0b07f546ed2",
+    "corpusHash": "b4db2cd22b4c008c9d63789df8ca2e21e697a21a84699466ea5f96c89d8e2806",
+    "corpusVersion": "1",
+    "cpu": "aarch64",
+    "os": "macos-25.5.0",
+    "runtime": "rustc-1.98.1 (48a229cea 2026-09-01)"
+  },
+  "schemaVersion": "3",
+  "surface": "rust-core"
+}
