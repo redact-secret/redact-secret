@@ -61,13 +61,22 @@ export function createStreamSanitizerRuntime(
     }
   }
 
+  function accumulateFindings(next: readonly SecretFinding[]): void {
+    try {
+      for (const finding of next) findings.push(finding);
+    } catch {
+      abort();
+      throw new SecretScanError("INVALID_STATE");
+    }
+  }
+
   function append(chunk: Uint8Array): IncrementalSanitizerResult {
     if (!(chunk instanceof Uint8Array)) {
       abort();
       throw new SecretScanError("INVALID_CHUNK");
     }
     const result = session.append(decode(chunk, true));
-    findings.push(...result.findings);
+    accumulateFindings(result.findings);
     return result;
   }
 
@@ -89,7 +98,8 @@ export function createStreamSanitizerRuntime(
       abort();
       throw error;
     }
-    findings.push(...decodedResult.findings, ...finalResult.findings);
+    accumulateFindings(decodedResult.findings);
+    accumulateFindings(finalResult.findings);
     return Object.freeze({
       text: decodedResult.text + finalResult.text,
       findings: Object.freeze([
