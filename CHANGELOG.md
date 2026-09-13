@@ -5,6 +5,9 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+- Assessment tooling now includes a CLI binary runner, self-test command, and
+  first checked-in correctness/performance baseline with explicit process
+  startup, process-inclusive processing, and whole-process RSS measurements.
 - Assessment tooling now evaluates an installed Python package through both
   whole-input and incremental APIs, normalizes code-point ranges to canonical
   UTF-8 byte spans, and records the first correctness, timing, Python-allocation,

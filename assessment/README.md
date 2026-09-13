@@ -307,11 +307,11 @@ finding, checked byte-for-byte against the placeholder text its own reported
 findings imply. Any of these failing aborts the run before an
 `AssessmentResult` is emitted.
 
-`npm run assessment:cli:self-test` runs tiny known-answer checks — a UTF-8
-byte range spanning an astral character, redaction, a decode failure, and a
-usage failure — through `cargo run -p redact-secret-cli --`, so they need no
-prebuilt release artifact. `assessment:check`'s vitest run exercises the same
-self-test via
+`npm run assessment:cli:self-test` builds the debug CLI once and runs tiny
+known-answer checks directly against that binary — a UTF-8 byte range spanning
+an astral character, redaction, a decode failure, and a usage failure — so they
+need no prebuilt release artifact. `assessment:check`'s vitest run exercises
+the same self-test via
 [`adapters/cli-adapter.test.ts`](./adapters/cli-adapter.test.ts), on the same
 terms `adapters/rust-adapter.test.ts` exercises the Rust adapter's self-test.
 

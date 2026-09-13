@@ -46,7 +46,9 @@ import { buildAndEmitAccuracyResult, loadAssessmentSchema, loadAssessmentScoring
 import {
   accuracyCorpusHash, gitCommit, hostCpu, hostOs, loadAccuracyCorpus,
 } from "./lib/assessment-provenance.mjs";
-import { cliVersion, resolveCliBinary, runCliProcess, rustcVersion, scanStdinJson } from "./lib/assessment-cli.mjs";
+import {
+  buildCliForSelfTest, cliVersion, resolveCliBinary, runCliProcess, rustcVersion, scanStdinJson,
+} from "./lib/assessment-cli.mjs";
 
 const PROFILE_ID = "accuracy-corpus";
 const REDACTED_ACTIONS = new Set(["redact", "block"]);
@@ -151,7 +153,7 @@ function verifyRedactMode(invoke, fixtures, rawFindingsByFixture) {
     let cursor = 0;
     redacted.forEach((finding, placeholder) => {
       pieces.push(source.subarray(cursor, finding.start));
-      pieces.push(Buffer.from(`<SECRET_${placeholder + 1}>`, "utf8"));
+      pieces.push(Buffer.from(["<SECRET_", placeholder + 1, ">"].join(""), "utf8"));
       cursor = finding.end;
     });
     pieces.push(source.subarray(cursor));
@@ -162,13 +164,11 @@ function verifyRedactMode(invoke, fixtures, rawFindingsByFixture) {
   if (checked === 0) fail("no accuracy-corpus fixture exercised redaction");
 }
 
-function cargoInvoke(args, stdinBuffer) {
-  return runCliProcess("cargo", ["run", "-p", "redact-secret-cli", "--", ...args], stdinBuffer);
-}
-
 /**
- * Tiny known-answer checks that need no prebuilt binary — `cargo run` builds
- * a debug binary on demand, the same way
+ * Tiny known-answer checks that need no prebuilt binary — Cargo builds a
+ * debug binary on demand, then every check invokes that binary directly. The
+ * direct invocation ensures the observed output and exit status belong to the
+ * CLI rather than its build wrapper. This follows the same terms
  * `assessment/adapters/rust-adapter.test.ts` drives the Rust adapter's own
  * `self-test` mode. Exercises check mode, redact mode, JSON reporting, a
  * UTF-8 byte range spanning an astral character, a decode failure, and a
@@ -177,13 +177,15 @@ function cargoInvoke(args, stdinBuffer) {
  * above, which require a real release artifact.
  */
 function runSelfTest() {
+  const binary = buildCliForSelfTest();
+  const invoke = (args, stdinBuffer) => runCliProcess(binary, args, stdinBuffer);
   const unicodeInput = "\u{1F511} API_KEY=ghp_SYNTHETICREVOKED00000000000000000000";
-  const findings = scanStdinJson(cargoInvoke, Buffer.from(unicodeInput, "utf8"));
+  const findings = scanStdinJson(invoke, Buffer.from(unicodeInput, "utf8"));
   if (findings.length !== 1) fail("self-test: unicode known-answer scan produced no finding");
   const expectedStart = Buffer.byteLength("\u{1F511} API_KEY=", "utf8");
   if (findings[0].start !== expectedStart) fail("self-test: unicode known-answer range was not a UTF-8 byte range");
 
-  const redacted = cargoInvoke(["--redact"], Buffer.from(unicodeInput, "utf8"));
+  const redacted = invoke(["--redact"], Buffer.from(unicodeInput, "utf8"));
   if (redacted.status !== 0) fail("self-test: redact mode did not exit cleanly");
   if (redacted.stdout.toString("utf8").includes("SYNTHETICREVOKED")) {
     fail("self-test: redact mode left the matched value in its output");
@@ -191,13 +193,13 @@ function runSelfTest() {
 
   let failedClosed = false;
   try {
-    scanStdinJson(cargoInvoke, Buffer.from([0xff, 0xfe, 0x00]));
+    scanStdinJson(invoke, Buffer.from([0xff, 0xfe, 0x00]));
   } catch {
     failedClosed = true;
   }
   if (!failedClosed) fail("self-test: malformed standard input did not fail the evaluation");
 
-  const usageError = cargoInvoke(["--not-an-option"], Buffer.alloc(0));
+  const usageError = invoke(["--not-an-option"], Buffer.alloc(0));
   if (usageError.status !== 2) fail("self-test: a usage error did not exit 2");
   if (!usageError.stderr.toString("utf8").includes("usage: redact-secret")) {
     fail("self-test: a usage error printed no usage block");

@@ -47,6 +47,35 @@ export function runCliProcess(command, args, stdinBuffer = Buffer.alloc(0)) {
   return result;
 }
 
+/** Builds the debug CLI once and returns Cargo's exact executable path. */
+export function buildCliForSelfTest() {
+  const result = spawnSync(
+    "cargo",
+    ["build", "-p", "redact-secret-cli", "--bin", CLI_BINARY_NAME, "--message-format=json-render-diagnostics"],
+    { cwd: REPO_ROOT, encoding: "utf8", maxBuffer: 64 * 1024 * 1024 },
+  );
+  if (result.error !== undefined) throw result.error;
+  if (result.status !== 0) throw new Error("cargo could not build the CLI self-test binary");
+
+  for (const line of result.stdout.trim().split("\n").reverse()) {
+    let message;
+    try {
+      message = JSON.parse(line);
+    } catch {
+      continue;
+    }
+    if (
+      message.reason === "compiler-artifact" &&
+      message.target?.name === CLI_BINARY_NAME &&
+      message.target.kind?.includes("bin") &&
+      typeof message.executable === "string"
+    ) {
+      return message.executable;
+    }
+  }
+  throw new Error("cargo did not report the CLI self-test binary path");
+}
+
 /**
  * Runs `--json` check mode against standard input and returns the report's
  * safe finding metadata in the CLI's own canonical UTF-8 byte ranges.
