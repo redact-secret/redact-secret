@@ -50,8 +50,8 @@ sufficient coverage evidence.
   [#187](https://github.com/redact-secret/redact-secret/issues/187),
   [#188](https://github.com/redact-secret/redact-secret/issues/188),
   [#189](https://github.com/redact-secret/redact-secret/issues/189), and
-  [#190](https://github.com/redact-secret/redact-secret/issues/190); only #190
-  remains pending.
+  [#190](https://github.com/redact-secret/redact-secret/issues/190). All five
+  historical breadth gaps now have reproducible resolution evidence.
 
 Tests: `python3 -B -m unittest discover -s scripts/tests -p 'test_generate_coverage_inventory.py'`.
 

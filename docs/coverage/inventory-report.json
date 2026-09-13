@@ -868,7 +868,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 46,
+        "fixtureCount": 51,
         "hostContextsExercised": [
           "chat",
           "dotenv",
@@ -876,6 +876,7 @@
           "javascript",
           "json",
           "log",
+          "markdown",
           "plain-text",
           "shell"
         ],
@@ -916,7 +917,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 46,
+        "fixtureCount": 51,
         "hostContextsExercised": [
           "chat",
           "dotenv",
@@ -924,6 +925,7 @@
           "javascript",
           "json",
           "log",
+          "markdown",
           "plain-text",
           "shell"
         ],
@@ -939,6 +941,11 @@
         ]
       },
       "evidenceFixtureIds": [
+        "authorization-host-dotenv",
+        "authorization-host-javascript",
+        "authorization-host-log",
+        "authorization-host-markdown",
+        "authorization-host-shell",
         "authorization-positive-basic",
         "authorization-positive-token-minimum"
       ],
