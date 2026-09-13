@@ -4,8 +4,8 @@
 
 - Reviewed on: 2026-09-13.
 - Source: `e77ceaf1d885c1b6f311142974cb8502d0d78d5a`, clean `main` at review start.
-- Base refresh: PR #242 was updated through `4b943115544bf16d4719efbae008ceb46370b13b`;
-  #234 and #237 are closed on that base.
+- Base refresh: PR #242 was updated through `704418c47c5668ec3d32b6bf9d8fc67b612fa5fe`;
+  #234, #235, and #237 are closed on that base.
 - Local environment: macOS arm64, Node 22.16.0, Python 3.14.7.
 - Verdict: **fix or explicitly disposition the remaining open findings below
   before release approval**. Existing automated checks pass; they do not cover
@@ -23,7 +23,7 @@ every possible credential grammar is correct.
 | --- | --- | --- |
 | P1 (closed) | [#234: invalid incremental input cleanup](https://github.com/redact-secret/redact-secret/issues/234) | At the reviewed source, JavaScript and Python rejected invalid input before the core saw the error. Closed on the refreshed base. |
 | P1 (closed) | [#237: partial PyPI recovery](https://github.com/redact-secret/redact-secret/issues/237) | At the reviewed source, an existing version with only a matching subset of qualified files failed exact-set verification before recovery could upload missing files. Closed on the refreshed base. |
-| P2 | [#235: leading BOM preservation](https://github.com/redact-secret/redact-secret/issues/235) | The shared stream decoder removes U+FEFF, changing output and original-input finding offsets relative to whole-input scanning. |
+| P2 (closed) | [#235: leading BOM preservation](https://github.com/redact-secret/redact-secret/issues/235) | At the reviewed source, the shared stream decoder removed U+FEFF, changing output and original-input finding offsets relative to whole-input scanning. Closed on the refreshed base. |
 | P2 | [#236: finding accumulation](https://github.com/redact-secret/redact-secret/issues/236) | Argument spread in `findings.push` raises a raw `RangeError` on an accepted chunk with many findings. The shared helper leaves its session accepting. |
 | P2 | [#238: unknown registry states](https://github.com/redact-secret/redact-secret/issues/238) | Failed registry queries become `unpublished` in release records; crate/PyPI recovery can also infer absence from non-200 responses. |
 | P3 | [#239: stale current-facing prose](https://github.com/redact-secret/redact-secret/issues/239) | Current architecture/workflow comments describe completed assessment and recovery work as absent, and reference obsolete branch/publication state. |
@@ -57,7 +57,7 @@ it is not a wheel/npm installation qualification.
 | --- | --- |
 | JavaScript append of number/lone surrogate after an ordinary retained marker | `INVALID_INPUT` / `UNPAIRED_SURROGATE`; state `accepting`; finalization re-emitted all 31 prior characters. |
 | Python append of number/lone surrogate after the same marker | `InvalidInputError`; state `accepting`; finalization re-emitted the prior marker. |
-| BOM-prefixed synthetic assignment, including splits after BOM byte 1 and 2 | Whole-input finding start 9; stream start 8; output equality false for all four partitions tested. |
+| BOM-prefixed synthetic assignment, including splits after BOM byte 1 and 2 | At the reviewed source, whole-input finding start 9, stream start 8, and output equality false for all four partitions tested. This is retained as historical reproduction evidence for closed issue #235. |
 | 150,000 short synthetic assignment lines, 5,700,000 bytes | Direct incremental append returned 150,000 findings; shared stream helper raised `RangeError`; owned session remained `accepting`. Total-input limit was 6,000,000 bytes; each line was below the token bound. |
 | Two-file synthetic Python inventory, one correctly published file | At the reviewed source, `verify_pypi` rejected the matching subset. This is retained as historical reproduction evidence for closed issue #237. |
 | Exact npm facade state-reporting step, with an offline failing npm stub | Recorded `npm:@redact-secret/core` as `unpublished`, not `unknown`. |
@@ -71,9 +71,9 @@ The Node probes use a freshly compiled addon. Browser impact follows the shared
 wrapper/decoder source; this audit did not reproduce these new cases in all
 three browser engines. Those real-artifact regressions remain issue acceptance
 criteria. PyPI recovery and registry-error probes use synthetic metadata and
-offline stubs, not uploads or live outage simulation. The PyPI recovery defect
-has since been fixed on the refreshed base; the registry-error probe still
-covers open issue #238.
+offline stubs, not uploads or live outage simulation. The BOM and PyPI recovery
+defects have since been fixed on the refreshed base; the registry-error probe
+still covers open issue #238.
 
 ## Existing verification
 
@@ -117,6 +117,6 @@ Hashing the beta.1 candidate review is not a beta.2 API sign-off.
 The new release runbook consolidates actual procedures, notes current recovery
 limitations, and links beta.1 publication evidence. The contribution guide and
 documentation navigation now point to it. All six findings were filed as new
-issues after checking that no open issue already covered them; #234 and #237 are
-now closed on the refreshed base. No version, branch, tag, release, package
-publication, or repository setting was changed.
+issues after checking that no open issue already covered them; #234, #235, and
+#237 are now closed on the refreshed base. No version, branch, tag, release,
+package publication, or repository setting was changed.
