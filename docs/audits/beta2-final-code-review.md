@@ -4,9 +4,12 @@
 
 - Reviewed on: 2026-09-13.
 - Source: `e77ceaf1d885c1b6f311142974cb8502d0d78d5a`, clean `main` at review start.
+- Base refresh: PR #242 was updated through `4b943115544bf16d4719efbae008ceb46370b13b`;
+  #234 and #237 are closed on that base.
 - Local environment: macOS arm64, Node 22.16.0, Python 3.14.7.
-- Verdict: **fix or explicitly disposition the findings below before release
-  approval**. Existing automated checks pass; they do not cover these failures.
+- Verdict: **fix or explicitly disposition the remaining open findings below
+  before release approval**. Existing automated checks pass; they do not cover
+  these failures.
 
 This review covers core pipeline/redaction and incremental retention, host input
 validation, JavaScript byte-stream adapters, Python binding failure handling,
@@ -18,17 +21,18 @@ every possible credential grammar is correct.
 
 | Priority | Issue | Confirmed behavior |
 | --- | --- | --- |
-| P1 | [#234: invalid incremental input cleanup](https://github.com/redact-secret/redact-secret/issues/234) | JavaScript and Python reject invalid input before the core sees the error. Previously retained input survives; the session remains `accepting` and can emit it on finalization. |
-| P1 | [#237: partial PyPI recovery](https://github.com/redact-secret/redact-secret/issues/237) | An existing version with only a matching subset of qualified files fails exact-set verification, before recovery can upload missing wheels/sdist. |
+| P1 (closed) | [#234: invalid incremental input cleanup](https://github.com/redact-secret/redact-secret/issues/234) | At the reviewed source, JavaScript and Python rejected invalid input before the core saw the error. Closed on the refreshed base. |
+| P1 (closed) | [#237: partial PyPI recovery](https://github.com/redact-secret/redact-secret/issues/237) | At the reviewed source, an existing version with only a matching subset of qualified files failed exact-set verification before recovery could upload missing files. Closed on the refreshed base. |
 | P2 | [#235: leading BOM preservation](https://github.com/redact-secret/redact-secret/issues/235) | The shared stream decoder removes U+FEFF, changing output and original-input finding offsets relative to whole-input scanning. |
 | P2 | [#236: finding accumulation](https://github.com/redact-secret/redact-secret/issues/236) | Argument spread in `findings.push` raises a raw `RangeError` on an accepted chunk with many findings. The shared helper leaves its session accepting. |
 | P2 | [#238: unknown registry states](https://github.com/redact-secret/redact-secret/issues/238) | Failed registry queries become `unpublished` in release records; crate/PyPI recovery can also infer absence from non-200 responses. |
 | P3 | [#239: stale current-facing prose](https://github.com/redact-secret/redact-secret/issues/239) | Current architecture/workflow comments describe completed assessment and recovery work as absent, and reference obsolete branch/publication state. |
 
-P1 means address before the next release; P2 means a reproducible correctness
-or operational defect requiring a fix or explicit disposition; P3 is maintenance
-work. Issue bodies contain pinned source links, triggers, and acceptance criteria.
-No detector or runtime implementation was changed as part of this audit.
+Open P1 findings mean address before the next release; P2 means a reproducible
+correctness or operational defect requiring a fix or explicit disposition; P3 is
+maintenance work. Issue bodies contain pinned source links, triggers, and
+acceptance criteria. No detector or runtime implementation was changed as part
+of this audit.
 
 ## Reproduction evidence
 
@@ -55,7 +59,7 @@ it is not a wheel/npm installation qualification.
 | Python append of number/lone surrogate after the same marker | `InvalidInputError`; state `accepting`; finalization re-emitted the prior marker. |
 | BOM-prefixed synthetic assignment, including splits after BOM byte 1 and 2 | Whole-input finding start 9; stream start 8; output equality false for all four partitions tested. |
 | 150,000 short synthetic assignment lines, 5,700,000 bytes | Direct incremental append returned 150,000 findings; shared stream helper raised `RangeError`; owned session remained `accepting`. Total-input limit was 6,000,000 bytes; each line was below the token bound. |
-| Two-file synthetic Python inventory, one correctly published file | `verify_pypi` rejected the matching subset. Workflow inspection confirms its HTTP-200 branch stops at this rejection. |
+| Two-file synthetic Python inventory, one correctly published file | At the reviewed source, `verify_pypi` rejected the matching subset. This is retained as historical reproduction evidence for closed issue #237. |
 | Exact npm facade state-reporting step, with an offline failing npm stub | Recorded `npm:@redact-secret/core` as `unpublished`, not `unknown`. |
 
 The dense-input probe measures the JavaScript call-argument ceiling, not
@@ -67,7 +71,9 @@ The Node probes use a freshly compiled addon. Browser impact follows the shared
 wrapper/decoder source; this audit did not reproduce these new cases in all
 three browser engines. Those real-artifact regressions remain issue acceptance
 criteria. PyPI recovery and registry-error probes use synthetic metadata and
-offline stubs, not uploads or live outage simulation.
+offline stubs, not uploads or live outage simulation. The PyPI recovery defect
+has since been fixed on the refreshed base; the registry-error probe still
+covers open issue #238.
 
 ## Existing verification
 
@@ -111,5 +117,6 @@ Hashing the beta.1 candidate review is not a beta.2 API sign-off.
 The new release runbook consolidates actual procedures, notes current recovery
 limitations, and links beta.1 publication evidence. The contribution guide and
 documentation navigation now point to it. All six findings were filed as new
-issues after checking that no open issue already covered them. No version,
-branch, tag, release, package publication, or repository setting was changed.
+issues after checking that no open issue already covered them; #234 and #237 are
+now closed on the refreshed base. No version, branch, tag, release, package
+publication, or repository setting was changed.

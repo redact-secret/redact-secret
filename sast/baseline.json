@@ -182,6 +182,13 @@
       "rationale": "Every argument list passed to this subprocess call is built entirely from this script's own internal logic (interpreter paths, pinned tool names, static flags) as a list -- never `shell=True` and never externally- or network-controlled data -- so there is no command-injection surface for this generic audit rule to flag.",
       "rule_id": "sast.rules.python.lang.security.audit.dangerous-subprocess-use-audit"
     },
+    "d6f9dcd628672c9b": {
+      "classification": "false_positive",
+      "line": 50,
+      "path": "docs/audits/evidence/beta2-final-review/reproduce.py",
+      "rationale": "This audit probe executes a repository-owned release-reporting shell snippet with a constant offline npm stub and a fixed `bash -c` argv list. No untrusted input reaches the command string, the probe publishes nothing, and it is stored under audit evidence rather than product runtime code, so the generic subprocess audit rule's command-injection concern does not apply.",
+      "rule_id": "sast.rules.python.lang.security.audit.dangerous-subprocess-use-audit"
+    },
     "7bb18f634eda7dd7": {
       "classification": "false_positive",
       "line": 149,

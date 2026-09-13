@@ -194,16 +194,14 @@ artifacts, content conflicts, or unknown registry state require resolution
 before proceeding. A full Release retry is not a general recovery mechanism:
 some publishers reject an already-published version.
 
-Known audit blockers in the current recovery implementation:
+Known audit blocker in the current recovery implementation:
 
-- [#237](https://github.com/redact-secret/redact-secret/issues/237): a matching
-  partial Python file set is rejected rather than completed.
 - [#238](https://github.com/redact-secret/redact-secret/issues/238): some lookup
   failures are misclassified as unpublished. Independently verify live state.
 
-Do not claim these cases are safely recoverable until their fixes and
-regressions pass. Preserve all recovery run IDs and verification outcomes;
-the recovery workflow does not write a replacement durable release manifest.
+Do not claim this case is safely recoverable until its fix and regressions pass.
+Preserve all recovery run IDs and verification outcomes; the recovery workflow
+does not write a replacement durable release manifest.
 
 ## Close out
 
