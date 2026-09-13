@@ -68,9 +68,18 @@ function completeAttempts(): AssessmentAttempt[] {
   ]);
 }
 
+function build(attempts: readonly AssessmentAttempt[]) {
+  return buildCompleteAssessment({
+    attempts,
+    performanceProfiles: PROFILES,
+    repetitions: 2,
+    validateResult: (candidate) => validateAssessmentResults([candidate]),
+  });
+}
+
 describe("complete assessment aggregation", () => {
   test("requires every surface and preserves whole and incremental evidence", () => {
-    const aggregate = buildCompleteAssessment({ attempts: completeAttempts(), performanceProfiles: PROFILES, repetitions: 2 });
+    const aggregate = build(completeAttempts());
     expect(aggregate.status).toBe("complete");
     expect(aggregate.runs).toHaveLength(15);
     expect(aggregate.runs.find((run) => run.surface === "node" && run.profileId === PROFILES[1].id)?.path).toBe("incremental");
@@ -101,13 +110,30 @@ describe("complete assessment aggregation", () => {
 
   test("a missing or failed product surface makes the aggregate incomplete", () => {
     const withoutBrowser = completeAttempts().filter((attempt) => attempt.surface !== "browser-wasm");
-    const missing = buildCompleteAssessment({ attempts: withoutBrowser, performanceProfiles: PROFILES, repetitions: 2 });
+    const missing = build(withoutBrowser);
     expect(missing.status).toBe("incomplete");
     expect(missing.validationFailures).toContain("browser-wasm:accuracy:accuracy-corpus:missing-run");
 
     const failed = completeAttempts();
     failed[0] = { ...failed[0], result: undefined, failureCode: "runner-failed" };
-    expect(buildCompleteAssessment({ attempts: failed, performanceProfiles: PROFILES, repetitions: 2 }).status).toBe("incomplete");
+    expect(build(failed).status).toBe("incomplete");
+  });
+
+  test("a schema-invalid result cannot report completion", () => {
+    const attempts = completeAttempts();
+    const original = attempts[0].result!;
+    attempts[0] = {
+      ...attempts[0],
+      result: {
+        ...original,
+        provenance: { ...original.provenance, commit: "not-a-commit" },
+      },
+    };
+    const aggregate = build(attempts);
+    expect(aggregate.status).toBe("incomplete");
+    expect(aggregate.validationFailures).toContain(
+      "rust-core:accuracy:accuracy-corpus:invalid-result",
+    );
   });
 
   test("identity drift and incomplete repetition samples cannot report completion", () => {
@@ -143,7 +169,7 @@ describe("complete assessment aggregation", () => {
         },
       },
     };
-    const aggregate = buildCompleteAssessment({ attempts, performanceProfiles: PROFILES, repetitions: 2 });
+    const aggregate = build(attempts);
     expect(aggregate.status).toBe("incomplete");
     expect(aggregate.validationFailures).toContain("suite:accuracy-corpus-identity-mismatch");
     expect(aggregate.validationFailures.some((failure) => failure.endsWith("repetition-count-mismatch"))).toBe(true);

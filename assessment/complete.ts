@@ -66,7 +66,7 @@ export function buildCompleteAssessment(input: {
   readonly attempts: readonly AssessmentAttempt[];
   readonly performanceProfiles: readonly CompleteAssessmentProfile[];
   readonly repetitions: number;
-  readonly validateResult?: (result: AssessmentResult) => void;
+  readonly validateResult: (result: AssessmentResult) => void;
 }): CompleteAssessment {
   const failures: string[] = [];
   const attempts = new Map<string, AssessmentAttempt>();
@@ -115,7 +115,7 @@ export function buildCompleteAssessment(input: {
     }
 
     try {
-      input.validateResult?.(attempt.result);
+      input.validateResult(attempt.result);
     } catch {
       failures.push(`${runKey}:invalid-result`);
       return { ...attempt, path: pathFor(surface, profile), status: "invalid" };
