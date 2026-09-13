@@ -1,0 +1,105 @@
+{
+  "issue": 200,
+  "recorded_on": "2026-09-13",
+  "verdict": "evidence-published-formal-same-revision-rc-matrix-pending",
+  "testbed": {
+    "status": "complete",
+    "source_revision": "a356e702e59b03cf297e0af15ba0423bc8466d48",
+    "summary": "assessment/results/complete/summary.json",
+    "baseline": "assessment/results/complete/baseline.md",
+    "surfaces": [
+      "rust-core",
+      "python",
+      "node",
+      "browser-wasm",
+      "cli"
+    ],
+    "run_count": 15,
+    "performance_repetitions": 2,
+    "validation_failures": 0
+  },
+  "accuracy_corpus": {
+    "path": "assessment/fixtures/accuracy-corpus.json",
+    "version": "1",
+    "sha256": "9c72ab77bb1ee54c6912592c2ce3de72c0c152356283d620498aac5fe08c26d9",
+    "fixtures": 9,
+    "categories": {
+      "logs": 3,
+      "code": 2,
+      "chat": 2,
+      "negative-text": 2
+    },
+    "expected_findings": 6,
+    "expected_empty_fixtures": 3
+  },
+  "workload_profiles": {
+    "path": "assessment/fixtures/workload-profiles.json",
+    "version": "1",
+    "sha256": "b4db2cd22b4c008c9d63789df8ca2e21e697a21a84699466ea5f96c89d8e2806",
+    "evaluated_profiles": [
+      "scale-logs-small-whole",
+      "scale-logs-medium-fixed4096"
+    ]
+  },
+  "per_surface_detection_result": {
+    "true_positives": 1,
+    "true_positive_denominator_expected": 6,
+    "false_negatives": 5,
+    "false_negative_denominator_expected": 6,
+    "false_positives": 1,
+    "false_positive_denominator_actual": 2,
+    "incorrect_ranges": 1,
+    "incorrect_range_denominator_expected": 6,
+    "incorrect_range_denominator_actual": 2,
+    "policy_correct": 1,
+    "policy_evaluable": 1,
+    "expected_empty_fixtures_with_findings": 0,
+    "expected_empty_fixture_denominator": 3
+  },
+  "range_interpretation": {
+    "paired_fixture_id": "chat-bearer-token",
+    "safe_mismatch_records_per_surface": 6,
+    "missing_records_per_surface": 5,
+    "extra_records_per_surface": 1,
+    "policy_mismatch_records_per_surface": 0,
+    "ordinary_negative_false_positive_observed": false
+  },
+  "redaction_evidence": {
+    "redacting_surface_whole_input_profile_results_complete": 4,
+    "redacting_surface_incremental_profile_results_complete": 4,
+    "cli_performance_profile_results_complete": 2,
+    "cli_accuracy_exact_output_oracle": "passed-before-result-emission",
+    "python_accuracy_whole_incremental_equivalence_fixtures": 9,
+    "cross_surface_assessment_redaction_rate_published": false,
+    "canonical_correctness_evidence": {
+      "owner": "docs/audits/public-contract-cross-runtime-conformance.md",
+      "source_revision": "5607de8973ddb83f9b61f840f67eb8534d5cea0d",
+      "synchronous_corpus_sha256": "27beff0ae10480c0e10f840be56f9cf07a2f76fa3a94b4af3c91d68ac0cc30a5",
+      "synchronous_fixtures": 399,
+      "supported_fixtures": 297,
+      "all_current_product_surfaces": "passed-applicable-redaction-checks",
+      "redaction_specific_rate_published": false
+    }
+  },
+  "disposition": {
+    "source": "assessment/results/beta.2/README.md",
+    "confirmed_detector_defects": 0,
+    "documented_limitation_fixture_ids": [
+      "logs-github-token",
+      "logs-unicode-astral-boundary",
+      "code-aws-access-key",
+      "logs-contextual-secret-warn"
+    ],
+    "contract_disagreement_fixture_ids": [
+      "chat-bearer-token"
+    ]
+  },
+  "remaining_evidence_owners": [
+    180,
+    203,
+    224
+  ],
+  "universal_accuracy_claimed": false,
+  "release_authorized": false,
+  "artifacts_published": false
+}

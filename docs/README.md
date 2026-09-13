@@ -16,6 +16,7 @@ Python, Rust, and the CLI share one deterministic Rust implementation.
 | --- | --- |
 | What does a finding mean? Which offsets does it use? | [API concepts](reference/api-contract.md) |
 | What credentials can be detected, and what can be missed? | [Detection and limits](reference/detection.md) |
+| What did the bounded reliability assessment observe? | [Detection reliability](reference/detection-reliability.md) |
 | Can I process a stream? | [Streaming](guides/streaming.md) |
 | Why did initialization or sanitization fail? | [Troubleshooting](troubleshooting.md) |
 | How do I contribute or run checks? | [Developer onboarding](onboarding.md) · [Contribution guide](../CONTRIBUTION.md) |
@@ -31,6 +32,7 @@ list is not proof that input contains no secrets.
 - [Rust workspace](rust-workspace.md), [Python packaging](python-packaging.md),
   and [artifact qualification](qualification.md)
 - [Detection coverage evidence](coverage/README.md)
+- [Detection reliability evidence](reference/detection-reliability.md)
 - [Review archive](audits/README.md) and [this pre-release review](audits/pre-release-code-and-docs-review.md)
 - [Changelog](../CHANGELOG.md), [security reporting](../SECURITY.md), and [MIT license](../LICENSE)
 
