@@ -35,7 +35,10 @@ list is not proof that input contains no secrets.
 - [Detection reliability evidence](reference/detection-reliability.md)
 - [Review archive](audits/README.md) and [this pre-release review](audits/pre-release-code-and-docs-review.md)
 - [Changelog](../CHANGELOG.md), [security reporting](../SECURITY.md), and [MIT license](../LICENSE)
+- [Documentation readiness and delivery follow-up](documentation-readiness.md)
 
 These Markdown pages are the source documentation. Relative links and ordinary
-code fences keep them usable in the repository and portable to a future wiki
-or static documentation build. No site generator or hosting account is required.
+code fences keep them usable in the repository and portable to a future public
+delivery platform. During beta, each feature change updates the corresponding
+Markdown guides. A separate web-app repository versus GitHub Wiki remains
+undecided. No site generator or hosting account is required.
