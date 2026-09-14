@@ -322,6 +322,34 @@ class ReleaseGateTests(unittest.TestCase):
             any("missing required job 'publish-wasm-dependency'" in error for error in errors)
         )
 
+    def test_recovery_assets_must_be_normalized_before_npm_pack(self) -> None:
+        self._write(
+            "reconcile-release.yml",
+            "name: Reconcile Release\n"
+            "jobs:\n"
+            "  reconcile:\n"
+            "    steps:\n"
+            "      - run: cp recovered/* package/\n",
+        )
+
+        errors = CHECK.validate(self.root)
+
+        self.assertEqual(len(errors), 1, errors)
+        self.assertIn("normalized to mode 0644", errors[0])
+
+    def test_recovery_asset_mode_normalization_is_accepted(self) -> None:
+        self._write(
+            "reconcile-release.yml",
+            "name: Reconcile Release\n"
+            "jobs:\n"
+            "  reconcile:\n"
+            "    steps:\n"
+            "      - run: |\n"
+            '          chmod 0644 "$package_dir"/$asset_glob\n',
+        )
+
+        self.assertEqual(CHECK.validate(self.root), [])
+
 
 if __name__ == "__main__":
     unittest.main()
