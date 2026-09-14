@@ -8,10 +8,9 @@ in this repository; [AGENTS.md](../AGENTS.md#release-authority) remains the
 release authority. A completed issue or successful build is not release approval.
 
 The previous release is recorded in [beta.1 evidence](releases/0.1.0-beta.1/README.md).
-The current checkout still declares `0.1.0-beta.1`; beta.2 work is in
-`CHANGELOG.md` under `Unreleased`. Preparing beta.2 requires an approved version
-change. The [final beta.2 code review](audits/beta2-final-code-review.md) records
-open defects that must be fixed or explicitly dispositioned before approval.
+Version `0.1.0-beta.2` was approved for candidate preparation on 2026-09-13.
+The [final beta.2 code review](audits/beta2-final-code-review.md) records the
+closed findings and the evidence required before publication approval.
 
 ## Product and artifact identity
 
@@ -194,12 +193,10 @@ artifacts, content conflicts, or unknown registry state require resolution
 before proceeding. A full Release retry is not a general recovery mechanism:
 some publishers reject an already-published version.
 
-Known audit blocker in the current recovery implementation:
-
-- [#238](https://github.com/redact-secret/redact-secret/issues/238): some lookup
-  failures are misclassified as unpublished. Independently verify live state.
-
-Do not claim this case is safely recoverable until its fix and regressions pass.
+Registry lookup failures remain `unknown` and block recovery planning rather
+than being inferred as unpublished; [#238](https://github.com/redact-secret/redact-secret/issues/238)
+records the fix and deterministic regressions. Independently verify live state
+before any recovery action.
 Preserve all recovery run IDs and verification outcomes; the recovery workflow
 does not write a replacement durable release manifest.
 

@@ -239,6 +239,11 @@ jobs:
             fi
             python3 -B scripts/verify-recovery-artifact.py --inventory original-inventory/artifact-inventory.json --artifact "$artifact_name" --directory "reconcile-artifact/$artifact_name"
             cp reconcile-artifact/"$artifact_name"/$asset_glob "$package_dir/"
+            # `actions/download-artifact` stages files as 0644 in the original
+            # release path. `gh run download` preserves the executable bit on
+            # native artifacts, and npm includes that mode in the tarball.
+            # Normalize recovery assets so repacking is byte-for-byte identical.
+            chmod 0644 "$package_dir"/$asset_glob
 
             if [[ "${{ inputs.dry_run }}" == "true" ]]; then
               node scripts/publish-dependency-package.mjs --package-dir "$package_dir" --tag "$tag" --dry-run

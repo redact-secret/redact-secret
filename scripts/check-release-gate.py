@@ -34,6 +34,7 @@ declared for the scripts in this directory.
 from __future__ import annotations
 
 import argparse
+import re
 import sys
 from pathlib import Path
 
@@ -177,6 +178,17 @@ def validate(root: Path) -> list[str]:
             errors.append(
                 f"{RELEASE_WORKFLOW.as_posix()}: publish job does not need {', '.join(missing)} "
                 "-- the wrapper must not be publishable ahead of its runtime dependency packages"
+            )
+
+    reconcile_path = root / ".github/workflows/reconcile-release.yml"
+    if reconcile_path.is_file():
+        reconcile = reconcile_path.read_text(encoding="utf-8")
+        if not re.search(
+            r'^\s+chmod 0644 "\$package_dir"/\$asset_glob\s*$', reconcile, re.M
+        ):
+            errors.append(
+                f"{reconcile_path.relative_to(root).as_posix()}: recovered npm package assets "
+                "must be normalized to mode 0644 before packing"
             )
 
     return errors
