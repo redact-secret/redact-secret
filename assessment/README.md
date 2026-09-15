@@ -258,6 +258,60 @@ npm run assessment:python:performance -- --python .venv/bin/python --profile sca
 npm run assessment:cli:performance -- --binary target/release/redact-secret --profile scale-logs-medium-fixed4096 --runs 2
 ```
 
+### A second environment profile: Linux x86_64
+
+`AcceptanceCriteria.environment` is a single, criteria-file-scoped block, so a
+second host is added as a second, independently loaded criteria document
+rather than by widening that type into a multi-profile lookup: this can never
+silently overwrite or ambiguate the macOS profile's already-fixed values, and
+`assessment-acceptance.mjs` already accepted `--criteria <path>` before this
+profile existed.
+
+[`acceptance-criteria-linux-x64.json`](./acceptance-criteria-linux-x64.json)
+fixes RC criteria for Linux x86_64 — the other host the release actually
+ships (npm and the CLI target Linux glibc, macOS, and Windows) — from a
+complete, five-repetition run captured by the
+[`Complete assessment`](../.github/workflows/complete-assessment.yml)
+workflow's `ubuntu-latest` runner at commit
+`9ff702001342ff84acdde8ad9acdec396572a15e`, committed under
+[`results/complete-linux-x64/`](./results/complete-linux-x64/). Its baseline
+pins accuracy corpus version `2` (this run postdates the corpus expansion
+that the original macOS profile's version-`1` baseline predates) and the same
+workload-profiles identity as the macOS profile, since that corpus is
+unchanged.
+
+The environment profile is `linux-x64-node22-chromium`: Linux on x86_64, Node
+22, Chromium, CPython 3, and the host Rust toolchain — otherwise the same
+scope as the macOS profile, just the other shipped host. Timing ceilings are
+twice the observed p95, rounded up to the nearest whole millisecond below 10
+and to the nearest 5/50/100 above that; throughput floors are half the
+observed minimum, rounded down to the nearest 10,000 (or 100,000 above 1
+million) bytes per second; memory caps are 2.5x the observed maximum, rounded
+up to the nearest mebibyte — the same "generous, stable, rounded" intent as
+the macOS profile's hand-fixed values, applied as an explicit rule since this
+is a fresh profile rather than a reproduction of the first one. As with the
+macOS profile, Rust, Python, and CLI share one memory cap across both
+performance profiles per category; Node and browser WebAssembly fix a cap per
+profile (Node's external-memory category is shared, since the two profiles'
+observations were nearly identical).
+
+Evaluate a Linux x86_64 candidate the same way as the macOS profile, pointing
+`--criteria` at the Linux document:
+
+```bash
+npm run assessment:acceptance -- \
+  --criteria assessment/acceptance-criteria-linux-x64.json \
+  --summary assessment-output-linux-x64/summary.json \
+  --json-out assessment-output-linux-x64/acceptance.json \
+  --markdown-out assessment-output-linux-x64/acceptance.md
+```
+
+The committed [acceptance evaluation](./results/complete-linux-x64/acceptance.md)
+of that same baseline run against its own freshly fixed criteria reports
+`accepted` with all 46 checks passing and no `environment-*-mismatch`
+failure, by construction: the thresholds were fixed from this run's own
+observations.
+
 ## Node and browser accuracy runners
 
 - [`adapters/scoring.ts`](./adapters/scoring.ts) — pure accuracy scoring:
