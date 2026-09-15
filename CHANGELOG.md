@@ -5,6 +5,13 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+- The `generic-token` detector no longer reports a value made of the same
+  character repeated three or more times (`********`, `••••••••`) as a
+  secret — classic redaction-style filler that masked CLI prompts, config
+  dumps, and `env` listings echo back in place of a real password. The
+  `connection-string` detector already excluded this shape; both detectors
+  now share one implementation. A value with even one differing character
+  (`********x`) continues to be reported.
 - The `generic-token` detector no longer reports a value fully delimited by
   `{{` and `}}` (`{{ vault_db_password }}`, `{{ .Values.postgresql.auth.password }}`,
   `{{ .ClientSecretRef }}`) as a secret, quoted or unquoted. This is the
