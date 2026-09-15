@@ -874,7 +874,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 57,
+        "fixtureCount": 61,
         "hostContextsExercised": [
           "chat",
           "dotenv",
@@ -884,7 +884,9 @@
           "log",
           "markdown",
           "plain-text",
-          "shell"
+          "shell",
+          "terminal",
+          "yaml"
         ],
         "kindsWithSupportedEvidence": [
           "adversarial",
@@ -914,6 +916,7 @@
         "contextual-positive-minimum-length-is-medium-confidence",
         "contextual-positive-remaining-declared-names",
         "contextual-positive-single-quoted-value",
+        "regression-nested-credential-under-parent-key",
         "regression-placeholder-embedded-in-high-entropy-value",
         "regression-placeholder-word-with-unrelated-tokens"
       ],
@@ -925,7 +928,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 57,
+        "fixtureCount": 61,
         "hostContextsExercised": [
           "chat",
           "dotenv",
@@ -935,7 +938,9 @@
           "log",
           "markdown",
           "plain-text",
-          "shell"
+          "shell",
+          "terminal",
+          "yaml"
         ],
         "kindsWithSupportedEvidence": [
           "adversarial",

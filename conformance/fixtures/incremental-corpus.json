@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 16,
+  "fixtureCount": 18,
   "fixtures": [
     {
       "id": "synthetic-regression-malformed-authority",
@@ -342,6 +342,29 @@
       "text": "-----BEGIN PRIVATE KEY-----\nSYNTHETIC_TRUNCATED",
       "expected": [],
       "note": "A bounded incomplete block is released only by explicit finalization."
+    },
+    {
+      "id": "contextual-assignment-stops-at-line-terminator",
+      "input": "secret:\n  secretName: web-tls-cert",
+      "text": "secret:\n  secretName: web-tls-cert",
+      "expected": [],
+      "note": "issue #262: an operator with no value before end-of-line does not treat the next line's token as the value, so a YAML secret: block opening a nested secretName: mapping is released unchanged at every partition."
+    },
+    {
+      "id": "contextual-assignment-nested-credential-under-parent-key",
+      "input": "database:\n  password: SYNTHETIC_REVOKED_FIXTURE_VALUE",
+      "text": "database:\n  password: <SECRET_1>",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 22,
+          "end": 53
+        }
+      ],
+      "note": "issue #262 / #265: a nested password: key under an unrelated parent key: line is still detected and redacted at every partition."
     }
   ]
 }
