@@ -6,8 +6,9 @@
 //! no candidates. Values above 4 KiB are left to more specific detectors.
 
 use super::text::{
-    ascii_run_len, char_at, ends_with_ci, is_js_whitespace, is_line_start,
-    matches_placeholder_vocabulary, prev_char, rskip_while_chars, skip_while_chars, starts_with_ci,
+    ascii_run_len, char_at, ends_with_ci, is_horizontal_js_whitespace, is_js_whitespace,
+    is_line_start, matches_placeholder_vocabulary, prev_char, rskip_while_chars, skip_while_chars,
+    starts_with_ci,
 };
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
@@ -334,6 +335,16 @@ fn is_prefix_boundary_char(ch: char) -> bool {
 /// The optional quotes are pure lookahead in effect: a quote character can
 /// never satisfy `[A-Za-z]`, so greedily consuming an optional quote when
 /// present never forecloses a match that skipping it would have found.
+///
+/// The `\s*` run after the operator stops at a line terminator instead of
+/// crossing it, unlike the ECMAScript oracle's `\s` class (and unlike the
+/// `\s*` run before the operator, which is unchanged: a name legitimately
+/// arrives on one physical line and its operator on the next when an
+/// incremental caller's chunk boundary falls between them). A value belongs
+/// on the operator's own line, so a key with no value before end-of-line
+/// (`secret:\n  nested: ...`, an interactive `Password:\n` prompt) never
+/// walks onto the next line's first token as if it were the value. See
+/// `docs/decisions/2026-09-15-contextual-assignment-stops-at-the-line.md`.
 fn parse_name_and_operator(input: &str, start: usize) -> Option<(usize, usize, usize)> {
     let mut cursor = start;
     if let Some(ch @ ('"' | '\'')) = char_at(input, cursor) {
@@ -363,7 +374,7 @@ fn parse_name_and_operator(input: &str, start: usize) -> Option<(usize, usize, u
         Some('=' | ':') => cursor += 1,
         _ => return None,
     }
-    cursor = skip_while_chars(input, cursor, is_js_whitespace);
+    cursor = skip_while_chars(input, cursor, is_horizontal_js_whitespace);
 
     Some((name_start, name_end, cursor))
 }
@@ -793,6 +804,47 @@ mod tests {
     #[test]
     fn authorization_scheme_other_than_basic_or_token_is_ignored() {
         assert!(detect("Authorization: Digest SYNTHETIC_REVOKED_DIGEST_VALUE_1234").is_empty());
+    }
+
+    // --- issue #262: a contextual-assignment operator with no value before
+    // end-of-line does not cross into the next physical line ---------------
+
+    #[test]
+    fn operator_with_no_value_before_end_of_line_does_not_cross_into_the_next_line() {
+        for input in [
+            // A Kubernetes-style YAML key opening a nested mapping.
+            "secret:\n  secretName: web-tls-cert",
+            // An interactive prompt with no value at all.
+            "Password:\nPermission denied, please try again.",
+            // An ssh transcript: prompt line, then the program's own denial.
+            "fixture@db.example.test's password:\nfixture@db.example.test: Permission denied (publickey,password).",
+        ] {
+            assert!(
+                detect(input).is_empty(),
+                "expected no findings for {input:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn password_value_on_the_same_line_is_still_detected() {
+        let input = "password: SYNTHETIC_REVOKED_CONTEXT_VALUE";
+        let candidates = detect(input);
+        assert_eq!(candidates.len(), 1);
+        assert_eq!(candidates[0].confidence(), Confidence::High);
+        assert_eq!(candidates[0].specificity(), Some(Specificity::Contextual));
+    }
+
+    /// The paired recall regression (issue #265): the outer `database:`
+    /// key's failed value scan used to advance the cursor past the nested
+    /// `password:` key's own boundary character, so it was never matched.
+    #[test]
+    fn a_nested_credential_under_an_unrelated_parent_key_is_still_detected() {
+        let input = "database:\n  password: SYNTHETIC_REVOKED_FIXTURE_VALUE";
+        let candidates = detect(input);
+        let (start, end) = only_range(&candidates);
+        assert_eq!(&input[start..end], "SYNTHETIC_REVOKED_FIXTURE_VALUE");
+        assert_eq!(candidates[0].confidence(), Confidence::High);
     }
 
     #[test]

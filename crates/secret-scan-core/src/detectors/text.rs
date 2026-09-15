@@ -20,6 +20,16 @@ pub(super) fn is_js_line_terminator(ch: char) -> bool {
     matches!(ch, '\n' | '\r' | '\u{2028}' | '\u{2029}')
 }
 
+/// `true` for [`is_js_whitespace`] excluding [`is_js_line_terminator`]:
+/// horizontal whitespace only. Unlike the ECMAScript `\s` class this mirrors
+/// elsewhere, a contextual assignment's name-operator-value grammar must not
+/// treat a line terminator as ordinary filler, or an operator with no value
+/// on its own line reads the next physical line's first token as the value
+/// (see `docs/decisions/2026-09-15-contextual-assignment-stops-at-the-line.md`).
+pub(super) fn is_horizontal_js_whitespace(ch: char) -> bool {
+    is_js_whitespace(ch) && !is_js_line_terminator(ch)
+}
+
 /// The character starting at byte offset `pos`, or `None` past the end of
 /// `input` or when `pos` is not on a character boundary.
 pub(super) fn char_at(input: &str, pos: usize) -> Option<char> {

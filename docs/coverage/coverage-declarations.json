@@ -2145,6 +2145,7 @@
             "contextual-positive-minimum-length-is-medium-confidence",
             "contextual-positive-remaining-declared-names",
             "contextual-positive-single-quoted-value",
+            "regression-nested-credential-under-parent-key",
             "regression-placeholder-embedded-in-high-entropy-value",
             "regression-placeholder-word-with-unrelated-tokens"
           ],
@@ -2186,7 +2187,8 @@
             "contextual-negative-prose-colon-unrecognized-name",
             "contextual-negative-shell-placeholder",
             "contextual-negative-token-name",
-            "contextual-negative-unqualified-random-text"
+            "contextual-negative-unqualified-random-text",
+            "regression-yaml-nested-key-no-crossing-newline"
           ],
           "state": "supported"
         },
@@ -2231,8 +2233,10 @@
             "contextual-positive-minimum-length-is-medium-confidence",
             "contextual-positive-remaining-declared-names",
             "contextual-positive-single-quoted-value",
+            "regression-nested-credential-under-parent-key",
             "regression-placeholder-embedded-in-high-entropy-value",
-            "regression-placeholder-word-with-unrelated-tokens"
+            "regression-placeholder-word-with-unrelated-tokens",
+            "regression-yaml-nested-key-no-crossing-newline"
           ],
           "state": "supported"
         },
@@ -2372,6 +2376,8 @@
             "adjacent-findings",
             "aws-contextual-assignment",
             "contextual-assignment",
+            "contextual-assignment-nested-credential-under-parent-key",
+            "contextual-assignment-stops-at-line-terminator",
             "encoded-connection",
             "fixed-width-unicode",
             "github-installation-stateless",
@@ -2586,6 +2592,8 @@
             "adjacent-findings",
             "aws-contextual-assignment",
             "contextual-assignment",
+            "contextual-assignment-nested-credential-under-parent-key",
+            "contextual-assignment-stops-at-line-terminator",
             "encoded-connection",
             "fixed-width-unicode",
             "github-installation-stateless",
@@ -2916,6 +2924,8 @@
             "adjacent-findings",
             "aws-contextual-assignment",
             "contextual-assignment",
+            "contextual-assignment-nested-credential-under-parent-key",
+            "contextual-assignment-stops-at-line-terminator",
             "encoded-connection",
             "fixed-width-unicode",
             "github-installation-stateless",

@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 421,
+  "fixtureCount": 425,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -9828,6 +9828,67 @@
         }
       ],
       "note": "issue #257: a listed placeholder word ('Secret') embedded inside a larger, unrelated password is not split out by token-boundary matching, so the password is still reported."
+    },
+    {
+      "id": "regression-yaml-nested-key-no-crossing-newline",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "secret:\n  secretName: web-tls-cert",
+      "expected": [],
+      "note": "issue #262: a contextual-assignment operator with no value before end-of-line no longer reads the next line's YAML key as its value -- a Kubernetes-style `secret:` block opening a nested `secretName:` mapping produces no finding."
+    },
+    {
+      "id": "regression-password-prompt-no-crossing-newline",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "terminal"
+      ],
+      "input": "Password:\nPermission denied, please try again.",
+      "expected": [],
+      "note": "issue #262: an interactive `Password:` prompt with no value on its own line no longer captures the program's denial message on the next line as the \"value\"."
+    },
+    {
+      "id": "regression-ssh-password-prompt-no-crossing-newline",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "terminal"
+      ],
+      "input": "fixture@db.example.test's password:\nfixture@db.example.test: Permission denied (publickey,password).",
+      "expected": [],
+      "note": "issue #262: an ssh password-prompt transcript no longer crosses the newline into the following denial line, which the buggy grammar previously captured as a redact-worthy value at high confidence."
+    },
+    {
+      "id": "regression-nested-credential-under-parent-key",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "database:\n  password: SYNTHETIC_REVOKED_FIXTURE_VALUE",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 22,
+          "end": 53
+        }
+      ],
+      "note": "issue #262 / #265: fixing the operator's value-crossing-newline skip also fixes the paired recall bug -- the outer database: key's failed value scan no longer advances the cursor past the nested password: key's own boundary, so the nested credential is still detected."
     }
   ]
 }
