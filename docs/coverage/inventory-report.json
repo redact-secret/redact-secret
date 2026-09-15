@@ -693,7 +693,7 @@
     {
       "detector": "connection-string",
       "evidence": {
-        "fixtureCount": 65,
+        "fixtureCount": 72,
         "hostContextsExercised": [
           "dotenv",
           "javascript",
