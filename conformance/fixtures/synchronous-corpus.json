@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 414,
+  "fixtureCount": 421,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -9710,6 +9710,124 @@
       "input": "secret=\"wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY\"",
       "expected": [],
       "note": "AWS's own documented example secret access key, published alongside the access key ID above, is exempted by the same exact-literal carve-out when assigned to a high-signal field name."
+    },
+    {
+      "id": "contextual-negative-placeholder-leading-separator",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "secret=\" changeme\"",
+      "expected": [],
+      "note": "issue #257: a leading separator inside an otherwise-listed placeholder value does not defeat the exclusion."
+    },
+    {
+      "id": "contextual-negative-placeholder-appended-digit",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "secret_key=\"changeme2\"",
+      "expected": [],
+      "note": "issue #257: a digit appended to a distinctive placeholder word ('changeme') does not defeat the exclusion; generic role names like 'secret' or 'password' are deliberately excluded from this tolerance (see contextual-positive-minimum-length-is-medium-confidence)."
+    },
+    {
+      "id": "contextual-negative-placeholder-hyphenated-compound",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "secret_key: \"REDACTED-EXAMPLE\"",
+      "expected": [],
+      "note": "issue #257: two already-listed placeholder words joined with a hyphen do not defeat the exclusion."
+    },
+    {
+      "id": "regression-placeholder-embedded-in-high-entropy-value",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "api_key=SecretSyntheticRevokedContextValue9fQ",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 8,
+          "end": 45
+        }
+      ],
+      "note": "issue #257: a listed placeholder word ('Secret') embedded inside a larger, unrelated alphanumeric run is not split out by token-boundary matching, so the value is still reported."
+    },
+    {
+      "id": "regression-placeholder-word-with-unrelated-tokens",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "client_secret=password_over_there",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 14,
+          "end": 33
+        }
+      ],
+      "note": "issue #257: a listed placeholder word ('password') alongside unrelated tokens ('over', 'there') is still reported -- token-boundary matching requires every token to be listed, not any token."
+    },
+    {
+      "id": "connection-negative-vendor-default-appended-digit",
+      "detector": "connection-string",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "postgres://user:changeme2@host/db",
+      "expected": [],
+      "note": "issue #257: a digit appended to a distinctive vendor-default placeholder word ('changeme') does not defeat the exclusion."
+    },
+    {
+      "id": "connection-regression-placeholder-embedded-in-password",
+      "detector": "connection-string",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "postgres://fixture:SecretSyntheticRevokedContext9fQ@localhost/example",
+      "expected": [
+        {
+          "detector": "connection-string",
+          "type": "connection_string_password",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 19,
+          "end": 51
+        }
+      ],
+      "note": "issue #257: a listed placeholder word ('Secret') embedded inside a larger, unrelated password is not split out by token-boundary matching, so the password is still reported."
     }
   ]
 }

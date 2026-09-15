@@ -150,8 +150,14 @@ const PLACEHOLDER_WORDS: &[&str] = &[
 /// appended digit (`changeme2`) without also swallowing common real (if
 /// weak) credentials like `password1` or `secret01` — see
 /// `matches_placeholder_vocabulary`'s doc comment.
-const DIGIT_SUFFIX_PLACEHOLDER_WORDS: &[&str] =
-    &["example", "sample", "placeholder", "redacted", "changeme", "replaceme"];
+const DIGIT_SUFFIX_PLACEHOLDER_WORDS: &[&str] = &[
+    "example",
+    "sample",
+    "placeholder",
+    "redacted",
+    "changeme",
+    "replaceme",
+];
 
 fn is_generic_placeholder_word(value: &str) -> bool {
     matches_placeholder_vocabulary(value, PLACEHOLDER_WORDS, DIGIT_SUFFIX_PLACEHOLDER_WORDS)
@@ -705,7 +711,10 @@ mod tests {
     #[test]
     fn a_placeholder_word_embedded_in_a_larger_high_entropy_value_is_still_detected() {
         let input = "api_key=SecretSyntheticRevokedContextValue9fQ";
-        assert!(!detect(input).is_empty(), "expected a finding for {input:?}");
+        assert!(
+            !detect(input).is_empty(),
+            "expected a finding for {input:?}"
+        );
     }
 
     #[test]
