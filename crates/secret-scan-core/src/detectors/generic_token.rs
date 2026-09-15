@@ -706,7 +706,10 @@ mod tests {
 
     #[test]
     fn masked_values_are_excluded_as_repeated_character_filler() {
-        for input in ["Password: ********", "Password: \u{2022}\u{2022}\u{2022}\u{2022}\u{2022}\u{2022}\u{2022}\u{2022}"] {
+        for input in [
+            "Password: ********",
+            "Password: \u{2022}\u{2022}\u{2022}\u{2022}\u{2022}\u{2022}\u{2022}\u{2022}",
+        ] {
             assert!(
                 detect(input).is_empty(),
                 "expected no findings for {input:?}"
