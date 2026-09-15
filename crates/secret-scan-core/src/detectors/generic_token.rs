@@ -203,6 +203,18 @@ fn ends_with_key_or_pem(value: &str) -> bool {
     ends_with_ci(value, ".key") || ends_with_ci(value, ".pem")
 }
 
+/// `true` when the whole value is delimited by `{{` and `}}`
+/// (`^\{\{.*\}\}$`) — the idiomatic Jinja/Helm/Go-template reference syntax
+/// Ansible, Helm, Salt, and Go templates use for a vaulted or injected
+/// value (`{{ vault_db_password }}`, `{{ .Values.postgresql.auth.password }}`).
+/// A value that only starts with `{{`, or that carries `{{...}}` inside a
+/// larger string, does not satisfy this and stays detected: only a value
+/// fully bounded by the delimiters is a bare reference rather than
+/// suspicious content the delimiters happen to appear in.
+fn is_template_reference(value: &str) -> bool {
+    value.starts_with("{{") && value.ends_with("}}") && value.len() >= 4
+}
+
 fn is_non_secret_reference(value: &str) -> bool {
     let lower = value.to_ascii_lowercase();
     is_generic_placeholder_word(&lower)
@@ -210,6 +222,7 @@ fn is_non_secret_reference(value: &str) -> bool {
         || starts_with_env_reference(value)
         || starts_with_path_like(value)
         || ends_with_key_or_pem(value)
+        || is_template_reference(value)
 }
 
 // --- confidence -----------------------------------------------------------
@@ -804,6 +817,55 @@ mod tests {
     #[test]
     fn authorization_scheme_other_than_basic_or_token_is_ignored() {
         assert!(detect("Authorization: Digest SYNTHETIC_REVOKED_DIGEST_VALUE_1234").is_empty());
+    }
+
+    // --- issue #263: a value fully delimited by `{{ ... }}` is a template
+    // reference (Ansible/Helm/Salt Jinja, Go templates), not a secret -------
+
+    #[test]
+    fn a_quoted_jinja_template_reference_is_excluded() {
+        for input in [
+            "password: \"{{ vault_db_password }}\"",
+            "password: \"{{ lookup('env', 'DB_PASSWORD') }}\"",
+            "password: '{{ pillar[\"postgres\"][\"password\"] }}'",
+            "\"password\": \"{{ vault_db_password }}\"",
+        ] {
+            assert!(
+                detect(input).is_empty(),
+                "expected no findings for {input:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn a_quoted_helm_or_go_template_reference_is_excluded() {
+        for input in [
+            "password: \"{{ .Values.postgresql.auth.password }}\"",
+            "client_secret: \"{{ .ClientSecretRef }}\"",
+        ] {
+            assert!(
+                detect(input).is_empty(),
+                "expected no findings for {input:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn a_value_only_starting_with_a_template_delimiter_is_still_detected() {
+        let input = "password=\"{{ SYNTHETIC_REVOKED_CONTEXT_VALUE\"";
+        assert!(
+            !detect(input).is_empty(),
+            "expected a finding for {input:?}"
+        );
+    }
+
+    #[test]
+    fn a_template_delimiter_pair_embedded_in_a_larger_value_is_still_detected() {
+        let input = "password=SYNTHETIC_REVOKED_{{ x }}_CONTEXT_VALUE";
+        assert!(
+            !detect(input).is_empty(),
+            "expected a finding for {input:?}"
+        );
     }
 
     // --- issue #262: a contextual-assignment operator with no value before

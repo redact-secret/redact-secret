@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 425,
+  "fixtureCount": 433,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -8796,6 +8796,128 @@
       "input": "{\"api_key\":\"${SECRET_MANAGER_REF}\"}",
       "expected": [],
       "note": "A ${...} environment-variable reference inside a quoted JSON value remains excluded, preserving JSON's quoting boundary."
+    },
+    {
+      "id": "contextual-negative-quoted-jinja-template-reference",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "password: \"{{ vault_db_password }}\"",
+      "expected": [],
+      "note": "A quoted Jinja template reference to a vaulted value, the idiomatic Ansible form, is fully delimited by '{{' and '}}' and remains excluded like the existing ${...} and <...> reference exclusions."
+    },
+    {
+      "id": "contextual-negative-quoted-jinja-lookup-template-reference",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "password: \"{{ lookup('env', 'DB_PASSWORD') }}\"",
+      "expected": [],
+      "note": "A quoted Ansible 'lookup' Jinja expression is still fully delimited by '{{' and '}}' at the whole-value boundary and remains excluded."
+    },
+    {
+      "id": "contextual-negative-quoted-salt-pillar-template-reference",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "password: '{{ pillar[\"postgres\"][\"password\"] }}'",
+      "expected": [],
+      "note": "A single-quoted Salt pillar Jinja reference remains excluded; quoting style does not change the whole-value delimiter check."
+    },
+    {
+      "id": "contextual-negative-json-template-reference",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"password\": \"{{ vault_db_password }}\"}",
+      "expected": [],
+      "note": "The JSON form of the same Jinja template reference, preserving JSON's quoting boundary like the existing ${...} JSON fixture."
+    },
+    {
+      "id": "contextual-negative-quoted-helm-template-reference",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "password: \"{{ .Values.postgresql.auth.password }}\"",
+      "expected": [],
+      "note": "A quoted Helm chart template reference is the same '{{ ... }}' reference syntax as Ansible's Jinja and remains excluded."
+    },
+    {
+      "id": "contextual-negative-quoted-go-template-reference",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "client_secret: \"{{ .ClientSecretRef }}\"",
+      "expected": [],
+      "note": "A quoted Go template field reference uses the same delimiter syntax and remains excluded."
+    },
+    {
+      "id": "contextual-positive-template-prefix-only-still-detected",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "password=\"{{ SYNTHETIC_REVOKED_CONTEXT_VALUE\"",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 10,
+          "end": 44
+        }
+      ],
+      "note": "A value that only starts with '{{', with no closing '}}' before the value ends, does not satisfy the whole-value template-reference exclusion and stays detected."
+    },
+    {
+      "id": "contextual-positive-template-embedded-still-detected",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "password=SYNTHETIC_REVOKED_{{ x }}_CONTEXT_VALUE",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 9,
+          "end": 29
+        }
+      ],
+      "note": "A '{{...}}' pair embedded inside a larger high-entropy value, rather than delimiting the whole value, does not satisfy the exclusion and stays detected."
     },
     {
       "id": "future-provider-family-pending",

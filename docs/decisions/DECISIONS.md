@@ -15,3 +15,4 @@ future planning and implementation but do not authorize Git or release actions.
 - [Measure JavaScript performance externally](2026-09-12-measure-javascript-performance-externally.md)
 - [Match placeholder words on token boundaries, not exact-string equality](2026-09-15-match-placeholder-words-on-token-boundaries.md)
 - [A contextual assignment's value never crosses a line terminator](2026-09-15-contextual-assignment-stops-at-the-line.md)
+- [Exclude a value fully delimited by `{{` and `}}` as a template reference](2026-09-15-exclude-fully-delimited-template-references.md)

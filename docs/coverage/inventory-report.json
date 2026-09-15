@@ -874,7 +874,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 61,
+        "fixtureCount": 69,
         "hostContextsExercised": [
           "chat",
           "dotenv",
@@ -916,6 +916,8 @@
         "contextual-positive-minimum-length-is-medium-confidence",
         "contextual-positive-remaining-declared-names",
         "contextual-positive-single-quoted-value",
+        "contextual-positive-template-embedded-still-detected",
+        "contextual-positive-template-prefix-only-still-detected",
         "regression-nested-credential-under-parent-key",
         "regression-placeholder-embedded-in-high-entropy-value",
         "regression-placeholder-word-with-unrelated-tokens"
@@ -928,7 +930,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 61,
+        "fixtureCount": 69,
         "hostContextsExercised": [
           "chat",
           "dotenv",
