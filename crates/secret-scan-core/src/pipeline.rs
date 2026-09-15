@@ -124,9 +124,9 @@ fn try_accept(accepted: &mut BTreeMap<usize, usize>, range: ByteRange) -> bool {
 /// surviving findings ordered by input offset with ids `finding-1`,
 /// `finding-2`, and so on.
 ///
-/// A candidate whose full matched text exactly equals one of
-/// [`KNOWN_VENDOR_PLACEHOLDER_LITERALS`] is dropped before validation,
-/// regardless of which detector proposed it.
+/// A candidate whose full matched text exactly equals a documented
+/// vendor-placeholder literal (an internal, fixed exemption list) is
+/// dropped before validation, regardless of which detector proposed it.
 ///
 /// Identical input and registry always produce identical findings.
 ///
