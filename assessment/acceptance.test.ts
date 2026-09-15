@@ -118,3 +118,53 @@ describe("fixed RC acceptance criteria", () => {
     expect(evaluation.failures).toContain("suite:workload-profile-identity-mismatch");
   });
 });
+
+const linuxCriteria = validateAcceptanceCriteria(JSON.parse(readFileSync(join(HERE, "acceptance-criteria-linux-x64.json"), "utf8")) as AcceptanceCriteria);
+const linuxBaseline = JSON.parse(readFileSync(join(HERE, "results", "complete-linux-x64", "summary.json"), "utf8")) as CompleteAssessment;
+
+describe("fixed RC acceptance criteria — Linux x86_64", () => {
+  test("is a separately identified, separately loaded profile that leaves the macOS criteria untouched", () => {
+    expect(linuxCriteria.criteriaId).not.toBe(criteria.criteriaId);
+    expect(linuxCriteria.environment.id).not.toBe(criteria.environment.id);
+    expect(criteria.environment.id).toBe("macos-arm64-node22-chromium");
+    expect(linuxCriteria.environment.id).toBe("linux-x64-node22-chromium");
+    expect(linuxCriteria.environment.osPrefixes).toEqual(["linux-"]);
+    expect(linuxCriteria.environment.cpus).toEqual(["x86_64", "x64"]);
+  });
+
+  test("criteria are bound to the committed Linux x86_64 baseline run", () => {
+    expect(linuxCriteria.baseline.sourceCommit).toBe(linuxBaseline.sourceCommit);
+    expect(linuxCriteria.baseline.accuracyCorpusVersion).toBe(linuxBaseline.accuracyCorpus?.version);
+    expect(linuxCriteria.baseline.accuracyCorpusHash).toBe(linuxBaseline.accuracyCorpus?.hash);
+    expect(linuxCriteria.baseline.workloadProfilesVersion).toBe(linuxBaseline.workloadProfiles?.version);
+    expect(linuxCriteria.baseline.workloadProfilesHash).toBe(linuxBaseline.workloadProfiles?.hash);
+    expect(linuxBaseline.status).toBe("complete");
+    expect(linuxBaseline.repetitions).toBe(linuxCriteria.minimumRepetitions);
+    expect(linuxBaseline.runs).toHaveLength(15);
+
+    const evidenceRoot = join(HERE, "results", "complete-linux-x64");
+    const evaluation = JSON.parse(readFileSync(join(evidenceRoot, "acceptance.json"), "utf8")) as { status: string; environmentId: string; checks: readonly { passed: boolean }[]; failures: readonly string[] };
+    expect(evaluation.status).toBe("accepted");
+    expect(evaluation.environmentId).toBe("linux-x64-node22-chromium");
+    expect(evaluation.checks).toHaveLength(46);
+    expect(evaluation.checks.every((item) => item.passed)).toBe(true);
+    expect(evaluation.failures).toEqual([]);
+    for (const run of linuxBaseline.runs) {
+      expect(join(evidenceRoot, run.resultPath)).toSatisfy(existsSync);
+      expect(join(evidenceRoot, run.markdownPath)).toSatisfy(existsSync);
+      if (run.mismatchesPath !== undefined) expect(join(evidenceRoot, run.mismatchesPath)).toSatisfy(existsSync);
+    }
+  });
+
+  test("the macOS-shaped candidate cannot silently satisfy the Linux profile", () => {
+    const evaluation = evaluateAcceptance(candidate(), linuxCriteria);
+    expect(evaluation.status).toBe("rejected");
+    expect(evaluation.failures.some((failure) => failure.endsWith(":environment-os-mismatch"))).toBe(true);
+  });
+
+  test("the Linux-shaped baseline cannot silently satisfy the macOS profile", () => {
+    const evaluation = evaluateAcceptance({ ...linuxBaseline, repetitions: criteria.minimumRepetitions }, criteria);
+    expect(evaluation.status).toBe("rejected");
+    expect(evaluation.failures.some((failure) => failure.endsWith(":environment-os-mismatch"))).toBe(true);
+  });
+});
