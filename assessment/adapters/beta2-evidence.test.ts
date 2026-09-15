@@ -1,10 +1,9 @@
-import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
 import { describe, expect, it } from "vitest";
 
-import { validateAssessmentFixtures, validateAssessmentResults } from "../schema.js";
+import { validateAssessmentResults } from "../schema.js";
 
 const root = process.cwd();
 const evidenceDirectory = join(root, "assessment", "results", "beta.2");
@@ -13,36 +12,26 @@ function readJson(relative: string): unknown {
   return JSON.parse(readFileSync(join(evidenceDirectory, relative), "utf8"));
 }
 
+/**
+ * `accuracy-corpus.json`'s scope as it existed when this evidence was
+ * generated (`./README.md`'s "Dataset scope" section): version "1", 9
+ * fixtures. Pinned here rather than re-derived from the live corpus file,
+ * which issue #248 grows past this snapshot; this report describes only
+ * those original 9 fixtures, not however many the corpus holds today.
+ */
+const FROZEN_CORPUS_SCOPE = {
+  fixtureCount: 9,
+  categories: { logs: 3, code: 2, chat: 2, "negative-text": 2 },
+  expectedFindingCount: 6,
+  negativeFixtureCount: 3,
+  corpusVersion: "1",
+  corpusSha256: "9c72ab77bb1ee54c6912592c2ce3de72c0c152356283d620498aac5fe08c26d9",
+};
+
 describe("beta.2 detection assessment evidence", () => {
   it("reconciles the reported denominators with the fixed corpus", () => {
-    const corpusBytes = readFileSync(
-      join(root, "assessment", "fixtures", "accuracy-corpus.json"),
-    );
-    const corpus = JSON.parse(corpusBytes.toString("utf8"));
-    const fixtures = validateAssessmentFixtures(corpus.fixtures);
-    const summary = readJson("summary.json") as {
-      scope: {
-        fixtureCount: number;
-        categories: Record<string, number>;
-        expectedFindingCount: number;
-        negativeFixtureCount: number;
-      };
-    };
-
-    const categories = Object.fromEntries(
-      ["logs", "code", "chat", "negative-text"].map((category) => [
-        category,
-        fixtures.filter((fixture) => fixture.category === category).length,
-      ]),
-    );
-    expect(summary.scope).toEqual({
-      fixtureCount: fixtures.length,
-      categories,
-      expectedFindingCount: fixtures.reduce((total, fixture) => total + fixture.expected.length, 0),
-      negativeFixtureCount: fixtures.filter((fixture) => fixture.expected.length === 0).length,
-      corpusVersion: corpus.corpusVersion,
-      corpusSha256: createHash("sha256").update(corpusBytes).digest("hex"),
-    });
+    const summary = readJson("summary.json") as { scope: typeof FROZEN_CORPUS_SCOPE };
+    expect(summary.scope).toEqual(FROZEN_CORPUS_SCOPE);
   });
 
   it("pins conforming, cross-surface results and safe range-mismatch evidence", () => {
