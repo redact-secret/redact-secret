@@ -17,7 +17,7 @@ python3 -B scripts/generate-coverage-report.py --out docs/coverage/coverage-repo
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 35.
+Coverage declarations: 36.
 
 ## Coverage by detector
 
@@ -102,15 +102,15 @@ Coverage declarations: 35.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 35 | 0 | 0 |
+| adversarial | 36 | 0 | 0 |
 | boundary | 25 | 0 | 0 |
 | host-context | 25 | 0 | 0 |
-| incremental | 3 | 7 | 0 |
-| malformed | 35 | 0 | 0 |
+| incremental | 3 | 8 | 0 |
+| malformed | 36 | 0 | 0 |
 | near-miss-negative | 25 | 0 | 0 |
 | overlap | 25 | 0 | 0 |
 | positive | 25 | 0 | 0 |
-| range | 35 | 0 | 0 |
+| range | 36 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

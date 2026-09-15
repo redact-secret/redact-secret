@@ -2771,6 +2771,64 @@
           "state": "supported"
         }
       ],
+      "note": "unit tests pin the Node addon's scan/redact/scan_and_redact agreement on a synthetic finding, including UTF-16 offset conversion at an astral-adjacent boundary",
+      "type": "bindings/node/src/lib.rs"
+    },
+    {
+      "behaviorClass": "binding-edge",
+      "detector": "unassigned",
+      "dimensions": [
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "BUFFER_LIMIT_EXCEEDED",
+            "DETECTOR_FAILURE",
+            "INPUT_LIMIT_EXCEEDED",
+            "INVALID_CHUNK",
+            "INVALID_INPUT",
+            "INVALID_LIMITS",
+            "INVALID_OPTIONS",
+            "INVALID_PLACEHOLDER",
+            "INVALID_POLICY_ACTION",
+            "INVALID_STATE",
+            "INVALID_UTF8",
+            "MULTILINE_LIMIT_EXCEEDED",
+            "PLACEHOLDER_FAILURE",
+            "POLICY_FAILURE",
+            "TOKEN_LIMIT_EXCEEDED"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "incremental",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "no-concept"
+          },
+          "state": "not-applicable"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "crates/secret-scan-core/tests/adversarial_bounds.rs:adversarial"
+          },
+          "state": "supported"
+        }
+      ],
       "note": "asserts the Python binding's scan() matches the canonical synchronous corpus",
       "type": "bindings/python/tests/test_conformance.py"
     },

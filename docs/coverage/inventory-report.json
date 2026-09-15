@@ -27,6 +27,11 @@
     },
     {
       "exists": true,
+      "path": "bindings/node/src/lib.rs",
+      "role": "unit tests pin the Node addon's scan/redact/scan_and_redact agreement on a synthetic finding, including UTF-16 offset conversion at an astral-adjacent boundary"
+    },
+    {
+      "exists": true,
       "path": "bindings/python/tests/test_conformance.py",
       "role": "asserts the Python binding's scan() matches the canonical synchronous corpus"
     },
