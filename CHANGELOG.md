@@ -5,6 +5,14 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+- AWS's own documented example credentials — the access key ID
+  `AKIAIOSFODNN7EXAMPLE` and its paired secret access key
+  `wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY` — are no longer reported as
+  findings. An exact-literal carve-out in the detector pipeline drops a
+  candidate whose full matched text equals one of these two vendor-published
+  placeholder values, regardless of which detector proposed it; no other
+  detection behavior changes.
+
 ## 0.1.0-beta.2 — 2026-09-13
 
 - JavaScript and Python incremental sanitizers now treat host-side invalid
