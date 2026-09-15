@@ -12,6 +12,25 @@ use crate::types::{
     PlaceholderFormatter, Policy, PolicyContext, ScanResult, Specificity, is_identifier,
 };
 
+/// Vendor-published placeholder credentials that can never be real secrets:
+/// each is a provider's own documented example value, invalid against any
+/// real account. Matched by exact equality against the candidate's full text
+/// only, never a substring or pattern, so the carve-out cannot be used as a
+/// template to hide part of a real secret.
+const KNOWN_VENDOR_PLACEHOLDER_LITERALS: &[&str] = &[
+    // AWS SDK/API documentation's example access key ID (IAM docs, `boto3`,
+    // countless tutorials): https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html
+    "AKIAIOSFODNN7EXAMPLE",
+    // AWS's paired example secret access key, published alongside the key
+    // above in the same official documentation.
+    "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+];
+
+/// Whether `matched` is exactly one of [`KNOWN_VENDOR_PLACEHOLDER_LITERALS`].
+fn is_known_vendor_placeholder_literal(matched: &str) -> bool {
+    KNOWN_VENDOR_PLACEHOLDER_LITERALS.contains(&matched)
+}
+
 /// A validated candidate with the keys overlap resolution sorts on.
 struct RankedCandidate<'a> {
     type_name: &'a str,
@@ -105,6 +124,10 @@ fn try_accept(accepted: &mut BTreeMap<usize, usize>, range: ByteRange) -> bool {
 /// surviving findings ordered by input offset with ids `finding-1`,
 /// `finding-2`, and so on.
 ///
+/// A candidate whose full matched text exactly equals one of
+/// [`KNOWN_VENDOR_PLACEHOLDER_LITERALS`] is dropped before validation,
+/// regardless of which detector proposed it.
+///
 /// Identical input and registry always produce identical findings.
 ///
 /// # Errors
@@ -130,6 +153,12 @@ pub fn run_detector_pipeline(
         registry.detectors().iter().enumerate().zip(&per_detector)
     {
         for (candidate_order, candidate) in candidates.iter().enumerate() {
+            let range = candidate.range();
+            if range.is_char_aligned_in(input)
+                && is_known_vendor_placeholder_literal(&input[range.start()..range.end()])
+            {
+                continue;
+            }
             ranked.push(validate_candidate(
                 input,
                 registered,
@@ -275,5 +304,53 @@ mod tests {
         assert!(try_accept(&mut spans, range(0, 10)));
         assert!(try_accept(&mut spans, range(40, 41)));
         assert_eq!(spans.len(), 5);
+    }
+
+    fn built_in_registry() -> DetectorRegistry {
+        DetectorRegistry::with_built_in([]).unwrap()
+    }
+
+    #[test]
+    fn the_documented_aws_access_key_literal_is_never_a_finding() {
+        let registry = built_in_registry();
+        assert_eq!(
+            run_detector_pipeline("AKIAIOSFODNN7EXAMPLE", &registry).unwrap(),
+            Vec::new()
+        );
+    }
+
+    #[test]
+    fn the_documented_aws_access_key_literal_is_never_a_finding_when_embedded() {
+        let registry = built_in_registry();
+        assert_eq!(
+            run_detector_pipeline("AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE", &registry).unwrap(),
+            Vec::new()
+        );
+    }
+
+    #[test]
+    fn the_documented_aws_secret_access_key_literal_is_never_a_finding() {
+        let registry = built_in_registry();
+        let input = "secret=\"wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY\"";
+        assert_eq!(run_detector_pipeline(input, &registry).unwrap(), Vec::new());
+    }
+
+    #[test]
+    fn a_near_miss_of_the_documented_access_key_literal_is_still_detected() {
+        // Last character changed: same shape, not the exempted literal — the
+        // carve-out is an exact match, not a prefix or substring one.
+        let registry = built_in_registry();
+        let findings = run_detector_pipeline("AKIAIOSFODNN7EXAMPLF", &registry).unwrap();
+        assert_eq!(findings.len(), 1);
+        assert_eq!(findings[0].type_name(), "aws_access_key_id");
+    }
+
+    #[test]
+    fn a_near_miss_of_the_documented_secret_key_literal_is_still_detected() {
+        let registry = built_in_registry();
+        let input = "secret=\"wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEZ\"";
+        let findings = run_detector_pipeline(input, &registry).unwrap();
+        assert_eq!(findings.len(), 1);
+        assert_eq!(findings[0].type_name(), "contextual_secret");
     }
 }

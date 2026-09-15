@@ -98,7 +98,7 @@
     {
       "detector": "aws-access-key",
       "evidence": {
-        "fixtureCount": 7,
+        "fixtureCount": 9,
         "hostContextsExercised": [
           "dotenv",
           "log",
@@ -873,7 +873,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 51,
+        "fixtureCount": 52,
         "hostContextsExercised": [
           "chat",
           "dotenv",
@@ -922,7 +922,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 51,
+        "fixtureCount": 52,
         "hostContextsExercised": [
           "chat",
           "dotenv",
