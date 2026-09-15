@@ -5,6 +5,15 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+- The `generic-token` and `connection-string` detectors' placeholder-word
+  exclusion (`changeme`, `redacted`, `example`, and similar hardcoded
+  non-secret values) now matches on token boundaries instead of whole-value
+  exact-string equality. A leading/trailing separator (`" changeme"`), a
+  digit appended to a distinctive placeholder word (`changeme2`), and two
+  already-excluded words joined with `-`/`_` (`REDACTED-EXAMPLE`) are now
+  excluded like the literal word already was; a real secret that merely
+  contains a placeholder word as a substring, or alongside unrelated tokens,
+  continues to be reported.
 - AWS's own documented example credentials — the access key ID
   `AKIAIOSFODNN7EXAMPLE` and its paired secret access key
   `wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY` — are no longer reported as

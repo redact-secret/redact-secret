@@ -1834,7 +1834,8 @@
             "connection-positive-postgres",
             "connection-positive-postgresql",
             "connection-positive-redis-password-only",
-            "connection-positive-rediss-fragment"
+            "connection-positive-rediss-fragment",
+            "connection-regression-placeholder-embedded-in-password"
           ],
           "state": "supported"
         },
@@ -1911,7 +1912,8 @@
             "connection-negative-redis-malformed-percent",
             "connection-negative-redis-vendor-default-changeit",
             "connection-negative-rediss-host-only",
-            "connection-negative-rediss-malformed-percent"
+            "connection-negative-rediss-malformed-percent",
+            "connection-negative-vendor-default-appended-digit"
           ],
           "state": "supported"
         },
@@ -2001,6 +2003,7 @@
             "connection-negative-redis-vendor-default-changeit",
             "connection-negative-rediss-host-only",
             "connection-negative-rediss-malformed-percent",
+            "connection-negative-vendor-default-appended-digit",
             "connection-overlap-context",
             "connection-positive-amqp-query",
             "connection-positive-amqps",
@@ -2016,6 +2019,7 @@
             "connection-positive-postgresql",
             "connection-positive-redis-password-only",
             "connection-positive-rediss-fragment",
+            "connection-regression-placeholder-embedded-in-password",
             "regression-malformed-percent-authority"
           ],
           "state": "supported"
@@ -2140,7 +2144,9 @@
             "contextual-positive-escaped-quote",
             "contextual-positive-minimum-length-is-medium-confidence",
             "contextual-positive-remaining-declared-names",
-            "contextual-positive-single-quoted-value"
+            "contextual-positive-single-quoted-value",
+            "regression-placeholder-embedded-in-high-entropy-value",
+            "regression-placeholder-word-with-unrelated-tokens"
           ],
           "state": "supported"
         },
@@ -2172,6 +2178,9 @@
             "contextual-negative-hash-non-credential-name",
             "contextual-negative-identifier-non-credential-name",
             "contextual-negative-json-env-reference",
+            "contextual-negative-placeholder-appended-digit",
+            "contextual-negative-placeholder-hyphenated-compound",
+            "contextual-negative-placeholder-leading-separator",
             "contextual-negative-placeholder-redacted",
             "contextual-negative-placeholder-replaceme",
             "contextual-negative-prose-colon-unrecognized-name",
@@ -2202,6 +2211,9 @@
             "contextual-negative-hash-non-credential-name",
             "contextual-negative-identifier-non-credential-name",
             "contextual-negative-json-env-reference",
+            "contextual-negative-placeholder-appended-digit",
+            "contextual-negative-placeholder-hyphenated-compound",
+            "contextual-negative-placeholder-leading-separator",
             "contextual-negative-placeholder-redacted",
             "contextual-negative-placeholder-replaceme",
             "contextual-negative-prose-colon-unrecognized-name",
@@ -2218,7 +2230,9 @@
             "contextual-positive-escaped-quote",
             "contextual-positive-minimum-length-is-medium-confidence",
             "contextual-positive-remaining-declared-names",
-            "contextual-positive-single-quoted-value"
+            "contextual-positive-single-quoted-value",
+            "regression-placeholder-embedded-in-high-entropy-value",
+            "regression-placeholder-word-with-unrelated-tokens"
           ],
           "state": "supported"
         },

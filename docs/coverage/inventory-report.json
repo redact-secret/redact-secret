@@ -693,7 +693,7 @@
     {
       "detector": "connection-string",
       "evidence": {
-        "fixtureCount": 72,
+        "fixtureCount": 74,
         "hostContextsExercised": [
           "dotenv",
           "javascript",
@@ -733,7 +733,8 @@
         "connection-positive-postgres",
         "connection-positive-postgresql",
         "connection-positive-redis-password-only",
-        "connection-positive-rediss-fragment"
+        "connection-positive-rediss-fragment",
+        "connection-regression-placeholder-embedded-in-password"
       ],
       "policyClass": "always-redact",
       "schemeRows": [
@@ -873,7 +874,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 52,
+        "fixtureCount": 57,
         "hostContextsExercised": [
           "chat",
           "dotenv",
@@ -912,7 +913,9 @@
         "contextual-positive-escaped-quote",
         "contextual-positive-minimum-length-is-medium-confidence",
         "contextual-positive-remaining-declared-names",
-        "contextual-positive-single-quoted-value"
+        "contextual-positive-single-quoted-value",
+        "regression-placeholder-embedded-in-high-entropy-value",
+        "regression-placeholder-word-with-unrelated-tokens"
       ],
       "policyClass": "confidence-gated",
       "schemeRows": "not-applicable",
@@ -922,7 +925,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 52,
+        "fixtureCount": 57,
         "hostContextsExercised": [
           "chat",
           "dotenv",
