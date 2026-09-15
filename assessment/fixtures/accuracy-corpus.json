@@ -1,7 +1,7 @@
 {
   "offsetUnit": "utf8-byte",
-  "corpusVersion": "1",
-  "fixtureCount": 9,
+  "corpusVersion": "2",
+  "fixtureCount": 14,
   "fixtures": [
     {
       "id": "logs-github-token",
@@ -134,6 +134,96 @@
         }
       ],
       "note": "An astral emoji immediately precedes the finding, the same divergence case conformance/fixtures/unicode-astral.source.ts exercises for UTF-8/UTF-16 conversion."
+    },
+    {
+      "id": "code-openai-api-key",
+      "category": "code",
+      "unicode": false,
+      "input": "const openaiApiKey = \"sk-ASSESSMENTSYNTHETIC_OPENAI_KEY_0000000000\";",
+      "expected": [
+        {
+          "detector": "openai-token",
+          "type": "openai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 66,
+          "policyOutcome": "redact"
+        }
+      ],
+      "note": "Provider behavior class (docs/coverage/evidence-requirements.md #1): OpenAI's bare sk- token format assigned to a variable in source code; always-redact type at high confidence."
+    },
+    {
+      "id": "logs-stripe-secret-key",
+      "category": "logs",
+      "unicode": false,
+      "input": "2026-09-13T00:02:00Z INFO billing charge stripe_key=sk_live_ASSESSMENTSYNTHETICSTRIPEKEY0000000 request_id=fixture-2",
+      "expected": [
+        {
+          "detector": "stripe-token",
+          "type": "stripe_credential",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 52,
+          "end": 95,
+          "policyOutcome": "redact"
+        }
+      ],
+      "note": "Provider behavior class: Stripe secret key embedded in a structured log line; always-redact type at high confidence."
+    },
+    {
+      "id": "chat-jwt-session-token",
+      "category": "chat",
+      "unicode": false,
+      "input": "here's the session token from staging: eyJSYNTHETICHEADER.eyJSYNTHETICPAYLOAD.ASSESSMENTSYNTHETICJWTSIGNATURE0000",
+      "expected": [
+        {
+          "detector": "jwt",
+          "type": "jwt",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 39,
+          "end": 113,
+          "policyOutcome": "redact"
+        }
+      ],
+      "note": "Structural behavior class: a three dot-separated-segment JWT pasted mid-sentence in a chat message, detected by shape alone; always-redact type."
+    },
+    {
+      "id": "code-connection-string-password",
+      "category": "code",
+      "unicode": false,
+      "input": "const databaseUrl = \"postgres://fixture:ASSESSMENTSYNTHETICDBPASSWORD0000@db.assessment.test:5432/fixture\";",
+      "expected": [
+        {
+          "detector": "connection-string",
+          "type": "connection_string_password",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 40,
+          "end": 73,
+          "policyOutcome": "redact"
+        }
+      ],
+      "note": "Structural behavior class: the password segment of a postgres:// connection URL assigned to a variable in source code; the scheme://user:pass@host shape is the whole signal."
+    },
+    {
+      "id": "logs-authorization-token-header",
+      "category": "logs",
+      "unicode": false,
+      "input": "request headers dump:\nAuthorization: Token ASSESSMENTSYNTHETICAUTHTOKEN0000\nstatus=fixture",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "authorization_credential",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 43,
+          "end": 75,
+          "policyOutcome": "redact"
+        }
+      ],
+      "note": "Contextual behavior class (docs/coverage/evidence-requirements.md #1, generic-token's authorization_credential type): confidence and the match itself are driven by the surrounding 'Authorization: Token' header syntax rather than a vendor-specific prefix, even though the accepted candidate's own specificity field is structural; dumped into a raw log line."
     }
   ]
 }
