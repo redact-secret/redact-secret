@@ -125,7 +125,7 @@ fn single_at(authority: &str) -> Option<usize> {
 }
 
 fn is_placeholder(value: &str) -> bool {
-    const NAMES: [&str; 7] = [
+    const NAMES: [&str; 10] = [
         "password",
         "secret",
         "example",
@@ -133,6 +133,16 @@ fn is_placeholder(value: &str) -> bool {
         "placeholder",
         "redacted",
         "changeme",
+        // Docker Hub's official `postgres` image quick-start, copy-pasted
+        // verbatim into a very large number of tutorials and READMEs:
+        // https://hub.docker.com/_/postgres
+        "mysecretpassword",
+        // The JDK's hardcoded default `keytool`/truststore password, shipped
+        // unchanged with every JDK distribution.
+        "changeit",
+        // A common tutorial derivative of "mysecretpassword" seen across the
+        // same class of copy-pasted quick-start docs.
+        "supersecretpassword",
     ];
     if NAMES.iter().any(|name| value.eq_ignore_ascii_case(name)) {
         return true;
@@ -723,6 +733,42 @@ mod tests {
             detect("postgres://fixture:password@localhost/example"),
             Vec::new()
         );
+    }
+
+    #[test]
+    fn well_known_vendor_default_passwords_are_ignored_across_schemes() {
+        for (scheme, authority) in [
+            ("postgres", "fixture:mysecretpassword@localhost/example"),
+            ("mysql", "fixture:mysecretpassword@db.example.test/example"),
+            ("mariadb", "fixture:changeit@db.example.test/example"),
+            ("redis", ":supersecretpassword@cache.example.test:6379/0"),
+            ("mongodb", "fixture:changeit@db0.example.test:27017/db"),
+        ] {
+            let input = format!("{scheme}://{authority}");
+            assert_eq!(
+                detect(&input),
+                Vec::new(),
+                "expected no findings for {input:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn well_known_vendor_default_passwords_are_case_insensitive() {
+        assert_eq!(
+            detect("postgres://fixture:MySecretPassword@localhost/example"),
+            Vec::new()
+        );
+    }
+
+    #[test]
+    fn a_near_miss_of_a_well_known_vendor_default_password_is_still_detected() {
+        // Same shape and length as "mysecretpassword" but not the exact
+        // vendor-documented literal — the carve-out is exact-match, not a
+        // prefix or substring one.
+        let candidates = detect("postgres://fixture:mysecretpasswore@localhost/example");
+        assert_eq!(candidates.len(), 1);
+        assert_eq!(candidates[0].type_name(), "connection_string_password");
     }
 
     #[test]

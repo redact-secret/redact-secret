@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 402,
+  "fixtureCount": 407,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -9497,6 +9497,71 @@
       "input": "Server=tcp:fixture.database.windows.net,1433;Database=fixturedb;IntegratedSecurity=true;Encrypt=true;TrustServerCertificate=false;",
       "expected": [],
       "note": "A semicolon-delimited SQL Server ADO.NET connection string is a different grammar and is not misclassified as Azure Storage."
+    },
+    {
+      "id": "connection-negative-postgres-vendor-default-mysecretpassword",
+      "detector": "connection-string",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "postgres://fixture:mysecretpassword@localhost/example",
+      "expected": [],
+      "note": "'mysecretpassword' is Docker Hub's official postgres image quick-start password, copy-pasted verbatim into an enormous number of tutorials, and is excluded the same as the existing 'changeme' placeholder evidence."
+    },
+    {
+      "id": "connection-negative-mysql-vendor-default-changeit",
+      "detector": "connection-string",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "mysql://fixture:changeit@db.example.test/example",
+      "expected": [],
+      "note": "'changeit' is the JDK's hardcoded default keystore/truststore password, shipped unchanged with every JDK, and is excluded regardless of scheme."
+    },
+    {
+      "id": "connection-negative-mariadb-vendor-default-supersecretpassword",
+      "detector": "connection-string",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "mariadb://fixture:supersecretpassword@db.example.test/example",
+      "expected": [],
+      "note": "'supersecretpassword' is a common tutorial derivative of 'mysecretpassword' seen across the same class of copy-pasted quick-start docs."
+    },
+    {
+      "id": "connection-negative-redis-vendor-default-changeit",
+      "detector": "connection-string",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "redis://:changeit@cache.example.test:6379/0",
+      "expected": [],
+      "note": "The JDK default truststore password is excluded in redis's password-only userinfo form as well as in username:password schemes."
+    },
+    {
+      "id": "connection-negative-mongodb-vendor-default-mysecretpassword",
+      "detector": "connection-string",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "mongodb://fixture:mysecretpassword@db0.example.test:27017/db",
+      "expected": [],
+      "note": "The Docker Hub postgres quick-start password is excluded across schemes, not just postgres."
     },
     {
       "id": "connection-adversarial-azure-overlong",
