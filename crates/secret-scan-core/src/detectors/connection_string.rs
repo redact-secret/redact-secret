@@ -159,7 +159,42 @@ fn is_placeholder(value: &str) -> bool {
             return true;
         }
     }
+    if is_repeated_character_filler(value) {
+        return true;
+    }
+    if is_fill_in_password_prose(value) {
+        return true;
+    }
     false
+}
+
+/// A value made of the same byte repeated three or more times (`xxxxxxxxxxxx`,
+/// `00000000000`) -- classic redaction-style filler used in documentation to
+/// mean "value omitted", structurally unlike a real password.
+fn is_repeated_character_filler(value: &str) -> bool {
+    let bytes = value.as_bytes();
+    bytes.len() >= 3 && bytes[1..].iter().all(|&byte| byte == bytes[0])
+}
+
+/// Prose scaffolding meaning "put your own password here": a snake/kebab-case
+/// value ending in a `_here`/`-here` token (`your_password_here`,
+/// `root_password_here`), or one starting with `insert`/`replace`/`todo` and
+/// containing "password" as its own token (`REPLACE_ME_PASSWORD`,
+/// `TODO_SET_PASSWORD`).
+fn is_fill_in_password_prose(value: &str) -> bool {
+    const PREFIXES: [&str; 3] = ["insert", "replace", "todo"];
+    let lower = value.to_ascii_lowercase();
+    let tokens: Vec<&str> = lower
+        .split(['_', '-'])
+        .filter(|token| !token.is_empty())
+        .collect();
+    if tokens.len() < 2 {
+        return false;
+    }
+    if tokens[tokens.len() - 1] == "here" {
+        return true;
+    }
+    PREFIXES.contains(&tokens[0]) && tokens.contains(&"password")
 }
 
 fn is_userinfo_char(byte: u8) -> bool {
@@ -767,6 +802,54 @@ mod tests {
         // vendor-documented literal — the carve-out is exact-match, not a
         // prefix or substring one.
         let candidates = detect("postgres://fixture:mysecretpasswore@localhost/example");
+        assert_eq!(candidates.len(), 1);
+        assert_eq!(candidates[0].type_name(), "connection_string_password");
+    }
+
+    #[test]
+    fn repeated_character_filler_passwords_are_ignored() {
+        for password in ["xxxxxxxxxxxx", "00000000000"] {
+            let input = format!("postgres://fixture:{password}@localhost/example");
+            assert_eq!(
+                detect(&input),
+                Vec::new(),
+                "expected no findings for {input:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn a_near_miss_of_repeated_character_filler_is_still_detected() {
+        // Two distinct characters, not a uniform run.
+        let candidates = detect("postgres://fixture:xxxxxxxxxxxy@localhost/example");
+        assert_eq!(candidates.len(), 1);
+        assert_eq!(candidates[0].type_name(), "connection_string_password");
+    }
+
+    #[test]
+    fn fill_in_your_own_value_prose_placeholders_are_ignored() {
+        for password in [
+            "your_password_here",
+            "insert-password-here",
+            "REPLACE_ME_PASSWORD",
+            "TODO_SET_PASSWORD",
+            "root_password_here",
+        ] {
+            let input = format!("postgres://fixture:{password}@localhost/example");
+            assert_eq!(
+                detect(&input),
+                Vec::new(),
+                "expected no findings for {input:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn a_near_miss_of_fill_in_prose_is_still_detected() {
+        // Contains "password" and a "here"-shaped token, but neither the
+        // trailing token is literally "here" nor the leading token is one of
+        // the recognized prefixes.
+        let candidates = detect("postgres://fixture:my_password_over_there@localhost/example");
         assert_eq!(candidates.len(), 1);
         assert_eq!(candidates[0].type_name(), "connection_string_password");
     }

@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 407,
+  "fixtureCount": 414,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -9562,6 +9562,97 @@
       "input": "mongodb://fixture:mysecretpassword@db0.example.test:27017/db",
       "expected": [],
       "note": "The Docker Hub postgres quick-start password is excluded across schemes, not just postgres."
+    },
+    {
+      "id": "connection-negative-postgres-placeholder-your-password-here",
+      "detector": "connection-string",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "postgres://fixture:your_password_here@localhost/example",
+      "expected": [],
+      "note": "'your_password_here' is prose scaffolding meaning \"put your own value here,\" not a literal credential."
+    },
+    {
+      "id": "connection-negative-postgres-placeholder-insert-password-here",
+      "detector": "connection-string",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "postgres://fixture:insert-password-here@localhost/example",
+      "expected": [],
+      "note": "A kebab-case '-here' suffix is recognized the same as the snake_case '_here' suffix."
+    },
+    {
+      "id": "connection-negative-postgres-placeholder-replace-me-password",
+      "detector": "connection-string",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "postgres://fixture:REPLACE_ME_PASSWORD@localhost/example",
+      "expected": [],
+      "note": "A 'replace'-prefixed snake_case value containing the word 'password' is scaffold prose, not a literal credential."
+    },
+    {
+      "id": "connection-negative-postgres-placeholder-todo-set-password",
+      "detector": "connection-string",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "postgres://fixture:TODO_SET_PASSWORD@localhost/example",
+      "expected": [],
+      "note": "A 'todo'-prefixed snake_case value containing the word 'password' is scaffold prose, not a literal credential."
+    },
+    {
+      "id": "connection-negative-postgres-placeholder-root-password-here",
+      "detector": "connection-string",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "postgres://fixture:root_password_here@localhost/example",
+      "expected": [],
+      "note": "The '_here' suffix is recognized regardless of the token preceding it."
+    },
+    {
+      "id": "connection-negative-postgres-placeholder-repeated-x",
+      "detector": "connection-string",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "postgres://fixture:xxxxxxxxxxxx@localhost/example",
+      "expected": [],
+      "note": "A run of the same repeated character is classic redaction-style filler used in documentation to mean \"value omitted.\""
+    },
+    {
+      "id": "connection-negative-postgres-placeholder-repeated-zero",
+      "detector": "connection-string",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "postgres://fixture:00000000000@localhost/example",
+      "expected": [],
+      "note": "Repeated-character filler is recognized for digits as well as letters."
     },
     {
       "id": "connection-adversarial-azure-overlong",
