@@ -160,3 +160,27 @@ pub(super) fn matches_placeholder_vocabulary(
     let joined: String = tokens.concat();
     is_listed(&joined, exact_words) || tokens.iter().all(|token| token_is_placeholder(token))
 }
+
+/// `true` for a value made of the same character repeated three or more
+/// times (`xxxxxxxxxxxx`, `00000000000`, `••••••••`) -- classic
+/// redaction-style filler used in documentation and masked terminal/UI
+/// echoes to mean "value omitted", structurally unlike a real secret.
+///
+/// Compares by Unicode scalar value, not raw byte, so a multi-byte filler
+/// character (`•`, U+2022) is recognized the same as a single-byte one
+/// (`*`). Shared by the connection-string and generic-token detectors so
+/// the exclusion stays consistent between them (see #256, #264).
+pub(super) fn is_repeated_character_filler(value: &str) -> bool {
+    let mut chars = value.chars();
+    let Some(first) = chars.next() else {
+        return false;
+    };
+    let mut count = 1usize;
+    for ch in chars {
+        if ch != first {
+            return false;
+        }
+        count += 1;
+    }
+    count >= 3
+}
