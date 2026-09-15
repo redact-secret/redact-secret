@@ -19,6 +19,7 @@
 //! string split across log lines, is a false negative by design, same as
 //! this file's other structural false negatives above.
 
+use super::text::matches_placeholder_vocabulary;
 use crate::entropy::shannon_entropy;
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
@@ -144,7 +145,18 @@ fn is_placeholder(value: &str) -> bool {
         // same class of copy-pasted quick-start docs.
         "supersecretpassword",
     ];
-    if NAMES.iter().any(|name| value.eq_ignore_ascii_case(name)) {
+    // Distinctive enough to tolerate an appended digit (`changeme2`) without
+    // also swallowing common real (if weak) credentials like `password1` or
+    // `secret01` — see `matches_placeholder_vocabulary`'s doc comment.
+    const DIGIT_SUFFIX_NAMES: [&str; 6] = [
+        "example",
+        "sample",
+        "placeholder",
+        "redacted",
+        "changeme",
+        "changeit",
+    ];
+    if matches_placeholder_vocabulary(value, &NAMES, &DIGIT_SUFFIX_NAMES) {
         return true;
     }
     if value.len() >= 2 && value.starts_with('<') && value.ends_with('>') {
@@ -802,6 +814,36 @@ mod tests {
         // vendor-documented literal — the carve-out is exact-match, not a
         // prefix or substring one.
         let candidates = detect("postgres://fixture:mysecretpasswore@localhost/example");
+        assert_eq!(candidates.len(), 1);
+        assert_eq!(candidates[0].type_name(), "connection_string_password");
+    }
+
+    // --- issue #257: placeholder-word exclusion is exact-string equality --
+    //
+    // `is_placeholder`'s `NAMES` check used to require the whole password to
+    // equal one listed word. `matches_placeholder_vocabulary` (super::text)
+    // closes the trivial lexical variant below -- an appended digit -- while
+    // still requiring every token in the password to reduce to a listed
+    // word, so `secret` embedded in a larger, unrelated password is not
+    // swept in for free (see
+    // `a_placeholder_word_embedded_in_a_larger_password_is_still_detected`
+    // below). The generic-token detector's equivalent tests additionally
+    // cover the leading-separator and hyphenated-compound variants, since
+    // both detectors share `matches_placeholder_vocabulary`.
+
+    #[test]
+    fn an_appended_digit_does_not_defeat_the_vendor_default_exclusion() {
+        assert_eq!(
+            detect("postgres://user:changeme2@host/db"),
+            Vec::new(),
+            "\"postgres://user:changeme2@host/db\" should have no findings"
+        );
+    }
+
+    #[test]
+    fn a_placeholder_word_embedded_in_a_larger_password_is_still_detected() {
+        let input = "postgres://fixture:SecretSyntheticRevokedContext9fQ@localhost/example";
+        let candidates = detect(input);
         assert_eq!(candidates.len(), 1);
         assert_eq!(candidates[0].type_name(), "connection_string_password");
     }

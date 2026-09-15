@@ -92,3 +92,61 @@ pub(super) fn ends_with_ci(value: &str, suffix: &str) -> bool {
     let suffix = suffix.as_bytes();
     bytes.len() >= suffix.len() && bytes[bytes.len() - suffix.len()..].eq_ignore_ascii_case(suffix)
 }
+
+/// `true` when `value` is entirely built from words already on `exact_words`
+/// (case-insensitively), closing trivial lexical variants of an
+/// already-excluded word — a leading/trailing separator, an appended digit
+/// to a word on `digit_suffix_words`, or two listed words joined with
+/// `-`/`_` — without falling back to raw substring containment (see
+/// `docs/decisions/2026-09-15-match-placeholder-words-on-token-boundaries.md`).
+///
+/// `value` is split into maximal runs of ASCII alphanumeric characters
+/// (every other byte is a separator). Two independent checks then apply:
+///
+/// - the tokens, concatenated in order with no separator, spell out exactly
+///   one word on `exact_words` (`replace_me`, `my-secret-password` ->
+///   `replaceme`, `mysecretpassword`); or
+/// - every token is itself a word on `exact_words`, or, once a trailing run
+///   of ASCII digits is stripped, a word on `digit_suffix_words`
+///   (`changeme2` -> `changeme`; `REDACTED-EXAMPLE` -> `redacted` +
+///   `example`).
+///
+/// `digit_suffix_words` must be a subset of `exact_words` restricted to
+/// words distinctive enough that an appended digit is still unambiguously a
+/// placeholder — generic role names such as `secret` or `password` belong
+/// only on `exact_words`, since `password1` or `secret01` are common real
+/// (if weak) credential shapes, not placeholder text, and must keep being
+/// reported.
+///
+/// A value with no alphanumeric characters at all never matches. Digit
+/// stripping only trims the end of a token, so a word embedded in a larger
+/// alphanumeric run (`mySecretKeyAbc123`) is never split out and stays a
+/// false negative by design, not an exclusion.
+pub(super) fn matches_placeholder_vocabulary(
+    value: &str,
+    exact_words: &[&str],
+    digit_suffix_words: &[&str],
+) -> bool {
+    fn strip_trailing_digits(token: &str) -> &str {
+        token.trim_end_matches(|ch: char| ch.is_ascii_digit())
+    }
+    let is_listed =
+        |token: &str, words: &[&str]| words.iter().any(|word| token.eq_ignore_ascii_case(word));
+    let token_is_placeholder = |token: &str| {
+        is_listed(token, exact_words) || {
+            let core = strip_trailing_digits(token);
+            core.len() < token.len() && is_listed(core, digit_suffix_words)
+        }
+    };
+
+    let tokens: Vec<&str> = value
+        .split(|ch: char| !ch.is_ascii_alphanumeric())
+        .filter(|token| !token.is_empty())
+        .collect();
+    if tokens.is_empty() {
+        return false;
+    }
+
+    let joined: String = tokens.concat();
+    is_listed(&joined, exact_words) || tokens.iter().all(|token| token_is_placeholder(token))
+}

@@ -13,3 +13,4 @@ future planning and implementation but do not authorize Git or release actions.
 - [Enforce OpenGrep in CI as a required, SARIF-integrated gate](2026-09-10-enforce-opengrep-in-ci-as-a-required-gate.md)
 - [Define the cross-language evaluation protocol](2026-09-12-define-cross-language-evaluation-protocol.md)
 - [Measure JavaScript performance externally](2026-09-12-measure-javascript-performance-externally.md)
+- [Match placeholder words on token boundaries, not exact-string equality](2026-09-15-match-placeholder-words-on-token-boundaries.md)

@@ -6,8 +6,8 @@
 //! no candidates. Values above 4 KiB are left to more specific detectors.
 
 use super::text::{
-    ascii_run_len, char_at, ends_with_ci, is_js_whitespace, is_line_start, prev_char,
-    rskip_while_chars, skip_while_chars, starts_with_ci,
+    ascii_run_len, char_at, ends_with_ci, is_js_whitespace, is_line_start,
+    matches_placeholder_vocabulary, prev_char, rskip_while_chars, skip_while_chars, starts_with_ci,
 };
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
@@ -135,11 +135,26 @@ pub(crate) fn has_open_contextual_assignment(input: &str) -> bool {
 
 // --- non-secret reference exclusions -----------------------------------
 
-fn is_generic_placeholder_word(lower: &str) -> bool {
-    matches!(
-        lower,
-        "example" | "sample" | "placeholder" | "redacted" | "changeme" | "password" | "secret"
-    ) || matches!(lower, "replaceme" | "replace_me" | "replace-me")
+const PLACEHOLDER_WORDS: &[&str] = &[
+    "example",
+    "sample",
+    "placeholder",
+    "redacted",
+    "changeme",
+    "password",
+    "secret",
+    "replaceme",
+];
+
+/// The subset of [`PLACEHOLDER_WORDS`] distinctive enough to tolerate an
+/// appended digit (`changeme2`) without also swallowing common real (if
+/// weak) credentials like `password1` or `secret01` — see
+/// `matches_placeholder_vocabulary`'s doc comment.
+const DIGIT_SUFFIX_PLACEHOLDER_WORDS: &[&str] =
+    &["example", "sample", "placeholder", "redacted", "changeme", "replaceme"];
+
+fn is_generic_placeholder_word(value: &str) -> bool {
+    matches_placeholder_vocabulary(value, PLACEHOLDER_WORDS, DIGIT_SUFFIX_PLACEHOLDER_WORDS)
 }
 
 fn is_boolean_null_or_digits(lower: &str) -> bool {
@@ -653,6 +668,53 @@ mod tests {
                 "expected no findings for {input:?}"
             );
         }
+    }
+
+    // --- issue #257: placeholder-word exclusion is exact-string equality --
+    //
+    // `is_generic_placeholder_word` used to require the whole value to equal
+    // one listed word. `matches_placeholder_vocabulary` (super::text) closes
+    // the trivial lexical variants below while still requiring every token
+    // in the value to reduce to a listed word, so a listed word merely
+    // embedded in a larger, unrelated value is not swept in for free (see
+    // `a_placeholder_word_embedded_in_a_larger_high_entropy_value_is_still_detected`
+    // below).
+
+    #[test]
+    fn a_leading_separator_inside_the_value_does_not_defeat_the_exclusion() {
+        assert!(detect("secret=\" changeme\"").is_empty());
+    }
+
+    #[test]
+    fn an_appended_digit_does_not_defeat_the_exclusion() {
+        assert!(detect("secret_key=\"changeme2\"").is_empty());
+    }
+
+    #[test]
+    fn hyphenating_two_listed_words_does_not_defeat_the_exclusion() {
+        // The issue's own reproduction hyphenates three words
+        // (`REDACTED-EXAMPLE-VALUE`); `value` is not itself a listed
+        // placeholder word, so it is dropped here per the issue's "or the
+        // maintainers' chosen equivalent minimal set" allowance -- every
+        // token in the value must reduce to a listed word, which keeps a
+        // value like `secret-CFj9...` (a real high-entropy secret hyphenated
+        // after an unrelated leading word) from being excluded for free.
+        assert!(detect("secret_key: \"REDACTED-EXAMPLE\"").is_empty());
+    }
+
+    #[test]
+    fn a_placeholder_word_embedded_in_a_larger_high_entropy_value_is_still_detected() {
+        let input = "api_key=SecretSyntheticRevokedContextValue9fQ";
+        assert!(!detect(input).is_empty(), "expected a finding for {input:?}");
+    }
+
+    #[test]
+    fn a_listed_word_followed_by_unrelated_tokens_is_still_detected() {
+        // Same shape as the hyphenation bypass above, but the extra token
+        // (`over`, `there`) is not itself a listed word, so the value must
+        // not be excluded -- a token-boundary fix must not degrade into
+        // "any token is a listed word".
+        assert!(!detect("client_secret=password_over_there").is_empty());
     }
 
     #[test]
