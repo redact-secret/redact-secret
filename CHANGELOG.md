@@ -5,6 +5,15 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+- The `generic-token` detector no longer reports a value fully delimited by
+  `{{` and `}}` (`{{ vault_db_password }}`, `{{ .Values.postgresql.auth.password }}`,
+  `{{ .ClientSecretRef }}`) as a secret, quoted or unquoted. This is the
+  idiomatic reference syntax Ansible, Helm, Salt, and Go templates use to
+  point at a vaulted or injected value, and previously the default policy's
+  `redact` action would rewrite the literal template placeholder, corrupting
+  the playbook or chart it appeared in. A value that only starts with `{{`,
+  or that has a `{{...}}` pair embedded inside a larger value, is unaffected
+  and continues to be reported.
 - The `generic-token` and `connection-string` detectors' placeholder-word
   exclusion (`changeme`, `redacted`, `example`, and similar hardcoded
   non-secret values) now matches on token boundaries instead of whole-value
