@@ -17,3 +17,4 @@ future planning and implementation but do not authorize Git or release actions.
 - [A contextual assignment's value never crosses a line terminator](2026-09-15-contextual-assignment-stops-at-the-line.md)
 - [Exclude a value fully delimited by `{{` and `}}` as a template reference](2026-09-15-exclude-fully-delimited-template-references.md)
 - [Exclude unquoted source-code expressions from generic-token's contextual values](2026-09-16-exclude-unquoted-source-code-expressions-as-contextual-values.md)
+- [Exclude secret-manager reference strings resolved at runtime](2026-09-16-exclude-secret-manager-references.md)

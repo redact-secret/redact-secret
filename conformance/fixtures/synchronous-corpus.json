@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 445,
+  "fixtureCount": 461,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -8918,6 +8918,277 @@
         }
       ],
       "note": "A '{{...}}' pair embedded inside a larger high-entropy value, rather than delimiting the whole value, does not satisfy the exclusion and stays detected."
+    },
+    {
+      "id": "contextual-negative-onepassword-secret-reference",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "shell"
+      ],
+      "input": "PASSWORD=op://Engineering/db-prod/password",
+      "expected": [],
+      "note": "A 1Password secret reference (op://<vault>/<item>/<field>), the syntax `op run` resolves at runtime, names where a secret lives and stays excluded like the existing ${...} reference exclusion."
+    },
+    {
+      "id": "contextual-negative-litellm-os-environ-reference",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "api_key: os.environ/ANTHROPIC_API_KEY",
+      "expected": [],
+      "note": "A LiteLLM proxy config's os.environ/<VAR_NAME> reference resolves to the named environment variable at load time and stays excluded."
+    },
+    {
+      "id": "contextual-negative-gcp-secret-reference-with-version",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "secret: projects/example-project/secrets/api-key/versions/latest",
+      "expected": [],
+      "note": "A GCP Secret Manager resource name with an explicit /versions/<v> selector stays excluded."
+    },
+    {
+      "id": "contextual-negative-gcp-secret-reference-no-version",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "secret: projects/example-project/secrets/api-key",
+      "expected": [],
+      "note": "A GCP Secret Manager resource name without the optional /versions/<v> selector stays excluded."
+    },
+    {
+      "id": "contextual-negative-vals-vault-reference",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "shell"
+      ],
+      "input": "PASSWORD=ref+vault://secret/data/db-prod#/password",
+      "expected": [],
+      "note": "A vals (github.com/helmfile/vals) ref+vault://<path>#<key> structured reference stays excluded."
+    },
+    {
+      "id": "contextual-negative-bank-vaults-injector-reference",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "kubernetes"
+      ],
+      "input": "password: vault:secret/data/db-prod#password",
+      "expected": [],
+      "note": "A bank-vaults / Vault Agent injector vault:<path>#<key> reference stays excluded."
+    },
+    {
+      "id": "contextual-negative-aws-secretsmanager-arn",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "secret: arn:aws:secretsmanager:us-east-1:123456789012:secret:prod/db/password-Ab12Cd",
+      "expected": [],
+      "note": "An AWS Secrets Manager ARN names the resource IAM policies and clients reference, not a resolved secret value, and stays excluded."
+    },
+    {
+      "id": "contextual-negative-azure-keyvault-secreturi-reference",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"password\": \"@Microsoft.KeyVault(SecretUri=https://myvault.vault.azure.net/secrets/mysecret/abc123)\"}",
+      "expected": [],
+      "note": "An Azure App Service @Microsoft.KeyVault(SecretUri=...) reference stays excluded."
+    },
+    {
+      "id": "contextual-negative-azure-keyvault-vaultname-reference",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"password\": \"@Microsoft.KeyVault(VaultName=myvault;SecretName=mysecret;SecretVersion=abc123)\"}",
+      "expected": [],
+      "note": "An Azure App Service @Microsoft.KeyVault(VaultName=...;SecretName=...;SecretVersion=...) reference stays excluded."
+    },
+    {
+      "id": "contextual-positive-onepassword-scheme-prefix-still-detected",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "password=op://SYNTHETIC_REVOKED_NO_SLASH_CONTEXT_VALUE",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 9,
+          "end": 54
+        }
+      ],
+      "note": "A value that only starts with the op:// scheme, with no vault/item/field segmentation, does not satisfy the 1Password reference grammar and stays detected."
+    },
+    {
+      "id": "contextual-positive-litellm-scheme-prefix-still-detected",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "api_key=os.environ/SYNTHETIC-REVOKED-CONTEXT-VALUE!!!",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 8,
+          "end": 53
+        }
+      ],
+      "note": "A value that starts with os.environ/ but is not a bare environment-variable identifier does not satisfy the LiteLLM reference grammar and stays detected."
+    },
+    {
+      "id": "contextual-positive-gcp-secret-scheme-prefix-still-detected",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "secret: projects/SYNTHETIC_REVOKED_MISSING_SECRETS_SEGMENT_CONTEXT_VALUE",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 8,
+          "end": 72
+        }
+      ],
+      "note": "A value that starts with projects/ but has no secrets/ segment does not satisfy the GCP Secret Manager resource-name grammar and stays detected."
+    },
+    {
+      "id": "contextual-positive-vals-scheme-prefix-still-detected",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "password=ref+SYNTHETIC_REVOKED_NO_SCHEME_DELIMITER_CONTEXT_VALUE",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 9,
+          "end": 64
+        }
+      ],
+      "note": "A value that starts with ref+ but has no :// scheme delimiter does not satisfy the vals reference grammar and stays detected."
+    },
+    {
+      "id": "contextual-positive-bank-vaults-scheme-prefix-still-detected",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "password=vault:SYNTHETIC_REVOKED_NO_FRAGMENT_CONTEXT_VALUE",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 9,
+          "end": 58
+        }
+      ],
+      "note": "A value that starts with vault: but has no # key selector does not satisfy the bank-vaults reference grammar and stays detected."
+    },
+    {
+      "id": "contextual-positive-aws-secretsmanager-arn-shape-still-detected",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "secret=arn:aws:secretsmanager:us-east-1:SYNTHETIC_REVOKED_NOT_TWELVE_DIGITS:secret:name",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 7,
+          "end": 87
+        }
+      ],
+      "note": "An ARN-shaped value whose account-id segment is not 12 digits does not satisfy the AWS Secrets Manager ARN grammar and stays detected."
+    },
+    {
+      "id": "contextual-positive-azure-keyvault-scheme-prefix-still-detected",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "password=@Microsoft.KeyVault(SYNTHETIC_REVOKED_CONTEXT_VALUE)",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 9,
+          "end": 61
+        }
+      ],
+      "note": "A value wrapped in @Microsoft.KeyVault(...) whose interior is neither SecretUri=... nor Key=value;... fields does not satisfy the Azure Key Vault reference grammar and stays detected."
     },
     {
       "id": "future-provider-family-pending",
