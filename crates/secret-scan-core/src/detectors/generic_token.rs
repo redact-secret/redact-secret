@@ -817,8 +817,13 @@ fn scan_backtick_delimiter(input: &str, start: usize) -> Option<usize> {
 fn delimited_reference_value(input: &str, start: usize) -> Option<(usize, usize)> {
     for opener in DELIMITED_REFERENCE_OPENERS {
         if input[start..].starts_with(opener.open) {
-            let end =
-                scan_nested_delimiter(input, start, opener.open.len(), opener.nest_open, opener.close)?;
+            let end = scan_nested_delimiter(
+                input,
+                start,
+                opener.open.len(),
+                opener.nest_open,
+                opener.close,
+            )?;
             return is_unquoted_value_boundary(char_at(input, end)).then_some((start, end));
         }
     }
@@ -827,6 +832,15 @@ fn delimited_reference_value(input: &str, start: usize) -> Option<(usize, usize)
         return is_unquoted_value_boundary(char_at(input, end)).then_some((start, end));
     }
     None
+}
+
+/// `true` when `input[start..]` opens with a recognized opencode
+/// substitution prefix (`{env:`/`{file:`), regardless of whether it goes on
+/// to close with a matching `}` before the value ends.
+fn starts_with_opencode_prefix(input: &str, start: usize) -> bool {
+    OPENCODE_REFERENCE_KINDS
+        .iter()
+        .any(|kind| input[start..].starts_with(&format!("{{{kind}:")))
 }
 
 /// Scans an unquoted value up to the next boundary character, rejecting
@@ -838,14 +852,25 @@ fn delimited_reference_value(input: &str, start: usize) -> Option<(usize, usize)
 /// credential (issue #266, the same shape as #262). No real unquoted
 /// credential in the syntaxes this detector targets legitimately begins
 /// with either character, so treating them as an immediate boundary costs
-/// no true positive. `{env:...}`/`{file:...}` are checked first and are
-/// exempt: their delimited scan already establishes they are a bounded
-/// reference, not an opened flow structure.
+/// no true positive.
+///
+/// `{env:...}`/`{file:...}` are exempt from that guard even when
+/// `delimited_reference_value` above didn't resolve them to a bare
+/// reference (i.e. one is embedded in a larger value, `{env:x}_EXTRA`):
+/// without the exemption, the guard would return no value at all for the
+/// whole assignment, silently dropping a candidate the paired-positive
+/// requirement in issue #279 says must still be reported, rather than
+/// merely mis-scoping its range. The narrow cost is a flow mapping whose
+/// first key happens to be spelled `env`/`file` (`secret: {file: "/etc/x"}`)
+/// losing the #266 guard's protection -- accepted because it is far rarer
+/// than a real secret embedding one of these substitution prefixes.
 fn unquoted_assignment_value(input: &str, start: usize) -> Option<(usize, usize)> {
     if let Some(span) = delimited_reference_value(input, start) {
         return Some(span);
     }
-    if matches!(char_at(input, start), Some('{' | '[')) {
+    if matches!(char_at(input, start), Some('{' | '['))
+        && !starts_with_opencode_prefix(input, start)
+    {
         return None;
     }
     let mut cursor = start;
@@ -1487,6 +1512,14 @@ mod tests {
             "password=SYNTHETIC_REVOKED_$(x)_CONTEXT_VALUE",
             "password=SYNTHETIC_REVOKED_#{x}_CONTEXT_VALUE",
             "password=SYNTHETIC_REVOKED_`x`_CONTEXT_VALUE",
+            // A well-formed `{env:...}`/`{file:...}` pair at the very start
+            // of an unquoted value, followed by more content rather than
+            // ending the value there, previously fell into the `{`/`[`
+            // flow-mapping guard (issue #266) and was silently dropped with
+            // no candidate at all, instead of being reported like the other
+            // delimiter shapes above.
+            "password={env:ANTHROPIC_API_KEY}_SYNTHETIC_REVOKED_CONTEXT_VALUE",
+            "password={file:SYNTHETIC_REVOKED_PATH}_CONTEXT_VALUE",
         ] {
             assert!(
                 !detect(input).is_empty(),

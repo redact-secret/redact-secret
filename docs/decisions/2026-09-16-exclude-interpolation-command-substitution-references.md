@@ -47,18 +47,34 @@ scans to that opener's matching close (honoring nesting for the
 bracket/brace/paren forms, so `$(echo $(date))` resolves to its outer close;
 honoring backslash-escaped backticks by parity, like `quoted_assignment_value`
 already does for `"`/`'`) instead of stopping at the first generic boundary
-character. `{env:...}`/`{file:...}` are exempt from the existing
-`{`/`[`-opens-a-flow-structure guard (issue #266) for the same reason: their
-delimited scan already establishes they are a bounded reference, not an
-opened YAML/JSON flow structure. If the delimited scan does not find a
-balanced close before a line terminator or the shared length bound, it falls
-through to the plain boundary scan unchanged, so a truncated or unterminated
-opener behaves exactly as it did before this change.
+character. If the delimited scan does not find a balanced close before a line
+terminator or the shared length bound, it falls through to the plain boundary
+scan unchanged, so a truncated or unterminated opener behaves exactly as it
+did before this change.
 
 A quoted value (`"..."`/`'...'`) never needed this: `quoted_assignment_value`
 already scans to the real closing quote regardless of `}`/`]` appearing
 inside, so none of the four reproducers in issue #279 that happen to be
 quoted were ever truncated.
+
+`{env:...}`/`{file:...}` need a second exemption beyond the delimited scan:
+they are the only two openers that literally start with `{`, so a value that
+opens with one of them but goes on to embed it in something larger
+(`{env:x}_EXTRA`, the same "embedded" shape the paired-positive requirement
+covers for every other delimiter) fails `delimited_reference_value`'s
+boundary check and then walks straight into the pre-existing `{`/`[`
+flow-structure guard (issue #266), which returns *no value at all* for the
+whole assignment — silently dropping the candidate instead of merely
+under-scoping its range. `unquoted_assignment_value` exempts any value
+opening with `{env:`/`{file:` from that guard regardless of whether the
+delimited scan resolved it, so it falls through to the plain boundary scan
+and stays reported (at a truncated range up to the delimiter's first `}`,
+same as any other value that happens to contain a `{`/`[`/`}`/`]` character
+already does under the existing boundary rules). The accepted cost is a flow
+mapping whose first key happens to be spelled `env` or `file`
+(`secret: {file: "/etc/passwd"}`) losing the #266 guard's protection — judged
+far rarer than a real secret embedding one of these two substitution
+prefixes.
 
 ## Rationale
 
