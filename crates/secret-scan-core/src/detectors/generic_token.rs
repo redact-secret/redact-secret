@@ -325,6 +325,38 @@ fn is_env_var_identifier(value: &str) -> bool {
     chars.all(|ch| ch.is_ascii_alphanumeric() || ch == '_')
 }
 
+// --- cmd-style Windows env reference and SQL bind parameter exclusions
+// (issue #292) ------------------------------------------------------------
+//
+// `docs/decisions/2026-09-16-exclude-interpolation-command-substitution-references.md`
+// deferred these two syntaxes so each got its own explicit fixture coverage.
+// Both share `is_env_var_identifier`'s identifier shape rather than
+// `is_template_reference`'s "anything between the delimiters" rule: `%` and
+// `:` are common enough punctuation (a percentage-bounded range, a URL port,
+// a prose colon) that a bare delimiter-pair check would exclude values that
+// merely start and end with one, so the *content* must itself look like an
+// identifier.
+
+/// `true` for a cmd.exe/batch-style Windows environment-variable reference
+/// (`%DB_PASSWORD%`): the whole value is `%` + an identifier + `%`, expanded
+/// by the shell at runtime rather than a secret. A value missing either `%`
+/// delimiter, or one that carries the pair embedded inside a larger value,
+/// does not satisfy this and stays detected — the same whole-value
+/// requirement as `is_template_reference`.
+fn is_windows_env_reference(value: &str) -> bool {
+    value
+        .strip_prefix('%')
+        .and_then(|rest| rest.strip_suffix('%'))
+        .is_some_and(is_env_var_identifier)
+}
+
+/// `true` for a SQL named bind parameter (`:new_password_hash`): the whole
+/// value is `:` followed by an identifier, a placeholder the query engine
+/// substitutes at execution time rather than a secret.
+fn is_sql_bind_parameter(value: &str) -> bool {
+    value.strip_prefix(':').is_some_and(is_env_var_identifier)
+}
+
 /// `true` for a 1Password secret reference (`op://<vault>/<item>/<field>`):
 /// exactly three non-empty, path-safe segments after the `op://` scheme,
 /// the vault/item/field selector `op run` and the 1Password SDKs resolve at
@@ -628,6 +660,8 @@ fn is_non_secret_reference(value: &str) -> bool {
         || is_secret_manager_reference(value)
         || is_repeated_character_filler(value)
         || is_source_code_expression(value)
+        || is_windows_env_reference(value)
+        || is_sql_bind_parameter(value)
 }
 
 // --- confidence -----------------------------------------------------------
@@ -1538,6 +1572,100 @@ mod tests {
             // JSON-escaped double quotes inside a Ruby interpolation that
             // would use single quotes unescaped.
             "{\"password\": \"#{ENV[\\\"DB_PASSWORD\\\"]}\"}",
+        ] {
+            assert!(
+                detect(input).is_empty(),
+                "expected no findings for {input:?}"
+            );
+        }
+    }
+
+    // --- issue #292: a cmd.exe/batch-style Windows environment-variable
+    // reference (`%VAR%`) or a SQL named bind parameter (`:identifier`) is
+    // excluded like the existing reference-syntax exclusions -- deferred
+    // out of issue #279 (`docs/decisions/2026-09-16-exclude-interpolation-command-substitution-references.md`)
+    // so each gets its own explicit fixture coverage. Only a value fully
+    // shaped as the syntax, with an identifier as its content, is a bare
+    // reference; a missing delimiter, or the pair embedded inside a larger
+    // value, stays detected.
+
+    #[test]
+    fn windows_env_and_sql_bind_parameter_references_are_excluded() {
+        for input in [
+            // Windows cmd-style env expansion, unquoted.
+            "PASSWORD=%DB_PASSWORD%",
+            // Windows cmd-style env expansion, quoted.
+            "PASSWORD=\"%DB_PASSWORD%\"",
+            // SQL named bind parameter, unquoted.
+            "password = :new_password_hash",
+            // SQL named bind parameter, quoted YAML.
+            "password: ':new_password_hash'",
+        ] {
+            assert!(
+                detect(input).is_empty(),
+                "expected no findings for {input:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn a_windows_env_reference_missing_either_delimiter_is_still_detected() {
+        for input in [
+            // Missing the closing `%`.
+            "PASSWORD=%DB_PASSWORD_SYNTHETIC_REVOKED",
+            // Missing the opening `%`.
+            "PASSWORD=DB_PASSWORD_SYNTHETIC_REVOKED%",
+        ] {
+            assert!(
+                !detect(input).is_empty(),
+                "expected a finding for {input:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn a_windows_env_reference_pair_embedded_in_a_larger_value_is_still_detected() {
+        assert!(
+            !detect("PASSWORD=SYNTHETIC_%DB_PASSWORD%_REVOKED_CONTEXT_VALUE").is_empty(),
+            "expected a finding for an embedded %VAR% pair"
+        );
+    }
+
+    #[test]
+    fn a_windows_env_reference_whose_content_is_not_an_identifier_is_still_detected() {
+        assert!(
+            !detect("PASSWORD=\"%not an identifier%\"").is_empty(),
+            "expected a finding when the %...% content is not identifier-shaped"
+        );
+    }
+
+    #[test]
+    fn a_sql_bind_parameter_missing_its_colon_is_still_detected() {
+        assert!(
+            !detect("password = new_password_hash_SYNTHETIC_REVOKED").is_empty(),
+            "expected a finding for a bare identifier with no leading colon"
+        );
+    }
+
+    #[test]
+    fn a_sql_bind_parameter_embedded_in_a_larger_value_is_still_detected() {
+        assert!(
+            !detect("password=SYNTHETIC_:new_password_hash_REVOKED_CONTEXT_VALUE").is_empty(),
+            "expected a finding for an embedded :identifier pair"
+        );
+    }
+
+    #[test]
+    fn windows_env_and_sql_bind_parameter_references_are_excluded_across_crlf_and_unicode_prefix() {
+        for input in [
+            // CRLF line ending after the value.
+            "PASSWORD=%DB_PASSWORD%\r\n",
+            // A tab, instead of a space, after the `=` operator.
+            "PASSWORD=\t%DB_PASSWORD%",
+            // A multi-byte Unicode character preceding the assignment,
+            // exercising byte-offset (not char-count) boundary handling.
+            "note: caf\u{e9} \u{2014} PASSWORD=%DB_PASSWORD%",
+            "note: caf\u{e9} \u{2014} password = :new_password_hash",
         ] {
             assert!(
                 detect(input).is_empty(),

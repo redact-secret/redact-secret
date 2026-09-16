@@ -19,3 +19,4 @@ future planning and implementation but do not authorize Git or release actions.
 - [Exclude unquoted source-code expressions from generic-token's contextual values](2026-09-16-exclude-unquoted-source-code-expressions-as-contextual-values.md)
 - [Exclude secret-manager reference strings resolved at runtime](2026-09-16-exclude-secret-manager-references.md)
 - [Exclude interpolation and command-substitution references beyond `${...}`, `$name`, and `{{...}}`](2026-09-16-exclude-interpolation-command-substitution-references.md)
+- [Exclude cmd-style Windows environment references (`%VAR%`) and SQL named bind parameters (`:identifier`)](2026-09-16-exclude-windows-env-and-sql-bind-parameter-references.md)
