@@ -5,6 +5,16 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+- A `generic-token` contextual assignment's value can no longer cross a line
+  terminator. Previously, a key with no value before end-of-line (a YAML
+  `secret:` block opening a nested mapping, an interactive `Password:`
+  prompt) could consume the next line's key name as if it were the value,
+  which both produced false positives on unrelated nested keys and — the
+  more serious direction — advanced the scan past that nested key's own
+  boundary, so a real credential nested directly under a parent key
+  (`database:\n  password: <value>`) was silently missed. Whole-input and
+  incremental scanning (single chunk or split at any boundary) now agree on
+  every such shape.
 - The `generic-token` detector no longer reports a value made of the same
   character repeated three or more times (`********`, `••••••••`) as a
   secret — classic redaction-style filler that masked CLI prompts, config

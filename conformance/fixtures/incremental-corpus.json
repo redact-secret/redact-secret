@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 18,
+  "fixtureCount": 22,
   "fixtures": [
     {
       "id": "synthetic-regression-malformed-authority",
@@ -365,6 +365,52 @@
         }
       ],
       "note": "issue #262 / #265: a nested password: key under an unrelated parent key: line is still detected and redacted at every partition."
+    },
+    {
+      "id": "contextual-assignment-consecutive-nested-keys",
+      "input": "properties:\n  password:\n    minLength: 12",
+      "text": "properties:\n  password:\n    minLength: 12",
+      "expected": [],
+      "note": "issue #265: three consecutive key-only lines, each nested one level deeper than the last, never let a later key steal the previous key's line-terminator boundary. No key here has a credential-shaped value, so every partition stays finding-free."
+    },
+    {
+      "id": "contextual-assignment-deeply-nested-keys",
+      "input": "spec:\n  auth:\n    password:\n      secretKeyRef:",
+      "text": "spec:\n  auth:\n    password:\n      secretKeyRef:",
+      "expected": [],
+      "note": "issue #265: four consecutive key-only lines, including a password: line with no value before end-of-line, stay finding-free at every partition; whole-input and incremental disagreed here before the fix."
+    },
+    {
+      "id": "contextual-assignment-credential-under-auth-key",
+      "input": "auth:\n  password: SYNTHETIC_REVOKED_FIXTURE_VALUE",
+      "text": "auth:\n  password: <SECRET_1>",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 18,
+          "end": 49
+        }
+      ],
+      "note": "issue #265: a password: value nested one level under an auth: key is detected and redacted at every partition, matching whole-input."
+    },
+    {
+      "id": "contextual-assignment-credential-under-two-nested-keys",
+      "input": "spec:\n  auth:\n    password: SYNTHETIC_REVOKED_FIXTURE_VALUE",
+      "text": "spec:\n  auth:\n    password: <SECRET_1>",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 28,
+          "end": 59
+        }
+      ],
+      "note": "issue #265: a password: value nested two levels under spec: / auth: is detected and redacted at every partition; this was whole-input-only before the fix."
     }
   ]
 }

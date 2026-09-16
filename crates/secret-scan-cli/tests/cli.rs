@@ -706,6 +706,78 @@ fn redact_matches_the_canonical_corpus_redacted_text() {
     }
 }
 
+// --- canonical corpus: whole-input vs incremental parity ---------------
+
+/// The canonical incremental partition-equivalence corpus, loaded the same
+/// way `crates/secret-scan-core/tests/support/mod.rs` loads it: `include_str!`,
+/// so a fixture change forces a rebuild of this test.
+const INCREMENTAL_CORPUS: &str =
+    include_str!("../../../conformance/fixtures/incremental-corpus.json");
+
+/// Every fixture's `id` and `input`, read out of the corpus file at run time.
+fn incremental_corpus_fixtures() -> Vec<(String, String)> {
+    let document: serde_json::Value =
+        serde_json::from_str(INCREMENTAL_CORPUS).expect("incremental-corpus.json is valid JSON");
+    document["fixtures"]
+        .as_array()
+        .expect("incremental-corpus.json has a fixtures array")
+        .iter()
+        .map(|fixture| {
+            (
+                fixture["id"]
+                    .as_str()
+                    .expect("fixture has an id")
+                    .to_owned(),
+                fixture["input"]
+                    .as_str()
+                    .expect("fixture has an input")
+                    .to_owned(),
+            )
+        })
+        .collect()
+}
+
+/// A `--json` check report's findings, with the `source` field dropped: a
+/// file-path run and a stdin run necessarily name different sources, but
+/// every other field must agree.
+fn findings_ignoring_source(stdout: &str) -> serde_json::Value {
+    let mut report: serde_json::Value =
+        serde_json::from_str(stdout).expect("--json output is valid JSON");
+    for source in report["sources"]
+        .as_array_mut()
+        .expect("report has a sources array")
+    {
+        source
+            .as_object_mut()
+            .expect("source entry is an object")
+            .remove("source");
+    }
+    report
+}
+
+/// issue #265: a path read whole and the same bytes streamed through stdin
+/// must report identical findings for every fixture in the canonical
+/// incremental corpus, not just the two mismatches the evaluator found.
+#[test]
+fn cli_file_path_and_stdin_reports_match_the_incremental_corpus() {
+    let scratch = Scratch::new();
+    let fixtures = incremental_corpus_fixtures();
+    assert!(!fixtures.is_empty(), "incremental corpus must not be empty");
+
+    for (id, input) in fixtures {
+        let path = scratch.write(&format!("{id}.txt"), &input);
+        let file = run(&[Path::new("--json"), &path], b"");
+        let stdin = run_args(&["--json"], input.as_bytes());
+
+        assert_eq!(file.code, stdin.code, "{id}: exit code");
+        assert_eq!(
+            findings_ignoring_source(&file.stdout),
+            findings_ignoring_source(&stdin.stdout),
+            "{id}: findings diverged between file path and stdin",
+        );
+    }
+}
+
 // --- broken pipe -------------------------------------------------------
 
 /// A downstream reader that exits early must not hang the binary, must not
