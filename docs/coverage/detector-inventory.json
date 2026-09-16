@@ -158,6 +158,13 @@
       "schemes": null
     },
     {
+      "type": "atlassian_api_token",
+      "detector": "atlassian-api-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "ATATSYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY_SYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY_SYNTHETIC_REVO",
+      "schemes": null
+    },
+    {
       "type": "jwt",
       "detector": "jwt",
       "policyClass": "always-redact",

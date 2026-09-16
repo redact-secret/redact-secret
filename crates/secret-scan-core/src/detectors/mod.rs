@@ -10,6 +10,7 @@
 
 mod additional_providers;
 mod anthropic;
+mod atlassian;
 mod aws;
 mod bearer_token;
 mod connection_string;
@@ -61,6 +62,7 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(additional_providers::GOOGLE),
         Box::new(sendgrid::SendgridTokenDetector),
         Box::new(microsoft_entra::MicrosoftEntraClientSecretDetector),
+        Box::new(atlassian::AtlassianApiTokenDetector),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
         Box::new(ConnectionStringDetector),
@@ -115,6 +117,7 @@ mod tests {
                 "google-api-key",
                 "sendgrid-token",
                 "microsoft-entra-client-secret",
+                "atlassian-api-token",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -154,7 +157,11 @@ mod tests {
         let pypi_input = format!("pypi-{}", "SYNTHETIC_REVOKED_".repeat(5));
         let sendgrid_input =
             "SG.SYNTHETIC_REVOKED_0000.SYNTHETIC_REVOKED_SENDGRID_SECRET_000000000";
-        let cases: [(&str, &str); 21] = [
+        let atlassian_input = format!(
+            "ATAT{}",
+            "SYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY_".repeat(3)
+        );
+        let cases: [(&str, &str); 22] = [
             ("aws-access-key", "AKIASYNTHETICEXAMPLE"),
             (
                 "github-token",
@@ -185,6 +192,7 @@ mod tests {
                 "microsoft-entra-client-secret",
                 "abc8Q~SYNTHETIC_REVOKED_ENTRA_SECRET_V",
             ),
+            ("atlassian-api-token", atlassian_input.as_str()),
         ];
         let detectors = built_in_detectors();
         for (id, input) in cases {

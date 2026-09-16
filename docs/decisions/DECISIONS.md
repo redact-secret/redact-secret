@@ -23,3 +23,4 @@ future planning and implementation but do not authorize Git or release actions.
 - [Bound the Azure Key Vault SecretUri reference by host shape, not domain identity](2026-09-16-bound-azure-keyvault-secreturi-host-by-shape.md)
 - [Detect a nested contextual assignment with no separator inside an enclosing quote](2026-09-16-detect-nested-assignments-with-no-separator-inside-a-quote.md)
 - [Freeze the Microsoft Entra application client-secret grammar as an unprefixed digit-Q-tilde marker](2026-09-16-freeze-microsoft-entra-client-secret-grammar.md)
+- [Freeze the Atlassian Cloud API token grammar as a minimum-length ATAT-prefixed body](2026-09-16-freeze-atlassian-api-token-grammar.md)

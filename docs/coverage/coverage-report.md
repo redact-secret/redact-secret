@@ -15,17 +15,18 @@ These counts describe finding-type inventory rows with corpus evidence, not dete
 
 | Row state | Count |
 | --- | --- |
-| supported | 28 |
+| supported | 29 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 39.
+Coverage declarations: 40.
 
 ## Coverage by detector
 
 | Detector | Declared types | Row states |
 | --- | --- | --- |
 | anthropic-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| atlassian-api-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | aws-access-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | bearer-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | cloudflare-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -58,6 +59,7 @@ Coverage declarations: 39.
 | Type | Detector | Behavior class | State | Scheme states | Pending dimensions |
 | --- | --- | --- | --- | --- | --- |
 | anthropic_api_key | anthropic-token | provider | supported | not-applicable | none |
+| atlassian_api_token | atlassian-api-token | provider | supported | not-applicable | none |
 | authorization_credential | generic-token | contextual | supported | supported | none |
 | aws_access_key_id | aws-access-key | provider | supported | not-applicable | none |
 | bearer_token | bearer-token | structural | supported | not-applicable | none |
@@ -110,15 +112,15 @@ Coverage declarations: 39.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 39 | 0 | 0 |
-| boundary | 28 | 0 | 0 |
-| host-context | 28 | 0 | 0 |
+| adversarial | 40 | 0 | 0 |
+| boundary | 29 | 0 | 0 |
+| host-context | 29 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 39 | 0 | 0 |
-| near-miss-negative | 28 | 0 | 0 |
-| overlap | 28 | 0 | 0 |
-| positive | 28 | 0 | 0 |
-| range | 39 | 0 | 0 |
+| malformed | 40 | 0 | 0 |
+| near-miss-negative | 29 | 0 | 0 |
+| overlap | 29 | 0 | 0 |
+| positive | 29 | 0 | 0 |
+| range | 40 | 0 | 0 |
 
 ## Unresolved and pending coverage
 
