@@ -1,12 +1,12 @@
 {
   "schemaVersion": "1",
-  "criteriaId": "rc-performance-resource-v1",
-  "fixedAt": "2026-09-13",
+  "criteriaId": "rc-performance-resource-v2",
+  "fixedAt": "2026-09-16",
   "baseline": {
-    "summaryPath": "assessment/results/complete/summary.json",
-    "sourceCommit": "a356e702e59b03cf297e0af15ba0423bc8466d48",
-    "accuracyCorpusVersion": "1",
-    "accuracyCorpusHash": "9c72ab77bb1ee54c6912592c2ce3de72c0c152356283d620498aac5fe08c26d9",
+    "summaryPath": "assessment/results/complete-v3/summary.json",
+    "sourceCommit": "9359f59596f03443254f662db60d553b0610809e",
+    "accuracyCorpusVersion": "3",
+    "accuracyCorpusHash": "cc4cb42028fd700bc98dd06dacebe421c5462dd59a46cf013154a4d185849979",
     "workloadProfilesVersion": "1",
     "workloadProfilesHash": "b4db2cd22b4c008c9d63789df8ca2e21e697a21a84699466ea5f96c89d8e2806"
   },
@@ -24,7 +24,7 @@
     }
   },
   "accuracy": {
-    "truePositives": 1,
+    "truePositives": 21,
     "falsePositives": 1,
     "falseNegatives": 5,
     "policyMismatches": 0

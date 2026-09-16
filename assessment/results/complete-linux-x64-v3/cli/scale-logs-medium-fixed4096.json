@@ -1,0 +1,135 @@
+{
+  "schemaVersion": "3",
+  "surface": "cli",
+  "profileId": "scale-logs-medium-fixed4096",
+  "performance": {
+    "initialization": {
+      "unit": "milliseconds",
+      "samples": [
+        2.445726999999991,
+        2.4625219999999786,
+        2.813591000000031,
+        2.4940270000000737,
+        2.5308519999999817
+      ],
+      "minimum": 2.445726999999991,
+      "median": 2.4940270000000737,
+      "p95": 2.813591000000031,
+      "maximum": 2.813591000000031,
+      "mean": 2.549343800000011,
+      "standardDeviation": 0.13527966878641776
+    },
+    "processing": {
+      "unit": "milliseconds",
+      "samples": [
+        101.584975,
+        101.20896800000003,
+        106.94901900000002,
+        102.28055900000004,
+        101.69504900000004
+      ],
+      "minimum": 101.20896800000003,
+      "median": 101.69504900000004,
+      "p95": 106.94901900000002,
+      "maximum": 106.94901900000002,
+      "mean": 102.74371400000003,
+      "standardDeviation": 2.1305831283435985
+    },
+    "throughput": {
+      "unit": "bytes-per-second",
+      "samples": [
+        2580637.540148039,
+        2590225.0085190074,
+        2451205.279405134,
+        2563087.282305525,
+        2577844.2763718017
+      ],
+      "minimum": 2451205.279405134,
+      "median": 2577844.2763718017,
+      "p95": 2590225.0085190074,
+      "maximum": 2590225.0085190074,
+      "mean": 2552599.877349901,
+      "standardDeviation": 51439.072440579104
+    },
+    "memory": {
+      "nodeHeap": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "The CLI is a native process, not a Node.js process.",
+        "samplingLimit": "No samples were available."
+      },
+      "nodeRss": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "The CLI is a native process, not a Node.js process.",
+        "samplingLimit": "No samples were available."
+      },
+      "nodeExternal": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "The CLI is a native process, not a Node.js process.",
+        "samplingLimit": "No samples were available."
+      },
+      "browserJsHeap": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "The CLI is a native process, not a browser JavaScript environment.",
+        "samplingLimit": "No samples were available."
+      },
+      "wasmLinearMemory": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "The CLI is a native process and does not use WebAssembly linear memory.",
+        "samplingLimit": "No samples were available."
+      },
+      "pythonHeap": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "The CLI is a native process, not a Python allocator.",
+        "samplingLimit": "No samples were available."
+      },
+      "processRss": {
+        "unit": "bytes",
+        "samples": [
+          {
+            "baselineBytes": 0,
+            "maximumObservedBytes": 2973696
+          },
+          {
+            "baselineBytes": 0,
+            "maximumObservedBytes": 2985984
+          },
+          {
+            "baselineBytes": 0,
+            "maximumObservedBytes": 2981888
+          },
+          {
+            "baselineBytes": 0,
+            "maximumObservedBytes": 2772992
+          },
+          {
+            "baselineBytes": 0,
+            "maximumObservedBytes": 3084288
+          }
+        ],
+        "samplingLimit": "A separate, untimed /usr/bin/time-wrapped repetition's whole-process maximum resident set size; it includes process startup, argument parsing, the Rust runtime, and the entire scan, and cannot isolate steady-state or Rust-only memory."
+      },
+      "streamingBuffer": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "The CLI's standard-input path streams through the incremental core, but the public contract exposes no retained plaintext buffer size.",
+        "samplingLimit": "No samples were available."
+      }
+    }
+  },
+  "provenance": {
+    "commit": "9359f59596f03443254f662db60d553b0610809e",
+    "artifactIdentity": "redact-secret@0.1.0-beta.2",
+    "corpusVersion": "1",
+    "corpusHash": "b4db2cd22b4c008c9d63789df8ca2e21e697a21a84699466ea5f96c89d8e2806",
+    "os": "linux-6.17.0-1022-azure",
+    "cpu": "x64",
+    "runtime": "rustc 1.98.1 (48a229cea 2026-09-01)",
+    "command": "node scripts/assessment-cli-performance.mjs --binary target/release/redact-secret --profile scale-logs-medium-fixed4096 --runs 5 --json-out assessment-output/cli/scale-logs-medium-fixed4096.json --markdown-out assessment-output/cli/scale-logs-medium-fixed4096.md"
+  }
+}

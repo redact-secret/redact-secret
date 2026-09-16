@@ -179,13 +179,22 @@ It publishes nothing and is not a release gate.
 
 ## Fixed RC performance and resource acceptance
 
-[`acceptance-criteria.json`](./acceptance-criteria.json) fixes the first RC
-criteria before candidate measurement. The criteria use the first complete
-baseline at commit `a356e702e59b03cf297e0af15ba0423bc8466d48` and pin both
-corpus identities. They cover the two representative log-processing profiles:
-64 KiB whole-input and 256 KiB fixed-4096 incremental input (standard input for
-the CLI). Five repetitions are required so a two-sample exploratory baseline
-cannot be mistaken for formal acceptance evidence.
+[`acceptance-criteria.json`](./acceptance-criteria.json) fixes the RC
+criteria before candidate measurement. Its performance and resource
+thresholds were derived once, from the first complete baseline at commit
+`a356e702e59b03cf297e0af15ba0423bc8466d48`, and have not changed since. Its
+`baseline` pointer and pinned accuracy counts are re-pinned whenever the
+accuracy corpus moves to a new reviewed revision, so a candidate built from
+the current corpus is not rejected on a stale identity mismatch before any
+timing threshold is even checked; the criteria currently point at the
+five-repetition run at commit `9359f59596f03443254f662db60d553b0610809e`
+(accuracy corpus version `3`, hash
+`cc4cb42028fd700bc98dd06dacebe421c5462dd59a46cf013154a4d185849979`),
+committed under [`results/complete-v3/`](./results/complete-v3/). They cover
+the two representative log-processing profiles: 64 KiB whole-input and 256
+KiB fixed-4096 incremental input (standard input for the CLI). Five
+repetitions are required so a two-sample exploratory baseline cannot be
+mistaken for formal acceptance evidence.
 
 The environment profile is deliberately narrow: macOS on arm64/aarch64, Node
 22, Chromium, CPython 3, and the host Rust toolchain. This is the environment
@@ -239,8 +248,16 @@ repetitions; all 46 timing, throughput, and observable-memory checks passed.
 The first durable run of that command is committed as
 [`results/complete/baseline.md`](./results/complete/baseline.md), with its
 machine-readable rollup in
-[`results/complete/summary.json`](./results/complete/summary.json). Use a new
-output directory when reproducing it so stale files cannot satisfy a run.
+[`results/complete/summary.json`](./results/complete/summary.json); it
+remains as historical evidence and stays byte-for-byte unchanged as the
+corpus moves forward. The criteria file's currently pinned baseline is the
+later five-repetition run committed as
+[`results/complete-v3/baseline.md`](./results/complete-v3/baseline.md) and
+[`results/complete-v3/summary.json`](./results/complete-v3/summary.json),
+evaluated as `accepted` in
+[`results/complete-v3/acceptance.md`](./results/complete-v3/acceptance.md).
+Use a new output directory when reproducing either so stale files cannot
+satisfy a run.
 
 To choose another bounded profile, repeat `--profile`; include at least one
 `whole` and one non-`whole` profile or the rollup is incomplete. Other useful
@@ -275,11 +292,21 @@ complete, five-repetition run captured by the
 [`Complete assessment`](../.github/workflows/complete-assessment.yml)
 workflow's `ubuntu-latest` runner at commit
 `9ff702001342ff84acdde8ad9acdec396572a15e`, committed under
-[`results/complete-linux-x64/`](./results/complete-linux-x64/). Its baseline
-pins accuracy corpus version `2` (this run postdates the corpus expansion
-that the original macOS profile's version-`1` baseline predates) and the same
-workload-profiles identity as the macOS profile, since that corpus is
-unchanged.
+[`results/complete-linux-x64/`](./results/complete-linux-x64/); it remains as
+historical evidence and stays byte-for-byte unchanged as the corpus moves
+forward. Its performance and resource thresholds were derived once, from
+that run, and have not changed since. The criteria file's `baseline` pointer
+and pinned accuracy counts are re-pinned whenever the accuracy corpus moves
+to a new reviewed revision, so they currently point at the later
+five-repetition `ubuntu-latest` run at commit
+`9359f59596f03443254f662db60d553b0610809e` (accuracy corpus version `3`,
+hash `cc4cb42028fd700bc98dd06dacebe421c5462dd59a46cf013154a4d185849979`),
+committed under
+[`results/complete-linux-x64-v3/`](./results/complete-linux-x64-v3/) and
+evaluated as `accepted` in
+[`results/complete-linux-x64-v3/acceptance.md`](./results/complete-linux-x64-v3/acceptance.md).
+Both runs pin the same workload-profiles identity as the macOS profile,
+since that corpus is unchanged.
 
 The environment profile is `linux-x64-node22-chromium`: Linux on x86_64, Node
 22, Chromium, CPython 3, and the host Rust toolchain — otherwise the same

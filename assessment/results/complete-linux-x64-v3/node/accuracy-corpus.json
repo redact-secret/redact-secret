@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "3",
+  "surface": "node",
+  "profileId": "accuracy-corpus",
+  "accuracy": {
+    "truePositives": 21,
+    "falsePositives": 1,
+    "falseNegatives": 5,
+    "policyMismatches": 0
+  },
+  "provenance": {
+    "commit": "9359f59596f03443254f662db60d553b0610809e",
+    "artifactIdentity": "@redact-secret/core@0.1.0-beta.2",
+    "corpusVersion": "3",
+    "corpusHash": "cc4cb42028fd700bc98dd06dacebe421c5462dd59a46cf013154a4d185849979",
+    "os": "linux-6.17.0-1022-azure",
+    "cpu": "x64",
+    "runtime": "node-22.23.2",
+    "command": "node scripts/assessment-run.mjs --json-out assessment-output/node/accuracy-corpus.json --markdown-out assessment-output/node/accuracy-corpus.md --mismatches-out assessment-output/node/accuracy-corpus-mismatches.json"
+  }
+}
