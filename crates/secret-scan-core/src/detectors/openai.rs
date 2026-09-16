@@ -149,4 +149,30 @@ mod tests {
         let input = format!("sk-{}", "antSYNTHETIC_REVOKED_OPENAI_KEY_VALUE");
         assert_eq!(detect(&input).len(), 1);
     }
+
+    #[test]
+    fn accepts_a_doc_style_placeholder_built_from_valid_alphabet_characters() {
+        let input = format!("sk-proj-{}", "x".repeat(MIN_SUFFIX_LEN));
+        assert_eq!(detect(&input).len(), 1);
+    }
+
+    #[test]
+    fn rejects_a_prefix_embedded_in_a_wider_benign_identifier() {
+        // A leading alnum/dash byte right before `sk-` means this is a
+        // truncated slice of a longer identifier, not a boundary-delimited
+        // credential.
+        let input = format!("legacysk-proj-{}", "SYNTHETIC_REVOKED_KEY_VALUE");
+        assert_eq!(detect(&input).len(), 0);
+    }
+
+    #[test]
+    fn a_trailing_comma_does_not_get_folded_into_or_suppress_the_match() {
+        let token = format!("sk-proj-{}", "SYNTHETIC_REVOKED_KEY_VALUE");
+        let input = format!("Rotate {token}, then redeploy.");
+        let candidates = detect(&input);
+        assert_eq!(candidates.len(), 1);
+        let start = "Rotate ".len();
+        let end = start + token.len();
+        assert_eq!(candidates[0].range(), ByteRange::new(start, end).unwrap());
+    }
 }

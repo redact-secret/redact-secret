@@ -395,8 +395,10 @@
           "dimension": "positive",
           "evidenceFixtureIds": [
             "openai-positive-all-prefixes",
+            "openai-positive-doc-style-placeholder",
             "openai-positive-min-length",
-            "openai-positive-project"
+            "openai-positive-project",
+            "openai-positive-punctuation-adjacent"
           ],
           "state": "supported"
         },
@@ -428,6 +430,7 @@
         {
           "dimension": "near-miss-negative",
           "evidenceFixtureIds": [
+            "openai-negative-embedded-in-wider-identifier",
             "openai-negative-lookalike",
             "openai-negative-model-name",
             "openai-negative-placeholder"
@@ -479,7 +482,9 @@
         {
           "dimension": "positive",
           "evidenceFixtureIds": [
+            "anthropic-positive-doc-style-placeholder",
             "anthropic-positive-min-length",
+            "anthropic-positive-punctuation-adjacent",
             "anthropic-positive-versioned"
           ],
           "state": "supported"
@@ -512,6 +517,8 @@
         {
           "dimension": "near-miss-negative",
           "evidenceFixtureIds": [
+            "anthropic-negative-embedded-in-wider-identifier",
+            "anthropic-negative-legacy-unversioned-tradeoff",
             "anthropic-negative-placeholder",
             "anthropic-negative-unrelated-id"
           ],
