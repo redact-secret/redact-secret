@@ -16,3 +16,4 @@ future planning and implementation but do not authorize Git or release actions.
 - [Match placeholder words on token boundaries, not exact-string equality](2026-09-15-match-placeholder-words-on-token-boundaries.md)
 - [A contextual assignment's value never crosses a line terminator](2026-09-15-contextual-assignment-stops-at-the-line.md)
 - [Exclude a value fully delimited by `{{` and `}}` as a template reference](2026-09-15-exclude-fully-delimited-template-references.md)
+- [Exclude secret-manager reference strings resolved at runtime](2026-09-16-exclude-secret-manager-references.md)

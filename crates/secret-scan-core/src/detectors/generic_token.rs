@@ -215,6 +215,252 @@ fn is_template_reference(value: &str) -> bool {
     value.starts_with("{{") && value.ends_with("}}") && value.len() >= 4
 }
 
+// --- secret-manager reference exclusions (issue #280) -------------------
+//
+// Each of these names *where* a secret lives at runtime -- a pointer `op
+// run`, LiteLLM, `vals`, the bank-vaults injector, or a cloud secret
+// manager's own client resolves -- rather than containing one. Per-scheme
+// grammars are used instead of a bare scheme-prefix allowlist: a prefix
+// check alone would exclude any value an attacker or careless author
+// prefixed with it, so each function below requires the whole value to
+// satisfy that scheme's actual reference shape. A scheme-like prefix on a
+// value that does not otherwise satisfy its grammar stays detected.
+// `docs/decisions/2026-09-16-exclude-secret-manager-references.md` records
+// the supported schemes and grammars.
+
+/// `true` for a byte allowed inside a generic path/identifier segment:
+/// ASCII letters, digits, `-`, `_`, or `.`. None of the grammars below
+/// allow whitespace or other structural punctuation inside a segment.
+fn is_segment_byte(byte: u8) -> bool {
+    byte.is_ascii_alphanumeric() || matches!(byte, b'-' | b'_' | b'.')
+}
+
+fn is_segment(value: &str) -> bool {
+    !value.is_empty() && value.bytes().all(is_segment_byte)
+}
+
+/// `true` for a byte allowed inside a reference path that may itself
+/// contain `/` (a vals or bank-vaults secret path), as opposed to a single
+/// path segment.
+fn is_path_byte(byte: u8) -> bool {
+    is_segment_byte(byte) || byte == b'/'
+}
+
+fn is_path(value: &str) -> bool {
+    !value.is_empty() && value.bytes().all(is_path_byte)
+}
+
+fn is_env_var_identifier(value: &str) -> bool {
+    let mut chars = value.chars();
+    match chars.next() {
+        Some(first) if first.is_ascii_alphabetic() || first == '_' => {}
+        _ => return false,
+    }
+    chars.all(|ch| ch.is_ascii_alphanumeric() || ch == '_')
+}
+
+/// `true` for a 1Password secret reference (`op://<vault>/<item>/<field>`):
+/// exactly three non-empty, path-safe segments after the `op://` scheme,
+/// the vault/item/field selector `op run` and the 1Password SDKs resolve at
+/// runtime. More or fewer segments, or a segment carrying whitespace or
+/// other unsafe punctuation, stays detected.
+fn is_onepassword_reference(value: &str) -> bool {
+    let Some(rest) = value.strip_prefix("op://") else {
+        return false;
+    };
+    let mut segments = rest.split('/');
+    let (Some(vault), Some(item), Some(field), None) = (
+        segments.next(),
+        segments.next(),
+        segments.next(),
+        segments.next(),
+    ) else {
+        return false;
+    };
+    is_segment(vault) && is_segment(item) && is_segment(field)
+}
+
+/// `true` for a `LiteLLM` `os.environ/<VAR_NAME>` reference: the proxy config
+/// resolves this to the named environment variable at load time, so the
+/// value names where a secret lives rather than containing one.
+fn is_litellm_env_reference(value: &str) -> bool {
+    value
+        .strip_prefix("os.environ/")
+        .is_some_and(is_env_var_identifier)
+}
+
+fn is_gcp_project_id(value: &str) -> bool {
+    if !value.is_empty() && value.bytes().all(|byte| byte.is_ascii_digit()) {
+        return true;
+    }
+    matches!(value.as_bytes().first(), Some(first) if first.is_ascii_lowercase())
+        && value
+            .bytes()
+            .all(|byte| byte.is_ascii_lowercase() || byte.is_ascii_digit() || byte == b'-')
+}
+
+fn is_gcp_secret_version(value: &str) -> bool {
+    value == "latest" || (!value.is_empty() && value.bytes().all(|byte| byte.is_ascii_digit()))
+}
+
+/// `true` for a GCP Secret Manager resource name
+/// (`projects/<id>/secrets/<name>(/versions/<v>)?`): the resource-name shape
+/// the Secret Manager client libraries accept in place of a resolved secret
+/// value.
+fn is_gcp_secret_manager_reference(value: &str) -> bool {
+    let segments: Vec<&str> = value.split('/').collect();
+    let (project, name) = match segments.as_slice() {
+        ["projects", project, "secrets", name] => (project, name),
+        ["projects", project, "secrets", name, "versions", version]
+            if is_gcp_secret_version(version) =>
+        {
+            (project, name)
+        }
+        _ => return false,
+    };
+    is_gcp_project_id(project) && is_segment(name)
+}
+
+/// `true` for a vals structured reference (`ref+<backend>://<path>#<key>`,
+/// e.g. `ref+vault://secret/data/db#/password`): the `ref+` scheme prefix
+/// vals (`github.com/helmfile/vals`) uses to resolve a value from Vault,
+/// cloud secret managers, and other backends at render time.
+fn is_vals_reference(value: &str) -> bool {
+    let Some(rest) = value.strip_prefix("ref+") else {
+        return false;
+    };
+    let Some((scheme, after_scheme)) = rest.split_once("://") else {
+        return false;
+    };
+    if scheme.is_empty()
+        || !scheme
+            .bytes()
+            .all(|byte| byte.is_ascii_lowercase() || byte.is_ascii_digit() || byte == b'-')
+    {
+        return false;
+    }
+    let Some((path, key)) = after_scheme.split_once('#') else {
+        return false;
+    };
+    is_path(path) && is_path(key)
+}
+
+/// `true` for a bank-vaults injector reference (`vault:<path>#<key>`, e.g.
+/// `vault:secret/data/db#password`, optionally `#<key>#<version>`): the
+/// syntax the bank-vaults mutating webhook and Vault Agent injector resolve
+/// from an environment value or annotation before the container starts.
+fn is_bank_vaults_reference(value: &str) -> bool {
+    let Some(rest) = value.strip_prefix("vault:") else {
+        return false;
+    };
+    let parts: Vec<&str> = rest.split('#').collect();
+    if !(2..=3).contains(&parts.len()) {
+        return false;
+    }
+    is_path(parts[0]) && parts[1..].iter().all(|part| is_segment(part))
+}
+
+fn is_aws_secretsmanager_partition(value: &str) -> bool {
+    matches!(value, "aws" | "aws-cn" | "aws-us-gov")
+}
+
+fn is_aws_region(value: &str) -> bool {
+    !value.is_empty()
+        && value
+            .bytes()
+            .all(|byte| byte.is_ascii_lowercase() || byte.is_ascii_digit() || byte == b'-')
+}
+
+fn is_aws_account_id(value: &str) -> bool {
+    value.len() == 12 && value.bytes().all(|byte| byte.is_ascii_digit())
+}
+
+fn is_secretsmanager_secret_name(value: &str) -> bool {
+    !value.is_empty()
+        && value
+            .bytes()
+            .all(|byte| is_segment_byte(byte) || matches!(byte, b'/' | b'+' | b'=' | b'@'))
+}
+
+/// `true` for an AWS Secrets Manager ARN
+/// (`arn:aws:secretsmanager:<region>:<12-digit account id>:secret:<name>`):
+/// the resource identifier IAM policies, Secrets Manager clients, and
+/// `CloudFormation` templates reference in place of a resolved secret value.
+fn is_aws_secretsmanager_arn(value: &str) -> bool {
+    let segments: Vec<&str> = value.splitn(7, ':').collect();
+    let [arn, partition, service, region, account, secret_literal, name] = segments.as_slice()
+    else {
+        return false;
+    };
+    *arn == "arn"
+        && is_aws_secretsmanager_partition(partition)
+        && *service == "secretsmanager"
+        && is_aws_region(region)
+        && is_aws_account_id(account)
+        && *secret_literal == "secret"
+        && is_secretsmanager_secret_name(name)
+}
+
+/// `true` for `https://<vault>.vault.azure.net/secrets/<name>(/<version>)?`,
+/// the Key Vault secret identifier an Azure App Service `SecretUri=` field
+/// carries.
+fn is_azure_keyvault_secret_uri(value: &str) -> bool {
+    let Some(rest) = value.strip_prefix("https://") else {
+        return false;
+    };
+    let Some(slash) = rest.find('/') else {
+        return false;
+    };
+    let (host, path) = rest.split_at(slash);
+    ends_with_ci(host, ".vault.azure.net")
+        && host.len() > ".vault.azure.net".len()
+        && path.strip_prefix("/secrets/").is_some_and(is_path)
+}
+
+/// `true` for an Azure App Service / Functions Key Vault reference
+/// (`@Microsoft.KeyVault(SecretUri=<vault-uri>)` or
+/// `@Microsoft.KeyVault(VaultName=<vault>;SecretName=<secret>[;SecretVersion=<version>])`):
+/// the app-setting syntax that is resolved from Key Vault at startup rather
+/// than storing the secret value directly.
+fn is_azure_keyvault_reference(value: &str) -> bool {
+    let Some(inner) = value
+        .strip_prefix("@Microsoft.KeyVault(")
+        .and_then(|rest| rest.strip_suffix(')'))
+    else {
+        return false;
+    };
+    if let Some(uri) = inner.strip_prefix("SecretUri=") {
+        return is_azure_keyvault_secret_uri(uri);
+    }
+    let mut has_vault_name = false;
+    let mut has_secret_name = false;
+    for field in inner.split(';') {
+        let Some((key, value)) = field.split_once('=') else {
+            return false;
+        };
+        if !is_segment(value) {
+            return false;
+        }
+        match key {
+            "VaultName" => has_vault_name = true,
+            "SecretName" => has_secret_name = true,
+            "SecretVersion" => {}
+            _ => return false,
+        }
+    }
+    has_vault_name && has_secret_name
+}
+
+fn is_secret_manager_reference(value: &str) -> bool {
+    is_onepassword_reference(value)
+        || is_litellm_env_reference(value)
+        || is_gcp_secret_manager_reference(value)
+        || is_vals_reference(value)
+        || is_bank_vaults_reference(value)
+        || is_aws_secretsmanager_arn(value)
+        || is_azure_keyvault_reference(value)
+}
+
 fn is_non_secret_reference(value: &str) -> bool {
     let lower = value.to_ascii_lowercase();
     is_generic_placeholder_word(&lower)
@@ -223,6 +469,7 @@ fn is_non_secret_reference(value: &str) -> bool {
         || starts_with_path_like(value)
         || ends_with_key_or_pem(value)
         || is_template_reference(value)
+        || is_secret_manager_reference(value)
         || is_repeated_character_filler(value)
 }
 
@@ -900,6 +1147,60 @@ mod tests {
             !detect(input).is_empty(),
             "expected a finding for {input:?}"
         );
+    }
+
+    // --- issue #280: a secret-manager reference -- a pointer `op run`,
+    // LiteLLM, `vals`, the bank-vaults injector, or a cloud secret manager
+    // resolves at runtime -- is excluded like the existing `${...}` and
+    // `{{...}}` reference exclusions. Each grammar requires the whole value
+    // to satisfy that scheme's reference shape, not merely start with its
+    // prefix.
+
+    #[test]
+    fn secret_manager_references_are_excluded() {
+        for input in [
+            "PASSWORD=op://Engineering/db-prod/password",
+            "api_key: os.environ/ANTHROPIC_API_KEY",
+            "secret: projects/example-project/secrets/api-key/versions/latest",
+            "secret: projects/example-project/secrets/api-key",
+            "secret: projects/123456789012/secrets/api-key",
+            "password=ref+vault://secret/data/db-prod#/password",
+            "password=vault:secret/data/db-prod#password",
+            "secret=arn:aws:secretsmanager:us-east-1:123456789012:secret:prod/db/password-Ab12Cd",
+            "password=@Microsoft.KeyVault(SecretUri=https://myvault.vault.azure.net/secrets/mysecret/abc123)",
+            "password=\"@Microsoft.KeyVault(VaultName=myvault;SecretName=mysecret;SecretVersion=abc123)\"",
+        ] {
+            assert!(
+                detect(input).is_empty(),
+                "expected no findings for {input:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn a_secret_manager_scheme_prefix_that_does_not_satisfy_its_grammar_is_still_detected() {
+        for input in [
+            // `op://` with no vault/item/field segmentation at all.
+            "password=op://SYNTHETIC_REVOKED_NO_SLASH_CONTEXT_VALUE",
+            // `os.environ/` followed by characters outside an env-var identifier.
+            "api_key=os.environ/SYNTHETIC-REVOKED-CONTEXT-VALUE!!!",
+            // `projects/...` with no `secrets/` segment.
+            "secret: projects/SYNTHETIC_REVOKED_MISSING_SECRETS_SEGMENT_CONTEXT_VALUE",
+            // `ref+` with no `://` scheme delimiter.
+            "password=ref+SYNTHETIC_REVOKED_NO_SCHEME_DELIMITER_CONTEXT_VALUE",
+            // `vault:` with no `#` key selector.
+            "password=vault:SYNTHETIC_REVOKED_NO_FRAGMENT_CONTEXT_VALUE",
+            // An ARN whose account-id segment is not 12 digits.
+            "secret=arn:aws:secretsmanager:us-east-1:SYNTHETIC_REVOKED_NOT_TWELVE_DIGITS:secret:name",
+            // `@Microsoft.KeyVault(...)` whose interior is neither `SecretUri=`
+            // nor `Key=value;...` fields.
+            "password=@Microsoft.KeyVault(SYNTHETIC_REVOKED_CONTEXT_VALUE)",
+        ] {
+            assert!(
+                !detect(input).is_empty(),
+                "expected a finding for {input:?}"
+            );
+        }
     }
 
     // --- issue #262: a contextual-assignment operator with no value before
