@@ -102,4 +102,73 @@ mod tests {
         let value = format!("AKIA{}", "SYNTHETICEXAMPLE");
         assert_eq!(detect(&format!("X{value}Y")).len(), 0);
     }
+
+    #[test]
+    fn rejects_a_user_id_prefix() {
+        // AIDA (IAM user) is not a documented access-key prefix, like the
+        // AROA (IAM role) case already covered by the corpus.
+        assert_eq!(detect("AIDASYNTHETICEXAMPLE").len(), 0);
+    }
+
+    #[test]
+    fn rejects_a_bare_account_id() {
+        assert_eq!(
+            detect("AWS account 123456789012 owns this resource.").len(),
+            0
+        );
+    }
+
+    #[test]
+    fn rejects_an_iam_role_arn() {
+        assert_eq!(
+            detect("arn:aws:iam::123456789012:role/SyntheticExampleRole").len(),
+            0
+        );
+    }
+
+    #[test]
+    fn rejects_an_s3_resource_arn() {
+        assert_eq!(
+            detect("arn:aws:s3:::synthetic-example-bucket-2026").len(),
+            0
+        );
+    }
+
+    #[test]
+    fn rejects_an_ordinary_uppercase_identifier() {
+        assert_eq!(detect("MAX_CONNECTIONS_ALLOWED_SYNTHETIC_EXAMPLE").len(), 0);
+    }
+
+    #[test]
+    fn accepts_a_key_shaped_value_inside_a_comment_naming_example() {
+        // The detector is pure grammar match with no context awareness, so a
+        // comment naming the field "example" must not suppress a genuinely
+        // key-shaped value; only the exact vendor-documented literal is
+        // exempted (see pipeline.rs's KNOWN_VENDOR_PLACEHOLDER_LITERALS).
+        let value = format!("AKIA{}", "SYNTHETICEXAMPLE");
+        let input = format!("// example: {value} (rotate before deploying)");
+        let candidates = detect(&input);
+        assert_eq!(candidates.len(), 1);
+        let start = "// example: ".len();
+        assert_eq!(
+            candidates[0].range(),
+            ByteRange::new(start, start + value.len()).unwrap()
+        );
+    }
+
+    #[test]
+    fn accepts_a_value_adjacent_to_a_multibyte_unicode_character() {
+        // "é" is 2 UTF-8 bytes; neither byte is ASCII-alnum, so both are
+        // correctly treated as non-alnum boundary bytes rather than one of
+        // them being mistaken for part of the run or splitting the offset.
+        let value = format!("AKIA{}", "SYNTHETICEXAMPLE");
+        let input = format!("caf\u{e9}{value}");
+        let candidates = detect(&input);
+        assert_eq!(candidates.len(), 1);
+        let start = "caf\u{e9}".len();
+        assert_eq!(
+            candidates[0].range(),
+            ByteRange::new(start, start + value.len()).unwrap()
+        );
+    }
 }

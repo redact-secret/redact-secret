@@ -98,9 +98,10 @@
     {
       "detector": "aws-access-key",
       "evidence": {
-        "fixtureCount": 9,
+        "fixtureCount": 18,
         "hostContextsExercised": [
           "dotenv",
+          "javascript",
           "log",
           "plain-text"
         ],
@@ -116,7 +117,11 @@
         ]
       },
       "evidenceFixtureIds": [
-        "aws-positive-akia"
+        "aws-positive-akia",
+        "aws-positive-asia-canonical",
+        "aws-positive-example-shaped-value-in-comment-context",
+        "aws-positive-unicode-adjacent-multibyte-before",
+        "regression-aws-example-mutation-still-detected"
       ],
       "policyClass": "always-redact",
       "schemeRows": "not-applicable",

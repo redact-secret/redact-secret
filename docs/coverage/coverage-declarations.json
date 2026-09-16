@@ -93,7 +93,11 @@
         {
           "dimension": "positive",
           "evidenceFixtureIds": [
-            "aws-positive-akia"
+            "aws-positive-akia",
+            "aws-positive-asia-canonical",
+            "aws-positive-example-shaped-value-in-comment-context",
+            "aws-positive-unicode-adjacent-multibyte-before",
+            "regression-aws-example-mutation-still-detected"
           ],
           "state": "supported"
         },
@@ -123,7 +127,12 @@
         {
           "dimension": "near-miss-negative",
           "evidenceFixtureIds": [
+            "aws-negative-account-id",
+            "aws-negative-arn-resource",
+            "aws-negative-arn-role",
+            "aws-negative-ordinary-uppercase-identifier",
             "aws-negative-role-id",
+            "aws-negative-user-id",
             "regression-aws-example-access-key-dotenv",
             "regression-aws-example-access-key-standalone"
           ],
