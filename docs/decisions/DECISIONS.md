@@ -22,3 +22,4 @@ future planning and implementation but do not authorize Git or release actions.
 - [Exclude cmd-style Windows environment references (`%VAR%`) and SQL named bind parameters (`:identifier`)](2026-09-16-exclude-windows-env-and-sql-bind-parameter-references.md)
 - [Bound the Azure Key Vault SecretUri reference by host shape, not domain identity](2026-09-16-bound-azure-keyvault-secreturi-host-by-shape.md)
 - [Detect a nested contextual assignment with no separator inside an enclosing quote](2026-09-16-detect-nested-assignments-with-no-separator-inside-a-quote.md)
+- [Freeze the Microsoft Entra application client-secret grammar as an unprefixed digit-Q-tilde marker](2026-09-16-freeze-microsoft-entra-client-secret-grammar.md)
