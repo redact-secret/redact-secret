@@ -137,6 +137,13 @@
       "schemes": null
     },
     {
+      "type": "google_api_key",
+      "detector": "google-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "AIzaSYNTHETIC_REVOKED_GOOGLE_API_KEY012",
+      "schemes": null
+    },
+    {
       "type": "sendgrid_api_key",
       "detector": "sendgrid-token",
       "policyClass": "always-redact",
