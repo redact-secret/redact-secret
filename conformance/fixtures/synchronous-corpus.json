@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 598,
+  "fixtureCount": 615,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -12579,6 +12579,304 @@
       "input": "atlassian cloudId (not a secret): 5b10ac8d-6180-45cc-98d0-30d0fbcbe4c8",
       "expected": [],
       "note": "A public Atlassian cloud/site identifier (a UUID) shares no shape with the ATAT-prefixed API token grammar and is not classified."
+    },
+    {
+      "id": "discord-bot-token-positive-bare",
+      "detector": "discord-bot-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "MDAwMDAwMDAwMDAwMDAwMDAw.REVOKE.SYNTHETICREVOKEDBOTTOKENFIX",
+      "expected": [
+        {
+          "detector": "discord-bot-token",
+          "type": "discord_bot_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 59
+        }
+      ],
+      "note": "The three-segment shape with a digit-decoding first segment is sufficient on its own; no surrounding context is required."
+    },
+    {
+      "id": "discord-bot-token-positive-dotenv",
+      "detector": "discord-bot-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "DISCORD_TOKEN=MDAwMDAwMDAwMDAwMDAwMDAw.REVOKE.SYNTHETICREVOKEDBOTTOKENFIX",
+      "expected": [
+        {
+          "detector": "discord-bot-token",
+          "type": "discord_bot_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 73
+        }
+      ],
+      "note": "A bare dotenv-style assignment (DISCORD_TOKEN=<token>, no quotes) is detected by format alone."
+    },
+    {
+      "id": "discord-bot-token-positive-json",
+      "detector": "discord-bot-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"token\": \"MDAwMDAwMDAwMDAwMDAwMDAw.REVOKE.SYNTHETICREVOKEDBOTTOKENFIX\"}",
+      "expected": [
+        {
+          "detector": "discord-bot-token",
+          "type": "discord_bot_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 70
+        }
+      ],
+      "note": "A quoted JSON string value is detected the same as a bare one; the enclosing quotes are not part of the match."
+    },
+    {
+      "id": "discord-bot-token-positive-log",
+      "detector": "discord-bot-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "INFO: logging in with token MDAwMDAwMDAwMDAwMDAwMDAw.REVOKE.SYNTHETICREVOKEDBOTTOKENFIX succeeded",
+      "expected": [
+        {
+          "detector": "discord-bot-token",
+          "type": "discord_bot_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 28,
+          "end": 87
+        }
+      ],
+      "note": "A token embedded in ordinary log prose, with no assignment syntax at all, is still detected by format alone."
+    },
+    {
+      "id": "discord-bot-token-positive-crlf-unicode-prefix",
+      "detector": "discord-bot-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# \ud83d\udd11 caf\u00e9\r\nMDAwMDAwMDAwMDAwMDAwMDAw.REVOKE.SYNTHETICREVOKEDBOTTOKENFIX\r\n",
+      "expected": [
+        {
+          "detector": "discord-bot-token",
+          "type": "discord_bot_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 73
+        }
+      ],
+      "note": "A multi-byte Unicode prefix and CRLF line endings before the token do not defeat detection; byte offsets advance by real UTF-8 byte width, not char count."
+    },
+    {
+      "id": "discord-bot-token-overlap-generic-context",
+      "detector": "discord-bot-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "discord_bot_token=MDAwMDAwMDAwMDAwMDAwMDAw.REVOKE.SYNTHETICREVOKEDBOTTOKENFIX",
+      "expected": [
+        {
+          "detector": "discord-bot-token",
+          "type": "discord_bot_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 18,
+          "end": 77
+        }
+      ],
+      "note": "Qualified provider evidence wins over generic_token's contextual name=value assignment heuristic, which would otherwise also fire on this input."
+    },
+    {
+      "id": "discord-bot-token-adversarial-long-padding",
+      "detector": "discord-bot-token",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 20170,
+        "maxFindings": 1,
+        "maxRuntimeMs": 250
+      },
+      "input": "MDAwMDAwMDAwMDAwMDAwMDAw.REVOKE.SYNTHETICREVOKEDBOTTOKENFIX!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!MDAwMDAwMDAwMDAwMDAwMDAw.a.b!",
+      "expected": [
+        {
+          "detector": "discord-bot-token",
+          "type": "discord_bot_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 59
+        }
+      ],
+      "note": "A long run of repeated near-miss segment-one occurrences, each immediately followed by segments too short to clear the documented lengths, stays linear and bounded after the one real match."
+    },
+    {
+      "id": "discord-bot-token-boundary-segment-one-short",
+      "detector": "discord-bot-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "MDAwMDAwMDAwMDAwMDAwMDA.REVOKE.SYNTHETICREVOKEDBOTTOKENFIX",
+      "expected": [],
+      "note": "A first segment one byte short of the documented 24-byte length is rejected."
+    },
+    {
+      "id": "discord-bot-token-boundary-segment-two-short",
+      "detector": "discord-bot-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "MDAwMDAwMDAwMDAwMDAwMDAw.REVOK.SYNTHETICREVOKEDBOTTOKENFIX",
+      "expected": [],
+      "note": "A second segment one byte short of the documented 6-byte length is rejected."
+    },
+    {
+      "id": "discord-bot-token-boundary-segment-three-short",
+      "detector": "discord-bot-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "MDAwMDAwMDAwMDAwMDAwMDAw.REVOKE.SYNTHETICREVOKEDBOTTOKENFI",
+      "expected": [],
+      "note": "A third segment one byte short of the documented 27-byte length is rejected."
+    },
+    {
+      "id": "discord-bot-token-boundary-segment-one-non-digit",
+      "detector": "discord-bot-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "eyJhbGciOiJIUzI1NiJ9AAAA.REVOKE.SYNTHETICREVOKEDBOTTOKENFIX",
+      "expected": [],
+      "note": "A first segment of the documented length that decodes to JSON rather than an all-digit snowflake ID is rejected; this is the same shape a JWT header segment takes."
+    },
+    {
+      "id": "discord-bot-token-overlap-jwt-shape",
+      "detector": "discord-bot-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.SYNTHETICREVOKEDSIGNATUREVALUEFIXTURE",
+      "expected": [
+        {
+          "detector": "jwt",
+          "type": "jwt",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 0,
+          "end": 102
+        }
+      ],
+      "note": "A genuine JWT is also three dot-separated base64url segments, and the jwt detector correctly matches it; the header segment decodes to JSON, not an all-digit snowflake ID, so the discord-bot-token detector does not also classify it and contributes no competing finding."
+    },
+    {
+      "id": "discord-bot-token-negative-webhook-url",
+      "detector": "discord-bot-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "https://discord.com/api/webhooks/198622483471925248/SYNTHETIC_REVOKED_WEBHOOK_TOKEN_VALUE",
+      "expected": [],
+      "note": "A Discord webhook URL's trailing path segment is a single opaque token, not three dot-joined segments; webhook tokens are explicitly out of scope per issue #301."
+    },
+    {
+      "id": "discord-bot-token-negative-placeholder",
+      "detector": "discord-bot-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "MDAwMDAwMDAwMDAwMDAwMDAw.<YOUR_TOKEN>.SYNTHETICREVOKEDBOTTOKENFIX",
+      "expected": [],
+      "note": "A documentation placeholder in the second segment breaks its alphabet run and is not classified."
+    },
+    {
+      "id": "discord-bot-token-negative-masked",
+      "detector": "discord-bot-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "************************.******.***************************",
+      "expected": [],
+      "note": "A fully masked value never satisfies the base64url alphabet and is not classified."
+    },
+    {
+      "id": "discord-bot-token-negative-reference",
+      "detector": "discord-bot-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "${DISCORD_BOT_TOKEN}",
+      "expected": [],
+      "note": "An environment-variable interpolation reference shares no shape with the three-segment grammar and is not classified."
+    },
+    {
+      "id": "discord-bot-token-negative-public-application-id",
+      "detector": "discord-bot-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "discord application id (not a secret): 198622483471925248",
+      "expected": [],
+      "note": "A bare public Discord application/client ID (a snowflake) shares no shape with the three-segment token grammar and is not classified."
     },
     {
       "id": "contextual-positive-nested-no-separator-api-key",

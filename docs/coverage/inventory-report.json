@@ -834,6 +834,39 @@
       "type": "atlassian_api_token"
     },
     {
+      "detector": "discord-bot-token",
+      "evidence": {
+        "fixtureCount": 17,
+        "hostContextsExercised": [
+          "dotenv",
+          "json",
+          "log",
+          "plain-text"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "discord-bot-token-positive-bare",
+        "discord-bot-token-positive-crlf-unicode-prefix",
+        "discord-bot-token-positive-dotenv",
+        "discord-bot-token-positive-json",
+        "discord-bot-token-positive-log"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "discord_bot_token"
+    },
+    {
       "detector": "jwt",
       "evidence": {
         "fixtureCount": 11,
@@ -1209,7 +1242,7 @@
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 31,
+    "supported": 32,
     "unresolved": 0
   }
 }
