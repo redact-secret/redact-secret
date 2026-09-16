@@ -315,7 +315,18 @@ fn quoted_assignment_value(input: &str, opening_quote: usize) -> Option<(usize, 
 
 /// Scans an unquoted value up to the next boundary character, rejecting
 /// values that exceed the shared bound.
+///
+/// A value starting with `{` or `[` opens a YAML/JSON flow structure rather
+/// than a scalar (`secret: {secretName: web-tls-cert}`), so scanning it as
+/// an unquoted value would capture the nested key as if it were the
+/// credential (issue #266, the same shape as #262). No real unquoted
+/// credential in the syntaxes this detector targets legitimately begins
+/// with either character, so treating them as an immediate boundary costs
+/// no true positive.
 fn unquoted_assignment_value(input: &str, start: usize) -> Option<(usize, usize)> {
+    if matches!(char_at(input, start), Some('{' | '[')) {
+        return None;
+    }
     let mut cursor = start;
     while let Some(ch) = char_at(input, cursor) {
         if is_unquoted_value_boundary(Some(ch)) {
@@ -930,6 +941,27 @@ mod tests {
         let (start, end) = only_range(&candidates);
         assert_eq!(&input[start..end], "SYNTHETIC_REVOKED_FIXTURE_VALUE");
         assert_eq!(candidates[0].confidence(), Confidence::High);
+    }
+
+    // --- issue #266: a YAML flow mapping's opening `{` (or a flow sequence's
+    // `[`) is not treated as the start of an unquoted scalar -------------
+
+    #[test]
+    fn a_yaml_flow_mapping_key_is_not_captured_as_the_assignment_value() {
+        let input = "volumes: [{name: tls, secret: {secretName: web-tls-cert}}]";
+        assert!(
+            detect(input).is_empty(),
+            "expected no findings for {input:?}"
+        );
+    }
+
+    #[test]
+    fn a_block_style_secret_value_is_still_detected() {
+        let input = "secret: SYNTHETIC_REVOKED_CONTEXT_VALUE";
+        let candidates = detect(input);
+        assert_eq!(candidates.len(), 1);
+        assert_eq!(candidates[0].confidence(), Confidence::High);
+        assert_eq!(candidates[0].specificity(), Some(Specificity::Contextual));
     }
 
     #[test]

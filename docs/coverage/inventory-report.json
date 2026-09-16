@@ -874,7 +874,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 72,
+        "fixtureCount": 74,
         "hostContextsExercised": [
           "chat",
           "dotenv",
@@ -921,7 +921,8 @@
         "contextual-positive-template-prefix-only-still-detected",
         "regression-nested-credential-under-parent-key",
         "regression-placeholder-embedded-in-high-entropy-value",
-        "regression-placeholder-word-with-unrelated-tokens"
+        "regression-placeholder-word-with-unrelated-tokens",
+        "regression-yaml-flow-mapping-block-style-still-detected"
       ],
       "policyClass": "confidence-gated",
       "schemeRows": "not-applicable",
@@ -931,7 +932,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 72,
+        "fixtureCount": 74,
         "hostContextsExercised": [
           "chat",
           "dotenv",

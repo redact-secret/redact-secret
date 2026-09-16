@@ -2150,7 +2150,8 @@
             "contextual-positive-template-prefix-only-still-detected",
             "regression-nested-credential-under-parent-key",
             "regression-placeholder-embedded-in-high-entropy-value",
-            "regression-placeholder-word-with-unrelated-tokens"
+            "regression-placeholder-word-with-unrelated-tokens",
+            "regression-yaml-flow-mapping-block-style-still-detected"
           ],
           "state": "supported"
         },
@@ -2258,6 +2259,7 @@
             "regression-nested-credential-under-parent-key",
             "regression-placeholder-embedded-in-high-entropy-value",
             "regression-placeholder-word-with-unrelated-tokens",
+            "regression-yaml-flow-mapping-block-style-still-detected",
             "regression-yaml-nested-key-no-crossing-newline"
           ],
           "state": "supported"
@@ -2402,6 +2404,8 @@
             "contextual-assignment-credential-under-auth-key",
             "contextual-assignment-credential-under-two-nested-keys",
             "contextual-assignment-deeply-nested-keys",
+            "contextual-assignment-flow-mapping-block-style-still-detected",
+            "contextual-assignment-flow-mapping-nested-key-not-captured",
             "contextual-assignment-nested-credential-under-parent-key",
             "contextual-assignment-stops-at-line-terminator",
             "encoded-connection",
@@ -2622,6 +2626,8 @@
             "contextual-assignment-credential-under-auth-key",
             "contextual-assignment-credential-under-two-nested-keys",
             "contextual-assignment-deeply-nested-keys",
+            "contextual-assignment-flow-mapping-block-style-still-detected",
+            "contextual-assignment-flow-mapping-nested-key-not-captured",
             "contextual-assignment-nested-credential-under-parent-key",
             "contextual-assignment-stops-at-line-terminator",
             "encoded-connection",
@@ -2958,6 +2964,8 @@
             "contextual-assignment-credential-under-auth-key",
             "contextual-assignment-credential-under-two-nested-keys",
             "contextual-assignment-deeply-nested-keys",
+            "contextual-assignment-flow-mapping-block-style-still-detected",
+            "contextual-assignment-flow-mapping-nested-key-not-captured",
             "contextual-assignment-nested-credential-under-parent-key",
             "contextual-assignment-stops-at-line-terminator",
             "encoded-connection",

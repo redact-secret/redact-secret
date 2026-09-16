@@ -47,6 +47,13 @@ evidence is linked from each published version.
   candidate whose full matched text equals one of these two vendor-published
   placeholder values, regardless of which detector proposed it; no other
   detection behavior changes.
+- The `generic-token` detector no longer reads a YAML flow mapping's or flow
+  sequence's opening `{`/`[` as the start of an unquoted scalar. Previously,
+  a credential-like key followed by inline flow syntax (`secret: {secretName:
+  web-tls-cert}`) captured the nested key as if it were the value. An
+  unquoted value beginning with either character is now treated as no value
+  at all; a value on the same line in ordinary block style (`secret:
+  <value>`) is unaffected and continues to be reported.
 
 ## 0.1.0-beta.2 — 2026-09-13
 
