@@ -949,7 +949,10 @@ mod tests {
     #[test]
     fn a_yaml_flow_mapping_key_is_not_captured_as_the_assignment_value() {
         let input = "volumes: [{name: tls, secret: {secretName: web-tls-cert}}]";
-        assert!(detect(input).is_empty(), "expected no findings for {input:?}");
+        assert!(
+            detect(input).is_empty(),
+            "expected no findings for {input:?}"
+        );
     }
 
     #[test]
