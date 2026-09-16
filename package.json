@@ -25,7 +25,7 @@
     "legacy-identifiers:check": "python3 -B -m unittest discover -s scripts/tests -p 'test_check_legacy_identifiers.py' && python3 -B scripts/check-legacy-identifiers.py",
     "python:check": "python3 -B -m unittest discover -s scripts/tests -p 'test_check_python_package.py' && python3 -B scripts/check-python-package.py",
     "rust:check": "python3 -B -m unittest discover -s scripts/tests -p 'test_check_rust_workspace.py' && python3 -B scripts/check-rust-workspace.py",
-    "artifacts:check": "python3 -B -m unittest discover -s scripts/tests -p 'test_check_artifact_matrix.py' && python3 -B -m unittest discover -s scripts/tests -p 'test_record_artifact_inventory.py' && python3 -B scripts/check-artifact-matrix.py",
+    "artifacts:check": "node --test scripts/tests/cli-qualification-batches.test.mjs && python3 -B -m unittest discover -s scripts/tests -p 'test_check_artifact_matrix.py' && python3 -B -m unittest discover -s scripts/tests -p 'test_record_artifact_inventory.py' && python3 -B scripts/check-artifact-matrix.py",
     "coverage:check": "python3 -B -m unittest discover -s scripts/tests -p 'test_generate_coverage_inventory.py' && python3 -B -m unittest discover -s scripts/tests -p 'test_generate_coverage_declarations.py' && python3 -B -m unittest discover -s scripts/tests -p 'test_generate_coverage_report.py' && vitest run conformance/schema.test.ts",
     "assessment:check": "python3 -B -m unittest discover -s scripts/tests -p 'test_assessment_python_worker.py' && vitest run --no-file-parallelism assessment/schema.test.ts assessment/complete.test.ts assessment/acceptance.test.ts assessment/adapters",
     "assessment:all": "node scripts/assessment-all.mjs",
