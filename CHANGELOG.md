@@ -54,6 +54,20 @@ evidence is linked from each published version.
   unquoted value beginning with either character is now treated as no value
   at all; a value on the same line in ordinary block style (`secret:
   <value>`) is unaffected and continues to be reported.
+- The `generic-token` detector no longer reports a secret-manager reference
+  string as a secret: a 1Password `op://<vault>/<item>/<field>` reference, a
+  LiteLLM `os.environ/<VAR_NAME>` reference, a GCP Secret Manager resource
+  name (`projects/<id>/secrets/<name>(/versions/<v>)?`), a `vals`
+  `ref+<backend>://<path>#<key>` reference, a bank-vaults/Vault Agent
+  injector `vault:<path>#<key>` reference, an AWS Secrets Manager ARN, or an
+  Azure App Service `@Microsoft.KeyVault(...)` reference. Each of these
+  names where a secret lives at runtime rather than containing one, and
+  previously the default policy's `redact` action would rewrite the literal
+  reference in place, corrupting the env file, config, or manifest it
+  appeared in. A value with a matching scheme prefix that does not satisfy
+  that scheme's full grammar (wrong segment count, an invalid identifier, a
+  missing delimiter, a non-12-digit account id, and similar) is unaffected
+  and continues to be reported.
 
 ## 0.1.0-beta.2 — 2026-09-13
 
