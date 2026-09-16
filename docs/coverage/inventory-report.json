@@ -874,7 +874,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 90,
+        "fixtureCount": 97,
         "hostContextsExercised": [
           "chat",
           "dotenv",
@@ -885,8 +885,11 @@
           "log",
           "markdown",
           "plain-text",
+          "python",
           "shell",
           "terminal",
+          "terraform",
+          "typescript",
           "yaml"
         ],
         "kindsWithSupportedEvidence": [
@@ -916,6 +919,7 @@
         "contextual-positive-bank-vaults-scheme-prefix-still-detected",
         "contextual-positive-colon-spaced-operator",
         "contextual-positive-crlf-line-start",
+        "contextual-positive-dotted-screaming-case-value-still-detected",
         "contextual-positive-escaped-quote",
         "contextual-positive-gcp-secret-scheme-prefix-still-detected",
         "contextual-positive-litellm-scheme-prefix-still-detected",
@@ -940,7 +944,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 90,
+        "fixtureCount": 97,
         "hostContextsExercised": [
           "chat",
           "dotenv",
@@ -951,8 +955,11 @@
           "log",
           "markdown",
           "plain-text",
+          "python",
           "shell",
           "terminal",
+          "terraform",
+          "typescript",
           "yaml"
         ],
         "kindsWithSupportedEvidence": [

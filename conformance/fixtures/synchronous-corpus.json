@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 454,
+  "fixtureCount": 461,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -10365,6 +10365,106 @@
         }
       ],
       "note": "issue #262 / #265: fixing the operator's value-crossing-newline skip also fixes the paired recall bug -- the outer database: key's failed value scan no longer advances the cursor past the nested password: key's own boundary, so the nested credential is still detected."
+    },
+    {
+      "id": "contextual-negative-django-settings-attribute-reference",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "python"
+      ],
+      "input": "password=settings.DATABASE_PASSWORD",
+      "expected": [],
+      "note": "issue #278: an unquoted value that is a Django settings-object member access names where the value lives at runtime, not the value itself, and remains excluded via the 'settings' code-reference root."
+    },
+    {
+      "id": "contextual-negative-typescript-config-member-reference",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "typescript"
+      ],
+      "input": "  apiKey: config.anthropicApiKey,",
+      "expected": [],
+      "note": "issue #278: a TypeScript object member access off a 'config' object remains excluded via the 'config' code-reference root."
+    },
+    {
+      "id": "contextual-negative-terraform-resource-attribute-reference",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "terraform"
+      ],
+      "input": "  password = random_password.db.result",
+      "expected": [],
+      "note": "issue #278: a Terraform resource-attribute reference is a dotted chain of lower_snake_case segments with an underscore in the chain, the shape a Terraform resource/data-source lookup always has, and remains excluded."
+    },
+    {
+      "id": "contextual-negative-python-os-environ-subscript-reference",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "python"
+      ],
+      "input": "    api_key=os.environ[\"OPENAI_API_KEY\"],",
+      "expected": [],
+      "note": "issue #278: the unquoted-value scan stops at the opening quote of the env-var name, so the captured value is only 'os.environ[' -- a call/subscript expression truncated at an open bracket rather than a literal, and remains excluded."
+    },
+    {
+      "id": "contextual-negative-rust-generic-type-annotation",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "    pub api_key: Option<String>,",
+      "expected": [],
+      "note": "issue #278: a Rust struct field's 'Option<String>' type annotation is generic-type syntax (an identifier immediately followed by '<'), not a literal value, and remains excluded. No dedicated 'rust' host context exists in the canonical schema, so this is tagged 'plain-text'."
+    },
+    {
+      "id": "contextual-negative-go-config-struct-field-reference",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\tPassword: cfg.RedisPassword,",
+      "expected": [],
+      "note": "issue #278: a Go struct-literal field assigned from a 'cfg' config struct's member remains excluded via the 'cfg' code-reference root. No dedicated 'go' host context exists in the canonical schema, so this is tagged 'plain-text'."
+    },
+    {
+      "id": "contextual-positive-dotted-screaming-case-value-still-detected",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "password: SYNTHETIC.REVOKED.CONTEXT_VALUE",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 10,
+          "end": 41
+        }
+      ],
+      "note": "issue #278: paired positive fixture -- a real-looking unquoted value containing '.' with no known code-reference root and no lower_snake_case segment (every segment is SCREAMING_CASE) does not satisfy either new exclusion and stays detected, the false-negative boundary the new exclusions deliberately do not cross."
     }
   ]
 }
