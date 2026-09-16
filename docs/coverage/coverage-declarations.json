@@ -564,7 +564,9 @@
           "evidenceFixtureIds": [
             "shopify-positive-admin-access",
             "shopify-positive-all-prefixes",
-            "shopify-positive-min-length"
+            "shopify-positive-doc-style-placeholder",
+            "shopify-positive-min-length",
+            "shopify-positive-mixed-public-and-secret"
           ],
           "state": "supported"
         },
@@ -597,8 +599,13 @@
           "dimension": "near-miss-negative",
           "evidenceFixtureIds": [
             "shopify-negative-header-name",
+            "shopify-negative-interpolated-secret-prefix",
             "shopify-negative-lookalike",
-            "shopify-negative-placeholder"
+            "shopify-negative-masked-secret-prefix",
+            "shopify-negative-placeholder",
+            "shopify-negative-public-prefix-punctuation",
+            "shopify-negative-public-prefix-unicode-crlf",
+            "shopify-negative-wrong-prefix"
           ],
           "state": "supported"
         },
@@ -732,7 +739,9 @@
           "dimension": "positive",
           "evidenceFixtureIds": [
             "stripe-positive-all-prefixes",
+            "stripe-positive-doc-style-placeholder",
             "stripe-positive-min-length",
+            "stripe-positive-mixed-public-and-secret",
             "stripe-positive-qualified"
           ],
           "state": "supported"
@@ -765,9 +774,14 @@
         {
           "dimension": "near-miss-negative",
           "evidenceFixtureIds": [
+            "stripe-negative-interpolated-secret-prefix",
             "stripe-negative-lookalike",
+            "stripe-negative-masked-secret-prefix",
             "stripe-negative-ordinary-reference",
-            "stripe-negative-placeholder"
+            "stripe-negative-placeholder",
+            "stripe-negative-public-prefix-punctuation",
+            "stripe-negative-public-prefix-unicode-crlf",
+            "stripe-negative-wrong-prefix"
           ],
           "state": "supported"
         },
@@ -1408,7 +1422,9 @@
         {
           "dimension": "positive",
           "evidenceFixtureIds": [
+            "supabase-positive-doc-style-placeholder",
             "supabase-positive-min-length",
+            "supabase-positive-mixed-public-and-secret",
             "supabase-positive-qualified"
           ],
           "state": "supported"
@@ -1441,9 +1457,14 @@
         {
           "dimension": "near-miss-negative",
           "evidenceFixtureIds": [
+            "supabase-negative-interpolated-secret-prefix",
             "supabase-negative-lookalike",
+            "supabase-negative-masked-secret-prefix",
             "supabase-negative-ordinary-reference",
-            "supabase-negative-placeholder"
+            "supabase-negative-placeholder",
+            "supabase-negative-public-prefix-punctuation",
+            "supabase-negative-public-prefix-unicode-crlf",
+            "supabase-negative-wrong-prefix"
           ],
           "state": "supported"
         },
@@ -2579,6 +2600,7 @@
             "multiline-private-key",
             "negative-end-of-stream",
             "redis-password-only-connection",
+            "stripe-public-secret-prefix-discriminating-boundary",
             "structural-overlap",
             "synthetic-regression-malformed-authority",
             "truncated-private-key",
@@ -2805,6 +2827,7 @@
             "multiline-private-key",
             "negative-end-of-stream",
             "redis-password-only-connection",
+            "stripe-public-secret-prefix-discriminating-boundary",
             "structural-overlap",
             "synthetic-regression-malformed-authority",
             "truncated-private-key",
@@ -3147,6 +3170,7 @@
             "multiline-private-key",
             "negative-end-of-stream",
             "redis-password-only-connection",
+            "stripe-public-secret-prefix-discriminating-boundary",
             "structural-overlap",
             "synthetic-regression-malformed-authority",
             "truncated-private-key",

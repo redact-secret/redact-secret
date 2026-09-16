@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 489,
+  "fixtureCount": 510,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -3176,6 +3176,115 @@
       "note": "A long delimited provider match remains deterministic and bounded."
     },
     {
+      "id": "stripe-negative-wrong-prefix",
+      "detector": "stripe-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk_liv_SYNTHETICREVOKEDSYNTHETICREVOKED",
+      "expected": [],
+      "note": "An undocumented near-miss prefix ('sk_liv_') that is not one byte-for-byte equal to any documented prefix is not classified, however long or well-formed the following run is."
+    },
+    {
+      "id": "stripe-negative-public-prefix-punctuation",
+      "detector": "stripe-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "(pk_live_SYNTHETICREVOKEDSYNT).",
+      "expected": [],
+      "note": "The public identifier prefix stays unclassified when immediately surrounded by punctuation, mirroring the positive suffix's own punctuation-boundary behavior."
+    },
+    {
+      "id": "stripe-negative-public-prefix-unicode-crlf",
+      "detector": "stripe-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 密钥 café\r\npk_live_SYNTHETICREVOKEDSYNT\r\n",
+      "expected": [],
+      "note": "A preceding Unicode comment line and CRLF line endings do not turn the public identifier prefix into a classified credential."
+    },
+    {
+      "id": "stripe-negative-masked-secret-prefix",
+      "detector": "stripe-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk_live_********************",
+      "expected": [],
+      "note": "A masked value (redaction asterisks in place of the real suffix) carries no alphabet run and is not classified, so a UI's own masking is never mistaken for a live credential."
+    },
+    {
+      "id": "stripe-negative-interpolated-secret-prefix",
+      "detector": "stripe-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk_live_${STRIPE_SECRET_KEY}",
+      "expected": [],
+      "note": "A shell/template interpolation reference immediately after the secret prefix breaks the alphabet run before the minimum length, so a variable reference is not misread as a literal secret."
+    },
+    {
+      "id": "stripe-positive-doc-style-placeholder",
+      "detector": "stripe-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk_live_xxxxxxxxxxxxxxxxxxxxxxxx",
+      "expected": [
+        {
+          "detector": "stripe-token",
+          "type": "stripe_credential",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 32
+        }
+      ],
+      "note": "A documentation placeholder built entirely from valid alphabet characters (e.g. a repeated filler letter) is indistinguishable from a real secret's shape and is classified: an accepted precision/recall tradeoff, not a bug. Only a placeholder that breaks the alphabet run (angle brackets, underscores outside the allowed set) is excluded."
+    },
+    {
+      "id": "stripe-positive-mixed-public-and-secret",
+      "detector": "stripe-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "pk_live_SYNTHETICREVOKEDSYNT\nsk_live_SYNTHETICREVOKEDSYNTHETICREVOKED",
+      "expected": [
+        {
+          "detector": "stripe-token",
+          "type": "stripe_credential",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 29,
+          "end": 69
+        }
+      ],
+      "note": "A public identifier and a secret credential on adjacent lines: the public prefix never generates a candidate at all (not merely suppressed by overlap resolution), while the paired secret is still classified with the correct range."
+    },
+    {
       "id": "slack-positive-qualified",
       "detector": "slack-token",
       "kind": "positive",
@@ -4934,6 +5043,115 @@
         }
       ],
       "note": "A long delimited provider match remains deterministic and bounded."
+    },
+    {
+      "id": "supabase-negative-wrong-prefix",
+      "detector": "supabase-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sb_secrets_SYNTHETICREVOKEDSYNTHETICREVOKED",
+      "expected": [],
+      "note": "An undocumented near-miss prefix ('sb_secrets_') that is not one byte-for-byte equal to any documented prefix is not classified, however long or well-formed the following run is."
+    },
+    {
+      "id": "supabase-negative-public-prefix-punctuation",
+      "detector": "supabase-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "(sb_publishable_SYNTHETICREVOKEDSYNT).",
+      "expected": [],
+      "note": "The public identifier prefix stays unclassified when immediately surrounded by punctuation, mirroring the positive suffix's own punctuation-boundary behavior."
+    },
+    {
+      "id": "supabase-negative-public-prefix-unicode-crlf",
+      "detector": "supabase-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 密钥 café\r\nsb_publishable_SYNTHETICREVOKEDSYNT\r\n",
+      "expected": [],
+      "note": "A preceding Unicode comment line and CRLF line endings do not turn the public identifier prefix into a classified credential."
+    },
+    {
+      "id": "supabase-negative-masked-secret-prefix",
+      "detector": "supabase-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sb_secret_********************",
+      "expected": [],
+      "note": "A masked value (redaction asterisks in place of the real suffix) carries no alphabet run and is not classified, so a UI's own masking is never mistaken for a live credential."
+    },
+    {
+      "id": "supabase-negative-interpolated-secret-prefix",
+      "detector": "supabase-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sb_secret_${SUPABASE_SERVICE_ROLE_KEY}",
+      "expected": [],
+      "note": "A shell/template interpolation reference immediately after the secret prefix breaks the alphabet run before the minimum length, so a variable reference is not misread as a literal secret."
+    },
+    {
+      "id": "supabase-positive-doc-style-placeholder",
+      "detector": "supabase-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sb_secret_xxxxxxxxxxxxxxxxxxxxxxxx",
+      "expected": [
+        {
+          "detector": "supabase-token",
+          "type": "supabase_secret_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 34
+        }
+      ],
+      "note": "A documentation placeholder built entirely from valid alphabet characters (e.g. a repeated filler letter) is indistinguishable from a real secret's shape and is classified: an accepted precision/recall tradeoff, not a bug. Only a placeholder that breaks the alphabet run (angle brackets, underscores outside the allowed set) is excluded."
+    },
+    {
+      "id": "supabase-positive-mixed-public-and-secret",
+      "detector": "supabase-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sb_publishable_SYNTHETICREVOKEDSYNT\nsb_secret_SYNTHETICREVOKEDSYNTHETICREVOKED",
+      "expected": [
+        {
+          "detector": "supabase-token",
+          "type": "supabase_secret_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 36,
+          "end": 78
+        }
+      ],
+      "note": "A public identifier and a secret credential on adjacent lines: the public prefix never generates a candidate at all (not merely suppressed by overlap resolution), while the paired secret is still classified with the correct range."
     },
     {
       "id": "vercel-positive-qualified",
@@ -6837,6 +7055,115 @@
         }
       ],
       "note": "A long delimited provider match remains deterministic and bounded."
+    },
+    {
+      "id": "shopify-negative-wrong-prefix",
+      "detector": "shopify-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "shpad_SYNTHETICREVOKEDSYNTHETICREVOKED",
+      "expected": [],
+      "note": "An undocumented near-miss prefix ('shpad_') that is not one byte-for-byte equal to any documented prefix is not classified, however long or well-formed the following run is."
+    },
+    {
+      "id": "shopify-negative-public-prefix-punctuation",
+      "detector": "shopify-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "(shpca_SYNTHETICREVOKEDSYNT).",
+      "expected": [],
+      "note": "The public identifier prefix stays unclassified when immediately surrounded by punctuation, mirroring the positive suffix's own punctuation-boundary behavior."
+    },
+    {
+      "id": "shopify-negative-public-prefix-unicode-crlf",
+      "detector": "shopify-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 密钥 café\r\nshpca_SYNTHETICREVOKEDSYNT\r\n",
+      "expected": [],
+      "note": "A preceding Unicode comment line and CRLF line endings do not turn the public identifier prefix into a classified credential."
+    },
+    {
+      "id": "shopify-negative-masked-secret-prefix",
+      "detector": "shopify-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "shpat_********************",
+      "expected": [],
+      "note": "A masked value (redaction asterisks in place of the real suffix) carries no alphabet run and is not classified, so a UI's own masking is never mistaken for a live credential."
+    },
+    {
+      "id": "shopify-negative-interpolated-secret-prefix",
+      "detector": "shopify-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "shpat_${SHOPIFY_ADMIN_API_TOKEN}",
+      "expected": [],
+      "note": "A shell/template interpolation reference immediately after the secret prefix breaks the alphabet run before the minimum length, so a variable reference is not misread as a literal secret."
+    },
+    {
+      "id": "shopify-positive-doc-style-placeholder",
+      "detector": "shopify-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "shpat_xxxxxxxxxxxxxxxxxxxxxxxx",
+      "expected": [
+        {
+          "detector": "shopify-token",
+          "type": "shopify_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 30
+        }
+      ],
+      "note": "A documentation placeholder built entirely from valid alphabet characters (e.g. a repeated filler letter) is indistinguishable from a real secret's shape and is classified: an accepted precision/recall tradeoff, not a bug. Only a placeholder that breaks the alphabet run (angle brackets, underscores outside the allowed set) is excluded."
+    },
+    {
+      "id": "shopify-positive-mixed-public-and-secret",
+      "detector": "shopify-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "shpca_SYNTHETICREVOKEDSYNT\nshpat_SYNTHETICREVOKEDSYNTHETICREVOKED",
+      "expected": [
+        {
+          "detector": "shopify-token",
+          "type": "shopify_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 27,
+          "end": 65
+        }
+      ],
+      "note": "A public identifier and a secret credential on adjacent lines: the public prefix never generates a candidate at all (not merely suppressed by overlap resolution), while the paired secret is still classified with the correct range."
     },
     {
       "id": "vault-positive-service-token",
