@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 489,
+  "fixtureCount": 500,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -9084,7 +9084,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "note: café — password=\"@Microsoft.KeyVault(VaultName=myvault;SecretName=mysecret)\"",
+      "input": "note: caf\u00e9 \u2014 password=\"@Microsoft.KeyVault(VaultName=myvault;SecretName=mysecret)\"",
       "expected": [],
       "note": "issue #293: a multi-byte Unicode character preceding the assignment does not defeat the Azure Key Vault VaultName/SecretName exclusion; the exclusion's byte-offset handling advances by real UTF-8 byte width, not char count."
     },
@@ -9618,7 +9618,7 @@
       "contexts": [
         "terminal"
       ],
-      "input": "Password: ••••••••",
+      "input": "Password: \u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022",
       "expected": [],
       "note": "Repeated-character filler is recognized for a multi-byte Unicode mask character (U+2022 BULLET), not only single-byte ASCII ones like '*'."
     },
@@ -10782,6 +10782,181 @@
       "note": "A long run that never reaches the documented 22-byte id/'.' delimiter terminates without a finding, and the precomputed alphabet-run table keeps the scan linear regardless of run length."
     },
     {
+      "id": "microsoft-entra-client-secret-positive-bare",
+      "detector": "microsoft-entra-client-secret",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "abc8Q~SYNTHETIC_REVOKED_ENTRA_SECRET_V",
+      "expected": [
+        {
+          "detector": "microsoft-entra-client-secret",
+          "type": "microsoft_entra_client_secret",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 38
+        }
+      ],
+      "note": "The undocumented but structurally distinctive digit-Q-tilde marker is sufficient on its own; no surrounding context is required."
+    },
+    {
+      "id": "microsoft-entra-client-secret-overlap-generic-context",
+      "detector": "microsoft-entra-client-secret",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "client_secret=abc8Q~SYNTHETIC_REVOKED_ENTRA_SECRET_V",
+      "expected": [
+        {
+          "detector": "microsoft-entra-client-secret",
+          "type": "microsoft_entra_client_secret",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 52
+        }
+      ],
+      "note": "Qualified provider evidence wins over generic_token's contextual client_secret= assignment heuristic."
+    },
+    {
+      "id": "microsoft-entra-client-secret-adversarial-long-padding",
+      "detector": "microsoft-entra-client-secret",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 20103,
+        "maxFindings": 1,
+        "maxRuntimeMs": 250
+      },
+      "input": "abc8Q~SYNTHETIC_REVOKED_ENTRA_SECRET_V!Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~Q~",
+      "expected": [
+        {
+          "detector": "microsoft-entra-client-secret",
+          "type": "microsoft_entra_client_secret",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 38
+        }
+      ],
+      "note": "A long run of repeated near-miss anchors after one real match stays linear and bounded."
+    },
+    {
+      "id": "microsoft-entra-client-secret-boundary-below-min",
+      "detector": "microsoft-entra-client-secret",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "abc8Q~SYNTHETIC_REVOKED_ENTRA_SECRET",
+      "expected": [],
+      "note": "A suffix one byte short of the documented 31-byte minimum is rejected."
+    },
+    {
+      "id": "microsoft-entra-client-secret-boundary-above-max",
+      "detector": "microsoft-entra-client-secret",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "abc8Q~SYNTHETIC_REVOKED_ENTRA_SECRET_VALU",
+      "expected": [],
+      "note": "A suffix one byte past the documented 34-byte maximum is rejected outright, not truncated to the max."
+    },
+    {
+      "id": "microsoft-entra-client-secret-boundary-invalid-alphabet",
+      "detector": "microsoft-entra-client-secret",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "abc8Q~SYNTHETIC_ EVOKED_ENTRA_SECRET_V",
+      "expected": [],
+      "note": "A byte outside the suffix alphabet breaks the run before the minimum length is reached."
+    },
+    {
+      "id": "microsoft-entra-client-secret-boundary-missing-digit",
+      "detector": "microsoft-entra-client-secret",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "abcXQ~SYNTHETIC_REVOKED_ENTRA_SECRET_V",
+      "expected": [],
+      "note": "A non-digit byte immediately before the Q~ marker does not satisfy the grammar."
+    },
+    {
+      "id": "microsoft-entra-client-secret-boundary-short-prefix",
+      "detector": "microsoft-entra-client-secret",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "8Q~SYNTHETIC_REVOKED_ENTRA_SECRET_V",
+      "expected": [],
+      "note": "An anchor too close to the start of input to carry the full 3-byte-plus-digit prefix is rejected."
+    },
+    {
+      "id": "microsoft-entra-client-secret-negative-ordinary-reference",
+      "detector": "microsoft-entra-client-secret",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "The migration guide explains the Q~ notation used in legacy templates.",
+      "expected": [],
+      "note": "An ordinary reference to the literal Q~ with no preceding digit has no credential shape."
+    },
+    {
+      "id": "microsoft-entra-client-secret-negative-placeholder",
+      "detector": "microsoft-entra-client-secret",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "abc8Q~<YOUR_CLIENT_SECRET_VALUE>",
+      "expected": [],
+      "note": "A documentation placeholder breaks the suffix alphabet immediately after the marker and is not classified."
+    },
+    {
+      "id": "microsoft-entra-client-secret-negative-lookalike",
+      "detector": "microsoft-entra-client-secret",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "build revision 8Qa2 shipped without incident",
+      "expected": [],
+      "note": "A digit followed by Q but not the literal Q~ marker is not a credential."
+    },
+    {
       "id": "contextual-positive-nested-no-separator-api-key",
       "detector": "generic-token",
       "kind": "positive",
@@ -10926,7 +11101,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "note: café — value=\"api_key=\"SYNTHETIC_REVOKED_NESTED_QUOTE_UNICODE_1234\"\"\n",
+      "input": "note: caf\u00e9 \u2014 value=\"api_key=\"SYNTHETIC_REVOKED_NESTED_QUOTE_UNICODE_1234\"\"\n",
       "expected": [
         {
           "detector": "generic-token",

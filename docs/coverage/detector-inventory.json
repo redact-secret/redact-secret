@@ -144,6 +144,13 @@
       "schemes": null
     },
     {
+      "type": "microsoft_entra_client_secret",
+      "detector": "microsoft-entra-client-secret",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "abc8Q~SYNTHETIC_REVOKED_ENTRA_SECRET_V",
+      "schemes": null
+    },
+    {
       "type": "jwt",
       "detector": "jwt",
       "policyClass": "always-redact",
