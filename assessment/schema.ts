@@ -156,6 +156,8 @@ export interface AssessmentProvenance {
   /** The language runtime and its version, e.g. "node-22.11.0". */
   readonly runtime: string;
   readonly command: string;
+  /** Standard Cargo profile; absent in historical results and non-Rust adapters. */
+  readonly buildProfile?: "debug" | "release";
 }
 
 /**
@@ -494,7 +496,8 @@ export function validateAssessmentResults(
       typeof provenance.runtime !== "string" ||
       provenance.runtime.length === 0 ||
       typeof provenance.command !== "string" ||
-      provenance.command.length === 0
+      provenance.command.length === 0 ||
+      (provenance.buildProfile !== undefined && !["debug", "release"].includes(provenance.buildProfile))
     ) {
       invalid(id, "invalid-provenance");
     }

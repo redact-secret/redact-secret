@@ -1,5 +1,7 @@
 # Complete cross-language assessment baseline
 
+> Historical measurement: Rust performance lacks release-build evidence and cannot support optimized cross-runtime comparisons or new acceptance decisions. Original samples and status are retained. See [the corrected local run](../release-profile/README.md).
+
 - Status: **COMPLETE**
 - Source commit: `9ff702001342ff84acdde8ad9acdec396572a15e`
 - Accuracy corpus: version `2`, SHA-256 `b50cdbc1ddb71bcac87936c26744384f35eb9174b1b654bc860f86193432c4e7`

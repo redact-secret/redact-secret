@@ -1,5 +1,7 @@
 # Complete cross-language assessment baseline
 
+> Historical measurement: Rust ran without `--release`. Its timing is not a valid optimized cross-runtime performance baseline. Raw samples and original completion status are preserved. See [the corrected run](../release-profile/baseline.md).
+
 - Status: **COMPLETE**
 - Source commit: `9359f59596f03443254f662db60d553b0610809e`
 - Accuracy corpus: version `3`, SHA-256 `cc4cb42028fd700bc98dd06dacebe421c5462dd59a46cf013154a4d185849979`

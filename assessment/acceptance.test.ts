@@ -21,6 +21,7 @@ function candidate(): CompleteAssessment {
         ...run.result,
         provenance: {
           ...run.result.provenance,
+          buildProfile: "release",
           os: "darwin-25.5.0",
           cpu: run.surface === "rust-core" ? "aarch64" : "arm64",
           runtime: run.surface === "rust-core" ? "rustc-1.98.1" : run.surface === "python" ? "cpython-3.14.7" : run.surface === "node" ? "node-22.16.0" : run.surface === "browser-wasm" ? "chromium-153" : "rustc 1.98.1",
@@ -71,6 +72,13 @@ describe("fixed RC acceptance criteria", () => {
     expect(evaluation.failures).toEqual([]);
     expect(evaluation.checks).toHaveLength(46);
     expect(renderAcceptanceMarkdown(evaluation)).toContain("Status: **ACCEPTED**");
+  });
+
+  test("historical completion cannot bypass release-build evidence", () => {
+    const evaluation = evaluateAcceptance(baseline, criteria);
+    expect(evaluation.status).toBe("rejected");
+    expect(evaluation.failures).toContain("rust-core:performance:scale-logs-small-whole:release-build-required");
+    expect(evaluation.checks.some(c => c.key.startsWith("rust-core:performance:"))).toBe(false);
   });
 
   test("rejects performance, resource, environment, and accuracy regressions", () => {

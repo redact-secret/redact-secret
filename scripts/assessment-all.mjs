@@ -81,7 +81,7 @@ function commandFor(surface, kind, profile, paths, options) {
   if (surface === "rust-core") {
     return {
       command: "cargo",
-      args: ["run", "--quiet", "--locked", "-p", "redact-secret", "--example", "assessment_adapter", "--", kind, ...(profile === undefined ? [] : ["--profile", profile, "--runs", String(options.runs)]), ...outputArgs],
+      args: ["run", "--release", "--quiet", "--locked", "-p", "redact-secret", "--example", "assessment_adapter", "--", kind, ...(profile === undefined ? [] : ["--profile", profile, "--runs", String(options.runs)]), ...outputArgs],
     };
   }
   if (surface === "python") {
@@ -159,6 +159,7 @@ async function main() {
   if (!selectedProfiles.some((profile) => profile.chunkProfile !== "whole")) {
     fail("the complete suite requires at least one incremental --profile");
   }
+  if (!runCommand("cargo", ["build", "--release", "--locked", "-p", "redact-secret", "--example", "assessment_adapter"])) fail("Rust assessment release build failed");
   mkdirSync(outputDir, { recursive: true });
 
   const attempts = [];

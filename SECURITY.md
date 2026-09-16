@@ -2,9 +2,13 @@
 
 ## Supported versions
 
-`@redact-secret/core` has not yet had an approved public release. There is
-currently no published version with a security-support commitment. This policy
-will be updated when the first release is approved.
+Redact Secret has public prereleases, including `0.1.0-beta.1`,
+`0.1.0-beta.2`, and `0.1.0-beta.3`. Beta publication is not a stable-release
+support guarantee. Security fixes target the latest beta; users of older betas
+should upgrade. Backports and fixed response or remediation times are not
+promised. Report suspected vulnerabilities in any version through the private
+channel below. See [release status](docs/releases/status.md) for registry and
+GitHub Release evidence.
 
 ## Reporting a vulnerability
 

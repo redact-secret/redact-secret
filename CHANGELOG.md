@@ -5,7 +5,13 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+- Correct assessment performance to require a release-built Rust adapter; keep
+  historical debug timings separate from optimized comparisons. Clarify corpus
+  coverage, measured reliability, public beta availability, and security support.
+
 ## 0.1.0-beta.3 — 2026-09-16
+
+[Publication status and recovery evidence](docs/releases/status.md).
 
 - Added a `sendgrid-token` detector recognizing SendGrid's documented
   `SG.<22-byte id>.<43-byte secret>` API key shape, both segments drawn from

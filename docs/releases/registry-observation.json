@@ -1,0 +1,421 @@
+{
+  "observedAt": "2026-09-16T19:09:18.518995+00:00",
+  "npm": [
+    {
+      "package": "@redact-secret/core",
+      "url": "https://registry.npmjs.org/@redact-secret%2fcore",
+      "distTags": {
+        "latest": "0.1.0-beta.1",
+        "beta": "0.1.0-beta.3"
+      },
+      "versions": {
+        "0.1.0-beta.1": {
+          "version": "0.1.0-beta.1",
+          "gitHead": null,
+          "integrity": "sha512-78Ed03WlYr/0wu5dFxNALaxZ/ngtwjUnt5QhyFgT2z3zr+oFv4g3JeJME4oGqpn68nCfvYOWddWkwBsbu6VXYw=="
+        },
+        "0.1.0-beta.2": {
+          "version": "0.1.0-beta.2",
+          "gitHead": null,
+          "integrity": "sha512-ZEKwxTY9zfIOW8av0HbONmrhlr20Nps1l1D4fyr/TviYSPq6R5uqP4v5AqXMzUB09oogWxaup/T6sBipCBei4g=="
+        },
+        "0.1.0-beta.3": {
+          "version": "0.1.0-beta.3",
+          "gitHead": null,
+          "integrity": "sha512-Znxedugve2tfPcu1Ed3DShnPf73t1ofjtjUNd1O3yU12JoeHhTXm4njONeXrXlTmjLtZyPiBsiUlGaOk8PSH0A=="
+        }
+      }
+    },
+    {
+      "package": "@redact-secret/wasm",
+      "url": "https://registry.npmjs.org/@redact-secret%2fwasm",
+      "distTags": {
+        "latest": "0.1.0-beta.1",
+        "beta": "0.1.0-beta.3"
+      },
+      "versions": {
+        "0.1.0-beta.1": {
+          "version": "0.1.0-beta.1",
+          "gitHead": null,
+          "integrity": "sha512-rLX3AKtNX8mwL/FKLh6ZYWui2OLCqQXNmrAAFuUrzG27Ecvcf55rwpAl8qM/t9GxQ3qjElDq4GhlRcvzSU+VGA=="
+        },
+        "0.1.0-beta.2": {
+          "version": "0.1.0-beta.2",
+          "gitHead": null,
+          "integrity": "sha512-86pbm/hcFJikxF5F1eNdleSuscET7ODQZWnWzosrS89ihpijQ2idXAn38as0wl0cQh9kjiymKIXS+K63UqoTyw=="
+        },
+        "0.1.0-beta.3": {
+          "version": "0.1.0-beta.3",
+          "gitHead": null,
+          "integrity": "sha512-r3pF61QjnbcL4ewU9LMYEgeKAswSk6+0PUfD/zi7u8hfWaqeqzCkulEqdg9wGGGXwJj8xYXjTJw10jRjo7h2fw=="
+        }
+      }
+    },
+    {
+      "package": "@redact-secret/node-darwin-arm64",
+      "url": "https://registry.npmjs.org/@redact-secret%2fnode-darwin-arm64",
+      "distTags": {
+        "latest": "0.1.0-beta.1",
+        "beta": "0.1.0-beta.3"
+      },
+      "versions": {
+        "0.1.0-beta.1": {
+          "version": "0.1.0-beta.1",
+          "gitHead": null,
+          "integrity": "sha512-lDJAH4ijDMTGBwrLsIJbig1yrRbwbSf+5sHRbnS6FYYHQcWuNOJBl6vhJGcS2H4r3CowHUgHaPhYeZmlLtlX/Q=="
+        },
+        "0.1.0-beta.2": {
+          "version": "0.1.0-beta.2",
+          "gitHead": null,
+          "integrity": "sha512-2LdsmFL2LzoUd3fflQbNw1pUh0/S+zUrvwwNvBeJoQAKUkgynNntCd/iTy0O2liEDD6uGVgUKQINAbY9kAZjpQ=="
+        },
+        "0.1.0-beta.3": {
+          "version": "0.1.0-beta.3",
+          "gitHead": null,
+          "integrity": "sha512-ZgqptgVXRLYAHZeEcV5CWacC40L8QMSHrXq8qLuIIXJigH5MU0i3hrzxNLPjhOwehmT+0KhD5CqMdzUzZAWJWg=="
+        }
+      }
+    },
+    {
+      "package": "@redact-secret/node-darwin-x64",
+      "url": "https://registry.npmjs.org/@redact-secret%2fnode-darwin-x64",
+      "distTags": {
+        "latest": "0.1.0-beta.1",
+        "beta": "0.1.0-beta.3"
+      },
+      "versions": {
+        "0.1.0-beta.1": {
+          "version": "0.1.0-beta.1",
+          "gitHead": null,
+          "integrity": "sha512-gdSoKg+OEQS0fRmDkQyevts2pZUN4LR++JvuH5jPJKhB1PgOprFUG0AmjAN6Hql9KGY5nulLglhhbmN1Zgadog=="
+        },
+        "0.1.0-beta.2": {
+          "version": "0.1.0-beta.2",
+          "gitHead": null,
+          "integrity": "sha512-AVDHJL5UAdeIYoHHyVVzFpZU2OAsKS29KkPAvHSz7GbWt/2ca8CIUhQOu90oDm0DHMb84GP6+A8psIFUIIvIbA=="
+        },
+        "0.1.0-beta.3": {
+          "version": "0.1.0-beta.3",
+          "gitHead": null,
+          "integrity": "sha512-++i1jkwEU+R61yvZoRzQHuVuNTdeJ5ItEefN+RS6gFEpd8cta0cTicM50+E3URIyEzl+COxQdBJ/hQOw6h60gQ=="
+        }
+      }
+    },
+    {
+      "package": "@redact-secret/node-linux-arm64-gnu",
+      "url": "https://registry.npmjs.org/@redact-secret%2fnode-linux-arm64-gnu",
+      "distTags": {
+        "latest": "0.1.0-beta.1",
+        "beta": "0.1.0-beta.3"
+      },
+      "versions": {
+        "0.1.0-beta.1": {
+          "version": "0.1.0-beta.1",
+          "gitHead": null,
+          "integrity": "sha512-I321/FSr5WalnYSmQlw9KGkoIfL3qn0nt/XiMoh+EaCBNgCFO+q0QUeMW9A4I0z7DDeiKJBqgp4hcOkE8nsndw=="
+        },
+        "0.1.0-beta.2": {
+          "version": "0.1.0-beta.2",
+          "gitHead": null,
+          "integrity": "sha512-EiPZm7oy+ugc1RL3ngDPk7evpbGo4uOkR5sR4N5zb80pVHJ/iTBx1P0PdlrpU2B5apL0t5KczXf3GZFkzMPJ6w=="
+        },
+        "0.1.0-beta.3": {
+          "version": "0.1.0-beta.3",
+          "gitHead": null,
+          "integrity": "sha512-86+IR8cj7VUDC3NSMRyrvhHOnbMm9+iA3aY8RuoCxtXL8vh1THPBjInuFfMDOyfV33zsaWJbgj+1pSl64l35Nw=="
+        }
+      }
+    },
+    {
+      "package": "@redact-secret/node-linux-x64-gnu",
+      "url": "https://registry.npmjs.org/@redact-secret%2fnode-linux-x64-gnu",
+      "distTags": {
+        "latest": "0.1.0-beta.1",
+        "beta": "0.1.0-beta.3"
+      },
+      "versions": {
+        "0.1.0-beta.1": {
+          "version": "0.1.0-beta.1",
+          "gitHead": null,
+          "integrity": "sha512-J/s12ocA39AqLkerncUz5ncW99roO1QVuDwrS2G/uYSC5RoeZe/sc1CDA5XrDASR+GFwLJUje85rTQ2+z0mJlA=="
+        },
+        "0.1.0-beta.2": {
+          "version": "0.1.0-beta.2",
+          "gitHead": null,
+          "integrity": "sha512-iABmVNgrpfY3AfQ7YfLX/Sw49h8xUcmvzU3XTArA8A0ax2etjeSI0Dd+fFYrwlRtRayj3/DSnjVMouQ24hUg7w=="
+        },
+        "0.1.0-beta.3": {
+          "version": "0.1.0-beta.3",
+          "gitHead": null,
+          "integrity": "sha512-fWpsBe3lE8eJTeAbTNT2HpK0OTt9Jaw5EaLt3DB4cuAtkCld0zZclJbZAv7BpeH/M8lqjU6Owp5LluU12nvGZA=="
+        }
+      }
+    },
+    {
+      "package": "@redact-secret/node-win32-arm64-msvc",
+      "url": "https://registry.npmjs.org/@redact-secret%2fnode-win32-arm64-msvc",
+      "distTags": {
+        "latest": "0.1.0-beta.1",
+        "beta": "0.1.0-beta.3"
+      },
+      "versions": {
+        "0.1.0-beta.1": {
+          "version": "0.1.0-beta.1",
+          "gitHead": null,
+          "integrity": "sha512-K46sBagEXvNIS2C0pE6CGDbSqSDQ1QcdmeWD6oApNC46M+F0c5jcycppGbXNRWkLrp4LlxOsTnDxIR1pyE9tJQ=="
+        },
+        "0.1.0-beta.2": {
+          "version": "0.1.0-beta.2",
+          "gitHead": null,
+          "integrity": "sha512-hqDoxjrYe3VFTJDurQPqaA8q9vfzJbKFnG1J8SO9WwZu49zqWjNrXxEcFYhYKjh1HjoTxyg8PC7hu9633O/HdA=="
+        },
+        "0.1.0-beta.3": {
+          "version": "0.1.0-beta.3",
+          "gitHead": null,
+          "integrity": "sha512-H8POqgWoJa72e4NI/1NIzaK+bv/+mOp6gyR7VzDLmkg1owXLuaqC5RYMA/OS6Qmz+hB3kxi7Q6wFB+mhcSHU1g=="
+        }
+      }
+    },
+    {
+      "package": "@redact-secret/node-win32-x64-msvc",
+      "url": "https://registry.npmjs.org/@redact-secret%2fnode-win32-x64-msvc",
+      "distTags": {
+        "latest": "0.1.0-beta.1",
+        "beta": "0.1.0-beta.3"
+      },
+      "versions": {
+        "0.1.0-beta.1": {
+          "version": "0.1.0-beta.1",
+          "gitHead": null,
+          "integrity": "sha512-bvyQnbIlWPsiN/yPY20xebx0PL7CHBvCxMz3Fsw5SOaY4eahqAuQnzietrB0jYQRsBau50QQm3ucSPu42qDfYg=="
+        },
+        "0.1.0-beta.2": {
+          "version": "0.1.0-beta.2",
+          "gitHead": null,
+          "integrity": "sha512-ASZFfCI+WfXBp7GumJ0nxlzWcHr0LES5bTd33jcLf9Dc6ghfp+WZBdWqRCBFrFu2D932czYWMIVSe2NrYznz6g=="
+        },
+        "0.1.0-beta.3": {
+          "version": "0.1.0-beta.3",
+          "gitHead": null,
+          "integrity": "sha512-O/zt0Vm0L63GuKl4rIbh32VfsDkWDnTgDJZb0TW063kkOf1byTp0WrtVvl1/OTPK33yL4hBop721E8ZyM6lGZA=="
+        }
+      }
+    }
+  ],
+  "crates": [
+    {
+      "crate": "redact-secret",
+      "url": "https://crates.io/api/v1/crates/redact-secret",
+      "versions": {
+        "0.1.0-beta.1": {
+          "checksum": "17fdba8b6470bc6dab8ce96c0add1f22546d71e473f84cb41764bc42769dc9c0",
+          "yanked": false
+        },
+        "0.1.0-beta.2": {
+          "checksum": "22266346394e57f665570b860f1f42a94a81f0b3dd0e05ae3800e7b8b06d8d2e",
+          "yanked": false
+        },
+        "0.1.0-beta.3": {
+          "checksum": "7fa953867f6a6af797122a4d08fdd3ce692345ea98619a12a243071f4c0dcc51",
+          "yanked": false
+        }
+      }
+    },
+    {
+      "crate": "redact-secret-cli",
+      "url": "https://crates.io/api/v1/crates/redact-secret-cli",
+      "versions": {
+        "0.1.0-beta.1": {
+          "checksum": "4e89e8e982c10306293d61b71ce1b4fb1f730e6fa24285db742fbbc740b74a1f",
+          "yanked": false
+        },
+        "0.1.0-beta.2": {
+          "checksum": "629da0acf9c9a7feb4ad75befcf1230944266fdcc3e9c6a761fb442e306c880b",
+          "yanked": false
+        },
+        "0.1.0-beta.3": {
+          "checksum": "cdc2801f2d2aad325dab138a036281e0d8966cb1ec20c4a4c76b2bb24bed2d2e",
+          "yanked": false
+        }
+      }
+    }
+  ],
+  "pypi": [
+    {
+      "url": "https://pypi.org/pypi/redact-secret/0.1.0b1/json",
+      "version": "0.1.0b1",
+      "files": [
+        {
+          "filename": "redact_secret-0.1.0b1-cp310-abi3-macosx_10_12_x86_64.whl",
+          "sha256": "40bc94a8b3bc027cc1c52d52ceb135c312b30eeaff04482d19474ae10481c4cb",
+          "yanked": false
+        },
+        {
+          "filename": "redact_secret-0.1.0b1-cp310-abi3-macosx_11_0_arm64.whl",
+          "sha256": "e8ea887ced6be4abf5bef0bd758f15b020fa63b4e1d5701e6503ebc13be86766",
+          "yanked": false
+        },
+        {
+          "filename": "redact_secret-0.1.0b1-cp310-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl",
+          "sha256": "08872334041c4629767c01fae499d98858a589e6882e888fcb3dd0877a68153c",
+          "yanked": false
+        },
+        {
+          "filename": "redact_secret-0.1.0b1-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+          "sha256": "aafde7768448efbcc041c537225101f1e4ed9f03afe06b1dfd07cbd1f795e55d",
+          "yanked": false
+        },
+        {
+          "filename": "redact_secret-0.1.0b1-cp310-abi3-musllinux_1_2_aarch64.whl",
+          "sha256": "65846ebacbb109338a6181149ab5188dee56e903a83a3e1dae583f311da7e5e1",
+          "yanked": false
+        },
+        {
+          "filename": "redact_secret-0.1.0b1-cp310-abi3-musllinux_1_2_x86_64.whl",
+          "sha256": "2d8c14125a04d61eb5093c3f97a1e5fe74e92e0840b3f02facb3273625623272",
+          "yanked": false
+        },
+        {
+          "filename": "redact_secret-0.1.0b1-cp310-abi3-win_amd64.whl",
+          "sha256": "93919df0074142096236e368ca83f01815f123e948d3383c0ec1c167b23a41e9",
+          "yanked": false
+        },
+        {
+          "filename": "redact_secret-0.1.0b1-cp310-abi3-win_arm64.whl",
+          "sha256": "742ac215e4ae4acd1812817bf2655e2d90effd6a90a4771d5853c2a1a698a389",
+          "yanked": false
+        },
+        {
+          "filename": "redact_secret-0.1.0b1.tar.gz",
+          "sha256": "ea375ac4000e70928ab5150f3a1ddef82bdc6f164071a9c862932826bf9c674b",
+          "yanked": false
+        }
+      ]
+    },
+    {
+      "url": "https://pypi.org/pypi/redact-secret/0.1.0b2/json",
+      "version": "0.1.0b2",
+      "files": [
+        {
+          "filename": "redact_secret-0.1.0b2-cp310-abi3-macosx_10_12_x86_64.whl",
+          "sha256": "3bf30ec56c2725b9443e053d41bf6b61d4971f1359a6e67607ce75ced60d6d72",
+          "yanked": false
+        },
+        {
+          "filename": "redact_secret-0.1.0b2-cp310-abi3-macosx_11_0_arm64.whl",
+          "sha256": "a5be76edb52ea6fc60cd65b8ed6c80e5df1a1ba4011c75cce2cc215819562cf0",
+          "yanked": false
+        },
+        {
+          "filename": "redact_secret-0.1.0b2-cp310-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl",
+          "sha256": "c485bf85a77c22615ed2d86684807c481e25aa4b6c5befbddb75d527cc44fa14",
+          "yanked": false
+        },
+        {
+          "filename": "redact_secret-0.1.0b2-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+          "sha256": "82ce96aac6ebb510770f5644cd324ff09a19215acc18ecd411f15ef7b89e79dc",
+          "yanked": false
+        },
+        {
+          "filename": "redact_secret-0.1.0b2-cp310-abi3-musllinux_1_2_aarch64.whl",
+          "sha256": "2812681e44ca29e796a1142820221ea1ec1a56dda9ed51d721246f163c96143e",
+          "yanked": false
+        },
+        {
+          "filename": "redact_secret-0.1.0b2-cp310-abi3-musllinux_1_2_x86_64.whl",
+          "sha256": "6d85d54da337b054a9a8475000021fe985815e9574cf3d91decbc59a30d5382c",
+          "yanked": false
+        },
+        {
+          "filename": "redact_secret-0.1.0b2-cp310-abi3-win_amd64.whl",
+          "sha256": "fd03b490c0998502a0773dcd72f0374707036eadb97bcbd172e05b277d515d38",
+          "yanked": false
+        },
+        {
+          "filename": "redact_secret-0.1.0b2-cp310-abi3-win_arm64.whl",
+          "sha256": "417eca4ecdc801f4e909657b3d2cf7895564fbe39c96fd806ebbfd64c0d93461",
+          "yanked": false
+        },
+        {
+          "filename": "redact_secret-0.1.0b2.tar.gz",
+          "sha256": "8a50ae341977916f42cd6cfec82004b9729954a010a9971a2d6b9f2f401c315f",
+          "yanked": false
+        }
+      ]
+    },
+    {
+      "url": "https://pypi.org/pypi/redact-secret/0.1.0b3/json",
+      "version": "0.1.0b3",
+      "files": [
+        {
+          "filename": "redact_secret-0.1.0b3-cp310-abi3-macosx_10_12_x86_64.whl",
+          "sha256": "2b5c20e1f08ce1779cf824285ea4d5abe51b6457de6cf1f0307b21b380e6671f",
+          "yanked": false
+        },
+        {
+          "filename": "redact_secret-0.1.0b3-cp310-abi3-macosx_11_0_arm64.whl",
+          "sha256": "f9c0b0ba690fa94362418a161ca8584f6885767562c8e292269bc5dee658474c",
+          "yanked": false
+        },
+        {
+          "filename": "redact_secret-0.1.0b3-cp310-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl",
+          "sha256": "705ce70337561307a9c276e5216d7577fecf21f1ef312cc6d818d65e356293ce",
+          "yanked": false
+        },
+        {
+          "filename": "redact_secret-0.1.0b3-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+          "sha256": "baa873b8171989be64c09fac2a5ecfa95e0ca44fcaa2c4edd93213f209678ef1",
+          "yanked": false
+        },
+        {
+          "filename": "redact_secret-0.1.0b3-cp310-abi3-musllinux_1_2_aarch64.whl",
+          "sha256": "8dee14da44278da64010f6ba59e2dabe6f012cfc8d26c4b8b5f98ca15a08ed01",
+          "yanked": false
+        },
+        {
+          "filename": "redact_secret-0.1.0b3-cp310-abi3-musllinux_1_2_x86_64.whl",
+          "sha256": "6493cc2379fed98d0f57ca2f982d3319f134ced65ce2700ca00e870860c3b249",
+          "yanked": false
+        },
+        {
+          "filename": "redact_secret-0.1.0b3-cp310-abi3-win_amd64.whl",
+          "sha256": "19d6d35264ee1f9c66cb4773077eb34f94e5a7ab4b0b1c988592555345338856",
+          "yanked": false
+        },
+        {
+          "filename": "redact_secret-0.1.0b3-cp310-abi3-win_arm64.whl",
+          "sha256": "545afdb4e563a3062984bfb465396d192d804faf8bc98790c1317685d789a253",
+          "yanked": false
+        },
+        {
+          "filename": "redact_secret-0.1.0b3.tar.gz",
+          "sha256": "aef48507d6b58618a4133d02526a7346bf3c9dd0d4101c3c16ca4444b5dc1961",
+          "yanked": false
+        }
+      ]
+    }
+  ],
+  "tags": [
+    {
+      "ref": "refs/tags/v0.1.0-beta.1",
+      "tagObject": "7b3ba1d18bb0b01013079fde8d332f2961ae3acf",
+      "commit": "7bbd345be0604b8c3d50335985e0bfbbbe3703c9"
+    },
+    {
+      "ref": "refs/tags/v0.1.0-beta.2",
+      "tagObject": "935f50a71c61c90c745bae578597d9d85e679702",
+      "commit": "8cdc1b118449a15be545ecf70bb7f0df53f6126e"
+    },
+    {
+      "ref": "refs/tags/v0.1.0-beta.3",
+      "tagObject": "ce4da72755ea64197adb26c615084a015662eee5",
+      "commit": "34ea9b92ed8879082e99f56f8f4715ee4e4f1f35"
+    }
+  ],
+  "githubReleases": [
+    {
+      "tag": "v0.1.0-beta.1",
+      "url": "https://github.com/redact-secret/redact-secret/releases/tag/v0.1.0-beta.1"
+    }
+  ]
+}

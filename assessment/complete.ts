@@ -128,6 +128,10 @@ export function buildCompleteAssessment(input: {
       failures.push(`${runKey}:result-identity-mismatch`);
       return { ...attempt, path: pathFor(surface, profile), status: "invalid" };
     }
+    if (surface === "rust-core" && kind === "performance" && attempt.result.provenance.buildProfile !== "release") {
+      failures.push(`${runKey}:release-build-required`);
+      return { ...attempt, path: pathFor(surface, profile), status: "invalid" };
+    }
     if (
       kind === "performance" &&
       attempt.result.performance?.processing.samples.length !== input.repetitions
@@ -209,12 +213,14 @@ export function renderCompleteAssessmentMarkdown(assessment: CompleteAssessment)
 
   lines.push("", "## Performance", "", "| Surface | Profile | Processing median (ms) | Throughput median (bytes/s) |", "| --- | --- | ---: | ---: |");
   for (const run of assessment.runs.filter((candidate) => candidate.kind === "performance")) {
-    const performance = run.result?.performance;
+    const performance = run.status === "complete" ? run.result?.performance : undefined;
     lines.push(`| ${run.surface} | ${run.profileId} | ${performance?.processing.median ?? "—"} | ${performance?.throughput.median ?? "—"} |`);
   }
 
   lines.push(
     "", "## Metric limitations", "",
+    "Rust performance requires explicit release-build provenance. Historical results without it cannot form a new complete baseline. CLI measures check mode; other surfaces scan and redact. These operations are not directly interchangeable.",
+    "",
     "Memory categories are separate and may overlap; they must not be summed. Observed maxima remain sampled observations, not guaranteed true peaks.",
     "", "| Surface | Profile | Category | Availability / sampling limit |", "| --- | --- | --- | --- |",
   );

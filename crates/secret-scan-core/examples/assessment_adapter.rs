@@ -240,6 +240,9 @@ fn run_accuracy(options: &Options) -> Result<(), String> {
 }
 
 fn run_performance(options: &Options) -> Result<(), String> {
+    if cfg!(debug_assertions) {
+        return Err("Performance assessment requires a release build (--release).".to_owned());
+    }
     let document = read_json(&repo_root().join("assessment/fixtures/workload-profiles.json"))?;
     let profiles = array_field(&document, "profiles")?;
     if usize_field(&document, "profileCount")? != profiles.len() {
@@ -705,12 +708,13 @@ fn provenance(corpus_version: &str, corpus_hash: &str, command: &str) -> Value {
         "cpu": env::consts::ARCH,
         "runtime": format!("rustc-{}", rustc_version()),
         "command": command,
+        "buildProfile": if cfg!(debug_assertions) { "debug" } else { "release" },
     })
 }
 
 fn invoked_command() -> String {
-    let arguments = env::args().skip(1).collect::<Vec<_>>().join(" ");
-    format!("cargo run -p redact-secret --example assessment_adapter -- {arguments}")
+    // Record the actual executable and argv, including argument boundaries.
+    serde_json::to_string(&env::args().collect::<Vec<_>>()).unwrap_or_default()
 }
 
 fn markdown_accuracy(result: &Value, mismatches: &[Value]) -> String {
