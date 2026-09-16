@@ -92,8 +92,11 @@ gitignored local cache; `conformance/fixtures/` holds this project's own
 canonical *synthetic* secret-shaped fixtures, and scanning deliberately
 secret-shaped text with a generic SAST tool is meaningless and risks a
 report copying secret-like values, which this issue's own security
-constraint forbids; `sast/rules/` is the vendored third-party ruleset itself,
-whose embedded example patterns are not this project's source.
+constraint forbids; `docs/coverage/` carries the same synthetic secret-shaped
+literals (`detector-inventory.json`'s `reconciliationTrigger` strings and
+the files generated from them), excluded for the identical reason;
+`sast/rules/` is the vendored third-party ruleset itself, whose embedded
+example patterns are not this project's source.
 
 ## Rules: vendoring, license, and update procedure
 

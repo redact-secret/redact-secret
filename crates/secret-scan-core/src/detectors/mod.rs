@@ -30,6 +30,7 @@ mod sendgrid;
 mod shopify;
 mod telegram;
 mod text;
+mod twilio;
 mod vault;
 
 use crate::types::Detector;
@@ -69,6 +70,8 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(azure_devops::AzureDevOpsPersonalAccessTokenDetector),
         Box::new(notion::NotionTokenDetector),
         Box::new(atlassian::AtlassianApiTokenDetector),
+        Box::new(twilio::TwilioAuthTokenDetector),
+        Box::new(twilio::TwilioApiKeySecretDetector),
         telegram::telegram_bot_token_detector(),
         Box::new(discord::DiscordBotTokenDetector),
         jwt::jwt_detector(),
@@ -128,6 +131,8 @@ mod tests {
                 "azure-devops-personal-access-token",
                 "notion-token",
                 "atlassian-api-token",
+                "twilio-auth-token",
+                "twilio-api-key-secret",
                 "telegram-bot-token",
                 "discord-bot-token",
                 "jwt",
@@ -173,9 +178,13 @@ mod tests {
             "ATAT{}",
             "SYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY_".repeat(3)
         );
+        let twilio_auth_token_input =
+            "twilio AC0123456789abcdef0123456789abcde0 fedcba9876543210fedcba9876543210";
+        let twilio_api_key_secret_input =
+            "twilio SKaB3dE5gH7jK9mN1pQ3sT5vW7yZ9AbC3d zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE";
         let telegram_input = "123456:SYNTHETIC_REVOKED_TELEGRAM_BOT_TOKEN_SECRET";
         let discord_input = "MDAwMDAwMDAwMDAwMDAwMDAw.REVOKE.SYNTHETICREVOKEDBOTTOKENFIX";
-        let cases: [(&str, &str); 26] = [
+        let cases: [(&str, &str); 28] = [
             ("aws-access-key", "AKIASYNTHETICEXAMPLE"),
             (
                 "github-token",
@@ -215,6 +224,8 @@ mod tests {
                 "secret_SYNTHETICREVOKEDNOTIONLEGACYTOKENVALUE00000",
             ),
             ("atlassian-api-token", atlassian_input.as_str()),
+            ("twilio-auth-token", twilio_auth_token_input),
+            ("twilio-api-key-secret", twilio_api_key_secret_input),
             ("discord-bot-token", discord_input),
             ("telegram-bot-token", telegram_input),
         ];

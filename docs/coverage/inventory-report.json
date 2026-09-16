@@ -1274,12 +1274,77 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "discord_bot_token"
+    },
+    {
+      "detector": "twilio-auth-token",
+      "evidence": {
+        "fixtureCount": 13,
+        "hostContextsExercised": [
+          "dotenv",
+          "json",
+          "plain-text",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "twilio-auth-token-positive-bare-with-account-sid",
+        "twilio-auth-token-positive-dotenv-keyword",
+        "twilio-auth-token-positive-json-keyword",
+        "twilio-auth-token-positive-yaml-keyword",
+        "twilio-auth-token-regression-crlf-and-unicode-prefix"
+      ],
+      "policyClass": "confidence-gated",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "twilio_auth_token"
+    },
+    {
+      "detector": "twilio-api-key-secret",
+      "evidence": {
+        "fixtureCount": 11,
+        "hostContextsExercised": [
+          "dotenv",
+          "plain-text",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "twilio-api-key-secret-positive-bare-with-api-key-sid",
+        "twilio-api-key-secret-positive-dotenv-keyword",
+        "twilio-api-key-secret-positive-yaml-keyword",
+        "twilio-api-key-secret-regression-uppercase-alnum-crossover"
+      ],
+      "policyClass": "confidence-gated",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "twilio_api_key_secret"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 33,
+    "supported": 35,
     "unresolved": 0
   }
 }

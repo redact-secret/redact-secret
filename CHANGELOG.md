@@ -5,6 +5,25 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+- Added `twilio-auth-token` and `twilio-api-key-secret` detectors recognizing
+  Twilio Auth Tokens and API Key Secrets: community-observed (gitleaks,
+  trufflehog) bare 32-byte values -- lowercase hex for an Auth Token,
+  mixed-alphanumeric for an API Key Secret -- with no vendor-documented
+  format of their own. Neither value carries a marker distinguishing it from
+  ordinary opaque text (an Auth Token's shape is indistinguishable from an
+  MD5 digest), so each detector requires reliable Twilio context on the same
+  line as the candidate: the paired identifier (an `AC`-prefixed Account SID
+  or `SK`-prefixed API Key SID, high confidence) or, absent that, a
+  case-insensitive `twilio` substring (medium confidence). Account SIDs and
+  API Key SIDs are never themselves flagged as findings -- they identify an
+  account or a key, not a secret, matching the issue's explicit rejection of
+  treating a bare identifier as equivalent credential coverage. Both types
+  are provider-specific and confidence-gated (redact at high confidence,
+  warn at medium) rather than unconditionally always-redact, since the
+  keyword-only signal is real but weaker evidence than the paired
+  identifier. A paired identifier on a *different* line from the value is a
+  documented, known false negative: context is scoped to a single line so
+  whole-input and incremental (line-at-a-time) scanning agree.
 - Added a `telegram-bot-token` detector recognizing Telegram Bot API tokens:
   a minimum 5-digit numeric id, a literal `:` separator, and a minimum
   34-byte secret from `[A-Za-z0-9_-]`, both lengths taken as documented

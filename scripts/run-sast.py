@@ -81,6 +81,13 @@ EXCLUSIONS: dict[str, str] = {
         "and risks a report copying secret-like values, which issue #155's own security "
         "constraint forbids"
     ),
+    "docs/coverage": (
+        "detector-inventory.json's reconciliationTrigger strings, and the "
+        "coverage-declarations.json/inventory-report.json/coverage-report.md files "
+        "generated from them, carry the same synthetic secret-shaped literals as "
+        "conformance/fixtures (each one already shipped verbatim in crates/secret-scan-core/src); "
+        "excluded for the identical reason"
+    ),
     "sast/rules": (
         "the vendored third-party OpenGrep rule definitions themselves; their embedded "
         "example patterns are not this project's source to remediate"
