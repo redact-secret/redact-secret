@@ -432,9 +432,50 @@ mod tests {
             format!("pk_live_{BODY}"),
             format!("sb_publishable_{BODY}"),
             format!("SK{}", "0".repeat(32)),
+            // An undocumented near-miss prefix (not one byte-for-byte equal to
+            // any documented prefix) stays a false-negative-by-design, never a
+            // fuzzy match.
+            format!("sk_liv_{BODY}"),
+            format!("sb_secrets_{BODY}"),
         ] {
-            assert_eq!(detect(&STRIPE, &input).len(), 0);
-            assert_eq!(detect(&SUPABASE, &input).len(), 0);
+            assert_eq!(detect(&STRIPE, &input).len(), 0, "{input}");
+            assert_eq!(detect(&SUPABASE, &input).len(), 0, "{input}");
         }
+    }
+
+    /// A public-prefix identifier surrounded by punctuation or Unicode/CRLF
+    /// context, and a documented secret prefix followed by a redaction mask
+    /// or a template interpolation reference instead of a real suffix, must
+    /// all stay unclassified.
+    #[test]
+    fn rejects_masked_interpolated_and_contextualized_near_misses() {
+        for input in [
+            format!("(pk_live_{BODY})."),
+            format!("(sb_publishable_{BODY})."),
+            format!("# \u{1F511} caf\u{e9}\r\npk_live_{BODY}\r\n"),
+            format!("# \u{1F511} caf\u{e9}\r\nsb_publishable_{BODY}\r\n"),
+            "sk_live_********************".to_string(),
+            "sb_secret_********************".to_string(),
+            "sk_live_${STRIPE_SECRET_KEY}".to_string(),
+            "sb_secret_${SUPABASE_SERVICE_ROLE_KEY}".to_string(),
+        ] {
+            assert_eq!(detect(&STRIPE, &input).len(), 0, "{input}");
+            assert_eq!(detect(&SUPABASE, &input).len(), 0, "{input}");
+        }
+    }
+
+    /// A public identifier and a secret credential on adjacent lines: the
+    /// public prefix never generates a candidate, while the paired secret is
+    /// still classified with the correct range.
+    #[test]
+    fn classifies_only_the_secret_half_of_a_mixed_public_and_secret_input() {
+        let input = format!("pk_live_SYNTHETICREVOKEDSYNT\nsk_live_{BODY}");
+        let candidates = detect(&STRIPE, &input);
+        assert_eq!(candidates.len(), 1);
+        let expected_start = input.find("sk_live_").unwrap();
+        assert_eq!(
+            candidates[0].range(),
+            ByteRange::new(expected_start, input.len()).unwrap()
+        );
     }
 }

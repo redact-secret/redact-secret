@@ -283,7 +283,7 @@
     {
       "detector": "shopify-token",
       "evidence": {
-        "fixtureCount": 13,
+        "fixtureCount": 20,
         "hostContextsExercised": [
           "plain-text"
         ],
@@ -301,7 +301,9 @@
       "evidenceFixtureIds": [
         "shopify-positive-admin-access",
         "shopify-positive-all-prefixes",
-        "shopify-positive-min-length"
+        "shopify-positive-doc-style-placeholder",
+        "shopify-positive-min-length",
+        "shopify-positive-mixed-public-and-secret"
       ],
       "policyClass": "always-redact",
       "schemeRows": "not-applicable",
@@ -339,7 +341,7 @@
     {
       "detector": "stripe-token",
       "evidence": {
-        "fixtureCount": 13,
+        "fixtureCount": 20,
         "hostContextsExercised": [
           "plain-text"
         ],
@@ -356,7 +358,9 @@
       },
       "evidenceFixtureIds": [
         "stripe-positive-all-prefixes",
+        "stripe-positive-doc-style-placeholder",
         "stripe-positive-min-length",
+        "stripe-positive-mixed-public-and-secret",
         "stripe-positive-qualified"
       ],
       "policyClass": "always-redact",
@@ -560,7 +564,7 @@
     {
       "detector": "supabase-token",
       "evidence": {
-        "fixtureCount": 12,
+        "fixtureCount": 19,
         "hostContextsExercised": [
           "plain-text"
         ],
@@ -576,7 +580,9 @@
         ]
       },
       "evidenceFixtureIds": [
+        "supabase-positive-doc-style-placeholder",
         "supabase-positive-min-length",
+        "supabase-positive-mixed-public-and-secret",
         "supabase-positive-qualified"
       ],
       "policyClass": "always-redact",

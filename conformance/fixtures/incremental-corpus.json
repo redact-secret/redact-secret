@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 27,
+  "fixtureCount": 28,
   "fixtures": [
     {
       "id": "synthetic-regression-malformed-authority",
@@ -473,6 +473,22 @@
         }
       ],
       "note": "issue #294: the no-separator nested-quote fix is detected and redacted at every partition even with a CRLF line ending after the outer close."
+    },
+    {
+      "id": "stripe-public-secret-prefix-discriminating-boundary",
+      "input": "pk_live_SYNTHETICREVOKEDSYNT\nsk_live_SYNTHETICREVOKEDSYNTHETICREVOKED",
+      "text": "pk_live_SYNTHETICREVOKEDSYNT\n<SECRET_1>",
+      "expected": [
+        {
+          "detector": "stripe-token",
+          "type": "stripe_credential",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 29,
+          "end": 69
+        }
+      ],
+      "note": "issue #316: a public identifier prefix and a documented secret prefix on adjacent lines stay correctly discriminated at every chunk split, including splits that fall inside either prefix's own bytes. Shopify's and Supabase's known-format provider detectors share the identical scan_prefixed_runs mechanism this exercises, so this one representative exemplar generalizes to their equivalent public/secret prefix pairs."
     }
   ]
 }
