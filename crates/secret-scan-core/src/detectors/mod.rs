@@ -12,6 +12,7 @@ mod additional_providers;
 mod anthropic;
 mod atlassian;
 mod aws;
+mod azure_devops;
 mod bearer_token;
 mod connection_string;
 mod generic_token;
@@ -19,6 +20,7 @@ mod github;
 mod gitlab;
 mod jwt;
 mod microsoft_entra;
+mod notion;
 mod openai;
 mod otpauth;
 mod pattern;
@@ -62,6 +64,8 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(additional_providers::GOOGLE),
         Box::new(sendgrid::SendgridTokenDetector),
         Box::new(microsoft_entra::MicrosoftEntraClientSecretDetector),
+        Box::new(azure_devops::AzureDevOpsPersonalAccessTokenDetector),
+        Box::new(notion::NotionTokenDetector),
         Box::new(atlassian::AtlassianApiTokenDetector),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
@@ -117,6 +121,8 @@ mod tests {
                 "google-api-key",
                 "sendgrid-token",
                 "microsoft-entra-client-secret",
+                "azure-devops-personal-access-token",
+                "notion-token",
                 "atlassian-api-token",
                 "jwt",
                 "bearer-token",
@@ -161,7 +167,7 @@ mod tests {
             "ATAT{}",
             "SYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY_".repeat(3)
         );
-        let cases: [(&str, &str); 22] = [
+        let cases: [(&str, &str); 24] = [
             ("aws-access-key", "AKIASYNTHETICEXAMPLE"),
             (
                 "github-token",
@@ -191,6 +197,14 @@ mod tests {
             (
                 "microsoft-entra-client-secret",
                 "abc8Q~SYNTHETIC_REVOKED_ENTRA_SECRET_V",
+            ),
+            (
+                "azure-devops-personal-access-token",
+                "SYNTHETICREVOKEDAZUREDEVOPSPATVALUEFORCONFORMANCETESTINGPADDINGFIXTUREDATAZZAZDOabcd",
+            ),
+            (
+                "notion-token",
+                "secret_SYNTHETICREVOKEDNOTIONLEGACYTOKENVALUE00000",
             ),
             ("atlassian-api-token", atlassian_input.as_str()),
         ];
