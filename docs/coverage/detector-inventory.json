@@ -1,7 +1,16 @@
 {
   "note": "Hand-authored baseline declaration for issue #101 (tracking-key dacd-f1-t1). One entry per finding type the built-in registry (crates/secret-scan-core/src/detectors) can emit, joined to its default-policy classification (crates/secret-scan-core/src/policy.rs). Reconciled against the real registry and DefaultPolicy by crates/secret-scan-core/src/detectors/mod.rs::tests::built_in_inventory_matches_the_declared_baseline, which fails if a detector, its emitted type(s), or its policy class drift from this file. scripts/generate-coverage-inventory.py joins this file with the canonical corpus (conformance/fixtures/synchronous-corpus.json) to report evidence coverage; this file itself carries no fixture input, no corpus data, and no matched value. Every reconciliationTrigger string is a synthetic, revoked literal already shipped verbatim elsewhere in crates/secret-scan-core/src (grep it to confirm) -- none is newly invented secret-shaped text.",
-  "policyClasses": ["block", "always-redact", "confidence-gated"],
-  "rowStates": ["supported", "intentionally-unsupported", "not-applicable", "unresolved"],
+  "policyClasses": [
+    "block",
+    "always-redact",
+    "confidence-gated"
+  ],
+  "rowStates": [
+    "supported",
+    "intentionally-unsupported",
+    "not-applicable",
+    "unresolved"
+  ],
   "types": [
     {
       "type": "private_key",
@@ -179,17 +188,10 @@
       "schemes": null
     },
     {
-      "type": "twilio_auth_token",
-      "detector": "twilio-auth-token",
-      "policyClass": "confidence-gated",
-      "reconciliationTrigger": "twilio AC0123456789abcdef0123456789abcde0 fedcba9876543210fedcba9876543210",
-      "schemes": null
-    },
-    {
-      "type": "twilio_api_key_secret",
-      "detector": "twilio-api-key-secret",
-      "policyClass": "confidence-gated",
-      "reconciliationTrigger": "twilio SKaB3dE5gH7jK9mN1pQ3sT5vW7yZ9AbC3d zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE",
+      "type": "telegram_bot_token",
+      "detector": "telegram-bot-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "123456:SYNTHETIC_REVOKED_TELEGRAM_BOT_TOKEN_SECRET",
       "schemes": null
     },
     {
@@ -247,7 +249,31 @@
       "detector": "generic-token",
       "policyClass": "always-redact",
       "reconciliationTrigger": "Authorization: Token SYNTHETIC_REVOKED_TOKEN_VALUE_1234",
-      "schemes": ["basic", "token"]
+      "schemes": [
+        "basic",
+        "token"
+      ]
+    },
+    {
+      "type": "discord_bot_token",
+      "detector": "discord-bot-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "MDAwMDAwMDAwMDAwMDAwMDAw.REVOKE.SYNTHETICREVOKEDBOTTOKENFIX",
+      "schemes": null
+    },
+    {
+      "type": "twilio_auth_token",
+      "detector": "twilio-auth-token",
+      "policyClass": "confidence-gated",
+      "reconciliationTrigger": "twilio AC0123456789abcdef0123456789abcde0 fedcba9876543210fedcba9876543210",
+      "schemes": null
+    },
+    {
+      "type": "twilio_api_key_secret",
+      "detector": "twilio-api-key-secret",
+      "policyClass": "confidence-gated",
+      "reconciliationTrigger": "twilio SKaB3dE5gH7jK9mN1pQ3sT5vW7yZ9AbC3d zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE",
+      "schemes": null
     }
   ],
   "consumers": [

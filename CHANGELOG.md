@@ -24,6 +24,33 @@ evidence is linked from each published version.
   identifier. A paired identifier on a *different* line from the value is a
   documented, known false negative: context is scoped to a single line so
   whole-input and incremental (line-at-a-time) scanning agree.
+- Added a `telegram-bot-token` detector recognizing Telegram Bot API tokens:
+  a minimum 5-digit numeric id, a literal `:` separator, and a minimum
+  34-byte secret from `[A-Za-z0-9_-]`, both lengths taken as documented
+  minimums (Telegram's own docs disclaim no fixed length but publish only
+  one worked example) rather than exact matches. A token glued directly onto
+  the documented Bot API request URL's `/bot` path segment
+  (`https://api.telegram.org/bot<token>/METHOD_NAME`) is also detected, with
+  only the id:secret token bytes selected. A bare numeric chat/user/bot id
+  with no secret, a public bot username handle, and Telegram's separate
+  MTProto `api_id`/`api_hash` client credentials are documented out-of-scope
+  gaps sharing no `id:secret` shape with this grammar. The new detector is
+  always-redact, provider-specific, and wins any overlap with the generic
+  contextual detector.
+- Added a `discord-bot-token` detector recognizing Discord bot tokens: three
+  dot-separated segments of exactly 24, 6, and 27 bytes from
+  `[A-Za-z0-9_-]`, matching the single example in Discord's own developer
+  reference and corroborated by gitleaks's and trufflehog's independent
+  Discord bot-token rules (consulted only as external behavioral
+  references; no code copied from either project). The first segment must
+  also decode, as unpadded base64url, to an all-ASCII-digit string -- the
+  shape of a Discord snowflake ID -- which anchors the detector to
+  Discord's specific token shape without overlapping the structurally
+  identical JWT grammar. Webhook URL tokens, OAuth2 client secrets, and
+  `mfa.`-prefixed user/self-bot tokens are documented out-of-scope gaps,
+  each a separate credential family. The new detector is always-redact,
+  provider-specific, and wins any overlap with the generic contextual
+  detector.
 - Added an `atlassian-api-token` detector recognizing Atlassian Cloud (Jira /
   Confluence) API tokens: the community-forum-confirmed `ATAT` prefix
   followed by a minimum 100-byte suffix from `[A-Za-z0-9_-]`. The length is a

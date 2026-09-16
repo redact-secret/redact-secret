@@ -155,7 +155,11 @@ fn line_has_paired_identifier(line: &str, prefix: &str, alphabet: Alphabet) -> b
 /// for exactly this reason, mirroring how [`super::aws`] and
 /// [`super::sendgrid`] already widen their own boundary alphabets past
 /// their match alphabet for the same class of adjacency.
-fn scan_bare_secret_runs(input: &str, alphabet: Alphabet, boundary: Alphabet) -> Vec<(usize, usize)> {
+fn scan_bare_secret_runs(
+    input: &str,
+    alphabet: Alphabet,
+    boundary: Alphabet,
+) -> Vec<(usize, usize)> {
     let bytes = input.as_bytes();
     let ends = pattern::run_ends(bytes, alphabet);
     let mut matches = Vec::new();

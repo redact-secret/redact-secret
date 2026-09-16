@@ -15,6 +15,7 @@ mod aws;
 mod azure_devops;
 mod bearer_token;
 mod connection_string;
+mod discord;
 mod generic_token;
 mod github;
 mod gitlab;
@@ -27,6 +28,7 @@ mod pattern;
 mod private_key;
 mod sendgrid;
 mod shopify;
+mod telegram;
 mod text;
 mod twilio;
 mod vault;
@@ -70,6 +72,8 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(atlassian::AtlassianApiTokenDetector),
         Box::new(twilio::TwilioAuthTokenDetector),
         Box::new(twilio::TwilioApiKeySecretDetector),
+        telegram::telegram_bot_token_detector(),
+        Box::new(discord::DiscordBotTokenDetector),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
         Box::new(ConnectionStringDetector),
@@ -129,6 +133,8 @@ mod tests {
                 "atlassian-api-token",
                 "twilio-auth-token",
                 "twilio-api-key-secret",
+                "telegram-bot-token",
+                "discord-bot-token",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -176,7 +182,9 @@ mod tests {
             "twilio AC0123456789abcdef0123456789abcde0 fedcba9876543210fedcba9876543210";
         let twilio_api_key_secret_input =
             "twilio SKaB3dE5gH7jK9mN1pQ3sT5vW7yZ9AbC3d zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE";
-        let cases: [(&str, &str); 26] = [
+        let telegram_input = "123456:SYNTHETIC_REVOKED_TELEGRAM_BOT_TOKEN_SECRET";
+        let discord_input = "MDAwMDAwMDAwMDAwMDAwMDAw.REVOKE.SYNTHETICREVOKEDBOTTOKENFIX";
+        let cases: [(&str, &str); 28] = [
             ("aws-access-key", "AKIASYNTHETICEXAMPLE"),
             (
                 "github-token",
@@ -218,6 +226,8 @@ mod tests {
             ("atlassian-api-token", atlassian_input.as_str()),
             ("twilio-auth-token", twilio_auth_token_input),
             ("twilio-api-key-secret", twilio_api_key_secret_input),
+            ("discord-bot-token", discord_input),
+            ("telegram-bot-token", telegram_input),
         ];
         let detectors = built_in_detectors();
         for (id, input) in cases {

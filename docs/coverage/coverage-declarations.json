@@ -2212,55 +2212,60 @@
     },
     {
       "behaviorClass": "provider",
-      "detector": "twilio-auth-token",
+      "detector": "telegram-bot-token",
       "dimensions": [
         {
           "dimension": "positive",
           "evidenceFixtureIds": [
-            "twilio-auth-token-positive-bare-with-account-sid",
-            "twilio-auth-token-positive-dotenv-keyword",
-            "twilio-auth-token-positive-json-keyword",
-            "twilio-auth-token-positive-yaml-keyword",
-            "twilio-auth-token-regression-crlf-and-unicode-prefix"
+            "telegram-bot-token-positive-bare",
+            "telegram-bot-token-positive-bot-api-url",
+            "telegram-bot-token-positive-crlf-unicode-prefix",
+            "telegram-bot-token-positive-dotenv",
+            "telegram-bot-token-positive-json",
+            "telegram-bot-token-positive-log"
           ],
           "state": "supported"
         },
         {
           "dimension": "overlap",
           "evidenceFixtureIds": [
-            "twilio-auth-token-overlap-beats-bearer-token"
+            "telegram-bot-token-overlap-generic-context"
           ],
           "state": "supported"
         },
         {
           "dimension": "adversarial",
           "evidenceFixtureIds": [
-            "twilio-auth-token-adversarial-dense-findings"
+            "telegram-bot-token-adversarial-long-padding"
           ],
           "state": "supported"
         },
         {
           "dimension": "boundary",
           "evidenceFixtureIds": [
-            "twilio-auth-token-boundary-wrong-length"
+            "telegram-bot-token-boundary-below-min-id",
+            "telegram-bot-token-boundary-below-min-secret",
+            "telegram-bot-token-boundary-missing-separator"
           ],
           "state": "supported"
         },
         {
           "dimension": "near-miss-negative",
           "evidenceFixtureIds": [
-            "twilio-auth-token-negative-account-sid-alone",
-            "twilio-auth-token-negative-account-sid-on-a-different-line",
-            "twilio-auth-token-negative-bare-value-with-no-context",
-            "twilio-auth-token-negative-environment-variable-reference",
-            "twilio-auth-token-negative-repeated-character-filler"
+            "telegram-bot-token-negative-bare-numeric-id",
+            "telegram-bot-token-negative-malformed-numeric-colon",
+            "telegram-bot-token-negative-masked",
+            "telegram-bot-token-negative-public-handle",
+            "telegram-bot-token-negative-reference"
           ],
           "state": "supported"
         },
         {
           "dimension": "malformed",
           "evidenceFixtureIds": [
-            "twilio-auth-token-boundary-wrong-length"
+            "telegram-bot-token-boundary-below-min-id",
+            "telegram-bot-token-boundary-below-min-secret",
+            "telegram-bot-token-boundary-missing-separator"
           ],
           "state": "supported"
         },
@@ -2288,87 +2293,8 @@
           "state": "supported"
         }
       ],
-      "note": "Coverage declaration for twilio_auth_token (twilio-auth-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
-      "type": "twilio_auth_token"
-    },
-    {
-      "behaviorClass": "provider",
-      "detector": "twilio-api-key-secret",
-      "dimensions": [
-        {
-          "dimension": "positive",
-          "evidenceFixtureIds": [
-            "twilio-api-key-secret-positive-bare-with-api-key-sid",
-            "twilio-api-key-secret-positive-dotenv-keyword",
-            "twilio-api-key-secret-positive-yaml-keyword",
-            "twilio-api-key-secret-regression-uppercase-alnum-crossover"
-          ],
-          "state": "supported"
-        },
-        {
-          "dimension": "overlap",
-          "evidenceFixtureIds": [
-            "twilio-api-key-secret-overlap-beats-bearer-token"
-          ],
-          "state": "supported"
-        },
-        {
-          "dimension": "adversarial",
-          "evidenceFixtureIds": [
-            "twilio-api-key-secret-adversarial-dense-findings"
-          ],
-          "state": "supported"
-        },
-        {
-          "dimension": "boundary",
-          "evidenceFixtureIds": [
-            "twilio-api-key-secret-boundary-wrong-length"
-          ],
-          "state": "supported"
-        },
-        {
-          "dimension": "near-miss-negative",
-          "evidenceFixtureIds": [
-            "twilio-api-key-secret-negative-api-key-sid-alone",
-            "twilio-api-key-secret-negative-api-key-sid-on-a-different-line",
-            "twilio-api-key-secret-negative-bare-value-with-no-context",
-            "twilio-api-key-secret-negative-placeholder-run-of-x-characters"
-          ],
-          "state": "supported"
-        },
-        {
-          "dimension": "malformed",
-          "evidenceFixtureIds": [
-            "twilio-api-key-secret-boundary-wrong-length"
-          ],
-          "state": "supported"
-        },
-        {
-          "classLevel": true,
-          "dimension": "host-context",
-          "evidenceFixtureIds": [],
-          "exception": {
-            "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
-          },
-          "state": "supported"
-        },
-        {
-          "classLevel": true,
-          "dimension": "range",
-          "evidenceFixtureIds": [
-            "unicode-conversion-adjacent-punctuation",
-            "unicode-conversion-astral-after",
-            "unicode-conversion-astral-before",
-            "unicode-conversion-astral-within",
-            "unicode-conversion-combining-before",
-            "unicode-conversion-multibyte-bmp-before"
-          ],
-          "state": "supported"
-        }
-      ],
-      "note": "Coverage declaration for twilio_api_key_secret (twilio-api-key-secret), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
-      "type": "twilio_api_key_secret"
+      "note": "Coverage declaration for telegram_bot_token (telegram-bot-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "telegram_bot_token"
     },
     {
       "behaviorClass": "structural",
@@ -3161,6 +3087,254 @@
       "type": "authorization_credential"
     },
     {
+      "behaviorClass": "provider",
+      "detector": "discord-bot-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "discord-bot-token-positive-bare",
+            "discord-bot-token-positive-crlf-unicode-prefix",
+            "discord-bot-token-positive-dotenv",
+            "discord-bot-token-positive-json",
+            "discord-bot-token-positive-log",
+            "discord-bot-token-positive-yaml"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "discord-bot-token-overlap-generic-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "discord-bot-token-adversarial-long-padding"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "discord-bot-token-boundary-segment-one-non-digit",
+            "discord-bot-token-boundary-segment-one-short",
+            "discord-bot-token-boundary-segment-three-short",
+            "discord-bot-token-boundary-segment-two-short"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "discord-bot-token-negative-masked",
+            "discord-bot-token-negative-placeholder",
+            "discord-bot-token-negative-public-application-id",
+            "discord-bot-token-negative-reference",
+            "discord-bot-token-negative-webhook-url"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "discord-bot-token-boundary-segment-one-non-digit",
+            "discord-bot-token-boundary-segment-one-short",
+            "discord-bot-token-boundary-segment-three-short",
+            "discord-bot-token-boundary-segment-two-short"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for discord_bot_token (discord-bot-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "discord_bot_token"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "twilio-auth-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "twilio-auth-token-positive-bare-with-account-sid",
+            "twilio-auth-token-positive-dotenv-keyword",
+            "twilio-auth-token-positive-json-keyword",
+            "twilio-auth-token-positive-yaml-keyword",
+            "twilio-auth-token-regression-crlf-and-unicode-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "twilio-auth-token-overlap-beats-bearer-token"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "twilio-auth-token-adversarial-dense-findings"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "twilio-auth-token-boundary-wrong-length"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "twilio-auth-token-negative-account-sid-alone",
+            "twilio-auth-token-negative-account-sid-on-a-different-line",
+            "twilio-auth-token-negative-bare-value-with-no-context",
+            "twilio-auth-token-negative-environment-variable-reference",
+            "twilio-auth-token-negative-repeated-character-filler"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "twilio-auth-token-boundary-wrong-length"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for twilio_auth_token (twilio-auth-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "twilio_auth_token"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "twilio-api-key-secret",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "twilio-api-key-secret-positive-bare-with-api-key-sid",
+            "twilio-api-key-secret-positive-dotenv-keyword",
+            "twilio-api-key-secret-positive-yaml-keyword",
+            "twilio-api-key-secret-regression-uppercase-alnum-crossover"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "twilio-api-key-secret-overlap-beats-bearer-token"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "twilio-api-key-secret-adversarial-dense-findings"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "twilio-api-key-secret-boundary-wrong-length"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "twilio-api-key-secret-negative-api-key-sid-alone",
+            "twilio-api-key-secret-negative-api-key-sid-on-a-different-line",
+            "twilio-api-key-secret-negative-bare-value-with-no-context",
+            "twilio-api-key-secret-negative-placeholder-run-of-x-characters"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "twilio-api-key-secret-boundary-wrong-length"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for twilio_api_key_secret (twilio-api-key-secret), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "twilio_api_key_secret"
+    },
+    {
       "behaviorClass": "incremental",
       "detector": "unassigned",
       "dimensions": [
@@ -3235,6 +3409,7 @@
             "connection-adversarial-overlong",
             "contextual-adversarial-overlong",
             "digitalocean-adversarial-long-suffix",
+            "discord-bot-token-adversarial-long-padding",
             "docker-adversarial-long-suffix",
             "github-adversarial-long-suffix",
             "gitlab-adversarial-long-suffix",
@@ -3256,6 +3431,7 @@
             "slack-adversarial-long-suffix",
             "stripe-adversarial-long-suffix",
             "supabase-adversarial-long-suffix",
+            "telegram-bot-token-adversarial-long-padding",
             "twilio-api-key-secret-adversarial-dense-findings",
             "twilio-auth-token-adversarial-dense-findings",
             "vault-adversarial-long-suffix",
@@ -3529,6 +3705,7 @@
             "connection-adversarial-overlong",
             "contextual-adversarial-overlong",
             "digitalocean-adversarial-long-suffix",
+            "discord-bot-token-adversarial-long-padding",
             "docker-adversarial-long-suffix",
             "github-adversarial-long-suffix",
             "gitlab-adversarial-long-suffix",
@@ -3550,6 +3727,7 @@
             "slack-adversarial-long-suffix",
             "stripe-adversarial-long-suffix",
             "supabase-adversarial-long-suffix",
+            "telegram-bot-token-adversarial-long-padding",
             "twilio-api-key-secret-adversarial-dense-findings",
             "twilio-auth-token-adversarial-dense-findings",
             "vault-adversarial-long-suffix",
