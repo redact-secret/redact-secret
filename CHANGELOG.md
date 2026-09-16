@@ -5,6 +5,28 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+- Added an `atlassian-api-token` detector recognizing Atlassian Cloud (Jira /
+  Confluence) API tokens: the community-forum-confirmed `ATAT` prefix
+  followed by a minimum 100-byte suffix from `[A-Za-z0-9_-]`. The length is a
+  minimum, not an exact match, because Atlassian's own documentation
+  explicitly disclaims a fixed token length. The legacy, pre-2022 unprefixed
+  24-character token is a documented out-of-scope gap, indistinguishable from
+  ordinary opaque text without reliable context; it is left to the generic
+  contextual detector. `ATCT`-prefixed access tokens and `ATBB`-prefixed app
+  passwords are separate Atlassian credential families, also out of scope.
+  The new detector is always-redact, provider-specific, and wins any overlap
+  with the generic contextual detector.
+- Added a `notion-token` detector recognizing Notion's documented and
+  community-converged integration token shapes: the legacy `secret_` prefix
+  followed by an exact 43-byte alphanumeric suffix, and the current `ntn_`
+  prefix (rolled out 2024-09-25 per Notion's own changelog) followed by an
+  exact 11-digit run and a 35-byte alphanumeric suffix. Both total exactly 50
+  bytes. Notion's OAuth refresh tokens (`nrt_`), OAuth access tokens, and
+  page/database/block IDs are documented out-of-scope gaps: no reliable
+  grammar for the former two could be confirmed at implementation time, and
+  the latter are public identifiers, not secrets. The new detector is
+  always-redact, provider-specific, and wins any overlap with the generic
+  contextual detector.
 - Added a `google-api-key` detector recognizing Google Cloud/Gemini's
   documented legacy "standard" API key shape: the `AIza` prefix followed by
   an exact 35-byte suffix from `[A-Za-z0-9_-]`. This is the key string used

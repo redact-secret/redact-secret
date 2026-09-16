@@ -1952,6 +1952,265 @@
       "type": "microsoft_entra_client_secret"
     },
     {
+      "behaviorClass": "provider",
+      "detector": "azure-devops-personal-access-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "azdo-pat-positive-bare"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "azdo-pat-overlap-generic-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "azdo-pat-adversarial-long-padding"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "azdo-pat-boundary-broken-prefix",
+            "azdo-pat-boundary-prefix-above-required",
+            "azdo-pat-boundary-prefix-below-required",
+            "azdo-pat-boundary-short-prefix",
+            "azdo-pat-boundary-suffix-above-required",
+            "azdo-pat-boundary-suffix-below-required"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "azdo-pat-negative-legacy-unmarked",
+            "azdo-pat-negative-legacy-unmarked-in-context",
+            "azdo-pat-negative-lookalike",
+            "azdo-pat-negative-placeholder"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "azdo-pat-boundary-broken-prefix",
+            "azdo-pat-boundary-prefix-above-required",
+            "azdo-pat-boundary-prefix-below-required",
+            "azdo-pat-boundary-short-prefix",
+            "azdo-pat-boundary-suffix-above-required",
+            "azdo-pat-boundary-suffix-below-required"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for azure_devops_personal_access_token (azure-devops-personal-access-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "azure_devops_personal_access_token"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "notion-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "notion-token-positive-bare-ntn",
+            "notion-token-positive-bare-secret"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "notion-token-overlap-generic-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "notion-token-adversarial-long-padding"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "notion-token-boundary-above-max-ntn",
+            "notion-token-boundary-above-max-secret",
+            "notion-token-boundary-below-min-ntn",
+            "notion-token-boundary-below-min-secret",
+            "notion-token-boundary-invalid-alphabet-secret",
+            "notion-token-boundary-missing-digit-ntn"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "notion-token-negative-masked",
+            "notion-token-negative-page-id-uuid",
+            "notion-token-negative-placeholder"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "notion-token-boundary-above-max-ntn",
+            "notion-token-boundary-above-max-secret",
+            "notion-token-boundary-below-min-ntn",
+            "notion-token-boundary-below-min-secret",
+            "notion-token-boundary-invalid-alphabet-secret",
+            "notion-token-boundary-missing-digit-ntn"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for notion_integration_token (notion-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "notion_integration_token"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "atlassian-api-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "atlassian-api-token-positive-bare",
+            "atlassian-api-token-positive-crlf-unicode-prefix",
+            "atlassian-api-token-positive-dotenv",
+            "atlassian-api-token-positive-json",
+            "atlassian-api-token-positive-log"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "atlassian-api-token-overlap-generic-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "atlassian-api-token-adversarial-long-padding"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "atlassian-api-token-boundary-below-min",
+            "atlassian-api-token-boundary-invalid-alphabet",
+            "atlassian-api-token-boundary-wrong-prefix-access-token",
+            "atlassian-api-token-boundary-wrong-prefix-app-password"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "atlassian-api-token-negative-legacy-unprefixed",
+            "atlassian-api-token-negative-masked",
+            "atlassian-api-token-negative-placeholder",
+            "atlassian-api-token-negative-public-cloud-id",
+            "atlassian-api-token-negative-reference"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "atlassian-api-token-boundary-below-min",
+            "atlassian-api-token-boundary-invalid-alphabet",
+            "atlassian-api-token-boundary-wrong-prefix-access-token",
+            "atlassian-api-token-boundary-wrong-prefix-app-password"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for atlassian_api_token (atlassian-api-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "atlassian_api_token"
+    },
+    {
       "behaviorClass": "structural",
       "detector": "jwt",
       "dimensions": [
@@ -2804,7 +3063,9 @@
           "evidenceFixtureIds": [
             "adversarial-dense-aws-findings",
             "anthropic-adversarial-long-suffix",
+            "atlassian-api-token-adversarial-long-padding",
             "aws-adversarial-long-suffix",
+            "azdo-pat-adversarial-long-padding",
             "bearer-adversarial-punctuation",
             "cloudflare-adversarial-long-suffix",
             "connection-adversarial-azure-overlong",
@@ -2820,6 +3081,7 @@
             "jwt-adversarial-incomplete",
             "linear-adversarial-long-suffix",
             "microsoft-entra-client-secret-adversarial-long-padding",
+            "notion-token-adversarial-long-padding",
             "npm-adversarial-long-suffix",
             "openai-adversarial-long-suffix",
             "otpauth-adversarial-overlong-query",
@@ -3091,7 +3353,9 @@
           "evidenceFixtureIds": [
             "adversarial-dense-aws-findings",
             "anthropic-adversarial-long-suffix",
+            "atlassian-api-token-adversarial-long-padding",
             "aws-adversarial-long-suffix",
+            "azdo-pat-adversarial-long-padding",
             "bearer-adversarial-punctuation",
             "cloudflare-adversarial-long-suffix",
             "connection-adversarial-azure-overlong",
@@ -3107,6 +3371,7 @@
             "jwt-adversarial-incomplete",
             "linear-adversarial-long-suffix",
             "microsoft-entra-client-secret-adversarial-long-padding",
+            "notion-token-adversarial-long-padding",
             "npm-adversarial-long-suffix",
             "openai-adversarial-long-suffix",
             "otpauth-adversarial-overlong-query",

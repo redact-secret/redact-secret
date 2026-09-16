@@ -748,6 +748,92 @@
       "type": "microsoft_entra_client_secret"
     },
     {
+      "detector": "azure-devops-personal-access-token",
+      "evidence": {
+        "fixtureCount": 13,
+        "hostContextsExercised": [
+          "plain-text"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "azdo-pat-positive-bare"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "azure_devops_personal_access_token"
+    },
+    {
+      "detector": "notion-token",
+      "evidence": {
+        "fixtureCount": 14,
+        "hostContextsExercised": [
+          "plain-text"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "notion-token-positive-bare-ntn",
+        "notion-token-positive-bare-secret"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "notion_integration_token"
+    },
+    {
+      "detector": "atlassian-api-token",
+      "evidence": {
+        "fixtureCount": 16,
+        "hostContextsExercised": [
+          "dotenv",
+          "json",
+          "log",
+          "plain-text"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "atlassian-api-token-positive-bare",
+        "atlassian-api-token-positive-crlf-unicode-prefix",
+        "atlassian-api-token-positive-dotenv",
+        "atlassian-api-token-positive-json",
+        "atlassian-api-token-positive-log"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "atlassian_api_token"
+    },
+    {
       "detector": "jwt",
       "evidence": {
         "fixtureCount": 11,
@@ -1123,7 +1209,7 @@
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 28,
+    "supported": 31,
     "unresolved": 0
   }
 }
