@@ -179,6 +179,20 @@
       "schemes": null
     },
     {
+      "type": "twilio_auth_token",
+      "detector": "twilio-auth-token",
+      "policyClass": "confidence-gated",
+      "reconciliationTrigger": "twilio AC0123456789abcdef0123456789abcde0 fedcba9876543210fedcba9876543210",
+      "schemes": null
+    },
+    {
+      "type": "twilio_api_key_secret",
+      "detector": "twilio-api-key-secret",
+      "policyClass": "confidence-gated",
+      "reconciliationTrigger": "twilio SKaB3dE5gH7jK9mN1pQ3sT5vW7yZ9AbC3d zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE",
+      "schemes": null
+    },
+    {
       "type": "jwt",
       "detector": "jwt",
       "policyClass": "always-redact",

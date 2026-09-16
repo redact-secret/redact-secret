@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 598,
+  "fixtureCount": 622,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -12579,6 +12579,2029 @@
       "input": "atlassian cloudId (not a secret): 5b10ac8d-6180-45cc-98d0-30d0fbcbe4c8",
       "expected": [],
       "note": "A public Atlassian cloud/site identifier (a UUID) shares no shape with the ATAT-prefixed API token grammar and is not classified."
+    },
+    {
+      "id": "twilio-auth-token-positive-bare-with-account-sid",
+      "detector": "twilio-auth-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "AC0123456789abcdef0123456789abcde0 fedcba9876543210fedcba9876543210",
+      "expected": [
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 35,
+          "end": 67
+        }
+      ],
+      "note": "An Auth Token on the same line as its paired Account SID is the strongest available context short of a network credential check, so it is classified at high confidence."
+    },
+    {
+      "id": "twilio-auth-token-positive-dotenv-keyword",
+      "detector": "twilio-auth-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "TWILIO_AUTH_TOKEN=fedcba9876543210fedcba9876543210",
+      "expected": [
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 18,
+          "end": 50
+        }
+      ],
+      "note": "The bare 32-byte lowercase-hex value has no marker of its own; the twilio-named dotenv key is the only context present, so this classifies at medium confidence, not high."
+    },
+    {
+      "id": "twilio-auth-token-positive-json-keyword",
+      "detector": "twilio-auth-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"twilioAuthToken\": \"fedcba9876543210fedcba9876543210\"}",
+      "expected": [
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 21,
+          "end": 53
+        }
+      ],
+      "note": "A quoted JSON string value is detected the same as a bare one; the twilio-named field is a keyword-only context, so confidence is medium."
+    },
+    {
+      "id": "twilio-auth-token-positive-yaml-keyword",
+      "detector": "twilio-auth-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "twilio_auth_token: fedcba9876543210fedcba9876543210",
+      "expected": [
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 19,
+          "end": 51
+        }
+      ],
+      "note": "YAML key syntax is lexical context only; the twilio-named key is a keyword-only signal, so confidence is medium."
+    },
+    {
+      "id": "twilio-auth-token-negative-account-sid-on-a-different-line",
+      "detector": "twilio-auth-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "AC0123456789abcdef0123456789abcde0\nfedcba9876543210fedcba9876543210\n",
+      "expected": [],
+      "note": "Context is scoped to the same line as the candidate so whole-input and incremental (line-at-a-time) scanning agree; a paired Account SID one line above the Auth Token is a documented, known false negative, not a match."
+    },
+    {
+      "id": "twilio-auth-token-negative-bare-value-with-no-context",
+      "detector": "twilio-auth-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "fedcba9876543210fedcba9876543210",
+      "expected": [],
+      "note": "A bare 32-byte lowercase-hex run is indistinguishable from an MD5 digest or a hyphen-stripped UUID without reliable Twilio context; unlike every other provider grammar in this crate it carries no format marker of its own."
+    },
+    {
+      "id": "twilio-auth-token-negative-account-sid-alone",
+      "detector": "twilio-auth-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "AC0123456789abcdef0123456789abcde0",
+      "expected": [],
+      "note": "An Account SID identifies the account but is not itself a secret; it is never emitted as a finding on its own, matching the issue's explicit scope."
+    },
+    {
+      "id": "twilio-auth-token-negative-environment-variable-reference",
+      "detector": "twilio-auth-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "shell"
+      ],
+      "input": "twilio TWILIO_AUTH_TOKEN=${TWILIO_AUTH_TOKEN}",
+      "expected": [],
+      "note": "An environment-variable interpolation reference is not hex-alphabet-shaped at the value position and is not classified, even with the twilio keyword present."
+    },
+    {
+      "id": "twilio-auth-token-negative-repeated-character-filler",
+      "detector": "twilio-auth-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "twilio 00000000000000000000000000000000",
+      "expected": [],
+      "note": "A value made of one character repeated is classic redaction-style filler; excluded even when Twilio context matches, since this grammar has no structural marker of its own to keep a masked placeholder from otherwise matching the bare alphabet outright."
+    },
+    {
+      "id": "twilio-auth-token-regression-crlf-and-unicode-prefix",
+      "detector": "twilio-auth-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# \ud83d\udd11 caf\u00e9\r\ntwilio fedcba9876543210fedcba9876543210\r\n",
+      "expected": [
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 21,
+          "end": 53
+        }
+      ],
+      "note": "An astral character and CRLF line endings ahead of the qualified line do not shift the match's UTF-8 byte offsets."
+    },
+    {
+      "id": "twilio-api-key-secret-positive-bare-with-api-key-sid",
+      "detector": "twilio-api-key-secret",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "SKaB3dE5gH7jK9mN1pQ3sT5vW7yZ9AbC3d zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE",
+      "expected": [
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 35,
+          "end": 67
+        }
+      ],
+      "note": "An API Key Secret on the same line as its paired API Key SID is the strongest available context short of a network credential check, so it is classified at high confidence."
+    },
+    {
+      "id": "twilio-api-key-secret-positive-dotenv-keyword",
+      "detector": "twilio-api-key-secret",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "TWILIO_API_KEY_SECRET=zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE",
+      "expected": [
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 22,
+          "end": 54
+        }
+      ],
+      "note": "The bare 32-byte mixed-alphanumeric value has no marker of its own; the twilio-named dotenv key is the only context present, so this classifies at medium confidence, not high."
+    },
+    {
+      "id": "twilio-api-key-secret-positive-yaml-keyword",
+      "detector": "twilio-api-key-secret",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "twilio_api_key_secret: zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE",
+      "expected": [
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 23,
+          "end": 55
+        }
+      ],
+      "note": "YAML key syntax is lexical context only; the twilio-named key is a keyword-only signal, so confidence is medium."
+    },
+    {
+      "id": "twilio-api-key-secret-negative-api-key-sid-on-a-different-line",
+      "detector": "twilio-api-key-secret",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "SKaB3dE5gH7jK9mN1pQ3sT5vW7yZ9AbC3d\nzY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE\n",
+      "expected": [],
+      "note": "Context is scoped to the same line as the candidate so whole-input and incremental (line-at-a-time) scanning agree; a paired API Key SID one line above the API Key Secret is a documented, known false negative, not a match."
+    },
+    {
+      "id": "twilio-api-key-secret-negative-bare-value-with-no-context",
+      "detector": "twilio-api-key-secret",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE",
+      "expected": [],
+      "note": "A bare 32-byte mixed-alphanumeric run is indistinguishable from countless unrelated tokens without reliable Twilio context."
+    },
+    {
+      "id": "twilio-api-key-secret-negative-api-key-sid-alone",
+      "detector": "twilio-api-key-secret",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "SKaB3dE5gH7jK9mN1pQ3sT5vW7yZ9AbC3d",
+      "expected": [],
+      "note": "An API Key SID is a username, not a secret; it is never emitted as a finding on its own, matching the issue's explicit scope and its warning against copying a competitor rule that flags a bare SK identifier as equivalent credential coverage."
+    },
+    {
+      "id": "twilio-api-key-secret-negative-placeholder-run-of-x-characters",
+      "detector": "twilio-api-key-secret",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "twilio XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+      "expected": [],
+      "note": "A value made of one character repeated is classic documentation/redaction filler (Twilio's own docs use an X-filled placeholder of this shape); excluded even when Twilio context matches."
+    },
+    {
+      "id": "twilio-api-key-secret-regression-uppercase-alnum-crossover",
+      "detector": "twilio-api-key-secret",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "twilio FEDCBA9876543210FEDCBA9876543210",
+      "expected": [
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 7,
+          "end": 39
+        }
+      ],
+      "note": "An uppercase-hex run is outside the Auth Token's lowercase-only alphabet (twilio-auth-token does not claim it) but is still inside the API Key Secret's mixed-alphanumeric alphabet, so it is classified as a twilio_api_key_secret candidate, not left unclassified."
+    },
+    {
+      "id": "twilio-auth-token-boundary-wrong-length",
+      "detector": "twilio-auth-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "twilio fedcba9876543210fedcba987654321",
+      "expected": [],
+      "note": "A value one byte short of the required 32-byte length is rejected rather than truncated, even with Twilio context present."
+    },
+    {
+      "id": "twilio-api-key-secret-boundary-wrong-length",
+      "detector": "twilio-api-key-secret",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "twilio zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1f",
+      "expected": [],
+      "note": "A value one byte short of the required 32-byte length is rejected rather than truncated, even with Twilio context present."
+    },
+    {
+      "id": "twilio-auth-token-overlap-beats-bearer-token",
+      "detector": "twilio-auth-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "twilio Authorization: Bearer fedcba9876543210fedcba9876543210",
+      "expected": [
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 29,
+          "end": 61
+        }
+      ],
+      "note": "Provider specificity outranks bearer-token's structural specificity for the same span, even though the bearer-token detector's own confidence is high and this detector's is only medium."
+    },
+    {
+      "id": "twilio-api-key-secret-overlap-beats-bearer-token",
+      "detector": "twilio-api-key-secret",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "twilio Authorization: Bearer zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE",
+      "expected": [
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 29,
+          "end": 61
+        }
+      ],
+      "note": "Provider specificity outranks bearer-token's structural specificity for the same span, even though the bearer-token detector's own confidence is high and this detector's is only medium."
+    },
+    {
+      "id": "twilio-auth-token-adversarial-dense-findings",
+      "detector": "twilio-auth-token",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 4096,
+        "maxFindings": 100,
+        "maxRuntimeMs": 250
+      },
+      "input": "twilio fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210 fedcba9876543210fedcba9876543210",
+      "expected": [
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 7,
+          "end": 39
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 40,
+          "end": 72
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 73,
+          "end": 105
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 106,
+          "end": 138
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 139,
+          "end": 171
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 172,
+          "end": 204
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 205,
+          "end": 237
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 238,
+          "end": 270
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 271,
+          "end": 303
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 304,
+          "end": 336
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 337,
+          "end": 369
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 370,
+          "end": 402
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 403,
+          "end": 435
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 436,
+          "end": 468
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 469,
+          "end": 501
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 502,
+          "end": 534
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 535,
+          "end": 567
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 568,
+          "end": 600
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 601,
+          "end": 633
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 634,
+          "end": 666
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 667,
+          "end": 699
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 700,
+          "end": 732
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 733,
+          "end": 765
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 766,
+          "end": 798
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 799,
+          "end": 831
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 832,
+          "end": 864
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 865,
+          "end": 897
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 898,
+          "end": 930
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 931,
+          "end": 963
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 964,
+          "end": 996
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 997,
+          "end": 1029
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1030,
+          "end": 1062
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1063,
+          "end": 1095
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1096,
+          "end": 1128
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1129,
+          "end": 1161
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1162,
+          "end": 1194
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1195,
+          "end": 1227
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1228,
+          "end": 1260
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1261,
+          "end": 1293
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1294,
+          "end": 1326
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1327,
+          "end": 1359
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1360,
+          "end": 1392
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1393,
+          "end": 1425
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1426,
+          "end": 1458
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1459,
+          "end": 1491
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1492,
+          "end": 1524
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1525,
+          "end": 1557
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1558,
+          "end": 1590
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1591,
+          "end": 1623
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1624,
+          "end": 1656
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1657,
+          "end": 1689
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1690,
+          "end": 1722
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1723,
+          "end": 1755
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1756,
+          "end": 1788
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1789,
+          "end": 1821
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1822,
+          "end": 1854
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1855,
+          "end": 1887
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1888,
+          "end": 1920
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1921,
+          "end": 1953
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1954,
+          "end": 1986
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1987,
+          "end": 2019
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2020,
+          "end": 2052
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2053,
+          "end": 2085
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2086,
+          "end": 2118
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2119,
+          "end": 2151
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2152,
+          "end": 2184
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2185,
+          "end": 2217
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2218,
+          "end": 2250
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2251,
+          "end": 2283
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2284,
+          "end": 2316
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2317,
+          "end": 2349
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2350,
+          "end": 2382
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2383,
+          "end": 2415
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2416,
+          "end": 2448
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2449,
+          "end": 2481
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2482,
+          "end": 2514
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2515,
+          "end": 2547
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2548,
+          "end": 2580
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2581,
+          "end": 2613
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2614,
+          "end": 2646
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2647,
+          "end": 2679
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2680,
+          "end": 2712
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2713,
+          "end": 2745
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2746,
+          "end": 2778
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2779,
+          "end": 2811
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2812,
+          "end": 2844
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2845,
+          "end": 2877
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2878,
+          "end": 2910
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2911,
+          "end": 2943
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2944,
+          "end": 2976
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2977,
+          "end": 3009
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3010,
+          "end": 3042
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3043,
+          "end": 3075
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3076,
+          "end": 3108
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3109,
+          "end": 3141
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3142,
+          "end": 3174
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3175,
+          "end": 3207
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3208,
+          "end": 3240
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3241,
+          "end": 3273
+        },
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3274,
+          "end": 3306
+        }
+      ],
+      "note": "A single twilio-context-bearing line densely packed with candidate-shaped runs stays linear: per-line (not per-candidate) context checks keep this bounded."
+    },
+    {
+      "id": "twilio-api-key-secret-adversarial-dense-findings",
+      "detector": "twilio-api-key-secret",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 4096,
+        "maxFindings": 100,
+        "maxRuntimeMs": 250
+      },
+      "input": "twilio zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE",
+      "expected": [
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 7,
+          "end": 39
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 40,
+          "end": 72
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 73,
+          "end": 105
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 106,
+          "end": 138
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 139,
+          "end": 171
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 172,
+          "end": 204
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 205,
+          "end": 237
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 238,
+          "end": 270
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 271,
+          "end": 303
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 304,
+          "end": 336
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 337,
+          "end": 369
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 370,
+          "end": 402
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 403,
+          "end": 435
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 436,
+          "end": 468
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 469,
+          "end": 501
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 502,
+          "end": 534
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 535,
+          "end": 567
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 568,
+          "end": 600
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 601,
+          "end": 633
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 634,
+          "end": 666
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 667,
+          "end": 699
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 700,
+          "end": 732
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 733,
+          "end": 765
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 766,
+          "end": 798
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 799,
+          "end": 831
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 832,
+          "end": 864
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 865,
+          "end": 897
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 898,
+          "end": 930
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 931,
+          "end": 963
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 964,
+          "end": 996
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 997,
+          "end": 1029
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1030,
+          "end": 1062
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1063,
+          "end": 1095
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1096,
+          "end": 1128
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1129,
+          "end": 1161
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1162,
+          "end": 1194
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1195,
+          "end": 1227
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1228,
+          "end": 1260
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1261,
+          "end": 1293
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1294,
+          "end": 1326
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1327,
+          "end": 1359
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1360,
+          "end": 1392
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1393,
+          "end": 1425
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1426,
+          "end": 1458
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1459,
+          "end": 1491
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1492,
+          "end": 1524
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1525,
+          "end": 1557
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1558,
+          "end": 1590
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1591,
+          "end": 1623
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1624,
+          "end": 1656
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1657,
+          "end": 1689
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1690,
+          "end": 1722
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1723,
+          "end": 1755
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1756,
+          "end": 1788
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1789,
+          "end": 1821
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1822,
+          "end": 1854
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1855,
+          "end": 1887
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1888,
+          "end": 1920
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1921,
+          "end": 1953
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1954,
+          "end": 1986
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1987,
+          "end": 2019
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2020,
+          "end": 2052
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2053,
+          "end": 2085
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2086,
+          "end": 2118
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2119,
+          "end": 2151
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2152,
+          "end": 2184
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2185,
+          "end": 2217
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2218,
+          "end": 2250
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2251,
+          "end": 2283
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2284,
+          "end": 2316
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2317,
+          "end": 2349
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2350,
+          "end": 2382
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2383,
+          "end": 2415
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2416,
+          "end": 2448
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2449,
+          "end": 2481
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2482,
+          "end": 2514
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2515,
+          "end": 2547
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2548,
+          "end": 2580
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2581,
+          "end": 2613
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2614,
+          "end": 2646
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2647,
+          "end": 2679
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2680,
+          "end": 2712
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2713,
+          "end": 2745
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2746,
+          "end": 2778
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2779,
+          "end": 2811
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2812,
+          "end": 2844
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2845,
+          "end": 2877
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2878,
+          "end": 2910
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2911,
+          "end": 2943
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2944,
+          "end": 2976
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2977,
+          "end": 3009
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3010,
+          "end": 3042
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3043,
+          "end": 3075
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3076,
+          "end": 3108
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3109,
+          "end": 3141
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3142,
+          "end": 3174
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3175,
+          "end": 3207
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3208,
+          "end": 3240
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3241,
+          "end": 3273
+        },
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3274,
+          "end": 3306
+        }
+      ],
+      "note": "A single twilio-context-bearing line densely packed with candidate-shaped runs stays linear: per-line (not per-candidate) context checks keep this bounded."
     },
     {
       "id": "contextual-positive-nested-no-separator-api-key",

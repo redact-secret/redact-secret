@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 28,
+  "fixtureCount": 30,
   "fixtures": [
     {
       "id": "synthetic-regression-malformed-authority",
@@ -489,6 +489,29 @@
         }
       ],
       "note": "issue #316: a public identifier prefix and a documented secret prefix on adjacent lines stay correctly discriminated at every chunk split, including splits that fall inside either prefix's own bytes. Shopify's and Supabase's known-format provider detectors share the identical scan_prefixed_runs mechanism this exercises, so this one representative exemplar generalizes to their equivalent public/secret prefix pairs."
+    },
+    {
+      "id": "twilio-auth-token-line-scoped-context-same-line",
+      "input": "AC0123456789abcdef0123456789abcde0 fedcba9876543210fedcba9876543210",
+      "text": "AC0123456789abcdef0123456789abcde0 <SECRET_1>",
+      "expected": [
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 35,
+          "end": 67
+        }
+      ],
+      "note": "The paired Account SID and the Auth Token stay on one incremental unit (a line) at every chunk split, so high-confidence detection and redaction are identical whole-input and incremental."
+    },
+    {
+      "id": "twilio-auth-token-line-scoped-context-different-line",
+      "input": "AC0123456789abcdef0123456789abcde0\nfedcba9876543210fedcba9876543210\n",
+      "text": "AC0123456789abcdef0123456789abcde0\nfedcba9876543210fedcba9876543210\n",
+      "expected": [],
+      "note": "Context is deliberately scoped to a single line so this documented false negative (the Account SID and Auth Token on separate lines) stays a non-match identically whole-input and incremental, at every chunk split including one that falls between the two lines."
     }
   ]
 }
