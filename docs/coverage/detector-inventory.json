@@ -158,6 +158,13 @@
       "schemes": null
     },
     {
+      "type": "notion_integration_token",
+      "detector": "notion-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "secret_SYNTHETICREVOKEDNOTIONLEGACYTOKENVALUE00000",
+      "schemes": null
+    },
+    {
       "type": "jwt",
       "detector": "jwt",
       "policyClass": "always-redact",

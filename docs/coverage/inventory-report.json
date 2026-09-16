@@ -743,6 +743,33 @@
       "type": "microsoft_entra_client_secret"
     },
     {
+      "detector": "notion-token",
+      "evidence": {
+        "fixtureCount": 14,
+        "hostContextsExercised": [
+          "plain-text"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "notion-token-positive-bare-ntn",
+        "notion-token-positive-bare-secret"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "notion_integration_token"
+    },
+    {
       "detector": "jwt",
       "evidence": {
         "fixtureCount": 11,
@@ -1118,7 +1145,7 @@
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 28,
+    "supported": 29,
     "unresolved": 0
   }
 }

@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 546,
+  "fixtureCount": 560,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -11726,6 +11726,229 @@
       "input": "build revision 8Qa2 shipped without incident",
       "expected": [],
       "note": "A digit followed by Q but not the literal Q~ marker is not a credential."
+    },
+    {
+      "id": "notion-token-positive-bare-secret",
+      "detector": "notion-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "secret_SYNTHETICREVOKEDNOTIONLEGACYTOKENVALUE00000",
+      "expected": [
+        {
+          "detector": "notion-token",
+          "type": "notion_integration_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 50
+        }
+      ],
+      "note": "The legacy `secret_`-prefixed exact-43-byte shape is sufficient on its own; no surrounding context is required."
+    },
+    {
+      "id": "notion-token-positive-bare-ntn",
+      "detector": "notion-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "ntn_00000000000SYNTHETICREVOKEDNOTIONCURRENTVAL000",
+      "expected": [
+        {
+          "detector": "notion-token",
+          "type": "notion_integration_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 50
+        }
+      ],
+      "note": "The current `ntn_`-prefixed 11-digit-plus-35-alnum shape, rolled out 2024-09-25, is sufficient on its own; no surrounding context is required."
+    },
+    {
+      "id": "notion-token-overlap-generic-context",
+      "detector": "notion-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "api_key=ntn_00000000000SYNTHETICREVOKEDNOTIONCURRENTVAL000",
+      "expected": [
+        {
+          "detector": "notion-token",
+          "type": "notion_integration_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 8,
+          "end": 58
+        }
+      ],
+      "note": "Qualified provider evidence wins over generic_token's contextual api_key= assignment heuristic."
+    },
+    {
+      "id": "notion-token-adversarial-long-padding",
+      "detector": "notion-token",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 20115,
+        "maxFindings": 1,
+        "maxRuntimeMs": 250
+      },
+      "input": "ntn_00000000000SYNTHETICREVOKEDNOTIONCURRENTVAL000!ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_ntn_",
+      "expected": [
+        {
+          "detector": "notion-token",
+          "type": "notion_integration_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 50
+        }
+      ],
+      "note": "A long run of repeated `ntn_` near-miss prefixes after one real match stays linear and bounded."
+    },
+    {
+      "id": "notion-token-boundary-below-min-secret",
+      "detector": "notion-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "secret_SYNTHETICREVOKEDNOTIONLEGACYTOKENVALUE0000",
+      "expected": [],
+      "note": "A `secret_` suffix one byte short of the documented 43-byte length is rejected."
+    },
+    {
+      "id": "notion-token-boundary-above-max-secret",
+      "detector": "notion-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "secret_SYNTHETICREVOKEDNOTIONLEGACYTOKENVALUE00000A",
+      "expected": [],
+      "note": "A `secret_` suffix one byte past the documented 43-byte length is rejected outright, not truncated."
+    },
+    {
+      "id": "notion-token-boundary-below-min-ntn",
+      "detector": "notion-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "ntn_00000000000SYNTHETICREVOKEDNOTIONCURRENTVAL00",
+      "expected": [],
+      "note": "An `ntn_` suffix one byte short of the documented 35-byte length is rejected."
+    },
+    {
+      "id": "notion-token-boundary-above-max-ntn",
+      "detector": "notion-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "ntn_00000000000SYNTHETICREVOKEDNOTIONCURRENTVAL000A",
+      "expected": [],
+      "note": "An `ntn_` suffix one byte past the documented 35-byte length is rejected outright, not truncated."
+    },
+    {
+      "id": "notion-token-boundary-missing-digit-ntn",
+      "detector": "notion-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "ntn_0000000000ASYNTHETICREVOKEDNOTIONCURRENTVAL000",
+      "expected": [],
+      "note": "A non-digit byte inside the 11-byte digit run does not satisfy the grammar."
+    },
+    {
+      "id": "notion-token-boundary-invalid-alphabet-secret",
+      "detector": "notion-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "secret_SYNTHETICREVOKEDNOTIONLEGACY TOKENVALUE0000",
+      "expected": [],
+      "note": "A byte outside the `[A-Za-z0-9]` suffix alphabet breaks the run before the minimum length is reached."
+    },
+    {
+      "id": "notion-token-negative-page-id-uuid",
+      "detector": "notion-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Notion page ID: e202e8c9-0990-40af-855f-ff8f872b1ec6",
+      "expected": [],
+      "note": "A Notion page/database ID is a public UUID identifier, not a secret, and carries neither documented prefix."
+    },
+    {
+      "id": "notion-token-negative-oauth-refresh-nrt",
+      "detector": "notion-token",
+      "kind": "negative",
+      "support": "intentionally-unsupported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "OAuth refresh tokens look like nrt_4991090011501Ejc6Xn4sHguI7jZIN449mKe9PRhpMfNK in Notion's docs.",
+      "expected": [],
+      "note": "The OAuth refresh-token `nrt_` shape is a known unsupported variant: see the frozen-grammar decision record."
+    },
+    {
+      "id": "notion-token-negative-placeholder",
+      "detector": "notion-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "NOTION_TOKEN=secret_<YOUR_INTEGRATION_TOKEN>",
+      "expected": [],
+      "note": "A documentation placeholder breaks the suffix alphabet immediately after the prefix and is not classified."
+    },
+    {
+      "id": "notion-token-negative-masked",
+      "detector": "notion-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "ntn_00000000000***********************************",
+      "expected": [],
+      "note": "Repeated-character mask filler after the digit run breaks the alphanumeric suffix alphabet and is not classified."
     },
     {
       "id": "contextual-positive-nested-no-separator-api-key",
