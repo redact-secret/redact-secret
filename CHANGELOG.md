@@ -5,6 +5,20 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+- Added a `discord-bot-token` detector recognizing Discord bot tokens: three
+  dot-separated segments of exactly 24, 6, and 27 bytes from
+  `[A-Za-z0-9_-]`, matching the single example in Discord's own developer
+  reference and corroborated by gitleaks's and trufflehog's independent
+  Discord bot-token rules (consulted only as external behavioral
+  references; no code copied from either project). The first segment must
+  also decode, as unpadded base64url, to an all-ASCII-digit string -- the
+  shape of a Discord snowflake ID -- which anchors the detector to
+  Discord's specific token shape without overlapping the structurally
+  identical JWT grammar. Webhook URL tokens, OAuth2 client secrets, and
+  `mfa.`-prefixed user/self-bot tokens are documented out-of-scope gaps,
+  each a separate credential family. The new detector is always-redact,
+  provider-specific, and wins any overlap with the generic contextual
+  detector.
 - Added an `atlassian-api-token` detector recognizing Atlassian Cloud (Jira /
   Confluence) API tokens: the community-forum-confirmed `ATAT` prefix
   followed by a minimum 100-byte suffix from `[A-Za-z0-9_-]`. The length is a

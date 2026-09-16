@@ -15,6 +15,7 @@ mod aws;
 mod azure_devops;
 mod bearer_token;
 mod connection_string;
+mod discord;
 mod generic_token;
 mod github;
 mod gitlab;
@@ -67,6 +68,7 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(azure_devops::AzureDevOpsPersonalAccessTokenDetector),
         Box::new(notion::NotionTokenDetector),
         Box::new(atlassian::AtlassianApiTokenDetector),
+        Box::new(discord::DiscordBotTokenDetector),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
         Box::new(ConnectionStringDetector),
@@ -124,6 +126,7 @@ mod tests {
                 "azure-devops-personal-access-token",
                 "notion-token",
                 "atlassian-api-token",
+                "discord-bot-token",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -167,7 +170,8 @@ mod tests {
             "ATAT{}",
             "SYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY_".repeat(3)
         );
-        let cases: [(&str, &str); 24] = [
+        let discord_input = "MDAwMDAwMDAwMDAwMDAwMDAw.REVOKE.SYNTHETICREVOKEDBOTTOKENFIX";
+        let cases: [(&str, &str); 25] = [
             ("aws-access-key", "AKIASYNTHETICEXAMPLE"),
             (
                 "github-token",
@@ -207,6 +211,7 @@ mod tests {
                 "secret_SYNTHETICREVOKEDNOTIONLEGACYTOKENVALUE00000",
             ),
             ("atlassian-api-token", atlassian_input.as_str()),
+            ("discord-bot-token", discord_input),
         ];
         let detectors = built_in_detectors();
         for (id, input) in cases {

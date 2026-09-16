@@ -179,6 +179,13 @@
       "schemes": null
     },
     {
+      "type": "discord_bot_token",
+      "detector": "discord-bot-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "MDAwMDAwMDAwMDAwMDAwMDAw.REVOKE.SYNTHETICREVOKEDBOTTOKENFIX",
+      "schemes": null
+    },
+    {
       "type": "jwt",
       "detector": "jwt",
       "policyClass": "always-redact",
