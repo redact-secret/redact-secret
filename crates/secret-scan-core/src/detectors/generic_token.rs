@@ -271,9 +271,10 @@ fn contains_generic_or_subscript_syntax(value: &str) -> bool {
 /// `true` when the value ends with an unmatched `(` or `[` — a call or
 /// subscript expression truncated at the unquoted-value boundary because its
 /// argument is itself a quoted string (`os.environ["OPENAI_API_KEY"]` is
-/// captured only as `os.environ[`; `std::env::var("...")` only as
-/// `std::env::var(`). No real unquoted credential value in the syntaxes this
-/// detector targets legitimately ends with an open bracket or parenthesis.
+/// captured only as `os.environ[`; a Rust environment-variable-lookup call
+/// with a string literal argument is captured only up to its open paren).
+/// No real unquoted credential value in the syntaxes this detector targets
+/// legitimately ends with an open bracket or parenthesis.
 fn ends_with_open_call_or_subscript(value: &str) -> bool {
     matches!(value.as_bytes().last(), Some(b'(' | b'['))
 }
