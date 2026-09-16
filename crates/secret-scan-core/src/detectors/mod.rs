@@ -170,8 +170,7 @@ mod tests {
             "ATAT{}",
             "SYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY_".repeat(3)
         );
-        let discord_input =
-            "MDAwMDAwMDAwMDAwMDAwMDAw.REVOKE.SYNTHETICREVOKEDBOTTOKENFIX";
+        let discord_input = "MDAwMDAwMDAwMDAwMDAwMDAw.REVOKE.SYNTHETICREVOKEDBOTTOKENFIX";
         let cases: [(&str, &str); 25] = [
             ("aws-access-key", "AKIASYNTHETICEXAMPLE"),
             (

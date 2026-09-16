@@ -836,12 +836,13 @@
     {
       "detector": "discord-bot-token",
       "evidence": {
-        "fixtureCount": 17,
+        "fixtureCount": 18,
         "hostContextsExercised": [
           "dotenv",
           "json",
           "log",
-          "plain-text"
+          "plain-text",
+          "yaml"
         ],
         "kindsWithSupportedEvidence": [
           "adversarial",
@@ -859,7 +860,8 @@
         "discord-bot-token-positive-crlf-unicode-prefix",
         "discord-bot-token-positive-dotenv",
         "discord-bot-token-positive-json",
-        "discord-bot-token-positive-log"
+        "discord-bot-token-positive-log",
+        "discord-bot-token-positive-yaml"
       ],
       "policyClass": "always-redact",
       "schemeRows": "not-applicable",

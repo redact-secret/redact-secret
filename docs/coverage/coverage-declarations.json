@@ -2221,7 +2221,8 @@
             "discord-bot-token-positive-crlf-unicode-prefix",
             "discord-bot-token-positive-dotenv",
             "discord-bot-token-positive-json",
-            "discord-bot-token-positive-log"
+            "discord-bot-token-positive-log",
+            "discord-bot-token-positive-yaml"
           ],
           "state": "supported"
         },

@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 615,
+  "fixtureCount": 616,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -12645,6 +12645,28 @@
         }
       ],
       "note": "A quoted JSON string value is detected the same as a bare one; the enclosing quotes are not part of the match."
+    },
+    {
+      "id": "discord-bot-token-positive-yaml",
+      "detector": "discord-bot-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "discord_token: MDAwMDAwMDAwMDAwMDAwMDAw.REVOKE.SYNTHETICREVOKEDBOTTOKENFIX",
+      "expected": [
+        {
+          "detector": "discord-bot-token",
+          "type": "discord_bot_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 15,
+          "end": 74
+        }
+      ],
+      "note": "A YAML-style scalar assignment exercises the structured-data context issue #301 calls out explicitly."
     },
     {
       "id": "discord-bot-token-positive-log",

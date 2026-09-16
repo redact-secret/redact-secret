@@ -117,7 +117,7 @@ required to classify a match.
   `inventory-report.json`, and `coverage-report.md` are regenerated from it
   and `conformance/fixtures/synchronous-corpus.json`, not hand-edited.
 - New corpus fixtures: `discord-bot-token-positive-bare`,
-  `-positive-dotenv`, `-positive-json`, `-positive-log`,
+  `-positive-dotenv`, `-positive-json`, `-positive-yaml`, `-positive-log`,
   `-positive-crlf-unicode-prefix`, `-overlap-generic-context`,
   `-overlap-jwt-shape`, `-adversarial-long-padding`,
   `-boundary-segment-one-short`, `-boundary-segment-two-short`,

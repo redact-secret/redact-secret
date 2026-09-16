@@ -364,12 +364,12 @@ mod tests {
     #[test]
     fn stays_bounded_over_a_long_run_of_rejected_dotted_segments() {
         let value = token();
-        let input = format!(
-            "{value}!{}",
-            format!("{SEGMENT_ONE}.a.b!").repeat(10_000)
-        );
+        let input = format!("{value}!{}", format!("{SEGMENT_ONE}.a.b!").repeat(10_000));
         let candidates = detect(&input);
         assert_eq!(candidates.len(), 1);
-        assert_eq!(candidates[0].range(), ByteRange::new(0, value.len()).unwrap());
+        assert_eq!(
+            candidates[0].range(),
+            ByteRange::new(0, value.len()).unwrap()
+        );
     }
 }
