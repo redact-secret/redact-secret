@@ -388,7 +388,15 @@ fn is_secretsmanager_secret_name(value: &str) -> bool {
 /// `CloudFormation` templates reference in place of a resolved secret value.
 fn is_aws_secretsmanager_arn(value: &str) -> bool {
     let segments: Vec<&str> = value.splitn(7, ':').collect();
-    let [arn, partition, service, region, account, secret_literal, name] = segments.as_slice()
+    let [
+        arn,
+        partition,
+        service,
+        region,
+        account,
+        secret_literal,
+        name,
+    ] = segments.as_slice()
     else {
         return false;
     };
