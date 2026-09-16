@@ -1,8 +1,10 @@
 name: Complete assessment
 
 # Manually builds one Linux host's real product artifacts and records a bounded,
-# complete cross-language accuracy/performance assessment and evaluates fixed
-# RC acceptance criteria. This publishes nothing and is not a release gate.
+# complete cross-language accuracy/performance assessment and evaluates it
+# against assessment/acceptance-criteria-linux-x64.json, the fixed RC
+# acceptance criteria for this ubuntu-latest host. This publishes nothing and
+# is not a release gate.
 on:
   workflow_dispatch:
 
@@ -74,7 +76,7 @@ jobs:
         run: npm run assessment:all -- --python .venv/bin/python --runs 5 --output-dir assessment-output
 
       - name: Evaluate the fixed RC acceptance criteria
-        run: npm run assessment:acceptance -- --summary assessment-output/summary.json --json-out assessment-output/acceptance.json --markdown-out assessment-output/acceptance.md
+        run: npm run assessment:acceptance -- --criteria assessment/acceptance-criteria-linux-x64.json --summary assessment-output/summary.json --json-out assessment-output/acceptance.json --markdown-out assessment-output/acceptance.md
 
       - name: Add the consolidated baseline to the workflow summary
         if: always() && hashFiles('assessment-output/baseline.md') != ''

@@ -167,4 +167,11 @@ describe("fixed RC acceptance criteria — Linux x86_64", () => {
     expect(evaluation.status).toBe("rejected");
     expect(evaluation.failures.some((failure) => failure.endsWith(":environment-os-mismatch"))).toBe(true);
   });
+
+  test("the Complete assessment workflow names the criteria file matching its runs-on host", () => {
+    const workflow = readFileSync(join(HERE, "..", ".github", "workflows", "complete-assessment.yml"), "utf8");
+    expect(workflow).toMatch(/^\s*runs-on:\s*ubuntu-latest\s*$/m);
+    expect(workflow).toContain("--criteria assessment/acceptance-criteria-linux-x64.json");
+    expect(linuxCriteria.environment.osPrefixes).toContain("linux-");
+  });
 });
