@@ -874,7 +874,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 69,
+        "fixtureCount": 72,
         "hostContextsExercised": [
           "chat",
           "dotenv",
@@ -914,6 +914,7 @@
         "contextual-positive-crlf-line-start",
         "contextual-positive-escaped-quote",
         "contextual-positive-minimum-length-is-medium-confidence",
+        "contextual-positive-near-miss-repeated-asterisk-filler",
         "contextual-positive-remaining-declared-names",
         "contextual-positive-single-quoted-value",
         "contextual-positive-template-embedded-still-detected",
@@ -930,7 +931,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 69,
+        "fixtureCount": 72,
         "hostContextsExercised": [
           "chat",
           "dotenv",

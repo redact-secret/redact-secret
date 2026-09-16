@@ -7,8 +7,8 @@
 
 use super::text::{
     ascii_run_len, char_at, ends_with_ci, is_horizontal_js_whitespace, is_js_whitespace,
-    is_line_start, matches_placeholder_vocabulary, prev_char, rskip_while_chars, skip_while_chars,
-    starts_with_ci,
+    is_line_start, is_repeated_character_filler, matches_placeholder_vocabulary, prev_char,
+    rskip_while_chars, skip_while_chars, starts_with_ci,
 };
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
@@ -223,6 +223,7 @@ fn is_non_secret_reference(value: &str) -> bool {
         || starts_with_path_like(value)
         || ends_with_key_or_pem(value)
         || is_template_reference(value)
+        || is_repeated_character_filler(value)
 }
 
 // --- confidence -----------------------------------------------------------
@@ -698,6 +699,28 @@ mod tests {
                 "expected no findings for {input:?}"
             );
         }
+    }
+
+    // --- issue #264: masked values are excluded as repeated-character
+    // filler, the same exclusion #256 gave the connection-string detector.
+
+    #[test]
+    fn masked_values_are_excluded_as_repeated_character_filler() {
+        for input in [
+            "Password: ********",
+            "Password: \u{2022}\u{2022}\u{2022}\u{2022}\u{2022}\u{2022}\u{2022}\u{2022}",
+        ] {
+            assert!(
+                detect(input).is_empty(),
+                "expected no findings for {input:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn a_near_miss_of_repeated_character_filler_is_still_detected() {
+        // A trailing, distinct character breaks the uniform run.
+        assert!(!detect("Password: ********x").is_empty());
     }
 
     // --- issue #257: placeholder-word exclusion is exact-string equality --

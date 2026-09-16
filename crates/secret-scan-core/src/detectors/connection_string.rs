@@ -19,7 +19,7 @@
 //! string split across log lines, is a false negative by design, same as
 //! this file's other structural false negatives above.
 
-use super::text::matches_placeholder_vocabulary;
+use super::text::{is_repeated_character_filler, matches_placeholder_vocabulary};
 use crate::entropy::shannon_entropy;
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
@@ -178,14 +178,6 @@ fn is_placeholder(value: &str) -> bool {
         return true;
     }
     false
-}
-
-/// A value made of the same byte repeated three or more times (`xxxxxxxxxxxx`,
-/// `00000000000`) -- classic redaction-style filler used in documentation to
-/// mean "value omitted", structurally unlike a real password.
-fn is_repeated_character_filler(value: &str) -> bool {
-    let bytes = value.as_bytes();
-    bytes.len() >= 3 && bytes[1..].iter().all(|&byte| byte == bytes[0])
 }
 
 /// Prose scaffolding meaning "put your own password here": a snake/kebab-case

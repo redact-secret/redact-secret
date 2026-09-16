@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 433,
+  "fixtureCount": 436,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -9250,6 +9250,54 @@
       "input": "SYNTHETIC_RANDOM_LOOKING_TEXT_WITHOUT_ANY_CREDENTIAL_CONTEXT_MARKER_OR_ASSIGNMENT_SYNTAX",
       "expected": [],
       "note": "Random-looking, high-entropy text with no assignment or authorization syntax at all produces no candidate: the detector never treats bare entropy as an independent secret classifier."
+    },
+    {
+      "id": "contextual-negative-repeated-asterisk-filler",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "terminal"
+      ],
+      "input": "Password: ********",
+      "expected": [],
+      "note": "A run of the same repeated ASCII character is classic redaction-style filler used by masked CLI prompts to mean \"value omitted\", the same exclusion #256 gave the connection-string detector."
+    },
+    {
+      "id": "contextual-negative-repeated-bullet-filler",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "terminal"
+      ],
+      "input": "Password: ••••••••",
+      "expected": [],
+      "note": "Repeated-character filler is recognized for a multi-byte Unicode mask character (U+2022 BULLET), not only single-byte ASCII ones like '*'."
+    },
+    {
+      "id": "contextual-positive-near-miss-repeated-asterisk-filler",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "terminal"
+      ],
+      "input": "Password: ********x",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "medium",
+          "specificity": "contextual",
+          "start": 10,
+          "end": 19
+        }
+      ],
+      "note": "A trailing, distinct character breaks the uniform run, so the value is not repeated-character filler and stays detected."
     },
     {
       "id": "otpauth-positive-totp-minimal",
