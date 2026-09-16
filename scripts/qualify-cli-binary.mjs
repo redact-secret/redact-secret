@@ -12,9 +12,11 @@
  * 3. **Contract** — the documented exit codes: 0 clean, 1 findings, 2 usage
  *    error, with the usage block on stderr and nothing on stdout.
  * 4. **Conform** — every canonical synchronous fixture
- *    (`decision-govern-cross-language-conformance`) through one multi-source
- *    `--json` run. The CLI reports UTF-8 byte ranges, which are the corpus's
- *    own canonical unit, so the comparison needs no conversion.
+ *    (`decision-govern-cross-language-conformance`) through bounded,
+ *    multi-source `--json` runs. Batching keeps the complete Windows command
+ *    line below its platform limit as the corpus grows. The CLI reports UTF-8
+ *    byte ranges, which are the corpus's own canonical unit, so the comparison
+ *    needs no conversion.
  * 5. **Redact** — every fixture with a redacted finding through `--redact`,
  *    compared byte for byte against the text that run's own findings and the
  *    documented default placeholder imply, and checked for any surviving
@@ -43,6 +45,8 @@ import {
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+
+import { batchArguments } from "./lib/cli-qualification-batches.mjs";
 
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const FIXTURES_DIR = join(REPO_ROOT, "conformance", "fixtures");
@@ -221,39 +225,45 @@ function writeSources(directory, fixtures) {
   });
 }
 
-/** One multi-source `--json` run; returns each fixture's reported findings. */
+/** Bounded multi-source `--json` runs; returns each fixture's reported findings. */
 function conform(binary, fixtures, paths) {
-  const result = runCli(binary, ["--json", "--", ...paths]);
-  assert([0, 1].includes(result.status), `unexpected exit code ${result.status}`);
-  const report = JSON.parse(result.stdout);
-  assertEqual(report.rangeUnit, "utf8-bytes", "reported range unit");
-  assertEqual(report.version, productVersion(), "reported version");
-  assertEqual(report.failures, [], "the run reported source failures");
-  assertEqual(report.sources.length, fixtures.length, "reported source count");
-
   const reported = new Map();
   const mismatched = [];
-  fixtures.forEach((fixture, index) => {
-    const findings = report.sources[index].findings;
-    reported.set(fixture.id, findings);
-    const actual = findings.map((finding) => [
-      finding.detector,
-      finding.type,
-      finding.confidence,
-      finding.start,
-      finding.end,
-    ]);
-    const expected = fixture.expected.map((item) => [
-      item.detector,
-      item.type,
-      item.confidence,
-      item.start,
-      item.end,
-    ]);
-    if (JSON.stringify(actual) !== JSON.stringify(expected)) {
-      mismatched.push({ id: fixture.id, expected, actual });
-    }
-  });
+  let fixtureIndex = 0;
+  for (const pathBatch of batchArguments(paths)) {
+    const result = runCli(binary, ["--json", "--", ...pathBatch]);
+    assert([0, 1].includes(result.status), `unexpected exit code ${result.status}`);
+    const report = JSON.parse(result.stdout);
+    assertEqual(report.rangeUnit, "utf8-bytes", "reported range unit");
+    assertEqual(report.version, productVersion(), "reported version");
+    assertEqual(report.failures, [], "the run reported source failures");
+    assertEqual(report.sources.length, pathBatch.length, "reported source count");
+
+    report.sources.forEach((source) => {
+      const fixture = fixtures[fixtureIndex];
+      const findings = source.findings;
+      reported.set(fixture.id, findings);
+      const actual = findings.map((finding) => [
+        finding.detector,
+        finding.type,
+        finding.confidence,
+        finding.start,
+        finding.end,
+      ]);
+      const expected = fixture.expected.map((item) => [
+        item.detector,
+        item.type,
+        item.confidence,
+        item.start,
+        item.end,
+      ]);
+      if (JSON.stringify(actual) !== JSON.stringify(expected)) {
+        mismatched.push({ id: fixture.id, expected, actual });
+      }
+      fixtureIndex += 1;
+    });
+  }
+  assertEqual(fixtureIndex, fixtures.length, "qualified fixture count");
   assert(
     mismatched.length === 0,
     `${mismatched.length} fixture(s) disagreed: ${JSON.stringify(mismatched.slice(0, 5))}`,
