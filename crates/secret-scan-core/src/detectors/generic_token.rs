@@ -289,6 +289,12 @@ fn is_source_code_expression(value: &str) -> bool {
         || ends_with_open_call_or_subscript(value)
 }
 
+/// Shared by contextual assignment values and, via [`authorization_candidates`],
+/// `Basic`/`Token` HTTP `Authorization` header values. `is_source_code_expression`'s
+/// checks key on punctuation (`.`, `<`, `[`, `(`) that `is_authorization_value_byte`
+/// already excludes from an authorization value's character class, so they can
+/// never fire there — this function's behavior for that caller is unchanged by
+/// them.
 fn is_non_secret_reference(value: &str) -> bool {
     let lower = value.to_ascii_lowercase();
     is_generic_placeholder_word(&lower)
