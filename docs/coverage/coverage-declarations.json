@@ -2212,62 +2212,60 @@
     },
     {
       "behaviorClass": "provider",
-      "detector": "discord-bot-token",
+      "detector": "telegram-bot-token",
       "dimensions": [
         {
           "dimension": "positive",
           "evidenceFixtureIds": [
-            "discord-bot-token-positive-bare",
-            "discord-bot-token-positive-crlf-unicode-prefix",
-            "discord-bot-token-positive-dotenv",
-            "discord-bot-token-positive-json",
-            "discord-bot-token-positive-log",
-            "discord-bot-token-positive-yaml"
+            "telegram-bot-token-positive-bare",
+            "telegram-bot-token-positive-bot-api-url",
+            "telegram-bot-token-positive-crlf-unicode-prefix",
+            "telegram-bot-token-positive-dotenv",
+            "telegram-bot-token-positive-json",
+            "telegram-bot-token-positive-log"
           ],
           "state": "supported"
         },
         {
           "dimension": "overlap",
           "evidenceFixtureIds": [
-            "discord-bot-token-overlap-generic-context"
+            "telegram-bot-token-overlap-generic-context"
           ],
           "state": "supported"
         },
         {
           "dimension": "adversarial",
           "evidenceFixtureIds": [
-            "discord-bot-token-adversarial-long-padding"
+            "telegram-bot-token-adversarial-long-padding"
           ],
           "state": "supported"
         },
         {
           "dimension": "boundary",
           "evidenceFixtureIds": [
-            "discord-bot-token-boundary-segment-one-non-digit",
-            "discord-bot-token-boundary-segment-one-short",
-            "discord-bot-token-boundary-segment-three-short",
-            "discord-bot-token-boundary-segment-two-short"
+            "telegram-bot-token-boundary-below-min-id",
+            "telegram-bot-token-boundary-below-min-secret",
+            "telegram-bot-token-boundary-missing-separator"
           ],
           "state": "supported"
         },
         {
           "dimension": "near-miss-negative",
           "evidenceFixtureIds": [
-            "discord-bot-token-negative-masked",
-            "discord-bot-token-negative-placeholder",
-            "discord-bot-token-negative-public-application-id",
-            "discord-bot-token-negative-reference",
-            "discord-bot-token-negative-webhook-url"
+            "telegram-bot-token-negative-bare-numeric-id",
+            "telegram-bot-token-negative-malformed-numeric-colon",
+            "telegram-bot-token-negative-masked",
+            "telegram-bot-token-negative-public-handle",
+            "telegram-bot-token-negative-reference"
           ],
           "state": "supported"
         },
         {
           "dimension": "malformed",
           "evidenceFixtureIds": [
-            "discord-bot-token-boundary-segment-one-non-digit",
-            "discord-bot-token-boundary-segment-one-short",
-            "discord-bot-token-boundary-segment-three-short",
-            "discord-bot-token-boundary-segment-two-short"
+            "telegram-bot-token-boundary-below-min-id",
+            "telegram-bot-token-boundary-below-min-secret",
+            "telegram-bot-token-boundary-missing-separator"
           ],
           "state": "supported"
         },
@@ -2295,8 +2293,8 @@
           "state": "supported"
         }
       ],
-      "note": "Coverage declaration for discord_bot_token (discord-bot-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
-      "type": "discord_bot_token"
+      "note": "Coverage declaration for telegram_bot_token (telegram-bot-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "telegram_bot_token"
     },
     {
       "behaviorClass": "structural",
@@ -3089,6 +3087,94 @@
       "type": "authorization_credential"
     },
     {
+      "behaviorClass": "provider",
+      "detector": "discord-bot-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "discord-bot-token-positive-bare",
+            "discord-bot-token-positive-crlf-unicode-prefix",
+            "discord-bot-token-positive-dotenv",
+            "discord-bot-token-positive-json",
+            "discord-bot-token-positive-log",
+            "discord-bot-token-positive-yaml"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "discord-bot-token-overlap-generic-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "discord-bot-token-adversarial-long-padding"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "discord-bot-token-boundary-segment-one-non-digit",
+            "discord-bot-token-boundary-segment-one-short",
+            "discord-bot-token-boundary-segment-three-short",
+            "discord-bot-token-boundary-segment-two-short"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "discord-bot-token-negative-masked",
+            "discord-bot-token-negative-placeholder",
+            "discord-bot-token-negative-public-application-id",
+            "discord-bot-token-negative-reference",
+            "discord-bot-token-negative-webhook-url"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "discord-bot-token-boundary-segment-one-non-digit",
+            "discord-bot-token-boundary-segment-one-short",
+            "discord-bot-token-boundary-segment-three-short",
+            "discord-bot-token-boundary-segment-two-short"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for discord_bot_token (discord-bot-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "discord_bot_token"
+    },
+    {
       "behaviorClass": "incremental",
       "detector": "unassigned",
       "dimensions": [
@@ -3183,6 +3269,7 @@
             "slack-adversarial-long-suffix",
             "stripe-adversarial-long-suffix",
             "supabase-adversarial-long-suffix",
+            "telegram-bot-token-adversarial-long-padding",
             "vault-adversarial-long-suffix",
             "vercel-adversarial-long-suffix"
           ],
@@ -3474,6 +3561,7 @@
             "slack-adversarial-long-suffix",
             "stripe-adversarial-long-suffix",
             "supabase-adversarial-long-suffix",
+            "telegram-bot-token-adversarial-long-padding",
             "vault-adversarial-long-suffix",
             "vercel-adversarial-long-suffix"
           ],

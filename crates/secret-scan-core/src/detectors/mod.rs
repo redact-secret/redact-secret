@@ -28,6 +28,7 @@ mod pattern;
 mod private_key;
 mod sendgrid;
 mod shopify;
+mod telegram;
 mod text;
 mod vault;
 
@@ -68,6 +69,7 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(azure_devops::AzureDevOpsPersonalAccessTokenDetector),
         Box::new(notion::NotionTokenDetector),
         Box::new(atlassian::AtlassianApiTokenDetector),
+        telegram::telegram_bot_token_detector(),
         Box::new(discord::DiscordBotTokenDetector),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
@@ -126,6 +128,7 @@ mod tests {
                 "azure-devops-personal-access-token",
                 "notion-token",
                 "atlassian-api-token",
+                "telegram-bot-token",
                 "discord-bot-token",
                 "jwt",
                 "bearer-token",
@@ -170,8 +173,9 @@ mod tests {
             "ATAT{}",
             "SYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY_".repeat(3)
         );
+        let telegram_input = "123456:SYNTHETIC_REVOKED_TELEGRAM_BOT_TOKEN_SECRET";
         let discord_input = "MDAwMDAwMDAwMDAwMDAwMDAw.REVOKE.SYNTHETICREVOKEDBOTTOKENFIX";
-        let cases: [(&str, &str); 25] = [
+        let cases: [(&str, &str); 26] = [
             ("aws-access-key", "AKIASYNTHETICEXAMPLE"),
             (
                 "github-token",
@@ -212,6 +216,7 @@ mod tests {
             ),
             ("atlassian-api-token", atlassian_input.as_str()),
             ("discord-bot-token", discord_input),
+            ("telegram-bot-token", telegram_input),
         ];
         let detectors = built_in_detectors();
         for (id, input) in cases {
