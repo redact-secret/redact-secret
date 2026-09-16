@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 24,
+  "fixtureCount": 27,
   "fixtures": [
     {
       "id": "synthetic-regression-malformed-authority",
@@ -434,6 +434,45 @@
         }
       ],
       "note": "issue #265: a password: value nested two levels under spec: / auth: is detected and redacted at every partition; this was whole-input-only before the fix."
+    },
+    {
+      "id": "contextual-assignment-nested-no-separator-inside-quote",
+      "input": "value=\"api_key=\"I9RBasVzoPPDPIErHTQcrdjnmKvu\"\"\n",
+      "text": "value=\"api_key=\"<SECRET_1>\"\"\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 16,
+          "end": 44
+        }
+      ],
+      "note": "issue #294: a nested api_key= assignment immediately inside an enclosing quoted value, with no separator between the two opening quotes, is detected and redacted at every partition."
+    },
+    {
+      "id": "contextual-assignment-nested-no-separator-masked-value",
+      "input": "value=\"password=\"********\"\"\n",
+      "text": "value=\"password=\"********\"\"\n",
+      "expected": [],
+      "note": "issue #294: a masked value nested with no separator inside an enclosing quote stays excluded as repeated-character filler and unchanged at every partition."
+    },
+    {
+      "id": "contextual-assignment-nested-no-separator-crlf",
+      "input": "value=\"api_key=\"SYNTHETIC_REVOKED_NESTED_QUOTE_CRLF_1234\"\"\r\n",
+      "text": "value=\"api_key=\"<SECRET_1>\"\"\r\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 16,
+          "end": 56
+        }
+      ],
+      "note": "issue #294: the no-separator nested-quote fix is detected and redacted at every partition even with a CRLF line ending after the outer close."
     }
   ]
 }

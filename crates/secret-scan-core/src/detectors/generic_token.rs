@@ -725,12 +725,20 @@ fn assignment_confidence(name: &str, value: &str) -> Option<Confidence> {
 
 // --- assignment value spans ------------------------------------------------
 
+/// A quote character (`"`/`'`) is a valid trailing boundary alongside the
+/// existing whitespace/structural set: when a quoted value's own closing
+/// quote is immediately followed by another quote rather than whitespace or
+/// a structural character, that adjacent quote is closing an *enclosing*
+/// quoted context with no separator of its own (`value="api_key="TOKEN""`,
+/// issue #294) rather than continuing the same value. `is_unquoted_value_boundary`
+/// already treats a bare quote as ending an unquoted value on the same
+/// reasoning.
 fn is_quoted_value_boundary(ch: Option<char>) -> bool {
     match ch {
         None => true,
         Some(c) => matches!(
             c,
-            ' ' | '\t' | '\u{0B}' | '\u{0C}' | '\r' | '\n' | ',' | ';' | '}' | ']'
+            ' ' | '\t' | '\u{0B}' | '\u{0C}' | '\r' | '\n' | ',' | ';' | '}' | ']' | '"' | '\''
         ),
     }
 }
@@ -956,9 +964,19 @@ fn assignment_value(input: &str, start: usize) -> Option<(usize, usize)> {
 }
 
 // --- `ASSIGNMENT_PREFIX_PATTERN`: (?:^|[\s{,;])["']?([A-Za-z][A-Za-z0-9_.-]*)["']?\s*(?:=|:)\s* ---
-
+//
+// A raw `"`/`'` is also accepted here, extending the mirrored alternation
+// (issue #294). It never collides with the `["']?` name-quoting lookahead
+// already consumed inside `parse_name_and_operator`: that optional quote is
+// stripped from the position *after* a boundary char, so a name can be
+// preceded by at most one quote either way, and the two never fire on the
+// same character. Treating a bare quote as a boundary lets a nested
+// assignment be recognized immediately inside an enclosing quoted value with
+// no separator between them (`value="api_key="TOKEN""`), the same way `;`
+// already does when a separator is present
+// (`nested_assignments_emit_overlapping_contextual_candidates`).
 fn is_prefix_boundary_char(ch: char) -> bool {
-    is_js_whitespace(ch) || matches!(ch, '{' | ',' | ';')
+    is_js_whitespace(ch) || matches!(ch, '{' | ',' | ';' | '"' | '\'')
 }
 
 /// Parses `["']?([A-Za-z][A-Za-z0-9_.-]*)["']?\s*(?:=|:)\s*` starting at
@@ -1242,6 +1260,88 @@ mod tests {
         let input = "{\"api_key\":\"SYNTHETIC_REVOKED_\\\"QUOTED_VALUE\"}";
         let candidates = detect(input);
         assert_eq!(only_range(&candidates), (12, 44));
+    }
+
+    // --- issue #294: a nested key immediately following an enclosing
+    // quote's opening quote, with no separator between them
+    // (`value="api_key="TOKEN""`), now starts its own contextual assignment
+    // scan, and its value's closing quote is recognized as a valid close
+    // even when the very next character is the enclosing quote rather than
+    // whitespace or a structural character.
+
+    #[test]
+    fn a_nested_assignment_with_no_separator_inside_an_enclosing_quote_is_detected() {
+        for (input, start, end) in [
+            // The three published-package reproducers from issue #294.
+            (
+                "value=\"api_key=\"I9RBasVzoPPDPIErHTQcrdjnmKvu\"\"\n",
+                16,
+                44,
+            ),
+            (
+                "value=\"password=\"yrdhd5QrRabaY9e8KnFuTTALQClH\"\"\n",
+                17,
+                45,
+            ),
+            (
+                "value=\"client_secret=\"rs06I0rFoRw0mKTRs9hZIDfyQqXw\"\"\n",
+                22,
+                50,
+            ),
+        ] {
+            let candidates = detect(input);
+            assert_eq!(only_range(&candidates), (start, end), "input: {input:?}");
+            assert_eq!(candidates[0].confidence(), Confidence::High);
+        }
+    }
+
+    #[test]
+    fn a_single_quoted_nested_assignment_with_no_separator_is_detected() {
+        let input = "value='api_key='SYNTHETIC_REVOKED_NESTED_SINGLE_QUOTE_1234''\n";
+        let candidates = detect(input);
+        assert_eq!(candidates.len(), 1);
+        assert_eq!(candidates[0].confidence(), Confidence::High);
+    }
+
+    #[test]
+    fn a_plain_quoted_assignment_with_no_nesting_is_unaffected() {
+        let input = "api_key=\"SYNTHETIC_REVOKED_PLAIN_QUOTED_VALUE_1234\"";
+        let candidates = detect(input);
+        assert_eq!(only_range(&candidates), (9, input.len() - 1));
+    }
+
+    #[test]
+    fn a_masked_value_nested_with_no_separator_inside_an_enclosing_quote_stays_excluded() {
+        let input = "value=\"password=\"********\"\"\n";
+        assert!(
+            detect(input).is_empty(),
+            "expected no findings for {input:?}"
+        );
+    }
+
+    #[test]
+    fn a_template_reference_nested_with_no_separator_inside_an_enclosing_quote_stays_excluded() {
+        let input = "value=\"password=\"{{ vault_db_password }}\"\"\n";
+        assert!(
+            detect(input).is_empty(),
+            "expected no findings for {input:?}"
+        );
+    }
+
+    #[test]
+    fn nested_assignment_with_no_separator_is_detected_across_crlf_and_unicode_prefix() {
+        for input in [
+            // CRLF line ending after the outer close.
+            "value=\"api_key=\"SYNTHETIC_REVOKED_NESTED_QUOTE_CRLF_1234\"\"\r\n",
+            // A multi-byte Unicode character preceding the assignment,
+            // exercising byte-offset (not char-count) boundary handling.
+            "note: caf\u{e9} \u{2014} value=\"api_key=\"SYNTHETIC_REVOKED_NESTED_QUOTE_UNICODE_1234\"\"\n",
+        ] {
+            assert!(
+                !detect(input).is_empty(),
+                "expected a finding for {input:?}"
+            );
+        }
     }
 
     #[test]

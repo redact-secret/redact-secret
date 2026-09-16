@@ -906,7 +906,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 102,
+        "fixtureCount": 111,
         "hostContextsExercised": [
           "chat",
           "dotenv",
@@ -958,6 +958,12 @@
         "contextual-positive-litellm-scheme-prefix-still-detected",
         "contextual-positive-minimum-length-is-medium-confidence",
         "contextual-positive-near-miss-repeated-asterisk-filler",
+        "contextual-positive-nested-no-separator-api-key",
+        "contextual-positive-nested-no-separator-client-secret",
+        "contextual-positive-nested-no-separator-crlf",
+        "contextual-positive-nested-no-separator-password",
+        "contextual-positive-nested-no-separator-single-quote",
+        "contextual-positive-nested-no-separator-unicode-prefix",
         "contextual-positive-onepassword-scheme-prefix-still-detected",
         "contextual-positive-remaining-declared-names",
         "contextual-positive-single-quoted-value",
@@ -967,6 +973,7 @@
         "regression-nested-credential-under-parent-key",
         "regression-placeholder-embedded-in-high-entropy-value",
         "regression-placeholder-word-with-unrelated-tokens",
+        "regression-plain-quoted-value-no-nesting-unaffected",
         "regression-yaml-flow-mapping-block-style-still-detected"
       ],
       "policyClass": "confidence-gated",
@@ -977,7 +984,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 102,
+        "fixtureCount": 111,
         "hostContextsExercised": [
           "chat",
           "dotenv",
