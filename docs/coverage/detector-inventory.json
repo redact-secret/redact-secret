@@ -158,6 +158,13 @@
       "schemes": null
     },
     {
+      "type": "azure_devops_personal_access_token",
+      "detector": "azure-devops-personal-access-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "SYNTHETICREVOKEDAZUREDEVOPSPATVALUEFORCONFORMANCETESTINGPADDINGFIXTUREDATAZZAZDOabcd",
+      "schemes": null
+    },
+    {
       "type": "jwt",
       "detector": "jwt",
       "policyClass": "always-redact",
