@@ -1,0 +1,930 @@
+{
+  "sourceCommit": "8cdc1b118449a15be545ecf70bb7f0df53f6126e",
+  "sourceRef": "refs/heads/rc/0.1.0-beta.2",
+  "workflowRun": "34792026587",
+  "workflowRunAttempt": "1",
+  "productVersion": "0.1.0-beta.2",
+  "published": false,
+  "conformanceFixtures": {
+    "error-codes.json": "8871993fec427032b0df4f80b9090baebcb49a11779384b6eb2b64332830044a",
+    "incremental-corpus.json": "ce6fe020a9eb5c343ff1fbbeaeef9b8395419f4ad8cd292f7a60606d4c02d64d",
+    "incremental-lifecycle-corpus.json": "596ead5a9f3e775e303a2daddb5ff16f88865169d299f97ad6a2e0f10ffb2873",
+    "synchronous-corpus.json": "27beff0ae10480c0e10f840be56f9cf07a2f76fa3a94b4af3c91d68ac0cc30a5",
+    "unicode-conversion-corpus.json": "15760b9f56f8f6cee0ba0d9c24bd4513114792b25072a0a90048ea7eb6244565"
+  },
+  "declaredMatrix": {
+    "nodeAddonTargets": [
+      "aarch64-apple-darwin",
+      "aarch64-pc-windows-msvc",
+      "aarch64-unknown-linux-gnu",
+      "aarch64-unknown-linux-musl",
+      "x86_64-apple-darwin",
+      "x86_64-pc-windows-msvc",
+      "x86_64-unknown-linux-gnu",
+      "x86_64-unknown-linux-musl"
+    ],
+    "nodePublishTargets": [
+      "aarch64-apple-darwin",
+      "aarch64-pc-windows-msvc",
+      "aarch64-unknown-linux-gnu",
+      "x86_64-apple-darwin",
+      "x86_64-pc-windows-msvc",
+      "x86_64-unknown-linux-gnu"
+    ],
+    "cliReleaseTargets": [
+      "aarch64-apple-darwin",
+      "aarch64-pc-windows-msvc",
+      "aarch64-unknown-linux-gnu",
+      "x86_64-apple-darwin",
+      "x86_64-pc-windows-msvc",
+      "x86_64-unknown-linux-gnu"
+    ],
+    "pythonWheelTargets": [
+      "aarch64-apple-darwin",
+      "aarch64-pc-windows-msvc",
+      "aarch64-unknown-linux-gnu",
+      "aarch64-unknown-linux-musl",
+      "x86_64-apple-darwin",
+      "x86_64-pc-windows-msvc",
+      "x86_64-unknown-linux-gnu",
+      "x86_64-unknown-linux-musl"
+    ],
+    "browserEngines": [
+      "chromium",
+      "firefox",
+      "webkit"
+    ],
+    "nodeSupportMajors": [
+      20,
+      22,
+      24
+    ]
+  },
+  "packageContents": {
+    "@redact-secret/core": [
+      "LICENSE",
+      "README.md",
+      "dist/adapters/node-stream.d.ts",
+      "dist/adapters/node-stream.js",
+      "dist/adapters/shared.d.ts",
+      "dist/adapters/shared.js",
+      "dist/adapters/web-stream.d.ts",
+      "dist/adapters/web-stream.js",
+      "dist/errors.d.ts",
+      "dist/errors.js",
+      "dist/formatters.d.ts",
+      "dist/formatters.js",
+      "dist/index.d.ts",
+      "dist/index.js",
+      "dist/native.d.ts",
+      "dist/native.js",
+      "dist/runtime.d.ts",
+      "dist/runtime.js",
+      "dist/runtime/browser.d.ts",
+      "dist/runtime/browser.js",
+      "dist/runtime/node.d.ts",
+      "dist/runtime/node.js",
+      "dist/session.d.ts",
+      "dist/session.js",
+      "dist/types.d.ts",
+      "dist/types.js",
+      "dist/version.d.ts",
+      "dist/version.js",
+      "package.json"
+    ],
+    "redact-secret (crate)": [
+      ".cargo_vcs_info.json",
+      "Cargo.lock",
+      "Cargo.toml",
+      "Cargo.toml.orig",
+      "README.md",
+      "src/detectors/additional_providers.rs",
+      "src/detectors/anthropic.rs",
+      "src/detectors/aws.rs",
+      "src/detectors/bearer_token.rs",
+      "src/detectors/connection_string.rs",
+      "src/detectors/generic_token.rs",
+      "src/detectors/github.rs",
+      "src/detectors/gitlab.rs",
+      "src/detectors/jwt.rs",
+      "src/detectors/mod.rs",
+      "src/detectors/openai.rs",
+      "src/detectors/otpauth.rs",
+      "src/detectors/pattern.rs",
+      "src/detectors/private_key.rs",
+      "src/detectors/shopify.rs",
+      "src/detectors/text.rs",
+      "src/detectors/vault.rs",
+      "src/entropy.rs",
+      "src/error.rs",
+      "src/incremental.rs",
+      "src/lib.rs",
+      "src/pipeline.rs",
+      "src/policy.rs",
+      "src/redact.rs",
+      "src/registry.rs",
+      "src/types.rs"
+    ]
+  },
+  "artifacts": [
+    {
+      "family": "cli",
+      "target": "aarch64-apple-darwin",
+      "artifact": "cli-aarch64-apple-darwin",
+      "file": "redact-secret",
+      "bytes": 572576,
+      "sha256": "0f45b0265e257a5ffa2ba642e54182a3ef0144cec7b17bf448988608e13a7e12"
+    },
+    {
+      "family": "cli",
+      "target": "aarch64-pc-windows-msvc",
+      "artifact": "cli-aarch64-pc-windows-msvc",
+      "file": "redact-secret.exe",
+      "bytes": 303616,
+      "sha256": "562c3760f878abb39bdc0947c62fb327191c2eb9bcaf6ad32d0715712806c2d1"
+    },
+    {
+      "family": "cli",
+      "target": "aarch64-unknown-linux-gnu",
+      "artifact": "cli-aarch64-unknown-linux-gnu",
+      "file": "redact-secret",
+      "bytes": 620824,
+      "sha256": "7fc325756a7adb10288f71db662fab219f40e2839091b168b8ea043dfa50a187"
+    },
+    {
+      "family": "cli",
+      "target": "x86_64-apple-darwin",
+      "artifact": "cli-x86_64-apple-darwin",
+      "file": "redact-secret",
+      "bytes": 581328,
+      "sha256": "df79eff952acf40c35223a525427e91c2f11fd2355e67ca2ad3672f94e20cb65"
+    },
+    {
+      "family": "cli",
+      "target": "x86_64-pc-windows-msvc",
+      "artifact": "cli-x86_64-pc-windows-msvc",
+      "file": "redact-secret.exe",
+      "bytes": 340480,
+      "sha256": "49196208ca2359c3a98ecc7ebecdb1873160a65c4a435eccbbf80393c29d0e83"
+    },
+    {
+      "family": "cli",
+      "target": "x86_64-unknown-linux-gnu",
+      "artifact": "cli-x86_64-unknown-linux-gnu",
+      "file": "redact-secret",
+      "bytes": 624968,
+      "sha256": "036bdc25f872f2fb563c8016a187341d2e6846ca1efa913929fba330dcda8fea"
+    },
+    {
+      "family": "node-addon",
+      "target": "aarch64-apple-darwin",
+      "artifact": "node-addon-aarch64-apple-darwin",
+      "file": "index.d.ts",
+      "bytes": 10115,
+      "sha256": "5c36d8b4b7eb8e42947dc4f90169453db1d4bcf93591ca4ac6d48e0e4e048810"
+    },
+    {
+      "family": "node-addon",
+      "target": "aarch64-apple-darwin",
+      "artifact": "node-addon-aarch64-apple-darwin",
+      "file": "index.js",
+      "bytes": 29984,
+      "sha256": "29125ffe9cb9e3154df98b5d38c2356c861f2938b7daf5317f5514ccada8c3a0"
+    },
+    {
+      "family": "node-addon",
+      "target": "aarch64-apple-darwin",
+      "artifact": "node-addon-aarch64-apple-darwin",
+      "file": "redact-secret.darwin-arm64.node",
+      "bytes": 776048,
+      "sha256": "46413a631df1b7f3e8130898b4396131d96bce4c87be8288929885e3a0942087"
+    },
+    {
+      "family": "node-addon",
+      "target": "aarch64-pc-windows-msvc",
+      "artifact": "node-addon-aarch64-pc-windows-msvc",
+      "file": "index.d.ts",
+      "bytes": 10115,
+      "sha256": "5c36d8b4b7eb8e42947dc4f90169453db1d4bcf93591ca4ac6d48e0e4e048810"
+    },
+    {
+      "family": "node-addon",
+      "target": "aarch64-pc-windows-msvc",
+      "artifact": "node-addon-aarch64-pc-windows-msvc",
+      "file": "index.js",
+      "bytes": 29984,
+      "sha256": "29125ffe9cb9e3154df98b5d38c2356c861f2938b7daf5317f5514ccada8c3a0"
+    },
+    {
+      "family": "node-addon",
+      "target": "aarch64-pc-windows-msvc",
+      "artifact": "node-addon-aarch64-pc-windows-msvc",
+      "file": "redact-secret.win32-arm64-msvc.node",
+      "bytes": 490496,
+      "sha256": "8804804ab6c928ad021cead2ca7f3bd61ee6354f2456bbc0f51ee558ccdb846d"
+    },
+    {
+      "family": "node-addon",
+      "target": "aarch64-unknown-linux-gnu",
+      "artifact": "node-addon-aarch64-unknown-linux-gnu",
+      "file": "index.d.ts",
+      "bytes": 10115,
+      "sha256": "5c36d8b4b7eb8e42947dc4f90169453db1d4bcf93591ca4ac6d48e0e4e048810"
+    },
+    {
+      "family": "node-addon",
+      "target": "aarch64-unknown-linux-gnu",
+      "artifact": "node-addon-aarch64-unknown-linux-gnu",
+      "file": "index.js",
+      "bytes": 29984,
+      "sha256": "29125ffe9cb9e3154df98b5d38c2356c861f2938b7daf5317f5514ccada8c3a0"
+    },
+    {
+      "family": "node-addon",
+      "target": "aarch64-unknown-linux-gnu",
+      "artifact": "node-addon-aarch64-unknown-linux-gnu",
+      "file": "redact-secret.linux-arm64-gnu.node",
+      "bytes": 900216,
+      "sha256": "84bd4bd5b9a031a16525b92870cbae60638f7be49b96e04e9e72b229fe397d01"
+    },
+    {
+      "family": "node-addon",
+      "target": "aarch64-unknown-linux-musl",
+      "artifact": "node-addon-aarch64-unknown-linux-musl",
+      "file": "index.d.ts",
+      "bytes": 10115,
+      "sha256": "5c36d8b4b7eb8e42947dc4f90169453db1d4bcf93591ca4ac6d48e0e4e048810"
+    },
+    {
+      "family": "node-addon",
+      "target": "aarch64-unknown-linux-musl",
+      "artifact": "node-addon-aarch64-unknown-linux-musl",
+      "file": "index.js",
+      "bytes": 29984,
+      "sha256": "29125ffe9cb9e3154df98b5d38c2356c861f2938b7daf5317f5514ccada8c3a0"
+    },
+    {
+      "family": "node-addon",
+      "target": "aarch64-unknown-linux-musl",
+      "artifact": "node-addon-aarch64-unknown-linux-musl",
+      "file": "redact-secret.linux-arm64-musl.node",
+      "bytes": 899304,
+      "sha256": "2801f78962cc15be67131ecb52e6d2681c92ce2af27054ad3b8f1bce47cd8bff"
+    },
+    {
+      "family": "node-addon",
+      "target": "x86_64-apple-darwin",
+      "artifact": "node-addon-x86_64-apple-darwin",
+      "file": "index.d.ts",
+      "bytes": 10115,
+      "sha256": "5c36d8b4b7eb8e42947dc4f90169453db1d4bcf93591ca4ac6d48e0e4e048810"
+    },
+    {
+      "family": "node-addon",
+      "target": "x86_64-apple-darwin",
+      "artifact": "node-addon-x86_64-apple-darwin",
+      "file": "index.js",
+      "bytes": 29984,
+      "sha256": "29125ffe9cb9e3154df98b5d38c2356c861f2938b7daf5317f5514ccada8c3a0"
+    },
+    {
+      "family": "node-addon",
+      "target": "x86_64-apple-darwin",
+      "artifact": "node-addon-x86_64-apple-darwin",
+      "file": "redact-secret.darwin-x64.node",
+      "bytes": 800184,
+      "sha256": "cacf4570133b90219f54f4f54d42f38aa26217352845e1de529397c7f4532570"
+    },
+    {
+      "family": "node-addon",
+      "target": "x86_64-pc-windows-msvc",
+      "artifact": "node-addon-x86_64-pc-windows-msvc",
+      "file": "index.d.ts",
+      "bytes": 10115,
+      "sha256": "5c36d8b4b7eb8e42947dc4f90169453db1d4bcf93591ca4ac6d48e0e4e048810"
+    },
+    {
+      "family": "node-addon",
+      "target": "x86_64-pc-windows-msvc",
+      "artifact": "node-addon-x86_64-pc-windows-msvc",
+      "file": "index.js",
+      "bytes": 29984,
+      "sha256": "29125ffe9cb9e3154df98b5d38c2356c861f2938b7daf5317f5514ccada8c3a0"
+    },
+    {
+      "family": "node-addon",
+      "target": "x86_64-pc-windows-msvc",
+      "artifact": "node-addon-x86_64-pc-windows-msvc",
+      "file": "redact-secret.win32-x64-msvc.node",
+      "bytes": 546816,
+      "sha256": "613b79cf48b9c1743dc825f11b78ff11db548449c245d76ad75bfd3a57bb87b0"
+    },
+    {
+      "family": "node-addon",
+      "target": "x86_64-unknown-linux-gnu",
+      "artifact": "node-addon-x86_64-unknown-linux-gnu",
+      "file": "index.d.ts",
+      "bytes": 10115,
+      "sha256": "5c36d8b4b7eb8e42947dc4f90169453db1d4bcf93591ca4ac6d48e0e4e048810"
+    },
+    {
+      "family": "node-addon",
+      "target": "x86_64-unknown-linux-gnu",
+      "artifact": "node-addon-x86_64-unknown-linux-gnu",
+      "file": "index.js",
+      "bytes": 29984,
+      "sha256": "29125ffe9cb9e3154df98b5d38c2356c861f2938b7daf5317f5514ccada8c3a0"
+    },
+    {
+      "family": "node-addon",
+      "target": "x86_64-unknown-linux-gnu",
+      "artifact": "node-addon-x86_64-unknown-linux-gnu",
+      "file": "redact-secret.linux-x64-gnu.node",
+      "bytes": 852952,
+      "sha256": "77d91b738a8a4ee21811ce550b403dd30744eef21a4e51aa20b10328ec89a8a1"
+    },
+    {
+      "family": "node-addon",
+      "target": "x86_64-unknown-linux-musl",
+      "artifact": "node-addon-x86_64-unknown-linux-musl",
+      "file": "index.d.ts",
+      "bytes": 10115,
+      "sha256": "5c36d8b4b7eb8e42947dc4f90169453db1d4bcf93591ca4ac6d48e0e4e048810"
+    },
+    {
+      "family": "node-addon",
+      "target": "x86_64-unknown-linux-musl",
+      "artifact": "node-addon-x86_64-unknown-linux-musl",
+      "file": "index.js",
+      "bytes": 29984,
+      "sha256": "29125ffe9cb9e3154df98b5d38c2356c861f2938b7daf5317f5514ccada8c3a0"
+    },
+    {
+      "family": "node-addon",
+      "target": "x86_64-unknown-linux-musl",
+      "artifact": "node-addon-x86_64-unknown-linux-musl",
+      "file": "redact-secret.linux-x64-musl.node",
+      "bytes": 858432,
+      "sha256": "bc1095bd24463ecfcced3295fc66731633ad2186dabb422d35e6b28374da0253"
+    },
+    {
+      "family": "python-sdist",
+      "target": null,
+      "artifact": "python-sdist",
+      "file": "redact_secret-0.1.0b2.tar.gz",
+      "bytes": 101742,
+      "sha256": "8a50ae341977916f42cd6cfec82004b9729954a010a9971a2d6b9f2f401c315f"
+    },
+    {
+      "family": "python-wheel",
+      "target": "aarch64-apple-darwin",
+      "artifact": "python-wheel-aarch64-apple-darwin",
+      "file": "redact_secret-0.1.0b2-cp310-abi3-macosx_11_0_arm64.whl",
+      "bytes": 347792,
+      "sha256": "a5be76edb52ea6fc60cd65b8ed6c80e5df1a1ba4011c75cce2cc215819562cf0"
+    },
+    {
+      "family": "python-wheel",
+      "target": "aarch64-pc-windows-msvc",
+      "artifact": "python-wheel-aarch64-pc-windows-msvc",
+      "file": "redact_secret-0.1.0b2-cp310-abi3-win_arm64.whl",
+      "bytes": 247158,
+      "sha256": "417eca4ecdc801f4e909657b3d2cf7895564fbe39c96fd806ebbfd64c0d93461"
+    },
+    {
+      "family": "python-wheel",
+      "target": "aarch64-unknown-linux-gnu",
+      "artifact": "python-wheel-aarch64-unknown-linux-gnu",
+      "file": "redact_secret-0.1.0b2-cp310-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl",
+      "bytes": 372753,
+      "sha256": "c485bf85a77c22615ed2d86684807c481e25aa4b6c5befbddb75d527cc44fa14"
+    },
+    {
+      "family": "python-wheel",
+      "target": "aarch64-unknown-linux-musl",
+      "artifact": "python-wheel-aarch64-unknown-linux-musl",
+      "file": "redact_secret-0.1.0b2-cp310-abi3-musllinux_1_2_aarch64.whl",
+      "bytes": 552180,
+      "sha256": "2812681e44ca29e796a1142820221ea1ec1a56dda9ed51d721246f163c96143e"
+    },
+    {
+      "family": "python-wheel",
+      "target": "x86_64-apple-darwin",
+      "artifact": "python-wheel-x86_64-apple-darwin",
+      "file": "redact_secret-0.1.0b2-cp310-abi3-macosx_10_12_x86_64.whl",
+      "bytes": 354657,
+      "sha256": "3bf30ec56c2725b9443e053d41bf6b61d4971f1359a6e67607ce75ced60d6d72"
+    },
+    {
+      "family": "python-wheel",
+      "target": "x86_64-pc-windows-msvc",
+      "artifact": "python-wheel-x86_64-pc-windows-msvc",
+      "file": "redact_secret-0.1.0b2-cp310-abi3-win_amd64.whl",
+      "bytes": 258967,
+      "sha256": "fd03b490c0998502a0773dcd72f0374707036eadb97bcbd172e05b277d515d38"
+    },
+    {
+      "family": "python-wheel",
+      "target": "x86_64-unknown-linux-gnu",
+      "artifact": "python-wheel-x86_64-unknown-linux-gnu",
+      "file": "redact_secret-0.1.0b2-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+      "bytes": 379206,
+      "sha256": "82ce96aac6ebb510770f5644cd324ff09a19215acc18ecd411f15ef7b89e79dc"
+    },
+    {
+      "family": "python-wheel",
+      "target": "x86_64-unknown-linux-musl",
+      "artifact": "python-wheel-x86_64-unknown-linux-musl",
+      "file": "redact_secret-0.1.0b2-cp310-abi3-musllinux_1_2_x86_64.whl",
+      "bytes": 590990,
+      "sha256": "6d85d54da337b054a9a8475000021fe985815e9574cf3d91decbc59a30d5382c"
+    },
+    {
+      "family": "browser",
+      "target": null,
+      "artifact": "wasm-web",
+      "file": "redact_secret_wasm.d.ts",
+      "bytes": 11549,
+      "sha256": "020fcb049fbb018bdb7ab128c80427b8948c74708235d917f314a5338e47d870"
+    },
+    {
+      "family": "browser",
+      "target": null,
+      "artifact": "wasm-web",
+      "file": "redact_secret_wasm.js",
+      "bytes": 28873,
+      "sha256": "cfedbcf1e439dd08ada8839438da5a553929d0ebe62825f2aaeafd32c4a7451e"
+    },
+    {
+      "family": "browser",
+      "target": null,
+      "artifact": "wasm-web",
+      "file": "redact_secret_wasm_bg.wasm",
+      "bytes": 220376,
+      "sha256": "85b0e8f69b63a76927fccacffeb295b45f8b97a62a1386072b591dddbcb1abba"
+    },
+    {
+      "family": "browser",
+      "target": null,
+      "artifact": "wasm-web",
+      "file": "redact_secret_wasm_bg.wasm.d.ts",
+      "bytes": 2630,
+      "sha256": "a23ac72681bcb3c621c6665b5b2a733952fa9803649ef46c0362ca1bb2b29d45"
+    }
+  ],
+  "installedJavaScriptQualification": [
+    {
+      "schemaVersion": 1,
+      "sourceCommit": "8cdc1b118449a15be545ecf70bb7f0df53f6126e",
+      "published": false,
+      "lane": "browser",
+      "runtime": {
+        "name": "chromium",
+        "version": "153.0.8010.12"
+      },
+      "productVersion": "0.1.0-beta.2",
+      "fixture": "host-dotenv-github",
+      "integrationFixtures": {
+        "redact": "host-dotenv-github",
+        "warn": "contextual-positive-minimum-length-is-medium-confidence",
+        "block": "private-key-positive"
+      },
+      "incrementalCorpus": {
+        "path": "conformance/fixtures/incremental-corpus.json",
+        "sha256": "ce6fe020a9eb5c343ff1fbbeaeef9b8395419f4ad8cd292f7a60606d4c02d64d",
+        "offsetUnit": "utf8-byte",
+        "fixtureCount": 16
+      },
+      "packageArtifacts": [
+        {
+          "name": "@redact-secret/core",
+          "version": "0.1.0-beta.2",
+          "file": "redact-secret-core-0.1.0-beta.2.tgz",
+          "sha256": "35dd4b9f1631b884e17177be80ee05ce692bdafc379671b6596db3f4a74cef27"
+        },
+        {
+          "name": "@redact-secret/node-linux-x64-gnu",
+          "version": "0.1.0-beta.2",
+          "file": "redact-secret-node-linux-x64-gnu-0.1.0-beta.2.tgz",
+          "sha256": "166088257feb82de7f4b7dbcaf8a2eb085418149e570bedd14d3db4ff12ec45b"
+        },
+        {
+          "name": "@redact-secret/wasm",
+          "version": "0.1.0-beta.2",
+          "file": "redact-secret-wasm-0.1.0-beta.2.tgz",
+          "sha256": "12beb91fd6c624b84e67c422060e4b82d5b6fb5195717293338728b6413931a9"
+        }
+      ],
+      "commands": [
+        "npm install --no-audit --no-fund",
+        "node scripts/qualify-package-consumer.mjs --lane browser --engine chromium --wasm-dir <candidate-wasm-dir> --report <evidence-path>"
+      ],
+      "operations": [
+        "initialize",
+        "scan",
+        "createIncrementalSanitizer",
+        "createWebStreamSanitizer",
+        "safeIntegration"
+      ],
+      "results": {
+        "initialize": "passed",
+        "scan": "passed",
+        "incremental": "passed",
+        "incrementalCorpus": "passed",
+        "stream": "passed",
+        "safeIntegration": "passed",
+        "incrementalCorpusSummary": {
+          "fixtures": 16,
+          "stringPartitions": 1583,
+          "bytePartitions": 1586,
+          "findings": 27
+        },
+        "engine": "chromium",
+        "engineVersion": "153.0.8010.12"
+      },
+      "artifact": "installed-javascript-browser-chromium",
+      "reportSha256": "ccc925dcc4b66691f837db2b978219281b1a5915fad7ea6bb5717352c03f8ab5"
+    },
+    {
+      "schemaVersion": 1,
+      "sourceCommit": "8cdc1b118449a15be545ecf70bb7f0df53f6126e",
+      "published": false,
+      "lane": "browser",
+      "runtime": {
+        "name": "firefox",
+        "version": "155.0"
+      },
+      "productVersion": "0.1.0-beta.2",
+      "fixture": "host-dotenv-github",
+      "integrationFixtures": {
+        "redact": "host-dotenv-github",
+        "warn": "contextual-positive-minimum-length-is-medium-confidence",
+        "block": "private-key-positive"
+      },
+      "incrementalCorpus": {
+        "path": "conformance/fixtures/incremental-corpus.json",
+        "sha256": "ce6fe020a9eb5c343ff1fbbeaeef9b8395419f4ad8cd292f7a60606d4c02d64d",
+        "offsetUnit": "utf8-byte",
+        "fixtureCount": 16
+      },
+      "packageArtifacts": [
+        {
+          "name": "@redact-secret/core",
+          "version": "0.1.0-beta.2",
+          "file": "redact-secret-core-0.1.0-beta.2.tgz",
+          "sha256": "35dd4b9f1631b884e17177be80ee05ce692bdafc379671b6596db3f4a74cef27"
+        },
+        {
+          "name": "@redact-secret/node-linux-x64-gnu",
+          "version": "0.1.0-beta.2",
+          "file": "redact-secret-node-linux-x64-gnu-0.1.0-beta.2.tgz",
+          "sha256": "166088257feb82de7f4b7dbcaf8a2eb085418149e570bedd14d3db4ff12ec45b"
+        },
+        {
+          "name": "@redact-secret/wasm",
+          "version": "0.1.0-beta.2",
+          "file": "redact-secret-wasm-0.1.0-beta.2.tgz",
+          "sha256": "12beb91fd6c624b84e67c422060e4b82d5b6fb5195717293338728b6413931a9"
+        }
+      ],
+      "commands": [
+        "npm install --no-audit --no-fund",
+        "node scripts/qualify-package-consumer.mjs --lane browser --engine firefox --wasm-dir <candidate-wasm-dir> --report <evidence-path>"
+      ],
+      "operations": [
+        "initialize",
+        "scan",
+        "createIncrementalSanitizer",
+        "createWebStreamSanitizer",
+        "safeIntegration"
+      ],
+      "results": {
+        "initialize": "passed",
+        "scan": "passed",
+        "incremental": "passed",
+        "incrementalCorpus": "passed",
+        "stream": "passed",
+        "safeIntegration": "passed",
+        "incrementalCorpusSummary": {
+          "fixtures": 16,
+          "stringPartitions": 1583,
+          "bytePartitions": 1586,
+          "findings": 27
+        },
+        "engine": "firefox",
+        "engineVersion": "155.0"
+      },
+      "artifact": "installed-javascript-browser-firefox",
+      "reportSha256": "5b4fdcc84bfba79f7f26e6e55a613131e1b78e9e99061811c7f0d2b7bf987392"
+    },
+    {
+      "schemaVersion": 1,
+      "sourceCommit": "8cdc1b118449a15be545ecf70bb7f0df53f6126e",
+      "published": false,
+      "lane": "browser",
+      "runtime": {
+        "name": "webkit",
+        "version": "26.6"
+      },
+      "productVersion": "0.1.0-beta.2",
+      "fixture": "host-dotenv-github",
+      "integrationFixtures": {
+        "redact": "host-dotenv-github",
+        "warn": "contextual-positive-minimum-length-is-medium-confidence",
+        "block": "private-key-positive"
+      },
+      "incrementalCorpus": {
+        "path": "conformance/fixtures/incremental-corpus.json",
+        "sha256": "ce6fe020a9eb5c343ff1fbbeaeef9b8395419f4ad8cd292f7a60606d4c02d64d",
+        "offsetUnit": "utf8-byte",
+        "fixtureCount": 16
+      },
+      "packageArtifacts": [
+        {
+          "name": "@redact-secret/core",
+          "version": "0.1.0-beta.2",
+          "file": "redact-secret-core-0.1.0-beta.2.tgz",
+          "sha256": "35dd4b9f1631b884e17177be80ee05ce692bdafc379671b6596db3f4a74cef27"
+        },
+        {
+          "name": "@redact-secret/node-linux-x64-gnu",
+          "version": "0.1.0-beta.2",
+          "file": "redact-secret-node-linux-x64-gnu-0.1.0-beta.2.tgz",
+          "sha256": "166088257feb82de7f4b7dbcaf8a2eb085418149e570bedd14d3db4ff12ec45b"
+        },
+        {
+          "name": "@redact-secret/wasm",
+          "version": "0.1.0-beta.2",
+          "file": "redact-secret-wasm-0.1.0-beta.2.tgz",
+          "sha256": "12beb91fd6c624b84e67c422060e4b82d5b6fb5195717293338728b6413931a9"
+        }
+      ],
+      "commands": [
+        "npm install --no-audit --no-fund",
+        "node scripts/qualify-package-consumer.mjs --lane browser --engine webkit --wasm-dir <candidate-wasm-dir> --report <evidence-path>"
+      ],
+      "operations": [
+        "initialize",
+        "scan",
+        "createIncrementalSanitizer",
+        "createWebStreamSanitizer",
+        "safeIntegration"
+      ],
+      "results": {
+        "initialize": "passed",
+        "scan": "passed",
+        "incremental": "passed",
+        "incrementalCorpus": "passed",
+        "stream": "passed",
+        "safeIntegration": "passed",
+        "incrementalCorpusSummary": {
+          "fixtures": 16,
+          "stringPartitions": 1583,
+          "bytePartitions": 1586,
+          "findings": 27
+        },
+        "engine": "webkit",
+        "engineVersion": "26.6"
+      },
+      "artifact": "installed-javascript-browser-webkit",
+      "reportSha256": "63cbf53c26aef0eaf86cd98fc7eb880b85df99ca57e0362b0c5bd5cbc687223a"
+    },
+    {
+      "schemaVersion": 1,
+      "sourceCommit": "8cdc1b118449a15be545ecf70bb7f0df53f6126e",
+      "published": false,
+      "lane": "node",
+      "runtime": {
+        "name": "node",
+        "version": "v20.20.2"
+      },
+      "productVersion": "0.1.0-beta.2",
+      "fixture": "host-dotenv-github",
+      "integrationFixtures": {
+        "redact": "host-dotenv-github",
+        "warn": "contextual-positive-minimum-length-is-medium-confidence",
+        "block": "private-key-positive"
+      },
+      "incrementalCorpus": {
+        "path": "conformance/fixtures/incremental-corpus.json",
+        "sha256": "ce6fe020a9eb5c343ff1fbbeaeef9b8395419f4ad8cd292f7a60606d4c02d64d",
+        "offsetUnit": "utf8-byte",
+        "fixtureCount": 16
+      },
+      "packageArtifacts": [
+        {
+          "name": "@redact-secret/core",
+          "version": "0.1.0-beta.2",
+          "file": "redact-secret-core-0.1.0-beta.2.tgz",
+          "sha256": "35dd4b9f1631b884e17177be80ee05ce692bdafc379671b6596db3f4a74cef27"
+        },
+        {
+          "name": "@redact-secret/node-linux-x64-gnu",
+          "version": "0.1.0-beta.2",
+          "file": "redact-secret-node-linux-x64-gnu-0.1.0-beta.2.tgz",
+          "sha256": "166088257feb82de7f4b7dbcaf8a2eb085418149e570bedd14d3db4ff12ec45b"
+        },
+        {
+          "name": "@redact-secret/wasm",
+          "version": "0.1.0-beta.2",
+          "file": "redact-secret-wasm-0.1.0-beta.2.tgz",
+          "sha256": "12beb91fd6c624b84e67c422060e4b82d5b6fb5195717293338728b6413931a9"
+        }
+      ],
+      "commands": [
+        "npm install --no-audit --no-fund",
+        "node scripts/qualify-package-consumer.mjs --lane node --wasm-dir <candidate-wasm-dir> --report <evidence-path>"
+      ],
+      "operations": [
+        "initialize",
+        "scan",
+        "createIncrementalSanitizer",
+        "createNodeStreamSanitizer",
+        "safeIntegration"
+      ],
+      "results": {
+        "initialize": "passed",
+        "scan": "passed",
+        "incremental": "passed",
+        "incrementalCorpus": "passed",
+        "stream": "passed",
+        "safeIntegration": "passed",
+        "incrementalCorpusSummary": {
+          "fixtures": 16,
+          "stringPartitions": 1583,
+          "bytePartitions": 1586,
+          "findings": 27
+        }
+      },
+      "artifact": "installed-javascript-node-20",
+      "reportSha256": "4b94d407875dce863e0e7b263c0f39ecdcf1c4487d348b86f300b879aab92652"
+    },
+    {
+      "schemaVersion": 1,
+      "sourceCommit": "8cdc1b118449a15be545ecf70bb7f0df53f6126e",
+      "published": false,
+      "lane": "node",
+      "runtime": {
+        "name": "node",
+        "version": "v22.23.2"
+      },
+      "productVersion": "0.1.0-beta.2",
+      "fixture": "host-dotenv-github",
+      "integrationFixtures": {
+        "redact": "host-dotenv-github",
+        "warn": "contextual-positive-minimum-length-is-medium-confidence",
+        "block": "private-key-positive"
+      },
+      "incrementalCorpus": {
+        "path": "conformance/fixtures/incremental-corpus.json",
+        "sha256": "ce6fe020a9eb5c343ff1fbbeaeef9b8395419f4ad8cd292f7a60606d4c02d64d",
+        "offsetUnit": "utf8-byte",
+        "fixtureCount": 16
+      },
+      "packageArtifacts": [
+        {
+          "name": "@redact-secret/core",
+          "version": "0.1.0-beta.2",
+          "file": "redact-secret-core-0.1.0-beta.2.tgz",
+          "sha256": "35dd4b9f1631b884e17177be80ee05ce692bdafc379671b6596db3f4a74cef27"
+        },
+        {
+          "name": "@redact-secret/node-linux-x64-gnu",
+          "version": "0.1.0-beta.2",
+          "file": "redact-secret-node-linux-x64-gnu-0.1.0-beta.2.tgz",
+          "sha256": "166088257feb82de7f4b7dbcaf8a2eb085418149e570bedd14d3db4ff12ec45b"
+        },
+        {
+          "name": "@redact-secret/wasm",
+          "version": "0.1.0-beta.2",
+          "file": "redact-secret-wasm-0.1.0-beta.2.tgz",
+          "sha256": "12beb91fd6c624b84e67c422060e4b82d5b6fb5195717293338728b6413931a9"
+        }
+      ],
+      "commands": [
+        "npm install --no-audit --no-fund",
+        "node scripts/qualify-package-consumer.mjs --lane node --wasm-dir <candidate-wasm-dir> --report <evidence-path>"
+      ],
+      "operations": [
+        "initialize",
+        "scan",
+        "createIncrementalSanitizer",
+        "createNodeStreamSanitizer",
+        "safeIntegration"
+      ],
+      "results": {
+        "initialize": "passed",
+        "scan": "passed",
+        "incremental": "passed",
+        "incrementalCorpus": "passed",
+        "stream": "passed",
+        "safeIntegration": "passed",
+        "incrementalCorpusSummary": {
+          "fixtures": 16,
+          "stringPartitions": 1583,
+          "bytePartitions": 1586,
+          "findings": 27
+        }
+      },
+      "artifact": "installed-javascript-node-22",
+      "reportSha256": "d588789fb8d8b25c2a05d9c8cd01940fa386e49a18f50ea939b7f18888ba70d5"
+    },
+    {
+      "schemaVersion": 1,
+      "sourceCommit": "8cdc1b118449a15be545ecf70bb7f0df53f6126e",
+      "published": false,
+      "lane": "node",
+      "runtime": {
+        "name": "node",
+        "version": "v24.20.0"
+      },
+      "productVersion": "0.1.0-beta.2",
+      "fixture": "host-dotenv-github",
+      "integrationFixtures": {
+        "redact": "host-dotenv-github",
+        "warn": "contextual-positive-minimum-length-is-medium-confidence",
+        "block": "private-key-positive"
+      },
+      "incrementalCorpus": {
+        "path": "conformance/fixtures/incremental-corpus.json",
+        "sha256": "ce6fe020a9eb5c343ff1fbbeaeef9b8395419f4ad8cd292f7a60606d4c02d64d",
+        "offsetUnit": "utf8-byte",
+        "fixtureCount": 16
+      },
+      "packageArtifacts": [
+        {
+          "name": "@redact-secret/core",
+          "version": "0.1.0-beta.2",
+          "file": "redact-secret-core-0.1.0-beta.2.tgz",
+          "sha256": "35dd4b9f1631b884e17177be80ee05ce692bdafc379671b6596db3f4a74cef27"
+        },
+        {
+          "name": "@redact-secret/node-linux-x64-gnu",
+          "version": "0.1.0-beta.2",
+          "file": "redact-secret-node-linux-x64-gnu-0.1.0-beta.2.tgz",
+          "sha256": "166088257feb82de7f4b7dbcaf8a2eb085418149e570bedd14d3db4ff12ec45b"
+        },
+        {
+          "name": "@redact-secret/wasm",
+          "version": "0.1.0-beta.2",
+          "file": "redact-secret-wasm-0.1.0-beta.2.tgz",
+          "sha256": "12beb91fd6c624b84e67c422060e4b82d5b6fb5195717293338728b6413931a9"
+        }
+      ],
+      "commands": [
+        "npm install --no-audit --no-fund",
+        "node scripts/qualify-package-consumer.mjs --lane node --wasm-dir <candidate-wasm-dir> --report <evidence-path>"
+      ],
+      "operations": [
+        "initialize",
+        "scan",
+        "createIncrementalSanitizer",
+        "createNodeStreamSanitizer",
+        "safeIntegration"
+      ],
+      "results": {
+        "initialize": "passed",
+        "scan": "passed",
+        "incremental": "passed",
+        "incrementalCorpus": "passed",
+        "stream": "passed",
+        "safeIntegration": "passed",
+        "incrementalCorpusSummary": {
+          "fixtures": 16,
+          "stringPartitions": 1583,
+          "bytePartitions": 1586,
+          "findings": 27
+        }
+      },
+      "artifact": "installed-javascript-node-24",
+      "reportSha256": "ad642641d67249dc9d2fadb6c083c6e2c573a680729f989742d4c0db2ca29672"
+    }
+  ],
+  "releaseReadiness": {
+    "issue": 203,
+    "publicApiAndChangelogReview": {
+      "status": "required-before-release-approval",
+      "currentPublicApiReview": {
+        "path": "docs/audits/beta2-final-code-review.md",
+        "sha256": "5bcb99db9bf41b390c35ad4c21676ca268f3bb3fb3739362af38fabcbdec5c26"
+      },
+      "publicApiReview": {
+        "path": "docs/audits/candidate-public-contract-review.md",
+        "sha256": "5527077f62c56c24bc014b7f1debe8eb4458bc5dc6716f6c116d052633a600bd",
+        "scope": "historical-beta.1-candidate-review"
+      },
+      "changelog": {
+        "path": "CHANGELOG.md",
+        "sha256": "fdbcec6b635eb41c5d8b6442ebbd16d53b2578a067d3556667137d35b7ef51f8"
+      }
+    },
+    "registryInstallVerification": {
+      "status": "post-publication-release-workflow",
+      "workflow": ".github/workflows/release.yml",
+      "verifier": "scripts/verify-registry-install.mjs",
+      "nodeTargets": "declared node-publish-targets",
+      "browserLane": "chromium",
+      "authorization": "separate release approval required"
+    }
+  }
+}

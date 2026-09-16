@@ -42,7 +42,7 @@
     "assessment:cli:performance": "node scripts/assessment-cli-performance.mjs",
     "assessment:rust:self-test": "cargo run -p redact-secret --example assessment_adapter -- self-test",
     "assessment:cli:self-test": "node scripts/assessment-cli-run.mjs --self-test",
-    "release-manifest:test": "node --test scripts/tests/npm-registry-metadata.test.mjs && python3 -B -m unittest discover -s scripts/tests -p 'test_release_manifest.py' && python3 -B -m unittest discover -s scripts/tests -p 'test_verify_recovery_artifact.py'",
+    "release-manifest:test": "node --test scripts/tests/npm-registry-metadata.test.mjs && python3 -B -m unittest discover -s scripts/tests -p 'test_release_manifest.py' && python3 -B -m unittest discover -s scripts/tests -p 'test_verify_recovery_artifact.py' && python3 -B -m unittest discover -s scripts/tests -p 'test_validate_release_records.py' && python3 -B scripts/validate-release-records.py",
     "reconcile-guard:test": "python3 -B -m unittest discover -s scripts/tests -p 'test_reconcile_guard.py'",
     "reconcile-artifact-plan:test": "python3 -B -m unittest discover -s scripts/tests -p 'test_reconcile_artifact_plan.py'",
     "release-environment:check": "python3 -B -m unittest discover -s scripts/tests -p 'test_check_release_environment.py' && python3 -B scripts/check-release-environment.py",

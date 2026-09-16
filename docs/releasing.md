@@ -214,3 +214,23 @@ what actually published. Merge release changes back into `main` through a
 reviewed PR and retain the RC branch. A release is complete only when the
 intended artifact set, verification, tag, and evidence agree; partial success
 must remain visible as partial success.
+
+Run the deterministic, offline durable-record check before opening the
+closeout PR:
+
+```bash
+python3 -B scripts/validate-release-records.py --version "$RELEASE_VERSION"
+```
+
+The checked-in record must contain `README.md`, the original
+`artifact-inventory.json`, and a final `manifest.json`. The validator ties the
+directory, version, source revision, conformance identity, artifact set,
+registry checksums, clean-install runs, and annotated tag together and requires
+the dated changelog entry to link the record. A reconstructed manifest must be
+explicitly labeled and retain the original partial manifest plus every recovery
+run needed to explain the final state. It cannot replace an `unknown` or
+`unpublished` final registry state with an assertion lacking provenance.
+
+A successful publication workflow or annotated tag is not release completion.
+Completion requires this check to pass in a reviewed closeout PR that is merged
+to `main`; retain the RC branch after merge.
