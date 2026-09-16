@@ -58,6 +58,7 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(additional_providers::SUPABASE),
         Box::new(additional_providers::VERCEL),
         Box::new(additional_providers::NPM),
+        Box::new(additional_providers::GOOGLE),
         Box::new(sendgrid::SendgridTokenDetector),
         Box::new(microsoft_entra::MicrosoftEntraClientSecretDetector),
         jwt::jwt_detector(),
@@ -111,6 +112,7 @@ mod tests {
                 "supabase-token",
                 "vercel-token",
                 "npm-token",
+                "google-api-key",
                 "sendgrid-token",
                 "microsoft-entra-client-secret",
                 "jwt",
@@ -152,7 +154,7 @@ mod tests {
         let pypi_input = format!("pypi-{}", "SYNTHETIC_REVOKED_".repeat(5));
         let sendgrid_input =
             "SG.SYNTHETIC_REVOKED_0000.SYNTHETIC_REVOKED_SENDGRID_SECRET_000000000";
-        let cases: [(&str, &str); 20] = [
+        let cases: [(&str, &str); 21] = [
             ("aws-access-key", "AKIASYNTHETICEXAMPLE"),
             (
                 "github-token",
@@ -177,6 +179,7 @@ mod tests {
             ("supabase-token", "sb_secret_SYNTHETICREVOKEDPROVIDERVALUE"),
             ("vercel-token", "vcp_SYNTHETICREVOKEDPROVIDERVALUE"),
             ("npm-token", "npm_SYNTHETICREVOKEDNPMACCESSTOKENVALUE1"),
+            ("google-api-key", "AIzaSYNTHETIC_REVOKED_GOOGLE_API_KEY012"),
             ("sendgrid-token", sendgrid_input),
             (
                 "microsoft-entra-client-secret",

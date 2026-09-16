@@ -5,6 +5,15 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+- Added a `google-api-key` detector recognizing Google Cloud/Gemini's
+  documented legacy "standard" API key shape: the `AIza` prefix followed by
+  an exact 35-byte suffix from `[A-Za-z0-9_-]`. This is the key string used
+  to authenticate requests, not the administrative key ID shown in Cloud
+  console URLs, which carries no `AIza` prefix and is out of scope. Google's
+  newer service-account-bound "Auth key" shape is a documented future gap:
+  no authoritative grammar for it could be confirmed at implementation time.
+  The new detector is always-redact, provider-specific, and wins any overlap
+  with the generic contextual detector.
 - Correct assessment performance to require a release-built Rust adapter; keep
   historical debug timings separate from optimized comparisons. Clarify corpus
   coverage, measured reliability, public beta availability, and security support.

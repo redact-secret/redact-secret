@@ -1,5 +1,5 @@
 //! Stripe, Slack, `PyPI`, Hugging Face, Docker, Cloudflare, `DigitalOcean`,
-//! Linear, Supabase, and Vercel token detection.
+//! Linear, Supabase, Vercel, npm, and Google API key detection.
 //!
 //! Mirrors `src/detectors/additional-providers.ts`. Every one of these
 //! providers reduces to the same shape as [`super::gitlab`] or
@@ -224,6 +224,33 @@ pub(super) const NPM: KnownFormatProviderDetector = KnownFormatProviderDetector 
     boundary: pattern::is_alnum_dash,
 };
 
+/// Legacy Google Cloud / Gemini "standard" API keys: the `AIza` prefix
+/// documented by Google Cloud's API-key authentication guide, followed by an
+/// exact 35-byte suffix from `[A-Za-z0-9_-]`, for 39 bytes total. This is the
+/// key *string* used to authenticate requests, not the administrative key
+/// *ID* shown in Cloud console URLs — the ID cannot call any API and is out
+/// of scope. Google began issuing a differently-shaped "Auth key" (service
+/// account-bound, reported with an `AQ.` prefix) as the new default in 2026
+/// and is retiring standalone `AIza` keys; that newer shape is an
+/// intentional false negative until its grammar is confirmed from
+/// authoritative Google documentation, not third-party reports. A suffix
+/// shorter or longer than exactly 35 bytes, or an undocumented prefix, is
+/// also an intentional false negative rather than a fuzzy match. The same
+/// `AIza`-prefixed shape appears in public Firebase/browser configuration
+/// (referrer-restricted, not always a privileged secret) as well as in
+/// service-scoped Cloud/Gemini use, so this detector reports the shape at
+/// `Confidence::High` and leaves the redact/warn action call to policy, the
+/// same tradeoff npm and the other known-format providers above make.
+pub(super) const GOOGLE: KnownFormatProviderDetector = KnownFormatProviderDetector {
+    id: "google-api-key",
+    type_name: "google_api_key",
+    signals: &["google-documented-prefix", "exact-length-suffix"],
+    prefixes: &["AIza"],
+    run: RunLength::Exact(35),
+    alphabet: pattern::is_alnum_dash,
+    boundary: pattern::is_alnum_dash,
+};
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -232,6 +259,9 @@ mod tests {
     /// npm's suffix is matched as an exact 36-byte length, not a minimum, so
     /// it needs its own fixed-length synthetic body rather than [`BODY`].
     const NPM_BODY: &str = "SYNTHETICREVOKEDNPMACCESSTOKENVALUE1";
+    /// Google's suffix is matched as an exact 35-byte length, not a minimum,
+    /// so it needs its own fixed-length synthetic body rather than [`BODY`].
+    const GOOGLE_BODY: &str = "SYNTHETIC_REVOKED_GOOGLE_API_KEY012";
 
     fn detect(detector: &KnownFormatProviderDetector, input: &str) -> Vec<Candidate> {
         detector
@@ -301,6 +331,11 @@ mod tests {
                 detector: NPM,
                 value: format!("npm_{NPM_BODY}"),
                 short: "npm_SYNTHETICSHORT",
+            },
+            Family {
+                detector: GOOGLE,
+                value: format!("AIza{GOOGLE_BODY}"),
+                short: "AIzaSYNTHETICSHORT",
             },
         ]
     }
