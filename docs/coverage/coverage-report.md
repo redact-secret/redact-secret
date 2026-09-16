@@ -15,11 +15,11 @@ These counts describe finding-type inventory rows with corpus evidence, not dete
 
 | Row state | Count |
 | --- | --- |
-| supported | 26 |
+| supported | 27 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 37.
+Coverage declarations: 38.
 
 ## Coverage by detector
 
@@ -38,6 +38,7 @@ Coverage declarations: 37.
 | huggingface-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | jwt | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | linear-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| microsoft-entra-client-secret | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | npm-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | openai-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | otpauth-uri | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -69,6 +70,7 @@ Coverage declarations: 37.
 | huggingface_token | huggingface-token | provider | supported | not-applicable | none |
 | jwt | jwt | structural | supported | not-applicable | none |
 | linear_token | linear-token | provider | supported | not-applicable | none |
+| microsoft_entra_client_secret | microsoft-entra-client-secret | provider | supported | not-applicable | none |
 | npm_access_token | npm-token | provider | supported | not-applicable | none |
 | openai_api_key | openai-token | provider | supported | not-applicable | none |
 | otpauth_secret | otpauth-uri | structural | supported | supported | none |
@@ -106,15 +108,15 @@ Coverage declarations: 37.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 37 | 0 | 0 |
-| boundary | 26 | 0 | 0 |
-| host-context | 26 | 0 | 0 |
+| adversarial | 38 | 0 | 0 |
+| boundary | 27 | 0 | 0 |
+| host-context | 27 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 37 | 0 | 0 |
-| near-miss-negative | 26 | 0 | 0 |
-| overlap | 26 | 0 | 0 |
-| positive | 26 | 0 | 0 |
-| range | 37 | 0 | 0 |
+| malformed | 38 | 0 | 0 |
+| near-miss-negative | 27 | 0 | 0 |
+| overlap | 27 | 0 | 0 |
+| positive | 27 | 0 | 0 |
+| range | 38 | 0 | 0 |
 
 ## Unresolved and pending coverage
 
