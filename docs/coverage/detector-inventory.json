@@ -137,10 +137,24 @@
       "schemes": null
     },
     {
+      "type": "google_api_key",
+      "detector": "google-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "AIzaSYNTHETIC_REVOKED_GOOGLE_API_KEY012",
+      "schemes": null
+    },
+    {
       "type": "sendgrid_api_key",
       "detector": "sendgrid-token",
       "policyClass": "always-redact",
       "reconciliationTrigger": "SG.SYNTHETIC_REVOKED_0000.SYNTHETIC_REVOKED_SENDGRID_SECRET_000000000",
+      "schemes": null
+    },
+    {
+      "type": "microsoft_entra_client_secret",
+      "detector": "microsoft-entra-client-secret",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "abc8Q~SYNTHETIC_REVOKED_ENTRA_SECRET_V",
       "schemes": null
     },
     {

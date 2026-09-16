@@ -15,11 +15,11 @@ These counts describe finding-type inventory rows with corpus evidence, not dete
 
 | Row state | Count |
 | --- | --- |
-| supported | 26 |
+| supported | 28 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 37.
+Coverage declarations: 39.
 
 ## Coverage by detector
 
@@ -35,9 +35,11 @@ Coverage declarations: 37.
 | generic-token | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
 | github-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | gitlab-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| google-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | huggingface-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | jwt | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | linear-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| microsoft-entra-client-secret | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | npm-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | openai-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | otpauth-uri | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -66,9 +68,11 @@ Coverage declarations: 37.
 | docker_token | docker-token | provider | supported | not-applicable | none |
 | github_token | github-token | provider | supported | not-applicable | none |
 | gitlab_token | gitlab-token | provider | supported | not-applicable | none |
+| google_api_key | google-api-key | provider | supported | not-applicable | none |
 | huggingface_token | huggingface-token | provider | supported | not-applicable | none |
 | jwt | jwt | structural | supported | not-applicable | none |
 | linear_token | linear-token | provider | supported | not-applicable | none |
+| microsoft_entra_client_secret | microsoft-entra-client-secret | provider | supported | not-applicable | none |
 | npm_access_token | npm-token | provider | supported | not-applicable | none |
 | openai_api_key | openai-token | provider | supported | not-applicable | none |
 | otpauth_secret | otpauth-uri | structural | supported | supported | none |
@@ -106,15 +110,15 @@ Coverage declarations: 37.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 37 | 0 | 0 |
-| boundary | 26 | 0 | 0 |
-| host-context | 26 | 0 | 0 |
+| adversarial | 39 | 0 | 0 |
+| boundary | 28 | 0 | 0 |
+| host-context | 28 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 37 | 0 | 0 |
-| near-miss-negative | 26 | 0 | 0 |
-| overlap | 26 | 0 | 0 |
-| positive | 26 | 0 | 0 |
-| range | 37 | 0 | 0 |
+| malformed | 39 | 0 | 0 |
+| near-miss-negative | 28 | 0 | 0 |
+| overlap | 28 | 0 | 0 |
+| positive | 28 | 0 | 0 |
+| range | 39 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

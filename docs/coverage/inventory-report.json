@@ -645,6 +645,42 @@
       "type": "npm_access_token"
     },
     {
+      "detector": "google-api-key",
+      "evidence": {
+        "fixtureCount": 18,
+        "hostContextsExercised": [
+          "dotenv",
+          "javascript",
+          "json",
+          "log",
+          "plain-text",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "google-positive-dotenv",
+        "google-positive-javascript-firebase-config",
+        "google-positive-json",
+        "google-positive-log",
+        "google-positive-qualified",
+        "google-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "google_api_key"
+    },
+    {
       "detector": "sendgrid-token",
       "evidence": {
         "fixtureCount": 14,
@@ -675,6 +711,32 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "sendgrid_api_key"
+    },
+    {
+      "detector": "microsoft-entra-client-secret",
+      "evidence": {
+        "fixtureCount": 11,
+        "hostContextsExercised": [
+          "plain-text"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "microsoft-entra-client-secret-positive-bare"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "microsoft_entra_client_secret"
     },
     {
       "detector": "jwt",
@@ -1052,7 +1114,7 @@
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 26,
+    "supported": 28,
     "unresolved": 0
   }
 }

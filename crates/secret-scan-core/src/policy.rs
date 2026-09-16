@@ -6,7 +6,7 @@ use crate::types::{Action, Confidence, DetectedFinding, Policy, PolicyContext};
 
 /// Finding types that are always redacted regardless of confidence, because
 /// their format alone is specific enough to be actionable.
-const ALWAYS_REDACT_TYPES: [&str; 24] = [
+const ALWAYS_REDACT_TYPES: [&str; 26] = [
     "anthropic_api_key",
     "authorization_credential",
     "aws_access_key_id",
@@ -17,9 +17,11 @@ const ALWAYS_REDACT_TYPES: [&str; 24] = [
     "docker_token",
     "github_token",
     "gitlab_token",
+    "google_api_key",
     "huggingface_token",
     "jwt",
     "linear_token",
+    "microsoft_entra_client_secret",
     "npm_access_token",
     "openai_api_key",
     "otpauth_secret",

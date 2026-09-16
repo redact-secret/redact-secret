@@ -1676,6 +1676,98 @@
     },
     {
       "behaviorClass": "provider",
+      "detector": "google-api-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "google-positive-dotenv",
+            "google-positive-javascript-firebase-config",
+            "google-positive-json",
+            "google-positive-log",
+            "google-positive-qualified",
+            "google-positive-yaml"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "google-overlap-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "google-adversarial-long-suffix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "google-boundary-below-min",
+            "google-boundary-case-sensitivity",
+            "google-boundary-crlf",
+            "google-boundary-delimiter",
+            "google-boundary-invalid-alphabet",
+            "google-boundary-short",
+            "google-boundary-unicode-lookalike-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "google-negative-key-id",
+            "google-negative-masked",
+            "google-negative-placeholder"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "google-boundary-below-min",
+            "google-boundary-case-sensitivity",
+            "google-boundary-crlf",
+            "google-boundary-delimiter",
+            "google-boundary-invalid-alphabet",
+            "google-boundary-short",
+            "google-boundary-unicode-lookalike-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for google_api_key (google-api-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "google_api_key"
+    },
+    {
+      "behaviorClass": "provider",
       "detector": "sendgrid-token",
       "dimensions": [
         {
@@ -1759,6 +1851,89 @@
       ],
       "note": "Coverage declaration for sendgrid_api_key (sendgrid-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
       "type": "sendgrid_api_key"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "microsoft-entra-client-secret",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "microsoft-entra-client-secret-positive-bare"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "microsoft-entra-client-secret-overlap-generic-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "microsoft-entra-client-secret-adversarial-long-padding"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "microsoft-entra-client-secret-boundary-above-max",
+            "microsoft-entra-client-secret-boundary-below-min",
+            "microsoft-entra-client-secret-boundary-invalid-alphabet",
+            "microsoft-entra-client-secret-boundary-missing-digit",
+            "microsoft-entra-client-secret-boundary-short-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "microsoft-entra-client-secret-negative-lookalike",
+            "microsoft-entra-client-secret-negative-ordinary-reference",
+            "microsoft-entra-client-secret-negative-placeholder"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "microsoft-entra-client-secret-boundary-above-max",
+            "microsoft-entra-client-secret-boundary-below-min",
+            "microsoft-entra-client-secret-boundary-invalid-alphabet",
+            "microsoft-entra-client-secret-boundary-missing-digit",
+            "microsoft-entra-client-secret-boundary-short-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for microsoft_entra_client_secret (microsoft-entra-client-secret), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "microsoft_entra_client_secret"
     },
     {
       "behaviorClass": "structural",
@@ -2624,9 +2799,11 @@
             "docker-adversarial-long-suffix",
             "github-adversarial-long-suffix",
             "gitlab-adversarial-long-suffix",
+            "google-adversarial-long-suffix",
             "huggingface-adversarial-long-suffix",
             "jwt-adversarial-incomplete",
             "linear-adversarial-long-suffix",
+            "microsoft-entra-client-secret-adversarial-long-padding",
             "npm-adversarial-long-suffix",
             "openai-adversarial-long-suffix",
             "otpauth-adversarial-overlong-query",
@@ -2909,9 +3086,11 @@
             "docker-adversarial-long-suffix",
             "github-adversarial-long-suffix",
             "gitlab-adversarial-long-suffix",
+            "google-adversarial-long-suffix",
             "huggingface-adversarial-long-suffix",
             "jwt-adversarial-incomplete",
             "linear-adversarial-long-suffix",
+            "microsoft-entra-client-secret-adversarial-long-padding",
             "npm-adversarial-long-suffix",
             "openai-adversarial-long-suffix",
             "otpauth-adversarial-overlong-query",
