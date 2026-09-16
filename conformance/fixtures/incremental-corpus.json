@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 22,
+  "fixtureCount": 24,
   "fixtures": [
     {
       "id": "synthetic-regression-malformed-authority",
@@ -349,6 +349,29 @@
       "text": "secret:\n  secretName: web-tls-cert",
       "expected": [],
       "note": "issue #262: an operator with no value before end-of-line does not treat the next line's token as the value, so a YAML secret: block opening a nested secretName: mapping is released unchanged at every partition."
+    },
+    {
+      "id": "contextual-assignment-flow-mapping-nested-key-not-captured",
+      "input": "volumes: [{name: tls, secret: {secretName: web-tls-cert}}]",
+      "text": "volumes: [{name: tls, secret: {secretName: web-tls-cert}}]",
+      "expected": [],
+      "note": "issue #266: an unquoted value starting with `{` no longer captures a YAML flow mapping's nested key as the assignment value, so `secret: {secretName: ...}` is released unchanged at every partition."
+    },
+    {
+      "id": "contextual-assignment-flow-mapping-block-style-still-detected",
+      "input": "secret: SYNTHETIC_REVOKED_CONTEXT_VALUE",
+      "text": "secret: <SECRET_1>",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 8,
+          "end": 39
+        }
+      ],
+      "note": "issue #266: excluding a leading `{`/`[` from unquoted assignment values does not affect ordinary block-style YAML, where secret: <value> is still detected and redacted at every partition."
     },
     {
       "id": "contextual-assignment-nested-credential-under-parent-key",

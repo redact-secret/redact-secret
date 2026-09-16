@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 436,
+  "fixtureCount": 438,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -10011,6 +10011,41 @@
       "input": "secret:\n  secretName: web-tls-cert",
       "expected": [],
       "note": "issue #262: a contextual-assignment operator with no value before end-of-line no longer reads the next line's YAML key as its value -- a Kubernetes-style `secret:` block opening a nested `secretName:` mapping produces no finding."
+    },
+    {
+      "id": "regression-yaml-flow-mapping-nested-key-not-captured",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "volumes: [{name: tls, secret: {secretName: web-tls-cert}}]",
+      "expected": [],
+      "note": "issue #266: an unquoted assignment value starting with `{` or `[` opens a YAML/JSON flow structure rather than a scalar, so a flow mapping's `secret: {secretName: ...}` no longer captures the nested `secretName:` key as the value."
+    },
+    {
+      "id": "regression-yaml-flow-mapping-block-style-still-detected",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "secret: SYNTHETIC_REVOKED_CONTEXT_VALUE",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 8,
+          "end": 39
+        }
+      ],
+      "note": "issue #266: excluding a leading `{`/`[` from unquoted assignment values does not affect ordinary block-style YAML, where `secret: <value>` is still detected."
     },
     {
       "id": "regression-password-prompt-no-crossing-newline",
