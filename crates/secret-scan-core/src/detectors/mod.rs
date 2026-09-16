@@ -10,6 +10,7 @@
 
 mod additional_providers;
 mod anthropic;
+mod atlassian;
 mod aws;
 mod azure_devops;
 mod bearer_token;
@@ -65,6 +66,7 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(microsoft_entra::MicrosoftEntraClientSecretDetector),
         Box::new(azure_devops::AzureDevOpsPersonalAccessTokenDetector),
         Box::new(notion::NotionTokenDetector),
+        Box::new(atlassian::AtlassianApiTokenDetector),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
         Box::new(ConnectionStringDetector),
@@ -121,6 +123,7 @@ mod tests {
                 "microsoft-entra-client-secret",
                 "azure-devops-personal-access-token",
                 "notion-token",
+                "atlassian-api-token",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -160,7 +163,11 @@ mod tests {
         let pypi_input = format!("pypi-{}", "SYNTHETIC_REVOKED_".repeat(5));
         let sendgrid_input =
             "SG.SYNTHETIC_REVOKED_0000.SYNTHETIC_REVOKED_SENDGRID_SECRET_000000000";
-        let cases: [(&str, &str); 23] = [
+        let atlassian_input = format!(
+            "ATAT{}",
+            "SYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY_".repeat(3)
+        );
+        let cases: [(&str, &str); 24] = [
             ("aws-access-key", "AKIASYNTHETICEXAMPLE"),
             (
                 "github-token",
@@ -199,6 +206,7 @@ mod tests {
                 "notion-token",
                 "secret_SYNTHETICREVOKEDNOTIONLEGACYTOKENVALUE00000",
             ),
+            ("atlassian-api-token", atlassian_input.as_str()),
         ];
         let detectors = built_in_detectors();
         for (id, input) in cases {

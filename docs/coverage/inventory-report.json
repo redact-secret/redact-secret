@@ -796,6 +796,39 @@
       "type": "notion_integration_token"
     },
     {
+      "detector": "atlassian-api-token",
+      "evidence": {
+        "fixtureCount": 16,
+        "hostContextsExercised": [
+          "dotenv",
+          "json",
+          "log",
+          "plain-text"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "atlassian-api-token-positive-bare",
+        "atlassian-api-token-positive-crlf-unicode-prefix",
+        "atlassian-api-token-positive-dotenv",
+        "atlassian-api-token-positive-json",
+        "atlassian-api-token-positive-log"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "atlassian_api_token"
+    },
+    {
       "detector": "jwt",
       "evidence": {
         "fixtureCount": 11,
@@ -1171,7 +1204,7 @@
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 30,
+    "supported": 31,
     "unresolved": 0
   }
 }

@@ -15,17 +15,18 @@ These counts describe finding-type inventory rows with corpus evidence, not dete
 
 | Row state | Count |
 | --- | --- |
-| supported | 30 |
+| supported | 31 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 41.
+Coverage declarations: 42.
 
 ## Coverage by detector
 
 | Detector | Declared types | Row states |
 | --- | --- | --- |
 | anthropic-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| atlassian-api-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | aws-access-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | azure-devops-personal-access-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | bearer-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -60,6 +61,7 @@ Coverage declarations: 41.
 | Type | Detector | Behavior class | State | Scheme states | Pending dimensions |
 | --- | --- | --- | --- | --- | --- |
 | anthropic_api_key | anthropic-token | provider | supported | not-applicable | none |
+| atlassian_api_token | atlassian-api-token | provider | supported | not-applicable | none |
 | authorization_credential | generic-token | contextual | supported | supported | none |
 | aws_access_key_id | aws-access-key | provider | supported | not-applicable | none |
 | azure_devops_personal_access_token | azure-devops-personal-access-token | provider | supported | not-applicable | none |
@@ -114,15 +116,15 @@ Coverage declarations: 41.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 41 | 0 | 0 |
-| boundary | 30 | 0 | 0 |
-| host-context | 30 | 0 | 0 |
+| adversarial | 42 | 0 | 0 |
+| boundary | 31 | 0 | 0 |
+| host-context | 31 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 41 | 0 | 0 |
-| near-miss-negative | 30 | 0 | 0 |
-| overlap | 30 | 0 | 0 |
-| positive | 30 | 0 | 0 |
-| range | 41 | 0 | 0 |
+| malformed | 42 | 0 | 0 |
+| near-miss-negative | 31 | 0 | 0 |
+| overlap | 31 | 0 | 0 |
+| positive | 31 | 0 | 0 |
+| range | 42 | 0 | 0 |
 
 ## Unresolved and pending coverage
 
