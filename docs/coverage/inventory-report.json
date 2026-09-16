@@ -228,7 +228,7 @@
     {
       "detector": "openai-token",
       "evidence": {
-        "fixtureCount": 13,
+        "fixtureCount": 16,
         "hostContextsExercised": [
           "plain-text"
         ],
@@ -245,8 +245,10 @@
       },
       "evidenceFixtureIds": [
         "openai-positive-all-prefixes",
+        "openai-positive-doc-style-placeholder",
         "openai-positive-min-length",
-        "openai-positive-project"
+        "openai-positive-project",
+        "openai-positive-punctuation-adjacent"
       ],
       "policyClass": "always-redact",
       "schemeRows": "not-applicable",
@@ -256,7 +258,7 @@
     {
       "detector": "anthropic-token",
       "evidence": {
-        "fixtureCount": 11,
+        "fixtureCount": 15,
         "hostContextsExercised": [
           "plain-text"
         ],
@@ -272,7 +274,9 @@
         ]
       },
       "evidenceFixtureIds": [
+        "anthropic-positive-doc-style-placeholder",
         "anthropic-positive-min-length",
+        "anthropic-positive-punctuation-adjacent",
         "anthropic-positive-versioned"
       ],
       "policyClass": "always-redact",

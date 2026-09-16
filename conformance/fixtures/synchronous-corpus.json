@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 539,
+  "fixtureCount": 546,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -6959,6 +6959,63 @@
       "note": "A long delimited match remains deterministic and bounded."
     },
     {
+      "id": "openai-positive-doc-style-placeholder",
+      "detector": "openai-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk-proj-xxxxxxxxxxxxxxxxxxxx",
+      "expected": [
+        {
+          "detector": "openai-token",
+          "type": "openai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 28
+        }
+      ],
+      "note": "A documentation placeholder built entirely from valid alphabet characters (e.g. a repeated filler letter) is indistinguishable from a real secret's shape and is classified: an accepted precision/recall tradeoff, not a bug. Only a placeholder that breaks the alphabet run (angle brackets, characters outside the allowed set) is excluded."
+    },
+    {
+      "id": "openai-negative-embedded-in-wider-identifier",
+      "detector": "openai-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "legacysk-proj-SYNTHETIC_REVOKED_KEY_VALUE",
+      "expected": [],
+      "note": "The 'sk-' prefix immediately preceded by an alphanumeric/dash character ('legacysk-proj-...') is a truncated slice of a wider benign identifier, not a boundary-delimited credential, so no candidate is emitted; a real secret substring is never carved out of a longer surrounding token."
+    },
+    {
+      "id": "openai-positive-punctuation-adjacent",
+      "detector": "openai-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Rotate sk-proj-SYNTHETIC_REVOKED_KEY_VALUE, then redeploy.",
+      "expected": [
+        {
+          "detector": "openai-token",
+          "type": "openai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 7,
+          "end": 42
+        }
+      ],
+      "note": "Trailing prose punctuation immediately after the suffix correctly bounds the match instead of being folded into it or suppressing the finding."
+    },
+    {
       "id": "anthropic-positive-versioned",
       "detector": "anthropic-token",
       "kind": "positive",
@@ -7147,6 +7204,76 @@
         }
       ],
       "note": "A long delimited provider match remains deterministic and bounded."
+    },
+    {
+      "id": "anthropic-positive-doc-style-placeholder",
+      "detector": "anthropic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk-ant-api03-xxxxxxxxxxxxxxxxxxxx",
+      "expected": [
+        {
+          "detector": "anthropic-token",
+          "type": "anthropic_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 33
+        }
+      ],
+      "note": "A documentation placeholder built entirely from valid alphabet characters (e.g. a repeated filler letter) is indistinguishable from a real secret's shape and is classified: an accepted precision/recall tradeoff, not a bug. Only a placeholder that breaks the alphabet run (angle brackets, characters outside the allowed set) is excluded."
+    },
+    {
+      "id": "anthropic-negative-embedded-in-wider-identifier",
+      "detector": "anthropic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "mysk-ant-api03-SYNTHETIC_REVOKED_ANTHROPIC_KEY",
+      "expected": [],
+      "note": "The versioned prefix immediately preceded by an alphanumeric/dash character ('mysk-ant-api03-...') is a truncated slice of a wider benign identifier, not a boundary-delimited credential, so no candidate is emitted; a real secret substring is never carved out of a longer surrounding token."
+    },
+    {
+      "id": "anthropic-positive-punctuation-adjacent",
+      "detector": "anthropic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Rotate sk-ant-api03-SYNTHETIC_REVOKED_KEY_VALUE, then redeploy.",
+      "expected": [
+        {
+          "detector": "anthropic-token",
+          "type": "anthropic_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 7,
+          "end": 47
+        }
+      ],
+      "note": "Trailing prose punctuation immediately after the suffix correctly bounds the match instead of being folded into it or suppressing the finding."
+    },
+    {
+      "id": "anthropic-negative-legacy-unversioned-tradeoff",
+      "detector": "anthropic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk-ant-SYNTHETIC_REVOKED_LEGACY_ANTHROPIC_KEY_VALUE",
+      "expected": [],
+      "note": "An unversioned 'sk-ant-' value (no 'api03' segment) can be a genuine older or shortened Anthropic key, but is not classified by any detector: openai-token excludes the whole 'sk-ant-' namespace on the assumption anthropic-token owns it, and anthropic-token requires the versioned prefix. This is a documented, accepted false-negative tradeoff for precision, not an oversight, and is distinct from openai-negative-lookalike, which only shows the openai-token side of the exclusion."
     },
     {
       "id": "shopify-positive-admin-access",
