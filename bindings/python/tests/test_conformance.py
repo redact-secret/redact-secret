@@ -32,12 +32,30 @@ def _actual_tuples(findings: list[redact_secret.Finding]) -> list[tuple]:
     return [(f.detector, f.type, f.confidence, f.start, f.end) for f in findings]
 
 
+def _finding_tuples(findings: list[redact_secret.Finding]) -> list[tuple]:
+    return [(f.id, f.type, f.detector, f.confidence, f.action, f.start, f.end) for f in findings]
+
+
+def _assert_equal(actual: object, expected: object, fixture_id: str) -> None:
+    """Compares outside an `assert` statement so pytest's assertion-rewriting
+    import hook never expands a mismatch into a printed diff, which could
+    otherwise surface a fixture input or a matched value in test output."""
+    if actual != expected:
+        raise AssertionError(fixture_id)
+
+
 def _synchronous_fixtures() -> list[dict]:
     corpus = load_corpus("synchronous-corpus.json")
     assert corpus["offsetUnit"] == "utf8-byte"
     # "not-yet-evaluated" fixtures carry no `expected` value (`null`) and
     # document a future gap, not a current behavioral contract.
     return [f for f in corpus["fixtures"] if f["support"] != "not-yet-evaluated"]
+
+
+def _canonical_fixtures() -> list[dict]:
+    corpus = load_corpus("synchronous-corpus.json")
+    assert corpus["offsetUnit"] == "utf8-byte"
+    return [f for f in corpus["fixtures"] if f["tier"] == "canonical"]
 
 
 @pytest.mark.parametrize(
@@ -58,6 +76,61 @@ def test_synchronous_corpus_is_not_vacuous() -> None:
     assert len(fixtures) >= 100
     assert any(f["expected"] for f in fixtures)
     assert any(not f["expected"] for f in fixtures)
+
+
+@pytest.mark.parametrize(
+    "fixture",
+    _synchronous_fixtures(),
+    ids=lambda fixture: fixture["id"],
+)
+def test_scan_and_redact_agrees_with_scan_then_redact_over_the_synchronous_corpus(
+    fixture: dict,
+) -> None:
+    """Mirrors the Rust core's
+    `scan_and_redact_equals_scan_then_redact_over_the_canonical_corpus`
+    (`crates/secret-scan-core/tests/public_api.rs`): `scan_and_redact`
+    must produce exactly the text and findings that separate `scan` and
+    `redact` calls produce, for every non-`not-yet-evaluated` synchronous
+    fixture."""
+    text = fixture["input"]
+    findings = redact_secret.scan(text)
+    redacted = redact_secret.redact(text, findings)
+
+    combined = redact_secret.scan_and_redact(text)
+
+    _assert_equal(combined.text, redacted, fixture["id"])
+    _assert_equal(_finding_tuples(combined.findings), _finding_tuples(findings), fixture["id"])
+
+
+@pytest.mark.parametrize(
+    "fixture",
+    _canonical_fixtures(),
+    ids=lambda fixture: fixture["id"],
+)
+def test_scan_and_redact_matches_the_canonical_corpus_redacted_text(
+    fixture: dict,
+) -> None:
+    """Mirrors the CLI's `redact_matches_the_canonical_corpus_redacted_text`
+    (`crates/secret-scan-cli/tests/cli.rs`): a `canonical`-tier fixture
+    declares exactly one high-signal expectation, and `DefaultPolicy`
+    always redacts or blocks it, both of which replace the range with
+    `<SECRET_1>` - so the expected text is computable from the fixture's
+    own `expected[0]` range alone."""
+    text = fixture["input"]
+    expected = fixture["expected"][0]
+    start = byte_offset_to_char_offset_reference(text, expected["start"])
+    end = byte_offset_to_char_offset_reference(text, expected["end"])
+    expected_text = f"{text[:start]}<SECRET_1>{text[end:]}"
+
+    result = redact_secret.scan_and_redact(text)
+
+    _assert_equal(result.text, expected_text, fixture["id"])
+
+
+def test_canonical_corpus_is_not_vacuous() -> None:
+    """Guards against the canonical tier being empty, which would make the
+    parametrized test above pass without checking anything."""
+    assert len(_canonical_fixtures()) > 0
 
 
 def _unicode_fixtures() -> list[dict]:

@@ -232,9 +232,12 @@ This item defines the schema, the UTF-8 range model, and the canonical
 synchronous, incremental, Unicode-conversion, and safe-error corpora. The
 Rust core consumes the canonical corpus directly
 (`crates/secret-scan-core/tests/canonical_corpus.rs`, plus the incremental and
-adversarial corpora — see the two sections above); a full Python
-detector-pipeline consumer for the whole synchronous corpus is a separate,
-larger change tracked elsewhere. Every JSON file under `fixtures/` is the
+adversarial corpora — see the two sections above); the Python binding
+consumes the whole synchronous corpus too
+(`bindings/python/tests/test_conformance.py`), asserting `scan()` against
+every corpus-declared expectation, `scan_and_redact()` against separate
+`scan()` + `redact()` calls, and the canonical tier's exact redacted text.
+Every JSON file under `fixtures/` is the
 independently authored, hand-maintained canonical source — the TypeScript
 oracle and the migration tooling that originally derived them from it have
 been retired (`RB-2`, issue #72).
