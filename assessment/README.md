@@ -295,6 +295,11 @@ performance profiles per category; Node and browser WebAssembly fix a cap per
 profile (Node's external-memory category is shared, since the two profiles'
 observations were nearly identical).
 
+The [`Complete assessment`](../.github/workflows/complete-assessment.yml)
+workflow runs on `ubuntu-latest`, so its "Evaluate the fixed RC acceptance
+criteria" step passes `--criteria assessment/acceptance-criteria-linux-x64.json`
+and is evaluated against this profile, not the macOS one.
+
 Evaluate a Linux x86_64 candidate the same way as the macOS profile, pointing
 `--criteria` at the Linux document:
 
