@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 546,
+  "fixtureCount": 555,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -6254,6 +6254,28 @@
       "note": "The fixed-length AKIA family is supported."
     },
     {
+      "id": "aws-positive-asia-canonical",
+      "detector": "aws-access-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "ASIASYNTHETICEXAMPLE",
+      "expected": [
+        {
+          "detector": "aws-access-key",
+          "type": "aws_access_key_id",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 20
+        }
+      ],
+      "note": "The temporary-credential ASIA prefix is corpus-evidenced alongside AKIA, not just unit-tested, so cross-surface bindings (JS, Python, WASM) also see it."
+    },
+    {
       "id": "aws-negative-role-id",
       "detector": "aws-access-key",
       "kind": "negative",
@@ -6265,6 +6287,71 @@
       "input": "AROASYNTHETICEXAMPLE",
       "expected": [],
       "note": "AWS role identifiers are not credentials."
+    },
+    {
+      "id": "aws-negative-user-id",
+      "detector": "aws-access-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "AIDASYNTHETICEXAMPLE",
+      "expected": [],
+      "note": "AWS IAM user identifiers (the AIDA prefix) are not credentials and are excluded, like the existing AROA role-identifier fixture."
+    },
+    {
+      "id": "aws-negative-account-id",
+      "detector": "aws-access-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "AWS account 123456789012 owns this resource.",
+      "expected": [],
+      "note": "A bare 12-digit AWS account ID carries no AKIA/ASIA prefix and is never a candidate."
+    },
+    {
+      "id": "aws-negative-arn-role",
+      "detector": "aws-access-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "arn:aws:iam::123456789012:role/SyntheticExampleRole",
+      "expected": [],
+      "note": "An IAM role ARN names a resource, not a resolved access-key credential, and stays excluded."
+    },
+    {
+      "id": "aws-negative-arn-resource",
+      "detector": "aws-access-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "arn:aws:s3:::synthetic-example-bucket-2026",
+      "expected": [],
+      "note": "An S3 bucket ARN names a resource, not a credential, and stays excluded."
+    },
+    {
+      "id": "aws-negative-ordinary-uppercase-identifier",
+      "detector": "aws-access-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "MAX_CONNECTIONS_ALLOWED_SYNTHETIC_EXAMPLE",
+      "expected": [],
+      "note": "An ordinary SCREAMING_SNAKE_CASE identifier that shares no AKIA/ASIA prefix is never a candidate, however it is shaped."
     },
     {
       "id": "aws-boundary-embedded",
@@ -6306,6 +6393,50 @@
         }
       ],
       "note": "Provider evidence wins over a contextual assignment."
+    },
+    {
+      "id": "aws-positive-example-shaped-value-in-comment-context",
+      "detector": "aws-access-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "javascript"
+      ],
+      "input": "// example: AKIASYNTHETICEXAMPLE (rotate before deploying)",
+      "expected": [
+        {
+          "detector": "aws-access-key",
+          "type": "aws_access_key_id",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 12,
+          "end": 32
+        }
+      ],
+      "note": "A key-shaped value inside a comment naming the field 'example' is not suppressed merely by that context — only the exact vendor-documented literal is excluded (see the regression-aws-example-* fixtures). This is a genuine credential shape and must still be detected."
+    },
+    {
+      "id": "aws-positive-unicode-adjacent-multibyte-before",
+      "detector": "aws-access-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "caféAKIASYNTHETICEXAMPLE",
+      "expected": [
+        {
+          "detector": "aws-access-key",
+          "type": "aws_access_key_id",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5,
+          "end": 25
+        }
+      ],
+      "note": "A multi-byte UTF-8 character (é, 2 bytes) immediately before the run is correctly treated as a non-alnum boundary byte, and the UTF-8 byte offset lands past both of its bytes rather than splitting them."
     },
     {
       "id": "aws-adversarial-long-suffix",
@@ -10983,6 +11114,28 @@
       "input": "AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE",
       "expected": [],
       "note": "The same documented example access key ID stays exempted when embedded in a dotenv-style assignment."
+    },
+    {
+      "id": "regression-aws-example-mutation-still-detected",
+      "detector": "aws-access-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "AKIAIOSFODNN7EXAMPLF",
+      "expected": [
+        {
+          "detector": "aws-access-key",
+          "type": "aws_access_key_id",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 20
+        }
+      ],
+      "note": "A one-character mutation of AWS's documented example access key ID (last byte E to F) no longer matches the exact-literal carve-out and is correctly detected — pairing that exclusion with a surviving positive proves it is exact-match only, not a shape-based allowance that could hide a real secret."
     },
     {
       "id": "regression-aws-example-secret-access-key",
