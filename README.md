@@ -199,7 +199,7 @@ Built-in Rust detection covers:
 - JWTs and bearer, Basic, and Token authorization credentials;
 - OpenAI, Anthropic, Shopify, and modern HashiCorp Vault credentials;
 - qualified Stripe, Slack, PyPI, Hugging Face, Docker Hub, Cloudflare,
-  DigitalOcean, Linear, Supabase, and Vercel credentials;
+  DigitalOcean, Linear, Supabase, Vercel, and SendGrid credentials;
 - contextual credential assignments, including AWS secret-access-key and
   session-token setting names;
 - credential-bearing PostgreSQL, MySQL, MariaDB, MongoDB, Redis, and AMQP URLs;

@@ -5,6 +5,13 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+- Added a `sendgrid-token` detector recognizing SendGrid's documented
+  `SG.<22-byte id>.<43-byte secret>` API key shape, both segments drawn from
+  the URL-safe base64 alphabet. Previously this shape was detected only when
+  assigned to a recognized generic field name like `api_key`; a bare token
+  or one assigned to an unrecognized name such as `SENDGRID_TOKEN` produced
+  no finding. The new detector is always-redact, provider-specific, and wins
+  any overlap with the generic contextual detector.
 - The `generic-token` detector no longer reports a value fully delimited by
   an interpolation or command-substitution syntax as a secret: a
   shell/`Makefile`/Kustomize `$(...)` variable or command substitution

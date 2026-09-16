@@ -21,6 +21,7 @@ mod openai;
 mod otpauth;
 mod pattern;
 mod private_key;
+mod sendgrid;
 mod shopify;
 mod text;
 mod vault;
@@ -56,6 +57,7 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(additional_providers::SUPABASE),
         Box::new(additional_providers::VERCEL),
         Box::new(additional_providers::NPM),
+        Box::new(sendgrid::SendgridTokenDetector),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
         Box::new(ConnectionStringDetector),
@@ -107,6 +109,7 @@ mod tests {
                 "supabase-token",
                 "vercel-token",
                 "npm-token",
+                "sendgrid-token",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -144,7 +147,9 @@ mod tests {
     #[test]
     fn every_built_in_provider_candidate_claims_provider_specificity() {
         let pypi_input = format!("pypi-{}", "SYNTHETIC_REVOKED_".repeat(5));
-        let cases: [(&str, &str); 18] = [
+        let sendgrid_input =
+            "SG.SYNTHETIC_REVOKED_0000.SYNTHETIC_REVOKED_SENDGRID_SECRET_000000000";
+        let cases: [(&str, &str); 19] = [
             ("aws-access-key", "AKIASYNTHETICEXAMPLE"),
             (
                 "github-token",
@@ -169,6 +174,7 @@ mod tests {
             ("supabase-token", "sb_secret_SYNTHETICREVOKEDPROVIDERVALUE"),
             ("vercel-token", "vcp_SYNTHETICREVOKEDPROVIDERVALUE"),
             ("npm-token", "npm_SYNTHETICREVOKEDNPMACCESSTOKENVALUE1"),
+            ("sendgrid-token", sendgrid_input),
         ];
         let detectors = built_in_detectors();
         for (id, input) in cases {
