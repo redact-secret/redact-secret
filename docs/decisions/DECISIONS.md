@@ -24,3 +24,4 @@ future planning and implementation but do not authorize Git or release actions.
 - [Detect a nested contextual assignment with no separator inside an enclosing quote](2026-09-16-detect-nested-assignments-with-no-separator-inside-a-quote.md)
 - [Freeze the Microsoft Entra application client-secret grammar as an unprefixed digit-Q-tilde marker](2026-09-16-freeze-microsoft-entra-client-secret-grammar.md)
 - [Freeze the Azure DevOps personal access token grammar as the documented 84-byte AZDO-signature shape](2026-09-16-freeze-azure-devops-pat-grammar.md)
+- [Freeze the Notion integration token grammar as two exact-length prefixed shapes](2026-09-16-freeze-notion-integration-token-grammar.md)

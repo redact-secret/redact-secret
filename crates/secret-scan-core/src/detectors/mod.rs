@@ -19,6 +19,7 @@ mod github;
 mod gitlab;
 mod jwt;
 mod microsoft_entra;
+mod notion;
 mod openai;
 mod otpauth;
 mod pattern;
@@ -63,6 +64,7 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(sendgrid::SendgridTokenDetector),
         Box::new(microsoft_entra::MicrosoftEntraClientSecretDetector),
         Box::new(azure_devops::AzureDevOpsPersonalAccessTokenDetector),
+        Box::new(notion::NotionTokenDetector),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
         Box::new(ConnectionStringDetector),
@@ -118,6 +120,7 @@ mod tests {
                 "sendgrid-token",
                 "microsoft-entra-client-secret",
                 "azure-devops-personal-access-token",
+                "notion-token",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -157,7 +160,7 @@ mod tests {
         let pypi_input = format!("pypi-{}", "SYNTHETIC_REVOKED_".repeat(5));
         let sendgrid_input =
             "SG.SYNTHETIC_REVOKED_0000.SYNTHETIC_REVOKED_SENDGRID_SECRET_000000000";
-        let cases: [(&str, &str); 22] = [
+        let cases: [(&str, &str); 23] = [
             ("aws-access-key", "AKIASYNTHETICEXAMPLE"),
             (
                 "github-token",
@@ -191,6 +194,10 @@ mod tests {
             (
                 "azure-devops-personal-access-token",
                 "SYNTHETICREVOKEDAZUREDEVOPSPATVALUEFORCONFORMANCETESTINGPADDINGFIXTUREDATAZZAZDOabcd",
+            ),
+            (
+                "notion-token",
+                "secret_SYNTHETICREVOKEDNOTIONLEGACYTOKENVALUE00000",
             ),
         ];
         let detectors = built_in_detectors();
