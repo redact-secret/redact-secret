@@ -874,7 +874,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 74,
+        "fixtureCount": 81,
         "hostContextsExercised": [
           "chat",
           "dotenv",
@@ -884,8 +884,11 @@
           "log",
           "markdown",
           "plain-text",
+          "python",
           "shell",
           "terminal",
+          "terraform",
+          "typescript",
           "yaml"
         ],
         "kindsWithSupportedEvidence": [
@@ -912,6 +915,7 @@
         "contextual-positive-aws-session-token",
         "contextual-positive-colon-spaced-operator",
         "contextual-positive-crlf-line-start",
+        "contextual-positive-dotted-screaming-case-value-still-detected",
         "contextual-positive-escaped-quote",
         "contextual-positive-minimum-length-is-medium-confidence",
         "contextual-positive-near-miss-repeated-asterisk-filler",
@@ -932,7 +936,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 74,
+        "fixtureCount": 81,
         "hostContextsExercised": [
           "chat",
           "dotenv",
@@ -942,8 +946,11 @@
           "log",
           "markdown",
           "plain-text",
+          "python",
           "shell",
           "terminal",
+          "terraform",
+          "typescript",
           "yaml"
         ],
         "kindsWithSupportedEvidence": [

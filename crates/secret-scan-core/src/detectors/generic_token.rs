@@ -215,6 +215,86 @@ fn is_template_reference(value: &str) -> bool {
     value.starts_with("{{") && value.ends_with("}}") && value.len() >= 4
 }
 
+/// A small, explicit set of source-code roots whose member-access syntax is
+/// unambiguous as soon as it opens: a Django/Rails/NestJS `settings`/`config`
+/// object, JS/Python/Ruby `self`/`this` instance access, or a Terraform
+/// `var`/`local`/`data` lookup. Anchored at the start of the value with a
+/// required `.` immediately after the root, so `self` does not also match an
+/// unrelated identifier like `selfhosted`.
+const CODE_REFERENCE_ROOTS: &[&str] = &[
+    "settings", "config", "cfg", "options", "self", "this", "var", "local", "data",
+];
+
+fn starts_with_code_reference_root(value: &str) -> bool {
+    CODE_REFERENCE_ROOTS.iter().any(|root| {
+        value
+            .strip_prefix(root)
+            .is_some_and(|rest| rest.starts_with('.'))
+    })
+}
+
+fn is_lower_snake_case_segment(segment: &str) -> bool {
+    let mut chars = segment.chars();
+    matches!(chars.next(), Some(first) if first.is_ascii_lowercase())
+        && chars.all(|ch| ch.is_ascii_lowercase() || ch.is_ascii_digit() || ch == '_')
+}
+
+/// `true` for a dotted chain of two or more `lower_snake_case` segments with
+/// at least one underscore somewhere in the chain — the shape of a Terraform
+/// resource/data-source attribute reference (`random_password.db.result`,
+/// `data.aws_secretsmanager_secret_version.db.secret_string`,
+/// `var.db_password`). The underscore requirement is deliberate: it is what
+/// keeps this from also matching a real dotted passphrase built from whole
+/// words (`my.pass.word`) — see the decision record for the tradeoff.
+fn is_snake_case_attribute_chain(value: &str) -> bool {
+    if !value.contains('_') || !value.contains('.') {
+        return false;
+    }
+    value
+        .split('.')
+        .all(|segment| !segment.is_empty() && is_lower_snake_case_segment(segment))
+}
+
+/// `true` when an identifier character is immediately followed by `<` or
+/// `[` anywhere in the value: `Identifier<...>` / `Identifier[...]`
+/// generic-type or subscript syntax (`Option<String>`, `Optional[str`,
+/// `&SecretBox<str>`), rather than a literal value.
+fn contains_generic_or_subscript_syntax(value: &str) -> bool {
+    let bytes = value.as_bytes();
+    bytes.iter().enumerate().any(|(index, &byte)| {
+        matches!(byte, b'<' | b'[')
+            && index > 0
+            && matches!(bytes[index - 1], b'0'..=b'9' | b'a'..=b'z' | b'A'..=b'Z' | b'_')
+    })
+}
+
+/// `true` when the value ends with an unmatched `(` or `[` — a call or
+/// subscript expression truncated at the unquoted-value boundary because its
+/// argument is itself a quoted string (`os.environ["OPENAI_API_KEY"]` is
+/// captured only as `os.environ[`; a Rust environment-variable-lookup call
+/// with a string literal argument is captured only up to its open paren).
+/// No real unquoted credential value in the syntaxes this detector targets
+/// legitimately ends with an open bracket or parenthesis.
+fn ends_with_open_call_or_subscript(value: &str) -> bool {
+    matches!(value.as_bytes().last(), Some(b'(' | b'['))
+}
+
+/// `true` when the value is structurally a source-code expression — member
+/// access, a call, a subscript, or a generic type — that names *where* a
+/// value lives rather than containing the value itself (issue #278).
+fn is_source_code_expression(value: &str) -> bool {
+    starts_with_code_reference_root(value)
+        || is_snake_case_attribute_chain(value)
+        || contains_generic_or_subscript_syntax(value)
+        || ends_with_open_call_or_subscript(value)
+}
+
+/// Shared by contextual assignment values and, via [`authorization_candidates`],
+/// `Basic`/`Token` HTTP `Authorization` header values. `is_source_code_expression`'s
+/// checks key on punctuation (`.`, `<`, `[`, `(`) that `is_authorization_value_byte`
+/// already excludes from an authorization value's character class, so they can
+/// never fire there — this function's behavior for that caller is unchanged by
+/// them.
 fn is_non_secret_reference(value: &str) -> bool {
     let lower = value.to_ascii_lowercase();
     is_generic_placeholder_word(&lower)
@@ -224,6 +304,7 @@ fn is_non_secret_reference(value: &str) -> bool {
         || ends_with_key_or_pem(value)
         || is_template_reference(value)
         || is_repeated_character_filler(value)
+        || is_source_code_expression(value)
 }
 
 // --- confidence -----------------------------------------------------------
@@ -900,6 +981,74 @@ mod tests {
             !detect(input).is_empty(),
             "expected a finding for {input:?}"
         );
+    }
+
+    // --- issue #278: an unquoted value that is a source-code expression
+    // (member access, call, subscript, or generic type) names where a value
+    // lives, not the value itself -------------------------------------------
+
+    #[test]
+    fn a_known_reference_root_member_access_is_excluded() {
+        for input in [
+            "password=settings.DATABASE_PASSWORD",
+            "  apiKey: config.anthropicApiKey,",
+            "this.configService.get(user.id)",
+            "cfg.RedisPassword",
+        ] {
+            assert!(
+                detect(input).is_empty(),
+                "expected no findings for {input:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn a_snake_case_attribute_reference_chain_is_excluded() {
+        for input in [
+            "password = random_password.db.result",
+            "password=data.aws_secretsmanager_secret_version.db.secret_string",
+        ] {
+            assert!(
+                detect(input).is_empty(),
+                "expected no findings for {input:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn a_generic_type_or_subscript_value_is_excluded() {
+        for input in ["pub api_key: Option<String>,", "api_key: Optional[str]"] {
+            assert!(
+                detect(input).is_empty(),
+                "expected no findings for {input:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn a_call_or_subscript_truncated_at_a_string_literal_is_excluded() {
+        let input = "api_key=os.environ[\"OPENAI_API_KEY\"],";
+        assert!(
+            detect(input).is_empty(),
+            "expected no findings for {input:?}"
+        );
+    }
+
+    #[test]
+    fn a_dotted_value_with_no_underscore_and_no_known_root_is_still_detected() {
+        let input = "password: SYNTHETIC.REVOKED.CONTEXT_VALUE";
+        assert!(
+            !detect(input).is_empty(),
+            "expected a finding for {input:?}"
+        );
+    }
+
+    #[test]
+    fn an_underscore_separated_value_with_no_dot_is_still_detected_at_high_confidence() {
+        let input = "password: SYNTHETIC_REVOKED_CONTEXT_VALUE";
+        let candidates = detect(input);
+        assert_eq!(candidates.len(), 1);
+        assert_eq!(candidates[0].confidence(), Confidence::High);
     }
 
     // --- issue #262: a contextual-assignment operator with no value before

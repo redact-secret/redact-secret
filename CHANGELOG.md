@@ -5,6 +5,20 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+- The `generic-token` detector no longer reports an unquoted value that is a
+  source-code expression as a secret: a known reference root
+  (`settings.DATABASE_PASSWORD`, `config.anthropicApiKey`, `self.foo`,
+  `this.bar`), a Terraform-shaped `var`/`local`/`data`/resource attribute
+  chain (`random_password.db.result`,
+  `data.aws_secretsmanager_secret_version.db.secret_string`), generic-type or
+  subscript syntax (`Option<String>`, `Optional[str`), or a call/subscript
+  expression truncated at its string-literal argument
+  (`os.environ["OPENAI_API_KEY"]`, previously captured only as
+  `os.environ[`). Such a value names *where* a secret lives at runtime, not
+  the secret itself, and the default policy's `redact` action previously
+  rewrote it as if it were a literal credential. A dotted value with no
+  known root and no `lower_snake_case` segment (`SYNTHETIC.REVOKED.CONTEXT_VALUE`)
+  continues to be reported.
 - A `generic-token` contextual assignment's value can no longer cross a line
   terminator. Previously, a key with no value before end-of-line (a YAML
   `secret:` block opening a nested mapping, an interactive `Password:`
