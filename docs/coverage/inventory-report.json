@@ -906,7 +906,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 97,
+        "fixtureCount": 102,
         "hostContextsExercised": [
           "chat",
           "dotenv",
@@ -948,6 +948,7 @@
         "contextual-positive-aws-secretsmanager-arn-shape-still-detected",
         "contextual-positive-aws-session-token",
         "contextual-positive-azure-keyvault-scheme-prefix-still-detected",
+        "contextual-positive-azure-keyvault-single-label-host-detected",
         "contextual-positive-bank-vaults-scheme-prefix-still-detected",
         "contextual-positive-colon-spaced-operator",
         "contextual-positive-crlf-line-start",
@@ -976,7 +977,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 97,
+        "fixtureCount": 102,
         "hostContextsExercised": [
           "chat",
           "dotenv",

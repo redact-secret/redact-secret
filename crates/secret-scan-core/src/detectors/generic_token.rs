@@ -507,9 +507,39 @@ fn is_aws_secretsmanager_arn(value: &str) -> bool {
         && is_secretsmanager_secret_name(name)
 }
 
-/// `true` for `https://<vault>.vault.azure.net/secrets/<name>(/<version>)?`,
-/// the Key Vault secret identifier an Azure App Service `SecretUri=` field
-/// carries.
+/// `true` for a DNS label: 1-63 ASCII letters, digits, or `-`, neither
+/// leading nor trailing with `-`.
+fn is_dns_label(label: &str) -> bool {
+    let bytes = label.as_bytes();
+    !bytes.is_empty()
+        && bytes.len() <= 63
+        && bytes[0] != b'-'
+        && bytes[bytes.len() - 1] != b'-'
+        && bytes
+            .iter()
+            .all(|byte| byte.is_ascii_alphanumeric() || *byte == b'-')
+}
+
+/// `true` for a syntactically well-formed HTTPS hostname: at least two
+/// dot-separated DNS labels (an FQDN shape, not a bare single-label host),
+/// each satisfying [`is_dns_label`]. This validates *shape*, not that the
+/// host is a real, resolvable Key Vault domain: Azure Key Vault is reachable
+/// under several sovereign-cloud suffixes (`vault.azure.net`,
+/// `vault.usgovcloudapi.net`, `vault.azure.cn`, `vault.microsoftazure.de`,
+/// and Private Link hostnames) with no fixed, enumerable list, so the
+/// grammar bounds the *host's structure* the way the other secret-manager
+/// grammars bound an identifier's structure, rather than checking host
+/// identity.
+fn is_https_hostname(host: &str) -> bool {
+    if host.is_empty() || host.len() > 255 {
+        return false;
+    }
+    let labels: Vec<&str> = host.split('.').collect();
+    labels.len() >= 2 && labels.into_iter().all(is_dns_label)
+}
+
+/// `true` for `https://<host>/secrets/<name>(/<version>)?`, the Key Vault
+/// secret identifier an Azure App Service `SecretUri=` field carries.
 fn is_azure_keyvault_secret_uri(value: &str) -> bool {
     let Some(rest) = value.strip_prefix("https://") else {
         return false;
@@ -518,9 +548,7 @@ fn is_azure_keyvault_secret_uri(value: &str) -> bool {
         return false;
     };
     let (host, path) = rest.split_at(slash);
-    ends_with_ci(host, ".vault.azure.net")
-        && host.len() > ".vault.azure.net".len()
-        && path.strip_prefix("/secrets/").is_some_and(is_path)
+    is_https_hostname(host) && path.strip_prefix("/secrets/").is_some_and(is_path)
 }
 
 /// `true` for an Azure App Service / Functions Key Vault reference
@@ -1724,6 +1752,71 @@ mod tests {
             assert!(
                 !detect(input).is_empty(),
                 "expected a finding for {input:?}"
+            );
+        }
+    }
+
+    // --- issue #293: an Azure Key Vault `SecretUri=` reference is excluded
+    // for any syntactically well-formed HTTPS host, not only a literal
+    // `*.vault.azure.net` suffix. Key Vault is reachable under several
+    // sovereign-cloud domains (and Private Link hostnames) with no fixed,
+    // enumerable list, so the grammar bounds the host's *shape* -- an FQDN
+    // of two or more DNS labels -- the same way the sibling GCP/AWS
+    // grammars bound an identifier's shape rather than checking a specific
+    // known value.
+
+    #[test]
+    fn azure_keyvault_secreturi_is_excluded_for_any_well_formed_https_host() {
+        for input in [
+            // A non-Azure host: the reference grammar validates host
+            // *shape*, not domain identity.
+            "password: @Microsoft.KeyVault(SecretUri=https://example.invalid/secrets/benchmark)",
+            // Azure Government sovereign-cloud Key Vault suffix.
+            "password=@Microsoft.KeyVault(SecretUri=https://myvault.vault.usgovcloudapi.net/secrets/mysecret)",
+            // Azure China sovereign-cloud Key Vault suffix.
+            "password=@Microsoft.KeyVault(SecretUri=https://myvault.vault.azure.cn/secrets/mysecret/abc123)",
+        ] {
+            assert!(
+                detect(input).is_empty(),
+                "expected no findings for {input:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn azure_keyvault_secreturi_with_a_malformed_host_is_still_detected() {
+        for input in [
+            // A single-label host: not an FQDN shape.
+            "password=@Microsoft.KeyVault(SecretUri=https://localhost/secrets/SYNTHETIC_REVOKED)",
+            // An empty host.
+            "password=@Microsoft.KeyVault(SecretUri=https:///secrets/SYNTHETIC_REVOKED)",
+            // A host containing a character outside the DNS label charset.
+            "password=@Microsoft.KeyVault(SecretUri=https://my_vault.vault.azure.net/secrets/SYNTHETIC_REVOKED)",
+        ] {
+            assert!(
+                !detect(input).is_empty(),
+                "expected a finding for {input:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn azure_keyvault_reference_is_excluded_across_crlf_and_unicode_prefix() {
+        for input in [
+            // CRLF line ending after the value.
+            "password: @Microsoft.KeyVault(SecretUri=https://myvault.vault.azure.net/secrets/mysecret)\r\n",
+            // LF line ending after the value.
+            "password: @Microsoft.KeyVault(SecretUri=https://myvault.vault.azure.net/secrets/mysecret)\n",
+            // A multi-byte Unicode character preceding the assignment,
+            // exercising byte-offset (not char-count) boundary handling.
+            // Quoted because the unquoted-value scanner treats `;` as a
+            // value boundary (the `VaultName=...;SecretName=...` form's
+            // required separator).
+            "note: caf\u{e9} \u{2014} password=\"@Microsoft.KeyVault(VaultName=myvault;SecretName=mysecret)\"",
+        ] {
+            assert!(
+                detect(input).is_empty(),
+                "expected no findings for {input:?}"
             );
         }
     }
