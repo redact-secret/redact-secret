@@ -2913,7 +2913,7 @@
           "state": "supported"
         }
       ],
-      "note": "asserts the Python binding's scan() matches the canonical synchronous corpus",
+      "note": "asserts the Python binding's scan() matches the canonical synchronous corpus, scan_and_redact() equals scan()+redact() over the same corpus, and scan_and_redact()'s redacted text matches the canonical tier exactly",
       "type": "bindings/python/tests/test_conformance.py"
     },
     {

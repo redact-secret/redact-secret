@@ -221,7 +221,7 @@
     },
     {
       "path": "bindings/python/tests/test_conformance.py",
-      "role": "asserts the Python binding's scan() matches the canonical synchronous corpus"
+      "role": "asserts the Python binding's scan() matches the canonical synchronous corpus, scan_and_redact() equals scan()+redact() over the same corpus, and scan_and_redact()'s redacted text matches the canonical tier exactly"
     },
     {
       "path": "bindings/python/tests/test_incremental.py",
