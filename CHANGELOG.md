@@ -106,6 +106,8 @@ evidence is linked from each published version.
 
 ## 0.1.0-beta.2 — 2026-09-13
 
+[Publication evidence](docs/releases/0.1.0-beta.2/README.md).
+
 - JavaScript and Python incremental sanitizers now treat host-side invalid
   append input as terminal: retained plaintext and offset state are discarded,
   the session reports `failed`, and later operations raise `INVALID_STATE`.
