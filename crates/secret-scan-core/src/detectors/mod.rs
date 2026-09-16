@@ -15,6 +15,7 @@ mod aws;
 mod azure_devops;
 mod bearer_token;
 mod connection_string;
+mod discord;
 mod generic_token;
 mod github;
 mod gitlab;
@@ -69,6 +70,7 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(notion::NotionTokenDetector),
         Box::new(atlassian::AtlassianApiTokenDetector),
         telegram::telegram_bot_token_detector(),
+        Box::new(discord::DiscordBotTokenDetector),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
         Box::new(ConnectionStringDetector),
@@ -127,6 +129,7 @@ mod tests {
                 "notion-token",
                 "atlassian-api-token",
                 "telegram-bot-token",
+                "discord-bot-token",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -171,7 +174,8 @@ mod tests {
             "SYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY_".repeat(3)
         );
         let telegram_input = "123456:SYNTHETIC_REVOKED_TELEGRAM_BOT_TOKEN_SECRET";
-        let cases: [(&str, &str); 25] = [
+        let discord_input = "MDAwMDAwMDAwMDAwMDAwMDAw.REVOKE.SYNTHETICREVOKEDBOTTOKENFIX";
+        let cases: [(&str, &str); 26] = [
             ("aws-access-key", "AKIASYNTHETICEXAMPLE"),
             (
                 "github-token",
@@ -211,6 +215,7 @@ mod tests {
                 "secret_SYNTHETICREVOKEDNOTIONLEGACYTOKENVALUE00000",
             ),
             ("atlassian-api-token", atlassian_input.as_str()),
+            ("discord-bot-token", discord_input),
             ("telegram-bot-token", telegram_input),
         ];
         let detectors = built_in_detectors();

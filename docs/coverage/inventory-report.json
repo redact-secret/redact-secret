@@ -1239,12 +1239,47 @@
       ],
       "state": "supported",
       "type": "authorization_credential"
+    },
+    {
+      "detector": "discord-bot-token",
+      "evidence": {
+        "fixtureCount": 18,
+        "hostContextsExercised": [
+          "dotenv",
+          "json",
+          "log",
+          "plain-text",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "discord-bot-token-positive-bare",
+        "discord-bot-token-positive-crlf-unicode-prefix",
+        "discord-bot-token-positive-dotenv",
+        "discord-bot-token-positive-json",
+        "discord-bot-token-positive-log",
+        "discord-bot-token-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "discord_bot_token"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 32,
+    "supported": 33,
     "unresolved": 0
   }
 }

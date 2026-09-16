@@ -141,7 +141,12 @@ impl Detector for TelegramBotTokenDetector {
 /// from [`pattern::run_ends`], so each segment's length is a table lookup
 /// rather than a rescan, keeping the whole detector linear in the input
 /// length.
-fn match_at(bytes: &[u8], digit_ends: &[usize], secret_ends: &[usize], start: usize) -> Option<usize> {
+fn match_at(
+    bytes: &[u8],
+    digit_ends: &[usize],
+    secret_ends: &[usize],
+    start: usize,
+) -> Option<usize> {
     let id_end = digit_ends[start];
     if id_end - start < MIN_ID_LEN {
         return None;
@@ -166,9 +171,8 @@ fn match_at(bytes: &[u8], digit_ends: &[usize], secret_ends: &[usize], start: us
 /// check: it is already the end of a maximal [`is_alnum_dash`] run by
 /// construction.
 fn boundary_ok(bytes: &[u8], start: usize, end: usize) -> bool {
-    let start_ok = start == 0
-        || !is_alnum_dash(bytes[start - 1])
-        || bytes[..start].ends_with(URL_PATH_PREFIX);
+    let start_ok =
+        start == 0 || !is_alnum_dash(bytes[start - 1]) || bytes[..start].ends_with(URL_PATH_PREFIX);
     let end_ok = end >= bytes.len() || !is_alnum_dash(bytes[end]);
     start_ok && end_ok
 }
@@ -210,7 +214,10 @@ mod tests {
         assert_eq!(candidates[0].type_name(), "telegram_bot_token");
         assert_eq!(candidates[0].confidence(), Confidence::High);
         assert_eq!(candidates[0].effective_specificity(), Specificity::Provider);
-        assert_eq!(candidates[0].range(), ByteRange::new(0, value.len()).unwrap());
+        assert_eq!(
+            candidates[0].range(),
+            ByteRange::new(0, value.len()).unwrap()
+        );
     }
 
     #[test]
@@ -247,7 +254,10 @@ mod tests {
         let value = format!("{short_id}:{SECRET}");
         let candidates = detect(&value);
         assert_eq!(candidates.len(), 1);
-        assert_eq!(candidates[0].range(), ByteRange::new(0, value.len()).unwrap());
+        assert_eq!(
+            candidates[0].range(),
+            ByteRange::new(0, value.len()).unwrap()
+        );
     }
 
     #[test]
@@ -255,7 +265,10 @@ mod tests {
         let input = format!("{ID}:{SECRET}EXTRA-TAIL-BYTES-PAST-THE-MINIMUM");
         let candidates = detect(&input);
         assert_eq!(candidates.len(), 1);
-        assert_eq!(candidates[0].range(), ByteRange::new(0, input.len()).unwrap());
+        assert_eq!(
+            candidates[0].range(),
+            ByteRange::new(0, input.len()).unwrap()
+        );
     }
 
     #[test]

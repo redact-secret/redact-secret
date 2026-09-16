@@ -27,3 +27,4 @@ future planning and implementation but do not authorize Git or release actions.
 - [Freeze the Notion integration token grammar as two exact-length prefixed shapes](2026-09-16-freeze-notion-integration-token-grammar.md)
 - [Freeze the Atlassian Cloud API token grammar as a minimum-length ATAT-prefixed body](2026-09-16-freeze-atlassian-api-token-grammar.md)
 - [Freeze the Telegram Bot API token grammar as a minimum-length digit-colon-secret shape](2026-09-16-freeze-telegram-bot-api-token-grammar.md)
+- [Freeze the Discord bot token grammar as a three-segment digit-decoding snowflake token](2026-09-16-freeze-discord-bot-token-grammar.md)
