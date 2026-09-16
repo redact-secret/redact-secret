@@ -5,6 +5,8 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+## 0.1.0-beta.3 — 2026-09-16
+
 - Added a `sendgrid-token` detector recognizing SendGrid's documented
   `SG.<22-byte id>.<43-byte secret>` API key shape, both segments drawn from
   the URL-safe base64 alphabet. Previously this shape was detected only when
