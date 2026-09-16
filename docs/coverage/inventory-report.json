@@ -743,6 +743,32 @@
       "type": "microsoft_entra_client_secret"
     },
     {
+      "detector": "azure-devops-personal-access-token",
+      "evidence": {
+        "fixtureCount": 13,
+        "hostContextsExercised": [
+          "plain-text"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "azdo-pat-positive-bare"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "azure_devops_personal_access_token"
+    },
+    {
       "detector": "notion-token",
       "evidence": {
         "fixtureCount": 14,
@@ -1145,7 +1171,7 @@
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 29,
+    "supported": 30,
     "unresolved": 0
   }
 }

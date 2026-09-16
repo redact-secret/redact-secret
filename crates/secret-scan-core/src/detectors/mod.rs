@@ -11,6 +11,7 @@
 mod additional_providers;
 mod anthropic;
 mod aws;
+mod azure_devops;
 mod bearer_token;
 mod connection_string;
 mod generic_token;
@@ -62,6 +63,7 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(additional_providers::GOOGLE),
         Box::new(sendgrid::SendgridTokenDetector),
         Box::new(microsoft_entra::MicrosoftEntraClientSecretDetector),
+        Box::new(azure_devops::AzureDevOpsPersonalAccessTokenDetector),
         Box::new(notion::NotionTokenDetector),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
@@ -117,6 +119,7 @@ mod tests {
                 "google-api-key",
                 "sendgrid-token",
                 "microsoft-entra-client-secret",
+                "azure-devops-personal-access-token",
                 "notion-token",
                 "jwt",
                 "bearer-token",
@@ -157,7 +160,7 @@ mod tests {
         let pypi_input = format!("pypi-{}", "SYNTHETIC_REVOKED_".repeat(5));
         let sendgrid_input =
             "SG.SYNTHETIC_REVOKED_0000.SYNTHETIC_REVOKED_SENDGRID_SECRET_000000000";
-        let cases: [(&str, &str); 22] = [
+        let cases: [(&str, &str); 23] = [
             ("aws-access-key", "AKIASYNTHETICEXAMPLE"),
             (
                 "github-token",
@@ -187,6 +190,10 @@ mod tests {
             (
                 "microsoft-entra-client-secret",
                 "abc8Q~SYNTHETIC_REVOKED_ENTRA_SECRET_V",
+            ),
+            (
+                "azure-devops-personal-access-token",
+                "SYNTHETICREVOKEDAZUREDEVOPSPATVALUEFORCONFORMANCETESTINGPADDINGFIXTUREDATAZZAZDOabcd",
             ),
             (
                 "notion-token",

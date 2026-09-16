@@ -15,11 +15,11 @@ These counts describe finding-type inventory rows with corpus evidence, not dete
 
 | Row state | Count |
 | --- | --- |
-| supported | 29 |
+| supported | 30 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 40.
+Coverage declarations: 41.
 
 ## Coverage by detector
 
@@ -27,6 +27,7 @@ Coverage declarations: 40.
 | --- | --- | --- |
 | anthropic-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | aws-access-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| azure-devops-personal-access-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | bearer-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | cloudflare-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | connection-string | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -61,6 +62,7 @@ Coverage declarations: 40.
 | anthropic_api_key | anthropic-token | provider | supported | not-applicable | none |
 | authorization_credential | generic-token | contextual | supported | supported | none |
 | aws_access_key_id | aws-access-key | provider | supported | not-applicable | none |
+| azure_devops_personal_access_token | azure-devops-personal-access-token | provider | supported | not-applicable | none |
 | bearer_token | bearer-token | structural | supported | not-applicable | none |
 | cloudflare_api_token | cloudflare-token | provider | supported | not-applicable | none |
 | connection_string_password | connection-string | structural | supported | supported | none |
@@ -112,15 +114,15 @@ Coverage declarations: 40.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 40 | 0 | 0 |
-| boundary | 29 | 0 | 0 |
-| host-context | 29 | 0 | 0 |
+| adversarial | 41 | 0 | 0 |
+| boundary | 30 | 0 | 0 |
+| host-context | 30 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 40 | 0 | 0 |
-| near-miss-negative | 29 | 0 | 0 |
-| overlap | 29 | 0 | 0 |
-| positive | 29 | 0 | 0 |
-| range | 40 | 0 | 0 |
+| malformed | 41 | 0 | 0 |
+| near-miss-negative | 30 | 0 | 0 |
+| overlap | 30 | 0 | 0 |
+| positive | 30 | 0 | 0 |
+| range | 41 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

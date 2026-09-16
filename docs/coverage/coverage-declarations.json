@@ -1944,6 +1944,92 @@
     },
     {
       "behaviorClass": "provider",
+      "detector": "azure-devops-personal-access-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "azdo-pat-positive-bare"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "azdo-pat-overlap-generic-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "azdo-pat-adversarial-long-padding"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "azdo-pat-boundary-broken-prefix",
+            "azdo-pat-boundary-prefix-above-required",
+            "azdo-pat-boundary-prefix-below-required",
+            "azdo-pat-boundary-short-prefix",
+            "azdo-pat-boundary-suffix-above-required",
+            "azdo-pat-boundary-suffix-below-required"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "azdo-pat-negative-legacy-unmarked",
+            "azdo-pat-negative-legacy-unmarked-in-context",
+            "azdo-pat-negative-lookalike",
+            "azdo-pat-negative-placeholder"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "azdo-pat-boundary-broken-prefix",
+            "azdo-pat-boundary-prefix-above-required",
+            "azdo-pat-boundary-prefix-below-required",
+            "azdo-pat-boundary-short-prefix",
+            "azdo-pat-boundary-suffix-above-required",
+            "azdo-pat-boundary-suffix-below-required"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for azure_devops_personal_access_token (azure-devops-personal-access-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "azure_devops_personal_access_token"
+    },
+    {
+      "behaviorClass": "provider",
       "detector": "notion-token",
       "dimensions": [
         {
@@ -2882,6 +2968,7 @@
             "adversarial-dense-aws-findings",
             "anthropic-adversarial-long-suffix",
             "aws-adversarial-long-suffix",
+            "azdo-pat-adversarial-long-padding",
             "bearer-adversarial-punctuation",
             "cloudflare-adversarial-long-suffix",
             "connection-adversarial-azure-overlong",
@@ -3170,6 +3257,7 @@
             "adversarial-dense-aws-findings",
             "anthropic-adversarial-long-suffix",
             "aws-adversarial-long-suffix",
+            "azdo-pat-adversarial-long-padding",
             "bearer-adversarial-punctuation",
             "cloudflare-adversarial-long-suffix",
             "connection-adversarial-azure-overlong",
