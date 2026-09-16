@@ -215,6 +215,72 @@ fn is_template_reference(value: &str) -> bool {
     value.starts_with("{{") && value.ends_with("}}") && value.len() >= 4
 }
 
+// --- interpolation / command-substitution reference exclusions
+// (issue #279) -----------------------------------------------------------
+//
+// Each of these is, like `is_template_reference`, a syntax that is only a
+// bare reference when it delimits the *whole* value -- a value that merely
+// starts with the opener, or that carries the pair embedded inside a larger
+// string, stays detected. `docs/decisions/2026-09-16-exclude-interpolation-command-substitution-references.md`
+// records the supported syntaxes and the accompanying span-scanning fix
+// (`delimited_reference_value`) that lets the whole-value check see past a
+// closing `)`/`]`/backtick that a plain unquoted-value boundary scan would
+// otherwise cut short before.
+
+/// `true` when `value` is exactly `open` followed by anything followed by
+/// `close` -- the same whole-value shape `is_template_reference` checks for
+/// `{{`/`}}`, generalized to an arbitrary delimiter pair.
+fn is_fully_delimited(value: &str, open: &str, close: &str) -> bool {
+    value.starts_with(open) && value.ends_with(close) && value.len() >= open.len() + close.len()
+}
+
+/// `true` for a POSIX/shell, `Makefile`, or Kustomize variable or
+/// command-substitution reference (`$(registryPassword)`,
+/// `$(pass show db/prod)`): the value names a variable or command to
+/// resolve at runtime, not a secret.
+fn is_command_substitution_reference(value: &str) -> bool {
+    is_fully_delimited(value, "$(", ")")
+}
+
+/// `true` for an Azure Pipelines runtime-expression reference
+/// (`$[variables.x]`).
+fn is_runtime_expression_reference(value: &str) -> bool {
+    is_fully_delimited(value, "$[", "]")
+}
+
+/// `true` for a Ruby string-interpolation reference
+/// (`#{ENV['DB_PASSWORD']}`).
+fn is_ruby_interpolation_reference(value: &str) -> bool {
+    is_fully_delimited(value, "#{", "}")
+}
+
+/// opencode config substitution kinds resolved from the environment or a
+/// file at load time rather than containing a secret directly.
+const OPENCODE_REFERENCE_KINDS: &[&str] = &["env", "file"];
+
+/// `true` for an opencode `{env:VAR}` or `{file:path}` substitution.
+fn is_opencode_reference(value: &str) -> bool {
+    OPENCODE_REFERENCE_KINDS.iter().any(|kind| {
+        let open = format!("{{{kind}:");
+        is_fully_delimited(value, &open, "}")
+    })
+}
+
+/// `true` for a value fully wrapped in a matching pair of backticks
+/// (`` `${process.env.X}` ``, `` `date +%s` ``): shell command substitution
+/// or a JS template literal, not a secret.
+fn is_backtick_reference(value: &str) -> bool {
+    is_fully_delimited(value, "`", "`")
+}
+
+fn is_interpolation_reference(value: &str) -> bool {
+    is_command_substitution_reference(value)
+        || is_runtime_expression_reference(value)
+        || is_ruby_interpolation_reference(value)
+        || is_opencode_reference(value)
+        || is_backtick_reference(value)
+}
+
 // --- secret-manager reference exclusions (issue #280) -------------------
 //
 // Each of these names *where* a secret lives at runtime -- a pointer `op
@@ -545,8 +611,9 @@ fn is_source_code_expression(value: &str) -> bool {
 
 /// Shared by contextual assignment values and, via [`authorization_candidates`],
 /// `Basic`/`Token` HTTP `Authorization` header values. `is_source_code_expression`'s
-/// checks key on punctuation (`.`, `<`, `[`, `(`) that `is_authorization_value_byte`
-/// already excludes from an authorization value's character class, so they can
+/// and `is_interpolation_reference`'s checks key on punctuation (`.`, `<`,
+/// `[`, `(`, `$`, `#`, `` ` ``) that `is_authorization_value_byte` already
+/// excludes from an authorization value's character class, so they can
 /// never fire there — this function's behavior for that caller is unchanged by
 /// them.
 fn is_non_secret_reference(value: &str) -> bool {
@@ -557,6 +624,7 @@ fn is_non_secret_reference(value: &str) -> bool {
         || starts_with_path_like(value)
         || ends_with_key_or_pem(value)
         || is_template_reference(value)
+        || is_interpolation_reference(value)
         || is_secret_manager_reference(value)
         || is_repeated_character_filler(value)
         || is_source_code_expression(value)
@@ -649,6 +717,132 @@ fn quoted_assignment_value(input: &str, opening_quote: usize) -> Option<(usize, 
     None
 }
 
+/// An interpolation/command-substitution opener whose closing delimiter
+/// (`)`, `]`, or `}`) is also a generic unquoted-value boundary character --
+/// so a plain boundary scan reaches it and stops *before* consuming it,
+/// truncating the value one byte short of its real close (issue #279).
+struct DelimitedOpener {
+    open: &'static str,
+    nest_open: char,
+    close: char,
+}
+
+const DELIMITED_REFERENCE_OPENERS: &[DelimitedOpener] = &[
+    DelimitedOpener {
+        open: "$(",
+        nest_open: '(',
+        close: ')',
+    },
+    DelimitedOpener {
+        open: "$[",
+        nest_open: '[',
+        close: ']',
+    },
+    DelimitedOpener {
+        open: "#{",
+        nest_open: '{',
+        close: '}',
+    },
+    DelimitedOpener {
+        open: "{env:",
+        nest_open: '{',
+        close: '}',
+    },
+    DelimitedOpener {
+        open: "{file:",
+        nest_open: '{',
+        close: '}',
+    },
+];
+
+/// Scans from `start` (an opener already matched at this position) to the
+/// close that balances `nest_open`, rejecting a span that crosses a
+/// physical line or exceeds the shared bound, mirroring
+/// `quoted_assignment_value`. Nesting is honored so `$(echo $(date))`
+/// resolves to its outer close rather than its first one.
+fn scan_nested_delimiter(
+    input: &str,
+    start: usize,
+    open_len: usize,
+    nest_open: char,
+    close: char,
+) -> Option<usize> {
+    let mut cursor = start + open_len;
+    let mut depth: u32 = 1;
+    while let Some(ch) = char_at(input, cursor) {
+        if matches!(ch, '\r' | '\n') || cursor - start > MAX_CONTEXT_VALUE_LENGTH {
+            return None;
+        }
+        if ch == nest_open {
+            depth += 1;
+        } else if ch == close {
+            depth -= 1;
+            if depth == 0 {
+                return Some(cursor + ch.len_utf8());
+            }
+        }
+        cursor += ch.len_utf8();
+    }
+    None
+}
+
+/// Scans from the opening backtick at `start` to its matching close,
+/// honoring backslash-escaped backticks by parity like
+/// `quoted_assignment_value`.
+fn scan_backtick_delimiter(input: &str, start: usize) -> Option<usize> {
+    let mut cursor = start + 1;
+    let mut backslash_run: u32 = 0;
+    while let Some(ch) = char_at(input, cursor) {
+        if matches!(ch, '\r' | '\n') || cursor - start > MAX_CONTEXT_VALUE_LENGTH {
+            return None;
+        }
+        if ch == '\\' {
+            backslash_run += 1;
+            cursor += ch.len_utf8();
+            continue;
+        }
+        if ch == '`' && backslash_run.is_multiple_of(2) {
+            return Some(cursor + ch.len_utf8());
+        }
+        backslash_run = 0;
+        cursor += ch.len_utf8();
+    }
+    None
+}
+
+/// `true` when the character immediately after a matched delimiter close is
+/// a legitimate unquoted-value boundary -- so `$(cmd)EXTRA` (the delimiter
+/// embedded in a larger value) is rejected here and falls through to the
+/// generic scan below, which captures it whole and leaves it detected.
+fn delimited_reference_value(input: &str, start: usize) -> Option<(usize, usize)> {
+    for opener in DELIMITED_REFERENCE_OPENERS {
+        if input[start..].starts_with(opener.open) {
+            let end = scan_nested_delimiter(
+                input,
+                start,
+                opener.open.len(),
+                opener.nest_open,
+                opener.close,
+            )?;
+            return is_unquoted_value_boundary(char_at(input, end)).then_some((start, end));
+        }
+    }
+    if char_at(input, start) == Some('`') {
+        let end = scan_backtick_delimiter(input, start)?;
+        return is_unquoted_value_boundary(char_at(input, end)).then_some((start, end));
+    }
+    None
+}
+
+/// `true` when `input[start..]` opens with a recognized opencode
+/// substitution prefix (`{env:`/`{file:`), regardless of whether it goes on
+/// to close with a matching `}` before the value ends.
+fn starts_with_opencode_prefix(input: &str, start: usize) -> bool {
+    OPENCODE_REFERENCE_KINDS
+        .iter()
+        .any(|kind| input[start..].starts_with(&format!("{{{kind}:")))
+}
+
 /// Scans an unquoted value up to the next boundary character, rejecting
 /// values that exceed the shared bound.
 ///
@@ -659,8 +853,24 @@ fn quoted_assignment_value(input: &str, opening_quote: usize) -> Option<(usize, 
 /// credential in the syntaxes this detector targets legitimately begins
 /// with either character, so treating them as an immediate boundary costs
 /// no true positive.
+///
+/// `{env:...}`/`{file:...}` are exempt from that guard even when
+/// `delimited_reference_value` above didn't resolve them to a bare
+/// reference (i.e. one is embedded in a larger value, `{env:x}_EXTRA`):
+/// without the exemption, the guard would return no value at all for the
+/// whole assignment, silently dropping a candidate the paired-positive
+/// requirement in issue #279 says must still be reported, rather than
+/// merely mis-scoping its range. The narrow cost is a flow mapping whose
+/// first key happens to be spelled `env`/`file` (`secret: {file: "/etc/x"}`)
+/// losing the #266 guard's protection -- accepted because it is far rarer
+/// than a real secret embedding one of these substitution prefixes.
 fn unquoted_assignment_value(input: &str, start: usize) -> Option<(usize, usize)> {
-    if matches!(char_at(input, start), Some('{' | '[')) {
+    if let Some(span) = delimited_reference_value(input, start) {
+        return Some(span);
+    }
+    if matches!(char_at(input, start), Some('{' | '['))
+        && !starts_with_opencode_prefix(input, start)
+    {
         return None;
     }
     let mut cursor = start;
@@ -1236,6 +1446,104 @@ mod tests {
             !detect(input).is_empty(),
             "expected a finding for {input:?}"
         );
+    }
+
+    // --- issue #279: an interpolation, macro-expansion, or
+    // command-substitution reference other than `${...}`, `$name`, or
+    // `{{...}}` -- a shell/Makefile/Kustomize `$(...)`, an Azure Pipelines
+    // `$[...]` runtime expression, a Ruby `#{...}` interpolation, an
+    // opencode `{env:...}`/`{file:...}` substitution, or a backtick-quoted
+    // command substitution / JS template literal -- is excluded like the
+    // existing `{{...}}` template-reference exclusion (#263): only a value
+    // fully delimited by the syntax, not merely starting with it, is a bare
+    // reference.
+
+    #[test]
+    fn interpolation_and_command_substitution_references_are_excluded() {
+        for input in [
+            // Azure Pipelines macro, unquoted YAML.
+            "password: $(registryPassword)",
+            // Shell command substitution, quoted.
+            "PASSWORD=\"$(pass show db/prod)\"",
+            // Ruby interpolation, quoted YAML.
+            "password: \"#{ENV['DB_PASSWORD']}\"",
+            // opencode env substitution, quoted JSON.
+            "\"apiKey\": \"{env:ANTHROPIC_API_KEY}\"",
+            // opencode file substitution, quoted JSON.
+            "\"apiKey\": \"{file:./secrets/api-key}\"",
+            // Azure Pipelines runtime expression, unquoted -- exercises the
+            // delimited-span scan, since `]` is otherwise a generic
+            // unquoted-value boundary that would truncate this one short.
+            "password: $[variables.x]",
+            // Backtick-quoted JS template literal, unquoted -- exercises
+            // the delimited-span scan for the same reason (`}` truncation).
+            "password: `${process.env.X}`",
+            // Backtick command substitution.
+            "password=`date +%s`",
+            // Nested command substitution.
+            "password=$(echo $(date))",
+        ] {
+            assert!(
+                detect(input).is_empty(),
+                "expected no findings for {input:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn a_value_only_starting_with_an_interpolation_delimiter_is_still_detected() {
+        for input in [
+            "password=$(SYNTHETIC_REVOKED_CONTEXT_VALUE",
+            "password=$[SYNTHETIC_REVOKED_CONTEXT_VALUE",
+            "password=\"#{SYNTHETIC_REVOKED_CONTEXT_VALUE\"",
+            "password=\"{env:SYNTHETIC_REVOKED_CONTEXT_VALUE\"",
+            "password=`SYNTHETIC_REVOKED_CONTEXT_VALUE",
+        ] {
+            assert!(
+                !detect(input).is_empty(),
+                "expected a finding for {input:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn an_interpolation_delimiter_pair_embedded_in_a_larger_value_is_still_detected() {
+        for input in [
+            "password=SYNTHETIC_REVOKED_$(x)_CONTEXT_VALUE",
+            "password=SYNTHETIC_REVOKED_#{x}_CONTEXT_VALUE",
+            "password=SYNTHETIC_REVOKED_`x`_CONTEXT_VALUE",
+            // A well-formed `{env:...}`/`{file:...}` pair at the very start
+            // of an unquoted value, followed by more content rather than
+            // ending the value there, previously fell into the `{`/`[`
+            // flow-mapping guard (issue #266) and was silently dropped with
+            // no candidate at all, instead of being reported like the other
+            // delimiter shapes above.
+            "password={env:ANTHROPIC_API_KEY}_SYNTHETIC_REVOKED_CONTEXT_VALUE",
+            "password={file:SYNTHETIC_REVOKED_PATH}_CONTEXT_VALUE",
+        ] {
+            assert!(
+                !detect(input).is_empty(),
+                "expected a finding for {input:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn interpolation_references_are_excluded_across_crlf_tab_operator_and_json_escaping() {
+        for input in [
+            // CRLF line ending after the value.
+            "password: $(registryPassword)\r\n",
+            // A tab, instead of a space, after the `:` operator.
+            "password:\t$(registryPassword)",
+            // JSON-escaped double quotes inside a Ruby interpolation that
+            // would use single quotes unescaped.
+            "{\"password\": \"#{ENV[\\\"DB_PASSWORD\\\"]}\"}",
+        ] {
+            assert!(
+                detect(input).is_empty(),
+                "expected no findings for {input:?}"
+            );
+        }
     }
 
     // --- issue #280: a secret-manager reference -- a pointer `op run`,

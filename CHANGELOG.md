@@ -5,6 +5,20 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+- The `generic-token` detector no longer reports a value fully delimited by
+  an interpolation or command-substitution syntax as a secret: a
+  shell/`Makefile`/Kustomize `$(...)` variable or command substitution
+  (`$(registryPassword)`, `$(pass show db/prod)`), an Azure Pipelines
+  `$[...]` runtime expression (`$[variables.x]`), a Ruby `#{...}` string
+  interpolation (`#{ENV['DB_PASSWORD']}`), an opencode `{env:...}`/
+  `{file:...}` substitution (`{env:ANTHROPIC_API_KEY}`), or a
+  backtick-quoted command substitution / JS template literal
+  (`` `${process.env.X}` ``). This is the same class of non-secret reference
+  as the existing `${...}`/`{{...}}` exclusions, and previously the default
+  policy's `redact` action would rewrite the literal reference in a pipeline
+  definition, shell script, or tool config. A value that only starts with
+  one of these delimiters, or that has a delimited pair embedded inside a
+  larger value, is unaffected and continues to be reported.
 - The `generic-token` detector no longer reports an unquoted value that is a
   source-code expression as a secret: a known reference root
   (`settings.DATABASE_PASSWORD`, `config.anthropicApiKey`, `self.foo`,
