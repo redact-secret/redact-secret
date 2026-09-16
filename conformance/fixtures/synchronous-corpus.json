@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 475,
+  "fixtureCount": 480,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -9035,6 +9035,80 @@
       "input": "{\"password\": \"@Microsoft.KeyVault(VaultName=myvault;SecretName=mysecret;SecretVersion=abc123)\"}",
       "expected": [],
       "note": "An Azure App Service @Microsoft.KeyVault(VaultName=...;SecretName=...;SecretVersion=...) reference stays excluded."
+    },
+    {
+      "id": "contextual-negative-azure-keyvault-secreturi-non-azure-host",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "password: @Microsoft.KeyVault(SecretUri=https://example.invalid/secrets/benchmark)",
+      "expected": [],
+      "note": "issue #293: an @Microsoft.KeyVault(SecretUri=...) reference stays excluded for any syntactically well-formed HTTPS host, not only a literal *.vault.azure.net suffix -- Key Vault is reachable under several sovereign-cloud domains and Private Link hostnames with no fixed, enumerable list, so the grammar bounds the host's shape rather than its identity."
+    },
+    {
+      "id": "contextual-negative-azure-keyvault-secreturi-sovereign-host",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "password=@Microsoft.KeyVault(SecretUri=https://myvault.vault.usgovcloudapi.net/secrets/mysecret)",
+      "expected": [],
+      "note": "issue #293: an Azure Government sovereign-cloud Key Vault SecretUri host stays excluded."
+    },
+    {
+      "id": "contextual-negative-azure-keyvault-secreturi-crlf",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "password: @Microsoft.KeyVault(SecretUri=https://myvault.vault.azure.net/secrets/mysecret)\r\n",
+      "expected": [],
+      "note": "issue #293: a CRLF line ending after the value does not defeat the Azure Key Vault SecretUri exclusion."
+    },
+    {
+      "id": "contextual-negative-azure-keyvault-vaultname-unicode-prefix",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "note: café — password=\"@Microsoft.KeyVault(VaultName=myvault;SecretName=mysecret)\"",
+      "expected": [],
+      "note": "issue #293: a multi-byte Unicode character preceding the assignment does not defeat the Azure Key Vault VaultName/SecretName exclusion; the exclusion's byte-offset handling advances by real UTF-8 byte width, not char count."
+    },
+    {
+      "id": "contextual-positive-azure-keyvault-single-label-host-detected",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "password=@Microsoft.KeyVault(SecretUri=https://localhost/secrets/SYNTHETIC_REVOKED_SINGLE_LABEL_HOST)",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 9,
+          "end": 101
+        }
+      ],
+      "note": "issue #293: a SecretUri host with no dot (not an FQDN shape) does not satisfy the Azure Key Vault reference grammar and stays detected."
     },
     {
       "id": "contextual-positive-onepassword-scheme-prefix-still-detected",
