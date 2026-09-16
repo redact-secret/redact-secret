@@ -205,7 +205,8 @@ Built-in Rust detection covers:
 - OpenAI, Anthropic, Shopify, and modern HashiCorp Vault credentials;
 - qualified Stripe, Slack, PyPI, Hugging Face, Docker Hub, Cloudflare,
   DigitalOcean, Linear, Supabase, Vercel, SendGrid, Google Cloud/Gemini,
-  Notion, and Atlassian Cloud (Jira / Confluence) credentials;
+  Notion, Atlassian Cloud (Jira / Confluence), and Telegram Bot API
+  credentials;
 - contextual credential assignments, including AWS secret-access-key and
   session-token setting names;
 - credential-bearing PostgreSQL, MySQL, MariaDB, MongoDB, Redis, and AMQP URLs;

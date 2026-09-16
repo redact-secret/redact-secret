@@ -834,6 +834,41 @@
       "type": "atlassian_api_token"
     },
     {
+      "detector": "telegram-bot-token",
+      "evidence": {
+        "fixtureCount": 16,
+        "hostContextsExercised": [
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "telegram-bot-token-positive-bare",
+        "telegram-bot-token-positive-bot-api-url",
+        "telegram-bot-token-positive-crlf-unicode-prefix",
+        "telegram-bot-token-positive-dotenv",
+        "telegram-bot-token-positive-json",
+        "telegram-bot-token-positive-log"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "telegram_bot_token"
+    },
+    {
       "detector": "jwt",
       "evidence": {
         "fixtureCount": 11,
@@ -1209,7 +1244,7 @@
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 31,
+    "supported": 32,
     "unresolved": 0
   }
 }

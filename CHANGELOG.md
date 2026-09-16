@@ -5,6 +5,19 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+- Added a `telegram-bot-token` detector recognizing Telegram Bot API tokens:
+  a minimum 5-digit numeric id, a literal `:` separator, and a minimum
+  34-byte secret from `[A-Za-z0-9_-]`, both lengths taken as documented
+  minimums (Telegram's own docs disclaim no fixed length but publish only
+  one worked example) rather than exact matches. A token glued directly onto
+  the documented Bot API request URL's `/bot` path segment
+  (`https://api.telegram.org/bot<token>/METHOD_NAME`) is also detected, with
+  only the id:secret token bytes selected. A bare numeric chat/user/bot id
+  with no secret, a public bot username handle, and Telegram's separate
+  MTProto `api_id`/`api_hash` client credentials are documented out-of-scope
+  gaps sharing no `id:secret` shape with this grammar. The new detector is
+  always-redact, provider-specific, and wins any overlap with the generic
+  contextual detector.
 - Added an `atlassian-api-token` detector recognizing Atlassian Cloud (Jira /
   Confluence) API tokens: the community-forum-confirmed `ATAT` prefix
   followed by a minimum 100-byte suffix from `[A-Za-z0-9_-]`. The length is a

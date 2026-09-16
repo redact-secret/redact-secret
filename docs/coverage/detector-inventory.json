@@ -179,6 +179,13 @@
       "schemes": null
     },
     {
+      "type": "telegram_bot_token",
+      "detector": "telegram-bot-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "123456:SYNTHETIC_REVOKED_TELEGRAM_BOT_TOKEN_SECRET",
+      "schemes": null
+    },
+    {
       "type": "jwt",
       "detector": "jwt",
       "policyClass": "always-redact",

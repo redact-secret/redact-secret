@@ -26,3 +26,4 @@ future planning and implementation but do not authorize Git or release actions.
 - [Freeze the Azure DevOps personal access token grammar as the documented 84-byte AZDO-signature shape](2026-09-16-freeze-azure-devops-pat-grammar.md)
 - [Freeze the Notion integration token grammar as two exact-length prefixed shapes](2026-09-16-freeze-notion-integration-token-grammar.md)
 - [Freeze the Atlassian Cloud API token grammar as a minimum-length ATAT-prefixed body](2026-09-16-freeze-atlassian-api-token-grammar.md)
+- [Freeze the Telegram Bot API token grammar as a minimum-length digit-colon-secret shape](2026-09-16-freeze-telegram-bot-api-token-grammar.md)
