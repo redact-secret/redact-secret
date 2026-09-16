@@ -582,3 +582,19 @@ against competing products, new language bindings, and any release,
 versioning, or publication action. Producing or reporting a result is not a
 release gate and does not by itself authorize any release action; see
 `AGENTS.md`'s release authority section.
+
+## Performance build correction
+
+The historical `complete`, `complete-v2`, and `complete-v3` Rust timings were
+collected without `--release`; their raw evidence is retained but does not
+support optimized cross-runtime comparisons. The corrected
+[release-profile run](results/release-profile/baseline.md) uses release builds.
+The Rust runner now rejects debug performance execution, records its actual
+executable argv and build profile, and aggregation requires release provenance.
+Build time is outside the measured processing interval. CLI check-mode timings
+remain distinct from the other surfaces' scan-and-redact timings.
+
+Previously stored acceptance statuses are historical. Both complete aggregation
+and acceptance evaluation now reject Rust performance without explicit release
+provenance. Existing fixed thresholds are retained as historical budgets, not
+recalibrated from debug timings or claimed as release-performance targets.

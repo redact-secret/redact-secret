@@ -1,0 +1,22 @@
+{
+  "accuracy": {
+    "falseNegatives": 5,
+    "falsePositives": 1,
+    "policyMismatches": 0,
+    "truePositives": 21
+  },
+  "profileId": "accuracy-corpus",
+  "provenance": {
+    "artifactIdentity": "redact-secret@0.1.0-beta.3",
+    "buildProfile": "release",
+    "command": "[\"target/release/examples/assessment_adapter\",\"accuracy\",\"--json-out\",\"assessment/results/release-profile/rust-core/accuracy-corpus.json\",\"--markdown-out\",\"assessment/results/release-profile/rust-core/accuracy-corpus.md\",\"--mismatches-out\",\"assessment/results/release-profile/rust-core/accuracy-corpus-mismatches.json\"]",
+    "commit": "d727f386f8fc2a88eded6f26dd38c79f6b83dc68",
+    "corpusHash": "cc4cb42028fd700bc98dd06dacebe421c5462dd59a46cf013154a4d185849979",
+    "corpusVersion": "3",
+    "cpu": "aarch64",
+    "os": "macos-25.5.0",
+    "runtime": "rustc-1.98.1 (48a229cea 2026-09-01)"
+  },
+  "schemaVersion": "3",
+  "surface": "rust-core"
+}

@@ -1,5 +1,7 @@
 # RC performance and resource acceptance
 
+> Historical measurement: Rust performance lacks release-build evidence and cannot support optimized cross-runtime comparisons or new acceptance decisions. Original samples and status are retained. See [the corrected local run](../release-profile/README.md).
+
 - Status: **ACCEPTED**
 - Criteria: `rc-performance-resource-v1` (fixed 2026-09-13)
 - Environment profile: `macos-arm64-node22-chromium`

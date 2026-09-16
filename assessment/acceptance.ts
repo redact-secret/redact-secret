@@ -146,6 +146,10 @@ export function evaluateAcceptance(
       failures.push(`${prefix}:missing-performance-result`);
       continue;
     }
+    if (criterion.surface === "rust-core" && run?.result?.provenance.buildProfile !== "release") {
+      failures.push(`${prefix}:release-build-required`);
+      continue;
+    }
     check(checks, failures, `${prefix}:initialization-p95-ms`, performance.initialization.p95, "<=", criterion.maxInitializationP95Ms);
     check(checks, failures, `${prefix}:processing-p95-ms`, performance.processing.p95, "<=", criterion.maxProcessingP95Ms);
     check(checks, failures, `${prefix}:throughput-minimum-bytes-per-second`, performance.throughput.minimum, ">=", criterion.minThroughputBytesPerSecond);

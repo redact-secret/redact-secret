@@ -19,9 +19,14 @@ policy, detection limits, and troubleshooting. The current checkout uses one
 Rust core through runtime-specific bindings; its executable behavior contract
 lives in [conformance](./conformance/README.md).
 
-Registry installation instructions apply to an approved published release.
-Development manifest versions alone do not establish availability. To try this
-checkout before publication, use the [source setup](./docs/getting-started.md).
+Public beta packages are available; see [release status](./docs/releases/status.md)
+for verified versions and artifacts. Development manifest versions alone do not
+establish availability. To build this checkout, use the
+[source setup](./docs/getting-started.md).
+
+Logging, telemetry, model context, and MCP are application use cases. This
+repository provides core APIs and generic integration examples, but no dedicated
+LangChain, OpenTelemetry, pino, Python logging, or MCP integration packages.
 
 ## Architecture at a glance
 

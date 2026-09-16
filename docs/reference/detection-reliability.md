@@ -3,126 +3,77 @@
 [Documentation home](../README.md) · [Detection coverage and limits](detection.md)
 
 Redact Secret detects the credential grammars and contexts listed in the
-[coverage report](../coverage/coverage-report.md). It does not claim universal
-secret detection, and an empty finding list does not prove that input is
-secret-free. Strict prefixes, length bounds, contextual allowlists, and exact
-source ranges favor predictable, lower-noise behavior at the cost of missing
-truncated, new, encoded, or otherwise unsupported credential shapes.
+[coverage report](../coverage/coverage-report.md). An empty finding list does
+not prove that input is secret-free. `supported` in that report means a
+finding-type inventory row has positive conformance evidence; it is not a
+precision, recall, or detector-count claim.
 
-## What the published assessment measures
+## Measured corpus and artifact identity
 
-The committed [cross-language assessment](../../assessment/README.md) uses a
-small, hand-reviewed synthetic corpus. It is separate from the canonical
-conformance contract and from real-world prevalence data. Version 1 contains 9
-whole-input fixtures: 3 logs, 2 source-code, 2 chat, and 2 negative-text
-fixtures. Six fixtures contain one expected finding and 3 are expected empty.
+The committed [v3 assessment](../../assessment/results/complete-v3/summary.json)
+contains 18 hand-reviewed synthetic whole-input fixtures, 26 expected findings,
+and 3 expected-empty fixtures. All five surfaces (Rust, Python, Node, browser
+WebAssembly, CLI) produced the same accuracy result. This is beta.2-era evidence
+from source `9359f59596f03443254f662db60d553b0610809e`, not a measurement of the
+published beta.3 packages. Accuracy corpus version `3` has SHA-256
+`cc4cb42028fd700bc98dd06dacebe421c5462dd59a46cf013154a4d185849979`.
 
-The durable complete run evaluated the Rust crate, installed Python package,
-Node package, browser WebAssembly package in Chromium, and CLI from source
-revision `a356e702e59b03cf297e0af15ba0423bc8466d48`. Every surface used accuracy
-corpus version `1`, SHA-256
-`9c72ab77bb1ee54c6912592c2ce3de72c0c152356283d620498aac5fe08c26d9`.
-The [machine-readable rollup](../../assessment/results/complete/summary.json),
-[consolidated baseline](../../assessment/results/complete/baseline.md), and
-[issue #200 verification summary](../audits/evidence/200/verification-summary.json)
-are the inspectable evidence.
-
-## Detection and range results
-
-All five surfaces produced the same result on this corpus.
-
-| Result | Count / denominator | Meaning |
+| Result | Count / denominator | Interpretation |
 | --- | ---: | --- |
-| Exact true positives | 1 / 6 expected findings | Detector, type, and source range all matched |
-| False negatives | 5 / 6 expected findings | No exact detector/type/range match |
-| False positives | 1 / 2 actual findings | One emitted finding did not exactly match an expectation |
-| Incorrect ranges | 1 / 6 expected; 1 / 2 actual | One missing/extra pair had the same detector and type but different ranges |
-| Policy-correct findings | 1 / 1 evaluable exact match | The action matched on the exact-range true positive |
-| Expected-empty fixtures with findings | 0 / 3 | No finding appeared in the three ordinary-negative fixtures |
+| Exact true positives | 21 / 26 expected | Detector, type, and source range matched |
+| False negatives | 5 / 26 expected | No exact detector/type/range match |
+| False positives | 1 / 22 emitted | One emitted range disagreed with the label |
+| Policy mismatches | 0 / 21 exact matches | Policy agreed on evaluable matches |
+| Expected-empty fixtures with findings | 0 / 3 | No ordinary-negative false positive observed |
 
-The false-positive and false-negative counts are not independent errors: the
-single range disagreement contributes one of each because the scorer requires
-an exact range. It is therefore inaccurate to say that this corpus observed an
-ordinary-negative false positive. It observed zero findings in 3 expected-empty
-fixtures and one range-disagreeing finding among 2 actual findings.
+The one extra Bearer finding covers the credential value, while the expected
+range includes the `Bearer` scheme. This single range disagreement contributes
+both one FP and one FN; it is not a false alarm in an ordinary-negative file.
+The [safe mismatch records](../../assessment/results/complete-v3/rust-core/accuracy-corpus-mismatches.json)
+contain only metadata and offsets.
 
-These fractions describe only these 9 synthetic fixtures. They are not
-precision, recall, or accuracy estimates for production traffic, provider
-inventories, repositories, or arbitrary secrets. The corpus was selected for
-reviewable boundary cases, not sampled from a target population; no confidence
-interval or universal detection percentage is justified.
+The remaining misses are two shortened GitHub tokens, a shortened AWS access
+key, and the unsupported contextual setting name `seed`. Their
+[dispositions](../../assessment/results/beta.2/README.md) remain documented
+scope and contract choices. Labels were not changed to improve the score.
 
-## Redaction results
+These fractions are not precision, recall, or accuracy estimates for production
+traffic or arbitrary secrets. The fixtures were selected for reviewable boundary
+cases, not sampled from a target population. They do not justify confidence
+intervals or a universal detection percentage. Strict prefixes and contextual
+exclusions reduce noise while missing short, new, encoded, or unsupported shapes.
 
-The same complete Testbed recorded successful whole-input and incremental
-processing for Rust, Python, Node, and browser WebAssembly using identical
-workload-profile identity. Those performance paths invoke `scanAndRedact`,
-`scan_and_redact`, or the bounded incremental sanitizer. The CLI performance
-runner instead exercises check mode over its standard-input boundary. These
-results prove that the real artifacts completed the stated paths; they are not
-a redaction-accuracy rate.
+## Redaction and performance are separate evidence
 
-The CLI accuracy adapter additionally compares `--redact` output byte-for-byte
-with the placeholders implied by every emitted `redact` or `block` finding and
-emits no result if that check fails. The installed Python adapter compares
-whole-input and one-code-point incremental sanitized output across all 9
-fixtures. The Testbed does not publish a cross-surface denominator for exact
-assessment-corpus redaction, so this page does not invent one.
+The accuracy adapter checks emitted findings; it does not establish a universal
+redaction-success rate. CLI additionally compares `--redact` output with the
+placeholders implied by its emitted findings. Python checks whole-input and
+incremental output equivalence. Neither detects a secret the scanner missed.
+The [canonical conformance review](../audits/public-contract-cross-runtime-conformance.md)
+owns redaction correctness for supported behavior.
 
-Redaction correctness is instead owned by the canonical conformance contract.
-The [public-contract review](../audits/public-contract-cross-runtime-conformance.md)
-records actual-artifact redaction checks for Rust, Python, Node, browser
-WebAssembly, and CLI at revision
-`5607de8973ddb83f9b61f840f67eb8534d5cea0d`, synchronous-corpus SHA-256
-`27beff0ae10480c0e10f840be56f9cf07a2f76fa3a94b4af3c91d68ac0cc30a5`.
-That evidence shows supported findings are replaced according to policy; it
-does not turn the assessment score into a universal redaction-success
-percentage or same-revision evidence for the older Testbed result.
+Historical Rust timing in `complete`, `complete-v2`, and `complete-v3` used a
+debug build and is unsuitable for optimized cross-runtime comparison. The
+[corrected release-build run](../../assessment/results/release-profile/baseline.md)
+records a separate current-checkout measurement; see its source and artifact
+provenance before comparing it with historical accuracy. CLI performance is
+check mode; the other surfaces scan and redact. Timing is environment-bound
+and is not detection reliability.
 
-## Known limitations and dispositions
+## Historical evidence and reproduction
 
-The five missed exact matches and the range disagreement have explicit
-dispositions in the
-[beta.2 assessment](../../assessment/results/beta.2/README.md):
+The earlier [9-fixture audit](../audits/evidence/200/verification-summary.json)
+is preserved for its original revision. It does not describe the current v3
+corpus. That audit does not claim that those artifacts were published and does
+not authorize a release.
 
-- two fixtures use a shortened classic GitHub-token shape;
-- one uses a shortened AWS access-key shape;
-- one uses the unsupported contextual setting name `seed`; and
-- the Bearer case expects the scheme and value while the stable detector
-  contract deliberately selects and redacts only the credential value.
-
-These are documented precision/recall and contract-boundary choices, not five
-newly confirmed detector defects. The reviewed assessment labels remain
-unchanged, and no detector was broadened to improve the score. If a currently
-unsupported shape becomes a product requirement, it needs a synthetic Rust-core
-regression and an explicit false-positive tradeoff.
-
-Further evidence limits remain linked to owners:
-
-- [#203](https://github.com/redact-secret/redact-secret/issues/203) owns the
-  formal same-revision, full-platform release-candidate artifact inventory;
-- [#224](https://github.com/redact-secret/redact-secret/issues/224) owns replay
-  of every canonical incremental fixture through installed Node and browser
-  artifacts; and
-- [#180](https://github.com/redact-secret/redact-secret/issues/180) and its
-  completed children own the underlying detector-coverage closeouts.
-
-The committed complete run is a macOS arm64 observation using Node 22, CPython
-3.14, and Chromium. Its timing and sampled-memory values are environment-bound
-and must not be read as detection reliability. Candidate package manifest
-identities are `0.1.0-beta.1`; the evidence does not claim that those artifacts
-were published, approve a release, or substitute for #203's formal RC run.
-
-## Reproduce and inspect
-
-Build the real artifacts and run the bounded five-surface suite as documented
-in the [assessment protocol](../../assessment/README.md#complete-reproducible-evaluation):
+Build all real artifacts from one checkout, then run:
 
 ```bash
-npm run assessment:all -- --python .venv/bin/python --output-dir assessment-output
+npm run assessment:all -- --python .venv/bin/python --runs 5 --output-dir assessment-output
 ```
 
-Use a new output directory. A missing, failed, invalid, skipped, identity-mismatched,
-or incomplete surface makes the aggregate status incomplete. Timing samples may
-vary; the source revision, corpus/profile hashes, surface inventory, and
-repetition count are the reproducible contract.
+Use a new output directory and follow the [build protocol](../../assessment/README.md#complete-reproducible-evaluation).
+Missing, failed, invalid, or identity-mismatched surfaces make the aggregate
+incomplete. The Rust performance runner requires `--release`; accuracy labels
+and old results remain unchanged.

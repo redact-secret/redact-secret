@@ -1,5 +1,54 @@
 {
   "findings": {
+    "e39f6215b256d436": {
+      "classification": "false_positive",
+      "line": 276,
+      "path": "assessment/schema.ts",
+      "rationale": "CASE_ID_PATTERN is a linear-time anchored identifier grammar whose repeated character classes and hyphen separators are disjoint, and this call additionally caps the candidate at 64 characters before matching. The generic ReDoS heuristic reports the grouped repetition without accounting for those constraints.",
+      "rule_id": "sast.rules.javascript.lang.security.audit.detect-redos"
+    },
+    "6d155b3cbd8bd6ce": {
+      "classification": "false_positive",
+      "line": 310,
+      "path": "assessment/schema.ts",
+      "rationale": "IDENTIFIER_PATTERN is a linear-time anchored grammar: each separator is outside the adjacent alphanumeric class, so the engine has no ambiguous partition to backtrack over. The value is reviewed assessment-fixture metadata rather than attacker-controlled request input.",
+      "rule_id": "sast.rules.javascript.lang.security.audit.detect-redos"
+    },
+    "ef16500f06b8e4e4": {
+      "classification": "false_positive",
+      "line": 311,
+      "path": "assessment/schema.ts",
+      "rationale": "IDENTIFIER_PATTERN is a linear-time anchored grammar: each separator is outside the adjacent alphanumeric class, so the engine has no ambiguous partition to backtrack over. The value is reviewed assessment-fixture metadata rather than attacker-controlled request input.",
+      "rule_id": "sast.rules.javascript.lang.security.audit.detect-redos"
+    },
+    "d421b316637ae022": {
+      "classification": "false_positive",
+      "line": 351,
+      "path": "assessment/schema.ts",
+      "rationale": "CASE_ID_PATTERN is a linear-time anchored identifier grammar whose repeated character classes and hyphen separators are disjoint, and this call additionally caps the candidate at 64 characters before matching. The generic ReDoS heuristic reports the grouped repetition without accounting for those constraints.",
+      "rule_id": "sast.rules.javascript.lang.security.audit.detect-redos"
+    },
+    "f45192e1ccbd9a5b": {
+      "classification": "false_positive",
+      "line": 367,
+      "path": "assessment/schema.ts",
+      "rationale": "IDENTIFIER_PATTERN is a linear-time anchored grammar: each separator is outside the adjacent alphanumeric class, so the engine has no ambiguous partition to backtrack over. The value is a repository-owned workload-profile algorithm identifier, not attacker-controlled request input.",
+      "rule_id": "sast.rules.javascript.lang.security.audit.detect-redos"
+    },
+    "41781bc1b1a9a126": {
+      "classification": "false_positive",
+      "line": 413,
+      "path": "assessment/schema.ts",
+      "rationale": "CASE_ID_PATTERN is a linear-time anchored identifier grammar because its alphanumeric runs and hyphen separators are disjoint. This validator processes assessment result identifiers produced by repository-owned runners, and the generic ReDoS heuristic cannot infer the grammar's non-overlapping transitions.",
+      "rule_id": "sast.rules.javascript.lang.security.audit.detect-redos"
+    },
+    "ac9ec490099dcbe6": {
+      "classification": "false_positive",
+      "line": 717,
+      "path": "crates/secret-scan-core/examples/assessment_adapter.rs",
+      "rationale": "The process arguments are collected only to serialize the assessment invocation as JSON provenance. They are never interpreted as a command, passed to a shell, or used to launch another process, so the command-argument injection class reported by this generic rule is absent.",
+      "rule_id": "sast.rules.rust.lang.security.args"
+    },
     "bd6f826f125bd4aa": {
       "classification": "false_positive",
       "line": 353,

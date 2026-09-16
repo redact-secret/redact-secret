@@ -1,0 +1,135 @@
+{
+  "schemaVersion": "3",
+  "surface": "browser-wasm",
+  "profileId": "scale-logs-medium-fixed4096",
+  "performance": {
+    "initialization": {
+      "unit": "milliseconds",
+      "samples": [
+        11.599999964237213,
+        11.800000011920929,
+        12.100000023841858,
+        11.5,
+        11.199999988079071
+      ],
+      "minimum": 11.199999988079071,
+      "median": 11.599999964237213,
+      "p95": 12.100000023841858,
+      "maximum": 12.100000023841858,
+      "mean": 11.639999997615813,
+      "standardDeviation": 0.30066594057214036
+    },
+    "processing": {
+      "unit": "milliseconds",
+      "samples": [
+        79.59999996423721,
+        72.90000003576279,
+        75.90000003576279,
+        72.59999996423721,
+        72.69999998807907
+      ],
+      "minimum": 72.59999996423721,
+      "median": 72.90000003576279,
+      "p95": 79.59999996423721,
+      "maximum": 79.59999996423721,
+      "mean": 74.73999999761581,
+      "standardDeviation": 2.723673982159041
+    },
+    "throughput": {
+      "unit": "bytes-per-second",
+      "samples": [
+        3293391.961278654,
+        3596076.81579416,
+        3453939.3923119563,
+        3610936.640897206,
+        3605969.739243281
+      ],
+      "minimum": 3293391.961278654,
+      "median": 3596076.81579416,
+      "p95": 3610936.640897206,
+      "maximum": 3610936.640897206,
+      "mean": 3512062.9099050513,
+      "standardDeviation": 123974.32857650463
+    },
+    "memory": {
+      "nodeHeap": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "A browser process does not expose Node heapUsed.",
+        "samplingLimit": "No samples were available."
+      },
+      "nodeRss": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "Browser pages do not expose process RSS through a standard API.",
+        "samplingLimit": "No samples were available."
+      },
+      "nodeExternal": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "Browser pages do not expose Node external memory.",
+        "samplingLimit": "No samples were available."
+      },
+      "browserJsHeap": {
+        "unit": "bytes",
+        "samples": [
+          {
+            "baselineBytes": 39600000,
+            "maximumObservedBytes": 39600000
+          },
+          {
+            "baselineBytes": 39600000,
+            "maximumObservedBytes": 39600000
+          },
+          {
+            "baselineBytes": 39600000,
+            "maximumObservedBytes": 39600000
+          },
+          {
+            "baselineBytes": 39600000,
+            "maximumObservedBytes": 39600000
+          },
+          {
+            "baselineBytes": 39600000,
+            "maximumObservedBytes": 39600000
+          }
+        ],
+        "samplingLimit": "Sampled immediately before and after processing; short-lived peaks between those boundaries may be missed, so maxima are observed samples, not guaranteed true peaks. performance.memory is non-standard, engine-dependent, and may be coarsened."
+      },
+      "wasmLinearMemory": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "The package intentionally keeps its WebAssembly.Memory handle private; the test harness cannot read linear-memory size without adding product instrumentation.",
+        "samplingLimit": "No samples were available."
+      },
+      "pythonHeap": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "The browser surface does not run inside a Python allocator.",
+        "samplingLimit": "No samples were available."
+      },
+      "processRss": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "Browser pages do not expose whole-process RSS through a standard API.",
+        "samplingLimit": "No samples were available."
+      },
+      "streamingBuffer": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "The public incremental session exposes lifecycle state but intentionally does not expose retained plaintext buffer size.",
+        "samplingLimit": "No samples were available."
+      }
+    }
+  },
+  "provenance": {
+    "commit": "d727f386f8fc2a88eded6f26dd38c79f6b83dc68",
+    "artifactIdentity": "@redact-secret/wasm@0.1.0-beta.3",
+    "corpusVersion": "1",
+    "corpusHash": "b4db2cd22b4c008c9d63789df8ca2e21e697a21a84699466ea5f96c89d8e2806",
+    "os": "darwin-25.5.0",
+    "cpu": "arm64",
+    "runtime": "chromium-153.0.8010.12",
+    "command": "node scripts/assessment-browser-performance.mjs --engine chromium --artifact-dir /Users/minhokang/Work/ops/utilities/redact-secret/bindings/wasm/pkg --profile scale-logs-medium-fixed4096 --runs 5 --json-out assessment/results/release-profile/browser-wasm/scale-logs-medium-fixed4096.json --markdown-out assessment/results/release-profile/browser-wasm/scale-logs-medium-fixed4096.md"
+  }
+}

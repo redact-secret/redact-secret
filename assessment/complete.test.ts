@@ -36,6 +36,7 @@ function result(surface: AssessmentSurface, profileId: string, kind: "accuracy" 
     commit: "1".repeat(40), artifactIdentity: `${surface}@synthetic`, corpusVersion: "1",
     corpusHash: hash, os: "test-os", cpu: "test-cpu", runtime: "test-runtime",
     command: `synthetic-${surface}-${profileId}`,
+    buildProfile: "release" as const,
   };
   return kind === "accuracy" ? {
     schemaVersion: "3", surface, profileId,
@@ -105,6 +106,33 @@ describe("complete assessment aggregation", () => {
       if (run.mismatchesPath !== undefined) {
         expect(existsSync(join(HERE, "results", "complete-v3", run.mismatchesPath))).toBe(true);
       }
+    }
+  });
+
+  test("debug and legacy unqualified Rust timing cannot form a comparison baseline", () => {
+    for (const buildProfile of ["debug", undefined] as const) {
+      const attempts = completeAttempts();
+      const index = attempts.findIndex(a => a.surface === "rust-core" && a.kind === "performance");
+      const original = attempts[index].result!;
+      attempts[index] = { ...attempts[index], result: { ...original, provenance: { ...original.provenance, buildProfile } } };
+      const aggregate = build(attempts);
+      expect(aggregate.status).toBe("incomplete");
+      expect(aggregate.validationFailures).toContain("rust-core:performance:scale-logs-small-whole:release-build-required");
+      expect(renderCompleteAssessmentMarkdown(aggregate)).toContain("| rust-core | scale-logs-small-whole | — | — |");
+    }
+  });
+
+  test("corrected evidence reaggregates with explicit release provenance", () => {
+    const current = JSON.parse(readFileSync(join(HERE, "results", "release-profile", "summary.json"), "utf8"));
+    const rebuilt = buildCompleteAssessment({attempts: current.runs, performanceProfiles: current.performanceProfiles, repetitions: current.repetitions, validateResult: candidate => validateAssessmentResults([candidate])});
+    expect(rebuilt.status).toBe("complete");
+    expect(rebuilt.runs).toHaveLength(15);
+    for (const run of rebuilt.runs.filter(r => r.surface === "rust-core")) {
+      expect(run.result?.provenance.buildProfile).toBe("release");
+      expect(JSON.parse(run.result!.provenance.command)[0]).toContain("release/examples/assessment_adapter");
+    }
+    for (const run of rebuilt.runs.filter(r => r.kind === "accuracy")) {
+      expect(run.result?.accuracy).toEqual({truePositives:21,falsePositives:1,falseNegatives:5,policyMismatches:0});
     }
   });
 
