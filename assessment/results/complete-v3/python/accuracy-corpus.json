@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "3",
+  "surface": "python",
+  "profileId": "accuracy-corpus",
+  "accuracy": {
+    "truePositives": 21,
+    "falsePositives": 1,
+    "falseNegatives": 5,
+    "policyMismatches": 0
+  },
+  "provenance": {
+    "commit": "9359f59596f03443254f662db60d553b0610809e",
+    "artifactIdentity": "redact-secret==0.1.0b2",
+    "corpusVersion": "3",
+    "corpusHash": "cc4cb42028fd700bc98dd06dacebe421c5462dd59a46cf013154a4d185849979",
+    "os": "darwin-25.5.0",
+    "cpu": "arm64",
+    "runtime": "cpython-3.14.7",
+    "command": "node scripts/assessment-python-run.mjs --python .venv/bin/python --json-out assessment-output/python/accuracy-corpus.json --markdown-out assessment-output/python/accuracy-corpus.md --mismatches-out assessment-output/python/accuracy-corpus-mismatches.json"
+  }
+}

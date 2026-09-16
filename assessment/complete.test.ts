@@ -88,7 +88,7 @@ describe("complete assessment aggregation", () => {
   });
 
   test("the committed baseline is complete, schema-valid, and fully linked", () => {
-    const baselinePath = join(HERE, "results", "complete", "summary.json");
+    const baselinePath = join(HERE, "results", "complete-v3", "summary.json");
     const baseline = JSON.parse(readFileSync(baselinePath, "utf8")) as {
       status: string;
       validationFailures: readonly string[];
@@ -100,10 +100,10 @@ describe("complete assessment aggregation", () => {
     for (const run of baseline.runs) {
       expect(run.result).toBeDefined();
       expect(() => validateAssessmentResults([run.result!])).not.toThrow();
-      expect(existsSync(join(HERE, "results", "complete", run.resultPath))).toBe(true);
-      expect(existsSync(join(HERE, "results", "complete", run.markdownPath))).toBe(true);
+      expect(existsSync(join(HERE, "results", "complete-v3", run.resultPath))).toBe(true);
+      expect(existsSync(join(HERE, "results", "complete-v3", run.markdownPath))).toBe(true);
       if (run.mismatchesPath !== undefined) {
-        expect(existsSync(join(HERE, "results", "complete", run.mismatchesPath))).toBe(true);
+        expect(existsSync(join(HERE, "results", "complete-v3", run.mismatchesPath))).toBe(true);
       }
     }
   });

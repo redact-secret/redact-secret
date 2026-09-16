@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -8,7 +9,7 @@ import type { CompleteAssessment } from "./complete.js";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const criteria = validateAcceptanceCriteria(JSON.parse(readFileSync(join(HERE, "acceptance-criteria.json"), "utf8")) as AcceptanceCriteria);
-const baseline = JSON.parse(readFileSync(join(HERE, "results", "complete", "summary.json"), "utf8")) as CompleteAssessment;
+const baseline = JSON.parse(readFileSync(join(HERE, "results", "complete-v3", "summary.json"), "utf8")) as CompleteAssessment;
 
 function candidate(): CompleteAssessment {
   return {
@@ -120,7 +121,7 @@ describe("fixed RC acceptance criteria", () => {
 });
 
 const linuxCriteria = validateAcceptanceCriteria(JSON.parse(readFileSync(join(HERE, "acceptance-criteria-linux-x64.json"), "utf8")) as AcceptanceCriteria);
-const linuxBaseline = JSON.parse(readFileSync(join(HERE, "results", "complete-linux-x64", "summary.json"), "utf8")) as CompleteAssessment;
+const linuxBaseline = JSON.parse(readFileSync(join(HERE, "results", "complete-linux-x64-v3", "summary.json"), "utf8")) as CompleteAssessment;
 
 describe("fixed RC acceptance criteria — Linux x86_64", () => {
   test("is a separately identified, separately loaded profile that leaves the macOS criteria untouched", () => {
@@ -142,7 +143,7 @@ describe("fixed RC acceptance criteria — Linux x86_64", () => {
     expect(linuxBaseline.repetitions).toBe(linuxCriteria.minimumRepetitions);
     expect(linuxBaseline.runs).toHaveLength(15);
 
-    const evidenceRoot = join(HERE, "results", "complete-linux-x64");
+    const evidenceRoot = join(HERE, "results", "complete-linux-x64-v3");
     const evaluation = JSON.parse(readFileSync(join(evidenceRoot, "acceptance.json"), "utf8")) as { status: string; environmentId: string; checks: readonly { passed: boolean }[]; failures: readonly string[] };
     expect(evaluation.status).toBe("accepted");
     expect(evaluation.environmentId).toBe("linux-x64-node22-chromium");
@@ -173,5 +174,15 @@ describe("fixed RC acceptance criteria — Linux x86_64", () => {
     expect(workflow).toMatch(/^\s*runs-on:\s*ubuntu-latest\s*$/m);
     expect(workflow).toContain("--criteria assessment/acceptance-criteria-linux-x64.json");
     expect(linuxCriteria.environment.osPrefixes).toContain("linux-");
+  });
+});
+
+describe("accuracy corpus identity pin does not drift from the live corpus", () => {
+  test("both criteria files pin the current accuracy-corpus.json hash", () => {
+    const liveCorpusHash = createHash("sha256")
+      .update(readFileSync(join(HERE, "fixtures", "accuracy-corpus.json")))
+      .digest("hex");
+    expect(criteria.baseline.accuracyCorpusHash).toBe(liveCorpusHash);
+    expect(linuxCriteria.baseline.accuracyCorpusHash).toBe(liveCorpusHash);
   });
 });
