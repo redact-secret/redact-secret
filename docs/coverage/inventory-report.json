@@ -639,6 +639,38 @@
       "type": "npm_access_token"
     },
     {
+      "detector": "sendgrid-token",
+      "evidence": {
+        "fixtureCount": 14,
+        "hostContextsExercised": [
+          "dotenv",
+          "json",
+          "plain-text"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "sendgrid-positive-bare",
+        "sendgrid-positive-crlf-host",
+        "sendgrid-positive-dotenv",
+        "sendgrid-positive-json",
+        "sendgrid-positive-unicode-prefix"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "sendgrid_api_key"
+    },
+    {
       "detector": "jwt",
       "evidence": {
         "fixtureCount": 11,
@@ -1006,7 +1038,7 @@
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 25,
+    "supported": 26,
     "unresolved": 0
   }
 }

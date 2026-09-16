@@ -1654,6 +1654,92 @@
       "type": "npm_access_token"
     },
     {
+      "behaviorClass": "provider",
+      "detector": "sendgrid-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "sendgrid-positive-bare",
+            "sendgrid-positive-crlf-host",
+            "sendgrid-positive-dotenv",
+            "sendgrid-positive-json",
+            "sendgrid-positive-unicode-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "sendgrid-overlap-generic-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "sendgrid-adversarial-incomplete-suffix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "sendgrid-boundary-embedded-identifier",
+            "sendgrid-boundary-malformed-separator",
+            "sendgrid-boundary-prefix-only",
+            "sendgrid-boundary-truncated-id",
+            "sendgrid-boundary-truncated-secret"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "sendgrid-negative-common-identifier",
+            "sendgrid-negative-placeholder"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "sendgrid-boundary-embedded-identifier",
+            "sendgrid-boundary-malformed-separator",
+            "sendgrid-boundary-prefix-only",
+            "sendgrid-boundary-truncated-id",
+            "sendgrid-boundary-truncated-secret"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for sendgrid_api_key (sendgrid-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "sendgrid_api_key"
+    },
+    {
       "behaviorClass": "structural",
       "detector": "jwt",
       "dimensions": [
@@ -2495,6 +2581,7 @@
             "private-key-adversarial-mismatched",
             "private-key-adversarial-nested",
             "pypi-adversarial-long-suffix",
+            "sendgrid-adversarial-incomplete-suffix",
             "shopify-adversarial-long-suffix",
             "slack-adversarial-long-suffix",
             "stripe-adversarial-long-suffix",
@@ -2775,6 +2862,7 @@
             "private-key-adversarial-mismatched",
             "private-key-adversarial-nested",
             "pypi-adversarial-long-suffix",
+            "sendgrid-adversarial-incomplete-suffix",
             "shopify-adversarial-long-suffix",
             "slack-adversarial-long-suffix",
             "stripe-adversarial-long-suffix",

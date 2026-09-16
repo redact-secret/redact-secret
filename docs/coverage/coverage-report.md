@@ -13,11 +13,11 @@ python3 -B scripts/generate-coverage-report.py --out docs/coverage/coverage-repo
 
 | Row state | Count |
 | --- | --- |
-| supported | 25 |
+| supported | 26 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 36.
+Coverage declarations: 37.
 
 ## Coverage by detector
 
@@ -41,6 +41,7 @@ Coverage declarations: 36.
 | otpauth-uri | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | private-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | pypi-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| sendgrid-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | shopify-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | slack-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | stripe-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -71,6 +72,7 @@ Coverage declarations: 36.
 | otpauth_secret | otpauth-uri | structural | supported | supported | none |
 | private_key | private-key | structural | supported | not-applicable | none |
 | pypi_api_token | pypi-token | provider | supported | not-applicable | none |
+| sendgrid_api_key | sendgrid-token | provider | supported | not-applicable | none |
 | shopify_access_token | shopify-token | provider | supported | not-applicable | none |
 | slack_token | slack-token | provider | supported | not-applicable | none |
 | stripe_credential | stripe-token | provider | supported | not-applicable | none |
@@ -102,15 +104,15 @@ Coverage declarations: 36.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 36 | 0 | 0 |
-| boundary | 25 | 0 | 0 |
-| host-context | 25 | 0 | 0 |
+| adversarial | 37 | 0 | 0 |
+| boundary | 26 | 0 | 0 |
+| host-context | 26 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 36 | 0 | 0 |
-| near-miss-negative | 25 | 0 | 0 |
-| overlap | 25 | 0 | 0 |
-| positive | 25 | 0 | 0 |
-| range | 36 | 0 | 0 |
+| malformed | 37 | 0 | 0 |
+| near-miss-negative | 26 | 0 | 0 |
+| overlap | 26 | 0 | 0 |
+| positive | 26 | 0 | 0 |
+| range | 37 | 0 | 0 |
 
 ## Unresolved and pending coverage
 
