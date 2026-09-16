@@ -1,6 +1,6 @@
 {
   "name": "@redact-secret/node",
-  "version": "0.1.0-beta.2",
+  "version": "0.1.0-beta.3",
   "private": true,
   "description": "N-API native addon for @redact-secret/core. Built with @napi-rs/cli; not published on its own.",
   "license": "MIT",

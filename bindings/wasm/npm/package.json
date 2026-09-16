@@ -1,7 +1,7 @@
 {
   "name": "@redact-secret/wasm",
   "description": "wasm-bindgen browser build for @redact-secret/core. Not intended for direct use; installed as an ordinary dependency of @redact-secret/core.",
-  "version": "0.1.0-beta.2",
+  "version": "0.1.0-beta.3",
   "type": "module",
   "sideEffects": false,
   "main": "redact_secret_wasm.js",

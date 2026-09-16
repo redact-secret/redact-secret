@@ -1,7 +1,7 @@
 {
   "name": "@redact-secret/node-darwin-x64",
   "description": "N-API native addon for @redact-secret/core (darwin-x64). Not intended for direct use; installed as an optional dependency of @redact-secret/core.",
-  "version": "0.1.0-beta.2",
+  "version": "0.1.0-beta.3",
   "os": ["darwin"],
   "cpu": ["x64"],
   "main": "redact-secret.darwin-x64.node",
