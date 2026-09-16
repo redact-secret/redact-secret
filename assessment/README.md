@@ -67,10 +67,11 @@ An `AssessmentExpectation` carries only `detector`, `type`, `confidence`,
 value. Both validators (`schema.ts`'s closed key check and `schema.json`'s
 `additionalProperties: false` on `#/$defs/expectation`) reject any expectation
 object with an extra key. Every fixture `input` is unmistakably synthetic or
-revoked; the corpus's only synthetic secret shape is
-`token=ghp_ASSESSMENTSYNTHETIC0000000000000000`, distinct from any string used
-in `conformance/`, on the same [fixture safety review](../conformance/README.md#fixture-safety-review)
-terms.
+revoked, one shape per finding type the corpus scores — for example
+`token=ghp_ASSESSMENTSYNTHETIC0000000000000000` for `github_token` and
+`sk-ant-api03-SYNTHETIC_REVOKED_ANTHROPIC_1` for `anthropic_api_key` — each
+distinct from any string used in `conformance/`, on the same
+[fixture safety review](../conformance/README.md#fixture-safety-review) terms.
 
 ## Accuracy is not scale
 

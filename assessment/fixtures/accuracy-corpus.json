@@ -1,7 +1,7 @@
 {
   "offsetUnit": "utf8-byte",
-  "corpusVersion": "2",
-  "fixtureCount": 14,
+  "corpusVersion": "3",
+  "fixtureCount": 18,
   "fixtures": [
     {
       "id": "logs-github-token",
@@ -113,7 +113,7 @@
       "id": "negative-text-unicode-astral",
       "category": "negative-text",
       "unicode": true,
-      "input": "咖啡座 talk continued late into the night 🦎 near the café, calm and uneventful.",
+      "input": "\u5496\u5561\u5ea7 talk continued late into the night \ud83e\udd8e near the caf\u00e9, calm and uneventful.",
       "expected": [],
       "note": "Negative baseline mixing CJK and an astral emoji with no credential-shaped content."
     },
@@ -121,7 +121,7 @@
       "id": "logs-unicode-astral-boundary",
       "category": "logs",
       "unicode": true,
-      "input": "🔑 token=ghp_ASSESSMENTSYNTHETIC0000000000000000 seen-in=café-fixture",
+      "input": "\ud83d\udd11 token=ghp_ASSESSMENTSYNTHETIC0000000000000000 seen-in=caf\u00e9-fixture",
       "expected": [
         {
           "detector": "github-token",
@@ -224,6 +224,177 @@
         }
       ],
       "note": "Contextual behavior class (docs/coverage/evidence-requirements.md #1, generic-token's authorization_credential type): confidence and the match itself are driven by the surrounding 'Authorization: Token' header syntax rather than a vendor-specific prefix, even though the accepted candidate's own specificity field is structural; dumped into a raw log line."
+    },
+    {
+      "id": "logs-additional-provider-tokens-one",
+      "category": "logs",
+      "unicode": false,
+      "input": "2026-09-14T00:03:00Z INFO secrets-scan hits: anthropic=sk-ant-api03-SYNTHETIC_REVOKED_ANTHROPIC_1 cloudflare=cfut_SYNTHETIC_REVOKED_CLOUDFLARE_1 digitalocean=dop_v1_SYNTHETIC_REVOKED_DIGITALOCEAN1 docker=dckr_pat_SYNTHETIC_REVOKED_DOCKER_1 gitlab=glpat-SYNTHETIC_REVOKED_GITLAB_1 request_id=fixture-3",
+      "expected": [
+        {
+          "detector": "anthropic-token",
+          "type": "anthropic_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 55,
+          "end": 97,
+          "policyOutcome": "redact"
+        },
+        {
+          "detector": "cloudflare-token",
+          "type": "cloudflare_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 109,
+          "end": 144,
+          "policyOutcome": "redact"
+        },
+        {
+          "detector": "digitalocean-token",
+          "type": "digitalocean_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 158,
+          "end": 196,
+          "policyOutcome": "redact"
+        },
+        {
+          "detector": "docker-token",
+          "type": "docker_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 204,
+          "end": 239,
+          "policyOutcome": "redact"
+        },
+        {
+          "detector": "gitlab-token",
+          "type": "gitlab_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 247,
+          "end": 279,
+          "policyOutcome": "redact"
+        }
+      ],
+      "note": "Five provider tokens (Anthropic, Cloudflare, DigitalOcean, Docker, GitLab) dumped in one secrets-scan log line; always-redact provider types at high confidence."
+    },
+    {
+      "id": "code-additional-provider-tokens-one",
+      "category": "code",
+      "unicode": false,
+      "input": "const leakedTokens = {\n  huggingFaceToken: \"hf_SYNTHETIC_REVOKED_HUGGINGFACE1\",\n  linearApiKey: \"lin_api_SYNTHETIC_REVOKED_LINEAR_1\",\n  npmToken: \"npm_SYNTHETICREVOKEDNPMACCESSTOKEN000001\",\n  pypiToken: \"pypi-SYNTHETIC_REVOKED_PYPI_API_TOKEN_MACAROON_FIXTURE_VALUE_0000000000000000000000000000000000\",\n  shopifyAccessToken: \"shpat_SYNTHETIC_REVOKED_SHOPIFY_1\",\n};",
+      "expected": [
+        {
+          "detector": "huggingface-token",
+          "type": "huggingface_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 44,
+          "end": 77,
+          "policyOutcome": "redact"
+        },
+        {
+          "detector": "linear-token",
+          "type": "linear_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 97,
+          "end": 131,
+          "policyOutcome": "redact"
+        },
+        {
+          "detector": "npm-token",
+          "type": "npm_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 147,
+          "end": 187,
+          "policyOutcome": "redact"
+        },
+        {
+          "detector": "pypi-token",
+          "type": "pypi_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 204,
+          "end": 299,
+          "policyOutcome": "redact"
+        },
+        {
+          "detector": "shopify-token",
+          "type": "shopify_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 325,
+          "end": 358,
+          "policyOutcome": "redact"
+        }
+      ],
+      "note": "Five provider tokens (Hugging Face, Linear, npm, PyPI, Shopify) assigned as object properties in source code; always-redact provider types at high confidence."
+    },
+    {
+      "id": "chat-additional-provider-tokens-one",
+      "category": "chat",
+      "unicode": false,
+      "input": "here are the leaked values from the audit: slack=xoxb-SYNTHETIC_REVOKED_SLACK_1 supabase=sb_secret_SYNTHETIC_REVOKED_SUPABASE_1 vault=hvs.SYNTHETIC_REVOKED_VAULT_TOKEN1 vercel=vcp_SYNTHETIC_REVOKED_VERCEL_1 please rotate all four now",
+      "expected": [
+        {
+          "detector": "slack-token",
+          "type": "slack_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 49,
+          "end": 79,
+          "policyOutcome": "redact"
+        },
+        {
+          "detector": "supabase-token",
+          "type": "supabase_secret_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 89,
+          "end": 127,
+          "policyOutcome": "redact"
+        },
+        {
+          "detector": "vault-token",
+          "type": "vault_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 134,
+          "end": 168,
+          "policyOutcome": "redact"
+        },
+        {
+          "detector": "vercel-token",
+          "type": "vercel_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 176,
+          "end": 206,
+          "policyOutcome": "redact"
+        }
+      ],
+      "note": "Four provider tokens (Slack, Supabase, Vault, Vercel) pasted mid-sentence in a chat message; always-redact provider types at high confidence."
+    },
+    {
+      "id": "code-otpauth-provisioning-uri",
+      "category": "code",
+      "unicode": false,
+      "input": "const provisioningUri = \"otpauth://totp/ExampleService:fixture@example.com?issuer=ExampleService&secret=SYNTHETICOTPSECRETVALUE&algorithm=SHA1&digits=6&period=30\";",
+      "expected": [
+        {
+          "detector": "otpauth-uri",
+          "type": "otpauth_secret",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 104,
+          "end": 127,
+          "policyOutcome": "redact"
+        }
+      ],
+      "note": "Structural behavior class: the secret= parameter of an otpauth://totp/ provisioning URI assigned to a variable in source code; detected by scheme and query-parameter shape alone."
     }
   ]
 }
