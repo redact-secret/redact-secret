@@ -79,4 +79,39 @@ mod tests {
     fn rejects_a_short_suffix() {
         assert_eq!(detect("sk-ant-api03-short").len(), 0);
     }
+
+    #[test]
+    fn accepts_a_doc_style_placeholder_built_from_valid_alphabet_characters() {
+        let input = format!("sk-ant-api03-{}", "x".repeat(20));
+        assert_eq!(detect(&input).len(), 1);
+    }
+
+    #[test]
+    fn rejects_a_prefix_embedded_in_a_wider_benign_identifier() {
+        // A leading alnum/dash byte right before `sk-ant-api03-` means this
+        // is a truncated slice of a longer identifier, not a
+        // boundary-delimited credential.
+        let input = format!("mysk-ant-api03-{}", "SYNTHETIC_REVOKED_ANTHROPIC_KEY");
+        assert_eq!(detect(&input).len(), 0);
+    }
+
+    #[test]
+    fn a_trailing_comma_does_not_get_folded_into_or_suppress_the_match() {
+        let token = format!("sk-ant-api03-{}", "SYNTHETIC_REVOKED_KEY_VALUE");
+        let input = format!("Rotate {token}, then redeploy.");
+        let candidates = detect(&input);
+        assert_eq!(candidates.len(), 1);
+        let start = "Rotate ".len();
+        let end = start + token.len();
+        assert_eq!(candidates[0].range(), ByteRange::new(start, end).unwrap());
+    }
+
+    #[test]
+    fn an_unversioned_prefix_is_a_documented_false_negative() {
+        // No detector claims this: openai-token excludes the whole
+        // `sk-ant-` namespace and anthropic-token requires the versioned
+        // prefix. See the module doc comment for the accepted tradeoff.
+        let input = "sk-ant-SYNTHETIC_REVOKED_LEGACY_ANTHROPIC_KEY_VALUE";
+        assert_eq!(detect(input).len(), 0);
+    }
 }
