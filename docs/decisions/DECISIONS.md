@@ -21,3 +21,4 @@ future planning and implementation but do not authorize Git or release actions.
 - [Exclude interpolation and command-substitution references beyond `${...}`, `$name`, and `{{...}}`](2026-09-16-exclude-interpolation-command-substitution-references.md)
 - [Exclude cmd-style Windows environment references (`%VAR%`) and SQL named bind parameters (`:identifier`)](2026-09-16-exclude-windows-env-and-sql-bind-parameter-references.md)
 - [Bound the Azure Key Vault SecretUri reference by host shape, not domain identity](2026-09-16-bound-azure-keyvault-secreturi-host-by-shape.md)
+- [Detect a nested contextual assignment with no separator inside an enclosing quote](2026-09-16-detect-nested-assignments-with-no-separator-inside-a-quote.md)
