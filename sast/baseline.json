@@ -342,6 +342,13 @@
       "path": "scripts/run-sast.py",
       "rationale": "Every argument list passed to this subprocess call is built as a list -- never shell=True. The executable is the pinned, digest-verified OpenGrep binary or git, and the dynamic values are repository paths, static flags, reviewed EXCLUSIONS entries, or caller-provided scan targets interpreted only by OpenGrep as paths to scan; they are not shell-interpreted command text, so this generic audit rule's command-injection concern does not apply.",
       "rule_id": "sast.rules.python.lang.security.audit.dangerous-subprocess-use-audit"
+    },
+    "d7701438119a990d": {
+      "classification": "false_positive",
+      "line": 92,
+      "path": "examples/logging-redaction/python/test_logging_filter.py",
+      "rationale": "The rule's `.*(api.key|secret|credential|token|password).*%s.*` heuristic matches this format string on the literal word \"token\", but the value logged is `SECRET_TOKEN_1`, this repository's synthetic, non-functional secret-shaped placeholder used identically by every example's fake-scanner fixtures (e.g. `examples/tracing-masking/python/fake_scanner.py`) -- never a real credential. This test's own point is to prove `RedactSecretFilter` redacts it before it reaches any destination: the next line asserts `handler.lines == [\"user alice presented token <SECRET_1>\"]`, i.e. no plaintext is ever emitted. The rule sees only the literal message text and cannot see that the logger call is wrapped by the filter under test.",
+      "rule_id": "sast.rules.python.lang.security.audit.logging.python-logger-credential-disclosure"
     }
   },
   "known_errors": {
