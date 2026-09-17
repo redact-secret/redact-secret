@@ -5,6 +5,10 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+## 0.1.0-beta.4 — 2026-09-17
+
+[Publication and qualification evidence](docs/releases/0.1.0-beta.4/README.md).
+
 - Fixed the pino logging example (`examples/logging-redaction/pino-hook.mjs`)
   to redact a secret split across a `msg` format string and its printf-style
   interpolation values, or across two interpolation values, within one log
