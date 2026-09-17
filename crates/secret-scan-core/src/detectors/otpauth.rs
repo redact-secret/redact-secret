@@ -312,4 +312,99 @@ mod tests {
         let candidates = detect(input);
         assert_eq!(candidates.len(), 2);
     }
+
+    #[test]
+    fn duplicate_secret_parameters_select_only_the_first_occurrence() {
+        let input =
+            "otpauth://totp/Example:alice@example.com?secret=JBSWY3DPEHPK3PXPAAAA&secret=JBSWY3DPEHPK3PXPBBBB";
+        let candidates = detect(input);
+        let (start, end) = only_range(&candidates);
+        assert_eq!(&input[start..end], "JBSWY3DPEHPK3PXPAAAA");
+    }
+
+    #[test]
+    fn a_duplicate_secret_whose_first_occurrence_is_below_the_minimum_length_produces_no_finding() {
+        // Accepted tradeoff: only the first `secret=` occurrence is ever
+        // inspected. When it fails validation, the detector does not fall
+        // back to a later, syntactically valid duplicate.
+        let input =
+            "otpauth://totp/Example:alice@example.com?secret=SHORT&secret=JBSWY3DPEHPK3PXPBBBB";
+        assert!(detect(input).is_empty());
+    }
+
+    #[test]
+    fn a_base32_lookalike_in_the_label_is_never_selected() {
+        let input = "otpauth://totp/JBSWY3DPEHPK3PXP:alice@example.com?secret=NB2HI4DTHIXS6IDUAAAA";
+        let candidates = detect(input);
+        let (start, end) = only_range(&candidates);
+        assert_eq!(&input[start..end], "NB2HI4DTHIXS6IDUAAAA");
+    }
+
+    #[test]
+    fn a_secret_value_with_an_rfc4648_excluded_digit_mid_value_produces_no_finding() {
+        let input = "otpauth://totp/Example:alice@example.com?secret=JBSWY3DP01PK3PXP";
+        assert!(detect(input).is_empty());
+    }
+
+    #[test]
+    fn padding_before_the_end_of_the_value_produces_no_finding() {
+        let input = "otpauth://totp/Example:alice@example.com?secret=JBSWY3DP=EHPK3PXP";
+        assert!(detect(input).is_empty());
+    }
+
+    #[test]
+    fn an_empty_secret_value_produces_no_finding() {
+        let input = "otpauth://totp/Example:alice@example.com?secret=&issuer=Example";
+        assert!(detect(input).is_empty());
+    }
+
+    #[test]
+    fn an_unsupported_type_segment_produces_no_finding() {
+        let input = "otpauth://push/Example:alice@example.com?secret=JBSWY3DPEHPK3PXP";
+        assert!(detect(input).is_empty());
+    }
+
+    #[test]
+    fn a_percent_encoded_padding_character_is_not_decoded_and_produces_no_finding() {
+        // Accepted tradeoff: the detector never percent-decodes the query
+        // string, so a secret that percent-encodes its own `=` padding is
+        // not recognized as base32 even though the decoded value would be
+        // a valid secret.
+        let input = "otpauth://totp/Example:alice@example.com?secret=JBSWY3DPEHPK3PXP%3D%3D";
+        assert!(detect(input).is_empty());
+    }
+
+    #[test]
+    fn a_percent_encoded_secret_key_is_not_decoded_and_produces_no_finding() {
+        // Accepted tradeoff: `find_secret_value` matches the literal ASCII
+        // bytes "secret=" only; a percent-encoded key byte never matches.
+        let input = "otpauth://totp/Example:alice@example.com?%73ecret=JBSWY3DPEHPK3PXP";
+        assert!(detect(input).is_empty());
+    }
+
+    #[test]
+    fn an_unencoded_space_in_the_label_produces_no_finding() {
+        // Accepted tradeoff: an unencoded space ends the label scan without
+        // the query string's `?` immediately following it, so the whole URI
+        // is skipped even though a genuine secret follows later in the line.
+        let input = "otpauth://totp/Example Corp:alice@example.com?secret=JBSWY3DPEHPK3PXP";
+        assert!(detect(input).is_empty());
+    }
+
+    #[test]
+    fn trailing_sentence_punctuation_is_absorbed_into_the_value_and_produces_no_finding() {
+        // Accepted tradeoff: a sentence-ending period is not a recognized
+        // query terminator, so it is absorbed into the candidate value and
+        // fails base32 validation.
+        let input = "See otpauth://totp/Example:alice@example.com?secret=JBSWY3DPEHPK3PXP.";
+        assert!(detect(input).is_empty());
+    }
+
+    #[test]
+    fn an_uppercase_scheme_produces_no_finding() {
+        // Accepted tradeoff, documented on `PREFIXES`: the scheme is matched
+        // as a literal lowercase byte sequence.
+        let input = "OTPAUTH://TOTP/Example:alice@example.com?secret=JBSWY3DPEHPK3PXP";
+        assert!(detect(input).is_empty());
+    }
 }
