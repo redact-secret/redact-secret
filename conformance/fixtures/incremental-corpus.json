@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 46,
+  "fixtureCount": 51,
   "fixtures": [
     {
       "id": "synthetic-regression-malformed-authority",
@@ -147,8 +147,8 @@
     },
     {
       "id": "fixed-width-unicode",
-      "input": "before \ud83e\uddea AKIASYNTHETICEXAMPLE after",
-      "text": "before \ud83e\uddea <SECRET_1> after",
+      "input": "before 🧪 AKIASYNTHETICEXAMPLE after",
+      "text": "before 🧪 <SECRET_1> after",
       "expected": [
         {
           "detector": "aws-access-key",
@@ -750,6 +750,86 @@
         }
       ],
       "note": "issue #323: the word 'bearer' embedded inside a wider identifier ('notbearer', already excluded by the boundary check) sits directly before a genuine explicit Bearer scheme on the next line, sharing the same 'bearer' bytes the detector's scheme match inspects. Every UTF-8 chunk split, including splits that fall inside either line's 'bearer' text, must still discriminate the two the same way the whole-input scan does."
+    },
+    {
+      "id": "vault-embedded-identifier-discriminating-boundary",
+      "input": "legacyhvs.SYNTHETIC_EMBEDDED_NOT_A_MATCH\nhvs.SYNTHETIC_REVOKED_VAULT_TOKEN",
+      "text": "legacyhvs.SYNTHETIC_EMBEDDED_NOT_A_MATCH\n<SECRET_1>",
+      "expected": [
+        {
+          "detector": "vault-token",
+          "type": "vault_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 41,
+          "end": 74
+        }
+      ],
+      "note": "issue #320: a wider benign identifier the vault-token prefix is embedded in (a leading alnum/dash byte immediately before the documented prefix means it is a truncated slice of a longer identifier, not a boundary-delimited credential) on one line, and a real boundary-delimited token on the next, stay correctly discriminated at every chunk split, including splits that fall inside either prefix's own bytes."
+    },
+    {
+      "id": "cloudflare-embedded-identifier-discriminating-boundary",
+      "input": "legacycfut_SYNTHETIC_EMBEDDED_NOT_A_MATCH\ncfut_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_",
+      "text": "legacycfut_SYNTHETIC_EMBEDDED_NOT_A_MATCH\n<SECRET_1>",
+      "expected": [
+        {
+          "detector": "cloudflare-token",
+          "type": "cloudflare_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 42,
+          "end": 83
+        }
+      ],
+      "note": "issue #320: a wider benign identifier the cloudflare-token prefix is embedded in (a leading alnum/dash byte immediately before the documented prefix means it is a truncated slice of a longer identifier, not a boundary-delimited credential) on one line, and a real boundary-delimited token on the next, stay correctly discriminated at every chunk split, including splits that fall inside either prefix's own bytes."
+    },
+    {
+      "id": "digitalocean-embedded-identifier-discriminating-boundary",
+      "input": "legacydop_v1_SYNTHETIC_EMBEDDED_NOT_A_MATCH\ndop_v1_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_",
+      "text": "legacydop_v1_SYNTHETIC_EMBEDDED_NOT_A_MATCH\n<SECRET_1>",
+      "expected": [
+        {
+          "detector": "digitalocean-token",
+          "type": "digitalocean_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 44,
+          "end": 87
+        }
+      ],
+      "note": "issue #320: a wider benign identifier the digitalocean-token prefix is embedded in (a leading alnum/dash byte immediately before the documented prefix means it is a truncated slice of a longer identifier, not a boundary-delimited credential) on one line, and a real boundary-delimited token on the next, stay correctly discriminated at every chunk split, including splits that fall inside either prefix's own bytes."
+    },
+    {
+      "id": "docker-embedded-identifier-discriminating-boundary",
+      "input": "legacydckr_pat_SYNTHETIC_EMBEDDED_NOT_A_MATCH\ndckr_pat_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_",
+      "text": "legacydckr_pat_SYNTHETIC_EMBEDDED_NOT_A_MATCH\n<SECRET_1>",
+      "expected": [
+        {
+          "detector": "docker-token",
+          "type": "docker_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 46,
+          "end": 91
+        }
+      ],
+      "note": "issue #320: a wider benign identifier the docker-token prefix is embedded in (a leading alnum/dash byte immediately before the documented prefix means it is a truncated slice of a longer identifier, not a boundary-delimited credential) on one line, and a real boundary-delimited token on the next, stay correctly discriminated at every chunk split, including splits that fall inside either prefix's own bytes."
+    },
+    {
+      "id": "vercel-embedded-identifier-discriminating-boundary",
+      "input": "legacyvcp_SYNTHETIC_EMBEDDED_NOT_A_MATCH\nvcp_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_",
+      "text": "legacyvcp_SYNTHETIC_EMBEDDED_NOT_A_MATCH\n<SECRET_1>",
+      "expected": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 41,
+          "end": 81
+        }
+      ],
+      "note": "issue #320: a wider benign identifier the vercel-token prefix is embedded in (a leading alnum/dash byte immediately before the documented prefix means it is a truncated slice of a longer identifier, not a boundary-delimited credential) on one line, and a real boundary-delimited token on the next, stay correctly discriminated at every chunk split, including splits that fall inside either prefix's own bytes."
     }
   ]
 }

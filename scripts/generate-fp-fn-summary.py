@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Generate the per-detector false-positive/false-negative guard summary
 requested by issue #316, and reused by later false-positive test-expansion
-issues covering other detectors (for example issue #319).
+issues covering other detectors (for example issues #319 and #320).
 
 Both issues ask for a report of "negative-file FP counts per detector and
 paired-positive FN counts", with fixture ids and provenance persisted, so a
@@ -36,6 +36,12 @@ each detector, no timestamps.
         --detector github-token --detector gitlab-token \\
         --detector npm-token --detector pypi-token \\
         --out docs/coverage/fp-fn-summary-319.json
+    python3 -B scripts/generate-fp-fn-summary.py \\
+        --issue https://github.com/redact-secret/redact-secret/issues/320 \\
+        --detector vault-token --detector cloudflare-token \\
+        --detector digitalocean-token --detector docker-token \\
+        --detector vercel-token \\
+        --out docs/coverage/fp-fn-summary-320.json
 """
 
 from __future__ import annotations
