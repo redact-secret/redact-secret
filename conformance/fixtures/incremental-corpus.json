@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 42,
+  "fixtureCount": 44,
   "fixtures": [
     {
       "id": "synthetic-regression-malformed-authority",
@@ -288,6 +288,22 @@
         }
       ],
       "note": "An AWS-specific high-signal name remains open across assignment partitions."
+    },
+    {
+      "id": "aws-access-key-exact-length-discriminating-boundary",
+      "input": "AKIASYNTHETICEXAMPLE\nAKIASYNTHETICOVERLENGTH",
+      "text": "<SECRET_1>\nAKIASYNTHETICOVERLENGTH",
+      "expected": [
+        {
+          "detector": "aws-access-key",
+          "type": "aws_access_key_id",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 20
+        }
+      ],
+      "note": "issue #318: aws-access-key's scan_prefixed_runs uses RunLength::Exact(16), a family it shares with github-token, new_relic, notion, sentry, and twilio. Its discriminating boundary is the byte immediately after the fixed-length run: one more alphanumeric byte there turns a match into the rejected longer run on the second line (deliberately a distinct value from the first line's, not a shared prefix, so the rejected run's own un-redacted text can never coincide with the first line's detected value). A chunk split anywhere in either run, including exactly at that boundary byte, must still resolve to the single first-line finding, the same as the whole-input scan — the Exact-length-family counterpart to stripe-public-secret-prefix-discriminating-boundary's AtLeast-family exemplar."
     },
     {
       "id": "multiline-private-key",
@@ -686,6 +702,22 @@
         }
       ],
       "note": "issue #319: an ordinary provider-related identifier with no credential shape and a real documented token on adjacent lines stay correctly discriminated at every chunk split, including splits that fall inside either prefix's own bytes."
+    },
+    {
+      "id": "anthropic-legacy-versioned-prefix-discriminating-boundary",
+      "input": "sk-ant-SYNTHETIC_REVOKED_LEGACY_ANTHROPIC_KEY_VALUE\nsk-ant-api03-SYNTHETIC_REVOKED_CONFORMANCE_KEY",
+      "text": "sk-ant-SYNTHETIC_REVOKED_LEGACY_ANTHROPIC_KEY_VALUE\n<SECRET_1>",
+      "expected": [
+        {
+          "detector": "anthropic-token",
+          "type": "anthropic_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 52,
+          "end": 98
+        }
+      ],
+      "note": "issue #317: the unversioned 'sk-ant-' prefix (a documented false-negative tradeoff no detector claims) and the versioned 'sk-ant-api03-' prefix (claimed by anthropic-token) share the same leading bytes the openai-token detector also inspects to exclude the Anthropic namespace. Every UTF-8 chunk split, including splits that fall inside 'ant-' or 'api03-' themselves, must still discriminate the two the same way the whole-input reference does."
     }
   ]
 }
