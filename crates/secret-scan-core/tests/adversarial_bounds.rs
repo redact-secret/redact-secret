@@ -32,13 +32,13 @@ fn adversarial_fixtures() -> Vec<CanonicalFixture> {
 /// The declared cap describes the shipped, optimized core: the slowest
 /// adversarial fixture measures ~17ms against a 250ms cap in a release
 /// build, and ~142ms in the unoptimized build `cargo test` produces by
-/// default. Asserting the declared number in a debug build would therefore
-/// be measuring the profile rather than the detector, and would be flaky on
-/// a slower runner. An optimized test binary is held to the declared cap
-/// exactly; a debug binary is held to this multiple of it, which is still
-/// orders of magnitude below the superlinear blowup these fixtures exist to
-/// catch.
-const DEBUG_RUNTIME_ALLOWANCE: u128 = 8;
+/// default. Hosted Linux and Windows runners have taken up to ~2.4s for this
+/// fixture under load, so asserting the declared number in a debug build would
+/// be measuring the profile and runner contention rather than the detector. An
+/// optimized test binary is held to the declared cap exactly; a debug binary is
+/// held to this multiple of it, which is still orders of magnitude below the
+/// superlinear blowup these fixtures exist to catch.
+const DEBUG_RUNTIME_ALLOWANCE: u128 = 12;
 
 /// The runtime budget this build is held to for `declared` declared
 /// milliseconds.
