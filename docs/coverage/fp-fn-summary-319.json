@@ -1,0 +1,187 @@
+{
+  "detectors": [
+    {
+      "detector": "github-token",
+      "falseNegativeGuards": {
+        "actualFalseNegatives": 0,
+        "count": 30,
+        "fixtureIds": [
+          "github-positive-classic",
+          "github-positive-fine-grained",
+          "github-positive-fine-grained-dotenv",
+          "github-positive-installation-stateless",
+          "host-chat-github",
+          "host-curl-github",
+          "host-docker-compose-github",
+          "host-dotenv-github",
+          "host-github-actions-github",
+          "host-http-github",
+          "host-javascript-github",
+          "host-json-github",
+          "host-kubernetes-github",
+          "host-log-github",
+          "host-markdown-github",
+          "host-powershell-github",
+          "host-python-github",
+          "host-shell-github",
+          "host-shell-heredoc-github",
+          "host-stack-trace-github",
+          "host-terminal-github",
+          "host-terraform-github",
+          "host-toml-github",
+          "host-typescript-github",
+          "host-xml-github",
+          "host-yaml-github",
+          "mutation-github-00-identity",
+          "mutation-github-06-punctuation-boundary",
+          "mutation-github-07-quoted",
+          "mutation-github-09-host-embedding"
+        ]
+      },
+      "falsePositiveGuards": {
+        "actualFalsePositives": 0,
+        "count": 4,
+        "fixtureIds": [
+          "github-negative-commit-hash",
+          "github-negative-fine-grained-variable-identifier",
+          "github-negative-oauth-url-query",
+          "github-negative-test-id"
+        ]
+      },
+      "hostContextsExercised": [
+        "chat",
+        "curl",
+        "docker-compose",
+        "dotenv",
+        "github-actions",
+        "http",
+        "javascript",
+        "json",
+        "kubernetes",
+        "log",
+        "markdown",
+        "plain-text",
+        "powershell",
+        "python",
+        "shell",
+        "stack-trace",
+        "terminal",
+        "terraform",
+        "toml",
+        "typescript",
+        "xml",
+        "yaml"
+      ]
+    },
+    {
+      "detector": "gitlab-token",
+      "falseNegativeGuards": {
+        "actualFalseNegatives": 0,
+        "count": 8,
+        "fixtureIds": [
+          "gitlab-positive-all-prefixes",
+          "gitlab-positive-crlf-unicode-prefix",
+          "gitlab-positive-dotenv",
+          "gitlab-positive-json",
+          "gitlab-positive-log",
+          "gitlab-positive-min-length",
+          "gitlab-positive-personal-access",
+          "gitlab-positive-yaml"
+        ]
+      },
+      "falsePositiveGuards": {
+        "actualFalsePositives": 0,
+        "count": 4,
+        "fixtureIds": [
+          "gitlab-negative-commit-hash",
+          "gitlab-negative-common-identifier",
+          "gitlab-negative-placeholder",
+          "gitlab-negative-url-truncated-token-param"
+        ]
+      },
+      "hostContextsExercised": [
+        "dotenv",
+        "http",
+        "json",
+        "log",
+        "plain-text",
+        "yaml"
+      ]
+    },
+    {
+      "detector": "npm-token",
+      "falseNegativeGuards": {
+        "actualFalseNegatives": 0,
+        "count": 7,
+        "fixtureIds": [
+          "npm-positive-crlf-unicode-prefix",
+          "npm-positive-dotenv",
+          "npm-positive-invalid-checksum-still-detected",
+          "npm-positive-json",
+          "npm-positive-log",
+          "npm-positive-qualified",
+          "npm-positive-yaml"
+        ]
+      },
+      "falsePositiveGuards": {
+        "actualFalsePositives": 0,
+        "count": 5,
+        "fixtureIds": [
+          "npm-negative-lookalike",
+          "npm-negative-ordinary-reference",
+          "npm-negative-package-name",
+          "npm-negative-placeholder",
+          "npm-negative-url-path-truncated"
+        ]
+      },
+      "hostContextsExercised": [
+        "dotenv",
+        "http",
+        "json",
+        "log",
+        "plain-text",
+        "yaml"
+      ]
+    },
+    {
+      "detector": "pypi-token",
+      "falseNegativeGuards": {
+        "actualFalseNegatives": 0,
+        "count": 8,
+        "fixtureIds": [
+          "pypi-positive-crlf-unicode-prefix",
+          "pypi-positive-dotenv",
+          "pypi-positive-json",
+          "pypi-positive-log",
+          "pypi-positive-min-length",
+          "pypi-positive-non-macaroon-body-still-detected",
+          "pypi-positive-qualified",
+          "pypi-positive-yaml"
+        ]
+      },
+      "falsePositiveGuards": {
+        "actualFalsePositives": 0,
+        "count": 4,
+        "fixtureIds": [
+          "pypi-negative-lookalike",
+          "pypi-negative-ordinary-reference",
+          "pypi-negative-placeholder",
+          "pypi-negative-project-url-path"
+        ]
+      },
+      "hostContextsExercised": [
+        "dotenv",
+        "http",
+        "json",
+        "log",
+        "plain-text",
+        "yaml"
+      ]
+    }
+  ],
+  "provenance": {
+    "corpus": "conformance/fixtures/synchronous-corpus.json",
+    "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+    "issue": "https://github.com/redact-secret/redact-secret/issues/319"
+  }
+}

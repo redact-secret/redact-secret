@@ -112,8 +112,10 @@ Tests: `python3 -B -m unittest discover -s scripts/tests -p 'test_generate_cover
 - [`fp-fn-summary.json`](./fp-fn-summary.json) — the per-detector false-
   positive/false-negative guard summary requested by issue
   [#316](https://github.com/redact-secret/redact-secret/issues/316) and
-  extended to a second batch of detectors by issue
-  [#320](https://github.com/redact-secret/redact-secret/issues/320): for each
+  extended to `openai-token`/`anthropic-token` by issue
+  [#317](https://github.com/redact-secret/redact-secret/issues/317) and to
+  `aws-access-key` by issue
+  [#318](https://github.com/redact-secret/redact-secret/issues/318): for each
   reported detector, the `kind: "negative"` fixture count and ids (each one a
   guard the detector must produce zero findings for) and the `kind:
   "positive"` fixture count and ids (each one a guard the detector must still
@@ -126,12 +128,45 @@ Tests: `python3 -B -m unittest discover -s scripts/tests -p 'test_generate_cover
   number this document could mis-report. Produced by
   [`scripts/generate-fp-fn-summary.py`](../../scripts/generate-fp-fn-summary.py)
   from the canonical corpus only (never a fixture's `input` or a matched
-  value). Defaults to `stripe-token`, `shopify-token`, `supabase-token`,
-  `vault-token`, `cloudflare-token`, `digitalocean-token`, `docker-token`, and
-  `vercel-token`; pass `--detector <id>` (repeatable) to report on others:
+  value). Defaults to `stripe-token`, `shopify-token`, and `supabase-token`;
+  pass `--detector <id>` (repeatable) and `--issue <url>` (repeatable) to
+  report on others, as this file's current six-detector, three-issue
+  `provenance.issue` list already does:
 
   ```sh
-  python3 -B scripts/generate-fp-fn-summary.py --out docs/coverage/fp-fn-summary.json
+  python3 -B scripts/generate-fp-fn-summary.py \
+    --detector stripe-token --detector shopify-token --detector supabase-token \
+    --detector openai-token --detector anthropic-token --detector aws-access-key \
+    --issue https://github.com/redact-secret/redact-secret/issues/316 \
+    --issue https://github.com/redact-secret/redact-secret/issues/317 \
+    --issue https://github.com/redact-secret/redact-secret/issues/318 \
+    --out docs/coverage/fp-fn-summary.json
+  ```
+
+- [`fp-fn-summary-319.json`](./fp-fn-summary-319.json) — the same report for
+  issue [#319](https://github.com/redact-secret/redact-secret/issues/319)'s
+  `github-token`, `gitlab-token`, `npm-token`, and `pypi-token` coverage:
+
+  ```sh
+  python3 -B scripts/generate-fp-fn-summary.py \
+    --detector github-token --detector gitlab-token \
+    --detector npm-token --detector pypi-token \
+    --issue https://github.com/redact-secret/redact-secret/issues/319 \
+    --out docs/coverage/fp-fn-summary-319.json
+  ```
+
+- [`fp-fn-summary-320.json`](./fp-fn-summary-320.json) — the same report for
+  issue [#320](https://github.com/redact-secret/redact-secret/issues/320)'s
+  `vault-token`, `cloudflare-token`, `digitalocean-token`, `docker-token`,
+  and `vercel-token` coverage:
+
+  ```sh
+  python3 -B scripts/generate-fp-fn-summary.py \
+    --detector vault-token --detector cloudflare-token \
+    --detector digitalocean-token --detector docker-token \
+    --detector vercel-token \
+    --issue https://github.com/redact-secret/redact-secret/issues/320 \
+    --out docs/coverage/fp-fn-summary-320.json
   ```
 
   Tests: `python3 -B -m unittest discover -s scripts/tests -p 'test_generate_fp_fn_summary.py'`.

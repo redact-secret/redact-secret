@@ -1,37 +1,36 @@
 {
   "detectors": [
     {
-      "detector": "cloudflare-token",
+      "detector": "anthropic-token",
       "falseNegativeGuards": {
         "actualFalseNegatives": 0,
-        "count": 9,
+        "count": 11,
         "fixtureIds": [
-          "cloudflare-positive-crlf-unicode-prefix",
-          "cloudflare-positive-doc-style-placeholder",
-          "cloudflare-positive-dotenv",
-          "cloudflare-positive-json",
-          "cloudflare-positive-log",
-          "cloudflare-positive-min-length",
-          "cloudflare-positive-punctuation-adjacent",
-          "cloudflare-positive-qualified",
-          "cloudflare-positive-yaml"
+          "anthropic-positive-doc-style-placeholder",
+          "anthropic-positive-json",
+          "anthropic-positive-log",
+          "anthropic-positive-min-length",
+          "anthropic-positive-punctuation-adjacent",
+          "anthropic-positive-repeated-value",
+          "anthropic-positive-shell-quoted",
+          "anthropic-positive-unicode-byte-offset",
+          "anthropic-positive-versioned",
+          "anthropic-positive-yaml",
+          "anthropic-positive-yaml-crlf"
         ]
       },
       "falsePositiveGuards": {
         "actualFalsePositives": 0,
-        "count": 7,
+        "count": 5,
         "fixtureIds": [
-          "cloudflare-negative-embedded-in-wider-identifier",
-          "cloudflare-negative-interpolated-secret-prefix",
-          "cloudflare-negative-lookalike",
-          "cloudflare-negative-masked-secret-prefix",
-          "cloudflare-negative-ordinary-reference",
-          "cloudflare-negative-placeholder",
-          "cloudflare-negative-zone-resource-id"
+          "anthropic-negative-embedded-in-wider-identifier",
+          "anthropic-negative-legacy-unversioned-tradeoff",
+          "anthropic-negative-near-prefix-underscore",
+          "anthropic-negative-placeholder",
+          "anthropic-negative-unrelated-id"
         ]
       },
       "hostContextsExercised": [
-        "dotenv",
         "json",
         "log",
         "plain-text",
@@ -40,78 +39,73 @@
       ]
     },
     {
-      "detector": "digitalocean-token",
+      "detector": "aws-access-key",
       "falseNegativeGuards": {
         "actualFalseNegatives": 0,
-        "count": 10,
+        "count": 6,
         "fixtureIds": [
-          "digitalocean-positive-all-prefixes",
-          "digitalocean-positive-crlf-unicode-prefix",
-          "digitalocean-positive-doc-style-placeholder",
-          "digitalocean-positive-dotenv",
-          "digitalocean-positive-json",
-          "digitalocean-positive-log",
-          "digitalocean-positive-min-length",
-          "digitalocean-positive-punctuation-adjacent",
-          "digitalocean-positive-qualified",
-          "digitalocean-positive-yaml"
+          "aws-positive-akia",
+          "aws-positive-asia-canonical",
+          "aws-positive-example-shaped-value-in-comment-context",
+          "aws-positive-punctuation-boundary",
+          "aws-positive-unicode-adjacent-multibyte-before",
+          "regression-aws-example-mutation-still-detected"
         ]
       },
       "falsePositiveGuards": {
         "actualFalsePositives": 0,
-        "count": 7,
+        "count": 8,
         "fixtureIds": [
-          "digitalocean-negative-embedded-in-wider-identifier",
-          "digitalocean-negative-interpolated-secret-prefix",
-          "digitalocean-negative-lookalike",
-          "digitalocean-negative-masked-secret-prefix",
-          "digitalocean-negative-ordinary-reference",
-          "digitalocean-negative-placeholder",
-          "digitalocean-negative-resource-id"
+          "aws-negative-account-id",
+          "aws-negative-arn-resource",
+          "aws-negative-arn-role",
+          "aws-negative-ordinary-uppercase-identifier",
+          "aws-negative-role-id",
+          "aws-negative-user-id",
+          "regression-aws-example-access-key-dotenv",
+          "regression-aws-example-access-key-standalone"
         ]
       },
       "hostContextsExercised": [
         "dotenv",
-        "json",
+        "javascript",
         "log",
-        "plain-text",
-        "shell",
-        "yaml"
+        "plain-text"
       ]
     },
     {
-      "detector": "docker-token",
+      "detector": "openai-token",
       "falseNegativeGuards": {
         "actualFalseNegatives": 0,
-        "count": 10,
+        "count": 13,
         "fixtureIds": [
-          "docker-positive-all-prefixes",
-          "docker-positive-crlf-unicode-prefix",
-          "docker-positive-doc-style-placeholder",
-          "docker-positive-dotenv",
-          "docker-positive-json",
-          "docker-positive-log",
-          "docker-positive-min-length",
-          "docker-positive-punctuation-adjacent",
-          "docker-positive-qualified",
-          "docker-positive-yaml"
+          "openai-positive-all-prefixes",
+          "openai-positive-doc-style-placeholder",
+          "openai-positive-json",
+          "openai-positive-log",
+          "openai-positive-min-length",
+          "openai-positive-namespace-separation-all-variants",
+          "openai-positive-project",
+          "openai-positive-punctuation-adjacent",
+          "openai-positive-repeated-value",
+          "openai-positive-shell-quoted",
+          "openai-positive-unicode-byte-offset",
+          "openai-positive-yaml",
+          "openai-positive-yaml-crlf"
         ]
       },
       "falsePositiveGuards": {
         "actualFalsePositives": 0,
-        "count": 7,
+        "count": 5,
         "fixtureIds": [
-          "docker-negative-embedded-in-wider-identifier",
-          "docker-negative-interpolated-secret-prefix",
-          "docker-negative-lookalike",
-          "docker-negative-masked-secret-prefix",
-          "docker-negative-ordinary-reference",
-          "docker-negative-placeholder",
-          "docker-negative-registry-image-reference"
+          "openai-negative-embedded-in-wider-identifier",
+          "openai-negative-lookalike",
+          "openai-negative-model-name",
+          "openai-negative-near-prefix-underscore",
+          "openai-negative-placeholder"
         ]
       },
       "hostContextsExercised": [
-        "dotenv",
         "json",
         "log",
         "plain-text",
@@ -240,93 +234,15 @@
         "shell",
         "yaml"
       ]
-    },
-    {
-      "detector": "vault-token",
-      "falseNegativeGuards": {
-        "actualFalseNegatives": 0,
-        "count": 10,
-        "fixtureIds": [
-          "vault-positive-all-prefixes",
-          "vault-positive-crlf-unicode-prefix",
-          "vault-positive-doc-style-placeholder",
-          "vault-positive-dotenv",
-          "vault-positive-json",
-          "vault-positive-log",
-          "vault-positive-min-length",
-          "vault-positive-punctuation-adjacent",
-          "vault-positive-service-token",
-          "vault-positive-yaml"
-        ]
-      },
-      "falsePositiveGuards": {
-        "actualFalsePositives": 0,
-        "count": 6,
-        "fixtureIds": [
-          "vault-negative-common-identifier",
-          "vault-negative-embedded-in-wider-identifier",
-          "vault-negative-interpolated-secret-prefix",
-          "vault-negative-masked-secret-prefix",
-          "vault-negative-path-namespace-and-version",
-          "vault-negative-placeholder"
-        ]
-      },
-      "hostContextsExercised": [
-        "dotenv",
-        "json",
-        "log",
-        "plain-text",
-        "shell",
-        "yaml"
-      ]
-    },
-    {
-      "detector": "vercel-token",
-      "falseNegativeGuards": {
-        "actualFalseNegatives": 0,
-        "count": 10,
-        "fixtureIds": [
-          "vercel-positive-all-prefixes",
-          "vercel-positive-crlf-unicode-prefix",
-          "vercel-positive-doc-style-placeholder",
-          "vercel-positive-dotenv",
-          "vercel-positive-json",
-          "vercel-positive-log",
-          "vercel-positive-min-length",
-          "vercel-positive-punctuation-adjacent",
-          "vercel-positive-qualified",
-          "vercel-positive-yaml"
-        ]
-      },
-      "falsePositiveGuards": {
-        "actualFalsePositives": 0,
-        "count": 7,
-        "fixtureIds": [
-          "vercel-negative-deployment-id",
-          "vercel-negative-embedded-in-wider-identifier",
-          "vercel-negative-interpolated-secret-prefix",
-          "vercel-negative-lookalike",
-          "vercel-negative-masked-secret-prefix",
-          "vercel-negative-ordinary-reference",
-          "vercel-negative-placeholder"
-        ]
-      },
-      "hostContextsExercised": [
-        "dotenv",
-        "json",
-        "log",
-        "plain-text",
-        "shell",
-        "yaml"
-      ]
     }
   ],
   "provenance": {
     "corpus": "conformance/fixtures/synchronous-corpus.json",
     "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
-    "issues": [
+    "issue": [
       "https://github.com/redact-secret/redact-secret/issues/316",
-      "https://github.com/redact-secret/redact-secret/issues/320"
+      "https://github.com/redact-secret/redact-secret/issues/317",
+      "https://github.com/redact-secret/redact-secret/issues/318"
     ]
   }
 }
