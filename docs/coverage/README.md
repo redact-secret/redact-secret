@@ -111,7 +111,9 @@ Tests: `python3 -B -m unittest discover -s scripts/tests -p 'test_generate_cover
 
 - [`fp-fn-summary.json`](./fp-fn-summary.json) — the per-detector false-
   positive/false-negative guard summary requested by issue
-  [#316](https://github.com/redact-secret/redact-secret/issues/316): for each
+  [#316](https://github.com/redact-secret/redact-secret/issues/316) and
+  extended to a second batch of detectors by issue
+  [#320](https://github.com/redact-secret/redact-secret/issues/320): for each
   reported detector, the `kind: "negative"` fixture count and ids (each one a
   guard the detector must produce zero findings for) and the `kind:
   "positive"` fixture count and ids (each one a guard the detector must still
@@ -124,8 +126,9 @@ Tests: `python3 -B -m unittest discover -s scripts/tests -p 'test_generate_cover
   number this document could mis-report. Produced by
   [`scripts/generate-fp-fn-summary.py`](../../scripts/generate-fp-fn-summary.py)
   from the canonical corpus only (never a fixture's `input` or a matched
-  value). Defaults to `stripe-token`, `shopify-token`, and `supabase-token`;
-  pass `--detector <id>` (repeatable) to report on others:
+  value). Defaults to `stripe-token`, `shopify-token`, `supabase-token`,
+  `vault-token`, `cloudflare-token`, `digitalocean-token`, `docker-token`, and
+  `vercel-token`; pass `--detector <id>` (repeatable) to report on others:
 
   ```sh
   python3 -B scripts/generate-fp-fn-summary.py --out docs/coverage/fp-fn-summary.json

@@ -332,9 +332,14 @@
     {
       "detector": "vault-token",
       "evidence": {
-        "fixtureCount": 12,
+        "fixtureCount": 23,
         "hostContextsExercised": [
-          "plain-text"
+          "dotenv",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "yaml"
         ],
         "kindsWithSupportedEvidence": [
           "adversarial",
@@ -349,8 +354,15 @@
       },
       "evidenceFixtureIds": [
         "vault-positive-all-prefixes",
+        "vault-positive-crlf-unicode-prefix",
+        "vault-positive-doc-style-placeholder",
+        "vault-positive-dotenv",
+        "vault-positive-json",
+        "vault-positive-log",
         "vault-positive-min-length",
-        "vault-positive-service-token"
+        "vault-positive-punctuation-adjacent",
+        "vault-positive-service-token",
+        "vault-positive-yaml"
       ],
       "policyClass": "always-redact",
       "schemeRows": "not-applicable",
@@ -482,9 +494,14 @@
     {
       "detector": "docker-token",
       "evidence": {
-        "fixtureCount": 13,
+        "fixtureCount": 24,
         "hostContextsExercised": [
-          "plain-text"
+          "dotenv",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "yaml"
         ],
         "kindsWithSupportedEvidence": [
           "adversarial",
@@ -499,8 +516,15 @@
       },
       "evidenceFixtureIds": [
         "docker-positive-all-prefixes",
+        "docker-positive-crlf-unicode-prefix",
+        "docker-positive-doc-style-placeholder",
+        "docker-positive-dotenv",
+        "docker-positive-json",
+        "docker-positive-log",
         "docker-positive-min-length",
-        "docker-positive-qualified"
+        "docker-positive-punctuation-adjacent",
+        "docker-positive-qualified",
+        "docker-positive-yaml"
       ],
       "policyClass": "always-redact",
       "schemeRows": "not-applicable",
@@ -510,9 +534,14 @@
     {
       "detector": "cloudflare-token",
       "evidence": {
-        "fixtureCount": 12,
+        "fixtureCount": 23,
         "hostContextsExercised": [
-          "plain-text"
+          "dotenv",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "yaml"
         ],
         "kindsWithSupportedEvidence": [
           "adversarial",
@@ -526,8 +555,15 @@
         ]
       },
       "evidenceFixtureIds": [
+        "cloudflare-positive-crlf-unicode-prefix",
+        "cloudflare-positive-doc-style-placeholder",
+        "cloudflare-positive-dotenv",
+        "cloudflare-positive-json",
+        "cloudflare-positive-log",
         "cloudflare-positive-min-length",
-        "cloudflare-positive-qualified"
+        "cloudflare-positive-punctuation-adjacent",
+        "cloudflare-positive-qualified",
+        "cloudflare-positive-yaml"
       ],
       "policyClass": "always-redact",
       "schemeRows": "not-applicable",
@@ -537,9 +573,14 @@
     {
       "detector": "digitalocean-token",
       "evidence": {
-        "fixtureCount": 13,
+        "fixtureCount": 24,
         "hostContextsExercised": [
-          "plain-text"
+          "dotenv",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "yaml"
         ],
         "kindsWithSupportedEvidence": [
           "adversarial",
@@ -554,8 +595,15 @@
       },
       "evidenceFixtureIds": [
         "digitalocean-positive-all-prefixes",
+        "digitalocean-positive-crlf-unicode-prefix",
+        "digitalocean-positive-doc-style-placeholder",
+        "digitalocean-positive-dotenv",
+        "digitalocean-positive-json",
+        "digitalocean-positive-log",
         "digitalocean-positive-min-length",
-        "digitalocean-positive-qualified"
+        "digitalocean-positive-punctuation-adjacent",
+        "digitalocean-positive-qualified",
+        "digitalocean-positive-yaml"
       ],
       "policyClass": "always-redact",
       "schemeRows": "not-applicable",
@@ -632,9 +680,14 @@
     {
       "detector": "vercel-token",
       "evidence": {
-        "fixtureCount": 13,
+        "fixtureCount": 24,
         "hostContextsExercised": [
-          "plain-text"
+          "dotenv",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "yaml"
         ],
         "kindsWithSupportedEvidence": [
           "adversarial",
@@ -649,8 +702,15 @@
       },
       "evidenceFixtureIds": [
         "vercel-positive-all-prefixes",
+        "vercel-positive-crlf-unicode-prefix",
+        "vercel-positive-doc-style-placeholder",
+        "vercel-positive-dotenv",
+        "vercel-positive-json",
+        "vercel-positive-log",
         "vercel-positive-min-length",
-        "vercel-positive-qualified"
+        "vercel-positive-punctuation-adjacent",
+        "vercel-positive-qualified",
+        "vercel-positive-yaml"
       ],
       "policyClass": "always-redact",
       "schemeRows": "not-applicable",

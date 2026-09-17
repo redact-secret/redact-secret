@@ -512,4 +512,108 @@ mod tests {
             ByteRange::new(expected_start, input.len()).unwrap()
         );
     }
+
+    /// Issue #320: the four infrastructure-provider detectors (Docker,
+    /// Cloudflare, `DigitalOcean`, Vercel) each get the same false-positive
+    /// assurance the earlier prefix-family issues (#316/#317) established
+    /// for Stripe/Shopify/Supabase/`OpenAI`/Anthropic, using each
+    /// detector's primary documented prefix.
+    const INFRA_SUFFIX: &str = "SYNTHETIC_REVOKED_KEY_VALUE";
+
+    fn infra_provider_detectors() -> [(&'static KnownFormatProviderDetector, &'static str); 4] {
+        [
+            (&DOCKER, "dckr_pat_"),
+            (&CLOUDFLARE, "cfut_"),
+            (&DIGITALOCEAN, "dop_v1_"),
+            (&VERCEL, "vcp_"),
+        ]
+    }
+
+    #[test]
+    fn infra_providers_accept_a_doc_style_placeholder_built_from_valid_alphabet_characters() {
+        for (detector, prefix) in infra_provider_detectors() {
+            let input = format!("{prefix}{}", "x".repeat(20));
+            assert_eq!(detect(detector, &input).len(), 1, "{}", detector.id());
+        }
+    }
+
+    #[test]
+    fn infra_providers_reject_a_prefix_embedded_in_a_wider_benign_identifier() {
+        // A leading alnum/dash byte right before the documented prefix means
+        // this is a truncated slice of a longer identifier, not a
+        // boundary-delimited credential.
+        for (detector, prefix) in infra_provider_detectors() {
+            let input = format!("legacy{prefix}{INFRA_SUFFIX}");
+            assert_eq!(detect(detector, &input).len(), 0, "{}", detector.id());
+        }
+    }
+
+    #[test]
+    fn infra_providers_reject_masked_and_interpolated_near_misses() {
+        for (detector, prefix) in infra_provider_detectors() {
+            for input in [
+                format!("{prefix}{}", "*".repeat(20)),
+                format!("{prefix}${{ENV_VAR}}"),
+            ] {
+                assert_eq!(
+                    detect(detector, &input).len(),
+                    0,
+                    "{} {input}",
+                    detector.id()
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn infra_providers_bound_a_match_against_trailing_prose_punctuation() {
+        for (detector, prefix) in infra_provider_detectors() {
+            let token = format!("{prefix}{INFRA_SUFFIX}");
+            let input = format!("Rotate {token}, then redeploy.");
+            let candidates = detect(detector, &input);
+            assert_eq!(candidates.len(), 1, "{}", detector.id());
+            let start = "Rotate ".len();
+            let end = start + token.len();
+            assert_eq!(
+                candidates[0].range(),
+                ByteRange::new(start, end).unwrap(),
+                "{}",
+                detector.id()
+            );
+        }
+    }
+
+    /// A container registry/image reference qualified by a `sha256:` digest
+    /// (the well-known hash of the empty string, not a credential) has
+    /// neither Docker Hub's documented prefix nor its alphabet shape.
+    #[test]
+    fn docker_rejects_an_ordinary_registry_image_digest_reference() {
+        let input = "docker pull registry.example.com/myorg/app@sha256:\
+            e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b85";
+        assert_eq!(detect(&DOCKER, input).len(), 0);
+    }
+
+    /// A Cloudflare zone/account resource ID is an ordinary 32-character hex
+    /// identifier, not a secret, and carries none of the `cfut_` prefix.
+    #[test]
+    fn cloudflare_rejects_an_ordinary_zone_resource_id() {
+        let input = "CF-Zone-ID: 023e105f4ecef8ad9ca31a8372d0c353";
+        assert_eq!(detect(&CLOUDFLARE, input).len(), 0);
+    }
+
+    /// A `DigitalOcean` App Platform deployment/resource identifier is an
+    /// ordinary UUID with no `v1` token prefix.
+    #[test]
+    fn digitalocean_rejects_an_ordinary_deployment_resource_id() {
+        let input = "resource: do:app:3f900b88-8eb1-4de4-b7a3-93c1fb2f8b1d";
+        assert_eq!(detect(&DIGITALOCEAN, input).len(), 0);
+    }
+
+    /// A Vercel deployment identifier uses its own `dpl_` namespace,
+    /// distinct from every documented Vercel token prefix.
+    #[test]
+    fn vercel_rejects_an_ordinary_deployment_id() {
+        let input = "deployment: dpl_8sFjq2K3nQeR7xYtLmWzAbCdEfGh";
+        assert_eq!(detect(&VERCEL, input).len(), 0);
+    }
 }

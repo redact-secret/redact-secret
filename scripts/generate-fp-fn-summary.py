@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 """Generate the per-detector false-positive/false-negative guard summary
-(issue #316).
+(issue #316, extended by issue #320).
 
 Issue #316 asks for a report of "negative-file FP counts per detector and
 paired-positive FN counts", with fixture ids and provenance persisted, so a
 reviewer does not have to recount ``conformance/fixtures/synchronous-corpus.json``
 by hand to see how thoroughly a detector's false-positive boundary is
-guarded.
+guarded. Issue #320 asks for the same report for a second batch of
+detectors; rather than forking the tool, ``DEFAULT_DETECTORS`` and
+``provenance.issues`` below simply grew to cover both batches.
 
 This script does not run any detector and does not measure a false positive
 or false negative independently. It reports the corpus's own design intent:
@@ -42,7 +44,16 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 CORPUS_PATH = ROOT / "conformance" / "fixtures" / "synchronous-corpus.json"
 
-DEFAULT_DETECTORS = ("stripe-token", "shopify-token", "supabase-token")
+DEFAULT_DETECTORS = (
+    "stripe-token",
+    "shopify-token",
+    "supabase-token",
+    "vault-token",
+    "cloudflare-token",
+    "digitalocean-token",
+    "docker-token",
+    "vercel-token",
+)
 ENFORCED_BY = (
     "crates/secret-scan-core/tests/canonical_corpus.rs"
     "::scan_matches_the_canonical_synchronous_corpus"
@@ -105,7 +116,10 @@ def build_report(corpus: dict, detectors: list[str]) -> dict:
 
     return {
         "provenance": {
-            "issue": "https://github.com/redact-secret/redact-secret/issues/316",
+            "issues": [
+                "https://github.com/redact-secret/redact-secret/issues/316",
+                "https://github.com/redact-secret/redact-secret/issues/320",
+            ],
             "corpus": "conformance/fixtures/synchronous-corpus.json",
             "enforcedBy": ENFORCED_BY,
         },
@@ -120,7 +134,7 @@ def main(argv: list[str] | None = None) -> int:
         "--detector",
         dest="detectors",
         action="append",
-        help="detector id to report on; may be repeated (default: stripe-token, shopify-token, supabase-token)",
+        help="detector id to report on; may be repeated (default: " + ", ".join(DEFAULT_DETECTORS) + ")",
     )
     parser.add_argument("--out", type=Path, default=None, help="write the report here instead of stdout")
     args = parser.parse_args(argv)

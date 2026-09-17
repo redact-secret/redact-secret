@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 783,
+  "fixtureCount": 838,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -4291,6 +4291,212 @@
       "note": "A long delimited provider match remains deterministic and bounded."
     },
     {
+      "id": "docker-positive-doc-style-placeholder",
+      "detector": "docker-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "dckr_pat_xxxxxxxxxxxxxxxxxxxx",
+      "expected": [
+        {
+          "detector": "docker-token",
+          "type": "docker_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 29
+        }
+      ],
+      "note": "A documentation placeholder built entirely from valid alphabet characters (e.g. a repeated filler letter) is indistinguishable from a real secret's shape and is classified: an accepted precision/recall tradeoff, not a bug. Only a placeholder that breaks the alphabet run (angle brackets, characters outside the allowed set) is excluded."
+    },
+    {
+      "id": "docker-negative-embedded-in-wider-identifier",
+      "detector": "docker-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "legacydckr_pat_SYNTHETIC_REVOKED_KEY_VALUE",
+      "expected": [],
+      "note": "The 'dckr_pat_' prefix immediately preceded by an alphanumeric/dash character ('legacydckr_pat_...') is a truncated slice of a wider benign identifier, not a boundary-delimited credential, so no candidate is emitted; a real secret substring is never carved out of a longer surrounding token."
+    },
+    {
+      "id": "docker-positive-punctuation-adjacent",
+      "detector": "docker-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Rotate dckr_pat_SYNTHETIC_REVOKED_KEY_VALUE, then redeploy.",
+      "expected": [
+        {
+          "detector": "docker-token",
+          "type": "docker_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 7,
+          "end": 43
+        }
+      ],
+      "note": "Trailing prose punctuation immediately after the suffix correctly bounds the match instead of being folded into it or suppressing the finding."
+    },
+    {
+      "id": "docker-negative-masked-secret-prefix",
+      "detector": "docker-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "dckr_pat_********************",
+      "expected": [],
+      "note": "A redacted/masked placeholder (a run of asterisks) breaks the suffix alphabet immediately after the documented prefix, so no candidate is emitted for a value the source has already redacted."
+    },
+    {
+      "id": "docker-negative-interpolated-secret-prefix",
+      "detector": "docker-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "shell"
+      ],
+      "input": "dckr_pat_${DOCKER_TOKEN}",
+      "expected": [],
+      "note": "A shell-style template interpolation reference (`${...}`) in place of the real suffix breaks the alphabet run immediately after the documented prefix, so the placeholder is never classified as a credential."
+    },
+    {
+      "id": "docker-positive-dotenv",
+      "detector": "docker-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "DOCKER_TOKEN=dckr_pat_SYNTHETIC_REVOKED_KEY_VALUE",
+      "expected": [
+        {
+          "detector": "docker-token",
+          "type": "docker_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 49
+        }
+      ],
+      "note": "A bare dotenv-style assignment (DOCKER_TOKEN=<token>, no quotes) is detected by format alone."
+    },
+    {
+      "id": "docker-positive-json",
+      "detector": "docker-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"dockerToken\": \"dckr_pat_SYNTHETIC_REVOKED_KEY_VALUE\"}",
+      "expected": [
+        {
+          "detector": "docker-token",
+          "type": "docker_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 17,
+          "end": 53
+        }
+      ],
+      "note": "A quoted JSON string value is detected the same as a bare one; the enclosing quotes are not part of the match."
+    },
+    {
+      "id": "docker-positive-yaml",
+      "detector": "docker-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "docker_token: dckr_pat_SYNTHETIC_REVOKED_KEY_VALUE\n",
+      "expected": [
+        {
+          "detector": "docker-token",
+          "type": "docker_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 50
+        }
+      ],
+      "note": "A YAML mapping value is detected the same as a bare one."
+    },
+    {
+      "id": "docker-positive-log",
+      "detector": "docker-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-16T00:00:00Z INFO pulling image key=dckr_pat_SYNTHETIC_REVOKED_KEY_VALUE repo=example/app",
+      "expected": [
+        {
+          "detector": "docker-token",
+          "type": "docker_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 44,
+          "end": 80
+        }
+      ],
+      "note": "A provider token embedded in a structured log line is still detected."
+    },
+    {
+      "id": "docker-positive-crlf-unicode-prefix",
+      "detector": "docker-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# \ud83d\udd11 caf\u00e9\r\ndckr_pat_SYNTHETIC_REVOKED_KEY_VALUE\r\n",
+      "expected": [
+        {
+          "detector": "docker-token",
+          "type": "docker_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 50
+        }
+      ],
+      "note": "A match after a CRLF line ending and a Unicode-prefixed comment line is still found at the correct UTF-8 byte offset."
+    },
+    {
+      "id": "docker-negative-registry-image-reference",
+      "detector": "docker-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "docker pull registry.example.com/myorg/app@sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b85",
+      "expected": [],
+      "note": "An ordinary container registry/image reference qualified by a SHA-256 digest carries neither the Docker Hub access-token prefix nor its alphabet shape, so it is not classified; the digest shown is the well-known SHA-256 hash of the empty string, not a credential."
+    },
+    {
       "id": "cloudflare-positive-qualified",
       "detector": "cloudflare-token",
       "kind": "positive",
@@ -4492,6 +4698,212 @@
         }
       ],
       "note": "A long delimited provider match remains deterministic and bounded."
+    },
+    {
+      "id": "cloudflare-positive-doc-style-placeholder",
+      "detector": "cloudflare-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "cfut_xxxxxxxxxxxxxxxxxxxx",
+      "expected": [
+        {
+          "detector": "cloudflare-token",
+          "type": "cloudflare_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 25
+        }
+      ],
+      "note": "A documentation placeholder built entirely from valid alphabet characters (e.g. a repeated filler letter) is indistinguishable from a real secret's shape and is classified: an accepted precision/recall tradeoff, not a bug. Only a placeholder that breaks the alphabet run (angle brackets, characters outside the allowed set) is excluded."
+    },
+    {
+      "id": "cloudflare-negative-embedded-in-wider-identifier",
+      "detector": "cloudflare-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "legacycfut_SYNTHETIC_REVOKED_KEY_VALUE",
+      "expected": [],
+      "note": "The 'cfut_' prefix immediately preceded by an alphanumeric/dash character ('legacycfut_...') is a truncated slice of a wider benign identifier, not a boundary-delimited credential, so no candidate is emitted; a real secret substring is never carved out of a longer surrounding token."
+    },
+    {
+      "id": "cloudflare-positive-punctuation-adjacent",
+      "detector": "cloudflare-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Rotate cfut_SYNTHETIC_REVOKED_KEY_VALUE, then redeploy.",
+      "expected": [
+        {
+          "detector": "cloudflare-token",
+          "type": "cloudflare_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 7,
+          "end": 39
+        }
+      ],
+      "note": "Trailing prose punctuation immediately after the suffix correctly bounds the match instead of being folded into it or suppressing the finding."
+    },
+    {
+      "id": "cloudflare-negative-masked-secret-prefix",
+      "detector": "cloudflare-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "cfut_********************",
+      "expected": [],
+      "note": "A redacted/masked placeholder (a run of asterisks) breaks the suffix alphabet immediately after the documented prefix, so no candidate is emitted for a value the source has already redacted."
+    },
+    {
+      "id": "cloudflare-negative-interpolated-secret-prefix",
+      "detector": "cloudflare-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "shell"
+      ],
+      "input": "cfut_${CLOUDFLARE_API_TOKEN}",
+      "expected": [],
+      "note": "A shell-style template interpolation reference (`${...}`) in place of the real suffix breaks the alphabet run immediately after the documented prefix, so the placeholder is never classified as a credential."
+    },
+    {
+      "id": "cloudflare-positive-dotenv",
+      "detector": "cloudflare-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "CLOUDFLARE_API_TOKEN=cfut_SYNTHETIC_REVOKED_KEY_VALUE",
+      "expected": [
+        {
+          "detector": "cloudflare-token",
+          "type": "cloudflare_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 21,
+          "end": 53
+        }
+      ],
+      "note": "A bare dotenv-style assignment (CLOUDFLARE_API_TOKEN=<token>, no quotes) is detected by format alone."
+    },
+    {
+      "id": "cloudflare-positive-json",
+      "detector": "cloudflare-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"cloudflareApiToken\": \"cfut_SYNTHETIC_REVOKED_KEY_VALUE\"}",
+      "expected": [
+        {
+          "detector": "cloudflare-token",
+          "type": "cloudflare_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 24,
+          "end": 56
+        }
+      ],
+      "note": "A quoted JSON string value is detected the same as a bare one; the enclosing quotes are not part of the match."
+    },
+    {
+      "id": "cloudflare-positive-yaml",
+      "detector": "cloudflare-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "cloudflare_api_token: cfut_SYNTHETIC_REVOKED_KEY_VALUE\n",
+      "expected": [
+        {
+          "detector": "cloudflare-token",
+          "type": "cloudflare_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 54
+        }
+      ],
+      "note": "A YAML mapping value is detected the same as a bare one."
+    },
+    {
+      "id": "cloudflare-positive-log",
+      "detector": "cloudflare-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-16T00:00:00Z INFO purging cache key=cfut_SYNTHETIC_REVOKED_KEY_VALUE zone=example.com",
+      "expected": [
+        {
+          "detector": "cloudflare-token",
+          "type": "cloudflare_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 44,
+          "end": 76
+        }
+      ],
+      "note": "A provider token embedded in a structured log line is still detected."
+    },
+    {
+      "id": "cloudflare-positive-crlf-unicode-prefix",
+      "detector": "cloudflare-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# \ud83d\udd11 caf\u00e9\r\ncfut_SYNTHETIC_REVOKED_KEY_VALUE\r\n",
+      "expected": [
+        {
+          "detector": "cloudflare-token",
+          "type": "cloudflare_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 46
+        }
+      ],
+      "note": "A match after a CRLF line ending and a Unicode-prefixed comment line is still found at the correct UTF-8 byte offset."
+    },
+    {
+      "id": "cloudflare-negative-zone-resource-id",
+      "detector": "cloudflare-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "CF-Zone-ID: 023e105f4ecef8ad9ca31a8372d0c353",
+      "expected": [],
+      "note": "A Cloudflare zone/account resource ID is an ordinary 32-character hex identifier, not a secret, and carries none of the documented 'cfut_' token prefix, so it is not classified."
     },
     {
       "id": "digitalocean-positive-qualified",
@@ -4725,6 +5137,212 @@
         }
       ],
       "note": "A long delimited provider match remains deterministic and bounded."
+    },
+    {
+      "id": "digitalocean-positive-doc-style-placeholder",
+      "detector": "digitalocean-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "dop_v1_xxxxxxxxxxxxxxxxxxxx",
+      "expected": [
+        {
+          "detector": "digitalocean-token",
+          "type": "digitalocean_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 27
+        }
+      ],
+      "note": "A documentation placeholder built entirely from valid alphabet characters (e.g. a repeated filler letter) is indistinguishable from a real secret's shape and is classified: an accepted precision/recall tradeoff, not a bug. Only a placeholder that breaks the alphabet run (angle brackets, characters outside the allowed set) is excluded."
+    },
+    {
+      "id": "digitalocean-negative-embedded-in-wider-identifier",
+      "detector": "digitalocean-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "legacydop_v1_SYNTHETIC_REVOKED_KEY_VALUE",
+      "expected": [],
+      "note": "The 'dop_v1_' prefix immediately preceded by an alphanumeric/dash character ('legacydop_v1_...') is a truncated slice of a wider benign identifier, not a boundary-delimited credential, so no candidate is emitted; a real secret substring is never carved out of a longer surrounding token."
+    },
+    {
+      "id": "digitalocean-positive-punctuation-adjacent",
+      "detector": "digitalocean-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Rotate dop_v1_SYNTHETIC_REVOKED_KEY_VALUE, then redeploy.",
+      "expected": [
+        {
+          "detector": "digitalocean-token",
+          "type": "digitalocean_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 7,
+          "end": 41
+        }
+      ],
+      "note": "Trailing prose punctuation immediately after the suffix correctly bounds the match instead of being folded into it or suppressing the finding."
+    },
+    {
+      "id": "digitalocean-negative-masked-secret-prefix",
+      "detector": "digitalocean-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "dop_v1_********************",
+      "expected": [],
+      "note": "A redacted/masked placeholder (a run of asterisks) breaks the suffix alphabet immediately after the documented prefix, so no candidate is emitted for a value the source has already redacted."
+    },
+    {
+      "id": "digitalocean-negative-interpolated-secret-prefix",
+      "detector": "digitalocean-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "shell"
+      ],
+      "input": "dop_v1_${DIGITALOCEAN_TOKEN}",
+      "expected": [],
+      "note": "A shell-style template interpolation reference (`${...}`) in place of the real suffix breaks the alphabet run immediately after the documented prefix, so the placeholder is never classified as a credential."
+    },
+    {
+      "id": "digitalocean-positive-dotenv",
+      "detector": "digitalocean-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "DIGITALOCEAN_TOKEN=dop_v1_SYNTHETIC_REVOKED_KEY_VALUE",
+      "expected": [
+        {
+          "detector": "digitalocean-token",
+          "type": "digitalocean_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 19,
+          "end": 53
+        }
+      ],
+      "note": "A bare dotenv-style assignment (DIGITALOCEAN_TOKEN=<token>, no quotes) is detected by format alone."
+    },
+    {
+      "id": "digitalocean-positive-json",
+      "detector": "digitalocean-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"digitaloceanToken\": \"dop_v1_SYNTHETIC_REVOKED_KEY_VALUE\"}",
+      "expected": [
+        {
+          "detector": "digitalocean-token",
+          "type": "digitalocean_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 23,
+          "end": 57
+        }
+      ],
+      "note": "A quoted JSON string value is detected the same as a bare one; the enclosing quotes are not part of the match."
+    },
+    {
+      "id": "digitalocean-positive-yaml",
+      "detector": "digitalocean-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "digitalocean_token: dop_v1_SYNTHETIC_REVOKED_KEY_VALUE\n",
+      "expected": [
+        {
+          "detector": "digitalocean-token",
+          "type": "digitalocean_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 20,
+          "end": 54
+        }
+      ],
+      "note": "A YAML mapping value is detected the same as a bare one."
+    },
+    {
+      "id": "digitalocean-positive-log",
+      "detector": "digitalocean-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-16T00:00:00Z INFO provisioning droplet key=dop_v1_SYNTHETIC_REVOKED_KEY_VALUE region=nyc3",
+      "expected": [
+        {
+          "detector": "digitalocean-token",
+          "type": "digitalocean_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 51,
+          "end": 85
+        }
+      ],
+      "note": "A provider token embedded in a structured log line is still detected."
+    },
+    {
+      "id": "digitalocean-positive-crlf-unicode-prefix",
+      "detector": "digitalocean-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# \ud83d\udd11 caf\u00e9\r\ndop_v1_SYNTHETIC_REVOKED_KEY_VALUE\r\n",
+      "expected": [
+        {
+          "detector": "digitalocean-token",
+          "type": "digitalocean_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 48
+        }
+      ],
+      "note": "A match after a CRLF line ending and a Unicode-prefixed comment line is still found at the correct UTF-8 byte offset."
+    },
+    {
+      "id": "digitalocean-negative-resource-id",
+      "detector": "digitalocean-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "resource: do:app:3f900b88-8eb1-4de4-b7a3-93c1fb2f8b1d",
+      "expected": [],
+      "note": "A DigitalOcean App Platform deployment/resource identifier is an ordinary UUID with no 'v1' token prefix, so it is not classified."
     },
     {
       "id": "linear-positive-qualified",
@@ -5621,6 +6239,212 @@
         }
       ],
       "note": "A long delimited provider match remains deterministic and bounded."
+    },
+    {
+      "id": "vercel-positive-doc-style-placeholder",
+      "detector": "vercel-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "vcp_xxxxxxxxxxxxxxxxxxxx",
+      "expected": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 24
+        }
+      ],
+      "note": "A documentation placeholder built entirely from valid alphabet characters (e.g. a repeated filler letter) is indistinguishable from a real secret's shape and is classified: an accepted precision/recall tradeoff, not a bug. Only a placeholder that breaks the alphabet run (angle brackets, characters outside the allowed set) is excluded."
+    },
+    {
+      "id": "vercel-negative-embedded-in-wider-identifier",
+      "detector": "vercel-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "legacyvcp_SYNTHETIC_REVOKED_KEY_VALUE",
+      "expected": [],
+      "note": "The 'vcp_' prefix immediately preceded by an alphanumeric/dash character ('legacyvcp_...') is a truncated slice of a wider benign identifier, not a boundary-delimited credential, so no candidate is emitted; a real secret substring is never carved out of a longer surrounding token."
+    },
+    {
+      "id": "vercel-positive-punctuation-adjacent",
+      "detector": "vercel-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Rotate vcp_SYNTHETIC_REVOKED_KEY_VALUE, then redeploy.",
+      "expected": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 7,
+          "end": 38
+        }
+      ],
+      "note": "Trailing prose punctuation immediately after the suffix correctly bounds the match instead of being folded into it or suppressing the finding."
+    },
+    {
+      "id": "vercel-negative-masked-secret-prefix",
+      "detector": "vercel-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "vcp_********************",
+      "expected": [],
+      "note": "A redacted/masked placeholder (a run of asterisks) breaks the suffix alphabet immediately after the documented prefix, so no candidate is emitted for a value the source has already redacted."
+    },
+    {
+      "id": "vercel-negative-interpolated-secret-prefix",
+      "detector": "vercel-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "shell"
+      ],
+      "input": "vcp_${VERCEL_TOKEN}",
+      "expected": [],
+      "note": "A shell-style template interpolation reference (`${...}`) in place of the real suffix breaks the alphabet run immediately after the documented prefix, so the placeholder is never classified as a credential."
+    },
+    {
+      "id": "vercel-positive-dotenv",
+      "detector": "vercel-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "VERCEL_TOKEN=vcp_SYNTHETIC_REVOKED_KEY_VALUE",
+      "expected": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 44
+        }
+      ],
+      "note": "A bare dotenv-style assignment (VERCEL_TOKEN=<token>, no quotes) is detected by format alone."
+    },
+    {
+      "id": "vercel-positive-json",
+      "detector": "vercel-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"vercelToken\": \"vcp_SYNTHETIC_REVOKED_KEY_VALUE\"}",
+      "expected": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 17,
+          "end": 48
+        }
+      ],
+      "note": "A quoted JSON string value is detected the same as a bare one; the enclosing quotes are not part of the match."
+    },
+    {
+      "id": "vercel-positive-yaml",
+      "detector": "vercel-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "vercel_token: vcp_SYNTHETIC_REVOKED_KEY_VALUE\n",
+      "expected": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 45
+        }
+      ],
+      "note": "A YAML mapping value is detected the same as a bare one."
+    },
+    {
+      "id": "vercel-positive-log",
+      "detector": "vercel-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-16T00:00:00Z INFO triggering deployment key=vcp_SYNTHETIC_REVOKED_KEY_VALUE project=example",
+      "expected": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 52,
+          "end": 83
+        }
+      ],
+      "note": "A provider token embedded in a structured log line is still detected."
+    },
+    {
+      "id": "vercel-positive-crlf-unicode-prefix",
+      "detector": "vercel-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# \ud83d\udd11 caf\u00e9\r\nvcp_SYNTHETIC_REVOKED_KEY_VALUE\r\n",
+      "expected": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 45
+        }
+      ],
+      "note": "A match after a CRLF line ending and a Unicode-prefixed comment line is still found at the correct UTF-8 byte offset."
+    },
+    {
+      "id": "vercel-negative-deployment-id",
+      "detector": "vercel-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "deployment: dpl_8sFjq2K3nQeR7xYtLmWzAbCdEfGh",
+      "expected": [],
+      "note": "A Vercel deployment identifier uses its own 'dpl_' namespace, distinct from every documented Vercel token prefix, so it is not classified."
     },
     {
       "id": "npm-positive-qualified",
@@ -8289,6 +9113,212 @@
         }
       ],
       "note": "A long delimited provider match remains deterministic and bounded."
+    },
+    {
+      "id": "vault-positive-doc-style-placeholder",
+      "detector": "vault-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "hvs.xxxxxxxxxxxxxxxxxxxxxxxx",
+      "expected": [
+        {
+          "detector": "vault-token",
+          "type": "vault_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 28
+        }
+      ],
+      "note": "A documentation placeholder built entirely from valid alphabet characters (e.g. a repeated filler letter) is indistinguishable from a real secret's shape and is classified: an accepted precision/recall tradeoff, not a bug. Only a placeholder that breaks the alphabet run (angle brackets, characters outside the allowed set) is excluded."
+    },
+    {
+      "id": "vault-negative-embedded-in-wider-identifier",
+      "detector": "vault-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "legacyhvs.SYNTHETIC_REVOKED_VAULT_TOKEN",
+      "expected": [],
+      "note": "The 'hvs.' prefix immediately preceded by an alphanumeric/dash character ('legacyhvs....') is a truncated slice of a wider benign identifier, not a boundary-delimited credential, so no candidate is emitted; a real secret substring is never carved out of a longer surrounding token."
+    },
+    {
+      "id": "vault-positive-punctuation-adjacent",
+      "detector": "vault-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Rotate hvs.SYNTHETIC_REVOKED_VAULT_TOKEN, then redeploy.",
+      "expected": [
+        {
+          "detector": "vault-token",
+          "type": "vault_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 7,
+          "end": 40
+        }
+      ],
+      "note": "Trailing prose punctuation immediately after the suffix correctly bounds the match instead of being folded into it or suppressing the finding."
+    },
+    {
+      "id": "vault-negative-masked-secret-prefix",
+      "detector": "vault-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "hvs.************************",
+      "expected": [],
+      "note": "A redacted/masked placeholder (a run of asterisks) breaks the suffix alphabet immediately after the documented prefix, so no candidate is emitted for a value the source has already redacted."
+    },
+    {
+      "id": "vault-negative-interpolated-secret-prefix",
+      "detector": "vault-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "shell"
+      ],
+      "input": "hvs.${VAULT_TOKEN}",
+      "expected": [],
+      "note": "A shell-style template interpolation reference (`${...}`) in place of the real suffix breaks the alphabet run immediately after the documented prefix, so the placeholder is never classified as a credential."
+    },
+    {
+      "id": "vault-positive-dotenv",
+      "detector": "vault-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "VAULT_TOKEN=hvs.SYNTHETIC_REVOKED_VAULT_TOKEN",
+      "expected": [
+        {
+          "detector": "vault-token",
+          "type": "vault_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 12,
+          "end": 45
+        }
+      ],
+      "note": "A bare dotenv-style assignment (VAULT_TOKEN=<token>, no quotes) is detected by format alone."
+    },
+    {
+      "id": "vault-positive-json",
+      "detector": "vault-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"vaultToken\": \"hvs.SYNTHETIC_REVOKED_VAULT_TOKEN\"}",
+      "expected": [
+        {
+          "detector": "vault-token",
+          "type": "vault_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 16,
+          "end": 49
+        }
+      ],
+      "note": "A quoted JSON string value is detected the same as a bare one; the enclosing quotes are not part of the match."
+    },
+    {
+      "id": "vault-positive-yaml",
+      "detector": "vault-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "vault_token: hvs.SYNTHETIC_REVOKED_VAULT_TOKEN\n",
+      "expected": [
+        {
+          "detector": "vault-token",
+          "type": "vault_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 46
+        }
+      ],
+      "note": "A YAML mapping value is detected the same as a bare one."
+    },
+    {
+      "id": "vault-positive-log",
+      "detector": "vault-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-16T00:00:00Z INFO authenticating client key=hvs.SYNTHETIC_REVOKED_VAULT_TOKEN mount=kv-v2",
+      "expected": [
+        {
+          "detector": "vault-token",
+          "type": "vault_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 52,
+          "end": 85
+        }
+      ],
+      "note": "A provider token embedded in a structured log line is still detected."
+    },
+    {
+      "id": "vault-positive-crlf-unicode-prefix",
+      "detector": "vault-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# \ud83d\udd11 caf\u00e9\r\nhvs.SYNTHETIC_REVOKED_VAULT_TOKEN\r\n",
+      "expected": [
+        {
+          "detector": "vault-token",
+          "type": "vault_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 47
+        }
+      ],
+      "note": "A match after a CRLF line ending and a Unicode-prefixed comment line is still found at the correct UTF-8 byte offset."
+    },
+    {
+      "id": "vault-negative-path-namespace-and-version",
+      "detector": "vault-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "vault kv get -namespace=admin secret/data/myapp/config on server v1.15.4",
+      "expected": [],
+      "note": "An ordinary Vault CLI path/namespace reference and a dotted server version string carry no modern token prefix, so nothing is classified."
     },
     {
       "id": "jwt-positive-structured",
