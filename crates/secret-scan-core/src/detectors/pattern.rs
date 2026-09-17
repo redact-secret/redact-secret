@@ -38,6 +38,15 @@ pub(super) fn is_alnum_dash_dot(byte: u8) -> bool {
     is_alnum_dash(byte) || byte == b'.'
 }
 
+/// `[A-Za-z0-9+/]`: the standard (non-URL-safe) base64 body alphabet,
+/// excluding the `=` padding character. A run matched against this alphabet
+/// stops before any trailing padding rather than trying to bound it to
+/// exactly 0-2 bytes; the padding carries no secret entropy of its own, so
+/// excluding it from the match still captures the whole secret value.
+pub(super) fn is_base64_body(byte: u8) -> bool {
+    is_alnum(byte) || byte == b'+' || byte == b'/'
+}
+
 /// Whether a matched run must be an exact length or a documented minimum,
 /// mirroring a regex quantifier of `{n}` or `{n,}`.
 #[derive(Clone, Copy, Debug)]
@@ -143,6 +152,12 @@ mod tests {
         assert!(is_alnum_underscore(b'_') && !is_alnum_underscore(b'-'));
         assert!(is_alnum_dash(b'-') && is_alnum_dash(b'_') && !is_alnum_dash(b'.'));
         assert!(is_alnum_dash_dot(b'.') && is_alnum_dash_dot(b'-'));
+        assert!(
+            is_base64_body(b'+')
+                && is_base64_body(b'/')
+                && !is_base64_body(b'=')
+                && !is_base64_body(b'_')
+        );
     }
 
     #[test]

@@ -234,7 +234,10 @@ mod tests {
     fn org_payload(len: usize) -> String {
         assert!(len >= ORG_JSON_MARKER.len());
         let filler = "SYNTHETICREVOKEDSENTRYORGPAYLOADFIXTURE0123456789".repeat(4);
-        format!("{ORG_JSON_MARKER}{}", &filler[..len - ORG_JSON_MARKER.len()])
+        format!(
+            "{ORG_JSON_MARKER}{}",
+            &filler[..len - ORG_JSON_MARKER.len()]
+        )
     }
 
     /// Exactly [`ORG_SIGNATURE_LEN`] bytes of [`is_base64_std`].
@@ -269,10 +272,7 @@ mod tests {
     fn fixtures_carry_their_own_declared_lengths() {
         assert_eq!(org_signature().len(), ORG_SIGNATURE_LEN);
         assert_eq!(org_payload(ORG_MIN_PAYLOAD_LEN).len(), ORG_MIN_PAYLOAD_LEN);
-        assert_eq!(
-            user_token().len(),
-            USER_PREFIX.len() + USER_SECRET_LEN
-        );
+        assert_eq!(user_token().len(), USER_PREFIX.len() + USER_SECRET_LEN);
     }
 
     // ---- user auth token ----
@@ -333,9 +333,7 @@ mod tests {
 
     #[test]
     fn rejects_a_masked_user_token() {
-        assert!(
-            detect_user(&format!("{USER_PREFIX}{}", "*".repeat(USER_SECRET_LEN))).is_empty()
-        );
+        assert!(detect_user(&format!("{USER_PREFIX}{}", "*".repeat(USER_SECRET_LEN))).is_empty());
     }
 
     #[test]

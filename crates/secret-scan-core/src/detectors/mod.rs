@@ -15,10 +15,12 @@ mod aws;
 mod azure_devops;
 mod bearer_token;
 mod connection_string;
+mod datadog;
 mod discord;
 mod generic_token;
 mod github;
 mod gitlab;
+mod grafana;
 mod jwt;
 mod microsoft_entra;
 mod notion;
@@ -77,6 +79,10 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(discord::DiscordBotTokenDetector),
         Box::new(sentry::SentryUserAuthTokenDetector),
         Box::new(sentry::SentryOrgAuthTokenDetector),
+        Box::new(datadog::DatadogApiKeyDetector),
+        Box::new(datadog::DatadogApplicationKeyDetector),
+        Box::new(grafana::GrafanaServiceAccountTokenDetector),
+        Box::new(additional_providers::GRAFANA_CLOUD),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
         Box::new(ConnectionStringDetector),
@@ -140,6 +146,10 @@ mod tests {
                 "discord-bot-token",
                 "sentry-user-auth-token",
                 "sentry-org-auth-token",
+                "datadog-api-key",
+                "datadog-application-key",
+                "grafana-service-account-token",
+                "grafana-cloud-access-policy-token",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -189,14 +199,18 @@ mod tests {
             "twilio SKaB3dE5gH7jK9mN1pQ3sT5vW7yZ9AbC3d zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE";
         let telegram_input = "123456:SYNTHETIC_REVOKED_TELEGRAM_BOT_TOKEN_SECRET";
         let discord_input = "MDAwMDAwMDAwMDAwMDAwMDAw.REVOKE.SYNTHETICREVOKEDBOTTOKENFIX";
-        let sentry_user_auth_token_input =
-            format!("sntryu_{}", "0123456789abcdef".repeat(4));
+        let sentry_user_auth_token_input = format!("sntryu_{}", "0123456789abcdef".repeat(4));
         let sentry_org_auth_token_input = format!(
             "sntrys_eyJ{}_{}",
             &"SYNTHETICREVOKEDSENTRYORGPAYLOADFIXTURE0123456789".repeat(4)[..23],
             &"SigFixSYNTHETICREVOKED0123456789".repeat(2)[..43]
         );
-        let cases: [(&str, &str); 30] = [
+        let grafana_sa_input = "glsa_SYNTHETICREVOKEDGRAFANASATOKEN01_deadbeef";
+        let grafana_cloud_input = "glc_SYNTHETICREVOKEDGRAFANACLOUDACCESSPOLICYTOKEN";
+        let datadog_api_key_input = "DD_API_KEY=0123456789abcdef0123456789abcdef";
+        let datadog_application_key_input =
+            "DD_APPLICATION_KEY=0123456789abcdef0123456789abcdef01234567";
+        let cases: [(&str, &str); 34] = [
             ("aws-access-key", "AKIASYNTHETICEXAMPLE"),
             (
                 "github-token",
@@ -240,8 +254,18 @@ mod tests {
             ("twilio-api-key-secret", twilio_api_key_secret_input),
             ("discord-bot-token", discord_input),
             ("telegram-bot-token", telegram_input),
-            ("sentry-user-auth-token", sentry_user_auth_token_input.as_str()),
-            ("sentry-org-auth-token", sentry_org_auth_token_input.as_str()),
+            (
+                "sentry-user-auth-token",
+                sentry_user_auth_token_input.as_str(),
+            ),
+            (
+                "sentry-org-auth-token",
+                sentry_org_auth_token_input.as_str(),
+            ),
+            ("datadog-api-key", datadog_api_key_input),
+            ("datadog-application-key", datadog_application_key_input),
+            ("grafana-service-account-token", grafana_sa_input),
+            ("grafana-cloud-access-policy-token", grafana_cloud_input),
         ];
         let detectors = built_in_detectors();
         for (id, input) in cases {

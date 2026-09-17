@@ -15,11 +15,11 @@ These counts describe finding-type inventory rows with corpus evidence, not dete
 
 | Row state | Count |
 | --- | --- |
-| supported | 37 |
+| supported | 41 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 48.
+Coverage declarations: 52.
 
 ## Coverage by detector
 
@@ -32,6 +32,8 @@ Coverage declarations: 48.
 | bearer-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | cloudflare-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | connection-string | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| datadog-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| datadog-application-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | digitalocean-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | discord-bot-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | docker-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -39,6 +41,8 @@ Coverage declarations: 48.
 | github-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | gitlab-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | google-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| grafana-cloud-access-policy-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| grafana-service-account-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | huggingface-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | jwt | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | linear-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -75,12 +79,16 @@ Coverage declarations: 48.
 | cloudflare_api_token | cloudflare-token | provider | supported | not-applicable | none |
 | connection_string_password | connection-string | structural | supported | supported | none |
 | contextual_secret | generic-token | contextual | supported | not-applicable | none |
+| datadog_api_key | datadog-api-key | provider | supported | not-applicable | none |
+| datadog_application_key | datadog-application-key | provider | supported | not-applicable | none |
 | digitalocean_token | digitalocean-token | provider | supported | not-applicable | none |
 | discord_bot_token | discord-bot-token | provider | supported | not-applicable | none |
 | docker_token | docker-token | provider | supported | not-applicable | none |
 | github_token | github-token | provider | supported | not-applicable | none |
 | gitlab_token | gitlab-token | provider | supported | not-applicable | none |
 | google_api_key | google-api-key | provider | supported | not-applicable | none |
+| grafana_cloud_access_policy_token | grafana-cloud-access-policy-token | provider | supported | not-applicable | none |
+| grafana_service_account_token | grafana-service-account-token | provider | supported | not-applicable | none |
 | huggingface_token | huggingface-token | provider | supported | not-applicable | none |
 | jwt | jwt | structural | supported | not-applicable | none |
 | linear_token | linear-token | provider | supported | not-applicable | none |
@@ -128,15 +136,15 @@ Coverage declarations: 48.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 48 | 0 | 0 |
-| boundary | 37 | 0 | 0 |
-| host-context | 37 | 0 | 0 |
+| adversarial | 52 | 0 | 0 |
+| boundary | 41 | 0 | 0 |
+| host-context | 41 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 48 | 0 | 0 |
-| near-miss-negative | 37 | 0 | 0 |
-| overlap | 37 | 0 | 0 |
-| positive | 37 | 0 | 0 |
-| range | 48 | 0 | 0 |
+| malformed | 52 | 0 | 0 |
+| near-miss-negative | 41 | 0 | 0 |
+| overlap | 41 | 0 | 0 |
+| positive | 41 | 0 | 0 |
+| range | 52 | 0 | 0 |
 
 ## Unresolved and pending coverage
 
