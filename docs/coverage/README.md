@@ -143,6 +143,18 @@ Tests: `python3 -B -m unittest discover -s scripts/tests -p 'test_generate_cover
     --out docs/coverage/fp-fn-summary.json
   ```
 
+- [`fp-fn-summary-319.json`](./fp-fn-summary-319.json) — the same report for
+  issue [#319](https://github.com/redact-secret/redact-secret/issues/319)'s
+  `github-token`, `gitlab-token`, `npm-token`, and `pypi-token` coverage:
+
+  ```sh
+  python3 -B scripts/generate-fp-fn-summary.py \
+    --detector github-token --detector gitlab-token \
+    --detector npm-token --detector pypi-token \
+    --issue https://github.com/redact-secret/redact-secret/issues/319 \
+    --out docs/coverage/fp-fn-summary-319.json
+  ```
+
   Tests: `python3 -B -m unittest discover -s scripts/tests -p 'test_generate_fp_fn_summary.py'`.
 
 ## Coverage drift is a CI failure
