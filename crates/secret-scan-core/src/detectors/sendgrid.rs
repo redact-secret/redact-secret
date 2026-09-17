@@ -196,7 +196,7 @@ mod tests {
     /// alphabet characters, at the exact documented segment lengths, is
     /// indistinguishable from a real key's shape and is classified — an
     /// accepted precision/recall tradeoff, mirroring
-    /// `additional_providers::accepts_an_all_valid_alphabet_documentation_placeholder`.
+    /// `additional_providers::application_providers_accept_an_all_valid_alphabet_documentation_placeholder`.
     #[test]
     fn accepts_an_all_valid_alphabet_documentation_placeholder() {
         let value = format!("SG.{}.{}", "x".repeat(ID_LEN), "x".repeat(SECRET_LEN));
@@ -221,7 +221,7 @@ mod tests {
         assert_eq!(candidates.len(), 2);
     }
 
-    /// SendGrid's documented alphabet is URL-safe base64 ([A-Za-z0-9_-]); an
+    /// `SendGrid`'s documented alphabet is URL-safe base64 ([A-Za-z0-9_-]); an
     /// id or secret segment ending in a literal '-' or '_' at the exact
     /// documented length is still matched in full.
     #[test]

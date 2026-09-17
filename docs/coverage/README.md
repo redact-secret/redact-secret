@@ -155,6 +155,33 @@ Tests: `python3 -B -m unittest discover -s scripts/tests -p 'test_generate_cover
     --out docs/coverage/fp-fn-summary-319.json
   ```
 
+- [`fp-fn-summary-320.json`](./fp-fn-summary-320.json) — the same report for
+  issue [#320](https://github.com/redact-secret/redact-secret/issues/320)'s
+  `vault-token`, `cloudflare-token`, `digitalocean-token`, `docker-token`,
+  and `vercel-token` coverage:
+
+  ```sh
+  python3 -B scripts/generate-fp-fn-summary.py \
+    --detector vault-token --detector cloudflare-token \
+    --detector digitalocean-token --detector docker-token \
+    --detector vercel-token \
+    --issue https://github.com/redact-secret/redact-secret/issues/320 \
+    --out docs/coverage/fp-fn-summary-320.json
+  ```
+
+- [`fp-fn-summary-321.json`](./fp-fn-summary-321.json) — the same report for
+  issue [#321](https://github.com/redact-secret/redact-secret/issues/321)'s
+  `huggingface-token`, `linear-token`, `slack-token`, and `sendgrid-token`
+  coverage:
+
+  ```sh
+  python3 -B scripts/generate-fp-fn-summary.py \
+    --detector huggingface-token --detector linear-token \
+    --detector slack-token --detector sendgrid-token \
+    --issue https://github.com/redact-secret/redact-secret/issues/321 \
+    --out docs/coverage/fp-fn-summary-321.json
+  ```
+
   Tests: `python3 -B -m unittest discover -s scripts/tests -p 'test_generate_fp_fn_summary.py'`.
 
 ## Coverage drift is a CI failure
