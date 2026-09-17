@@ -23,6 +23,10 @@ contract's concern:
 - a `crates/secret-scan-core` or `crates/secret-scan-cli` path segment -- the
   directories were not renamed (Cargo resolves a crate by its manifest name,
   not its path);
+- the phrase `secret-scanning` -- GitHub's product name for its own feature
+  (as in its `supported-secret-scanning-patterns` documentation), which the
+  audit evidence cites as a source; it shares a prefix with the old crate
+  name but never named this project;
 - `SecretScanError`/`SecretScanErrorCode` themselves, per the scope boundary
   above.
 
@@ -108,10 +112,11 @@ LEGACY_IDENTIFIER_ALLOWLIST: dict[str, str] = {
     ),
 }
 
-# `secret-scan` immediately inside a preserved directory path is not a legacy
+# `secret-scan` immediately inside a preserved directory path, or as the
+# prefix of GitHub's `secret-scanning` product name, is not a legacy
 # identifier. The former GitHub owner/name and wiki sibling name are detected
 # now that issue #157 has transferred the repository.
-KEBAB = re.compile(r"secret-scan(?!-core|-cli|-node|-wasm|-python)")
+KEBAB = re.compile(r"secret-scan(?!-core|-cli|-node|-wasm|-python|ning)")
 SNAKE = re.compile(r"secret_scan")
 # `SecretScanError`/`SecretScanErrorCode` are exported type names this
 # contract leaves unchanged; any other `SecretScan*` is a legacy identifier.

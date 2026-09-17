@@ -77,6 +77,15 @@ class CheckLegacyIdentifiersTest(unittest.TestCase):
         )
         self.assertEqual(self.validate(), [])
 
+    def test_githubs_secret_scanning_product_name_is_not_flagged(self) -> None:
+        self.repo.write(
+            "docs/audits/evidence/note.md",
+            "Corroborated against GitHub supported secret-scanning patterns "
+            "(docs.github.com/en/code-security/secret-scanning/introduction/"
+            "supported-secret-scanning-patterns).\n",
+        )
+        self.assertEqual(self.validate(), [])
+
     def test_the_legacy_github_path_is_rejected(self) -> None:
         self.repo.write(
             "docs/note.md",
