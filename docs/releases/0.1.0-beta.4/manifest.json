@@ -1,0 +1,107 @@
+{
+  "record_schema_version": 1,
+  "record_kind": "reconstructed",
+  "source_revision": "b4a9ae83d737d367ebc1d6d1732e634b44b2452a",
+  "conformance_identity": "0fd11de35ace2d807c478b31e74408952f3fa832",
+  "version": "0.1.0-beta.4",
+  "artifact_inventory_sha256": "f59fbd8d8599e291d758b6ac92b71133be63aba6e23184d7bd123226af2f6e2c",
+  "artifact_set": [
+    "crate:redact-secret",
+    "crate:redact-secret-cli",
+    "npm:@redact-secret/core",
+    "npm:@redact-secret/node-darwin-arm64",
+    "npm:@redact-secret/node-darwin-x64",
+    "npm:@redact-secret/node-linux-arm64-gnu",
+    "npm:@redact-secret/node-linux-x64-gnu",
+    "npm:@redact-secret/node-win32-arm64-msvc",
+    "npm:@redact-secret/node-win32-x64-msvc",
+    "npm:@redact-secret/wasm",
+    "pypi:redact-secret"
+  ],
+  "registry_state": {
+    "crate:redact-secret": "published",
+    "crate:redact-secret-cli": "published",
+    "npm:@redact-secret/core": "published",
+    "npm:@redact-secret/node-darwin-arm64": "published",
+    "npm:@redact-secret/node-darwin-x64": "published",
+    "npm:@redact-secret/node-linux-arm64-gnu": "published",
+    "npm:@redact-secret/node-linux-x64-gnu": "published",
+    "npm:@redact-secret/node-win32-arm64-msvc": "published",
+    "npm:@redact-secret/node-win32-x64-msvc": "published",
+    "npm:@redact-secret/wasm": "published",
+    "pypi:redact-secret": "published"
+  },
+  "release_evidence": {
+    "manifest_reconstructed": true,
+    "reason": "The Release workflow manifest captured partial registry state before reconciliation. Reconcile Release intentionally emits no replacement manifest, so final immutable registry metadata, successful clean-install jobs, and the annotated Git tag were combined with the preserved original manifest and inventory.",
+    "observed_at": "2026-09-17",
+    "original_run": 35243359690,
+    "original_manifest": {
+      "artifact_set": [
+        "crate:redact-secret", "crate:redact-secret-cli", "npm:@redact-secret/core",
+        "npm:@redact-secret/node-darwin-arm64", "npm:@redact-secret/node-darwin-x64",
+        "npm:@redact-secret/node-linux-arm64-gnu", "npm:@redact-secret/node-linux-x64-gnu",
+        "npm:@redact-secret/node-win32-arm64-msvc", "npm:@redact-secret/node-win32-x64-msvc",
+        "npm:@redact-secret/wasm", "pypi:redact-secret"
+      ],
+      "conformance_identity": "0fd11de35ace2d807c478b31e74408952f3fa832",
+      "registry_state": {
+        "crate:redact-secret": "published", "crate:redact-secret-cli": "published",
+        "npm:@redact-secret/core": "unknown", "npm:@redact-secret/node-darwin-arm64": "published",
+        "npm:@redact-secret/node-darwin-x64": "published", "npm:@redact-secret/node-linux-arm64-gnu": "published",
+        "npm:@redact-secret/node-linux-x64-gnu": "unpublished", "npm:@redact-secret/node-win32-arm64-msvc": "unpublished",
+        "npm:@redact-secret/node-win32-x64-msvc": "published", "npm:@redact-secret/wasm": "published",
+        "pypi:redact-secret": "published"
+      },
+      "source_revision": "b4a9ae83d737d367ebc1d6d1732e634b44b2452a",
+      "version": "0.1.0-beta.4"
+    },
+    "registries": {
+      "crate:redact-secret": {"checksum": "d44c8a4d84531cd46850ca8e688ba848409fedc23439878c2e5ee9de18170e6b"},
+      "crate:redact-secret-cli": {"checksum": "47ae8fea561164c97f36329474e1dee9d25728c40abfd64062600f00e4698ae6"},
+      "npm:@redact-secret/core": {"shasum": "201978cf72825477de5aa2acf2562c2f4fbe0af0", "integrity": "sha512-MPAs1K8U0CxRXZE1O+AhWKDXeWOefui/+HdvrRtAQ3s3/+IVgnrE+89wqXU9NNLLJAalgugs5+E83GZntq/+rA=="},
+      "npm:@redact-secret/wasm": {"shasum": "b1814c5a7bf664e33f8167433adc9630948e9c7e", "integrity": "sha512-K1uGWuD/+cuxdO4cT73ersANzFvc6FBMj3UXa5vQJfc2wCeY6SEcZvGTN3rCNatZZVpDGPoKlQsdW3D6fIAlQQ=="},
+      "npm:@redact-secret/node-darwin-arm64": {"shasum": "2fdf6fe62f036df4d3f08e44b0b045b9cb4855e1", "integrity": "sha512-QmEtdRPWF//GqaFwUcwTozPvx2hA7JIy4TcP342xk6kuvJC9cE0X9T1kBVSUhq3YIYBvV2nR9pVdhQ6GgFJKxQ=="},
+      "npm:@redact-secret/node-darwin-x64": {"shasum": "0b75ec6eaad80ccac49d757039214e2745503985", "integrity": "sha512-PwrFZacmnf+or7mOVOk/60FEE8fQXx1ITN1T5gaIEvIrjrO+tSWlzlsaFvUAhnc5Qz/Nlbgj998npRAqJMHy+A=="},
+      "npm:@redact-secret/node-linux-arm64-gnu": {"shasum": "ac3664d25334122acad8ddcf927419d1f77b7137", "integrity": "sha512-9djbpDSTd6VC4vL8offveGfz3qiKTw+fKS81JAUZWnBivj06ALX67QUn3xM4VSiGFsfa8ITxNczzqBofHdS+mw=="},
+      "npm:@redact-secret/node-linux-x64-gnu": {"shasum": "09df85ece9dd0913929c08777675d56c3797f6a8", "integrity": "sha512-fDc6hOjJxvL4Gi7VoP+Vjg+8VZhUmseDHPLvVez9bVZCa5fDOHPs5M+g+27PrGx45/wmHsP8Wxf02uQE2Euy3w=="},
+      "npm:@redact-secret/node-win32-arm64-msvc": {"shasum": "0edcf3272e9948d95dc28ea2b3153849a6b74303", "integrity": "sha512-4KKwTyZIRrCLYbUAupyueALoNFObVzAPmlnzYIw05QnUU6wYghw9UfbIAVS7fyzpvYpER8Eiilj9fdgMopPMWw=="},
+      "npm:@redact-secret/node-win32-x64-msvc": {"shasum": "f2a161fa4f0b293a1abcffac06f49b4827209a81", "integrity": "sha512-iYbktxpN05u/OXNihnZLZV7e9Kv5o0JmHAsbvEvOJfUiqGiHc0+z/qKHLZDOfo8W+8LajogU9/ghV/OGOk63Vw=="},
+      "pypi:redact-secret": {
+        "files": [
+          {"filename": "redact_secret-0.1.0b4.tar.gz", "sha256": "5c14e5874dbe7a9361c7be7a483c95d4f75dfd40ce7d3145cec0bc829e39a079"},
+          {"filename": "redact_secret-0.1.0b4-cp310-abi3-macosx_11_0_arm64.whl", "sha256": "ee9db7a6819aca194a76b29b14fd8147a57552c904a9e0005efe147f5edab95e"},
+          {"filename": "redact_secret-0.1.0b4-cp310-abi3-win_arm64.whl", "sha256": "daa59ee45160c8db12ada33d882e93656444c0069b89bc2c4ac144f3065621b9"},
+          {"filename": "redact_secret-0.1.0b4-cp310-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", "sha256": "3a4963ce9de599dfe383dc0fa9369c8765674e8572d6f55e0e422051998df9a8"},
+          {"filename": "redact_secret-0.1.0b4-cp310-abi3-musllinux_1_2_aarch64.whl", "sha256": "7e88d15dfd36ec982c72f01cf6e1482d337278b88bca4724fc93491d9ab93638"},
+          {"filename": "redact_secret-0.1.0b4-cp310-abi3-macosx_10_12_x86_64.whl", "sha256": "baee9dd4e25f4123cd0824eff71a2088d198f5bfc7098e98a720bf2996da082d"},
+          {"filename": "redact_secret-0.1.0b4-cp310-abi3-win_amd64.whl", "sha256": "ca146bb4bbcb2c63d28f3e40344a9bc5dc13e08cb76b6e5093edf46a8023fa05"},
+          {"filename": "redact_secret-0.1.0b4-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", "sha256": "ab60a0ed43f047ba28a727f50226bdb46b9194f10eb6d07633c5bf754fbd09c7"},
+          {"filename": "redact_secret-0.1.0b4-cp310-abi3-musllinux_1_2_x86_64.whl", "sha256": "0f49c25471c1b6810c23b8fbca573834641f9760bf3cf64353ca7d04f731da6b"}
+        ]
+      }
+    },
+    "runs": [
+      {"id": 35241840201, "result": "CI passed at the frozen source revision."},
+      {"id": 35241840155, "result": "SAST passed at the frozen source revision."},
+      {"id": 35241840473, "result": "Artifact qualification passed and produced the preserved inventory and qualified artifact set."},
+      {"id": 35241861038, "result": "Package Release Rehearsal passed at the frozen source revision."},
+      {"id": 35243359690, "result": "Release partially published the multi-registry artifact set and preserved the original inventory and partial manifest."},
+      {"id": 35245875637, "result": "Authorized dry-run reconciliation validated the preserved evidence and planned only the missing npm facade publication."},
+      {"id": 35246240335, "result": "Authorized recovery published the npm facade; npm processing exceeded the immediate metadata-verification window."},
+      {"id": 35246692567, "result": "Idempotent authorized recovery verified every registry artifact, six Node clean installs, Chromium, and annotated tagging."}
+    ],
+    "verification": {
+      "run": 35246692567,
+      "node": ["aarch64-apple-darwin", "x86_64-apple-darwin", "aarch64-unknown-linux-gnu", "x86_64-unknown-linux-gnu", "aarch64-pc-windows-msvc", "x86_64-pc-windows-msvc"],
+      "browser": "chromium",
+      "rust": {"run": 35243359690, "job": 105282984413, "version": "0.1.0-beta.4"},
+      "python": {"run": 35243359690, "job": 105282984411, "version": "0.1.0b4", "files": 9}
+    },
+    "tag": {
+      "name": "v0.1.0-beta.4",
+      "object": "cd8d996b53e279223c0716faa23af16b1c760f8c",
+      "target": "b4a9ae83d737d367ebc1d6d1732e634b44b2452a"
+    }
+  }
+}
