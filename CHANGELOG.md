@@ -5,6 +5,11 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+- Preserve `__proto__` and other prototype-named JSON keys as own data in
+  tracing, logging, and MCP redaction examples, without changing prototypes.
+- Sanitize cached Python logging exception text and emit a fixed marker when
+  exception traversal reaches its depth limit.
+
 - Added `new-relic-user-api-key` and `new-relic-license-key` detectors
   recognizing New Relic User API Keys and (ingest) License Keys. The User API
   Key is New Relic's own documented `NRAK-` prefix plus an exact 27-byte

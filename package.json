@@ -20,7 +20,7 @@
     "addon:qualify": "node scripts/qualify-node-addon.mjs",
     "cli:qualify": "node scripts/qualify-cli-binary.mjs",
     "ci": "npm run decisions:validate && npm run legacy-identifiers:check && npm run python:check && npm run artifacts:check && npm run coverage:check && npm run assessment:check && npm run release-manifest:test && npm run reconcile-guard:test && npm run reconcile-artifact-plan:test && npm run release-environment:check && npm run release-gate:check && npm run release-refs:check && npm run sast:test && npm run examples:test && npm run js:typecheck && npm run js:test",
-    "examples:test": "node --test examples/safe-integration/integration.test.mjs examples/tracing-masking/mask-secrets.test.mjs examples/tracing-masking/redact-span-attributes.test.mjs examples/mcp-redact/redact-tool-call.test.mjs examples/mcp-redact/wrap-tool-call.test.mjs examples/mcp-redact/streaming-tool-result.test.mjs examples/logging-redaction/pino-hook.test.mjs",
+    "examples:test": "node --test examples/safe-integration/integration.test.mjs examples/tracing-masking/mask-secrets.test.mjs examples/tracing-masking/redact-span-attributes.test.mjs examples/mcp-redact/redact-tool-call.test.mjs examples/mcp-redact/wrap-tool-call.test.mjs examples/mcp-redact/streaming-tool-result.test.mjs examples/logging-redaction/pino-hook.test.mjs && npm run examples:python",
     "decisions:validate": "python3 -B -m unittest discover -s scripts/tests -p 'test_validate_decisions.py' && python3 -B scripts/validate-decisions.py",
     "legacy-identifiers:check": "python3 -B -m unittest discover -s scripts/tests -p 'test_check_legacy_identifiers.py' && python3 -B scripts/check-legacy-identifiers.py",
     "python:check": "python3 -B -m unittest discover -s scripts/tests -p 'test_check_python_package.py' && python3 -B scripts/check-python-package.py",
@@ -52,7 +52,8 @@
     "sast:test": "python3 -B -m unittest discover -s scripts/tests -p 'test_install_opengrep.py' && python3 -B -m unittest discover -s scripts/tests -p 'test_run_sast.py' && python3 -B -m unittest discover -s scripts/tests -p 'test_check_sast_workflow.py' && python3 -B scripts/check-sast-workflow.py",
     "sast:scan": "python3 -B scripts/run-sast.py",
     "release:check": "npm run ci && npm run registry-preflight:check && npm pack --dry-run ./packages/javascript",
-    "release": "npm publish --access public ./packages/javascript"
+    "release": "npm publish --access public ./packages/javascript",
+    "examples:python": "python3 -B -m unittest discover -s examples/tracing-masking/python -p 'test_*.py' && python3 -B -m unittest discover -s examples/mcp-redact/python -p 'test_*.py' && python3 -B -m unittest discover -s examples/logging-redaction/python -p 'test_*.py'"
   },
   "devDependencies": {
     "@types/node": "^24.3.0",

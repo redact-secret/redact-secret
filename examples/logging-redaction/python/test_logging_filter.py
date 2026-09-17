@@ -128,6 +128,22 @@ class RedactSecretFilterTest(unittest.TestCase):
         self.assertIsNone(captured[0].exc_info)
         self.assertIn("<SECRET_1>", captured[0].exc_text)
 
+    def test_cached_exception_text_without_exc_info_is_redacted(self) -> None:
+        _, handler = make_logger("logging-redaction.cached-exception")
+        record = logging.makeLogRecord({"msg": "query failed", "exc_text": "ValueError: " + _SECRET})
+        handler.handle(record)
+        self.assertIsNone(record.exc_info)
+        self.assertEqual(handler.lines, ["query failed\nValueError: <SECRET_1>"])
+
+    def test_exception_depth_limit_emits_marker(self) -> None:
+        handler = ListHandler()
+        handler.addFilter(RedactSecretFilter(fake_scan_and_redact, limits={"max_depth": 0}))
+        error = ValueError(_SECRET)
+        record = logging.makeLogRecord({"msg": "query failed", "exc_info": (ValueError, error, None)})
+        handler.handle(record)
+        self.assertIsNone(record.exc_info)
+        self.assertEqual(handler.lines, ["query failed\n[REDACTED:LIMIT_EXCEEDED]"])
+
     def test_configured_extra_string_field_is_redacted(self) -> None:
         logger, handler = make_logger("logging-redaction.extra", extra_fields=("request_id", "auth_header"))
         logger.info("request received", extra={"request_id": "req-1", "auth_header": "Bearer SECRET_TOKEN_1"})

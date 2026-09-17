@@ -62,7 +62,13 @@ function maskError(scanAndRedact, error, ctx, depth, seen) {
   }
   for (const key of Object.keys(error)) {
     if (key === "message" || key === "stack") continue;
-    out[key] = maskValue(scanAndRedact, error[key], ctx, depth + 1, seen);
+    // Define data keys without invoking inherited setters such as __proto__.
+    Object.defineProperty(out, key, {
+      value: maskValue(scanAndRedact, error[key], ctx, depth + 1, seen),
+      enumerable: true,
+      configurable: true,
+      writable: true,
+    });
   }
   if (error.cause !== undefined) {
     out.cause = maskValue(scanAndRedact, error.cause, ctx, depth + 1, seen);
@@ -103,7 +109,13 @@ function maskValue(scanAndRedact, value, ctx, depth, seen) {
     const keys = Object.keys(value).slice(0, ctx.limits.maxObjectKeys);
     const out = {};
     for (const key of keys) {
-      out[key] = maskValue(scanAndRedact, value[key], ctx, depth + 1, seen);
+      // Define data keys without invoking inherited setters such as __proto__.
+      Object.defineProperty(out, key, {
+        value: maskValue(scanAndRedact, value[key], ctx, depth + 1, seen),
+        enumerable: true,
+        configurable: true,
+        writable: true,
+      });
     }
     seen.delete(value);
     return out;

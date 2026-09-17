@@ -105,3 +105,12 @@ test("content beyond maxContentBlocks is dropped, never passed through unscanned
   assert.equal(outcome.outcome, "ok");
   assert.equal(outcome.result.content.length, 2);
 });
+
+test("preserves prototype-named JSON keys as redacted own data", () => {
+  const input = JSON.parse('{"__proto__":{"value":"SECRET_TOKEN_1"},"constructor":"SECRET_TOKEN_2","toString":"SECRET_TOKEN_3"}');
+  const result = redactArguments(fakeScanAndRedact, input).arguments;
+  assert.equal(Object.getPrototypeOf(result), Object.prototype);
+  assert.equal(Object.hasOwn(result, "__proto__"), true);
+  assert.deepEqual(JSON.parse(JSON.stringify(result)), JSON.parse('{"__proto__":{"value":"<SECRET_1>"},"constructor":"<SECRET_1>","toString":"<SECRET_1>"}'));
+  assert.equal(input.__proto__.value, "SECRET_TOKEN_1");
+});
