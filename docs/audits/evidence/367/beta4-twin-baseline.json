@@ -1,0 +1,2649 @@
+{
+  "counts": {
+    "pairedPositives": 24,
+    "pairs": 24,
+    "perFamily": {
+      "cloudflare-token": {
+        "twins": 2,
+        "twinsFlaggedByContract": 0,
+        "uniqueMutations": [
+          "alphabet: non-hexadecimal eight-character suffix"
+        ]
+      },
+      "digitalocean-token": {
+        "twins": 6,
+        "twinsFlaggedByContract": 0,
+        "uniqueMutations": [
+          "length: 63 vs contracted 64"
+        ]
+      },
+      "docker-token": {
+        "twins": 4,
+        "twinsFlaggedByContract": 0,
+        "uniqueMutations": [
+          "length: 26 vs contracted 27",
+          "length: 31 vs contracted 32"
+        ]
+      },
+      "huggingface-token": {
+        "twins": 2,
+        "twinsFlaggedByContract": 0,
+        "uniqueMutations": [
+          "length: 33 vs contracted 34"
+        ]
+      },
+      "linear-token": {
+        "twins": 2,
+        "twinsFlaggedByContract": 0,
+        "uniqueMutations": [
+          "length: 39 vs contracted 40"
+        ]
+      },
+      "openai-token": {
+        "twins": 6,
+        "twinsFlaggedByContract": 0,
+        "uniqueMutations": [
+          "internal marker: T3BlbkFK vs contracted T3BlbkFJ",
+          "length: 73-character left segment vs contracted 74"
+        ]
+      },
+      "slack-token": {
+        "twins": 2,
+        "twinsFlaggedByContract": 0,
+        "uniqueMutations": [
+          "boundary: missing dash before the secret section"
+        ]
+      }
+    },
+    "positivesPreservedByContract": 24,
+    "twins": 24,
+    "twinsFlaggedByBeta4": 24,
+    "twinsFlaggedByContract": 0,
+    "uniqueMutationDescriptions": 9,
+    "uniqueMutations": 12
+  },
+  "issue": "https://github.com/redact-secret/redact-secret/issues/367",
+  "note": "Frozen beta.4 negative-twin baseline for the seven provider families. Literal contents are not committed; scripts/audit-precision-contracts.py reconstructs each fixture bit-for-bit from `construction` (the benchmark generator's public deterministic seed formula) and verifies `contentSha256`, `contentBytes`, `expected` and `actualBeta4` against that reconstruction. The child issues #368-#374 carry the same 48 fixtures as self-contained literal snapshots. `assessment`, `expected` and `actualBeta4` are the frozen baseline view and must not be edited; `contractView` is derived from precision-contracts.json and shows the corrected-contract view separately, so a reclassification can never be mistaken for a detection gain.",
+  "pairs": [
+    {
+      "context": "plain",
+      "contractView": {
+        "positiveMatchesExpectedRange": true,
+        "positiveVariant": "legacy",
+        "twinFlaggedByContract": false,
+        "twinMutationRetained": true
+      },
+      "family": "openai-token",
+      "issue": "https://github.com/redact-secret/redact-secret/issues/368",
+      "mutation": "internal marker: T3BlbkFK vs contracted T3BlbkFJ",
+      "mutationKind": "boundary",
+      "negative": {
+        "actualBeta4": [
+          {
+            "end": 51,
+            "start": 0
+          }
+        ],
+        "assessment": {
+          "contract": "openai-token",
+          "kind": "must-not-flag",
+          "reason": "Negative twin of openai-token-legacy-plain: internal marker: T3BlbkFK vs contracted T3BlbkFJ. Exactly one structural property differs from the positive; silence follows from construction.",
+          "sources": [
+            "https://github.com/trufflesecurity/trufflehog/blob/v3.97.4/pkg/detectors/openai/openai.go",
+            "https://github.com/gitleaks/gitleaks/blob/v8.30.1/config/gitleaks.toml"
+          ],
+          "tier": "T2"
+        },
+        "construction": {
+          "context": "plain",
+          "parts": [
+            {
+              "literal": "sk-"
+            },
+            {
+              "synthetic": {
+                "alphabet": "alnum",
+                "label": "reviewed-formats:openai-left",
+                "length": 20
+              }
+            },
+            {
+              "literal": "T3BlbkFK"
+            },
+            {
+              "synthetic": {
+                "alphabet": "alnum",
+                "label": "reviewed-formats:openai-right",
+                "length": 20
+              }
+            }
+          ]
+        },
+        "contentBytes": 53,
+        "contentSha256": "40f24fab122d9219642af293d8fdd77e1834abeb02d81542474779dd4f69ed80",
+        "expected": [],
+        "id": "openai-token-legacy-plain-twin",
+        "twinOf": "openai-token-legacy-plain"
+      },
+      "positive": {
+        "actualBeta4": [
+          {
+            "end": 51,
+            "start": 0
+          }
+        ],
+        "assessment": {
+          "contract": "openai-token",
+          "kind": "must-redact",
+          "reason": "Pinned source-backed lexical format; synthetic and never provider-issued. Any missing scanner support remains in the result.",
+          "sources": [
+            "https://github.com/trufflesecurity/trufflehog/blob/v3.97.4/pkg/detectors/openai/openai.go",
+            "https://github.com/gitleaks/gitleaks/blob/v8.30.1/config/gitleaks.toml"
+          ],
+          "tier": "T2"
+        },
+        "construction": {
+          "context": "plain",
+          "parts": [
+            {
+              "literal": "sk-"
+            },
+            {
+              "synthetic": {
+                "alphabet": "alnum",
+                "label": "reviewed-formats:openai-left",
+                "length": 20
+              }
+            },
+            {
+              "literal": "T3BlbkFJ"
+            },
+            {
+              "synthetic": {
+                "alphabet": "alnum",
+                "label": "reviewed-formats:openai-right",
+                "length": 20
+              }
+            }
+          ]
+        },
+        "contentBytes": 53,
+        "contentSha256": "567e6eeaed0ee8fa8aa7a24eaf00deb127603a5ca2e46a6c8d31b39bda34c96c",
+        "expected": [
+          {
+            "end": 51,
+            "role": "secret",
+            "start": 0
+          }
+        ],
+        "id": "openai-token-legacy-plain"
+      },
+      "variant": "legacy"
+    },
+    {
+      "context": "unicode-crlf",
+      "contractView": {
+        "positiveMatchesExpectedRange": true,
+        "positiveVariant": "legacy",
+        "twinFlaggedByContract": false,
+        "twinMutationRetained": true
+      },
+      "family": "openai-token",
+      "issue": "https://github.com/redact-secret/redact-secret/issues/368",
+      "mutation": "internal marker: T3BlbkFK vs contracted T3BlbkFJ",
+      "mutationKind": "boundary",
+      "negative": {
+        "actualBeta4": [
+          {
+            "end": 75,
+            "start": 24
+          }
+        ],
+        "assessment": {
+          "contract": "openai-token",
+          "kind": "must-not-flag",
+          "reason": "Negative twin of openai-token-legacy-unicode-crlf: internal marker: T3BlbkFK vs contracted T3BlbkFJ. Exactly one structural property differs from the positive; silence follows from construction.",
+          "sources": [
+            "https://github.com/trufflesecurity/trufflehog/blob/v3.97.4/pkg/detectors/openai/openai.go",
+            "https://github.com/gitleaks/gitleaks/blob/v8.30.1/config/gitleaks.toml"
+          ],
+          "tier": "T2"
+        },
+        "construction": {
+          "context": "unicode-crlf",
+          "parts": [
+            {
+              "literal": "sk-"
+            },
+            {
+              "synthetic": {
+                "alphabet": "alnum",
+                "label": "reviewed-formats:openai-left",
+                "length": 20
+              }
+            },
+            {
+              "literal": "T3BlbkFK"
+            },
+            {
+              "synthetic": {
+                "alphabet": "alnum",
+                "label": "reviewed-formats:openai-right",
+                "length": 20
+              }
+            }
+          ]
+        },
+        "contentBytes": 78,
+        "contentSha256": "b704f76632605f296fb42463c4a3f8153060040c009efd79586de772de756079",
+        "expected": [],
+        "id": "openai-token-legacy-unicode-crlf-twin",
+        "twinOf": "openai-token-legacy-unicode-crlf"
+      },
+      "positive": {
+        "actualBeta4": [
+          {
+            "end": 75,
+            "start": 24
+          }
+        ],
+        "assessment": {
+          "contract": "openai-token",
+          "kind": "must-redact",
+          "reason": "Pinned source-backed lexical format; synthetic and never provider-issued. Any missing scanner support remains in the result.",
+          "sources": [
+            "https://github.com/trufflesecurity/trufflehog/blob/v3.97.4/pkg/detectors/openai/openai.go",
+            "https://github.com/gitleaks/gitleaks/blob/v8.30.1/config/gitleaks.toml"
+          ],
+          "tier": "T2"
+        },
+        "construction": {
+          "context": "unicode-crlf",
+          "parts": [
+            {
+              "literal": "sk-"
+            },
+            {
+              "synthetic": {
+                "alphabet": "alnum",
+                "label": "reviewed-formats:openai-left",
+                "length": 20
+              }
+            },
+            {
+              "literal": "T3BlbkFJ"
+            },
+            {
+              "synthetic": {
+                "alphabet": "alnum",
+                "label": "reviewed-formats:openai-right",
+                "length": 20
+              }
+            }
+          ]
+        },
+        "contentBytes": 78,
+        "contentSha256": "6a98a8b9f6a37cbe8641ab48c6c39762fd8d802d346e96a17d93100868f4b542",
+        "expected": [
+          {
+            "end": 75,
+            "role": "secret",
+            "start": 24
+          }
+        ],
+        "id": "openai-token-legacy-unicode-crlf"
+      },
+      "variant": "legacy"
+    },
+    {
+      "context": "plain",
+      "contractView": {
+        "positiveMatchesExpectedRange": true,
+        "positiveVariant": "proj",
+        "twinFlaggedByContract": false,
+        "twinMutationRetained": true
+      },
+      "family": "openai-token",
+      "issue": "https://github.com/redact-secret/redact-secret/issues/368",
+      "mutation": "length: 73-character left segment vs contracted 74",
+      "mutationKind": "length",
+      "negative": {
+        "actualBeta4": [
+          {
+            "end": 163,
+            "start": 0
+          }
+        ],
+        "assessment": {
+          "contract": "openai-token",
+          "kind": "must-not-flag",
+          "reason": "Negative twin of openai-token-proj-plain: length: 73-character left segment vs contracted 74. Exactly one structural property differs from the positive; silence follows from construction.",
+          "sources": [
+            "https://github.com/trufflesecurity/trufflehog/blob/v3.97.4/pkg/detectors/openai/openai.go",
+            "https://github.com/gitleaks/gitleaks/blob/v8.30.1/config/gitleaks.toml"
+          ],
+          "tier": "T2"
+        },
+        "construction": {
+          "context": "plain",
+          "parts": [
+            {
+              "literal": "sk-proj-"
+            },
+            {
+              "synthetic": {
+                "alphabet": "alnum",
+                "label": "reviewed-formats:proj:left",
+                "length": 74,
+                "take": 73
+              }
+            },
+            {
+              "literal": "T3BlbkFJ"
+            },
+            {
+              "synthetic": {
+                "alphabet": "alnum",
+                "label": "reviewed-formats:proj:right",
+                "length": 74
+              }
+            }
+          ]
+        },
+        "contentBytes": 165,
+        "contentSha256": "42def66bef3bb73a9900851e04deea4ed144e1e86a58234cf5dd47066bdabca2",
+        "expected": [],
+        "id": "openai-token-proj-plain-twin",
+        "twinOf": "openai-token-proj-plain"
+      },
+      "positive": {
+        "actualBeta4": [
+          {
+            "end": 164,
+            "start": 0
+          }
+        ],
+        "assessment": {
+          "contract": "openai-token",
+          "kind": "must-redact",
+          "reason": "Pinned source-backed lexical format; synthetic and never provider-issued. Any missing scanner support remains in the result.",
+          "sources": [
+            "https://github.com/trufflesecurity/trufflehog/blob/v3.97.4/pkg/detectors/openai/openai.go",
+            "https://github.com/gitleaks/gitleaks/blob/v8.30.1/config/gitleaks.toml"
+          ],
+          "tier": "T2"
+        },
+        "construction": {
+          "context": "plain",
+          "parts": [
+            {
+              "literal": "sk-proj-"
+            },
+            {
+              "synthetic": {
+                "alphabet": "alnum",
+                "label": "reviewed-formats:proj:left",
+                "length": 74
+              }
+            },
+            {
+              "literal": "T3BlbkFJ"
+            },
+            {
+              "synthetic": {
+                "alphabet": "alnum",
+                "label": "reviewed-formats:proj:right",
+                "length": 74
+              }
+            }
+          ]
+        },
+        "contentBytes": 166,
+        "contentSha256": "acaef8033ca737934d8c82107484af0c1ae13a3ecee6f87c5a3feda5cbd31ade",
+        "expected": [
+          {
+            "end": 164,
+            "role": "secret",
+            "start": 0
+          }
+        ],
+        "id": "openai-token-proj-plain"
+      },
+      "variant": "proj"
+    },
+    {
+      "context": "unicode-crlf",
+      "contractView": {
+        "positiveMatchesExpectedRange": true,
+        "positiveVariant": "proj",
+        "twinFlaggedByContract": false,
+        "twinMutationRetained": true
+      },
+      "family": "openai-token",
+      "issue": "https://github.com/redact-secret/redact-secret/issues/368",
+      "mutation": "length: 73-character left segment vs contracted 74",
+      "mutationKind": "length",
+      "negative": {
+        "actualBeta4": [
+          {
+            "end": 187,
+            "start": 24
+          }
+        ],
+        "assessment": {
+          "contract": "openai-token",
+          "kind": "must-not-flag",
+          "reason": "Negative twin of openai-token-proj-unicode-crlf: length: 73-character left segment vs contracted 74. Exactly one structural property differs from the positive; silence follows from construction.",
+          "sources": [
+            "https://github.com/trufflesecurity/trufflehog/blob/v3.97.4/pkg/detectors/openai/openai.go",
+            "https://github.com/gitleaks/gitleaks/blob/v8.30.1/config/gitleaks.toml"
+          ],
+          "tier": "T2"
+        },
+        "construction": {
+          "context": "unicode-crlf",
+          "parts": [
+            {
+              "literal": "sk-proj-"
+            },
+            {
+              "synthetic": {
+                "alphabet": "alnum",
+                "label": "reviewed-formats:proj:left",
+                "length": 74,
+                "take": 73
+              }
+            },
+            {
+              "literal": "T3BlbkFJ"
+            },
+            {
+              "synthetic": {
+                "alphabet": "alnum",
+                "label": "reviewed-formats:proj:right",
+                "length": 74
+              }
+            }
+          ]
+        },
+        "contentBytes": 190,
+        "contentSha256": "32b1d15fe4ebb4d39e1d3cdd4d847bf7bc8eb27108b569039467e631ed7c99a8",
+        "expected": [],
+        "id": "openai-token-proj-unicode-crlf-twin",
+        "twinOf": "openai-token-proj-unicode-crlf"
+      },
+      "positive": {
+        "actualBeta4": [
+          {
+            "end": 188,
+            "start": 24
+          }
+        ],
+        "assessment": {
+          "contract": "openai-token",
+          "kind": "must-redact",
+          "reason": "Pinned source-backed lexical format; synthetic and never provider-issued. Any missing scanner support remains in the result.",
+          "sources": [
+            "https://github.com/trufflesecurity/trufflehog/blob/v3.97.4/pkg/detectors/openai/openai.go",
+            "https://github.com/gitleaks/gitleaks/blob/v8.30.1/config/gitleaks.toml"
+          ],
+          "tier": "T2"
+        },
+        "construction": {
+          "context": "unicode-crlf",
+          "parts": [
+            {
+              "literal": "sk-proj-"
+            },
+            {
+              "synthetic": {
+                "alphabet": "alnum",
+                "label": "reviewed-formats:proj:left",
+                "length": 74
+              }
+            },
+            {
+              "literal": "T3BlbkFJ"
+            },
+            {
+              "synthetic": {
+                "alphabet": "alnum",
+                "label": "reviewed-formats:proj:right",
+                "length": 74
+              }
+            }
+          ]
+        },
+        "contentBytes": 191,
+        "contentSha256": "39998f5e7a617221bdbc8981b0254ead794509e3e20eeb061f536693ff099c02",
+        "expected": [
+          {
+            "end": 188,
+            "role": "secret",
+            "start": 24
+          }
+        ],
+        "id": "openai-token-proj-unicode-crlf"
+      },
+      "variant": "proj"
+    },
+    {
+      "context": "plain",
+      "contractView": {
+        "positiveMatchesExpectedRange": true,
+        "positiveVariant": "svcacct",
+        "twinFlaggedByContract": false,
+        "twinMutationRetained": true
+      },
+      "family": "openai-token",
+      "issue": "https://github.com/redact-secret/redact-secret/issues/368",
+      "mutation": "length: 73-character left segment vs contracted 74",
+      "mutationKind": "length",
+      "negative": {
+        "actualBeta4": [
+          {
+            "end": 166,
+            "start": 0
+          }
+        ],
+        "assessment": {
+          "contract": "openai-token",
+          "kind": "must-not-flag",
+          "reason": "Negative twin of openai-token-svcacct-plain: length: 73-character left segment vs contracted 74. Exactly one structural property differs from the positive; silence follows from construction.",
+          "sources": [
+            "https://github.com/trufflesecurity/trufflehog/blob/v3.97.4/pkg/detectors/openai/openai.go",
+            "https://github.com/gitleaks/gitleaks/blob/v8.30.1/config/gitleaks.toml"
+          ],
+          "tier": "T2"
+        },
+        "construction": {
+          "context": "plain",
+          "parts": [
+            {
+              "literal": "sk-svcacct-"
+            },
+            {
+              "synthetic": {
+                "alphabet": "alnum",
+                "label": "reviewed-formats:svcacct:left",
+                "length": 74,
+                "take": 73
+              }
+            },
+            {
+              "literal": "T3BlbkFJ"
+            },
+            {
+              "synthetic": {
+                "alphabet": "alnum",
+                "label": "reviewed-formats:svcacct:right",
+                "length": 74
+              }
+            }
+          ]
+        },
+        "contentBytes": 168,
+        "contentSha256": "ddc2f043959bd7091d05b3f223448b7e408051a82554ebd33621a0d7c39901c9",
+        "expected": [],
+        "id": "openai-token-svcacct-plain-twin",
+        "twinOf": "openai-token-svcacct-plain"
+      },
+      "positive": {
+        "actualBeta4": [
+          {
+            "end": 167,
+            "start": 0
+          }
+        ],
+        "assessment": {
+          "contract": "openai-token",
+          "kind": "must-redact",
+          "reason": "Pinned source-backed lexical format; synthetic and never provider-issued. Any missing scanner support remains in the result.",
+          "sources": [
+            "https://github.com/trufflesecurity/trufflehog/blob/v3.97.4/pkg/detectors/openai/openai.go",
+            "https://github.com/gitleaks/gitleaks/blob/v8.30.1/config/gitleaks.toml"
+          ],
+          "tier": "T2"
+        },
+        "construction": {
+          "context": "plain",
+          "parts": [
+            {
+              "literal": "sk-svcacct-"
+            },
+            {
+              "synthetic": {
+                "alphabet": "alnum",
+                "label": "reviewed-formats:svcacct:left",
+                "length": 74
+              }
+            },
+            {
+              "literal": "T3BlbkFJ"
+            },
+            {
+              "synthetic": {
+                "alphabet": "alnum",
+                "label": "reviewed-formats:svcacct:right",
+                "length": 74
+              }
+            }
+          ]
+        },
+        "contentBytes": 169,
+        "contentSha256": "9851fea9f221f1d6497441883123ebd6628a4ac9333cdc7d3c9d8a7b6948aea7",
+        "expected": [
+          {
+            "end": 167,
+            "role": "secret",
+            "start": 0
+          }
+        ],
+        "id": "openai-token-svcacct-plain"
+      },
+      "variant": "svcacct"
+    },
+    {
+      "context": "unicode-crlf",
+      "contractView": {
+        "positiveMatchesExpectedRange": true,
+        "positiveVariant": "svcacct",
+        "twinFlaggedByContract": false,
+        "twinMutationRetained": true
+      },
+      "family": "openai-token",
+      "issue": "https://github.com/redact-secret/redact-secret/issues/368",
+      "mutation": "length: 73-character left segment vs contracted 74",
+      "mutationKind": "length",
+      "negative": {
+        "actualBeta4": [
+          {
+            "end": 190,
+            "start": 24
+          }
+        ],
+        "assessment": {
+          "contract": "openai-token",
+          "kind": "must-not-flag",
+          "reason": "Negative twin of openai-token-svcacct-unicode-crlf: length: 73-character left segment vs contracted 74. Exactly one structural property differs from the positive; silence follows from construction.",
+          "sources": [
+            "https://github.com/trufflesecurity/trufflehog/blob/v3.97.4/pkg/detectors/openai/openai.go",
+            "https://github.com/gitleaks/gitleaks/blob/v8.30.1/config/gitleaks.toml"
+          ],
+          "tier": "T2"
+        },
+        "construction": {
+          "context": "unicode-crlf",
+          "parts": [
+            {
+              "literal": "sk-svcacct-"
+            },
+            {
+              "synthetic": {
+                "alphabet": "alnum",
+                "label": "reviewed-formats:svcacct:left",
+                "length": 74,
+                "take": 73
+              }
+            },
+            {
+              "literal": "T3BlbkFJ"
+            },
+            {
+              "synthetic": {
+                "alphabet": "alnum",
+                "label": "reviewed-formats:svcacct:right",
+                "length": 74
+              }
+            }
+          ]
+        },
+        "contentBytes": 193,
+        "contentSha256": "22e1e775a502558d6abe6563ff4d4dd80c58fd37536869722068e0840e0e8ca7",
+        "expected": [],
+        "id": "openai-token-svcacct-unicode-crlf-twin",
+        "twinOf": "openai-token-svcacct-unicode-crlf"
+      },
+      "positive": {
+        "actualBeta4": [
+          {
+            "end": 191,
+            "start": 24
+          }
+        ],
+        "assessment": {
+          "contract": "openai-token",
+          "kind": "must-redact",
+          "reason": "Pinned source-backed lexical format; synthetic and never provider-issued. Any missing scanner support remains in the result.",
+          "sources": [
+            "https://github.com/trufflesecurity/trufflehog/blob/v3.97.4/pkg/detectors/openai/openai.go",
+            "https://github.com/gitleaks/gitleaks/blob/v8.30.1/config/gitleaks.toml"
+          ],
+          "tier": "T2"
+        },
+        "construction": {
+          "context": "unicode-crlf",
+          "parts": [
+            {
+              "literal": "sk-svcacct-"
+            },
+            {
+              "synthetic": {
+                "alphabet": "alnum",
+                "label": "reviewed-formats:svcacct:left",
+                "length": 74
+              }
+            },
+            {
+              "literal": "T3BlbkFJ"
+            },
+            {
+              "synthetic": {
+                "alphabet": "alnum",
+                "label": "reviewed-formats:svcacct:right",
+                "length": 74
+              }
+            }
+          ]
+        },
+        "contentBytes": 194,
+        "contentSha256": "1f452e3f1bbfa18d2ef4967d46607b0a8bf401b525314fd11379448f59e9ab58",
+        "expected": [
+          {
+            "end": 191,
+            "role": "secret",
+            "start": 24
+          }
+        ],
+        "id": "openai-token-svcacct-unicode-crlf"
+      },
+      "variant": "svcacct"
+    },
+    {
+      "context": "plain",
+      "contractView": {
+        "positiveMatchesExpectedRange": true,
+        "positiveVariant": "dop",
+        "twinFlaggedByContract": false,
+        "twinMutationRetained": true
+      },
+      "family": "digitalocean-token",
+      "issue": "https://github.com/redact-secret/redact-secret/issues/369",
+      "mutation": "length: 63 vs contracted 64",
+      "mutationKind": "length",
+      "negative": {
+        "actualBeta4": [
+          {
+            "end": 70,
+            "start": 0
+          }
+        ],
+        "assessment": {
+          "contract": "digitalocean-token",
+          "kind": "must-not-flag",
+          "reason": "Negative twin of digitalocean-token-dop-plain: length: 63 vs contracted 64. Exactly one structural property differs from the positive; silence follows from construction.",
+          "sources": [
+            "https://docs.digitalocean.com/release-notes/api/",
+            "https://github.com/trufflesecurity/trufflehog/blob/v3.97.4/pkg/detectors/digitaloceanv2/digitaloceanv2.go",
+            "https://github.com/gitleaks/gitleaks/blob/v8.30.1/config/gitleaks.toml"
+          ],
+          "tier": "T2"
+        },
+        "construction": {
+          "context": "plain",
+          "parts": [
+            {
+              "literal": "dop_v1_"
+            },
+            {
+              "synthetic": {
+                "alphabet": "hex",
+                "label": "reviewed-formats:dop",
+                "length": 64,
+                "take": 63
+              }
+            }
+          ]
+        },
+        "contentBytes": 72,
+        "contentSha256": "3564f08aac804702f47d540f9357e2a912a27a9534e3bebaa5572f1060381fa0",
+        "expected": [],
+        "id": "digitalocean-token-dop-plain-twin",
+        "twinOf": "digitalocean-token-dop-plain"
+      },
+      "positive": {
+        "actualBeta4": [
+          {
+            "end": 71,
+            "start": 0
+          }
+        ],
+        "assessment": {
+          "contract": "digitalocean-token",
+          "kind": "must-redact",
+          "reason": "Pinned source-backed lexical format; synthetic and never provider-issued. Any missing scanner support remains in the result.",
+          "sources": [
+            "https://docs.digitalocean.com/release-notes/api/",
+            "https://github.com/trufflesecurity/trufflehog/blob/v3.97.4/pkg/detectors/digitaloceanv2/digitaloceanv2.go",
+            "https://github.com/gitleaks/gitleaks/blob/v8.30.1/config/gitleaks.toml"
+          ],
+          "tier": "T1"
+        },
+        "construction": {
+          "context": "plain",
+          "parts": [
+            {
+              "literal": "dop_v1_"
+            },
+            {
+              "synthetic": {
+                "alphabet": "hex",
+                "label": "reviewed-formats:dop",
+                "length": 64
+              }
+            }
+          ]
+        },
+        "contentBytes": 73,
+        "contentSha256": "bdba41b18df7f42ee0349446a9df44742ac1811843303a7b3bb95e375c3bf307",
+        "expected": [
+          {
+            "end": 71,
+            "role": "secret",
+            "start": 0
+          }
+        ],
+        "id": "digitalocean-token-dop-plain"
+      },
+      "variant": "dop"
+    },
+    {
+      "context": "unicode-crlf",
+      "contractView": {
+        "positiveMatchesExpectedRange": true,
+        "positiveVariant": "dop",
+        "twinFlaggedByContract": false,
+        "twinMutationRetained": true
+      },
+      "family": "digitalocean-token",
+      "issue": "https://github.com/redact-secret/redact-secret/issues/369",
+      "mutation": "length: 63 vs contracted 64",
+      "mutationKind": "length",
+      "negative": {
+        "actualBeta4": [
+          {
+            "end": 94,
+            "start": 24
+          }
+        ],
+        "assessment": {
+          "contract": "digitalocean-token",
+          "kind": "must-not-flag",
+          "reason": "Negative twin of digitalocean-token-dop-unicode-crlf: length: 63 vs contracted 64. Exactly one structural property differs from the positive; silence follows from construction.",
+          "sources": [
+            "https://docs.digitalocean.com/release-notes/api/",
+            "https://github.com/trufflesecurity/trufflehog/blob/v3.97.4/pkg/detectors/digitaloceanv2/digitaloceanv2.go",
+            "https://github.com/gitleaks/gitleaks/blob/v8.30.1/config/gitleaks.toml"
+          ],
+          "tier": "T2"
+        },
+        "construction": {
+          "context": "unicode-crlf",
+          "parts": [
+            {
+              "literal": "dop_v1_"
+            },
+            {
+              "synthetic": {
+                "alphabet": "hex",
+                "label": "reviewed-formats:dop",
+                "length": 64,
+                "take": 63
+              }
+            }
+          ]
+        },
+        "contentBytes": 97,
+        "contentSha256": "7b688bf50ddd95cb7c389d9c0e5867411554f02d2cb5e77e275494015279aeb3",
+        "expected": [],
+        "id": "digitalocean-token-dop-unicode-crlf-twin",
+        "twinOf": "digitalocean-token-dop-unicode-crlf"
+      },
+      "positive": {
+        "actualBeta4": [
+          {
+            "end": 95,
+            "start": 24
+          }
+        ],
+        "assessment": {
+          "contract": "digitalocean-token",
+          "kind": "must-redact",
+          "reason": "Pinned source-backed lexical format; synthetic and never provider-issued. Any missing scanner support remains in the result.",
+          "sources": [
+            "https://docs.digitalocean.com/release-notes/api/",
+            "https://github.com/trufflesecurity/trufflehog/blob/v3.97.4/pkg/detectors/digitaloceanv2/digitaloceanv2.go",
+            "https://github.com/gitleaks/gitleaks/blob/v8.30.1/config/gitleaks.toml"
+          ],
+          "tier": "T1"
+        },
+        "construction": {
+          "context": "unicode-crlf",
+          "parts": [
+            {
+              "literal": "dop_v1_"
+            },
+            {
+              "synthetic": {
+                "alphabet": "hex",
+                "label": "reviewed-formats:dop",
+                "length": 64
+              }
+            }
+          ]
+        },
+        "contentBytes": 98,
+        "contentSha256": "4e60af0313ed023b3475991879f455c0ff68cf726867929a4f9f7f6d21930237",
+        "expected": [
+          {
+            "end": 95,
+            "role": "secret",
+            "start": 24
+          }
+        ],
+        "id": "digitalocean-token-dop-unicode-crlf"
+      },
+      "variant": "dop"
+    },
+    {
+      "context": "plain",
+      "contractView": {
+        "positiveMatchesExpectedRange": true,
+        "positiveVariant": "doo",
+        "twinFlaggedByContract": false,
+        "twinMutationRetained": true
+      },
+      "family": "digitalocean-token",
+      "issue": "https://github.com/redact-secret/redact-secret/issues/369",
+      "mutation": "length: 63 vs contracted 64",
+      "mutationKind": "length",
+      "negative": {
+        "actualBeta4": [
+          {
+            "end": 70,
+            "start": 0
+          }
+        ],
+        "assessment": {
+          "contract": "digitalocean-token",
+          "kind": "must-not-flag",
+          "reason": "Negative twin of digitalocean-token-doo-plain: length: 63 vs contracted 64. Exactly one structural property differs from the positive; silence follows from construction.",
+          "sources": [
+            "https://docs.digitalocean.com/release-notes/api/",
+            "https://github.com/trufflesecurity/trufflehog/blob/v3.97.4/pkg/detectors/digitaloceanv2/digitaloceanv2.go",
+            "https://github.com/gitleaks/gitleaks/blob/v8.30.1/config/gitleaks.toml"
+          ],
+          "tier": "T2"
+        },
+        "construction": {
+          "context": "plain",
+          "parts": [
+            {
+              "literal": "doo_v1_"
+            },
+            {
+              "synthetic": {
+                "alphabet": "hex",
+                "label": "reviewed-formats:doo",
+                "length": 64,
+                "take": 63
+              }
+            }
+          ]
+        },
+        "contentBytes": 72,
+        "contentSha256": "8e224d59db6414e7e82cd7e9191ca4310855c3b7dbd0662357c79984f8adf1c4",
+        "expected": [],
+        "id": "digitalocean-token-doo-plain-twin",
+        "twinOf": "digitalocean-token-doo-plain"
+      },
+      "positive": {
+        "actualBeta4": [
+          {
+            "end": 71,
+            "start": 0
+          }
+        ],
+        "assessment": {
+          "contract": "digitalocean-token",
+          "kind": "must-redact",
+          "reason": "Pinned source-backed lexical format; synthetic and never provider-issued. Any missing scanner support remains in the result.",
+          "sources": [
+            "https://docs.digitalocean.com/release-notes/api/",
+            "https://github.com/trufflesecurity/trufflehog/blob/v3.97.4/pkg/detectors/digitaloceanv2/digitaloceanv2.go",
+            "https://github.com/gitleaks/gitleaks/blob/v8.30.1/config/gitleaks.toml"
+          ],
+          "tier": "T1"
+        },
+        "construction": {
+          "context": "plain",
+          "parts": [
+            {
+              "literal": "doo_v1_"
+            },
+            {
+              "synthetic": {
+                "alphabet": "hex",
+                "label": "reviewed-formats:doo",
+                "length": 64
+              }
+            }
+          ]
+        },
+        "contentBytes": 73,
+        "contentSha256": "65585d0f3b67180e0070a7c312034737a47202fd345201bea2f241c3c743e846",
+        "expected": [
+          {
+            "end": 71,
+            "role": "secret",
+            "start": 0
+          }
+        ],
+        "id": "digitalocean-token-doo-plain"
+      },
+      "variant": "doo"
+    },
+    {
+      "context": "unicode-crlf",
+      "contractView": {
+        "positiveMatchesExpectedRange": true,
+        "positiveVariant": "doo",
+        "twinFlaggedByContract": false,
+        "twinMutationRetained": true
+      },
+      "family": "digitalocean-token",
+      "issue": "https://github.com/redact-secret/redact-secret/issues/369",
+      "mutation": "length: 63 vs contracted 64",
+      "mutationKind": "length",
+      "negative": {
+        "actualBeta4": [
+          {
+            "end": 94,
+            "start": 24
+          }
+        ],
+        "assessment": {
+          "contract": "digitalocean-token",
+          "kind": "must-not-flag",
+          "reason": "Negative twin of digitalocean-token-doo-unicode-crlf: length: 63 vs contracted 64. Exactly one structural property differs from the positive; silence follows from construction.",
+          "sources": [
+            "https://docs.digitalocean.com/release-notes/api/",
+            "https://github.com/trufflesecurity/trufflehog/blob/v3.97.4/pkg/detectors/digitaloceanv2/digitaloceanv2.go",
+            "https://github.com/gitleaks/gitleaks/blob/v8.30.1/config/gitleaks.toml"
+          ],
+          "tier": "T2"
+        },
+        "construction": {
+          "context": "unicode-crlf",
+          "parts": [
+            {
+              "literal": "doo_v1_"
+            },
+            {
+              "synthetic": {
+                "alphabet": "hex",
+                "label": "reviewed-formats:doo",
+                "length": 64,
+                "take": 63
+              }
+            }
+          ]
+        },
+        "contentBytes": 97,
+        "contentSha256": "fbf42cbb48be7afc3ef96e806287105565afb6c17d204b0191ba432bfe0a0a43",
+        "expected": [],
+        "id": "digitalocean-token-doo-unicode-crlf-twin",
+        "twinOf": "digitalocean-token-doo-unicode-crlf"
+      },
+      "positive": {
+        "actualBeta4": [
+          {
+            "end": 95,
+            "start": 24
+          }
+        ],
+        "assessment": {
+          "contract": "digitalocean-token",
+          "kind": "must-redact",
+          "reason": "Pinned source-backed lexical format; synthetic and never provider-issued. Any missing scanner support remains in the result.",
+          "sources": [
+            "https://docs.digitalocean.com/release-notes/api/",
+            "https://github.com/trufflesecurity/trufflehog/blob/v3.97.4/pkg/detectors/digitaloceanv2/digitaloceanv2.go",
+            "https://github.com/gitleaks/gitleaks/blob/v8.30.1/config/gitleaks.toml"
+          ],
+          "tier": "T1"
+        },
+        "construction": {
+          "context": "unicode-crlf",
+          "parts": [
+            {
+              "literal": "doo_v1_"
+            },
+            {
+              "synthetic": {
+                "alphabet": "hex",
+                "label": "reviewed-formats:doo",
+                "length": 64
+              }
+            }
+          ]
+        },
+        "contentBytes": 98,
+        "contentSha256": "997af04d1a7c87041e73a8a04aba6ae8d647f5acc817bf7790fefda5574a459c",
+        "expected": [
+          {
+            "end": 95,
+            "role": "secret",
+            "start": 24
+          }
+        ],
+        "id": "digitalocean-token-doo-unicode-crlf"
+      },
+      "variant": "doo"
+    },
+    {
+      "context": "plain",
+      "contractView": {
+        "positiveMatchesExpectedRange": true,
+        "positiveVariant": "dor",
+        "twinFlaggedByContract": false,
+        "twinMutationRetained": true
+      },
+      "family": "digitalocean-token",
+      "issue": "https://github.com/redact-secret/redact-secret/issues/369",
+      "mutation": "length: 63 vs contracted 64",
+      "mutationKind": "length",
+      "negative": {
+        "actualBeta4": [
+          {
+            "end": 70,
+            "start": 0
+          }
+        ],
+        "assessment": {
+          "contract": "digitalocean-token",
+          "kind": "must-not-flag",
+          "reason": "Negative twin of digitalocean-token-dor-plain: length: 63 vs contracted 64. Exactly one structural property differs from the positive; silence follows from construction.",
+          "sources": [
+            "https://docs.digitalocean.com/release-notes/api/",
+            "https://github.com/trufflesecurity/trufflehog/blob/v3.97.4/pkg/detectors/digitaloceanv2/digitaloceanv2.go",
+            "https://github.com/gitleaks/gitleaks/blob/v8.30.1/config/gitleaks.toml"
+          ],
+          "tier": "T2"
+        },
+        "construction": {
+          "context": "plain",
+          "parts": [
+            {
+              "literal": "dor_v1_"
+            },
+            {
+              "synthetic": {
+                "alphabet": "hex",
+                "label": "reviewed-formats:dor",
+                "length": 64,
+                "take": 63
+              }
+            }
+          ]
+        },
+        "contentBytes": 72,
+        "contentSha256": "ece7195050d4902014f20c1121edcfb7ea42344d4b32a7045e73dd3bcd3d7c6c",
+        "expected": [],
+        "id": "digitalocean-token-dor-plain-twin",
+        "twinOf": "digitalocean-token-dor-plain"
+      },
+      "positive": {
+        "actualBeta4": [
+          {
+            "end": 71,
+            "start": 0
+          }
+        ],
+        "assessment": {
+          "contract": "digitalocean-token",
+          "kind": "must-redact",
+          "reason": "Pinned source-backed lexical format; synthetic and never provider-issued. Any missing scanner support remains in the result.",
+          "sources": [
+            "https://docs.digitalocean.com/release-notes/api/",
+            "https://github.com/trufflesecurity/trufflehog/blob/v3.97.4/pkg/detectors/digitaloceanv2/digitaloceanv2.go",
+            "https://github.com/gitleaks/gitleaks/blob/v8.30.1/config/gitleaks.toml"
+          ],
+          "tier": "T1"
+        },
+        "construction": {
+          "context": "plain",
+          "parts": [
+            {
+              "literal": "dor_v1_"
+            },
+            {
+              "synthetic": {
+                "alphabet": "hex",
+                "label": "reviewed-formats:dor",
+                "length": 64
+              }
+            }
+          ]
+        },
+        "contentBytes": 73,
+        "contentSha256": "f992a4d85c0a25469b4206c815f85840a4f9b3164d5a4468817238791664a558",
+        "expected": [
+          {
+            "end": 71,
+            "role": "secret",
+            "start": 0
+          }
+        ],
+        "id": "digitalocean-token-dor-plain"
+      },
+      "variant": "dor"
+    },
+    {
+      "context": "unicode-crlf",
+      "contractView": {
+        "positiveMatchesExpectedRange": true,
+        "positiveVariant": "dor",
+        "twinFlaggedByContract": false,
+        "twinMutationRetained": true
+      },
+      "family": "digitalocean-token",
+      "issue": "https://github.com/redact-secret/redact-secret/issues/369",
+      "mutation": "length: 63 vs contracted 64",
+      "mutationKind": "length",
+      "negative": {
+        "actualBeta4": [
+          {
+            "end": 94,
+            "start": 24
+          }
+        ],
+        "assessment": {
+          "contract": "digitalocean-token",
+          "kind": "must-not-flag",
+          "reason": "Negative twin of digitalocean-token-dor-unicode-crlf: length: 63 vs contracted 64. Exactly one structural property differs from the positive; silence follows from construction.",
+          "sources": [
+            "https://docs.digitalocean.com/release-notes/api/",
+            "https://github.com/trufflesecurity/trufflehog/blob/v3.97.4/pkg/detectors/digitaloceanv2/digitaloceanv2.go",
+            "https://github.com/gitleaks/gitleaks/blob/v8.30.1/config/gitleaks.toml"
+          ],
+          "tier": "T2"
+        },
+        "construction": {
+          "context": "unicode-crlf",
+          "parts": [
+            {
+              "literal": "dor_v1_"
+            },
+            {
+              "synthetic": {
+                "alphabet": "hex",
+                "label": "reviewed-formats:dor",
+                "length": 64,
+                "take": 63
+              }
+            }
+          ]
+        },
+        "contentBytes": 97,
+        "contentSha256": "63946ea27bd80a0a6b4e7be4c705a3216236bb055c64611e3496c1a6599389df",
+        "expected": [],
+        "id": "digitalocean-token-dor-unicode-crlf-twin",
+        "twinOf": "digitalocean-token-dor-unicode-crlf"
+      },
+      "positive": {
+        "actualBeta4": [
+          {
+            "end": 95,
+            "start": 24
+          }
+        ],
+        "assessment": {
+          "contract": "digitalocean-token",
+          "kind": "must-redact",
+          "reason": "Pinned source-backed lexical format; synthetic and never provider-issued. Any missing scanner support remains in the result.",
+          "sources": [
+            "https://docs.digitalocean.com/release-notes/api/",
+            "https://github.com/trufflesecurity/trufflehog/blob/v3.97.4/pkg/detectors/digitaloceanv2/digitaloceanv2.go",
+            "https://github.com/gitleaks/gitleaks/blob/v8.30.1/config/gitleaks.toml"
+          ],
+          "tier": "T1"
+        },
+        "construction": {
+          "context": "unicode-crlf",
+          "parts": [
+            {
+              "literal": "dor_v1_"
+            },
+            {
+              "synthetic": {
+                "alphabet": "hex",
+                "label": "reviewed-formats:dor",
+                "length": 64
+              }
+            }
+          ]
+        },
+        "contentBytes": 98,
+        "contentSha256": "3338e8a8169fc244c23b8a3f3ea4710d296c415469b8a0f6334e21dfe7b623d0",
+        "expected": [
+          {
+            "end": 95,
+            "role": "secret",
+            "start": 24
+          }
+        ],
+        "id": "digitalocean-token-dor-unicode-crlf"
+      },
+      "variant": "dor"
+    },
+    {
+      "context": "plain",
+      "contractView": {
+        "positiveMatchesExpectedRange": true,
+        "positiveVariant": "pat",
+        "twinFlaggedByContract": false,
+        "twinMutationRetained": true
+      },
+      "family": "docker-token",
+      "issue": "https://github.com/redact-secret/redact-secret/issues/370",
+      "mutation": "length: 26 vs contracted 27",
+      "mutationKind": "length",
+      "negative": {
+        "actualBeta4": [
+          {
+            "end": 35,
+            "start": 0
+          }
+        ],
+        "assessment": {
+          "contract": "docker-token",
+          "kind": "must-not-flag",
+          "reason": "Negative twin of docker-token-pat-plain: length: 26 vs contracted 27. Exactly one structural property differs from the positive; silence follows from construction.",
+          "sources": [
+            "https://github.com/trufflesecurity/trufflehog/blob/v3.97.4/pkg/detectors/dockerhub/v2/dockerhub.go"
+          ],
+          "tier": "T2"
+        },
+        "construction": {
+          "context": "plain",
+          "parts": [
+            {
+              "literal": "dckr_pat_"
+            },
+            {
+              "synthetic": {
+                "alphabet": "alnum",
+                "label": "reviewed-formats:docker-pat",
+                "length": 27,
+                "take": 26
+              }
+            }
+          ]
+        },
+        "contentBytes": 37,
+        "contentSha256": "52ecbba8257ed22e090792e6094758ddfb02caddea6b03b444a07359435b3c41",
+        "expected": [],
+        "id": "docker-token-pat-plain-twin",
+        "twinOf": "docker-token-pat-plain"
+      },
+      "positive": {
+        "actualBeta4": [
+          {
+            "end": 36,
+            "start": 0
+          }
+        ],
+        "assessment": {
+          "contract": "docker-token",
+          "kind": "must-redact",
+          "reason": "Pinned source-backed lexical format; synthetic and never provider-issued. Any missing scanner support remains in the result.",
+          "sources": [
+            "https://github.com/trufflesecurity/trufflehog/blob/v3.97.4/pkg/detectors/dockerhub/v2/dockerhub.go"
+          ],
+          "tier": "T2"
+        },
+        "construction": {
+          "context": "plain",
+          "parts": [
+            {
+              "literal": "dckr_pat_"
+            },
+            {
+              "synthetic": {
+                "alphabet": "alnum",
+                "label": "reviewed-formats:docker-pat",
+                "length": 27
+              }
+            }
+          ]
+        },
+        "contentBytes": 38,
+        "contentSha256": "27a2508d8a8612cfcd743cf550b20a3fc44bc99f3730cdfda37c3f177ad0cb98",
+        "expected": [
+          {
+            "end": 36,
+            "role": "secret",
+            "start": 0
+          }
+        ],
+        "id": "docker-token-pat-plain"
+      },
+      "variant": "pat"
+    },
+    {
+      "context": "unicode-crlf",
+      "contractView": {
+        "positiveMatchesExpectedRange": true,
+        "positiveVariant": "pat",
+        "twinFlaggedByContract": false,
+        "twinMutationRetained": true
+      },
+      "family": "docker-token",
+      "issue": "https://github.com/redact-secret/redact-secret/issues/370",
+      "mutation": "length: 26 vs contracted 27",
+      "mutationKind": "length",
+      "negative": {
+        "actualBeta4": [
+          {
+            "end": 59,
+            "start": 24
+          }
+        ],
+        "assessment": {
+          "contract": "docker-token",
+          "kind": "must-not-flag",
+          "reason": "Negative twin of docker-token-pat-unicode-crlf: length: 26 vs contracted 27. Exactly one structural property differs from the positive; silence follows from construction.",
+          "sources": [
+            "https://github.com/trufflesecurity/trufflehog/blob/v3.97.4/pkg/detectors/dockerhub/v2/dockerhub.go"
+          ],
+          "tier": "T2"
+        },
+        "construction": {
+          "context": "unicode-crlf",
+          "parts": [
+            {
+              "literal": "dckr_pat_"
+            },
+            {
+              "synthetic": {
+                "alphabet": "alnum",
+                "label": "reviewed-formats:docker-pat",
+                "length": 27,
+                "take": 26
+              }
+            }
+          ]
+        },
+        "contentBytes": 62,
+        "contentSha256": "4b3f85b4a805f58d4900806da3bdbc8353c3c2aac7df99d32efd92e064f3107b",
+        "expected": [],
+        "id": "docker-token-pat-unicode-crlf-twin",
+        "twinOf": "docker-token-pat-unicode-crlf"
+      },
+      "positive": {
+        "actualBeta4": [
+          {
+            "end": 60,
+            "start": 24
+          }
+        ],
+        "assessment": {
+          "contract": "docker-token",
+          "kind": "must-redact",
+          "reason": "Pinned source-backed lexical format; synthetic and never provider-issued. Any missing scanner support remains in the result.",
+          "sources": [
+            "https://github.com/trufflesecurity/trufflehog/blob/v3.97.4/pkg/detectors/dockerhub/v2/dockerhub.go"
+          ],
+          "tier": "T2"
+        },
+        "construction": {
+          "context": "unicode-crlf",
+          "parts": [
+            {
+              "literal": "dckr_pat_"
+            },
+            {
+              "synthetic": {
+                "alphabet": "alnum",
+                "label": "reviewed-formats:docker-pat",
+                "length": 27
+              }
+            }
+          ]
+        },
+        "contentBytes": 63,
+        "contentSha256": "946439697bb834abfa2c7ea04854c7da725c02c0f94d189ac123c12db0a6800b",
+        "expected": [
+          {
+            "end": 60,
+            "role": "secret",
+            "start": 24
+          }
+        ],
+        "id": "docker-token-pat-unicode-crlf"
+      },
+      "variant": "pat"
+    },
+    {
+      "context": "plain",
+      "contractView": {
+        "positiveMatchesExpectedRange": true,
+        "positiveVariant": "oat",
+        "twinFlaggedByContract": false,
+        "twinMutationRetained": true
+      },
+      "family": "docker-token",
+      "issue": "https://github.com/redact-secret/redact-secret/issues/370",
+      "mutation": "length: 31 vs contracted 32",
+      "mutationKind": "length",
+      "negative": {
+        "actualBeta4": [
+          {
+            "end": 40,
+            "start": 0
+          }
+        ],
+        "assessment": {
+          "contract": "docker-token",
+          "kind": "must-not-flag",
+          "reason": "Negative twin of docker-token-oat-plain: length: 31 vs contracted 32. Exactly one structural property differs from the positive; silence follows from construction.",
+          "sources": [
+            "https://github.com/trufflesecurity/trufflehog/blob/v3.97.4/pkg/detectors/dockerhub/v2/dockerhub.go"
+          ],
+          "tier": "T2"
+        },
+        "construction": {
+          "context": "plain",
+          "parts": [
+            {
+              "literal": "dckr_oat_"
+            },
+            {
+              "synthetic": {
+                "alphabet": "alnum",
+                "label": "reviewed-formats:docker-oat",
+                "length": 32,
+                "take": 31
+              }
+            }
+          ]
+        },
+        "contentBytes": 42,
+        "contentSha256": "0acd5799a33766d2755dfc8bcdc8d2dec2f154dfb664f385a9d0756382dba18c",
+        "expected": [],
+        "id": "docker-token-oat-plain-twin",
+        "twinOf": "docker-token-oat-plain"
+      },
+      "positive": {
+        "actualBeta4": [
+          {
+            "end": 41,
+            "start": 0
+          }
+        ],
+        "assessment": {
+          "contract": "docker-token",
+          "kind": "must-redact",
+          "reason": "Pinned source-backed lexical format; synthetic and never provider-issued. Any missing scanner support remains in the result.",
+          "sources": [
+            "https://github.com/trufflesecurity/trufflehog/blob/v3.97.4/pkg/detectors/dockerhub/v2/dockerhub.go"
+          ],
+          "tier": "T2"
+        },
+        "construction": {
+          "context": "plain",
+          "parts": [
+            {
+              "literal": "dckr_oat_"
+            },
+            {
+              "synthetic": {
+                "alphabet": "alnum",
+                "label": "reviewed-formats:docker-oat",
+                "length": 32
+              }
+            }
+          ]
+        },
+        "contentBytes": 43,
+        "contentSha256": "2d9f5cd89337676d63e1aa7c48750d20c75c05b3b941a8af3cfc587f14e395a9",
+        "expected": [
+          {
+            "end": 41,
+            "role": "secret",
+            "start": 0
+          }
+        ],
+        "id": "docker-token-oat-plain"
+      },
+      "variant": "oat"
+    },
+    {
+      "context": "unicode-crlf",
+      "contractView": {
+        "positiveMatchesExpectedRange": true,
+        "positiveVariant": "oat",
+        "twinFlaggedByContract": false,
+        "twinMutationRetained": true
+      },
+      "family": "docker-token",
+      "issue": "https://github.com/redact-secret/redact-secret/issues/370",
+      "mutation": "length: 31 vs contracted 32",
+      "mutationKind": "length",
+      "negative": {
+        "actualBeta4": [
+          {
+            "end": 64,
+            "start": 24
+          }
+        ],
+        "assessment": {
+          "contract": "docker-token",
+          "kind": "must-not-flag",
+          "reason": "Negative twin of docker-token-oat-unicode-crlf: length: 31 vs contracted 32. Exactly one structural property differs from the positive; silence follows from construction.",
+          "sources": [
+            "https://github.com/trufflesecurity/trufflehog/blob/v3.97.4/pkg/detectors/dockerhub/v2/dockerhub.go"
+          ],
+          "tier": "T2"
+        },
+        "construction": {
+          "context": "unicode-crlf",
+          "parts": [
+            {
+              "literal": "dckr_oat_"
+            },
+            {
+              "synthetic": {
+                "alphabet": "alnum",
+                "label": "reviewed-formats:docker-oat",
+                "length": 32,
+                "take": 31
+              }
+            }
+          ]
+        },
+        "contentBytes": 67,
+        "contentSha256": "9be6bcd1d802c4d29d4483728e2fc3e7835b4a25d895cb8b64d5ff0bc2be1773",
+        "expected": [],
+        "id": "docker-token-oat-unicode-crlf-twin",
+        "twinOf": "docker-token-oat-unicode-crlf"
+      },
+      "positive": {
+        "actualBeta4": [
+          {
+            "end": 65,
+            "start": 24
+          }
+        ],
+        "assessment": {
+          "contract": "docker-token",
+          "kind": "must-redact",
+          "reason": "Pinned source-backed lexical format; synthetic and never provider-issued. Any missing scanner support remains in the result.",
+          "sources": [
+            "https://github.com/trufflesecurity/trufflehog/blob/v3.97.4/pkg/detectors/dockerhub/v2/dockerhub.go"
+          ],
+          "tier": "T2"
+        },
+        "construction": {
+          "context": "unicode-crlf",
+          "parts": [
+            {
+              "literal": "dckr_oat_"
+            },
+            {
+              "synthetic": {
+                "alphabet": "alnum",
+                "label": "reviewed-formats:docker-oat",
+                "length": 32
+              }
+            }
+          ]
+        },
+        "contentBytes": 68,
+        "contentSha256": "1baa740edadb5e7c74ef218f142314f543269b3a9a2a0f2ca9f73b85e7cc2f21",
+        "expected": [
+          {
+            "end": 65,
+            "role": "secret",
+            "start": 24
+          }
+        ],
+        "id": "docker-token-oat-unicode-crlf"
+      },
+      "variant": "oat"
+    },
+    {
+      "context": "plain",
+      "contractView": {
+        "positiveMatchesExpectedRange": true,
+        "positiveVariant": "bot",
+        "twinFlaggedByContract": false,
+        "twinMutationRetained": true
+      },
+      "family": "slack-token",
+      "issue": "https://github.com/redact-secret/redact-secret/issues/371",
+      "mutation": "boundary: missing dash before the secret section",
+      "mutationKind": "boundary",
+      "negative": {
+        "actualBeta4": [
+          {
+            "end": 54,
+            "start": 0
+          }
+        ],
+        "assessment": {
+          "contract": "slack-token",
+          "kind": "must-not-flag",
+          "reason": "Negative twin of slack-token-bot-plain: boundary: missing dash before the secret section. Exactly one structural property differs from the positive; silence follows from construction.",
+          "sources": [
+            "https://docs.slack.dev/authentication/tokens",
+            "https://github.com/trufflesecurity/trufflehog/blob/v3.97.4/pkg/detectors/slack/slack.go",
+            "https://github.com/gitleaks/gitleaks/blob/v8.30.1/config/gitleaks.toml"
+          ],
+          "tier": "T2"
+        },
+        "construction": {
+          "context": "plain",
+          "parts": [
+            {
+              "literal": "xoxb-"
+            },
+            {
+              "synthetic": {
+                "alphabet": "digits",
+                "label": "reviewed-formats:slack-team",
+                "length": 12
+              }
+            },
+            {
+              "literal": "-"
+            },
+            {
+              "synthetic": {
+                "alphabet": "digits",
+                "label": "reviewed-formats:slack-bot",
+                "length": 12
+              }
+            },
+            {
+              "synthetic": {
+                "alphabet": "alnum",
+                "label": "reviewed-formats:slack-secret",
+                "length": 24
+              }
+            }
+          ]
+        },
+        "contentBytes": 56,
+        "contentSha256": "32a2f8640deacebc7bd73e14d5c175019785e7f8cbf68fa6f16d9afe6b4516c6",
+        "expected": [],
+        "id": "slack-token-bot-plain-twin",
+        "twinOf": "slack-token-bot-plain"
+      },
+      "positive": {
+        "actualBeta4": [
+          {
+            "end": 55,
+            "start": 0
+          }
+        ],
+        "assessment": {
+          "contract": "slack-token",
+          "kind": "must-redact",
+          "reason": "Pinned source-backed lexical format; synthetic and never provider-issued. Any missing scanner support remains in the result.",
+          "sources": [
+            "https://docs.slack.dev/authentication/tokens",
+            "https://github.com/trufflesecurity/trufflehog/blob/v3.97.4/pkg/detectors/slack/slack.go",
+            "https://github.com/gitleaks/gitleaks/blob/v8.30.1/config/gitleaks.toml"
+          ],
+          "tier": "T1"
+        },
+        "construction": {
+          "context": "plain",
+          "parts": [
+            {
+              "literal": "xoxb-"
+            },
+            {
+              "synthetic": {
+                "alphabet": "digits",
+                "label": "reviewed-formats:slack-team",
+                "length": 12
+              }
+            },
+            {
+              "literal": "-"
+            },
+            {
+              "synthetic": {
+                "alphabet": "digits",
+                "label": "reviewed-formats:slack-bot",
+                "length": 12
+              }
+            },
+            {
+              "literal": "-"
+            },
+            {
+              "synthetic": {
+                "alphabet": "alnum",
+                "label": "reviewed-formats:slack-secret",
+                "length": 24
+              }
+            }
+          ]
+        },
+        "contentBytes": 57,
+        "contentSha256": "e64ae90bbd333a1707e5302917f077e3a75d7f8ef7e919d10fd4b44b5b87af3a",
+        "expected": [
+          {
+            "end": 55,
+            "role": "secret",
+            "start": 0
+          }
+        ],
+        "id": "slack-token-bot-plain"
+      },
+      "variant": "bot"
+    },
+    {
+      "context": "unicode-crlf",
+      "contractView": {
+        "positiveMatchesExpectedRange": true,
+        "positiveVariant": "bot",
+        "twinFlaggedByContract": false,
+        "twinMutationRetained": true
+      },
+      "family": "slack-token",
+      "issue": "https://github.com/redact-secret/redact-secret/issues/371",
+      "mutation": "boundary: missing dash before the secret section",
+      "mutationKind": "boundary",
+      "negative": {
+        "actualBeta4": [
+          {
+            "end": 78,
+            "start": 24
+          }
+        ],
+        "assessment": {
+          "contract": "slack-token",
+          "kind": "must-not-flag",
+          "reason": "Negative twin of slack-token-bot-unicode-crlf: boundary: missing dash before the secret section. Exactly one structural property differs from the positive; silence follows from construction.",
+          "sources": [
+            "https://docs.slack.dev/authentication/tokens",
+            "https://github.com/trufflesecurity/trufflehog/blob/v3.97.4/pkg/detectors/slack/slack.go",
+            "https://github.com/gitleaks/gitleaks/blob/v8.30.1/config/gitleaks.toml"
+          ],
+          "tier": "T2"
+        },
+        "construction": {
+          "context": "unicode-crlf",
+          "parts": [
+            {
+              "literal": "xoxb-"
+            },
+            {
+              "synthetic": {
+                "alphabet": "digits",
+                "label": "reviewed-formats:slack-team",
+                "length": 12
+              }
+            },
+            {
+              "literal": "-"
+            },
+            {
+              "synthetic": {
+                "alphabet": "digits",
+                "label": "reviewed-formats:slack-bot",
+                "length": 12
+              }
+            },
+            {
+              "synthetic": {
+                "alphabet": "alnum",
+                "label": "reviewed-formats:slack-secret",
+                "length": 24
+              }
+            }
+          ]
+        },
+        "contentBytes": 81,
+        "contentSha256": "1337564126ebe3cadef7b00e87e191791cbbef6e61192c2bca471c379bffa59e",
+        "expected": [],
+        "id": "slack-token-bot-unicode-crlf-twin",
+        "twinOf": "slack-token-bot-unicode-crlf"
+      },
+      "positive": {
+        "actualBeta4": [
+          {
+            "end": 79,
+            "start": 24
+          }
+        ],
+        "assessment": {
+          "contract": "slack-token",
+          "kind": "must-redact",
+          "reason": "Pinned source-backed lexical format; synthetic and never provider-issued. Any missing scanner support remains in the result.",
+          "sources": [
+            "https://docs.slack.dev/authentication/tokens",
+            "https://github.com/trufflesecurity/trufflehog/blob/v3.97.4/pkg/detectors/slack/slack.go",
+            "https://github.com/gitleaks/gitleaks/blob/v8.30.1/config/gitleaks.toml"
+          ],
+          "tier": "T1"
+        },
+        "construction": {
+          "context": "unicode-crlf",
+          "parts": [
+            {
+              "literal": "xoxb-"
+            },
+            {
+              "synthetic": {
+                "alphabet": "digits",
+                "label": "reviewed-formats:slack-team",
+                "length": 12
+              }
+            },
+            {
+              "literal": "-"
+            },
+            {
+              "synthetic": {
+                "alphabet": "digits",
+                "label": "reviewed-formats:slack-bot",
+                "length": 12
+              }
+            },
+            {
+              "literal": "-"
+            },
+            {
+              "synthetic": {
+                "alphabet": "alnum",
+                "label": "reviewed-formats:slack-secret",
+                "length": 24
+              }
+            }
+          ]
+        },
+        "contentBytes": 82,
+        "contentSha256": "027ccbefe6a696fb76789836395bdd938e4b3350b25fa726f797596f0937de0c",
+        "expected": [
+          {
+            "end": 79,
+            "role": "secret",
+            "start": 24
+          }
+        ],
+        "id": "slack-token-bot-unicode-crlf"
+      },
+      "variant": "bot"
+    },
+    {
+      "context": "plain",
+      "contractView": {
+        "positiveMatchesExpectedRange": true,
+        "positiveVariant": "user",
+        "twinFlaggedByContract": false,
+        "twinMutationRetained": true
+      },
+      "family": "huggingface-token",
+      "issue": "https://github.com/redact-secret/redact-secret/issues/372",
+      "mutation": "length: 33 vs contracted 34",
+      "mutationKind": "length",
+      "negative": {
+        "actualBeta4": [
+          {
+            "end": 36,
+            "start": 0
+          }
+        ],
+        "assessment": {
+          "contract": "huggingface-token",
+          "kind": "must-not-flag",
+          "reason": "Negative twin of huggingface-token-user-plain: length: 33 vs contracted 34. Exactly one structural property differs from the positive; silence follows from construction.",
+          "sources": [
+            "https://github.com/trufflesecurity/trufflehog/blob/v3.97.4/pkg/detectors/huggingface/huggingface.go",
+            "https://github.com/gitleaks/gitleaks/blob/v8.30.1/config/gitleaks.toml"
+          ],
+          "tier": "T2"
+        },
+        "construction": {
+          "context": "plain",
+          "parts": [
+            {
+              "literal": "hf_"
+            },
+            {
+              "synthetic": {
+                "alphabet": "letters",
+                "label": "reviewed-formats:hf",
+                "length": 34,
+                "take": 33
+              }
+            }
+          ]
+        },
+        "contentBytes": 38,
+        "contentSha256": "4b235d58c77e38a19dc20c29bffcd46f2e826373c91ffc6f277aba53d581bb1a",
+        "expected": [],
+        "id": "huggingface-token-user-plain-twin",
+        "twinOf": "huggingface-token-user-plain"
+      },
+      "positive": {
+        "actualBeta4": [
+          {
+            "end": 37,
+            "start": 0
+          }
+        ],
+        "assessment": {
+          "contract": "huggingface-token",
+          "kind": "must-redact",
+          "reason": "Pinned source-backed lexical format; synthetic and never provider-issued. Any missing scanner support remains in the result.",
+          "sources": [
+            "https://github.com/trufflesecurity/trufflehog/blob/v3.97.4/pkg/detectors/huggingface/huggingface.go",
+            "https://github.com/gitleaks/gitleaks/blob/v8.30.1/config/gitleaks.toml"
+          ],
+          "tier": "T2"
+        },
+        "construction": {
+          "context": "plain",
+          "parts": [
+            {
+              "literal": "hf_"
+            },
+            {
+              "synthetic": {
+                "alphabet": "letters",
+                "label": "reviewed-formats:hf",
+                "length": 34
+              }
+            }
+          ]
+        },
+        "contentBytes": 39,
+        "contentSha256": "21e27f72d52e99a4609bd643708ddf08fe9448e05d8996a7c9efd2ac9886c5a2",
+        "expected": [
+          {
+            "end": 37,
+            "role": "secret",
+            "start": 0
+          }
+        ],
+        "id": "huggingface-token-user-plain"
+      },
+      "variant": "user"
+    },
+    {
+      "context": "unicode-crlf",
+      "contractView": {
+        "positiveMatchesExpectedRange": true,
+        "positiveVariant": "user",
+        "twinFlaggedByContract": false,
+        "twinMutationRetained": true
+      },
+      "family": "huggingface-token",
+      "issue": "https://github.com/redact-secret/redact-secret/issues/372",
+      "mutation": "length: 33 vs contracted 34",
+      "mutationKind": "length",
+      "negative": {
+        "actualBeta4": [
+          {
+            "end": 60,
+            "start": 24
+          }
+        ],
+        "assessment": {
+          "contract": "huggingface-token",
+          "kind": "must-not-flag",
+          "reason": "Negative twin of huggingface-token-user-unicode-crlf: length: 33 vs contracted 34. Exactly one structural property differs from the positive; silence follows from construction.",
+          "sources": [
+            "https://github.com/trufflesecurity/trufflehog/blob/v3.97.4/pkg/detectors/huggingface/huggingface.go",
+            "https://github.com/gitleaks/gitleaks/blob/v8.30.1/config/gitleaks.toml"
+          ],
+          "tier": "T2"
+        },
+        "construction": {
+          "context": "unicode-crlf",
+          "parts": [
+            {
+              "literal": "hf_"
+            },
+            {
+              "synthetic": {
+                "alphabet": "letters",
+                "label": "reviewed-formats:hf",
+                "length": 34,
+                "take": 33
+              }
+            }
+          ]
+        },
+        "contentBytes": 63,
+        "contentSha256": "aa10d38bf00e8c85239e96b0f0b289b3177c24f80583204b980d31725c9b3338",
+        "expected": [],
+        "id": "huggingface-token-user-unicode-crlf-twin",
+        "twinOf": "huggingface-token-user-unicode-crlf"
+      },
+      "positive": {
+        "actualBeta4": [
+          {
+            "end": 61,
+            "start": 24
+          }
+        ],
+        "assessment": {
+          "contract": "huggingface-token",
+          "kind": "must-redact",
+          "reason": "Pinned source-backed lexical format; synthetic and never provider-issued. Any missing scanner support remains in the result.",
+          "sources": [
+            "https://github.com/trufflesecurity/trufflehog/blob/v3.97.4/pkg/detectors/huggingface/huggingface.go",
+            "https://github.com/gitleaks/gitleaks/blob/v8.30.1/config/gitleaks.toml"
+          ],
+          "tier": "T2"
+        },
+        "construction": {
+          "context": "unicode-crlf",
+          "parts": [
+            {
+              "literal": "hf_"
+            },
+            {
+              "synthetic": {
+                "alphabet": "letters",
+                "label": "reviewed-formats:hf",
+                "length": 34
+              }
+            }
+          ]
+        },
+        "contentBytes": 64,
+        "contentSha256": "4a33dca6e566543380822bc8eaefb8a8c975b88e8451d2a4625e59876e8c5d21",
+        "expected": [
+          {
+            "end": 61,
+            "role": "secret",
+            "start": 24
+          }
+        ],
+        "id": "huggingface-token-user-unicode-crlf"
+      },
+      "variant": "user"
+    },
+    {
+      "context": "plain",
+      "contractView": {
+        "positiveMatchesExpectedRange": true,
+        "positiveVariant": "user",
+        "twinFlaggedByContract": false,
+        "twinMutationRetained": true
+      },
+      "family": "cloudflare-token",
+      "issue": "https://github.com/redact-secret/redact-secret/issues/373",
+      "mutation": "alphabet: non-hexadecimal eight-character suffix",
+      "mutationKind": "alphabet",
+      "negative": {
+        "actualBeta4": [
+          {
+            "end": 53,
+            "start": 0
+          }
+        ],
+        "assessment": {
+          "contract": "cloudflare-token",
+          "kind": "must-not-flag",
+          "reason": "Negative twin of cloudflare-token-user-plain: alphabet: non-hexadecimal eight-character suffix. Exactly one structural property differs from the positive; silence follows from construction.",
+          "sources": [
+            "https://developers.cloudflare.com/fundamentals/api/get-started/create-token/",
+            "https://github.com/trufflesecurity/trufflehog/blob/v3.97.4/pkg/detectors/cloudflareapitoken/v2/cloudflareapitoken.go"
+          ],
+          "tier": "T2"
+        },
+        "construction": {
+          "context": "plain",
+          "parts": [
+            {
+              "literal": "cfut_"
+            },
+            {
+              "synthetic": {
+                "alphabet": "alnum",
+                "label": "reviewed-formats:cf",
+                "length": 40
+              }
+            },
+            {
+              "literal": "ghijklmn"
+            }
+          ]
+        },
+        "contentBytes": 55,
+        "contentSha256": "674f10f3aab3cb2259789511a8137ee749d1e3f36cf750ddda3382b07acf75e2",
+        "expected": [],
+        "id": "cloudflare-token-user-plain-twin",
+        "twinOf": "cloudflare-token-user-plain"
+      },
+      "positive": {
+        "actualBeta4": [
+          {
+            "end": 53,
+            "start": 0
+          }
+        ],
+        "assessment": {
+          "contract": "cloudflare-token",
+          "kind": "must-redact",
+          "reason": "Pinned source-backed lexical format; synthetic and never provider-issued. Any missing scanner support remains in the result.",
+          "sources": [
+            "https://developers.cloudflare.com/fundamentals/api/get-started/create-token/",
+            "https://github.com/trufflesecurity/trufflehog/blob/v3.97.4/pkg/detectors/cloudflareapitoken/v2/cloudflareapitoken.go"
+          ],
+          "tier": "T1"
+        },
+        "construction": {
+          "context": "plain",
+          "parts": [
+            {
+              "literal": "cfut_"
+            },
+            {
+              "synthetic": {
+                "alphabet": "alnum",
+                "label": "reviewed-formats:cf",
+                "length": 40
+              }
+            },
+            {
+              "synthetic": {
+                "alphabet": "hex",
+                "label": "reviewed-formats:cf-suffix",
+                "length": 8
+              }
+            }
+          ]
+        },
+        "contentBytes": 55,
+        "contentSha256": "46371739be4e6468068609e107286bccafb0505ae984ca18cf1b3a5b74586af9",
+        "expected": [
+          {
+            "end": 53,
+            "role": "secret",
+            "start": 0
+          }
+        ],
+        "id": "cloudflare-token-user-plain"
+      },
+      "variant": "user"
+    },
+    {
+      "context": "unicode-crlf",
+      "contractView": {
+        "positiveMatchesExpectedRange": true,
+        "positiveVariant": "user",
+        "twinFlaggedByContract": false,
+        "twinMutationRetained": true
+      },
+      "family": "cloudflare-token",
+      "issue": "https://github.com/redact-secret/redact-secret/issues/373",
+      "mutation": "alphabet: non-hexadecimal eight-character suffix",
+      "mutationKind": "alphabet",
+      "negative": {
+        "actualBeta4": [
+          {
+            "end": 77,
+            "start": 24
+          }
+        ],
+        "assessment": {
+          "contract": "cloudflare-token",
+          "kind": "must-not-flag",
+          "reason": "Negative twin of cloudflare-token-user-unicode-crlf: alphabet: non-hexadecimal eight-character suffix. Exactly one structural property differs from the positive; silence follows from construction.",
+          "sources": [
+            "https://developers.cloudflare.com/fundamentals/api/get-started/create-token/",
+            "https://github.com/trufflesecurity/trufflehog/blob/v3.97.4/pkg/detectors/cloudflareapitoken/v2/cloudflareapitoken.go"
+          ],
+          "tier": "T2"
+        },
+        "construction": {
+          "context": "unicode-crlf",
+          "parts": [
+            {
+              "literal": "cfut_"
+            },
+            {
+              "synthetic": {
+                "alphabet": "alnum",
+                "label": "reviewed-formats:cf",
+                "length": 40
+              }
+            },
+            {
+              "literal": "ghijklmn"
+            }
+          ]
+        },
+        "contentBytes": 80,
+        "contentSha256": "36dbc4cb9aa5cdd2ba2609d1f099ac170b35e37aa8184a574a32d6bd16054ff8",
+        "expected": [],
+        "id": "cloudflare-token-user-unicode-crlf-twin",
+        "twinOf": "cloudflare-token-user-unicode-crlf"
+      },
+      "positive": {
+        "actualBeta4": [
+          {
+            "end": 77,
+            "start": 24
+          }
+        ],
+        "assessment": {
+          "contract": "cloudflare-token",
+          "kind": "must-redact",
+          "reason": "Pinned source-backed lexical format; synthetic and never provider-issued. Any missing scanner support remains in the result.",
+          "sources": [
+            "https://developers.cloudflare.com/fundamentals/api/get-started/create-token/",
+            "https://github.com/trufflesecurity/trufflehog/blob/v3.97.4/pkg/detectors/cloudflareapitoken/v2/cloudflareapitoken.go"
+          ],
+          "tier": "T1"
+        },
+        "construction": {
+          "context": "unicode-crlf",
+          "parts": [
+            {
+              "literal": "cfut_"
+            },
+            {
+              "synthetic": {
+                "alphabet": "alnum",
+                "label": "reviewed-formats:cf",
+                "length": 40
+              }
+            },
+            {
+              "synthetic": {
+                "alphabet": "hex",
+                "label": "reviewed-formats:cf-suffix",
+                "length": 8
+              }
+            }
+          ]
+        },
+        "contentBytes": 80,
+        "contentSha256": "ca723c73d272cc5b12783b77c74f05b9c5fe2c824e80d151f5cf25c27aa54164",
+        "expected": [
+          {
+            "end": 77,
+            "role": "secret",
+            "start": 24
+          }
+        ],
+        "id": "cloudflare-token-user-unicode-crlf"
+      },
+      "variant": "user"
+    },
+    {
+      "context": "plain",
+      "contractView": {
+        "positiveMatchesExpectedRange": true,
+        "positiveVariant": "api",
+        "twinFlaggedByContract": false,
+        "twinMutationRetained": true
+      },
+      "family": "linear-token",
+      "issue": "https://github.com/redact-secret/redact-secret/issues/374",
+      "mutation": "length: 39 vs contracted 40",
+      "mutationKind": "length",
+      "negative": {
+        "actualBeta4": [
+          {
+            "end": 47,
+            "start": 0
+          }
+        ],
+        "assessment": {
+          "contract": "linear-token",
+          "kind": "must-not-flag",
+          "reason": "Negative twin of linear-token-api-plain: length: 39 vs contracted 40. Exactly one structural property differs from the positive; silence follows from construction.",
+          "sources": [
+            "https://github.com/trufflesecurity/trufflehog/blob/v3.97.4/pkg/detectors/linearapi/linearapi.go",
+            "https://github.com/gitleaks/gitleaks/blob/v8.30.1/config/gitleaks.toml"
+          ],
+          "tier": "T2"
+        },
+        "construction": {
+          "context": "plain",
+          "parts": [
+            {
+              "literal": "lin_api_"
+            },
+            {
+              "synthetic": {
+                "alphabet": "alnum",
+                "label": "reviewed-formats:linear",
+                "length": 40,
+                "take": 39
+              }
+            }
+          ]
+        },
+        "contentBytes": 49,
+        "contentSha256": "6261a939d5c2eca3ed638bc7c850a9cb7f0763b3cd60c2db787ef42da52396cc",
+        "expected": [],
+        "id": "linear-token-api-plain-twin",
+        "twinOf": "linear-token-api-plain"
+      },
+      "positive": {
+        "actualBeta4": [
+          {
+            "end": 48,
+            "start": 0
+          }
+        ],
+        "assessment": {
+          "contract": "linear-token",
+          "kind": "must-redact",
+          "reason": "Pinned source-backed lexical format; synthetic and never provider-issued. Any missing scanner support remains in the result.",
+          "sources": [
+            "https://github.com/trufflesecurity/trufflehog/blob/v3.97.4/pkg/detectors/linearapi/linearapi.go",
+            "https://github.com/gitleaks/gitleaks/blob/v8.30.1/config/gitleaks.toml"
+          ],
+          "tier": "T2"
+        },
+        "construction": {
+          "context": "plain",
+          "parts": [
+            {
+              "literal": "lin_api_"
+            },
+            {
+              "synthetic": {
+                "alphabet": "alnum",
+                "label": "reviewed-formats:linear",
+                "length": 40
+              }
+            }
+          ]
+        },
+        "contentBytes": 50,
+        "contentSha256": "02095165a22c1495664bd9f0fdde8144729c08af1c4fb97c6151b6f3dcaab9f0",
+        "expected": [
+          {
+            "end": 48,
+            "role": "secret",
+            "start": 0
+          }
+        ],
+        "id": "linear-token-api-plain"
+      },
+      "variant": "api"
+    },
+    {
+      "context": "unicode-crlf",
+      "contractView": {
+        "positiveMatchesExpectedRange": true,
+        "positiveVariant": "api",
+        "twinFlaggedByContract": false,
+        "twinMutationRetained": true
+      },
+      "family": "linear-token",
+      "issue": "https://github.com/redact-secret/redact-secret/issues/374",
+      "mutation": "length: 39 vs contracted 40",
+      "mutationKind": "length",
+      "negative": {
+        "actualBeta4": [
+          {
+            "end": 71,
+            "start": 24
+          }
+        ],
+        "assessment": {
+          "contract": "linear-token",
+          "kind": "must-not-flag",
+          "reason": "Negative twin of linear-token-api-unicode-crlf: length: 39 vs contracted 40. Exactly one structural property differs from the positive; silence follows from construction.",
+          "sources": [
+            "https://github.com/trufflesecurity/trufflehog/blob/v3.97.4/pkg/detectors/linearapi/linearapi.go",
+            "https://github.com/gitleaks/gitleaks/blob/v8.30.1/config/gitleaks.toml"
+          ],
+          "tier": "T2"
+        },
+        "construction": {
+          "context": "unicode-crlf",
+          "parts": [
+            {
+              "literal": "lin_api_"
+            },
+            {
+              "synthetic": {
+                "alphabet": "alnum",
+                "label": "reviewed-formats:linear",
+                "length": 40,
+                "take": 39
+              }
+            }
+          ]
+        },
+        "contentBytes": 74,
+        "contentSha256": "f06173660731e46cc1e1db47712304c6bc45532bffd4aa74d1b385a8107cea34",
+        "expected": [],
+        "id": "linear-token-api-unicode-crlf-twin",
+        "twinOf": "linear-token-api-unicode-crlf"
+      },
+      "positive": {
+        "actualBeta4": [
+          {
+            "end": 72,
+            "start": 24
+          }
+        ],
+        "assessment": {
+          "contract": "linear-token",
+          "kind": "must-redact",
+          "reason": "Pinned source-backed lexical format; synthetic and never provider-issued. Any missing scanner support remains in the result.",
+          "sources": [
+            "https://github.com/trufflesecurity/trufflehog/blob/v3.97.4/pkg/detectors/linearapi/linearapi.go",
+            "https://github.com/gitleaks/gitleaks/blob/v8.30.1/config/gitleaks.toml"
+          ],
+          "tier": "T2"
+        },
+        "construction": {
+          "context": "unicode-crlf",
+          "parts": [
+            {
+              "literal": "lin_api_"
+            },
+            {
+              "synthetic": {
+                "alphabet": "alnum",
+                "label": "reviewed-formats:linear",
+                "length": 40
+              }
+            }
+          ]
+        },
+        "contentBytes": 75,
+        "contentSha256": "d9a492565609d27ebb008b5b5dc9fc203657a4f5f702daa8c6583f8a13991acb",
+        "expected": [
+          {
+            "end": 72,
+            "role": "secret",
+            "start": 24
+          }
+        ],
+        "id": "linear-token-api-unicode-crlf"
+      },
+      "variant": "api"
+    }
+  ],
+  "provenance": {
+    "benchmarkRevision": "2f3d1c051e3a9f4c776835c939cd0b3c5d560533",
+    "benchmarkRevisionDirty": true,
+    "benchmarkRunId": "2026-09-17T21:26:02.204Z-3390af",
+    "benchmarkRunNote": "Local run cited by issues #367-#376. It is not persisted as a baseline in the benchmark repository; the persisted beta.4 baseline is runId 2026-09-17T18:58:05.028Z-fe936e over the same common-formats corpus hash. Neither run is claimed to be reproducible from the revision alone.",
+    "corpusSha256": "19ca47f5dbf21acc94c6712a51d6586c9fd1653b3da132172622c0e7c4b08fb8",
+    "corpusTotals": {
+      "common-formats must-not-flag/T2": {
+        "files": 50,
+        "flaggedFiles": 24
+      },
+      "must-not-flag/T1": {
+        "files": 6,
+        "flaggedFiles": 0
+      },
+      "must-not-flag/T2": {
+        "files": 114,
+        "flaggedFiles": 24
+      },
+      "must-not-flag/T3": {
+        "files": 104,
+        "flaggedFiles": 0
+      },
+      "must-redact/T1": {
+        "leakedSpans": 0,
+        "spans": 135
+      },
+      "must-redact/T2": {
+        "leakedSpans": 0,
+        "spans": 60
+      }
+    },
+    "corpusTotalsNote": "Copied from the issue provenance block. Tiers are never aggregated into a product accuracy score.",
+    "generator": {
+      "contexts": {
+        "plain": {
+          "after": "\n",
+          "before": ""
+        },
+        "unicode-crlf": {
+          "after": "\r\n",
+          "before": "# 🔑 reviewed format\r\n"
+        }
+      },
+      "labelPrefix": "reviewed-formats:",
+      "layout": "before + token + \"\\n\" + after; offsets are UTF-8 bytes [start, end)",
+      "seedFormat": "sha256(\"secret-benchmark:never-issued:v2:<label>:<block>\") bytes, each mapped to alphabet[byte % len]",
+      "source": "redact-secret-benchmarks fixtures/generated/build.mjs `synthetic()` and fixtures/generated/common-formats.mjs"
+    },
+    "liveVerification": "none; every value is synthetic and never provider-issued",
+    "measurementProtocol": "v4",
+    "package": "@redact-secret/core@0.1.0-beta.4 (published), default detectors",
+    "scanners": {
+      "gitleaks": "8.30.1",
+      "redact-secret": "0.1.0-beta.4",
+      "trufflehog": "3.97.4"
+    },
+    "snapshotSource": "Self-contained synthetic reproduction blocks in issues #368, #369, #370, #371, #372, #373 and #374, read 2026-09-17."
+  },
+  "schemaVersion": 1
+}

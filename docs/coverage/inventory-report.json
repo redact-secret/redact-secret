@@ -674,13 +674,16 @@
     {
       "detector": "digitalocean-token",
       "evidence": {
-        "fixtureCount": 25,
+        "fixtureCount": 57,
         "hostContextsExercised": [
           "dotenv",
+          "http",
           "json",
           "log",
+          "markdown",
           "plain-text",
           "shell",
+          "toml",
           "yaml"
         ],
         "kindsWithSupportedEvidence": [
@@ -697,15 +700,29 @@
       "evidenceFixtureIds": [
         "digitalocean-positive-all-prefixes",
         "digitalocean-positive-crlf-unicode-prefix",
-        "digitalocean-positive-doc-style-placeholder",
         "digitalocean-positive-dotenv",
+        "digitalocean-positive-hex-placeholder",
         "digitalocean-positive-json",
         "digitalocean-positive-log",
-        "digitalocean-positive-min-length",
+        "digitalocean-positive-markdown-code-span",
+        "digitalocean-positive-markdown-fenced-block",
+        "digitalocean-positive-oauth-access-prefix",
+        "digitalocean-positive-oauth-refresh-prefix",
         "digitalocean-positive-punctuation-adjacent",
+        "digitalocean-positive-punctuation-boundary",
         "digitalocean-positive-qualified",
+        "digitalocean-positive-quoted",
         "digitalocean-positive-repeated-value",
-        "digitalocean-positive-yaml"
+        "digitalocean-positive-shell-export",
+        "digitalocean-positive-toml",
+        "digitalocean-positive-url-query",
+        "digitalocean-positive-yaml",
+        "digitalocean-regression-doo-plain",
+        "digitalocean-regression-doo-unicode-crlf",
+        "digitalocean-regression-dop-plain",
+        "digitalocean-regression-dop-unicode-crlf",
+        "digitalocean-regression-dor-plain",
+        "digitalocean-regression-dor-unicode-crlf"
       ],
       "policyClass": "always-redact",
       "schemeRows": "not-applicable",

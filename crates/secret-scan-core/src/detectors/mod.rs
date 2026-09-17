@@ -264,7 +264,10 @@ mod tests {
             ("huggingface-token", "hf_SYNTHETICREVOKEDPROVIDERVALUE"),
             ("docker-token", "dckr_pat_SYNTHETICREVOKEDPROVIDERVALUE"),
             ("cloudflare-token", "cfut_SYNTHETICREVOKEDPROVIDERVALUE"),
-            ("digitalocean-token", "dop_v1_SYNTHETICREVOKEDPROVIDERVALUE"),
+            (
+                "digitalocean-token",
+                "dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9",
+            ),
             ("linear-token", "lin_api_SYNTHETICREVOKEDPROVIDERVALUE"),
             ("supabase-token", "sb_secret_SYNTHETICREVOKEDPROVIDERVALUE"),
             ("vercel-token", "vcp_SYNTHETICREVOKEDPROVIDERVALUE"),

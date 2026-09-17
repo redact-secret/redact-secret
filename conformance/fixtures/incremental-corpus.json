@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 63,
+  "fixtureCount": 65,
   "fixtures": [
     {
       "id": "synthetic-regression-malformed-authority",
@@ -59,7 +59,7 @@
     },
     {
       "id": "additional-provider-families",
-      "input": "sk_live_SYNTHETICREVOKEDSYNTHETICREVOKED\nxoxb-SYNTHETIC-REVOKED-SYNTHETIC-REVOKED-\npypi-SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\nhf_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\ndckr_pat_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\ncfut_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\ndop_v1_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\nlin_api_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\nsb_secret_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\nvcp_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_",
+      "input": "sk_live_SYNTHETICREVOKEDSYNTHETICREVOKED\nxoxb-SYNTHETIC-REVOKED-SYNTHETIC-REVOKED-\npypi-SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\nhf_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\ndckr_pat_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\ncfut_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\ndop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9\nlin_api_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\nsb_secret_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\nvcp_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_",
       "text": "<SECRET_1>\n<SECRET_2>\n<SECRET_3>\n<SECRET_4>\n<SECRET_5>\n<SECRET_6>\n<SECRET_7>\n<SECRET_8>\n<SECRET_9>\n<SECRET_10>",
       "expected": [
         {
@@ -116,34 +116,34 @@
           "confidence": "high",
           "specificity": "provider",
           "start": 307,
-          "end": 350
+          "end": 378
         },
         {
           "detector": "linear-token",
           "type": "linear_token",
           "confidence": "high",
           "specificity": "provider",
-          "start": 351,
-          "end": 395
+          "start": 379,
+          "end": 423
         },
         {
           "detector": "supabase-token",
           "type": "supabase_secret_key",
           "confidence": "high",
           "specificity": "provider",
-          "start": 396,
-          "end": 442
+          "start": 424,
+          "end": 470
         },
         {
           "detector": "vercel-token",
           "type": "vercel_token",
           "confidence": "high",
           "specificity": "provider",
-          "start": 443,
-          "end": 483
+          "start": 471,
+          "end": 511
         }
       ],
-      "note": "Every newly qualified variable-length provider family remains whole across partitions."
+      "note": "Every newly qualified variable-length provider family remains whole across partitions. The DigitalOcean line carries the reviewed exact 64-byte hex contract (issue #369); later offsets shifted accordingly."
     },
     {
       "id": "fixed-width-unicode",
@@ -897,19 +897,51 @@
     },
     {
       "id": "digitalocean-embedded-identifier-discriminating-boundary",
-      "input": "legacydop_v1_SYNTHETIC_EMBEDDED_NOT_A_MATCH\ndop_v1_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_",
-      "text": "legacydop_v1_SYNTHETIC_EMBEDDED_NOT_A_MATCH\n<SECRET_1>",
+      "input": "legacydop_v1_025343c0555235768c29735f523ad644fbfe1569b1d88f46b4f506628ae8b08a\ndop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9",
+      "text": "legacydop_v1_025343c0555235768c29735f523ad644fbfe1569b1d88f46b4f506628ae8b08a\n<SECRET_1>",
       "expected": [
         {
           "detector": "digitalocean-token",
           "type": "digitalocean_token",
           "confidence": "high",
           "specificity": "provider",
-          "start": 44,
-          "end": 87
+          "start": 78,
+          "end": 149
         }
       ],
-      "note": "issue #320: a wider benign identifier the digitalocean-token prefix is embedded in (a leading alnum/dash byte immediately before the documented prefix means it is a truncated slice of a longer identifier, not a boundary-delimited credential) on one line, and a real boundary-delimited token on the next, stay correctly discriminated at every chunk split, including splits that fall inside either prefix's own bytes."
+      "note": "issue #320: a wider benign identifier the digitalocean-token prefix is embedded in (a leading alnum/dash byte immediately before the documented prefix means it is a truncated slice of a longer identifier, not a boundary-delimited credential) on one line, and a real boundary-delimited token on the next, stay correctly discriminated at every chunk split, including splits that fall inside either prefix's own bytes. Both lines carry a reviewed exact 64-byte hex body (issue #369); the embedded line uses a different synthetic body so that no released safe output ever contains the bytes of the detected value on the next line."
+    },
+    {
+      "id": "digitalocean-length-twin-discriminating-boundary",
+      "input": "dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad\ndop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9\n",
+      "text": "dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad\n<SECRET_1>\n",
+      "expected": [
+        {
+          "detector": "digitalocean-token",
+          "type": "digitalocean_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 71,
+          "end": 142
+        }
+      ],
+      "note": "issue #369: a 63-byte negative twin on one line and its paired 64-byte positive on the next stay correctly discriminated at every chunk split, including splits that fall on the final body byte -- the single byte that distinguishes them -- and inside either prefix."
+    },
+    {
+      "id": "digitalocean-length-twin-unicode-crlf-boundary",
+      "input": "# 🔑 reviewed format\r\ndop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad\n\r\n# 🔑 reviewed format\r\ndoo_v1_025343c0555235768c29735f523ad644fbfe1569b1d88f46b4f506628ae8b08a\n\r\n",
+      "text": "# 🔑 reviewed format\r\ndop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad\n\r\n# 🔑 reviewed format\r\n<SECRET_1>\n\r\n",
+      "expected": [
+        {
+          "detector": "digitalocean-token",
+          "type": "digitalocean_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 121,
+          "end": 192
+        }
+      ],
+      "note": "issue #369: the benchmark's Unicode/CRLF framing around a 63-byte twin and a paired 64-byte positive (a different documented prefix) reproduces the whole-input result at every UTF-8 byte partition, including splits inside the multi-byte emoji, inside the CRLF pair, and on the distinguishing final body byte."
     },
     {
       "id": "docker-embedded-identifier-discriminating-boundary",
