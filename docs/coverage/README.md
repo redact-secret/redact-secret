@@ -169,6 +169,17 @@ Tests: `python3 -B -m unittest discover -s scripts/tests -p 'test_generate_cover
     --out docs/coverage/fp-fn-summary-320.json
   ```
 
+- [`fp-fn-summary-322.json`](./fp-fn-summary-322.json) — the same report for
+  issue [#322](https://github.com/redact-secret/redact-secret/issues/322)'s
+  `private-key` coverage:
+
+  ```sh
+  python3 -B scripts/generate-fp-fn-summary.py \
+    --detector private-key \
+    --issue https://github.com/redact-secret/redact-secret/issues/322 \
+    --out docs/coverage/fp-fn-summary-322.json
+  ```
+
   Tests: `python3 -B -m unittest discover -s scripts/tests -p 'test_generate_fp_fn_summary.py'`.
 
 ## Coverage drift is a CI failure
