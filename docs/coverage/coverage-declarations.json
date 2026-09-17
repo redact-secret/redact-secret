@@ -721,8 +721,15 @@
           "dimension": "positive",
           "evidenceFixtureIds": [
             "vault-positive-all-prefixes",
+            "vault-positive-crlf-unicode-prefix",
+            "vault-positive-doc-style-placeholder",
+            "vault-positive-dotenv",
+            "vault-positive-json",
+            "vault-positive-log",
             "vault-positive-min-length",
-            "vault-positive-service-token"
+            "vault-positive-punctuation-adjacent",
+            "vault-positive-service-token",
+            "vault-positive-yaml"
           ],
           "state": "supported"
         },
@@ -755,6 +762,10 @@
           "dimension": "near-miss-negative",
           "evidenceFixtureIds": [
             "vault-negative-common-identifier",
+            "vault-negative-embedded-in-wider-identifier",
+            "vault-negative-interpolated-secret-prefix",
+            "vault-negative-masked-secret-prefix",
+            "vault-negative-path-namespace-and-version",
             "vault-negative-placeholder"
           ],
           "state": "supported"
@@ -1162,8 +1173,15 @@
           "dimension": "positive",
           "evidenceFixtureIds": [
             "docker-positive-all-prefixes",
+            "docker-positive-crlf-unicode-prefix",
+            "docker-positive-doc-style-placeholder",
+            "docker-positive-dotenv",
+            "docker-positive-json",
+            "docker-positive-log",
             "docker-positive-min-length",
-            "docker-positive-qualified"
+            "docker-positive-punctuation-adjacent",
+            "docker-positive-qualified",
+            "docker-positive-yaml"
           ],
           "state": "supported"
         },
@@ -1195,9 +1213,13 @@
         {
           "dimension": "near-miss-negative",
           "evidenceFixtureIds": [
+            "docker-negative-embedded-in-wider-identifier",
+            "docker-negative-interpolated-secret-prefix",
             "docker-negative-lookalike",
+            "docker-negative-masked-secret-prefix",
             "docker-negative-ordinary-reference",
-            "docker-negative-placeholder"
+            "docker-negative-placeholder",
+            "docker-negative-registry-image-reference"
           ],
           "state": "supported"
         },
@@ -1246,8 +1268,15 @@
         {
           "dimension": "positive",
           "evidenceFixtureIds": [
+            "cloudflare-positive-crlf-unicode-prefix",
+            "cloudflare-positive-doc-style-placeholder",
+            "cloudflare-positive-dotenv",
+            "cloudflare-positive-json",
+            "cloudflare-positive-log",
             "cloudflare-positive-min-length",
-            "cloudflare-positive-qualified"
+            "cloudflare-positive-punctuation-adjacent",
+            "cloudflare-positive-qualified",
+            "cloudflare-positive-yaml"
           ],
           "state": "supported"
         },
@@ -1279,9 +1308,13 @@
         {
           "dimension": "near-miss-negative",
           "evidenceFixtureIds": [
+            "cloudflare-negative-embedded-in-wider-identifier",
+            "cloudflare-negative-interpolated-secret-prefix",
             "cloudflare-negative-lookalike",
+            "cloudflare-negative-masked-secret-prefix",
             "cloudflare-negative-ordinary-reference",
-            "cloudflare-negative-placeholder"
+            "cloudflare-negative-placeholder",
+            "cloudflare-negative-zone-resource-id"
           ],
           "state": "supported"
         },
@@ -1331,8 +1364,15 @@
           "dimension": "positive",
           "evidenceFixtureIds": [
             "digitalocean-positive-all-prefixes",
+            "digitalocean-positive-crlf-unicode-prefix",
+            "digitalocean-positive-doc-style-placeholder",
+            "digitalocean-positive-dotenv",
+            "digitalocean-positive-json",
+            "digitalocean-positive-log",
             "digitalocean-positive-min-length",
-            "digitalocean-positive-qualified"
+            "digitalocean-positive-punctuation-adjacent",
+            "digitalocean-positive-qualified",
+            "digitalocean-positive-yaml"
           ],
           "state": "supported"
         },
@@ -1364,9 +1404,13 @@
         {
           "dimension": "near-miss-negative",
           "evidenceFixtureIds": [
+            "digitalocean-negative-embedded-in-wider-identifier",
+            "digitalocean-negative-interpolated-secret-prefix",
             "digitalocean-negative-lookalike",
+            "digitalocean-negative-masked-secret-prefix",
             "digitalocean-negative-ordinary-reference",
-            "digitalocean-negative-placeholder"
+            "digitalocean-negative-placeholder",
+            "digitalocean-negative-resource-id"
           ],
           "state": "supported"
         },
@@ -1597,8 +1641,15 @@
           "dimension": "positive",
           "evidenceFixtureIds": [
             "vercel-positive-all-prefixes",
+            "vercel-positive-crlf-unicode-prefix",
+            "vercel-positive-doc-style-placeholder",
+            "vercel-positive-dotenv",
+            "vercel-positive-json",
+            "vercel-positive-log",
             "vercel-positive-min-length",
-            "vercel-positive-qualified"
+            "vercel-positive-punctuation-adjacent",
+            "vercel-positive-qualified",
+            "vercel-positive-yaml"
           ],
           "state": "supported"
         },
@@ -1630,7 +1681,11 @@
         {
           "dimension": "near-miss-negative",
           "evidenceFixtureIds": [
+            "vercel-negative-deployment-id",
+            "vercel-negative-embedded-in-wider-identifier",
+            "vercel-negative-interpolated-secret-prefix",
             "vercel-negative-lookalike",
+            "vercel-negative-masked-secret-prefix",
             "vercel-negative-ordinary-reference",
             "vercel-negative-placeholder"
           ],
@@ -4104,6 +4159,7 @@
             "anthropic-legacy-versioned-prefix-discriminating-boundary",
             "aws-access-key-exact-length-discriminating-boundary",
             "aws-contextual-assignment",
+            "cloudflare-embedded-identifier-discriminating-boundary",
             "contextual-assignment",
             "contextual-assignment-consecutive-nested-keys",
             "contextual-assignment-credential-under-auth-key",
@@ -4118,6 +4174,8 @@
             "contextual-assignment-stops-at-line-terminator",
             "datadog-api-key-line-scoped-context-different-line",
             "datadog-api-key-line-scoped-context-same-line",
+            "digitalocean-embedded-identifier-discriminating-boundary",
+            "docker-embedded-identifier-discriminating-boundary",
             "encoded-connection",
             "fixed-width-unicode",
             "github-installation-stateless",
@@ -4142,7 +4200,9 @@
             "truncated-private-key",
             "twilio-auth-token-line-scoped-context-different-line",
             "twilio-auth-token-line-scoped-context-same-line",
-            "variable-provider"
+            "variable-provider",
+            "vault-embedded-identifier-discriminating-boundary",
+            "vercel-embedded-identifier-discriminating-boundary"
           ],
           "state": "supported"
         },
@@ -4364,6 +4424,7 @@
             "anthropic-legacy-versioned-prefix-discriminating-boundary",
             "aws-access-key-exact-length-discriminating-boundary",
             "aws-contextual-assignment",
+            "cloudflare-embedded-identifier-discriminating-boundary",
             "contextual-assignment",
             "contextual-assignment-consecutive-nested-keys",
             "contextual-assignment-credential-under-auth-key",
@@ -4378,6 +4439,8 @@
             "contextual-assignment-stops-at-line-terminator",
             "datadog-api-key-line-scoped-context-different-line",
             "datadog-api-key-line-scoped-context-same-line",
+            "digitalocean-embedded-identifier-discriminating-boundary",
+            "docker-embedded-identifier-discriminating-boundary",
             "encoded-connection",
             "fixed-width-unicode",
             "github-installation-stateless",
@@ -4402,7 +4465,9 @@
             "truncated-private-key",
             "twilio-auth-token-line-scoped-context-different-line",
             "twilio-auth-token-line-scoped-context-same-line",
-            "variable-provider"
+            "variable-provider",
+            "vault-embedded-identifier-discriminating-boundary",
+            "vercel-embedded-identifier-discriminating-boundary"
           ],
           "state": "supported"
         },
@@ -4740,6 +4805,7 @@
             "anthropic-legacy-versioned-prefix-discriminating-boundary",
             "aws-access-key-exact-length-discriminating-boundary",
             "aws-contextual-assignment",
+            "cloudflare-embedded-identifier-discriminating-boundary",
             "contextual-assignment",
             "contextual-assignment-consecutive-nested-keys",
             "contextual-assignment-credential-under-auth-key",
@@ -4754,6 +4820,8 @@
             "contextual-assignment-stops-at-line-terminator",
             "datadog-api-key-line-scoped-context-different-line",
             "datadog-api-key-line-scoped-context-same-line",
+            "digitalocean-embedded-identifier-discriminating-boundary",
+            "docker-embedded-identifier-discriminating-boundary",
             "encoded-connection",
             "fixed-width-unicode",
             "github-installation-stateless",
@@ -4778,7 +4846,9 @@
             "truncated-private-key",
             "twilio-auth-token-line-scoped-context-different-line",
             "twilio-auth-token-line-scoped-context-same-line",
-            "variable-provider"
+            "variable-provider",
+            "vault-embedded-identifier-discriminating-boundary",
+            "vercel-embedded-identifier-discriminating-boundary"
           ],
           "state": "supported"
         },
