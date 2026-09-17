@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 768,
+  "fixtureCount": 786,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -7147,6 +7147,219 @@
       "note": "Trailing prose punctuation immediately after the suffix correctly bounds the match instead of being folded into it or suppressing the finding."
     },
     {
+      "id": "openai-positive-json",
+      "detector": "openai-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"apiKey\": \"sk-proj-SYNTHETIC_REVOKED_CONFORMANCE_KEY\"}",
+      "expected": [
+        {
+          "detector": "openai-token",
+          "type": "openai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 12,
+          "end": 53
+        }
+      ],
+      "note": "A quoted JSON string value is detected the same as a bare one; the enclosing quotes are not part of the match."
+    },
+    {
+      "id": "openai-positive-yaml",
+      "detector": "openai-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "openai_api_key: sk-proj-SYNTHETIC_REVOKED_CONFORMANCE_KEY\n",
+      "expected": [
+        {
+          "detector": "openai-token",
+          "type": "openai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 16,
+          "end": 57
+        }
+      ],
+      "note": "A YAML mapping value is detected the same as a bare one."
+    },
+    {
+      "id": "openai-positive-log",
+      "detector": "openai-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-16T00:00:00Z INFO calling openai key=sk-proj-SYNTHETIC_REVOKED_CONFORMANCE_KEY status=200",
+      "expected": [
+        {
+          "detector": "openai-token",
+          "type": "openai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 45,
+          "end": 86
+        }
+      ],
+      "note": "A provider token embedded in a structured log line is still detected."
+    },
+    {
+      "id": "openai-positive-shell-quoted",
+      "detector": "openai-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export OPENAI_API_KEY=\"sk-proj-SYNTHETIC_REVOKED_CONFORMANCE_KEY\"\n",
+      "expected": [
+        {
+          "detector": "openai-token",
+          "type": "openai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 23,
+          "end": 64
+        }
+      ],
+      "note": "A double-quoted shell export value is detected the same as a bare one; the enclosing quotes are not part of the match."
+    },
+    {
+      "id": "openai-positive-yaml-crlf",
+      "detector": "openai-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "openai_api_key: sk-proj-SYNTHETIC_REVOKED_CONFORMANCE_KEY\r\n",
+      "expected": [
+        {
+          "detector": "openai-token",
+          "type": "openai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 16,
+          "end": 57
+        }
+      ],
+      "note": "A CRLF line terminator immediately after the match is not folded into it and does not suppress it."
+    },
+    {
+      "id": "openai-positive-repeated-value",
+      "detector": "openai-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk-proj-SYNTHETIC_REVOKED_CONFORMANCE_KEY sk-proj-SYNTHETIC_REVOKED_CONFORMANCE_KEY",
+      "expected": [
+        {
+          "detector": "openai-token",
+          "type": "openai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 41
+        },
+        {
+          "detector": "openai-token",
+          "type": "openai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 42,
+          "end": 83
+        }
+      ],
+      "note": "An identical value repeated in the same input is reported once per independent occurrence, not deduplicated."
+    },
+    {
+      "id": "openai-negative-near-prefix-underscore",
+      "detector": "openai-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk_proj_SYNTHETIC_REVOKED_CONFORMANCE_KEY",
+      "expected": [],
+      "note": "An underscore-delimited near-miss of the documented 'sk-' prefix is prose about the shape, not the literal dash-delimited prefix, and is not classified."
+    },
+    {
+      "id": "openai-positive-namespace-separation-all-variants",
+      "detector": "openai-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk-SYNTHETIC_REVOKED_CONFORMANCE_KEY\nsk-proj-SYNTHETIC_REVOKED_CONFORMANCE_KEY\nsk-svcacct-SYNTHETIC_REVOKED_CONFORMANCE_KEY",
+      "expected": [
+        {
+          "detector": "openai-token",
+          "type": "openai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 36
+        },
+        {
+          "detector": "openai-token",
+          "type": "openai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 37,
+          "end": 78
+        },
+        {
+          "detector": "openai-token",
+          "type": "openai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 79,
+          "end": 123
+        }
+      ],
+      "note": "The legacy (bare), project, and service-account namespaces are all independently recognized in the same input without one suppressing another."
+    },
+    {
+      "id": "openai-positive-unicode-byte-offset",
+      "detector": "openai-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\ud83d\udd11 Authorization: Bearer sk-proj-SYNTHETIC_REVOKED_CONFORMANCE_KEY",
+      "expected": [
+        {
+          "detector": "openai-token",
+          "type": "openai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 27,
+          "end": 68
+        }
+      ],
+      "note": "A preceding astral-plane emoji (a 4-byte UTF-8 sequence, a UTF-16 surrogate pair) shifts the match's UTF-8 byte offsets; the range is still exact."
+    },
+    {
       "id": "anthropic-positive-versioned",
       "detector": "anthropic-token",
       "kind": "positive",
@@ -7405,6 +7618,194 @@
       "input": "sk-ant-SYNTHETIC_REVOKED_LEGACY_ANTHROPIC_KEY_VALUE",
       "expected": [],
       "note": "An unversioned 'sk-ant-' value (no 'api03' segment) can be a genuine older or shortened Anthropic key, but is not classified by any detector: openai-token excludes the whole 'sk-ant-' namespace on the assumption anthropic-token owns it, and anthropic-token requires the versioned prefix. This is a documented, accepted false-negative tradeoff for precision, not an oversight, and is distinct from openai-negative-lookalike, which only shows the openai-token side of the exclusion."
+    },
+    {
+      "id": "anthropic-positive-json",
+      "detector": "anthropic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"apiKey\": \"sk-ant-api03-SYNTHETIC_REVOKED_CONFORMANCE_KEY\"}",
+      "expected": [
+        {
+          "detector": "anthropic-token",
+          "type": "anthropic_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 12,
+          "end": 58
+        }
+      ],
+      "note": "A quoted JSON string value is detected the same as a bare one; the enclosing quotes are not part of the match."
+    },
+    {
+      "id": "anthropic-positive-yaml",
+      "detector": "anthropic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "anthropic_api_key: sk-ant-api03-SYNTHETIC_REVOKED_CONFORMANCE_KEY\n",
+      "expected": [
+        {
+          "detector": "anthropic-token",
+          "type": "anthropic_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 19,
+          "end": 65
+        }
+      ],
+      "note": "A YAML mapping value is detected the same as a bare one."
+    },
+    {
+      "id": "anthropic-positive-log",
+      "detector": "anthropic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-16T00:00:00Z INFO calling anthropic key=sk-ant-api03-SYNTHETIC_REVOKED_CONFORMANCE_KEY status=200",
+      "expected": [
+        {
+          "detector": "anthropic-token",
+          "type": "anthropic_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 48,
+          "end": 94
+        }
+      ],
+      "note": "A provider token embedded in a structured log line is still detected."
+    },
+    {
+      "id": "anthropic-positive-shell-quoted",
+      "detector": "anthropic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export ANTHROPIC_API_KEY=\"sk-ant-api03-SYNTHETIC_REVOKED_CONFORMANCE_KEY\"\n",
+      "expected": [
+        {
+          "detector": "anthropic-token",
+          "type": "anthropic_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 26,
+          "end": 72
+        }
+      ],
+      "note": "A double-quoted shell export value is detected the same as a bare one; the enclosing quotes are not part of the match."
+    },
+    {
+      "id": "anthropic-positive-yaml-crlf",
+      "detector": "anthropic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "anthropic_api_key: sk-ant-api03-SYNTHETIC_REVOKED_CONFORMANCE_KEY\r\n",
+      "expected": [
+        {
+          "detector": "anthropic-token",
+          "type": "anthropic_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 19,
+          "end": 65
+        }
+      ],
+      "note": "A CRLF line terminator immediately after the match is not folded into it and does not suppress it."
+    },
+    {
+      "id": "anthropic-positive-repeated-value",
+      "detector": "anthropic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk-ant-api03-SYNTHETIC_REVOKED_CONFORMANCE_KEY sk-ant-api03-SYNTHETIC_REVOKED_CONFORMANCE_KEY",
+      "expected": [
+        {
+          "detector": "anthropic-token",
+          "type": "anthropic_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 46
+        },
+        {
+          "detector": "anthropic-token",
+          "type": "anthropic_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 47,
+          "end": 93
+        }
+      ],
+      "note": "An identical value repeated in the same input is reported once per independent occurrence, not deduplicated."
+    },
+    {
+      "id": "anthropic-negative-near-prefix-underscore",
+      "detector": "anthropic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk_ant_api03_SYNTHETIC_REVOKED_CONFORMANCE_KEY",
+      "expected": [],
+      "note": "An underscore-delimited near-miss of the documented 'sk-ant-api03-' prefix is prose about the shape, not the literal dash-delimited prefix, and is not classified."
+    },
+    {
+      "id": "anthropic-boundary-future-version",
+      "detector": "anthropic-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk-ant-api04-SYNTHETIC_REVOKED_CONFORMANCE_KEY",
+      "expected": [],
+      "note": "Anthropic version markers are matched exactly; a plausible future version segment ('api04') is not speculatively accepted alongside the documented 'api03'."
+    },
+    {
+      "id": "anthropic-positive-unicode-byte-offset",
+      "detector": "anthropic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\ud83d\udd11 Authorization: Bearer sk-ant-api03-SYNTHETIC_REVOKED_CONFORMANCE_KEY",
+      "expected": [
+        {
+          "detector": "anthropic-token",
+          "type": "anthropic_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 27,
+          "end": 73
+        }
+      ],
+      "note": "A preceding astral-plane emoji (a 4-byte UTF-8 sequence, a UTF-16 surrogate pair) shifts the match's UTF-8 byte offsets; the range is still exact."
     },
     {
       "id": "shopify-positive-admin-access",

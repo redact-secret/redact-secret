@@ -405,9 +405,17 @@
           "evidenceFixtureIds": [
             "openai-positive-all-prefixes",
             "openai-positive-doc-style-placeholder",
+            "openai-positive-json",
+            "openai-positive-log",
             "openai-positive-min-length",
+            "openai-positive-namespace-separation-all-variants",
             "openai-positive-project",
-            "openai-positive-punctuation-adjacent"
+            "openai-positive-punctuation-adjacent",
+            "openai-positive-repeated-value",
+            "openai-positive-shell-quoted",
+            "openai-positive-unicode-byte-offset",
+            "openai-positive-yaml",
+            "openai-positive-yaml-crlf"
           ],
           "state": "supported"
         },
@@ -442,6 +450,7 @@
             "openai-negative-embedded-in-wider-identifier",
             "openai-negative-lookalike",
             "openai-negative-model-name",
+            "openai-negative-near-prefix-underscore",
             "openai-negative-placeholder"
           ],
           "state": "supported"
@@ -492,9 +501,16 @@
           "dimension": "positive",
           "evidenceFixtureIds": [
             "anthropic-positive-doc-style-placeholder",
+            "anthropic-positive-json",
+            "anthropic-positive-log",
             "anthropic-positive-min-length",
             "anthropic-positive-punctuation-adjacent",
-            "anthropic-positive-versioned"
+            "anthropic-positive-repeated-value",
+            "anthropic-positive-shell-quoted",
+            "anthropic-positive-unicode-byte-offset",
+            "anthropic-positive-versioned",
+            "anthropic-positive-yaml",
+            "anthropic-positive-yaml-crlf"
           ],
           "state": "supported"
         },
@@ -518,6 +534,7 @@
             "anthropic-boundary-below-min",
             "anthropic-boundary-case-sensitivity",
             "anthropic-boundary-delimiter",
+            "anthropic-boundary-future-version",
             "anthropic-boundary-invalid-alphabet",
             "anthropic-boundary-version"
           ],
@@ -528,6 +545,7 @@
           "evidenceFixtureIds": [
             "anthropic-negative-embedded-in-wider-identifier",
             "anthropic-negative-legacy-unversioned-tradeoff",
+            "anthropic-negative-near-prefix-underscore",
             "anthropic-negative-placeholder",
             "anthropic-negative-unrelated-id"
           ],
@@ -539,6 +557,7 @@
             "anthropic-boundary-below-min",
             "anthropic-boundary-case-sensitivity",
             "anthropic-boundary-delimiter",
+            "anthropic-boundary-future-version",
             "anthropic-boundary-invalid-alphabet",
             "anthropic-boundary-version"
           ],
@@ -4026,6 +4045,7 @@
           "evidenceFixtureIds": [
             "additional-provider-families",
             "adjacent-findings",
+            "anthropic-legacy-versioned-prefix-discriminating-boundary",
             "aws-contextual-assignment",
             "contextual-assignment",
             "contextual-assignment-consecutive-nested-keys",
@@ -4278,6 +4298,7 @@
           "evidenceFixtureIds": [
             "additional-provider-families",
             "adjacent-findings",
+            "anthropic-legacy-versioned-prefix-discriminating-boundary",
             "aws-contextual-assignment",
             "contextual-assignment",
             "contextual-assignment-consecutive-nested-keys",
@@ -4646,6 +4667,7 @@
           "evidenceFixtureIds": [
             "additional-provider-families",
             "adjacent-findings",
+            "anthropic-legacy-versioned-prefix-discriminating-boundary",
             "aws-contextual-assignment",
             "contextual-assignment",
             "contextual-assignment-consecutive-nested-keys",

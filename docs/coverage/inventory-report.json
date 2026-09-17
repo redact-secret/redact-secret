@@ -233,9 +233,13 @@
     {
       "detector": "openai-token",
       "evidence": {
-        "fixtureCount": 16,
+        "fixtureCount": 25,
         "hostContextsExercised": [
-          "plain-text"
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "yaml"
         ],
         "kindsWithSupportedEvidence": [
           "adversarial",
@@ -251,9 +255,17 @@
       "evidenceFixtureIds": [
         "openai-positive-all-prefixes",
         "openai-positive-doc-style-placeholder",
+        "openai-positive-json",
+        "openai-positive-log",
         "openai-positive-min-length",
+        "openai-positive-namespace-separation-all-variants",
         "openai-positive-project",
-        "openai-positive-punctuation-adjacent"
+        "openai-positive-punctuation-adjacent",
+        "openai-positive-repeated-value",
+        "openai-positive-shell-quoted",
+        "openai-positive-unicode-byte-offset",
+        "openai-positive-yaml",
+        "openai-positive-yaml-crlf"
       ],
       "policyClass": "always-redact",
       "schemeRows": "not-applicable",
@@ -263,9 +275,13 @@
     {
       "detector": "anthropic-token",
       "evidence": {
-        "fixtureCount": 15,
+        "fixtureCount": 24,
         "hostContextsExercised": [
-          "plain-text"
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "yaml"
         ],
         "kindsWithSupportedEvidence": [
           "adversarial",
@@ -280,9 +296,16 @@
       },
       "evidenceFixtureIds": [
         "anthropic-positive-doc-style-placeholder",
+        "anthropic-positive-json",
+        "anthropic-positive-log",
         "anthropic-positive-min-length",
         "anthropic-positive-punctuation-adjacent",
-        "anthropic-positive-versioned"
+        "anthropic-positive-repeated-value",
+        "anthropic-positive-shell-quoted",
+        "anthropic-positive-unicode-byte-offset",
+        "anthropic-positive-versioned",
+        "anthropic-positive-yaml",
+        "anthropic-positive-yaml-crlf"
       ],
       "policyClass": "always-redact",
       "schemeRows": "not-applicable",
