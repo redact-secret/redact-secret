@@ -232,6 +232,54 @@ mod tests {
     }
 
     #[test]
+    fn missing_value_after_scheme_is_ignored() {
+        assert!(detect("Authorization: Bearer").is_empty());
+    }
+
+    #[test]
+    fn newline_separator_is_not_accepted() {
+        // Only a space or a tab separates the scheme from its credential;
+        // a line break is deliberately outside that separator charset.
+        assert!(detect("Bearer\nSYNTHETIC_REVOKED_BEARER_NEWLINE_VALUE").is_empty());
+    }
+
+    #[test]
+    fn case_insensitive_scheme_and_tab_separator_are_accepted() {
+        let input = "BEARER\tSYNTHETIC_REVOKED_BEARER_TAB_VALUE";
+        let candidates = detect(input);
+        assert_eq!(only_range(&candidates), (7, input.len()));
+    }
+
+    #[test]
+    fn extra_whitespace_and_case_around_the_authorization_header_are_accepted() {
+        let input = "AUTHORIZATION  :  BEARER   SYNTHETIC_REVOKED_BEARER_CASE_WS_VALUE";
+        let candidates = detect(input);
+        let (start, end) = only_range(&candidates);
+        assert_eq!(&input[start..end], "SYNTHETIC_REVOKED_BEARER_CASE_WS_VALUE");
+    }
+
+    #[test]
+    fn ordinary_prose_usage_of_bearer_is_safe_but_a_long_incidental_word_is_an_accepted_tradeoff() {
+        // "bearer" used as an ordinary English noun followed by a short
+        // word stays negative: the token-length floor, not any language
+        // awareness, is what keeps this safe.
+        assert!(
+            detect("The bearer of this letter is authorized to collect the package.").is_empty()
+        );
+        // The same ordinary usage followed by an incidentally long
+        // hyphenated word is indistinguishable from a real credential at
+        // the character-grammar level and is classified: an accepted
+        // precision/recall tradeoff, not a bug.
+        let input =
+            "Please note the bearer identification-verification-procedure must be followed.";
+        let candidates = detect(input);
+        assert_eq!(
+            only_range(&candidates),
+            (23, 23 + "identification-verification-procedure".len())
+        );
+    }
+
+    #[test]
     fn trailing_padding_equals_are_included() {
         let input = "Bearer SYNTHETIC_REVOKED_BEARER_VALUE==";
         let candidates = detect(input);

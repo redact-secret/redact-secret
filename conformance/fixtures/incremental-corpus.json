@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 49,
+  "fixtureCount": 51,
   "fixtures": [
     {
       "id": "synthetic-regression-malformed-authority",
@@ -303,7 +303,7 @@
           "end": 20
         }
       ],
-      "note": "issue #318: aws-access-key's scan_prefixed_runs uses RunLength::Exact(16), a family it shares with github-token, new_relic, notion, sentry, and twilio. Its discriminating boundary is the byte immediately after the fixed-length run: one more alphanumeric byte there turns a match into the rejected longer run on the second line (deliberately a distinct value from the first line's, not a shared prefix, so the rejected run's own un-redacted text can never coincide with the first line's detected value). A chunk split anywhere in either run, including exactly at that boundary byte, must still resolve to the single first-line finding, the same as the whole-input scan — the Exact-length-family counterpart to stripe-public-secret-prefix-discriminating-boundary's AtLeast-family exemplar."
+      "note": "issue #318: aws-access-key's scan_prefixed_runs uses RunLength::Exact(16), a family it shares with github-token, new_relic, notion, sentry, and twilio. Its discriminating boundary is the byte immediately after the fixed-length run: one more alphanumeric byte there turns a match into the rejected longer run on the second line (deliberately a distinct value from the first line's, not a shared prefix, so the rejected run's own un-redacted text can never coincide with the first line's detected value). A chunk split anywhere in either run, including exactly at that boundary byte, must still resolve to the single first-line finding, the same as the whole-input scan \u2014 the Exact-length-family counterpart to stripe-public-secret-prefix-discriminating-boundary's AtLeast-family exemplar."
     },
     {
       "id": "multiline-private-key",
@@ -718,6 +718,38 @@
         }
       ],
       "note": "issue #317: the unversioned 'sk-ant-' prefix (a documented false-negative tradeoff no detector claims) and the versioned 'sk-ant-api03-' prefix (claimed by anthropic-token) share the same leading bytes the openai-token detector also inspects to exclude the Anthropic namespace. Every UTF-8 chunk split, including splits that fall inside 'ant-' or 'api03-' themselves, must still discriminate the two the same way the whole-input reference does."
+    },
+    {
+      "id": "jwt-near-miss-short-signature-discriminating-boundary",
+      "input": "eyJAAAAA.eyJAAAAA.short\neyJTWU5USEVUSUNfSEVBREVS.eyJTWU5USEVUSUNfUEFZTE9BRA.SYNTHETIC_REVOKED_SIGNATURE",
+      "text": "eyJAAAAA.eyJAAAAA.short\n<SECRET_1>",
+      "expected": [
+        {
+          "detector": "jwt",
+          "type": "jwt",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 24,
+          "end": 103
+        }
+      ],
+      "note": "issue #323: an eyJ-prefixed near-miss whose signature segment is one byte short of the 16-byte minimum (a documented boundary this grammar rejects) sits directly before a genuine three-segment token on the next line, sharing the same leading eyJ bytes the detector inspects. Every UTF-8 chunk split, including splits that fall inside either line's own eyJ-prefixed segments, must still discriminate the two the same way the whole-input scan does."
+    },
+    {
+      "id": "bearer-token-lookalike-identifier-discriminating-boundary",
+      "input": "notbearer SYNTHETIC_REVOKED_IDENTIFIER_VALUE_LONG\nBearer SYNTHETIC_REVOKED_BEARER_INCREMENTAL_VALUE",
+      "text": "notbearer SYNTHETIC_REVOKED_IDENTIFIER_VALUE_LONG\nBearer <SECRET_1>",
+      "expected": [
+        {
+          "detector": "bearer-token",
+          "type": "bearer_token",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 57,
+          "end": 99
+        }
+      ],
+      "note": "issue #323: the word 'bearer' embedded inside a wider identifier ('notbearer', already excluded by the boundary check) sits directly before a genuine explicit Bearer scheme on the next line, sharing the same 'bearer' bytes the detector's scheme match inspects. Every UTF-8 chunk split, including splits that fall inside either line's 'bearer' text, must still discriminate the two the same way the whole-input scan does."
     },
     {
       "id": "vault-embedded-identifier-discriminating-boundary",

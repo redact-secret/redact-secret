@@ -2433,6 +2433,10 @@
         {
           "dimension": "positive",
           "evidenceFixtureIds": [
+            "jwt-positive-context-json",
+            "jwt-positive-context-log",
+            "jwt-positive-context-shell",
+            "jwt-positive-structural-despite-fabricated-claims",
             "jwt-positive-structured"
           ],
           "state": "supported"
@@ -2456,6 +2460,7 @@
           "evidenceFixtureIds": [
             "jwt-boundary-base64-padding",
             "jwt-boundary-four-segments",
+            "jwt-boundary-leading-identifier-char",
             "jwt-boundary-short-signature",
             "jwt-boundary-standard-base64-alphabet",
             "jwt-boundary-two-segments"
@@ -2467,6 +2472,7 @@
           "evidenceFixtureIds": [
             "jwt-negative-colon-delimiter",
             "jwt-negative-dotted-id",
+            "jwt-negative-ordinary-base64",
             "jwt-negative-payload-not-json-prefixed"
           ],
           "state": "supported"
@@ -2476,6 +2482,7 @@
           "evidenceFixtureIds": [
             "jwt-boundary-base64-padding",
             "jwt-boundary-four-segments",
+            "jwt-boundary-leading-identifier-char",
             "jwt-boundary-short-signature",
             "jwt-boundary-standard-base64-alphabet",
             "jwt-boundary-two-segments"
@@ -2516,7 +2523,12 @@
         {
           "dimension": "positive",
           "evidenceFixtureIds": [
-            "bearer-positive-scheme"
+            "bearer-boundary-prose-long-word-tradeoff",
+            "bearer-positive-authorization-extra-whitespace-and-case",
+            "bearer-positive-context-json",
+            "bearer-positive-context-log",
+            "bearer-positive-scheme",
+            "bearer-positive-tab-and-uppercase"
           ],
           "state": "supported"
         },
@@ -2537,6 +2549,7 @@
         {
           "dimension": "boundary",
           "evidenceFixtureIds": [
+            "bearer-boundary-newline-separator",
             "bearer-boundary-short"
           ],
           "state": "supported"
@@ -2544,13 +2557,16 @@
         {
           "dimension": "near-miss-negative",
           "evidenceFixtureIds": [
-            "bearer-negative-identifier"
+            "bearer-negative-identifier",
+            "bearer-negative-missing-value",
+            "bearer-negative-prose-ordinary"
           ],
           "state": "supported"
         },
         {
           "dimension": "malformed",
           "evidenceFixtureIds": [
+            "bearer-boundary-newline-separator",
             "bearer-boundary-short"
           ],
           "state": "supported"
@@ -4159,6 +4175,7 @@
             "anthropic-legacy-versioned-prefix-discriminating-boundary",
             "aws-access-key-exact-length-discriminating-boundary",
             "aws-contextual-assignment",
+            "bearer-token-lookalike-identifier-discriminating-boundary",
             "cloudflare-embedded-identifier-discriminating-boundary",
             "contextual-assignment",
             "contextual-assignment-consecutive-nested-keys",
@@ -4183,6 +4200,7 @@
             "gitlab-lookalike-token-discriminating-boundary",
             "grafana-cloud-access-policy-token-basic",
             "grafana-service-account-token-basic",
+            "jwt-near-miss-short-signature-discriminating-boundary",
             "legacy-variable-detector-families",
             "mongodb-seed-list-connection",
             "multiline-private-key",
@@ -4424,6 +4442,7 @@
             "anthropic-legacy-versioned-prefix-discriminating-boundary",
             "aws-access-key-exact-length-discriminating-boundary",
             "aws-contextual-assignment",
+            "bearer-token-lookalike-identifier-discriminating-boundary",
             "cloudflare-embedded-identifier-discriminating-boundary",
             "contextual-assignment",
             "contextual-assignment-consecutive-nested-keys",
@@ -4448,6 +4467,7 @@
             "gitlab-lookalike-token-discriminating-boundary",
             "grafana-cloud-access-policy-token-basic",
             "grafana-service-account-token-basic",
+            "jwt-near-miss-short-signature-discriminating-boundary",
             "legacy-variable-detector-families",
             "mongodb-seed-list-connection",
             "multiline-private-key",
@@ -4805,6 +4825,7 @@
             "anthropic-legacy-versioned-prefix-discriminating-boundary",
             "aws-access-key-exact-length-discriminating-boundary",
             "aws-contextual-assignment",
+            "bearer-token-lookalike-identifier-discriminating-boundary",
             "cloudflare-embedded-identifier-discriminating-boundary",
             "contextual-assignment",
             "contextual-assignment-consecutive-nested-keys",
@@ -4829,6 +4850,7 @@
             "gitlab-lookalike-token-discriminating-boundary",
             "grafana-cloud-access-policy-token-basic",
             "grafana-service-account-token-basic",
+            "jwt-near-miss-short-signature-discriminating-boundary",
             "legacy-variable-detector-families",
             "mongodb-seed-list-connection",
             "multiline-private-key",

@@ -74,6 +74,65 @@
       ]
     },
     {
+      "detector": "bearer-token",
+      "falseNegativeGuards": {
+        "actualFalseNegatives": 0,
+        "count": 6,
+        "fixtureIds": [
+          "bearer-boundary-prose-long-word-tradeoff",
+          "bearer-positive-authorization-extra-whitespace-and-case",
+          "bearer-positive-context-json",
+          "bearer-positive-context-log",
+          "bearer-positive-scheme",
+          "bearer-positive-tab-and-uppercase"
+        ]
+      },
+      "falsePositiveGuards": {
+        "actualFalsePositives": 0,
+        "count": 3,
+        "fixtureIds": [
+          "bearer-negative-identifier",
+          "bearer-negative-missing-value",
+          "bearer-negative-prose-ordinary"
+        ]
+      },
+      "hostContextsExercised": [
+        "json",
+        "log",
+        "plain-text"
+      ]
+    },
+    {
+      "detector": "jwt",
+      "falseNegativeGuards": {
+        "actualFalseNegatives": 0,
+        "count": 5,
+        "fixtureIds": [
+          "jwt-positive-context-json",
+          "jwt-positive-context-log",
+          "jwt-positive-context-shell",
+          "jwt-positive-structural-despite-fabricated-claims",
+          "jwt-positive-structured"
+        ]
+      },
+      "falsePositiveGuards": {
+        "actualFalsePositives": 0,
+        "count": 4,
+        "fixtureIds": [
+          "jwt-negative-colon-delimiter",
+          "jwt-negative-dotted-id",
+          "jwt-negative-ordinary-base64",
+          "jwt-negative-payload-not-json-prefixed"
+        ]
+      },
+      "hostContextsExercised": [
+        "json",
+        "log",
+        "plain-text",
+        "shell"
+      ]
+    },
+    {
       "detector": "openai-token",
       "falseNegativeGuards": {
         "actualFalseNegatives": 0,
@@ -242,7 +301,8 @@
     "issue": [
       "https://github.com/redact-secret/redact-secret/issues/316",
       "https://github.com/redact-secret/redact-secret/issues/317",
-      "https://github.com/redact-secret/redact-secret/issues/318"
+      "https://github.com/redact-secret/redact-secret/issues/318",
+      "https://github.com/redact-secret/redact-secret/issues/323"
     ]
   }
 }

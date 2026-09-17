@@ -1019,9 +1019,12 @@
     {
       "detector": "jwt",
       "evidence": {
-        "fixtureCount": 11,
+        "fixtureCount": 17,
         "hostContextsExercised": [
-          "plain-text"
+          "json",
+          "log",
+          "plain-text",
+          "shell"
         ],
         "kindsWithSupportedEvidence": [
           "adversarial",
@@ -1035,6 +1038,10 @@
         ]
       },
       "evidenceFixtureIds": [
+        "jwt-positive-context-json",
+        "jwt-positive-context-log",
+        "jwt-positive-context-shell",
+        "jwt-positive-structural-despite-fabricated-claims",
         "jwt-positive-structured"
       ],
       "policyClass": "always-redact",
@@ -1045,8 +1052,10 @@
     {
       "detector": "bearer-token",
       "evidence": {
-        "fixtureCount": 6,
+        "fixtureCount": 15,
         "hostContextsExercised": [
+          "json",
+          "log",
           "plain-text"
         ],
         "kindsWithSupportedEvidence": [
@@ -1061,7 +1070,12 @@
         ]
       },
       "evidenceFixtureIds": [
-        "bearer-positive-scheme"
+        "bearer-boundary-prose-long-word-tradeoff",
+        "bearer-positive-authorization-extra-whitespace-and-case",
+        "bearer-positive-context-json",
+        "bearer-positive-context-log",
+        "bearer-positive-scheme",
+        "bearer-positive-tab-and-uppercase"
       ],
       "policyClass": "always-redact",
       "schemeRows": "not-applicable",
