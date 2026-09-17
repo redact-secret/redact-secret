@@ -1,0 +1,447 @@
+{
+  "schemaVersion": 1,
+  "issue": "https://github.com/redact-secret/redact-secret/issues/367",
+  "reviewedAt": "2026-09-17",
+  "decision": "docs/decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md",
+  "note": "Reviewed precision contracts for seven provider families. Each `grammar` is a reference regular expression over the credential itself; `scripts/audit-precision-contracts.py` wraps it in the shared boundary rule (no `[A-Za-z0-9_-]` byte immediately before or after) when it evaluates a fixture. The grammar is an evidence oracle for review, not a runtime detector: the Rust core stays the only authoritative implementation. `basis` records whether a property comes from provider documentation (`provider`), from agreement between the pinned tool sources (`tool-agreement`), from one tool source only (`single-tool`), or from this project's own support policy (`support-policy`). A support-policy property is a choice this project makes and can revisit; it is never presented as provider evidence.",
+  "evidenceTiers": {
+    "T1": "provider documentation establishes the property",
+    "T2": "no provider documentation for the property; pinned tool sources corroborate it",
+    "T3": "project policy, not a format claim",
+    "T0": "pending: no reviewed contract; unscored"
+  },
+  "selectedApproach": {
+    "id": "default-rule-precision",
+    "summary": "Refine the default provider rules in place so they enforce the reviewed contract. No strict mode, no new public option, no new detector id, no finding-type or result-interface change.",
+    "alternativesRejected": [
+      "A separate strict mode or option: splits the corpus into two truths, leaves the default rule broad, and adds public surface for a precision problem that the default rule caused.",
+      "Reclassifying the twins as policy cases: hides the false alarms instead of removing them; reclassification never counts as a detector improvement (issue #367)."
+    ]
+  },
+  "boundary": {
+    "alphabet": "[A-Za-z0-9_-]",
+    "rule": "A candidate is rejected when the byte immediately before its first byte or immediately after its last byte is in the boundary alphabet. This is beta.4's existing `pattern::boundary_ok` rule and is unchanged by the contracts.",
+    "source": "crates/secret-scan-core/src/detectors/pattern.rs"
+  },
+  "sources": {
+    "slack-docs-tokens": {
+      "url": "https://docs.slack.dev/authentication/tokens",
+      "kind": "provider",
+      "revision": "page shows no version or last-updated date",
+      "observedAt": "2026-09-17",
+      "establishes": [
+        "prefixes: `xoxb-` (bot), `xoxp-` (user), `xwfp-` (workflow), `xapp-` (app-level)",
+        "structure: \"The token is divided into several sections, separated by a `-` character. The final section is the secret.\"",
+        "user-token secret length: 32 characters; tokens created before August 2016 may have 6- or 10-character secrets and can be rotated to 32",
+        "example user token shape `xoxp-111-222-333-<32 hex characters>` (three placeholder numeric sections before the secret)"
+      ],
+      "doesNotEstablish": [
+        "numeric section widths (the examples use `111`, `222`, `333` placeholders)",
+        "bot-token secret length or alphabet",
+        "any `xoxe` prefix, or legacy `xoxa`/`xoxr`/`xoxs`/`xoxo` shapes"
+      ]
+    },
+    "slack-docs-rotation": {
+      "url": "https://docs.slack.dev/authentication/using-token-rotation/",
+      "kind": "provider",
+      "revision": "page shows no version or last-updated date",
+      "observedAt": "2026-09-17",
+      "establishes": [
+        "rotated access tokens carry `xoxe.xoxb-1-...` (bot) and `xoxe.xoxp-1-1234-...` (user) prefixes; the refresh token carries `xoxe-1-...`",
+        "access tokens expire after 43,200 seconds"
+      ],
+      "doesNotEstablish": ["section widths, secret length or alphabet: every example elides the body with `...`"]
+    },
+    "digitalocean-release-notes": {
+      "url": "https://docs.digitalocean.com/release-notes/api/",
+      "kind": "provider",
+      "revision": "entry dated 2022-03-29",
+      "observedAt": "2026-09-17",
+      "establishes": ["prefixes: `dop_v1_` (personal access tokens), `doo_v1_` (OAuth access tokens), `dor_v1_` (OAuth refresh tokens)"],
+      "doesNotEstablish": ["body length or alphabet"]
+    },
+    "digitalocean-oauth-reference": {
+      "url": "https://docs.digitalocean.com/reference/api/oauth/",
+      "kind": "provider",
+      "revision": "last updated 2026-09-03",
+      "observedAt": "2026-09-17",
+      "establishes": ["example `access_token` (`doo_v1_EXAMPLE...`) and `refresh_token` (`dor_v1_EXAMPLE...`) values whose bodies are each 64 characters long"],
+      "doesNotEstablish": ["alphabet: both example bodies contain the uppercase placeholder `EXAMPLE`, and the refresh example contains a `y`, so they are illustrations of length, not of a hexadecimal alphabet"]
+    },
+    "cloudflare-token-formats": {
+      "url": "https://developers.cloudflare.com/fundamentals/api/get-started/token-formats/",
+      "kind": "provider",
+      "revision": "last updated 2026-04-20",
+      "observedAt": "2026-09-17",
+      "establishes": [
+        "\"Each credential type has a distinct prefix followed by 40 characters and a checksum.\"",
+        "formats: Global API Key `cfk_[40 characters][checksum]`, User API Token `cfut_[40 characters][checksum]`, Account API Token `cfat_[40 characters][checksum]`",
+        "pre-2026 formats: Global API Key 37–45 character lowercase hex; User and Account API Token 40-character alphanumeric, unprefixed; these continue to work",
+        "the checksum exists so scanners can verify a token before reporting it"
+      ],
+      "doesNotEstablish": ["checksum width, checksum alphabet or algorithm", "the alphabet of the 40-character body in the new format"]
+    },
+    "cloudflare-create-token": {
+      "url": "https://developers.cloudflare.com/fundamentals/api/get-started/create-token/",
+      "kind": "provider",
+      "revision": "last updated 2026-04-20",
+      "observedAt": "2026-09-17",
+      "establishes": ["\"New API tokens use the `cfut_` prefixed scannable format, which allows credential scanning tools to detect leaked tokens.\""]
+    },
+    "cloudflare-account-tokens": {
+      "url": "https://developers.cloudflare.com/fundamentals/api/get-started/account-owned-tokens/",
+      "kind": "provider",
+      "revision": "last updated 2026-09-02",
+      "observedAt": "2026-09-17",
+      "establishes": ["new account API tokens use the `cfat_` prefixed scannable format"]
+    },
+    "huggingface-docs-tokens": {
+      "url": "https://huggingface.co/docs/hub/security-tokens",
+      "kind": "provider",
+      "revision": "page shows no version or last-updated date",
+      "observedAt": "2026-09-17",
+      "establishes": ["user access tokens exist in fine-grained, read and write roles; the only token text shown is the placeholder `hf_...`"],
+      "doesNotEstablish": ["length, alphabet, or any format difference between roles", "the organization `api_org_` token shape"]
+    },
+    "linear-docs-graphql": {
+      "url": "https://linear.app/developers/graphql",
+      "kind": "provider",
+      "revision": "page shows no version or last-updated date",
+      "observedAt": "2026-09-17",
+      "establishes": ["personal API keys are sent as `Authorization: <API_KEY>`; OAuth access tokens as `Authorization: Bearer <ACCESS_TOKEN>`"],
+      "doesNotEstablish": ["any prefix, length or alphabet"]
+    },
+    "linear-docs-oauth": {
+      "url": "https://linear.app/developers/oauth-2-0-authentication",
+      "kind": "provider",
+      "revision": "states that all OAuth2 applications migrated to refresh tokens on 2026-04-01; no page date shown",
+      "observedAt": "2026-09-17",
+      "establishes": ["the example `access_token` is a bare 64-character lowercase-hex string with no `lin_oauth_` prefix; access tokens are valid for 24 hours"],
+      "doesNotEstablish": ["that `lin_oauth_` is an issued prefix; no consulted provider page shows it"]
+    },
+    "linear-docs-api-webhooks": {
+      "url": "https://linear.app/docs/api-and-webhooks",
+      "kind": "provider",
+      "revision": "page shows no version or last-updated date",
+      "observedAt": "2026-09-17",
+      "establishes": ["personal API keys are created under Settings > Account > Security & Access with optional permission restriction"],
+      "doesNotEstablish": ["any prefix, length or alphabet"]
+    },
+    "docker-docs-pat": {
+      "url": "https://docs.docker.com/security/access-tokens/",
+      "kind": "provider",
+      "revision": "page shows no version or last-updated date",
+      "observedAt": "2026-09-17",
+      "establishes": ["personal access tokens exist and replace passwords for CLI login"],
+      "doesNotEstablish": ["any prefix, length or alphabet"]
+    },
+    "docker-docs-oat": {
+      "url": "https://docs.docker.com/security/for-admins/access-tokens/",
+      "kind": "provider",
+      "revision": "page shows no version or last-updated date",
+      "observedAt": "2026-09-17",
+      "establishes": ["organization access tokens exist and are distinct from personal access tokens"],
+      "doesNotEstablish": ["any prefix, length or alphabet"]
+    },
+    "openai-help-api-key": {
+      "url": "https://help.openai.com/en/articles/4936850-where-do-i-find-my-openai-api-key",
+      "kind": "provider",
+      "revision": "not retrievable: HTTP 403 to automated fetch on 2026-09-17",
+      "observedAt": "2026-09-17",
+      "establishes": [],
+      "doesNotEstablish": ["nothing could be reviewed; no OpenAI page that publishes a key grammar is known to this review"]
+    },
+    "openai-platform-authentication": {
+      "url": "https://platform.openai.com/docs/api-reference/authentication",
+      "kind": "provider",
+      "revision": "not retrievable: HTTP 403 to automated fetch on 2026-09-17",
+      "observedAt": "2026-09-17",
+      "establishes": [],
+      "doesNotEstablish": ["nothing could be reviewed"]
+    },
+    "gitleaks-8.30.1": {
+      "url": "https://github.com/gitleaks/gitleaks/blob/v8.30.1/config/gitleaks.toml",
+      "kind": "tool",
+      "revision": "tag v8.30.1 = commit 83d9cd684c87d95d656c1458ef04895a7f1cbd8e",
+      "observedAt": "2026-09-17",
+      "establishes": ["the rule patterns quoted per family below; consulted only as an external behavioral reference per AGENTS.md, no code reproduced"],
+      "doesNotEstablish": ["provider issuance, liveness, or that a shape the rule accepts is the only shape a provider issues"]
+    },
+    "trufflehog-3.97.4": {
+      "url": "https://github.com/trufflesecurity/trufflehog/tree/v3.97.4/pkg/detectors",
+      "kind": "tool",
+      "revision": "tag v3.97.4 = commit 363923b901c911a9164f50b6c423f47c15372b1c",
+      "observedAt": "2026-09-17",
+      "establishes": ["the detector patterns quoted per family below; consulted only as an external behavioral reference per AGENTS.md, no code reproduced"],
+      "doesNotEstablish": ["provider issuance, liveness, or that a shape the pattern accepts is the only shape a provider issues"]
+    },
+    "github-secret-scanning-patterns": {
+      "url": "https://docs.github.com/en/code-security/secret-scanning/introduction/supported-secret-scanning-patterns",
+      "kind": "corroboration",
+      "revision": "page shows no version; observed 2026-09-17",
+      "observedAt": "2026-09-17",
+      "establishes": ["which token types each provider registers with GitHub's partner program (existence of a type, not its grammar): OpenAI API Key; DigitalOcean OAuth Token, Personal Access Token, Refresh Token, System Token; Docker Organization Access Token, Personal Access Token; Slack API Token; Hugging Face User Access Token, Organization API Token; Cloudflare Account API Token, Global User API Key, User API Token; Linear API Key, OAuth Access Token"],
+      "doesNotEstablish": ["any prefix, length or alphabet"]
+    },
+    "benchmark-common-formats": {
+      "url": "redact-secret-benchmarks fixtures/generated/common-formats.mjs",
+      "kind": "corroboration",
+      "revision": "2f3d1c051e3a9f4c776835c939cd0b3c5d560533 with uncommitted modifications; corpus SHA-256 19ca47f5dbf21acc94c6712a51d6586c9fd1653b3da132172622c0e7c4b08fb8",
+      "observedAt": "2026-09-17",
+      "establishes": ["the synthetic construction of every positive and negative twin frozen in beta4-twin-baseline.json; the benchmark's own tier assignment per family"],
+      "doesNotEstablish": ["anything about provider formats: it is downstream of the same tool sources"]
+    }
+  },
+  "families": [
+    {
+      "detector": "openai-token",
+      "findingType": "openai_api_key",
+      "implementation": "crates/secret-scan-core/src/detectors/openai.rs",
+      "beta4Rule": "`sk-` then either `proj-`/`svcacct-` plus >=20 bytes of `[A-Za-z0-9_-]`, or (when the next four bytes are not `ant-`) >=20 bytes of `[A-Za-z0-9_-]`. No marker, no upper bound, no per-segment length.",
+      "toolRules": {
+        "gitleaks-8.30.1": "openai-api-key: `\\b(sk-(?:proj|svcacct|admin)-(?:[A-Za-z0-9_-]{74}|[A-Za-z0-9_-]{58})T3BlbkFJ(?:[A-Za-z0-9_-]{74}|[A-Za-z0-9_-]{58})\\b|sk-[a-zA-Z0-9]{20}T3BlbkFJ[a-zA-Z0-9]{20})` followed by a delimiter or end; keyword `t3blbkfj`",
+        "trufflehog-3.97.4": "openai: `\\b(sk-(?:(?:proj|svcacct|service)-[A-Za-z0-9_-]+|[a-zA-Z0-9]+)T3BlbkFJ[A-Za-z0-9_-]+)\\b`; source comment: the marker is the base64 encoding of `OpenAI`; matches legacy, project and service-account keys (`svcacct-` or `service-`); does not match admin keys"
+      },
+      "variants": [
+        {
+          "id": "legacy",
+          "support": "supported",
+          "tier": "T2",
+          "grammar": "sk-[A-Za-z0-9]{20}T3BlbkFJ[A-Za-z0-9]{20}",
+          "segments": [
+            {"name": "prefix", "literal": "sk-", "basis": "tool-agreement"},
+            {"name": "left", "alphabet": "[A-Za-z0-9]", "length": 20, "basis": "single-tool (gitleaks fixes 20; trufflehog accepts any positive length); adopted as support-policy"},
+            {"name": "marker", "literal": "T3BlbkFJ", "basis": "tool-agreement"},
+            {"name": "right", "alphabet": "[A-Za-z0-9]", "length": 20, "basis": "single-tool (gitleaks fixes 20; trufflehog accepts any positive length); adopted as support-policy"}
+          ],
+          "sources": ["gitleaks-8.30.1", "trufflehog-3.97.4"],
+          "evidenceGaps": ["no provider documentation was retrievable (openai-help-api-key, openai-platform-authentication); tier T2"]
+        },
+        {
+          "id": "proj",
+          "support": "supported",
+          "tier": "T2",
+          "grammar": "sk-proj-(?:[A-Za-z0-9_-]{74}|[A-Za-z0-9_-]{58})T3BlbkFJ(?:[A-Za-z0-9_-]{74}|[A-Za-z0-9_-]{58})",
+          "segments": [
+            {"name": "prefix", "literal": "sk-proj-", "basis": "tool-agreement"},
+            {"name": "left", "alphabet": "[A-Za-z0-9_-]", "length": [58, 74], "basis": "single-tool (gitleaks names exactly these two widths; trufflehog accepts any positive length); adopted as support-policy"},
+            {"name": "marker", "literal": "T3BlbkFJ", "basis": "tool-agreement"},
+            {"name": "right", "alphabet": "[A-Za-z0-9_-]", "length": [58, 74], "basis": "single-tool; adopted as support-policy"}
+          ],
+          "sources": ["gitleaks-8.30.1", "trufflehog-3.97.4"]
+        },
+        {
+          "id": "svcacct",
+          "support": "supported",
+          "tier": "T2",
+          "grammar": "sk-svcacct-(?:[A-Za-z0-9_-]{74}|[A-Za-z0-9_-]{58})T3BlbkFJ(?:[A-Za-z0-9_-]{74}|[A-Za-z0-9_-]{58})",
+          "segments": [
+            {"name": "prefix", "literal": "sk-svcacct-", "basis": "tool-agreement"},
+            {"name": "left", "alphabet": "[A-Za-z0-9_-]", "length": [58, 74], "basis": "single-tool; adopted as support-policy"},
+            {"name": "marker", "literal": "T3BlbkFJ", "basis": "tool-agreement"},
+            {"name": "right", "alphabet": "[A-Za-z0-9_-]", "length": [58, 74], "basis": "single-tool; adopted as support-policy"}
+          ],
+          "sources": ["gitleaks-8.30.1", "trufflehog-3.97.4"]
+        }
+      ],
+      "pending": [
+        {"id": "admin", "prefix": "sk-admin-", "tier": "T0", "reason": "gitleaks registers it with the proj/svcacct widths; trufflehog explicitly excludes admin keys; no provider documentation. Unresolved tool disagreement; not supported by the default rule until a second independent source establishes the shape. Under beta.4 this prefix fell through to the bare branch and matched as a legacy key; under the contract it is a recorded false negative."},
+        {"id": "service", "prefix": "sk-service-", "tier": "T0", "reason": "trufflehog alone registers `service-` as a service-account spelling; gitleaks does not; no provider documentation. Not supported until independently established."}
+      ],
+      "excluded": [
+        {"id": "anthropic-namespace", "prefix": "sk-ant-", "basis": "ownership", "reason": "Owned by `anthropic-token`; the legacy grammar's `[A-Za-z0-9]` left segment cannot contain the `-` of `ant-`, so the exclusion is structural under the contract and the explicit `ant-` check stays as a documented guard."},
+        {"id": "marker-less-body", "basis": "support-policy", "reason": "Any `sk-`-prefixed value without the `T3BlbkFJ` marker is intentionally unsupported. Both tool sources require the marker; the benchmark twin `openai-token-legacy-*-twin` mutates it. This is the property that removes the legacy false alarm, and it also stops matching every existing synthetic positive in this repository that has no marker (listed in corpus-audit.json)."}
+      ],
+      "conflicts": [
+        {"property": "segment lengths", "positions": {"gitleaks-8.30.1": "exactly 74 or 58 per segment (proj/svcacct/admin); exactly 20/20 (legacy)", "trufflehog-3.97.4": "one or more bytes per segment"}, "resolution": "Adopt gitleaks's enumerated widths as an explicit support-policy choice, because it is the only source that states a width and the measured twin differs only in width (73 vs 74). This is not converted into a provider claim: a provider-issued key with another width is a recorded intentionally-unsupported form, and the ADR flags it for revisiting if provider documentation appears. The marker requirement, on which both tools agree, is the evidence-backed part of the rule."},
+        {"property": "prefix set", "positions": {"gitleaks-8.30.1": "proj, svcacct, admin", "trufflehog-3.97.4": "proj, svcacct, service; explicitly not admin"}, "resolution": "Support the intersection (proj, svcacct) plus legacy; record admin and service as pending."}
+      ],
+      "mutations": [
+        {"mutationKind": "boundary", "mutation": "internal marker: T3BlbkFK vs contracted T3BlbkFJ", "fixtureIds": ["openai-token-legacy-plain-twin", "openai-token-legacy-unicode-crlf-twin"], "distinguishingProperty": "marker literal", "basis": "tool-agreement", "disposition": "retained", "reason": "Both tool sources require the literal marker; silence follows from construction."},
+        {"mutationKind": "length", "mutation": "length: 73-character left segment vs contracted 74", "fixtureIds": ["openai-token-proj-plain-twin", "openai-token-proj-unicode-crlf-twin", "openai-token-svcacct-plain-twin", "openai-token-svcacct-unicode-crlf-twin"], "distinguishingProperty": "left segment width in {58, 74}", "basis": "single-tool; adopted as support-policy", "disposition": "retained", "reason": "Retained as a must-not-flag/T2 negative under the frozen contract. The width itself rests on one tool source, so the contract records that a real key of width 73 would be an intentionally unsupported form; the twin's classification is unchanged."}
+      ]
+    },
+    {
+      "detector": "digitalocean-token",
+      "findingType": "digitalocean_token",
+      "implementation": "crates/secret-scan-core/src/detectors/additional_providers.rs (DIGITALOCEAN)",
+      "beta4Rule": "`dop_v1_`, `doo_v1_` or `dor_v1_` plus >=20 bytes of `[A-Za-z0-9_-]`.",
+      "toolRules": {
+        "gitleaks-8.30.1": "digitalocean-pat `\\b(dop_v1_[a-f0-9]{64})`, digitalocean-access-token `\\b(doo_v1_[a-f0-9]{64})`, digitalocean-refresh-token `(?i)\\b(dor_v1_[a-f0-9]{64})` (the refresh rule alone is case-insensitive), each followed by a delimiter or end",
+        "trufflehog-3.97.4": "digitaloceanv2: `\\b((?:dop|doo|dor)_v1_[a-f0-9]{64})\\b`"
+      },
+      "variants": [
+        {"id": "dop", "support": "supported", "tier": "T1", "grammar": "dop_v1_[0-9a-f]{64}", "segments": [{"name": "prefix", "literal": "dop_v1_", "basis": "provider"}, {"name": "body", "alphabet": "[0-9a-f]", "length": 64, "basis": "length: provider examples (digitalocean-oauth-reference show 64-character bodies for the sibling variants) and tool-agreement; alphabet: tool-agreement (lowercase hex)"}], "sources": ["digitalocean-release-notes", "digitalocean-oauth-reference", "gitleaks-8.30.1", "trufflehog-3.97.4"]},
+        {"id": "doo", "support": "supported", "tier": "T1", "grammar": "doo_v1_[0-9a-f]{64}", "segments": [{"name": "prefix", "literal": "doo_v1_", "basis": "provider"}, {"name": "body", "alphabet": "[0-9a-f]", "length": 64, "basis": "length: provider example and tool-agreement; alphabet: tool-agreement"}], "sources": ["digitalocean-release-notes", "digitalocean-oauth-reference", "gitleaks-8.30.1", "trufflehog-3.97.4"]},
+        {"id": "dor", "support": "supported", "tier": "T1", "grammar": "dor_v1_[0-9a-f]{64}", "segments": [{"name": "prefix", "literal": "dor_v1_", "basis": "provider"}, {"name": "body", "alphabet": "[0-9a-f]", "length": 64, "basis": "length: provider example and tool-agreement; alphabet: tool-agreement"}], "sources": ["digitalocean-release-notes", "digitalocean-oauth-reference", "gitleaks-8.30.1", "trufflehog-3.97.4"]}
+      ],
+      "pending": [
+        {"id": "system-token", "tier": "T0", "reason": "GitHub's partner list names a `DigitalOcean System Token`; no consulted source shows its shape."},
+        {"id": "future-version", "prefix": "dop_v2_ and siblings", "tier": "T0", "reason": "Already recorded in the module documentation as an intentional false negative until the shape is confirmed."}
+      ],
+      "excluded": [
+        {"id": "uppercase-hex-or-mixed-case", "basis": "support-policy", "reason": "gitleaks's refresh-token rule is case-insensitive, its other two rules and trufflehog are not, and the provider examples are placeholders. The contract adopts lowercase hex; an uppercase or mixed-case body (including an uppercase prefix, which the existing `digitalocean-boundary-case-sensitivity` fixture already rejects) is intentionally unsupported."}
+      ],
+      "conflicts": [
+        {"property": "body alphabet", "positions": {"digitalocean-oauth-reference": "example bodies contain non-hex placeholder characters", "gitleaks-8.30.1": "lowercase hex (dor rule case-insensitive)", "trufflehog-3.97.4": "lowercase hex"}, "resolution": "The provider examples establish length (64) but not alphabet, because they are visibly placeholders. Alphabet comes from tool agreement (lowercase hex). The single case-insensitive gitleaks rule is treated as a tool artifact, not adopted."}
+      ],
+      "mutations": [
+        {"mutationKind": "length", "mutation": "length: 63 vs contracted 64", "fixtureIds": ["digitalocean-token-dop-plain-twin", "digitalocean-token-dop-unicode-crlf-twin", "digitalocean-token-doo-plain-twin", "digitalocean-token-doo-unicode-crlf-twin", "digitalocean-token-dor-plain-twin", "digitalocean-token-dor-unicode-crlf-twin"], "distinguishingProperty": "body length exactly 64", "basis": "provider examples plus tool-agreement", "disposition": "retained", "reason": "Every consulted source that states a length states 64; silence follows from construction."}
+      ]
+    },
+    {
+      "detector": "docker-token",
+      "findingType": "docker_token",
+      "implementation": "crates/secret-scan-core/src/detectors/additional_providers.rs (DOCKER)",
+      "beta4Rule": "`dckr_pat_` or `dckr_oat_` plus >=20 bytes of `[A-Za-z0-9_-]`; both segment names share one rule.",
+      "toolRules": {
+        "gitleaks-8.30.1": "no Docker Hub access-token rule exists in this revision",
+        "trufflehog-3.97.4": "dockerhub v2: `\\b(dckr_pat_[a-zA-Z0-9_-]{27}|dckr_oat_[a-zA-Z0-9_-]{32})(?:[^a-zA-Z0-9_-]|\\z)`; source comment: the scanner checks PATs and OATs, not passwords"
+      },
+      "variants": [
+        {"id": "pat", "support": "supported", "tier": "T2", "grammar": "dckr_pat_[A-Za-z0-9_-]{27}", "segments": [{"name": "prefix", "literal": "dckr_pat_", "basis": "single-tool; existence of the type corroborated by github-secret-scanning-patterns"}, {"name": "body", "alphabet": "[A-Za-z0-9_-]", "length": 27, "basis": "single-tool; adopted as support-policy"}], "sources": ["trufflehog-3.97.4", "github-secret-scanning-patterns", "docker-docs-pat"]},
+        {"id": "oat", "support": "supported", "tier": "T2", "grammar": "dckr_oat_[A-Za-z0-9_-]{32}", "segments": [{"name": "prefix", "literal": "dckr_oat_", "basis": "single-tool; existence of the type corroborated by github-secret-scanning-patterns"}, {"name": "body", "alphabet": "[A-Za-z0-9_-]", "length": 32, "basis": "single-tool; adopted as support-policy"}], "sources": ["trufflehog-3.97.4", "github-secret-scanning-patterns", "docker-docs-oat"]}
+      ],
+      "pending": [],
+      "excluded": [
+        {"id": "unprefixed-registry-password", "basis": "evidence", "reason": "Docker Hub passwords carry no distinguishing prefix; already out of scope in the module documentation and in the trufflehog source comment."},
+        {"id": "shared-minimum", "basis": "support-policy", "reason": "PAT and OAT are validated separately at their own exact lengths; the beta.4 shared 20-byte minimum is withdrawn."}
+      ],
+      "conflicts": [
+        {"property": "exact lengths 27 and 32", "positions": {"trufflehog-3.97.4": "exact 27 (PAT) and 32 (OAT)", "gitleaks-8.30.1": "no rule", "docker-docs-pat, docker-docs-oat": "no grammar published"}, "resolution": "No disagreement exists, but only one source states a length. The contract adopts it as a support-policy choice and records that a provider-issued token of another length would be an intentionally unsupported form until a second source establishes the width. The measured twins (26 and 31) are retained because they differ from the only stated width, not because the width is provider-proven."}
+      ],
+      "mutations": [
+        {"mutationKind": "length", "mutation": "length: 26 vs contracted 27", "fixtureIds": ["docker-token-pat-plain-twin", "docker-token-pat-unicode-crlf-twin"], "distinguishingProperty": "PAT body length exactly 27", "basis": "single-tool; adopted as support-policy", "disposition": "retained", "reason": "Retained as must-not-flag/T2; the tier already records that the property is tool-corroborated, not provider-documented."},
+        {"mutationKind": "length", "mutation": "length: 31 vs contracted 32", "fixtureIds": ["docker-token-oat-plain-twin", "docker-token-oat-unicode-crlf-twin"], "distinguishingProperty": "OAT body length exactly 32", "basis": "single-tool; adopted as support-policy", "disposition": "retained", "reason": "As above."}
+      ]
+    },
+    {
+      "detector": "slack-token",
+      "findingType": "slack_token",
+      "implementation": "crates/secret-scan-core/src/detectors/additional_providers.rs (SLACK)",
+      "beta4Rule": "`xoxb-`, `xoxp-`, `xapp-`, `xwfp-`, `xoxe-`, `xoxe.xoxb-` or `xoxe.xoxp-` plus >=20 bytes of `[A-Za-z0-9_-]`; no section grammar.",
+      "toolRules": {
+        "gitleaks-8.30.1": "slack-bot-token `xoxb-[0-9]{10,13}-[0-9]{10,13}[a-zA-Z0-9-]*` (no separator required before the tail); slack-legacy-bot-token `xoxb-[0-9]{8,14}-[a-zA-Z0-9]{18,26}`; slack-user-token `xox[pe](?:-[0-9]{10,13}){3}-[a-zA-Z0-9-]{28,34}`; slack-app-token `(?i)xapp-\\d-[A-Z0-9]+-\\d+-[a-z0-9]+`; slack-config-access-token `(?i)xoxe.xox[bp]-\\d-[A-Z0-9]{163,166}`; slack-config-refresh-token `(?i)xoxe-\\d-[A-Z0-9]{146}`; slack-legacy-workspace-token `xox[ar]-(?:\\d-)?[0-9a-zA-Z]{8,48}`; slack-legacy-token `xox[os]-\\d+-\\d+-\\d+-[a-fA-F\\d]+`",
+        "trufflehog-3.97.4": "slack: `xoxb\\-[0-9]{10,13}\\-[0-9]{10,13}[a-zA-Z0-9\\-]*` and the same shape for `xoxp`, `xoxa`, `xoxr` (no separator required before the tail)"
+      },
+      "variants": [
+        {
+          "id": "bot",
+          "support": "supported",
+          "tier": "T1",
+          "grammar": "xoxb-[0-9]{10,13}-[0-9]{10,13}-[A-Za-z0-9]{18,}",
+          "segments": [
+            {"name": "prefix", "literal": "xoxb-", "basis": "provider"},
+            {"name": "section-1", "alphabet": "[0-9]", "length": [10, 13], "basis": "tool-agreement (width); provider establishes only that sections are `-`-separated"},
+            {"name": "separator", "literal": "-", "basis": "provider"},
+            {"name": "section-2", "alphabet": "[0-9]", "length": [10, 13], "basis": "tool-agreement (width)"},
+            {"name": "separator", "literal": "-", "basis": "provider: \"The final section is the secret\" separated by `-`; neither tool requires this separator, which is why all three baseline scanners flag the twin"},
+            {"name": "secret", "alphabet": "[A-Za-z0-9]", "length": "18 or more", "basis": "support-policy floor: the smallest bot-secret width any consulted tool accepts (gitleaks legacy-bot 18); the provider documents no bot secret length; alphabet is the provider example's alphanumeric shape, without the `-` the tool tails allow because the provider defines the secret as the final section"}
+          ],
+          "sources": ["slack-docs-tokens", "gitleaks-8.30.1", "trufflehog-3.97.4"]
+        },
+        {"id": "user", "support": "supported-interim", "tier": "T3", "grammar": "xoxp-[A-Za-z0-9_-]{20,}", "segments": [{"name": "prefix", "literal": "xoxp-", "basis": "provider"}, {"name": "body", "alphabet": "[A-Za-z0-9_-]", "length": "20 or more", "basis": "support-policy: beta.4 rule retained unchanged as an interim guard"}], "sources": ["slack-docs-tokens", "gitleaks-8.30.1", "trufflehog-3.97.4"], "candidateGrammar": "xoxp-[0-9]{10,13}-[0-9]{10,13}-[0-9]{10,13}-[A-Za-z0-9]{32}", "candidateBasis": "provider: three `-`-separated sections then a 32-character secret (6/10-character pre-2016 secrets documented as rotatable); tools: section widths 10–13, secret 28–34 (gitleaks). No beta.4 twin measured this variant, so it is not narrowed by this contract; the benchmark scores its random-body samples as policy/T3."},
+        {"id": "app-level", "support": "supported-interim", "tier": "T3", "grammar": "xapp-[A-Za-z0-9_-]{20,}", "segments": [{"name": "prefix", "literal": "xapp-", "basis": "provider"}, {"name": "body", "alphabet": "[A-Za-z0-9_-]", "length": "20 or more", "basis": "support-policy: beta.4 rule retained unchanged as an interim guard"}], "sources": ["slack-docs-tokens", "gitleaks-8.30.1"], "candidateGrammar": "xapp-[0-9]-[A-Z0-9]+-[0-9]+-[a-z0-9]+", "candidateBasis": "single-tool (gitleaks, case-insensitive); not adopted without a second source."},
+        {"id": "workflow", "support": "supported-interim", "tier": "T0", "grammar": "xwfp-[A-Za-z0-9_-]{20,}", "segments": [{"name": "prefix", "literal": "xwfp-", "basis": "provider"}, {"name": "body", "alphabet": "[A-Za-z0-9_-]", "length": "20 or more", "basis": "support-policy: beta.4 rule retained unchanged as an interim guard"}], "sources": ["slack-docs-tokens"], "candidateGrammar": null, "candidateBasis": "No tool source registers `xwfp-`; the benchmark keeps its sample pending (T0)."},
+        {"id": "refresh", "support": "supported-interim", "tier": "T3", "grammar": "xoxe-[A-Za-z0-9_-]{20,}", "segments": [{"name": "prefix", "literal": "xoxe-", "basis": "provider (slack-docs-rotation example `xoxe-1-...`)"}, {"name": "body", "alphabet": "[A-Za-z0-9_-]", "length": "20 or more", "basis": "support-policy: beta.4 rule retained unchanged as an interim guard"}], "sources": ["slack-docs-rotation", "gitleaks-8.30.1"], "candidateGrammar": "xoxe-[0-9]-[A-Za-z0-9]{146}", "candidateBasis": "single-tool (gitleaks config-refresh-token, case-insensitive); the provider example shows `xoxe-1-` then elides the body."},
+        {"id": "rotating-bot", "support": "supported-interim", "tier": "T3", "grammar": "xoxe\\.xoxb-[A-Za-z0-9_-]{20,}", "segments": [{"name": "prefix", "literal": "xoxe.xoxb-", "basis": "provider (slack-docs-rotation example `xoxe.xoxb-1-...`)"}, {"name": "body", "alphabet": "[A-Za-z0-9_-]", "length": "20 or more", "basis": "support-policy: beta.4 rule retained unchanged as an interim guard"}], "sources": ["slack-docs-rotation", "gitleaks-8.30.1"], "candidateGrammar": "xoxe\\.xoxb-[0-9]-[A-Za-z0-9]{163,166}", "candidateBasis": "single-tool (gitleaks config-access-token, case-insensitive)."},
+        {"id": "rotating-user", "support": "supported-interim", "tier": "T3", "grammar": "xoxe\\.xoxp-[A-Za-z0-9_-]{20,}", "segments": [{"name": "prefix", "literal": "xoxe.xoxp-", "basis": "provider (slack-docs-rotation example `xoxe.xoxp-1-1234-...`)"}, {"name": "body", "alphabet": "[A-Za-z0-9_-]", "length": "20 or more", "basis": "support-policy: beta.4 rule retained unchanged as an interim guard"}], "sources": ["slack-docs-rotation", "gitleaks-8.30.1"], "candidateGrammar": "xoxe\\.xoxp-[0-9]-[A-Za-z0-9]{163,166}", "candidateBasis": "single-tool (gitleaks config-access-token, case-insensitive)."}
+      ],
+      "pending": [
+        {"id": "legacy-workspace-and-custom-integration", "prefix": "xoxa-, xoxr-, xoxs-, xoxo-", "tier": "T0", "reason": "The provider page lists legacy workspace apps as fully deprecated since August 2021 and legacy custom-integration tokens as no longer recommended, without prefixes; trufflehog registers `xoxa`/`xoxr`, gitleaks registers `xoxa`/`xoxr`/`xoxs`/`xoxo`. Not supported by beta.4 and not added by this contract."}
+      ],
+      "excluded": [
+        {"id": "bot-without-secret-separator", "basis": "provider", "reason": "A value whose second numeric section runs straight into the secret has no `-` before its final section and so has no secret section under the provider's own structure. Evidence-backed exclusion; the tools' `[a-zA-Z0-9-]*` tails accept it, which is why competitor agreement is not the negative oracle here."},
+        {"id": "bot-widths-applied-to-other-prefixes", "basis": "support-policy", "reason": "The bot section grammar applies to `xoxb-` only. Every other prefix keeps its own interim guard above."},
+        {"id": "pre-2016-short-user-secrets", "basis": "support-policy", "reason": "Not exercised by the interim user rule either way; recorded so the candidate 32-character user grammar, if adopted later, states the 6/10-character legacy secrets as intentionally unsupported."}
+      ],
+      "conflicts": [
+        {"property": "separator before the bot secret", "positions": {"slack-docs-tokens": "sections are `-`-separated and the final section is the secret", "gitleaks-8.30.1": "bot rule accepts `[a-zA-Z0-9-]*` directly after the second numeric section", "trufflehog-3.97.4": "same as gitleaks"}, "resolution": "Provider documentation comes first: the separator is required. Tool sources corroborate the numeric section widths only."},
+        {"property": "bot secret length", "positions": {"slack-docs-tokens": "not stated for bot tokens (32 stated for user tokens)", "gitleaks-8.30.1": "legacy-bot 18–26 alphanumeric; modern bot unbounded", "trufflehog-3.97.4": "unbounded"}, "resolution": "No exact length is imposed. An 18-byte alphanumeric floor is a support-policy choice taken from the smallest width any tool accepts; it is not a provider claim and the ADR says so."}
+      ],
+      "mutations": [
+        {"mutationKind": "boundary", "mutation": "boundary: missing dash before the secret section", "fixtureIds": ["slack-token-bot-plain-twin", "slack-token-bot-unicode-crlf-twin"], "distinguishingProperty": "`-` before the final (secret) section", "basis": "provider", "disposition": "retained", "reason": "Evidence-backed: the provider defines the secret as the final `-`-separated section."}
+      ]
+    },
+    {
+      "detector": "huggingface-token",
+      "findingType": "huggingface_token",
+      "implementation": "crates/secret-scan-core/src/detectors/additional_providers.rs (HUGGING_FACE)",
+      "beta4Rule": "`hf_` plus >=20 bytes of `[A-Za-z0-9_-]`.",
+      "toolRules": {
+        "gitleaks-8.30.1": "huggingface-access-token `\\b(hf_(?i:[a-z]{34}))` followed by a delimiter or end (letters only, either case); huggingface-organization-api-token `\\b(api_org_(?i:[a-z]{34}))`",
+        "trufflehog-3.97.4": "huggingface: `\\b(?:hf_|api_org_)[a-zA-Z0-9]{34}\\b`"
+      },
+      "variants": [
+        {"id": "user", "support": "supported", "tier": "T2", "grammar": "hf_[A-Za-z0-9]{34}", "segments": [{"name": "prefix", "literal": "hf_", "basis": "provider (placeholder `hf_...`) and tool-agreement"}, {"name": "body", "alphabet": "[A-Za-z0-9]", "length": 34, "basis": "length: tool-agreement; alphabet: support-policy (the union of the two tool alphabets; see conflicts)"}], "sources": ["huggingface-docs-tokens", "gitleaks-8.30.1", "trufflehog-3.97.4", "github-secret-scanning-patterns"]}
+      ],
+      "pending": [
+        {"id": "digit-bearing-body", "tier": "T0", "reason": "Accepted by the default rule as a support-policy choice (rejecting digits would follow one tool only and would create a false negative if the other tool is right). The benchmark keeps its digit-body samples pending (T0) and they stay unscored until independently reviewed; accepting them is not claimed as evidence."},
+        {"id": "organization-token", "prefix": "api_org_", "tier": "T0", "reason": "Both tools register `api_org_` with a 34-character body and GitHub lists an Organization API Token, but beta.4 does not match this prefix and adding a variant is a coverage change, not a precision fix. Recorded as a known false negative for a separate issue."}
+      ],
+      "excluded": [
+        {"id": "underscore-or-dash-in-body", "basis": "evidence", "reason": "Neither tool alphabet contains `_` or `-`; the beta.4 acceptance of them was a shared-rule artifact. Evidence-backed exclusion."},
+        {"id": "dash-prefix", "prefix": "hf-", "basis": "evidence", "reason": "Already rejected by the existing `huggingface-negative-lookalike` fixture."}
+      ],
+      "conflicts": [
+        {"property": "body alphabet", "positions": {"gitleaks-8.30.1": "letters only, either case", "trufflehog-3.97.4": "letters and digits", "huggingface-docs-tokens": "no grammar published"}, "resolution": "Not resolved by guesswork into the letters-only intersection. The default rule accepts the union `[A-Za-z0-9]` as a support-policy choice that favors not missing a real token, and scored evidence stays on letters-only positives; digit-body samples remain pending (T0). The exclusion of `_`/`-`, on which both tools agree, is evidence-backed."}
+      ],
+      "mutations": [
+        {"mutationKind": "length", "mutation": "length: 33 vs contracted 34", "fixtureIds": ["huggingface-token-user-plain-twin", "huggingface-token-user-unicode-crlf-twin"], "distinguishingProperty": "body length exactly 34", "basis": "tool-agreement", "disposition": "retained", "reason": "Both tools state 34; silence follows from construction."}
+      ]
+    },
+    {
+      "detector": "cloudflare-token",
+      "findingType": "cloudflare_api_token",
+      "implementation": "crates/secret-scan-core/src/detectors/additional_providers.rs (CLOUDFLARE)",
+      "beta4Rule": "`cfut_` plus >=20 bytes of `[A-Za-z0-9_-]`.",
+      "toolRules": {
+        "gitleaks-8.30.1": "no `cfut_` rule; cloudflare-api-key is a context-gated legacy `[a-z0-9_-]{40}` rule and cloudflare-global-api-key a context-gated `[a-f0-9]{37}` rule",
+        "trufflehog-3.97.4": "cloudflareapitoken v2: `\\b(cf[ua]t_[a-zA-Z0-9]{40}[a-f0-9]{8})\\b`"
+      },
+      "variants": [
+        {"id": "user", "support": "supported", "tier": "T1", "grammar": "cfut_[A-Za-z0-9]{40}[0-9a-f]{8}", "segments": [{"name": "prefix", "literal": "cfut_", "basis": "provider"}, {"name": "body", "alphabet": "[A-Za-z0-9]", "length": 40, "basis": "length: provider; alphabet: provider's description of the pre-2026 token as 40-character alphanumeric plus single-tool"}, {"name": "checksum", "alphabet": "[0-9a-f]", "length": 8, "basis": "existence: provider; width and alphabet: single-tool; adopted as support-policy. Lexical only: no checksum algorithm is computed or claimed."}], "sources": ["cloudflare-token-formats", "cloudflare-create-token", "trufflehog-3.97.4", "github-secret-scanning-patterns"]}
+      ],
+      "pending": [
+        {"id": "account-token", "prefix": "cfat_", "tier": "T1", "reason": "Provider-documented with the same `[40 characters][checksum]` shape and matched by trufflehog, but not matched by beta.4. Adding it is a coverage change for a separate issue, not part of the precision fix; recorded as a known false negative."},
+        {"id": "scannable-global-key", "prefix": "cfk_", "tier": "T1", "reason": "Provider-documented; not matched by beta.4 or by either tool. Same disposition as `cfat_`."}
+      ],
+      "excluded": [
+        {"id": "legacy-unprefixed-formats", "basis": "evidence", "reason": "The pre-2026 40-character alphanumeric token and 37–45-character hex global key are indistinguishable from ordinary opaque values without a prefix; already recorded in the module documentation as a known false negative."},
+        {"id": "non-hex-checksum", "basis": "single-tool; adopted as support-policy", "reason": "The provider says a checksum follows the 40-character body but does not publish its width or alphabet; the 8-byte lowercase-hex form comes from one tool. A token whose trailing eight bytes are not lowercase hex is intentionally unsupported under this choice."}
+      ],
+      "conflicts": [
+        {"property": "checksum width and alphabet", "positions": {"cloudflare-token-formats": "a checksum follows the body; width and alphabet unstated", "trufflehog-3.97.4": "8 lowercase-hex bytes", "gitleaks-8.30.1": "no rule"}, "resolution": "Provider evidence establishes that a checksum segment exists (so a 40-byte body alone is malformed); one tool supplies its width and alphabet. Adopted as support-policy and recorded as lexical validation only."}
+      ],
+      "mutations": [
+        {"mutationKind": "alphabet", "mutation": "alphabet: non-hexadecimal eight-character suffix", "fixtureIds": ["cloudflare-token-user-plain-twin", "cloudflare-token-user-unicode-crlf-twin"], "distinguishingProperty": "eight-byte lowercase-hex checksum", "basis": "existence: provider; width and alphabet: single-tool; adopted as support-policy", "disposition": "retained", "reason": "Retained as must-not-flag: the value has no checksum segment of any shape a consulted source describes. The tier stays T1 for the prefix and body; the suffix alphabet is recorded as tool-corroborated."}
+      ]
+    },
+    {
+      "detector": "linear-token",
+      "findingType": "linear_token",
+      "implementation": "crates/secret-scan-core/src/detectors/additional_providers.rs (LINEAR)",
+      "beta4Rule": "`lin_api_` or `lin_oauth_` plus >=20 bytes of `[A-Za-z0-9_-]`; both prefixes share one rule.",
+      "toolRules": {
+        "gitleaks-8.30.1": "linear-api-key `lin_api_(?i)[a-z0-9]{40}`; linear-client-secret is a context-gated `[a-f0-9]{32}` rule; no `lin_oauth_` rule",
+        "trufflehog-3.97.4": "linearapi: `\\b(lin_api_[0-9A-Za-z]{40})\\b`; no `lin_oauth_` detector"
+      },
+      "variants": [
+        {"id": "api", "support": "supported", "tier": "T2", "grammar": "lin_api_[A-Za-z0-9]{40}", "segments": [{"name": "prefix", "literal": "lin_api_", "basis": "tool-agreement; existence of the type corroborated by github-secret-scanning-patterns"}, {"name": "body", "alphabet": "[A-Za-z0-9]", "length": 40, "basis": "tool-agreement"}], "sources": ["gitleaks-8.30.1", "trufflehog-3.97.4", "github-secret-scanning-patterns", "linear-docs-graphql", "linear-docs-api-webhooks"]},
+        {"id": "oauth", "support": "supported-interim", "tier": "T0", "grammar": "lin_oauth_[A-Za-z0-9_-]{20,}", "segments": [{"name": "prefix", "literal": "lin_oauth_", "basis": "support-policy: no consulted provider or tool source shows this prefix; the provider's OAuth example is a bare 64-character hex string"}, {"name": "body", "alphabet": "[A-Za-z0-9_-]", "length": "20 or more", "basis": "support-policy: beta.4 rule retained unchanged as a separate interim guard"}], "sources": ["linear-docs-oauth", "github-secret-scanning-patterns"], "candidateGrammar": null, "candidateBasis": "GitHub lists a Linear OAuth Access Token type but no consulted source shows its grammar. The 40-byte API-key length must not be reused for it; the benchmark keeps its sample pending (T0)."}
+      ],
+      "pending": [
+        {"id": "unprefixed-oauth-access-token", "tier": "T0", "reason": "The provider's OAuth documentation shows a bare 64-character hex access token. Without a prefix it is indistinguishable from ordinary hex and is not a candidate for a provider rule."}
+      ],
+      "excluded": [
+        {"id": "underscore-or-dash-in-api-body", "basis": "evidence", "reason": "Neither tool alphabet contains `_` or `-`; the beta.4 acceptance was a shared-rule artifact."}
+      ],
+      "conflicts": [
+        {"property": "case of the API-key body", "positions": {"gitleaks-8.30.1": "case-insensitive alphanumeric", "trufflehog-3.97.4": "mixed-case alphanumeric"}, "resolution": "Both accept `[A-Za-z0-9]`; no conflict in effect."}
+      ],
+      "mutations": [
+        {"mutationKind": "length", "mutation": "length: 39 vs contracted 40", "fixtureIds": ["linear-token-api-plain-twin", "linear-token-api-unicode-crlf-twin"], "distinguishingProperty": "API-key body length exactly 40", "basis": "tool-agreement", "disposition": "retained", "reason": "Both tools state 40; silence follows from construction."}
+      ]
+    }
+  ]
+}

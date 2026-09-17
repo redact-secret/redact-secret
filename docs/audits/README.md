@@ -25,6 +25,7 @@ and [qualification follow-up](release-qualification-follow-up.md) describe beta.
 | Remediation classification | [Release gaps](release-gap-disposition.md), [deferred quality](deferred-quality-backlog.md) |
 | Earlier release readiness | [Readiness audit](release-readiness-audit.md) |
 | Independent repeat audit (#145) | [Revision-bound verdict and residual findings](repeated-release-readiness-audit.md) |
+| Precision contracts (#367) | [Frozen contracts, beta.4 twin baseline and corpus audit](evidence/367/README.md) |
 | Detection assurance | [Epic closeout](detection-assurance-epic-closeout.md), [historical closeout](detection-assurance-closeout-audit.md), [residual evidence](detection-assurance-residual-evidence-backlog.md) |
 | Repository transfer | [Transfer evidence](repository-transfer-evidence.md) |
 | Release authority and publishers | [Recorded evidence](release-approval-and-registry-publisher-evidence.md) |
