@@ -3335,6 +3335,179 @@
       "type": "twilio_api_key_secret"
     },
     {
+      "behaviorClass": "provider",
+      "detector": "sentry-user-auth-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "sentry-user-auth-token-positive-bare",
+            "sentry-user-auth-token-positive-crlf-unicode-prefix",
+            "sentry-user-auth-token-positive-dotenv",
+            "sentry-user-auth-token-positive-json",
+            "sentry-user-auth-token-positive-log",
+            "sentry-user-auth-token-positive-yaml"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "sentry-user-auth-token-overlap-generic-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "sentry-user-auth-token-adversarial-long-run"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "sentry-user-auth-token-boundary-above-exact",
+            "sentry-user-auth-token-boundary-below-min"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "sentry-user-auth-token-negative-masked",
+            "sentry-user-auth-token-negative-public-dsn",
+            "sentry-user-auth-token-negative-reference",
+            "sentry-user-auth-token-negative-wrong-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "sentry-user-auth-token-boundary-above-exact",
+            "sentry-user-auth-token-boundary-below-min"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for sentry_user_auth_token (sentry-user-auth-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "sentry_user_auth_token"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "sentry-org-auth-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "sentry-org-auth-token-positive-bare-long-payload",
+            "sentry-org-auth-token-positive-bare-min-payload",
+            "sentry-org-auth-token-positive-crlf-unicode-prefix",
+            "sentry-org-auth-token-positive-dotenv",
+            "sentry-org-auth-token-positive-json",
+            "sentry-org-auth-token-positive-log",
+            "sentry-org-auth-token-positive-padded-payload",
+            "sentry-org-auth-token-positive-yaml"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "sentry-org-auth-token-overlap-generic-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "sentry-org-auth-token-adversarial-long-run"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "sentry-org-auth-token-boundary-above-max-signature",
+            "sentry-org-auth-token-boundary-below-min-payload",
+            "sentry-org-auth-token-boundary-below-min-signature",
+            "sentry-org-auth-token-boundary-missing-json-marker",
+            "sentry-org-auth-token-boundary-missing-separator"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "sentry-org-auth-token-negative-masked",
+            "sentry-org-auth-token-negative-public-dsn",
+            "sentry-org-auth-token-negative-reference"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "sentry-org-auth-token-boundary-above-max-signature",
+            "sentry-org-auth-token-boundary-below-min-payload",
+            "sentry-org-auth-token-boundary-below-min-signature",
+            "sentry-org-auth-token-boundary-missing-json-marker",
+            "sentry-org-auth-token-boundary-missing-separator"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for sentry_org_auth_token (sentry-org-auth-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "sentry_org_auth_token"
+    },
+    {
       "behaviorClass": "incremental",
       "detector": "unassigned",
       "dimensions": [
@@ -3427,6 +3600,8 @@
             "private-key-adversarial-nested",
             "pypi-adversarial-long-suffix",
             "sendgrid-adversarial-incomplete-suffix",
+            "sentry-org-auth-token-adversarial-long-run",
+            "sentry-user-auth-token-adversarial-long-run",
             "shopify-adversarial-long-suffix",
             "slack-adversarial-long-suffix",
             "stripe-adversarial-long-suffix",
@@ -3723,6 +3898,8 @@
             "private-key-adversarial-nested",
             "pypi-adversarial-long-suffix",
             "sendgrid-adversarial-incomplete-suffix",
+            "sentry-org-auth-token-adversarial-long-run",
+            "sentry-user-auth-token-adversarial-long-run",
             "shopify-adversarial-long-suffix",
             "slack-adversarial-long-suffix",
             "stripe-adversarial-long-suffix",

@@ -274,6 +274,20 @@
       "policyClass": "confidence-gated",
       "reconciliationTrigger": "twilio SKaB3dE5gH7jK9mN1pQ3sT5vW7yZ9AbC3d zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE",
       "schemes": null
+    },
+    {
+      "type": "sentry_user_auth_token",
+      "detector": "sentry-user-auth-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "sntryu_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      "schemes": null
+    },
+    {
+      "type": "sentry_org_auth_token",
+      "detector": "sentry-org-auth-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "sntrys_eyJSYNTHETICREVOKEDSENTRYO_SigFixSYNTHETICREVOKED0123456789SigFixSYNTH",
+      "schemes": null
     }
   ],
   "consumers": [

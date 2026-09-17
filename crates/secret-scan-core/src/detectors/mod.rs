@@ -27,6 +27,7 @@ mod otpauth;
 mod pattern;
 mod private_key;
 mod sendgrid;
+mod sentry;
 mod shopify;
 mod telegram;
 mod text;
@@ -74,6 +75,8 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(twilio::TwilioApiKeySecretDetector),
         telegram::telegram_bot_token_detector(),
         Box::new(discord::DiscordBotTokenDetector),
+        Box::new(sentry::SentryUserAuthTokenDetector),
+        Box::new(sentry::SentryOrgAuthTokenDetector),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
         Box::new(ConnectionStringDetector),
@@ -135,6 +138,8 @@ mod tests {
                 "twilio-api-key-secret",
                 "telegram-bot-token",
                 "discord-bot-token",
+                "sentry-user-auth-token",
+                "sentry-org-auth-token",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -184,7 +189,14 @@ mod tests {
             "twilio SKaB3dE5gH7jK9mN1pQ3sT5vW7yZ9AbC3d zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE";
         let telegram_input = "123456:SYNTHETIC_REVOKED_TELEGRAM_BOT_TOKEN_SECRET";
         let discord_input = "MDAwMDAwMDAwMDAwMDAwMDAw.REVOKE.SYNTHETICREVOKEDBOTTOKENFIX";
-        let cases: [(&str, &str); 28] = [
+        let sentry_user_auth_token_input =
+            format!("sntryu_{}", "0123456789abcdef".repeat(4));
+        let sentry_org_auth_token_input = format!(
+            "sntrys_eyJ{}_{}",
+            &"SYNTHETICREVOKEDSENTRYORGPAYLOADFIXTURE0123456789".repeat(4)[..23],
+            &"SigFixSYNTHETICREVOKED0123456789".repeat(2)[..43]
+        );
+        let cases: [(&str, &str); 30] = [
             ("aws-access-key", "AKIASYNTHETICEXAMPLE"),
             (
                 "github-token",
@@ -228,6 +240,8 @@ mod tests {
             ("twilio-api-key-secret", twilio_api_key_secret_input),
             ("discord-bot-token", discord_input),
             ("telegram-bot-token", telegram_input),
+            ("sentry-user-auth-token", sentry_user_auth_token_input.as_str()),
+            ("sentry-org-auth-token", sentry_org_auth_token_input.as_str()),
         ];
         let detectors = built_in_detectors();
         for (id, input) in cases {
