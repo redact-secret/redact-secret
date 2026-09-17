@@ -43,6 +43,7 @@ ROOT = Path(__file__).resolve().parents[1]
 CORPUS_PATH = ROOT / "conformance" / "fixtures" / "synchronous-corpus.json"
 
 DEFAULT_DETECTORS = ("stripe-token", "shopify-token", "supabase-token")
+DEFAULT_ISSUE = "https://github.com/redact-secret/redact-secret/issues/316"
 ENFORCED_BY = (
     "crates/secret-scan-core/tests/canonical_corpus.rs"
     "::scan_matches_the_canonical_synchronous_corpus"
@@ -96,16 +97,23 @@ def build_detector_row(detector: str, corpus_fixtures: list[dict]) -> dict:
     }
 
 
-def build_report(corpus: dict, detectors: list[str]) -> dict:
+def build_report(
+    corpus: dict, detectors: list[str], issues: list[str] | None = None
+) -> dict:
     fixtures = corpus["fixtures"]
     known_detectors = {f["detector"] for f in fixtures}
     missing = sorted(set(detectors) - known_detectors)
     if missing:
         raise ValueError(f"detector(s) not present in the corpus: {missing}")
 
+    resolved_issues = issues or [DEFAULT_ISSUE]
+    issue_field: str | list[str] = (
+        resolved_issues[0] if len(resolved_issues) == 1 else resolved_issues
+    )
+
     return {
         "provenance": {
-            "issue": "https://github.com/redact-secret/redact-secret/issues/316",
+            "issue": issue_field,
             "corpus": "conformance/fixtures/synchronous-corpus.json",
             "enforcedBy": ENFORCED_BY,
         },
@@ -122,12 +130,18 @@ def main(argv: list[str] | None = None) -> int:
         action="append",
         help="detector id to report on; may be repeated (default: stripe-token, shopify-token, supabase-token)",
     )
+    parser.add_argument(
+        "--issue",
+        dest="issues",
+        action="append",
+        help="requesting issue URL to record in provenance.issue; may be repeated (default: issue #316)",
+    )
     parser.add_argument("--out", type=Path, default=None, help="write the report here instead of stdout")
     args = parser.parse_args(argv)
 
     detectors = args.detectors or list(DEFAULT_DETECTORS)
     corpus = load_json(args.corpus)
-    report = build_report(corpus, detectors)
+    report = build_report(corpus, detectors, args.issues)
     text = json.dumps(report, indent=2, sort_keys=True) + "\n"
 
     if args.out is not None:

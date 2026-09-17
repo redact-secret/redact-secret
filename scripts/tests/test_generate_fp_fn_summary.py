@@ -88,6 +88,23 @@ class BuildReportTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             GEN.build_report(corpus, ["widget", "not-a-real-detector"])
 
+    def test_provenance_issue_defaults_to_a_single_string(self) -> None:
+        corpus = {"fixtures": [fixture("widget-positive-a", "widget", kind="positive")]}
+        report = GEN.build_report(corpus, ["widget"])
+        self.assertEqual(report["provenance"]["issue"], GEN.DEFAULT_ISSUE)
+
+    def test_provenance_issue_is_a_list_when_multiple_issues_are_reported(self) -> None:
+        corpus = {"fixtures": [fixture("widget-positive-a", "widget", kind="positive")]}
+        report = GEN.build_report(
+            corpus,
+            ["widget"],
+            issues=[GEN.DEFAULT_ISSUE, "https://github.com/redact-secret/redact-secret/issues/317"],
+        )
+        self.assertEqual(
+            report["provenance"]["issue"],
+            [GEN.DEFAULT_ISSUE, "https://github.com/redact-secret/redact-secret/issues/317"],
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

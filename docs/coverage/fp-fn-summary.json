@@ -1,6 +1,84 @@
 {
   "detectors": [
     {
+      "detector": "anthropic-token",
+      "falseNegativeGuards": {
+        "actualFalseNegatives": 0,
+        "count": 11,
+        "fixtureIds": [
+          "anthropic-positive-doc-style-placeholder",
+          "anthropic-positive-json",
+          "anthropic-positive-log",
+          "anthropic-positive-min-length",
+          "anthropic-positive-punctuation-adjacent",
+          "anthropic-positive-repeated-value",
+          "anthropic-positive-shell-quoted",
+          "anthropic-positive-unicode-byte-offset",
+          "anthropic-positive-versioned",
+          "anthropic-positive-yaml",
+          "anthropic-positive-yaml-crlf"
+        ]
+      },
+      "falsePositiveGuards": {
+        "actualFalsePositives": 0,
+        "count": 5,
+        "fixtureIds": [
+          "anthropic-negative-embedded-in-wider-identifier",
+          "anthropic-negative-legacy-unversioned-tradeoff",
+          "anthropic-negative-near-prefix-underscore",
+          "anthropic-negative-placeholder",
+          "anthropic-negative-unrelated-id"
+        ]
+      },
+      "hostContextsExercised": [
+        "json",
+        "log",
+        "plain-text",
+        "shell",
+        "yaml"
+      ]
+    },
+    {
+      "detector": "openai-token",
+      "falseNegativeGuards": {
+        "actualFalseNegatives": 0,
+        "count": 13,
+        "fixtureIds": [
+          "openai-positive-all-prefixes",
+          "openai-positive-doc-style-placeholder",
+          "openai-positive-json",
+          "openai-positive-log",
+          "openai-positive-min-length",
+          "openai-positive-namespace-separation-all-variants",
+          "openai-positive-project",
+          "openai-positive-punctuation-adjacent",
+          "openai-positive-repeated-value",
+          "openai-positive-shell-quoted",
+          "openai-positive-unicode-byte-offset",
+          "openai-positive-yaml",
+          "openai-positive-yaml-crlf"
+        ]
+      },
+      "falsePositiveGuards": {
+        "actualFalsePositives": 0,
+        "count": 5,
+        "fixtureIds": [
+          "openai-negative-embedded-in-wider-identifier",
+          "openai-negative-lookalike",
+          "openai-negative-model-name",
+          "openai-negative-near-prefix-underscore",
+          "openai-negative-placeholder"
+        ]
+      },
+      "hostContextsExercised": [
+        "json",
+        "log",
+        "plain-text",
+        "shell",
+        "yaml"
+      ]
+    },
+    {
       "detector": "shopify-token",
       "falseNegativeGuards": {
         "actualFalseNegatives": 0,
@@ -126,6 +204,9 @@
   "provenance": {
     "corpus": "conformance/fixtures/synchronous-corpus.json",
     "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
-    "issue": "https://github.com/redact-secret/redact-secret/issues/316"
+    "issue": [
+      "https://github.com/redact-secret/redact-secret/issues/316",
+      "https://github.com/redact-secret/redact-secret/issues/317"
+    ]
   }
 }
