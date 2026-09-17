@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 34,
+  "fixtureCount": 36,
   "fixtures": [
     {
       "id": "synthetic-regression-malformed-authority",
@@ -147,8 +147,8 @@
     },
     {
       "id": "fixed-width-unicode",
-      "input": "before 🧪 AKIASYNTHETICEXAMPLE after",
-      "text": "before 🧪 <SECRET_1> after",
+      "input": "before \ud83e\uddea AKIASYNTHETICEXAMPLE after",
+      "text": "before \ud83e\uddea <SECRET_1> after",
       "expected": [
         {
           "detector": "aws-access-key",
@@ -567,6 +567,29 @@
         }
       ],
       "note": "The fixed-prefix, minimum-length glc_ shape needs no cross-line context, so it is identical whole-input and incremental at every chunk split, including one that falls inside the token itself."
+    },
+    {
+      "id": "new-relic-license-key-line-scoped-context-same-line",
+      "input": "newrelic 0123456789abcdef0123456789abcdef01234567",
+      "text": "newrelic 0123456789abcdef0123456789abcdef01234567",
+      "expected": [
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 9,
+          "end": 49
+        }
+      ],
+      "note": "The new-relic keyword and the License Key stay on one incremental unit (a line) at every chunk split, so medium-confidence detection is identical whole-input and incremental; DefaultPolicy warns rather than redacts at medium confidence, so the finalized text is unchanged from the input."
+    },
+    {
+      "id": "new-relic-license-key-line-scoped-context-different-line",
+      "input": "newrelic\n0123456789abcdef0123456789abcdef01234567\n",
+      "text": "newrelic\n0123456789abcdef0123456789abcdef01234567\n",
+      "expected": [],
+      "note": "Context is deliberately scoped to a single line so this documented false negative (the new-relic keyword and the License Key on separate lines) stays a non-match identically whole-input and incremental, at every chunk split including one that falls between the two lines."
     }
   ]
 }

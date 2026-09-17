@@ -5,6 +5,22 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+- Added `new-relic-user-api-key` and `new-relic-license-key` detectors
+  recognizing New Relic User API Keys and (ingest) License Keys. The User API
+  Key is New Relic's own documented `NRAK-` prefix plus an exact 27-byte
+  uppercase-alphanumeric body (32 bytes total, converging with gitleaks's and
+  trufflehog's independent detectors), always redacted at high confidence.
+  The License Key is documented only as "a 40-character hexadecimal string"
+  with no marker of its own, so -- following the same reliable-context
+  requirement Twilio's bare hex formats already use -- it is only classified
+  when a `newrelic`/`new_relic`/`new-relic`/`new relic` substring shares its
+  physical line, at medium confidence. A masked placeholder of a single
+  repeated character is excluded from both formats. The Browser Key and
+  Mobile App Token are explicitly reviewed and excluded: New Relic's own
+  documentation designs both for public client embedding, not as secrets.
+  The legacy Insights Insert/Query Keys, the deprecated Admin Key, and the
+  bare account-scoped "user API id" are documented out-of-scope gaps, not
+  silently dropped.
 - Added `sentry-user-auth-token` and `sentry-org-auth-token` detectors
   recognizing Sentry's documented-in-practice prefixed token formats: a
   user auth token is the literal `sntryu_` followed by an exact 64-byte

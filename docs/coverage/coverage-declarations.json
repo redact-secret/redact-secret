@@ -3841,6 +3841,163 @@
       "type": "sentry_org_auth_token"
     },
     {
+      "behaviorClass": "provider",
+      "detector": "new-relic-user-api-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "new-relic-user-api-key-positive-bare",
+            "new-relic-user-api-key-positive-dotenv",
+            "new-relic-user-api-key-positive-json",
+            "new-relic-user-api-key-positive-log",
+            "new-relic-user-api-key-positive-yaml",
+            "new-relic-user-api-key-regression-crlf-and-unicode-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "new-relic-user-api-key-overlap-generic-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "new-relic-user-api-key-adversarial-long-padding"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "new-relic-user-api-key-boundary-wrong-length"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "new-relic-user-api-key-negative-environment-variable-reference",
+            "new-relic-user-api-key-negative-repeated-character-filler"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "new-relic-user-api-key-boundary-wrong-length"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for new_relic_user_api_key (new-relic-user-api-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "new_relic_user_api_key"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "new-relic-license-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "new-relic-license-key-positive-dotenv-keyword",
+            "new-relic-license-key-positive-json-keyword",
+            "new-relic-license-key-positive-log-keyword",
+            "new-relic-license-key-positive-yaml-keyword",
+            "new-relic-license-key-regression-crlf-and-unicode-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "new-relic-license-key-overlap-beats-bearer-token"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "new-relic-license-key-adversarial-dense-findings"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "new-relic-license-key-boundary-wrong-length"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "new-relic-license-key-negative-environment-variable-reference",
+            "new-relic-license-key-negative-repeated-character-filler"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "new-relic-license-key-boundary-wrong-length"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for new_relic_license_key (new-relic-license-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "new_relic_license_key"
+    },
+    {
       "behaviorClass": "incremental",
       "detector": "unassigned",
       "dimensions": [
@@ -3893,6 +4050,8 @@
             "mongodb-seed-list-connection",
             "multiline-private-key",
             "negative-end-of-stream",
+            "new-relic-license-key-line-scoped-context-different-line",
+            "new-relic-license-key-line-scoped-context-same-line",
             "redis-password-only-connection",
             "stripe-public-secret-prefix-discriminating-boundary",
             "structural-overlap",
@@ -3932,6 +4091,8 @@
             "jwt-adversarial-incomplete",
             "linear-adversarial-long-suffix",
             "microsoft-entra-client-secret-adversarial-long-padding",
+            "new-relic-license-key-adversarial-dense-findings",
+            "new-relic-user-api-key-adversarial-long-padding",
             "notion-token-adversarial-long-padding",
             "npm-adversarial-long-suffix",
             "openai-adversarial-long-suffix",
@@ -4141,6 +4302,8 @@
             "mongodb-seed-list-connection",
             "multiline-private-key",
             "negative-end-of-stream",
+            "new-relic-license-key-line-scoped-context-different-line",
+            "new-relic-license-key-line-scoped-context-same-line",
             "redis-password-only-connection",
             "stripe-public-secret-prefix-discriminating-boundary",
             "structural-overlap",
@@ -4238,6 +4401,8 @@
             "jwt-adversarial-incomplete",
             "linear-adversarial-long-suffix",
             "microsoft-entra-client-secret-adversarial-long-padding",
+            "new-relic-license-key-adversarial-dense-findings",
+            "new-relic-user-api-key-adversarial-long-padding",
             "notion-token-adversarial-long-padding",
             "npm-adversarial-long-suffix",
             "openai-adversarial-long-suffix",
@@ -4505,6 +4670,8 @@
             "mongodb-seed-list-connection",
             "multiline-private-key",
             "negative-end-of-stream",
+            "new-relic-license-key-line-scoped-context-different-line",
+            "new-relic-license-key-line-scoped-context-same-line",
             "redis-password-only-connection",
             "stripe-public-secret-prefix-discriminating-boundary",
             "structural-overlap",

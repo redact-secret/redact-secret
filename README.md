@@ -208,7 +208,7 @@ Built-in Rust detection covers:
   Notion, Atlassian Cloud (Jira / Confluence), Twilio Auth Token/API Key
   Secret, Telegram Bot API, Discord bot, Sentry user/organization auth token,
   Datadog API/Application Key, Grafana service account, and Grafana Cloud access
-  policy credentials;
+  policy, and New Relic User API Key/License Key credentials;
 - contextual credential assignments, including AWS secret-access-key and
   session-token setting names;
 - credential-bearing PostgreSQL, MySQL, MariaDB, MongoDB, Redis, and AMQP URLs;

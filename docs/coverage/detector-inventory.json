@@ -316,6 +316,20 @@
       "policyClass": "always-redact",
       "reconciliationTrigger": "sntrys_eyJSYNTHETICREVOKEDSENTRYO_SigFixSYNTHETICREVOKED0123456789SigFixSYNTH",
       "schemes": null
+    },
+    {
+      "type": "new_relic_user_api_key",
+      "detector": "new-relic-user-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "NRAK-SYNTHETICREVOKEDNEWRELICUSA",
+      "schemes": null
+    },
+    {
+      "type": "new_relic_license_key",
+      "detector": "new-relic-license-key",
+      "policyClass": "confidence-gated",
+      "reconciliationTrigger": "newrelic 0123456789abcdef0123456789abcdef01234567",
+      "schemes": null
     }
   ],
   "consumers": [
