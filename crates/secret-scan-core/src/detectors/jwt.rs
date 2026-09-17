@@ -178,6 +178,27 @@ mod tests {
     }
 
     #[test]
+    fn ordinary_base64_without_a_delimiter_is_excluded() {
+        // Starts with the literal header prefix and is otherwise a valid,
+        // long base64url run, but never reaches the required dot delimiter.
+        assert!(
+            detect("eyJordinaryBase64TextWithNoDelimitersAnywhereInTheRun").is_empty(),
+            "the eyJ prefix alone is not sufficient without the three-segment shape"
+        );
+    }
+
+    #[test]
+    fn structural_match_ignores_decoded_claims_semantics() {
+        // An alg:none header and an already-expired exp claim are policy and
+        // structural questions the decoded JSON would answer; this detector
+        // never decodes or evaluates claims, so the shape alone still
+        // matches.
+        let input = "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJzdWIiOiJzeW50aGV0aWMtcmV2b2tlZC1zdWJqZWN0IiwiZXhwIjoxfQ.SYNTHETIC_REVOKED_UNSIGNED_PLACEHOLDER";
+        let candidates = detect(input);
+        assert_eq!(only_range(&candidates), (0, input.len()));
+    }
+
+    #[test]
     fn adjacent_identifier_characters_reject_the_boundary() {
         assert!(
             detect("xeyJAAAAA.eyJAAAAA.AAAAAAAAAAAAAAAAAAAA").is_empty(),
