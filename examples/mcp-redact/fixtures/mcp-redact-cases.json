@@ -1,0 +1,120 @@
+{
+  "resultCases": [
+    {
+      "name": "single text block",
+      "input": { "content": [{ "type": "text", "text": "prefix SECRET_TOKEN_1 suffix" }] },
+      "expectedBlocked": false,
+      "expected": { "content": [{ "type": "text", "text": "prefix <SECRET_1> suffix" }] }
+    },
+    {
+      "name": "JSON-in-text result",
+      "input": { "content": [{ "type": "text", "text": "{\"apiKey\":\"SECRET_TOKEN_9\",\"ok\":true}" }] },
+      "expectedBlocked": false,
+      "expected": { "content": [{ "type": "text", "text": "{\"apiKey\":\"<SECRET_1>\",\"ok\":true}" }] }
+    },
+    {
+      "name": "multi-block result: text, image passthrough, warn text",
+      "input": {
+        "content": [
+          { "type": "text", "text": "prefix SECRET_TOKEN_1 suffix" },
+          { "type": "image", "data": "YWJjZA==", "mimeType": "image/png" },
+          { "type": "text", "text": "WARN_ME please" }
+        ]
+      },
+      "expectedBlocked": false,
+      "expected": {
+        "content": [
+          { "type": "text", "text": "prefix <SECRET_1> suffix" },
+          { "type": "image", "data": "YWJjZA==", "mimeType": "image/png" },
+          { "type": "text", "text": "WARN_ME please" }
+        ]
+      }
+    },
+    {
+      "name": "embedded text resource block",
+      "input": {
+        "content": [
+          {
+            "type": "resource",
+            "resource": { "uri": "file:///x.txt", "mimeType": "text/plain", "text": "token SECRET_TOKEN_2 here" }
+          }
+        ]
+      },
+      "expectedBlocked": false,
+      "expected": {
+        "content": [
+          {
+            "type": "resource",
+            "resource": { "uri": "file:///x.txt", "mimeType": "text/plain", "text": "token <SECRET_1> here" }
+          }
+        ]
+      }
+    },
+    {
+      "name": "embedded blob resource passes through unchanged",
+      "input": {
+        "content": [
+          { "type": "resource", "resource": { "uri": "file:///x.bin", "mimeType": "application/octet-stream", "blob": "SECRET_TOKEN_7" } }
+        ]
+      },
+      "expectedBlocked": false,
+      "expected": {
+        "content": [
+          { "type": "resource", "resource": { "uri": "file:///x.bin", "mimeType": "application/octet-stream", "blob": "SECRET_TOKEN_7" } }
+        ]
+      }
+    },
+    {
+      "name": "structuredContent is redacted alongside content",
+      "input": { "content": [], "structuredContent": { "nested": { "value": "SECRET_TOKEN_3" } } },
+      "expectedBlocked": false,
+      "expected": { "content": [], "structuredContent": { "nested": { "value": "<SECRET_1>" } } }
+    },
+    {
+      "name": "unicode text is redacted correctly",
+      "input": { "content": [{ "type": "text", "text": "héllo SECRET_TOKEN_8 wörld 😀" }] },
+      "expectedBlocked": false,
+      "expected": { "content": [{ "type": "text", "text": "héllo <SECRET_1> wörld 😀" }] }
+    },
+    {
+      "name": "a block finding blocks the whole result",
+      "input": { "content": [{ "type": "text", "text": "prefix BLOCK_ME suffix" }] },
+      "expectedBlocked": true
+    },
+    {
+      "name": "a core failure fails closed",
+      "input": { "content": [{ "type": "text", "text": "trigger BOOM here" }] },
+      "expectedBlocked": true
+    }
+  ],
+  "argumentCases": [
+    {
+      "name": "nested argument object",
+      "input": { "path": "/tmp/x", "meta": { "token": "SECRET_TOKEN_4" } },
+      "expectedBlocked": false,
+      "expected": { "path": "/tmp/x", "meta": { "token": "<SECRET_1>" } }
+    },
+    {
+      "name": "argument array of strings",
+      "input": { "tags": ["a", "SECRET_TOKEN_5", "c"] },
+      "expectedBlocked": false,
+      "expected": { "tags": ["a", "<SECRET_1>", "c"] }
+    },
+    {
+      "name": "argument unicode",
+      "input": { "note": "héllo SECRET_TOKEN_6 wörld" },
+      "expectedBlocked": false,
+      "expected": { "note": "héllo <SECRET_1> wörld" }
+    },
+    {
+      "name": "a block finding blocks the whole argument set",
+      "input": { "password": "prefix BLOCK_ME suffix" },
+      "expectedBlocked": true
+    },
+    {
+      "name": "a core failure on an argument fails closed",
+      "input": { "value": "trigger BOOM here" },
+      "expectedBlocked": true
+    }
+  ]
+}
