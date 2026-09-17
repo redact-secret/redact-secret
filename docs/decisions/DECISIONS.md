@@ -29,3 +29,4 @@ future planning and implementation but do not authorize Git or release actions.
 - [Freeze the Twilio Auth Token and API Key Secret grammar as context-gated 32-byte values](2026-09-16-freeze-twilio-auth-token-api-key-secret-grammar.md)
 - [Freeze the Telegram Bot API token grammar as a minimum-length digit-colon-secret shape](2026-09-16-freeze-telegram-bot-api-token-grammar.md)
 - [Freeze the Discord bot token grammar as a three-segment digit-decoding snowflake token](2026-09-16-freeze-discord-bot-token-grammar.md)
+- [Freeze the Grafana service account and Cloud access policy token grammar, and exclude the legacy API key](2026-09-16-freeze-grafana-service-account-and-cloud-access-policy-token-grammar.md)

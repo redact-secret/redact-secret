@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 656,
+  "fixtureCount": 683,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -15387,6 +15387,502 @@
         }
       ],
       "note": "A single twilio-context-bearing line densely packed with candidate-shaped runs stays linear: per-line (not per-candidate) context checks keep this bounded."
-    }
+    },
+  {
+    "id": "grafana-service-account-token-positive-bare",
+    "detector": "grafana-service-account-token",
+    "kind": "positive",
+    "support": "supported",
+    "tier": "canonical",
+    "contexts": [
+      "plain-text"
+    ],
+    "input": "glsa_SYNTHETICREVOKEDGRAFANASATOKEN01_deadbeef",
+    "expected": [
+      {
+        "detector": "grafana-service-account-token",
+        "type": "grafana_service_account_token",
+        "confidence": "high",
+        "specificity": "provider",
+        "start": 0,
+        "end": 46
+      }
+    ],
+    "note": "The three-part glsa_<body>_<checksum> shape is sufficient on its own; no surrounding context is required."
+  },
+  {
+    "id": "grafana-service-account-token-positive-dotenv",
+    "detector": "grafana-service-account-token",
+    "kind": "positive",
+    "support": "supported",
+    "tier": "canonical",
+    "contexts": [
+      "dotenv"
+    ],
+    "input": "GRAFANA_SERVICE_ACCOUNT_TOKEN=glsa_SYNTHETICREVOKEDGRAFANASATOKEN01_deadbeef",
+    "expected": [
+      {
+        "detector": "grafana-service-account-token",
+        "type": "grafana_service_account_token",
+        "confidence": "high",
+        "specificity": "provider",
+        "start": 30,
+        "end": 76
+      }
+    ],
+    "note": "A bare dotenv-style assignment (KEY=<token>, no quotes) is detected by format alone."
+  },
+  {
+    "id": "grafana-service-account-token-positive-json",
+    "detector": "grafana-service-account-token",
+    "kind": "positive",
+    "support": "supported",
+    "tier": "canonical",
+    "contexts": [
+      "json"
+    ],
+    "input": "{\"token\": \"glsa_SYNTHETICREVOKEDGRAFANASATOKEN01_deadbeef\"}",
+    "expected": [
+      {
+        "detector": "grafana-service-account-token",
+        "type": "grafana_service_account_token",
+        "confidence": "high",
+        "specificity": "provider",
+        "start": 11,
+        "end": 57
+      }
+    ],
+    "note": "A quoted JSON string value is detected the same as a bare one; the enclosing quotes are not part of the match."
+  },
+  {
+    "id": "grafana-service-account-token-positive-yaml",
+    "detector": "grafana-service-account-token",
+    "kind": "positive",
+    "support": "supported",
+    "tier": "canonical",
+    "contexts": [
+      "yaml"
+    ],
+    "input": "grafana_service_account_token: glsa_SYNTHETICREVOKEDGRAFANASATOKEN01_deadbeef",
+    "expected": [
+      {
+        "detector": "grafana-service-account-token",
+        "type": "grafana_service_account_token",
+        "confidence": "high",
+        "specificity": "provider",
+        "start": 31,
+        "end": 77
+      }
+    ],
+    "note": "A YAML-style scalar assignment exercises the structured-data context issue #305 calls out explicitly."
+  },
+  {
+    "id": "grafana-service-account-token-positive-log",
+    "detector": "grafana-service-account-token",
+    "kind": "positive",
+    "support": "supported",
+    "tier": "canonical",
+    "contexts": [
+      "log"
+    ],
+    "input": "INFO: created service account token glsa_SYNTHETICREVOKEDGRAFANASATOKEN01_deadbeef succeeded",
+    "expected": [
+      {
+        "detector": "grafana-service-account-token",
+        "type": "grafana_service_account_token",
+        "confidence": "high",
+        "specificity": "provider",
+        "start": 36,
+        "end": 82
+      }
+    ],
+    "note": "A token embedded in ordinary log prose, with no assignment syntax at all, is still detected by format alone."
+  },
+  {
+    "id": "grafana-service-account-token-positive-crlf-unicode-prefix",
+    "detector": "grafana-service-account-token",
+    "kind": "positive",
+    "support": "supported",
+    "tier": "regression",
+    "contexts": [
+      "plain-text"
+    ],
+    "input": "# 🔑 café\r\nglsa_SYNTHETICREVOKEDGRAFANASATOKEN01_deadbeef\r\n",
+    "expected": [
+      {
+        "detector": "grafana-service-account-token",
+        "type": "grafana_service_account_token",
+        "confidence": "high",
+        "specificity": "provider",
+        "start": 14,
+        "end": 60
+      }
+    ],
+    "note": "A multi-byte Unicode prefix and CRLF line endings before the token do not defeat detection; byte offsets advance by real UTF-8 byte width, not char count."
+  },
+  {
+    "id": "grafana-service-account-token-overlap-generic-context",
+    "detector": "grafana-service-account-token",
+    "kind": "overlap",
+    "support": "supported",
+    "tier": "contextual",
+    "contexts": [
+      "plain-text"
+    ],
+    "input": "grafana_sa_token=glsa_SYNTHETICREVOKEDGRAFANASATOKEN01_deadbeef",
+    "expected": [
+      {
+        "detector": "grafana-service-account-token",
+        "type": "grafana_service_account_token",
+        "confidence": "high",
+        "specificity": "provider",
+        "start": 17,
+        "end": 63
+      }
+    ],
+    "note": "Qualified provider evidence wins over generic_token's contextual name=value assignment heuristic, which would otherwise also fire on this input."
+  },
+  {
+    "id": "grafana-service-account-token-adversarial-near-miss-body",
+    "detector": "grafana-service-account-token",
+    "kind": "adversarial",
+    "support": "supported",
+    "tier": "adversarial",
+    "contexts": [
+      "plain-text"
+    ],
+    "resource": {
+      "maxInputBytes": 18647,
+      "maxFindings": 1,
+      "maxRuntimeMs": 250
+    },
+    "input": "glsa_SYNTHETICREVOKEDGRAFANASATOKEN01_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef!",
+    "expected": [
+      {
+        "detector": "grafana-service-account-token",
+        "type": "grafana_service_account_token",
+        "confidence": "high",
+        "specificity": "provider",
+        "start": 0,
+        "end": 46
+      }
+    ],
+    "note": "A long run of repeated near-miss bodies, each one byte short of the documented length, stays linear and bounded after the one real match."
+  },
+  {
+    "id": "grafana-service-account-token-boundary-body-short",
+    "detector": "grafana-service-account-token",
+    "kind": "boundary",
+    "support": "intentionally-unsupported",
+    "tier": "malformed",
+    "contexts": [
+      "plain-text"
+    ],
+    "input": "glsa_SYNTHETICREVOKEDGRAFANASATOKEN0_deadbeef",
+    "expected": [],
+    "note": "A body segment one byte short of the documented 32-byte length is rejected."
+  },
+  {
+    "id": "grafana-service-account-token-boundary-checksum-short",
+    "detector": "grafana-service-account-token",
+    "kind": "boundary",
+    "support": "intentionally-unsupported",
+    "tier": "malformed",
+    "contexts": [
+      "plain-text"
+    ],
+    "input": "glsa_SYNTHETICREVOKEDGRAFANASATOKEN01_deadbee",
+    "expected": [],
+    "note": "A checksum segment one byte short of the documented 8-byte length is rejected."
+  },
+  {
+    "id": "grafana-service-account-token-boundary-separator-wrong",
+    "detector": "grafana-service-account-token",
+    "kind": "boundary",
+    "support": "intentionally-unsupported",
+    "tier": "malformed",
+    "contexts": [
+      "plain-text"
+    ],
+    "input": "glsa_SYNTHETICREVOKEDGRAFANASATOKEN01.deadbeef",
+    "expected": [],
+    "note": "A `.` in place of the documented `_` separator between the body and checksum segments is rejected."
+  },
+  {
+    "id": "grafana-service-account-token-boundary-checksum-non-hex",
+    "detector": "grafana-service-account-token",
+    "kind": "boundary",
+    "support": "intentionally-unsupported",
+    "tier": "malformed",
+    "contexts": [
+      "plain-text"
+    ],
+    "input": "glsa_SYNTHETICREVOKEDGRAFANASATOKEN01_SYNTHETIC",
+    "expected": [],
+    "note": "A checksum segment containing non-hex letters is rejected; the checksum alphabet is `[A-Fa-f0-9]`, narrower than the body's `[A-Za-z0-9]`."
+  },
+  {
+    "id": "grafana-service-account-token-negative-masked",
+    "detector": "grafana-service-account-token",
+    "kind": "negative",
+    "support": "supported",
+    "tier": "negative",
+    "contexts": [
+      "plain-text"
+    ],
+    "input": "glsa_********************************_********",
+    "expected": [],
+    "note": "A fully masked value never satisfies the body or checksum alphabet and is not classified."
+  },
+  {
+    "id": "grafana-service-account-token-negative-reference",
+    "detector": "grafana-service-account-token",
+    "kind": "negative",
+    "support": "supported",
+    "tier": "negative",
+    "contexts": [
+      "shell"
+    ],
+    "input": "${GRAFANA_SERVICE_ACCOUNT_TOKEN}",
+    "expected": [],
+    "note": "An environment-variable interpolation reference shares no shape with the glsa_ grammar and is not classified."
+  },
+  {
+    "id": "grafana-legacy-api-key-negative-out-of-scope",
+    "detector": "grafana-service-account-token",
+    "kind": "negative",
+    "support": "intentionally-unsupported",
+    "tier": "negative",
+    "contexts": [
+      "plain-text"
+    ],
+    "input": "eyJrIjoiU1lOVEhFVElDX1JFVk9LRURfR1JBRkFOQV9BUElfS0VZIiwibiI6InN5bnRoZXRpYyIsImlkIjoxfQ==",
+    "expected": [],
+    "note": "Grafana's legacy (pre-service-account) API key -- a base64-encoded JSON blob beginning eyJrIjoi once encoded -- is explicitly out of scope per issue #305's instruction to decide legacy API-key support; Grafana's own documentation states service accounts replace API keys, and this shape carries no Grafana-owned marker beyond a generic base64/JSON convention already shared with this crate's jwt and generic_token detectors' known false-positive surface. See docs/decisions/2026-09-16-freeze-grafana-service-account-and-cloud-access-policy-token-grammar.md."
+  },
+  {
+    "id": "grafana-cloud-access-policy-token-positive-qualified",
+    "detector": "grafana-cloud-access-policy-token",
+    "kind": "positive",
+    "support": "supported",
+    "tier": "canonical",
+    "contexts": [
+      "plain-text"
+    ],
+    "input": "glc_SYNTHETICREVOKEDGRAFANACLOUDACCESSPOLICYTOKEN",
+    "expected": [
+      {
+        "detector": "grafana-cloud-access-policy-token",
+        "type": "grafana_cloud_access_policy_token",
+        "confidence": "high",
+        "specificity": "provider",
+        "start": 0,
+        "end": 49
+      }
+    ],
+    "note": "A provider-published prefix with a substantial synthetic base64 suffix is supported."
+  },
+  {
+    "id": "grafana-cloud-access-policy-token-negative-ordinary-reference",
+    "detector": "grafana-cloud-access-policy-token",
+    "kind": "negative",
+    "support": "supported",
+    "tier": "negative",
+    "contexts": [
+      "plain-text"
+    ],
+    "input": "grafana-cloud-access-policy-documentation",
+    "expected": [],
+    "note": "An ordinary provider-related identifier has no credential shape."
+  },
+  {
+    "id": "grafana-cloud-access-policy-token-boundary-short",
+    "detector": "grafana-cloud-access-policy-token",
+    "kind": "boundary",
+    "support": "intentionally-unsupported",
+    "tier": "malformed",
+    "contexts": [
+      "plain-text"
+    ],
+    "input": "glc_SYNTHETICSHORT",
+    "expected": [],
+    "note": "A suffix far short of the documented 32-byte minimum is deliberately excluded from standalone matching."
+  },
+  {
+    "id": "grafana-cloud-access-policy-token-overlap-context",
+    "detector": "grafana-cloud-access-policy-token",
+    "kind": "overlap",
+    "support": "supported",
+    "tier": "contextual",
+    "contexts": [
+      "plain-text"
+    ],
+    "input": "access_token=glc_SYNTHETICREVOKEDGRAFANACLOUDACCESSPOLICYTOKEN",
+    "expected": [
+      {
+        "detector": "grafana-cloud-access-policy-token",
+        "type": "grafana_cloud_access_policy_token",
+        "confidence": "high",
+        "specificity": "provider",
+        "start": 13,
+        "end": 62
+      }
+    ],
+    "note": "Qualified provider evidence wins over a contextual assignment."
+  },
+  {
+    "id": "grafana-cloud-access-policy-token-positive-min-length",
+    "detector": "grafana-cloud-access-policy-token",
+    "kind": "positive",
+    "support": "supported",
+    "tier": "canonical",
+    "contexts": [
+      "plain-text"
+    ],
+    "input": "glc_SYNTHETICREVOKEDGRAFANACLOUDACCE",
+    "expected": [
+      {
+        "detector": "grafana-cloud-access-policy-token",
+        "type": "grafana_cloud_access_policy_token",
+        "confidence": "high",
+        "specificity": "provider",
+        "start": 0,
+        "end": 36
+      }
+    ],
+    "note": "The documented minimum suffix length, at its exact boundary, is supported."
+  },
+  {
+    "id": "grafana-cloud-access-policy-token-boundary-below-min",
+    "detector": "grafana-cloud-access-policy-token",
+    "kind": "boundary",
+    "support": "intentionally-unsupported",
+    "tier": "malformed",
+    "contexts": [
+      "plain-text"
+    ],
+    "input": "glc_SYNTHETICREVOKEDGRAFANACLOUDACC",
+    "expected": [],
+    "note": "A suffix exactly one byte short of the documented 32-byte minimum is rejected."
+  },
+  {
+    "id": "grafana-cloud-access-policy-token-boundary-invalid-alphabet",
+    "detector": "grafana-cloud-access-policy-token",
+    "kind": "boundary",
+    "support": "intentionally-unsupported",
+    "tier": "malformed",
+    "contexts": [
+      "plain-text"
+    ],
+    "input": "glc_SYNTH!ETICREVOKEDGRAFANACLOUDACCESSPOLICY",
+    "expected": [],
+    "note": "An invalid character inside the suffix breaks the run before the minimum length is reached."
+  },
+  {
+    "id": "grafana-cloud-access-policy-token-negative-placeholder",
+    "detector": "grafana-cloud-access-policy-token",
+    "kind": "negative",
+    "support": "supported",
+    "tier": "negative",
+    "contexts": [
+      "plain-text"
+    ],
+    "input": "glc_<YOUR_GRAFANA_CLOUD_TOKEN>",
+    "expected": [],
+    "note": "A documentation placeholder value is not classified as a credential."
+  },
+  {
+    "id": "grafana-cloud-access-policy-token-positive-dotenv",
+    "detector": "grafana-cloud-access-policy-token",
+    "kind": "positive",
+    "support": "supported",
+    "tier": "canonical",
+    "contexts": [
+      "dotenv"
+    ],
+    "input": "GRAFANA_CLOUD_ACCESS_POLICY_TOKEN=glc_SYNTHETICREVOKEDGRAFANACLOUDACCESSPOLICYTOKEN",
+    "expected": [
+      {
+        "detector": "grafana-cloud-access-policy-token",
+        "type": "grafana_cloud_access_policy_token",
+        "confidence": "high",
+        "specificity": "provider",
+        "start": 34,
+        "end": 83
+      }
+    ],
+    "note": "A bare dotenv-style assignment (KEY=<token>, no quotes) is detected by format alone."
+  },
+  {
+    "id": "grafana-cloud-access-policy-token-positive-json",
+    "detector": "grafana-cloud-access-policy-token",
+    "kind": "positive",
+    "support": "supported",
+    "tier": "canonical",
+    "contexts": [
+      "json"
+    ],
+    "input": "{\"token\": \"glc_SYNTHETICREVOKEDGRAFANACLOUDACCESSPOLICYTOKEN\"}",
+    "expected": [
+      {
+        "detector": "grafana-cloud-access-policy-token",
+        "type": "grafana_cloud_access_policy_token",
+        "confidence": "high",
+        "specificity": "provider",
+        "start": 11,
+        "end": 60
+      }
+    ],
+    "note": "A quoted JSON string value is detected the same as a bare one; the enclosing quotes are not part of the match."
+  },
+  {
+    "id": "grafana-cloud-access-policy-token-regression-crlf-unicode-prefix",
+    "detector": "grafana-cloud-access-policy-token",
+    "kind": "positive",
+    "support": "supported",
+    "tier": "regression",
+    "contexts": [
+      "plain-text"
+    ],
+    "input": "# 🔑 café\r\nglc_SYNTHETICREVOKEDGRAFANACLOUDACCESSPOLICYTOKEN\r\n",
+    "expected": [
+      {
+        "detector": "grafana-cloud-access-policy-token",
+        "type": "grafana_cloud_access_policy_token",
+        "confidence": "high",
+        "specificity": "provider",
+        "start": 14,
+        "end": 63
+      }
+    ],
+    "note": "A multi-byte Unicode prefix and CRLF line endings before the token do not defeat detection; byte offsets advance by real UTF-8 byte width, not char count."
+  },
+  {
+    "id": "grafana-cloud-access-policy-token-adversarial-long-suffix",
+    "detector": "grafana-cloud-access-policy-token",
+    "kind": "adversarial",
+    "support": "supported",
+    "tier": "adversarial",
+    "contexts": [
+      "plain-text"
+    ],
+    "resource": {
+      "maxInputBytes": 1805,
+      "maxFindings": 1,
+      "maxRuntimeMs": 250
+    },
+    "input": "glc_SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKED!",
+    "expected": [
+      {
+        "detector": "grafana-cloud-access-policy-token",
+        "type": "grafana_cloud_access_policy_token",
+        "confidence": "high",
+        "specificity": "provider",
+        "start": 0,
+        "end": 1604
+      }
+    ],
+    "note": "A long delimited provider match remains deterministic and bounded."
+  }
   ]
 }

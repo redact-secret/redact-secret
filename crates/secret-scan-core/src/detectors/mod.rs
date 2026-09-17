@@ -19,6 +19,7 @@ mod discord;
 mod generic_token;
 mod github;
 mod gitlab;
+mod grafana;
 mod jwt;
 mod microsoft_entra;
 mod notion;
@@ -74,6 +75,8 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(twilio::TwilioApiKeySecretDetector),
         telegram::telegram_bot_token_detector(),
         Box::new(discord::DiscordBotTokenDetector),
+        Box::new(grafana::GrafanaServiceAccountTokenDetector),
+        Box::new(additional_providers::GRAFANA_CLOUD),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
         Box::new(ConnectionStringDetector),
@@ -135,6 +138,8 @@ mod tests {
                 "twilio-api-key-secret",
                 "telegram-bot-token",
                 "discord-bot-token",
+                "grafana-service-account-token",
+                "grafana-cloud-access-policy-token",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -184,7 +189,9 @@ mod tests {
             "twilio SKaB3dE5gH7jK9mN1pQ3sT5vW7yZ9AbC3d zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE";
         let telegram_input = "123456:SYNTHETIC_REVOKED_TELEGRAM_BOT_TOKEN_SECRET";
         let discord_input = "MDAwMDAwMDAwMDAwMDAwMDAw.REVOKE.SYNTHETICREVOKEDBOTTOKENFIX";
-        let cases: [(&str, &str); 28] = [
+        let grafana_sa_input = "glsa_SYNTHETICREVOKEDGRAFANASATOKEN01_deadbeef";
+        let grafana_cloud_input = "glc_SYNTHETICREVOKEDGRAFANACLOUDACCESSPOLICYTOKEN";
+        let cases: [(&str, &str); 30] = [
             ("aws-access-key", "AKIASYNTHETICEXAMPLE"),
             (
                 "github-token",
@@ -228,6 +235,8 @@ mod tests {
             ("twilio-api-key-secret", twilio_api_key_secret_input),
             ("discord-bot-token", discord_input),
             ("telegram-bot-token", telegram_input),
+            ("grafana-service-account-token", grafana_sa_input),
+            ("grafana-cloud-access-policy-token", grafana_cloud_input),
         ];
         let detectors = built_in_detectors();
         for (id, input) in cases {

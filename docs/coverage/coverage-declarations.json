@@ -3335,6 +3335,173 @@
       "type": "twilio_api_key_secret"
     },
     {
+      "behaviorClass": "provider",
+      "detector": "grafana-service-account-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "grafana-service-account-token-positive-bare",
+            "grafana-service-account-token-positive-crlf-unicode-prefix",
+            "grafana-service-account-token-positive-dotenv",
+            "grafana-service-account-token-positive-json",
+            "grafana-service-account-token-positive-log",
+            "grafana-service-account-token-positive-yaml"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "grafana-service-account-token-overlap-generic-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "grafana-service-account-token-adversarial-near-miss-body"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "grafana-service-account-token-boundary-body-short",
+            "grafana-service-account-token-boundary-checksum-non-hex",
+            "grafana-service-account-token-boundary-checksum-short",
+            "grafana-service-account-token-boundary-separator-wrong"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "grafana-service-account-token-negative-masked",
+            "grafana-service-account-token-negative-reference"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "grafana-service-account-token-boundary-body-short",
+            "grafana-service-account-token-boundary-checksum-non-hex",
+            "grafana-service-account-token-boundary-checksum-short",
+            "grafana-service-account-token-boundary-separator-wrong"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for grafana_service_account_token (grafana-service-account-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "grafana_service_account_token"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "grafana-cloud-access-policy-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "grafana-cloud-access-policy-token-positive-dotenv",
+            "grafana-cloud-access-policy-token-positive-json",
+            "grafana-cloud-access-policy-token-positive-min-length",
+            "grafana-cloud-access-policy-token-positive-qualified",
+            "grafana-cloud-access-policy-token-regression-crlf-unicode-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "grafana-cloud-access-policy-token-overlap-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "grafana-cloud-access-policy-token-adversarial-long-suffix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "grafana-cloud-access-policy-token-boundary-below-min",
+            "grafana-cloud-access-policy-token-boundary-invalid-alphabet",
+            "grafana-cloud-access-policy-token-boundary-short"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "grafana-cloud-access-policy-token-negative-ordinary-reference",
+            "grafana-cloud-access-policy-token-negative-placeholder"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "grafana-cloud-access-policy-token-boundary-below-min",
+            "grafana-cloud-access-policy-token-boundary-invalid-alphabet",
+            "grafana-cloud-access-policy-token-boundary-short"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for grafana_cloud_access_policy_token (grafana-cloud-access-policy-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "grafana_cloud_access_policy_token"
+    },
+    {
       "behaviorClass": "incremental",
       "detector": "unassigned",
       "dimensions": [
@@ -3379,6 +3546,8 @@
             "encoded-connection",
             "fixed-width-unicode",
             "github-installation-stateless",
+            "grafana-cloud-access-policy-token-basic",
+            "grafana-service-account-token-basic",
             "legacy-variable-detector-families",
             "mongodb-seed-list-connection",
             "multiline-private-key",
@@ -3414,6 +3583,8 @@
             "github-adversarial-long-suffix",
             "gitlab-adversarial-long-suffix",
             "google-adversarial-long-suffix",
+            "grafana-cloud-access-policy-token-adversarial-long-suffix",
+            "grafana-service-account-token-adversarial-near-miss-body",
             "huggingface-adversarial-long-suffix",
             "jwt-adversarial-incomplete",
             "linear-adversarial-long-suffix",
@@ -3617,6 +3788,8 @@
             "encoded-connection",
             "fixed-width-unicode",
             "github-installation-stateless",
+            "grafana-cloud-access-policy-token-basic",
+            "grafana-service-account-token-basic",
             "legacy-variable-detector-families",
             "mongodb-seed-list-connection",
             "multiline-private-key",
@@ -3710,6 +3883,8 @@
             "github-adversarial-long-suffix",
             "gitlab-adversarial-long-suffix",
             "google-adversarial-long-suffix",
+            "grafana-cloud-access-policy-token-adversarial-long-suffix",
+            "grafana-service-account-token-adversarial-near-miss-body",
             "huggingface-adversarial-long-suffix",
             "jwt-adversarial-incomplete",
             "linear-adversarial-long-suffix",
@@ -3971,6 +4146,8 @@
             "encoded-connection",
             "fixed-width-unicode",
             "github-installation-stateless",
+            "grafana-cloud-access-policy-token-basic",
+            "grafana-service-account-token-basic",
             "legacy-variable-detector-families",
             "mongodb-seed-list-connection",
             "multiline-private-key",

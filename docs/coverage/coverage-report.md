@@ -15,11 +15,11 @@ These counts describe finding-type inventory rows with corpus evidence, not dete
 
 | Row state | Count |
 | --- | --- |
-| supported | 35 |
+| supported | 37 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 46.
+Coverage declarations: 48.
 
 ## Coverage by detector
 
@@ -39,6 +39,8 @@ Coverage declarations: 46.
 | github-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | gitlab-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | google-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| grafana-cloud-access-policy-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| grafana-service-account-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | huggingface-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | jwt | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | linear-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -79,6 +81,8 @@ Coverage declarations: 46.
 | github_token | github-token | provider | supported | not-applicable | none |
 | gitlab_token | gitlab-token | provider | supported | not-applicable | none |
 | google_api_key | google-api-key | provider | supported | not-applicable | none |
+| grafana_cloud_access_policy_token | grafana-cloud-access-policy-token | provider | supported | not-applicable | none |
+| grafana_service_account_token | grafana-service-account-token | provider | supported | not-applicable | none |
 | huggingface_token | huggingface-token | provider | supported | not-applicable | none |
 | jwt | jwt | structural | supported | not-applicable | none |
 | linear_token | linear-token | provider | supported | not-applicable | none |
@@ -124,15 +128,15 @@ Coverage declarations: 46.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 46 | 0 | 0 |
-| boundary | 35 | 0 | 0 |
-| host-context | 35 | 0 | 0 |
+| adversarial | 48 | 0 | 0 |
+| boundary | 37 | 0 | 0 |
+| host-context | 37 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 46 | 0 | 0 |
-| near-miss-negative | 35 | 0 | 0 |
-| overlap | 35 | 0 | 0 |
-| positive | 35 | 0 | 0 |
-| range | 46 | 0 | 0 |
+| malformed | 48 | 0 | 0 |
+| near-miss-negative | 37 | 0 | 0 |
+| overlap | 37 | 0 | 0 |
+| positive | 37 | 0 | 0 |
+| range | 48 | 0 | 0 |
 
 ## Unresolved and pending coverage
 
