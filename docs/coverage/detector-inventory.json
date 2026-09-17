@@ -302,6 +302,20 @@
       "policyClass": "always-redact",
       "reconciliationTrigger": "glc_SYNTHETICREVOKEDGRAFANACLOUDACCESSPOLICYTOKEN",
       "schemes": null
+    },
+    {
+      "type": "sentry_user_auth_token",
+      "detector": "sentry-user-auth-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "sntryu_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      "schemes": null
+    },
+    {
+      "type": "sentry_org_auth_token",
+      "detector": "sentry-org-auth-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "sntrys_eyJSYNTHETICREVOKEDSENTRYO_SigFixSYNTHETICREVOKED0123456789SigFixSYNTH",
+      "schemes": null
     }
   ],
   "consumers": [

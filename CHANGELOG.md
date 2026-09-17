@@ -5,6 +5,24 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+- Added `sentry-user-auth-token` and `sentry-org-auth-token` detectors
+  recognizing Sentry's documented-in-practice prefixed token formats: a
+  user auth token is the literal `sntryu_` followed by an exact 64-byte
+  lowercase-hex secret; an organization auth token is the literal
+  `sntrys_eyJ` (`eyJ` being the base64 encoding of a JSON object's opening
+  `{"`), a documented-minimum base64 payload, an optional trailing base64
+  padding, a literal `_`, and an exact 43-byte base64 signature. Sentry's
+  own documentation publishes no grammar for either value; the shapes are
+  cross-referenced from gitleaks's and trufflehog's independent rules (no
+  code reproduced from either). Both prefixes are unambiguous provider
+  markers, so neither detector requires surrounding context, unlike
+  Twilio's unmarked Auth Token/API Key Secret above. Sentry's legacy,
+  pre-2024 unprefixed 64-byte hex token is indistinguishable from an
+  ordinary hex digest without reliable context and is intentionally out of
+  scope for a dedicated detector; a qualified `name=value` assignment of it
+  still gets a lower-confidence contextual finding through the generic
+  detector. A public Sentry DSN shares no shape with either grammar and is
+  not classified. Both new types are always-redact and provider-specific.
 - Added `grafana-service-account-token` and `grafana-cloud-access-policy-token`
   detectors. The service account detector matches the documented `glsa_`
   prefix, an exact 32-byte alphanumeric body, a literal `_` separator, and an

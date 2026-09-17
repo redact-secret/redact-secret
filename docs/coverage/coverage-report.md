@@ -15,11 +15,11 @@ These counts describe finding-type inventory rows with corpus evidence, not dete
 
 | Row state | Count |
 | --- | --- |
-| supported | 39 |
+| supported | 41 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 50.
+Coverage declarations: 52.
 
 ## Coverage by detector
 
@@ -54,6 +54,8 @@ Coverage declarations: 50.
 | private-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | pypi-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | sendgrid-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| sentry-org-auth-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| sentry-user-auth-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | shopify-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | slack-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | stripe-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -98,6 +100,8 @@ Coverage declarations: 50.
 | private_key | private-key | structural | supported | not-applicable | none |
 | pypi_api_token | pypi-token | provider | supported | not-applicable | none |
 | sendgrid_api_key | sendgrid-token | provider | supported | not-applicable | none |
+| sentry_org_auth_token | sentry-org-auth-token | provider | supported | not-applicable | none |
+| sentry_user_auth_token | sentry-user-auth-token | provider | supported | not-applicable | none |
 | shopify_access_token | shopify-token | provider | supported | not-applicable | none |
 | slack_token | slack-token | provider | supported | not-applicable | none |
 | stripe_credential | stripe-token | provider | supported | not-applicable | none |
@@ -132,15 +136,15 @@ Coverage declarations: 50.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 50 | 0 | 0 |
-| boundary | 39 | 0 | 0 |
-| host-context | 39 | 0 | 0 |
+| adversarial | 52 | 0 | 0 |
+| boundary | 41 | 0 | 0 |
+| host-context | 41 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 50 | 0 | 0 |
-| near-miss-negative | 39 | 0 | 0 |
-| overlap | 39 | 0 | 0 |
-| positive | 39 | 0 | 0 |
-| range | 50 | 0 | 0 |
+| malformed | 52 | 0 | 0 |
+| near-miss-negative | 41 | 0 | 0 |
+| overlap | 41 | 0 | 0 |
+| positive | 41 | 0 | 0 |
+| range | 52 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

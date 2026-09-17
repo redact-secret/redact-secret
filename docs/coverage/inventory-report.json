@@ -1474,12 +1474,84 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "grafana_cloud_access_policy_token"
+    },
+    {
+      "detector": "sentry-user-auth-token",
+      "evidence": {
+        "fixtureCount": 15,
+        "hostContextsExercised": [
+          "dotenv",
+          "json",
+          "log",
+          "plain-text",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "sentry-user-auth-token-positive-bare",
+        "sentry-user-auth-token-positive-crlf-unicode-prefix",
+        "sentry-user-auth-token-positive-dotenv",
+        "sentry-user-auth-token-positive-json",
+        "sentry-user-auth-token-positive-log",
+        "sentry-user-auth-token-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "sentry_user_auth_token"
+    },
+    {
+      "detector": "sentry-org-auth-token",
+      "evidence": {
+        "fixtureCount": 18,
+        "hostContextsExercised": [
+          "dotenv",
+          "json",
+          "log",
+          "plain-text",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "sentry-org-auth-token-positive-bare-long-payload",
+        "sentry-org-auth-token-positive-bare-min-payload",
+        "sentry-org-auth-token-positive-crlf-unicode-prefix",
+        "sentry-org-auth-token-positive-dotenv",
+        "sentry-org-auth-token-positive-json",
+        "sentry-org-auth-token-positive-log",
+        "sentry-org-auth-token-positive-padded-payload",
+        "sentry-org-auth-token-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "sentry_org_auth_token"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 39,
+    "supported": 41,
     "unresolved": 0
   }
 }
