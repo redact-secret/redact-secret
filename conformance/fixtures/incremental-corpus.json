@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 37,
+  "fixtureCount": 39,
   "fixtures": [
     {
       "id": "synthetic-regression-malformed-authority",
@@ -489,6 +489,38 @@
         }
       ],
       "note": "issue #316: a public identifier prefix and a documented secret prefix on adjacent lines stay correctly discriminated at every chunk split, including splits that fall inside either prefix's own bytes. Shopify's and Supabase's known-format provider detectors share the identical scan_prefixed_runs mechanism this exercises, so this one representative exemplar generalizes to their equivalent public/secret prefix pairs."
+    },
+    {
+      "id": "shopify-public-secret-prefix-discriminating-boundary",
+      "input": "shpca_SYNTHETICREVOKEDSYNT\nshpat_SYNTHETICREVOKEDSYNTHETICREVOKED",
+      "text": "shpca_SYNTHETICREVOKEDSYNT\n<SECRET_1>",
+      "expected": [
+        {
+          "detector": "shopify-token",
+          "type": "shopify_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 27,
+          "end": 65
+        }
+      ],
+      "note": "issue #316: a public identifier prefix and a documented secret prefix on adjacent lines stay correctly discriminated at every chunk split, including splits that fall inside either prefix's own bytes."
+    },
+    {
+      "id": "supabase-public-secret-prefix-discriminating-boundary",
+      "input": "sb_publishable_SYNTHETICREVOKEDSYNT\nsb_secret_SYNTHETICREVOKEDSYNTHETICREVOKED",
+      "text": "sb_publishable_SYNTHETICREVOKEDSYNT\n<SECRET_1>",
+      "expected": [
+        {
+          "detector": "supabase-token",
+          "type": "supabase_secret_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 36,
+          "end": 78
+        }
+      ],
+      "note": "issue #316: a public identifier prefix and a documented secret prefix on adjacent lines stay correctly discriminated at every chunk split, including splits that fall inside either prefix's own bytes."
     },
     {
       "id": "twilio-auth-token-line-scoped-context-same-line",

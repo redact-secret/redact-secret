@@ -599,9 +599,14 @@
           "evidenceFixtureIds": [
             "shopify-positive-admin-access",
             "shopify-positive-all-prefixes",
+            "shopify-positive-crlf-unicode-prefix",
             "shopify-positive-doc-style-placeholder",
+            "shopify-positive-dotenv",
+            "shopify-positive-json",
+            "shopify-positive-log",
             "shopify-positive-min-length",
-            "shopify-positive-mixed-public-and-secret"
+            "shopify-positive-mixed-public-and-secret",
+            "shopify-positive-yaml"
           ],
           "state": "supported"
         },
@@ -774,10 +779,15 @@
           "dimension": "positive",
           "evidenceFixtureIds": [
             "stripe-positive-all-prefixes",
+            "stripe-positive-crlf-unicode-prefix",
             "stripe-positive-doc-style-placeholder",
+            "stripe-positive-dotenv",
+            "stripe-positive-json",
+            "stripe-positive-log",
             "stripe-positive-min-length",
             "stripe-positive-mixed-public-and-secret",
-            "stripe-positive-qualified"
+            "stripe-positive-qualified",
+            "stripe-positive-yaml"
           ],
           "state": "supported"
         },
@@ -1457,10 +1467,15 @@
         {
           "dimension": "positive",
           "evidenceFixtureIds": [
+            "supabase-positive-crlf-unicode-prefix",
             "supabase-positive-doc-style-placeholder",
+            "supabase-positive-dotenv",
+            "supabase-positive-json",
+            "supabase-positive-log",
             "supabase-positive-min-length",
             "supabase-positive-mixed-public-and-secret",
-            "supabase-positive-qualified"
+            "supabase-positive-qualified",
+            "supabase-positive-yaml"
           ],
           "state": "supported"
         },
@@ -4073,8 +4088,10 @@
             "new-relic-license-key-line-scoped-context-different-line",
             "new-relic-license-key-line-scoped-context-same-line",
             "redis-password-only-connection",
+            "shopify-public-secret-prefix-discriminating-boundary",
             "stripe-public-secret-prefix-discriminating-boundary",
             "structural-overlap",
+            "supabase-public-secret-prefix-discriminating-boundary",
             "synthetic-regression-malformed-authority",
             "truncated-private-key",
             "twilio-auth-token-line-scoped-context-different-line",
@@ -4326,8 +4343,10 @@
             "new-relic-license-key-line-scoped-context-different-line",
             "new-relic-license-key-line-scoped-context-same-line",
             "redis-password-only-connection",
+            "shopify-public-secret-prefix-discriminating-boundary",
             "stripe-public-secret-prefix-discriminating-boundary",
             "structural-overlap",
+            "supabase-public-secret-prefix-discriminating-boundary",
             "synthetic-regression-malformed-authority",
             "truncated-private-key",
             "twilio-auth-token-line-scoped-context-different-line",
@@ -4695,8 +4714,10 @@
             "new-relic-license-key-line-scoped-context-different-line",
             "new-relic-license-key-line-scoped-context-same-line",
             "redis-password-only-connection",
+            "shopify-public-secret-prefix-discriminating-boundary",
             "stripe-public-secret-prefix-discriminating-boundary",
             "structural-overlap",
+            "supabase-public-secret-prefix-discriminating-boundary",
             "synthetic-regression-malformed-authority",
             "truncated-private-key",
             "twilio-auth-token-line-scoped-context-different-line",
