@@ -46,7 +46,7 @@ FIXTURES = ROOT / "conformance" / "fixtures"
 NPM_PACKAGE = Path("packages") / "javascript"
 CRATE = "redact-secret"
 PUBLIC_API_REVIEW = Path("docs/audits/candidate-public-contract-review.md")
-CURRENT_PUBLIC_API_REVIEW = Path("docs/audits/beta2-final-code-review.md")
+CURRENT_PUBLIC_API_REVIEW = Path("docs/audits/beta4-candidate-public-contract-review.md")
 CHANGELOG = Path("CHANGELOG.md")
 RELEASE_WORKFLOW = Path(".github/workflows/release.yml")
 REGISTRY_INSTALL_VERIFIER = Path("scripts/verify-registry-install.mjs")
@@ -311,7 +311,7 @@ def incremental_corpus_fixture_count() -> int:
 def release_readiness_record() -> dict:
     """Record the non-artifact review and post-publication boundaries."""
     return {
-        "issue": 203,
+        "issue": 362,
         "publicApiAndChangelogReview": {
             "status": "required-before-release-approval",
             "currentPublicApiReview": {

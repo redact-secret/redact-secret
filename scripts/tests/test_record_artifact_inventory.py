@@ -328,12 +328,12 @@ class InventoryTests(unittest.TestCase):
 
     def test_release_readiness_record_pins_review_and_registry_boundaries(self) -> None:
         record = RECORD.release_readiness_record()
-        self.assertEqual(record["issue"], 203)
+        self.assertEqual(record["issue"], 362)
         review = record["publicApiAndChangelogReview"]
         self.assertEqual(review["status"], "required-before-release-approval")
         self.assertEqual(
             review["currentPublicApiReview"]["path"],
-            "docs/audits/beta2-final-code-review.md",
+            "docs/audits/beta4-candidate-public-contract-review.md",
         )
         self.assertRegex(
             review["currentPublicApiReview"]["sha256"], r"^[0-9a-f]{64}$"
