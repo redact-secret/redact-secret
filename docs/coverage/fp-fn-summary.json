@@ -103,6 +103,89 @@
       ]
     },
     {
+      "detector": "connection-string",
+      "falseNegativeGuards": {
+        "actualFalseNegatives": 0,
+        "count": 22,
+        "fixtureIds": [
+          "connection-host-dotenv",
+          "connection-host-javascript",
+          "connection-host-log",
+          "connection-host-markdown",
+          "connection-host-shell",
+          "connection-positive-amqp-query",
+          "connection-positive-amqps",
+          "connection-positive-azure-http",
+          "connection-positive-azure-https",
+          "connection-positive-azure-sovereign-suffix",
+          "connection-positive-encoded-ipv6",
+          "connection-positive-mariadb-percent-encoded",
+          "connection-positive-mongodb-seed-list",
+          "connection-positive-mongodb-srv",
+          "connection-positive-mongodb-srv-reserved-example-host",
+          "connection-positive-port",
+          "connection-positive-postgres",
+          "connection-positive-postgres-reserved-example-host",
+          "connection-positive-postgresql",
+          "connection-positive-redis-password-only",
+          "connection-positive-rediss-fragment",
+          "connection-regression-placeholder-embedded-in-password"
+        ]
+      },
+      "falsePositiveGuards": {
+        "actualFalsePositives": 0,
+        "count": 38,
+        "fixtureIds": [
+          "connection-negative-amqp-host-only",
+          "connection-negative-amqp-malformed-percent",
+          "connection-negative-amqps-host-only",
+          "connection-negative-amqps-malformed-percent",
+          "connection-negative-azure-account-name-only",
+          "connection-negative-azure-sas-token-no-account-key",
+          "connection-negative-azure-unrelated-semicolon-config",
+          "connection-negative-host-only",
+          "connection-negative-malformed-percent",
+          "connection-negative-mariadb-host-only",
+          "connection-negative-mariadb-malformed-percent",
+          "connection-negative-mariadb-vendor-default-supersecretpassword",
+          "connection-negative-mongodb-host-only",
+          "connection-negative-mongodb-malformed-percent",
+          "connection-negative-mongodb-srv-doc-placeholder-example-host",
+          "connection-negative-mongodb-srv-host-only",
+          "connection-negative-mongodb-srv-malformed-percent",
+          "connection-negative-mongodb-vendor-default-mysecretpassword",
+          "connection-negative-mysql-host-only",
+          "connection-negative-mysql-malformed-percent",
+          "connection-negative-mysql-vendor-default-changeit",
+          "connection-negative-postgres-placeholder-insert-password-here",
+          "connection-negative-postgres-placeholder-repeated-x",
+          "connection-negative-postgres-placeholder-repeated-zero",
+          "connection-negative-postgres-placeholder-replace-me-password",
+          "connection-negative-postgres-placeholder-root-password-here",
+          "connection-negative-postgres-placeholder-todo-set-password",
+          "connection-negative-postgres-placeholder-your-password-here",
+          "connection-negative-postgres-vendor-default-mysecretpassword",
+          "connection-negative-postgresql-host-only",
+          "connection-negative-postgresql-malformed-percent",
+          "connection-negative-redis-host-only",
+          "connection-negative-redis-malformed-percent",
+          "connection-negative-redis-vendor-default-changeit",
+          "connection-negative-rediss-host-only",
+          "connection-negative-rediss-malformed-percent",
+          "connection-negative-user-only-authority",
+          "connection-negative-vendor-default-appended-digit"
+        ]
+      },
+      "hostContextsExercised": [
+        "dotenv",
+        "javascript",
+        "log",
+        "markdown",
+        "plain-text",
+        "shell"
+      ]
+    },
+    {
       "detector": "jwt",
       "falseNegativeGuards": {
         "actualFalseNegatives": 0,
@@ -302,7 +385,8 @@
       "https://github.com/redact-secret/redact-secret/issues/316",
       "https://github.com/redact-secret/redact-secret/issues/317",
       "https://github.com/redact-secret/redact-secret/issues/318",
-      "https://github.com/redact-secret/redact-secret/issues/323"
+      "https://github.com/redact-secret/redact-secret/issues/323",
+      "https://github.com/redact-secret/redact-secret/issues/324"
     ]
   }
 }

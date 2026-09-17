@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 57,
+  "fixtureCount": 58,
   "fixtures": [
     {
       "id": "synthetic-regression-malformed-authority",
@@ -272,6 +272,22 @@
         }
       ],
       "note": "Password-only Redis userinfo remains unresolved until the authority closes."
+    },
+    {
+      "id": "amqp-amqps-scheme-prefix-discriminating-boundary",
+      "input": "amqps://fixture:SYNTHETIC%40REVOKED%3AINCREMENTAL@localhost:5671/vhost",
+      "text": "amqps://fixture:<SECRET_1>@localhost:5671/vhost",
+      "expected": [
+        {
+          "detector": "connection-string",
+          "type": "connection_string_password",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 16,
+          "end": 49
+        }
+      ],
+      "note": "amqp is a byte-for-byte prefix of amqps, so every chunk split -- including one landing between the two -- must still backtrack to the longer scheme rather than misreading it as amqp followed by stray userinfo."
     },
     {
       "id": "aws-contextual-assignment",

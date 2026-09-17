@@ -767,6 +767,14 @@ mod tests {
     }
 
     #[test]
+    fn a_user_only_authority_with_no_separator_has_no_credential() {
+        assert_eq!(
+            detect("postgres://fixtureuser@localhost/example"),
+            Vec::new()
+        );
+    }
+
+    #[test]
     fn obvious_placeholder_is_ignored() {
         assert_eq!(
             detect("postgres://fixture:password@localhost/example"),
@@ -891,6 +899,35 @@ mod tests {
     #[test]
     fn empty_password_userinfo_is_ignored() {
         assert_eq!(detect("postgres://fixture:@localhost/example"), Vec::new());
+    }
+
+    #[test]
+    fn empty_password_userinfo_is_credential_free_across_amqp_and_related_schemes() {
+        for (scheme, authority) in [
+            ("amqp", "fixture:@localhost:5672/vhost"),
+            ("amqps", "fixture:@localhost:5671/vhost"),
+            ("rediss", ":@localhost:6380/0"),
+            ("mongodb+srv", "fixture:@cluster0.example.mongodb.net/db"),
+        ] {
+            let input = format!("{scheme}://{authority}");
+            assert_eq!(
+                detect(&input),
+                Vec::new(),
+                "expected no findings for {input:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn a_reserved_documentation_host_does_not_suppress_detection() {
+        for input in [
+            "postgres://produser:SyntheticProdPassw0rdNotReal9@db.example.com:5432/proddb",
+            "mongodb+srv://produser:SyntheticProdPassw0rdNotReal9@cluster0.example.mongodb.net/proddb",
+        ] {
+            let candidates = detect(input);
+            assert_eq!(candidates.len(), 1, "expected one finding for {input:?}");
+            assert_eq!(candidates[0].type_name(), "connection_string_password");
+        }
     }
 
     #[test]
@@ -1094,6 +1131,20 @@ mod tests {
     }
 
     #[test]
+    fn an_account_key_is_selected_despite_an_adjacent_shared_access_signature_field() {
+        let input = format!(
+            "DefaultEndpointsProtocol=https;AccountName={AZURE_ACCOUNT_NAME};AccountKey={AZURE_ACCOUNT_KEY};EndpointSuffix=core.windows.net;SharedAccessSignature=sv=2022-11-02&ss=bqtf&sig=SYNTHETIC-REVOKED-SAS-SIGNATURE-VALUE-NOT-REAL%3D"
+        );
+        let key_start = input.find(AZURE_ACCOUNT_KEY).unwrap();
+        let found = detect(&input);
+        assert_eq!(
+            spans(&found),
+            [(key_start, key_start + AZURE_ACCOUNT_KEY.len())],
+            "the trailing SAS field must not widen or displace the selected range"
+        );
+    }
+
+    #[test]
     fn an_empty_account_key_value_is_ignored() {
         let input = format!(
             "DefaultEndpointsProtocol=https;AccountName={AZURE_ACCOUNT_NAME};AccountKey=;EndpointSuffix=core.windows.net"
@@ -1115,6 +1166,23 @@ mod tests {
             "DefaultEndpointsProtocol=https;AccountName={AZURE_ACCOUNT_NAME};EndpointSuffix=core.windows.net"
         );
         assert_eq!(detect(&input), Vec::new());
+    }
+
+    // --- issue #324: SAS-based connection strings carry no AccountKey -----
+    //
+    // A `SharedAccessSignature`-based connection string is a real, common
+    // shape (the Azure portal's "SAS connection string", distinct from its
+    // "access key" connection string) that never contains an `AccountKey`
+    // field at all, so the anchor this detector requires is simply absent.
+    // The SAS token is itself authorization-bearing -- unlike `AccountName`
+    // or `EndpointSuffix`, which are genuinely public -- so this is a
+    // deliberate, documented tradeoff rather than an accidental gap: see
+    // `connection-negative-azure-sas-token-no-account-key`.
+
+    #[test]
+    fn a_shared_access_signature_field_with_no_account_key_is_ignored() {
+        let input = "BlobEndpoint=https://fixturestorageaccount.blob.core.windows.net/;SharedAccessSignature=sv=2022-11-02&ss=bqtf&srt=sco&sp=rwdlacupitfx&se=2030-01-01T00:00:00Z&st=2020-01-01T00:00:00Z&spr=https&sig=SYNTHETIC-REVOKED-SAS-SIGNATURE-VALUE-NOT-REAL%3D";
+        assert_eq!(detect(input), Vec::new());
     }
 
     #[test]
