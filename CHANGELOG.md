@@ -32,6 +32,21 @@ evidence is linked from each published version.
   hash-pinned to the committed acceptance results, so it is left for the
   beta.5 qualification pass (#376) to re-version rather than edited here.
 
+- Froze reviewed precision contracts for the `openai-token`,
+  `digitalocean-token`, `docker-token`, `slack-token`, `huggingface-token`,
+  `cloudflare-token` and `linear-token` detectors (issue #367, decision
+  `docs/decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md`).
+  This is evidence and tooling only: `docs/audits/evidence/367/` records each
+  family's supported variants, segment grammar, lengths, alphabets, markers,
+  source provenance and resolved source conflicts, freezes the beta.4
+  negative-twin baseline by construction recipe and content hash, and audits
+  every existing fixture for those families against the contract.
+  `npm run precision-contracts:check` (now part of `npm run ci`) keeps the
+  derived evidence consistent. No detector behavior, public interface,
+  detector id or finding type changes in this entry; the behavior changes
+  the contracts call for land with issues #368-#374 and are described in the
+  decision record.
+
 ## 0.1.0-beta.4 — 2026-09-17
 
 [Publication and qualification evidence](docs/releases/0.1.0-beta.4/README.md).
