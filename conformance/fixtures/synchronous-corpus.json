@@ -4356,9 +4356,9 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "DCKR_PAT_SYNTHETIC_REVOKED_SY",
+      "input": "DCKR_PAT_SYNTHETIC_REVOKED_KEY_VALUE\nDCKR_OAT_SYNTHETIC_REVOKED_KEY_VALUE",
       "expected": [],
-      "note": "The documented prefix is matched case-sensitively; an uppercased prefix is not classified."
+      "note": "Every documented prefix is matched case-sensitively; the realistic-length uppercased variants are wrong prefixes and are not classified."
     },
     {
       "id": "docker-negative-placeholder",
@@ -4466,9 +4466,9 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "legacydckr_pat_SYNTHETIC_REVOKED_KEY_VALUE",
+      "input": "legacydckr_pat_SYNTHETIC_REVOKED_KEY_VALUE\nlegacydckr_oat_SYNTHETIC_REVOKED_KEY_VALUE",
       "expected": [],
-      "note": "The 'dckr_pat_' prefix immediately preceded by an alphanumeric/dash character ('legacydckr_pat_...') is a truncated slice of a wider benign identifier, not a boundary-delimited credential, so no candidate is emitted; a real secret substring is never carved out of a longer surrounding token."
+      "note": "Every supported Docker prefix immediately preceded by an alphanumeric/dash character is a truncated slice of a wider benign identifier, not a boundary-delimited credential, so no candidate is emitted; a real secret substring is never carved out of a longer surrounding token."
     },
     {
       "id": "docker-positive-punctuation-adjacent",
@@ -5196,9 +5196,9 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "DOP_V1_SYNTHETIC_REVOKED_SY",
+      "input": "DOP_V1_SYNTHETIC_REVOKED_KEY_VALUE\nDOO_V1_SYNTHETIC_REVOKED_KEY_VALUE\nDOR_V1_SYNTHETIC_REVOKED_KEY_VALUE",
       "expected": [],
-      "note": "The documented prefix is matched case-sensitively; an uppercased prefix is not classified."
+      "note": "Every documented prefix is matched case-sensitively; the realistic-length uppercased variants are wrong prefixes and are not classified."
     },
     {
       "id": "digitalocean-negative-placeholder",
@@ -5314,9 +5314,9 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "legacydop_v1_SYNTHETIC_REVOKED_KEY_VALUE",
+      "input": "legacydop_v1_SYNTHETIC_REVOKED_KEY_VALUE\nlegacydoo_v1_SYNTHETIC_REVOKED_KEY_VALUE\nlegacydor_v1_SYNTHETIC_REVOKED_KEY_VALUE",
       "expected": [],
-      "note": "The 'dop_v1_' prefix immediately preceded by an alphanumeric/dash character ('legacydop_v1_...') is a truncated slice of a wider benign identifier, not a boundary-delimited credential, so no candidate is emitted; a real secret substring is never carved out of a longer surrounding token."
+      "note": "Every supported DigitalOcean prefix immediately preceded by an alphanumeric/dash character is a truncated slice of a wider benign identifier, not a boundary-delimited credential, so no candidate is emitted; a real secret substring is never carved out of a longer surrounding token."
     },
     {
       "id": "digitalocean-positive-punctuation-adjacent",
@@ -6282,9 +6282,9 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "VCP_SYNTHETIC_REVOKED_SY",
+      "input": "VCP_SYNTHETIC_REVOKED_KEY_VALUE\nVCI_SYNTHETIC_REVOKED_KEY_VALUE\nVCA_SYNTHETIC_REVOKED_KEY_VALUE\nVCR_SYNTHETIC_REVOKED_KEY_VALUE\nVCK_SYNTHETIC_REVOKED_KEY_VALUE",
       "expected": [],
-      "note": "The documented prefix is matched case-sensitively; an uppercased prefix is not classified."
+      "note": "Every documented prefix is matched case-sensitively; the realistic-length uppercased variants are wrong prefixes and are not classified."
     },
     {
       "id": "vercel-negative-placeholder",
@@ -6416,9 +6416,9 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "legacyvcp_SYNTHETIC_REVOKED_KEY_VALUE",
+      "input": "legacyvcp_SYNTHETIC_REVOKED_KEY_VALUE\nlegacyvci_SYNTHETIC_REVOKED_KEY_VALUE\nlegacyvca_SYNTHETIC_REVOKED_KEY_VALUE\nlegacyvcr_SYNTHETIC_REVOKED_KEY_VALUE\nlegacyvck_SYNTHETIC_REVOKED_KEY_VALUE",
       "expected": [],
-      "note": "The 'vcp_' prefix immediately preceded by an alphanumeric/dash character ('legacyvcp_...') is a truncated slice of a wider benign identifier, not a boundary-delimited credential, so no candidate is emitted; a real secret substring is never carved out of a longer surrounding token."
+      "note": "Every supported Vercel prefix immediately preceded by an alphanumeric/dash character is a truncated slice of a wider benign identifier, not a boundary-delimited credential, so no candidate is emitted; a real secret substring is never carved out of a longer surrounding token."
     },
     {
       "id": "vercel-positive-punctuation-adjacent",
@@ -10037,9 +10037,9 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "HVS.SYNTHETIC_REVOKED_SYNTHE",
+      "input": "HVS.SYNTHETIC_REVOKED_VAULT_TOKEN\nHVB.SYNTHETIC_REVOKED_VAULT_TOKEN\nHVR.SYNTHETIC_REVOKED_VAULT_TOKEN",
       "expected": [],
-      "note": "The documented prefix is matched case-sensitively; an uppercased prefix is not classified."
+      "note": "Every documented prefix is matched case-sensitively; the realistic-length uppercased variants are wrong prefixes and are not classified."
     },
     {
       "id": "vault-negative-placeholder",
@@ -10142,9 +10142,9 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "legacyhvs.SYNTHETIC_REVOKED_VAULT_TOKEN",
+      "input": "legacyhvs.SYNTHETIC_REVOKED_VAULT_TOKEN\nlegacyhvb.SYNTHETIC_REVOKED_VAULT_TOKEN\nlegacyhvr.SYNTHETIC_REVOKED_VAULT_TOKEN",
       "expected": [],
-      "note": "The 'hvs.' prefix immediately preceded by an alphanumeric/dash character ('legacyhvs....') is a truncated slice of a wider benign identifier, not a boundary-delimited credential, so no candidate is emitted; a real secret substring is never carved out of a longer surrounding token."
+      "note": "Every supported Vault prefix immediately preceded by an alphanumeric/dash character is a truncated slice of a wider benign identifier, not a boundary-delimited credential, so no candidate is emitted; a real secret substring is never carved out of a longer surrounding token."
     },
     {
       "id": "vault-positive-punctuation-adjacent",

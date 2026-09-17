@@ -516,22 +516,29 @@ mod tests {
     /// Issue #320: the four infrastructure-provider detectors (Docker,
     /// Cloudflare, `DigitalOcean`, Vercel) each get the same false-positive
     /// assurance the earlier prefix-family issues (#316/#317) established
-    /// for Stripe/Shopify/Supabase/`OpenAI`/Anthropic, using each
-    /// detector's primary documented prefix.
+    /// for Stripe/Shopify/Supabase/`OpenAI`/Anthropic, across every
+    /// documented prefix variant.
     const INFRA_SUFFIX: &str = "SYNTHETIC_REVOKED_KEY_VALUE";
 
-    fn infra_provider_detectors() -> [(&'static KnownFormatProviderDetector, &'static str); 4] {
+    fn infra_provider_prefixes() -> [(&'static KnownFormatProviderDetector, &'static str); 11] {
         [
             (&DOCKER, "dckr_pat_"),
+            (&DOCKER, "dckr_oat_"),
             (&CLOUDFLARE, "cfut_"),
             (&DIGITALOCEAN, "dop_v1_"),
+            (&DIGITALOCEAN, "doo_v1_"),
+            (&DIGITALOCEAN, "dor_v1_"),
             (&VERCEL, "vcp_"),
+            (&VERCEL, "vci_"),
+            (&VERCEL, "vca_"),
+            (&VERCEL, "vcr_"),
+            (&VERCEL, "vck_"),
         ]
     }
 
     #[test]
     fn infra_providers_accept_a_doc_style_placeholder_built_from_valid_alphabet_characters() {
-        for (detector, prefix) in infra_provider_detectors() {
+        for (detector, prefix) in infra_provider_prefixes() {
             let input = format!("{prefix}{}", "x".repeat(20));
             assert_eq!(detect(detector, &input).len(), 1, "{}", detector.id());
         }
@@ -542,15 +549,23 @@ mod tests {
         // A leading alnum/dash byte right before the documented prefix means
         // this is a truncated slice of a longer identifier, not a
         // boundary-delimited credential.
-        for (detector, prefix) in infra_provider_detectors() {
+        for (detector, prefix) in infra_provider_prefixes() {
             let input = format!("legacy{prefix}{INFRA_SUFFIX}");
             assert_eq!(detect(detector, &input).len(), 0, "{}", detector.id());
         }
     }
 
     #[test]
+    fn infra_providers_reject_case_changed_wrong_prefixes() {
+        for (detector, prefix) in infra_provider_prefixes() {
+            let input = format!("{}{INFRA_SUFFIX}", prefix.to_ascii_uppercase());
+            assert_eq!(detect(detector, &input).len(), 0, "{}", detector.id());
+        }
+    }
+
+    #[test]
     fn infra_providers_reject_masked_and_interpolated_near_misses() {
-        for (detector, prefix) in infra_provider_detectors() {
+        for (detector, prefix) in infra_provider_prefixes() {
             for input in [
                 format!("{prefix}{}", "*".repeat(20)),
                 format!("{prefix}${{ENV_VAR}}"),
@@ -567,7 +582,7 @@ mod tests {
 
     #[test]
     fn infra_providers_bound_a_match_against_trailing_prose_punctuation() {
-        for (detector, prefix) in infra_provider_detectors() {
+        for (detector, prefix) in infra_provider_prefixes() {
             let token = format!("{prefix}{INFRA_SUFFIX}");
             let input = format!("Rotate {token}, then redeploy.");
             let candidates = detect(detector, &input);

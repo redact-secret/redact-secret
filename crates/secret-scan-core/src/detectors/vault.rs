@@ -97,46 +97,68 @@ mod tests {
     /// Stripe/Shopify/Supabase/`OpenAI`/Anthropic, applied to Vault.
     #[test]
     fn accepts_a_doc_style_placeholder_built_from_valid_alphabet_characters() {
-        let input = format!("hvs.{}", "x".repeat(24));
-        assert_eq!(detect(&input).len(), 1);
+        for prefix in PREFIXES {
+            let input = format!("{prefix}{}", "x".repeat(24));
+            assert_eq!(detect(&input).len(), 1, "{prefix}");
+        }
     }
 
     #[test]
     fn rejects_a_prefix_embedded_in_a_wider_benign_identifier() {
-        // A leading alnum/dash byte right before `hvs.` means this is a
+        // A leading alnum/dash byte right before the prefix means this is a
         // truncated slice of a longer identifier, not a boundary-delimited
         // credential.
-        let input = "legacyhvs.SYNTHETIC_REVOKED_VAULT_TOKEN";
-        assert_eq!(detect(input).len(), 0);
+        for prefix in PREFIXES {
+            let input = format!("legacy{prefix}SYNTHETIC_REVOKED_VAULT_TOKEN");
+            assert_eq!(detect(&input).len(), 0, "{prefix}");
+        }
+    }
+
+    #[test]
+    fn rejects_case_changed_wrong_prefixes() {
+        for prefix in PREFIXES {
+            let input = format!(
+                "{}SYNTHETIC_REVOKED_VAULT_TOKEN",
+                prefix.to_ascii_uppercase()
+            );
+            assert_eq!(detect(&input).len(), 0, "{prefix}");
+        }
     }
 
     #[test]
     fn rejects_masked_and_interpolated_near_misses() {
-        for input in [
-            format!("hvs.{}", "*".repeat(24)),
-            "hvs.${ENV_VAR}".to_string(),
-        ] {
-            assert_eq!(detect(&input).len(), 0, "{input}");
+        for prefix in PREFIXES {
+            for input in [
+                format!("{prefix}{}", "*".repeat(24)),
+                format!("{prefix}${{ENV_VAR}}"),
+            ] {
+                assert_eq!(detect(&input).len(), 0, "{input}");
+            }
         }
     }
 
     #[test]
     fn a_trailing_comma_does_not_get_folded_into_or_suppress_the_match() {
-        let token = "hvs.SYNTHETIC_REVOKED_VAULT_TOKEN";
-        let input = format!("Rotate {token}, then redeploy.");
-        let candidates = detect(&input);
-        assert_eq!(candidates.len(), 1);
-        let start = "Rotate ".len();
-        let end = start + token.len();
-        assert_eq!(candidates[0].range(), ByteRange::new(start, end).unwrap());
+        for prefix in PREFIXES {
+            let token = format!("{prefix}SYNTHETIC_REVOKED_VAULT_TOKEN");
+            let input = format!("Rotate {token}, then redeploy.");
+            let candidates = detect(&input);
+            assert_eq!(candidates.len(), 1, "{prefix}");
+            let start = "Rotate ".len();
+            let end = start + token.len();
+            assert_eq!(
+                candidates[0].range(),
+                ByteRange::new(start, end).unwrap(),
+                "{prefix}"
+            );
+        }
     }
 
     /// An ordinary Vault CLI path/namespace reference and a dotted server
     /// version string carry no modern token prefix.
     #[test]
     fn rejects_an_ordinary_vault_path_and_dotted_version_string() {
-        let input =
-            "vault kv get -namespace=admin secret/data/myapp/config on server v1.15.4";
+        let input = "vault kv get -namespace=admin secret/data/myapp/config on server v1.15.4";
         assert_eq!(detect(input).len(), 0);
     }
 }
