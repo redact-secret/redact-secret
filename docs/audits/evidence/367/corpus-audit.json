@@ -512,23 +512,134 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/incremental",
       "detector": "openai-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 41,
+          "end": 164,
           "start": 0
         }
       ],
       "id": "legacy-variable-detector-families",
       "kind": null,
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 41,
+          "end": 164,
           "start": 0
         }
       ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
+      "support": null,
+      "tier": null
+    },
+    {
+      "contexts": [],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/incremental",
+      "detector": "openai-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 75,
+          "start": 24
+        },
+        {
+          "end": 344,
+          "start": 180
+        },
+        {
+          "end": 728,
+          "start": 561
+        }
+      ],
+      "id": "openai-368-unicode-crlf-pairs",
+      "kind": null,
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 75,
+          "start": 24
+        },
+        {
+          "end": 344,
+          "start": 180
+        },
+        {
+          "end": 728,
+          "start": 561
+        }
+      ],
+      "support": null,
+      "tier": null
+    },
+    {
+      "contexts": [],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/incremental",
+      "detector": "openai-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 51,
+          "start": 0
+        }
+      ],
+      "id": "openai-legacy-marker-twin-discriminating-boundary",
+      "kind": null,
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 51,
+          "start": 0
+        }
+      ],
+      "support": null,
+      "tier": null
+    },
+    {
+      "contexts": [],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/incremental",
+      "detector": "openai-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 164,
+          "start": 0
+        }
+      ],
+      "id": "openai-project-length-twin-discriminating-boundary",
+      "kind": null,
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 164,
+          "start": 0
+        }
+      ],
+      "support": null,
+      "tier": null
+    },
+    {
+      "contexts": [],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/incremental",
+      "detector": "openai-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 167,
+          "start": 0
+        }
+      ],
+      "id": "openai-svcacct-length-twin-discriminating-boundary",
+      "kind": null,
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 167,
+          "start": 0
+        }
+      ],
       "support": null,
       "tier": null
     },
@@ -4011,23 +4122,22 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "openai-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 55,
+          "end": 178,
           "start": 14
         }
       ],
       "id": "contextual-overlap-provider",
       "kind": "overlap",
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 55,
+          "end": 178,
           "start": 14
         }
       ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
       "support": "supported",
       "tier": "contextual"
     },
@@ -4038,25 +4148,56 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "openai-token",
-      "disposition": "broad-shape",
-      "expectedRanges": [
-        {
-          "end": 100008,
-          "start": 0
-        }
-      ],
+      "disposition": "silent",
+      "expectedRanges": [],
       "id": "openai-adversarial-long-suffix",
       "kind": "adversarial",
-      "lostRanges": [
-        {
-          "end": 100008,
-          "start": 0
-        }
-      ],
-      "policyOutcomes": [],
+      "lostRanges": [],
       "retainedRanges": [],
       "support": "supported",
       "tier": "adversarial"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 90165,
+          "start": 90001
+        }
+      ],
+      "id": "openai-adversarial-marker-prefix-flood",
+      "kind": "adversarial",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 90165,
+          "start": 90001
+        }
+      ],
+      "support": "supported",
+      "tier": "adversarial"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "openai-boundary-admin-left-73",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
     },
     {
       "contexts": [
@@ -4131,12 +4272,300 @@
       "detector": "openai-token",
       "disposition": "silent",
       "expectedRanges": [],
+      "id": "openai-boundary-legacy-left-19",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "openai-boundary-legacy-left-21",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "openai-boundary-legacy-right-19",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "openai-boundary-legacy-right-21",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "openai-boundary-marker-uppercase-prefix",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "openai-boundary-project-left-57",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "openai-boundary-project-left-59",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "openai-boundary-project-left-75",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "openai-boundary-project-right-73",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "openai-boundary-project-right-75",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "openai-boundary-service-namespace-unsupported",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "silent",
+      "expectedRanges": [],
       "id": "openai-boundary-short",
       "kind": "boundary",
       "lostRanges": [],
       "retainedRanges": [],
       "support": "intentionally-unsupported",
       "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "openai-boundary-svcacct-left-75",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "openai-negative-368-legacy-plain-twin",
+      "kind": "negative",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "negative"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "openai-negative-368-legacy-unicode-crlf-twin",
+      "kind": "negative",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "negative"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "openai-negative-368-proj-plain-twin",
+      "kind": "negative",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "negative"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "openai-negative-368-proj-unicode-crlf-twin",
+      "kind": "negative",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "negative"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "openai-negative-368-svcacct-plain-twin",
+      "kind": "negative",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "negative"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "openai-negative-368-svcacct-unicode-crlf-twin",
+      "kind": "negative",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "negative"
     },
     {
       "contexts": [
@@ -4163,7 +4592,103 @@
       "detector": "openai-token",
       "disposition": "silent",
       "expectedRanges": [],
+      "id": "openai-negative-explicit-namespace-legacy-body",
+      "kind": "negative",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "negative"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "openai-negative-legacy-underscore-segment",
+      "kind": "negative",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "negative"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "silent",
+      "expectedRanges": [],
       "id": "openai-negative-lookalike",
+      "kind": "negative",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "negative"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "openai-negative-marker-embedded-leading",
+      "kind": "negative",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "negative"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "openai-negative-marker-embedded-trailing",
+      "kind": "negative",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "negative"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "openai-negative-marker-lowercase",
+      "kind": "negative",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "negative"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "openai-negative-marker-near-prefix-underscore",
       "kind": "negative",
       "lostRanges": [],
       "retainedRanges": [],
@@ -4225,23 +4750,252 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "openai-token",
-      "disposition": "broad-shape",
-      "expectedRanges": [
-        {
-          "end": 55,
-          "start": 14
-        }
-      ],
+      "disposition": "silent",
+      "expectedRanges": [],
       "id": "openai-overlap-context",
       "kind": "overlap",
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "contextual"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "retained",
+      "expectedRanges": [
         {
-          "end": 55,
+          "end": 178,
           "start": 14
         }
       ],
-      "policyOutcomes": [],
+      "id": "openai-overlap-marker-client-secret",
+      "kind": "overlap",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 178,
+          "start": 14
+        }
+      ],
+      "support": "supported",
+      "tier": "contextual"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 191,
+          "start": 27
+        }
+      ],
+      "id": "openai-overlap-marker-unicode-bearer",
+      "kind": "overlap",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 191,
+          "start": 27
+        }
+      ],
+      "support": "supported",
+      "tier": "contextual"
+    },
+    {
+      "contexts": [
+        "dotenv"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "openai-overlap-twin-under-api-key",
+      "kind": "overlap",
+      "lostRanges": [],
       "retainedRanges": [],
+      "support": "supported",
+      "tier": "contextual"
+    },
+    {
+      "contexts": [
+        "http"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "openai-overlap-twin-under-bearer",
+      "kind": "overlap",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "contextual"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 51,
+          "start": 0
+        }
+      ],
+      "id": "openai-positive-368-legacy-plain",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 51,
+          "start": 0
+        }
+      ],
+      "support": "supported",
+      "tier": "canonical"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 75,
+          "start": 24
+        }
+      ],
+      "id": "openai-positive-368-legacy-unicode-crlf",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 75,
+          "start": 24
+        }
+      ],
+      "support": "supported",
+      "tier": "contextual"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 164,
+          "start": 0
+        }
+      ],
+      "id": "openai-positive-368-proj-plain",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 164,
+          "start": 0
+        }
+      ],
+      "support": "supported",
+      "tier": "canonical"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 188,
+          "start": 24
+        }
+      ],
+      "id": "openai-positive-368-proj-unicode-crlf",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 188,
+          "start": 24
+        }
+      ],
+      "support": "supported",
+      "tier": "contextual"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 167,
+          "start": 0
+        }
+      ],
+      "id": "openai-positive-368-svcacct-plain",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 167,
+          "start": 0
+        }
+      ],
+      "support": "supported",
+      "tier": "canonical"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 191,
+          "start": 24
+        }
+      ],
+      "id": "openai-positive-368-svcacct-unicode-crlf",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 191,
+          "start": 24
+        }
+      ],
       "support": "supported",
       "tier": "contextual"
     },
@@ -4255,50 +5009,15 @@
       "disposition": "broad-shape",
       "expectedRanges": [
         {
-          "end": 33,
+          "end": 165,
           "start": 0
-        },
-        {
-          "end": 70,
-          "start": 34
         }
       ],
-      "id": "openai-positive-all-prefixes",
+      "id": "openai-positive-admin-marker",
       "kind": "positive",
       "lostRanges": [
         {
-          "end": 33,
-          "start": 0
-        },
-        {
-          "end": 70,
-          "start": 34
-        }
-      ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
-      "support": "supported",
-      "tier": "contextual"
-    },
-    {
-      "contexts": [
-        "plain-text"
-      ],
-      "contractOnlyMatches": [],
-      "corpus": "conformance/synchronous",
-      "detector": "openai-token",
-      "disposition": "broad-shape",
-      "expectedRanges": [
-        {
-          "end": 28,
-          "start": 0
-        }
-      ],
-      "id": "openai-positive-doc-style-placeholder",
-      "kind": "positive",
-      "lostRanges": [
-        {
-          "end": 28,
+          "end": 165,
           "start": 0
         }
       ],
@@ -4309,28 +5028,75 @@
     },
     {
       "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "openai-positive-all-prefixes",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "openai-positive-doc-style-placeholder",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
         "json"
       ],
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "openai-token",
-      "disposition": "broad-shape",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "openai-positive-json",
+      "kind": "overlap",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "contextual"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 53,
-          "start": 12
+          "end": 51,
+          "start": 0
         }
       ],
-      "id": "openai-positive-json",
+      "id": "openai-positive-legacy-marker",
       "kind": "positive",
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 53,
-          "start": 12
+          "end": 51,
+          "start": 0
         }
       ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
       "support": "supported",
       "tier": "canonical"
     },
@@ -4341,23 +5107,194 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "openai-token",
-      "disposition": "broad-shape",
-      "expectedRanges": [
-        {
-          "end": 86,
-          "start": 45
-        }
-      ],
+      "disposition": "silent",
+      "expectedRanges": [],
       "id": "openai-positive-log",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "broad-shape",
+      "expectedRanges": [
+        {
+          "end": 51,
+          "start": 0
+        },
+        {
+          "end": 216,
+          "start": 52
+        },
+        {
+          "end": 384,
+          "start": 217
+        },
+        {
+          "end": 550,
+          "start": 385
+        }
+      ],
+      "id": "openai-positive-marker-all-variants",
       "kind": "positive",
       "lostRanges": [
         {
-          "end": 86,
+          "end": 550,
+          "start": 385
+        }
+      ],
+      "policyOutcomes": [],
+      "retainedRanges": [
+        {
+          "end": 51,
+          "start": 0
+        },
+        {
+          "end": 216,
+          "start": 52
+        },
+        {
+          "end": 384,
+          "start": 217
+        }
+      ],
+      "support": "supported",
+      "tier": "contextual"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 164,
+          "start": 0
+        }
+      ],
+      "id": "openai-positive-marker-doc-style-placeholder",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 164,
+          "start": 0
+        }
+      ],
+      "support": "supported",
+      "tier": "canonical"
+    },
+    {
+      "contexts": [
+        "dotenv"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 179,
+          "start": 15
+        }
+      ],
+      "id": "openai-positive-marker-dotenv",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 179,
+          "start": 15
+        }
+      ],
+      "support": "supported",
+      "tier": "canonical"
+    },
+    {
+      "contexts": [
+        "json"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 63,
+          "start": 12
+        }
+      ],
+      "id": "openai-positive-marker-json",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 63,
+          "start": 12
+        }
+      ],
+      "support": "supported",
+      "tier": "canonical"
+    },
+    {
+      "contexts": [
+        "log"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 209,
           "start": 45
         }
       ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
+      "id": "openai-positive-marker-log",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 209,
+          "start": 45
+        }
+      ],
+      "support": "supported",
+      "tier": "canonical"
+    },
+    {
+      "contexts": [
+        "markdown"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 56,
+          "start": 5
+        }
+      ],
+      "id": "openai-positive-marker-markdown",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 56,
+          "start": 5
+        }
+      ],
       "support": "supported",
       "tier": "canonical"
     },
@@ -4368,66 +5305,22 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "openai-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 28,
-          "start": 0
+          "end": 171,
+          "start": 7
         }
       ],
-      "id": "openai-positive-min-length",
+      "id": "openai-positive-marker-punctuation-adjacent",
       "kind": "positive",
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 28,
-          "start": 0
+          "end": 171,
+          "start": 7
         }
       ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
-      "support": "supported",
-      "tier": "canonical"
-    },
-    {
-      "contexts": [
-        "plain-text"
-      ],
-      "contractOnlyMatches": [],
-      "corpus": "conformance/synchronous",
-      "detector": "openai-token",
-      "disposition": "broad-shape",
-      "expectedRanges": [
-        {
-          "end": 36,
-          "start": 0
-        },
-        {
-          "end": 78,
-          "start": 37
-        },
-        {
-          "end": 123,
-          "start": 79
-        }
-      ],
-      "id": "openai-positive-namespace-separation-all-variants",
-      "kind": "positive",
-      "lostRanges": [
-        {
-          "end": 36,
-          "start": 0
-        },
-        {
-          "end": 78,
-          "start": 37
-        },
-        {
-          "end": 123,
-          "start": 79
-        }
-      ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
       "support": "supported",
       "tier": "contextual"
     },
@@ -4438,85 +5331,30 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "openai-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 41,
-          "start": 0
-        }
-      ],
-      "id": "openai-positive-project",
-      "kind": "positive",
-      "lostRanges": [
-        {
-          "end": 41,
-          "start": 0
-        }
-      ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
-      "support": "supported",
-      "tier": "canonical"
-    },
-    {
-      "contexts": [
-        "plain-text"
-      ],
-      "contractOnlyMatches": [],
-      "corpus": "conformance/synchronous",
-      "detector": "openai-token",
-      "disposition": "broad-shape",
-      "expectedRanges": [
-        {
-          "end": 42,
-          "start": 7
-        }
-      ],
-      "id": "openai-positive-punctuation-adjacent",
-      "kind": "positive",
-      "lostRanges": [
-        {
-          "end": 42,
-          "start": 7
-        }
-      ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
-      "support": "supported",
-      "tier": "contextual"
-    },
-    {
-      "contexts": [
-        "plain-text"
-      ],
-      "contractOnlyMatches": [],
-      "corpus": "conformance/synchronous",
-      "detector": "openai-token",
-      "disposition": "broad-shape",
-      "expectedRanges": [
-        {
-          "end": 41,
+          "end": 51,
           "start": 0
         },
         {
-          "end": 83,
-          "start": 42
+          "end": 103,
+          "start": 52
         }
       ],
-      "id": "openai-positive-repeated-value",
+      "id": "openai-positive-marker-repeated-value",
       "kind": "positive",
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 41,
+          "end": 51,
           "start": 0
         },
         {
-          "end": 83,
-          "start": 42
+          "end": 103,
+          "start": 52
         }
       ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
       "support": "supported",
       "tier": "contextual"
     },
@@ -4527,23 +5365,148 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "openai-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 64,
+          "end": 187,
           "start": 23
         }
       ],
-      "id": "openai-positive-shell-quoted",
+      "id": "openai-positive-marker-shell-quoted",
       "kind": "positive",
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 64,
+          "end": 187,
           "start": 23
         }
       ],
-      "policyOutcomes": [],
+      "support": "supported",
+      "tier": "canonical"
+    },
+    {
+      "contexts": [
+        "yaml"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 183,
+          "start": 16
+        }
+      ],
+      "id": "openai-positive-marker-yaml",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 183,
+          "start": 16
+        }
+      ],
+      "support": "supported",
+      "tier": "canonical"
+    },
+    {
+      "contexts": [
+        "yaml"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 180,
+          "start": 16
+        }
+      ],
+      "id": "openai-positive-marker-yaml-crlf",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 180,
+          "start": 16
+        }
+      ],
+      "support": "supported",
+      "tier": "contextual"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "openai-positive-min-length",
+      "kind": "boundary",
+      "lostRanges": [],
       "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "openai-positive-namespace-separation-all-variants",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "openai-positive-project",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 132,
+          "start": 0
+        }
+      ],
+      "id": "openai-positive-project-58-byte-segments",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 132,
+          "start": 0
+        }
+      ],
       "support": "supported",
       "tier": "canonical"
     },
@@ -4554,79 +5517,180 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "openai-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 68,
-          "start": 27
+          "end": 164,
+          "start": 0
         }
       ],
-      "id": "openai-positive-unicode-byte-offset",
+      "id": "openai-positive-project-marker",
       "kind": "positive",
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 68,
-          "start": 27
+          "end": 164,
+          "start": 0
         }
       ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
-      "support": "supported",
-      "tier": "contextual"
-    },
-    {
-      "contexts": [
-        "yaml"
-      ],
-      "contractOnlyMatches": [],
-      "corpus": "conformance/synchronous",
-      "detector": "openai-token",
-      "disposition": "broad-shape",
-      "expectedRanges": [
-        {
-          "end": 57,
-          "start": 16
-        }
-      ],
-      "id": "openai-positive-yaml",
-      "kind": "positive",
-      "lostRanges": [
-        {
-          "end": 57,
-          "start": 16
-        }
-      ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
       "support": "supported",
       "tier": "canonical"
     },
     {
       "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 148,
+          "start": 0
+        },
+        {
+          "end": 297,
+          "start": 149
+        }
+      ],
+      "id": "openai-positive-project-mixed-segment-lengths",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 148,
+          "start": 0
+        },
+        {
+          "end": 297,
+          "start": 149
+        }
+      ],
+      "support": "supported",
+      "tier": "contextual"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "openai-positive-punctuation-adjacent",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "openai-positive-repeated-value",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 167,
+          "start": 0
+        }
+      ],
+      "id": "openai-positive-service-account-marker",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 167,
+          "start": 0
+        }
+      ],
+      "support": "supported",
+      "tier": "canonical"
+    },
+    {
+      "contexts": [
+        "shell"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "openai-positive-shell-quoted",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "openai-positive-unicode-byte-offset",
+      "kind": "overlap",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "contextual"
+    },
+    {
+      "contexts": [
         "yaml"
       ],
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "openai-token",
-      "disposition": "broad-shape",
-      "expectedRanges": [
-        {
-          "end": 57,
-          "start": 16
-        }
-      ],
-      "id": "openai-positive-yaml-crlf",
-      "kind": "positive",
-      "lostRanges": [
-        {
-          "end": 57,
-          "start": 16
-        }
-      ],
-      "policyOutcomes": [],
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "openai-positive-yaml",
+      "kind": "boundary",
+      "lostRanges": [],
       "retainedRanges": [],
-      "support": "supported",
-      "tier": "contextual"
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "yaml"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "openai-positive-yaml-crlf",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
     },
     {
       "contexts": [
@@ -5381,22 +6445,22 @@
       "contractOnlyMatches": [],
       "corpus": "docs/coverage/detector-inventory.json#reconciliationTrigger",
       "detector": "openai-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 36,
+          "end": 164,
           "start": 0
         }
       ],
       "id": "openai_api_key",
       "kind": "reconciliation-trigger",
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 36,
+          "end": 164,
           "start": 0
         }
       ],
-      "retainedRanges": [],
       "support": null,
       "tier": null
     },
@@ -5458,10 +6522,10 @@
       "silent": 11
     },
     "openai-token": {
-      "broad-shape": 19,
-      "retained": 0,
+      "broad-shape": 3,
+      "retained": 31,
       "review": 0,
-      "silent": 10
+      "silent": 52
     },
     "slack-token": {
       "broad-shape": 18,

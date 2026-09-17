@@ -5,6 +5,29 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+- Narrowed `openai-token` to OpenAI's actual key grammar (issue #368,
+  `docs/decisions/2026-09-17-freeze-openai-api-key-grammar.md`). A value is
+  now classified only when it carries the literal `T3BlbkFJ` marker (base64
+  `OpenAI`) between two segments of a source-documented exact length:
+  `sk-` + 20 + marker + 20 alphanumerics (legacy), or
+  `sk-proj-`/`sk-svcacct-`/`sk-admin-` + 74 or 58 + marker + 74 or 58 bytes
+  of `[A-Za-z0-9_-]`, each variant validated independently with no fallback
+  from a malformed namespaced form to the legacy form. The previous rule
+  accepted any `sk-` value with a 20-byte minimum suffix, which flagged the
+  six beta.4 benchmark controls that differ from a real key by one marker
+  byte or one segment byte. Marker-less `sk-` values are no longer
+  classified by this detector; an assignment such as `api_key=` or a Bearer
+  credential carrying one still surfaces through `generic-token` or
+  `bearer-token`. `sk-admin-` is newly named as a supported namespace (it
+  was already caught by the old bare branch); `sk-service-` is documented
+  as unsupported. Detector id, finding type, confidence, policy class, and
+  the public API are unchanged. The fourteen pre-existing marker-less
+  corpus positives are kept and reclassified in place, with
+  contract-conformant counterparts, the issue's twelve inputs, and
+  one-byte-off boundary mutations added to the synchronous and incremental
+  corpora. The assessment accuracy corpus's `code-openai-api-key` fixture is
+  intentionally left for the next evidence re-pin (see the decision record).
+
 - Narrowed `digitalocean-token` to DigitalOcean's reviewed v1 token contract:
   each documented prefix (`dop_v1_` personal access token, `doo_v1_` OAuth
   access token, `dor_v1_` OAuth refresh token) followed by exactly 64
