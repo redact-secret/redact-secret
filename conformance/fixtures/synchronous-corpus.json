@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 994,
+  "fixtureCount": 1000,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -24280,6 +24280,169 @@
       "input": "https://fixtureuser:SyntheticHttpsPassw0rd9@host.example.com/path",
       "expected": [],
       "note": "A generic https URL carrying real-looking userinfo is outside this detector's bounded scheme set; treating arbitrary http(s) URLs as connection strings is an intentional scope boundary, not a parsing gap, the same as the existing unsupported-scheme Rust evidence."
+    },
+    {
+      "id": "vault-positive-repeated-value",
+      "detector": "vault-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "hvs.SYNTHETIC_REVOKED_VAULT_TOKEN hvs.SYNTHETIC_REVOKED_VAULT_TOKEN",
+      "expected": [
+        {
+          "detector": "vault-token",
+          "type": "vault_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 33
+        },
+        {
+          "detector": "vault-token",
+          "type": "vault_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 34,
+          "end": 67
+        }
+      ],
+      "note": "Issue #320 follow-up: an identical value repeated in the same input is reported once per independent occurrence, not deduplicated, the same dimension #321 established for HuggingFace/Linear/Slack."
+    },
+    {
+      "id": "cloudflare-positive-repeated-value",
+      "detector": "cloudflare-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "cfut_SYNTHETIC_REVOKED_KEY_VALUE cfut_SYNTHETIC_REVOKED_KEY_VALUE",
+      "expected": [
+        {
+          "detector": "cloudflare-token",
+          "type": "cloudflare_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 32
+        },
+        {
+          "detector": "cloudflare-token",
+          "type": "cloudflare_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 33,
+          "end": 65
+        }
+      ],
+      "note": "Issue #320 follow-up: an identical value repeated in the same input is reported once per independent occurrence, not deduplicated, the same dimension #321 established for HuggingFace/Linear/Slack."
+    },
+    {
+      "id": "cloudflare-negative-truncated-prefix",
+      "detector": "cloudflare-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "cfu_SYNTHETIC_REVOKED_KEY_VALUE",
+      "expected": [],
+      "note": "Issue #320 follow-up: a truncated/misspelled prefix (the documented 'cfut_' with its final letter dropped) followed by a realistic-length body is deliberately excluded, matching the module doc comment's stated tradeoff; cloudflare-token has only one documented prefix, so unlike docker/digitalocean/vercel it had no wrong-prefix-with-realistic-length-body control yet."
+    },
+    {
+      "id": "digitalocean-positive-repeated-value",
+      "detector": "digitalocean-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "dop_v1_SYNTHETIC_REVOKED_KEY_VALUE dop_v1_SYNTHETIC_REVOKED_KEY_VALUE",
+      "expected": [
+        {
+          "detector": "digitalocean-token",
+          "type": "digitalocean_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 34
+        },
+        {
+          "detector": "digitalocean-token",
+          "type": "digitalocean_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 35,
+          "end": 69
+        }
+      ],
+      "note": "Issue #320 follow-up: an identical value repeated in the same input is reported once per independent occurrence, not deduplicated, the same dimension #321 established for HuggingFace/Linear/Slack."
+    },
+    {
+      "id": "docker-positive-repeated-value",
+      "detector": "docker-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "dckr_pat_SYNTHETIC_REVOKED_KEY_VALUE dckr_pat_SYNTHETIC_REVOKED_KEY_VALUE",
+      "expected": [
+        {
+          "detector": "docker-token",
+          "type": "docker_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 36
+        },
+        {
+          "detector": "docker-token",
+          "type": "docker_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 37,
+          "end": 73
+        }
+      ],
+      "note": "Issue #320 follow-up: an identical value repeated in the same input is reported once per independent occurrence, not deduplicated, the same dimension #321 established for HuggingFace/Linear/Slack."
+    },
+    {
+      "id": "vercel-positive-repeated-value",
+      "detector": "vercel-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "vcp_SYNTHETIC_REVOKED_KEY_VALUE vcp_SYNTHETIC_REVOKED_KEY_VALUE",
+      "expected": [
+        {
+          "detector": "vercel-token",
+          "type": "vercel_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 31
+        },
+        {
+          "detector": "vercel-token",
+          "type": "vercel_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 32,
+          "end": 63
+        }
+      ],
+      "note": "Issue #320 follow-up: an identical value repeated in the same input is reported once per independent occurrence, not deduplicated, the same dimension #321 established for HuggingFace/Linear/Slack."
     }
   ]
 }

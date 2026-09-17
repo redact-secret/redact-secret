@@ -742,6 +742,7 @@
             "vault-positive-log",
             "vault-positive-min-length",
             "vault-positive-punctuation-adjacent",
+            "vault-positive-repeated-value",
             "vault-positive-service-token",
             "vault-positive-yaml"
           ],
@@ -1221,6 +1222,7 @@
             "docker-positive-min-length",
             "docker-positive-punctuation-adjacent",
             "docker-positive-qualified",
+            "docker-positive-repeated-value",
             "docker-positive-yaml"
           ],
           "state": "supported"
@@ -1316,6 +1318,7 @@
             "cloudflare-positive-min-length",
             "cloudflare-positive-punctuation-adjacent",
             "cloudflare-positive-qualified",
+            "cloudflare-positive-repeated-value",
             "cloudflare-positive-yaml"
           ],
           "state": "supported"
@@ -1354,6 +1357,7 @@
             "cloudflare-negative-masked-secret-prefix",
             "cloudflare-negative-ordinary-reference",
             "cloudflare-negative-placeholder",
+            "cloudflare-negative-truncated-prefix",
             "cloudflare-negative-zone-resource-id"
           ],
           "state": "supported"
@@ -1412,6 +1416,7 @@
             "digitalocean-positive-min-length",
             "digitalocean-positive-punctuation-adjacent",
             "digitalocean-positive-qualified",
+            "digitalocean-positive-repeated-value",
             "digitalocean-positive-yaml"
           ],
           "state": "supported"
@@ -1702,6 +1707,7 @@
             "vercel-positive-min-length",
             "vercel-positive-punctuation-adjacent",
             "vercel-positive-qualified",
+            "vercel-positive-repeated-value",
             "vercel-positive-yaml"
           ],
           "state": "supported"

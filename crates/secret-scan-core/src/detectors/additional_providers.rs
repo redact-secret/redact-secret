@@ -632,6 +632,32 @@ mod tests {
         assert_eq!(detect(&VERCEL, input).len(), 0);
     }
 
+    /// Issue #320 follow-up: an identical value repeated in the same input
+    /// is reported once per independent occurrence, not deduplicated, the
+    /// same dimension #321 established for `HuggingFace`/Linear/Slack but
+    /// not yet exercised for the four infra-provider families.
+    #[test]
+    fn infra_providers_report_a_repeated_identical_value_once_per_occurrence() {
+        for (detector, prefix) in infra_provider_prefixes() {
+            let value = format!("{prefix}{INFRA_SUFFIX}");
+            let input = format!("{value} {value}");
+            let candidates = detect(detector, &input);
+            assert_eq!(candidates.len(), 2, "{}", detector.id());
+        }
+    }
+
+    /// Issue #320 follow-up: unlike Docker/`DigitalOcean`/Vercel, Cloudflare
+    /// has only one documented prefix, so it never got a wrong-prefix
+    /// control with a realistic-length (not three-character) body. A
+    /// truncated prefix (the documented `cfut_` with its final letter
+    /// dropped) is exactly the "misspelled prefix" scenario the module doc
+    /// comment already claims is excluded, now with corpus/test evidence.
+    #[test]
+    fn cloudflare_rejects_a_truncated_prefix_with_a_realistic_length_body() {
+        let input = format!("cfu_{INFRA_SUFFIX}");
+        assert_eq!(detect(&CLOUDFLARE, &input).len(), 0);
+    }
+
     /// Issue #321: these dimensions are scoped to `HUGGING_FACE`, `LINEAR`,
     /// and `SLACK`, without widening the shared [`families`] list.
     #[test]
