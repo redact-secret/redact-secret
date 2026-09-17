@@ -169,6 +169,19 @@ Tests: `python3 -B -m unittest discover -s scripts/tests -p 'test_generate_cover
     --out docs/coverage/fp-fn-summary-320.json
   ```
 
+- [`fp-fn-summary-321.json`](./fp-fn-summary-321.json) — the same report for
+  issue [#321](https://github.com/redact-secret/redact-secret/issues/321)'s
+  `huggingface-token`, `linear-token`, `slack-token`, and `sendgrid-token`
+  coverage:
+
+  ```sh
+  python3 -B scripts/generate-fp-fn-summary.py \
+    --detector huggingface-token --detector linear-token \
+    --detector slack-token --detector sendgrid-token \
+    --issue https://github.com/redact-secret/redact-secret/issues/321 \
+    --out docs/coverage/fp-fn-summary-321.json
+  ```
+
 - [`fp-fn-summary-322.json`](./fp-fn-summary-322.json) — the same report for
   issue [#322](https://github.com/redact-secret/redact-secret/issues/322)'s
   `private-key` coverage:

@@ -454,9 +454,15 @@
     {
       "detector": "slack-token",
       "evidence": {
-        "fixtureCount": 13,
+        "fixtureCount": 26,
         "hostContextsExercised": [
-          "plain-text"
+          "http",
+          "json",
+          "log",
+          "markdown",
+          "plain-text",
+          "shell",
+          "yaml"
         ],
         "kindsWithSupportedEvidence": [
           "adversarial",
@@ -471,8 +477,18 @@
       },
       "evidenceFixtureIds": [
         "slack-positive-all-prefixes",
+        "slack-positive-doc-style-placeholder",
+        "slack-positive-json",
+        "slack-positive-log",
+        "slack-positive-markdown-delimiter",
         "slack-positive-min-length",
-        "slack-positive-qualified"
+        "slack-positive-punctuation-adjacent",
+        "slack-positive-qualified",
+        "slack-positive-repeated-value",
+        "slack-positive-shell-quoted",
+        "slack-positive-unicode-byte-offset",
+        "slack-positive-yaml",
+        "slack-positive-yaml-crlf"
       ],
       "policyClass": "always-redact",
       "schemeRows": "not-applicable",
@@ -520,9 +536,15 @@
     {
       "detector": "huggingface-token",
       "evidence": {
-        "fixtureCount": 12,
+        "fixtureCount": 25,
         "hostContextsExercised": [
-          "plain-text"
+          "http",
+          "json",
+          "log",
+          "markdown",
+          "plain-text",
+          "shell",
+          "yaml"
         ],
         "kindsWithSupportedEvidence": [
           "adversarial",
@@ -536,8 +558,18 @@
         ]
       },
       "evidenceFixtureIds": [
+        "huggingface-positive-doc-style-placeholder",
+        "huggingface-positive-json",
+        "huggingface-positive-log",
+        "huggingface-positive-markdown-delimiter",
         "huggingface-positive-min-length",
-        "huggingface-positive-qualified"
+        "huggingface-positive-punctuation-adjacent",
+        "huggingface-positive-qualified",
+        "huggingface-positive-repeated-value",
+        "huggingface-positive-shell-quoted",
+        "huggingface-positive-unicode-byte-offset",
+        "huggingface-positive-yaml",
+        "huggingface-positive-yaml-crlf"
       ],
       "policyClass": "always-redact",
       "schemeRows": "not-applicable",
@@ -666,9 +698,15 @@
     {
       "detector": "linear-token",
       "evidence": {
-        "fixtureCount": 13,
+        "fixtureCount": 26,
         "hostContextsExercised": [
-          "plain-text"
+          "http",
+          "json",
+          "log",
+          "markdown",
+          "plain-text",
+          "shell",
+          "yaml"
         ],
         "kindsWithSupportedEvidence": [
           "adversarial",
@@ -683,8 +721,18 @@
       },
       "evidenceFixtureIds": [
         "linear-positive-all-prefixes",
+        "linear-positive-doc-style-placeholder",
+        "linear-positive-json",
+        "linear-positive-log",
+        "linear-positive-markdown-delimiter",
         "linear-positive-min-length",
-        "linear-positive-qualified"
+        "linear-positive-punctuation-adjacent",
+        "linear-positive-qualified",
+        "linear-positive-repeated-value",
+        "linear-positive-shell-quoted",
+        "linear-positive-unicode-byte-offset",
+        "linear-positive-yaml",
+        "linear-positive-yaml-crlf"
       ],
       "policyClass": "always-redact",
       "schemeRows": "not-applicable",
@@ -846,11 +894,16 @@
     {
       "detector": "sendgrid-token",
       "evidence": {
-        "fixtureCount": 14,
+        "fixtureCount": 24,
         "hostContextsExercised": [
           "dotenv",
+          "http",
           "json",
-          "plain-text"
+          "log",
+          "markdown",
+          "plain-text",
+          "shell",
+          "yaml"
         ],
         "kindsWithSupportedEvidence": [
           "adversarial",
@@ -866,9 +919,17 @@
       "evidenceFixtureIds": [
         "sendgrid-positive-bare",
         "sendgrid-positive-crlf-host",
+        "sendgrid-positive-doc-style-placeholder",
         "sendgrid-positive-dotenv",
         "sendgrid-positive-json",
-        "sendgrid-positive-unicode-prefix"
+        "sendgrid-positive-log",
+        "sendgrid-positive-markdown-delimiter",
+        "sendgrid-positive-punctuation-adjacent",
+        "sendgrid-positive-repeated-value",
+        "sendgrid-positive-shell-quoted",
+        "sendgrid-positive-trailing-url-safe-characters",
+        "sendgrid-positive-unicode-prefix",
+        "sendgrid-positive-yaml"
       ],
       "policyClass": "always-redact",
       "schemeRows": "not-applicable",
