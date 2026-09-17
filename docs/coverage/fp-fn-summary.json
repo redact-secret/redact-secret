@@ -39,6 +39,41 @@
       ]
     },
     {
+      "detector": "aws-access-key",
+      "falseNegativeGuards": {
+        "actualFalseNegatives": 0,
+        "count": 6,
+        "fixtureIds": [
+          "aws-positive-akia",
+          "aws-positive-asia-canonical",
+          "aws-positive-example-shaped-value-in-comment-context",
+          "aws-positive-punctuation-boundary",
+          "aws-positive-unicode-adjacent-multibyte-before",
+          "regression-aws-example-mutation-still-detected"
+        ]
+      },
+      "falsePositiveGuards": {
+        "actualFalsePositives": 0,
+        "count": 8,
+        "fixtureIds": [
+          "aws-negative-account-id",
+          "aws-negative-arn-resource",
+          "aws-negative-arn-role",
+          "aws-negative-ordinary-uppercase-identifier",
+          "aws-negative-role-id",
+          "aws-negative-user-id",
+          "regression-aws-example-access-key-dotenv",
+          "regression-aws-example-access-key-standalone"
+        ]
+      },
+      "hostContextsExercised": [
+        "dotenv",
+        "javascript",
+        "log",
+        "plain-text"
+      ]
+    },
+    {
       "detector": "openai-token",
       "falseNegativeGuards": {
         "actualFalseNegatives": 0,
@@ -206,7 +241,8 @@
     "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
     "issue": [
       "https://github.com/redact-secret/redact-secret/issues/316",
-      "https://github.com/redact-secret/redact-secret/issues/317"
+      "https://github.com/redact-secret/redact-secret/issues/317",
+      "https://github.com/redact-secret/redact-secret/issues/318"
     ]
   }
 }

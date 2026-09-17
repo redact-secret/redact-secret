@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 801,
+  "fixtureCount": 802,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -6590,7 +6590,29 @@
       },
       "input": "XAKIASYNTHETICEXAMPLEY",
       "expected": [],
-      "note": "Provider values embedded in identifiers are excluded."
+      "note": "Accepted tradeoff, not a shape-based allowance: a key-shaped run merged into a longer alphanumeric identifier (alnum on both sides) is indistinguishable at the grammar level from an ordinary wider identifier that happens to contain the same 20 characters, so it is excluded. This can suppress a genuine AKIA/ASIA key if it were ever concatenated directly against other alphanumeric text (for example inside a base64 blob or a compound token) with no separator; that residual false-negative risk is accepted because is_alnum boundary checking cannot resolve it without a wider identifier grammar. It does not apply merely because punctuation, whitespace, or a line boundary sits on either side of the value — see the paired surviving positive, aws-positive-punctuation-boundary."
+    },
+    {
+      "id": "aws-positive-punctuation-boundary",
+      "detector": "aws-access-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "(AKIASYNTHETICEXAMPLE).",
+      "expected": [
+        {
+          "detector": "aws-access-key",
+          "type": "aws_access_key_id",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1,
+          "end": 21
+        }
+      ],
+      "note": "Pairs with aws-boundary-embedded: a key-shaped value bounded by punctuation on both sides is still detected, proving the embedded-value exclusion is specifically about alphanumeric adjacency (merging into a longer identifier), not about the value merely appearing inside punctuated text."
     },
     {
       "id": "aws-overlap-context",

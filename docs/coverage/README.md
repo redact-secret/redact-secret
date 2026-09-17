@@ -113,7 +113,9 @@ Tests: `python3 -B -m unittest discover -s scripts/tests -p 'test_generate_cover
   positive/false-negative guard summary requested by issue
   [#316](https://github.com/redact-secret/redact-secret/issues/316) and
   extended to `openai-token`/`anthropic-token` by issue
-  [#317](https://github.com/redact-secret/redact-secret/issues/317): for each
+  [#317](https://github.com/redact-secret/redact-secret/issues/317) and to
+  `aws-access-key` by issue
+  [#318](https://github.com/redact-secret/redact-secret/issues/318): for each
   reported detector, the `kind: "negative"` fixture count and ids (each one a
   guard the detector must produce zero findings for) and the `kind:
   "positive"` fixture count and ids (each one a guard the detector must still
@@ -128,15 +130,16 @@ Tests: `python3 -B -m unittest discover -s scripts/tests -p 'test_generate_cover
   from the canonical corpus only (never a fixture's `input` or a matched
   value). Defaults to `stripe-token`, `shopify-token`, and `supabase-token`;
   pass `--detector <id>` (repeatable) and `--issue <url>` (repeatable) to
-  report on others, as this file's current five-detector, two-issue
+  report on others, as this file's current six-detector, three-issue
   `provenance.issue` list already does:
 
   ```sh
   python3 -B scripts/generate-fp-fn-summary.py \
     --detector stripe-token --detector shopify-token --detector supabase-token \
-    --detector openai-token --detector anthropic-token \
+    --detector openai-token --detector anthropic-token --detector aws-access-key \
     --issue https://github.com/redact-secret/redact-secret/issues/316 \
     --issue https://github.com/redact-secret/redact-secret/issues/317 \
+    --issue https://github.com/redact-secret/redact-secret/issues/318 \
     --out docs/coverage/fp-fn-summary.json
   ```
 
