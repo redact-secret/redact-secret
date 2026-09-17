@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 36,
+  "fixtureCount": 37,
   "fixtures": [
     {
       "id": "synthetic-regression-malformed-authority",
@@ -288,6 +288,22 @@
         }
       ],
       "note": "An AWS-specific high-signal name remains open across assignment partitions."
+    },
+    {
+      "id": "aws-access-key-exact-length-discriminating-boundary",
+      "input": "AKIASYNTHETICEXAMPLE\nAKIASYNTHETICOVERLENGTH",
+      "text": "<SECRET_1>\nAKIASYNTHETICOVERLENGTH",
+      "expected": [
+        {
+          "detector": "aws-access-key",
+          "type": "aws_access_key_id",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 20
+        }
+      ],
+      "note": "issue #318: aws-access-key's scan_prefixed_runs uses RunLength::Exact(16), a family it shares with github-token, new_relic, notion, sentry, and twilio. Its discriminating boundary is the byte immediately after the fixed-length run: one more alphanumeric byte there turns a match into the rejected longer run on the second line (deliberately a distinct value from the first line's, not a shared prefix, so the rejected run's own un-redacted text can never coincide with the first line's detected value). A chunk split anywhere in either run, including exactly at that boundary byte, must still resolve to the single first-line finding, the same as the whole-input scan — the Exact-length-family counterpart to stripe-public-secret-prefix-discriminating-boundary's AtLeast-family exemplar."
     },
     {
       "id": "multiline-private-key",

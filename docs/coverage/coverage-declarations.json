@@ -96,6 +96,7 @@
             "aws-positive-akia",
             "aws-positive-asia-canonical",
             "aws-positive-example-shaped-value-in-comment-context",
+            "aws-positive-punctuation-boundary",
             "aws-positive-unicode-adjacent-multibyte-before",
             "regression-aws-example-mutation-still-detected"
           ],
@@ -4026,6 +4027,7 @@
           "evidenceFixtureIds": [
             "additional-provider-families",
             "adjacent-findings",
+            "aws-access-key-exact-length-discriminating-boundary",
             "aws-contextual-assignment",
             "contextual-assignment",
             "contextual-assignment-consecutive-nested-keys",
@@ -4278,6 +4280,7 @@
           "evidenceFixtureIds": [
             "additional-provider-families",
             "adjacent-findings",
+            "aws-access-key-exact-length-discriminating-boundary",
             "aws-contextual-assignment",
             "contextual-assignment",
             "contextual-assignment-consecutive-nested-keys",
@@ -4646,6 +4649,7 @@
           "evidenceFixtureIds": [
             "additional-provider-families",
             "adjacent-findings",
+            "aws-access-key-exact-length-discriminating-boundary",
             "aws-contextual-assignment",
             "contextual-assignment",
             "contextual-assignment-consecutive-nested-keys",

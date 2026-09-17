@@ -98,7 +98,7 @@
     {
       "detector": "aws-access-key",
       "evidence": {
-        "fixtureCount": 18,
+        "fixtureCount": 19,
         "hostContextsExercised": [
           "dotenv",
           "javascript",
@@ -120,6 +120,7 @@
         "aws-positive-akia",
         "aws-positive-asia-canonical",
         "aws-positive-example-shaped-value-in-comment-context",
+        "aws-positive-punctuation-boundary",
         "aws-positive-unicode-adjacent-multibyte-before",
         "regression-aws-example-mutation-still-detected"
       ],
