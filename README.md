@@ -282,6 +282,30 @@ from langfuse_mask import mask_secrets
 langfuse = Langfuse(mask=mask_secrets)
 ```
 
+## Redact secrets in logs
+
+Wire the same detection into application logging, alongside pino's own
+path-based `redact` or Python's standard `logging`, so a secret in a
+message, a field, or an error's text never reaches a log destination. See
+[`examples/logging-redaction/`](examples/logging-redaction/) for both
+integrations, the API details they're pinned against, and their tests.
+
+```js
+import pino from "pino";
+import { createRedactingLogMethod } from "./examples/logging-redaction/pino-redact.mjs";
+
+const logMethod = await createRedactingLogMethod();
+const logger = pino({ hooks: { logMethod } });
+```
+
+```python
+import logging
+import redact_secret
+from logging_filter import RedactSecretFilter
+
+handler.addFilter(RedactSecretFilter(redact_secret.scan_and_redact))
+```
+
 ## CLI quick start
 
 The `redact-secret` binary is a host adapter over the same core, for CI,

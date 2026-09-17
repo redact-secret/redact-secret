@@ -1,0 +1,44 @@
+{
+  "cases": [
+    {
+      "name": "message_string",
+      "input": "login failed for token SECRET_TOKEN_1",
+      "expected": "login failed for token <SECRET_1>"
+    },
+    {
+      "name": "merging_object_field",
+      "input": { "userId": "u_42", "authHeader": "Bearer SECRET_TOKEN_1" },
+      "expected": { "userId": "u_42", "authHeader": "Bearer <SECRET_1>" }
+    },
+    {
+      "name": "nested_field",
+      "input": { "req": { "headers": { "cookie": "session=SECRET_TOKEN_1" } } },
+      "expected": { "req": { "headers": { "cookie": "session=<SECRET_1>" } } }
+    },
+    {
+      "name": "array_field",
+      "input": { "tags": ["build", "SECRET_TOKEN_1 embedded", "deploy"] },
+      "expected": { "tags": ["build", "<SECRET_1> embedded", "deploy"] }
+    },
+    {
+      "name": "block_finding_replaces_the_whole_field",
+      "input": { "note": "leaked BLOCK_ME here" },
+      "expected": { "note": "[REDACTED:BLOCKED]" }
+    },
+    {
+      "name": "warn_finding_left_untouched",
+      "input": { "note": "WARN_ME please keep visible" },
+      "expected": { "note": "WARN_ME please keep visible" }
+    },
+    {
+      "name": "unicode",
+      "input": { "message": "café 🔑 SECRET_TOKEN_1 中文" },
+      "expected": { "message": "café 🔑 <SECRET_1> 中文" }
+    },
+    {
+      "name": "mixed_scalars_untouched",
+      "input": { "count": 42, "active": true, "missing": null, "label": "no secret" },
+      "expected": { "count": 42, "active": true, "missing": null, "label": "no secret" }
+    }
+  ]
+}
