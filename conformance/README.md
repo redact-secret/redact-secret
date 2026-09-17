@@ -42,6 +42,11 @@ depend on `src/`.
   the deterministic reproducer for the `github-classic` grammar-mutation
   family declared in `synchronous-corpus.json`; see
   [Mutation provenance](#mutation-provenance).
+- [`fixtures/docker-token-mutations.ts`](./fixtures/docker-token-mutations.ts) —
+  the same kind of reproducer for the `docker-token-exact-length` family
+  (issue #370): the exact-length personal and organization access token
+  identities and the one-byte-short, one-byte-long, cross-prefix-length,
+  invalid-alphabet, and whitespace-insertion mutations around them.
 - [`fixtures/incremental-corpus.json`](./fixtures/incremental-corpus.json) —
   whole-input incremental references, canonical UTF-8 byte offsets. A bounded
   incremental session must reproduce each fixture's `text` and `expected`
@@ -133,7 +138,10 @@ what it claims to be, so `operation` splits into two kinds:
   corpus — `synchronous-corpus.json` stays hand-maintained — it only proves
   the provenance already recorded there is real. A new generated grammar
   needs the same pairing: a small, pure generator function plus a
-  cross-check against the fixtures that cite it.
+  cross-check against the fixtures that cite it —
+  [`fixtures/docker-token-mutations.ts`](./fixtures/docker-token-mutations.ts)
+  and its `schema.test.ts` block are another such pairing, for the
+  `docker-token-exact-length` grammar (issue #370).
   `crates/secret-scan-core/tests/grammar_mutation_discovery.rs` (issue #115)
   is the same idea one step earlier: it generates and checks its own
   differential cases every run without persisting them, and its

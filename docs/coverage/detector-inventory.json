@@ -100,7 +100,7 @@
       "type": "docker_token",
       "detector": "docker-token",
       "policyClass": "always-redact",
-      "reconciliationTrigger": "dckr_pat_SYNTHETICREVOKEDPROVIDERVALUE",
+      "reconciliationTrigger": "dckr_pat_SYNTHETICREVOKEDDOCKERPAT00",
       "schemes": null
     },
     {

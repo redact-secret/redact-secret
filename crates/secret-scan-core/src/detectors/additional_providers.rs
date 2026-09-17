@@ -2,14 +2,16 @@
 //! Linear, Supabase, Vercel, npm, Google, and Grafana Cloud API key
 //! detection.
 //!
-//! Mirrors `src/detectors/additional-providers.ts`. Every one of these
-//! providers reduces to the same shape as [`super::gitlab`] or
-//! [`super::anthropic`] — a documented literal prefix set followed by a
-//! fixed- or minimum-length run of a documented alphabet, with a boundary
-//! alphabet of `[A-Za-z0-9_-]` — so they share one generic [`Detector`]
-//! implementation instead of one bespoke type each.
+//! Mirrors the retired `src/detectors/additional-providers.ts` oracle. Every
+//! one of these providers reduces to the same shape as [`super::gitlab`] or
+//! [`super::anthropic`] — a documented literal prefix set, each prefix
+//! followed by a fixed- or minimum-length run of a documented alphabet,
+//! with a boundary alphabet of `[A-Za-z0-9_-]` — so they share one generic
+//! [`Detector`] implementation instead of one bespoke type each. Prefixes of
+//! one provider may carry different lengths (Docker Hub's `dckr_pat_` and
+//! `dckr_oat_`), which is why each prefix is a [`PrefixShape`] of its own.
 
-use crate::detectors::pattern::{self, Alphabet, RunLength};
+use crate::detectors::pattern::{self, Alphabet, PrefixShape};
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
 
@@ -19,8 +21,7 @@ pub(super) struct KnownFormatProviderDetector {
     id: &'static str,
     type_name: &'static str,
     signals: &'static [&'static str],
-    prefixes: &'static [&'static str],
-    run: RunLength,
+    shapes: &'static [PrefixShape<'static>],
     alphabet: Alphabet,
     boundary: Alphabet,
 }
@@ -36,13 +37,9 @@ impl Detector for KnownFormatProviderDetector {
         _context: &DetectorContext,
     ) -> Result<Vec<Candidate>, DetectorFailure> {
         let mut candidates = Vec::new();
-        for (start, end) in pattern::scan_prefixed_runs(
-            input,
-            self.prefixes,
-            self.run,
-            self.alphabet,
-            self.boundary,
-        ) {
+        for (start, end) in
+            pattern::scan_prefixed_shapes(input, self.shapes, self.alphabet, self.boundary)
+        {
             let Some(range) = ByteRange::new(start, end) else {
                 continue;
             };
@@ -67,10 +64,14 @@ pub(super) const STRIPE: KnownFormatProviderDetector = KnownFormatProviderDetect
     id: "stripe-token",
     type_name: "stripe_credential",
     signals: &["stripe-documented-prefix", "opaque-suffix"],
-    prefixes: &[
-        "sk_test_", "sk_live_", "rk_test_", "rk_live_", "sk_org_", "whsec_",
+    shapes: &[
+        PrefixShape::at_least("sk_test_", 20),
+        PrefixShape::at_least("sk_live_", 20),
+        PrefixShape::at_least("rk_test_", 20),
+        PrefixShape::at_least("rk_live_", 20),
+        PrefixShape::at_least("sk_org_", 20),
+        PrefixShape::at_least("whsec_", 20),
     ],
-    run: RunLength::AtLeast(20),
     alphabet: pattern::is_alnum,
     boundary: pattern::is_alnum_dash,
 };
@@ -83,16 +84,15 @@ pub(super) const SLACK: KnownFormatProviderDetector = KnownFormatProviderDetecto
     id: "slack-token",
     type_name: "slack_token",
     signals: &["slack-documented-prefix", "opaque-suffix"],
-    prefixes: &[
-        "xoxb-",
-        "xoxp-",
-        "xapp-",
-        "xwfp-",
-        "xoxe-",
-        "xoxe.xoxb-",
-        "xoxe.xoxp-",
+    shapes: &[
+        PrefixShape::at_least("xoxb-", 20),
+        PrefixShape::at_least("xoxp-", 20),
+        PrefixShape::at_least("xapp-", 20),
+        PrefixShape::at_least("xwfp-", 20),
+        PrefixShape::at_least("xoxe-", 20),
+        PrefixShape::at_least("xoxe.xoxb-", 20),
+        PrefixShape::at_least("xoxe.xoxp-", 20),
     ],
-    run: RunLength::AtLeast(20),
     alphabet: pattern::is_alnum_dash,
     boundary: pattern::is_alnum_dash,
 };
@@ -106,8 +106,7 @@ pub(super) const PYPI: KnownFormatProviderDetector = KnownFormatProviderDetector
     id: "pypi-token",
     type_name: "pypi_api_token",
     signals: &["pypi-documented-prefix", "macaroon-minimum-length"],
-    prefixes: &["pypi-"],
-    run: RunLength::AtLeast(85),
+    shapes: &[PrefixShape::at_least("pypi-", 85)],
     alphabet: pattern::is_alnum_dash,
     boundary: pattern::is_alnum_dash,
 };
@@ -119,26 +118,44 @@ pub(super) const HUGGING_FACE: KnownFormatProviderDetector = KnownFormatProvider
     id: "huggingface-token",
     type_name: "huggingface_token",
     signals: &["huggingface-documented-prefix", "opaque-suffix"],
-    prefixes: &["hf_"],
-    run: RunLength::AtLeast(20),
+    shapes: &[PrefixShape::at_least("hf_", 20)],
     alphabet: pattern::is_alnum_dash,
     boundary: pattern::is_alnum_dash,
 };
 
-/// Docker Hub personal and organization access tokens. Only the two
-/// documented `_pat_`/`_oat_` segment names are matched; an undocumented
-/// segment name is an intentional false negative, and legacy Docker Hub
-/// passwords (which carry no distinguishing prefix at all) are out of
-/// scope for this detector.
+/// Docker Hub personal (`dckr_pat_`) and organization (`dckr_oat_`) access
+/// tokens, validated as two separately-sized exact-length shapes (issue
+/// #370, `decision-freeze-docker-pat-oat-exact-length-grammar`):
+///
+/// ```text
+/// dckr_pat_<27 bytes from [A-Za-z0-9_-]>   (36 bytes total)
+/// dckr_oat_<32 bytes from [A-Za-z0-9_-]>   (41 bytes total)
+/// ```
+///
+/// Each segment name carries its own length, so a 26- or 28-byte suffix
+/// after `dckr_pat_`, a 31- or 33-byte suffix after `dckr_oat_`, or the
+/// PAT length under the OAT prefix (and vice versa) is an intentional false
+/// negative rather than a fuzzy match, the same exact-length precedent
+/// `npm-token` and `google-api-key` below already set. Only the two
+/// documented segment names are matched; an undocumented segment name is an
+/// intentional false negative, and legacy Docker Hub passwords (which carry
+/// no distinguishing prefix at all) are out of scope for this detector.
 pub(super) const DOCKER: KnownFormatProviderDetector = KnownFormatProviderDetector {
     id: "docker-token",
     type_name: "docker_token",
-    signals: &["docker-documented-prefix", "opaque-suffix"],
-    prefixes: &["dckr_pat_", "dckr_oat_"],
-    run: RunLength::AtLeast(20),
+    signals: &["docker-documented-prefix", "exact-length-suffix"],
+    shapes: &[
+        PrefixShape::exact("dckr_pat_", DOCKER_PAT_SUFFIX_LEN),
+        PrefixShape::exact("dckr_oat_", DOCKER_OAT_SUFFIX_LEN),
+    ],
     alphabet: pattern::is_alnum_dash,
     boundary: pattern::is_alnum_dash,
 };
+
+/// The exact suffix length after `dckr_pat_`.
+pub(super) const DOCKER_PAT_SUFFIX_LEN: usize = 27;
+/// The exact suffix length after `dckr_oat_`.
+pub(super) const DOCKER_OAT_SUFFIX_LEN: usize = 32;
 
 /// Cloudflare's current scannable user and account API-token namespace. A
 /// truncated or misspelled prefix is deliberately excluded, and the
@@ -149,8 +166,7 @@ pub(super) const CLOUDFLARE: KnownFormatProviderDetector = KnownFormatProviderDe
     id: "cloudflare-token",
     type_name: "cloudflare_api_token",
     signals: &["cloudflare-scannable-prefix", "opaque-suffix"],
-    prefixes: &["cfut_"],
-    run: RunLength::AtLeast(20),
+    shapes: &[PrefixShape::at_least("cfut_", 20)],
     alphabet: pattern::is_alnum_dash,
     boundary: pattern::is_alnum_dash,
 };
@@ -177,8 +193,11 @@ pub(super) const DIGITALOCEAN: KnownFormatProviderDetector = KnownFormatProvider
     id: "digitalocean-token",
     type_name: "digitalocean_token",
     signals: &["digitalocean-documented-prefix", "fixed-length-hex-suffix"],
-    prefixes: &["dop_v1_", "doo_v1_", "dor_v1_"],
-    run: RunLength::Exact(64),
+    shapes: &[
+        PrefixShape::exact("dop_v1_", 64),
+        PrefixShape::exact("doo_v1_", 64),
+        PrefixShape::exact("dor_v1_", 64),
+    ],
     alphabet: pattern::is_lower_hex,
     boundary: pattern::is_alnum_dash,
 };
@@ -190,8 +209,10 @@ pub(super) const LINEAR: KnownFormatProviderDetector = KnownFormatProviderDetect
     id: "linear-token",
     type_name: "linear_token",
     signals: &["linear-scannable-prefix", "opaque-suffix"],
-    prefixes: &["lin_api_", "lin_oauth_"],
-    run: RunLength::AtLeast(20),
+    shapes: &[
+        PrefixShape::at_least("lin_api_", 20),
+        PrefixShape::at_least("lin_oauth_", 20),
+    ],
     alphabet: pattern::is_alnum_dash,
     boundary: pattern::is_alnum_dash,
 };
@@ -204,8 +225,7 @@ pub(super) const SUPABASE: KnownFormatProviderDetector = KnownFormatProviderDete
     id: "supabase-token",
     type_name: "supabase_secret_key",
     signals: &["supabase-secret-prefix", "elevated-access-key"],
-    prefixes: &["sb_secret_"],
-    run: RunLength::AtLeast(20),
+    shapes: &[PrefixShape::at_least("sb_secret_", 20)],
     alphabet: pattern::is_alnum_dash,
     boundary: pattern::is_alnum_dash,
 };
@@ -216,8 +236,13 @@ pub(super) const VERCEL: KnownFormatProviderDetector = KnownFormatProviderDetect
     id: "vercel-token",
     type_name: "vercel_token",
     signals: &["vercel-documented-prefix", "opaque-suffix"],
-    prefixes: &["vcp_", "vci_", "vca_", "vcr_", "vck_"],
-    run: RunLength::AtLeast(20),
+    shapes: &[
+        PrefixShape::at_least("vcp_", 20),
+        PrefixShape::at_least("vci_", 20),
+        PrefixShape::at_least("vca_", 20),
+        PrefixShape::at_least("vcr_", 20),
+        PrefixShape::at_least("vck_", 20),
+    ],
     alphabet: pattern::is_alnum_dash,
     boundary: pattern::is_alnum_dash,
 };
@@ -233,8 +258,7 @@ pub(super) const NPM: KnownFormatProviderDetector = KnownFormatProviderDetector 
     id: "npm-token",
     type_name: "npm_access_token",
     signals: &["npm-documented-prefix", "base62-exact-length"],
-    prefixes: &["npm_"],
-    run: RunLength::Exact(36),
+    shapes: &[PrefixShape::exact("npm_", 36)],
     alphabet: pattern::is_alnum,
     boundary: pattern::is_alnum_dash,
 };
@@ -260,8 +284,7 @@ pub(super) const GOOGLE: KnownFormatProviderDetector = KnownFormatProviderDetect
     id: "google-api-key",
     type_name: "google_api_key",
     signals: &["google-documented-prefix", "exact-length-suffix"],
-    prefixes: &["AIza"],
-    run: RunLength::Exact(35),
+    shapes: &[PrefixShape::exact("AIza", 35)],
     alphabet: pattern::is_alnum_dash,
     boundary: pattern::is_alnum_dash,
 };
@@ -285,8 +308,7 @@ pub(super) const GRAFANA_CLOUD: KnownFormatProviderDetector = KnownFormatProvide
     id: "grafana-cloud-access-policy-token",
     type_name: "grafana_cloud_access_policy_token",
     signals: &["grafana-cloud-documented-prefix", "base64-opaque-suffix"],
-    prefixes: &["glc_"],
-    run: RunLength::AtLeast(32),
+    shapes: &[PrefixShape::at_least("glc_", 32)],
     alphabet: pattern::is_base64_body,
     boundary: pattern::is_alnum_dash,
 };
@@ -305,6 +327,14 @@ mod tests {
     /// Grafana Cloud's suffix has a 32-byte minimum, longer than [`BODY`]'s
     /// 30 bytes, so it needs its own body.
     const GRAFANA_CLOUD_BODY: &str = "SYNTHETICREVOKEDGRAFANACLOUDACCESSPOLICYTOKEN";
+    /// Exactly [`DOCKER_PAT_SUFFIX_LEN`] bytes: the documented `dckr_pat_`
+    /// suffix length (issue #370).
+    const DOCKER_PAT_BODY: &str = "SYNTHETICREVOKEDDOCKERPAT00";
+    /// Exactly [`DOCKER_OAT_SUFFIX_LEN`] bytes: the documented `dckr_oat_`
+    /// suffix length (issue #370).
+    const DOCKER_OAT_BODY: &str = "SYNTHETICREVOKEDDOCKERORGTOKEN00";
+    const _: () = assert!(DOCKER_PAT_BODY.len() == DOCKER_PAT_SUFFIX_LEN);
+    const _: () = assert!(DOCKER_OAT_BODY.len() == DOCKER_OAT_SUFFIX_LEN);
     /// `DigitalOcean`'s suffix is exactly 64 lowercase hex bytes (issue
     /// #369), so each documented prefix gets its own fixed-length synthetic
     /// body. These are the locally constructed values from the issue's
@@ -357,7 +387,12 @@ mod tests {
                 "pypi-SYNTHETICSHORT",
             ),
             family(HUGGING_FACE, "hf_", BODY, "hf_SYNTHETIC_SHORT"),
-            family(DOCKER, "dckr_pat_", BODY, "dckr_pat_SYNTHETIC_SHORT"),
+            family(
+                DOCKER,
+                "dckr_pat_",
+                DOCKER_PAT_BODY,
+                "dckr_pat_SYNTHETIC_SHORT",
+            ),
             family(CLOUDFLARE, "cfut_", BODY, "cfut_SYNTHETIC_SHORT"),
             family(
                 DIGITALOCEAN,
@@ -425,7 +460,10 @@ mod tests {
 
     #[test]
     fn detects_every_documented_prefix_variant() {
-        let cases: [(&KnownFormatProviderDetector, &str); 25] = [
+        // Docker's two prefixes carry different exact lengths, so they are
+        // asserted by `docker_accepts_each_segment_at_exactly_its_own_length`
+        // instead of against the shared minimum-length `BODY`.
+        let cases: [(&KnownFormatProviderDetector, &str); 23] = [
             (&STRIPE, "sk_test_"),
             (&STRIPE, "sk_live_"),
             (&STRIPE, "rk_test_"),
@@ -439,8 +477,6 @@ mod tests {
             (&SLACK, "xoxe-"),
             (&SLACK, "xoxe.xoxb-"),
             (&SLACK, "xoxe.xoxp-"),
-            (&DOCKER, "dckr_pat_"),
-            (&DOCKER, "dckr_oat_"),
             (&DIGITALOCEAN, "dop_v1_"),
             (&DIGITALOCEAN, "doo_v1_"),
             (&DIGITALOCEAN, "dor_v1_"),
@@ -529,7 +565,13 @@ mod tests {
     /// assurance the earlier prefix-family issues (#316/#317) established
     /// for Stripe/Shopify/Supabase/`OpenAI`/Anthropic, across every
     /// documented prefix variant.
+    /// 27 bytes: a valid suffix for every minimum-length infra prefix and,
+    /// since issue #370, exactly the documented `dckr_pat_` length too.
     const INFRA_SUFFIX: &str = "SYNTHETIC_REVOKED_KEY_VALUE";
+    /// 32 bytes: exactly the documented `dckr_oat_` length (issue #370).
+    const DOCKER_OAT_SUFFIX: &str = "SYNTHETIC_REVOKED_OAT_KEY_VALUE3";
+    const _: () = assert!(INFRA_SUFFIX.len() == DOCKER_PAT_SUFFIX_LEN);
+    const _: () = assert!(DOCKER_OAT_SUFFIX.len() == DOCKER_OAT_SUFFIX_LEN);
 
     /// One documented prefix of an infrastructure-provider detector, paired
     /// with a synthetic body that satisfies that detector's contracted
@@ -566,10 +608,22 @@ mod tests {
         }
     }
 
+    /// Docker Hub's two prefixes carry different exact lengths (issue
+    /// #370), so each gets a body of its own documented length and a
+    /// placeholder of that same length.
+    fn docker_variant(prefix: &'static str, body: &'static str) -> InfraVariant {
+        InfraVariant {
+            detector: &DOCKER,
+            prefix,
+            body,
+            placeholder: "x".repeat(body.len()),
+        }
+    }
+
     fn infra_provider_variants() -> Vec<InfraVariant> {
         vec![
-            opaque_variant(&DOCKER, "dckr_pat_"),
-            opaque_variant(&DOCKER, "dckr_oat_"),
+            docker_variant("dckr_pat_", INFRA_SUFFIX),
+            docker_variant("dckr_oat_", DOCKER_OAT_SUFFIX),
             opaque_variant(&CLOUDFLARE, "cfut_"),
             digitalocean_variant("dop_v1_", DIGITALOCEAN_BODY),
             digitalocean_variant("doo_v1_", DIGITALOCEAN_OAUTH_BODY),
@@ -628,7 +682,7 @@ mod tests {
     fn infra_providers_reject_masked_and_interpolated_near_misses() {
         for variant in infra_provider_variants() {
             for input in [
-                format!("{}{}", variant.prefix, "*".repeat(20)),
+                format!("{}{}", variant.prefix, "*".repeat(variant.body.len())),
                 format!("{}${{ENV_VAR}}", variant.prefix),
             ] {
                 assert_eq!(
@@ -667,6 +721,127 @@ mod tests {
         let input = "docker pull registry.example.com/myorg/app@sha256:\
             e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b85";
         assert_eq!(detect(&DOCKER, input).len(), 0);
+    }
+
+    /// Issue #370: `dckr_pat_` and `dckr_oat_` are validated separately, each
+    /// at exactly its own documented length (27 and 32 bytes), instead of
+    /// sharing one 20-byte minimum.
+    #[test]
+    fn docker_accepts_each_segment_at_exactly_its_own_length() {
+        for (prefix, body) in [
+            ("dckr_pat_", DOCKER_PAT_BODY),
+            ("dckr_oat_", DOCKER_OAT_BODY),
+        ] {
+            let value = format!("{prefix}{body}");
+            let candidates = detect(&DOCKER, &value);
+            assert_eq!(candidates.len(), 1, "{prefix}");
+            assert_eq!(candidates[0].confidence(), Confidence::High);
+            assert_eq!(candidates[0].effective_specificity(), Specificity::Provider);
+            assert_eq!(
+                candidates[0].range(),
+                ByteRange::new(0, value.len()).unwrap(),
+                "{prefix}"
+            );
+        }
+    }
+
+    /// Issue #370: one byte short of, or one byte past, either documented
+    /// length is an intentional false negative — the beta.4 benchmark's
+    /// `docker-token-pat-plain-twin` (26) and `docker-token-oat-plain-twin`
+    /// (31) mutations, plus their one-byte-long counterparts. A longer run is
+    /// not misread as the exact shape followed by trailing bytes.
+    #[test]
+    fn docker_rejects_a_suffix_one_byte_off_either_documented_length() {
+        for (prefix, body) in [
+            ("dckr_pat_", DOCKER_PAT_BODY),
+            ("dckr_oat_", DOCKER_OAT_BODY),
+        ] {
+            let one_short = format!("{prefix}{}", &body[..body.len() - 1]);
+            let one_long = format!("{prefix}{body}0");
+            for input in [one_short, one_long] {
+                assert_eq!(detect(&DOCKER, &input).len(), 0, "{input}");
+            }
+        }
+    }
+
+    /// Issue #370: the two segment names do not share a length — the PAT
+    /// length under the OAT prefix and the OAT length under the PAT prefix
+    /// are both rejected.
+    #[test]
+    fn docker_does_not_share_a_length_between_segment_names() {
+        for input in [
+            format!("dckr_oat_{DOCKER_PAT_BODY}"),
+            format!("dckr_pat_{DOCKER_OAT_BODY}"),
+        ] {
+            assert_eq!(detect(&DOCKER, &input).len(), 0, "{input}");
+        }
+    }
+
+    /// Issue #370: the benchmark's Unicode/CRLF twins
+    /// (`docker-token-pat-unicode-crlf-twin`,
+    /// `docker-token-oat-unicode-crlf-twin`) stay silent while their paired
+    /// positives are reported at exact UTF-8 byte offsets — the 24-byte
+    /// comment line before each token is the same prefix the benchmark uses.
+    #[test]
+    fn docker_distinguishes_unicode_crlf_twins_from_their_paired_positives() {
+        const COMMENT: &str = "# \u{1F511} reviewed format\r\n";
+        assert_eq!(COMMENT.len(), 24);
+        for (prefix, body) in [
+            ("dckr_pat_", DOCKER_PAT_BODY),
+            ("dckr_oat_", DOCKER_OAT_BODY),
+        ] {
+            let positive = format!("{COMMENT}{prefix}{body}\n\r\n");
+            let candidates = detect(&DOCKER, &positive);
+            assert_eq!(candidates.len(), 1, "{prefix}");
+            assert_eq!(
+                candidates[0].range(),
+                ByteRange::new(COMMENT.len(), COMMENT.len() + prefix.len() + body.len()).unwrap(),
+                "{prefix}"
+            );
+
+            let twin = format!("{COMMENT}{prefix}{}\n\r\n", &body[..body.len() - 1]);
+            assert_eq!(detect(&DOCKER, &twin).len(), 0, "{prefix}");
+        }
+    }
+
+    /// Issue #370: a valid PAT, its 26-byte twin, a valid OAT, and its
+    /// 31-byte twin on adjacent lines are discriminated independently, and a
+    /// quoted, backticked, or `key=` value is still bounded exactly.
+    #[test]
+    fn docker_discriminates_adjacent_twins_and_bounds_delimited_values() {
+        let pat = format!("dckr_pat_{DOCKER_PAT_BODY}");
+        let oat = format!("dckr_oat_{DOCKER_OAT_BODY}");
+        let pat_twin = &pat[..pat.len() - 1];
+        let oat_twin = &oat[..oat.len() - 1];
+        let input = format!("{pat}\n{pat_twin}\n{oat}\n{oat_twin}\n");
+        let candidates = detect(&DOCKER, &input);
+        let ranges: Vec<(usize, usize)> = candidates
+            .iter()
+            .map(|candidate| (candidate.range().start(), candidate.range().end()))
+            .collect();
+        let oat_start = pat.len() + 1 + pat_twin.len() + 1;
+        assert_eq!(
+            ranges,
+            vec![(0, pat.len()), (oat_start, oat_start + oat.len())]
+        );
+
+        for (input, start, len) in [
+            (format!("\"{pat}\""), 1, pat.len()),
+            (format!("`{oat}`"), 1, oat.len()),
+            (
+                format!("DOCKER_TOKEN={pat}"),
+                "DOCKER_TOKEN=".len(),
+                pat.len(),
+            ),
+        ] {
+            let candidates = detect(&DOCKER, &input);
+            assert_eq!(candidates.len(), 1, "{input}");
+            assert_eq!(
+                candidates[0].range(),
+                ByteRange::new(start, start + len).unwrap(),
+                "{input}"
+            );
+        }
     }
 
     /// A Cloudflare zone/account resource ID is an ordinary 32-character hex

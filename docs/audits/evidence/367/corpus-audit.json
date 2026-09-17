@@ -362,48 +362,30 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/incremental",
       "detector": "docker-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 264,
-          "start": 219
-        }
-      ],
-      "id": "additional-provider-families",
-      "kind": null,
-      "lostRanges": [
-        {
-          "end": 264,
-          "start": 219
-        }
-      ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
-      "support": null,
-      "tier": null
-    },
-    {
-      "contexts": [],
-      "contractOnlyMatches": [],
-      "corpus": "conformance/incremental",
-      "detector": "docker-token",
-      "disposition": "broad-shape",
-      "expectedRanges": [
-        {
-          "end": 91,
+          "end": 82,
           "start": 46
-        }
-      ],
-      "id": "docker-embedded-identifier-discriminating-boundary",
-      "kind": null,
-      "lostRanges": [
+        },
         {
-          "end": 91,
-          "start": 46
+          "end": 160,
+          "start": 119
         }
       ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
+      "id": "docker-pat-oat-exact-length-partitions",
+      "kind": null,
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 82,
+          "start": 46
+        },
+        {
+          "end": 160,
+          "start": 119
+        }
+      ],
       "support": null,
       "tier": null
     },
@@ -2428,22 +2410,11 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "docker-token",
-      "disposition": "broad-shape",
-      "expectedRanges": [
-        {
-          "end": 11259,
-          "start": 0
-        }
-      ],
+      "disposition": "silent",
+      "expectedRanges": [],
       "id": "docker-adversarial-long-suffix",
       "kind": "adversarial",
-      "lostRanges": [
-        {
-          "end": 11259,
-          "start": 0
-        }
-      ],
-      "policyOutcomes": [],
+      "lostRanges": [],
       "retainedRanges": [],
       "support": "supported",
       "tier": "adversarial"
@@ -2506,6 +2477,134 @@
       "disposition": "silent",
       "expectedRanges": [],
       "id": "docker-boundary-invalid-alphabet",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "docker-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "docker-boundary-oat-length-under-pat-prefix",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "docker-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "docker-boundary-oat-one-long",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "docker-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "docker-boundary-oat-one-short",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "docker-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "docker-boundary-oat-whitespace-insertion-exact-length",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "docker-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "docker-boundary-pat-invalid-alphabet-exact-length",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "docker-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "docker-boundary-pat-length-under-oat-prefix",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "docker-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "docker-boundary-pat-one-long",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "docker-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "docker-boundary-pat-one-short",
       "kind": "boundary",
       "lostRanges": [],
       "retainedRanges": [],
@@ -2594,6 +2693,38 @@
     },
     {
       "contexts": [
+        "json"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "docker-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "docker-negative-oat-one-short-json",
+      "kind": "negative",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "negative"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "docker-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "docker-negative-oat-one-short-unicode-crlf",
+      "kind": "negative",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "negative"
+    },
+    {
+      "contexts": [
         "plain-text"
       ],
       "contractOnlyMatches": [],
@@ -2602,6 +2733,38 @@
       "disposition": "silent",
       "expectedRanges": [],
       "id": "docker-negative-ordinary-reference",
+      "kind": "negative",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "negative"
+    },
+    {
+      "contexts": [
+        "dotenv"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "docker-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "docker-negative-pat-one-short-dotenv",
+      "kind": "negative",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "negative"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "docker-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "docker-negative-pat-one-short-unicode-crlf",
       "kind": "negative",
       "lostRanges": [],
       "retainedRanges": [],
@@ -2647,22 +2810,11 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "docker-token",
-      "disposition": "broad-shape",
-      "expectedRanges": [
-        {
-          "end": 58,
-          "start": 13
-        }
-      ],
+      "disposition": "silent",
+      "expectedRanges": [],
       "id": "docker-overlap-context",
       "kind": "overlap",
-      "lostRanges": [
-        {
-          "end": 58,
-          "start": 13
-        }
-      ],
-      "policyOutcomes": [],
+      "lostRanges": [],
       "retainedRanges": [],
       "support": "supported",
       "tier": "contextual"
@@ -2674,25 +2826,66 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "docker-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 34,
-          "start": 0
+          "end": 49,
+          "start": 13
         }
       ],
-      "id": "docker-positive-all-prefixes",
-      "kind": "positive",
-      "lostRanges": [
+      "id": "docker-overlap-context-exact-length",
+      "kind": "overlap",
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 34,
-          "start": 0
+          "end": 49,
+          "start": 13
         }
       ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
       "support": "supported",
       "tier": "contextual"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "docker-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 55,
+          "start": 14
+        }
+      ],
+      "id": "docker-overlap-context-oat-exact-length",
+      "kind": "overlap",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 55,
+          "start": 14
+        }
+      ],
+      "support": "supported",
+      "tier": "contextual"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "docker-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "docker-positive-all-prefixes",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
     },
     {
       "contexts": [
@@ -2727,25 +2920,14 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "docker-token",
-      "disposition": "broad-shape",
-      "expectedRanges": [
-        {
-          "end": 29,
-          "start": 0
-        }
-      ],
+      "disposition": "silent",
+      "expectedRanges": [],
       "id": "docker-positive-doc-style-placeholder",
-      "kind": "positive",
-      "lostRanges": [
-        {
-          "end": 29,
-          "start": 0
-        }
-      ],
-      "policyOutcomes": [],
+      "kind": "boundary",
+      "lostRanges": [],
       "retainedRanges": [],
-      "support": "supported",
-      "tier": "canonical"
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
     },
     {
       "contexts": [
@@ -2827,30 +3009,329 @@
     },
     {
       "contexts": [
+        "markdown"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "docker-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 44,
+          "start": 8
+        },
+        {
+          "end": 92,
+          "start": 51
+        }
+      ],
+      "id": "docker-positive-markdown-inline-code",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 44,
+          "start": 8
+        },
+        {
+          "end": 92,
+          "start": 51
+        }
+      ],
+      "support": "supported",
+      "tier": "contextual"
+    },
+    {
+      "contexts": [
         "plain-text"
       ],
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "docker-token",
-      "disposition": "broad-shape",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "docker-positive-min-length",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "docker-token",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 29,
-          "start": 0
+          "end": 55,
+          "start": 14
         }
       ],
-      "id": "docker-positive-min-length",
+      "id": "docker-positive-oat-crlf-unicode-prefix",
       "kind": "positive",
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 29,
-          "start": 0
+          "end": 55,
+          "start": 14
         }
       ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
       "support": "supported",
       "tier": "canonical"
+    },
+    {
+      "contexts": [
+        "dotenv"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "docker-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 58,
+          "start": 17
+        }
+      ],
+      "id": "docker-positive-oat-dotenv",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 58,
+          "start": 17
+        }
+      ],
+      "support": "supported",
+      "tier": "canonical"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "docker-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 41,
+          "start": 0
+        }
+      ],
+      "id": "docker-positive-oat-exact-length",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 41,
+          "start": 0
+        }
+      ],
+      "support": "supported",
+      "tier": "canonical"
+    },
+    {
+      "contexts": [
+        "json"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "docker-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 61,
+          "start": 20
+        }
+      ],
+      "id": "docker-positive-oat-json",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 61,
+          "start": 20
+        }
+      ],
+      "support": "supported",
+      "tier": "canonical"
+    },
+    {
+      "contexts": [
+        "log"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "docker-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 85,
+          "start": 44
+        }
+      ],
+      "id": "docker-positive-oat-log",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 85,
+          "start": 44
+        }
+      ],
+      "support": "supported",
+      "tier": "canonical"
+    },
+    {
+      "contexts": [
+        "yaml"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "docker-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 60,
+          "start": 19
+        }
+      ],
+      "id": "docker-positive-oat-yaml-quoted",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 60,
+          "start": 19
+        }
+      ],
+      "support": "supported",
+      "tier": "canonical"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "docker-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 36,
+          "start": 0
+        },
+        {
+          "end": 114,
+          "start": 73
+        }
+      ],
+      "id": "docker-positive-pat-and-oat-adjacent-twins",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 36,
+          "start": 0
+        },
+        {
+          "end": 114,
+          "start": 73
+        }
+      ],
+      "support": "supported",
+      "tier": "contextual"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "docker-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 36,
+          "start": 0
+        }
+      ],
+      "id": "docker-positive-pat-doc-style-placeholder-exact-length",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 36,
+          "start": 0
+        }
+      ],
+      "support": "supported",
+      "tier": "canonical"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "docker-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 36,
+          "start": 0
+        }
+      ],
+      "id": "docker-positive-pat-exact-length",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 36,
+          "start": 0
+        }
+      ],
+      "support": "supported",
+      "tier": "canonical"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "docker-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 36,
+          "start": 0
+        },
+        {
+          "end": 109,
+          "start": 73
+        }
+      ],
+      "id": "docker-positive-pat-repeated-with-twin",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 36,
+          "start": 0
+        },
+        {
+          "end": 109,
+          "start": 73
+        }
+      ],
+      "support": "supported",
+      "tier": "contextual"
     },
     {
       "contexts": [
@@ -2885,25 +3366,14 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "docker-token",
-      "disposition": "broad-shape",
-      "expectedRanges": [
-        {
-          "end": 45,
-          "start": 0
-        }
-      ],
+      "disposition": "silent",
+      "expectedRanges": [],
       "id": "docker-positive-qualified",
-      "kind": "positive",
-      "lostRanges": [
-        {
-          "end": 45,
-          "start": 0
-        }
-      ],
-      "policyOutcomes": [],
+      "kind": "boundary",
+      "lostRanges": [],
       "retainedRanges": [],
-      "support": "supported",
-      "tier": "canonical"
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
     },
     {
       "contexts": [
@@ -6373,22 +6843,22 @@
       "contractOnlyMatches": [],
       "corpus": "docs/coverage/detector-inventory.json#reconciliationTrigger",
       "detector": "docker-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 38,
+          "end": 36,
           "start": 0
         }
       ],
       "id": "docker_token",
       "kind": "reconciliation-trigger",
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 38,
+          "end": 36,
           "start": 0
         }
       ],
-      "retainedRanges": [],
       "support": null,
       "tier": null
     },
@@ -6504,10 +6974,10 @@
       "silent": 31
     },
     "docker-token": {
-      "broad-shape": 10,
-      "retained": 7,
+      "broad-shape": 1,
+      "retained": 22,
       "review": 0,
-      "silent": 12
+      "silent": 30
     },
     "huggingface-token": {
       "broad-shape": 18,

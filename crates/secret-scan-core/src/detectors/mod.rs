@@ -262,7 +262,7 @@ mod tests {
             ("slack-token", "xoxb-SYNTHETICREVOKEDPROVIDERVALUE"),
             ("pypi-token", pypi_input.as_str()),
             ("huggingface-token", "hf_SYNTHETICREVOKEDPROVIDERVALUE"),
-            ("docker-token", "dckr_pat_SYNTHETICREVOKEDPROVIDERVALUE"),
+            ("docker-token", "dckr_pat_SYNTHETICREVOKEDDOCKERPAT00"),
             ("cloudflare-token", "cfut_SYNTHETICREVOKEDPROVIDERVALUE"),
             (
                 "digitalocean-token",

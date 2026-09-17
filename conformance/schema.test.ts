@@ -23,6 +23,10 @@ import {
   generateGithubClassicMutations,
 } from "./fixtures/github-classic-mutations.js";
 import {
+  DOCKER_TOKEN_EXACT_LENGTH_SEED_ID,
+  generateDockerTokenMutations,
+} from "./fixtures/docker-token-mutations.js";
+import {
   DIGITALOCEAN_V1_SEED_ID,
   generateDigitaloceanV1Mutations,
 } from "./fixtures/digitalocean-v1-mutations.js";
@@ -325,6 +329,43 @@ describe("github-classic mutation reproducibility (issue #116)", () => {
       expect(mutation.seedId).toBe(GITHUB_CLASSIC_SEED_ID);
       expect(mutation.operation).toBe(reproduced!.operation);
       expect(fixture.input).toBe(reproduced!.input);
+    }
+  });
+});
+
+describe("docker-token-exact-length mutation reproducibility (issue #370)", () => {
+  test("regenerating the seeded mutation set is byte-identical", () => {
+    expect(generateDockerTokenMutations()).toEqual(generateDockerTokenMutations());
+  });
+
+  test("every corpus fixture declaring this grammar reproduces byte-for-byte", () => {
+    const generated = new Map(
+      generateDockerTokenMutations().map((mutation) => [mutation.ordinal, mutation]),
+    );
+    const declared = corpus.fixtures.filter(
+      (fixture) => fixture.mutation?.grammar === "docker-token-exact-length",
+    );
+
+    expect(declared.length).toBe(generated.size);
+    for (const fixture of declared) {
+      const mutation = fixture.mutation!;
+      const reproduced = generated.get(mutation.ordinal);
+      expect(reproduced, `${fixture.id}: no generated case for ordinal ${mutation.ordinal}`)
+        .toBeDefined();
+      expect(mutation.seedId).toBe(DOCKER_TOKEN_EXACT_LENGTH_SEED_ID);
+      expect(mutation.operation).toBe(reproduced!.operation);
+      expect(fixture.input).toBe(reproduced!.input);
+    }
+  });
+
+  test("each identity case is the only supported positive in its family", () => {
+    const declared = corpus.fixtures.filter(
+      (fixture) => fixture.mutation?.grammar === "docker-token-exact-length",
+    );
+    for (const fixture of declared) {
+      const identity = fixture.mutation!.operation.endsWith("-identity");
+      expect(fixture.expected.length, fixture.id).toBe(identity ? 1 : 0);
+      expect(fixture.support, fixture.id).toBe(identity ? "supported" : "intentionally-unsupported");
     }
   });
 });
