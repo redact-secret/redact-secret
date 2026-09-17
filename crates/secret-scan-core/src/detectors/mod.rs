@@ -189,6 +189,25 @@ mod tests {
         assert!(bearer[0].range().overlaps(contextual[0].range()));
     }
 
+    #[test]
+    fn basic_scheme_is_excluded_from_bearer_token_but_generic_token_still_claims_it() {
+        let input = "Authorization: Basic ZGVtb3VzZXI6ZGVtb3Bhc3N3b3Jk";
+        let context = DetectorContext::new(input.len());
+        let bearer = bearer_token::bearer_token_detector()
+            .detect(input, &context)
+            .unwrap();
+        let contextual = generic_token::generic_token_detector()
+            .detect(input, &context)
+            .unwrap();
+
+        assert!(
+            bearer.is_empty(),
+            "bearer-token only claims the literal 'bearer' scheme"
+        );
+        assert_eq!(contextual.len(), 1);
+        assert_eq!(contextual[0].type_name(), "authorization_credential");
+    }
+
     fn assert_provider_candidates(cases: &[(&str, &str)]) {
         let detectors = built_in_detectors();
         for (id, input) in cases {
