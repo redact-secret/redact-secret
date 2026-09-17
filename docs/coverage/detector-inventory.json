@@ -44,7 +44,7 @@
       "type": "openai_api_key",
       "detector": "openai-token",
       "policyClass": "always-redact",
-      "reconciliationTrigger": "sk-proj-SYNTHETIC_REVOKED_OPENAI_KEY",
+      "reconciliationTrigger": "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",
       "schemes": null
     },
     {
@@ -114,7 +114,7 @@
       "type": "digitalocean_token",
       "detector": "digitalocean-token",
       "policyClass": "always-redact",
-      "reconciliationTrigger": "dop_v1_SYNTHETICREVOKEDPROVIDERVALUE",
+      "reconciliationTrigger": "dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9",
       "schemes": null
     },
     {

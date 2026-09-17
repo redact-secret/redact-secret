@@ -248,7 +248,10 @@ mod tests {
                 &"ghp_SYNTHETICREVOKEDVALUE0000000000000000"[..40],
             ),
             ("gitlab-token", "glpat-SYNTHETIC_REVOKED_TOKEN_FIXTURE"),
-            ("openai-token", "sk-proj-SYNTHETIC_REVOKED_OPENAI_KEY"),
+            (
+                "openai-token",
+                "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",
+            ),
             (
                 "anthropic-token",
                 "sk-ant-api03-SYNTHETIC_REVOKED_ANTHROPIC_KEY",
@@ -261,7 +264,10 @@ mod tests {
             ("huggingface-token", "hf_SYNTHETICREVOKEDPROVIDERVALUE"),
             ("docker-token", "dckr_pat_SYNTHETICREVOKEDDOCKERPAT00"),
             ("cloudflare-token", "cfut_SYNTHETICREVOKEDPROVIDERVALUE"),
-            ("digitalocean-token", "dop_v1_SYNTHETICREVOKEDPROVIDERVALUE"),
+            (
+                "digitalocean-token",
+                "dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9",
+            ),
             ("linear-token", "lin_api_SYNTHETICREVOKEDPROVIDERVALUE"),
             ("supabase-token", "sb_secret_SYNTHETICREVOKEDPROVIDERVALUE"),
             ("vercel-token", "vcp_SYNTHETICREVOKEDPROVIDERVALUE"),

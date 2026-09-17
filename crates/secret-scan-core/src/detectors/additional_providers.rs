@@ -5,7 +5,7 @@
 //! Mirrors the retired `src/detectors/additional-providers.ts` oracle. Every
 //! one of these providers reduces to the same shape as [`super::gitlab`] or
 //! [`super::anthropic`] — a documented literal prefix set, each prefix
-//! followed by an opaque suffix of a documented minimum or exact length,
+//! followed by a fixed- or minimum-length run of a documented alphabet,
 //! with a boundary alphabet of `[A-Za-z0-9_-]` — so they share one generic
 //! [`Detector`] implementation instead of one bespoke type each. Prefixes of
 //! one provider may carry different lengths (Docker Hub's `dckr_pat_` and
@@ -171,20 +171,34 @@ pub(super) const CLOUDFLARE: KnownFormatProviderDetector = KnownFormatProviderDe
     boundary: pattern::is_alnum_dash,
 };
 
-/// `DigitalOcean` personal, `OAuth` access, and `OAuth` refresh token
-/// families. Only the documented `v1` namespace is matched; a future
+/// `DigitalOcean` personal (`dop_v1_`), `OAuth` access (`doo_v1_`), and
+/// `OAuth` refresh (`dor_v1_`) token families.
+///
+/// The reviewed contract (issue #369) is each documented prefix followed by
+/// exactly 64 lowercase hexadecimal bytes. `DigitalOcean`'s API release
+/// notes (2022-03-29) establish the three prefixes; gitleaks v8.30.1
+/// (`digitalocean-pat`, `digitalocean-access-token`,
+/// `digitalocean-refresh-token`) and trufflehog v3.97.4 (`digitaloceanv2`)
+/// independently pin the body to `[a-f0-9]{64}`, and no reviewed source
+/// shows any other length or alphabet. The earlier 20-byte `[A-Za-z0-9_-]`
+/// minimum accepted a 63-byte twin of every paired positive; the exact run
+/// rejects it, rejects a 65-byte or wider run outright (a token is never
+/// carved out of a longer identifier), and rejects uppercase hex. gitleaks
+/// alone matches `dor_v1_` case-insensitively; that is a tool convenience
+/// with no provider evidence behind it, so all three prefixes stay
+/// case-sensitive. Only the documented `v1` namespace is matched; a future
 /// version bump (`dop_v2_` and siblings) is an intentional false negative
 /// until that shape is confirmed and added.
 pub(super) const DIGITALOCEAN: KnownFormatProviderDetector = KnownFormatProviderDetector {
     id: "digitalocean-token",
     type_name: "digitalocean_token",
-    signals: &["digitalocean-documented-prefix", "versioned-opaque-suffix"],
+    signals: &["digitalocean-documented-prefix", "fixed-length-hex-suffix"],
     shapes: &[
-        PrefixShape::at_least("dop_v1_", 20),
-        PrefixShape::at_least("doo_v1_", 20),
-        PrefixShape::at_least("dor_v1_", 20),
+        PrefixShape::exact("dop_v1_", 64),
+        PrefixShape::exact("doo_v1_", 64),
+        PrefixShape::exact("dor_v1_", 64),
     ],
-    alphabet: pattern::is_alnum_dash,
+    alphabet: pattern::is_lower_hex,
     boundary: pattern::is_alnum_dash,
 };
 
@@ -321,6 +335,16 @@ mod tests {
     const DOCKER_OAT_BODY: &str = "SYNTHETICREVOKEDDOCKERORGTOKEN00";
     const _: () = assert!(DOCKER_PAT_BODY.len() == DOCKER_PAT_SUFFIX_LEN);
     const _: () = assert!(DOCKER_OAT_BODY.len() == DOCKER_OAT_SUFFIX_LEN);
+    /// `DigitalOcean`'s suffix is exactly 64 lowercase hex bytes (issue
+    /// #369), so each documented prefix gets its own fixed-length synthetic
+    /// body. These are the locally constructed values from the issue's
+    /// self-contained snapshot; none was ever provider-issued.
+    const DIGITALOCEAN_BODY: &str =
+        "1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9";
+    const DIGITALOCEAN_OAUTH_BODY: &str =
+        "025343c0555235768c29735f523ad644fbfe1569b1d88f46b4f506628ae8b08a";
+    const DIGITALOCEAN_REFRESH_BODY: &str =
+        "686b232b8722f7ab110b24d01fd9a96539cdec166f27e643ae9852b28d2b0da5";
 
     fn detect(detector: &KnownFormatProviderDetector, input: &str) -> Vec<Candidate> {
         detector
@@ -331,76 +355,62 @@ mod tests {
     struct Family {
         detector: KnownFormatProviderDetector,
         value: String,
+        /// `value` with an invalid-alphabet byte inserted four bytes into
+        /// the suffix, so the run breaks before any family's minimum or
+        /// exact length is reached.
+        broken: String,
         short: &'static str,
+    }
+
+    fn family(
+        detector: KnownFormatProviderDetector,
+        prefix: &str,
+        body: &str,
+        short: &'static str,
+    ) -> Family {
+        Family {
+            detector,
+            value: format!("{prefix}{body}"),
+            broken: format!("{prefix}{}!{}", &body[..4], &body[4..]),
+            short,
+        }
     }
 
     fn families() -> Vec<Family> {
         vec![
-            Family {
-                detector: STRIPE,
-                value: format!("sk_live_{BODY}"),
-                short: "sk_live_SYNTHETICSHORT",
-            },
-            Family {
-                detector: SLACK,
-                value: format!("xoxb-{BODY}"),
-                short: "xoxb-SYNTHETICSHORT",
-            },
-            Family {
-                detector: PYPI,
-                value: format!("pypi-{}", "SYNTHETIC_REVOKED_".repeat(5)),
-                short: "pypi-SYNTHETICSHORT",
-            },
-            Family {
-                detector: HUGGING_FACE,
-                value: format!("hf_{BODY}"),
-                short: "hf_SYNTHETIC_SHORT",
-            },
-            Family {
-                detector: DOCKER,
-                value: format!("dckr_pat_{DOCKER_PAT_BODY}"),
-                short: "dckr_pat_SYNTHETIC_SHORT",
-            },
-            Family {
-                detector: CLOUDFLARE,
-                value: format!("cfut_{BODY}"),
-                short: "cfut_SYNTHETIC_SHORT",
-            },
-            Family {
-                detector: DIGITALOCEAN,
-                value: format!("dop_v1_{BODY}"),
-                short: "dop_v1_SYNTHETIC_SHORT",
-            },
-            Family {
-                detector: LINEAR,
-                value: format!("lin_api_{BODY}"),
-                short: "lin_api_SYNTHETIC_SHORT",
-            },
-            Family {
-                detector: SUPABASE,
-                value: format!("sb_secret_{BODY}"),
-                short: "sb_secret_SYNTHETIC_SHORT",
-            },
-            Family {
-                detector: VERCEL,
-                value: format!("vcp_{BODY}"),
-                short: "vcp_SYNTHETIC_SHORT",
-            },
-            Family {
-                detector: NPM,
-                value: format!("npm_{NPM_BODY}"),
-                short: "npm_SYNTHETICSHORT",
-            },
-            Family {
-                detector: GOOGLE,
-                value: format!("AIza{GOOGLE_BODY}"),
-                short: "AIzaSYNTHETICSHORT",
-            },
-            Family {
-                detector: GRAFANA_CLOUD,
-                value: format!("glc_{GRAFANA_CLOUD_BODY}"),
-                short: "glc_SYNTHETICSHORT",
-            },
+            family(STRIPE, "sk_live_", BODY, "sk_live_SYNTHETICSHORT"),
+            family(SLACK, "xoxb-", BODY, "xoxb-SYNTHETICSHORT"),
+            family(
+                PYPI,
+                "pypi-",
+                &"SYNTHETIC_REVOKED_".repeat(5),
+                "pypi-SYNTHETICSHORT",
+            ),
+            family(HUGGING_FACE, "hf_", BODY, "hf_SYNTHETIC_SHORT"),
+            family(
+                DOCKER,
+                "dckr_pat_",
+                DOCKER_PAT_BODY,
+                "dckr_pat_SYNTHETIC_SHORT",
+            ),
+            family(CLOUDFLARE, "cfut_", BODY, "cfut_SYNTHETIC_SHORT"),
+            family(
+                DIGITALOCEAN,
+                "dop_v1_",
+                DIGITALOCEAN_BODY,
+                "dop_v1_SYNTHETIC_SHORT",
+            ),
+            family(LINEAR, "lin_api_", BODY, "lin_api_SYNTHETIC_SHORT"),
+            family(SUPABASE, "sb_secret_", BODY, "sb_secret_SYNTHETIC_SHORT"),
+            family(VERCEL, "vcp_", BODY, "vcp_SYNTHETIC_SHORT"),
+            family(NPM, "npm_", NPM_BODY, "npm_SYNTHETICSHORT"),
+            family(GOOGLE, "AIza", GOOGLE_BODY, "AIzaSYNTHETICSHORT"),
+            family(
+                GRAFANA_CLOUD,
+                "glc_",
+                GRAFANA_CLOUD_BODY,
+                "glc_SYNTHETICSHORT",
+            ),
         ]
     }
 
@@ -422,8 +432,7 @@ mod tests {
     fn rejects_short_invalid_alphabet_and_embedded_lookalikes() {
         for family in families() {
             let embedded = format!("X{}Y", family.value);
-            let broken = family.value.replacen("REVOKED", "REVO!KED", 1);
-            for input in [family.short, broken.as_str(), embedded.as_str()] {
+            for input in [family.short, family.broken.as_str(), embedded.as_str()] {
                 assert_eq!(
                     detect(&family.detector, input).len(),
                     0,
@@ -480,7 +489,14 @@ mod tests {
             (&VERCEL, "vck_"),
         ];
         for (detector, prefix) in cases {
-            let value = format!("{prefix}{BODY}");
+            // DigitalOcean's contracted body is exactly 64 lowercase hex
+            // bytes (issue #369), so it cannot share the generic [`BODY`].
+            let body = if detector.id() == DIGITALOCEAN.id() {
+                DIGITALOCEAN_BODY
+            } else {
+                BODY
+            };
+            let value = format!("{prefix}{body}");
             let candidates = detect(detector, &value);
             assert_eq!(candidates.len(), 1, "{prefix}");
             assert_eq!(
@@ -557,33 +573,79 @@ mod tests {
     const _: () = assert!(INFRA_SUFFIX.len() == DOCKER_PAT_SUFFIX_LEN);
     const _: () = assert!(DOCKER_OAT_SUFFIX.len() == DOCKER_OAT_SUFFIX_LEN);
 
-    /// Every documented infra prefix paired with a suffix that is valid for
-    /// that prefix's own documented length.
-    fn infra_provider_prefixes() -> [(
-        &'static KnownFormatProviderDetector,
-        &'static str,
-        &'static str,
-    ); 11] {
-        [
-            (&DOCKER, "dckr_pat_", INFRA_SUFFIX),
-            (&DOCKER, "dckr_oat_", DOCKER_OAT_SUFFIX),
-            (&CLOUDFLARE, "cfut_", INFRA_SUFFIX),
-            (&DIGITALOCEAN, "dop_v1_", INFRA_SUFFIX),
-            (&DIGITALOCEAN, "doo_v1_", INFRA_SUFFIX),
-            (&DIGITALOCEAN, "dor_v1_", INFRA_SUFFIX),
-            (&VERCEL, "vcp_", INFRA_SUFFIX),
-            (&VERCEL, "vci_", INFRA_SUFFIX),
-            (&VERCEL, "vca_", INFRA_SUFFIX),
-            (&VERCEL, "vcr_", INFRA_SUFFIX),
-            (&VERCEL, "vck_", INFRA_SUFFIX),
+    /// One documented prefix of an infrastructure-provider detector, paired
+    /// with a synthetic body that satisfies that detector's contracted
+    /// shape and a documentation-style placeholder built entirely from the
+    /// detector's own suffix alphabet at a length its contract accepts.
+    struct InfraVariant {
+        detector: &'static KnownFormatProviderDetector,
+        prefix: &'static str,
+        body: &'static str,
+        placeholder: String,
+    }
+
+    fn opaque_variant(
+        detector: &'static KnownFormatProviderDetector,
+        prefix: &'static str,
+    ) -> InfraVariant {
+        InfraVariant {
+            detector,
+            prefix,
+            body: INFRA_SUFFIX,
+            placeholder: "x".repeat(20),
+        }
+    }
+
+    /// `DigitalOcean`'s contract is exactly 64 lowercase hex bytes (issue
+    /// #369), so its variants carry a fixed-length hex body and a hex-only
+    /// placeholder.
+    fn digitalocean_variant(prefix: &'static str, body: &'static str) -> InfraVariant {
+        InfraVariant {
+            detector: &DIGITALOCEAN,
+            prefix,
+            body,
+            placeholder: "a".repeat(64),
+        }
+    }
+
+    /// Docker Hub's two prefixes carry different exact lengths (issue
+    /// #370), so each gets a body of its own documented length and a
+    /// placeholder of that same length.
+    fn docker_variant(prefix: &'static str, body: &'static str) -> InfraVariant {
+        InfraVariant {
+            detector: &DOCKER,
+            prefix,
+            body,
+            placeholder: "x".repeat(body.len()),
+        }
+    }
+
+    fn infra_provider_variants() -> Vec<InfraVariant> {
+        vec![
+            docker_variant("dckr_pat_", INFRA_SUFFIX),
+            docker_variant("dckr_oat_", DOCKER_OAT_SUFFIX),
+            opaque_variant(&CLOUDFLARE, "cfut_"),
+            digitalocean_variant("dop_v1_", DIGITALOCEAN_BODY),
+            digitalocean_variant("doo_v1_", DIGITALOCEAN_OAUTH_BODY),
+            digitalocean_variant("dor_v1_", DIGITALOCEAN_REFRESH_BODY),
+            opaque_variant(&VERCEL, "vcp_"),
+            opaque_variant(&VERCEL, "vci_"),
+            opaque_variant(&VERCEL, "vca_"),
+            opaque_variant(&VERCEL, "vcr_"),
+            opaque_variant(&VERCEL, "vck_"),
         ]
     }
 
     #[test]
     fn infra_providers_accept_a_doc_style_placeholder_built_from_valid_alphabet_characters() {
-        for (detector, prefix, suffix) in infra_provider_prefixes() {
-            let input = format!("{prefix}{}", "x".repeat(suffix.len()));
-            assert_eq!(detect(detector, &input).len(), 1, "{}", detector.id());
+        for variant in infra_provider_variants() {
+            let input = format!("{}{}", variant.prefix, variant.placeholder);
+            assert_eq!(
+                detect(variant.detector, &input).len(),
+                1,
+                "{}",
+                variant.detector.id()
+            );
         }
     }
 
@@ -592,32 +654,42 @@ mod tests {
         // A leading alnum/dash byte right before the documented prefix means
         // this is a truncated slice of a longer identifier, not a
         // boundary-delimited credential.
-        for (detector, prefix, suffix) in infra_provider_prefixes() {
-            let input = format!("legacy{prefix}{suffix}");
-            assert_eq!(detect(detector, &input).len(), 0, "{}", detector.id());
+        for variant in infra_provider_variants() {
+            let input = format!("legacy{}{}", variant.prefix, variant.body);
+            assert_eq!(
+                detect(variant.detector, &input).len(),
+                0,
+                "{}",
+                variant.detector.id()
+            );
         }
     }
 
     #[test]
     fn infra_providers_reject_case_changed_wrong_prefixes() {
-        for (detector, prefix, suffix) in infra_provider_prefixes() {
-            let input = format!("{}{suffix}", prefix.to_ascii_uppercase());
-            assert_eq!(detect(detector, &input).len(), 0, "{}", detector.id());
+        for variant in infra_provider_variants() {
+            let input = format!("{}{}", variant.prefix.to_ascii_uppercase(), variant.body);
+            assert_eq!(
+                detect(variant.detector, &input).len(),
+                0,
+                "{}",
+                variant.detector.id()
+            );
         }
     }
 
     #[test]
     fn infra_providers_reject_masked_and_interpolated_near_misses() {
-        for (detector, prefix, suffix) in infra_provider_prefixes() {
+        for variant in infra_provider_variants() {
             for input in [
-                format!("{prefix}{}", "*".repeat(suffix.len())),
-                format!("{prefix}${{ENV_VAR}}"),
+                format!("{}{}", variant.prefix, "*".repeat(variant.body.len())),
+                format!("{}${{ENV_VAR}}", variant.prefix),
             ] {
                 assert_eq!(
-                    detect(detector, &input).len(),
+                    detect(variant.detector, &input).len(),
                     0,
                     "{} {input}",
-                    detector.id()
+                    variant.detector.id()
                 );
             }
         }
@@ -625,18 +697,18 @@ mod tests {
 
     #[test]
     fn infra_providers_bound_a_match_against_trailing_prose_punctuation() {
-        for (detector, prefix, suffix) in infra_provider_prefixes() {
-            let token = format!("{prefix}{suffix}");
+        for variant in infra_provider_variants() {
+            let token = format!("{}{}", variant.prefix, variant.body);
             let input = format!("Rotate {token}, then redeploy.");
-            let candidates = detect(detector, &input);
-            assert_eq!(candidates.len(), 1, "{}", detector.id());
+            let candidates = detect(variant.detector, &input);
+            assert_eq!(candidates.len(), 1, "{}", variant.detector.id());
             let start = "Rotate ".len();
             let end = start + token.len();
             assert_eq!(
                 candidates[0].range(),
                 ByteRange::new(start, end).unwrap(),
                 "{}",
-                detector.id()
+                variant.detector.id()
             );
         }
     }
@@ -802,11 +874,11 @@ mod tests {
     /// not yet exercised for the four infra-provider families.
     #[test]
     fn infra_providers_report_a_repeated_identical_value_once_per_occurrence() {
-        for (detector, prefix, suffix) in infra_provider_prefixes() {
-            let value = format!("{prefix}{suffix}");
+        for variant in infra_provider_variants() {
+            let value = format!("{}{}", variant.prefix, variant.body);
             let input = format!("{value} {value}");
-            let candidates = detect(detector, &input);
-            assert_eq!(candidates.len(), 2, "{}", detector.id());
+            let candidates = detect(variant.detector, &input);
+            assert_eq!(candidates.len(), 2, "{}", variant.detector.id());
         }
     }
 
@@ -877,6 +949,132 @@ mod tests {
             let input = format!("{value} {value}");
             let candidates = detect(detector, &input);
             assert_eq!(candidates.len(), 2, "{}", detector.id());
+        }
+    }
+
+    // Issue #369: the DigitalOcean v1 token contract. DigitalOcean's API
+    // release notes (2022-03-29) document the `dop_v1_` / `doo_v1_` /
+    // `dor_v1_` prefixes; gitleaks v8.30.1 and trufflehog v3.97.4
+    // independently pin the body to `[a-f0-9]{64}`. Every body below is a
+    // locally constructed synthetic value from the issue's self-contained
+    // snapshot; none was ever provider-issued.
+
+    /// The three documented prefixes, each with its synthetic 64-byte body.
+    fn digitalocean_tokens() -> [String; 3] {
+        [
+            format!("dop_v1_{DIGITALOCEAN_BODY}"),
+            format!("doo_v1_{DIGITALOCEAN_OAUTH_BODY}"),
+            format!("dor_v1_{DIGITALOCEAN_REFRESH_BODY}"),
+        ]
+    }
+
+    #[test]
+    fn digitalocean_accepts_exactly_sixty_four_lowercase_hex_bytes_for_every_prefix() {
+        for token in digitalocean_tokens() {
+            assert_eq!(token.len(), 71);
+            let candidates = detect(&DIGITALOCEAN, &token);
+            assert_eq!(candidates.len(), 1, "{token}");
+            assert_eq!(candidates[0].type_name(), "digitalocean_token");
+            assert_eq!(candidates[0].confidence(), Confidence::High);
+            assert_eq!(candidates[0].effective_specificity(), Specificity::Provider);
+            assert_eq!(candidates[0].range(), ByteRange::new(0, 71).unwrap());
+        }
+    }
+
+    /// The reproduced beta.4 failure: a 63-byte body -- the paired positive
+    /// with its final byte dropped -- was accepted under the old 20-byte
+    /// minimum and is now rejected, both bare and in the Unicode/CRLF
+    /// framing the benchmark used, while the paired positive keeps its exact
+    /// UTF-8 byte range.
+    #[test]
+    fn digitalocean_rejects_a_sixty_three_byte_twin_of_every_prefix() {
+        for token in digitalocean_tokens() {
+            let twin = &token[..token.len() - 1];
+            for input in [
+                format!("{twin}\n\n"),
+                format!("# \u{1F511} reviewed format\r\n{twin}\n\r\n"),
+            ] {
+                assert!(detect(&DIGITALOCEAN, &input).is_empty(), "{input}");
+            }
+            let framed = format!("# \u{1F511} reviewed format\r\n{token}\n\r\n");
+            let candidates = detect(&DIGITALOCEAN, &framed);
+            assert_eq!(candidates.len(), 1, "{framed}");
+            assert_eq!(candidates[0].range(), ByteRange::new(24, 95).unwrap());
+        }
+    }
+
+    /// A longer run of the boundary alphabet is a wider identifier, not a
+    /// token with a valid-looking 64-byte substring: nothing is carved out
+    /// of it on either side.
+    #[test]
+    fn digitalocean_never_extracts_a_token_from_a_wider_identifier() {
+        for token in digitalocean_tokens() {
+            for input in [
+                // One extra hex byte: a 65-byte run.
+                format!("{token}0"),
+                // A trailing underscore- or dash-joined segment.
+                format!("{token}_backup"),
+                format!("{token}-1"),
+                // A leading alphabet byte or identifier fragment.
+                format!("x{token}"),
+                format!("legacy{token}"),
+            ] {
+                assert!(detect(&DIGITALOCEAN, &input).is_empty(), "{input}");
+            }
+        }
+    }
+
+    #[test]
+    fn digitalocean_rejects_uppercase_hex_and_non_hex_bytes_inside_the_body() {
+        let token = format!("dop_v1_{DIGITALOCEAN_BODY}");
+        let body_at = |index: usize, replacement: &str| {
+            let at = "dop_v1_".len() + index;
+            format!("{}{replacement}{}", &token[..at], &token[at + 1..])
+        };
+        for input in [
+            // One uppercase hex digit inside the body.
+            body_at(8, "D"),
+            // One byte outside `[0-9a-f]`.
+            body_at(8, "g"),
+            // Whitespace splits the run.
+            body_at(8, " "),
+            // An uppercase final byte: 63 valid bytes then a boundary byte.
+            body_at(63, "A"),
+        ] {
+            assert!(detect(&DIGITALOCEAN, &input).is_empty(), "{input}");
+        }
+    }
+
+    /// Quotes, Markdown code spans, prose punctuation, and URL query
+    /// delimiters all bound the token without joining it.
+    #[test]
+    fn digitalocean_bounds_the_token_against_quotes_code_spans_and_urls() {
+        let token = format!("dop_v1_{DIGITALOCEAN_BODY}");
+        for (input, start) in [
+            (format!("\"{token}\""), 1),
+            (format!("`{token}`"), 1),
+            (format!("token: '{token}',"), 8),
+            (format!("https://example.test/?token={token}&x=1"), 28),
+        ] {
+            let candidates = detect(&DIGITALOCEAN, &input);
+            assert_eq!(candidates.len(), 1, "{input}");
+            assert_eq!(
+                candidates[0].range(),
+                ByteRange::new(start, start + 71).unwrap(),
+                "{input}"
+            );
+        }
+    }
+
+    #[test]
+    fn digitalocean_rejects_wrong_and_encoded_prefixes_with_a_contracted_body() {
+        for input in [
+            format!("dov_v1_{DIGITALOCEAN_BODY}"),
+            format!("dop_v2_{DIGITALOCEAN_BODY}"),
+            format!("DOP_V1_{DIGITALOCEAN_BODY}"),
+            format!("dop%5Fv1%5F{DIGITALOCEAN_BODY}"),
+        ] {
+            assert!(detect(&DIGITALOCEAN, &input).is_empty(), "{input}");
         }
     }
 }

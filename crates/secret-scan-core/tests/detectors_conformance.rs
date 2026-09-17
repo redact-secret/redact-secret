@@ -40,7 +40,7 @@ fn structured_jwt_displaces_the_broader_bearer_candidate() {
 /// the same value.
 #[test]
 fn contextual_candidate_yields_to_a_higher_specificity_provider_candidate() {
-    let input = "client_secret=sk-proj-SYNTHETIC_REVOKED_CONFORMANCE_KEY";
+    let input = "client_secret=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";
     let provider_range = range(14, input.len());
 
     let registry = DetectorRegistry::with_built_in([]).unwrap();

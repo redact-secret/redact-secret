@@ -26,6 +26,10 @@ import {
   DOCKER_TOKEN_EXACT_LENGTH_SEED_ID,
   generateDockerTokenMutations,
 } from "./fixtures/docker-token-mutations.js";
+import {
+  DIGITALOCEAN_V1_SEED_ID,
+  generateDigitaloceanV1Mutations,
+} from "./fixtures/digitalocean-v1-mutations.js";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..");
@@ -362,6 +366,32 @@ describe("docker-token-exact-length mutation reproducibility (issue #370)", () =
       const identity = fixture.mutation!.operation.endsWith("-identity");
       expect(fixture.expected.length, fixture.id).toBe(identity ? 1 : 0);
       expect(fixture.support, fixture.id).toBe(identity ? "supported" : "intentionally-unsupported");
+    }
+  });
+});
+
+describe("digitalocean-v1 mutation reproducibility (issue #369)", () => {
+  test("regenerating the seeded mutation set is byte-identical", () => {
+    expect(generateDigitaloceanV1Mutations()).toEqual(generateDigitaloceanV1Mutations());
+  });
+
+  test("every corpus fixture declaring this grammar reproduces byte-for-byte", () => {
+    const generated = new Map(
+      generateDigitaloceanV1Mutations().map((mutation) => [mutation.ordinal, mutation]),
+    );
+    const declared = corpus.fixtures.filter(
+      (fixture) => fixture.mutation?.grammar === "digitalocean-v1",
+    );
+
+    expect(declared.length).toBe(generated.size);
+    for (const fixture of declared) {
+      const mutation = fixture.mutation!;
+      const reproduced = generated.get(mutation.ordinal);
+      expect(reproduced, `${fixture.id}: no generated case for ordinal ${mutation.ordinal}`)
+        .toBeDefined();
+      expect(mutation.seedId).toBe(DIGITALOCEAN_V1_SEED_ID);
+      expect(mutation.operation).toBe(reproduced!.operation);
+      expect(fixture.input).toBe(reproduced!.input);
     }
   });
 });

@@ -6,9 +6,10 @@
 //! module reimplements just enough of "literal prefix, then a bounded run of
 //! an alphabet, then a byte-adjacent boundary check" to reproduce the
 //! TypeScript oracle's `RegExp` + `TOKEN_CHARACTER` guard idiom without a
-//! regex engine. Every provider pattern in `src/detectors/*.ts` reduces to
-//! this shape except the `OpenAI` exclusion, which [`super::openai`] implements
-//! directly with the same primitives.
+//! regex engine. Every provider pattern in `src/detectors/*.ts` reduced to
+//! this shape except `OpenAI`'s, which [`super::openai`] composes directly
+//! from the same primitives (two exact-length segments around a literal
+//! marker, plus the Anthropic namespace exclusion).
 
 /// A byte-membership predicate for a token alphabet, e.g. `[A-Za-z0-9_-]`.
 pub(super) type Alphabet = fn(u8) -> bool;
@@ -36,6 +37,13 @@ pub(super) fn is_alnum_dash(byte: u8) -> bool {
 /// `[A-Za-z0-9_.-]`.
 pub(super) fn is_alnum_dash_dot(byte: u8) -> bool {
     is_alnum_dash(byte) || byte == b'.'
+}
+
+/// `[0-9a-f]`: a lowercase hexadecimal body. Uppercase `A-F` is deliberately
+/// outside the class, so a provider whose reviewed contract is lowercase hex
+/// rejects a case-mangled twin instead of matching it.
+pub(super) fn is_lower_hex(byte: u8) -> bool {
+    byte.is_ascii_digit() || (b'a'..=b'f').contains(&byte)
 }
 
 /// `[A-Za-z0-9+/]`: the standard (non-URL-safe) base64 body alphabet,
@@ -201,6 +209,13 @@ mod tests {
         assert!(is_alnum_underscore(b'_') && !is_alnum_underscore(b'-'));
         assert!(is_alnum_dash(b'-') && is_alnum_dash(b'_') && !is_alnum_dash(b'.'));
         assert!(is_alnum_dash_dot(b'.') && is_alnum_dash_dot(b'-'));
+        assert!(
+            is_lower_hex(b'0')
+                && is_lower_hex(b'f')
+                && !is_lower_hex(b'g')
+                && !is_lower_hex(b'F')
+                && !is_lower_hex(b'_')
+        );
         assert!(
             is_base64_body(b'+')
                 && is_base64_body(b'/')

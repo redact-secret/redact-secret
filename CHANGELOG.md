@@ -36,6 +36,71 @@ evidence is linked from each published version.
   different run length per prefix; every other prefix-run detector's
   behavior is unchanged.
 
+- Narrowed `openai-token` to OpenAI's actual key grammar (issue #368,
+  `docs/decisions/2026-09-17-freeze-openai-api-key-grammar.md`). A value is
+  now classified only when it carries the literal `T3BlbkFJ` marker (base64
+  `OpenAI`) between two segments of a source-documented exact length:
+  `sk-` + 20 + marker + 20 alphanumerics (legacy), or
+  `sk-proj-`/`sk-svcacct-`/`sk-admin-` + 74 or 58 + marker + 74 or 58 bytes
+  of `[A-Za-z0-9_-]`, each variant validated independently with no fallback
+  from a malformed namespaced form to the legacy form. The previous rule
+  accepted any `sk-` value with a 20-byte minimum suffix, which flagged the
+  six beta.4 benchmark controls that differ from a real key by one marker
+  byte or one segment byte. Marker-less `sk-` values are no longer
+  classified by this detector; an assignment such as `api_key=` or a Bearer
+  credential carrying one still surfaces through `generic-token` or
+  `bearer-token`. `sk-admin-` is newly named as a supported namespace (it
+  was already caught by the old bare branch); `sk-service-` is documented
+  as unsupported. Detector id, finding type, confidence, policy class, and
+  the public API are unchanged. The fourteen pre-existing marker-less
+  corpus positives are kept and reclassified in place, with
+  contract-conformant counterparts, the issue's twelve inputs, and
+  one-byte-off boundary mutations added to the synchronous and incremental
+  corpora. The assessment accuracy corpus's `code-openai-api-key` fixture is
+  intentionally left for the next evidence re-pin (see the decision record).
+
+- Narrowed `digitalocean-token` to DigitalOcean's reviewed v1 token contract:
+  each documented prefix (`dop_v1_` personal access token, `doo_v1_` OAuth
+  access token, `dor_v1_` OAuth refresh token) followed by exactly 64
+  lowercase hexadecimal bytes, matched case-sensitively and bounded by the
+  existing `[A-Za-z0-9_-]` boundary alphabet (issue #369, contract review
+  #367). DigitalOcean's API release notes (2022-03-29) establish the prefixes;
+  gitleaks v8.30.1 and trufflehog v3.97.4 independently pin the body to
+  `[a-f0-9]{64}`. The previous rule accepted any 20-or-more-byte
+  `[A-Za-z0-9_-]` suffix, so `@redact-secret/core@0.1.0-beta.4` flagged a
+  63-byte twin of every paired positive (six must-not-flag benchmark files);
+  those twins are now rejected while every paired positive keeps its exact
+  byte range. Intentional behavior changes: a 65-byte or wider hex run, an
+  uppercase hex digit, a non-hex body byte, or a body shorter than 64 bytes no
+  longer matches, so the earlier broad-shape positives in the conformance
+  corpus were re-authored with contracted bodies; the repeated-`x` filler
+  placeholder (`digitalocean-positive-doc-style-placeholder`) is now the
+  negative `digitalocean-negative-doc-style-placeholder`, the minimum-length
+  positive `digitalocean-positive-min-length` was retired in favor of the
+  `digitalocean-v1` identity/short-length mutation pair, and the
+  `digitalocean-adversarial-long-suffix` input now yields zero findings. No
+  detector id, finding type, policy class, public option, or result shape
+  changed. The `assessment/fixtures/accuracy-corpus.json` fixture
+  `logs-additional-provider-tokens-one` still carries a pre-contract
+  DigitalOcean value with a `redact` expectation; that corpus is
+  hash-pinned to the committed acceptance results, so it is left for the
+  beta.5 qualification pass (#376) to re-version rather than edited here.
+
+- Froze reviewed precision contracts for the `openai-token`,
+  `digitalocean-token`, `docker-token`, `slack-token`, `huggingface-token`,
+  `cloudflare-token` and `linear-token` detectors (issue #367, decision
+  `docs/decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md`).
+  This is evidence and tooling only: `docs/audits/evidence/367/` records each
+  family's supported variants, segment grammar, lengths, alphabets, markers,
+  source provenance and resolved source conflicts, freezes the beta.4
+  negative-twin baseline by construction recipe and content hash, and audits
+  every existing fixture for those families against the contract.
+  `npm run precision-contracts:check` (now part of `npm run ci`) keeps the
+  derived evidence consistent. No detector behavior, public interface,
+  detector id or finding type changes in this entry; the behavior changes
+  the contracts call for land with issues #368-#374 and are described in the
+  decision record.
+
 ## 0.1.0-beta.4 — 2026-09-17
 
 [Publication and qualification evidence](docs/releases/0.1.0-beta.4/README.md).

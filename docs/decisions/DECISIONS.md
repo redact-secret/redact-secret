@@ -34,3 +34,5 @@ future planning and implementation but do not authorize Git or release actions.
 - [Freeze the Grafana service account and Cloud access policy token grammar, and exclude the legacy API key](2026-09-16-freeze-grafana-service-account-and-cloud-access-policy-token-grammar.md)
 - [Freeze the Datadog API Key and Application Key grammar as marker-gated lowercase-hex values](2026-09-16-freeze-datadog-api-application-key-grammar.md)
 - [Freeze the Docker Hub access token grammar as two separately-sized exact-length prefixed shapes](2026-09-17-freeze-docker-pat-oat-exact-length-grammar.md)
+- [Freeze reviewed precision contracts for seven provider families and refine their default rules in place](2026-09-17-freeze-precision-contracts-for-seven-provider-families.md)
+- [Freeze the OpenAI API key grammar as a marker-gated shape with exact segment lengths](2026-09-17-freeze-openai-api-key-grammar.md)
