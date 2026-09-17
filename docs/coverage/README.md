@@ -155,6 +155,20 @@ Tests: `python3 -B -m unittest discover -s scripts/tests -p 'test_generate_cover
     --out docs/coverage/fp-fn-summary-319.json
   ```
 
+- [`fp-fn-summary-320.json`](./fp-fn-summary-320.json) — the same report for
+  issue [#320](https://github.com/redact-secret/redact-secret/issues/320)'s
+  `vault-token`, `cloudflare-token`, `digitalocean-token`, `docker-token`,
+  and `vercel-token` coverage:
+
+  ```sh
+  python3 -B scripts/generate-fp-fn-summary.py \
+    --detector vault-token --detector cloudflare-token \
+    --detector digitalocean-token --detector docker-token \
+    --detector vercel-token \
+    --issue https://github.com/redact-secret/redact-secret/issues/320 \
+    --out docs/coverage/fp-fn-summary-320.json
+  ```
+
 - [`fp-fn-summary-322.json`](./fp-fn-summary-322.json) — the same report for
   issue [#322](https://github.com/redact-secret/redact-secret/issues/322)'s
   `private-key` coverage:
