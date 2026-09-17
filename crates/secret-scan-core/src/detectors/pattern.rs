@@ -61,6 +61,35 @@ pub(super) enum RunLength {
     AtLeast(usize),
 }
 
+/// One literal prefix paired with the run length its own documented grammar
+/// requires, for detectors whose prefixes do not all share a single length
+/// (Docker Hub's `dckr_pat_` is followed by exactly 27 bytes, `dckr_oat_` by
+/// exactly 32). A detector whose prefixes do share one length can keep using
+/// [`scan_prefixed_runs`], which is this shape with the same `run` repeated.
+#[derive(Clone, Copy, Debug)]
+pub(super) struct PrefixShape<'a> {
+    pub(super) prefix: &'a str,
+    pub(super) run: RunLength,
+}
+
+impl<'a> PrefixShape<'a> {
+    /// `prefix` followed by exactly `len` alphabet bytes (`{n}`).
+    pub(super) const fn exact(prefix: &'a str, len: usize) -> Self {
+        Self {
+            prefix,
+            run: RunLength::Exact(len),
+        }
+    }
+
+    /// `prefix` followed by at least `len` alphabet bytes (`{n,}`).
+    pub(super) const fn at_least(prefix: &'a str, len: usize) -> Self {
+        Self {
+            prefix,
+            run: RunLength::AtLeast(len),
+        }
+    }
+}
+
 /// For every offset, the exclusive end of the maximal run of `alphabet`
 /// bytes starting there.
 ///
@@ -107,23 +136,43 @@ pub(super) fn scan_prefixed_runs(
     alphabet: Alphabet,
     boundary: Alphabet,
 ) -> Vec<(usize, usize)> {
+    let shapes: Vec<PrefixShape<'_>> = prefixes
+        .iter()
+        .map(|prefix| PrefixShape { prefix, run })
+        .collect();
+    scan_prefixed_shapes(input, &shapes, alphabet, boundary)
+}
+
+/// [`scan_prefixed_runs`] generalized to one run length per prefix: the
+/// regex equivalent is `(?:prefix1run1|prefix2run2|...)`, still matched left
+/// to right with the longest literal prefix winning at each position, and
+/// each prefix's own `{n}` / `{n,}` quantifier applied to the run that
+/// follows it.
+///
+/// Returns already boundary-filtered `(start, end)` byte ranges.
+pub(super) fn scan_prefixed_shapes(
+    input: &str,
+    shapes: &[PrefixShape<'_>],
+    alphabet: Alphabet,
+    boundary: Alphabet,
+) -> Vec<(usize, usize)> {
     let bytes = input.as_bytes();
     let ends = run_ends(bytes, alphabet);
     let mut matches = Vec::new();
     let mut start = 0;
     while start < bytes.len() {
-        let Some(prefix) = prefixes
+        let Some(shape) = shapes
             .iter()
-            .filter(|prefix| bytes[start..].starts_with(prefix.as_bytes()))
-            .max_by_key(|prefix| prefix.len())
+            .filter(|shape| bytes[start..].starts_with(shape.prefix.as_bytes()))
+            .max_by_key(|shape| shape.prefix.len())
         else {
             start += 1;
             continue;
         };
 
-        let suffix_start = start + prefix.len();
+        let suffix_start = start + shape.prefix.len();
         let available = ends[suffix_start] - suffix_start;
-        let matched_len = match run {
+        let matched_len = match shape.run {
             RunLength::Exact(len) if available >= len => len,
             RunLength::AtLeast(len) if available >= len => available,
             _ => {

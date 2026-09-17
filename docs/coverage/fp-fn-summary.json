@@ -271,30 +271,41 @@
       "detector": "docker-token",
       "falseNegativeGuards": {
         "actualFalseNegatives": 0,
-        "count": 11,
+        "count": 18,
         "fixtureIds": [
-          "docker-positive-all-prefixes",
           "docker-positive-crlf-unicode-prefix",
-          "docker-positive-doc-style-placeholder",
           "docker-positive-dotenv",
           "docker-positive-json",
           "docker-positive-log",
-          "docker-positive-min-length",
+          "docker-positive-markdown-inline-code",
+          "docker-positive-oat-crlf-unicode-prefix",
+          "docker-positive-oat-dotenv",
+          "docker-positive-oat-exact-length",
+          "docker-positive-oat-json",
+          "docker-positive-oat-log",
+          "docker-positive-oat-yaml-quoted",
+          "docker-positive-pat-and-oat-adjacent-twins",
+          "docker-positive-pat-doc-style-placeholder-exact-length",
+          "docker-positive-pat-exact-length",
+          "docker-positive-pat-repeated-with-twin",
           "docker-positive-punctuation-adjacent",
-          "docker-positive-qualified",
           "docker-positive-repeated-value",
           "docker-positive-yaml"
         ]
       },
       "falsePositiveGuards": {
         "actualFalsePositives": 0,
-        "count": 7,
+        "count": 11,
         "fixtureIds": [
           "docker-negative-embedded-in-wider-identifier",
           "docker-negative-interpolated-secret-prefix",
           "docker-negative-lookalike",
           "docker-negative-masked-secret-prefix",
+          "docker-negative-oat-one-short-json",
+          "docker-negative-oat-one-short-unicode-crlf",
           "docker-negative-ordinary-reference",
+          "docker-negative-pat-one-short-dotenv",
+          "docker-negative-pat-one-short-unicode-crlf",
           "docker-negative-placeholder",
           "docker-negative-registry-image-reference"
         ]
@@ -303,6 +314,7 @@
         "dotenv",
         "json",
         "log",
+        "markdown",
         "plain-text",
         "shell",
         "yaml"
@@ -630,7 +642,8 @@
       "https://github.com/redact-secret/redact-secret/issues/320",
       "https://github.com/redact-secret/redact-secret/issues/323",
       "https://github.com/redact-secret/redact-secret/issues/324",
-      "https://github.com/redact-secret/redact-secret/issues/325"
+      "https://github.com/redact-secret/redact-secret/issues/325",
+      "https://github.com/redact-secret/redact-secret/issues/370"
     ]
   }
 }

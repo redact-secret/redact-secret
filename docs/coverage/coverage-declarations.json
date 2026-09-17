@@ -1213,15 +1213,22 @@
         {
           "dimension": "positive",
           "evidenceFixtureIds": [
-            "docker-positive-all-prefixes",
             "docker-positive-crlf-unicode-prefix",
-            "docker-positive-doc-style-placeholder",
             "docker-positive-dotenv",
             "docker-positive-json",
             "docker-positive-log",
-            "docker-positive-min-length",
+            "docker-positive-markdown-inline-code",
+            "docker-positive-oat-crlf-unicode-prefix",
+            "docker-positive-oat-dotenv",
+            "docker-positive-oat-exact-length",
+            "docker-positive-oat-json",
+            "docker-positive-oat-log",
+            "docker-positive-oat-yaml-quoted",
+            "docker-positive-pat-and-oat-adjacent-twins",
+            "docker-positive-pat-doc-style-placeholder-exact-length",
+            "docker-positive-pat-exact-length",
+            "docker-positive-pat-repeated-with-twin",
             "docker-positive-punctuation-adjacent",
-            "docker-positive-qualified",
             "docker-positive-repeated-value",
             "docker-positive-yaml"
           ],
@@ -1230,7 +1237,8 @@
         {
           "dimension": "overlap",
           "evidenceFixtureIds": [
-            "docker-overlap-context"
+            "docker-overlap-context-exact-length",
+            "docker-overlap-context-oat-exact-length"
           ],
           "state": "supported"
         },
@@ -1248,7 +1256,19 @@
             "docker-boundary-case-sensitivity",
             "docker-boundary-delimiter",
             "docker-boundary-invalid-alphabet",
-            "docker-boundary-short"
+            "docker-boundary-oat-length-under-pat-prefix",
+            "docker-boundary-oat-one-long",
+            "docker-boundary-oat-one-short",
+            "docker-boundary-oat-whitespace-insertion-exact-length",
+            "docker-boundary-pat-invalid-alphabet-exact-length",
+            "docker-boundary-pat-length-under-oat-prefix",
+            "docker-boundary-pat-one-long",
+            "docker-boundary-pat-one-short",
+            "docker-boundary-short",
+            "docker-positive-all-prefixes",
+            "docker-positive-doc-style-placeholder",
+            "docker-positive-min-length",
+            "docker-positive-qualified"
           ],
           "state": "supported"
         },
@@ -1259,7 +1279,11 @@
             "docker-negative-interpolated-secret-prefix",
             "docker-negative-lookalike",
             "docker-negative-masked-secret-prefix",
+            "docker-negative-oat-one-short-json",
+            "docker-negative-oat-one-short-unicode-crlf",
             "docker-negative-ordinary-reference",
+            "docker-negative-pat-one-short-dotenv",
+            "docker-negative-pat-one-short-unicode-crlf",
             "docker-negative-placeholder",
             "docker-negative-registry-image-reference"
           ],
@@ -1272,7 +1296,19 @@
             "docker-boundary-case-sensitivity",
             "docker-boundary-delimiter",
             "docker-boundary-invalid-alphabet",
-            "docker-boundary-short"
+            "docker-boundary-oat-length-under-pat-prefix",
+            "docker-boundary-oat-one-long",
+            "docker-boundary-oat-one-short",
+            "docker-boundary-oat-whitespace-insertion-exact-length",
+            "docker-boundary-pat-invalid-alphabet-exact-length",
+            "docker-boundary-pat-length-under-oat-prefix",
+            "docker-boundary-pat-one-long",
+            "docker-boundary-pat-one-short",
+            "docker-boundary-short",
+            "docker-positive-all-prefixes",
+            "docker-positive-doc-style-placeholder",
+            "docker-positive-min-length",
+            "docker-positive-qualified"
           ],
           "state": "supported"
         },
@@ -4317,6 +4353,7 @@
             "datadog-api-key-line-scoped-context-same-line",
             "digitalocean-embedded-identifier-discriminating-boundary",
             "docker-embedded-identifier-discriminating-boundary",
+            "docker-pat-oat-exact-length-partitions",
             "encoded-connection",
             "fixed-width-unicode",
             "github-installation-stateless",
@@ -4592,6 +4629,7 @@
             "datadog-api-key-line-scoped-context-same-line",
             "digitalocean-embedded-identifier-discriminating-boundary",
             "docker-embedded-identifier-discriminating-boundary",
+            "docker-pat-oat-exact-length-partitions",
             "encoded-connection",
             "fixed-width-unicode",
             "github-installation-stateless",
@@ -4983,6 +5021,7 @@
             "datadog-api-key-line-scoped-context-same-line",
             "digitalocean-embedded-identifier-discriminating-boundary",
             "docker-embedded-identifier-discriminating-boundary",
+            "docker-pat-oat-exact-length-partitions",
             "encoded-connection",
             "fixed-width-unicode",
             "github-installation-stateless",

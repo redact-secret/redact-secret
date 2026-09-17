@@ -5,6 +5,37 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+- Narrowed the `docker-token` detector (issue #370,
+  `decision-freeze-docker-pat-oat-exact-length-grammar`) from one shared
+  20-byte minimum under either prefix to two separately validated
+  exact-length shapes: `dckr_pat_` followed by exactly 27 bytes of
+  `[A-Za-z0-9_-]` (personal access token) and `dckr_oat_` followed by
+  exactly 32 bytes of the same alphabet (organization access token), the
+  lengths trufflehog's `dockerhub` v2 detector (`v3.97.4`) enforces. The
+  published beta.4 package flagged the benchmark's 26-byte and 31-byte
+  near-miss twins of both shapes; those, a one-byte-long suffix, and either
+  length under the other prefix are now intentional false negatives. Every
+  previously supported 27-byte fixture is preserved, and both exact shapes
+  are now covered bare, quoted, in JSON/dotenv/YAML/log/Markdown, after
+  Unicode/CRLF, repeated, adjacent to their twins, under contextual
+  assignment keys, and across every incremental chunk split
+  (`conformance/fixtures/docker-token-mutations.ts` reproduces the
+  boundary mutations byte-for-byte). Seven synchronous and two incremental
+  conformance fixtures that had been authored to the retired minimum with
+  20-, 25-, 36-, or 11250-byte suffixes keep their inputs and have their
+  expectations corrected in place, each note naming the decision; a 36-byte
+  value under a generic assignment key (`docker-overlap-context`) is now
+  owned by `generic-token` as a `contextual_secret` and is still redacted.
+  Detector id, finding type, confidence, specificity, default policy, and
+  every public interface are unchanged. The fixed release-qualification
+  accuracy corpus is deliberately not rewritten: its one 26-byte Docker
+  value (`logs-additional-provider-tokens-one`) now records as a false
+  negative (Rust adapter 21/1/5 to 20/1/6) until the beta.5 precision gate
+  (#376) re-versions that corpus. Internally, `pattern.rs` gains
+  `PrefixShape` and `scan_prefixed_shapes` so one detector can carry a
+  different run length per prefix; every other prefix-run detector's
+  behavior is unchanged.
+
 ## 0.1.0-beta.4 — 2026-09-17
 
 [Publication and qualification evidence](docs/releases/0.1.0-beta.4/README.md).

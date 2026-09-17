@@ -580,11 +580,12 @@
     {
       "detector": "docker-token",
       "evidence": {
-        "fixtureCount": 25,
+        "fixtureCount": 50,
         "hostContextsExercised": [
           "dotenv",
           "json",
           "log",
+          "markdown",
           "plain-text",
           "shell",
           "yaml"
@@ -601,15 +602,22 @@
         ]
       },
       "evidenceFixtureIds": [
-        "docker-positive-all-prefixes",
         "docker-positive-crlf-unicode-prefix",
-        "docker-positive-doc-style-placeholder",
         "docker-positive-dotenv",
         "docker-positive-json",
         "docker-positive-log",
-        "docker-positive-min-length",
+        "docker-positive-markdown-inline-code",
+        "docker-positive-oat-crlf-unicode-prefix",
+        "docker-positive-oat-dotenv",
+        "docker-positive-oat-exact-length",
+        "docker-positive-oat-json",
+        "docker-positive-oat-log",
+        "docker-positive-oat-yaml-quoted",
+        "docker-positive-pat-and-oat-adjacent-twins",
+        "docker-positive-pat-doc-style-placeholder-exact-length",
+        "docker-positive-pat-exact-length",
+        "docker-positive-pat-repeated-with-twin",
         "docker-positive-punctuation-adjacent",
-        "docker-positive-qualified",
         "docker-positive-repeated-value",
         "docker-positive-yaml"
       ],

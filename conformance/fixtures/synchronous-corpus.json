@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 1000,
+  "fixtureCount": 1025,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -4213,24 +4213,15 @@
     {
       "id": "docker-positive-qualified",
       "detector": "docker-token",
-      "kind": "positive",
-      "support": "supported",
-      "tier": "canonical",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
       "contexts": [
         "plain-text"
       ],
       "input": "dckr_pat_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_",
-      "expected": [
-        {
-          "detector": "docker-token",
-          "type": "docker_token",
-          "confidence": "high",
-          "specificity": "provider",
-          "start": 0,
-          "end": 45
-        }
-      ],
-      "note": "A provider-published prefix with a substantial synthetic suffix is supported."
+      "expected": [],
+      "note": "Reclassified by issue #370 (decision-freeze-docker-pat-oat-exact-length-grammar): a 36-byte suffix after dckr_pat_ is neither the 27-byte personal access token nor the 32-byte organization access token shape, so the input is now an intentional false negative. The input is unchanged from its beta.4 form; only the expectation is corrected."
     },
     {
       "id": "docker-negative-ordinary-reference",
@@ -4276,37 +4267,28 @@
       "input": "access_token=dckr_pat_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_",
       "expected": [
         {
-          "detector": "docker-token",
-          "type": "docker_token",
+          "detector": "generic-token",
+          "type": "contextual_secret",
           "confidence": "high",
-          "specificity": "provider",
+          "specificity": "contextual",
           "start": 13,
           "end": 58
         }
       ],
-      "note": "Qualified provider evidence wins over a contextual assignment."
+      "note": "Reclassified by issue #370 (decision-freeze-docker-pat-oat-exact-length-grammar): docker-token no longer claims the 36-byte suffix, so the same input is owned by generic-token's contextual assignment path instead (the value under access_token= is still redacted, at contextual specificity). A bare malformed provider shape and the same value under an assignment key legitimately have different outcomes; nothing is globally suppressed."
     },
     {
       "id": "docker-positive-min-length",
       "detector": "docker-token",
-      "kind": "positive",
-      "support": "supported",
-      "tier": "canonical",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
       "contexts": [
         "plain-text"
       ],
       "input": "dckr_pat_SYNTHETIC_REVOKED_SY",
-      "expected": [
-        {
-          "detector": "docker-token",
-          "type": "docker_token",
-          "confidence": "high",
-          "specificity": "provider",
-          "start": 0,
-          "end": 29
-        }
-      ],
-      "note": "The documented minimum suffix length, at its exact boundary, is supported."
+      "expected": [],
+      "note": "Reclassified by issue #370 (decision-freeze-docker-pat-oat-exact-length-grammar): the retired 20-byte shared minimum is not a documented Docker Hub length; a 20-byte suffix after dckr_pat_ is an intentional false negative. Input unchanged; expectation corrected."
     },
     {
       "id": "docker-boundary-below-min",
@@ -4319,7 +4301,7 @@
       ],
       "input": "dckr_pat_SYNTHETIC_REVOKED_S",
       "expected": [],
-      "note": "A suffix exactly one byte short of the documented minimum length is rejected."
+      "note": "A 19-byte suffix is rejected: it is below the retired 20-byte minimum and, since issue #370, also not the exact 27-byte personal access token length."
     },
     {
       "id": "docker-boundary-invalid-alphabet",
@@ -4389,24 +4371,15 @@
     {
       "id": "docker-positive-all-prefixes",
       "detector": "docker-token",
-      "kind": "positive",
-      "support": "supported",
-      "tier": "contextual",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
       "contexts": [
         "plain-text"
       ],
       "input": "dckr_oat_SYNTHETIC_REVOKED_SYNTHET",
-      "expected": [
-        {
-          "detector": "docker-token",
-          "type": "docker_token",
-          "confidence": "high",
-          "specificity": "provider",
-          "start": 0,
-          "end": 34
-        }
-      ],
-      "note": "Every remaining documented prefix variant is independently supported."
+      "expected": [],
+      "note": "Reclassified by issue #370 (decision-freeze-docker-pat-oat-exact-length-grammar): a 25-byte suffix after dckr_oat_ is not the 32-byte organization access token shape and is an intentional false negative; every documented prefix variant is now asserted at its own exact length by docker-positive-oat-exact-length and the docker-token-exact-length mutation family. Input unchanged; expectation corrected."
     },
     {
       "id": "docker-adversarial-long-suffix",
@@ -4419,43 +4392,25 @@
       ],
       "resource": {
         "maxInputBytes": 33780,
-        "maxFindings": 1,
+        "maxFindings": 0,
         "maxRuntimeMs": 250
       },
       "input": "dckr_pat_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_!",
-      "expected": [
-        {
-          "detector": "docker-token",
-          "type": "docker_token",
-          "confidence": "high",
-          "specificity": "provider",
-          "start": 0,
-          "end": 11259
-        }
-      ],
-      "note": "A long delimited provider match remains deterministic and bounded."
+      "expected": [],
+      "note": "Reclassified by issue #370 (decision-freeze-docker-pat-oat-exact-length-grammar): an 11250-byte suffix is neither documented length, so the corrected rule reports nothing; the scan still stays deterministic and bounded (a long same-alphabet run is not misread as the exact shape plus trailing bytes). Input unchanged; expectation corrected."
     },
     {
       "id": "docker-positive-doc-style-placeholder",
       "detector": "docker-token",
-      "kind": "positive",
-      "support": "supported",
-      "tier": "canonical",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
       "contexts": [
         "plain-text"
       ],
       "input": "dckr_pat_xxxxxxxxxxxxxxxxxxxx",
-      "expected": [
-        {
-          "detector": "docker-token",
-          "type": "docker_token",
-          "confidence": "high",
-          "specificity": "provider",
-          "start": 0,
-          "end": 29
-        }
-      ],
-      "note": "A documentation placeholder built entirely from valid alphabet characters (e.g. a repeated filler letter) is indistinguishable from a real secret's shape and is classified: an accepted precision/recall tradeoff, not a bug. Only a placeholder that breaks the alphabet run (angle brackets, characters outside the allowed set) is excluded."
+      "expected": [],
+      "note": "Reclassified by issue #370 (decision-freeze-docker-pat-oat-exact-length-grammar): a 20-byte run of valid alphabet bytes is not a documented Docker Hub length; the corrected exact-length rule declines it. docker-positive-pat-doc-style-placeholder-exact-length carries the same placeholder at the documented 27-byte length. Input unchanged; expectation corrected."
     },
     {
       "id": "docker-negative-embedded-in-wider-identifier",
@@ -24413,6 +24368,532 @@
         }
       ],
       "note": "Issue #320 follow-up: an identical value repeated in the same input is reported once per independent occurrence, not deduplicated, the same dimension #321 established for HuggingFace/Linear/Slack."
+    },
+    {
+      "id": "docker-positive-pat-exact-length",
+      "detector": "docker-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "mutation": {
+        "grammar": "docker-token-exact-length",
+        "seedId": "docker-token-exact-length-synthetic-seed",
+        "operation": "pat-identity",
+        "ordinal": 0
+      },
+      "input": "dckr_pat_SYNTHETIC_REVOKED_KEY_VALUE",
+      "expected": [
+        {
+          "detector": "docker-token",
+          "type": "docker_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 36
+        }
+      ],
+      "note": "Issue #370: a dckr_pat_ personal access token with exactly the documented 27-byte suffix (36 bytes total) is supported; mirrors benchmark fixture docker-token-pat-plain."
+    },
+    {
+      "id": "docker-boundary-pat-one-short",
+      "detector": "docker-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "mutation": {
+        "grammar": "docker-token-exact-length",
+        "seedId": "docker-token-exact-length-synthetic-seed",
+        "operation": "pat-one-short",
+        "ordinal": 1
+      },
+      "input": "dckr_pat_SYNTHETIC_REVOKED_KEY_VALU",
+      "expected": [],
+      "note": "Issue #370: exactly one byte short of the 27-byte personal access token suffix is an intentional false negative; mirrors benchmark fixture docker-token-pat-plain-twin (length 26 vs contracted 27), which beta.4 flagged."
+    },
+    {
+      "id": "docker-boundary-pat-one-long",
+      "detector": "docker-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "mutation": {
+        "grammar": "docker-token-exact-length",
+        "seedId": "docker-token-exact-length-synthetic-seed",
+        "operation": "pat-one-long",
+        "ordinal": 2
+      },
+      "input": "dckr_pat_SYNTHETIC_REVOKED_KEY_VALUE0",
+      "expected": [],
+      "note": "Issue #370: exactly one byte past the 27-byte personal access token suffix is an intentional false negative; the run is not misread as the exact shape followed by a trailing byte."
+    },
+    {
+      "id": "docker-positive-oat-exact-length",
+      "detector": "docker-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "mutation": {
+        "grammar": "docker-token-exact-length",
+        "seedId": "docker-token-exact-length-synthetic-seed",
+        "operation": "oat-identity",
+        "ordinal": 3
+      },
+      "input": "dckr_oat_SYNTHETIC_REVOKED_OAT_KEY_VALUE3",
+      "expected": [
+        {
+          "detector": "docker-token",
+          "type": "docker_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 41
+        }
+      ],
+      "note": "Issue #370: a dckr_oat_ organization access token with exactly the documented 32-byte suffix (41 bytes total) is supported; mirrors benchmark fixture docker-token-oat-plain."
+    },
+    {
+      "id": "docker-boundary-oat-one-short",
+      "detector": "docker-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "mutation": {
+        "grammar": "docker-token-exact-length",
+        "seedId": "docker-token-exact-length-synthetic-seed",
+        "operation": "oat-one-short",
+        "ordinal": 4
+      },
+      "input": "dckr_oat_SYNTHETIC_REVOKED_OAT_KEY_VALUE",
+      "expected": [],
+      "note": "Issue #370: exactly one byte short of the 32-byte organization access token suffix is an intentional false negative; mirrors benchmark fixture docker-token-oat-plain-twin (length 31 vs contracted 32), which beta.4 flagged."
+    },
+    {
+      "id": "docker-boundary-oat-one-long",
+      "detector": "docker-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "mutation": {
+        "grammar": "docker-token-exact-length",
+        "seedId": "docker-token-exact-length-synthetic-seed",
+        "operation": "oat-one-long",
+        "ordinal": 5
+      },
+      "input": "dckr_oat_SYNTHETIC_REVOKED_OAT_KEY_VALUE30",
+      "expected": [],
+      "note": "Issue #370: exactly one byte past the 32-byte organization access token suffix is an intentional false negative."
+    },
+    {
+      "id": "docker-boundary-pat-length-under-oat-prefix",
+      "detector": "docker-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "mutation": {
+        "grammar": "docker-token-exact-length",
+        "seedId": "docker-token-exact-length-synthetic-seed",
+        "operation": "pat-length-under-oat-prefix",
+        "ordinal": 6
+      },
+      "input": "dckr_oat_SYNTHETIC_REVOKED_KEY_VALUE",
+      "expected": [],
+      "note": "Issue #370: the two segment names are validated separately; the 27-byte personal access token length under the dckr_oat_ prefix is an intentional false negative."
+    },
+    {
+      "id": "docker-boundary-oat-length-under-pat-prefix",
+      "detector": "docker-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "mutation": {
+        "grammar": "docker-token-exact-length",
+        "seedId": "docker-token-exact-length-synthetic-seed",
+        "operation": "oat-length-under-pat-prefix",
+        "ordinal": 7
+      },
+      "input": "dckr_pat_SYNTHETIC_REVOKED_OAT_KEY_VALUE3",
+      "expected": [],
+      "note": "Issue #370: the 32-byte organization access token length under the dckr_pat_ prefix is an intentional false negative."
+    },
+    {
+      "id": "docker-boundary-pat-invalid-alphabet-exact-length",
+      "detector": "docker-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "mutation": {
+        "grammar": "docker-token-exact-length",
+        "seedId": "docker-token-exact-length-synthetic-seed",
+        "operation": "pat-invalid-alphabet",
+        "ordinal": 8
+      },
+      "input": "dckr_pat_SYNTHETI!_REVOKED_KEY_VALUE",
+      "expected": [],
+      "note": "Issue #370: an invalid byte inside an otherwise exact-length personal access token suffix breaks the run before the documented length is reached."
+    },
+    {
+      "id": "docker-boundary-oat-whitespace-insertion-exact-length",
+      "detector": "docker-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "mutation": {
+        "grammar": "docker-token-exact-length",
+        "seedId": "docker-token-exact-length-synthetic-seed",
+        "operation": "oat-whitespace-insertion",
+        "ordinal": 9
+      },
+      "input": "dckr_oat_SYNTHETI C_REVOKED_OAT_KEY_VALUE3",
+      "expected": [],
+      "note": "Issue #370: an inserted space inside an otherwise exact-length organization access token suffix breaks the run instead of being silently bridged."
+    },
+    {
+      "id": "docker-negative-pat-one-short-unicode-crlf",
+      "detector": "docker-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# \ud83d\udd11 caf\u00e9\r\ndckr_pat_SYNTHETIC_REVOKED_KEY_VALU\r\n",
+      "expected": [],
+      "note": "Issue #370: the 26-byte personal access token twin after a CRLF line ending and a Unicode-prefixed comment line stays silent; mirrors benchmark fixture docker-token-pat-unicode-crlf-twin, which beta.4 flagged."
+    },
+    {
+      "id": "docker-negative-oat-one-short-unicode-crlf",
+      "detector": "docker-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# \ud83d\udd11 caf\u00e9\r\ndckr_oat_SYNTHETIC_REVOKED_OAT_KEY_VALUE\r\n",
+      "expected": [],
+      "note": "Issue #370: the 31-byte organization access token twin after a CRLF line ending and a Unicode-prefixed comment line stays silent; mirrors benchmark fixture docker-token-oat-unicode-crlf-twin, which beta.4 flagged."
+    },
+    {
+      "id": "docker-positive-oat-crlf-unicode-prefix",
+      "detector": "docker-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# \ud83d\udd11 caf\u00e9\r\ndckr_oat_SYNTHETIC_REVOKED_OAT_KEY_VALUE3\r\n",
+      "expected": [
+        {
+          "detector": "docker-token",
+          "type": "docker_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 55
+        }
+      ],
+      "note": "Issue #370: an exact-length organization access token after a CRLF line ending and a Unicode-prefixed comment line is found at the correct UTF-8 byte offsets; mirrors benchmark fixture docker-token-oat-unicode-crlf."
+    },
+    {
+      "id": "docker-positive-oat-json",
+      "detector": "docker-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"dockerOrgToken\": \"dckr_oat_SYNTHETIC_REVOKED_OAT_KEY_VALUE3\"}",
+      "expected": [
+        {
+          "detector": "docker-token",
+          "type": "docker_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 20,
+          "end": 61
+        }
+      ],
+      "note": "Issue #370: a quoted JSON string value carrying an exact-length organization access token is detected the same as a bare one; the enclosing quotes are not part of the match."
+    },
+    {
+      "id": "docker-positive-oat-dotenv",
+      "detector": "docker-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "DOCKER_ORG_TOKEN=dckr_oat_SYNTHETIC_REVOKED_OAT_KEY_VALUE3",
+      "expected": [
+        {
+          "detector": "docker-token",
+          "type": "docker_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 17,
+          "end": 58
+        }
+      ],
+      "note": "Issue #370: a bare dotenv-style assignment of an exact-length organization access token is detected by format alone."
+    },
+    {
+      "id": "docker-positive-oat-log",
+      "detector": "docker-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-16T00:00:00Z INFO pulling image key=dckr_oat_SYNTHETIC_REVOKED_OAT_KEY_VALUE3 repo=example/app",
+      "expected": [
+        {
+          "detector": "docker-token",
+          "type": "docker_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 44,
+          "end": 85
+        }
+      ],
+      "note": "Issue #370: an exact-length organization access token embedded in a structured log line is still detected and bounded before the next field."
+    },
+    {
+      "id": "docker-positive-oat-yaml-quoted",
+      "detector": "docker-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "docker_org_token: \"dckr_oat_SYNTHETIC_REVOKED_OAT_KEY_VALUE3\"\n",
+      "expected": [
+        {
+          "detector": "docker-token",
+          "type": "docker_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 19,
+          "end": 60
+        }
+      ],
+      "note": "Issue #370: a double-quoted YAML mapping value carrying an exact-length organization access token is detected without the quotes."
+    },
+    {
+      "id": "docker-positive-markdown-inline-code",
+      "detector": "docker-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "markdown"
+      ],
+      "input": "Rotate `dckr_pat_SYNTHETIC_REVOKED_KEY_VALUE` and `dckr_oat_SYNTHETIC_REVOKED_OAT_KEY_VALUE3` today.",
+      "expected": [
+        {
+          "detector": "docker-token",
+          "type": "docker_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 8,
+          "end": 44
+        },
+        {
+          "detector": "docker-token",
+          "type": "docker_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 51,
+          "end": 92
+        }
+      ],
+      "note": "Issue #370: an exact-length personal and organization access token each inside Markdown inline code are both detected; the backticks bound each match."
+    },
+    {
+      "id": "docker-positive-pat-and-oat-adjacent-twins",
+      "detector": "docker-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "dckr_pat_SYNTHETIC_REVOKED_KEY_VALUE\ndckr_pat_SYNTHETIC_REVOKED_KEY_VALU\ndckr_oat_SYNTHETIC_REVOKED_OAT_KEY_VALUE3\ndckr_oat_SYNTHETIC_REVOKED_OAT_KEY_VALUE\n",
+      "expected": [
+        {
+          "detector": "docker-token",
+          "type": "docker_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 36
+        },
+        {
+          "detector": "docker-token",
+          "type": "docker_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 73,
+          "end": 114
+        }
+      ],
+      "note": "Issue #370: a valid personal access token, its 26-byte twin, a valid organization access token, and its 31-byte twin on adjacent lines are discriminated independently; only the two exact-length values are reported."
+    },
+    {
+      "id": "docker-positive-pat-repeated-with-twin",
+      "detector": "docker-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "dckr_pat_SYNTHETIC_REVOKED_KEY_VALUE dckr_pat_SYNTHETIC_REVOKED_KEY_VALU dckr_pat_SYNTHETIC_REVOKED_KEY_VALUE",
+      "expected": [
+        {
+          "detector": "docker-token",
+          "type": "docker_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 36
+        },
+        {
+          "detector": "docker-token",
+          "type": "docker_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 73,
+          "end": 109
+        }
+      ],
+      "note": "Issue #370: an identical exact-length value repeated around its one-byte-short twin is reported once per exact-length occurrence and never for the twin."
+    },
+    {
+      "id": "docker-negative-pat-one-short-dotenv",
+      "detector": "docker-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "DOCKER_TOKEN=dckr_pat_SYNTHETIC_REVOKED_KEY_VALU",
+      "expected": [],
+      "note": "Issue #370: the 26-byte personal access token twin under a dotenv-style DOCKER_TOKEN= key is not rescued by the key name: docker-token declines the length and DOCKER_TOKEN is not a generic-token contextual key, so the whole default registry stays silent. Compare docker-overlap-context, where a generic contextual key (access_token=) does own the malformed value."
+    },
+    {
+      "id": "docker-negative-oat-one-short-json",
+      "detector": "docker-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"dockerOrgToken\": \"dckr_oat_SYNTHETIC_REVOKED_OAT_KEY_VALUE\"}",
+      "expected": [],
+      "note": "Issue #370: the 31-byte organization access token twin as a quoted JSON value stays silent through the whole default registry."
+    },
+    {
+      "id": "docker-positive-pat-doc-style-placeholder-exact-length",
+      "detector": "docker-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "dckr_pat_xxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "expected": [
+        {
+          "detector": "docker-token",
+          "type": "docker_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 36
+        }
+      ],
+      "note": "Issue #370: a documentation placeholder built entirely from valid alphabet bytes at exactly the 27-byte personal access token length is still matched by shape (the corrected counterpart of docker-positive-doc-style-placeholder); the redact/warn call remains a policy decision."
+    },
+    {
+      "id": "docker-overlap-context-exact-length",
+      "detector": "docker-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "access_token=dckr_pat_SYNTHETIC_REVOKED_KEY_VALUE",
+      "expected": [
+        {
+          "detector": "docker-token",
+          "type": "docker_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 49
+        }
+      ],
+      "note": "Issue #370: an exact-length personal access token under a generic contextual assignment key is owned by docker-token (provider specificity) over generic-token's contextual candidate for the same span; the corrected counterpart of docker-overlap-context, whose 36-byte value the provider detector no longer claims."
+    },
+    {
+      "id": "docker-overlap-context-oat-exact-length",
+      "detector": "docker-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "client_secret=dckr_oat_SYNTHETIC_REVOKED_OAT_KEY_VALUE3",
+      "expected": [
+        {
+          "detector": "docker-token",
+          "type": "docker_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 55
+        }
+      ],
+      "note": "Issue #370: an exact-length organization access token under a generic contextual assignment key is owned by docker-token over generic-token's contextual candidate for the same span."
     },
     {
       "id": "vercel-positive-repeated-value",

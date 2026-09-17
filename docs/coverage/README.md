@@ -130,16 +130,25 @@ Tests: `python3 -B -m unittest discover -s scripts/tests -p 'test_generate_cover
   from the canonical corpus only (never a fixture's `input` or a matched
   value). Defaults to `stripe-token`, `shopify-token`, and `supabase-token`;
   pass `--detector <id>` (repeatable) and `--issue <url>` (repeatable) to
-  report on others, as this file's current six-detector, three-issue
+  report on others, as this file's current fifteen-detector, eight-issue
   `provenance.issue` list already does:
 
   ```sh
   python3 -B scripts/generate-fp-fn-summary.py \
-    --detector stripe-token --detector shopify-token --detector supabase-token \
-    --detector openai-token --detector anthropic-token --detector aws-access-key \
+    --detector anthropic-token --detector aws-access-key --detector bearer-token \
+    --detector cloudflare-token --detector connection-string \
+    --detector digitalocean-token --detector docker-token --detector jwt \
+    --detector openai-token --detector otpauth-uri --detector shopify-token \
+    --detector stripe-token --detector supabase-token --detector vault-token \
+    --detector vercel-token \
     --issue https://github.com/redact-secret/redact-secret/issues/316 \
     --issue https://github.com/redact-secret/redact-secret/issues/317 \
     --issue https://github.com/redact-secret/redact-secret/issues/318 \
+    --issue https://github.com/redact-secret/redact-secret/issues/320 \
+    --issue https://github.com/redact-secret/redact-secret/issues/323 \
+    --issue https://github.com/redact-secret/redact-secret/issues/324 \
+    --issue https://github.com/redact-secret/redact-secret/issues/325 \
+    --issue https://github.com/redact-secret/redact-secret/issues/370 \
     --out docs/coverage/fp-fn-summary.json
   ```
 
@@ -191,6 +200,20 @@ Tests: `python3 -B -m unittest discover -s scripts/tests -p 'test_generate_cover
     --detector private-key \
     --issue https://github.com/redact-secret/redact-secret/issues/322 \
     --out docs/coverage/fp-fn-summary-322.json
+  ```
+
+- [`fp-fn-summary-370.json`](./fp-fn-summary-370.json) — the same report for
+  issue [#370](https://github.com/redact-secret/redact-secret/issues/370)'s
+  `docker-token` exact-length coverage (the corpus view after the Docker
+  PAT/OAT contract was frozen; `fp-fn-summary-320.json` is the earlier,
+  pre-#370 snapshot of the same detector and is intentionally left as it
+  was recorded):
+
+  ```sh
+  python3 -B scripts/generate-fp-fn-summary.py \
+    --detector docker-token \
+    --issue https://github.com/redact-secret/redact-secret/issues/370 \
+    --out docs/coverage/fp-fn-summary-370.json
   ```
 
   Tests: `python3 -B -m unittest discover -s scripts/tests -p 'test_generate_fp_fn_summary.py'`.

@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 59,
+  "fixtureCount": 60,
   "fixtures": [
     {
       "id": "synthetic-regression-malformed-authority",
@@ -60,7 +60,7 @@
     {
       "id": "additional-provider-families",
       "input": "sk_live_SYNTHETICREVOKEDSYNTHETICREVOKED\nxoxb-SYNTHETIC-REVOKED-SYNTHETIC-REVOKED-\npypi-SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\nhf_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\ndckr_pat_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\ncfut_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\ndop_v1_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\nlin_api_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\nsb_secret_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\nvcp_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_",
-      "text": "<SECRET_1>\n<SECRET_2>\n<SECRET_3>\n<SECRET_4>\n<SECRET_5>\n<SECRET_6>\n<SECRET_7>\n<SECRET_8>\n<SECRET_9>\n<SECRET_10>",
+      "text": "<SECRET_1>\n<SECRET_2>\n<SECRET_3>\n<SECRET_4>\ndckr_pat_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\n<SECRET_5>\n<SECRET_6>\n<SECRET_7>\n<SECRET_8>\n<SECRET_9>",
       "expected": [
         {
           "detector": "stripe-token",
@@ -93,14 +93,6 @@
           "specificity": "provider",
           "start": 179,
           "end": 218
-        },
-        {
-          "detector": "docker-token",
-          "type": "docker_token",
-          "confidence": "high",
-          "specificity": "provider",
-          "start": 219,
-          "end": 264
         },
         {
           "detector": "cloudflare-token",
@@ -143,7 +135,7 @@
           "end": 483
         }
       ],
-      "note": "Every newly qualified variable-length provider family remains whole across partitions."
+      "note": "Every newly qualified variable-length provider family remains whole across partitions. Reclassified by issue #370 (decision-freeze-docker-pat-oat-exact-length-grammar): the dckr_pat_ line carries a 36-byte suffix, which is neither documented Docker Hub length, so it now stays as plain text at every partition while its neighbours are still redacted; docker-pat-oat-exact-length-partitions carries the exact-length shapes. Input unchanged; expectation corrected."
     },
     {
       "id": "fixed-width-unicode",
@@ -914,7 +906,14 @@
     {
       "id": "docker-embedded-identifier-discriminating-boundary",
       "input": "legacydckr_pat_SYNTHETIC_EMBEDDED_NOT_A_MATCH\ndckr_pat_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_",
-      "text": "legacydckr_pat_SYNTHETIC_EMBEDDED_NOT_A_MATCH\n<SECRET_1>",
+      "text": "legacydckr_pat_SYNTHETIC_EMBEDDED_NOT_A_MATCH\ndckr_pat_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_",
+      "expected": [],
+      "note": "issue #320: a wider benign identifier the docker-token prefix is embedded in (a leading alnum/dash byte immediately before the documented prefix means it is a truncated slice of a longer identifier, not a boundary-delimited credential) on one line, and a real boundary-delimited token on the next, stay correctly discriminated at every chunk split, including splits that fall inside either prefix's own bytes. Reclassified by issue #370 (decision-freeze-docker-pat-oat-exact-length-grammar): the boundary-delimited value on the second line carries a 36-byte suffix, which is not the 27-byte personal access token length, so both lines now stay as plain text at every partition; docker-pat-oat-exact-length-partitions repeats this discrimination with exact-length shapes. Input unchanged; expectation corrected."
+    },
+    {
+      "id": "docker-pat-oat-exact-length-partitions",
+      "input": "legacydckr_pat_SYNTHETIC_EMBEDDED_NOT_A_MATCH\ndckr_pat_SYNTHETIC_REVOKED_KEY_VALUE\ndckr_pat_SYNTHETIC_REVOKED_KEY_VALU\ndckr_oat_SYNTHETIC_REVOKED_OAT_KEY_VALUE3\ndckr_oat_SYNTHETIC_REVOKED_OAT_KEY_VALUE\n",
+      "text": "legacydckr_pat_SYNTHETIC_EMBEDDED_NOT_A_MATCH\n<SECRET_1>\ndckr_pat_SYNTHETIC_REVOKED_KEY_VALU\n<SECRET_2>\ndckr_oat_SYNTHETIC_REVOKED_OAT_KEY_VALUE\n",
       "expected": [
         {
           "detector": "docker-token",
@@ -922,10 +921,18 @@
           "confidence": "high",
           "specificity": "provider",
           "start": 46,
-          "end": 91
+          "end": 82
+        },
+        {
+          "detector": "docker-token",
+          "type": "docker_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 119,
+          "end": 160
         }
       ],
-      "note": "issue #320: a wider benign identifier the docker-token prefix is embedded in (a leading alnum/dash byte immediately before the documented prefix means it is a truncated slice of a longer identifier, not a boundary-delimited credential) on one line, and a real boundary-delimited token on the next, stay correctly discriminated at every chunk split, including splits that fall inside either prefix's own bytes."
+      "note": "Issue #370: a wider benign identifier the dckr_pat_ prefix is embedded in, an exact-length personal access token, its 26-byte twin, an exact-length organization access token, and its 31-byte twin on successive lines stay correctly discriminated at every chunk split, including splits that fall inside a prefix's own bytes and splits exactly at the 27th/32nd suffix byte where the two shapes' lengths diverge."
     },
     {
       "id": "vercel-embedded-identifier-discriminating-boundary",
