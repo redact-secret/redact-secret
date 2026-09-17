@@ -7,10 +7,9 @@ qualification, publication, recovery, and closeout. It describes the workflows
 in this repository; [AGENTS.md](../AGENTS.md#release-authority) remains the
 release authority. A completed issue or successful build is not release approval.
 
-The previous release is recorded in [beta.1 evidence](releases/0.1.0-beta.1/README.md).
-Version `0.1.0-beta.2` was approved for candidate preparation on 2026-09-13.
-The [final beta.2 code review](audits/beta2-final-code-review.md) records the
-closed findings and the evidence required before publication approval.
+Published versions and their evidence are listed in
+[release status](releases/status.md). Use the candidate's own source revision
+and review evidence when preparing the next release.
 
 ## Product and artifact identity
 

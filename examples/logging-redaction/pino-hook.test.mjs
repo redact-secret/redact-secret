@@ -101,3 +101,21 @@ test("numbers, booleans, and non-string interpolation values pass through unchan
 test("rejects a non-function scanAndRedact", () => {
   assert.throws(() => createRedactingLogMethodWith(null), TypeError);
 });
+
+test("preserves prototype-named JSON keys as redacted own data", () => {
+  const input = JSON.parse('{"__proto__":{"value":"SECRET_TOKEN_1"},"constructor":"SECRET_TOKEN_2","toString":"SECRET_TOKEN_3"}');
+  const result = maskLogValueWith(fakeScanAndRedact, input);
+  assert.equal(Object.getPrototypeOf(result), Object.prototype);
+  assert.equal(Object.hasOwn(result, "__proto__"), true);
+  assert.deepEqual(JSON.parse(JSON.stringify(result)), JSON.parse('{"__proto__":{"value":"<SECRET_1>"},"constructor":"<SECRET_1>","toString":"<SECRET_1>"}'));
+  assert.equal(input.__proto__.value, "SECRET_TOKEN_1");
+});
+
+test("preserves an Error's own __proto__ data without changing the output prototype", () => {
+  const error = new Error("ordinary message");
+  Object.defineProperty(error, "__proto__", { value: { detail: "SECRET_TOKEN_1" }, enumerable: true });
+  const result = maskLogValueWith(fakeScanAndRedact, error);
+  assert.equal(Object.getPrototypeOf(result), Object.prototype);
+  assert.equal(Object.hasOwn(result, "__proto__"), true);
+  assert.deepEqual(result.__proto__, { detail: "<SECRET_1>" });
+});

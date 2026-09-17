@@ -93,3 +93,12 @@ test("a string too long for the size limit is marked, not scanned", () => {
 test("rejects a non-function scanAndRedact", () => {
   assert.throws(() => maskSecretsWith(null, {}), TypeError);
 });
+
+test("preserves prototype-named JSON keys as redacted own data", () => {
+  const input = JSON.parse('{"__proto__":{"value":"SECRET_TOKEN_1"},"constructor":"SECRET_TOKEN_2","toString":"SECRET_TOKEN_3"}');
+  const result = maskSecretsWith(fakeScanAndRedact, input);
+  assert.equal(Object.getPrototypeOf(result), Object.prototype);
+  assert.equal(Object.hasOwn(result, "__proto__"), true);
+  assert.deepEqual(JSON.parse(JSON.stringify(result)), JSON.parse('{"__proto__":{"value":"<SECRET_1>"},"constructor":"<SECRET_1>","toString":"<SECRET_1>"}'));
+  assert.equal(input.__proto__.value, "SECRET_TOKEN_1");
+});

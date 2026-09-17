@@ -99,38 +99,22 @@ call — a masked leaf is always returned, never an exception.
 
 ## Python `logging.Filter` semantics, pinned
 
-Confirmed against CPython's `logging` module while resolving this issue
-(exact references in [`logging_filter.py`](./python/logging_filter.py)'s
-module docstring):
+The filter relies on these Python logging behaviors:
 
-- `LogRecord.getMessage()` always returns a `str` — `self.msg % self.args`
-  when `args` is truthy, else `str(self.msg)` — covering `%`-style args and
-  f-strings identically. The filter redacts that return value, writes it to
-  `record.msg`, and clears `record.args`, so a later `getMessage()` call
-  (a `Formatter` calls it again) returns the same text without reformatting.
-- `record.exc_text` is *not* populated when a filter runs — CPython's
-  `Formatter.format()` computes it lazily from `record.exc_info` on first
-  use. This filter formats the traceback itself with
-  `traceback.format_exception` (which also expands any `__cause__`/
-  `__context__` chain), redacts it, and writes it to `record.exc_text`, so
-  the formatter's own lazy step finds it already set.
-- `record.exc_info` is cleared to `None` afterward. Some handlers read
-  `exc_info` directly instead of `exc_text` (to render their own traceback
-  styling); clearing it trades that convenience for a hard guarantee that
-  nothing downstream can re-extract the original exception object. A
-  handler that only consults `exc_text` — CPython's own `Formatter` does —
-  is unaffected.
-- `record.stack_info` (from `stack_info=True`) is, unlike `exc_text`,
-  already a formatted string by the time any filter runs, so it is redacted
-  directly like any other field.
-- **Attach to every `Handler` that could emit the record, not to a
-  `Logger`.** A `Logger`-level filter mutates a record once, but a second
-  logger in the hierarchy (or a handler reached via propagation that this
-  filter was never attached to) can still emit that same record's original,
-  unredacted text — filter lists are per-logger and per-handler, not
-  global. `handler.addFilter(RedactSecretFilter(...))` on every handler that
-  could see the record is the safe default; see `python/test_logging_filter.py`
-  for a worked `make_logger` helper.
+- `LogRecord.getMessage()` applies `%` interpolation before scanning. The
+  filter stores the sanitized message and clears `args`.
+- When `exc_info` is present, the filter renders and sanitizes the traceback,
+  including exception chains, then clears the raw exception tuple. If only
+  cached `exc_text` remains, it sanitizes that string directly. Reaching the
+  exception depth limit emits a fixed marker.
+- `stack_info` and configured string extras are sanitized directly.
+- Attach the filter to each emitting handler. Ancestor logger filters do not
+  run for propagated child records. Record mutations are shared across
+  handlers, so filter ordering matters. Custom formatters must not append
+  unscanned data after this filter.
+
+See [`python/test_logging_filter.py`](./python/test_logging_filter.py) for
+handler setup and regression tests.
 
 ## False positives, false negatives, and cost
 

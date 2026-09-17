@@ -52,7 +52,13 @@ function maskValue(scanAndRedact, value, ctx, depth, seen) {
     const keys = Object.keys(value).slice(0, ctx.limits.maxObjectKeys);
     const out = {};
     for (const key of keys) {
-      out[key] = maskValue(scanAndRedact, value[key], ctx, depth + 1, seen);
+      // Define data keys without invoking inherited setters such as __proto__.
+      Object.defineProperty(out, key, {
+        value: maskValue(scanAndRedact, value[key], ctx, depth + 1, seen),
+        enumerable: true,
+        configurable: true,
+        writable: true,
+      });
     }
     seen.delete(value);
     return out;
