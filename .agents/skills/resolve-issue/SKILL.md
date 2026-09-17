@@ -79,6 +79,7 @@ Then run the checks yourself and read the output:
 ```bash
 rtk npm run ci          # decisions:validate + typecheck + build + vitest
 rtk cargo test          # when the change touches crates/
+rtk cargo fmt --all --check
 rtk cargo clippy
 ```
 

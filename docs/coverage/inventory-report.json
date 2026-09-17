@@ -1292,8 +1292,10 @@
     {
       "detector": "otpauth-uri",
       "evidence": {
-        "fixtureCount": 11,
+        "fixtureCount": 31,
         "hostContextsExercised": [
+          "json",
+          "log",
           "plain-text"
         ],
         "kindsWithSupportedEvidence": [
@@ -1308,8 +1310,16 @@
         ]
       },
       "evidenceFixtureIds": [
+        "otpauth-positive-base32-lookalike-in-label-not-selected",
+        "otpauth-positive-crlf-unicode-prefix",
+        "otpauth-positive-duplicate-secret-first-wins",
         "otpauth-positive-hotp-full-parameters",
         "otpauth-positive-hotp-minimal",
+        "otpauth-positive-json",
+        "otpauth-positive-log",
+        "otpauth-positive-percent-encoded-label",
+        "otpauth-positive-repeated-identical-uri",
+        "otpauth-positive-totp-and-hotp-paired-in-same-input",
         "otpauth-positive-totp-full-parameters",
         "otpauth-positive-totp-minimal"
       ],
@@ -1317,6 +1327,7 @@
       "schemeRows": [
         {
           "evidenceFixtureIds": [
+            "otpauth-positive-totp-and-hotp-paired-in-same-input",
             "otpauth-positive-totp-full-parameters",
             "otpauth-positive-totp-minimal"
           ],
@@ -1326,7 +1337,8 @@
         {
           "evidenceFixtureIds": [
             "otpauth-positive-hotp-full-parameters",
-            "otpauth-positive-hotp-minimal"
+            "otpauth-positive-hotp-minimal",
+            "otpauth-positive-totp-and-hotp-paired-in-same-input"
           ],
           "scheme": "hotp",
           "state": "supported"

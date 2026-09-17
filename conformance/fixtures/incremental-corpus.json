@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 58,
+  "fixtureCount": 59,
   "fixtures": [
     {
       "id": "synthetic-regression-malformed-authority",
@@ -942,6 +942,22 @@
         }
       ],
       "note": "issue #320: a wider benign identifier the vercel-token prefix is embedded in (a leading alnum/dash byte immediately before the documented prefix means it is a truncated slice of a longer identifier, not a boundary-delimited credential) on one line, and a real boundary-delimited token on the next, stay correctly discriminated at every chunk split, including splits that fall inside either prefix's own bytes."
+    },
+    {
+      "id": "otpauth-embedded-identifier-discriminating-boundary",
+      "input": "xotpauth://totp/Example:alice@example.com?secret=SYNTHETICEMBEDDEDVALUEQP\notpauth://totp/Example:alice@example.com?secret=SYNTHETICREALVALUETWOQP",
+      "text": "xotpauth://totp/Example:alice@example.com?secret=SYNTHETICEMBEDDEDVALUEQP\notpauth://totp/Example:alice@example.com?secret=<SECRET_1>",
+      "expected": [
+        {
+          "detector": "otpauth-uri",
+          "type": "otpauth_secret",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 122,
+          "end": 145
+        }
+      ],
+      "note": "issue #325: an otpauth:// occurrence immediately preceded by an identifier character ('x', a truncated slice of a wider identifier rather than a boundary-delimited URI) sits directly before a genuine otpauth:// URI on the next line, sharing the same otpauth://totp/Example:alice@example.com?secret= bytes the detector scans through. Every UTF-8 chunk split, including splits that fall inside either line's shared prefix bytes or inside the secret value itself, must still discriminate the two the same way the whole-input scan does -- the otpauth-uri counterpart to vault-embedded-identifier-discriminating-boundary's boundary_blocked family."
     }
   ]
 }
