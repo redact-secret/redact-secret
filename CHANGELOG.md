@@ -21,6 +21,66 @@ evidence is linked from each published version.
   The legacy Insights Insert/Query Keys, the deprecated Admin Key, and the
   bare account-scoped "user API id" are documented out-of-scope gaps, not
   silently dropped.
+- Added `sentry-user-auth-token` and `sentry-org-auth-token` detectors
+  recognizing Sentry's documented-in-practice prefixed token formats: a
+  user auth token is the literal `sntryu_` followed by an exact 64-byte
+  lowercase-hex secret; an organization auth token is the literal
+  `sntrys_eyJ` (`eyJ` being the base64 encoding of a JSON object's opening
+  `{"`), a documented-minimum base64 payload, an optional trailing base64
+  padding, a literal `_`, and an exact 43-byte base64 signature. Sentry's
+  own documentation publishes no grammar for either value; the shapes are
+  cross-referenced from gitleaks's and trufflehog's independent rules (no
+  code reproduced from either). Both prefixes are unambiguous provider
+  markers, so neither detector requires surrounding context, unlike
+  Twilio's unmarked Auth Token/API Key Secret above. Sentry's legacy,
+  pre-2024 unprefixed 64-byte hex token is indistinguishable from an
+  ordinary hex digest without reliable context and is intentionally out of
+  scope for a dedicated detector; a qualified `name=value` assignment of it
+  still gets a lower-confidence contextual finding through the generic
+  detector. A public Sentry DSN shares no shape with either grammar and is
+  not classified. Both new types are always-redact and provider-specific.
+- Added `grafana-service-account-token` and `grafana-cloud-access-policy-token`
+  detectors. The service account detector matches the documented `glsa_`
+  prefix, an exact 32-byte alphanumeric body, a literal `_` separator, and an
+  exact 8-byte hex checksum -- a shape shown in Grafana's own example request
+  and corroborated by gitleaks's and trufflehog's independent Grafana rules
+  (consulted only as external behavioral references; no code copied from
+  either project). The Cloud access policy detector matches the documented
+  `glc_` prefix followed by a minimum 32-byte base64 body (`[A-Za-z0-9+/]`),
+  the same floor gitleaks's rule uses; trufflehog's narrower `glc_eyJ`-anchored
+  variant, which encodes a single tool's implementation detail rather than a
+  confirmed provider fact, was deliberately not adopted. Grafana's legacy
+  (pre-service-account) API key -- an unprefixed base64-encoded JSON blob --
+  is an explicit, documented out-of-scope gap: it is deprecated by Grafana in
+  favor of service accounts and carries no Grafana-owned marker beyond a
+  generic base64/JSON convention this crate's `jwt` and generic-token
+  detectors already cover the same false-positive risk for. Both new
+  detectors are always-redact, provider-specific, and win any overlap with
+  the generic contextual detector.
+- Added `datadog-api-key` and `datadog-application-key` detectors recognizing
+  Datadog API Keys and Application Keys: community-observed (gitleaks,
+  trufflehog) bare lowercase-hex values -- 32 bytes for an API Key, 40 bytes
+  for an Application Key -- with no vendor-documented character-class grammar
+  of their own, though Datadog's own docs publish the `DD-API-KEY` /
+  `DD-APPLICATION-KEY` header names and `DD_API_KEY` / `DD_APPLICATION_KEY`
+  environment variable names. Neither key carries a paired public identifier
+  the way a Twilio Account SID or API Key SID does, so each detector requires
+  reliable Datadog context on the same line as the candidate: a specific
+  same-line marker naming the key type (`dd_api_key`, `dd-application-key`,
+  and similar `-`/`_`-joined spellings of the documented header/env-var
+  names, high confidence) or, absent that, a bare case-insensitive `datadog`
+  substring (medium confidence). The bare two-letter `dd` form is never
+  checked as an unanchored keyword, since it collides with ordinary English
+  inside `address`, `middleware`, and similar words; it remains reachable
+  only as part of the longer specific markers. Both types are
+  provider-specific and confidence-gated (redact at high confidence, warn at
+  medium) rather than unconditionally always-redact. A specific marker or the
+  bare vendor word on a *different* line from the value is a documented,
+  known false negative: context is scoped to a single line so whole-input and
+  incremental (line-at-a-time) scanning agree. The two distinct finding types
+  record, in metadata, the issue's requested distinction between an
+  ingestion credential (API Key) and broader application-API authority
+  (Application Key).
 - Added `twilio-auth-token` and `twilio-api-key-secret` detectors recognizing
   Twilio Auth Tokens and API Key Secrets: community-observed (gitleaks,
   trufflehog) bare 32-byte values -- lowercase hex for an Auth Token,

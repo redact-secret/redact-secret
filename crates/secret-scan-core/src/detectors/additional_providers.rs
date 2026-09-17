@@ -1,5 +1,6 @@
 //! Stripe, Slack, `PyPI`, Hugging Face, Docker, Cloudflare, `DigitalOcean`,
-//! Linear, Supabase, Vercel, npm, and Google API key detection.
+//! Linear, Supabase, Vercel, npm, Google, and Grafana Cloud API key
+//! detection.
 //!
 //! Mirrors `src/detectors/additional-providers.ts`. Every one of these
 //! providers reduces to the same shape as [`super::gitlab`] or
@@ -251,6 +252,31 @@ pub(super) const GOOGLE: KnownFormatProviderDetector = KnownFormatProviderDetect
     boundary: pattern::is_alnum_dash,
 };
 
+/// Grafana Cloud access policy tokens (formerly "Grafana Cloud API tokens"
+/// in older provider material). Grafana's own documentation describes the
+/// `glc_` prefix only through example output, not a published grammar; two
+/// independent external tools (gitleaks's `grafana-cloud-api-token` and
+/// trufflehog's `grafana` detector, consulted only as behavioral references
+/// per `AGENTS.md`) both converge on a `glc_`-prefixed base64 body, with
+/// trufflehog additionally observing that the body itself decodes as
+/// base64-encoded JSON. This detector matches the `glc_` prefix followed by
+/// a run of the standard base64 body alphabet (`[A-Za-z0-9+/]`, no `=`
+/// padding -- see [`pattern::is_base64_body`]) with a 32-byte minimum,
+/// matching gitleaks's documented floor rather than trufflehog's narrower
+/// `eyJ`-anchored variant, since requiring a specific decoded-JSON prefix
+/// would encode an implementation detail of a single external tool rather
+/// than an independently confirmed provider fact. An undocumented prefix,
+/// or a body shorter than the minimum, is an intentional false negative.
+pub(super) const GRAFANA_CLOUD: KnownFormatProviderDetector = KnownFormatProviderDetector {
+    id: "grafana-cloud-access-policy-token",
+    type_name: "grafana_cloud_access_policy_token",
+    signals: &["grafana-cloud-documented-prefix", "base64-opaque-suffix"],
+    prefixes: &["glc_"],
+    run: RunLength::AtLeast(32),
+    alphabet: pattern::is_base64_body,
+    boundary: pattern::is_alnum_dash,
+};
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -262,6 +288,9 @@ mod tests {
     /// Google's suffix is matched as an exact 35-byte length, not a minimum,
     /// so it needs its own fixed-length synthetic body rather than [`BODY`].
     const GOOGLE_BODY: &str = "SYNTHETIC_REVOKED_GOOGLE_API_KEY012";
+    /// Grafana Cloud's suffix has a 32-byte minimum, longer than [`BODY`]'s
+    /// 30 bytes, so it needs its own body.
+    const GRAFANA_CLOUD_BODY: &str = "SYNTHETICREVOKEDGRAFANACLOUDACCESSPOLICYTOKEN";
 
     fn detect(detector: &KnownFormatProviderDetector, input: &str) -> Vec<Candidate> {
         detector
@@ -336,6 +365,11 @@ mod tests {
                 detector: GOOGLE,
                 value: format!("AIza{GOOGLE_BODY}"),
                 short: "AIzaSYNTHETICSHORT",
+            },
+            Family {
+                detector: GRAFANA_CLOUD,
+                value: format!("glc_{GRAFANA_CLOUD_BODY}"),
+                short: "glc_SYNTHETICSHORT",
             },
         ]
     }

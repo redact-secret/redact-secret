@@ -276,6 +276,48 @@
       "schemes": null
     },
     {
+      "type": "datadog_api_key",
+      "detector": "datadog-api-key",
+      "policyClass": "confidence-gated",
+      "reconciliationTrigger": "DD_API_KEY=0123456789abcdef0123456789abcdef",
+      "schemes": null
+    },
+    {
+      "type": "datadog_application_key",
+      "detector": "datadog-application-key",
+      "policyClass": "confidence-gated",
+      "reconciliationTrigger": "DD_APPLICATION_KEY=0123456789abcdef0123456789abcdef01234567",
+      "schemes": null
+    },
+    {
+      "type": "grafana_service_account_token",
+      "detector": "grafana-service-account-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "glsa_SYNTHETICREVOKEDGRAFANASATOKEN01_deadbeef",
+      "schemes": null
+    },
+    {
+      "type": "grafana_cloud_access_policy_token",
+      "detector": "grafana-cloud-access-policy-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "glc_SYNTHETICREVOKEDGRAFANACLOUDACCESSPOLICYTOKEN",
+      "schemes": null
+    },
+    {
+      "type": "sentry_user_auth_token",
+      "detector": "sentry-user-auth-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "sntryu_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      "schemes": null
+    },
+    {
+      "type": "sentry_org_auth_token",
+      "detector": "sentry-org-auth-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "sntrys_eyJSYNTHETICREVOKEDSENTRYO_SigFixSYNTHETICREVOKED0123456789SigFixSYNTH",
+      "schemes": null
+    },
+    {
       "type": "new_relic_user_api_key",
       "detector": "new-relic-user-api-key",
       "policyClass": "always-redact",

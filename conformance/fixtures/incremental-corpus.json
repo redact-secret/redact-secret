@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 32,
+  "fixtureCount": 36,
   "fixtures": [
     {
       "id": "synthetic-regression-malformed-authority",
@@ -147,8 +147,8 @@
     },
     {
       "id": "fixed-width-unicode",
-      "input": "before 🧪 AKIASYNTHETICEXAMPLE after",
-      "text": "before 🧪 <SECRET_1> after",
+      "input": "before \ud83e\uddea AKIASYNTHETICEXAMPLE after",
+      "text": "before \ud83e\uddea <SECRET_1> after",
       "expected": [
         {
           "detector": "aws-access-key",
@@ -512,6 +512,61 @@
       "text": "AC0123456789abcdef0123456789abcde0\nfedcba9876543210fedcba9876543210\n",
       "expected": [],
       "note": "Context is deliberately scoped to a single line so this documented false negative (the Account SID and Auth Token on separate lines) stays a non-match identically whole-input and incremental, at every chunk split including one that falls between the two lines."
+    },
+    {
+      "id": "datadog-api-key-line-scoped-context-same-line",
+      "input": "DD_API_KEY=0123456789abcdef0123456789abcdef",
+      "text": "DD_API_KEY=<SECRET_1>",
+      "expected": [
+        {
+          "detector": "datadog-api-key",
+          "type": "datadog_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 43
+        }
+      ],
+      "note": "The specific dd_api_key marker and the value stay on one incremental unit (a line) at every chunk split, so high-confidence detection and redaction are identical whole-input and incremental."
+    },
+    {
+      "id": "datadog-api-key-line-scoped-context-different-line",
+      "input": "DD_API_KEY=\n0123456789abcdef0123456789abcdef\n",
+      "text": "DD_API_KEY=\n0123456789abcdef0123456789abcdef\n",
+      "expected": [],
+      "note": "Context is deliberately scoped to a single line so this documented false negative (the DD_API_KEY marker and the value on separate lines) stays a non-match identically whole-input and incremental, at every chunk split including one that falls between the two lines."
+    },
+    {
+      "id": "grafana-service-account-token-basic",
+      "input": "glsa_SYNTHETICREVOKEDGRAFANASATOKEN01_deadbeef",
+      "text": "<SECRET_1>",
+      "expected": [
+        {
+          "detector": "grafana-service-account-token",
+          "type": "grafana_service_account_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 46
+        }
+      ],
+      "note": "The fixed-prefix, fixed-length glsa_<body>_<checksum> shape needs no cross-line context, so it is identical whole-input and incremental at every chunk split, including one that falls inside the token itself."
+    },
+    {
+      "id": "grafana-cloud-access-policy-token-basic",
+      "input": "glc_SYNTHETICREVOKEDGRAFANACLOUDACCESSPOLICYTOKEN",
+      "text": "<SECRET_1>",
+      "expected": [
+        {
+          "detector": "grafana-cloud-access-policy-token",
+          "type": "grafana_cloud_access_policy_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 49
+        }
+      ],
+      "note": "The fixed-prefix, minimum-length glc_ shape needs no cross-line context, so it is identical whole-input and incremental at every chunk split, including one that falls inside the token itself."
     },
     {
       "id": "new-relic-license-key-line-scoped-context-same-line",

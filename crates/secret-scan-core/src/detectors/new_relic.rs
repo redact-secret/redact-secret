@@ -163,8 +163,7 @@ impl Detector for NewRelicUserApiKeyDetector {
             pattern::is_upper_alnum,
             pattern::is_alnum,
         ) {
-            if text::is_repeated_character_filler(&input[start + USER_API_KEY_PREFIX.len()..end])
-            {
+            if text::is_repeated_character_filler(&input[start + USER_API_KEY_PREFIX.len()..end]) {
                 continue;
             }
             let Some(range) = ByteRange::new(start, end) else {
@@ -173,7 +172,10 @@ impl Detector for NewRelicUserApiKeyDetector {
             candidates.push(
                 Candidate::new("new_relic_user_api_key", Confidence::High, range)
                     .with_specificity(Specificity::Provider)
-                    .with_signals(["new-relic-documented-prefix", "exact-length-upper-alnum-body"]),
+                    .with_signals([
+                        "new-relic-documented-prefix",
+                        "exact-length-upper-alnum-body",
+                    ]),
             );
         }
         Ok(candidates)
@@ -329,7 +331,7 @@ mod tests {
 
     #[test]
     fn rejects_a_user_api_key_body_one_byte_longer_than_the_required_length_rather_than_truncating()
-     {
+    {
         let long = format!("{USER_API_KEY_BODY}A");
         assert!(detect_user_api_key(&format!("{USER_API_KEY_PREFIX}{long}")).is_empty());
     }
@@ -354,7 +356,9 @@ mod tests {
 
     #[test]
     fn rejects_a_user_api_key_environment_variable_reference() {
-        assert!(detect_user_api_key(&format!("{USER_API_KEY_PREFIX}${{NEW_RELIC_API_KEY}}")).is_empty());
+        assert!(
+            detect_user_api_key(&format!("{USER_API_KEY_PREFIX}${{NEW_RELIC_API_KEY}}")).is_empty()
+        );
     }
 
     #[test]
@@ -390,11 +394,7 @@ mod tests {
 
     #[test]
     fn stays_bounded_over_a_long_run_of_rejected_user_api_key_prefixes() {
-        let input = format!(
-            "{}!{}",
-            user_api_key(),
-            "NRAK-!".repeat(10_000)
-        );
+        let input = format!("{}!{}", user_api_key(), "NRAK-!".repeat(10_000));
         let candidates = detect_user_api_key(&input);
         assert_eq!(candidates.len(), 1);
         assert_eq!(
@@ -455,7 +455,9 @@ mod tests {
 
     #[test]
     fn rejects_a_masked_license_key() {
-        assert!(detect_license_key(&format!("newrelic {}", "0".repeat(LICENSE_KEY_LEN))).is_empty());
+        assert!(
+            detect_license_key(&format!("newrelic {}", "0".repeat(LICENSE_KEY_LEN))).is_empty()
+        );
     }
 
     #[test]

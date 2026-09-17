@@ -15,10 +15,12 @@ mod aws;
 mod azure_devops;
 mod bearer_token;
 mod connection_string;
+mod datadog;
 mod discord;
 mod generic_token;
 mod github;
 mod gitlab;
+mod grafana;
 mod jwt;
 mod microsoft_entra;
 mod new_relic;
@@ -28,6 +30,7 @@ mod otpauth;
 mod pattern;
 mod private_key;
 mod sendgrid;
+mod sentry;
 mod shopify;
 mod telegram;
 mod text;
@@ -75,6 +78,12 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(twilio::TwilioApiKeySecretDetector),
         telegram::telegram_bot_token_detector(),
         Box::new(discord::DiscordBotTokenDetector),
+        Box::new(sentry::SentryUserAuthTokenDetector),
+        Box::new(sentry::SentryOrgAuthTokenDetector),
+        Box::new(datadog::DatadogApiKeyDetector),
+        Box::new(datadog::DatadogApplicationKeyDetector),
+        Box::new(grafana::GrafanaServiceAccountTokenDetector),
+        Box::new(additional_providers::GRAFANA_CLOUD),
         Box::new(new_relic::NewRelicUserApiKeyDetector),
         Box::new(new_relic::NewRelicLicenseKeyDetector),
         jwt::jwt_detector(),
@@ -138,6 +147,12 @@ mod tests {
                 "twilio-api-key-secret",
                 "telegram-bot-token",
                 "discord-bot-token",
+                "sentry-user-auth-token",
+                "sentry-org-auth-token",
+                "datadog-api-key",
+                "datadog-application-key",
+                "grafana-service-account-token",
+                "grafana-cloud-access-policy-token",
                 "new-relic-user-api-key",
                 "new-relic-license-key",
                 "jwt",
@@ -174,8 +189,26 @@ mod tests {
         assert!(bearer[0].range().overlaps(contextual[0].range()));
     }
 
+    fn assert_provider_candidates(cases: &[(&str, &str)]) {
+        let detectors = built_in_detectors();
+        for (id, input) in cases {
+            let registered = detectors
+                .iter()
+                .find(|detector| detector.id() == *id)
+                .expect("every case id names a registered built-in detector");
+            let context = DetectorContext::new(input.len());
+            let candidates: Vec<Candidate> = registered.detect(input, &context).unwrap();
+            assert_eq!(candidates.len(), 1, "{id}");
+            assert_eq!(
+                candidates[0].effective_specificity(),
+                Specificity::Provider,
+                "{id}"
+            );
+        }
+    }
+
     #[test]
-    fn every_built_in_provider_candidate_claims_provider_specificity() {
+    fn established_built_in_provider_candidates_claim_provider_specificity() {
         let pypi_input = format!("pypi-{}", "SYNTHETIC_REVOKED_".repeat(5));
         let sendgrid_input =
             "SG.SYNTHETIC_REVOKED_0000.SYNTHETIC_REVOKED_SENDGRID_SECRET_000000000";
@@ -189,10 +222,7 @@ mod tests {
             "twilio SKaB3dE5gH7jK9mN1pQ3sT5vW7yZ9AbC3d zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE";
         let telegram_input = "123456:SYNTHETIC_REVOKED_TELEGRAM_BOT_TOKEN_SECRET";
         let discord_input = "MDAwMDAwMDAwMDAwMDAwMDAw.REVOKE.SYNTHETICREVOKEDBOTTOKENFIX";
-        let new_relic_user_api_key_input = "NRAK-SYNTHETICREVOKEDNEWRELICUSA";
-        let new_relic_license_key_input =
-            "newrelic 0123456789abcdef0123456789abcdef01234567";
-        let cases: [(&str, &str); 30] = [
+        let cases = [
             ("aws-access-key", "AKIASYNTHETICEXAMPLE"),
             (
                 "github-token",
@@ -236,23 +266,41 @@ mod tests {
             ("twilio-api-key-secret", twilio_api_key_secret_input),
             ("discord-bot-token", discord_input),
             ("telegram-bot-token", telegram_input),
+        ];
+        assert_provider_candidates(&cases);
+    }
+
+    #[test]
+    fn recent_built_in_provider_candidates_claim_provider_specificity() {
+        let sentry_user_auth_token_input = format!("sntryu_{}", "0123456789abcdef".repeat(4));
+        let sentry_org_auth_token_input = format!(
+            "sntrys_eyJ{}_{}",
+            &"SYNTHETICREVOKEDSENTRYORGPAYLOADFIXTURE0123456789".repeat(4)[..23],
+            &"SigFixSYNTHETICREVOKED0123456789".repeat(2)[..43]
+        );
+        let grafana_sa_input = "glsa_SYNTHETICREVOKEDGRAFANASATOKEN01_deadbeef";
+        let grafana_cloud_input = "glc_SYNTHETICREVOKEDGRAFANACLOUDACCESSPOLICYTOKEN";
+        let datadog_api_key_input = "DD_API_KEY=0123456789abcdef0123456789abcdef";
+        let datadog_application_key_input =
+            "DD_APPLICATION_KEY=0123456789abcdef0123456789abcdef01234567";
+        let new_relic_user_api_key_input = "NRAK-SYNTHETICREVOKEDNEWRELICUSA";
+        let new_relic_license_key_input = "newrelic 0123456789abcdef0123456789abcdef01234567";
+        let cases = [
+            (
+                "sentry-user-auth-token",
+                sentry_user_auth_token_input.as_str(),
+            ),
+            (
+                "sentry-org-auth-token",
+                sentry_org_auth_token_input.as_str(),
+            ),
+            ("datadog-api-key", datadog_api_key_input),
+            ("datadog-application-key", datadog_application_key_input),
+            ("grafana-service-account-token", grafana_sa_input),
+            ("grafana-cloud-access-policy-token", grafana_cloud_input),
             ("new-relic-user-api-key", new_relic_user_api_key_input),
             ("new-relic-license-key", new_relic_license_key_input),
         ];
-        let detectors = built_in_detectors();
-        for (id, input) in cases {
-            let registered = detectors
-                .iter()
-                .find(|detector| detector.id() == id)
-                .expect("every case id names a registered built-in detector");
-            let context = DetectorContext::new(input.len());
-            let candidates: Vec<Candidate> = registered.detect(input, &context).unwrap();
-            assert_eq!(candidates.len(), 1, "{id}");
-            assert_eq!(
-                candidates[0].effective_specificity(),
-                Specificity::Provider,
-                "{id}"
-            );
-        }
+        assert_provider_candidates(&cases);
     }
 }
