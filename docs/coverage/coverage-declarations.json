@@ -4159,6 +4159,7 @@
             "anthropic-legacy-versioned-prefix-discriminating-boundary",
             "aws-access-key-exact-length-discriminating-boundary",
             "aws-contextual-assignment",
+            "cloudflare-embedded-identifier-discriminating-boundary",
             "contextual-assignment",
             "contextual-assignment-consecutive-nested-keys",
             "contextual-assignment-credential-under-auth-key",
@@ -4173,6 +4174,8 @@
             "contextual-assignment-stops-at-line-terminator",
             "datadog-api-key-line-scoped-context-different-line",
             "datadog-api-key-line-scoped-context-same-line",
+            "digitalocean-embedded-identifier-discriminating-boundary",
+            "docker-embedded-identifier-discriminating-boundary",
             "encoded-connection",
             "fixed-width-unicode",
             "github-installation-stateless",
@@ -4197,7 +4200,9 @@
             "truncated-private-key",
             "twilio-auth-token-line-scoped-context-different-line",
             "twilio-auth-token-line-scoped-context-same-line",
-            "variable-provider"
+            "variable-provider",
+            "vault-embedded-identifier-discriminating-boundary",
+            "vercel-embedded-identifier-discriminating-boundary"
           ],
           "state": "supported"
         },
@@ -4419,6 +4424,7 @@
             "anthropic-legacy-versioned-prefix-discriminating-boundary",
             "aws-access-key-exact-length-discriminating-boundary",
             "aws-contextual-assignment",
+            "cloudflare-embedded-identifier-discriminating-boundary",
             "contextual-assignment",
             "contextual-assignment-consecutive-nested-keys",
             "contextual-assignment-credential-under-auth-key",
@@ -4433,6 +4439,8 @@
             "contextual-assignment-stops-at-line-terminator",
             "datadog-api-key-line-scoped-context-different-line",
             "datadog-api-key-line-scoped-context-same-line",
+            "digitalocean-embedded-identifier-discriminating-boundary",
+            "docker-embedded-identifier-discriminating-boundary",
             "encoded-connection",
             "fixed-width-unicode",
             "github-installation-stateless",
@@ -4457,7 +4465,9 @@
             "truncated-private-key",
             "twilio-auth-token-line-scoped-context-different-line",
             "twilio-auth-token-line-scoped-context-same-line",
-            "variable-provider"
+            "variable-provider",
+            "vault-embedded-identifier-discriminating-boundary",
+            "vercel-embedded-identifier-discriminating-boundary"
           ],
           "state": "supported"
         },
@@ -4795,6 +4805,7 @@
             "anthropic-legacy-versioned-prefix-discriminating-boundary",
             "aws-access-key-exact-length-discriminating-boundary",
             "aws-contextual-assignment",
+            "cloudflare-embedded-identifier-discriminating-boundary",
             "contextual-assignment",
             "contextual-assignment-consecutive-nested-keys",
             "contextual-assignment-credential-under-auth-key",
@@ -4809,6 +4820,8 @@
             "contextual-assignment-stops-at-line-terminator",
             "datadog-api-key-line-scoped-context-different-line",
             "datadog-api-key-line-scoped-context-same-line",
+            "digitalocean-embedded-identifier-discriminating-boundary",
+            "docker-embedded-identifier-discriminating-boundary",
             "encoded-connection",
             "fixed-width-unicode",
             "github-installation-stateless",
@@ -4833,7 +4846,9 @@
             "truncated-private-key",
             "twilio-auth-token-line-scoped-context-different-line",
             "twilio-auth-token-line-scoped-context-same-line",
-            "variable-provider"
+            "variable-provider",
+            "vault-embedded-identifier-discriminating-boundary",
+            "vercel-embedded-identifier-discriminating-boundary"
           ],
           "state": "supported"
         },
