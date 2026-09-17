@@ -1,0 +1,131 @@
+{
+  "detectors": [
+    {
+      "detector": "shopify-token",
+      "falseNegativeGuards": {
+        "actualFalseNegatives": 0,
+        "count": 10,
+        "fixtureIds": [
+          "shopify-positive-admin-access",
+          "shopify-positive-all-prefixes",
+          "shopify-positive-crlf-unicode-prefix",
+          "shopify-positive-doc-style-placeholder",
+          "shopify-positive-dotenv",
+          "shopify-positive-json",
+          "shopify-positive-log",
+          "shopify-positive-min-length",
+          "shopify-positive-mixed-public-and-secret",
+          "shopify-positive-yaml"
+        ]
+      },
+      "falsePositiveGuards": {
+        "actualFalsePositives": 0,
+        "count": 8,
+        "fixtureIds": [
+          "shopify-negative-header-name",
+          "shopify-negative-interpolated-secret-prefix",
+          "shopify-negative-lookalike",
+          "shopify-negative-masked-secret-prefix",
+          "shopify-negative-placeholder",
+          "shopify-negative-public-prefix-punctuation",
+          "shopify-negative-public-prefix-unicode-crlf",
+          "shopify-negative-wrong-prefix"
+        ]
+      },
+      "hostContextsExercised": [
+        "dotenv",
+        "json",
+        "log",
+        "plain-text",
+        "shell",
+        "yaml"
+      ]
+    },
+    {
+      "detector": "stripe-token",
+      "falseNegativeGuards": {
+        "actualFalseNegatives": 0,
+        "count": 10,
+        "fixtureIds": [
+          "stripe-positive-all-prefixes",
+          "stripe-positive-crlf-unicode-prefix",
+          "stripe-positive-doc-style-placeholder",
+          "stripe-positive-dotenv",
+          "stripe-positive-json",
+          "stripe-positive-log",
+          "stripe-positive-min-length",
+          "stripe-positive-mixed-public-and-secret",
+          "stripe-positive-qualified",
+          "stripe-positive-yaml"
+        ]
+      },
+      "falsePositiveGuards": {
+        "actualFalsePositives": 0,
+        "count": 8,
+        "fixtureIds": [
+          "stripe-negative-interpolated-secret-prefix",
+          "stripe-negative-lookalike",
+          "stripe-negative-masked-secret-prefix",
+          "stripe-negative-ordinary-reference",
+          "stripe-negative-placeholder",
+          "stripe-negative-public-prefix-punctuation",
+          "stripe-negative-public-prefix-unicode-crlf",
+          "stripe-negative-wrong-prefix"
+        ]
+      },
+      "hostContextsExercised": [
+        "dotenv",
+        "json",
+        "log",
+        "plain-text",
+        "shell",
+        "yaml"
+      ]
+    },
+    {
+      "detector": "supabase-token",
+      "falseNegativeGuards": {
+        "actualFalseNegatives": 0,
+        "count": 9,
+        "fixtureIds": [
+          "supabase-positive-crlf-unicode-prefix",
+          "supabase-positive-doc-style-placeholder",
+          "supabase-positive-dotenv",
+          "supabase-positive-json",
+          "supabase-positive-log",
+          "supabase-positive-min-length",
+          "supabase-positive-mixed-public-and-secret",
+          "supabase-positive-qualified",
+          "supabase-positive-yaml"
+        ]
+      },
+      "falsePositiveGuards": {
+        "actualFalsePositives": 0,
+        "count": 8,
+        "fixtureIds": [
+          "supabase-negative-interpolated-secret-prefix",
+          "supabase-negative-lookalike",
+          "supabase-negative-masked-secret-prefix",
+          "supabase-negative-ordinary-reference",
+          "supabase-negative-placeholder",
+          "supabase-negative-public-prefix-punctuation",
+          "supabase-negative-public-prefix-unicode-crlf",
+          "supabase-negative-wrong-prefix"
+        ]
+      },
+      "hostContextsExercised": [
+        "dotenv",
+        "json",
+        "log",
+        "plain-text",
+        "shell",
+        "yaml"
+      ]
+    }
+  ],
+  "provenance": {
+    "corpus": "conformance/fixtures/synchronous-corpus.json",
+    "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+    "issue": "https://github.com/redact-secret/redact-secret/issues/316"
+  }
+}

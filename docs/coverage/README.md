@@ -109,6 +109,30 @@ Tests: `python3 -B -m unittest discover -s scripts/tests -p 'test_generate_cover
 
   Tests: `python3 -B -m unittest discover -s scripts/tests -p 'test_generate_coverage_report.py'`.
 
+- [`fp-fn-summary.json`](./fp-fn-summary.json) — the per-detector false-
+  positive/false-negative guard summary requested by issue
+  [#316](https://github.com/redact-secret/redact-secret/issues/316): for each
+  reported detector, the `kind: "negative"` fixture count and ids (each one a
+  guard the detector must produce zero findings for) and the `kind:
+  "positive"` fixture count and ids (each one a guard the detector must still
+  fire for), plus the union of `contexts` those fixtures exercise. It reports
+  design intent only — whether the real detector actually meets every guard
+  is asserted independently by
+  `crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus`,
+  named in the file's own `provenance.enforcedBy` field, so an actual false
+  positive or false negative among these fixtures is a build failure, not a
+  number this document could mis-report. Produced by
+  [`scripts/generate-fp-fn-summary.py`](../../scripts/generate-fp-fn-summary.py)
+  from the canonical corpus only (never a fixture's `input` or a matched
+  value). Defaults to `stripe-token`, `shopify-token`, and `supabase-token`;
+  pass `--detector <id>` (repeatable) to report on others:
+
+  ```sh
+  python3 -B scripts/generate-fp-fn-summary.py --out docs/coverage/fp-fn-summary.json
+  ```
+
+  Tests: `python3 -B -m unittest discover -s scripts/tests -p 'test_generate_fp_fn_summary.py'`.
+
 ## Coverage drift is a CI failure
 
 `npm run ci` runs `npm run coverage:check`, which fails the build if:
