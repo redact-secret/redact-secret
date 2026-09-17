@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 53,
+  "fixtureCount": 57,
   "fixtures": [
     {
       "id": "synthetic-regression-malformed-authority",
