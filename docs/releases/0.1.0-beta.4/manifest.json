@@ -95,8 +95,23 @@
       "run": 35246692567,
       "node": ["aarch64-apple-darwin", "x86_64-apple-darwin", "aarch64-unknown-linux-gnu", "x86_64-unknown-linux-gnu", "aarch64-pc-windows-msvc", "x86_64-pc-windows-msvc"],
       "browser": "chromium",
-      "rust": {"run": 35243359690, "job": 105282984413, "version": "0.1.0-beta.4"},
-      "python": {"run": 35243359690, "job": 105282984411, "version": "0.1.0b4", "files": 9}
+      "rust": {
+        "observed_at": "2026-09-17",
+        "platform": "aarch64-apple-darwin",
+        "version": "0.1.0-beta.4",
+        "install": "cargo install redact-secret-cli --version 0.1.0-beta.4 --locked --root <empty-temporary-root>",
+        "checks": ["redact-secret --version", "clean standard-input scan"],
+        "result": "passed"
+      },
+      "python": {
+        "observed_at": "2026-09-17",
+        "platform": "macosx_11_0_arm64",
+        "version": "0.1.0b4",
+        "install": "python -m pip install redact-secret==0.1.0b4 in a new virtual environment",
+        "checks": ["importlib.metadata exact-version assertion", "clean scan_and_redact call"],
+        "files": 9,
+        "result": "passed"
+      }
     },
     "tag": {
       "name": "v0.1.0-beta.4",

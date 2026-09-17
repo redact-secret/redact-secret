@@ -40,11 +40,14 @@ verified every registry artifact, passed clean installs on all six published
 Node targets and Chromium, and created annotated tag `v0.1.0-beta.4` at the
 frozen source revision.
 
-The original Release run's successful crates.io and PyPI jobs provide the
-exact-version Rust and Python publication/install evidence. The final recovery
-run provides the registry-backed JavaScript install evidence. Registry
-metadata was observed again for this record on 2026-09-17, and every PyPI file
-hash matches the original inventory.
+The final recovery run provides the registry-backed JavaScript install
+evidence. On 2026-09-17, the operator also installed
+`redact-secret-cli@0.1.0-beta.4` with `cargo install --locked` into an empty
+temporary root and ran its version and clean-input checks, then installed
+`redact-secret==0.1.0b4` from PyPI into a new virtual environment and exercised
+`scan_and_redact` on clean input. Registry metadata was observed again for
+this record on the same date, and every PyPI file hash matches the original
+inventory.
 
 ## Durable record
 
