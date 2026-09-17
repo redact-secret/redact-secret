@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 937,
+  "fixtureCount": 963,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -10501,6 +10501,126 @@
       "note": "Colon-delimited segments are excluded; only the dot delimiter is recognized between JWT segments."
     },
     {
+      "id": "jwt-negative-ordinary-base64",
+      "detector": "jwt",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "eyJhbGciSGVsbG9UaGlzSXNPcmRpbmFyeUJhc2U2NEVuY29kZWRUZXh0V2l0aE5vRG90RGVsaW1pdGVyc0FueXdoZXJl",
+      "expected": [],
+      "note": "Ordinary base64url-encoded text that happens to start with the same three literal bytes ('eyJ') as an encoded-JSON header but carries no dot delimiter anywhere in the run is excluded: the required three-segment shape, not merely the header prefix, is what the grammar tests."
+    },
+    {
+      "id": "jwt-boundary-leading-identifier-char",
+      "detector": "jwt",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "mutation": {
+        "grammar": "jwt",
+        "seedId": "jwt-boundary-leading-identifier-char",
+        "operation": "declared-boundary",
+        "ordinal": 0
+      },
+      "input": "xeyJTWU5USEVUSUNfSEVBREVS.eyJTWU5USEVUSUNfUEFZTE9BRA.SYNTHETIC_REVOKED_SIGNATURE",
+      "expected": [],
+      "note": "A leading identifier character immediately before an otherwise structurally valid three-segment token blocks the match at the boundary check, mirroring the trailing-segment boundary jwt-boundary-four-segments already covers on the other side."
+    },
+    {
+      "id": "jwt-positive-context-json",
+      "detector": "jwt",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"token\": \"eyJTWU5USEVUSUNfSEVBREVS.eyJTWU5USEVUSUNfUEFZTE9BRA.SYNTHETIC_REVOKED_SIGNATURE\"}",
+      "expected": [
+        {
+          "detector": "jwt",
+          "type": "jwt",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 11,
+          "end": 90
+        }
+      ],
+      "note": "A JWT sitting as a quoted JSON string value is detected the same as bare plain-text; the structural grammar does not depend on host syntax."
+    },
+    {
+      "id": "jwt-positive-context-log",
+      "detector": "jwt",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-17T12:00:00Z INFO issued token eyJTWU5USEVUSUNfSEVBREVS.eyJTWU5USEVUSUNfUEFZTE9BRA.SYNTHETIC_REVOKED_SIGNATURE",
+      "expected": [
+        {
+          "detector": "jwt",
+          "type": "jwt",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 39,
+          "end": 118
+        }
+      ],
+      "note": "A JWT embedded in an unstructured log line, bounded only by whitespace, is detected the same as bare plain-text."
+    },
+    {
+      "id": "jwt-positive-context-shell",
+      "detector": "jwt",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export TOKEN='eyJTWU5USEVUSUNfSEVBREVS.eyJTWU5USEVUSUNfUEFZTE9BRA.SYNTHETIC_REVOKED_SIGNATURE'",
+      "expected": [
+        {
+          "detector": "jwt",
+          "type": "jwt",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 14,
+          "end": 93
+        }
+      ],
+      "note": "A JWT wrapped in single quotes inside a shell variable assignment is detected the same as bare plain-text."
+    },
+    {
+      "id": "jwt-positive-structural-despite-fabricated-claims",
+      "detector": "jwt",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJzdWIiOiJzeW50aGV0aWMtcmV2b2tlZC1zdWJqZWN0IiwiZXhwIjoxfQ.SYNTHETIC_REVOKED_UNSIGNED_PLACEHOLDER",
+      "expected": [
+        {
+          "detector": "jwt",
+          "type": "jwt",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 0,
+          "end": 133
+        }
+      ],
+      "note": "Expiry, `alg:none`, and a fabricated or absent signature are policy and structural questions the base64url-decoded claims would answer, not proof the token is harmless; this detector never decodes or evaluates claims, so an already-expired, unsigned, alg:none-header token (all synthetic, all revoked) is still detected the same as any other structurally valid three-segment shape. Excluding it would require semantic decoding this detector intentionally does not do."
+    },
+    {
       "id": "jwt-negative-payload-not-json-prefixed",
       "detector": "jwt",
       "kind": "negative",
@@ -10610,6 +10730,183 @@
         }
       ],
       "note": "A structured JWT displaces the broader Bearer candidate."
+    },
+    {
+      "id": "bearer-overlap-basic-scheme-excluded",
+      "detector": "bearer-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Authorization: Basic ZGVtb3VzZXI6ZGVtb3Bhc3N3b3Jk",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "authorization_credential",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 21,
+          "end": 49
+        }
+      ],
+      "note": "HTTP Basic authorization is excluded from bearer-token specifically: the grammar requires the literal 'bearer' keyword, so a Basic-scheme header never reaches its scheme check. The value is not left unguarded, though — generic-token's broader authorization_credential rule still claims it, the same scheme-agnostic pattern authorization-positive-basic already documents for a bare (non-bearer-token-adjacent) Basic header. This is the Basic-versus-Bearer scheme separation: bearer-token owns only the 'bearer' literal, and a sibling contextual detector covers the rest."
+    },
+    {
+      "id": "bearer-negative-missing-value",
+      "detector": "bearer-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Authorization: Bearer",
+      "expected": [],
+      "note": "An Authorization header whose Bearer scheme has no following whitespace or value at all is excluded: the required separator never appears, so there is no credential run to measure."
+    },
+    {
+      "id": "bearer-boundary-newline-separator",
+      "detector": "bearer-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "mutation": {
+        "grammar": "bearer-token",
+        "seedId": "bearer-boundary-newline-separator",
+        "operation": "declared-boundary",
+        "ordinal": 0
+      },
+      "input": "Bearer\nSYNTHETIC_REVOKED_BEARER_NEWLINE_VALUE",
+      "expected": [],
+      "note": "Only a space or a tab separates the Bearer keyword from its credential; a newline is deliberately excluded from that separator charset, so a scheme keyword immediately followed by a line break never reaches a value."
+    },
+    {
+      "id": "bearer-positive-tab-and-uppercase",
+      "detector": "bearer-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "BEARER\tSYNTHETIC_REVOKED_BEARER_TAB_VALUE",
+      "expected": [
+        {
+          "detector": "bearer-token",
+          "type": "bearer_token",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 7,
+          "end": 41
+        }
+      ],
+      "note": "The scheme keyword is matched case-insensitively and a tab is accepted as the separator, not only a space."
+    },
+    {
+      "id": "bearer-positive-authorization-extra-whitespace-and-case",
+      "detector": "bearer-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "AUTHORIZATION  :  BEARER   SYNTHETIC_REVOKED_BEARER_CASE_WS_VALUE",
+      "expected": [
+        {
+          "detector": "bearer-token",
+          "type": "bearer_token",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 27,
+          "end": 65
+        }
+      ],
+      "note": "Uppercase 'AUTHORIZATION'/'BEARER' keywords and extra whitespace around the header colon and before the credential are all accepted; the case and whitespace policy is flexible on both sides of the scheme."
+    },
+    {
+      "id": "bearer-positive-context-json",
+      "detector": "bearer-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"authorization\": \"Bearer SYNTHETIC_REVOKED_BEARER_JSON_VALUE\"}",
+      "expected": [
+        {
+          "detector": "bearer-token",
+          "type": "bearer_token",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 26,
+          "end": 61
+        }
+      ],
+      "note": "A Bearer credential sitting as a quoted JSON string value is detected the same as bare plain-text."
+    },
+    {
+      "id": "bearer-positive-context-log",
+      "detector": "bearer-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "log"
+      ],
+      "input": "INFO request completed Authorization: Bearer SYNTHETIC_REVOKED_BEARER_LOG_VALUE",
+      "expected": [
+        {
+          "detector": "bearer-token",
+          "type": "bearer_token",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 45,
+          "end": 79
+        }
+      ],
+      "note": "A Bearer credential embedded in an unstructured log line is detected the same as bare plain-text."
+    },
+    {
+      "id": "bearer-negative-prose-ordinary",
+      "detector": "bearer-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "The bearer of this letter is authorized to collect the package.",
+      "expected": [],
+      "note": "Ordinary English prose using 'bearer' as a common noun stays negative whenever the word that follows it is short: the token-length floor, not any language awareness, is what keeps this safe."
+    },
+    {
+      "id": "bearer-boundary-prose-long-word-tradeoff",
+      "detector": "bearer-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Please note the bearer identification-verification-procedure must be followed.",
+      "expected": [
+        {
+          "detector": "bearer-token",
+          "type": "bearer_token",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 23,
+          "end": 60
+        }
+      ],
+      "note": "Ordinary English prose using 'bearer' as a common noun immediately followed by a long hyphenated word is indistinguishable from a real credential at the character-grammar level and is classified: an accepted precision/recall tradeoff (the same kind the doc-style-placeholder fixtures document for provider detectors), not a bug. Nothing short of semantic language understanding, which this detector intentionally does not attempt, could exclude it."
     },
     {
       "id": "bearer-adversarial-punctuation",
@@ -21357,825 +21654,6 @@
       "note": "A value one byte short of the required 40-byte length is rejected rather than truncated, even with new-relic context present."
     },
     {
-      "id": "new-relic-license-key-adversarial-dense-findings",
-      "detector": "new-relic-license-key",
-      "kind": "adversarial",
-      "support": "supported",
-      "tier": "adversarial",
-      "contexts": [
-        "plain-text"
-      ],
-      "resource": {
-        "maxInputBytes": 4108,
-        "maxFindings": 100,
-        "maxRuntimeMs": 250
-      },
-      "input": "newrelic 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567",
-      "expected": [
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 9,
-          "end": 49
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 50,
-          "end": 90
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 91,
-          "end": 131
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 132,
-          "end": 172
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 173,
-          "end": 213
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 214,
-          "end": 254
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 255,
-          "end": 295
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 296,
-          "end": 336
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 337,
-          "end": 377
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 378,
-          "end": 418
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 419,
-          "end": 459
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 460,
-          "end": 500
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 501,
-          "end": 541
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 542,
-          "end": 582
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 583,
-          "end": 623
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 624,
-          "end": 664
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 665,
-          "end": 705
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 706,
-          "end": 746
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 747,
-          "end": 787
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 788,
-          "end": 828
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 829,
-          "end": 869
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 870,
-          "end": 910
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 911,
-          "end": 951
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 952,
-          "end": 992
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 993,
-          "end": 1033
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 1034,
-          "end": 1074
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 1075,
-          "end": 1115
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 1116,
-          "end": 1156
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 1157,
-          "end": 1197
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 1198,
-          "end": 1238
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 1239,
-          "end": 1279
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 1280,
-          "end": 1320
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 1321,
-          "end": 1361
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 1362,
-          "end": 1402
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 1403,
-          "end": 1443
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 1444,
-          "end": 1484
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 1485,
-          "end": 1525
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 1526,
-          "end": 1566
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 1567,
-          "end": 1607
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 1608,
-          "end": 1648
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 1649,
-          "end": 1689
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 1690,
-          "end": 1730
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 1731,
-          "end": 1771
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 1772,
-          "end": 1812
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 1813,
-          "end": 1853
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 1854,
-          "end": 1894
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 1895,
-          "end": 1935
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 1936,
-          "end": 1976
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 1977,
-          "end": 2017
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 2018,
-          "end": 2058
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 2059,
-          "end": 2099
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 2100,
-          "end": 2140
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 2141,
-          "end": 2181
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 2182,
-          "end": 2222
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 2223,
-          "end": 2263
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 2264,
-          "end": 2304
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 2305,
-          "end": 2345
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 2346,
-          "end": 2386
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 2387,
-          "end": 2427
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 2428,
-          "end": 2468
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 2469,
-          "end": 2509
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 2510,
-          "end": 2550
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 2551,
-          "end": 2591
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 2592,
-          "end": 2632
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 2633,
-          "end": 2673
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 2674,
-          "end": 2714
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 2715,
-          "end": 2755
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 2756,
-          "end": 2796
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 2797,
-          "end": 2837
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 2838,
-          "end": 2878
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 2879,
-          "end": 2919
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 2920,
-          "end": 2960
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 2961,
-          "end": 3001
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 3002,
-          "end": 3042
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 3043,
-          "end": 3083
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 3084,
-          "end": 3124
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 3125,
-          "end": 3165
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 3166,
-          "end": 3206
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 3207,
-          "end": 3247
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 3248,
-          "end": 3288
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 3289,
-          "end": 3329
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 3330,
-          "end": 3370
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 3371,
-          "end": 3411
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 3412,
-          "end": 3452
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 3453,
-          "end": 3493
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 3494,
-          "end": 3534
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 3535,
-          "end": 3575
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 3576,
-          "end": 3616
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 3617,
-          "end": 3657
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 3658,
-          "end": 3698
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 3699,
-          "end": 3739
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 3740,
-          "end": 3780
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 3781,
-          "end": 3821
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 3822,
-          "end": 3862
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 3863,
-          "end": 3903
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 3904,
-          "end": 3944
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 3945,
-          "end": 3985
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 3986,
-          "end": 4026
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 4027,
-          "end": 4067
-        },
-        {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
-          "start": 4068,
-          "end": 4108
-        }
-      ],
-      "note": "A single new-relic-context-bearing line densely packed with candidate-shaped runs stays linear: per-line (not per-candidate) context checks keep this bounded."
-    },
-    {
       "id": "huggingface-positive-doc-style-placeholder",
       "detector": "huggingface-token",
       "kind": "positive",
@@ -23185,6 +22663,1021 @@
       "input": "Rotate your key at https://app.sendgrid.com/settings/api_keys before Friday.",
       "expected": [],
       "note": "A harmless SendGrid dashboard URL and ordinary provider-name prose carry no two-segment SG.<id>.<secret> shape and are not classified."
+    },
+    {
+      "id": "private-key-negative-public-key-full-block",
+      "detector": "private-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "-----BEGIN PUBLIC KEY-----\nU1lOVEhFVElDX1JFVk9LRURfUFVCTElDX0JMT0NL\n-----END PUBLIC KEY-----",
+      "expected": [],
+      "note": "issue #322: a complete, well-formed PUBLIC KEY PEM block -- valid delimiters and a genuine encoded body, not just a bare header -- is excluded end to end, not only when truncated to its BEGIN line alone; PUBLIC KEY is never in the detector's accepted label set."
+    },
+    {
+      "id": "private-key-positive-mixed-public-and-private-blocks",
+      "detector": "private-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "-----BEGIN PUBLIC KEY-----\nU1lOVEhFVElDX1JFVk9LRURfUFVCTElDX0JMT0NL\n-----END PUBLIC KEY-----\n-----BEGIN PRIVATE KEY-----\nU1lOVEhFVElDX1JFVk9LRURfTUlYRURfRE9DVU1FTlQ=\n-----END PRIVATE KEY-----",
+      "expected": [
+        {
+          "detector": "private-key",
+          "type": "private_key",
+          "confidence": "high",
+          "specificity": "private-key",
+          "start": 93,
+          "end": 191
+        }
+      ],
+      "note": "issue #322: paired guard for private-key-negative-public-key-full-block -- a document carrying a non-matching public-key block immediately followed by a genuine private-key block still finds exactly the private-key span, at the correct offset, with the public block contributing no finding and no interference."
+    },
+    {
+      "id": "private-key-negative-label-only-prose",
+      "detector": "private-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "markdown"
+      ],
+      "input": "Rotate credentials by replacing the block between the BEGIN PRIVATE KEY and END PRIVATE KEY markers in config/keys.pem.",
+      "expected": [],
+      "note": "issue #322: ordinary documentation prose that names the BEGIN PRIVATE KEY / END PRIVATE KEY markers in English sentence text, with no delimiter dashes at all, matches no delimiter grammar and is excluded -- a label-only mention is not a PEM block."
+    },
+    {
+      "id": "private-key-negative-delimiter-like-prose-markdown",
+      "detector": "private-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "markdown"
+      ],
+      "input": "-----\n## BEGIN Private Key Rotation Runbook\nRotate every service-account private key on a 90-day cadence.\n## END Private Key Rotation Runbook\n-----",
+      "expected": [],
+      "note": "issue #322: a markdown document uses genuine five-dash horizontal-rule lines and separately mentions BEGIN/END and Private Key as heading words, but never as the single contiguous '-----BEGIN <label>-----' token the grammar requires -- delimiter-like text embedded in prose is excluded."
+    },
+    {
+      "id": "private-key-positive-markdown-prose-then-real-block",
+      "detector": "private-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "markdown"
+      ],
+      "input": "-----\n## BEGIN Private Key Rotation Runbook\nRotate every service-account private key on a 90-day cadence.\n## END Private Key Rotation Runbook\n-----\n\n-----BEGIN EC PRIVATE KEY-----\nU1lOVEhFVElDX1JFVk9LRURfTUFSS0RPV05fVFJBSUxJTkc=\n-----END EC PRIVATE KEY-----",
+      "expected": [
+        {
+          "detector": "private-key",
+          "type": "private_key",
+          "confidence": "high",
+          "specificity": "private-key",
+          "start": 149,
+          "end": 257
+        }
+      ],
+      "note": "issue #322: paired guard for private-key-negative-delimiter-like-prose-markdown -- delimiter-like prose noise earlier in the same document does not suppress a genuine trailing PEM block, which is still found at its own correct offset."
+    },
+    {
+      "id": "private-key-boundary-empty-body",
+      "detector": "private-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "-----BEGIN PRIVATE KEY-----\n-----END PRIVATE KEY-----",
+      "expected": [],
+      "note": "issue #322: a well-paired PRIVATE KEY block with zero body bytes between its delimiters has no encoded-body evidence at all, so it is excluded even though the delimiter pair itself is complete and well-formed; this cannot discard real key material since an empty body carries none."
+    },
+    {
+      "id": "private-key-boundary-body-below-threshold",
+      "detector": "private-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "-----BEGIN PRIVATE KEY-----\nSYNTHETICSHORT1\n-----END PRIVATE KEY-----",
+      "expected": [],
+      "note": "issue #322: a well-paired block whose body is a 15-byte run of base64-alphabet characters -- one byte short of the detector's 16-byte minimum-evidence threshold -- is excluded. This is an accepted precision tradeoff, not a claim the body cannot be real key material: see the paired surviving positive, private-key-positive-body-at-threshold, for the exact byte where detection resumes."
+    },
+    {
+      "id": "private-key-positive-body-at-threshold",
+      "detector": "private-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "-----BEGIN PRIVATE KEY-----\nSYNTHETICSHORT16\n-----END PRIVATE KEY-----",
+      "expected": [
+        {
+          "detector": "private-key",
+          "type": "private_key",
+          "confidence": "high",
+          "specificity": "private-key",
+          "start": 0,
+          "end": 70
+        }
+      ],
+      "note": "issue #322: paired guard for private-key-boundary-body-below-threshold -- a well-paired block whose body is a 16-byte run of base64-alphabet characters, exactly at the detector's minimum-evidence threshold, is detected."
+    },
+    {
+      "id": "private-key-boundary-truncated-crlf",
+      "detector": "private-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "-----BEGIN PRIVATE KEY-----\r\nSYNTHETIC_TRUNCATED_CRLF",
+      "expected": [],
+      "note": "issue #322: an incomplete header with no matching footer is ignored identically whether the line ending is LF (private-key-boundary-truncated) or CRLF -- the exclusion is not an artifact of a specific line-ending byte."
+    },
+    {
+      "id": "private-key-positive-multiple-labels-adjacent",
+      "detector": "private-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "-----BEGIN RSA PRIVATE KEY-----\nU1lOVEhFVElDX1JFVk9LRURfTVVMVElQTEVfUlNB\n-----END RSA PRIVATE KEY-----\n-----BEGIN EC PRIVATE KEY-----\nU1lOVEhFVElDX1JFVk9LRURfTVVMVElQTEVfRUM=\n-----END EC PRIVATE KEY-----",
+      "expected": [
+        {
+          "detector": "private-key",
+          "type": "private_key",
+          "confidence": "high",
+          "specificity": "private-key",
+          "start": 0,
+          "end": 102
+        },
+        {
+          "detector": "private-key",
+          "type": "private_key",
+          "confidence": "high",
+          "specificity": "private-key",
+          "start": 103,
+          "end": 203
+        }
+      ],
+      "note": "issue #322: two adjacent complete blocks under different accepted labels (RSA PRIVATE KEY, EC PRIVATE KEY) each produce their own separate finding at their own span; multiple labels in one input do not merge or shadow each other."
+    },
+    {
+      "id": "private-key-positive-crlf-unicode-prefix",
+      "detector": "private-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# \ud83d\udd11 caf\u00e9\r\n-----BEGIN PRIVATE KEY-----\r\nU1lOVEhFVElDX0NSTEZfVU5JQ09ERV9QUkVGSVg=\r\n-----END PRIVATE KEY-----\r\n",
+      "expected": [
+        {
+          "detector": "private-key",
+          "type": "private_key",
+          "confidence": "high",
+          "specificity": "private-key",
+          "start": 14,
+          "end": 110
+        }
+      ],
+      "note": "issue #322: a match after a CRLF line ending and a Unicode-prefixed comment line is still found at the correct UTF-8 byte offset, matching the convention used for the provider-token detectors' own crlf-unicode-prefix fixtures."
+    },
+    {
+      "id": "new-relic-license-key-adversarial-dense-findings",
+      "detector": "new-relic-license-key",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 4108,
+        "maxFindings": 100,
+        "maxRuntimeMs": 250
+      },
+      "input": "newrelic 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567",
+      "expected": [
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 9,
+          "end": 49
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 50,
+          "end": 90
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 91,
+          "end": 131
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 132,
+          "end": 172
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 173,
+          "end": 213
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 214,
+          "end": 254
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 255,
+          "end": 295
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 296,
+          "end": 336
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 337,
+          "end": 377
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 378,
+          "end": 418
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 419,
+          "end": 459
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 460,
+          "end": 500
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 501,
+          "end": 541
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 542,
+          "end": 582
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 583,
+          "end": 623
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 624,
+          "end": 664
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 665,
+          "end": 705
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 706,
+          "end": 746
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 747,
+          "end": 787
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 788,
+          "end": 828
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 829,
+          "end": 869
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 870,
+          "end": 910
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 911,
+          "end": 951
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 952,
+          "end": 992
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 993,
+          "end": 1033
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1034,
+          "end": 1074
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1075,
+          "end": 1115
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1116,
+          "end": 1156
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1157,
+          "end": 1197
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1198,
+          "end": 1238
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1239,
+          "end": 1279
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1280,
+          "end": 1320
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1321,
+          "end": 1361
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1362,
+          "end": 1402
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1403,
+          "end": 1443
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1444,
+          "end": 1484
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1485,
+          "end": 1525
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1526,
+          "end": 1566
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1567,
+          "end": 1607
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1608,
+          "end": 1648
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1649,
+          "end": 1689
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1690,
+          "end": 1730
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1731,
+          "end": 1771
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1772,
+          "end": 1812
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1813,
+          "end": 1853
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1854,
+          "end": 1894
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1895,
+          "end": 1935
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1936,
+          "end": 1976
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1977,
+          "end": 2017
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2018,
+          "end": 2058
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2059,
+          "end": 2099
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2100,
+          "end": 2140
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2141,
+          "end": 2181
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2182,
+          "end": 2222
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2223,
+          "end": 2263
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2264,
+          "end": 2304
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2305,
+          "end": 2345
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2346,
+          "end": 2386
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2387,
+          "end": 2427
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2428,
+          "end": 2468
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2469,
+          "end": 2509
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2510,
+          "end": 2550
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2551,
+          "end": 2591
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2592,
+          "end": 2632
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2633,
+          "end": 2673
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2674,
+          "end": 2714
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2715,
+          "end": 2755
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2756,
+          "end": 2796
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2797,
+          "end": 2837
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2838,
+          "end": 2878
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2879,
+          "end": 2919
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2920,
+          "end": 2960
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2961,
+          "end": 3001
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3002,
+          "end": 3042
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3043,
+          "end": 3083
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3084,
+          "end": 3124
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3125,
+          "end": 3165
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3166,
+          "end": 3206
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3207,
+          "end": 3247
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3248,
+          "end": 3288
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3289,
+          "end": 3329
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3330,
+          "end": 3370
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3371,
+          "end": 3411
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3412,
+          "end": 3452
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3453,
+          "end": 3493
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3494,
+          "end": 3534
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3535,
+          "end": 3575
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3576,
+          "end": 3616
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3617,
+          "end": 3657
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3658,
+          "end": 3698
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3699,
+          "end": 3739
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3740,
+          "end": 3780
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3781,
+          "end": 3821
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3822,
+          "end": 3862
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3863,
+          "end": 3903
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3904,
+          "end": 3944
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3945,
+          "end": 3985
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3986,
+          "end": 4026
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 4027,
+          "end": 4067
+        },
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 4068,
+          "end": 4108
+        }
+      ],
+      "note": "A single new-relic-context-bearing line densely packed with candidate-shaped runs stays linear: per-line (not per-candidate) context checks keep this bounded."
     }
   ]
 }

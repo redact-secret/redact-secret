@@ -303,7 +303,7 @@
           "end": 20
         }
       ],
-      "note": "issue #318: aws-access-key's scan_prefixed_runs uses RunLength::Exact(16), a family it shares with github-token, new_relic, notion, sentry, and twilio. Its discriminating boundary is the byte immediately after the fixed-length run: one more alphanumeric byte there turns a match into the rejected longer run on the second line (deliberately a distinct value from the first line's, not a shared prefix, so the rejected run's own un-redacted text can never coincide with the first line's detected value). A chunk split anywhere in either run, including exactly at that boundary byte, must still resolve to the single first-line finding, the same as the whole-input scan — the Exact-length-family counterpart to stripe-public-secret-prefix-discriminating-boundary's AtLeast-family exemplar."
+      "note": "issue #318: aws-access-key's scan_prefixed_runs uses RunLength::Exact(16), a family it shares with github-token, new_relic, notion, sentry, and twilio. Its discriminating boundary is the byte immediately after the fixed-length run: one more alphanumeric byte there turns a match into the rejected longer run on the second line (deliberately a distinct value from the first line's, not a shared prefix, so the rejected run's own un-redacted text can never coincide with the first line's detected value). A chunk split anywhere in either run, including exactly at that boundary byte, must still resolve to the single first-line finding, the same as the whole-input scan \u2014 the Exact-length-family counterpart to stripe-public-secret-prefix-discriminating-boundary's AtLeast-family exemplar."
     },
     {
       "id": "multiline-private-key",
@@ -782,6 +782,70 @@
         }
       ],
       "note": "issue #321: an ordinary SG.-prefixed identifier with no second segment and a real documented two-segment key on adjacent lines stay correctly discriminated at every chunk split, including splits that fall inside the 'SG.' prefix itself."
+    },
+    {
+      "id": "private-key-public-block-then-real-key-discriminating-boundary",
+      "input": "-----BEGIN PUBLIC KEY-----\nU1lOVEhFVElDX1JFVk9LRURfUFVCTElDX0JMT0NL\n-----END PUBLIC KEY-----\n-----BEGIN PRIVATE KEY-----\nU1lOVEhFVElDX1JFVk9LRURfSU5DUkVNRU5UQUxfRElTQw==\n-----END PRIVATE KEY-----",
+      "text": "-----BEGIN PUBLIC KEY-----\nU1lOVEhFVElDX1JFVk9LRURfUFVCTElDX0JMT0NL\n-----END PUBLIC KEY-----\n<SECRET_1>",
+      "expected": [
+        {
+          "detector": "private-key",
+          "type": "private_key",
+          "confidence": "high",
+          "specificity": "private-key",
+          "start": 93,
+          "end": 195
+        }
+      ],
+      "note": "issue #322: a complete non-matching PUBLIC KEY block and a genuine adjacent PRIVATE KEY block stay correctly discriminated at every chunk split, including splits that fall inside either block's own delimiter bytes."
+    },
+    {
+      "id": "private-key-empty-body-then-real-key-discriminating-boundary",
+      "input": "-----BEGIN PRIVATE KEY-----\n-----END PRIVATE KEY-----\n-----BEGIN EC PRIVATE KEY-----\nU1lOVEhFVElDX1JFVk9LRURfRU1QVFlfVEhFTl9SRUFM\n-----END EC PRIVATE KEY-----",
+      "text": "-----BEGIN PRIVATE KEY-----\n-----END PRIVATE KEY-----\n<SECRET_1>",
+      "expected": [
+        {
+          "detector": "private-key",
+          "type": "private_key",
+          "confidence": "high",
+          "specificity": "private-key",
+          "start": 54,
+          "end": 158
+        }
+      ],
+      "note": "issue #322: a well-paired but empty-body PRIVATE KEY block (no encoded-body evidence) and a genuine adjacent EC PRIVATE KEY block stay correctly discriminated at every chunk split, including splits that fall inside either block's own delimiter bytes."
+    },
+    {
+      "id": "jwt-near-miss-short-signature-discriminating-boundary",
+      "input": "eyJAAAAA.eyJAAAAA.short\neyJTWU5USEVUSUNfSEVBREVS.eyJTWU5USEVUSUNfUEFZTE9BRA.SYNTHETIC_REVOKED_SIGNATURE",
+      "text": "eyJAAAAA.eyJAAAAA.short\n<SECRET_1>",
+      "expected": [
+        {
+          "detector": "jwt",
+          "type": "jwt",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 24,
+          "end": 103
+        }
+      ],
+      "note": "issue #323: an eyJ-prefixed near-miss whose signature segment is one byte short of the 16-byte minimum (a documented boundary this grammar rejects) sits directly before a genuine three-segment token on the next line, sharing the same leading eyJ bytes the detector inspects. Every UTF-8 chunk split, including splits that fall inside either line's own eyJ-prefixed segments, must still discriminate the two the same way the whole-input scan does."
+    },
+    {
+      "id": "bearer-token-lookalike-identifier-discriminating-boundary",
+      "input": "notbearer SYNTHETIC_REVOKED_IDENTIFIER_VALUE_LONG\nBearer SYNTHETIC_REVOKED_BEARER_INCREMENTAL_VALUE",
+      "text": "notbearer SYNTHETIC_REVOKED_IDENTIFIER_VALUE_LONG\nBearer <SECRET_1>",
+      "expected": [
+        {
+          "detector": "bearer-token",
+          "type": "bearer_token",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 57,
+          "end": 99
+        }
+      ],
+      "note": "issue #323: the word 'bearer' embedded inside a wider identifier ('notbearer', already excluded by the boundary check) sits directly before a genuine explicit Bearer scheme on the next line, sharing the same 'bearer' bytes the detector's scheme match inspects. Every UTF-8 chunk split, including splits that fall inside either line's 'bearer' text, must still discriminate the two the same way the whole-input scan does."
     },
     {
       "id": "vault-embedded-identifier-discriminating-boundary",
