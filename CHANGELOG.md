@@ -5,6 +5,30 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+- Added `datadog-api-key` and `datadog-application-key` detectors recognizing
+  Datadog API Keys and Application Keys: community-observed (gitleaks,
+  trufflehog) bare lowercase-hex values -- 32 bytes for an API Key, 40 bytes
+  for an Application Key -- with no vendor-documented character-class grammar
+  of their own, though Datadog's own docs publish the `DD-API-KEY` /
+  `DD-APPLICATION-KEY` header names and `DD_API_KEY` / `DD_APPLICATION_KEY`
+  environment variable names. Neither key carries a paired public identifier
+  the way a Twilio Account SID or API Key SID does, so each detector requires
+  reliable Datadog context on the same line as the candidate: a specific
+  same-line marker naming the key type (`dd_api_key`, `dd-application-key`,
+  and similar `-`/`_`-joined spellings of the documented header/env-var
+  names, high confidence) or, absent that, a bare case-insensitive `datadog`
+  substring (medium confidence). The bare two-letter `dd` form is never
+  checked as an unanchored keyword, since it collides with ordinary English
+  inside `address`, `middleware`, and similar words; it remains reachable
+  only as part of the longer specific markers. Both types are
+  provider-specific and confidence-gated (redact at high confidence, warn at
+  medium) rather than unconditionally always-redact. A specific marker or the
+  bare vendor word on a *different* line from the value is a documented,
+  known false negative: context is scoped to a single line so whole-input and
+  incremental (line-at-a-time) scanning agree. The two distinct finding types
+  record, in metadata, the issue's requested distinction between an
+  ingestion credential (API Key) and broader application-API authority
+  (Application Key).
 - Added `twilio-auth-token` and `twilio-api-key-secret` detectors recognizing
   Twilio Auth Tokens and API Key Secrets: community-observed (gitleaks,
   trufflehog) bare 32-byte values -- lowercase hex for an Auth Token,

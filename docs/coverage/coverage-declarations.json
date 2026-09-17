@@ -3335,6 +3335,172 @@
       "type": "twilio_api_key_secret"
     },
     {
+      "behaviorClass": "provider",
+      "detector": "datadog-api-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "datadog-api-key-positive-bare-with-header-marker",
+            "datadog-api-key-positive-dotenv-marker",
+            "datadog-api-key-positive-json-marker",
+            "datadog-api-key-positive-yaml-vendor-keyword",
+            "datadog-api-key-regression-crlf-and-unicode-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "datadog-api-key-overlap-beats-bearer-token"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "datadog-api-key-adversarial-dense-findings"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "datadog-api-key-boundary-key-record-id",
+            "datadog-api-key-boundary-wrong-length"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "datadog-api-key-negative-bare-dd-mention-no-key-type-wording",
+            "datadog-api-key-negative-bare-value-with-no-context",
+            "datadog-api-key-negative-context-on-a-different-line",
+            "datadog-api-key-negative-environment-variable-reference",
+            "datadog-api-key-negative-non-hex-placeholder-characters",
+            "datadog-api-key-negative-repeated-character-filler"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "datadog-api-key-boundary-key-record-id",
+            "datadog-api-key-boundary-wrong-length"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for datadog_api_key (datadog-api-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "datadog_api_key"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "datadog-application-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "datadog-application-key-positive-app-key-shorthand-marker",
+            "datadog-application-key-positive-bare-with-header-marker",
+            "datadog-application-key-positive-dotenv-marker",
+            "datadog-application-key-positive-json-vendor-keyword",
+            "datadog-application-key-regression-crlf-and-unicode-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "datadog-application-key-overlap-beats-bearer-token"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "datadog-application-key-adversarial-dense-findings"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "datadog-application-key-boundary-wrong-length",
+            "datadog-application-key-boundary-wrong-length-is-api-key-shaped"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "datadog-application-key-negative-bare-value-with-no-context",
+            "datadog-application-key-negative-context-on-a-different-line",
+            "datadog-application-key-negative-environment-variable-reference",
+            "datadog-application-key-negative-repeated-character-filler"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "datadog-application-key-boundary-wrong-length",
+            "datadog-application-key-boundary-wrong-length-is-api-key-shaped"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for datadog_application_key (datadog-application-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "datadog_application_key"
+    },
+    {
       "behaviorClass": "incremental",
       "detector": "unassigned",
       "dimensions": [
@@ -3376,6 +3542,8 @@
             "contextual-assignment-nested-no-separator-inside-quote",
             "contextual-assignment-nested-no-separator-masked-value",
             "contextual-assignment-stops-at-line-terminator",
+            "datadog-api-key-line-scoped-context-different-line",
+            "datadog-api-key-line-scoped-context-same-line",
             "encoded-connection",
             "fixed-width-unicode",
             "github-installation-stateless",
@@ -3408,6 +3576,8 @@
             "connection-adversarial-malformed-authority",
             "connection-adversarial-overlong",
             "contextual-adversarial-overlong",
+            "datadog-api-key-adversarial-dense-findings",
+            "datadog-application-key-adversarial-dense-findings",
             "digitalocean-adversarial-long-suffix",
             "discord-bot-token-adversarial-long-padding",
             "docker-adversarial-long-suffix",
@@ -3614,6 +3784,8 @@
             "contextual-assignment-nested-no-separator-inside-quote",
             "contextual-assignment-nested-no-separator-masked-value",
             "contextual-assignment-stops-at-line-terminator",
+            "datadog-api-key-line-scoped-context-different-line",
+            "datadog-api-key-line-scoped-context-same-line",
             "encoded-connection",
             "fixed-width-unicode",
             "github-installation-stateless",
@@ -3704,6 +3876,8 @@
             "connection-adversarial-malformed-authority",
             "connection-adversarial-overlong",
             "contextual-adversarial-overlong",
+            "datadog-api-key-adversarial-dense-findings",
+            "datadog-application-key-adversarial-dense-findings",
             "digitalocean-adversarial-long-suffix",
             "discord-bot-token-adversarial-long-padding",
             "docker-adversarial-long-suffix",
@@ -3968,6 +4142,8 @@
             "contextual-assignment-nested-no-separator-inside-quote",
             "contextual-assignment-nested-no-separator-masked-value",
             "contextual-assignment-stops-at-line-terminator",
+            "datadog-api-key-line-scoped-context-different-line",
+            "datadog-api-key-line-scoped-context-same-line",
             "encoded-connection",
             "fixed-width-unicode",
             "github-installation-stateless",

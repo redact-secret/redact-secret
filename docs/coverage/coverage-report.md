@@ -15,11 +15,11 @@ These counts describe finding-type inventory rows with corpus evidence, not dete
 
 | Row state | Count |
 | --- | --- |
-| supported | 35 |
+| supported | 37 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 46.
+Coverage declarations: 48.
 
 ## Coverage by detector
 
@@ -32,6 +32,8 @@ Coverage declarations: 46.
 | bearer-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | cloudflare-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | connection-string | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| datadog-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| datadog-application-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | digitalocean-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | discord-bot-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | docker-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -73,6 +75,8 @@ Coverage declarations: 46.
 | cloudflare_api_token | cloudflare-token | provider | supported | not-applicable | none |
 | connection_string_password | connection-string | structural | supported | supported | none |
 | contextual_secret | generic-token | contextual | supported | not-applicable | none |
+| datadog_api_key | datadog-api-key | provider | supported | not-applicable | none |
+| datadog_application_key | datadog-application-key | provider | supported | not-applicable | none |
 | digitalocean_token | digitalocean-token | provider | supported | not-applicable | none |
 | discord_bot_token | discord-bot-token | provider | supported | not-applicable | none |
 | docker_token | docker-token | provider | supported | not-applicable | none |
@@ -124,15 +128,15 @@ Coverage declarations: 46.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 46 | 0 | 0 |
-| boundary | 35 | 0 | 0 |
-| host-context | 35 | 0 | 0 |
+| adversarial | 48 | 0 | 0 |
+| boundary | 37 | 0 | 0 |
+| host-context | 37 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 46 | 0 | 0 |
-| near-miss-negative | 35 | 0 | 0 |
-| overlap | 35 | 0 | 0 |
-| positive | 35 | 0 | 0 |
-| range | 46 | 0 | 0 |
+| malformed | 48 | 0 | 0 |
+| near-miss-negative | 37 | 0 | 0 |
+| overlap | 37 | 0 | 0 |
+| positive | 37 | 0 | 0 |
+| range | 48 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

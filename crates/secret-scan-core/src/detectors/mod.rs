@@ -15,6 +15,7 @@ mod aws;
 mod azure_devops;
 mod bearer_token;
 mod connection_string;
+mod datadog;
 mod discord;
 mod generic_token;
 mod github;
@@ -74,6 +75,8 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(twilio::TwilioApiKeySecretDetector),
         telegram::telegram_bot_token_detector(),
         Box::new(discord::DiscordBotTokenDetector),
+        Box::new(datadog::DatadogApiKeyDetector),
+        Box::new(datadog::DatadogApplicationKeyDetector),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
         Box::new(ConnectionStringDetector),
@@ -135,6 +138,8 @@ mod tests {
                 "twilio-api-key-secret",
                 "telegram-bot-token",
                 "discord-bot-token",
+                "datadog-api-key",
+                "datadog-application-key",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -184,7 +189,10 @@ mod tests {
             "twilio SKaB3dE5gH7jK9mN1pQ3sT5vW7yZ9AbC3d zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE";
         let telegram_input = "123456:SYNTHETIC_REVOKED_TELEGRAM_BOT_TOKEN_SECRET";
         let discord_input = "MDAwMDAwMDAwMDAwMDAwMDAw.REVOKE.SYNTHETICREVOKEDBOTTOKENFIX";
-        let cases: [(&str, &str); 28] = [
+        let datadog_api_key_input = "DD_API_KEY=0123456789abcdef0123456789abcdef";
+        let datadog_application_key_input =
+            "DD_APPLICATION_KEY=0123456789abcdef0123456789abcdef01234567";
+        let cases: [(&str, &str); 30] = [
             ("aws-access-key", "AKIASYNTHETICEXAMPLE"),
             (
                 "github-token",
@@ -228,6 +236,8 @@ mod tests {
             ("twilio-api-key-secret", twilio_api_key_secret_input),
             ("discord-bot-token", discord_input),
             ("telegram-bot-token", telegram_input),
+            ("datadog-api-key", datadog_api_key_input),
+            ("datadog-application-key", datadog_application_key_input),
         ];
         let detectors = built_in_detectors();
         for (id, input) in cases {
