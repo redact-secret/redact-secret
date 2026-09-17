@@ -315,8 +315,7 @@ mod tests {
 
     #[test]
     fn duplicate_secret_parameters_select_only_the_first_occurrence() {
-        let input =
-            "otpauth://totp/Example:alice@example.com?secret=JBSWY3DPEHPK3PXPAAAA&secret=JBSWY3DPEHPK3PXPBBBB";
+        let input = "otpauth://totp/Example:alice@example.com?secret=JBSWY3DPEHPK3PXPAAAA&secret=JBSWY3DPEHPK3PXPBBBB";
         let candidates = detect(input);
         let (start, end) = only_range(&candidates);
         assert_eq!(&input[start..end], "JBSWY3DPEHPK3PXPAAAA");
