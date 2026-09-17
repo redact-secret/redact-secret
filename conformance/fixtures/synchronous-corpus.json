@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 833,
+  "fixtureCount": 844,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -21144,6 +21144,202 @@
         }
       ],
       "note": "A single new-relic-context-bearing line densely packed with candidate-shaped runs stays linear: per-line (not per-candidate) context checks keep this bounded."
+    },
+    {
+      "id": "private-key-negative-public-key-full-block",
+      "detector": "private-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "-----BEGIN PUBLIC KEY-----\nU1lOVEhFVElDX1JFVk9LRURfUFVCTElDX0JMT0NL\n-----END PUBLIC KEY-----",
+      "expected": [],
+      "note": "issue #322: a complete, well-formed PUBLIC KEY PEM block -- valid delimiters and a genuine encoded body, not just a bare header -- is excluded end to end, not only when truncated to its BEGIN line alone; PUBLIC KEY is never in the detector's accepted label set."
+    },
+    {
+      "id": "private-key-positive-mixed-public-and-private-blocks",
+      "detector": "private-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "-----BEGIN PUBLIC KEY-----\nU1lOVEhFVElDX1JFVk9LRURfUFVCTElDX0JMT0NL\n-----END PUBLIC KEY-----\n-----BEGIN PRIVATE KEY-----\nU1lOVEhFVElDX1JFVk9LRURfTUlYRURfRE9DVU1FTlQ=\n-----END PRIVATE KEY-----",
+      "expected": [
+        {
+          "detector": "private-key",
+          "type": "private_key",
+          "confidence": "high",
+          "specificity": "private-key",
+          "start": 93,
+          "end": 191
+        }
+      ],
+      "note": "issue #322: paired guard for private-key-negative-public-key-full-block -- a document carrying a non-matching public-key block immediately followed by a genuine private-key block still finds exactly the private-key span, at the correct offset, with the public block contributing no finding and no interference."
+    },
+    {
+      "id": "private-key-negative-label-only-prose",
+      "detector": "private-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "markdown"
+      ],
+      "input": "Rotate credentials by replacing the block between the BEGIN PRIVATE KEY and END PRIVATE KEY markers in config/keys.pem.",
+      "expected": [],
+      "note": "issue #322: ordinary documentation prose that names the BEGIN PRIVATE KEY / END PRIVATE KEY markers in English sentence text, with no delimiter dashes at all, matches no delimiter grammar and is excluded -- a label-only mention is not a PEM block."
+    },
+    {
+      "id": "private-key-negative-delimiter-like-prose-markdown",
+      "detector": "private-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "markdown"
+      ],
+      "input": "-----\n## BEGIN Private Key Rotation Runbook\nRotate every service-account private key on a 90-day cadence.\n## END Private Key Rotation Runbook\n-----",
+      "expected": [],
+      "note": "issue #322: a markdown document uses genuine five-dash horizontal-rule lines and separately mentions BEGIN/END and Private Key as heading words, but never as the single contiguous '-----BEGIN <label>-----' token the grammar requires -- delimiter-like text embedded in prose is excluded."
+    },
+    {
+      "id": "private-key-positive-markdown-prose-then-real-block",
+      "detector": "private-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "markdown"
+      ],
+      "input": "-----\n## BEGIN Private Key Rotation Runbook\nRotate every service-account private key on a 90-day cadence.\n## END Private Key Rotation Runbook\n-----\n\n-----BEGIN EC PRIVATE KEY-----\nU1lOVEhFVElDX1JFVk9LRURfTUFSS0RPV05fVFJBSUxJTkc=\n-----END EC PRIVATE KEY-----",
+      "expected": [
+        {
+          "detector": "private-key",
+          "type": "private_key",
+          "confidence": "high",
+          "specificity": "private-key",
+          "start": 149,
+          "end": 257
+        }
+      ],
+      "note": "issue #322: paired guard for private-key-negative-delimiter-like-prose-markdown -- delimiter-like prose noise earlier in the same document does not suppress a genuine trailing PEM block, which is still found at its own correct offset."
+    },
+    {
+      "id": "private-key-boundary-empty-body",
+      "detector": "private-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "-----BEGIN PRIVATE KEY-----\n-----END PRIVATE KEY-----",
+      "expected": [],
+      "note": "issue #322: a well-paired PRIVATE KEY block with zero body bytes between its delimiters has no encoded-body evidence at all, so it is excluded even though the delimiter pair itself is complete and well-formed; this cannot discard real key material since an empty body carries none."
+    },
+    {
+      "id": "private-key-boundary-body-below-threshold",
+      "detector": "private-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "-----BEGIN PRIVATE KEY-----\nSYNTHETICSHORT1\n-----END PRIVATE KEY-----",
+      "expected": [],
+      "note": "issue #322: a well-paired block whose body is a 15-byte run of base64-alphabet characters -- one byte short of the detector's 16-byte minimum-evidence threshold -- is excluded. This is an accepted precision tradeoff, not a claim the body cannot be real key material: see the paired surviving positive, private-key-positive-body-at-threshold, for the exact byte where detection resumes."
+    },
+    {
+      "id": "private-key-positive-body-at-threshold",
+      "detector": "private-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "-----BEGIN PRIVATE KEY-----\nSYNTHETICSHORT16\n-----END PRIVATE KEY-----",
+      "expected": [
+        {
+          "detector": "private-key",
+          "type": "private_key",
+          "confidence": "high",
+          "specificity": "private-key",
+          "start": 0,
+          "end": 70
+        }
+      ],
+      "note": "issue #322: paired guard for private-key-boundary-body-below-threshold -- a well-paired block whose body is a 16-byte run of base64-alphabet characters, exactly at the detector's minimum-evidence threshold, is detected."
+    },
+    {
+      "id": "private-key-boundary-truncated-crlf",
+      "detector": "private-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "-----BEGIN PRIVATE KEY-----\r\nSYNTHETIC_TRUNCATED_CRLF",
+      "expected": [],
+      "note": "issue #322: an incomplete header with no matching footer is ignored identically whether the line ending is LF (private-key-boundary-truncated) or CRLF -- the exclusion is not an artifact of a specific line-ending byte."
+    },
+    {
+      "id": "private-key-positive-multiple-labels-adjacent",
+      "detector": "private-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "-----BEGIN RSA PRIVATE KEY-----\nU1lOVEhFVElDX1JFVk9LRURfTVVMVElQTEVfUlNB\n-----END RSA PRIVATE KEY-----\n-----BEGIN EC PRIVATE KEY-----\nU1lOVEhFVElDX1JFVk9LRURfTVVMVElQTEVfRUM=\n-----END EC PRIVATE KEY-----",
+      "expected": [
+        {
+          "detector": "private-key",
+          "type": "private_key",
+          "confidence": "high",
+          "specificity": "private-key",
+          "start": 0,
+          "end": 102
+        },
+        {
+          "detector": "private-key",
+          "type": "private_key",
+          "confidence": "high",
+          "specificity": "private-key",
+          "start": 103,
+          "end": 203
+        }
+      ],
+      "note": "issue #322: two adjacent complete blocks under different accepted labels (RSA PRIVATE KEY, EC PRIVATE KEY) each produce their own separate finding at their own span; multiple labels in one input do not merge or shadow each other."
+    },
+    {
+      "id": "private-key-positive-crlf-unicode-prefix",
+      "detector": "private-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# \ud83d\udd11 caf\u00e9\r\n-----BEGIN PRIVATE KEY-----\r\nU1lOVEhFVElDX0NSTEZfVU5JQ09ERV9QUkVGSVg=\r\n-----END PRIVATE KEY-----\r\n",
+      "expected": [
+        {
+          "detector": "private-key",
+          "type": "private_key",
+          "confidence": "high",
+          "specificity": "private-key",
+          "start": 14,
+          "end": 110
+        }
+      ],
+      "note": "issue #322: a match after a CRLF line ending and a Unicode-prefixed comment line is still found at the correct UTF-8 byte offset, matching the convention used for the provider-token detectors' own crlf-unicode-prefix fixtures."
     }
   ]
 }

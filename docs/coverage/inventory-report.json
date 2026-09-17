@@ -65,9 +65,10 @@
     {
       "detector": "private-key",
       "evidence": {
-        "fixtureCount": 16,
+        "fixtureCount": 27,
         "hostContextsExercised": [
           "json",
+          "markdown",
           "plain-text"
         ],
         "kindsWithSupportedEvidence": [
@@ -83,11 +84,16 @@
       },
       "evidenceFixtureIds": [
         "private-key-positive",
+        "private-key-positive-body-at-threshold",
         "private-key-positive-crlf-line-endings",
+        "private-key-positive-crlf-unicode-prefix",
         "private-key-positive-dsa-label",
         "private-key-positive-encrypted-label",
         "private-key-positive-json-escaped-newlines",
         "private-key-positive-json-service-account-export",
+        "private-key-positive-markdown-prose-then-real-block",
+        "private-key-positive-mixed-public-and-private-blocks",
+        "private-key-positive-multiple-labels-adjacent",
         "private-key-positive-openssh-multiline-body"
       ],
       "policyClass": "block",

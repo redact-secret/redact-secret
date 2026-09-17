@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 44,
+  "fixtureCount": 46,
   "fixtures": [
     {
       "id": "synthetic-regression-malformed-authority",
@@ -718,6 +718,38 @@
         }
       ],
       "note": "issue #317: the unversioned 'sk-ant-' prefix (a documented false-negative tradeoff no detector claims) and the versioned 'sk-ant-api03-' prefix (claimed by anthropic-token) share the same leading bytes the openai-token detector also inspects to exclude the Anthropic namespace. Every UTF-8 chunk split, including splits that fall inside 'ant-' or 'api03-' themselves, must still discriminate the two the same way the whole-input reference does."
+    },
+    {
+      "id": "private-key-public-block-then-real-key-discriminating-boundary",
+      "input": "-----BEGIN PUBLIC KEY-----\nU1lOVEhFVElDX1JFVk9LRURfUFVCTElDX0JMT0NL\n-----END PUBLIC KEY-----\n-----BEGIN PRIVATE KEY-----\nU1lOVEhFVElDX1JFVk9LRURfSU5DUkVNRU5UQUxfRElTQw==\n-----END PRIVATE KEY-----",
+      "text": "-----BEGIN PUBLIC KEY-----\nU1lOVEhFVElDX1JFVk9LRURfUFVCTElDX0JMT0NL\n-----END PUBLIC KEY-----\n<SECRET_1>",
+      "expected": [
+        {
+          "detector": "private-key",
+          "type": "private_key",
+          "confidence": "high",
+          "specificity": "private-key",
+          "start": 93,
+          "end": 195
+        }
+      ],
+      "note": "issue #322: a complete non-matching PUBLIC KEY block and a genuine adjacent PRIVATE KEY block stay correctly discriminated at every chunk split, including splits that fall inside either block's own delimiter bytes."
+    },
+    {
+      "id": "private-key-empty-body-then-real-key-discriminating-boundary",
+      "input": "-----BEGIN PRIVATE KEY-----\n-----END PRIVATE KEY-----\n-----BEGIN EC PRIVATE KEY-----\nU1lOVEhFVElDX1JFVk9LRURfRU1QVFlfVEhFTl9SRUFM\n-----END EC PRIVATE KEY-----",
+      "text": "-----BEGIN PRIVATE KEY-----\n-----END PRIVATE KEY-----\n<SECRET_1>",
+      "expected": [
+        {
+          "detector": "private-key",
+          "type": "private_key",
+          "confidence": "high",
+          "specificity": "private-key",
+          "start": 54,
+          "end": 158
+        }
+      ],
+      "note": "issue #322: a well-paired but empty-body PRIVATE KEY block (no encoded-body evidence) and a genuine adjacent EC PRIVATE KEY block stay correctly discriminated at every chunk split, including splits that fall inside either block's own delimiter bytes."
     }
   ]
 }
