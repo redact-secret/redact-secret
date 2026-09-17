@@ -5,6 +5,23 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+- Fixed the pino logging example (`examples/logging-redaction/pino-hook.mjs`)
+  to redact a secret split across a `msg` format string and its printf-style
+  interpolation values, or across two interpolation values, within one log
+  call. The hook previously scanned `msg` and each interpolation value as
+  independent leaves, before pino ever formats them together, so a value
+  like `logger.info("api_key=%s", token)` was never joined and never seen as
+  one string by the scanner. `msg` and its interpolation values are now
+  joined into the exact string pino's own `quick-format-unescaped`
+  dependency would produce (`examples/logging-redaction/format-pino-message.mjs`,
+  a byte-for-byte vendored port, verified against the real package) before
+  redaction runs. `pino` and `quick-format-unescaped` are now pinned
+  `devDependencies`, exercised by a real, pinned pino `10.3.1` consumer test
+  asserting on exact destination bytes
+  (`examples/logging-redaction/pino-consumer.test.mjs`). This is an example
+  integration fix, not a change to the Rust core's detection. Python's
+  `logging.Filter` integration already formatted `msg`/`args` before
+  scanning and was not affected.
 - Preserve `__proto__` and other prototype-named JSON keys as own data in
   tracing, logging, and MCP redaction examples, without changing prototypes.
 - Sanitize cached Python logging exception text and emit a fixed marker when
