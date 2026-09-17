@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 768,
+  "fixtureCount": 783,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -3234,7 +3234,7 @@
       "support": "supported",
       "tier": "negative",
       "contexts": [
-        "plain-text"
+        "shell"
       ],
       "input": "sk_live_${STRIPE_SECRET_KEY}",
       "expected": [],
@@ -3283,6 +3283,116 @@
         }
       ],
       "note": "A public identifier and a secret credential on adjacent lines: the public prefix never generates a candidate at all (not merely suppressed by overlap resolution), while the paired secret is still classified with the correct range."
+    },
+    {
+      "id": "stripe-positive-dotenv",
+      "detector": "stripe-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "STRIPE_SECRET_KEY=sk_live_SYNTHETICREVOKEDSYNTHETICREVOKED",
+      "expected": [
+        {
+          "detector": "stripe-token",
+          "type": "stripe_credential",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 18,
+          "end": 58
+        }
+      ],
+      "note": "A bare dotenv-style assignment (STRIPE_SECRET_KEY=<token>, no quotes) is detected by format alone."
+    },
+    {
+      "id": "stripe-positive-json",
+      "detector": "stripe-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"stripeSecretKey\": \"sk_live_SYNTHETICREVOKEDSYNTHETICREVOKED\"}",
+      "expected": [
+        {
+          "detector": "stripe-token",
+          "type": "stripe_credential",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 21,
+          "end": 61
+        }
+      ],
+      "note": "A quoted JSON string value is detected the same as a bare one; the enclosing quotes are not part of the match."
+    },
+    {
+      "id": "stripe-positive-yaml",
+      "detector": "stripe-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "stripe_secret_key: sk_live_SYNTHETICREVOKEDSYNTHETICREVOKED\n",
+      "expected": [
+        {
+          "detector": "stripe-token",
+          "type": "stripe_credential",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 19,
+          "end": 59
+        }
+      ],
+      "note": "A YAML mapping value is detected the same as a bare one."
+    },
+    {
+      "id": "stripe-positive-log",
+      "detector": "stripe-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-16T00:00:00Z INFO processing payment key=sk_live_SYNTHETICREVOKEDSYNTHETICREVOKED account=example",
+      "expected": [
+        {
+          "detector": "stripe-token",
+          "type": "stripe_credential",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 49,
+          "end": 89
+        }
+      ],
+      "note": "A provider token embedded in a structured log line is still detected."
+    },
+    {
+      "id": "stripe-positive-crlf-unicode-prefix",
+      "detector": "stripe-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# \ud83d\udd11 caf\u00e9\r\nsk_live_SYNTHETICREVOKEDSYNTHETICREVOKED\r\n",
+      "expected": [
+        {
+          "detector": "stripe-token",
+          "type": "stripe_credential",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 54
+        }
+      ],
+      "note": "A match after a CRLF line ending and a Unicode-prefixed comment line is still found at the correct UTF-8 byte offset."
     },
     {
       "id": "slack-positive-qualified",
@@ -5103,7 +5213,7 @@
       "support": "supported",
       "tier": "negative",
       "contexts": [
-        "plain-text"
+        "shell"
       ],
       "input": "sb_secret_${SUPABASE_SERVICE_ROLE_KEY}",
       "expected": [],
@@ -5152,6 +5262,116 @@
         }
       ],
       "note": "A public identifier and a secret credential on adjacent lines: the public prefix never generates a candidate at all (not merely suppressed by overlap resolution), while the paired secret is still classified with the correct range."
+    },
+    {
+      "id": "supabase-positive-dotenv",
+      "detector": "supabase-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "SUPABASE_SERVICE_ROLE_KEY=sb_secret_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_",
+      "expected": [
+        {
+          "detector": "supabase-token",
+          "type": "supabase_secret_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 26,
+          "end": 72
+        }
+      ],
+      "note": "A bare dotenv-style assignment (SUPABASE_SERVICE_ROLE_KEY=<token>, no quotes) is detected by format alone."
+    },
+    {
+      "id": "supabase-positive-json",
+      "detector": "supabase-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"supabaseServiceRoleKey\": \"sb_secret_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\"}",
+      "expected": [
+        {
+          "detector": "supabase-token",
+          "type": "supabase_secret_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 28,
+          "end": 74
+        }
+      ],
+      "note": "A quoted JSON string value is detected the same as a bare one; the enclosing quotes are not part of the match."
+    },
+    {
+      "id": "supabase-positive-yaml",
+      "detector": "supabase-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "supabase_service_role_key: sb_secret_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\n",
+      "expected": [
+        {
+          "detector": "supabase-token",
+          "type": "supabase_secret_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 27,
+          "end": 73
+        }
+      ],
+      "note": "A YAML mapping value is detected the same as a bare one."
+    },
+    {
+      "id": "supabase-positive-log",
+      "detector": "supabase-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-16T00:00:00Z INFO refreshing session key=sb_secret_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_ project=example",
+      "expected": [
+        {
+          "detector": "supabase-token",
+          "type": "supabase_secret_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 49,
+          "end": 95
+        }
+      ],
+      "note": "A provider token embedded in a structured log line is still detected."
+    },
+    {
+      "id": "supabase-positive-crlf-unicode-prefix",
+      "detector": "supabase-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# \ud83d\udd11 caf\u00e9\r\nsb_secret_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\r\n",
+      "expected": [
+        {
+          "detector": "supabase-token",
+          "type": "supabase_secret_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 60
+        }
+      ],
+      "note": "A match after a CRLF line ending and a Unicode-prefixed comment line is still found at the correct UTF-8 byte offset."
     },
     {
       "id": "vercel-positive-qualified",
@@ -7690,7 +7910,7 @@
       "support": "supported",
       "tier": "negative",
       "contexts": [
-        "plain-text"
+        "shell"
       ],
       "input": "shpat_${SHOPIFY_ADMIN_API_TOKEN}",
       "expected": [],
@@ -7739,6 +7959,116 @@
         }
       ],
       "note": "A public identifier and a secret credential on adjacent lines: the public prefix never generates a candidate at all (not merely suppressed by overlap resolution), while the paired secret is still classified with the correct range."
+    },
+    {
+      "id": "shopify-positive-dotenv",
+      "detector": "shopify-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "SHOPIFY_ADMIN_API_TOKEN=shpat_SYNTHETIC_REVOKED_SHOPIFY_TOKEN",
+      "expected": [
+        {
+          "detector": "shopify-token",
+          "type": "shopify_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 24,
+          "end": 61
+        }
+      ],
+      "note": "A bare dotenv-style assignment (SHOPIFY_ADMIN_API_TOKEN=<token>, no quotes) is detected by format alone."
+    },
+    {
+      "id": "shopify-positive-json",
+      "detector": "shopify-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"shopifyAdminApiToken\": \"shpat_SYNTHETIC_REVOKED_SHOPIFY_TOKEN\"}",
+      "expected": [
+        {
+          "detector": "shopify-token",
+          "type": "shopify_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 26,
+          "end": 63
+        }
+      ],
+      "note": "A quoted JSON string value is detected the same as a bare one; the enclosing quotes are not part of the match."
+    },
+    {
+      "id": "shopify-positive-yaml",
+      "detector": "shopify-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "shopify_admin_api_token: shpat_SYNTHETIC_REVOKED_SHOPIFY_TOKEN\n",
+      "expected": [
+        {
+          "detector": "shopify-token",
+          "type": "shopify_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 62
+        }
+      ],
+      "note": "A YAML mapping value is detected the same as a bare one."
+    },
+    {
+      "id": "shopify-positive-log",
+      "detector": "shopify-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-16T00:00:00Z INFO syncing catalog token=shpat_SYNTHETIC_REVOKED_SHOPIFY_TOKEN shop=example.myshopify.com",
+      "expected": [
+        {
+          "detector": "shopify-token",
+          "type": "shopify_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 48,
+          "end": 85
+        }
+      ],
+      "note": "A provider token embedded in a structured log line is still detected."
+    },
+    {
+      "id": "shopify-positive-crlf-unicode-prefix",
+      "detector": "shopify-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# \ud83d\udd11 caf\u00e9\r\nshpat_SYNTHETIC_REVOKED_SHOPIFY_TOKEN\r\n",
+      "expected": [
+        {
+          "detector": "shopify-token",
+          "type": "shopify_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 51
+        }
+      ],
+      "note": "A match after a CRLF line ending and a Unicode-prefixed comment line is still found at the correct UTF-8 byte offset."
     },
     {
       "id": "vault-positive-service-token",

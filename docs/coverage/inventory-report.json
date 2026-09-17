@@ -292,9 +292,14 @@
     {
       "detector": "shopify-token",
       "evidence": {
-        "fixtureCount": 20,
+        "fixtureCount": 25,
         "hostContextsExercised": [
-          "plain-text"
+          "dotenv",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "yaml"
         ],
         "kindsWithSupportedEvidence": [
           "adversarial",
@@ -310,9 +315,14 @@
       "evidenceFixtureIds": [
         "shopify-positive-admin-access",
         "shopify-positive-all-prefixes",
+        "shopify-positive-crlf-unicode-prefix",
         "shopify-positive-doc-style-placeholder",
+        "shopify-positive-dotenv",
+        "shopify-positive-json",
+        "shopify-positive-log",
         "shopify-positive-min-length",
-        "shopify-positive-mixed-public-and-secret"
+        "shopify-positive-mixed-public-and-secret",
+        "shopify-positive-yaml"
       ],
       "policyClass": "always-redact",
       "schemeRows": "not-applicable",
@@ -350,9 +360,14 @@
     {
       "detector": "stripe-token",
       "evidence": {
-        "fixtureCount": 20,
+        "fixtureCount": 25,
         "hostContextsExercised": [
-          "plain-text"
+          "dotenv",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "yaml"
         ],
         "kindsWithSupportedEvidence": [
           "adversarial",
@@ -367,10 +382,15 @@
       },
       "evidenceFixtureIds": [
         "stripe-positive-all-prefixes",
+        "stripe-positive-crlf-unicode-prefix",
         "stripe-positive-doc-style-placeholder",
+        "stripe-positive-dotenv",
+        "stripe-positive-json",
+        "stripe-positive-log",
         "stripe-positive-min-length",
         "stripe-positive-mixed-public-and-secret",
-        "stripe-positive-qualified"
+        "stripe-positive-qualified",
+        "stripe-positive-yaml"
       ],
       "policyClass": "always-redact",
       "schemeRows": "not-applicable",
@@ -573,9 +593,14 @@
     {
       "detector": "supabase-token",
       "evidence": {
-        "fixtureCount": 19,
+        "fixtureCount": 24,
         "hostContextsExercised": [
-          "plain-text"
+          "dotenv",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "yaml"
         ],
         "kindsWithSupportedEvidence": [
           "adversarial",
@@ -589,10 +614,15 @@
         ]
       },
       "evidenceFixtureIds": [
+        "supabase-positive-crlf-unicode-prefix",
         "supabase-positive-doc-style-placeholder",
+        "supabase-positive-dotenv",
+        "supabase-positive-json",
+        "supabase-positive-log",
         "supabase-positive-min-length",
         "supabase-positive-mixed-public-and-secret",
-        "supabase-positive-qualified"
+        "supabase-positive-qualified",
+        "supabase-positive-yaml"
       ],
       "policyClass": "always-redact",
       "schemeRows": "not-applicable",
