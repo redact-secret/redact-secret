@@ -1406,12 +1406,80 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "datadog_application_key"
+    },
+    {
+      "detector": "grafana-service-account-token",
+      "evidence": {
+        "fixtureCount": 15,
+        "hostContextsExercised": [
+          "dotenv",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "grafana-service-account-token-positive-bare",
+        "grafana-service-account-token-positive-crlf-unicode-prefix",
+        "grafana-service-account-token-positive-dotenv",
+        "grafana-service-account-token-positive-json",
+        "grafana-service-account-token-positive-log",
+        "grafana-service-account-token-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "grafana_service_account_token"
+    },
+    {
+      "detector": "grafana-cloud-access-policy-token",
+      "evidence": {
+        "fixtureCount": 12,
+        "hostContextsExercised": [
+          "dotenv",
+          "json",
+          "plain-text"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "grafana-cloud-access-policy-token-positive-dotenv",
+        "grafana-cloud-access-policy-token-positive-json",
+        "grafana-cloud-access-policy-token-positive-min-length",
+        "grafana-cloud-access-policy-token-positive-qualified",
+        "grafana-cloud-access-policy-token-regression-crlf-unicode-prefix"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "grafana_cloud_access_policy_token"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 37,
+    "supported": 39,
     "unresolved": 0
   }
 }

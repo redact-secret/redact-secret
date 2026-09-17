@@ -5,6 +5,24 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+- Added `grafana-service-account-token` and `grafana-cloud-access-policy-token`
+  detectors. The service account detector matches the documented `glsa_`
+  prefix, an exact 32-byte alphanumeric body, a literal `_` separator, and an
+  exact 8-byte hex checksum -- a shape shown in Grafana's own example request
+  and corroborated by gitleaks's and trufflehog's independent Grafana rules
+  (consulted only as external behavioral references; no code copied from
+  either project). The Cloud access policy detector matches the documented
+  `glc_` prefix followed by a minimum 32-byte base64 body (`[A-Za-z0-9+/]`),
+  the same floor gitleaks's rule uses; trufflehog's narrower `glc_eyJ`-anchored
+  variant, which encodes a single tool's implementation detail rather than a
+  confirmed provider fact, was deliberately not adopted. Grafana's legacy
+  (pre-service-account) API key -- an unprefixed base64-encoded JSON blob --
+  is an explicit, documented out-of-scope gap: it is deprecated by Grafana in
+  favor of service accounts and carries no Grafana-owned marker beyond a
+  generic base64/JSON convention this crate's `jwt` and generic-token
+  detectors already cover the same false-positive risk for. Both new
+  detectors are always-redact, provider-specific, and win any overlap with
+  the generic contextual detector.
 - Added `datadog-api-key` and `datadog-application-key` detectors recognizing
   Datadog API Keys and Application Keys: community-observed (gitleaks,
   trufflehog) bare lowercase-hex values -- 32 bytes for an API Key, 40 bytes
