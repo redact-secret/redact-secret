@@ -6,9 +6,10 @@
 //! module reimplements just enough of "literal prefix, then a bounded run of
 //! an alphabet, then a byte-adjacent boundary check" to reproduce the
 //! TypeScript oracle's `RegExp` + `TOKEN_CHARACTER` guard idiom without a
-//! regex engine. Every provider pattern in `src/detectors/*.ts` reduces to
-//! this shape except the `OpenAI` exclusion, which [`super::openai`] implements
-//! directly with the same primitives.
+//! regex engine. Every provider pattern in `src/detectors/*.ts` reduced to
+//! this shape except `OpenAI`'s, which [`super::openai`] composes directly
+//! from the same primitives (two exact-length segments around a literal
+//! marker, plus the Anthropic namespace exclusion).
 
 /// A byte-membership predicate for a token alphabet, e.g. `[A-Za-z0-9_-]`.
 pub(super) type Alphabet = fn(u8) -> bool;

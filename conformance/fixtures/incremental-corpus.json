@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 59,
+  "fixtureCount": 63,
   "fixtures": [
     {
       "id": "synthetic-regression-malformed-authority",
@@ -11,7 +11,7 @@
     },
     {
       "id": "legacy-variable-detector-families",
-      "input": "sk-proj-SYNTHETIC_REVOKED_INCREMENTAL_KEY\nsk-ant-api03-SYNTHETIC_REVOKED_INCREMENTAL_KEY\nshpat_SYNTHETIC_REVOKED_INCREMENTAL_TOKEN\nhvs.SYNTHETIC_REVOKED_INCREMENTAL_TOKEN\nBearer SYNTHETIC_REVOKED_INCREMENTAL_BEARER",
+      "input": "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\nsk-ant-api03-SYNTHETIC_REVOKED_INCREMENTAL_KEY\nshpat_SYNTHETIC_REVOKED_INCREMENTAL_TOKEN\nhvs.SYNTHETIC_REVOKED_INCREMENTAL_TOKEN\nBearer SYNTHETIC_REVOKED_INCREMENTAL_BEARER",
       "text": "<SECRET_1>\n<SECRET_2>\n<SECRET_3>\n<SECRET_4>\nBearer <SECRET_5>",
       "expected": [
         {
@@ -20,42 +20,42 @@
           "confidence": "high",
           "specificity": "provider",
           "start": 0,
-          "end": 41
+          "end": 164
         },
         {
           "detector": "anthropic-token",
           "type": "anthropic_api_key",
           "confidence": "high",
           "specificity": "provider",
-          "start": 42,
-          "end": 88
+          "start": 165,
+          "end": 211
         },
         {
           "detector": "shopify-token",
           "type": "shopify_access_token",
           "confidence": "high",
           "specificity": "provider",
-          "start": 89,
-          "end": 130
+          "start": 212,
+          "end": 253
         },
         {
           "detector": "vault-token",
           "type": "vault_token",
           "confidence": "high",
           "specificity": "provider",
-          "start": 131,
-          "end": 170
+          "start": 254,
+          "end": 293
         },
         {
           "detector": "bearer-token",
           "type": "bearer_token",
           "confidence": "high",
           "specificity": "structural",
-          "start": 178,
-          "end": 214
+          "start": 301,
+          "end": 337
         }
       ],
-      "note": "Every pre-expansion variable-length detector family remains whole across UTF-16 and UTF-8 partitions."
+      "note": "Every pre-expansion variable-length detector family remains whole across UTF-16 and UTF-8 partitions. (issue #368: the openai-token line now carries the contracted marker shape; the marker-less value it replaced is no longer claimed.)"
     },
     {
       "id": "additional-provider-families",
@@ -958,6 +958,86 @@
         }
       ],
       "note": "issue #325: an otpauth:// occurrence immediately preceded by an identifier character ('x', a truncated slice of a wider identifier rather than a boundary-delimited URI) sits directly before a genuine otpauth:// URI on the next line, sharing the same otpauth://totp/Example:alice@example.com?secret= bytes the detector scans through. Every UTF-8 chunk split, including splits that fall inside either line's shared prefix bytes or inside the secret value itself, must still discriminate the two the same way the whole-input scan does -- the otpauth-uri counterpart to vault-embedded-identifier-discriminating-boundary's boundary_blocked family."
+    },
+    {
+      "id": "openai-legacy-marker-twin-discriminating-boundary",
+      "input": "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\nsk-SYNTHETICREVOKED0001T3BlbkFKSYNTHETICREVOKED0002",
+      "text": "<SECRET_1>\nsk-SYNTHETICREVOKED0001T3BlbkFKSYNTHETICREVOKED0002",
+      "expected": [
+        {
+          "detector": "openai-token",
+          "type": "openai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 51
+        }
+      ],
+      "note": "issue #368: the positive and its twin differ in one structural property, so every UTF-8 byte and char partition must resolve the same single finding as the whole-input scan, including splits inside the `T3BlbkFJ` marker and at the 73/74-byte segment boundary. Here the twin mutates the marker's last byte."
+    },
+    {
+      "id": "openai-project-length-twin-discriminating-boundary",
+      "input": "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\nsk-proj-SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTT3BlbkFJSYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SY",
+      "text": "<SECRET_1>\nsk-proj-SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTT3BlbkFJSYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SY",
+      "expected": [
+        {
+          "detector": "openai-token",
+          "type": "openai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 164
+        }
+      ],
+      "note": "issue #368: the positive and its twin differ in one structural property, so every UTF-8 byte and char partition must resolve the same single finding as the whole-input scan, including splits inside the `T3BlbkFJ` marker and at the 73/74-byte segment boundary. Here the twin drops one byte from the 74-byte left segment."
+    },
+    {
+      "id": "openai-svcacct-length-twin-discriminating-boundary",
+      "input": "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\nsk-svcacct-SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTT3BlbkFJSYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SY",
+      "text": "<SECRET_1>\nsk-svcacct-SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTT3BlbkFJSYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SY",
+      "expected": [
+        {
+          "detector": "openai-token",
+          "type": "openai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 167
+        }
+      ],
+      "note": "issue #368: the positive and its twin differ in one structural property, so every UTF-8 byte and char partition must resolve the same single finding as the whole-input scan, including splits inside the `T3BlbkFJ` marker and at the 73/74-byte segment boundary. Here the twin drops one byte from the 74-byte left segment."
+    },
+    {
+      "id": "openai-368-unicode-crlf-pairs",
+      "input": "# 🔑 reviewed format\r\n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\n\r\n# 🔑 reviewed format\r\nsk-CETkIjobDgQhiCSRBjSgT3BlbkFKjwnQ0FqBPH7mULVtCSjs\n\r\n# 🔑 reviewed format\r\n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\n\r\n# 🔑 reviewed format\r\nsk-proj-XQaEbXdYpB2bY4iugTKGKEsfpzbarfDE4qLowLdD4YAe8PTMyFPUAxlT3gVQhyppB4rNDqRBuT3BlbkFJs3wTeLdTFRFjZCzIBROCBs0r30BvMe4LSjGlMmIQjdpQfuWnojoR0WCEDCvGp09Cf68wvz90Ng\n\r\n# 🔑 reviewed format\r\n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\n\r\n# 🔑 reviewed format\r\nsk-svcacct-vOuQp18EMEQEexlPHizducCt2ZpSuVfwijDiYEVKQUDWDw9W1yvOhrgPkZdA5dgmxJl2lbPXYT3BlbkFJFFBjTH5S5JmqBkLzL8FupQ65xXFRMDWZoyHUcRFMmsOEL2SBu2ptiTCJBWqgqUwVrscOG1VYQD\n\r\n",
+      "text": "# 🔑 reviewed format\r\n<SECRET_1>\n\r\n# 🔑 reviewed format\r\nsk-CETkIjobDgQhiCSRBjSgT3BlbkFKjwnQ0FqBPH7mULVtCSjs\n\r\n# 🔑 reviewed format\r\n<SECRET_2>\n\r\n# 🔑 reviewed format\r\nsk-proj-XQaEbXdYpB2bY4iugTKGKEsfpzbarfDE4qLowLdD4YAe8PTMyFPUAxlT3gVQhyppB4rNDqRBuT3BlbkFJs3wTeLdTFRFjZCzIBROCBs0r30BvMe4LSjGlMmIQjdpQfuWnojoR0WCEDCvGp09Cf68wvz90Ng\n\r\n# 🔑 reviewed format\r\n<SECRET_3>\n\r\n# 🔑 reviewed format\r\nsk-svcacct-vOuQp18EMEQEexlPHizducCt2ZpSuVfwijDiYEVKQUDWDw9W1yvOhrgPkZdA5dgmxJl2lbPXYT3BlbkFJFFBjTH5S5JmqBkLzL8FupQ65xXFRMDWZoyHUcRFMmsOEL2SBu2ptiTCJBWqgqUwVrscOG1VYQD\n\r\n",
+      "expected": [
+        {
+          "detector": "openai-token",
+          "type": "openai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 24,
+          "end": 75
+        },
+        {
+          "detector": "openai-token",
+          "type": "openai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 180,
+          "end": 344
+        },
+        {
+          "detector": "openai-token",
+          "type": "openai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 561,
+          "end": 728
+        }
+      ],
+      "note": "issue #368: the three Unicode/CRLF positives and their twins from the issue's self-contained reproduction, concatenated; each astral emoji and CRLF shifts the byte offsets and every partition must still resolve exactly the three positives."
     }
   ]
 }

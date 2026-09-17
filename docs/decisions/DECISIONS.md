@@ -33,3 +33,4 @@ future planning and implementation but do not authorize Git or release actions.
 - [Freeze the Sentry user and organization auth token grammar as two unambiguous prefixed shapes](2026-09-16-freeze-sentry-user-and-organization-auth-token-grammar.md)
 - [Freeze the Grafana service account and Cloud access policy token grammar, and exclude the legacy API key](2026-09-16-freeze-grafana-service-account-and-cloud-access-policy-token-grammar.md)
 - [Freeze the Datadog API Key and Application Key grammar as marker-gated lowercase-hex values](2026-09-16-freeze-datadog-api-application-key-grammar.md)
+- [Freeze the OpenAI API key grammar as a marker-gated shape with exact segment lengths](2026-09-17-freeze-openai-api-key-grammar.md)

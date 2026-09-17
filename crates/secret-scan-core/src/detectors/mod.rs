@@ -248,7 +248,10 @@ mod tests {
                 &"ghp_SYNTHETICREVOKEDVALUE0000000000000000"[..40],
             ),
             ("gitlab-token", "glpat-SYNTHETIC_REVOKED_TOKEN_FIXTURE"),
-            ("openai-token", "sk-proj-SYNTHETIC_REVOKED_OPENAI_KEY"),
+            (
+                "openai-token",
+                "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",
+            ),
             (
                 "anthropic-token",
                 "sk-ant-api03-SYNTHETIC_REVOKED_ANTHROPIC_KEY",

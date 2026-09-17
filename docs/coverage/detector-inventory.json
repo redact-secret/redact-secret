@@ -44,7 +44,7 @@
       "type": "openai_api_key",
       "detector": "openai-token",
       "policyClass": "always-redact",
-      "reconciliationTrigger": "sk-proj-SYNTHETIC_REVOKED_OPENAI_KEY",
+      "reconciliationTrigger": "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",
       "schemes": null
     },
     {

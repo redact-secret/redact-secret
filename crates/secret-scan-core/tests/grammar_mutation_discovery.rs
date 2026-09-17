@@ -30,12 +30,16 @@
 //!   minimized input and its provenance, ready to promote into
 //!   `conformance/fixtures/synchronous-corpus.json` at `tier: "regression"`; or
 //! - an **expected exploratory difference**: a documented, intentional
-//!   detector policy (right now, exactly one: `openai-token`'s exclusion of
-//!   Anthropic's `sk-ant-` namespace, which the plain prefix/run/boundary
-//!   model has no way to express) that `EXPECTED_EXPLORATORY_DIFFERENCES`
-//!   names explicitly. The suite also asserts every declared entry actually
-//!   fires, so a stale allowance (the exclusion changing or disappearing)
-//!   is itself caught.
+//!   detector policy the plain prefix/run/boundary model has no way to
+//!   express, which `EXPECTED_EXPLORATORY_DIFFERENCES` names explicitly.
+//!   The suite also asserts every declared entry actually fires, so a stale
+//!   allowance (the exclusion changing or disappearing) is itself caught.
+//!   The list is empty today: `openai-token` used to be the one entry (its
+//!   `sk-ant-` exclusion), but since issue #368 that detector requires a
+//!   literal `T3BlbkFJ` marker between two exact-length segments, a
+//!   compound shape this model does not describe at all, so it is no longer
+//!   a grammar here. Its boundary mutations live as explicit fixtures in
+//!   `conformance/fixtures/synchronous-corpus.json` instead.
 
 #![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 
@@ -228,21 +232,8 @@ const VERCEL: Grammar = Grammar {
     boundary: is_alnum_dash,
 };
 
-/// The bare `sk-` form only (`sk-proj-`/`sk-svcacct-` are a distinct
-/// sub-branch `openai.rs` handles separately). This is also the one grammar
-/// with a documented, intentional divergence from the plain model: `sk-ant-`
-/// is excluded to leave Anthropic's namespace to the more specific detector.
-/// See `EXPECTED_EXPLORATORY_DIFFERENCES`.
-const OPENAI: Grammar = Grammar {
-    id: "openai-token",
-    type_name: "openai_api_key",
-    prefixes: &["sk-"],
-    run: Run::AtLeast(20),
-    alphabet: is_alnum_dash,
-    boundary: is_alnum_dash,
-};
-
-const GRAMMARS: &[Grammar] = &[AWS_ACCESS_KEY, HUGGING_FACE, STRIPE, VERCEL, OPENAI];
+/// `openai-token` is deliberately absent: see the module docs.
+const GRAMMARS: &[Grammar] = &[AWS_ACCESS_KEY, HUGGING_FACE, STRIPE, VERCEL];
 
 /// The independent, dependency-free reimplementation of
 /// `scan_prefixed_runs`: the documented grammar's own prediction of the
@@ -360,16 +351,6 @@ fn prefix_pool(grammar: &Grammar) -> Vec<(String, String)> {
         if !grammar.prefixes.contains(&reversed.as_str()) {
             pool.push((format!("reverse:{prefix}"), format!("{reversed}{body}")));
         }
-    }
-
-    // The one documented policy exclusion the plain grammar model cannot
-    // express: `openai-token` intentionally excludes `sk-ant-`.
-    if grammar.id == OPENAI.id {
-        let body = synthetic_body(grammar.alphabet, grammar.run.min_len());
-        pool.push((
-            "documented-anthropic-exclusion".to_owned(),
-            format!("sk-ant-{body}"),
-        ));
     }
 
     pool
@@ -593,8 +574,7 @@ fn discover_cases() -> Vec<Case> {
 /// regression tier. Keyed by `(grammar id, operation, note)`. The suite
 /// asserts every entry here actually fires, so a stale allowance cannot
 /// silently mask a real regression once the underlying exclusion changes.
-const EXPECTED_EXPLORATORY_DIFFERENCES: &[(&str, &str, &str)] =
-    &[("openai-token", "prefix", "documented-anthropic-exclusion")];
+const EXPECTED_EXPLORATORY_DIFFERENCES: &[(&str, &str, &str)] = &[];
 
 fn single_matching_range(
     findings: &[Finding],
