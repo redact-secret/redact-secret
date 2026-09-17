@@ -9,7 +9,7 @@ text. It does not determine whether a credential is active, expired, or valid.
 | --- | --- |
 | Private keys | PEM-style private-key blocks |
 | Provider credentials | AWS access-key IDs; GitHub, GitLab, OpenAI, Anthropic, Shopify, modern Vault patterns |
-| Additional provider formats | Qualified Stripe, Slack, PyPI, Hugging Face, Docker Hub, Cloudflare, DigitalOcean, Linear, Supabase, Vercel patterns |
+| Additional provider formats | Qualified Stripe, Slack, PyPI, Hugging Face, Docker Hub, Cloudflare, DigitalOcean (`dop_v1_`/`doo_v1_`/`dor_v1_` plus exactly 64 lowercase hex bytes), Linear, Supabase, Vercel patterns |
 | Authorization | JWT, Bearer, Basic, and Token credentials |
 | Context | Credential assignments, including AWS secret-access-key and session-token names |
 | Connections | Credential-bearing PostgreSQL, MySQL, MariaDB, MongoDB, Redis, AMQP URLs |

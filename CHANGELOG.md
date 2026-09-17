@@ -5,6 +5,33 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+- Narrowed `digitalocean-token` to DigitalOcean's reviewed v1 token contract:
+  each documented prefix (`dop_v1_` personal access token, `doo_v1_` OAuth
+  access token, `dor_v1_` OAuth refresh token) followed by exactly 64
+  lowercase hexadecimal bytes, matched case-sensitively and bounded by the
+  existing `[A-Za-z0-9_-]` boundary alphabet (issue #369, contract review
+  #367). DigitalOcean's API release notes (2022-03-29) establish the prefixes;
+  gitleaks v8.30.1 and trufflehog v3.97.4 independently pin the body to
+  `[a-f0-9]{64}`. The previous rule accepted any 20-or-more-byte
+  `[A-Za-z0-9_-]` suffix, so `@redact-secret/core@0.1.0-beta.4` flagged a
+  63-byte twin of every paired positive (six must-not-flag benchmark files);
+  those twins are now rejected while every paired positive keeps its exact
+  byte range. Intentional behavior changes: a 65-byte or wider hex run, an
+  uppercase hex digit, a non-hex body byte, or a body shorter than 64 bytes no
+  longer matches, so the earlier broad-shape positives in the conformance
+  corpus were re-authored with contracted bodies; the repeated-`x` filler
+  placeholder (`digitalocean-positive-doc-style-placeholder`) is now the
+  negative `digitalocean-negative-doc-style-placeholder`, the minimum-length
+  positive `digitalocean-positive-min-length` was retired in favor of the
+  `digitalocean-v1` identity/short-length mutation pair, and the
+  `digitalocean-adversarial-long-suffix` input now yields zero findings. No
+  detector id, finding type, policy class, public option, or result shape
+  changed. The `assessment/fixtures/accuracy-corpus.json` fixture
+  `logs-additional-provider-tokens-one` still carries a pre-contract
+  DigitalOcean value with a `redact` expectation; that corpus is
+  hash-pinned to the committed acceptance results, so it is left for the
+  beta.5 qualification pass (#376) to re-version rather than edited here.
+
 ## 0.1.0-beta.4 — 2026-09-17
 
 [Publication and qualification evidence](docs/releases/0.1.0-beta.4/README.md).
