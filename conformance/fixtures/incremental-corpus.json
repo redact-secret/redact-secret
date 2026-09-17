@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 38,
+  "fixtureCount": 42,
   "fixtures": [
     {
       "id": "synthetic-regression-malformed-authority",
@@ -622,6 +622,70 @@
       "text": "newrelic\n0123456789abcdef0123456789abcdef01234567\n",
       "expected": [],
       "note": "Context is deliberately scoped to a single line so this documented false negative (the new-relic keyword and the License Key on separate lines) stays a non-match identically whole-input and incremental, at every chunk split including one that falls between the two lines."
+    },
+    {
+      "id": "github-lookalike-token-discriminating-boundary",
+      "input": "github_pat_rotation_days_ninety\nghp_SYNTHETICREVOKEDSYNTHETICREVOKEDSYNT",
+      "text": "github_pat_rotation_days_ninety\n<SECRET_1>",
+      "expected": [
+        {
+          "detector": "github-token",
+          "type": "github_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 32,
+          "end": 72
+        }
+      ],
+      "note": "issue #319: a lookalike fine-grained-prefixed identifier (too short a first segment to match) and a real classic token on adjacent lines stay correctly discriminated at every chunk split, including splits that fall inside either prefix's own bytes."
+    },
+    {
+      "id": "gitlab-lookalike-token-discriminating-boundary",
+      "input": "gitlab-project-identifier-00009\nglpat-SYNTHETIC_REVOKED_GITLAB_TOKEN",
+      "text": "gitlab-project-identifier-00009\n<SECRET_1>",
+      "expected": [
+        {
+          "detector": "gitlab-token",
+          "type": "gitlab_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 32,
+          "end": 68
+        }
+      ],
+      "note": "issue #319: an ordinary GitLab-related identifier with no credential prefix and a real documented token on adjacent lines stay correctly discriminated at every chunk split, including splits that fall inside either prefix's own bytes."
+    },
+    {
+      "id": "npm-lookalike-token-discriminating-boundary",
+      "input": "npm_config_registry\nnpm_SYNTHETICREVOKEDSYNTHETICREVOKEDSYNT",
+      "text": "npm_config_registry\n<SECRET_1>",
+      "expected": [
+        {
+          "detector": "npm-token",
+          "type": "npm_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 20,
+          "end": 60
+        }
+      ],
+      "note": "issue #319: an npm environment-variable identifier sharing the npm_ prefix and a real documented token on adjacent lines stay correctly discriminated at every chunk split, including splits that fall inside either prefix's own bytes."
+    },
+    {
+      "id": "pypi-lookalike-token-discriminating-boundary",
+      "input": "pypi-documentation-identifier\npypi-SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_",
+      "text": "pypi-documentation-identifier\n<SECRET_1>",
+      "expected": [
+        {
+          "detector": "pypi-token",
+          "type": "pypi_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 30,
+          "end": 125
+        }
+      ],
+      "note": "issue #319: an ordinary provider-related identifier with no credential shape and a real documented token on adjacent lines stay correctly discriminated at every chunk split, including splits that fall inside either prefix's own bytes."
     }
   ]
 }

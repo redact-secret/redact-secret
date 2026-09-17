@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Generate the per-detector false-positive/false-negative guard summary
-(issue #316).
+requested by issue #316, and reused by later false-positive test-expansion
+issues covering other detectors (for example issue #319).
 
-Issue #316 asks for a report of "negative-file FP counts per detector and
+Both issues ask for a report of "negative-file FP counts per detector and
 paired-positive FN counts", with fixture ids and provenance persisted, so a
 reviewer does not have to recount ``conformance/fixtures/synchronous-corpus.json``
 by hand to see how thoroughly a detector's false-positive boundary is
@@ -30,6 +31,11 @@ Output is deterministic: sorted detector names, sorted fixture ids within
 each detector, no timestamps.
 
     python3 -B scripts/generate-fp-fn-summary.py --out docs/coverage/fp-fn-summary.json
+    python3 -B scripts/generate-fp-fn-summary.py \\
+        --issue https://github.com/redact-secret/redact-secret/issues/319 \\
+        --detector github-token --detector gitlab-token \\
+        --detector npm-token --detector pypi-token \\
+        --out docs/coverage/fp-fn-summary-319.json
 """
 
 from __future__ import annotations
@@ -43,6 +49,7 @@ ROOT = Path(__file__).resolve().parents[1]
 CORPUS_PATH = ROOT / "conformance" / "fixtures" / "synchronous-corpus.json"
 
 DEFAULT_DETECTORS = ("stripe-token", "shopify-token", "supabase-token")
+DEFAULT_ISSUE = "https://github.com/redact-secret/redact-secret/issues/316"
 ENFORCED_BY = (
     "crates/secret-scan-core/tests/canonical_corpus.rs"
     "::scan_matches_the_canonical_synchronous_corpus"
@@ -96,7 +103,7 @@ def build_detector_row(detector: str, corpus_fixtures: list[dict]) -> dict:
     }
 
 
-def build_report(corpus: dict, detectors: list[str]) -> dict:
+def build_report(corpus: dict, detectors: list[str], issue: str = DEFAULT_ISSUE) -> dict:
     fixtures = corpus["fixtures"]
     known_detectors = {f["detector"] for f in fixtures}
     missing = sorted(set(detectors) - known_detectors)
@@ -105,7 +112,7 @@ def build_report(corpus: dict, detectors: list[str]) -> dict:
 
     return {
         "provenance": {
-            "issue": "https://github.com/redact-secret/redact-secret/issues/316",
+            "issue": issue,
             "corpus": "conformance/fixtures/synchronous-corpus.json",
             "enforcedBy": ENFORCED_BY,
         },
@@ -123,11 +130,16 @@ def main(argv: list[str] | None = None) -> int:
         help="detector id to report on; may be repeated (default: stripe-token, shopify-token, supabase-token)",
     )
     parser.add_argument("--out", type=Path, default=None, help="write the report here instead of stdout")
+    parser.add_argument(
+        "--issue",
+        default=DEFAULT_ISSUE,
+        help="the requesting issue URL recorded in provenance.issue (default: issue #316)",
+    )
     args = parser.parse_args(argv)
 
     detectors = args.detectors or list(DEFAULT_DETECTORS)
     corpus = load_json(args.corpus)
-    report = build_report(corpus, detectors)
+    report = build_report(corpus, detectors, args.issue)
     text = json.dumps(report, indent=2, sort_keys=True) + "\n"
 
     if args.out is not None:

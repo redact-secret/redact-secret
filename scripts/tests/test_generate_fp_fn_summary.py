@@ -88,6 +88,15 @@ class BuildReportTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             GEN.build_report(corpus, ["widget", "not-a-real-detector"])
 
+    def test_provenance_issue_defaults_to_316_and_can_be_overridden(self) -> None:
+        corpus = {"fixtures": [fixture("widget-positive-a", "widget", kind="positive")]}
+        default_report = GEN.build_report(corpus, ["widget"])
+        self.assertEqual(default_report["provenance"]["issue"], GEN.DEFAULT_ISSUE)
+
+        other_issue = "https://github.com/redact-secret/redact-secret/issues/319"
+        overridden_report = GEN.build_report(corpus, ["widget"], issue=other_issue)
+        self.assertEqual(overridden_report["provenance"]["issue"], other_issue)
+
 
 if __name__ == "__main__":
     unittest.main()

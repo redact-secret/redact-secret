@@ -111,24 +111,34 @@ Tests: `python3 -B -m unittest discover -s scripts/tests -p 'test_generate_cover
 
 - [`fp-fn-summary.json`](./fp-fn-summary.json) — the per-detector false-
   positive/false-negative guard summary requested by issue
-  [#316](https://github.com/redact-secret/redact-secret/issues/316): for each
-  reported detector, the `kind: "negative"` fixture count and ids (each one a
-  guard the detector must produce zero findings for) and the `kind:
-  "positive"` fixture count and ids (each one a guard the detector must still
-  fire for), plus the union of `contexts` those fixtures exercise. It reports
-  design intent only — whether the real detector actually meets every guard
-  is asserted independently by
+  [#316](https://github.com/redact-secret/redact-secret/issues/316), for
+  `stripe-token`, `shopify-token`, and `supabase-token`. For each reported
+  detector: the `kind: "negative"` fixture count and ids (each one a guard
+  the detector must produce zero findings for) and the `kind: "positive"`
+  fixture count and ids (each one a guard the detector must still fire for),
+  plus the union of `contexts` those fixtures exercise. It reports design
+  intent only — whether the real detector actually meets every guard is
+  asserted independently by
   `crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus`,
   named in the file's own `provenance.enforcedBy` field, so an actual false
   positive or false negative among these fixtures is a build failure, not a
   number this document could mis-report. Produced by
   [`scripts/generate-fp-fn-summary.py`](../../scripts/generate-fp-fn-summary.py)
   from the canonical corpus only (never a fixture's `input` or a matched
-  value). Defaults to `stripe-token`, `shopify-token`, and `supabase-token`;
-  pass `--detector <id>` (repeatable) to report on others:
+  value). Defaults to `stripe-token`, `shopify-token`, and `supabase-token`
+  under issue #316's provenance; pass `--detector <id>` (repeatable) and
+  `--issue <url>` to report on others under a different requesting issue,
+  as [`fp-fn-summary-319.json`](./fp-fn-summary-319.json) does for issue
+  [#319](https://github.com/redact-secret/redact-secret/issues/319)'s
+  `github-token`, `gitlab-token`, `npm-token`, and `pypi-token`:
 
   ```sh
   python3 -B scripts/generate-fp-fn-summary.py --out docs/coverage/fp-fn-summary.json
+  python3 -B scripts/generate-fp-fn-summary.py \
+      --issue https://github.com/redact-secret/redact-secret/issues/319 \
+      --detector github-token --detector gitlab-token \
+      --detector npm-token --detector pypi-token \
+      --out docs/coverage/fp-fn-summary-319.json
   ```
 
   Tests: `python3 -B -m unittest discover -s scripts/tests -p 'test_generate_fp_fn_summary.py'`.

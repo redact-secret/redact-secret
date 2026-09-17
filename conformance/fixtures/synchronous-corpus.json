@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 783,
+  "fixtureCount": 814,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -3863,6 +3863,151 @@
       "note": "A long delimited provider match remains deterministic and bounded."
     },
     {
+      "id": "pypi-positive-dotenv",
+      "detector": "pypi-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "PYPI_TOKEN=pypi-SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_",
+      "expected": [
+        {
+          "detector": "pypi-token",
+          "type": "pypi_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 106
+        }
+      ],
+      "note": "A bare dotenv-style assignment (PYPI_TOKEN=<token>, no quotes) is detected by format alone."
+    },
+    {
+      "id": "pypi-positive-json",
+      "detector": "pypi-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"pypiToken\": \"pypi-SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\"}",
+      "expected": [
+        {
+          "detector": "pypi-token",
+          "type": "pypi_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 15,
+          "end": 110
+        }
+      ],
+      "note": "A quoted JSON string value is detected the same as a bare one; the enclosing quotes are not part of the match."
+    },
+    {
+      "id": "pypi-positive-yaml",
+      "detector": "pypi-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "pypi_token: pypi-SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\n",
+      "expected": [
+        {
+          "detector": "pypi-token",
+          "type": "pypi_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 12,
+          "end": 107
+        }
+      ],
+      "note": "A YAML mapping value is detected the same as a bare one."
+    },
+    {
+      "id": "pypi-positive-log",
+      "detector": "pypi-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-16T00:00:00Z INFO uploading distribution key=pypi-SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_ project=example",
+      "expected": [
+        {
+          "detector": "pypi-token",
+          "type": "pypi_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 53,
+          "end": 148
+        }
+      ],
+      "note": "A provider token embedded in a structured log line is still detected."
+    },
+    {
+      "id": "pypi-positive-crlf-unicode-prefix",
+      "detector": "pypi-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# \ud83d\udd11 caf\u00e9\r\npypi-SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\r\n",
+      "expected": [
+        {
+          "detector": "pypi-token",
+          "type": "pypi_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 109
+        }
+      ],
+      "note": "A match after a CRLF line ending and a Unicode-prefixed comment line is still found at the correct UTF-8 byte offset."
+    },
+    {
+      "id": "pypi-positive-non-macaroon-body-still-detected",
+      "detector": "pypi-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "pypi-0000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "expected": [
+        {
+          "detector": "pypi-token",
+          "type": "pypi_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 90
+        }
+      ],
+      "note": "PyPI API tokens serialize a Macaroon (the documented pypi- prefix plus a base64-shaped body encoding caveats and a signature); this detector matches the prefix and an at-least-85-byte alphanumeric/dash run only -- it does not decode the body as a macaroon or verify its signature, since doing so would execute provider-specific deserialization against secret material, out of scope for this side-effect-free core (AGENTS.md security boundary). A body that is not valid macaroon serialization at all (a run of literal zeros here) is therefore still classified; this documents the checksum/serialization-policy tradeoff issue #319 asks for, and never requires live provider verification."
+    },
+    {
+      "id": "pypi-negative-project-url-path",
+      "detector": "pypi-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "http"
+      ],
+      "input": "https://pypi.org/project/pypi-token-rotator/",
+      "expected": [],
+      "note": "A PyPI project page URL path segment that shares the documented pypi- prefix is not classified: the alphanumeric/dash run after the prefix is far short of the documented 85-byte minimum."
+    },
+    {
       "id": "huggingface-positive-qualified",
       "detector": "huggingface-token",
       "kind": "positive",
@@ -5804,6 +5949,164 @@
       "note": "A long delimited provider match remains deterministic and bounded."
     },
     {
+      "id": "npm-positive-dotenv",
+      "detector": "npm-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "NPM_TOKEN=npm_SYNTHETICREVOKEDSYNTHETICREVOKEDSYNT",
+      "expected": [
+        {
+          "detector": "npm-token",
+          "type": "npm_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 10,
+          "end": 50
+        }
+      ],
+      "note": "A bare dotenv-style assignment (NPM_TOKEN=<token>, no quotes) is detected by format alone."
+    },
+    {
+      "id": "npm-positive-json",
+      "detector": "npm-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"npmToken\": \"npm_SYNTHETICREVOKEDSYNTHETICREVOKEDSYNT\"}",
+      "expected": [
+        {
+          "detector": "npm-token",
+          "type": "npm_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 54
+        }
+      ],
+      "note": "A quoted JSON string value is detected the same as a bare one; the enclosing quotes are not part of the match."
+    },
+    {
+      "id": "npm-positive-yaml",
+      "detector": "npm-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "npm_token: npm_SYNTHETICREVOKEDSYNTHETICREVOKEDSYNT\n",
+      "expected": [
+        {
+          "detector": "npm-token",
+          "type": "npm_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 51
+        }
+      ],
+      "note": "A YAML mapping value is detected the same as a bare one."
+    },
+    {
+      "id": "npm-positive-log",
+      "detector": "npm-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-16T00:00:00Z INFO publishing package key=npm_SYNTHETICREVOKEDSYNTHETICREVOKEDSYNT package=example",
+      "expected": [
+        {
+          "detector": "npm-token",
+          "type": "npm_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 49,
+          "end": 89
+        }
+      ],
+      "note": "A provider token embedded in a structured log line is still detected."
+    },
+    {
+      "id": "npm-positive-crlf-unicode-prefix",
+      "detector": "npm-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# \ud83d\udd11 caf\u00e9\r\nnpm_SYNTHETICREVOKEDSYNTHETICREVOKEDSYNT\r\n",
+      "expected": [
+        {
+          "detector": "npm-token",
+          "type": "npm_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 54
+        }
+      ],
+      "note": "A match after a CRLF line ending and a Unicode-prefixed comment line is still found at the correct UTF-8 byte offset."
+    },
+    {
+      "id": "npm-positive-invalid-checksum-still-detected",
+      "detector": "npm-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "npm_SYNTHETICREVOKEDSYNTHETICREVOK000000",
+      "expected": [
+        {
+          "detector": "npm-token",
+          "type": "npm_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 40
+        }
+      ],
+      "note": "npm access tokens encode a base62 CRC32 checksum in their final six bytes (see the npm-token detector's own module documentation); this detector performs structural prefix+exact-length+alphabet matching only and does not decode or recompute that checksum, since doing so would execute provider-specific checksum logic against secret material, out of scope for AGENTS.md's side-effect-free core boundary. A token whose trailing six bytes are an obviously invalid checksum (six literal zeros here) is therefore still classified; this documents the checksum/serialization tradeoff issue #319 asks for, and never requires live provider verification."
+    },
+    {
+      "id": "npm-negative-package-name",
+      "detector": "npm-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "@example-org/npm_token_rotation-action",
+      "expected": [],
+      "note": "A scoped npm package name that happens to contain npm_token as a substring is not classified: the alphanumeric run after the npm_ prefix stops at token's trailing underscore, far short of the documented 36-byte exact length."
+    },
+    {
+      "id": "npm-negative-url-path-truncated",
+      "detector": "npm-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "http"
+      ],
+      "input": "https://registry.npmjs.org/-/user/org.example/npm_",
+      "expected": [],
+      "note": "An npm registry URL path segment that is truncated to just the documented npm_ prefix, with no suffix at all, never reaches the exact 36-byte length."
+    },
+    {
       "id": "google-positive-qualified",
       "detector": "google-api-key",
       "kind": "positive",
@@ -6793,6 +7096,141 @@
       "note": "An overlong token-like identifier is rejected in bounded time."
     },
     {
+      "id": "github-positive-fine-grained",
+      "detector": "github-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "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",
+      "expected": [
+        {
+          "detector": "github-token",
+          "type": "github_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 93
+        }
+      ],
+      "note": "GitHub's fine-grained personal access token format (github_pat_ + an exact 22-byte first segment + a literal underscore separator + an exact 59-byte second segment) is supported; the corpus previously had no fine-grained fixture at all, only the rust unit tests in detectors/github.rs."
+    },
+    {
+      "id": "github-positive-fine-grained-dotenv",
+      "detector": "github-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "GITHUB_FINE_GRAINED_TOKEN=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",
+      "expected": [
+        {
+          "detector": "github-token",
+          "type": "github_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 26,
+          "end": 119
+        }
+      ],
+      "note": "A bare dotenv-style assignment carrying a fine-grained token is detected the same as a classic one."
+    },
+    {
+      "id": "github-boundary-fine-grained-wrong-separator",
+      "detector": "github-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "github_pat_SYNTHETICREVOKEDSYNTHE-SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICRE",
+      "expected": [],
+      "note": "The literal underscore between a fine-grained token's two segments is not interchangeable with a dash; a dash in that position is not a documented fine-grained shape and is rejected."
+    },
+    {
+      "id": "github-boundary-fine-grained-short-second-segment",
+      "detector": "github-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "github_pat_SYNTHETICREVOKEDSYNTHE_SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICR",
+      "expected": [],
+      "note": "A fine-grained token's second segment is matched as an exact 59-byte length, not a minimum; one byte short of that length is rejected."
+    },
+    {
+      "id": "github-boundary-fine-grained-overlong-first-segment",
+      "detector": "github-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "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E",
+      "expected": [],
+      "note": "A fine-grained token's first segment is matched as an exact 22-byte length; a 23rd alphanumeric byte pushes the literal underscore separator one position later than the fixed offset the detector checks, so the candidate is rejected rather than fuzzily re-aligned."
+    },
+    {
+      "id": "github-boundary-classic-overlong",
+      "detector": "github-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "ghp_SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTX",
+      "expected": [],
+      "note": "Documented classic tokens are matched by an exact 36-byte length, not a minimum; a 37th trailing alphanumeric byte with no delimiter means this is a truncated view of a longer run, and the whole candidate -- not just its excess byte -- is rejected."
+    },
+    {
+      "id": "github-negative-fine-grained-variable-identifier",
+      "detector": "github-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "python"
+      ],
+      "input": "github_pat_rotation_days = 90",
+      "expected": [],
+      "note": "A source identifier that shares the fine-grained github_pat_ prefix textually is not classified: the first segment's alphanumeric run ends at the first underscore in rotation_days, far short of the documented 22-byte length."
+    },
+    {
+      "id": "github-negative-commit-hash",
+      "detector": "github-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "log"
+      ],
+      "input": "Deployed commit a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0 to production",
+      "expected": [],
+      "note": "A git commit SHA-1 hex digest cannot collide with any documented GitHub token prefix: every prefix (gho_/ghp_/ghu_/ghr_/ghs_/github_pat_) begins with a letter outside the hex alphabet [0-9a-f], so no accidental match is structurally possible."
+    },
+    {
+      "id": "github-negative-oauth-url-query",
+      "detector": "github-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorize at https://github.com/login/oauth/authorize?client_id=ghp_client_identifier&scope=repo",
+      "expected": [],
+      "note": "A GitHub OAuth authorize URL's client_id query parameter happens to start with the classic-token prefix ghp_, but its value is a short underscore-delimited identifier: the classic-token alphabet excludes underscore, so the run breaks at client's first underscore, far short of the documented 36-byte body."
+    },
+    {
       "id": "gitlab-positive-personal-access",
       "detector": "gitlab-token",
       "kind": "positive",
@@ -7075,6 +7513,142 @@
         }
       ],
       "note": "A long delimited provider match remains deterministic and bounded."
+    },
+    {
+      "id": "gitlab-positive-dotenv",
+      "detector": "gitlab-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "GITLAB_TOKEN=glpat-SYNTHETIC_REVOKED_GITLAB_TOKEN",
+      "expected": [
+        {
+          "detector": "gitlab-token",
+          "type": "gitlab_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 49
+        }
+      ],
+      "note": "A bare dotenv-style assignment (GITLAB_TOKEN=<token>, no quotes) is detected by format alone."
+    },
+    {
+      "id": "gitlab-positive-json",
+      "detector": "gitlab-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"gitlabToken\": \"glpat-SYNTHETIC_REVOKED_GITLAB_TOKEN\"}",
+      "expected": [
+        {
+          "detector": "gitlab-token",
+          "type": "gitlab_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 17,
+          "end": 53
+        }
+      ],
+      "note": "A quoted JSON string value is detected the same as a bare one; the enclosing quotes are not part of the match."
+    },
+    {
+      "id": "gitlab-positive-yaml",
+      "detector": "gitlab-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "gitlab_token: glpat-SYNTHETIC_REVOKED_GITLAB_TOKEN\n",
+      "expected": [
+        {
+          "detector": "gitlab-token",
+          "type": "gitlab_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 50
+        }
+      ],
+      "note": "A YAML mapping value is detected the same as a bare one."
+    },
+    {
+      "id": "gitlab-positive-log",
+      "detector": "gitlab-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-16T00:00:00Z INFO cloning repository key=glpat-SYNTHETIC_REVOKED_GITLAB_TOKEN project=example",
+      "expected": [
+        {
+          "detector": "gitlab-token",
+          "type": "gitlab_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 49,
+          "end": 85
+        }
+      ],
+      "note": "A provider token embedded in a structured log line is still detected."
+    },
+    {
+      "id": "gitlab-positive-crlf-unicode-prefix",
+      "detector": "gitlab-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# \ud83d\udd11 caf\u00e9\r\nglpat-SYNTHETIC_REVOKED_GITLAB_TOKEN\r\n",
+      "expected": [
+        {
+          "detector": "gitlab-token",
+          "type": "gitlab_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 50
+        }
+      ],
+      "note": "A match after a CRLF line ending and a Unicode-prefixed comment line is still found at the correct UTF-8 byte offset."
+    },
+    {
+      "id": "gitlab-negative-commit-hash",
+      "detector": "gitlab-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "log"
+      ],
+      "input": "Merged commit f1e2d3c4b5a6978685746352413f2e1d0c9b8a7 into main",
+      "expected": [],
+      "note": "A git commit SHA-1 hex digest cannot collide with any documented GitLab token prefix: every prefix begins with the letter g, which is outside the hex alphabet [0-9a-f], so no accidental match is structurally possible."
+    },
+    {
+      "id": "gitlab-negative-url-truncated-token-param",
+      "detector": "gitlab-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "http"
+      ],
+      "input": "https://gitlab.example.com/api/v4/projects?private_token=glpat-",
+      "expected": [],
+      "note": "A GitLab API URL query parameter whose value is truncated to just the documented prefix, with no suffix at all, never reaches the minimum 20-byte opaque-suffix length."
     },
     {
       "id": "openai-positive-project",

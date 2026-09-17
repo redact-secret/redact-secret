@@ -180,6 +180,8 @@
           "dimension": "positive",
           "evidenceFixtureIds": [
             "github-positive-classic",
+            "github-positive-fine-grained",
+            "github-positive-fine-grained-dotenv",
             "github-positive-installation-stateless",
             "host-chat-github",
             "host-curl-github",
@@ -227,6 +229,10 @@
         {
           "dimension": "boundary",
           "evidenceFixtureIds": [
+            "github-boundary-classic-overlong",
+            "github-boundary-fine-grained-overlong-first-segment",
+            "github-boundary-fine-grained-short-second-segment",
+            "github-boundary-fine-grained-wrong-separator",
             "github-boundary-short",
             "mutation-github-01-invalid-prefix",
             "mutation-github-02-short-length",
@@ -240,6 +246,9 @@
         {
           "dimension": "near-miss-negative",
           "evidenceFixtureIds": [
+            "github-negative-commit-hash",
+            "github-negative-fine-grained-variable-identifier",
+            "github-negative-oauth-url-query",
             "github-negative-test-id"
           ],
           "state": "supported"
@@ -247,6 +256,10 @@
         {
           "dimension": "malformed",
           "evidenceFixtureIds": [
+            "github-boundary-classic-overlong",
+            "github-boundary-fine-grained-overlong-first-segment",
+            "github-boundary-fine-grained-short-second-segment",
+            "github-boundary-fine-grained-wrong-separator",
             "github-boundary-short",
             "mutation-github-01-invalid-prefix",
             "mutation-github-02-short-length",
@@ -262,9 +275,14 @@
           "dimension": "host-context",
           "evidenceFixtureIds": [
             "github-adversarial-long-suffix",
+            "github-negative-commit-hash",
+            "github-negative-fine-grained-variable-identifier",
+            "github-negative-oauth-url-query",
             "github-negative-test-id",
             "github-overlap-context",
             "github-positive-classic",
+            "github-positive-fine-grained",
+            "github-positive-fine-grained-dotenv",
             "github-positive-installation-stateless",
             "host-chat-github",
             "host-curl-github",
@@ -320,8 +338,13 @@
           "dimension": "positive",
           "evidenceFixtureIds": [
             "gitlab-positive-all-prefixes",
+            "gitlab-positive-crlf-unicode-prefix",
+            "gitlab-positive-dotenv",
+            "gitlab-positive-json",
+            "gitlab-positive-log",
             "gitlab-positive-min-length",
-            "gitlab-positive-personal-access"
+            "gitlab-positive-personal-access",
+            "gitlab-positive-yaml"
           ],
           "state": "supported"
         },
@@ -353,8 +376,10 @@
         {
           "dimension": "near-miss-negative",
           "evidenceFixtureIds": [
+            "gitlab-negative-commit-hash",
             "gitlab-negative-common-identifier",
-            "gitlab-negative-placeholder"
+            "gitlab-negative-placeholder",
+            "gitlab-negative-url-truncated-token-param"
           ],
           "state": "supported"
         },
@@ -941,8 +966,14 @@
         {
           "dimension": "positive",
           "evidenceFixtureIds": [
+            "pypi-positive-crlf-unicode-prefix",
+            "pypi-positive-dotenv",
+            "pypi-positive-json",
+            "pypi-positive-log",
             "pypi-positive-min-length",
-            "pypi-positive-qualified"
+            "pypi-positive-non-macaroon-body-still-detected",
+            "pypi-positive-qualified",
+            "pypi-positive-yaml"
           ],
           "state": "supported"
         },
@@ -976,7 +1007,8 @@
           "evidenceFixtureIds": [
             "pypi-negative-lookalike",
             "pypi-negative-ordinary-reference",
-            "pypi-negative-placeholder"
+            "pypi-negative-placeholder",
+            "pypi-negative-project-url-path"
           ],
           "state": "supported"
         },
@@ -1629,7 +1661,13 @@
         {
           "dimension": "positive",
           "evidenceFixtureIds": [
-            "npm-positive-qualified"
+            "npm-positive-crlf-unicode-prefix",
+            "npm-positive-dotenv",
+            "npm-positive-invalid-checksum-still-detected",
+            "npm-positive-json",
+            "npm-positive-log",
+            "npm-positive-qualified",
+            "npm-positive-yaml"
           ],
           "state": "supported"
         },
@@ -1663,7 +1701,9 @@
           "evidenceFixtureIds": [
             "npm-negative-lookalike",
             "npm-negative-ordinary-reference",
-            "npm-negative-placeholder"
+            "npm-negative-package-name",
+            "npm-negative-placeholder",
+            "npm-negative-url-path-truncated"
           ],
           "state": "supported"
         },
@@ -4059,6 +4099,8 @@
             "encoded-connection",
             "fixed-width-unicode",
             "github-installation-stateless",
+            "github-lookalike-token-discriminating-boundary",
+            "gitlab-lookalike-token-discriminating-boundary",
             "grafana-cloud-access-policy-token-basic",
             "grafana-service-account-token-basic",
             "legacy-variable-detector-families",
@@ -4067,6 +4109,8 @@
             "negative-end-of-stream",
             "new-relic-license-key-line-scoped-context-different-line",
             "new-relic-license-key-line-scoped-context-same-line",
+            "npm-lookalike-token-discriminating-boundary",
+            "pypi-lookalike-token-discriminating-boundary",
             "redis-password-only-connection",
             "shopify-public-secret-prefix-discriminating-boundary",
             "stripe-public-secret-prefix-discriminating-boundary",
@@ -4313,6 +4357,8 @@
             "encoded-connection",
             "fixed-width-unicode",
             "github-installation-stateless",
+            "github-lookalike-token-discriminating-boundary",
+            "gitlab-lookalike-token-discriminating-boundary",
             "grafana-cloud-access-policy-token-basic",
             "grafana-service-account-token-basic",
             "legacy-variable-detector-families",
@@ -4321,6 +4367,8 @@
             "negative-end-of-stream",
             "new-relic-license-key-line-scoped-context-different-line",
             "new-relic-license-key-line-scoped-context-same-line",
+            "npm-lookalike-token-discriminating-boundary",
+            "pypi-lookalike-token-discriminating-boundary",
             "redis-password-only-connection",
             "shopify-public-secret-prefix-discriminating-boundary",
             "stripe-public-secret-prefix-discriminating-boundary",
@@ -4683,6 +4731,8 @@
             "encoded-connection",
             "fixed-width-unicode",
             "github-installation-stateless",
+            "github-lookalike-token-discriminating-boundary",
+            "gitlab-lookalike-token-discriminating-boundary",
             "grafana-cloud-access-policy-token-basic",
             "grafana-service-account-token-basic",
             "legacy-variable-detector-families",
@@ -4691,6 +4741,8 @@
             "negative-end-of-stream",
             "new-relic-license-key-line-scoped-context-different-line",
             "new-relic-license-key-line-scoped-context-same-line",
+            "npm-lookalike-token-discriminating-boundary",
+            "pypi-lookalike-token-discriminating-boundary",
             "redis-password-only-connection",
             "shopify-public-secret-prefix-discriminating-boundary",
             "stripe-public-secret-prefix-discriminating-boundary",

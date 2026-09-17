@@ -131,7 +131,7 @@
     {
       "detector": "github-token",
       "evidence": {
-        "fixtureCount": 38,
+        "fixtureCount": 47,
         "hostContextsExercised": [
           "chat",
           "curl",
@@ -169,6 +169,8 @@
       },
       "evidenceFixtureIds": [
         "github-positive-classic",
+        "github-positive-fine-grained",
+        "github-positive-fine-grained-dotenv",
         "github-positive-installation-stateless",
         "host-chat-github",
         "host-curl-github",
@@ -205,9 +207,14 @@
     {
       "detector": "gitlab-token",
       "evidence": {
-        "fixtureCount": 12,
+        "fixtureCount": 19,
         "hostContextsExercised": [
-          "plain-text"
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "yaml"
         ],
         "kindsWithSupportedEvidence": [
           "adversarial",
@@ -222,8 +229,13 @@
       },
       "evidenceFixtureIds": [
         "gitlab-positive-all-prefixes",
+        "gitlab-positive-crlf-unicode-prefix",
+        "gitlab-positive-dotenv",
+        "gitlab-positive-json",
+        "gitlab-positive-log",
         "gitlab-positive-min-length",
-        "gitlab-positive-personal-access"
+        "gitlab-positive-personal-access",
+        "gitlab-positive-yaml"
       ],
       "policyClass": "always-redact",
       "schemeRows": "not-applicable",
@@ -428,9 +440,14 @@
     {
       "detector": "pypi-token",
       "evidence": {
-        "fixtureCount": 12,
+        "fixtureCount": 19,
         "hostContextsExercised": [
-          "plain-text"
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "yaml"
         ],
         "kindsWithSupportedEvidence": [
           "adversarial",
@@ -444,8 +461,14 @@
         ]
       },
       "evidenceFixtureIds": [
+        "pypi-positive-crlf-unicode-prefix",
+        "pypi-positive-dotenv",
+        "pypi-positive-json",
+        "pypi-positive-log",
         "pypi-positive-min-length",
-        "pypi-positive-qualified"
+        "pypi-positive-non-macaroon-body-still-detected",
+        "pypi-positive-qualified",
+        "pypi-positive-yaml"
       ],
       "policyClass": "always-redact",
       "schemeRows": "not-applicable",
@@ -660,9 +683,14 @@
     {
       "detector": "npm-token",
       "evidence": {
-        "fixtureCount": 11,
+        "fixtureCount": 19,
         "hostContextsExercised": [
-          "plain-text"
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "yaml"
         ],
         "kindsWithSupportedEvidence": [
           "adversarial",
@@ -676,7 +704,13 @@
         ]
       },
       "evidenceFixtureIds": [
-        "npm-positive-qualified"
+        "npm-positive-crlf-unicode-prefix",
+        "npm-positive-dotenv",
+        "npm-positive-invalid-checksum-still-detected",
+        "npm-positive-json",
+        "npm-positive-log",
+        "npm-positive-qualified",
+        "npm-positive-yaml"
       ],
       "policyClass": "always-redact",
       "schemeRows": "not-applicable",
