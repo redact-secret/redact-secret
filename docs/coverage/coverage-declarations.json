@@ -902,8 +902,18 @@
           "dimension": "positive",
           "evidenceFixtureIds": [
             "slack-positive-all-prefixes",
+            "slack-positive-doc-style-placeholder",
+            "slack-positive-json",
+            "slack-positive-log",
+            "slack-positive-markdown-delimiter",
             "slack-positive-min-length",
-            "slack-positive-qualified"
+            "slack-positive-punctuation-adjacent",
+            "slack-positive-qualified",
+            "slack-positive-repeated-value",
+            "slack-positive-shell-quoted",
+            "slack-positive-unicode-byte-offset",
+            "slack-positive-yaml",
+            "slack-positive-yaml-crlf"
           ],
           "state": "supported"
         },
@@ -935,9 +945,12 @@
         {
           "dimension": "near-miss-negative",
           "evidenceFixtureIds": [
+            "slack-negative-embedded-in-wider-identifier",
             "slack-negative-lookalike",
             "slack-negative-ordinary-reference",
-            "slack-negative-placeholder"
+            "slack-negative-percent-encoded-lookalike",
+            "slack-negative-placeholder",
+            "slack-negative-team-channel-id"
           ],
           "state": "supported"
         },
@@ -1077,8 +1090,18 @@
         {
           "dimension": "positive",
           "evidenceFixtureIds": [
+            "huggingface-positive-doc-style-placeholder",
+            "huggingface-positive-json",
+            "huggingface-positive-log",
+            "huggingface-positive-markdown-delimiter",
             "huggingface-positive-min-length",
-            "huggingface-positive-qualified"
+            "huggingface-positive-punctuation-adjacent",
+            "huggingface-positive-qualified",
+            "huggingface-positive-repeated-value",
+            "huggingface-positive-shell-quoted",
+            "huggingface-positive-unicode-byte-offset",
+            "huggingface-positive-yaml",
+            "huggingface-positive-yaml-crlf"
           ],
           "state": "supported"
         },
@@ -1110,8 +1133,11 @@
         {
           "dimension": "near-miss-negative",
           "evidenceFixtureIds": [
+            "huggingface-negative-embedded-in-wider-identifier",
             "huggingface-negative-lookalike",
+            "huggingface-negative-model-repository-name",
             "huggingface-negative-ordinary-reference",
+            "huggingface-negative-percent-encoded-lookalike",
             "huggingface-negative-placeholder"
           ],
           "state": "supported"
@@ -1416,8 +1442,18 @@
           "dimension": "positive",
           "evidenceFixtureIds": [
             "linear-positive-all-prefixes",
+            "linear-positive-doc-style-placeholder",
+            "linear-positive-json",
+            "linear-positive-log",
+            "linear-positive-markdown-delimiter",
             "linear-positive-min-length",
-            "linear-positive-qualified"
+            "linear-positive-punctuation-adjacent",
+            "linear-positive-qualified",
+            "linear-positive-repeated-value",
+            "linear-positive-shell-quoted",
+            "linear-positive-unicode-byte-offset",
+            "linear-positive-yaml",
+            "linear-positive-yaml-crlf"
           ],
           "state": "supported"
         },
@@ -1449,8 +1485,11 @@
         {
           "dimension": "near-miss-negative",
           "evidenceFixtureIds": [
+            "linear-negative-embedded-in-wider-identifier",
+            "linear-negative-issue-identifier",
             "linear-negative-lookalike",
             "linear-negative-ordinary-reference",
+            "linear-negative-percent-encoded-lookalike",
             "linear-negative-placeholder"
           ],
           "state": "supported"
@@ -1866,9 +1905,17 @@
           "evidenceFixtureIds": [
             "sendgrid-positive-bare",
             "sendgrid-positive-crlf-host",
+            "sendgrid-positive-doc-style-placeholder",
             "sendgrid-positive-dotenv",
             "sendgrid-positive-json",
-            "sendgrid-positive-unicode-prefix"
+            "sendgrid-positive-log",
+            "sendgrid-positive-markdown-delimiter",
+            "sendgrid-positive-punctuation-adjacent",
+            "sendgrid-positive-repeated-value",
+            "sendgrid-positive-shell-quoted",
+            "sendgrid-positive-trailing-url-safe-characters",
+            "sendgrid-positive-unicode-prefix",
+            "sendgrid-positive-yaml"
           ],
           "state": "supported"
         },
@@ -1901,6 +1948,8 @@
           "dimension": "near-miss-negative",
           "evidenceFixtureIds": [
             "sendgrid-negative-common-identifier",
+            "sendgrid-negative-harmless-url",
+            "sendgrid-negative-percent-encoded-lookalike",
             "sendgrid-negative-placeholder"
           ],
           "state": "supported"
@@ -4125,7 +4174,9 @@
             "gitlab-lookalike-token-discriminating-boundary",
             "grafana-cloud-access-policy-token-basic",
             "grafana-service-account-token-basic",
+            "huggingface-lookalike-token-discriminating-boundary",
             "legacy-variable-detector-families",
+            "linear-lookalike-token-discriminating-boundary",
             "mongodb-seed-list-connection",
             "multiline-private-key",
             "negative-end-of-stream",
@@ -4134,7 +4185,9 @@
             "npm-lookalike-token-discriminating-boundary",
             "pypi-lookalike-token-discriminating-boundary",
             "redis-password-only-connection",
+            "sendgrid-lookalike-token-discriminating-boundary",
             "shopify-public-secret-prefix-discriminating-boundary",
+            "slack-lookalike-token-discriminating-boundary",
             "stripe-public-secret-prefix-discriminating-boundary",
             "structural-overlap",
             "supabase-public-secret-prefix-discriminating-boundary",
@@ -4385,7 +4438,9 @@
             "gitlab-lookalike-token-discriminating-boundary",
             "grafana-cloud-access-policy-token-basic",
             "grafana-service-account-token-basic",
+            "huggingface-lookalike-token-discriminating-boundary",
             "legacy-variable-detector-families",
+            "linear-lookalike-token-discriminating-boundary",
             "mongodb-seed-list-connection",
             "multiline-private-key",
             "negative-end-of-stream",
@@ -4394,7 +4449,9 @@
             "npm-lookalike-token-discriminating-boundary",
             "pypi-lookalike-token-discriminating-boundary",
             "redis-password-only-connection",
+            "sendgrid-lookalike-token-discriminating-boundary",
             "shopify-public-secret-prefix-discriminating-boundary",
+            "slack-lookalike-token-discriminating-boundary",
             "stripe-public-secret-prefix-discriminating-boundary",
             "structural-overlap",
             "supabase-public-secret-prefix-discriminating-boundary",
@@ -4761,7 +4818,9 @@
             "gitlab-lookalike-token-discriminating-boundary",
             "grafana-cloud-access-policy-token-basic",
             "grafana-service-account-token-basic",
+            "huggingface-lookalike-token-discriminating-boundary",
             "legacy-variable-detector-families",
+            "linear-lookalike-token-discriminating-boundary",
             "mongodb-seed-list-connection",
             "multiline-private-key",
             "negative-end-of-stream",
@@ -4770,7 +4829,9 @@
             "npm-lookalike-token-discriminating-boundary",
             "pypi-lookalike-token-discriminating-boundary",
             "redis-password-only-connection",
+            "sendgrid-lookalike-token-discriminating-boundary",
             "shopify-public-secret-prefix-discriminating-boundary",
+            "slack-lookalike-token-discriminating-boundary",
             "stripe-public-secret-prefix-discriminating-boundary",
             "structural-overlap",
             "supabase-public-secret-prefix-discriminating-boundary",

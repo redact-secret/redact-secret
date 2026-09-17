@@ -191,4 +191,51 @@ mod tests {
         assert!(detect(&format!("x{value}")).is_empty());
         assert!(detect(&format!("{value}x")).is_empty());
     }
+
+    /// issue #321: a documentation placeholder built entirely from valid
+    /// alphabet characters, at the exact documented segment lengths, is
+    /// indistinguishable from a real key's shape and is classified — an
+    /// accepted precision/recall tradeoff, mirroring
+    /// `additional_providers::accepts_an_all_valid_alphabet_documentation_placeholder`.
+    #[test]
+    fn accepts_an_all_valid_alphabet_documentation_placeholder() {
+        let value = format!("SG.{}.{}", "x".repeat(ID_LEN), "x".repeat(SECRET_LEN));
+        let candidates = detect(&value);
+        assert_eq!(candidates.len(), 1);
+        assert_eq!(candidates[0].confidence(), Confidence::High);
+    }
+
+    /// A percent-encoded rendering of the documented '.' separator does not
+    /// literally match the prefix's own bytes.
+    #[test]
+    fn rejects_a_percent_encoded_separator_lookalike() {
+        let value = format!("SG%2E{ID}.{SECRET}");
+        assert!(detect(&value).is_empty());
+    }
+
+    #[test]
+    fn reports_a_repeated_identical_value_once_per_occurrence() {
+        let value = token();
+        let input = format!("{value} {value}");
+        let candidates = detect(&input);
+        assert_eq!(candidates.len(), 2);
+    }
+
+    /// SendGrid's documented alphabet is URL-safe base64 ([A-Za-z0-9_-]); an
+    /// id or secret segment ending in a literal '-' or '_' at the exact
+    /// documented length is still matched in full.
+    #[test]
+    fn accepts_segments_with_trailing_url_safe_characters() {
+        let id = format!("{}-", &ID[..ID_LEN - 1]);
+        let secret = format!("{}_", &SECRET[..SECRET_LEN - 1]);
+        assert_eq!(id.len(), ID_LEN);
+        assert_eq!(secret.len(), SECRET_LEN);
+        let value = format!("SG.{id}.{secret}");
+        let candidates = detect(&value);
+        assert_eq!(candidates.len(), 1);
+        assert_eq!(
+            candidates[0].range(),
+            ByteRange::new(0, value.len()).unwrap()
+        );
+    }
 }

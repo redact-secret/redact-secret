@@ -512,4 +512,60 @@ mod tests {
             ByteRange::new(expected_start, input.len()).unwrap()
         );
     }
+
+    /// issue #321: the false-positive-assurance dimensions below are scoped
+    /// to `HUGGING_FACE`, `LINEAR`, and `SLACK` only, the same way #320's
+    /// infra-provider block stayed scoped to its own four detectors instead
+    /// of widening the shared [`families`] list every other test here reuses.
+
+    #[test]
+    fn accepts_an_all_valid_alphabet_documentation_placeholder() {
+        for (detector, prefix) in [
+            (&HUGGING_FACE, "hf_"),
+            (&LINEAR, "lin_api_"),
+            (&SLACK, "xoxb-"),
+        ] {
+            let value = format!("{prefix}{}", "x".repeat(20));
+            let candidates = detect(detector, &value);
+            assert_eq!(candidates.len(), 1, "{}", detector.id());
+            assert_eq!(candidates[0].confidence(), Confidence::High, "{}", detector.id());
+        }
+    }
+
+    #[test]
+    fn rejects_the_prefix_embedded_in_a_wider_identifier() {
+        for (detector, prefix) in [
+            (&HUGGING_FACE, "hf_"),
+            (&LINEAR, "lin_api_"),
+            (&SLACK, "xoxb-"),
+        ] {
+            let value = format!("legacy{prefix}SYNTHETIC_REVOKED_KEY_VALUE");
+            assert_eq!(detect(detector, &value).len(), 0, "{}", detector.id());
+        }
+    }
+
+    #[test]
+    fn rejects_a_percent_encoded_delimiter_lookalike() {
+        for (detector, value) in [
+            (&HUGGING_FACE, "hf%5FSYNTHETIC_REVOKED_CONFORMANCE_KEY"),
+            (&LINEAR, "lin%5Fapi_SYNTHETIC_REVOKED_CONFORMANCE_KEY"),
+            (&SLACK, "xoxb%2DSYNTHETIC_REVOKED_CONFORMANCE_KEY"),
+        ] {
+            assert_eq!(detect(detector, value).len(), 0, "{}", detector.id());
+        }
+    }
+
+    #[test]
+    fn reports_a_repeated_identical_value_once_per_occurrence() {
+        for (detector, prefix) in [
+            (&HUGGING_FACE, "hf_"),
+            (&LINEAR, "lin_api_"),
+            (&SLACK, "xoxb-"),
+        ] {
+            let value = format!("{prefix}SYNTHETIC_REVOKED_KEY_VALUE");
+            let input = format!("{value} {value}");
+            let candidates = detect(detector, &input);
+            assert_eq!(candidates.len(), 2, "{}", detector.id());
+        }
+    }
 }

@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 833,
+  "fixtureCount": 882,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -21144,6 +21144,1017 @@
         }
       ],
       "note": "A single new-relic-context-bearing line densely packed with candidate-shaped runs stays linear: per-line (not per-candidate) context checks keep this bounded."
+    },
+    {
+      "id": "huggingface-positive-doc-style-placeholder",
+      "detector": "huggingface-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "hf_xxxxxxxxxxxxxxxxxxxx",
+      "expected": [
+        {
+          "detector": "huggingface-token",
+          "type": "huggingface_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 23
+        }
+      ],
+      "note": "A documentation placeholder built entirely from valid alphabet characters (e.g. a repeated filler letter) is indistinguishable from a real secret's shape and is classified: an accepted precision/recall tradeoff, not a bug. Only a placeholder that breaks the alphabet run (angle brackets, characters outside the allowed set) is excluded."
+    },
+    {
+      "id": "huggingface-negative-embedded-in-wider-identifier",
+      "detector": "huggingface-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "legacyhf_SYNTHETIC_REVOKED_KEY_VALUE",
+      "expected": [],
+      "note": "The 'hf_' prefix immediately preceded by an alphanumeric/dash character ('legacyhf_...') is a truncated slice of a wider benign identifier, not a boundary-delimited credential, so no candidate is emitted; a real secret substring is never carved out of a longer surrounding token."
+    },
+    {
+      "id": "huggingface-positive-punctuation-adjacent",
+      "detector": "huggingface-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Rotate hf_SYNTHETIC_REVOKED_KEY_VALUE, then redeploy.",
+      "expected": [
+        {
+          "detector": "huggingface-token",
+          "type": "huggingface_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 7,
+          "end": 37
+        }
+      ],
+      "note": "Trailing prose punctuation immediately after the suffix correctly bounds the match instead of being folded into it or suppressing the finding."
+    },
+    {
+      "id": "huggingface-positive-json",
+      "detector": "huggingface-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"apiKey\": \"hf_SYNTHETIC_REVOKED_CONFORMANCE_KEY\"}",
+      "expected": [
+        {
+          "detector": "huggingface-token",
+          "type": "huggingface_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 12,
+          "end": 48
+        }
+      ],
+      "note": "A quoted JSON string value is detected the same as a bare one; the enclosing quotes are not part of the match."
+    },
+    {
+      "id": "huggingface-positive-yaml",
+      "detector": "huggingface-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "huggingface_api_key: hf_SYNTHETIC_REVOKED_CONFORMANCE_KEY\n",
+      "expected": [
+        {
+          "detector": "huggingface-token",
+          "type": "huggingface_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 21,
+          "end": 57
+        }
+      ],
+      "note": "A YAML mapping value is detected the same as a bare one."
+    },
+    {
+      "id": "huggingface-positive-log",
+      "detector": "huggingface-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-16T00:00:00Z INFO calling huggingface key=hf_SYNTHETIC_REVOKED_CONFORMANCE_KEY status=200",
+      "expected": [
+        {
+          "detector": "huggingface-token",
+          "type": "huggingface_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 50,
+          "end": 86
+        }
+      ],
+      "note": "A provider token embedded in a structured log line is still detected."
+    },
+    {
+      "id": "huggingface-positive-shell-quoted",
+      "detector": "huggingface-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export HUGGINGFACE_API_KEY=\"hf_SYNTHETIC_REVOKED_CONFORMANCE_KEY\"\n",
+      "expected": [
+        {
+          "detector": "huggingface-token",
+          "type": "huggingface_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 28,
+          "end": 64
+        }
+      ],
+      "note": "A double-quoted shell export value is detected the same as a bare one; the enclosing quotes are not part of the match."
+    },
+    {
+      "id": "huggingface-positive-yaml-crlf",
+      "detector": "huggingface-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "huggingface_api_key: hf_SYNTHETIC_REVOKED_CONFORMANCE_KEY\r\n",
+      "expected": [
+        {
+          "detector": "huggingface-token",
+          "type": "huggingface_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 21,
+          "end": 57
+        }
+      ],
+      "note": "A CRLF line terminator immediately after the match is not folded into it and does not suppress it."
+    },
+    {
+      "id": "huggingface-positive-repeated-value",
+      "detector": "huggingface-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "hf_SYNTHETIC_REVOKED_CONFORMANCE_KEY hf_SYNTHETIC_REVOKED_CONFORMANCE_KEY",
+      "expected": [
+        {
+          "detector": "huggingface-token",
+          "type": "huggingface_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 36
+        },
+        {
+          "detector": "huggingface-token",
+          "type": "huggingface_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 37,
+          "end": 73
+        }
+      ],
+      "note": "An identical value repeated in the same input is reported once per independent occurrence, not deduplicated."
+    },
+    {
+      "id": "huggingface-positive-unicode-byte-offset",
+      "detector": "huggingface-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\ud83d\udd11 Authorization: Bearer hf_SYNTHETIC_REVOKED_CONFORMANCE_KEY",
+      "expected": [
+        {
+          "detector": "huggingface-token",
+          "type": "huggingface_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 27,
+          "end": 63
+        }
+      ],
+      "note": "A preceding astral-plane emoji (a 4-byte UTF-8 sequence, a UTF-16 surrogate pair) shifts the match's UTF-8 byte offsets; the range is still exact."
+    },
+    {
+      "id": "huggingface-negative-percent-encoded-lookalike",
+      "detector": "huggingface-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "hf%5FSYNTHETIC_REVOKED_CONFORMANCE_KEY",
+      "expected": [],
+      "note": "A percent-encoded rendering of the documented delimiter ('hf%5F' in place of 'hf_') does not literally match the prefix's own bytes, so no candidate is emitted; a URL-decoded lookalike is an intentional false negative rather than a fuzzy match."
+    },
+    {
+      "id": "huggingface-positive-markdown-delimiter",
+      "detector": "huggingface-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "markdown"
+      ],
+      "input": "`hf_SYNTHETIC_REVOKED_CONFORMANCE_KEY` must be rotated before reuse.",
+      "expected": [
+        {
+          "detector": "huggingface-token",
+          "type": "huggingface_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1,
+          "end": 37
+        }
+      ],
+      "note": "A Markdown inline-code span wrapping the value in backticks does not defeat detection: the backtick is outside the boundary alphabet, so the match is found at its correct offsets with the delimiters excluded."
+    },
+    {
+      "id": "huggingface-negative-model-repository-name",
+      "detector": "huggingface-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "http"
+      ],
+      "input": "https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct",
+      "expected": [],
+      "note": "A Hugging Face model-repository URL (organization/model-name path) carries no credential shape and is not classified."
+    },
+    {
+      "id": "linear-positive-doc-style-placeholder",
+      "detector": "linear-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "lin_api_xxxxxxxxxxxxxxxxxxxx",
+      "expected": [
+        {
+          "detector": "linear-token",
+          "type": "linear_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 28
+        }
+      ],
+      "note": "A documentation placeholder built entirely from valid alphabet characters (e.g. a repeated filler letter) is indistinguishable from a real secret's shape and is classified: an accepted precision/recall tradeoff, not a bug. Only a placeholder that breaks the alphabet run (angle brackets, characters outside the allowed set) is excluded."
+    },
+    {
+      "id": "linear-negative-embedded-in-wider-identifier",
+      "detector": "linear-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "legacylin_api_SYNTHETIC_REVOKED_KEY_VALUE",
+      "expected": [],
+      "note": "The 'lin_api_' prefix immediately preceded by an alphanumeric/dash character ('legacylin_api_...') is a truncated slice of a wider benign identifier, not a boundary-delimited credential, so no candidate is emitted; a real secret substring is never carved out of a longer surrounding token."
+    },
+    {
+      "id": "linear-positive-punctuation-adjacent",
+      "detector": "linear-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Rotate lin_api_SYNTHETIC_REVOKED_KEY_VALUE, then redeploy.",
+      "expected": [
+        {
+          "detector": "linear-token",
+          "type": "linear_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 7,
+          "end": 42
+        }
+      ],
+      "note": "Trailing prose punctuation immediately after the suffix correctly bounds the match instead of being folded into it or suppressing the finding."
+    },
+    {
+      "id": "linear-positive-json",
+      "detector": "linear-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"apiKey\": \"lin_api_SYNTHETIC_REVOKED_CONFORMANCE_KEY\"}",
+      "expected": [
+        {
+          "detector": "linear-token",
+          "type": "linear_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 12,
+          "end": 53
+        }
+      ],
+      "note": "A quoted JSON string value is detected the same as a bare one; the enclosing quotes are not part of the match."
+    },
+    {
+      "id": "linear-positive-yaml",
+      "detector": "linear-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "linear_api_key: lin_api_SYNTHETIC_REVOKED_CONFORMANCE_KEY\n",
+      "expected": [
+        {
+          "detector": "linear-token",
+          "type": "linear_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 16,
+          "end": 57
+        }
+      ],
+      "note": "A YAML mapping value is detected the same as a bare one."
+    },
+    {
+      "id": "linear-positive-log",
+      "detector": "linear-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-16T00:00:00Z INFO calling linear key=lin_api_SYNTHETIC_REVOKED_CONFORMANCE_KEY status=200",
+      "expected": [
+        {
+          "detector": "linear-token",
+          "type": "linear_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 45,
+          "end": 86
+        }
+      ],
+      "note": "A provider token embedded in a structured log line is still detected."
+    },
+    {
+      "id": "linear-positive-shell-quoted",
+      "detector": "linear-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export LINEAR_API_KEY=\"lin_api_SYNTHETIC_REVOKED_CONFORMANCE_KEY\"\n",
+      "expected": [
+        {
+          "detector": "linear-token",
+          "type": "linear_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 23,
+          "end": 64
+        }
+      ],
+      "note": "A double-quoted shell export value is detected the same as a bare one; the enclosing quotes are not part of the match."
+    },
+    {
+      "id": "linear-positive-yaml-crlf",
+      "detector": "linear-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "linear_api_key: lin_api_SYNTHETIC_REVOKED_CONFORMANCE_KEY\r\n",
+      "expected": [
+        {
+          "detector": "linear-token",
+          "type": "linear_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 16,
+          "end": 57
+        }
+      ],
+      "note": "A CRLF line terminator immediately after the match is not folded into it and does not suppress it."
+    },
+    {
+      "id": "linear-positive-repeated-value",
+      "detector": "linear-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "lin_api_SYNTHETIC_REVOKED_CONFORMANCE_KEY lin_api_SYNTHETIC_REVOKED_CONFORMANCE_KEY",
+      "expected": [
+        {
+          "detector": "linear-token",
+          "type": "linear_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 41
+        },
+        {
+          "detector": "linear-token",
+          "type": "linear_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 42,
+          "end": 83
+        }
+      ],
+      "note": "An identical value repeated in the same input is reported once per independent occurrence, not deduplicated."
+    },
+    {
+      "id": "linear-positive-unicode-byte-offset",
+      "detector": "linear-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\ud83d\udd11 Authorization: Bearer lin_api_SYNTHETIC_REVOKED_CONFORMANCE_KEY",
+      "expected": [
+        {
+          "detector": "linear-token",
+          "type": "linear_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 27,
+          "end": 68
+        }
+      ],
+      "note": "A preceding astral-plane emoji (a 4-byte UTF-8 sequence, a UTF-16 surrogate pair) shifts the match's UTF-8 byte offsets; the range is still exact."
+    },
+    {
+      "id": "linear-negative-percent-encoded-lookalike",
+      "detector": "linear-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "lin%5Fapi_SYNTHETIC_REVOKED_CONFORMANCE_KEY",
+      "expected": [],
+      "note": "A percent-encoded rendering of the documented delimiter ('lin%5Fapi_' in place of 'lin_api_') does not literally match the prefix's own bytes, so no candidate is emitted; a URL-decoded lookalike is an intentional false negative rather than a fuzzy match."
+    },
+    {
+      "id": "linear-positive-markdown-delimiter",
+      "detector": "linear-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "markdown"
+      ],
+      "input": "`lin_api_SYNTHETIC_REVOKED_CONFORMANCE_KEY` must be rotated before reuse.",
+      "expected": [
+        {
+          "detector": "linear-token",
+          "type": "linear_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1,
+          "end": 42
+        }
+      ],
+      "note": "A Markdown inline-code span wrapping the value in backticks does not defeat detection: the backtick is outside the boundary alphabet, so the match is found at its correct offsets with the delimiters excluded."
+    },
+    {
+      "id": "linear-negative-issue-identifier",
+      "detector": "linear-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "http"
+      ],
+      "input": "See https://linear.app/acme/issue/ENG-1234/fix-flaky-onboarding-test for details.",
+      "expected": [],
+      "note": "A Linear issue-tracker URL with an issue identifier (ENG-1234) carries no credential shape and is not classified."
+    },
+    {
+      "id": "slack-positive-doc-style-placeholder",
+      "detector": "slack-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xoxb-xxxxxxxxxxxxxxxxxxxx",
+      "expected": [
+        {
+          "detector": "slack-token",
+          "type": "slack_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 25
+        }
+      ],
+      "note": "A documentation placeholder built entirely from valid alphabet characters (e.g. a repeated filler letter) is indistinguishable from a real secret's shape and is classified: an accepted precision/recall tradeoff, not a bug. Only a placeholder that breaks the alphabet run (angle brackets, characters outside the allowed set) is excluded."
+    },
+    {
+      "id": "slack-negative-embedded-in-wider-identifier",
+      "detector": "slack-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "legacyxoxb-SYNTHETIC_REVOKED_KEY_VALUE",
+      "expected": [],
+      "note": "The 'xoxb-' prefix immediately preceded by an alphanumeric/dash character ('legacyxoxb-...') is a truncated slice of a wider benign identifier, not a boundary-delimited credential, so no candidate is emitted; a real secret substring is never carved out of a longer surrounding token."
+    },
+    {
+      "id": "slack-positive-punctuation-adjacent",
+      "detector": "slack-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Rotate xoxb-SYNTHETIC_REVOKED_KEY_VALUE, then redeploy.",
+      "expected": [
+        {
+          "detector": "slack-token",
+          "type": "slack_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 7,
+          "end": 39
+        }
+      ],
+      "note": "Trailing prose punctuation immediately after the suffix correctly bounds the match instead of being folded into it or suppressing the finding."
+    },
+    {
+      "id": "slack-positive-json",
+      "detector": "slack-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"apiKey\": \"xoxb-SYNTHETIC_REVOKED_CONFORMANCE_KEY\"}",
+      "expected": [
+        {
+          "detector": "slack-token",
+          "type": "slack_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 12,
+          "end": 50
+        }
+      ],
+      "note": "A quoted JSON string value is detected the same as a bare one; the enclosing quotes are not part of the match."
+    },
+    {
+      "id": "slack-positive-yaml",
+      "detector": "slack-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "slack_api_key: xoxb-SYNTHETIC_REVOKED_CONFORMANCE_KEY\n",
+      "expected": [
+        {
+          "detector": "slack-token",
+          "type": "slack_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 15,
+          "end": 53
+        }
+      ],
+      "note": "A YAML mapping value is detected the same as a bare one."
+    },
+    {
+      "id": "slack-positive-log",
+      "detector": "slack-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-16T00:00:00Z INFO calling slack key=xoxb-SYNTHETIC_REVOKED_CONFORMANCE_KEY status=200",
+      "expected": [
+        {
+          "detector": "slack-token",
+          "type": "slack_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 44,
+          "end": 82
+        }
+      ],
+      "note": "A provider token embedded in a structured log line is still detected."
+    },
+    {
+      "id": "slack-positive-shell-quoted",
+      "detector": "slack-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export SLACK_API_KEY=\"xoxb-SYNTHETIC_REVOKED_CONFORMANCE_KEY\"\n",
+      "expected": [
+        {
+          "detector": "slack-token",
+          "type": "slack_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 60
+        }
+      ],
+      "note": "A double-quoted shell export value is detected the same as a bare one; the enclosing quotes are not part of the match."
+    },
+    {
+      "id": "slack-positive-yaml-crlf",
+      "detector": "slack-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "slack_api_key: xoxb-SYNTHETIC_REVOKED_CONFORMANCE_KEY\r\n",
+      "expected": [
+        {
+          "detector": "slack-token",
+          "type": "slack_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 15,
+          "end": 53
+        }
+      ],
+      "note": "A CRLF line terminator immediately after the match is not folded into it and does not suppress it."
+    },
+    {
+      "id": "slack-positive-repeated-value",
+      "detector": "slack-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xoxb-SYNTHETIC_REVOKED_CONFORMANCE_KEY xoxb-SYNTHETIC_REVOKED_CONFORMANCE_KEY",
+      "expected": [
+        {
+          "detector": "slack-token",
+          "type": "slack_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 38
+        },
+        {
+          "detector": "slack-token",
+          "type": "slack_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 39,
+          "end": 77
+        }
+      ],
+      "note": "An identical value repeated in the same input is reported once per independent occurrence, not deduplicated."
+    },
+    {
+      "id": "slack-positive-unicode-byte-offset",
+      "detector": "slack-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\ud83d\udd11 Authorization: Bearer xoxb-SYNTHETIC_REVOKED_CONFORMANCE_KEY",
+      "expected": [
+        {
+          "detector": "slack-token",
+          "type": "slack_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 27,
+          "end": 65
+        }
+      ],
+      "note": "A preceding astral-plane emoji (a 4-byte UTF-8 sequence, a UTF-16 surrogate pair) shifts the match's UTF-8 byte offsets; the range is still exact."
+    },
+    {
+      "id": "slack-negative-percent-encoded-lookalike",
+      "detector": "slack-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xoxb%2DSYNTHETIC_REVOKED_CONFORMANCE_KEY",
+      "expected": [],
+      "note": "A percent-encoded rendering of the documented delimiter ('xoxb%2D' in place of 'xoxb-') does not literally match the prefix's own bytes, so no candidate is emitted; a URL-decoded lookalike is an intentional false negative rather than a fuzzy match."
+    },
+    {
+      "id": "slack-positive-markdown-delimiter",
+      "detector": "slack-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "markdown"
+      ],
+      "input": "`xoxb-SYNTHETIC_REVOKED_CONFORMANCE_KEY` must be rotated before reuse.",
+      "expected": [
+        {
+          "detector": "slack-token",
+          "type": "slack_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1,
+          "end": 39
+        }
+      ],
+      "note": "A Markdown inline-code span wrapping the value in backticks does not defeat detection: the backtick is outside the boundary alphabet, so the match is found at its correct offsets with the delimiters excluded."
+    },
+    {
+      "id": "slack-negative-team-channel-id",
+      "detector": "slack-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "http"
+      ],
+      "input": "https://app.slack.com/client/T0123ABCD/C0456EFGH",
+      "expected": [],
+      "note": "Slack workspace/channel identifiers (T.../C...) in a client URL share no prefix with any documented token namespace and are not classified."
+    },
+    {
+      "id": "sendgrid-positive-doc-style-placeholder",
+      "detector": "sendgrid-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "SG.xxxxxxxxxxxxxxxxxxxxxx.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "expected": [
+        {
+          "detector": "sendgrid-token",
+          "type": "sendgrid_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 69
+        }
+      ],
+      "note": "A documentation placeholder built entirely from valid alphabet characters at the exact documented segment lengths is indistinguishable from a real key's shape and is classified: an accepted precision/recall tradeoff, not a bug. Only a placeholder that breaks the alphabet run or the segment lengths is excluded."
+    },
+    {
+      "id": "sendgrid-positive-punctuation-adjacent",
+      "detector": "sendgrid-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Rotate SG.SYNTHETIC_REVOKED_0000.SYNTHETIC_REVOKED_SENDGRID_SECRET_000000000, then redeploy.",
+      "expected": [
+        {
+          "detector": "sendgrid-token",
+          "type": "sendgrid_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 7,
+          "end": 76
+        }
+      ],
+      "note": "Trailing prose punctuation immediately after the secret segment correctly bounds the match instead of being folded into it or suppressing the finding."
+    },
+    {
+      "id": "sendgrid-positive-yaml",
+      "detector": "sendgrid-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "sendgrid_api_key: SG.SYNTHETIC_REVOKED_0000.SYNTHETIC_REVOKED_SENDGRID_SECRET_000000000\n",
+      "expected": [
+        {
+          "detector": "sendgrid-token",
+          "type": "sendgrid_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 18,
+          "end": 87
+        }
+      ],
+      "note": "A YAML mapping value is detected the same as a bare one."
+    },
+    {
+      "id": "sendgrid-positive-log",
+      "detector": "sendgrid-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-16T00:00:00Z INFO calling sendgrid key=SG.SYNTHETIC_REVOKED_0000.SYNTHETIC_REVOKED_SENDGRID_SECRET_000000000 status=200",
+      "expected": [
+        {
+          "detector": "sendgrid-token",
+          "type": "sendgrid_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 47,
+          "end": 116
+        }
+      ],
+      "note": "A provider token embedded in a structured log line is still detected."
+    },
+    {
+      "id": "sendgrid-positive-shell-quoted",
+      "detector": "sendgrid-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export SENDGRID_API_KEY=\"SG.SYNTHETIC_REVOKED_0000.SYNTHETIC_REVOKED_SENDGRID_SECRET_000000000\"\n",
+      "expected": [
+        {
+          "detector": "sendgrid-token",
+          "type": "sendgrid_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 94
+        }
+      ],
+      "note": "A double-quoted shell export value is detected the same as a bare one; the enclosing quotes are not part of the match."
+    },
+    {
+      "id": "sendgrid-positive-repeated-value",
+      "detector": "sendgrid-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "SG.SYNTHETIC_REVOKED_0000.SYNTHETIC_REVOKED_SENDGRID_SECRET_000000000 SG.SYNTHETIC_REVOKED_0000.SYNTHETIC_REVOKED_SENDGRID_SECRET_000000000",
+      "expected": [
+        {
+          "detector": "sendgrid-token",
+          "type": "sendgrid_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 69
+        },
+        {
+          "detector": "sendgrid-token",
+          "type": "sendgrid_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 70,
+          "end": 139
+        }
+      ],
+      "note": "An identical value repeated in the same input is reported once per independent occurrence, not deduplicated."
+    },
+    {
+      "id": "sendgrid-positive-trailing-url-safe-characters",
+      "detector": "sendgrid-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "SG.SYNTHETIC_REVOKED_000-.SYNTHETIC_REVOKED_SENDGRID_SECRET_00000000_",
+      "expected": [
+        {
+          "detector": "sendgrid-token",
+          "type": "sendgrid_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 69
+        }
+      ],
+      "note": "SendGrid's documented alphabet is URL-safe base64 ([A-Za-z0-9_-]); an id or secret segment ending in a literal '-' or '_' at the exact documented length is still matched in full, not truncated one byte short by mistaking the trailing character for a delimiter."
+    },
+    {
+      "id": "sendgrid-negative-percent-encoded-lookalike",
+      "detector": "sendgrid-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "SG%2ESYNTHETIC_REVOKED_0000.SYNTHETIC_REVOKED_SENDGRID_SECRET_000000000",
+      "expected": [],
+      "note": "A percent-encoded rendering of the documented '.' separator ('SG%2E' in place of 'SG.') does not literally match the prefix's own bytes, so no candidate is emitted; a URL-decoded lookalike is an intentional false negative rather than a fuzzy match."
+    },
+    {
+      "id": "sendgrid-positive-markdown-delimiter",
+      "detector": "sendgrid-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "markdown"
+      ],
+      "input": "`SG.SYNTHETIC_REVOKED_0000.SYNTHETIC_REVOKED_SENDGRID_SECRET_000000000` must be rotated before reuse.",
+      "expected": [
+        {
+          "detector": "sendgrid-token",
+          "type": "sendgrid_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1,
+          "end": 70
+        }
+      ],
+      "note": "A Markdown inline-code span wrapping the value in backticks does not defeat detection: the backtick is outside the boundary alphabet, so the match is found at its correct offsets with the delimiters excluded."
+    },
+    {
+      "id": "sendgrid-negative-harmless-url",
+      "detector": "sendgrid-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "http"
+      ],
+      "input": "Rotate your key at https://app.sendgrid.com/settings/api_keys before Friday.",
+      "expected": [],
+      "note": "A harmless SendGrid dashboard URL and ordinary provider-name prose carry no two-segment SG.<id>.<secret> shape and are not classified."
     }
   ]
 }
