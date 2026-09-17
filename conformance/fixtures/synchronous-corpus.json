@@ -26235,7 +26235,7 @@
       "detector": "docker-token",
       "kind": "positive",
       "support": "supported",
-      "tier": "canonical",
+      "tier": "contextual",
       "contexts": [
         "markdown"
       ],
