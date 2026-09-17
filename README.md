@@ -260,6 +260,28 @@ return modelGateway.respond({ input: result.text });
 
 Never log raw request or tool bodies before authoritative scanning.
 
+## Mask secrets in traces
+
+Wire the same detection into LLM tracing SDKs so prompts, tool calls, and
+spans never carry a secret into observability storage. See
+[`examples/tracing-masking/`](examples/tracing-masking/) for the masking
+callback, an OpenTelemetry `SpanProcessor`, and their tests.
+
+```ts
+import { Langfuse } from "langfuse";
+import { createMaskSecrets } from "./examples/tracing-masking/langfuse-mask.mjs";
+
+const maskSecrets = await createMaskSecrets();
+const langfuse = new Langfuse({ mask: ({ data }) => maskSecrets(data) });
+```
+
+```python
+from langfuse import Langfuse
+from langfuse_mask import mask_secrets
+
+langfuse = Langfuse(mask=mask_secrets)
+```
+
 ## CLI quick start
 
 The `redact-secret` binary is a host adapter over the same core, for CI,

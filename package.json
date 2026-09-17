@@ -20,7 +20,7 @@
     "addon:qualify": "node scripts/qualify-node-addon.mjs",
     "cli:qualify": "node scripts/qualify-cli-binary.mjs",
     "ci": "npm run decisions:validate && npm run legacy-identifiers:check && npm run python:check && npm run artifacts:check && npm run coverage:check && npm run assessment:check && npm run release-manifest:test && npm run reconcile-guard:test && npm run reconcile-artifact-plan:test && npm run release-environment:check && npm run release-gate:check && npm run release-refs:check && npm run sast:test && npm run examples:test && npm run js:typecheck && npm run js:test",
-    "examples:test": "node --test examples/safe-integration/integration.test.mjs",
+    "examples:test": "node --test examples/safe-integration/integration.test.mjs examples/tracing-masking/mask-secrets.test.mjs examples/tracing-masking/redact-span-attributes.test.mjs",
     "decisions:validate": "python3 -B -m unittest discover -s scripts/tests -p 'test_validate_decisions.py' && python3 -B scripts/validate-decisions.py",
     "legacy-identifiers:check": "python3 -B -m unittest discover -s scripts/tests -p 'test_check_legacy_identifiers.py' && python3 -B scripts/check-legacy-identifiers.py",
     "python:check": "python3 -B -m unittest discover -s scripts/tests -p 'test_check_python_package.py' && python3 -B scripts/check-python-package.py",
