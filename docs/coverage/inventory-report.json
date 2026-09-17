@@ -1341,6 +1341,73 @@
       "type": "twilio_api_key_secret"
     },
     {
+      "detector": "datadog-api-key",
+      "evidence": {
+        "fixtureCount": 15,
+        "hostContextsExercised": [
+          "dotenv",
+          "json",
+          "plain-text",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "datadog-api-key-positive-bare-with-header-marker",
+        "datadog-api-key-positive-dotenv-marker",
+        "datadog-api-key-positive-json-marker",
+        "datadog-api-key-positive-yaml-vendor-keyword",
+        "datadog-api-key-regression-crlf-and-unicode-prefix"
+      ],
+      "policyClass": "confidence-gated",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "datadog_api_key"
+    },
+    {
+      "detector": "datadog-application-key",
+      "evidence": {
+        "fixtureCount": 13,
+        "hostContextsExercised": [
+          "dotenv",
+          "json",
+          "plain-text",
+          "shell"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "datadog-application-key-positive-app-key-shorthand-marker",
+        "datadog-application-key-positive-bare-with-header-marker",
+        "datadog-application-key-positive-dotenv-marker",
+        "datadog-application-key-positive-json-vendor-keyword",
+        "datadog-application-key-regression-crlf-and-unicode-prefix"
+      ],
+      "policyClass": "confidence-gated",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "datadog_application_key"
+    },
+    {
       "detector": "grafana-service-account-token",
       "evidence": {
         "fixtureCount": 15,
@@ -1412,7 +1479,7 @@
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 37,
+    "supported": 39,
     "unresolved": 0
   }
 }

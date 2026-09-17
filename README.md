@@ -206,8 +206,8 @@ Built-in Rust detection covers:
 - qualified Stripe, Slack, PyPI, Hugging Face, Docker Hub, Cloudflare,
   DigitalOcean, Linear, Supabase, Vercel, SendGrid, Google Cloud/Gemini,
   Notion, Atlassian Cloud (Jira / Confluence), Twilio Auth Token/API Key
-  Secret, Telegram Bot API, Discord bot, Grafana service account, and Grafana
-  Cloud access policy credentials;
+  Secret, Telegram Bot API, Discord bot, Datadog API/Application Key, Grafana
+  service account, and Grafana Cloud access policy credentials;
 - contextual credential assignments, including AWS secret-access-key and
   session-token setting names;
 - credential-bearing PostgreSQL, MySQL, MariaDB, MongoDB, Redis, and AMQP URLs;

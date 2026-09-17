@@ -15,6 +15,7 @@ mod aws;
 mod azure_devops;
 mod bearer_token;
 mod connection_string;
+mod datadog;
 mod discord;
 mod generic_token;
 mod github;
@@ -75,6 +76,8 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(twilio::TwilioApiKeySecretDetector),
         telegram::telegram_bot_token_detector(),
         Box::new(discord::DiscordBotTokenDetector),
+        Box::new(datadog::DatadogApiKeyDetector),
+        Box::new(datadog::DatadogApplicationKeyDetector),
         Box::new(grafana::GrafanaServiceAccountTokenDetector),
         Box::new(additional_providers::GRAFANA_CLOUD),
         jwt::jwt_detector(),
@@ -138,6 +141,8 @@ mod tests {
                 "twilio-api-key-secret",
                 "telegram-bot-token",
                 "discord-bot-token",
+                "datadog-api-key",
+                "datadog-application-key",
                 "grafana-service-account-token",
                 "grafana-cloud-access-policy-token",
                 "jwt",
@@ -191,7 +196,10 @@ mod tests {
         let discord_input = "MDAwMDAwMDAwMDAwMDAwMDAw.REVOKE.SYNTHETICREVOKEDBOTTOKENFIX";
         let grafana_sa_input = "glsa_SYNTHETICREVOKEDGRAFANASATOKEN01_deadbeef";
         let grafana_cloud_input = "glc_SYNTHETICREVOKEDGRAFANACLOUDACCESSPOLICYTOKEN";
-        let cases: [(&str, &str); 30] = [
+        let datadog_api_key_input = "DD_API_KEY=0123456789abcdef0123456789abcdef";
+        let datadog_application_key_input =
+            "DD_APPLICATION_KEY=0123456789abcdef0123456789abcdef01234567";
+        let cases: [(&str, &str); 32] = [
             ("aws-access-key", "AKIASYNTHETICEXAMPLE"),
             (
                 "github-token",
@@ -235,6 +243,8 @@ mod tests {
             ("twilio-api-key-secret", twilio_api_key_secret_input),
             ("discord-bot-token", discord_input),
             ("telegram-bot-token", telegram_input),
+            ("datadog-api-key", datadog_api_key_input),
+            ("datadog-application-key", datadog_application_key_input),
             ("grafana-service-account-token", grafana_sa_input),
             ("grafana-cloud-access-policy-token", grafana_cloud_input),
         ];

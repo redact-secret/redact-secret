@@ -153,7 +153,9 @@ mod tests {
         assert!(is_alnum_dash(b'-') && is_alnum_dash(b'_') && !is_alnum_dash(b'.'));
         assert!(is_alnum_dash_dot(b'.') && is_alnum_dash_dot(b'-'));
         assert!(
-            is_base64_body(b'+') && is_base64_body(b'/') && !is_base64_body(b'=')
+            is_base64_body(b'+')
+                && is_base64_body(b'/')
+                && !is_base64_body(b'=')
                 && !is_base64_body(b'_')
         );
     }

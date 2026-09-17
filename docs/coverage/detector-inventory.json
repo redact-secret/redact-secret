@@ -276,6 +276,20 @@
       "schemes": null
     },
     {
+      "type": "datadog_api_key",
+      "detector": "datadog-api-key",
+      "policyClass": "confidence-gated",
+      "reconciliationTrigger": "DD_API_KEY=0123456789abcdef0123456789abcdef",
+      "schemes": null
+    },
+    {
+      "type": "datadog_application_key",
+      "detector": "datadog-application-key",
+      "policyClass": "confidence-gated",
+      "reconciliationTrigger": "DD_APPLICATION_KEY=0123456789abcdef0123456789abcdef01234567",
+      "schemes": null
+    },
+    {
       "type": "grafana_service_account_token",
       "detector": "grafana-service-account-token",
       "policyClass": "always-redact",
