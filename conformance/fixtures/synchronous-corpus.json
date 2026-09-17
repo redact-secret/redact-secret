@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 1000,
+  "fixtureCount": 1032,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -5059,7 +5059,13 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "dop_v1_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_",
+      "mutation": {
+        "grammar": "digitalocean-v1",
+        "seedId": "digitalocean-v1-synthetic-seed",
+        "operation": "identity",
+        "ordinal": 0
+      },
+      "input": "dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9",
       "expected": [
         {
           "detector": "digitalocean-token",
@@ -5067,10 +5073,10 @@
           "confidence": "high",
           "specificity": "provider",
           "start": 0,
-          "end": 43
+          "end": 71
         }
       ],
-      "note": "A provider-published prefix with a substantial synthetic suffix is supported."
+      "note": "The reviewed contract's identity case: a documented prefix followed by exactly 64 lowercase hexadecimal bytes is supported. DigitalOcean API release notes 2022-03-29 (prefixes); gitleaks v8.30.1 digitalocean-pat/-access-token/-refresh-token and trufflehog v3.97.4 digitaloceanv2 ([a-f0-9]{64})."
     },
     {
       "id": "digitalocean-negative-ordinary-reference",
@@ -5113,7 +5119,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "access_token=dop_v1_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_",
+      "input": "access_token=dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9",
       "expected": [
         {
           "detector": "digitalocean-token",
@@ -5121,32 +5127,10 @@
           "confidence": "high",
           "specificity": "provider",
           "start": 13,
-          "end": 56
+          "end": 84
         }
       ],
       "note": "Qualified provider evidence wins over a contextual assignment."
-    },
-    {
-      "id": "digitalocean-positive-min-length",
-      "detector": "digitalocean-token",
-      "kind": "positive",
-      "support": "supported",
-      "tier": "canonical",
-      "contexts": [
-        "plain-text"
-      ],
-      "input": "dop_v1_SYNTHETIC_REVOKED_SY",
-      "expected": [
-        {
-          "detector": "digitalocean-token",
-          "type": "digitalocean_token",
-          "confidence": "high",
-          "specificity": "provider",
-          "start": 0,
-          "end": 27
-        }
-      ],
-      "note": "The documented minimum suffix length, at its exact boundary, is supported."
     },
     {
       "id": "digitalocean-boundary-below-min",
@@ -5157,9 +5141,15 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "dop_v1_SYNTHETIC_REVOKED_S",
+      "mutation": {
+        "grammar": "digitalocean-v1",
+        "seedId": "digitalocean-v1-synthetic-seed",
+        "operation": "short-length",
+        "ordinal": 3
+      },
+      "input": "dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad",
       "expected": [],
-      "note": "A suffix exactly one byte short of the documented minimum length is rejected."
+      "note": "Length 63 vs contracted 64: the paired positive with its final byte dropped is rejected. This is the beta.4 regression reproduced by issue #369 (benchmark fixture digitalocean-token-dop-plain-twin, flagged by @redact-secret/core@0.1.0-beta.4 under the earlier 20-byte minimum). A fixed digitalocean-v1 grammar mutation (issue #369) records the accepted boundary or neighboring rejected form; exactly one structural property differs from the identity case. DigitalOcean API release notes 2022-03-29 (prefixes); gitleaks v8.30.1 digitalocean-pat/-access-token/-refresh-token and trufflehog v3.97.4 digitaloceanv2 ([a-f0-9]{64})."
     },
     {
       "id": "digitalocean-boundary-invalid-alphabet",
@@ -5170,9 +5160,15 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "dop_v1_SYNTH!ETIC_REVOKED_SYNTHETIC_RE",
+      "mutation": {
+        "grammar": "digitalocean-v1",
+        "seedId": "digitalocean-v1-synthetic-seed",
+        "operation": "invalid-alphabet",
+        "ordinal": 6
+      },
+      "input": "dop_v1_1f24601fg1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9",
       "expected": [],
-      "note": "An invalid character inside the suffix breaks the run before the minimum length is reached."
+      "note": "One byte outside [0-9a-f] inside an otherwise contracted 64-byte body breaks the run, so no candidate is emitted. A fixed digitalocean-v1 grammar mutation (issue #369) records the accepted boundary or neighboring rejected form; exactly one structural property differs from the identity case. DigitalOcean API release notes 2022-03-29 (prefixes); gitleaks v8.30.1 digitalocean-pat/-access-token/-refresh-token and trufflehog v3.97.4 digitaloceanv2 ([a-f0-9]{64})."
     },
     {
       "id": "digitalocean-boundary-delimiter",
@@ -5183,9 +5179,15 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "dop_v1_SYNTH ETIC_REVOKED_SYNTHETIC_RE",
+      "mutation": {
+        "grammar": "digitalocean-v1",
+        "seedId": "digitalocean-v1-synthetic-seed",
+        "operation": "whitespace-insertion",
+        "ordinal": 7
+      },
+      "input": "dop_v1_1f24601f d1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9",
       "expected": [],
-      "note": "An inserted space inside the suffix breaks the run instead of being silently bridged."
+      "note": "An inserted space inside the body breaks the run instead of being silently bridged. A fixed digitalocean-v1 grammar mutation (issue #369) records the accepted boundary or neighboring rejected form; exactly one structural property differs from the identity case. DigitalOcean API release notes 2022-03-29 (prefixes); gitleaks v8.30.1 digitalocean-pat/-access-token/-refresh-token and trufflehog v3.97.4 digitaloceanv2 ([a-f0-9]{64})."
     },
     {
       "id": "digitalocean-boundary-case-sensitivity",
@@ -5196,9 +5198,9 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "DOP_V1_SYNTHETIC_REVOKED_KEY_VALUE\nDOO_V1_SYNTHETIC_REVOKED_KEY_VALUE\nDOR_V1_SYNTHETIC_REVOKED_KEY_VALUE",
+      "input": "DOP_V1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9\nDOO_V1_025343c0555235768c29735f523ad644fbfe1569b1d88f46b4f506628ae8b08a\nDOR_V1_686b232b8722f7ab110b24d01fd9a96539cdec166f27e643ae9852b28d2b0da5",
       "expected": [],
-      "note": "Every documented prefix is matched case-sensitively; the realistic-length uppercased variants are wrong prefixes and are not classified."
+      "note": "Every documented prefix is matched case-sensitively; each uppercased prefix is followed by a contracted 64-byte body so the prefix case is the only differing property. gitleaks v8.30.1 alone matches dor_v1_ case-insensitively, a tool convenience with no provider evidence behind it, so all three prefixes stay case-sensitive here."
     },
     {
       "id": "digitalocean-negative-placeholder",
@@ -5222,9 +5224,15 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "dop_v2_SYNTHETIC_REVOKED_SY",
+      "mutation": {
+        "grammar": "digitalocean-v1",
+        "seedId": "digitalocean-v1-synthetic-seed",
+        "operation": "version-lookalike",
+        "ordinal": 10
+      },
+      "input": "dop_v2_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9",
       "expected": [],
-      "note": "Only the documented v1 DigitalOcean token namespace is matched; an unreleased version is a future false negative."
+      "note": "Only the documented v1 DigitalOcean token namespace is matched; an unreleased version with an otherwise contracted body is a future false negative. A fixed digitalocean-v1 grammar mutation (issue #369) records the accepted boundary or neighboring rejected form; exactly one structural property differs from the identity case. DigitalOcean API release notes 2022-03-29 (prefixes); gitleaks v8.30.1 digitalocean-pat/-access-token/-refresh-token and trufflehog v3.97.4 digitaloceanv2 ([a-f0-9]{64})."
     },
     {
       "id": "digitalocean-positive-all-prefixes",
@@ -5235,7 +5243,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "doo_v1_SYNTHETIC_REVOKED_SYNTHET\ndor_v1_SYNTHETIC_REVOKED_SYNTHET",
+      "input": "doo_v1_025343c0555235768c29735f523ad644fbfe1569b1d88f46b4f506628ae8b08a\ndor_v1_686b232b8722f7ab110b24d01fd9a96539cdec166f27e643ae9852b28d2b0da5",
       "expected": [
         {
           "detector": "digitalocean-token",
@@ -5243,18 +5251,18 @@
           "confidence": "high",
           "specificity": "provider",
           "start": 0,
-          "end": 32
+          "end": 71
         },
         {
           "detector": "digitalocean-token",
           "type": "digitalocean_token",
           "confidence": "high",
           "specificity": "provider",
-          "start": 33,
-          "end": 65
+          "start": 72,
+          "end": 143
         }
       ],
-      "note": "Every remaining documented prefix variant is independently supported."
+      "note": "Every remaining documented prefix variant (OAuth access and OAuth refresh) is independently supported with its own contracted 64-byte body."
     },
     {
       "id": "digitalocean-adversarial-long-suffix",
@@ -5267,43 +5275,25 @@
       ],
       "resource": {
         "maxInputBytes": 33774,
-        "maxFindings": 1,
+        "maxFindings": 0,
         "maxRuntimeMs": 250
       },
-      "input": "dop_v1_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_!",
-      "expected": [
-        {
-          "detector": "digitalocean-token",
-          "type": "digitalocean_token",
-          "confidence": "high",
-          "specificity": "provider",
-          "start": 0,
-          "end": 11257
-        }
-      ],
-      "note": "A long delimited provider match remains deterministic and bounded."
+      "input": "dop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01",
+      "expected": [],
+      "note": "A single 11250-byte lowercase-hex run after the documented prefix is a wider identifier, not a token: the exact 64-byte contract never carves a valid-looking substring out of it, and the scan stays linear and bounded (issue #369; previously this input matched as one 11257-byte finding under the minimum-length rule)."
     },
     {
-      "id": "digitalocean-positive-doc-style-placeholder",
+      "id": "digitalocean-negative-doc-style-placeholder",
       "detector": "digitalocean-token",
-      "kind": "positive",
+      "kind": "negative",
       "support": "supported",
-      "tier": "canonical",
+      "tier": "negative",
       "contexts": [
         "plain-text"
       ],
       "input": "dop_v1_xxxxxxxxxxxxxxxxxxxx",
-      "expected": [
-        {
-          "detector": "digitalocean-token",
-          "type": "digitalocean_token",
-          "confidence": "high",
-          "specificity": "provider",
-          "start": 0,
-          "end": 27
-        }
-      ],
-      "note": "A documentation placeholder built entirely from valid alphabet characters (e.g. a repeated filler letter) is indistinguishable from a real secret's shape and is classified: an accepted precision/recall tradeoff, not a bug. Only a placeholder that breaks the alphabet run (angle brackets, characters outside the allowed set) is excluded."
+      "expected": [],
+      "note": "Intentional behavior change (issue #369): this repeated-filler placeholder was previously classified under the 20-byte [A-Za-z0-9_-] minimum (as digitalocean-positive-doc-style-placeholder). 'x' is outside the contracted [0-9a-f] alphabet and 20 bytes is not the contracted 64, so it is now rejected. A hex-only filler of the contracted length is still classified; see digitalocean-positive-hex-placeholder."
     },
     {
       "id": "digitalocean-negative-embedded-in-wider-identifier",
@@ -5314,9 +5304,9 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "legacydop_v1_SYNTHETIC_REVOKED_KEY_VALUE\nlegacydoo_v1_SYNTHETIC_REVOKED_KEY_VALUE\nlegacydor_v1_SYNTHETIC_REVOKED_KEY_VALUE",
+      "input": "legacydop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9\nlegacydoo_v1_025343c0555235768c29735f523ad644fbfe1569b1d88f46b4f506628ae8b08a\nlegacydor_v1_686b232b8722f7ab110b24d01fd9a96539cdec166f27e643ae9852b28d2b0da5",
       "expected": [],
-      "note": "Every supported DigitalOcean prefix immediately preceded by an alphanumeric/dash character is a truncated slice of a wider benign identifier, not a boundary-delimited credential, so no candidate is emitted; a real secret substring is never carved out of a longer surrounding token."
+      "note": "Every supported DigitalOcean prefix immediately preceded by an alphanumeric/dash character is a truncated slice of a wider benign identifier, not a boundary-delimited credential, so no candidate is emitted even though a contracted 64-byte body follows; a real secret substring is never carved out of a longer surrounding token."
     },
     {
       "id": "digitalocean-positive-punctuation-adjacent",
@@ -5327,7 +5317,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "Rotate dop_v1_SYNTHETIC_REVOKED_KEY_VALUE, then redeploy.",
+      "input": "Rotate dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9, then redeploy.",
       "expected": [
         {
           "detector": "digitalocean-token",
@@ -5335,10 +5325,10 @@
           "confidence": "high",
           "specificity": "provider",
           "start": 7,
-          "end": 41
+          "end": 78
         }
       ],
-      "note": "Trailing prose punctuation immediately after the suffix correctly bounds the match instead of being folded into it or suppressing the finding."
+      "note": "Trailing prose punctuation immediately after the 64-byte body correctly bounds the match instead of being folded into it or suppressing the finding."
     },
     {
       "id": "digitalocean-negative-masked-secret-prefix",
@@ -5375,7 +5365,7 @@
       "contexts": [
         "dotenv"
       ],
-      "input": "DIGITALOCEAN_TOKEN=dop_v1_SYNTHETIC_REVOKED_KEY_VALUE",
+      "input": "DIGITALOCEAN_TOKEN=dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9",
       "expected": [
         {
           "detector": "digitalocean-token",
@@ -5383,7 +5373,7 @@
           "confidence": "high",
           "specificity": "provider",
           "start": 19,
-          "end": 53
+          "end": 90
         }
       ],
       "note": "A bare dotenv-style assignment (DIGITALOCEAN_TOKEN=<token>, no quotes) is detected by format alone."
@@ -5397,7 +5387,7 @@
       "contexts": [
         "json"
       ],
-      "input": "{\"digitaloceanToken\": \"dop_v1_SYNTHETIC_REVOKED_KEY_VALUE\"}",
+      "input": "{\"digitaloceanToken\": \"dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9\"}",
       "expected": [
         {
           "detector": "digitalocean-token",
@@ -5405,7 +5395,7 @@
           "confidence": "high",
           "specificity": "provider",
           "start": 23,
-          "end": 57
+          "end": 94
         }
       ],
       "note": "A quoted JSON string value is detected the same as a bare one; the enclosing quotes are not part of the match."
@@ -5419,7 +5409,7 @@
       "contexts": [
         "yaml"
       ],
-      "input": "digitalocean_token: dop_v1_SYNTHETIC_REVOKED_KEY_VALUE\n",
+      "input": "digitalocean_token: dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9\n",
       "expected": [
         {
           "detector": "digitalocean-token",
@@ -5427,7 +5417,7 @@
           "confidence": "high",
           "specificity": "provider",
           "start": 20,
-          "end": 54
+          "end": 91
         }
       ],
       "note": "A YAML mapping value is detected the same as a bare one."
@@ -5441,7 +5431,7 @@
       "contexts": [
         "log"
       ],
-      "input": "2026-09-16T00:00:00Z INFO provisioning droplet key=dop_v1_SYNTHETIC_REVOKED_KEY_VALUE region=nyc3",
+      "input": "2026-09-16T00:00:00Z INFO provisioning droplet key=dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9 region=nyc3",
       "expected": [
         {
           "detector": "digitalocean-token",
@@ -5449,7 +5439,7 @@
           "confidence": "high",
           "specificity": "provider",
           "start": 51,
-          "end": 85
+          "end": 122
         }
       ],
       "note": "A provider token embedded in a structured log line is still detected."
@@ -5463,7 +5453,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# \ud83d\udd11 caf\u00e9\r\ndop_v1_SYNTHETIC_REVOKED_KEY_VALUE\r\n",
+      "input": "# 🔑 café\r\ndop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9\r\n",
       "expected": [
         {
           "detector": "digitalocean-token",
@@ -5471,7 +5461,7 @@
           "confidence": "high",
           "specificity": "provider",
           "start": 14,
-          "end": 48
+          "end": 85
         }
       ],
       "note": "A match after a CRLF line ending and a Unicode-prefixed comment line is still found at the correct UTF-8 byte offset."
@@ -5488,6 +5478,681 @@
       "input": "resource: do:app:3f900b88-8eb1-4de4-b7a3-93c1fb2f8b1d",
       "expected": [],
       "note": "A DigitalOcean App Platform deployment/resource identifier is an ordinary UUID with no 'v1' token prefix, so it is not classified."
+    },
+    {
+      "id": "digitalocean-positive-oauth-access-prefix",
+      "detector": "digitalocean-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "mutation": {
+        "grammar": "digitalocean-v1",
+        "seedId": "digitalocean-v1-synthetic-seed",
+        "operation": "oauth-access-prefix",
+        "ordinal": 1
+      },
+      "input": "doo_v1_025343c0555235768c29735f523ad644fbfe1569b1d88f46b4f506628ae8b08a",
+      "expected": [
+        {
+          "detector": "digitalocean-token",
+          "type": "digitalocean_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 71
+        }
+      ],
+      "note": "The doo_v1_ OAuth access token prefix with a contracted 64-byte body. A fixed digitalocean-v1 grammar mutation (issue #369) records the accepted boundary or neighboring rejected form; exactly one structural property differs from the identity case. DigitalOcean API release notes 2022-03-29 (prefixes); gitleaks v8.30.1 digitalocean-pat/-access-token/-refresh-token and trufflehog v3.97.4 digitaloceanv2 ([a-f0-9]{64})."
+    },
+    {
+      "id": "digitalocean-positive-oauth-refresh-prefix",
+      "detector": "digitalocean-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "mutation": {
+        "grammar": "digitalocean-v1",
+        "seedId": "digitalocean-v1-synthetic-seed",
+        "operation": "oauth-refresh-prefix",
+        "ordinal": 2
+      },
+      "input": "dor_v1_686b232b8722f7ab110b24d01fd9a96539cdec166f27e643ae9852b28d2b0da5",
+      "expected": [
+        {
+          "detector": "digitalocean-token",
+          "type": "digitalocean_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 71
+        }
+      ],
+      "note": "The dor_v1_ OAuth refresh token prefix with a contracted 64-byte body. A fixed digitalocean-v1 grammar mutation (issue #369) records the accepted boundary or neighboring rejected form; exactly one structural property differs from the identity case. DigitalOcean API release notes 2022-03-29 (prefixes); gitleaks v8.30.1 digitalocean-pat/-access-token/-refresh-token and trufflehog v3.97.4 digitaloceanv2 ([a-f0-9]{64})."
+    },
+    {
+      "id": "digitalocean-boundary-long-length",
+      "detector": "digitalocean-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "mutation": {
+        "grammar": "digitalocean-v1",
+        "seedId": "digitalocean-v1-synthetic-seed",
+        "operation": "long-length",
+        "ordinal": 4
+      },
+      "input": "dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad90",
+      "expected": [],
+      "note": "Length 65 vs contracted 64: one extra hex byte makes the whole run a wider identifier, and no 64-byte token is carved out of it. A fixed digitalocean-v1 grammar mutation (issue #369) records the accepted boundary or neighboring rejected form; exactly one structural property differs from the identity case. DigitalOcean API release notes 2022-03-29 (prefixes); gitleaks v8.30.1 digitalocean-pat/-access-token/-refresh-token and trufflehog v3.97.4 digitaloceanv2 ([a-f0-9]{64})."
+    },
+    {
+      "id": "digitalocean-boundary-uppercase-hex",
+      "detector": "digitalocean-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "mutation": {
+        "grammar": "digitalocean-v1",
+        "seedId": "digitalocean-v1-synthetic-seed",
+        "operation": "uppercase-hex",
+        "ordinal": 5
+      },
+      "input": "dop_v1_1f24601fD1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9",
+      "expected": [],
+      "note": "One uppercase hex digit inside the body is outside the contracted lowercase [0-9a-f] alphabet, so the run breaks and no candidate is emitted. A fixed digitalocean-v1 grammar mutation (issue #369) records the accepted boundary or neighboring rejected form; exactly one structural property differs from the identity case. DigitalOcean API release notes 2022-03-29 (prefixes); gitleaks v8.30.1 digitalocean-pat/-access-token/-refresh-token and trufflehog v3.97.4 digitaloceanv2 ([a-f0-9]{64})."
+    },
+    {
+      "id": "digitalocean-boundary-invalid-prefix",
+      "detector": "digitalocean-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "mutation": {
+        "grammar": "digitalocean-v1",
+        "seedId": "digitalocean-v1-synthetic-seed",
+        "operation": "invalid-prefix",
+        "ordinal": 8
+      },
+      "input": "dov_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9",
+      "expected": [],
+      "note": "A one-letter-off prefix (dov_v1_) with a contracted body is not fuzzy-matched. A fixed digitalocean-v1 grammar mutation (issue #369) records the accepted boundary or neighboring rejected form; exactly one structural property differs from the identity case. DigitalOcean API release notes 2022-03-29 (prefixes); gitleaks v8.30.1 digitalocean-pat/-access-token/-refresh-token and trufflehog v3.97.4 digitaloceanv2 ([a-f0-9]{64})."
+    },
+    {
+      "id": "digitalocean-boundary-uppercase-prefix",
+      "detector": "digitalocean-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "mutation": {
+        "grammar": "digitalocean-v1",
+        "seedId": "digitalocean-v1-synthetic-seed",
+        "operation": "uppercase-prefix",
+        "ordinal": 9
+      },
+      "input": "DOP_V1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9",
+      "expected": [],
+      "note": "An uppercased prefix with a contracted body is a wrong prefix; prefixes are matched case-sensitively. A fixed digitalocean-v1 grammar mutation (issue #369) records the accepted boundary or neighboring rejected form; exactly one structural property differs from the identity case. DigitalOcean API release notes 2022-03-29 (prefixes); gitleaks v8.30.1 digitalocean-pat/-access-token/-refresh-token and trufflehog v3.97.4 digitaloceanv2 ([a-f0-9]{64})."
+    },
+    {
+      "id": "digitalocean-negative-leading-embedding",
+      "detector": "digitalocean-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "mutation": {
+        "grammar": "digitalocean-v1",
+        "seedId": "digitalocean-v1-synthetic-seed",
+        "operation": "leading-embedding",
+        "ordinal": 11
+      },
+      "input": "legacydop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9",
+      "expected": [],
+      "note": "An identifier fragment joined directly before the prefix makes the whole span a wider identifier; the contracted 64-byte token inside it is never extracted. A fixed digitalocean-v1 grammar mutation (issue #369) records the accepted boundary or neighboring rejected form; exactly one structural property differs from the identity case. DigitalOcean API release notes 2022-03-29 (prefixes); gitleaks v8.30.1 digitalocean-pat/-access-token/-refresh-token and trufflehog v3.97.4 digitaloceanv2 ([a-f0-9]{64})."
+    },
+    {
+      "id": "digitalocean-negative-trailing-embedding",
+      "detector": "digitalocean-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "mutation": {
+        "grammar": "digitalocean-v1",
+        "seedId": "digitalocean-v1-synthetic-seed",
+        "operation": "trailing-embedding",
+        "ordinal": 12
+      },
+      "input": "dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9_backup",
+      "expected": [],
+      "note": "An underscore-joined segment directly after the 64-byte body makes the whole span a wider identifier; the contracted token inside it is never extracted. A fixed digitalocean-v1 grammar mutation (issue #369) records the accepted boundary or neighboring rejected form; exactly one structural property differs from the identity case. DigitalOcean API release notes 2022-03-29 (prefixes); gitleaks v8.30.1 digitalocean-pat/-access-token/-refresh-token and trufflehog v3.97.4 digitaloceanv2 ([a-f0-9]{64})."
+    },
+    {
+      "id": "digitalocean-negative-dash-embedding",
+      "detector": "digitalocean-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "mutation": {
+        "grammar": "digitalocean-v1",
+        "seedId": "digitalocean-v1-synthetic-seed",
+        "operation": "dash-embedding",
+        "ordinal": 13
+      },
+      "input": "dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9-1",
+      "expected": [],
+      "note": "A dash-joined segment directly after the 64-byte body joins a wider identifier under the [A-Za-z0-9_-] boundary alphabet, so nothing is extracted. This is stricter than trufflehog's \\b word boundary, which treats '-' as a delimiter; the repository keeps its existing boundary rule (issue #320) rather than carving a token out of a dash-joined identifier. A fixed digitalocean-v1 grammar mutation (issue #369) records the accepted boundary or neighboring rejected form; exactly one structural property differs from the identity case. DigitalOcean API release notes 2022-03-29 (prefixes); gitleaks v8.30.1 digitalocean-pat/-access-token/-refresh-token and trufflehog v3.97.4 digitaloceanv2 ([a-f0-9]{64})."
+    },
+    {
+      "id": "digitalocean-positive-punctuation-boundary",
+      "detector": "digitalocean-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "mutation": {
+        "grammar": "digitalocean-v1",
+        "seedId": "digitalocean-v1-synthetic-seed",
+        "operation": "punctuation-boundary",
+        "ordinal": 14
+      },
+      "input": "dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9,",
+      "expected": [
+        {
+          "detector": "digitalocean-token",
+          "type": "digitalocean_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 71
+        }
+      ],
+      "note": "Trailing punctuation immediately after the body bounds the match. A fixed digitalocean-v1 grammar mutation (issue #369) records the accepted boundary or neighboring rejected form; exactly one structural property differs from the identity case. DigitalOcean API release notes 2022-03-29 (prefixes); gitleaks v8.30.1 digitalocean-pat/-access-token/-refresh-token and trufflehog v3.97.4 digitaloceanv2 ([a-f0-9]{64})."
+    },
+    {
+      "id": "digitalocean-positive-quoted",
+      "detector": "digitalocean-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "mutation": {
+        "grammar": "digitalocean-v1",
+        "seedId": "digitalocean-v1-synthetic-seed",
+        "operation": "quoted",
+        "ordinal": 15
+      },
+      "input": "\"dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9\"",
+      "expected": [
+        {
+          "detector": "digitalocean-token",
+          "type": "digitalocean_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1,
+          "end": 72
+        }
+      ],
+      "note": "Enclosing double quotes bound the match and are not part of it. A fixed digitalocean-v1 grammar mutation (issue #369) records the accepted boundary or neighboring rejected form; exactly one structural property differs from the identity case. DigitalOcean API release notes 2022-03-29 (prefixes); gitleaks v8.30.1 digitalocean-pat/-access-token/-refresh-token and trufflehog v3.97.4 digitaloceanv2 ([a-f0-9]{64})."
+    },
+    {
+      "id": "digitalocean-positive-markdown-code-span",
+      "detector": "digitalocean-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "markdown"
+      ],
+      "mutation": {
+        "grammar": "digitalocean-v1",
+        "seedId": "digitalocean-v1-synthetic-seed",
+        "operation": "markdown-code-span",
+        "ordinal": 16
+      },
+      "input": "`dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9`",
+      "expected": [
+        {
+          "detector": "digitalocean-token",
+          "type": "digitalocean_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1,
+          "end": 72
+        }
+      ],
+      "note": "A Markdown inline code span bounds the match; the backticks are not part of it. A fixed digitalocean-v1 grammar mutation (issue #369) records the accepted boundary or neighboring rejected form; exactly one structural property differs from the identity case. DigitalOcean API release notes 2022-03-29 (prefixes); gitleaks v8.30.1 digitalocean-pat/-access-token/-refresh-token and trufflehog v3.97.4 digitaloceanv2 ([a-f0-9]{64})."
+    },
+    {
+      "id": "digitalocean-boundary-encoded-prefix",
+      "detector": "digitalocean-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "mutation": {
+        "grammar": "digitalocean-v1",
+        "seedId": "digitalocean-v1-synthetic-seed",
+        "operation": "encoded-prefix",
+        "ordinal": 17
+      },
+      "input": "dop%5Fv1%5F1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9",
+      "expected": [],
+      "note": "A percent-encoded delimiter lookalike in the prefix is not the documented literal prefix, so nothing is classified. A fixed digitalocean-v1 grammar mutation (issue #369) records the accepted boundary or neighboring rejected form; exactly one structural property differs from the identity case. DigitalOcean API release notes 2022-03-29 (prefixes); gitleaks v8.30.1 digitalocean-pat/-access-token/-refresh-token and trufflehog v3.97.4 digitaloceanv2 ([a-f0-9]{64})."
+    },
+    {
+      "id": "digitalocean-positive-url-query",
+      "detector": "digitalocean-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "mutation": {
+        "grammar": "digitalocean-v1",
+        "seedId": "digitalocean-v1-synthetic-seed",
+        "operation": "host-embedding",
+        "ordinal": 18
+      },
+      "input": "https://example.test/?token=dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9&x=1",
+      "expected": [
+        {
+          "detector": "digitalocean-token",
+          "type": "digitalocean_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 28,
+          "end": 99
+        }
+      ],
+      "note": "A token carried as a URL query value is bounded by the '=' before it and the '&' after it. A fixed digitalocean-v1 grammar mutation (issue #369) records the accepted boundary or neighboring rejected form; exactly one structural property differs from the identity case. DigitalOcean API release notes 2022-03-29 (prefixes); gitleaks v8.30.1 digitalocean-pat/-access-token/-refresh-token and trufflehog v3.97.4 digitaloceanv2 ([a-f0-9]{64})."
+    },
+    {
+      "id": "digitalocean-positive-toml",
+      "detector": "digitalocean-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "toml"
+      ],
+      "input": "token = \"doo_v1_025343c0555235768c29735f523ad644fbfe1569b1d88f46b4f506628ae8b08a\"\n",
+      "expected": [
+        {
+          "detector": "digitalocean-token",
+          "type": "digitalocean_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 9,
+          "end": 80
+        }
+      ],
+      "note": "A quoted TOML string value is detected; the enclosing quotes are not part of the match."
+    },
+    {
+      "id": "digitalocean-positive-shell-export",
+      "detector": "digitalocean-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export DIGITALOCEAN_ACCESS_TOKEN=\"dor_v1_686b232b8722f7ab110b24d01fd9a96539cdec166f27e643ae9852b28d2b0da5\"",
+      "expected": [
+        {
+          "detector": "digitalocean-token",
+          "type": "digitalocean_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 34,
+          "end": 105
+        }
+      ],
+      "note": "A quoted shell export is detected; the enclosing quotes are not part of the match."
+    },
+    {
+      "id": "digitalocean-positive-markdown-fenced-block",
+      "detector": "digitalocean-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "markdown"
+      ],
+      "input": "```sh\ndoctl auth init --access-token dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9\n```\n",
+      "expected": [
+        {
+          "detector": "digitalocean-token",
+          "type": "digitalocean_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 37,
+          "end": 108
+        }
+      ],
+      "note": "A token inside a fenced Markdown code block is detected at its exact UTF-8 byte range; the fence and command text are untouched."
+    },
+    {
+      "id": "digitalocean-positive-hex-placeholder",
+      "detector": "digitalocean-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "dop_v1_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": [
+        {
+          "detector": "digitalocean-token",
+          "type": "digitalocean_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 71
+        }
+      ],
+      "note": "A documentation placeholder built entirely from the contracted alphabet at the contracted length (a repeated hex filler) is indistinguishable from a real secret's shape and is classified: an accepted precision/recall tradeoff, not a bug. Only a placeholder that breaks the alphabet, the length, or the boundary is excluded."
+    },
+    {
+      "id": "digitalocean-negative-dotenv-length-twin",
+      "detector": "digitalocean-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "DIGITALOCEAN_TOKEN=dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad",
+      "expected": [],
+      "note": "A 63-byte twin under a provider-named dotenv assignment: the provider detector rejects it under the exact-length contract and no other default detector claims the value, so the default scan is silent."
+    },
+    {
+      "id": "digitalocean-overlap-contextual-length-twin",
+      "detector": "digitalocean-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "api_key=dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 8,
+          "end": 78
+        }
+      ],
+      "note": "Attribution, not a DigitalOcean classification: the provider detector rejects the 63-byte twin under the exact-length contract, and the finding here belongs to the generic contextual detector because of the api_key= assignment context. A bare malformed provider shape and the same value under a credential-assignment key legitimately have different policy outcomes; the contextual detector is not suppressed to make the provider twin silent."
+    },
+    {
+      "id": "digitalocean-overlap-bearer-length-twin",
+      "detector": "digitalocean-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad",
+      "expected": [
+        {
+          "detector": "bearer-token",
+          "type": "bearer_token",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 22,
+          "end": 92
+        }
+      ],
+      "note": "Attribution, not a DigitalOcean classification: the provider detector rejects the 63-byte twin, and the finding belongs to the bearer-token detector because of the Authorization header context. The bearer detector is not suppressed to make the provider twin silent."
+    },
+    {
+      "id": "digitalocean-regression-dop-plain-twin",
+      "detector": "digitalocean-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad\n\n",
+      "expected": [],
+      "note": "Regression frozen from issue #369's self-contained synthetic snapshot (benchmark fixture digitalocean-token-dop-plain-twin; published @redact-secret/core@0.1.0-beta.4, default detectors, measurement protocol v4, local benchmark run 2026-09-17T21:26:02.204Z-3390af, corpus SHA-256 19ca47f5dbf21acc94c6712a51d6586c9fd1653b3da132172622c0e7c4b08fb8). Negative twin (length 63 vs contracted 64) that beta.4 flagged at bytes [0,70); silence follows from construction. The value is locally constructed and was never provider-issued."
+    },
+    {
+      "id": "digitalocean-regression-dop-plain",
+      "detector": "digitalocean-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9\n\n",
+      "expected": [
+        {
+          "detector": "digitalocean-token",
+          "type": "digitalocean_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 71
+        }
+      ],
+      "note": "Regression frozen from issue #369's self-contained synthetic snapshot (benchmark fixture digitalocean-token-dop-plain; published @redact-secret/core@0.1.0-beta.4, default detectors, measurement protocol v4, local benchmark run 2026-09-17T21:26:02.204Z-3390af, corpus SHA-256 19ca47f5dbf21acc94c6712a51d6586c9fd1653b3da132172622c0e7c4b08fb8). Paired positive that must keep matching at bytes [0,71) after the contract is narrowed. The value is locally constructed and was never provider-issued."
+    },
+    {
+      "id": "digitalocean-regression-dop-unicode-crlf-twin",
+      "detector": "digitalocean-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 reviewed format\r\ndop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad\n\r\n",
+      "expected": [],
+      "note": "Regression frozen from issue #369's self-contained synthetic snapshot (benchmark fixture digitalocean-token-dop-unicode-crlf-twin; published @redact-secret/core@0.1.0-beta.4, default detectors, measurement protocol v4, local benchmark run 2026-09-17T21:26:02.204Z-3390af, corpus SHA-256 19ca47f5dbf21acc94c6712a51d6586c9fd1653b3da132172622c0e7c4b08fb8). Negative twin (length 63 vs contracted 64) after a Unicode comment and CRLF that beta.4 flagged at bytes [24,94); silence follows from construction. The value is locally constructed and was never provider-issued."
+    },
+    {
+      "id": "digitalocean-regression-dop-unicode-crlf",
+      "detector": "digitalocean-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 reviewed format\r\ndop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9\n\r\n",
+      "expected": [
+        {
+          "detector": "digitalocean-token",
+          "type": "digitalocean_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 24,
+          "end": 95
+        }
+      ],
+      "note": "Regression frozen from issue #369's self-contained synthetic snapshot (benchmark fixture digitalocean-token-dop-unicode-crlf; published @redact-secret/core@0.1.0-beta.4, default detectors, measurement protocol v4, local benchmark run 2026-09-17T21:26:02.204Z-3390af, corpus SHA-256 19ca47f5dbf21acc94c6712a51d6586c9fd1653b3da132172622c0e7c4b08fb8). Paired positive after a Unicode comment and CRLF that must keep matching at UTF-8 bytes [24,95). The value is locally constructed and was never provider-issued."
+    },
+    {
+      "id": "digitalocean-regression-doo-plain-twin",
+      "detector": "digitalocean-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "doo_v1_025343c0555235768c29735f523ad644fbfe1569b1d88f46b4f506628ae8b08\n\n",
+      "expected": [],
+      "note": "Regression frozen from issue #369's self-contained synthetic snapshot (benchmark fixture digitalocean-token-doo-plain-twin; published @redact-secret/core@0.1.0-beta.4, default detectors, measurement protocol v4, local benchmark run 2026-09-17T21:26:02.204Z-3390af, corpus SHA-256 19ca47f5dbf21acc94c6712a51d6586c9fd1653b3da132172622c0e7c4b08fb8). Negative twin (length 63 vs contracted 64) that beta.4 flagged at bytes [0,70); silence follows from construction. The value is locally constructed and was never provider-issued."
+    },
+    {
+      "id": "digitalocean-regression-doo-plain",
+      "detector": "digitalocean-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "doo_v1_025343c0555235768c29735f523ad644fbfe1569b1d88f46b4f506628ae8b08a\n\n",
+      "expected": [
+        {
+          "detector": "digitalocean-token",
+          "type": "digitalocean_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 71
+        }
+      ],
+      "note": "Regression frozen from issue #369's self-contained synthetic snapshot (benchmark fixture digitalocean-token-doo-plain; published @redact-secret/core@0.1.0-beta.4, default detectors, measurement protocol v4, local benchmark run 2026-09-17T21:26:02.204Z-3390af, corpus SHA-256 19ca47f5dbf21acc94c6712a51d6586c9fd1653b3da132172622c0e7c4b08fb8). Paired positive that must keep matching at bytes [0,71) after the contract is narrowed. The value is locally constructed and was never provider-issued."
+    },
+    {
+      "id": "digitalocean-regression-doo-unicode-crlf-twin",
+      "detector": "digitalocean-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 reviewed format\r\ndoo_v1_025343c0555235768c29735f523ad644fbfe1569b1d88f46b4f506628ae8b08\n\r\n",
+      "expected": [],
+      "note": "Regression frozen from issue #369's self-contained synthetic snapshot (benchmark fixture digitalocean-token-doo-unicode-crlf-twin; published @redact-secret/core@0.1.0-beta.4, default detectors, measurement protocol v4, local benchmark run 2026-09-17T21:26:02.204Z-3390af, corpus SHA-256 19ca47f5dbf21acc94c6712a51d6586c9fd1653b3da132172622c0e7c4b08fb8). Negative twin (length 63 vs contracted 64) after a Unicode comment and CRLF that beta.4 flagged at bytes [24,94); silence follows from construction. The value is locally constructed and was never provider-issued."
+    },
+    {
+      "id": "digitalocean-regression-doo-unicode-crlf",
+      "detector": "digitalocean-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 reviewed format\r\ndoo_v1_025343c0555235768c29735f523ad644fbfe1569b1d88f46b4f506628ae8b08a\n\r\n",
+      "expected": [
+        {
+          "detector": "digitalocean-token",
+          "type": "digitalocean_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 24,
+          "end": 95
+        }
+      ],
+      "note": "Regression frozen from issue #369's self-contained synthetic snapshot (benchmark fixture digitalocean-token-doo-unicode-crlf; published @redact-secret/core@0.1.0-beta.4, default detectors, measurement protocol v4, local benchmark run 2026-09-17T21:26:02.204Z-3390af, corpus SHA-256 19ca47f5dbf21acc94c6712a51d6586c9fd1653b3da132172622c0e7c4b08fb8). Paired positive after a Unicode comment and CRLF that must keep matching at UTF-8 bytes [24,95). The value is locally constructed and was never provider-issued."
+    },
+    {
+      "id": "digitalocean-regression-dor-plain-twin",
+      "detector": "digitalocean-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "dor_v1_686b232b8722f7ab110b24d01fd9a96539cdec166f27e643ae9852b28d2b0da\n\n",
+      "expected": [],
+      "note": "Regression frozen from issue #369's self-contained synthetic snapshot (benchmark fixture digitalocean-token-dor-plain-twin; published @redact-secret/core@0.1.0-beta.4, default detectors, measurement protocol v4, local benchmark run 2026-09-17T21:26:02.204Z-3390af, corpus SHA-256 19ca47f5dbf21acc94c6712a51d6586c9fd1653b3da132172622c0e7c4b08fb8). Negative twin (length 63 vs contracted 64) that beta.4 flagged at bytes [0,70); silence follows from construction. The value is locally constructed and was never provider-issued."
+    },
+    {
+      "id": "digitalocean-regression-dor-plain",
+      "detector": "digitalocean-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "dor_v1_686b232b8722f7ab110b24d01fd9a96539cdec166f27e643ae9852b28d2b0da5\n\n",
+      "expected": [
+        {
+          "detector": "digitalocean-token",
+          "type": "digitalocean_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 71
+        }
+      ],
+      "note": "Regression frozen from issue #369's self-contained synthetic snapshot (benchmark fixture digitalocean-token-dor-plain; published @redact-secret/core@0.1.0-beta.4, default detectors, measurement protocol v4, local benchmark run 2026-09-17T21:26:02.204Z-3390af, corpus SHA-256 19ca47f5dbf21acc94c6712a51d6586c9fd1653b3da132172622c0e7c4b08fb8). Paired positive that must keep matching at bytes [0,71) after the contract is narrowed. The value is locally constructed and was never provider-issued."
+    },
+    {
+      "id": "digitalocean-regression-dor-unicode-crlf-twin",
+      "detector": "digitalocean-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 reviewed format\r\ndor_v1_686b232b8722f7ab110b24d01fd9a96539cdec166f27e643ae9852b28d2b0da\n\r\n",
+      "expected": [],
+      "note": "Regression frozen from issue #369's self-contained synthetic snapshot (benchmark fixture digitalocean-token-dor-unicode-crlf-twin; published @redact-secret/core@0.1.0-beta.4, default detectors, measurement protocol v4, local benchmark run 2026-09-17T21:26:02.204Z-3390af, corpus SHA-256 19ca47f5dbf21acc94c6712a51d6586c9fd1653b3da132172622c0e7c4b08fb8). Negative twin (length 63 vs contracted 64) after a Unicode comment and CRLF that beta.4 flagged at bytes [24,94); silence follows from construction. The value is locally constructed and was never provider-issued."
+    },
+    {
+      "id": "digitalocean-regression-dor-unicode-crlf",
+      "detector": "digitalocean-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 reviewed format\r\ndor_v1_686b232b8722f7ab110b24d01fd9a96539cdec166f27e643ae9852b28d2b0da5\n\r\n",
+      "expected": [
+        {
+          "detector": "digitalocean-token",
+          "type": "digitalocean_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 24,
+          "end": 95
+        }
+      ],
+      "note": "Regression frozen from issue #369's self-contained synthetic snapshot (benchmark fixture digitalocean-token-dor-unicode-crlf; published @redact-secret/core@0.1.0-beta.4, default detectors, measurement protocol v4, local benchmark run 2026-09-17T21:26:02.204Z-3390af, corpus SHA-256 19ca47f5dbf21acc94c6712a51d6586c9fd1653b3da132172622c0e7c4b08fb8). Paired positive after a Unicode comment and CRLF that must keep matching at UTF-8 bytes [24,95). The value is locally constructed and was never provider-issued."
     },
     {
       "id": "linear-positive-qualified",
@@ -24363,7 +25028,13 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "dop_v1_SYNTHETIC_REVOKED_KEY_VALUE dop_v1_SYNTHETIC_REVOKED_KEY_VALUE",
+      "mutation": {
+        "grammar": "digitalocean-v1",
+        "seedId": "digitalocean-v1-synthetic-seed",
+        "operation": "repeated",
+        "ordinal": 19
+      },
+      "input": "dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9 dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9",
       "expected": [
         {
           "detector": "digitalocean-token",
@@ -24371,18 +25042,18 @@
           "confidence": "high",
           "specificity": "provider",
           "start": 0,
-          "end": 34
+          "end": 71
         },
         {
           "detector": "digitalocean-token",
           "type": "digitalocean_token",
           "confidence": "high",
           "specificity": "provider",
-          "start": 35,
-          "end": 69
+          "start": 72,
+          "end": 143
         }
       ],
-      "note": "Issue #320 follow-up: an identical value repeated in the same input is reported once per independent occurrence, not deduplicated, the same dimension #321 established for HuggingFace/Linear/Slack."
+      "note": "Issue #320 follow-up: an identical value repeated in the same input is reported once per independent occurrence, not deduplicated, the same dimension #321 established for HuggingFace/Linear/Slack. A fixed digitalocean-v1 grammar mutation (issue #369) records the accepted boundary or neighboring rejected form; exactly one structural property differs from the identity case. DigitalOcean API release notes 2022-03-29 (prefixes); gitleaks v8.30.1 digitalocean-pat/-access-token/-refresh-token and trufflehog v3.97.4 digitaloceanv2 ([a-f0-9]{64})."
     },
     {
       "id": "docker-positive-repeated-value",
