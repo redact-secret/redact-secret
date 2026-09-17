@@ -24,11 +24,19 @@
  *
  * `args` is exactly what the caller passed to `logger.info(...)` et al.:
  * `(msg, ...interpolationValues)`, `(mergingObject, msg,
- * ...interpolationValues)`, or a bare `Error`. This module treats the
- * whole `args` array as one value tree and redacts it with
- * `maskLogValueWith` (`./mask-log-value.mjs`), so:
+ * ...interpolationValues)`, or a bare `Error`. Before anything is scanned,
+ * `joinInterpolatedMessage` (below) closes the gap issue #361 reported: a
+ * string `msg` followed by further positional arguments is joined with
+ * those arguments into the single string pino's own `quick-format-unescaped`
+ * would produce (`./format-pino-message.mjs`), *before* redaction runs, so a
+ * secret split across the format string and an interpolation value -- or
+ * across two interpolation values -- is scanned as one leaf, not two that
+ * never individually match. Everything from that point on -- the joined
+ * message, a merging object, or a normalized `Error` -- is one value tree,
+ * redacted with `maskLogValueWith` (`./mask-log-value.mjs`), so:
  *
- * - a string `msg` or a string interpolation value is redacted in place;
+ * - the joined message, or a plain string `msg` with nothing to join, is
+ *   redacted as one leaf;
  * - every string field of a merging object is redacted, at any depth;
  * - an `Error` anywhere in the tree -- including a bare `logger.error(err)`
  *   call -- is replaced by an already-redacted `{ type, message, stack,
@@ -42,7 +50,8 @@
  * Error`, and replacing that argument with our masked plain object (which
  * is not `instanceof Error`) would silently drop the `msg` field from the
  * output. Normalizing first keeps that shape -- both the `err` object and
- * a top-level `msg` -- with everything inside already redacted.
+ * a top-level `msg` -- with everything inside already redacted. Joining
+ * runs after this normalization, uniformly, over whatever shape results.
  *
  * `await initialize()` (`@redact-secret/core`) must resolve before the
  * returned hook is used; `./pino-redact.mjs`'s `createRedactingLogMethod`
@@ -51,6 +60,7 @@
  * addon built, matching `examples/tracing-masking/mask-secrets.mjs`.
  */
 
+import { formatPinoMessage } from "./format-pino-message.mjs";
 import { maskLogValueWith } from "./mask-log-value.mjs";
 
 export {
@@ -69,6 +79,27 @@ function normalizeLeadingError(args) {
   return args;
 }
 
+function hasMergingObjectFirst(args) {
+  return args.length > 0 && typeof args[0] === "object" && args[0] !== null;
+}
+
+/**
+ * Folds `msg` and any trailing printf-style interpolation values into the
+ * single string pino would format, so the redaction pass below sees it as
+ * one leaf. A no-op for every other shape -- a bare message with nothing
+ * after it, a non-string `msg`, or a merging object with no message --
+ * which all fall through to the existing per-leaf walk unchanged.
+ */
+function joinInterpolatedMessage(args) {
+  const msgIndex = hasMergingObjectFirst(args) ? 1 : 0;
+  const msg = args[msgIndex];
+  if (typeof msg !== "string" || args.length <= msgIndex + 1) {
+    return args;
+  }
+  const joined = formatPinoMessage(msg, args.slice(msgIndex + 1));
+  return msgIndex === 1 ? [args[0], joined] : [joined];
+}
+
 /**
  * Builds a pino `hooks.logMethod` function. `scanAndRedact` is injected
  * (see `./pino-redact.mjs` for the live factory over `@redact-secret/core`).
@@ -79,7 +110,8 @@ export function createRedactingLogMethodWith(scanAndRedact, options = {}) {
   }
   return function redactingLogMethod(args, method, level) {
     const normalized = normalizeLeadingError(Array.from(args));
-    const redacted = maskLogValueWith(scanAndRedact, normalized, options);
+    const joined = joinInterpolatedMessage(normalized);
+    const redacted = maskLogValueWith(scanAndRedact, joined, options);
     method.apply(this, redacted);
   };
 }

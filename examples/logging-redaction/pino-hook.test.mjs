@@ -39,11 +39,67 @@ test("a secret in a merging-object string field is redacted alongside the messag
   assert.deepEqual(calls[0].args, [{ authHeader: "Bearer <SECRET_1>" }, "request received"]);
 });
 
-test("a secret in a printf-style interpolation value is redacted", () => {
+test("a secret in a printf-style interpolation value is redacted -- msg and values joined into one scanned leaf, matching what pino itself would format", () => {
   const { method, calls } = spyMethod();
   const hook = createRedactingLogMethodWith(fakeScanAndRedact);
   hook.call({}, ["user %s presented %s", "alice", "SECRET_TOKEN_1"], method, 30);
-  assert.deepEqual(calls[0].args, ["user %s presented %s", "alice", "<SECRET_1>"]);
+  assert.deepEqual(calls[0].args, ["user alice presented <SECRET_1>"]);
+});
+
+test("issue #361: a secret split across the format string and an interpolation value is redacted -- neither leaf alone matches", () => {
+  const { method, calls } = spyMethod();
+  const hook = createRedactingLogMethodWith(fakeScanAndRedact);
+  hook.call({}, ["token is SECRET_TOKEN_%s", "1"], method, 30);
+  assert.deepEqual(calls[0].args, ["token is <SECRET_1>"]);
+});
+
+test("issue #361: a secret split across two interpolation values is redacted", () => {
+  const { method, calls } = spyMethod();
+  const hook = createRedactingLogMethodWith(fakeScanAndRedact);
+  hook.call({}, ["token is %s%s", "SECRET_TOKEN_", "1"], method, 30);
+  assert.deepEqual(calls[0].args, ["token is <SECRET_1>"]);
+});
+
+test("issue #361: a contextual assignment split from its value across msg and an interpolation value is redacted", () => {
+  const { method, calls } = spyMethod();
+  const hook = createRedactingLogMethodWith(fakeScanAndRedact);
+  hook.call({}, ["api_key=%s", "SECRET_TOKEN_1"], method, 30);
+  assert.deepEqual(calls[0].args, ["api_key=<SECRET_1>"]);
+});
+
+test("issue #361: a joined message that trips a block finding replaces the whole message, not a partial value", () => {
+  const { method, calls } = spyMethod();
+  const hook = createRedactingLogMethodWith(fakeScanAndRedact);
+  hook.call({}, ["prefix %s suffix", "BLOCK_ME"], method, 30);
+  assert.deepEqual(calls[0].args, [BLOCK_MARKER]);
+});
+
+test("issue #361: a scanner failure on the joined message fails closed", () => {
+  const { method, calls } = spyMethod();
+  const hook = createRedactingLogMethodWith(fakeScanAndRedact);
+  hook.call({}, ["trigger %s here", "BOOM"], method, 30);
+  assert.deepEqual(calls[0].args, [ERROR_MARKER]);
+});
+
+test("issue #361: a merging object plus a split interpolated message are both redacted", () => {
+  const { method, calls } = spyMethod();
+  const hook = createRedactingLogMethodWith(fakeScanAndRedact);
+  hook.call({}, [{ authHeader: "Bearer SECRET_TOKEN_1" }, "token is SECRET_TOKEN_%s", "2"], method, 30);
+  assert.deepEqual(calls[0].args, [{ authHeader: "Bearer <SECRET_1>" }, "token is <SECRET_1>"]);
+});
+
+test("issue #361: an unused trailing interpolation value is dropped from the joined message, matching pino's own quick-format-unescaped, and its secret is still redacted", () => {
+  const { method, calls } = spyMethod();
+  const hook = createRedactingLogMethodWith(fakeScanAndRedact);
+  hook.call({}, ["no placeholders here", "SECRET_TOKEN_1"], method, 30);
+  assert.deepEqual(calls[0].args, ["no placeholders here"]);
+});
+
+test("issue #361: ordinary formatting with no secret is unaffected", () => {
+  const { method, calls } = spyMethod();
+  const hook = createRedactingLogMethodWith(fakeScanAndRedact);
+  hook.call({}, ["user %s logged in from %s", "alice", "10.0.0.1"], method, 30);
+  assert.deepEqual(calls[0].args, ["user alice logged in from 10.0.0.1"]);
 });
 
 test("a bare leading Error is normalized to { err }, message, ...rest -- and both are redacted", () => {
@@ -91,11 +147,11 @@ test("method is invoked exactly once via apply, with the logger as receiver", ()
   assert.equal(calls[0].receiver, logger);
 });
 
-test("numbers, booleans, and non-string interpolation values pass through unchanged", () => {
+test("numbers and booleans are formatted into the joined message, matching pino's own quick-format-unescaped, and pass through unredacted", () => {
   const { method, calls } = spyMethod();
   const hook = createRedactingLogMethodWith(fakeScanAndRedact);
   hook.call({}, ["count is %d, active is %s", 3, true], method, 30);
-  assert.deepEqual(calls[0].args, ["count is %d, active is %s", 3, true]);
+  assert.deepEqual(calls[0].args, ["count is 3, active is true"]);
 });
 
 test("rejects a non-function scanAndRedact", () => {
