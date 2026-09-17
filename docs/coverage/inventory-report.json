@@ -1339,12 +1339,83 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "twilio_api_key_secret"
+    },
+    {
+      "detector": "new-relic-user-api-key",
+      "evidence": {
+        "fixtureCount": 12,
+        "hostContextsExercised": [
+          "dotenv",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "new-relic-user-api-key-positive-bare",
+        "new-relic-user-api-key-positive-dotenv",
+        "new-relic-user-api-key-positive-json",
+        "new-relic-user-api-key-positive-log",
+        "new-relic-user-api-key-positive-yaml",
+        "new-relic-user-api-key-regression-crlf-and-unicode-prefix"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "new_relic_user_api_key"
+    },
+    {
+      "detector": "new-relic-license-key",
+      "evidence": {
+        "fixtureCount": 12,
+        "hostContextsExercised": [
+          "dotenv",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "new-relic-license-key-positive-dotenv-keyword",
+        "new-relic-license-key-positive-json-keyword",
+        "new-relic-license-key-positive-log-keyword",
+        "new-relic-license-key-positive-yaml-keyword",
+        "new-relic-license-key-regression-crlf-and-unicode-prefix"
+      ],
+      "policyClass": "confidence-gated",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "new_relic_license_key"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 35,
+    "supported": 37,
     "unresolved": 0
   }
 }

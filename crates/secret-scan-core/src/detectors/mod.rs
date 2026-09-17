@@ -21,6 +21,7 @@ mod github;
 mod gitlab;
 mod jwt;
 mod microsoft_entra;
+mod new_relic;
 mod notion;
 mod openai;
 mod otpauth;
@@ -74,6 +75,8 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(twilio::TwilioApiKeySecretDetector),
         telegram::telegram_bot_token_detector(),
         Box::new(discord::DiscordBotTokenDetector),
+        Box::new(new_relic::NewRelicUserApiKeyDetector),
+        Box::new(new_relic::NewRelicLicenseKeyDetector),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
         Box::new(ConnectionStringDetector),
@@ -135,6 +138,8 @@ mod tests {
                 "twilio-api-key-secret",
                 "telegram-bot-token",
                 "discord-bot-token",
+                "new-relic-user-api-key",
+                "new-relic-license-key",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -184,7 +189,10 @@ mod tests {
             "twilio SKaB3dE5gH7jK9mN1pQ3sT5vW7yZ9AbC3d zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE";
         let telegram_input = "123456:SYNTHETIC_REVOKED_TELEGRAM_BOT_TOKEN_SECRET";
         let discord_input = "MDAwMDAwMDAwMDAwMDAwMDAw.REVOKE.SYNTHETICREVOKEDBOTTOKENFIX";
-        let cases: [(&str, &str); 28] = [
+        let new_relic_user_api_key_input = "NRAK-SYNTHETICREVOKEDNEWRELICUSA";
+        let new_relic_license_key_input =
+            "newrelic 0123456789abcdef0123456789abcdef01234567";
+        let cases: [(&str, &str); 30] = [
             ("aws-access-key", "AKIASYNTHETICEXAMPLE"),
             (
                 "github-token",
@@ -228,6 +236,8 @@ mod tests {
             ("twilio-api-key-secret", twilio_api_key_secret_input),
             ("discord-bot-token", discord_input),
             ("telegram-bot-token", telegram_input),
+            ("new-relic-user-api-key", new_relic_user_api_key_input),
+            ("new-relic-license-key", new_relic_license_key_input),
         ];
         let detectors = built_in_detectors();
         for (id, input) in cases {
