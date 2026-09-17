@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 963,
+  "fixtureCount": 974,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -23678,6 +23678,212 @@
         }
       ],
       "note": "A single new-relic-context-bearing line densely packed with candidate-shaped runs stays linear: per-line (not per-candidate) context checks keep this bounded."
+    },
+    {
+      "id": "connection-negative-azure-sas-token-no-account-key",
+      "detector": "connection-string",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "BlobEndpoint=https://fixturestorageaccount.blob.core.windows.net/;QueueEndpoint=https://fixturestorageaccount.queue.core.windows.net/;SharedAccessSignature=sv=2022-11-02&ss=bqtf&srt=sco&sp=rwdlacupitfx&se=2030-01-01T00:00:00Z&st=2020-01-01T00:00:00Z&spr=https&sig=SYNTHETIC-REVOKED-SAS-SIGNATURE-VALUE-NOT-REAL%3D",
+      "expected": [],
+      "note": "A SAS-based Azure Storage connection string carries public endpoint URLs and a SharedAccessSignature token but no AccountKey field, so the AccountKey-anchored parser finds no field to select. Accepted tradeoff: the SAS token itself is authorization-bearing -- holding it grants the permissions and expiry it encodes -- but it is a distinct credential shape this detector does not parse; treating it as in scope would require a new, separate exclusion, not a fix to the AccountKey check."
+    },
+    {
+      "id": "connection-positive-azure-sas-and-account-key",
+      "detector": "connection-string",
+      "kind": "boundary",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "mutation": {
+        "grammar": "connection-string",
+        "seedId": "connection-positive-azure-sas-and-account-key",
+        "operation": "declared-boundary",
+        "ordinal": 0
+      },
+      "input": "DefaultEndpointsProtocol=https;AccountName=fixturestorageaccount;AccountKey=U1lOVEhFVElDLVJFVk9LRUQtQVpVUkUtU0FTLVBBSVJFRC1BQ0NPVU5ULUtFWS1GSVhUVVJFLTAwMDAwMDAwMDA=;EndpointSuffix=core.windows.net;SharedAccessSignature=sv=2022-11-02&ss=bqtf&sig=SYNTHETIC-REVOKED-SAS-SIGNATURE-VALUE-NOT-REAL%3D",
+      "expected": [
+        {
+          "detector": "connection-string",
+          "type": "connection_string_password",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 76,
+          "end": 164
+        }
+      ],
+      "note": "A connection string carrying both an AccountKey and a trailing SharedAccessSignature field still selects only the AccountKey value; the adjacent public SAS metadata does not widen or displace the selected range."
+    },
+    {
+      "id": "connection-positive-postgres-reserved-example-host",
+      "detector": "connection-string",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "postgres://produser:SyntheticProdPassw0rdNotReal9@db.example.com:5432/proddb",
+      "expected": [
+        {
+          "detector": "connection-string",
+          "type": "connection_string_password",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 20,
+          "end": 49
+        }
+      ],
+      "note": "A password paired with the RFC 2606 reserved 'example.com' documentation domain is still detected at high confidence; the detector does not treat a reserved or documentation-style host as evidence that the credential itself is a placeholder."
+    },
+    {
+      "id": "connection-positive-mongodb-srv-reserved-example-host",
+      "detector": "connection-string",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "mongodb+srv://produser:SyntheticProdPassw0rdNotReal9@cluster0.example.mongodb.net/proddb",
+      "expected": [
+        {
+          "detector": "connection-string",
+          "type": "connection_string_password",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 23,
+          "end": 52
+        }
+      ],
+      "note": "A mongodb+srv password paired with an Atlas-shaped reserved 'example.mongodb.net' host is still detected; the srv host grammar's tolerance for the reserved word does not suppress a real-looking credential."
+    },
+    {
+      "id": "connection-negative-mongodb-srv-doc-placeholder-example-host",
+      "detector": "connection-string",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "mongodb+srv://username:password@cluster0.example.mongodb.net/myDatabase",
+      "expected": [],
+      "note": "Documentation prose using the literal placeholder words 'username'/'password' against an Atlas-shaped example host is credential-free, the same as the existing postgres placeholder evidence, now exercised on the mongodb+srv grammar and its reserved-word host."
+    },
+    {
+      "id": "connection-boundary-amqp-missing-password",
+      "detector": "connection-string",
+      "kind": "boundary",
+      "support": "supported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "mutation": {
+        "grammar": "connection-string",
+        "seedId": "connection-boundary-amqp-missing-password",
+        "operation": "declared-boundary",
+        "ordinal": 0
+      },
+      "input": "amqp://fixture:@localhost:5672/vhost",
+      "expected": [],
+      "note": "Empty password userinfo is credential-free for amqp, the same as the existing postgres and mysql evidence."
+    },
+    {
+      "id": "connection-boundary-amqps-missing-password",
+      "detector": "connection-string",
+      "kind": "boundary",
+      "support": "supported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "mutation": {
+        "grammar": "connection-string",
+        "seedId": "connection-boundary-amqps-missing-password",
+        "operation": "declared-boundary",
+        "ordinal": 0
+      },
+      "input": "amqps://fixture:@localhost:5671/vhost",
+      "expected": [],
+      "note": "Empty password userinfo is credential-free for amqps."
+    },
+    {
+      "id": "connection-boundary-rediss-missing-password",
+      "detector": "connection-string",
+      "kind": "boundary",
+      "support": "supported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "mutation": {
+        "grammar": "connection-string",
+        "seedId": "connection-boundary-rediss-missing-password",
+        "operation": "declared-boundary",
+        "ordinal": 0
+      },
+      "input": "rediss://:@localhost:6380/0",
+      "expected": [],
+      "note": "An empty password-only rediss userinfo (a bare ':' before '@') is credential-free."
+    },
+    {
+      "id": "connection-boundary-mongodb-srv-missing-password",
+      "detector": "connection-string",
+      "kind": "boundary",
+      "support": "supported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "mutation": {
+        "grammar": "connection-string",
+        "seedId": "connection-boundary-mongodb-srv-missing-password",
+        "operation": "declared-boundary",
+        "ordinal": 0
+      },
+      "input": "mongodb+srv://fixture:@cluster0.example.mongodb.net/db",
+      "expected": [],
+      "note": "Empty password userinfo is credential-free for mongodb+srv."
+    },
+    {
+      "id": "connection-negative-user-only-authority",
+      "detector": "connection-string",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "postgres://fixtureuser@localhost/example",
+      "expected": [],
+      "note": "A user-only authority with no ':' separator at all carries no password to select, the same as the existing host-only evidence."
+    },
+    {
+      "id": "connection-negative-unsupported-scheme-https-with-credentials",
+      "detector": "connection-string",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "mutation": {
+        "grammar": "connection-string",
+        "seedId": "connection-negative-unsupported-scheme-https-with-credentials",
+        "operation": "declared-boundary",
+        "ordinal": 0
+      },
+      "input": "https://fixtureuser:SyntheticHttpsPassw0rd9@host.example.com/path",
+      "expected": [],
+      "note": "A generic https URL carrying real-looking userinfo is outside this detector's bounded scheme set; treating arbitrary http(s) URLs as connection strings is an intentional scope boundary, not a parsing gap, the same as the existing unsupported-scheme Rust evidence."
     }
   ]
 }

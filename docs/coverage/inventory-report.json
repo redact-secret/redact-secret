@@ -1152,7 +1152,7 @@
     {
       "detector": "connection-string",
       "evidence": {
-        "fixtureCount": 74,
+        "fixtureCount": 85,
         "hostContextsExercised": [
           "dotenv",
           "javascript",
@@ -1188,8 +1188,10 @@
         "connection-positive-mariadb-percent-encoded",
         "connection-positive-mongodb-seed-list",
         "connection-positive-mongodb-srv",
+        "connection-positive-mongodb-srv-reserved-example-host",
         "connection-positive-port",
         "connection-positive-postgres",
+        "connection-positive-postgres-reserved-example-host",
         "connection-positive-postgresql",
         "connection-positive-redis-password-only",
         "connection-positive-rediss-fragment",
@@ -1207,6 +1209,7 @@
         {
           "evidenceFixtureIds": [
             "connection-positive-postgres",
+            "connection-positive-postgres-reserved-example-host",
             "connection-positive-postgresql"
           ],
           "scheme": "postgres",
@@ -1228,7 +1231,8 @@
         },
         {
           "evidenceFixtureIds": [
-            "connection-positive-mongodb-srv"
+            "connection-positive-mongodb-srv",
+            "connection-positive-mongodb-srv-reserved-example-host"
           ],
           "scheme": "mongodb+srv",
           "state": "supported"
@@ -1236,7 +1240,8 @@
         {
           "evidenceFixtureIds": [
             "connection-positive-mongodb-seed-list",
-            "connection-positive-mongodb-srv"
+            "connection-positive-mongodb-srv",
+            "connection-positive-mongodb-srv-reserved-example-host"
           ],
           "scheme": "mongodb",
           "state": "supported"
