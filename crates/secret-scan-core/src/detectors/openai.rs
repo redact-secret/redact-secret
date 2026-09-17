@@ -175,4 +175,39 @@ mod tests {
         let end = start + token.len();
         assert_eq!(candidates[0].range(), ByteRange::new(start, end).unwrap());
     }
+
+    #[test]
+    fn rejects_a_near_prefix_variant_using_underscore_instead_of_dash() {
+        // Prose about the shape of the prefix, not the literal
+        // dash-delimited prefix itself, must not be classified.
+        let input = format!("sk_proj_{}", "SYNTHETIC_REVOKED_KEY_VALUE");
+        assert_eq!(detect(&input).len(), 0);
+    }
+
+    #[test]
+    fn reports_each_occurrence_of_a_repeated_value_independently() {
+        let token = format!("sk-proj-{}", "SYNTHETIC_REVOKED_KEY_VALUE");
+        let input = format!("{token} {token}");
+        let candidates = detect(&input);
+        assert_eq!(candidates.len(), 2);
+        assert_eq!(
+            candidates[0].range(),
+            ByteRange::new(0, token.len()).unwrap()
+        );
+        let second_start = token.len() + 1;
+        assert_eq!(
+            candidates[1].range(),
+            ByteRange::new(second_start, second_start + token.len()).unwrap()
+        );
+    }
+
+    #[test]
+    fn detects_every_namespace_variant_independently_in_the_same_input() {
+        let legacy = format!("sk-{}", "SYNTHETIC_REVOKED_KEY_VALUE");
+        let project = format!("sk-proj-{}", "SYNTHETIC_REVOKED_KEY_VALUE");
+        let service_account = format!("sk-svcacct-{}", "SYNTHETIC_REVOKED_KEY_VALUE");
+        let input = format!("{legacy}\n{project}\n{service_account}");
+        let candidates = detect(&input);
+        assert_eq!(candidates.len(), 3);
+    }
 }

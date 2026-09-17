@@ -114,4 +114,37 @@ mod tests {
         let input = "sk-ant-SYNTHETIC_REVOKED_LEGACY_ANTHROPIC_KEY_VALUE";
         assert_eq!(detect(input).len(), 0);
     }
+
+    #[test]
+    fn rejects_a_future_version_marker_not_yet_documented() {
+        // Only the exact `api03` segment is supported; a plausible future
+        // version is not speculatively accepted alongside it.
+        let input = format!("sk-ant-api04-{}", "SYNTHETIC_REVOKED_ANTHROPIC_KEY");
+        assert_eq!(detect(&input).len(), 0);
+    }
+
+    #[test]
+    fn rejects_a_near_prefix_variant_using_underscore_instead_of_dash() {
+        // Prose about the shape of the prefix, not the literal
+        // dash-delimited prefix itself, must not be classified.
+        let input = format!("sk_ant_api03_{}", "SYNTHETIC_REVOKED_ANTHROPIC_KEY");
+        assert_eq!(detect(&input).len(), 0);
+    }
+
+    #[test]
+    fn reports_each_occurrence_of_a_repeated_value_independently() {
+        let token = format!("sk-ant-api03-{}", "SYNTHETIC_REVOKED_KEY_VALUE");
+        let input = format!("{token} {token}");
+        let candidates = detect(&input);
+        assert_eq!(candidates.len(), 2);
+        assert_eq!(
+            candidates[0].range(),
+            ByteRange::new(0, token.len()).unwrap()
+        );
+        let second_start = token.len() + 1;
+        assert_eq!(
+            candidates[1].range(),
+            ByteRange::new(second_start, second_start + token.len()).unwrap()
+        );
+    }
 }
