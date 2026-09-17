@@ -161,4 +161,14 @@ mod tests {
         let input = "vault kv get -namespace=admin secret/data/myapp/config on server v1.15.4";
         assert_eq!(detect(input).len(), 0);
     }
+
+    /// Issue #320 follow-up: an identical value repeated in the same input
+    /// is reported once per independent occurrence, not deduplicated, the
+    /// same dimension #321 established for `HuggingFace`/Linear/Slack.
+    #[test]
+    fn reports_a_repeated_identical_value_once_per_occurrence() {
+        let value = "hvs.SYNTHETIC_REVOKED_VAULT_TOKEN";
+        let input = format!("{value} {value}");
+        assert_eq!(detect(&input).len(), 2);
+    }
 }

@@ -374,7 +374,7 @@
     {
       "detector": "vault-token",
       "evidence": {
-        "fixtureCount": 23,
+        "fixtureCount": 24,
         "hostContextsExercised": [
           "dotenv",
           "json",
@@ -403,6 +403,7 @@
         "vault-positive-log",
         "vault-positive-min-length",
         "vault-positive-punctuation-adjacent",
+        "vault-positive-repeated-value",
         "vault-positive-service-token",
         "vault-positive-yaml"
       ],
@@ -579,7 +580,7 @@
     {
       "detector": "docker-token",
       "evidence": {
-        "fixtureCount": 24,
+        "fixtureCount": 25,
         "hostContextsExercised": [
           "dotenv",
           "json",
@@ -609,6 +610,7 @@
         "docker-positive-min-length",
         "docker-positive-punctuation-adjacent",
         "docker-positive-qualified",
+        "docker-positive-repeated-value",
         "docker-positive-yaml"
       ],
       "policyClass": "always-redact",
@@ -619,7 +621,7 @@
     {
       "detector": "cloudflare-token",
       "evidence": {
-        "fixtureCount": 23,
+        "fixtureCount": 25,
         "hostContextsExercised": [
           "dotenv",
           "json",
@@ -648,6 +650,7 @@
         "cloudflare-positive-min-length",
         "cloudflare-positive-punctuation-adjacent",
         "cloudflare-positive-qualified",
+        "cloudflare-positive-repeated-value",
         "cloudflare-positive-yaml"
       ],
       "policyClass": "always-redact",
@@ -658,7 +661,7 @@
     {
       "detector": "digitalocean-token",
       "evidence": {
-        "fixtureCount": 24,
+        "fixtureCount": 25,
         "hostContextsExercised": [
           "dotenv",
           "json",
@@ -688,6 +691,7 @@
         "digitalocean-positive-min-length",
         "digitalocean-positive-punctuation-adjacent",
         "digitalocean-positive-qualified",
+        "digitalocean-positive-repeated-value",
         "digitalocean-positive-yaml"
       ],
       "policyClass": "always-redact",
@@ -781,7 +785,7 @@
     {
       "detector": "vercel-token",
       "evidence": {
-        "fixtureCount": 24,
+        "fixtureCount": 25,
         "hostContextsExercised": [
           "dotenv",
           "json",
@@ -811,6 +815,7 @@
         "vercel-positive-min-length",
         "vercel-positive-punctuation-adjacent",
         "vercel-positive-qualified",
+        "vercel-positive-repeated-value",
         "vercel-positive-yaml"
       ],
       "policyClass": "always-redact",
