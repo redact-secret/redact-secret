@@ -32,6 +32,15 @@ but not published to npm. The exact matrices belong to
 `Cargo.toml`'s `[workspace.metadata.redact-secret]`; see
 [qualification](qualification.md) and [Python packaging](python-packaging.md).
 
+`@redact-secret/wasm` carries two built artifacts under one package identity:
+the unchanged root (`full`) glue and `.wasm`, and a `common` subpath shipping
+the opt-in `common`-profile build's own glue and `.wasm` beside them. One
+pack/publish step covers both. Before publishing, the workflow instantiates
+the downloaded root artifact and asks it — rather than trusting the download's
+artifact name — that `profile() === "full"`, refusing to publish a `common`
+or otherwise non-`full` build under the `full`/default package identity. See
+[detector profiles](reference/api-contract.md#detector-profiles).
+
 The workflows create an annotated Git tag after verification. They do not
 automatically create a GitHub Release or attach CLI binaries to one. A GitHub
 Release or another distribution channel needs an explicit publication decision

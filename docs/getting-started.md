@@ -6,8 +6,8 @@
 
 | Runtime | Package / entry point | Current scope |
 | --- | --- | --- |
-| Node.js 20, 22, 24 | `@redact-secret/core` (ESM) | Whole-input and incremental; glibc Linux, macOS, Windows; x64 and arm64 |
-| Browser | `@redact-secret/core` with WebAssembly | Whole-input and incremental; Chromium, Firefox, WebKit qualification |
+| Node.js 20, 22, 24 | `@redact-secret/core` (ESM); `@redact-secret/core/common` (opt-in) | Whole-input and incremental; glibc Linux, macOS, Windows; x64 and arm64 |
+| Browser | `@redact-secret/core` with WebAssembly; `@redact-secret/core/common` (opt-in) | Whole-input and incremental; Chromium, Firefox, WebKit qualification |
 | CPython 3.10+ | `redact-secret`, imported as `redact_secret` | Whole-input and incremental; see [wheel matrix](python-packaging.md) |
 | Rust 1.88+ | `redact-secret`, imported as `redact_secret` | Whole-input and incremental |
 | CLI | `redact-secret` binary | File checking/redaction and streamed standard input |
@@ -16,6 +16,13 @@ Node npm packages and CLI release binaries do not include musl/Alpine builds.
 Python has a separate musllinux wheel matrix. A built test artifact is not
 necessarily a distributed package; [qualification](qualification.md) explains
 that distinction.
+
+The `/common` entry point (Node and browser only) is the opt-in `common`
+detector profile: a smaller, structural/contextual-only detector set for
+size- or latency-sensitive preventive consumers. `full` — everything above
+uses it by default — stays the first and simplest path and the only one
+Python, Rust, and the CLI expose. See
+[detector profiles in the JavaScript guide](guides/javascript.md#detector-profiles).
 
 ## Install a published release
 

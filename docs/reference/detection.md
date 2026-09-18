@@ -15,8 +15,30 @@ text. It does not determine whether a credential is active, expired, or valid.
 | Connections | Credential-bearing PostgreSQL, MySQL, MariaDB, MongoDB, Redis, AMQP URLs |
 | One-time password provisioning | `otpauth://totp` and `otpauth://hotp` with base32 shared secrets |
 
-The opt-in `common` detector profile omits both provider rows; see the
-[README's profile section](../../README.md#opt-in-detector-profiles).
+## Detector profiles
+
+`full` — every detector in the table above, the default and compatibility
+baseline on every surface — stays the first and simplest path. `common` is a
+smaller, opt-in built-in set for size- or latency-sensitive **preventive**
+consumers (browser UX, small agent or tool processes): only private keys,
+JWT/Bearer authorization, connections, one-time-password provisioning, and
+the generic credential-assignment context detector — it omits both provider
+rows (Provider credentials, Additional provider formats) entirely. Node and
+the browser expose it as `@redact-secret/core/common`
+([JavaScript guide](../guides/javascript.md#detector-profiles)) and Rust as
+`DetectorRegistry::with_common_built_in`
+([Rust guide](../guides/rust.md#detector-profiles)). Python and the CLI stay
+`full` only.
+
+`common`'s false-negative tradeoff is on provider tokens specifically: a bare
+provider token (for example a raw GitHub or AWS credential, with no
+surrounding `Bearer` header or contextual assignment) is not detected at all,
+and a provider token that *is* caught by a `common` detector's context is
+reported under that detector's type and confidence instead of the
+provider-specific one — for example `warn` where `full` would `redact`. It
+adds no false positive: it only drops candidates `full` would have reported.
+See the [README's profile section](../../README.md#opt-in-detector-profiles)
+for the measured size and latency savings.
 
 This is a family overview, not a promise to match every token each provider
 issues. Exact supported grammars and evidence are recorded in the
