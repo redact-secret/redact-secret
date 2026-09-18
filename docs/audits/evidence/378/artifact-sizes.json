@@ -1,0 +1,68 @@
+{
+  "variants": {
+    "engine-only": {
+      "detectorCount": 0,
+      "nativeRawBytes": 496928,
+      "wasmRawBytes": 156857,
+      "wasmGzipBytes": 54687,
+      "wasmBrotliBytes": 45183,
+      "jsGlueRawBytes": 28873
+    },
+    "full": {
+      "detectorCount": 42,
+      "nativeRawBytes": 631200,
+      "wasmRawBytes": 281346,
+      "wasmGzipBytes": 96324,
+      "wasmBrotliBytes": 77407,
+      "jsGlueRawBytes": 28873
+    },
+    "minus-ai": {
+      "detectorCount": 39,
+      "nativeRawBytes": 630592,
+      "wasmRawBytes": 277997,
+      "wasmGzipBytes": 95538,
+      "wasmBrotliBytes": 76909,
+      "jsGlueRawBytes": 28873
+    },
+    "minus-cloud": {
+      "detectorCount": 28,
+      "nativeRawBytes": 611600,
+      "wasmRawBytes": 262971,
+      "wasmGzipBytes": 91398,
+      "wasmBrotliBytes": 74012,
+      "jsGlueRawBytes": 28873
+    },
+    "minus-devtools": {
+      "detectorCount": 36,
+      "nativeRawBytes": 612624,
+      "wasmRawBytes": 271791,
+      "wasmGzipBytes": 93366,
+      "wasmBrotliBytes": 75263,
+      "jsGlueRawBytes": 28873
+    },
+    "minus-pkg-registry": {
+      "detectorCount": 39,
+      "nativeRawBytes": 631168,
+      "wasmRawBytes": 280643,
+      "wasmGzipBytes": 96036,
+      "wasmBrotliBytes": 77332,
+      "jsGlueRawBytes": 28873
+    },
+    "minus-saas": {
+      "detectorCount": 32,
+      "nativeRawBytes": 611888,
+      "wasmRawBytes": 265980,
+      "wasmGzipBytes": 91920,
+      "wasmBrotliBytes": 74514,
+      "jsGlueRawBytes": 28873
+    },
+    "tiny-common": {
+      "detectorCount": 6,
+      "nativeRawBytes": 570656,
+      "wasmRawBytes": 224879,
+      "wasmGzipBytes": 79724,
+      "wasmBrotliBytes": 65235,
+      "jsGlueRawBytes": 28873
+    }
+  }
+}

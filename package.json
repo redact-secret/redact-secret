@@ -45,6 +45,7 @@
     "assessment:cli:self-test": "node scripts/assessment-cli-run.mjs --self-test",
     "benchmark:candidate": "node scripts/benchmark-candidate.mjs",
     "benchmark:candidate:test": "node --test scripts/tests/benchmark-candidate.test.mjs",
+    "detector-cost:test": "node --test scripts/tests/measure-detector-cost.test.mjs",
     "release-manifest:test": "node --test scripts/tests/npm-registry-metadata.test.mjs && python3 -B -m unittest discover -s scripts/tests -p 'test_release_manifest.py' && python3 -B -m unittest discover -s scripts/tests -p 'test_verify_recovery_artifact.py' && python3 -B -m unittest discover -s scripts/tests -p 'test_validate_release_records.py' && python3 -B scripts/validate-release-records.py",
     "reconcile-guard:test": "python3 -B -m unittest discover -s scripts/tests -p 'test_reconcile_guard.py'",
     "reconcile-artifact-plan:test": "python3 -B -m unittest discover -s scripts/tests -p 'test_reconcile_artifact_plan.py'",
