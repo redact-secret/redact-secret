@@ -59,13 +59,16 @@ documentation, inside a function that returns `Result`.)
 | Result | `ScanResult`, `IncrementalResult` |
 | Sanitized error | `SecretScanError`, `SecretScanErrorCode`, `DetectorFailure`, `PolicyFailure`, `FormatterFailure` |
 | Custom detectors | `Detector`, `Candidate`, `DetectorContext`, `DetectorRegistry`, `RegisteredDetector` |
+| Profiles | `Profile` |
 | Identifiers and units | `is_identifier`, `MAX_IDENTIFIER_LENGTH`, `RANGE_UNIT`, `VERSION` |
 | Detector building blocks | `shannon_entropy` |
 
 That table is the whole surface — it lists every name the crate root exports.
-Everything else is private. In particular, the built-in detector set is
-reached only through `DetectorRegistry::with_built_in`, and the incremental
-retention tuning is derived through
+Everything else is private. In particular, the built-in detector set of each
+profile is reached only through `DetectorRegistry::with_built_in` (`full`,
+the default) and `DetectorRegistry::with_common_built_in` (`common`, a
+strict order-preserving subset for size- or latency-sensitive preventive
+consumers), and the incremental retention tuning is derived through
 `IncrementalLimits::minimum_buffered_bytes` rather than exposed as a
 constant, so both can change without breaking a caller.
 

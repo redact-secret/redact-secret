@@ -36,13 +36,18 @@
 //! Two whole-input capabilities are deliberately outside this API, because
 //! neither can be evaluated before the end of the input is known:
 //!
-//! - **Custom synchronous detectors.** Neither [`IncrementalSanitizer::new`]
-//!   nor [`IncrementalSanitizer::with_policy_and_formatter`] accepts a
-//!   [`DetectorRegistry`], so a session always runs the built-in detectors
-//!   only. A custom [`Detector`](crate::Detector) carries no retention
-//!   declaration, so a session could not bound how long it must hold an open
-//!   construct for it. Register custom detectors on the whole-input
-//!   [`scan`](crate::scan) path instead.
+//! - **Custom synchronous detectors.** No constructor accepts a
+//!   [`DetectorRegistry`]; a session always runs one profile's built-in
+//!   detectors only — [`IncrementalSanitizer::new`] and
+//!   [`IncrementalSanitizer::with_policy_and_formatter`] select `full`,
+//!   [`IncrementalSanitizer::with_common_built_in`] and
+//!   [`IncrementalSanitizer::with_common_built_in_policy_and_formatter`]
+//!   select `common`
+//!   (`decision-define-detector-profile-and-pack-contract`). A custom
+//!   [`Detector`](crate::Detector) carries no retention declaration, so a
+//!   session could not bound how long it must hold an open construct for
+//!   it. Register custom detectors on the whole-input [`scan`](crate::scan)
+//!   path instead.
 //! - **Whole-input count-dependent policies.** [`PolicyContext`] carries the
 //!   total finalized finding count; [`IncrementalPolicyContext`]
 //!   deliberately does not, because a progressive evaluation cannot know how
@@ -65,7 +70,7 @@ use crate::error::{FormatterFailure, PolicyFailure, SecretScanError, SecretScanE
 use crate::pipeline::run_detector_pipeline;
 use crate::policy::DefaultPolicy;
 use crate::redact::{default_placeholder_formatter, redact};
-use crate::registry::DetectorRegistry;
+use crate::registry::{DetectorRegistry, Profile};
 use crate::types::{
     Action, ByteRange, DetectedFinding, Finding, PlaceholderContext, PlaceholderFormatter, Policy,
     PolicyContext, ScanResult,
@@ -386,7 +391,55 @@ impl IncrementalSanitizer {
         formatter: Box<dyn PlaceholderFormatter>,
     ) -> Result<Self, SecretScanError> {
         let registry = DetectorRegistry::with_built_in([])?;
-        Ok(Self {
+        Ok(Self::from_registry(registry, limits, policy, formatter))
+    }
+
+    /// Creates a session over the `common` profile's built-in detectors
+    /// (`decision-define-detector-profile-and-pack-contract`), using
+    /// [`DefaultPolicy`] and [`default_placeholder_formatter`].
+    ///
+    /// The whole-input and incremental paths select their built-in
+    /// detectors the same way: this constructor pairs with
+    /// [`DetectorRegistry::with_common_built_in`] exactly as [`Self::new`]
+    /// pairs with [`DetectorRegistry::with_built_in`].
+    ///
+    /// # Errors
+    ///
+    /// Returns [`SecretScanErrorCode::InvalidDetector`] only if the
+    /// built-in detector registry itself is malformed, which cannot happen
+    /// for the detectors this crate ships.
+    pub fn with_common_built_in(limits: IncrementalLimits) -> Result<Self, SecretScanError> {
+        Self::with_common_built_in_policy_and_formatter(
+            limits,
+            Box::new(DefaultPolicy),
+            Box::new(default_placeholder_formatter),
+        )
+    }
+
+    /// Creates a session over the `common` profile's built-in detectors,
+    /// with an explicit policy and placeholder formatter.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`SecretScanErrorCode::InvalidDetector`] only if the
+    /// built-in detector registry itself is malformed, which cannot happen
+    /// for the detectors this crate ships.
+    pub fn with_common_built_in_policy_and_formatter(
+        limits: IncrementalLimits,
+        policy: Box<dyn IncrementalPolicy>,
+        formatter: Box<dyn PlaceholderFormatter>,
+    ) -> Result<Self, SecretScanError> {
+        let registry = DetectorRegistry::with_common_built_in([])?;
+        Ok(Self::from_registry(registry, limits, policy, formatter))
+    }
+
+    fn from_registry(
+        registry: DetectorRegistry,
+        limits: IncrementalLimits,
+        policy: Box<dyn IncrementalPolicy>,
+        formatter: Box<dyn PlaceholderFormatter>,
+    ) -> Self {
+        Self {
             registry,
             policy,
             formatter,
@@ -400,13 +453,19 @@ impl IncrementalSanitizer {
             private_key: PrivateKeyRetentionTracker::new(),
             multiline_open: false,
             multiline_detected: false,
-        })
+        }
     }
 
     /// The session's current lifecycle state.
     #[must_use]
     pub const fn state(&self) -> SessionState {
         self.state
+    }
+
+    /// Which profile this session's built-in detectors were selected from.
+    #[must_use]
+    pub const fn profile(&self) -> Option<Profile> {
+        self.registry.profile()
     }
 
     fn require_accepting(&self) -> Result<(), SecretScanError> {
@@ -816,5 +875,43 @@ mod tests {
 
         assert!(!rendered.contains(MARKER));
         assert!(rendered.starts_with("IncrementalSanitizer {"));
+    }
+
+    #[test]
+    fn full_and_common_sessions_report_the_profile_they_were_built_from() {
+        assert_eq!(default_session().profile(), Some(Profile::Full));
+        let common = IncrementalSanitizer::with_common_built_in(generous_limits()).unwrap();
+        assert_eq!(common.profile(), Some(Profile::Common));
+    }
+
+    /// The whole-input path ([`crate::scan_and_redact`] over a `common`
+    /// registry) and the incremental path
+    /// ([`IncrementalSanitizer::with_common_built_in`]) select the `common`
+    /// profile's built-in detectors the same way, so they must agree on the
+    /// same input (`decision-define-detector-profile-and-pack-contract`).
+    #[test]
+    fn common_profile_incremental_session_matches_the_whole_input_reference() {
+        let input = "API_KEY=SYNTHETIC_REVOKED_GENERIC_TOKEN_VALUE_0001234567890\ntail";
+        let registry = DetectorRegistry::with_common_built_in([]).unwrap();
+        let expected = crate::scan_and_redact(
+            input,
+            &registry,
+            &DefaultPolicy,
+            &default_placeholder_formatter,
+        )
+        .unwrap();
+
+        let mut session = IncrementalSanitizer::with_common_built_in(generous_limits()).unwrap();
+        let mut text = String::new();
+        let mut findings = Vec::new();
+        let (piece, released) = session.append(input).unwrap().into_parts();
+        text.push_str(&piece);
+        findings.extend(released);
+        let finalized = session.finalize().unwrap();
+        text.push_str(finalized.text());
+        findings.extend(finalized.findings().iter().cloned());
+
+        assert_eq!(text, expected.text());
+        assert_eq!(findings, expected.findings().to_vec());
     }
 }

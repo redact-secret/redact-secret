@@ -97,6 +97,100 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
     ]
 }
 
+/// Every built-in detector the `common` profile registers, in the same
+/// relative order [`built_in_detectors`] gives them.
+///
+/// This function is written to reference only these six constructors. A
+/// `common`-only artifact links no `provider` detector's code, because
+/// nothing here calls into `built_in_detectors` or any `provider` module —
+/// see `decision-define-detector-profile-and-pack-contract`'s reachability
+/// rule. [`BUILT_IN_PACKS`] pins, in tests, that this list is exactly the
+/// `Pack::Common` members of the canonical order.
+#[must_use]
+pub(crate) fn common_built_in_detectors() -> Vec<Box<dyn Detector>> {
+    vec![
+        Box::new(PrivateKeyDetector),
+        jwt::jwt_detector(),
+        bearer_token::bearer_token_detector(),
+        Box::new(ConnectionStringDetector),
+        otpauth::otpauth_detector(),
+        generic_token::generic_token_detector(),
+    ]
+}
+
+/// Which profiles a built-in detector belongs to
+/// (`decision-define-detector-profile-and-pack-contract`). Every built-in
+/// detector has exactly one pack; `full` holds both.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum Pack {
+    /// Format-agnostic: a published structure or a credential-bearing
+    /// context, not one issuer's token format. Ships in every profile.
+    Common,
+    /// One issuer's documented or reviewed token format. Ships only in
+    /// `full`.
+    Provider,
+}
+
+/// The canonical id and pack of every built-in detector, in canonical
+/// order.
+///
+/// Pure data: constructing this array calls no detector constructor, so
+/// referencing it — for example to compute the reserved-id set a smaller
+/// profile's custom detectors must avoid — never pulls a `provider`
+/// detector's code into a `common`-only artifact.
+pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
+    ("private-key", Pack::Common),
+    ("aws-access-key", Pack::Provider),
+    ("github-token", Pack::Provider),
+    ("gitlab-token", Pack::Provider),
+    ("openai-token", Pack::Provider),
+    ("anthropic-token", Pack::Provider),
+    ("shopify-token", Pack::Provider),
+    ("vault-token", Pack::Provider),
+    ("stripe-token", Pack::Provider),
+    ("slack-token", Pack::Provider),
+    ("pypi-token", Pack::Provider),
+    ("huggingface-token", Pack::Provider),
+    ("docker-token", Pack::Provider),
+    ("cloudflare-token", Pack::Provider),
+    ("digitalocean-token", Pack::Provider),
+    ("linear-token", Pack::Provider),
+    ("supabase-token", Pack::Provider),
+    ("vercel-token", Pack::Provider),
+    ("npm-token", Pack::Provider),
+    ("google-api-key", Pack::Provider),
+    ("sendgrid-token", Pack::Provider),
+    ("microsoft-entra-client-secret", Pack::Provider),
+    ("azure-devops-personal-access-token", Pack::Provider),
+    ("notion-token", Pack::Provider),
+    ("atlassian-api-token", Pack::Provider),
+    ("twilio-auth-token", Pack::Provider),
+    ("twilio-api-key-secret", Pack::Provider),
+    ("telegram-bot-token", Pack::Provider),
+    ("discord-bot-token", Pack::Provider),
+    ("sentry-user-auth-token", Pack::Provider),
+    ("sentry-org-auth-token", Pack::Provider),
+    ("datadog-api-key", Pack::Provider),
+    ("datadog-application-key", Pack::Provider),
+    ("grafana-service-account-token", Pack::Provider),
+    ("grafana-cloud-access-policy-token", Pack::Provider),
+    ("new-relic-user-api-key", Pack::Provider),
+    ("new-relic-license-key", Pack::Provider),
+    ("jwt", Pack::Common),
+    ("bearer-token", Pack::Common),
+    ("connection-string", Pack::Common),
+    ("otpauth-uri", Pack::Common),
+    ("generic-token", Pack::Common),
+];
+
+/// Every built-in id, `full`'s reserved-id set: no custom detector in any
+/// profile may reuse one of these, even a `provider` id a smaller profile
+/// does not itself register
+/// (`decision-define-detector-profile-and-pack-contract`, "Reserved ids").
+pub(crate) fn built_in_ids() -> impl Iterator<Item = &'static str> {
+    BUILT_IN_PACKS.iter().map(|(id, _)| *id)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -165,6 +259,66 @@ mod tests {
                 "generic-token",
             ]
         );
+    }
+
+    fn ids_of(detectors: &[Box<dyn Detector>]) -> Vec<&str> {
+        detectors.iter().map(|d| d.id()).collect()
+    }
+
+    #[test]
+    fn built_in_packs_table_matches_the_real_full_registry() {
+        let full = built_in_detectors();
+        let full_ids = ids_of(&full);
+        let table_ids: Vec<&str> = built_in_ids().collect();
+        assert_eq!(
+            table_ids, full_ids,
+            "BUILT_IN_PACKS must list exactly built_in_detectors()'s ids, in the same order"
+        );
+        assert_eq!(BUILT_IN_PACKS.len(), full_ids.len());
+    }
+
+    #[test]
+    fn common_built_in_detectors_are_exactly_the_common_pack_in_canonical_order() {
+        let common = common_built_in_detectors();
+        let common_ids = ids_of(&common);
+        let table_common_ids: Vec<&str> = BUILT_IN_PACKS
+            .iter()
+            .filter(|(_, pack)| *pack == Pack::Common)
+            .map(|(id, _)| *id)
+            .collect();
+        assert_eq!(common_ids, table_common_ids);
+        assert_eq!(
+            common_ids,
+            vec![
+                "private-key",
+                "jwt",
+                "bearer-token",
+                "connection-string",
+                "otpauth-uri",
+                "generic-token",
+            ]
+        );
+
+        // `common` is an order-preserving subsequence of `full`.
+        let full = built_in_detectors();
+        let full_ids = ids_of(&full);
+        let mut cursor = 0;
+        for id in &common_ids {
+            let found = full_ids[cursor..]
+                .iter()
+                .position(|full_id| full_id == id)
+                .expect("every common id must appear in full");
+            cursor += found + 1;
+        }
+    }
+
+    #[test]
+    fn every_built_in_has_exactly_one_pack_and_no_id_repeats() {
+        let mut ids: Vec<&str> = BUILT_IN_PACKS.iter().map(|(id, _)| *id).collect();
+        let count = ids.len();
+        ids.sort_unstable();
+        ids.dedup();
+        assert_eq!(ids.len(), count, "BUILT_IN_PACKS must not repeat an id");
     }
 
     #[test]

@@ -4,9 +4,50 @@
 //! breaker and it fixes the order in which detectors run. Built-in detectors
 //! are always registered before custom ones.
 
-use crate::detectors::built_in_detectors;
+use crate::detectors::{built_in_detectors, built_in_ids, common_built_in_detectors};
 use crate::error::{SecretScanError, SecretScanErrorCode};
 use crate::types::{Detector, is_identifier};
+
+/// A named, reviewed built-in detector composition
+/// (`decision-define-detector-profile-and-pack-contract`).
+///
+/// A profile is the only unit a caller selects: which detectors exist in
+/// each one, and how they are constructed, stays private. `full` is the
+/// default and compatibility baseline everywhere; `common` is a strict,
+/// order-preserving subset meant for size- or latency-sensitive preventive
+/// consumers. A registry built through [`DetectorRegistry::new`] plus
+/// [`DetectorRegistry::register`] carries no profile identity.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Profile {
+    /// Every officially supported built-in detector. The default and
+    /// compatibility baseline on every surface.
+    Full,
+    /// Only the format-agnostic `common` pack: detectors that recognize a
+    /// published structure or a credential-bearing context rather than one
+    /// issuer's token format.
+    Common,
+}
+
+impl Profile {
+    /// The wire name (`"full"`, `"common"`).
+    #[must_use]
+    pub const fn as_str(self) -> &'static str {
+        match self {
+            Self::Full => "full",
+            Self::Common => "common",
+        }
+    }
+
+    /// Parses a wire name.
+    #[must_use]
+    pub fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "full" => Some(Self::Full),
+            "common" => Some(Self::Common),
+            _ => None,
+        }
+    }
+}
 
 /// A detector together with the id captured at registration time.
 ///
@@ -43,14 +84,19 @@ impl std::fmt::Debug for RegisteredDetector {
 #[derive(Debug, Default)]
 pub struct DetectorRegistry {
     detectors: Vec<RegisteredDetector>,
+    profile: Option<Profile>,
 }
 
 impl DetectorRegistry {
     /// Creates an empty registry.
+    ///
+    /// The low-level path: registering built-ins and custom detectors this
+    /// way carries no [`Profile`] identity and no profile guarantee.
     #[must_use]
     pub const fn new() -> Self {
         Self {
             detectors: Vec::new(),
+            profile: None,
         }
     }
 
@@ -94,7 +140,55 @@ impl DetectorRegistry {
         for detector in custom {
             registry.register(detector)?;
         }
+        registry.profile = Some(Profile::Full);
         Ok(registry)
+    }
+
+    /// Creates a registry holding the `common` profile's built-in detectors
+    /// in canonical order, followed by `custom` in the given order
+    /// (`decision-define-detector-profile-and-pack-contract`).
+    ///
+    /// `common` is a strict, order-preserving subset of `full`: every
+    /// `common` detector's candidates, over any input, are exactly its
+    /// candidates in [`Self::with_built_in`]. Overlap resolution is global,
+    /// so a `common` registry's *findings* can still differ from `full`'s —
+    /// removing a `provider` competitor changes which candidate wins.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`SecretScanErrorCode::InvalidDetector`] when a custom
+    /// detector has a malformed id, repeats an id already registered, or
+    /// reuses any `full` built-in id — including a `provider` id this
+    /// profile does not itself register. A custom `github-token` inside
+    /// `common` would otherwise emit findings under a built-in id with
+    /// different behavior.
+    pub fn with_common_built_in<I>(custom: I) -> Result<Self, SecretScanError>
+    where
+        I: IntoIterator<Item = Box<dyn Detector>>,
+    {
+        let mut registry = Self::new();
+        for detector in common_built_in_detectors() {
+            registry.register(detector)?;
+        }
+        for detector in custom {
+            if built_in_ids().any(|reserved| reserved == detector.id()) {
+                return Err(SecretScanErrorCode::InvalidDetector.into());
+            }
+            registry.register(detector)?;
+        }
+        registry.profile = Some(Profile::Common);
+        Ok(registry)
+    }
+
+    /// Which profile this registry was built from, when it carries one.
+    ///
+    /// `Some` only for a registry built through [`Self::with_built_in`] or
+    /// [`Self::with_common_built_in`]. A registry assembled through
+    /// [`Self::new`] and [`Self::register`] carries no profile guarantee and
+    /// reports `None`.
+    #[must_use]
+    pub const fn profile(&self) -> Option<Profile> {
+        self.profile
     }
 
     /// Appends `detector`.
@@ -218,6 +312,109 @@ mod tests {
         assert_eq!(ids.len(), built_in.len() + 1);
         assert_eq!(ids[..built_in.len()], built_in);
         assert_eq!(ids[built_in.len()], "custom");
+    }
+
+    #[test]
+    fn common_built_in_come_first_and_are_an_ordered_subset_of_full() {
+        let registry =
+            DetectorRegistry::with_common_built_in(
+                [Box::new(Named("custom")) as Box<dyn Detector>],
+            )
+            .unwrap();
+        let common: Vec<String> = common_built_in_detectors()
+            .iter()
+            .map(|d| d.id().to_owned())
+            .collect();
+        let ids: Vec<&str> = registry.ids().collect();
+        assert_eq!(ids.len(), common.len() + 1);
+        assert_eq!(ids[..common.len()], common);
+        assert_eq!(ids[common.len()], "custom");
+
+        let full: Vec<String> = built_in_detectors()
+            .iter()
+            .map(|d| d.id().to_owned())
+            .collect();
+        let mut cursor = 0;
+        for id in &common {
+            let found = full[cursor..].iter().position(|f| f == id).unwrap();
+            cursor += found + 1;
+        }
+    }
+
+    #[test]
+    fn common_rejects_a_custom_detector_that_reuses_any_full_built_in_id() {
+        // "github-token" is a `provider` id, never registered by `common`
+        // itself, but still reserved.
+        let error = DetectorRegistry::with_common_built_in([
+            Box::new(Named("github-token")) as Box<dyn Detector>
+        ])
+        .unwrap_err();
+        assert_eq!(error.code(), SecretScanErrorCode::InvalidDetector);
+
+        // "private-key" is a `common` id the profile already registers.
+        let error = DetectorRegistry::with_common_built_in([
+            Box::new(Named("private-key")) as Box<dyn Detector>
+        ])
+        .unwrap_err();
+        assert_eq!(error.code(), SecretScanErrorCode::InvalidDetector);
+    }
+
+    #[test]
+    fn profile_identity_matches_how_the_registry_was_built() {
+        assert_eq!(DetectorRegistry::new().profile(), None);
+        assert_eq!(
+            DetectorRegistry::with_built_in([]).unwrap().profile(),
+            Some(Profile::Full)
+        );
+        assert_eq!(
+            DetectorRegistry::with_common_built_in([])
+                .unwrap()
+                .profile(),
+            Some(Profile::Common)
+        );
+    }
+
+    #[test]
+    fn profile_wire_names_round_trip() {
+        for (profile, name) in [(Profile::Full, "full"), (Profile::Common, "common")] {
+            assert_eq!(profile.as_str(), name);
+            assert_eq!(Profile::from_name(name), Some(profile));
+        }
+        assert_eq!(Profile::from_name("tiny"), None);
+    }
+
+    #[test]
+    fn common_detectors_produce_the_same_candidates_as_in_full() {
+        let full = DetectorRegistry::with_built_in([]).unwrap();
+        let common = DetectorRegistry::with_common_built_in([]).unwrap();
+        let inputs = [
+            "-----BEGIN PRIVATE KEY-----\nU1lOVEhFVElDX1JFVk9LRUQ=\n-----END PRIVATE KEY-----",
+            "eyJhbGciOiJIUzI1NiJ9.SYNTHETIC_REVOKED_PAYLOAD.SYNTHETIC_REVOKED_SIGNATURE",
+            "Authorization: Bearer SYNTHETIC_REVOKED_BEARER_TOKEN_VALUE_0001",
+            "postgres://user:SYNTHETIC_REVOKED_PASSWORD@example.test:5432/db",
+            "otpauth://totp/Example:alice@example.test?secret=SYNTHETICREVOKEDSECRET&issuer=Example",
+            "API_KEY=SYNTHETIC_REVOKED_GENERIC_TOKEN_VALUE_0001234567890",
+        ];
+        for input in inputs {
+            let context = DetectorContext::new(input.len());
+            for id in common.ids() {
+                let full_detector = full
+                    .detectors()
+                    .iter()
+                    .find(|registered| registered.id() == id)
+                    .unwrap();
+                let common_detector = common
+                    .detectors()
+                    .iter()
+                    .find(|registered| registered.id() == id)
+                    .unwrap();
+                assert_eq!(
+                    full_detector.detector().detect(input, &context).unwrap(),
+                    common_detector.detector().detect(input, &context).unwrap(),
+                    "{id}: {input}",
+                );
+            }
+        }
     }
 
     #[test]
