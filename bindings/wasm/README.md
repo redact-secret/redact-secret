@@ -3,7 +3,7 @@
 `wasm-bindgen` build for browsers. Crate: `redact-secret-wasm`. Target:
 `wasm32-unknown-unknown`.
 
-- Exports `initialize`, `version`, `scan`, `redact`, `scanAndRedact`, and
+- Exports `initialize`, `version`, `profile`, `scan`, `redact`, `scanAndRedact`, and
   `createIncrementalSanitizer`, plus the `Finding`, `Range`,
   `ScanAndRedactResult`, `IncrementalSanitizer`, and `IncrementalResult`
   classes those return. `scan`/`redact`/`scanAndRedact` accept an optional
@@ -20,6 +20,15 @@
   The four legacy `CodeUnits` limit parameter names are retained for API
   compatibility, while their values are enforced as UTF-8 byte ceilings by
   the Rust core.
+- One Cargo feature, default-on `full`, picks the compiled detector profile
+  (`decision-define-detector-profile-and-pack-contract`). The default build
+  (`npm run wasm:build`, `pkg/redact_secret_wasm*`) is the `full` artifact.
+  `--no-default-features` (`npm run wasm:build:common`,
+  `pkg-common/redact_secret_wasm_common*`) links only the `common` registry
+  constructors, for both whole-input and incremental scans, so no `provider`
+  detector code is in that binary. `profile()` returns `"full"` or `"common"`.
+  Only `full` is packaged today. The `common` package export is issue #382.
+  Measurements are in `docs/audits/evidence/381/README.md`.
 - `initialize` is this crate's own synchronous, idempotent setup step (it
   builds and caches the built-in detector registry) — distinct from, and in
   addition to, wasm-bindgen's own generated `init()`/default export, which a

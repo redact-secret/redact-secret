@@ -1,0 +1,124 @@
+{
+  "source": {
+    "commit": "6bceee2c05f4838e9d9ede3f4bf617bf25ba4922",
+    "workingTreeClean": true
+  },
+  "runs": 10,
+  "protocol": "scripts/assessment-browser-performance.mjs through @redact-secret/core, one fresh browser context per run (#378)",
+  "engines": {
+    "chromium": {
+      "scale-logs-small-whole": {
+        "full": {
+          "runtime": "chromium-153.0.8010.12",
+          "file": "raw/full/chromium-scale-logs-small-whole.json",
+          "initializationMedianMs": 6.5,
+          "processingMedianMs": 30.30000001192093,
+          "processingStdDevMs": 2.666927077435533,
+          "throughputMedianBytesPerSecond": 2163498.348983798
+        },
+        "common": {
+          "runtime": "chromium-153.0.8010.12",
+          "file": "raw/common/chromium-scale-logs-small-whole.json",
+          "initializationMedianMs": 5.050000011920929,
+          "processingMedianMs": 9.599999964237213,
+          "processingStdDevMs": 0.6759437828459786,
+          "throughputMedianBytesPerSecond": 6828541.692104967
+        }
+      },
+      "scale-logs-medium-fixed4096": {
+        "full": {
+          "runtime": "chromium-153.0.8010.12",
+          "file": "raw/full/chromium-scale-logs-medium-fixed4096.json",
+          "initializationMedianMs": 11.349999994039536,
+          "processingMedianMs": 116.35000002384186,
+          "processingStdDevMs": 9.02075384827557,
+          "throughputMedianBytesPerSecond": 2253150.3941513123
+        },
+        "common": {
+          "runtime": "chromium-153.0.8010.12",
+          "file": "raw/common/chromium-scale-logs-medium-fixed4096.json",
+          "initializationMedianMs": 11.200000017881393,
+          "processingMedianMs": 20.500000029802322,
+          "processingStdDevMs": 0.8942035485388135,
+          "throughputMedianBytesPerSecond": 12788304.283675008
+        }
+      }
+    },
+    "firefox": {
+      "scale-logs-small-whole": {
+        "full": {
+          "runtime": "firefox-155.0",
+          "file": "raw/full/firefox-scale-logs-small-whole.json",
+          "initializationMedianMs": 27.5,
+          "processingMedianMs": 38,
+          "processingStdDevMs": 3.014962686336267,
+          "throughputMedianBytesPerSecond": 1725105.2631578948
+        },
+        "common": {
+          "runtime": "firefox-155.0",
+          "file": "raw/common/firefox-scale-logs-small-whole.json",
+          "initializationMedianMs": 22.5,
+          "processingMedianMs": 9.5,
+          "processingStdDevMs": 1.3564659966250536,
+          "throughputMedianBytesPerSecond": 6919588.888888889
+        }
+      },
+      "scale-logs-medium-fixed4096": {
+        "full": {
+          "runtime": "firefox-155.0",
+          "file": "raw/full/firefox-scale-logs-medium-fixed4096.json",
+          "initializationMedianMs": 36,
+          "processingMedianMs": 186,
+          "processingStdDevMs": 32.14965007585619,
+          "throughputMedianBytesPerSecond": 1410082.2440717178
+        },
+        "common": {
+          "runtime": "firefox-155.0",
+          "file": "raw/common/firefox-scale-logs-medium-fixed4096.json",
+          "initializationMedianMs": 24,
+          "processingMedianMs": 30.5,
+          "processingStdDevMs": 9.75756117070244,
+          "throughputMedianBytesPerSecond": 8597523.655913979
+        }
+      }
+    },
+    "webkit": {
+      "scale-logs-small-whole": {
+        "full": {
+          "runtime": "webkit-26.6",
+          "file": "raw/full/webkit-scale-logs-small-whole.json",
+          "initializationMedianMs": 14,
+          "processingMedianMs": 26,
+          "processingStdDevMs": 1.4866068747318506,
+          "throughputMedianBytesPerSecond": 2521307.6923076925
+        },
+        "common": {
+          "runtime": "webkit-26.6",
+          "file": "raw/common/webkit-scale-logs-small-whole.json",
+          "initializationMedianMs": 13.5,
+          "processingMedianMs": 9,
+          "processingStdDevMs": 1.4177446878757824,
+          "throughputMedianBytesPerSecond": 7283777.777777778
+        }
+      },
+      "scale-logs-medium-fixed4096": {
+        "full": {
+          "runtime": "webkit-26.6",
+          "file": "raw/full/webkit-scale-logs-medium-fixed4096.json",
+          "initializationMedianMs": 13.5,
+          "processingMedianMs": 93,
+          "processingStdDevMs": 12.480384609458156,
+          "throughputMedianBytesPerSecond": 2819186.170212766
+        },
+        "common": {
+          "runtime": "webkit-26.6",
+          "file": "raw/common/webkit-scale-logs-medium-fixed4096.json",
+          "initializationMedianMs": 17.5,
+          "processingMedianMs": 23.5,
+          "processingStdDevMs": 3.4292856398964497,
+          "throughputMedianBytesPerSecond": 11201125.454545455
+        }
+      }
+    }
+  }
+}

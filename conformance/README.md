@@ -69,6 +69,18 @@ depend on `src/`.
   cross-language error-code registry (`fixtures/error-codes.source.ts`):
   every stable code the incremental sanitizer and its stream adapters can
   raise, paired with its fixed, input-free message.
+- [`fixtures/common-profile-expectations.json`](./fixtures/common-profile-expectations.json) —
+  the reviewed findings of the `common` detector profile for every evaluated
+  `synchronous-corpus.json` fixture, by id
+  (`decision-define-detector-profile-and-pack-contract`). `common` findings
+  differ from `full` by design, so they are pinned here rather than derived
+  at runtime. Each entry holds detector, type, confidence, action, and a
+  UTF-8 byte range, never a value. Unlike the hand-authored files above, it
+  is regenerated from the Rust core with
+  `REDACT_SECRET_UPDATE_COMMON_EXPECTATIONS=1 cargo test -p redact-secret --test common_profile_corpus`,
+  and the resulting diff is reviewed. That test fails when the file is stale,
+  so a change to the synchronous corpus also regenerates this file. The
+  `common` browser artifact is qualified against it.
 
 Every JSON file under `fixtures/` is the independently authored, hand-maintained
 canonical source. It was not always: `scripts/migrate-conformance-corpus.ts`

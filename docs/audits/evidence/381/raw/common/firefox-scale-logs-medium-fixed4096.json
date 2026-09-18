@@ -1,0 +1,130 @@
+{
+  "schemaVersion": "3",
+  "surface": "browser-wasm",
+  "profileId": "scale-logs-medium-fixed4096",
+  "performance": {
+    "initialization": {
+      "unit": "milliseconds",
+      "samples": [
+        86,
+        19,
+        24,
+        24,
+        24,
+        21,
+        25,
+        24,
+        28,
+        51
+      ],
+      "minimum": 19,
+      "median": 24,
+      "p95": 86,
+      "maximum": 86,
+      "mean": 32.6,
+      "standardDeviation": 19.70888124678821
+    },
+    "processing": {
+      "unit": "milliseconds",
+      "samples": [
+        36,
+        54,
+        30,
+        30,
+        30,
+        26,
+        31,
+        30,
+        54,
+        42
+      ],
+      "minimum": 26,
+      "median": 30.5,
+      "p95": 54,
+      "maximum": 54,
+      "mean": 36.3,
+      "standardDeviation": 9.75756117070244
+    },
+    "throughput": {
+      "unit": "bytes-per-second",
+      "samples": [
+        7282055.555555556,
+        4854703.703703703,
+        8738466.666666668,
+        8738466.666666668,
+        8738466.666666668,
+        10082846.153846154,
+        8456580.64516129,
+        8738466.666666668,
+        4854703.703703703,
+        6241761.904761904
+      ],
+      "minimum": 4854703.703703703,
+      "median": 8597523.655913979,
+      "p95": 10082846.153846154,
+      "maximum": 10082846.153846154,
+      "mean": 7672651.833339898,
+      "standardDeviation": 1704379.677270501
+    },
+    "memory": {
+      "nodeHeap": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "A browser process does not expose Node heapUsed.",
+        "samplingLimit": "No samples were available."
+      },
+      "nodeRss": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "Browser pages do not expose process RSS through a standard API.",
+        "samplingLimit": "No samples were available."
+      },
+      "nodeExternal": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "Browser pages do not expose Node external memory.",
+        "samplingLimit": "No samples were available."
+      },
+      "browserJsHeap": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "This engine does not expose performance.memory.usedJSHeapSize.",
+        "samplingLimit": "No samples were available."
+      },
+      "wasmLinearMemory": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "The package intentionally keeps its WebAssembly.Memory handle private; the test harness cannot read linear-memory size without adding product instrumentation.",
+        "samplingLimit": "No samples were available."
+      },
+      "pythonHeap": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "The browser surface does not run inside a Python allocator.",
+        "samplingLimit": "No samples were available."
+      },
+      "processRss": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "Browser pages do not expose whole-process RSS through a standard API.",
+        "samplingLimit": "No samples were available."
+      },
+      "streamingBuffer": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "The public incremental session exposes lifecycle state but intentionally does not expose retained plaintext buffer size.",
+        "samplingLimit": "No samples were available."
+      }
+    }
+  },
+  "provenance": {
+    "commit": "6bceee2c05f4838e9d9ede3f4bf617bf25ba4922",
+    "artifactIdentity": "@redact-secret/wasm@0.1.0-beta.4 (common)",
+    "corpusVersion": "1",
+    "corpusHash": "b4db2cd22b4c008c9d63789df8ca2e21e697a21a84699466ea5f96c89d8e2806",
+    "os": "darwin-25.5.0",
+    "cpu": "arm64",
+    "runtime": "firefox-155.0",
+    "command": "node scripts/assessment-browser-performance.mjs --engine firefox --detector-profile common --artifact-dir target/wasm-profiles/common --profile scale-logs-medium-fixed4096 --runs 10 --json-out docs/audits/evidence/381/raw/common/firefox-scale-logs-medium-fixed4096.json"
+  }
+}

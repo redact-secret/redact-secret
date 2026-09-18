@@ -13,11 +13,21 @@
  * (issue #79), and `scripts/qualify-package-consumer.mjs` copies this
  * directory over it, so a manifest emitted here would overwrite it.
  *
+ * `--detector-profile` selects the compiled detector profile
+ * (`decision-define-detector-profile-and-pack-contract`). `full`, the
+ * default, is the build above, unchanged. `common` builds the crate with
+ * `--no-default-features`, so only the `common` registry constructor is
+ * linked, and emits `redact_secret_wasm_common{.js,.d.ts,_bg.wasm,_bg.wasm.d.ts}`
+ * into `bindings/wasm/pkg-common` by default. Its own file names let both
+ * artifacts sit side by side in one directory without either overwriting
+ * the other.
+ *
  * The `wasm-bindgen` CLI must be the exact version the crate is compiled
  * against; a mismatch produces glue that cannot instantiate the module, so it
  * fails here rather than in a browser. Usage:
  *
  *     node scripts/build-browser-artifact.mjs [--out-dir <dir>] [--debug]
+ *         [--detector-profile full|common]
  */
 
 import { execFileSync } from "node:child_process";
@@ -29,9 +39,25 @@ const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
 /** The crate whose cdylib becomes the browser artifact. */
 const CRATE = "redact-secret-wasm";
-/** The `--out-name` given to `wasm-bindgen`; every emitted file uses it. */
-const OUT_NAME = "redact_secret_wasm";
-const DEFAULT_OUT_DIR = join("bindings", "wasm", "pkg");
+/**
+ * Per detector profile: the Cargo feature arguments, the `--out-name` given
+ * to `wasm-bindgen` (every emitted file uses it), and the default output
+ * directory. The `cargo` output file is `redact_secret_wasm.wasm` either way.
+ */
+export const DETECTOR_PROFILES = {
+  full: {
+    cargoArgs: [],
+    outName: "redact_secret_wasm",
+    defaultOutDir: join("bindings", "wasm", "pkg"),
+  },
+  common: {
+    cargoArgs: ["--no-default-features"],
+    outName: "redact_secret_wasm_common",
+    defaultOutDir: join("bindings", "wasm", "pkg-common"),
+  },
+};
+/** The `cargo` output name of the cdylib, whichever profile it was built for. */
+const CARGO_OUT_NAME = "redact_secret_wasm";
 
 function fail(message) {
   console.error(message);
@@ -48,7 +74,7 @@ function run(command, args, options = {}) {
 }
 
 function parseArguments(argv) {
-  const options = { outDir: DEFAULT_OUT_DIR, profile: "release" };
+  const options = { outDir: undefined, profile: "release", detectorProfile: "full" };
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index];
     if (argument === "--out-dir") {
@@ -58,10 +84,18 @@ function parseArguments(argv) {
       options.outDir = value;
     } else if (argument === "--debug") {
       options.profile = "debug";
+    } else if (argument === "--detector-profile") {
+      index += 1;
+      const value = argv[index];
+      if (!Object.hasOwn(DETECTOR_PROFILES, value ?? "")) {
+        fail(`--detector-profile must be one of ${Object.keys(DETECTOR_PROFILES).join(", ")}`);
+      }
+      options.detectorProfile = value;
     } else {
       fail(`unknown argument: ${argument}`);
     }
   }
+  options.outDir ??= DETECTOR_PROFILES[options.detectorProfile].defaultOutDir;
   return options;
 }
 
@@ -112,7 +146,16 @@ function main() {
   const workspace = readWorkspace();
   requireMatchingBindgenCli(workspace.bindgenVersion);
 
-  const build = ["build", "-p", CRATE, "--target", "wasm32-unknown-unknown", "--locked"];
+  const detectorProfile = DETECTOR_PROFILES[options.detectorProfile];
+  const build = [
+    "build",
+    "-p",
+    CRATE,
+    "--target",
+    "wasm32-unknown-unknown",
+    "--locked",
+    ...detectorProfile.cargoArgs,
+  ];
   if (options.profile === "release") build.push("--release");
   run("cargo", build, { stdio: "inherit" });
 
@@ -120,20 +163,23 @@ function main() {
     workspace.targetDirectory,
     "wasm32-unknown-unknown",
     options.profile,
-    `${OUT_NAME}.wasm`,
+    `${CARGO_OUT_NAME}.wasm`,
   );
   const outDir = resolve(REPO_ROOT, options.outDir);
   rmSync(outDir, { recursive: true, force: true });
   mkdirSync(outDir, { recursive: true });
   run(
     "wasm-bindgen",
-    ["--target", "web", "--out-dir", outDir, "--out-name", OUT_NAME, wasm],
+    ["--target", "web", "--out-dir", outDir, "--out-name", detectorProfile.outName, wasm],
     { stdio: "inherit" },
   );
 
   console.log(
-    `built the browser artifact ${workspace.version} (${options.profile}) in ${options.outDir}`,
+    `built the ${options.detectorProfile} browser artifact ${workspace.version} ` +
+      `(${options.profile}) in ${options.outDir}`,
   );
 }
 
-main();
+if (import.meta.url === `file://${process.argv[1]}`) {
+  main();
+}

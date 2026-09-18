@@ -175,14 +175,27 @@ The first, `scripts/browser-harness.mjs`, drives the artifact through its own
 exports:
 
 - a synchronous call before `initialize()` fails with `NOT_INITIALIZED`;
-- `initialize()` is idempotent and `version()` reports the product version;
-- every canonical synchronous fixture matches, converted as above;
+- `initialize()` is idempotent, `version()` reports the product version, and
+  `profile()` reports the compiled detector profile;
+- every canonical synchronous fixture matches, converted as above, and every
+  finding comes from a detector in the artifact's profile;
+- an incremental session fed each positive fixture in two chunks produces
+  the same text and findings as `scanAndRedact` on the same artifact;
 - the corpus's astral fixture is present, and prefixing or suffixing any
   positive fixture with an astral character shifts its reported span by
   UTF-16 code units rather than UTF-8 bytes;
 - `scanAndRedact` equals `scan` then `redact` and no redacted span survives;
 - a throwing policy surfaces `POLICY_FAILURE` carrying no input, and custom
   policy and formatter callbacks take effect.
+
+`--detector-profile common` runs the same page against the `common` artifact
+(`npm run wasm:build:common`, `bindings/wasm/pkg-common`)
+(`decision-define-detector-profile-and-pack-contract`). Each fixture's
+expectation is then its reviewed entry in
+`conformance/fixtures/common-profile-expectations.json`, which the Rust core
+asserts in `crates/secret-scan-core/tests/common_profile_corpus.rs`. The
+package page below is skipped for `common` until `@redact-secret/core` has a
+`common` entry (issue #382).
 
 The "astral character *within* a finding" case is not observable end to end,
 because no built-in detector matches a span containing one; it is asserted at
@@ -309,6 +322,8 @@ npm run addon:qualify -- --target <triple>
 npm run wasm:build
 npx playwright install --with-deps chromium firefox webkit
 npm run browser:qualify                 # or --engine chromium
+npm run wasm:build:common
+npm run browser:qualify -- --detector-profile common
 
 # Clean installed-candidate checks (repeat across the declared matrices).
 node scripts/qualify-package-consumer.mjs --lane node \

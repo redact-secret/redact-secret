@@ -5,6 +5,21 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+- Built the `common` detector-profile WebAssembly artifact beside the
+  default `full` one (issue #381, epic #377,
+  `decision-define-detector-profile-and-pack-contract`). `bindings/wasm` gains
+  one default-on Cargo feature, `full`. `npm run wasm:build` is unchanged, and
+  `npm run wasm:build:common` builds with `--no-default-features`, linking only
+  the `common` registry constructors for both whole-input and incremental
+  scans. Both artifacts export a new `profile()` function (`"full"` or
+  `"common"`). Additive: `full` findings are unchanged, and its `.wasm` is
+  +140 B raw / −41 B brotli with no removed export. Measured on the real
+  artifacts, `common` saves 12,222 B brotli (15.8%) and scans 2.9–6.1× faster
+  on Chromium, Firefox, and WebKit
+  ([evidence](docs/audits/evidence/381/README.md)). Its reviewed findings over
+  the canonical corpus are pinned in
+  `conformance/fixtures/common-profile-expectations.json`. Nothing publishes
+  or exports the `common` artifact yet. Package exports are #382.
 - Narrowed `linear-token`'s `lin_api_` variant to Linear's reviewed API-key
   contract: `lin_api_` followed by exactly 40 bytes of `[A-Za-z0-9]`, bounded
   by the existing `[A-Za-z0-9_-]` boundary alphabet (issue #374, contract

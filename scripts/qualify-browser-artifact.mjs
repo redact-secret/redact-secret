@@ -28,6 +28,15 @@
  * `--artifact-dir` (also accepted as `--wasm-dir`) points at a build other
  * than the default `bindings/wasm/pkg`.
  *
+ * `--detector-profile common` qualifies the `common` artifact
+ * (`npm run wasm:build:common`, default directory `bindings/wasm/pkg-common`)
+ * instead (`decision-define-detector-profile-and-pack-contract`): the
+ * artifact page runs against the reviewed
+ * `conformance/fixtures/common-profile-expectations.json`, and must report
+ * the `common` profile and only `common` detector ids. The package page is
+ * skipped for `common`: `@redact-secret/core` has no `common` entry yet
+ * (issue #382), so it would load the `full` artifact.
+ *
  * Every corpus input is synthetic or explicitly revoked, and no diagnostic
  * this script prints carries an input, a matched value, or a placeholder.
  */
@@ -48,7 +57,27 @@ import { fileURLToPath } from "node:url";
 const SCRIPTS_DIR = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(SCRIPTS_DIR, "..");
 const FIXTURES_DIR = join(REPO_ROOT, "conformance", "fixtures");
-const DEFAULT_ARTIFACT_DIR = join(REPO_ROOT, "bindings", "wasm", "pkg");
+/**
+ * Per detector profile: the glue and binary the page loads, the default
+ * build directory, and which pages apply.
+ */
+const DETECTOR_PROFILES = {
+  full: {
+    glue: "redact_secret_wasm.js",
+    binary: "redact_secret_wasm_bg.wasm",
+    defaultArtifactDir: join(REPO_ROOT, "bindings", "wasm", "pkg"),
+    pages: ["artifact", "package"],
+    buildCommand: "npm run wasm:build",
+  },
+  common: {
+    glue: "redact_secret_wasm_common.js",
+    binary: "redact_secret_wasm_common_bg.wasm",
+    defaultArtifactDir: join(REPO_ROOT, "bindings", "wasm", "pkg-common"),
+    pages: ["artifact"],
+    buildCommand: "npm run wasm:build:common",
+  },
+};
+const COMMON_EXPECTATIONS = "common-profile-expectations.json";
 const PACKAGE_ENTRY = join(REPO_ROOT, "packages", "javascript", "dist", "index.js");
 const PACKAGE_WEB_STREAM_ENTRY = join(
   REPO_ROOT,
@@ -62,8 +91,6 @@ const PACKAGE_WEB_STREAM_ENTRY = join(
 /** The engines this artifact is qualified in, in the order they run. */
 const ENGINES = ["chromium", "firefox", "webkit"];
 
-/** The artifact files the page loads, copied next to the harness. */
-const ARTIFACT_FILES = ["redact_secret_wasm.js", "redact_secret_wasm_bg.wasm"];
 
 const CONTENT_TYPES = {
   ".html": "text/html; charset=utf-8",
@@ -110,7 +137,7 @@ function fail(message) {
 }
 
 function parseArguments(argv) {
-  const options = { engines: [], artifactDir: DEFAULT_ARTIFACT_DIR };
+  const options = { engines: [], artifactDir: undefined, detectorProfile: "full" };
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index];
     if (argument === "--engine") {
@@ -125,11 +152,19 @@ function parseArguments(argv) {
       const value = argv[index];
       if (value === undefined) fail(`${argument} requires a directory`);
       options.artifactDir = resolve(REPO_ROOT, value);
+    } else if (argument === "--detector-profile") {
+      index += 1;
+      const value = argv[index];
+      if (!Object.hasOwn(DETECTOR_PROFILES, value ?? "")) {
+        fail(`--detector-profile must be one of ${Object.keys(DETECTOR_PROFILES).join(", ")}`);
+      }
+      options.detectorProfile = value;
     } else {
       fail(`unknown argument: ${argument}`);
     }
   }
   if (options.engines.length === 0) options.engines = [...ENGINES];
+  options.artifactDir ??= DETECTOR_PROFILES[options.detectorProfile].defaultArtifactDir;
   return options;
 }
 
@@ -137,27 +172,64 @@ function loadCorpus(name) {
   return JSON.parse(readFileSync(join(FIXTURES_DIR, name), "utf8"));
 }
 
+/** The canonical `full` detector ids, in order, from the corpus's own oracle. */
+function fullDetectorIds() {
+  const source = readFileSync(
+    join(REPO_ROOT, "crates", "secret-scan-core", "src", "detectors", "mod.rs"),
+    "utf8",
+  );
+  const table = source.match(/BUILT_IN_PACKS: &\[\(&str, Pack\)\] = &\[([\s\S]*?)\n\];/);
+  if (table === null) fail("detectors/mod.rs: BUILT_IN_PACKS not found");
+  return [...table[1].matchAll(/\("([a-z0-9-]+)", Pack::/g)].map((match) => match[1]);
+}
+
 /**
  * The fixture payload the page fetches: the canonical corpora reduced to the
- * fields the harness asserts on, plus the version the artifact must report.
+ * fields the harness asserts on, plus the version, profile, and detector ids
+ * the artifact must report. For `common`, each expectation is replaced by
+ * its reviewed `common` expectation, matched by fixture id.
  */
-function buildFixtures(artifactDir) {
+function buildFixtures(detectorProfile) {
   const synchronous = loadCorpus("synchronous-corpus.json");
   if (synchronous.offsetUnit !== "utf8-byte") {
     fail(
       `synchronous-corpus.json: offsetUnit is ${synchronous.offsetUnit}, not utf8-byte`,
     );
   }
+  // "not-yet-evaluated" fixtures carry no expectation and document a
+  // future gap, not a current behavioral contract.
+  let fixtures = synchronous.fixtures
+    .filter((fixture) => fixture.support !== "not-yet-evaluated")
+    .map(({ id, input, expected }) => ({ id, input, expected }));
+  let detectors = fullDetectorIds();
+
+  if (detectorProfile === "common") {
+    const common = loadCorpus(COMMON_EXPECTATIONS);
+    if (common.profile !== "common" || common.offsetUnit !== "utf8-byte") {
+      fail(`${COMMON_EXPECTATIONS}: not a utf8-byte common expectation set`);
+    }
+    const expectations = new Map(common.fixtures.map(({ id, expected }) => [id, expected]));
+    if (expectations.size !== fixtures.length) {
+      fail(
+        `${COMMON_EXPECTATIONS} covers ${expectations.size} fixtures, the corpus ` +
+          `evaluates ${fixtures.length}; regenerate it (see its Rust test)`,
+      );
+    }
+    fixtures = fixtures.map((fixture) => {
+      const expected = expectations.get(fixture.id);
+      if (expected === undefined) fail(`${COMMON_EXPECTATIONS}: no entry for ${fixture.id}`);
+      return { ...fixture, expected };
+    });
+    detectors = common.detectors;
+  }
 
   return {
     version: JSON.parse(
       readFileSync(join(REPO_ROOT, "packages/javascript/package.json"), "utf8"),
     ).version,
-    // "not-yet-evaluated" fixtures carry no expectation and document a
-    // future gap, not a current behavioral contract.
-    synchronous: synchronous.fixtures
-      .filter((fixture) => fixture.support !== "not-yet-evaluated")
-      .map(({ id, input, expected }) => ({ id, input, expected })),
+    profile: detectorProfile,
+    detectors,
+    synchronous: fixtures,
   };
 }
 
@@ -193,35 +265,43 @@ async function bundlePackageHarness(artifactDir, outFile) {
   }
 }
 
-async function stageServeDirectory(artifactDir) {
-  for (const entry of [PACKAGE_ENTRY, PACKAGE_WEB_STREAM_ENTRY]) {
+async function stageServeDirectory(artifactDir, detectorProfile, pages) {
+  const profile = DETECTOR_PROFILES[detectorProfile];
+  const packaged = pages.some(({ name }) => name === "package");
+  for (const entry of packaged ? [PACKAGE_ENTRY, PACKAGE_WEB_STREAM_ENTRY] : []) {
     if (!existsSync(entry)) {
       fail(`${entry}: missing; build the package with \`npm run js:build\``);
     }
   }
   const directory = mkdtempSync(join(tmpdir(), "redact-secret-browser-"));
-  for (const name of ARTIFACT_FILES) {
+  for (const name of [profile.glue, profile.binary]) {
     try {
       copyFileSync(join(artifactDir, name), join(directory, name));
     } catch {
       rmSync(directory, { recursive: true, force: true });
       fail(
         `${join(artifactDir, name)}: missing; build it with ` +
-          "`npm run wasm:build`",
+          `\`${profile.buildCommand}\``,
       );
     }
   }
+  writeFileSync(
+    join(directory, "artifact.js"),
+    `export * from "./${profile.glue}";\nexport { default } from "./${profile.glue}";\n`,
+  );
   copyFileSync(
     join(SCRIPTS_DIR, "browser-harness.mjs"),
     join(directory, "browser-harness.mjs"),
   );
-  await bundlePackageHarness(artifactDir, join(directory, "package-harness.js"));
-  for (const { file, module } of PAGES) {
+  if (packaged) {
+    await bundlePackageHarness(artifactDir, join(directory, "package-harness.js"));
+  }
+  for (const { file, module } of pages) {
     writeFileSync(join(directory, file), renderPage(module));
   }
   writeFileSync(
     join(directory, "fixtures.json"),
-    JSON.stringify(buildFixtures(artifactDir)),
+    JSON.stringify(buildFixtures(detectorProfile)),
   );
   return directory;
 }
@@ -261,11 +341,11 @@ async function serve(directory) {
  * each drives a fresh module instance through the one-time initialization
  * gate its first check asserts.
  */
-async function runEngine(playwright, engine, origin) {
+async function runEngine(playwright, engine, origin, pages) {
   const browser = await playwright[engine].launch();
   const runs = [];
   try {
-    for (const { name, file } of PAGES) {
+    for (const { name, file } of pages) {
       const diagnostics = [];
       const tab = await browser.newPage();
       tab.on("pageerror", (error) => diagnostics.push(`pageerror: ${error.message}`));
@@ -305,7 +385,14 @@ async function main() {
     return;
   }
 
-  const directory = await stageServeDirectory(options.artifactDir);
+  const pages = PAGES.filter(({ name }) =>
+    DETECTOR_PROFILES[options.detectorProfile].pages.includes(name),
+  );
+  const directory = await stageServeDirectory(
+    options.artifactDir,
+    options.detectorProfile,
+    pages,
+  );
   const { server, origin } = await serve(directory);
   let failed = 0;
   try {
@@ -313,7 +400,7 @@ async function main() {
       const started = Date.now();
       let runs;
       try {
-        runs = await runEngine(playwright, engine, origin);
+        runs = await runEngine(playwright, engine, origin, pages);
       } catch (error) {
         failed += 1;
         console.error(`${engine}: FAILED to run — ${error.message}`);

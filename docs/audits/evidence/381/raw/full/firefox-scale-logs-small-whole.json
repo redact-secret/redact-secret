@@ -1,0 +1,130 @@
+{
+  "schemaVersion": "3",
+  "surface": "browser-wasm",
+  "profileId": "scale-logs-small-whole",
+  "performance": {
+    "initialization": {
+      "unit": "milliseconds",
+      "samples": [
+        27,
+        15,
+        30,
+        30,
+        24,
+        32,
+        24,
+        33,
+        28,
+        12
+      ],
+      "minimum": 12,
+      "median": 27.5,
+      "p95": 33,
+      "maximum": 33,
+      "mean": 25.5,
+      "standardDeviation": 6.6670833203133135
+    },
+    "processing": {
+      "unit": "milliseconds",
+      "samples": [
+        39,
+        38,
+        38,
+        39,
+        31,
+        40,
+        35,
+        37,
+        33,
+        41
+      ],
+      "minimum": 31,
+      "median": 38,
+      "p95": 41,
+      "maximum": 41,
+      "mean": 37.1,
+      "standardDeviation": 3.014962686336267
+    },
+    "throughput": {
+      "unit": "bytes-per-second",
+      "samples": [
+        1680871.7948717948,
+        1725105.2631578948,
+        1725105.2631578948,
+        1680871.7948717948,
+        2114645.1612903224,
+        1638850,
+        1872971.4285714284,
+        1771729.7297297297,
+        1986484.8484848484,
+        1598878.0487804879
+      ],
+      "minimum": 1598878.0487804879,
+      "median": 1725105.2631578948,
+      "p95": 2114645.1612903224,
+      "maximum": 2114645.1612903224,
+      "mean": 1779551.33329162,
+      "standardDeviation": 155480.4159998971
+    },
+    "memory": {
+      "nodeHeap": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "A browser process does not expose Node heapUsed.",
+        "samplingLimit": "No samples were available."
+      },
+      "nodeRss": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "Browser pages do not expose process RSS through a standard API.",
+        "samplingLimit": "No samples were available."
+      },
+      "nodeExternal": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "Browser pages do not expose Node external memory.",
+        "samplingLimit": "No samples were available."
+      },
+      "browserJsHeap": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "This engine does not expose performance.memory.usedJSHeapSize.",
+        "samplingLimit": "No samples were available."
+      },
+      "wasmLinearMemory": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "The package intentionally keeps its WebAssembly.Memory handle private; the test harness cannot read linear-memory size without adding product instrumentation.",
+        "samplingLimit": "No samples were available."
+      },
+      "pythonHeap": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "The browser surface does not run inside a Python allocator.",
+        "samplingLimit": "No samples were available."
+      },
+      "processRss": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "Browser pages do not expose whole-process RSS through a standard API.",
+        "samplingLimit": "No samples were available."
+      },
+      "streamingBuffer": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "The public incremental session exposes lifecycle state but intentionally does not expose retained plaintext buffer size.",
+        "samplingLimit": "No samples were available."
+      }
+    }
+  },
+  "provenance": {
+    "commit": "6bceee2c05f4838e9d9ede3f4bf617bf25ba4922",
+    "artifactIdentity": "@redact-secret/wasm@0.1.0-beta.4",
+    "corpusVersion": "1",
+    "corpusHash": "b4db2cd22b4c008c9d63789df8ca2e21e697a21a84699466ea5f96c89d8e2806",
+    "os": "darwin-25.5.0",
+    "cpu": "arm64",
+    "runtime": "firefox-155.0",
+    "command": "node scripts/assessment-browser-performance.mjs --engine firefox --detector-profile full --artifact-dir target/wasm-profiles/full --profile scale-logs-small-whole --runs 10 --json-out docs/audits/evidence/381/raw/full/firefox-scale-logs-small-whole.json"
+  }
+}

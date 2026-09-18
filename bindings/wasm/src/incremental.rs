@@ -490,7 +490,7 @@ pub fn create_incremental_sanitizer(
         }),
     };
 
-    let session = CoreIncrementalSanitizer::with_policy_and_formatter(limits, policy, formatter)
+    let session = crate::lifecycle::new_incremental_session(limits, policy, formatter)
         .map_err(|error| to_js_error(error.into()))?;
 
     Ok(IncrementalSanitizerJs {
@@ -714,9 +714,12 @@ mod tests {
     #[wasm_bindgen_test::wasm_bindgen_test]
     fn finding_ranges_use_utf16_offsets_across_a_chunk_boundary() {
         let prefix = "\u{1F511} ";
-        let value = format!("AKIA{}", "SYNTHETICEXAMPLE");
-        let whole = format!("{prefix}{value} suffix");
-        let (chunk_a, chunk_b) = whole.split_at(prefix.len() + 4);
+        let secret = crate::synthetic::secret();
+        let whole = format!("{prefix}{} suffix", secret.text);
+        // Four bytes into the finding itself, so it spans the boundary.
+        let finding_start = prefix.len() + secret.text.find(&secret.matched).unwrap();
+        let value = secret.matched;
+        let (chunk_a, chunk_b) = whole.split_at(finding_start + 4);
 
         let mut session =
             create_incremental_sanitizer(1 << 20, 16_512, 8_192, 16_384, None, None).unwrap();

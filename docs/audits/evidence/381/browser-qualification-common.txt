@@ -1,0 +1,49 @@
+ok - chromium · artifact · operations before initialize fail with NOT_INITIALIZED
+ok - chromium · artifact · initialize is idempotent
+ok - chromium · artifact · version reports the shared product version
+ok - chromium · artifact · profile reports the compiled detector profile
+ok - chromium · artifact · the canonical synchronous corpus is not vacuous
+ok - chromium · artifact · scan matches the canonical synchronous corpus
+ok - chromium · artifact · every finding comes from a detector in the profile
+ok - chromium · artifact · an incremental session matches scanAndRedact on the same artifact
+ok - chromium · artifact · the corpus exercises an astral character before a finding
+ok - chromium · artifact · an astral character around a finding does not perturb its span
+ok - chromium · artifact · scanAndRedact equals scan then redact and removes every match
+ok - chromium · artifact · a throwing policy callback surfaces POLICY_FAILURE
+ok - chromium · artifact · a custom policy callback controls the action
+ok - chromium · artifact · a custom placeholder formatter controls redaction output
+chromium: 14 check(s) passed in 0.8s
+
+ok - firefox · artifact · operations before initialize fail with NOT_INITIALIZED
+ok - firefox · artifact · initialize is idempotent
+ok - firefox · artifact · version reports the shared product version
+ok - firefox · artifact · profile reports the compiled detector profile
+ok - firefox · artifact · the canonical synchronous corpus is not vacuous
+ok - firefox · artifact · scan matches the canonical synchronous corpus
+ok - firefox · artifact · every finding comes from a detector in the profile
+ok - firefox · artifact · an incremental session matches scanAndRedact on the same artifact
+ok - firefox · artifact · the corpus exercises an astral character before a finding
+ok - firefox · artifact · an astral character around a finding does not perturb its span
+ok - firefox · artifact · scanAndRedact equals scan then redact and removes every match
+ok - firefox · artifact · a throwing policy callback surfaces POLICY_FAILURE
+ok - firefox · artifact · a custom policy callback controls the action
+ok - firefox · artifact · a custom placeholder formatter controls redaction output
+firefox: 14 check(s) passed in 4.2s
+
+ok - webkit · artifact · operations before initialize fail with NOT_INITIALIZED
+ok - webkit · artifact · initialize is idempotent
+ok - webkit · artifact · version reports the shared product version
+ok - webkit · artifact · profile reports the compiled detector profile
+ok - webkit · artifact · the canonical synchronous corpus is not vacuous
+ok - webkit · artifact · scan matches the canonical synchronous corpus
+ok - webkit · artifact · every finding comes from a detector in the profile
+ok - webkit · artifact · an incremental session matches scanAndRedact on the same artifact
+ok - webkit · artifact · the corpus exercises an astral character before a finding
+ok - webkit · artifact · an astral character around a finding does not perturb its span
+ok - webkit · artifact · scanAndRedact equals scan then redact and removes every match
+ok - webkit · artifact · a throwing policy callback surfaces POLICY_FAILURE
+ok - webkit · artifact · a custom policy callback controls the action
+ok - webkit · artifact · a custom placeholder formatter controls redaction output
+webkit: 14 check(s) passed in 1.1s
+
+browser qualification passed in chromium, firefox, webkit

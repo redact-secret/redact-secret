@@ -85,6 +85,9 @@ jobs:
       - name: Lint
         run: cargo clippy --workspace --all-targets --locked -- -D warnings
 
+      - name: Run Clippy on the common-profile browser binding
+        run: cargo clippy -p redact-secret-wasm --all-targets --no-default-features --locked -- -D warnings
+
       - name: Check API surface, boundaries, versions, MSRV, and package contents
         run: npm run rust:check
 
@@ -200,3 +203,16 @@ jobs:
           CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_RUNNER: wasm-bindgen-test-runner
           WASM_BINDGEN_TEST_ONLY_NODE: "1"
         run: cargo test -p redact-secret-wasm --target wasm32-unknown-unknown --locked
+
+      # The `common` detector-profile artifact is the same crate built
+      # without its default-on `full` feature
+      # (decision-define-detector-profile-and-pack-contract). Its native
+      # `#[test]`s and its wasm32 `wasm_bindgen_test`s run separately.
+      - name: Test the common-profile browser binding natively
+        run: cargo test -p redact-secret-wasm --no-default-features --locked
+
+      - name: Test the common-profile browser binding for wasm32 (via Node)
+        env:
+          CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_RUNNER: wasm-bindgen-test-runner
+          WASM_BINDGEN_TEST_ONLY_NODE: "1"
+        run: cargo test -p redact-secret-wasm --no-default-features --target wasm32-unknown-unknown --locked

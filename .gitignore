@@ -48,6 +48,7 @@ __pycache__/
 # Generated browser WebAssembly artifact (regenerate with
 # `npm run wasm:build`); the glue and the `.wasm` binary are build output.
 /bindings/wasm/pkg/
+/bindings/wasm/pkg-common/
 
 # Each npm/<platform> directory under bindings/node ships one published
 # package.json plus a compiled addon copied in at publish/qualification time
