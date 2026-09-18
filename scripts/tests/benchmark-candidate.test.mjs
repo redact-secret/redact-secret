@@ -4,7 +4,7 @@ import { execFileSync } from 'node:child_process';
 import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { parseArguments, inspectCleanRevision, resolveExactCommit, sha256File, verifyBenchmarkRepository, verifyCheckoutHead, withTemporaryDirectory } from '../benchmark-candidate.mjs';
+import { parseArguments, inspectCleanRevision, resolveExactCommit, sha256File, summarizeSection, verifyBenchmarkRepository, verifyCheckoutHead, withTemporaryDirectory } from '../benchmark-candidate.mjs';
 
 const git = (root, ...args) => execFileSync('git', args, { cwd: root, encoding: 'utf8' }).trim();
 
@@ -52,4 +52,23 @@ test('benchmark installation runs lifecycle scripts needed to materialize genera
   const source = await readFile(new URL('../benchmark-candidate.mjs', import.meta.url), 'utf8');
   assert.match(source, /\['ci', '--no-audit', '--no-fund'\], benchmarkCheckout/);
   assert.doesNotMatch(source, /\['ci', '--ignore-scripts'[^\n]+benchmarkCheckout/);
+});
+
+test('section summaries distinguish unknown baselines from findings', () => {
+  const report = { results: [
+    { corpusSection: 'expanded-corpus', kind: 'must-not-flag', expectedSpans: 0, actualFindings: 0, outcome: 'observed:0', baseline: { outcome: null } },
+    { corpusSection: 'expanded-corpus', kind: 'must-not-flag', expectedSpans: 0, actualFindings: 0, outcome: 'clean', baseline: { outcome: 'flagged:1' } },
+    { corpusSection: 'expanded-corpus', kind: 'must-redact', expectedSpans: 1, actualFindings: 1, outcome: 'EXACT', baseline: { outcome: null } },
+  ] };
+  assert.deepEqual(summarizeSection(report, 'expanded-corpus'), {
+    rows: 3,
+    negativeBefore: 1,
+    negativeBaselined: 1,
+    negativeAfter: 0,
+    negativeTotal: 2,
+    missesBefore: 0,
+    positiveBaselined: 0,
+    missesAfter: 0,
+    positiveTotal: 1,
+  });
 });

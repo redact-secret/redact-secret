@@ -68,6 +68,25 @@ export async function withTemporaryDirectory(prefix, action) {
   finally { await rm(directory, { recursive: true, force: true }); }
 }
 
+export function summarizeSection(report, section) {
+  const rows = report.results.filter(row => row.corpusSection === section);
+  const negatives = rows.filter(row => row.kind === 'must-not-flag');
+  const positives = rows.filter(row => row.expectedSpans > 0);
+  const baselineNegatives = negatives.filter(row => row.baseline.outcome !== null);
+  const baselinePositives = positives.filter(row => row.baseline.outcome !== null);
+  return {
+    rows: rows.length,
+    negativeBefore: baselineNegatives.filter(row => /^(?:flagged|observed):[1-9][0-9]*$/.test(row.baseline.outcome)).length,
+    negativeBaselined: baselineNegatives.length,
+    negativeAfter: negatives.filter(row => row.actualFindings > 0).length,
+    negativeTotal: negatives.length,
+    missesBefore: baselinePositives.filter(row => String(row.baseline.outcome).includes('MISS')).length,
+    positiveBaselined: baselinePositives.length,
+    missesAfter: positives.filter(row => String(row.outcome).includes('MISS')).length,
+    positiveTotal: positives.length,
+  };
+}
+
 async function run(command, args, cwd, failureCode = 'command-failed') {
   try {
     await exec(command, args, { cwd, timeout: 10 * 60_000, maxBuffer: 16 * 1024 * 1024, env: { ...process.env, npm_config_update_notifier: 'false' } });
@@ -154,23 +173,11 @@ export async function main(argv = process.argv.slice(2)) {
       const report = JSON.parse(await readFile(evidence, 'utf8'));
       if (report.status !== 'complete' || report.candidate.sourceCommit !== productCommit || report.benchmark.sourceCommit !== benchmarkCommit || report.candidate.artifactSha256 !== artifacts.coreSha256)
         throw new Error('candidate-evidence-identity-mismatch');
-      const summary = section => {
-        const rows = report.results.filter(row => row.corpusSection === section);
-        const negatives = rows.filter(row => row.kind === 'must-not-flag');
-        const positives = rows.filter(row => row.expectedSpans > 0);
-        return {
-          rows: rows.length,
-          negativeBefore: negatives.filter(row => row.baseline.outcome !== 'clean').length,
-          negativeAfter: negatives.filter(row => row.outcome !== 'clean').length,
-          missesBefore: positives.filter(row => String(row.baseline.outcome).includes('MISS')).length,
-          missesAfter: positives.filter(row => String(row.outcome).includes('MISS')).length,
-        };
-      };
-      const fixed = summary('fixed-corpus'), expanded = summary('expanded-corpus');
+      const fixed = summarizeSection(report, 'fixed-corpus'), expanded = summarizeSection(report, 'expanded-corpus');
       console.log(`Candidate ${productCommit} against benchmark ${benchmarkCommit}`);
       console.log(`Artifact SHA-256: ${artifacts.coreSha256}`);
-      console.log(`Fixed corpus (${fixed.rows} fixtures): negative flags ${fixed.negativeBefore} before / ${fixed.negativeAfter} after; positive misses ${fixed.missesBefore} before / ${fixed.missesAfter} after.`);
-      console.log(`Expanded corpus (${expanded.rows} fixtures): negative flags ${expanded.negativeBefore} before / ${expanded.negativeAfter} after; positive misses ${expanded.missesBefore} before / ${expanded.missesAfter} after.`);
+      console.log(`Fixed corpus (${fixed.rows} fixtures): negative flags ${fixed.negativeBefore} before (${fixed.negativeBaselined}/${fixed.negativeTotal} baselined) / ${fixed.negativeAfter} after; positive misses ${fixed.missesBefore} before (${fixed.positiveBaselined}/${fixed.positiveTotal} baselined) / ${fixed.missesAfter} after.`);
+      console.log(`Expanded corpus (${expanded.rows} fixtures): negative flags ${expanded.negativeBefore} before (${expanded.negativeBaselined}/${expanded.negativeTotal} baselined) / ${expanded.negativeAfter} after; positive misses ${expanded.missesBefore} before (${expanded.positiveBaselined}/${expanded.positiveTotal} baselined) / ${expanded.missesAfter} after.`);
       console.log(`Evidence: ${evidence}`);
       return { evidence, report };
     } finally {
