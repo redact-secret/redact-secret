@@ -1687,11 +1687,10 @@
           "dimension": "positive",
           "evidenceFixtureIds": [
             "linear-positive-all-prefixes",
-            "linear-positive-doc-style-placeholder",
+            "linear-positive-exact-length",
             "linear-positive-json",
             "linear-positive-log",
             "linear-positive-markdown-delimiter",
-            "linear-positive-min-length",
             "linear-positive-punctuation-adjacent",
             "linear-positive-qualified",
             "linear-positive-repeated-value",
@@ -1721,9 +1720,16 @@
           "evidenceFixtureIds": [
             "linear-boundary-below-min",
             "linear-boundary-case-sensitivity",
+            "linear-boundary-dash-in-body",
             "linear-boundary-delimiter",
             "linear-boundary-invalid-alphabet",
-            "linear-boundary-short"
+            "linear-boundary-invalid-alphabet-exact-length",
+            "linear-boundary-one-long-exact-length",
+            "linear-boundary-one-short-exact-length",
+            "linear-boundary-short",
+            "linear-boundary-underscore-in-body",
+            "linear-positive-doc-style-placeholder",
+            "linear-positive-min-length"
           ],
           "state": "supported"
         },
@@ -1744,9 +1750,16 @@
           "evidenceFixtureIds": [
             "linear-boundary-below-min",
             "linear-boundary-case-sensitivity",
+            "linear-boundary-dash-in-body",
             "linear-boundary-delimiter",
             "linear-boundary-invalid-alphabet",
-            "linear-boundary-short"
+            "linear-boundary-invalid-alphabet-exact-length",
+            "linear-boundary-one-long-exact-length",
+            "linear-boundary-one-short-exact-length",
+            "linear-boundary-short",
+            "linear-boundary-underscore-in-body",
+            "linear-positive-doc-style-placeholder",
+            "linear-positive-min-length"
           ],
           "state": "supported"
         },

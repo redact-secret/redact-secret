@@ -1,5 +1,5 @@
-//! Stripe, `PyPI`, Hugging Face, Docker, `DigitalOcean`, Linear, Supabase,
-//! Vercel, npm, Google, and Grafana Cloud API key detection.
+//! Stripe, `PyPI`, Hugging Face, Docker, `DigitalOcean`, Supabase, Vercel,
+//! npm, Google, and Grafana Cloud API key detection.
 //!
 //! Mirrors the retired `src/detectors/additional-providers.ts` oracle. Every
 //! one of these providers reduces to the same shape as [`super::gitlab`] or
@@ -16,7 +16,11 @@
 //! `pattern` primitives instead of through this type. Cloudflare moved out
 //! to [`super::cloudflare`] (issue #373): its reviewed contract needs a
 //! post-hoc check on the matched run's trailing bytes (a checksum-shaped
-//! tail) this type cannot express.
+//! tail) this type cannot express. Linear moved out to [`super::linear`]
+//! (issue #374): its reviewed `lin_api_` contract needs a narrower suffix
+//! alphabet (`[A-Za-z0-9]`) than the interim-guarded `lin_oauth_` prefix
+//! (`[A-Za-z0-9_-]`), and this type's single alphabet field is shared by
+//! every shape, not per-prefix.
 
 use crate::detectors::pattern::{self, Alphabet, PrefixShape};
 use crate::error::DetectorFailure;
@@ -187,21 +191,6 @@ pub(super) const DIGITALOCEAN: KnownFormatProviderDetector = KnownFormatProvider
         PrefixShape::exact("dor_v1_", 64),
     ],
     alphabet: pattern::is_lower_hex,
-    boundary: pattern::is_alnum_dash,
-};
-
-/// Linear API keys and OAuth access tokens with scanner-oriented prefixes.
-/// An undocumented segment name in place of `api`/`oauth` is an
-/// intentional false negative.
-pub(super) const LINEAR: KnownFormatProviderDetector = KnownFormatProviderDetector {
-    id: "linear-token",
-    type_name: "linear_token",
-    signals: &["linear-scannable-prefix", "opaque-suffix"],
-    shapes: &[
-        PrefixShape::at_least("lin_api_", 20),
-        PrefixShape::at_least("lin_oauth_", 20),
-    ],
-    alphabet: pattern::is_alnum_dash,
     boundary: pattern::is_alnum_dash,
 };
 
@@ -392,7 +381,6 @@ mod tests {
                 DIGITALOCEAN_BODY,
                 "dop_v1_SYNTHETIC_SHORT",
             ),
-            family(LINEAR, "lin_api_", BODY, "lin_api_SYNTHETIC_SHORT"),
             family(SUPABASE, "sb_secret_", BODY, "sb_secret_SYNTHETIC_SHORT"),
             family(VERCEL, "vcp_", BODY, "vcp_SYNTHETIC_SHORT"),
             family(NPM, "npm_", NPM_BODY, "npm_SYNTHETICSHORT"),
@@ -455,9 +443,9 @@ mod tests {
         // Docker's two prefixes carry different exact lengths, so they are
         // asserted by `docker_accepts_each_segment_at_exactly_its_own_length`
         // instead of against the shared minimum-length `BODY`. Slack moved
-        // out to `super::slack` (issue #371) and is covered by its own
-        // tests there.
-        let cases: [(&KnownFormatProviderDetector, &str); 16] = [
+        // out to `super::slack` (issue #371) and Linear to `super::linear`
+        // (issue #374); each is covered by its own tests there.
+        let cases: [(&KnownFormatProviderDetector, &str); 14] = [
             (&STRIPE, "sk_test_"),
             (&STRIPE, "sk_live_"),
             (&STRIPE, "rk_test_"),
@@ -467,8 +455,6 @@ mod tests {
             (&DIGITALOCEAN, "dop_v1_"),
             (&DIGITALOCEAN, "doo_v1_"),
             (&DIGITALOCEAN, "dor_v1_"),
-            (&LINEAR, "lin_api_"),
-            (&LINEAR, "lin_oauth_"),
             (&VERCEL, "vcp_"),
             (&VERCEL, "vci_"),
             (&VERCEL, "vca_"),
@@ -860,72 +846,37 @@ mod tests {
         }
     }
 
-    /// Issue #321: these dimensions are scoped to `HUGGING_FACE` and
-    /// `LINEAR`, without widening the shared [`families`] list. Slack moved
-    /// out to `super::slack` (issue #371) and repeats these dimensions
-    /// there for its own interim-guarded prefixes. Issue #372 narrowed
-    /// `HUGGING_FACE` to an exact 34-byte `[A-Za-z0-9]` body, so it now
-    /// needs its own valid placeholder/body length and alphabet instead of
-    /// sharing `LINEAR`'s 20-byte-minimum, underscore-inclusive value.
+    /// Issue #321: this dimension is scoped to `HUGGING_FACE`, without
+    /// widening the shared [`families`] list. Slack moved out to
+    /// `super::slack` (issue #371) and Linear to `super::linear` (issue
+    /// #374); each repeats this dimension there for its own prefixes.
     #[test]
     fn application_providers_accept_an_all_valid_alphabet_documentation_placeholder() {
-        for (detector, value) in [
-            (
-                &HUGGING_FACE as &KnownFormatProviderDetector,
-                format!("hf_{}", "x".repeat(34)),
-            ),
-            (&LINEAR, format!("lin_api_{}", "x".repeat(20))),
-        ] {
-            let candidates = detect(detector, &value);
-            assert_eq!(candidates.len(), 1, "{}", detector.id());
-            assert_eq!(
-                candidates[0].confidence(),
-                Confidence::High,
-                "{}",
-                detector.id()
-            );
-        }
+        let value = format!("hf_{}", "x".repeat(34));
+        let candidates = detect(&HUGGING_FACE, &value);
+        assert_eq!(candidates.len(), 1);
+        assert_eq!(candidates[0].confidence(), Confidence::High);
     }
 
     #[test]
     fn application_providers_reject_the_prefix_embedded_in_a_wider_identifier() {
-        for (detector, value) in [
-            (
-                &HUGGING_FACE as &KnownFormatProviderDetector,
-                format!("legacyhf_{HUGGING_FACE_BODY}"),
-            ),
-            (
-                &LINEAR,
-                "legacylin_api_SYNTHETIC_REVOKED_KEY_VALUE".to_string(),
-            ),
-        ] {
-            assert_eq!(detect(detector, &value).len(), 0, "{}", detector.id());
-        }
+        let value = format!("legacyhf_{HUGGING_FACE_BODY}");
+        assert_eq!(detect(&HUGGING_FACE, &value).len(), 0);
     }
 
     #[test]
     fn application_providers_reject_a_percent_encoded_delimiter_lookalike() {
-        for (detector, value) in [
-            (&HUGGING_FACE, "hf%5FSYNTHETIC_REVOKED_CONFORMANCE_KEY"),
-            (&LINEAR, "lin%5Fapi_SYNTHETIC_REVOKED_CONFORMANCE_KEY"),
-        ] {
-            assert_eq!(detect(detector, value).len(), 0, "{}", detector.id());
-        }
+        assert_eq!(
+            detect(&HUGGING_FACE, "hf%5FSYNTHETIC_REVOKED_CONFORMANCE_KEY").len(),
+            0
+        );
     }
 
     #[test]
     fn application_providers_report_a_repeated_identical_value_once_per_occurrence() {
-        for (detector, value) in [
-            (
-                &HUGGING_FACE as &KnownFormatProviderDetector,
-                format!("hf_{HUGGING_FACE_BODY}"),
-            ),
-            (&LINEAR, "lin_api_SYNTHETIC_REVOKED_KEY_VALUE".to_string()),
-        ] {
-            let input = format!("{value} {value}");
-            let candidates = detect(detector, &input);
-            assert_eq!(candidates.len(), 2, "{}", detector.id());
-        }
+        let value = format!("hf_{HUGGING_FACE_BODY}");
+        let input = format!("{value} {value}");
+        assert_eq!(detect(&HUGGING_FACE, &input).len(), 2);
     }
 
     /// Issue #372: the frozen precision contract

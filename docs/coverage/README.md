@@ -216,6 +216,20 @@ Tests: `python3 -B -m unittest discover -s scripts/tests -p 'test_generate_cover
     --out docs/coverage/fp-fn-summary-370.json
   ```
 
+- [`fp-fn-summary-374.json`](./fp-fn-summary-374.json) — the same report for
+  issue [#374](https://github.com/redact-secret/redact-secret/issues/374)'s
+  `linear-token` exact-length coverage (the corpus view after the `lin_api_`
+  contract was frozen; `fp-fn-summary-321.json` is the earlier, pre-#374
+  snapshot of the same detector and is intentionally left as it was
+  recorded):
+
+  ```sh
+  python3 -B scripts/generate-fp-fn-summary.py \
+    --detector linear-token \
+    --issue https://github.com/redact-secret/redact-secret/issues/374 \
+    --out docs/coverage/fp-fn-summary-374.json
+  ```
+
   Tests: `python3 -B -m unittest discover -s scripts/tests -p 'test_generate_fp_fn_summary.py'`.
 
 ## Coverage drift is a CI failure

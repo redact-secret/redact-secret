@@ -60,7 +60,7 @@
     {
       "id": "additional-provider-families",
       "input": "sk_live_SYNTHETICREVOKEDSYNTHETICREVOKED\nxoxb-SYNTHETIC-REVOKED-SYNTHETIC-REVOKED-\npypi-SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\n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\ndckr_pat_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\ncfut_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\ndop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9\nlin_api_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\nsb_secret_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\nvcp_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_",
-      "text": "<SECRET_1>\nxoxb-SYNTHETIC-REVOKED-SYNTHETIC-REVOKED-\n<SECRET_2>\n<SECRET_3>\ndckr_pat_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\ncfut_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\n<SECRET_4>\n<SECRET_5>\n<SECRET_6>\n<SECRET_7>",
+      "text": "<SECRET_1>\nxoxb-SYNTHETIC-REVOKED-SYNTHETIC-REVOKED-\n<SECRET_2>\n<SECRET_3>\ndckr_pat_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\ncfut_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\n<SECRET_4>\nlin_api_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\n<SECRET_5>\n<SECRET_6>",
       "expected": [
         {
           "detector": "stripe-token",
@@ -95,14 +95,6 @@
           "end": 376
         },
         {
-          "detector": "linear-token",
-          "type": "linear_token",
-          "confidence": "high",
-          "specificity": "provider",
-          "start": 377,
-          "end": 421
-        },
-        {
           "detector": "supabase-token",
           "type": "supabase_secret_key",
           "confidence": "high",
@@ -119,7 +111,7 @@
           "end": 509
         }
       ],
-      "note": "Every newly qualified variable-length provider family remains whole across partitions. Reclassified by issue #370 (decision-freeze-docker-pat-oat-exact-length-grammar): the dckr_pat_ line carries a 36-byte suffix, which is neither documented Docker Hub length, so it now stays as plain text at every partition while its neighbours are still redacted; docker-pat-oat-exact-length-partitions carries the exact-length shapes. Input unchanged; expectation corrected. The DigitalOcean line carries the reviewed exact 64-byte hex contract (issue #369); later offsets shifted accordingly. Reclassified again by issue #371 (docs/decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md): the xoxb- line has no digit sections, so it now stays as plain text at every partition too. Reclassified again by issue #372 (docs/audits/evidence/367/precision-contracts.json, families.huggingface-token): the hf_ line now carries the reviewed exact 34-byte letters-only body instead of the retired 20-byte-minimum, underscore-inclusive shape, shifting every later detector's start/end by -2; every offset above already reflects that shift. Reclassified again by issue #373 (docs/audits/evidence/367/precision-contracts.json, families.cloudflare-token): the cfut_ line carries a 36-byte underscore-including body, not the reviewed 40-byte alphanumeric body plus 8-byte lowercase-hex checksum, so it now stays as plain text at every partition too; every SECRET tag after it is renumbered down by one but no later detector's input start/end offset shifts, since the cfut_ line's input text is unchanged."
+      "note": "Every newly qualified variable-length provider family remains whole across partitions. Reclassified by issue #370 (decision-freeze-docker-pat-oat-exact-length-grammar): the dckr_pat_ line carries a 36-byte suffix, which is neither documented Docker Hub length, so it now stays as plain text at every partition while its neighbours are still redacted; docker-pat-oat-exact-length-partitions carries the exact-length shapes. Input unchanged; expectation corrected. The DigitalOcean line carries the reviewed exact 64-byte hex contract (issue #369); later offsets shifted accordingly. Reclassified again by issue #371 (docs/decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md): the xoxb- line has no digit sections, so it now stays as plain text at every partition too. Reclassified again by issue #372 (docs/audits/evidence/367/precision-contracts.json, families.huggingface-token): the hf_ line now carries the reviewed exact 34-byte letters-only body instead of the retired 20-byte-minimum, underscore-inclusive shape, shifting every later detector's start/end by -2; every offset above already reflects that shift. Reclassified again by issue #373 (docs/audits/evidence/367/precision-contracts.json, families.cloudflare-token): the cfut_ line carries a 36-byte underscore-including body, not the reviewed 40-byte alphanumeric body plus 8-byte lowercase-hex checksum, so it now stays as plain text at every partition too; every SECRET tag after it is renumbered down by one but no later detector's input start/end offset shifts, since the cfut_ line's input text is unchanged. Reclassified again by issue #374 (docs/audits/evidence/367/precision-contracts.json, families.linear-token): the lin_api_ line carries a 45-byte underscore-including body, not the reviewed 40-byte alphanumeric body, so it now stays as plain text at every partition too; every SECRET tag after it is renumbered down by one but no later detector's input start/end offset shifts, since the lin_api_ line's input text is unchanged."
     },
     {
       "id": "fixed-width-unicode",
@@ -729,7 +721,7 @@
     },
     {
       "id": "linear-lookalike-token-discriminating-boundary",
-      "input": "linear-documentation-identifier\nlin_api_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_",
+      "input": "linear-documentation-identifier\nlin_api_SYNTHETICREVOKEDLINEARAPITOKENVALUE01234",
       "text": "linear-documentation-identifier\n<SECRET_1>",
       "expected": [
         {
@@ -738,7 +730,7 @@
           "confidence": "high",
           "specificity": "provider",
           "start": 32,
-          "end": 76
+          "end": 80
         }
       ],
       "note": "issue #321: an ordinary Linear-related identifier with no credential shape and a real documented token on adjacent lines stay correctly discriminated at every chunk split, including splits that fall inside the 'lin_api_' prefix itself."
