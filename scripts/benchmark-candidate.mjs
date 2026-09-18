@@ -68,8 +68,10 @@ export async function withTemporaryDirectory(prefix, action) {
   finally { await rm(directory, { recursive: true, force: true }); }
 }
 
-async function run(command, args, cwd) {
-  await exec(command, args, { cwd, timeout: 10 * 60_000, maxBuffer: 16 * 1024 * 1024, env: { ...process.env, npm_config_update_notifier: 'false' } });
+async function run(command, args, cwd, failureCode = 'command-failed') {
+  try {
+    await exec(command, args, { cwd, timeout: 10 * 60_000, maxBuffer: 16 * 1024 * 1024, env: { ...process.env, npm_config_update_notifier: 'false' } });
+  } catch (error) { throw new Error(failureCode, { cause: error }); }
 }
 
 async function pack(directory, destination) {
@@ -80,12 +82,12 @@ async function pack(directory, destination) {
 }
 
 async function buildCandidate(productCheckout, artifactDirectory, scratch) {
-  await run(npm, ['ci', '--ignore-scripts', '--no-audit', '--no-fund'], productCheckout);
-  await run(npm, ['ci', '--ignore-scripts', '--no-audit', '--no-fund'], path.join(productCheckout, 'bindings/node'));
-  await run(npm, ['run', 'js:build'], productCheckout);
-  await run(npm, ['run', 'build'], path.join(productCheckout, 'bindings/node'));
+  await run(npm, ['ci', '--ignore-scripts', '--no-audit', '--no-fund'], productCheckout, 'product-install-failed');
+  await run(npm, ['ci', '--ignore-scripts', '--no-audit', '--no-fund'], path.join(productCheckout, 'bindings/node'), 'node-toolchain-install-failed');
+  await run(npm, ['run', 'js:build'], productCheckout, 'javascript-build-failed');
+  await run(npm, ['run', 'build'], path.join(productCheckout, 'bindings/node'), 'node-addon-build-failed');
   const wasmOutput = path.join(scratch, 'wasm-output');
-  await run(npm, ['run', 'wasm:build', '--', '--out-dir', wasmOutput], productCheckout);
+  await run(npm, ['run', 'wasm:build', '--', '--out-dir', wasmOutput], productCheckout, 'wasm-build-failed');
   await mkdir(artifactDirectory, { recursive: true });
   const core = await pack(path.join(productCheckout, 'packages/javascript'), artifactDirectory);
   const runtime = await import(`${pathToFileURL(path.join(productCheckout, 'packages/javascript/dist/runtime/node.js')).href}?candidate=${Date.now()}`);
@@ -121,7 +123,7 @@ async function benchmarkSource(options, scratch) {
   try { verifyBenchmarkRepository(sibling); return { root: sibling, temporaryClone: false }; }
   catch {}
   const root = path.join(scratch, 'benchmark-source');
-  await run('git', ['clone', '--no-checkout', 'https://github.com/redact-secret/redact-secret-benchmarks.git', root], scratch);
+  await run('git', ['clone', '--no-checkout', 'https://github.com/redact-secret/redact-secret-benchmarks.git', root], scratch, 'benchmark-clone-failed');
   return { root, temporaryClone: true };
 }
 
@@ -140,15 +142,15 @@ export async function main(argv = process.argv.slice(2)) {
       await addWorktree(repositoryRoot, productCheckout, productCommit);
       await addWorktree(source.root, benchmarkCheckout, benchmarkCommit);
       const artifacts = await buildCandidate(productCheckout, artifactDirectory, scratch);
-      await run(npm, ['ci', '--ignore-scripts', '--no-audit', '--no-fund'], benchmarkCheckout);
+      await run(npm, ['ci', '--no-audit', '--no-fund'], benchmarkCheckout, 'benchmark-install-failed');
       const candidateArgs = ['run', 'eval:candidate', '--',
         '--candidate-package', artifacts.core, '--candidate-node-package', artifacts.node, '--candidate-wasm-package', artifacts.wasm,
         '--candidate-source-commit', productCommit, '--product-state', 'clean', '--expected-artifact-sha256', artifacts.coreSha256,
         '--output-dir', outputDirectory];
       if (options.filter) candidateArgs.push('--filter', options.filter);
-      await run(npm, candidateArgs, benchmarkCheckout);
+      await run(npm, candidateArgs, benchmarkCheckout, 'candidate-evaluation-failed');
       const evidence = path.join(outputDirectory, 'candidate-evidence-v1.json');
-      await run(npm, ['run', 'eval:validate', '--', evidence], benchmarkCheckout);
+      await run(npm, ['run', 'eval:validate', '--', evidence], benchmarkCheckout, 'candidate-evidence-validation-failed');
       const report = JSON.parse(await readFile(evidence, 'utf8'));
       if (report.status !== 'complete' || report.candidate.sourceCommit !== productCommit || report.benchmark.sourceCommit !== benchmarkCommit || report.candidate.artifactSha256 !== artifacts.coreSha256)
         throw new Error('candidate-evidence-identity-mismatch');
@@ -168,5 +170,9 @@ export async function main(argv = process.argv.slice(2)) {
 }
 
 if (process.argv[1] && pathToFileURL(path.resolve(process.argv[1])).href === import.meta.url) {
-  main().catch(() => { console.error('Candidate benchmark failed; no successful evidence was reported.'); process.exitCode = 1; });
+  main().catch(error => {
+    const code = error instanceof Error && /^[a-z][a-z0-9-]+$/.test(error.message) ? error.message : 'candidate-benchmark-failed';
+    console.error(`Candidate benchmark failed: ${code}. No successful evidence was reported.`);
+    process.exitCode = 1;
+  });
 }

@@ -47,3 +47,9 @@ test('artifact hashing is byte exact and temporary directories are cleaned', asy
   assert.equal(digest, 'd14e0edc00c9672581e58e175dfe75a0e69758946e293323f8e3b84e9d87ccaf');
   await assert.rejects(readFile(target));
 });
+
+test('benchmark installation runs lifecycle scripts needed to materialize generated fixtures', async () => {
+  const source = await readFile(new URL('../benchmark-candidate.mjs', import.meta.url), 'utf8');
+  assert.match(source, /\['ci', '--no-audit', '--no-fund'\], benchmarkCheckout/);
+  assert.doesNotMatch(source, /\['ci', '--ignore-scripts'[^\n]+benchmarkCheckout/);
+});
