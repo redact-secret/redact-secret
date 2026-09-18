@@ -94,15 +94,31 @@ pub(super) const PYPI: KnownFormatProviderDetector = KnownFormatProviderDetector
     boundary: pattern::is_alnum_dash,
 };
 
-/// Hugging Face user access tokens in the provider's `hf_` namespace. A
-/// dash in place of the documented underscore, or any other undocumented
-/// prefix, is an intentional false negative.
+/// Hugging Face user access tokens in the provider's `hf_` namespace.
+/// Issue #372 (following the frozen precision contract from issue #367,
+/// `docs/audits/evidence/367/precision-contracts.json`) narrows the
+/// retired `hf_` + 20-byte-minimum shared shape to the reviewed grammar:
+/// gitleaks 8.30.1 and trufflehog 3.97.4 independently agree on an exact
+/// 34-byte body, so a body one byte short of 34 (the beta.4
+/// `huggingface-token-user-plain-twin` regression) is now an intentional
+/// false negative instead of a match. The two tools disagree on the body
+/// alphabet (gitleaks: letters only; trufflehog: letters and digits); that
+/// conflict is resolved as a support-policy choice for the union
+/// `[A-Za-z0-9]` rather than guessed into the letters-only intersection, so
+/// a digit-bearing body is still accepted even though it stays unscored
+/// (T0) in the benchmark corpus pending independent review. Both tools
+/// agree the body excludes `_`/`-`, so — unlike the shared "prefix plus a
+/// minimum-length run" shape most of this module's providers still use —
+/// an underscore or dash inside the body is now evidence-backed exclusion,
+/// not merely a length shortfall. A dash in place of the documented
+/// underscore prefix, or any other undocumented prefix, remains an
+/// intentional false negative.
 pub(super) const HUGGING_FACE: KnownFormatProviderDetector = KnownFormatProviderDetector {
     id: "huggingface-token",
     type_name: "huggingface_token",
-    signals: &["huggingface-documented-prefix", "opaque-suffix"],
-    shapes: &[PrefixShape::at_least("hf_", 20)],
-    alphabet: pattern::is_alnum_dash,
+    signals: &["huggingface-documented-prefix", "base62-exact-length"],
+    shapes: &[PrefixShape::exact("hf_", 34)],
+    alphabet: pattern::is_alnum,
     boundary: pattern::is_alnum_dash,
 };
 
@@ -301,6 +317,12 @@ mod tests {
     use super::*;
 
     const BODY: &str = "SYNTHETICREVOKEDPROVIDERVALUE";
+    /// Issue #372: Hugging Face's suffix is matched as an exact 34-byte
+    /// length from `[A-Za-z0-9]` (no `_`/`-`), not a minimum, so it needs
+    /// its own fixed-length, underscore-free synthetic body rather than
+    /// [`BODY`].
+    const HUGGING_FACE_BODY: &str = "SYNTHETICREVOKEDHUGGINGFACETOKEN01";
+    const _: () = assert!(HUGGING_FACE_BODY.len() == 34);
     /// npm's suffix is matched as an exact 36-byte length, not a minimum, so
     /// it needs its own fixed-length synthetic body rather than [`BODY`].
     const NPM_BODY: &str = "SYNTHETICREVOKEDNPMACCESSTOKENVALUE1";
@@ -368,7 +390,7 @@ mod tests {
                 &"SYNTHETIC_REVOKED_".repeat(5),
                 "pypi-SYNTHETICSHORT",
             ),
-            family(HUGGING_FACE, "hf_", BODY, "hf_SYNTHETIC_SHORT"),
+            family(HUGGING_FACE, "hf_", HUGGING_FACE_BODY, "hf_SYNTHETIC_SHORT"),
             family(
                 DOCKER,
                 "dckr_pat_",
@@ -874,11 +896,19 @@ mod tests {
     /// Issue #321: these dimensions are scoped to `HUGGING_FACE` and
     /// `LINEAR`, without widening the shared [`families`] list. Slack moved
     /// out to `super::slack` (issue #371) and repeats these dimensions
-    /// there for its own interim-guarded prefixes.
+    /// there for its own interim-guarded prefixes. Issue #372 narrowed
+    /// `HUGGING_FACE` to an exact 34-byte `[A-Za-z0-9]` body, so it now
+    /// needs its own valid placeholder/body length and alphabet instead of
+    /// sharing `LINEAR`'s 20-byte-minimum, underscore-inclusive value.
     #[test]
     fn application_providers_accept_an_all_valid_alphabet_documentation_placeholder() {
-        for (detector, prefix) in [(&HUGGING_FACE, "hf_"), (&LINEAR, "lin_api_")] {
-            let value = format!("{prefix}{}", "x".repeat(20));
+        for (detector, value) in [
+            (
+                &HUGGING_FACE as &KnownFormatProviderDetector,
+                format!("hf_{}", "x".repeat(34)),
+            ),
+            (&LINEAR, format!("lin_api_{}", "x".repeat(20))),
+        ] {
             let candidates = detect(detector, &value);
             assert_eq!(candidates.len(), 1, "{}", detector.id());
             assert_eq!(
@@ -892,8 +922,16 @@ mod tests {
 
     #[test]
     fn application_providers_reject_the_prefix_embedded_in_a_wider_identifier() {
-        for (detector, prefix) in [(&HUGGING_FACE, "hf_"), (&LINEAR, "lin_api_")] {
-            let value = format!("legacy{prefix}SYNTHETIC_REVOKED_KEY_VALUE");
+        for (detector, value) in [
+            (
+                &HUGGING_FACE as &KnownFormatProviderDetector,
+                format!("legacyhf_{HUGGING_FACE_BODY}"),
+            ),
+            (
+                &LINEAR,
+                "legacylin_api_SYNTHETIC_REVOKED_KEY_VALUE".to_string(),
+            ),
+        ] {
             assert_eq!(detect(detector, &value).len(), 0, "{}", detector.id());
         }
     }
@@ -910,12 +948,64 @@ mod tests {
 
     #[test]
     fn application_providers_report_a_repeated_identical_value_once_per_occurrence() {
-        for (detector, prefix) in [(&HUGGING_FACE, "hf_"), (&LINEAR, "lin_api_")] {
-            let value = format!("{prefix}SYNTHETIC_REVOKED_KEY_VALUE");
+        for (detector, value) in [
+            (
+                &HUGGING_FACE as &KnownFormatProviderDetector,
+                format!("hf_{HUGGING_FACE_BODY}"),
+            ),
+            (&LINEAR, "lin_api_SYNTHETIC_REVOKED_KEY_VALUE".to_string()),
+        ] {
             let input = format!("{value} {value}");
             let candidates = detect(detector, &input);
             assert_eq!(candidates.len(), 2, "{}", detector.id());
         }
+    }
+
+    /// Issue #372: the frozen precision contract
+    /// (`docs/audits/evidence/367/precision-contracts.json`, `families.
+    /// huggingface-token`) narrows the body to exactly 34 bytes. A 33-byte
+    /// body — one byte short, the beta.4
+    /// `huggingface-token-user-plain-twin` regression fixture — is an
+    /// intentional false negative, and a 35-byte body (one byte past the
+    /// documented length) is not misread as the exact shape followed by a
+    /// trailing byte.
+    #[test]
+    fn huggingface_rejects_a_body_one_byte_off_the_documented_length() {
+        for body in [
+            &HUGGING_FACE_BODY[..HUGGING_FACE_BODY.len() - 1],
+            &format!("{HUGGING_FACE_BODY}A"),
+        ] {
+            let value = format!("hf_{body}");
+            assert_eq!(detect(&HUGGING_FACE, &value).len(), 0, "{value}");
+        }
+    }
+
+    /// Issue #372: both gitleaks 8.30.1 and trufflehog 3.97.4 agree the body
+    /// excludes `_`/`-`; the beta.4 shared minimum-length shape's acceptance
+    /// of them was a shared-rule artifact, not evidence. An otherwise
+    /// documented-length body containing either byte is rejected rather
+    /// than truncated to its longest valid-alphabet prefix.
+    #[test]
+    fn huggingface_rejects_a_documented_length_body_containing_underscore_or_dash() {
+        for byte in ['_', '-'] {
+            let mut body = HUGGING_FACE_BODY.to_string();
+            body.replace_range(4..5, &byte.to_string());
+            let value = format!("hf_{body}");
+            assert_eq!(detect(&HUGGING_FACE, &value).len(), 0, "{value}");
+        }
+    }
+
+    /// Issue #372: the two tools disagree on the body alphabet (gitleaks:
+    /// letters only; trufflehog: letters and digits). That conflict is
+    /// resolved as a support-policy choice for the union rather than
+    /// guessed into the letters-only intersection, so a digit-bearing body
+    /// is still accepted.
+    #[test]
+    fn huggingface_accepts_a_digit_bearing_documented_length_body() {
+        let mut body = HUGGING_FACE_BODY.to_string();
+        body.replace_range(0..2, "42");
+        let value = format!("hf_{body}");
+        assert_eq!(detect(&HUGGING_FACE, &value).len(), 1, "{value}");
     }
 
     // Issue #369: the DigitalOcean v1 token contract. DigitalOcean's API

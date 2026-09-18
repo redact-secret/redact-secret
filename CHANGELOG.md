@@ -5,6 +5,40 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+- Narrowed `huggingface-token` to Hugging Face's reviewed user-access-token
+  contract: `hf_` followed by exactly 34 bytes, matched case-sensitively and
+  bounded by the existing `[A-Za-z0-9_-]` boundary alphabet (issue #372,
+  contract review #367). gitleaks v8.30.1 and trufflehog v3.97.4 independently
+  agree on the 34-byte length; the two tools disagree on the body alphabet
+  (gitleaks: letters only; trufflehog: letters and digits), and that conflict
+  is resolved as a support-policy choice for the union `[A-Za-z0-9]` rather
+  than guessed into the letters-only intersection, so a digit-bearing body is
+  still accepted even though it stays unscored (T0) in the benchmark corpus
+  pending independent review. The previous rule accepted any 20-or-more-byte
+  `[A-Za-z0-9_-]` suffix, so `@redact-secret/core@0.1.0-beta.4` flagged a
+  33-byte twin of the benchmark's paired positive; that twin is now rejected
+  while the paired positive keeps its exact byte range. Intentional behavior
+  changes: an underscore or dash inside an otherwise documented-length body,
+  or a body one byte short of or past 34 bytes, no longer matches — both tools
+  agree the body excludes `_`/`-`, so that acceptance under the retired shared
+  rule was a shared-rule artifact, not evidence. The earlier broad-shape
+  positives in the conformance corpus were re-authored with contracted
+  bodies; the repeated-`x` filler placeholder
+  (`huggingface-positive-doc-style-placeholder`) and the retired minimum-length
+  positive (`huggingface-positive-min-length`) are now reclassified as
+  intentional false negatives in favor of a dedicated
+  `huggingface-token-exact-length` grammar-mutation family (identity,
+  one-short, one-long, invalid-alphabet, underscore-in-body, dash-in-body,
+  digit-bearing — `conformance/fixtures/huggingface-token-mutations.ts`
+  reproduces every case byte-for-byte), and the
+  `huggingface-adversarial-long-suffix` input now yields exactly one finding
+  bounded to the documented 34-byte body instead of matching the whole
+  11250-byte run. No detector id, finding type, confidence, specificity,
+  default policy, or public interface changed. The fixed release-qualification
+  accuracy corpus is deliberately not rewritten: its `code-additional-provider-tokens-one`
+  fixture's underscore-bearing Hugging Face value now records as a false
+  negative until the beta.5 precision gate (#376) re-versions that corpus.
+
 - Narrowed the `slack-token` detector's `xoxb-` bot form (issue #371,
   `docs/decisions/2026-09-17-freeze-slack-bot-token-segment-grammar.md`) from
   one shared 20-byte minimum of `[A-Za-z0-9_-]` to the reviewed three-section
