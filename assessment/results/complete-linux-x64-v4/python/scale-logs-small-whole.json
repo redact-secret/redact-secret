@@ -1,0 +1,155 @@
+{
+  "schemaVersion": "3",
+  "surface": "python",
+  "profileId": "scale-logs-small-whole",
+  "performance": {
+    "initialization": {
+      "unit": "milliseconds",
+      "samples": [
+        0.82436,
+        0.814381,
+        0.832936,
+        0.828969,
+        0.820642
+      ],
+      "minimum": 0.814381,
+      "median": 0.82436,
+      "p95": 0.832936,
+      "maximum": 0.832936,
+      "mean": 0.8242575999999999,
+      "standardDeviation": 0.0064520104339655165
+    },
+    "processing": {
+      "unit": "milliseconds",
+      "samples": [
+        23.548526,
+        23.662601,
+        27.499768,
+        24.564706,
+        26.487697
+      ],
+      "minimum": 23.548526,
+      "median": 24.564706,
+      "p95": 27.499768,
+      "maximum": 27.499768,
+      "mean": 25.1526596,
+      "standardDeviation": 1.5767340533257477
+    },
+    "throughput": {
+      "unit": "bytes-per-second",
+      "samples": [
+        2783783.579490283,
+        2770363.2411331283,
+        2383801.9288017265,
+        2668625.4661464295,
+        2474884.849369879
+      ],
+      "minimum": 2383801.9288017265,
+      "median": 2668625.4661464295,
+      "p95": 2783783.579490283,
+      "maximum": 2783783.579490283,
+      "mean": 2616291.8129882896,
+      "standardDeviation": 160360.708203902
+    },
+    "memory": {
+      "nodeHeap": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "The Python process does not run inside a Node.js heap.",
+        "samplingLimit": "No samples were available."
+      },
+      "nodeRss": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "The Python process is not a Node.js process; its whole-process RSS is reported as processRss.",
+        "samplingLimit": "No samples were available."
+      },
+      "nodeExternal": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "The Python process has no Node external-memory category.",
+        "samplingLimit": "No samples were available."
+      },
+      "browserJsHeap": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "The Python process does not run inside a browser JavaScript heap.",
+        "samplingLimit": "No samples were available."
+      },
+      "wasmLinearMemory": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "The Python package uses a native extension, not WebAssembly linear memory.",
+        "samplingLimit": "No samples were available."
+      },
+      "pythonHeap": {
+        "unit": "bytes",
+        "samples": [
+          {
+            "baselineBytes": 0,
+            "maximumObservedBytes": 75205
+          },
+          {
+            "baselineBytes": 0,
+            "maximumObservedBytes": 75205
+          },
+          {
+            "baselineBytes": 0,
+            "maximumObservedBytes": 75205
+          },
+          {
+            "baselineBytes": 0,
+            "maximumObservedBytes": 75205
+          },
+          {
+            "baselineBytes": 0,
+            "maximumObservedBytes": 75205
+          }
+        ],
+        "samplingLimit": "Measured by tracemalloc during a separate untimed processing pass; it observes Python allocations made after tracing starts, not the interpreter's pre-existing heap or native Rust allocations."
+      },
+      "processRss": {
+        "unit": "bytes",
+        "samples": [
+          {
+            "baselineBytes": 21340160,
+            "maximumObservedBytes": 21340160
+          },
+          {
+            "baselineBytes": 21282816,
+            "maximumObservedBytes": 21291008
+          },
+          {
+            "baselineBytes": 21434368,
+            "maximumObservedBytes": 21442560
+          },
+          {
+            "baselineBytes": 21204992,
+            "maximumObservedBytes": 21213184
+          },
+          {
+            "baselineBytes": 21434368,
+            "maximumObservedBytes": 21442560
+          }
+        ],
+        "samplingLimit": "Unix ru_maxrss high-water marks sampled immediately before and after a separate untimed processing pass; the value includes the Python interpreter, native extension, allocator, and earlier process activity and cannot isolate Rust-only memory."
+      },
+      "streamingBuffer": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "The public incremental session exposes lifecycle state but intentionally does not expose retained plaintext buffer size.",
+        "samplingLimit": "No samples were available."
+      }
+    }
+  },
+  "provenance": {
+    "commit": "944341903d5b85686a056d3218f4c33110d7d57b",
+    "artifactIdentity": "redact-secret==0.1.0b4",
+    "corpusVersion": "1",
+    "corpusHash": "b4db2cd22b4c008c9d63789df8ca2e21e697a21a84699466ea5f96c89d8e2806",
+    "os": "linux-6.17.0-1022-azure",
+    "cpu": "x64",
+    "runtime": "cpython-3.12.14",
+    "command": "node scripts/assessment-python-performance.mjs --python .venv/bin/python --profile scale-logs-small-whole --runs 5 --json-out assessment-output/python/scale-logs-small-whole.json --markdown-out assessment-output/python/scale-logs-small-whole.md"
+  }
+}

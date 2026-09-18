@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "3",
+  "surface": "browser-wasm",
+  "profileId": "accuracy-corpus",
+  "accuracy": {
+    "truePositives": 21,
+    "falsePositives": 1,
+    "falseNegatives": 5,
+    "policyMismatches": 0
+  },
+  "provenance": {
+    "commit": "944341903d5b85686a056d3218f4c33110d7d57b",
+    "artifactIdentity": "@redact-secret/wasm@0.1.0-beta.4",
+    "corpusVersion": "3",
+    "corpusHash": "438df062ddde47dcb32ae0aefc4297ed8b8c9e2c3270778c2b1f8809e40bd0dd",
+    "os": "darwin-25.5.0",
+    "cpu": "arm64",
+    "runtime": "chromium-153.0.8010.12",
+    "command": "node scripts/assessment-browser-run.mjs --engine chromium --artifact-dir /Users/minhokang/orca/workspaces/redact-secret/gate-beta.5-on-precision-gains-and-positive-pres/bindings/wasm/pkg --json-out assessment-output-v4-real/browser-wasm/accuracy-corpus.json --markdown-out assessment-output-v4-real/browser-wasm/accuracy-corpus.md --mismatches-out assessment-output-v4-real/browser-wasm/accuracy-corpus-mismatches.json"
+  }
+}
