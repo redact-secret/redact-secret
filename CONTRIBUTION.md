@@ -39,6 +39,29 @@ Pull requests should explain the observable change, its verification, and any
 compatibility impact. By contributing, you agree that your contribution is licensed
 under the repository's [MIT License](LICENSE).
 
+### Benchmark-originated bug checklist
+
+For a bug found by
+[`redact-secret-benchmarks`](https://github.com/redact-secret/redact-secret-benchmarks),
+link its benchmark fixture ID, corpus hash, measured candidate identity,
+expected and actual safe metadata, finding kind, independent expectation-review
+evidence, and product bug issue. Do not change an expectation merely to make a
+scanner pass.
+
+Before describing the bug as verified, record both gates in
+[`conformance/benchmark-regressions.json`](conformance/benchmark-regressions.json):
+
+- the minimal canonical regression passes every required supported conformance
+  surface; and
+- the exact fixed candidate was rerun in the benchmark repository and the
+  verification evidence is linked.
+
+Follow
+[`decision-govern-benchmark-regression-promotion`](docs/decisions/2026-09-18-govern-benchmark-regression-promotion.md)
+for fixture placement, detector-unit-test criteria, ownership, and historical
+reconciliation. A code fix or a closed implementation issue alone does not
+satisfy both gates.
+
 During beta, repository Markdown is the documentation source. Include updates
 to the relevant user guides, examples, support statements, and limitations in
 each feature change. Use the [documentation readiness checklist](docs/documentation-readiness.md)

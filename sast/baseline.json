@@ -1,5 +1,19 @@
 {
   "findings": {
+    "fe254bb8f9497c7c": {
+      "classification": "false_positive",
+      "line": 100,
+      "path": "conformance/benchmark-regressions.ts",
+      "rationale": "ID is a linear-time anchored identifier grammar (`^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$`): the hyphen separator is disjoint from the adjacent `[a-z0-9]` class, so there is no ambiguous split point for the engine to backtrack over. The generic ReDoS heuristic reports the grouped repetition without accounting for that disjointness.",
+      "rule_id": "sast.rules.javascript.lang.security.audit.detect-redos"
+    },
+    "3f2c813c39106d72": {
+      "classification": "false_positive",
+      "line": 110,
+      "path": "conformance/benchmark-regressions.ts",
+      "rationale": "ID is a linear-time anchored identifier grammar (`^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$`): the hyphen separator is disjoint from the adjacent `[a-z0-9]` class, so there is no ambiguous split point for the engine to backtrack over. The generic ReDoS heuristic reports the grouped repetition without accounting for that disjointness.",
+      "rule_id": "sast.rules.javascript.lang.security.audit.detect-redos"
+    },
     "e39f6215b256d436": {
       "classification": "false_positive",
       "line": 276,

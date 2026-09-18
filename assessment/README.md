@@ -583,6 +583,14 @@ versioning, or publication action. Producing or reporting a result is not a
 release gate and does not by itself authorize any release action; see
 `AGENTS.md`'s release authority section.
 
+Discovery fixtures, generated variants, differential and holdout evaluation,
+known-gap lifecycle, raw evidence, and fixed-candidate revalidation belong to
+[`redact-secret-benchmarks`](https://github.com/redact-secret/redact-secret-benchmarks)
+under
+[`decision-govern-benchmark-regression-promotion`](../docs/decisions/2026-09-18-govern-benchmark-regression-promotion.md).
+Do not copy them here: `assessment/` remains the bounded cross-language protocol
+above and must not become a second discovery benchmark.
+
 ## Performance build correction
 
 The historical `complete`, `complete-v2`, and `complete-v3` Rust timings were
