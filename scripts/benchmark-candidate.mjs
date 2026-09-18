@@ -154,12 +154,23 @@ export async function main(argv = process.argv.slice(2)) {
       const report = JSON.parse(await readFile(evidence, 'utf8'));
       if (report.status !== 'complete' || report.candidate.sourceCommit !== productCommit || report.benchmark.sourceCommit !== benchmarkCommit || report.candidate.artifactSha256 !== artifacts.coreSha256)
         throw new Error('candidate-evidence-identity-mismatch');
-      const negatives = report.results.filter(row => row.kind === 'must-not-flag');
-      const positives = report.results.filter(row => row.expectedSpans > 0);
+      const summary = section => {
+        const rows = report.results.filter(row => row.corpusSection === section);
+        const negatives = rows.filter(row => row.kind === 'must-not-flag');
+        const positives = rows.filter(row => row.expectedSpans > 0);
+        return {
+          rows: rows.length,
+          negativeBefore: negatives.filter(row => row.baseline.outcome !== 'clean').length,
+          negativeAfter: negatives.filter(row => row.outcome !== 'clean').length,
+          missesBefore: positives.filter(row => String(row.baseline.outcome).includes('MISS')).length,
+          missesAfter: positives.filter(row => String(row.outcome).includes('MISS')).length,
+        };
+      };
+      const fixed = summary('fixed-corpus'), expanded = summary('expanded-corpus');
       console.log(`Candidate ${productCommit} against benchmark ${benchmarkCommit}`);
       console.log(`Artifact SHA-256: ${artifacts.coreSha256}`);
-      console.log(`Negative flags: ${negatives.filter(row => row.baseline.outcome !== 'clean').length} before / ${negatives.filter(row => row.outcome !== 'clean').length} after`);
-      console.log(`Paired-positive misses: ${positives.filter(row => String(row.baseline.outcome).includes('MISS')).length} before / ${positives.filter(row => String(row.outcome).includes('MISS')).length} after`);
+      console.log(`Fixed corpus (${fixed.rows} fixtures): negative flags ${fixed.negativeBefore} before / ${fixed.negativeAfter} after; positive misses ${fixed.missesBefore} before / ${fixed.missesAfter} after.`);
+      console.log(`Expanded corpus (${expanded.rows} fixtures): negative flags ${expanded.negativeBefore} before / ${expanded.negativeAfter} after; positive misses ${expanded.missesBefore} before / ${expanded.missesAfter} after.`);
       console.log(`Evidence: ${evidence}`);
       return { evidence, report };
     } finally {
