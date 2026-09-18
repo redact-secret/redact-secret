@@ -22,8 +22,10 @@ name: Release
 # carries the `common` profile artifact (`wasm-web-common`, issue #382,
 # `decision-define-detector-profile-and-pack-contract`) under its `./common`
 # subpath; `publish-wasm-dependency` assembles both artifacts into the one
-# package directory before packing, and asserts the root artifact still
-# reports the `full` profile before anything is published.
+# package directory before packing, and asserts the root artifact reports the
+# `full` profile and the `./common` artifact reports `common` before anything
+# is published (`scripts/check-release-gate.py`, issue #417, pins that this
+# verification step exists and precedes the publish step below).
 #
 # This is the one first-npm-cutover path, not two: `scripts/publish-dependency-package.mjs`
 # is idempotent by registry state, not by a cutover-vs-routine switch. The
@@ -245,17 +247,21 @@ jobs:
           path: bindings/wasm/npm
 
       # AC7: never publish a tiny artifact under the full/default package
-      # identity. The root export and `redact_secret_wasm_bg.wasm` must stay
-      # the `full` build byte-for-byte; instantiating the actual downloaded
-      # module and asking it, rather than trusting the artifact name, is the
-      # same "ask the artifact, don't trust the label" approach
+      # identity, and never publish the common artifact under a mismatched
+      # profile. This does not diff bytes against a golden `full` build --
+      # it instantiates each downloaded module and asks its own `profile()`,
+      # the same "ask the artifact, don't trust the label" approach
       # `scripts/qualify-browser-artifact.mjs` uses in-browser.
+      # `scripts/check-release-gate.py` (issue #417) pins that this step
+      # exists, asserts both profiles, and precedes the publish step below.
       - name: Verify the root artifact reports the full profile
         shell: bash
         run: |
           node --input-type=module <<'NODE_VERIFY'
           import { readFileSync } from "node:fs";
           import init, { profile } from "./bindings/wasm/npm/redact_secret_wasm.js";
+          import initCommon, { profile as profileCommon } from "./bindings/wasm/npm/redact_secret_wasm_common.js";
+
           await init(readFileSync("./bindings/wasm/npm/redact_secret_wasm_bg.wasm"));
           const reported = profile();
           if (reported !== "full") {
@@ -264,6 +270,15 @@ jobs:
             );
           }
           console.log('bindings/wasm/npm/redact_secret_wasm.js reports profile "full" as expected.');
+
+          await initCommon(readFileSync("./bindings/wasm/npm/redact_secret_wasm_common_bg.wasm"));
+          const reportedCommon = profileCommon();
+          if (reportedCommon !== "common") {
+            throw new Error(
+              `bindings/wasm/npm/redact_secret_wasm_common.js reports profile "${reportedCommon}", not "common" -- refusing to publish the common artifact under a mismatched profile`,
+            );
+          }
+          console.log('bindings/wasm/npm/redact_secret_wasm_common.js reports profile "common" as expected.');
           NODE_VERIFY
 
       - name: Pack, content-check, publish, and verify

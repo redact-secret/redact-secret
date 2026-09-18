@@ -67,6 +67,22 @@ jobs:
       - name: Check out repository
         run: echo noop
 
+      - name: Verify the root artifact reports the full profile
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE_VERIFY'
+          import { readFileSync } from "node:fs";
+          import init, { profile } from "./bindings/wasm/npm/redact_secret_wasm.js";
+          import initCommon, { profile as profileCommon } from "./bindings/wasm/npm/redact_secret_wasm_common.js";
+          await init(readFileSync("./bindings/wasm/npm/redact_secret_wasm_bg.wasm"));
+          if (profile() !== "full") { throw new Error("not full"); }
+          await initCommon(readFileSync("./bindings/wasm/npm/redact_secret_wasm_common_bg.wasm"));
+          if (profileCommon() !== "common") { throw new Error("not common"); }
+          NODE_VERIFY
+
+      - name: Pack, content-check, publish, and verify
+        run: echo noop
+
   publish:
     name: Publish to npm
     runs-on: ubuntu-latest
@@ -320,6 +336,99 @@ class ReleaseGateTests(unittest.TestCase):
         errors = CHECK.validate(self.root)
         self.assertTrue(
             any("missing required job 'publish-wasm-dependency'" in error for error in errors)
+        )
+
+    def test_missing_profile_verification_step_is_an_error(self) -> None:
+        broken = RELEASE_YML.replace(
+            "      - name: Verify the root artifact reports the full profile\n"
+            "        shell: bash\n"
+            "        run: |\n"
+            "          node --input-type=module <<'NODE_VERIFY'\n"
+            "          import { readFileSync } from \"node:fs\";\n"
+            "          import init, { profile } from \"./bindings/wasm/npm/redact_secret_wasm.js\";\n"
+            "          import initCommon, { profile as profileCommon } from \"./bindings/wasm/npm/redact_secret_wasm_common.js\";\n"
+            "          await init(readFileSync(\"./bindings/wasm/npm/redact_secret_wasm_bg.wasm\"));\n"
+            "          if (profile() !== \"full\") { throw new Error(\"not full\"); }\n"
+            "          await initCommon(readFileSync(\"./bindings/wasm/npm/redact_secret_wasm_common_bg.wasm\"));\n"
+            "          if (profileCommon() !== \"common\") { throw new Error(\"not common\"); }\n"
+            "          NODE_VERIFY\n\n",
+            "",
+        )
+        self._write("release.yml", broken)
+        errors = CHECK.validate(self.root)
+        self.assertTrue(
+            any(
+                "is missing the 'Verify the root artifact reports the full profile' step" in error
+                for error in errors
+            )
+        )
+
+    def test_missing_wasm_publish_step_is_an_error(self) -> None:
+        broken = RELEASE_YML.replace(
+            "      - name: Pack, content-check, publish, and verify\n        run: echo noop\n\n",
+            "",
+        )
+        self._write("release.yml", broken)
+        errors = CHECK.validate(self.root)
+        self.assertTrue(
+            any(
+                "is missing the 'Pack, content-check, publish, and verify' step" in error
+                for error in errors
+            )
+        )
+
+    def test_profile_verification_step_after_publish_step_is_an_error(self) -> None:
+        verify_step = (
+            "      - name: Verify the root artifact reports the full profile\n"
+            "        shell: bash\n"
+            "        run: |\n"
+            "          node --input-type=module <<'NODE_VERIFY'\n"
+            "          import { readFileSync } from \"node:fs\";\n"
+            "          import init, { profile } from \"./bindings/wasm/npm/redact_secret_wasm.js\";\n"
+            "          import initCommon, { profile as profileCommon } from \"./bindings/wasm/npm/redact_secret_wasm_common.js\";\n"
+            "          await init(readFileSync(\"./bindings/wasm/npm/redact_secret_wasm_bg.wasm\"));\n"
+            "          if (profile() !== \"full\") { throw new Error(\"not full\"); }\n"
+            "          await initCommon(readFileSync(\"./bindings/wasm/npm/redact_secret_wasm_common_bg.wasm\"));\n"
+            "          if (profileCommon() !== \"common\") { throw new Error(\"not common\"); }\n"
+            "          NODE_VERIFY\n\n"
+        )
+        publish_step = "      - name: Pack, content-check, publish, and verify\n        run: echo noop\n\n"
+        broken = RELEASE_YML.replace(verify_step + publish_step, publish_step + verify_step)
+        self.assertNotEqual(broken, RELEASE_YML)
+        self._write("release.yml", broken)
+        errors = CHECK.validate(self.root)
+        self.assertTrue(
+            any(
+                "must precede 'Pack, content-check, publish, and verify'" in error
+                for error in errors
+            )
+        )
+
+    def test_profile_verification_step_not_asserting_full_is_an_error(self) -> None:
+        broken = RELEASE_YML.replace(
+            'if (profile() !== "full") { throw new Error("not full"); }\n',
+            "\n",
+        )
+        self._write("release.yml", broken)
+        errors = CHECK.validate(self.root)
+        self.assertTrue(
+            any('does not assert the root artifact reports "full"' in error for error in errors)
+        )
+
+    def test_profile_verification_step_not_asserting_common_is_an_error(self) -> None:
+        broken = RELEASE_YML.replace(
+            "          await initCommon(readFileSync(\"./bindings/wasm/npm/redact_secret_wasm_common_bg.wasm\"));\n"
+            '          if (profileCommon() !== "common") { throw new Error("not common"); }\n',
+            "",
+        )
+        self.assertNotEqual(broken, RELEASE_YML)
+        self._write("release.yml", broken)
+        errors = CHECK.validate(self.root)
+        self.assertTrue(
+            any(
+                'does not assert the common artifact reports "common"' in error
+                for error in errors
+            )
         )
 
     def test_recovery_assets_must_be_normalized_before_npm_pack(self) -> None:
