@@ -369,6 +369,21 @@ Extensions are trusted in-process code, not a sandbox. Fixed library errors can
 sanitize an exception crossing a callback boundary, but cannot prevent trusted
 application code from capturing plaintext through closures or global state.
 
+## Detector profiles
+
+The built-in detectors are split into two internal packs. `common` holds the
+structural and contextual detectors, and `provider` holds the issuer-specific
+ones. Two profiles are built from them: `full` (every built-in, the default on
+every surface) and `common` (an opt-in, smaller profile for preventive browser
+and small-process use). A smaller profile gets its size from link-time
+reachability of its own registry constructor, not from Cargo features on the
+core. Each profile keeps the canonical order as a subsequence, and no detector
+id behaves differently between profiles. Python and the CLI stay `full` only.
+The contract is accepted in
+[Define the detector profile and pack contract](./docs/decisions/2026-09-18-define-detector-profile-and-pack-contract.md).
+Its implementation is planned under issues #380–#382. Until that lands, every
+surface builds `full` only.
+
 ## Error and telemetry constraints
 
 Public errors use stable codes and fixed, input-free messages. Binding layers
@@ -467,3 +482,4 @@ The accepted records governing this architecture are:
 - [Ship the first release's full artifact set](./docs/decisions/2026-09-10-ship-first-release-artifact-set.md)
 - [Define the cross-language evaluation protocol](./docs/decisions/2026-09-12-define-cross-language-evaluation-protocol.md)
 - [Measure JavaScript performance externally](./docs/decisions/2026-09-12-measure-javascript-performance-externally.md)
+- [Define the detector profile and pack contract](./docs/decisions/2026-09-18-define-detector-profile-and-pack-contract.md)
