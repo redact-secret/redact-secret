@@ -34,6 +34,10 @@ import {
   HUGGINGFACE_TOKEN_EXACT_LENGTH_SEED_ID,
   generateHuggingFaceTokenMutations,
 } from "./fixtures/huggingface-token-mutations.js";
+import {
+  CLOUDFLARE_TOKEN_CHECKSUM_SUFFIX_SEED_ID,
+  generateCloudflareTokenMutations,
+} from "./fixtures/cloudflare-token-mutations.js";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..");
@@ -432,6 +436,45 @@ describe("huggingface-token-exact-length mutation reproducibility (issue #372)",
     for (const fixture of declared) {
       const operation = fixture.mutation!.operation;
       const isPositive = operation === "identity" || operation === "digit-bearing";
+      expect(fixture.expected.length, fixture.id).toBe(isPositive ? 1 : 0);
+      expect(fixture.support, fixture.id).toBe(
+        isPositive ? "supported" : "intentionally-unsupported",
+      );
+    }
+  });
+});
+
+describe("cloudflare-token-checksum-suffix mutation reproducibility (issue #373)", () => {
+  test("regenerating the seeded mutation set is byte-identical", () => {
+    expect(generateCloudflareTokenMutations()).toEqual(generateCloudflareTokenMutations());
+  });
+
+  test("every corpus fixture declaring this grammar reproduces byte-for-byte", () => {
+    const generated = new Map(
+      generateCloudflareTokenMutations().map((mutation) => [mutation.ordinal, mutation]),
+    );
+    const declared = corpus.fixtures.filter(
+      (fixture) => fixture.mutation?.grammar === "cloudflare-token-checksum-suffix",
+    );
+
+    expect(declared.length).toBe(generated.size);
+    for (const fixture of declared) {
+      const mutation = fixture.mutation!;
+      const reproduced = generated.get(mutation.ordinal);
+      expect(reproduced, `${fixture.id}: no generated case for ordinal ${mutation.ordinal}`)
+        .toBeDefined();
+      expect(mutation.seedId).toBe(CLOUDFLARE_TOKEN_CHECKSUM_SUFFIX_SEED_ID);
+      expect(mutation.operation).toBe(reproduced!.operation);
+      expect(fixture.input).toBe(reproduced!.input);
+    }
+  });
+
+  test("only the identity case is a supported positive", () => {
+    const declared = corpus.fixtures.filter(
+      (fixture) => fixture.mutation?.grammar === "cloudflare-token-checksum-suffix",
+    );
+    for (const fixture of declared) {
+      const isPositive = fixture.mutation!.operation === "identity";
       expect(fixture.expected.length, fixture.id).toBe(isPositive ? 1 : 0);
       expect(fixture.support, fixture.id).toBe(
         isPositive ? "supported" : "intentionally-unsupported",

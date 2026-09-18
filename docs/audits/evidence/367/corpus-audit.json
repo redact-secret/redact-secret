@@ -216,48 +216,22 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/incremental",
       "detector": "cloudflare-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 304,
-          "start": 263
-        }
-      ],
-      "id": "additional-provider-families",
-      "kind": null,
-      "lostRanges": [
-        {
-          "end": 304,
-          "start": 263
-        }
-      ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
-      "support": null,
-      "tier": null
-    },
-    {
-      "contexts": [],
-      "contractOnlyMatches": [],
-      "corpus": "conformance/incremental",
-      "detector": "cloudflare-token",
-      "disposition": "broad-shape",
-      "expectedRanges": [
-        {
-          "end": 83,
+          "end": 95,
           "start": 42
         }
       ],
       "id": "cloudflare-embedded-identifier-discriminating-boundary",
       "kind": null,
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 83,
+          "end": 95,
           "start": 42
         }
       ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
       "support": null,
       "tier": null
     },
@@ -630,23 +604,22 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "cloudflare-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 11255,
+          "end": 53,
           "start": 0
         }
       ],
       "id": "cloudflare-adversarial-long-suffix",
       "kind": "adversarial",
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 11255,
+          "end": 53,
           "start": 0
         }
       ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
       "support": "supported",
       "tier": "adversarial"
     },
@@ -691,6 +664,70 @@
       "detector": "cloudflare-token",
       "disposition": "silent",
       "expectedRanges": [],
+      "id": "cloudflare-boundary-checksum-non-hex",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "cloudflare-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "cloudflare-boundary-checksum-one-long",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "cloudflare-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "cloudflare-boundary-checksum-one-short",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "cloudflare-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "cloudflare-boundary-checksum-uppercase-hex",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "cloudflare-token",
+      "disposition": "silent",
+      "expectedRanges": [],
       "id": "cloudflare-boundary-delimiter",
       "kind": "boundary",
       "lostRanges": [],
@@ -708,6 +745,54 @@
       "disposition": "silent",
       "expectedRanges": [],
       "id": "cloudflare-boundary-invalid-alphabet",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "cloudflare-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "cloudflare-boundary-invalid-alphabet-checksum-suffix",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "cloudflare-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "cloudflare-boundary-one-long-checksum-suffix",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "cloudflare-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "cloudflare-boundary-one-short-checksum-suffix",
       "kind": "boundary",
       "lostRanges": [],
       "retainedRanges": [],
@@ -865,23 +950,22 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "cloudflare-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 54,
+          "end": 66,
           "start": 13
         }
       ],
       "id": "cloudflare-overlap-context",
       "kind": "overlap",
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 54,
+          "end": 66,
           "start": 13
         }
       ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
       "support": "supported",
       "tier": "contextual"
     },
@@ -892,23 +976,22 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "cloudflare-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 46,
-          "start": 14
+          "end": 53,
+          "start": 0
         }
       ],
-      "id": "cloudflare-positive-crlf-unicode-prefix",
+      "id": "cloudflare-positive-checksum-suffix",
       "kind": "positive",
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 46,
-          "start": 14
+          "end": 53,
+          "start": 0
         }
       ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
       "support": "supported",
       "tier": "canonical"
     },
@@ -919,25 +1002,40 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "cloudflare-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 25,
-          "start": 0
+          "end": 67,
+          "start": 14
         }
       ],
-      "id": "cloudflare-positive-doc-style-placeholder",
+      "id": "cloudflare-positive-crlf-unicode-prefix",
       "kind": "positive",
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 25,
-          "start": 0
+          "end": 67,
+          "start": 14
         }
       ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
       "support": "supported",
       "tier": "canonical"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "cloudflare-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "cloudflare-positive-doc-style-placeholder",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
     },
     {
       "contexts": [
@@ -946,23 +1044,22 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "cloudflare-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 53,
+          "end": 74,
           "start": 21
         }
       ],
       "id": "cloudflare-positive-dotenv",
       "kind": "positive",
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 53,
+          "end": 74,
           "start": 21
         }
       ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
       "support": "supported",
       "tier": "canonical"
     },
@@ -973,23 +1070,22 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "cloudflare-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 56,
+          "end": 77,
           "start": 24
         }
       ],
       "id": "cloudflare-positive-json",
       "kind": "positive",
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 56,
+          "end": 77,
           "start": 24
         }
       ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
       "support": "supported",
       "tier": "canonical"
     },
@@ -1000,23 +1096,22 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "cloudflare-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 76,
+          "end": 97,
           "start": 44
         }
       ],
       "id": "cloudflare-positive-log",
       "kind": "positive",
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 76,
+          "end": 97,
           "start": 44
         }
       ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
       "support": "supported",
       "tier": "canonical"
     },
@@ -1027,25 +1122,14 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "cloudflare-token",
-      "disposition": "broad-shape",
-      "expectedRanges": [
-        {
-          "end": 25,
-          "start": 0
-        }
-      ],
+      "disposition": "silent",
+      "expectedRanges": [],
       "id": "cloudflare-positive-min-length",
-      "kind": "positive",
-      "lostRanges": [
-        {
-          "end": 25,
-          "start": 0
-        }
-      ],
-      "policyOutcomes": [],
+      "kind": "boundary",
+      "lostRanges": [],
       "retainedRanges": [],
-      "support": "supported",
-      "tier": "canonical"
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
     },
     {
       "contexts": [
@@ -1054,23 +1138,22 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "cloudflare-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 39,
+          "end": 60,
           "start": 7
         }
       ],
       "id": "cloudflare-positive-punctuation-adjacent",
       "kind": "positive",
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 39,
+          "end": 60,
           "start": 7
         }
       ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
       "support": "supported",
       "tier": "contextual"
     },
@@ -1081,23 +1164,22 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "cloudflare-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 41,
+          "end": 53,
           "start": 0
         }
       ],
       "id": "cloudflare-positive-qualified",
       "kind": "positive",
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 41,
+          "end": 53,
           "start": 0
         }
       ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
       "support": "supported",
       "tier": "canonical"
     },
@@ -1108,31 +1190,30 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "cloudflare-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 32,
+          "end": 53,
           "start": 0
         },
         {
-          "end": 65,
-          "start": 33
+          "end": 107,
+          "start": 54
         }
       ],
       "id": "cloudflare-positive-repeated-value",
       "kind": "positive",
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 32,
+          "end": 53,
           "start": 0
         },
         {
-          "end": 65,
-          "start": 33
+          "end": 107,
+          "start": 54
         }
       ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
       "support": "supported",
       "tier": "contextual"
     },
@@ -1143,23 +1224,22 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "cloudflare-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 54,
+          "end": 75,
           "start": 22
         }
       ],
       "id": "cloudflare-positive-yaml",
       "kind": "positive",
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 54,
+          "end": 75,
           "start": 22
         }
       ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
       "support": "supported",
       "tier": "canonical"
     },
@@ -6705,22 +6785,22 @@
       "contractOnlyMatches": [],
       "corpus": "docs/coverage/detector-inventory.json#reconciliationTrigger",
       "detector": "cloudflare-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 34,
+          "end": 53,
           "start": 0
         }
       ],
       "id": "cloudflare_api_token",
       "kind": "reconciliation-trigger",
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 34,
+          "end": 53,
           "start": 0
         }
       ],
-      "retainedRanges": [],
       "support": null,
       "tier": null
     },
@@ -6872,10 +6952,10 @@
   "schemaVersion": 1,
   "summary": {
     "cloudflare-token": {
-      "broad-shape": 16,
-      "retained": 0,
+      "broad-shape": 1,
+      "retained": 13,
       "review": 0,
-      "silent": 13
+      "silent": 22
     },
     "digitalocean-token": {
       "broad-shape": 1,

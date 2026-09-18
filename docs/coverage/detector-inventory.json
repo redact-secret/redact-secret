@@ -107,7 +107,7 @@
       "type": "cloudflare_api_token",
       "detector": "cloudflare-token",
       "policyClass": "always-redact",
-      "reconciliationTrigger": "cfut_SYNTHETICREVOKEDPROVIDERVALUE",
+      "reconciliationTrigger": "cfut_SYNTHETICREVOKEDCLOUDFLAREAPITOKENVALUE1deadbeef",
       "schemes": null
     },
     {
