@@ -1,0 +1,115 @@
+/**
+ * `@redact-secret/core/common`: the opt-in `common` detector profile, the
+ * same deterministic secret detection and redaction API as
+ * `@redact-secret/core` across Node.js and the browser, built from the
+ * 6-detector structural/contextual subset instead of the full 42
+ * (`decision-define-detector-profile-and-pack-contract`).
+ *
+ * The package's `exports` map selects the N-API addon on Node and the
+ * WebAssembly build in the browser (`decision-define-runtime-bindings`).
+ * Every runtime uses the same contract:
+ *
+ * ```ts
+ * import { initialize, scanAndRedact } from "@redact-secret/core/common";
+ *
+ * await initialize();
+ * const { text, findings } = scanAndRedact(input);
+ * ```
+ *
+ * `await initialize()` must succeed exactly once before any synchronous
+ * operation; calling it again is free. Node's own loading has nothing to
+ * await, but the call stays part of the contract so the usage model does not
+ * vary by runtime.
+ *
+ * Every range this module reports is a `[start, end)` pair of UTF-16
+ * code-unit offsets ({@link RANGE_UNIT}), and every finding it returns is
+ * frozen. Every failure is a {@link SecretScanError} carrying nothing but a
+ * fixed code and message.
+ *
+ * This entry point's smaller registry trades detection coverage for transfer
+ * size: it finds only bare, structurally- or contextually-identifiable
+ * secrets and never the vendor-specific findings the full profile's other 36
+ * detectors add, so it has a strictly higher false-negative rate on
+ * vendor-shaped secrets than `@redact-secret/core`.
+ *
+ * Built-in detectors all run in Rust; there is no custom detector callback in
+ * this API, and no internal module of this package is reachable through its
+ * `exports` map.
+ *
+ * Byte streams are served by the two adapter subpaths,
+ * `@redact-secret/core/node-stream` and
+ * `@redact-secret/core/web-stream`, each of which drives one incremental
+ * session per stream. This root module never resolves a `node:` module.
+ */
+
+import { runtime } from "./session-common.js";
+import type { RangeUnit } from "./types.js";
+
+/**
+ * Loads this runtime's binding and prepares it for use.
+ *
+ * Idempotent: the artifact is loaded at most once no matter how many callers
+ * await it. A rejected attempt is not cached, so a caller may retry. Rejects
+ * with `INITIALIZATION_FAILED` when the artifact is missing, unusable, or
+ * built from a different product version or detector profile than this
+ * package.
+ */
+export const initialize = runtime.initialize;
+
+/** Scans `input` and returns every finding, in input order. */
+export const scan = runtime.scan;
+
+/**
+ * Replaces the `redact` and `block` findings in `input` with placeholders,
+ * leaving `warn` and `allow` findings untouched.
+ *
+ * `findings` must be the findings {@link scan} returned for this same input.
+ */
+export const redact = runtime.redact;
+
+/** Scans and redacts in one call, so text and findings cannot disagree. */
+export const scanAndRedact = runtime.scanAndRedact;
+
+/** Opens a bounded incremental session over text supplied in chunks. */
+export const createIncrementalSanitizer = runtime.createIncrementalSanitizer;
+
+export {
+  defaultPlaceholderFormatter,
+  typedPlaceholderFormatter,
+} from "./formatters.js";
+export { SecretScanError } from "./errors.js";
+export type { SecretScanErrorCode } from "./errors.js";
+export { VERSION } from "./version.js";
+
+/** The string-index unit of every range this package reports. */
+export const RANGE_UNIT: RangeUnit = "utf16-code-units";
+
+/**
+ * The detector profile this entry point is built from: the 6-detector
+ * structural/contextual subset. `@redact-secret/core` exports the same
+ * constant as `"full"` (`decision-define-detector-profile-and-pack-contract`).
+ */
+export const PROFILE = "common" as const;
+
+export type {
+  DetectedSecretFinding,
+  IncrementalLimits,
+  IncrementalPolicyContext,
+  IncrementalSanitizer,
+  IncrementalSanitizerOptions,
+  IncrementalSanitizerResult,
+  IncrementalSanitizerState,
+  IncrementalSecretPolicy,
+  PlaceholderContext,
+  PlaceholderFormatter,
+  PolicyContext,
+  RangeUnit,
+  RedactOptions,
+  ScanAndRedactOptions,
+  ScanOptions,
+  ScanResult,
+  SecretAction,
+  SecretConfidence,
+  SecretFinding,
+  SecretPolicy,
+} from "./types.js";

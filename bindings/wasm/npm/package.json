@@ -6,11 +6,26 @@
   "sideEffects": false,
   "main": "redact_secret_wasm.js",
   "types": "redact_secret_wasm.d.ts",
+  "exports": {
+    ".": {
+      "types": "./redact_secret_wasm.d.ts",
+      "import": "./redact_secret_wasm.js"
+    },
+    "./common": {
+      "types": "./redact_secret_wasm_common.d.ts",
+      "import": "./redact_secret_wasm_common.js"
+    },
+    "./package.json": "./package.json"
+  },
   "files": [
     "redact_secret_wasm.js",
     "redact_secret_wasm.d.ts",
     "redact_secret_wasm_bg.wasm",
-    "redact_secret_wasm_bg.wasm.d.ts"
+    "redact_secret_wasm_bg.wasm.d.ts",
+    "redact_secret_wasm_common.js",
+    "redact_secret_wasm_common.d.ts",
+    "redact_secret_wasm_common_bg.wasm",
+    "redact_secret_wasm_common_bg.wasm.d.ts"
   ],
   "license": "MIT",
   "repository": {

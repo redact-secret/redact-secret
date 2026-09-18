@@ -14,7 +14,7 @@ const LIMITS = {
 
 describe("initialization contract", () => {
   it("refuses every synchronous operation before initialize succeeds", () => {
-    const runtime = createRedactSecretRuntime(async () => createFakeBinding());
+    const runtime = createRedactSecretRuntime(async () => createFakeBinding(), "full");
 
     for (const call of [
       () => runtime.scan("SYNTHETIC_REVOKED_VALUE"),
@@ -33,7 +33,7 @@ describe("initialization contract", () => {
 
   it("does not inspect its input before initialize succeeds", () => {
     const binding = createFakeBinding();
-    const runtime = createRedactSecretRuntime(async () => binding);
+    const runtime = createRedactSecretRuntime(async () => binding, "full");
 
     expect(() => runtime.scan(undefined as unknown as string)).toThrowError(
       expect.objectContaining({ code: "NOT_INITIALIZED" }),
@@ -47,7 +47,7 @@ describe("initialization contract", () => {
     const runtime = createRedactSecretRuntime(async () => {
       loads += 1;
       return binding;
-    });
+    }, "full");
 
     await Promise.all([
       runtime.initialize(),
@@ -66,7 +66,7 @@ describe("initialization contract", () => {
       attempts += 1;
       if (attempts === 1) throw new Error("artifact is missing");
       return createFakeBinding();
-    });
+    }, "full");
 
     await expect(runtime.initialize()).rejects.toThrowError(
       expect.objectContaining({
@@ -81,7 +81,7 @@ describe("initialization contract", () => {
   it("never surfaces a loader's own failure message", async () => {
     const runtime = createRedactSecretRuntime(async () => {
       throw new Error("/private/path/to/redact-secret.darwin-arm64.node");
-    });
+    }, "full");
 
     await expect(runtime.initialize()).rejects.toThrowError(
       new SecretScanError("INITIALIZATION_FAILED"),
@@ -89,8 +89,9 @@ describe("initialization contract", () => {
   });
 
   it("rejects an artifact built from a different product version", async () => {
-    const runtime = createRedactSecretRuntime(async () =>
-      createFakeBinding({ version: "0.0.0-other" }),
+    const runtime = createRedactSecretRuntime(
+      async () => createFakeBinding({ version: "0.0.0-other" }),
+      "full",
     );
 
     await expect(runtime.initialize()).rejects.toThrowError(
@@ -103,7 +104,30 @@ describe("initialization contract", () => {
 
   it("accepts the artifact that reports this package's version", async () => {
     const binding = createFakeBinding({ version: VERSION });
-    const runtime = createRedactSecretRuntime(async () => binding);
+    const runtime = createRedactSecretRuntime(async () => binding, "full");
+
+    await runtime.initialize();
+
+    expect(runtime.scan("API_KEY=SYNTHETIC")).toEqual([]);
+  });
+
+  it("rejects an artifact that reports a different detector profile", async () => {
+    const runtime = createRedactSecretRuntime(
+      async () => createFakeBinding({ profile: "common" }),
+      "full",
+    );
+
+    await expect(runtime.initialize()).rejects.toThrowError(
+      expect.objectContaining({ code: "INITIALIZATION_FAILED" }),
+    );
+    expect(() => runtime.scan("SYNTHETIC_REVOKED_VALUE")).toThrowError(
+      expect.objectContaining({ code: "NOT_INITIALIZED" }),
+    );
+  });
+
+  it("accepts the artifact that reports the expected detector profile", async () => {
+    const binding = createFakeBinding({ profile: "common" });
+    const runtime = createRedactSecretRuntime(async () => binding, "common");
 
     await runtime.initialize();
 
@@ -113,8 +137,9 @@ describe("initialization contract", () => {
 
 describe("finding normalization", () => {
   it("freezes every finding and exposes only the documented fields", async () => {
-    const runtime = createRedactSecretRuntime(async () =>
-      createFakeBinding({ findings: [sampleFinding] }),
+    const runtime = createRedactSecretRuntime(
+      async () => createFakeBinding({ findings: [sampleFinding] }),
+      "full",
     );
     await runtime.initialize();
 
@@ -136,8 +161,9 @@ describe("finding normalization", () => {
   });
 
   it("freezes the findings list a scan returns", async () => {
-    const runtime = createRedactSecretRuntime(async () =>
-      createFakeBinding({ findings: [sampleFinding] }),
+    const runtime = createRedactSecretRuntime(
+      async () => createFakeBinding({ findings: [sampleFinding] }),
+      "full",
     );
     await runtime.initialize();
 
@@ -150,7 +176,7 @@ describe("finding normalization", () => {
     const { defaultPlaceholderFormatter, typedPlaceholderFormatter } =
       await import("../src/formatters.js");
     const binding = createFakeBinding({ findings: [sampleFinding] });
-    const runtime = createRedactSecretRuntime(async () => binding);
+    const runtime = createRedactSecretRuntime(async () => binding, "full");
     await runtime.initialize();
 
     runtime.redact("API_KEY=x", [], {
@@ -171,7 +197,7 @@ describe("finding normalization", () => {
 describe("incremental sessions", () => {
   async function openSession() {
     const binding = createFakeBinding({ findings: [sampleFinding] });
-    const runtime = createRedactSecretRuntime(async () => binding);
+    const runtime = createRedactSecretRuntime(async () => binding, "full");
     await runtime.initialize();
     return {
       binding,
@@ -236,7 +262,7 @@ describe("incremental sessions", () => {
   });
 
   it("rejects a session created before initialize succeeds", () => {
-    const runtime = createRedactSecretRuntime(async () => createFakeBinding());
+    const runtime = createRedactSecretRuntime(async () => createFakeBinding(), "full");
 
     expect(() => runtime.createIncrementalSanitizer({ limits: LIMITS })).toThrowError(
       expect.objectContaining({ code: "NOT_INITIALIZED" }),
@@ -251,7 +277,7 @@ describe("binding handles", () => {
     const binding = createFakeBinding({
       findings: [{ ...sampleFinding, [NATIVE_HANDLE]: handle }],
     });
-    const runtime = createRedactSecretRuntime(async () => binding);
+    const runtime = createRedactSecretRuntime(async () => binding, "full");
     await runtime.initialize();
 
     const input = "API_KEY=SYNTHETIC_REVOKED_CONTEXT_VALUE";
@@ -280,8 +306,9 @@ describe("error normalization", () => {
     const nativeError = Object.assign(new Error("Redaction findings are invalid."), {
       code: "INVALID_FINDINGS",
     });
-    const runtime = createRedactSecretRuntime(async () =>
-      createFakeBinding({ throwOnScan: nativeError }),
+    const runtime = createRedactSecretRuntime(
+      async () => createFakeBinding({ throwOnScan: nativeError }),
+      "full",
     );
     await runtime.initialize();
 
@@ -292,8 +319,10 @@ describe("error normalization", () => {
   });
 
   it("replaces an uncoded failure rather than surfacing its message", async () => {
-    const runtime = createRedactSecretRuntime(async () =>
-      createFakeBinding({ throwOnScan: new Error("segfault at 0xdeadbeef") }),
+    const runtime = createRedactSecretRuntime(
+      async () =>
+        createFakeBinding({ throwOnScan: new Error("segfault at 0xdeadbeef") }),
+      "full",
     );
     await runtime.initialize();
 
@@ -303,7 +332,7 @@ describe("error normalization", () => {
   });
 
   it("rejects a non-string input once initialized", async () => {
-    const runtime = createRedactSecretRuntime(async () => createFakeBinding());
+    const runtime = createRedactSecretRuntime(async () => createFakeBinding(), "full");
     await runtime.initialize();
 
     expect(() => runtime.scan(42 as unknown as string)).toThrowError(
@@ -315,7 +344,7 @@ describe("error normalization", () => {
 describe("unpaired surrogates", () => {
   it("rejects a lone high surrogate before it reaches the binding", async () => {
     const binding = createFakeBinding();
-    const runtime = createRedactSecretRuntime(async () => binding);
+    const runtime = createRedactSecretRuntime(async () => binding, "full");
     await runtime.initialize();
 
     for (const call of [
@@ -329,7 +358,7 @@ describe("unpaired surrogates", () => {
   });
 
   it("rejects a lone low surrogate", async () => {
-    const runtime = createRedactSecretRuntime(async () => createFakeBinding());
+    const runtime = createRedactSecretRuntime(async () => createFakeBinding(), "full");
     await runtime.initialize();
 
     expect(() => runtime.scan("key\uDC00")).toThrowError(
@@ -338,7 +367,7 @@ describe("unpaired surrogates", () => {
   });
 
   it("rejects a surrogate pair reversed into two lone surrogates", async () => {
-    const runtime = createRedactSecretRuntime(async () => createFakeBinding());
+    const runtime = createRedactSecretRuntime(async () => createFakeBinding(), "full");
     await runtime.initialize();
 
     // \uDC00\uD800 is a low surrogate followed by a high surrogate — the
@@ -350,7 +379,7 @@ describe("unpaired surrogates", () => {
 
   it("does not reject a well-formed surrogate pair", async () => {
     const binding = createFakeBinding();
-    const runtime = createRedactSecretRuntime(async () => binding);
+    const runtime = createRedactSecretRuntime(async () => binding, "full");
     await runtime.initialize();
 
     expect(() => runtime.scan("\u{1F511}key")).not.toThrow();
@@ -361,7 +390,7 @@ describe("unpaired surrogates", () => {
     "discards the native session on invalid incremental input (%j)",
     async (chunk) => {
       const binding = createFakeBinding();
-      const runtime = createRedactSecretRuntime(async () => binding);
+      const runtime = createRedactSecretRuntime(async () => binding, "full");
       await runtime.initialize();
       const session = runtime.createIncrementalSanitizer({ limits: LIMITS });
       session.append("🔑SYNTHETIC_REVOKED_RETAINED_TEXT");

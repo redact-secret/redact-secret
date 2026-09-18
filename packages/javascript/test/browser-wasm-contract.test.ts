@@ -32,7 +32,7 @@ const LIMITS = {
 describe("WebAssembly-shaped binding: lifecycle", () => {
   it("runs the generated default() init before the binding's own initialize()", async () => {
     const wasm = createWasmShapedBinding();
-    const runtime = createRedactSecretRuntime(wasm.load);
+    const runtime = createRedactSecretRuntime(wasm.load, "full");
 
     await runtime.initialize();
 
@@ -41,7 +41,7 @@ describe("WebAssembly-shaped binding: lifecycle", () => {
 
   it("loads at most once no matter how many callers await it", async () => {
     const wasm = createWasmShapedBinding();
-    const runtime = createRedactSecretRuntime(wasm.load);
+    const runtime = createRedactSecretRuntime(wasm.load, "full");
 
     await Promise.all([
       runtime.initialize(),
@@ -55,7 +55,7 @@ describe("WebAssembly-shaped binding: lifecycle", () => {
 
   it("rejects an artifact built from a different product version", async () => {
     const wasm = createWasmShapedBinding({ version: "0.0.0-other" });
-    const runtime = createRedactSecretRuntime(wasm.load);
+    const runtime = createRedactSecretRuntime(wasm.load, "full");
 
     await expect(runtime.initialize()).rejects.toThrowError(
       expect.objectContaining({ code: "INITIALIZATION_FAILED" }),
@@ -67,7 +67,31 @@ describe("WebAssembly-shaped binding: lifecycle", () => {
 
   it("accepts the artifact that reports this package's version", async () => {
     const wasm = createWasmShapedBinding({ version: VERSION });
-    const runtime = createRedactSecretRuntime(wasm.load);
+    const runtime = createRedactSecretRuntime(wasm.load, "full");
+
+    await runtime.initialize();
+
+    expect(runtime.scan("API_KEY=SYNTHETIC")).toEqual([]);
+  });
+
+  it("rejects an artifact that reports a different detector profile", async () => {
+    const wasm = createWasmShapedBinding({ profile: "common" });
+    const runtime = createRedactSecretRuntime(wasm.load, "full");
+
+    await expect(runtime.initialize()).rejects.toThrowError(
+      expect.objectContaining({ code: "INITIALIZATION_FAILED" }),
+    );
+    expect(() => runtime.scan("SYNTHETIC_REVOKED_VALUE")).toThrowError(
+      expect.objectContaining({ code: "NOT_INITIALIZED" }),
+    );
+  });
+
+  it("accepts a common-profile artifact against the common-profile runtime", async () => {
+    // Exercises the exact normalization `runtime/browser-common.ts` reuses
+    // from `runtime/browser.ts`'s `createBindingFromWasmModule`: a WebAssembly
+    // module built from the `common` registry, mapped to `profile()`.
+    const wasm = createWasmShapedBinding({ profile: "common" });
+    const runtime = createRedactSecretRuntime(wasm.load, "common");
 
     await runtime.initialize();
 
@@ -76,7 +100,7 @@ describe("WebAssembly-shaped binding: lifecycle", () => {
 
   it("refuses every synchronous operation before initialize succeeds", () => {
     const wasm = createWasmShapedBinding();
-    const runtime = createRedactSecretRuntime(wasm.load);
+    const runtime = createRedactSecretRuntime(wasm.load, "full");
 
     for (const call of [
       () => runtime.scan("SYNTHETIC_REVOKED_VALUE"),
@@ -94,7 +118,7 @@ describe("WebAssembly-shaped binding: lifecycle", () => {
 describe("WebAssembly-shaped binding: finding normalization", () => {
   it("flattens the opaque, nested-range finding scan returns", async () => {
     const wasm = createWasmShapedBinding({ findings: [sampleWasmFinding] });
-    const runtime = createRedactSecretRuntime(wasm.load);
+    const runtime = createRedactSecretRuntime(wasm.load, "full");
     await runtime.initialize();
 
     const [finding] = runtime.scan(
@@ -115,7 +139,7 @@ describe("WebAssembly-shaped binding: finding normalization", () => {
 
   it("returns the exact handle scan produced back to redact", async () => {
     const wasm = createWasmShapedBinding({ findings: [sampleWasmFinding] });
-    const runtime = createRedactSecretRuntime(wasm.load);
+    const runtime = createRedactSecretRuntime(wasm.load, "full");
     await runtime.initialize();
 
     const input = "API_KEY=SYNTHETIC_REVOKED_CONTEXT_VALUE";
@@ -131,7 +155,7 @@ describe("WebAssembly-shaped binding: finding normalization", () => {
 describe("WebAssembly-shaped binding: policy and formatter callbacks", () => {
   it("gives a policy callback a finding whose start and end are numbers, frozen", async () => {
     const wasm = createWasmShapedBinding({ findings: [sampleWasmFinding] });
-    const runtime = createRedactSecretRuntime(wasm.load);
+    const runtime = createRedactSecretRuntime(wasm.load, "full");
     await runtime.initialize();
 
     let seen: unknown;
@@ -159,7 +183,7 @@ describe("WebAssembly-shaped binding: policy and formatter callbacks", () => {
 
   it("gives a formatter callback a finding whose start and end are numbers, frozen", async () => {
     const wasm = createWasmShapedBinding({ findings: [sampleWasmFinding] });
-    const runtime = createRedactSecretRuntime(wasm.load);
+    const runtime = createRedactSecretRuntime(wasm.load, "full");
     await runtime.initialize();
 
     const input = "API_KEY=SYNTHETIC_REVOKED_CONTEXT_VALUE";
@@ -190,7 +214,7 @@ describe("WebAssembly-shaped binding: policy and formatter callbacks", () => {
 describe("WebAssembly-shaped binding: incremental sanitization", () => {
   it("builds a real session and forwards the flat limits positionally", async () => {
     const wasm = createWasmShapedBinding();
-    const runtime = createRedactSecretRuntime(wasm.load);
+    const runtime = createRedactSecretRuntime(wasm.load, "full");
     await runtime.initialize();
 
     const session = runtime.createIncrementalSanitizer({ limits: LIMITS });
@@ -203,7 +227,7 @@ describe("WebAssembly-shaped binding: incremental sanitization", () => {
 
   it("moves through the lifecycle and rejects an operation once it is not accepting", async () => {
     const wasm = createWasmShapedBinding();
-    const runtime = createRedactSecretRuntime(wasm.load);
+    const runtime = createRedactSecretRuntime(wasm.load, "full");
     await runtime.initialize();
 
     const session = runtime.createIncrementalSanitizer({ limits: LIMITS });
@@ -221,7 +245,7 @@ describe("WebAssembly-shaped binding: incremental sanitization", () => {
 
   it("aborting releases the session and rejects every further call", async () => {
     const wasm = createWasmShapedBinding();
-    const runtime = createRedactSecretRuntime(wasm.load);
+    const runtime = createRedactSecretRuntime(wasm.load, "full");
     await runtime.initialize();
 
     const session = runtime.createIncrementalSanitizer({ limits: LIMITS });
@@ -241,7 +265,7 @@ describe("WebAssembly-shaped binding: incremental sanitization", () => {
     const wasm = createWasmShapedBinding({
       incrementalFindings: [sampleWasmFinding],
     });
-    const runtime = createRedactSecretRuntime(wasm.load);
+    const runtime = createRedactSecretRuntime(wasm.load, "full");
     await runtime.initialize();
 
     const session = runtime.createIncrementalSanitizer({ limits: LIMITS });
@@ -266,7 +290,7 @@ describe("WebAssembly-shaped binding: incremental sanitization", () => {
     const wasm = createWasmShapedBinding({
       incrementalFindings: [sampleWasmFinding],
     });
-    const runtime = createRedactSecretRuntime(wasm.load);
+    const runtime = createRedactSecretRuntime(wasm.load, "full");
     await runtime.initialize();
 
     let seenFinding: unknown;
@@ -300,7 +324,7 @@ describe("WebAssembly-shaped binding: incremental sanitization", () => {
     const wasm = createWasmShapedBinding({
       incrementalFindings: [sampleWasmFinding],
     });
-    const runtime = createRedactSecretRuntime(wasm.load);
+    const runtime = createRedactSecretRuntime(wasm.load, "full");
     await runtime.initialize();
 
     let seen: unknown;
@@ -328,7 +352,7 @@ describe("WebAssembly-shaped binding: incremental sanitization", () => {
 
   it("does not stop initialize() from resolving", async () => {
     const wasm = createWasmShapedBinding();
-    const runtime = createRedactSecretRuntime(wasm.load);
+    const runtime = createRedactSecretRuntime(wasm.load, "full");
 
     await expect(runtime.initialize()).resolves.toBeUndefined();
     expect(() =>

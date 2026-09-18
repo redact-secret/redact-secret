@@ -171,6 +171,7 @@ export function createSanitizingBinding(): NativeBinding {
 
   return {
     version: () => VERSION,
+    profile: () => "full",
     initialize: () => undefined,
     scan: () => [],
     redact: (input: string) => input,

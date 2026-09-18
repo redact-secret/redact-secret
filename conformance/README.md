@@ -80,7 +80,9 @@ depend on `src/`.
   `REDACT_SECRET_UPDATE_COMMON_EXPECTATIONS=1 cargo test -p redact-secret --test common_profile_corpus`,
   and the resulting diff is reviewed. That test fails when the file is stale,
   so a change to the synchronous corpus also regenerates this file. The
-  `common` browser artifact is qualified against it.
+  `common` browser artifact and the Node addon's `common` exports are both
+  qualified against it (`scripts/qualify-browser-artifact.mjs`,
+  `scripts/qualify-node-addon.mjs`, `--detector-profile common`).
 
 Every JSON file under `fixtures/` is the independently authored, hand-maintained
 canonical source. It was not always: `scripts/migrate-conformance-corpus.ts`

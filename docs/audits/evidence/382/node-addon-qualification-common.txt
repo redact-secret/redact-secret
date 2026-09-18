@@ -1,0 +1,42 @@
+# node v22.16.0 on darwin-arm64 (detector profile: common)
+# /Users/minhokang/orca/workspaces/redact-secret/qualify-modular-detector-profiles-across-conform/bindings/node
+#         796  Cargo.toml
+#        1377  README.md
+#         106  build.rs
+#       12968  index.d.ts
+#       30376  index.js
+#         256  npm
+#       65231  package-lock.json
+#         960  package.json
+#     4046264  redact-secret.darwin-arm64.node
+#        9384  smoke-test.mjs
+ok - the addon directory holds exactly one compiled artifact
+ok - repeated initialization is idempotent
+ok - scan finds a synthetic bearer token with UTF-16 offsets
+ok - reported ranges are valid JavaScript UTF-16 slice boundaries
+ok - scanAndRedact matches scan + redact
+ok - a throwing policy callback surfaces POLICY_FAILURE
+ok - a policy callback returning an unknown action is rejected
+ok - a custom policy callback controls the action
+ok - a custom placeholder formatter controls redaction output
+ok - a throwing formatter surfaces PLACEHOLDER_FAILURE
+ok - malformed findings passed to redact are rejected as input-free errors
+ok - version reports the shared product version
+ok - a value split across chunks, including an astral character, matches the whole-input result
+ok - abort discards retained plaintext and rejects every later operation
+ok - a second finalize is rejected rather than re-emitted
+ok - an open construct one code unit past the token cap fails safely with no output
+ok - an open construct exactly at the token cap is accepted, not rejected
+ok - a custom incremental policy controls the action with UTF-16 offsets
+ok - a custom incremental formatter controls the placeholder text
+ok - a throwing incremental policy surfaces POLICY_FAILURE and discards retained text
+ok - invalid limits are rejected with INVALID_LIMITS before a session is created
+
+smoke test passed
+ok - the addon passes its own consumer smoke test
+ok - the addon matches the canonical synchronous corpus (common)
+ok - profile()/profileCommon() report the common contract
+ok - the JavaScript package's public API runs on the real addon (common)
+ok - the Node stream adapter runs on the real addon (common)
+
+addon qualification passed

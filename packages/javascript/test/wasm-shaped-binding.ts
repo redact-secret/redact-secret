@@ -26,6 +26,7 @@ import { VERSION } from "../src/version.js";
 
 export interface WasmShapedBindingOptions {
   readonly version?: string;
+  readonly profile?: string;
   readonly findings?: readonly WasmFinding[];
   readonly redacted?: string;
   readonly throwOnScan?: unknown;
@@ -76,6 +77,7 @@ export function createWasmShapedBinding(
       if (options.throwOnDefault !== undefined) throw options.throwOnDefault;
     },
     version: () => options.version ?? VERSION,
+    profile: () => options.profile ?? "full",
     initialize: () => {
       calls.push("initialize");
     },

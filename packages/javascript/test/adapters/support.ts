@@ -26,7 +26,10 @@ export const LIMITS = Object.freeze({
 export async function openSession(
   options: Partial<IncrementalSanitizerOptions> = {},
 ): Promise<IncrementalSanitizer> {
-  const runtime = createRedactSecretRuntime(async () => createSanitizingBinding());
+  const runtime = createRedactSecretRuntime(
+    async () => createSanitizingBinding(),
+    "full",
+  );
   await runtime.initialize();
   return runtime.createIncrementalSanitizer({ limits: LIMITS, ...options });
 }

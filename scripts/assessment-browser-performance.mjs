@@ -3,9 +3,13 @@
  *
  * `--detector-profile common` measures the `common` artifact
  * (`npm run wasm:build:common`, default directory `bindings/wasm/pkg-common`)
- * through the same `@redact-secret/core` facade and protocol as `full`
- * (`decision-define-detector-profile-and-pack-contract`): only the glue the
- * facade's `@redact-secret/wasm` import resolves to changes.
+ * through `@redact-secret/core/common` and the same protocol as `full`'s
+ * `@redact-secret/core` (`decision-define-detector-profile-and-pack-contract`,
+ * `scripts/assessment-browser-performance-harness-common.mjs`'s module
+ * comment). Both facades expose the same measured surface
+ * (`initialize`/`scanAndRedact`/`createIncrementalSanitizer`), so only the
+ * bundled entry point and the glue the facade's `@redact-secret/wasm` import
+ * resolves to change between profiles.
  */
 import { createServer } from "node:http";
 import { copyFileSync, existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
@@ -22,6 +26,7 @@ import {
 
 const SCRIPTS_DIR = dirname(fileURLToPath(import.meta.url));
 const PACKAGE_ENTRY = join(REPO_ROOT, "packages", "javascript", "dist", "index.js");
+const PACKAGE_COMMON_ENTRY = join(REPO_ROOT, "packages", "javascript", "dist", "common.js");
 /** Per detector profile: the glue and binary to stage, and the default build directory. */
 const DETECTOR_PROFILES = {
   full: {
@@ -70,7 +75,8 @@ function renderPage() {
 }
 
 async function stage(artifactDir, detectorProfile, profile) {
-  if (!existsSync(PACKAGE_ENTRY)) fail(`${PACKAGE_ENTRY}: missing; run \`npm run js:build\` first`);
+  const packageEntry = detectorProfile === "common" ? PACKAGE_COMMON_ENTRY : PACKAGE_ENTRY;
+  if (!existsSync(packageEntry)) fail(`${packageEntry}: missing; run \`npm run js:build\` first`);
   const artifact = DETECTOR_PROFILES[detectorProfile];
   const directory = mkdtempSync(join(tmpdir(), "redact-secret-performance-"));
   for (const name of [artifact.glue, artifact.binary]) {
@@ -78,11 +84,19 @@ async function stage(artifactDir, detectorProfile, profile) {
     catch { rmSync(directory, { recursive: true, force: true }); fail(`${join(artifactDir, name)}: missing; run \`${artifact.buildCommand}\` first`); }
   }
   const { build } = await import("esbuild");
+  const harnessEntry =
+    detectorProfile === "common"
+      ? join(SCRIPTS_DIR, "assessment-browser-performance-harness-common.mjs")
+      : join(SCRIPTS_DIR, "assessment-browser-performance-harness.mjs");
+  const alias =
+    detectorProfile === "common"
+      ? { "@redact-secret/core/common": packageEntry, "@redact-secret/wasm/common": join(artifactDir, artifact.glue) }
+      : { "@redact-secret/core": packageEntry, "@redact-secret/wasm": join(artifactDir, artifact.glue) };
   await build({
-    entryPoints: [join(SCRIPTS_DIR, "assessment-browser-performance-harness.mjs")],
+    entryPoints: [harnessEntry],
     outfile: join(directory, "harness.js"), bundle: true, format: "esm", platform: "browser",
     conditions: ["browser", "import"],
-    alias: { "@redact-secret/core": PACKAGE_ENTRY, "@redact-secret/wasm": join(artifactDir, artifact.glue) },
+    alias,
     logLevel: "silent",
   });
   writeFileSync(join(directory, "index.html"), renderPage());

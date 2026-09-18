@@ -388,9 +388,25 @@ Issue #381 builds the `common` WebAssembly artifact from the same
 `bindings/wasm` crate. The default build is `full`, and `--no-default-features`
 (`npm run wasm:build:common`) builds `common`. Each artifact reports its
 profile through `profile()`. The measured savings and the build evidence are
-in [the #381 record](./docs/audits/evidence/381/README.md). No package exposes
-`common` yet: the `./common` package exports belong to #382 (qualification
-and package exports). Until then, every published surface ships `full` only.
+in [the #381 record](./docs/audits/evidence/381/README.md). Issue #382
+qualifies `common` on every surface that exposes it and adds the package
+exports: `@redact-secret/core` gains a `./common` entry (same public API as
+the root export, plus a `PROFILE` constant), `@redact-secret/wasm` gains a
+`common` subpath shipping its own glue and `.wasm`, and `bindings/node` gains
+`common` counterparts to every registry-backed export
+(`initializeCommon`/`scanCommon`/`scanAndRedactCommon`/
+`createIncrementalSanitizerCommon`/`profileCommon`) on the one compiled
+addon that serves both profiles. `initialize()` on every entry point rejects
+with `INITIALIZATION_FAILED` if the artifact it loaded reports a different
+profile than the entry point that loaded it. CI builds, qualifies, and
+packages both WASM artifacts and both Node profiles on every run, and the
+release workflow verifies the published root `@redact-secret/wasm` artifact
+reports `profile() === "full"` before publishing. Evidence, remaining
+limitations (`@redact-secret/core/web-stream` and `/node-stream` are not yet
+profile-aware), and the named-pack recommendation are in
+[the #382 record](./docs/audits/evidence/382/README.md). Publishing a
+released version with these exports still requires the explicit release
+approval `AGENTS.md` describes.
 
 ## Error and telemetry constraints
 

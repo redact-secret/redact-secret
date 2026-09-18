@@ -207,6 +207,24 @@ class InventoryTests(unittest.TestCase):
             ["cli: built aarch64-unknown-linux-gnu, which Cargo.toml does not declare"],
         )
 
+    def test_a_common_browser_artifact_is_recorded_with_its_own_family(self) -> None:
+        def configure(artifacts: Artifacts) -> None:
+            artifacts.files["wasm-web-common"] = [
+                "redact_secret_wasm_common.js",
+                "redact_secret_wasm_common_bg.wasm",
+            ]
+
+        collected = self.collect(configure)
+        entry = next(
+            item for item in collected if item["file"] == "redact_secret_wasm_common_bg.wasm"
+        )
+        self.assertEqual(entry["family"], "browser-common")
+        self.assertIsNone(entry["target"])
+        # Recognized, not required: the `browser` job's own
+        # `if-no-files-found: error` upload step is what actually guards a
+        # missing common artifact, the same way it already does for `wasm-web`.
+        self.assertEqual(RECORD.require_matrix(MATRIX, collected), [])
+
     def test_an_unrecognized_artifact_fails(self) -> None:
         def configure(artifacts: Artifacts) -> None:
             artifacts.files["something-else"] = ["file"]

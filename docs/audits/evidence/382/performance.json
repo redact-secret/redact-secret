@@ -1,0 +1,48 @@
+{
+  "source": {
+    "commit": "922d4dada304a7b550fc13be5779fa8e4104ee2a",
+    "workingTreeClean": false
+  },
+  "runs": 10,
+  "protocol": "scripts/assessment-browser-performance.mjs through @redact-secret/core, one fresh browser context per run (#378)",
+  "engines": {
+    "chromium": {
+      "scale-logs-small-whole": {
+        "full": {
+          "runtime": "chromium-153.0.8010.12",
+          "file": "raw/full/chromium-scale-logs-small-whole.json",
+          "initializationMedianMs": 6.3499999940395355,
+          "processingMedianMs": 30.30000001192093,
+          "processingStdDevMs": 1.7538528995683418,
+          "throughputMedianBytesPerSecond": 2163498.348983798
+        },
+        "common": {
+          "runtime": "chromium-153.0.8010.12",
+          "file": "raw/common/chromium-scale-logs-small-whole.json",
+          "initializationMedianMs": 8.399999976158142,
+          "processingMedianMs": 10.699999988079071,
+          "processingStdDevMs": 0.7332121003322566,
+          "throughputMedianBytesPerSecond": 6126542.06290038
+        }
+      },
+      "scale-logs-medium-fixed4096": {
+        "full": {
+          "runtime": "chromium-153.0.8010.12",
+          "file": "raw/full/chromium-scale-logs-medium-fixed4096.json",
+          "initializationMedianMs": 14.249999970197678,
+          "processingMedianMs": 140.90000000596046,
+          "processingStdDevMs": 7.170502087816347,
+          "throughputMedianBytesPerSecond": 1860576.213157895
+        },
+        "common": {
+          "runtime": "chromium-153.0.8010.12",
+          "file": "raw/common/chromium-scale-logs-medium-fixed4096.json",
+          "initializationMedianMs": 14.099999994039536,
+          "processingMedianMs": 25,
+          "processingStdDevMs": 2.0238824125812336,
+          "throughputMedianBytesPerSecond": 10486160
+        }
+      }
+    }
+  }
+}

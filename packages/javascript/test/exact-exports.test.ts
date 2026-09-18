@@ -10,6 +10,7 @@ import { describe, expect, it } from "vitest";
  * API (`decision-define-runtime-bindings`).
  */
 const PUBLIC_RUNTIME_EXPORTS = [
+  "PROFILE",
   "RANGE_UNIT",
   "SecretScanError",
   "VERSION",
@@ -47,12 +48,22 @@ describe("exact exports", () => {
     expect(Object.keys(publicApi).sort()).toEqual(PUBLIC_RUNTIME_EXPORTS);
   });
 
-  it("states its range unit and its lockstep product version", async () => {
-    const { RANGE_UNIT, VERSION } = await import("@redact-secret/core");
+  it("states its range unit, its lockstep product version, and its profile", async () => {
+    const { PROFILE, RANGE_UNIT, VERSION } = await import("@redact-secret/core");
     const manifest = await import("../package.json", { with: { type: "json" } });
 
     expect(RANGE_UNIT).toBe("utf16-code-units");
     expect(VERSION).toBe(manifest.default.version);
+    expect(PROFILE).toBe("full");
+  });
+
+  it("exposes the same public shape from the common profile entry, differing only in PROFILE", async () => {
+    const fullApi = await import("@redact-secret/core");
+    const commonApi = await import("@redact-secret/core/common");
+
+    expect(Object.keys(commonApi).sort()).toEqual(Object.keys(fullApi).sort());
+    expect(commonApi.PROFILE).toBe("common");
+    expect(fullApi.PROFILE).toBe("full");
   });
 
   it("exposes only the reviewed values on each stream adapter subpath", async () => {
@@ -68,9 +79,12 @@ describe("exact exports", () => {
       "@redact-secret/core/native",
       "@redact-secret/core/runtime",
       "@redact-secret/core/session",
+      "@redact-secret/core/session-common",
       "@redact-secret/core/adapters/shared",
       "@redact-secret/core/dist/index.js",
       "@redact-secret/core/runtime/node",
+      "@redact-secret/core/runtime/node-common",
+      "@redact-secret/core/runtime/browser-common",
     ]) {
       await expect(import(subpath)).rejects.toThrowError(
         /is not exported|ERR_PACKAGE_PATH_NOT_EXPORTED|Cannot find/,

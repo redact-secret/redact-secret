@@ -5,6 +5,49 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+- Qualified the `common` detector profile on every surface that exposes it
+  and added its package exports (issue #382, epic #377,
+  `decision-define-detector-profile-and-pack-contract`). Additive and minor:
+  `full` stays the default and unchanged everywhere, and every new surface is
+  opt-in.
+  - `bindings/node` gains `profile()`, and a `common` counterpart to every
+    registry-backed export: `initializeCommon()`, `scanCommon()`,
+    `scanAndRedactCommon()`, `createIncrementalSanitizerCommon()`, and
+    `profileCommon()`. `redact()` is unchanged and shared — it never touches
+    the registry. One compiled addon serves both profiles; there is no
+    second native binary.
+  - `@redact-secret/core` gains a `./common` export mirroring the root
+    export's full public API, and a `PROFILE` constant (`"full"` on the root
+    export, `"common"` on `./common`) on both. `initialize()` now rejects
+    with `INITIALIZATION_FAILED` if the artifact it loaded reports a
+    different profile than the entry point that loaded it — the same
+    detail-free rejection an unusable or version-mismatched artifact already
+    got.
+  - `@redact-secret/wasm` gains a `common` subpath export, shipping the
+    `common` artifact's own glue and `.wasm` beside the unchanged root
+    (`full`) files.
+  - `common`'s findings differ from `full`'s by design: it omits every
+    `provider`-pack detector, so a bare provider token is not detected, and a
+    provider token inside a `common`-detector's context (a `Bearer` header or
+    a contextual assignment) is reported under that detector's type and
+    confidence instead — for example `warn` where `full` would `redact`.
+    Reviewed `common` expectations for the whole canonical corpus are pinned
+    in `conformance/fixtures/common-profile-expectations.json`.
+  - `@redact-secret/core/web-stream` and `@redact-secret/core/node-stream`
+    are not profile-aware yet: their `createWebStreamSanitizer`/
+    `createNodeStreamSanitizer` convenience exports always open a session
+    against `full`, regardless of which entry point a consumer also
+    imported. The `WebStreamSanitizer`/`NodeStreamSanitizer` classes
+    themselves are profile-agnostic — they wrap whichever session they are
+    given — so a `common` consumer can call `createIncrementalSanitizer` from
+    `@redact-secret/core/common` and pass that session into either class
+    directly. Recorded as a known limitation, not fixed by this change
+    ([evidence](docs/audits/evidence/382/README.md)).
+  - CI now builds, qualifies, and uploads the `common` WebAssembly artifact
+    and Node addon exports on every run, and the release workflow verifies
+    the published `@redact-secret/wasm` root artifact reports `profile()
+    === "full"` before publishing, so a `common`/tiny build can never publish
+    under the `full`/default package identity.
 - Built the `common` detector-profile WebAssembly artifact beside the
   default `full` one (issue #381, epic #377,
   `decision-define-detector-profile-and-pack-contract`). `bindings/wasm` gains

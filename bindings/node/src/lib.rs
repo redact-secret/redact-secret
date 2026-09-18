@@ -32,7 +32,7 @@ use crate::offsets::{byte_to_utf16, utf16_to_byte};
 // `lib.rs` applies to its private `incremental` module.
 pub use crate::incremental::{
     JsIncrementalLimits, JsIncrementalOptions, JsIncrementalPolicyContext, JsIncrementalResult,
-    JsIncrementalSanitizer, create_incremental_sanitizer,
+    JsIncrementalSanitizer, create_incremental_sanitizer, create_incremental_sanitizer_common,
 };
 
 /// Returns the shared product version.
@@ -117,17 +117,23 @@ pub(crate) type FormatterCallback<'env> =
     Function<'env, FnArgs<(JsFinding, JsPlaceholderContext)>, String>;
 
 thread_local! {
-    /// The built-in detector registry, built at most once per thread
+    /// The built-in `full` detector registry, built at most once per thread
     /// (`decision-define-runtime-bindings`: initialization is idempotent).
     /// `DetectorRegistry` holds `Box<dyn Detector>` trait objects that are
     /// not required to be `Sync`, so the cache is thread-local rather than a
     /// single process-wide `static`; every export here runs synchronously on
     /// whichever JS thread calls it.
     static REGISTRY: OnceCell<Result<DetectorRegistry, SecretScanError>> = const { OnceCell::new() };
+    /// The built-in `common` detector registry
+    /// (`decision-define-detector-profile-and-pack-contract`), cached the
+    /// same way as `REGISTRY` and independently of it: a process that only
+    /// ever calls the `common` exports never builds the `full` registry, and
+    /// vice versa.
+    static REGISTRY_COMMON: OnceCell<Result<DetectorRegistry, SecretScanError>> = const { OnceCell::new() };
 }
 
-/// Runs `f` against the shared built-in detector registry, building it on
-/// first use.
+/// Runs `f` against the shared built-in `full` detector registry, building it
+/// on first use.
 fn with_registry<T>(
     f: impl FnOnce(&DetectorRegistry) -> Result<T, SecretScanError>,
 ) -> Result<T, SecretScanError> {
@@ -137,6 +143,41 @@ fn with_registry<T>(
             Err(error) => Err(*error),
         }
     })
+}
+
+/// Runs `f` against the shared built-in `common` detector registry
+/// (`decision-define-detector-profile-and-pack-contract`), building it on
+/// first use. Mirrors [`with_registry`] for the smaller, opt-in profile.
+fn with_common_registry<T>(
+    f: impl FnOnce(&DetectorRegistry) -> Result<T, SecretScanError>,
+) -> Result<T, SecretScanError> {
+    REGISTRY_COMMON.with(|cell| {
+        match cell.get_or_init(|| DetectorRegistry::with_common_built_in(std::iter::empty())) {
+            Ok(registry) => f(registry),
+            Err(error) => Err(*error),
+        }
+    })
+}
+
+/// Returns the detector profile the default exports ([`scan`], [`redact`],
+/// [`scan_and_redact`], [`initialize`]) operate on: always `"full"`, this
+/// binding's only build (`decision-define-detector-profile-and-pack-contract`).
+/// Mirrors `bindings/wasm`'s compile-time `profile()`, but Node links both
+/// profiles into one addon and exposes each through its own function rather
+/// than a Cargo feature, so this is a constant, not a build-time switch.
+#[napi]
+#[must_use]
+pub fn profile() -> String {
+    "full".to_owned()
+}
+
+/// Returns the detector profile the `*Common` exports ([`scan_common`],
+/// [`scan_and_redact_common`], [`initialize_common`]) operate on: always
+/// `"common"`.
+#[napi]
+#[must_use]
+pub fn profile_common() -> String {
+    "common".to_owned()
 }
 
 /// Idempotent initialization hook required by the cross-runtime contract:
@@ -153,6 +194,21 @@ fn with_registry<T>(
 #[napi]
 pub fn initialize() -> napi::Result<(), String> {
     with_registry(|_| Ok(())).map_err(to_js_error)
+}
+
+/// The `common`-profile analogue of [`initialize`]
+/// (`decision-define-detector-profile-and-pack-contract`): idempotently
+/// builds and caches the `common` registry, independently of `initialize`'s
+/// `full` registry.
+///
+/// # Errors
+///
+/// Returns `INVALID_DETECTOR` only if the built-in `common` detector
+/// registry itself is malformed, which the core's own test suite already
+/// proves cannot happen.
+#[napi]
+pub fn initialize_common() -> napi::Result<(), String> {
+    with_common_registry(|_| Ok(())).map_err(to_js_error)
 }
 
 fn to_js_detected_finding(input: &str, finding: &DetectedFinding) -> JsDetectedFinding {
@@ -303,6 +359,29 @@ pub fn scan(
     Ok(findings.iter().map(|f| to_js_finding(&input, f)).collect())
 }
 
+/// The `common`-profile analogue of [`scan`]
+/// (`decision-define-detector-profile-and-pack-contract`): same behavior,
+/// against the `common` registry's smaller detector set. A bare
+/// provider-shaped token with no credential-bearing context, which the
+/// `full` profile's `provider` detectors catch, is not detected at all —
+/// the documented false-negative cost of `common`.
+///
+/// # Errors
+///
+/// The same as [`scan`].
+// See `scan`'s attribute: owned params are what N-API hands back.
+#[allow(clippy::needless_pass_by_value)]
+#[napi]
+pub fn scan_common(
+    input: String,
+    #[napi(ts_arg_type = "(finding: JsDetectedFinding, context: JsPolicyContext) => string")]
+    policy: Option<PolicyCallback<'_>>,
+) -> napi::Result<Vec<JsFinding>, String> {
+    let findings = with_common_registry(|registry| run_scan(&input, registry, policy.as_ref()))
+        .map_err(to_js_error)?;
+    Ok(findings.iter().map(|f| to_js_finding(&input, f)).collect())
+}
+
 /// Replaces `redact`/`block` findings in `input` with placeholder text,
 /// leaving `warn`/`allow` findings untouched. `findings` is normally the
 /// output of [`scan`] and need not be pre-sorted. When `formatter` is
@@ -353,6 +432,33 @@ pub fn scan_and_redact(
     formatter: Option<FormatterCallback<'_>>,
 ) -> napi::Result<JsScanAndRedactResult, String> {
     let findings = with_registry(|registry| run_scan(&input, registry, policy.as_ref()))
+        .map_err(to_js_error)?;
+    let redacted = run_redact(&input, &findings, formatter.as_ref()).map_err(to_js_error)?;
+    let js_findings = findings.iter().map(|f| to_js_finding(&input, f)).collect();
+    Ok(JsScanAndRedactResult {
+        findings: js_findings,
+        redacted,
+    })
+}
+
+/// The `common`-profile analogue of [`scan_and_redact`]
+/// (`decision-define-detector-profile-and-pack-contract`): equivalent to
+/// calling [`scan_common`] then [`redact`] with its result.
+///
+/// # Errors
+///
+/// Every error [`scan_common`] and [`redact`] can return.
+// See `scan`'s attribute: owned params are what N-API hands back.
+#[allow(clippy::needless_pass_by_value)]
+#[napi]
+pub fn scan_and_redact_common(
+    input: String,
+    #[napi(ts_arg_type = "(finding: JsDetectedFinding, context: JsPolicyContext) => string")]
+    policy: Option<PolicyCallback<'_>>,
+    #[napi(ts_arg_type = "(finding: JsFinding, context: JsPlaceholderContext) => string")]
+    formatter: Option<FormatterCallback<'_>>,
+) -> napi::Result<JsScanAndRedactResult, String> {
+    let findings = with_common_registry(|registry| run_scan(&input, registry, policy.as_ref()))
         .map_err(to_js_error)?;
     let redacted = run_redact(&input, &findings, formatter.as_ref()).map_err(to_js_error)?;
     let js_findings = findings.iter().map(|f| to_js_finding(&input, f)).collect();
@@ -475,5 +581,54 @@ mod tests {
 
         assert_eq!(js_findings.len(), 1);
         assert_eq!(redacted, run_redact(input, &findings, None).unwrap());
+    }
+
+    fn scan_common_default(input: &str) -> Vec<Finding> {
+        with_common_registry(|registry| run_scan(input, registry, None)).unwrap()
+    }
+
+    #[test]
+    fn profile_and_profile_common_report_their_fixed_names() {
+        assert_eq!(profile(), "full");
+        assert_eq!(profile_common(), "common");
+    }
+
+    #[test]
+    fn initialize_common_is_idempotent() {
+        assert!(initialize_common().is_ok());
+        assert!(initialize_common().is_ok());
+        assert!(initialize_common().is_ok());
+        // The registry built on the first call is reused, not rebuilt.
+        assert!(with_common_registry(|registry| Ok(!registry.is_empty())).unwrap());
+    }
+
+    /// The `common` registry links no `provider` detector, so a bare
+    /// provider-shaped token with no credential-bearing context is not
+    /// detected at all — the documented false-negative cost of `common`
+    /// (`decision-define-detector-profile-and-pack-contract`). The `full`
+    /// registry detects the same input. Mirrors
+    /// `bindings/wasm/src/lib.rs::a_bare_provider_token_is_detected_only_by_the_full_profile`.
+    #[test]
+    fn a_bare_provider_token_is_detected_only_by_the_full_profile() {
+        let input = format!("prefix \u{1F511} AKIA{} suffix", "SYNTHETICEXAMPLE");
+
+        let full_findings = scan_default(&input);
+        assert_eq!(full_findings.len(), 1);
+        assert_eq!(full_findings[0].detector(), "aws-access-key");
+
+        let common_findings = scan_common_default(&input);
+        assert!(common_findings.is_empty());
+    }
+
+    /// `scan_and_redact_common`'s body, exercised the same way
+    /// `scan_and_redact_matches_separate_scan_then_redact` exercises the
+    /// `full` path: equivalent to a separate `scan_common` then `redact`.
+    #[test]
+    fn scan_and_redact_common_matches_separate_scan_then_redact() {
+        let input = "postgres://user:SYNTHETIC_REVOKED_PASSWORD@example.test:5432/db";
+        let findings = scan_common_default(input);
+        assert_eq!(findings.len(), 1);
+        let redacted = run_redact(input, &findings, None).unwrap();
+        assert!(!redacted.contains("SYNTHETIC_REVOKED_PASSWORD"));
     }
 }

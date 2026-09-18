@@ -23,6 +23,7 @@ describe("Node package import", () => {
     );
 
     expect(JSON.parse(output)).toEqual([
+      "PROFILE",
       "RANGE_UNIT",
       "SecretScanError",
       "VERSION",
@@ -53,6 +54,51 @@ describe("Node package import", () => {
         ].join(" "),
       ).trim(),
     ).toBe("true");
+  });
+
+  it("selects the Node common-profile adapter, not the browser one", () => {
+    const output = runInNode(
+      [
+        "const { loadNativeBinding } = await import('#native-common');",
+        "console.log(typeof loadNativeBinding);",
+      ].join(" "),
+    );
+
+    expect(output.trim()).toBe("function");
+    expect(
+      runInNode(
+        [
+          "const resolved = import.meta.resolve('#native-common');",
+          "console.log(resolved.endsWith('dist/runtime/node-common.js'));",
+        ].join(" "),
+      ).trim(),
+    ).toBe("true");
+  });
+
+  it("resolves the common-profile entry point through its exports map", () => {
+    const output = runInNode(
+      [
+        "const api = await import('@redact-secret/core/common');",
+        "console.log(JSON.stringify({ keys: Object.keys(api).sort(), profile: api.PROFILE }));",
+      ].join(" "),
+    );
+
+    expect(JSON.parse(output)).toEqual({
+      keys: [
+        "PROFILE",
+        "RANGE_UNIT",
+        "SecretScanError",
+        "VERSION",
+        "createIncrementalSanitizer",
+        "defaultPlaceholderFormatter",
+        "initialize",
+        "redact",
+        "scan",
+        "scanAndRedact",
+        "typedPlaceholderFormatter",
+      ],
+      profile: "common",
+    });
   });
 
   it("resolves both stream adapter subpaths through the exports map", () => {

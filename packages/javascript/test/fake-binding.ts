@@ -18,6 +18,7 @@ import type { IncrementalSanitizerState } from "../src/types.js";
 
 export interface FakeBindingOptions {
   readonly version?: string;
+  readonly profile?: string;
   readonly findings?: readonly NativeFinding[];
   readonly redacted?: string;
   readonly throwOnScan?: unknown;
@@ -70,6 +71,7 @@ export function createFakeBinding(
   return {
     calls,
     version: () => options.version ?? VERSION,
+    profile: () => options.profile ?? "full",
     initialize: () => {
       calls.push("initialize");
       if (options.throwOnInitialize !== undefined) {
