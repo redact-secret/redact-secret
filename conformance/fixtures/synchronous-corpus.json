@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 1132,
+  "fixtureCount": 1212,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -26737,6 +26737,1301 @@
       "input": "cfut_SYNTHETICREVOKEDCLOUDFLAREAPITOKENVALUE1DEADBEEF",
       "expected": [],
       "note": "Issue #373 (frozen precision contract in docs/audits/evidence/367/precision-contracts.json, families.cloudflare-token): the checksum alphabet is `[0-9a-f]`, not `[0-9A-Fa-f]` -- the single tool corroborating its shape states lowercase hex, so an uppercase-hex checksum is an intentional false negative rather than a case-insensitive match."
+    },
+    {
+      "id": "openai-negative-marker-dotenv",
+      "detector": "openai-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "OPENAI_API_KEY=sk-SYNTHETICREVOKED0001T3BlbkFKSYNTHETICREVOKED0002\n",
+      "expected": [],
+      "note": "Malformed twin of openai-positive-marker-dotenv in the same dotenv context: the internal marker is corrupted (`T3BlbkFK` vs the contracted `T3BlbkFJ`). Issue #375 context-pairing evidence."
+    },
+    {
+      "id": "openai-overlap-marker-malformed-json-assignment",
+      "detector": "openai-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"apiKey\":\"sk-proj-SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTT3BlbkFJSYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SY\"}",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 11,
+          "end": 174
+        }
+      ],
+      "note": "The `sk-proj-` left segment is 73 bytes, one short of the contracted 74, so openai-token stays silent; under the JSON `apiKey` assignment generic-token still masks the value. Issue #375: provider-only (silent) vs default-registry (masked) evidence, checkbox 5."
+    },
+    {
+      "id": "openai-negative-marker-log",
+      "detector": "openai-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-18T00:00:00Z key=sk-SYNTH_TICREVOKED0001T3BlbkFJSYNTHETICREVOKED0002",
+      "expected": [],
+      "note": "Malformed twin of openai-positive-marker-log in the same log context: an underscore inside the legacy left segment breaks the `[A-Za-z0-9]`-only alphabet. Issue #375 context-pairing evidence."
+    },
+    {
+      "id": "openai-negative-marker-markdown",
+      "detector": "openai-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "markdown"
+      ],
+      "input": "Rotate this key:\n\n```\nsk-svcacct-SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTHt3blbkfjSYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SY\n```\n",
+      "expected": [],
+      "note": "Malformed twin of openai-positive-marker-markdown in the same fenced-code markdown context: the marker is lowercased (`t3blbkfj`), which the case-sensitive literal never matches. Issue #375 context-pairing evidence."
+    },
+    {
+      "id": "openai-negative-marker-shell-quoted",
+      "detector": "openai-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export OPENAI_API_KEY='sk-admin-SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTHT3BlbkFJSYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_S'",
+      "expected": [],
+      "note": "Malformed twin of openai-positive-marker-shell-quoted in the same shell context: the `sk-admin-` right segment is 73 bytes, one short of the contracted 74. Issue #375 context-pairing evidence."
+    },
+    {
+      "id": "openai-positive-marker-toml",
+      "detector": "openai-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "toml"
+      ],
+      "input": "[tool.example]\nopenai_api_key = \"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\"\n",
+      "expected": [
+        {
+          "detector": "openai-token",
+          "type": "openai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 33,
+          "end": 84
+        }
+      ],
+      "note": "The contracted legacy key is still classified inside a TOML table value. Issue #375 host-context evidence: toml was previously unexercised for openai-token."
+    },
+    {
+      "id": "openai-negative-marker-toml",
+      "detector": "openai-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "toml"
+      ],
+      "input": "[tool.example]\nopenai_api_key = \"sk-SYNTHETICREVOKED0001T3BlbkFKSYNTHETICREVOKED0002\"\n",
+      "expected": [],
+      "note": "Malformed twin of openai-positive-marker-toml in the same TOML context: the internal marker is corrupted (`T3BlbkFK`). Issue #375 context-pairing evidence."
+    },
+    {
+      "id": "openai-boundary-svcacct-right-57",
+      "detector": "openai-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk-svcacct-SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTHT3BlbkFJSYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SYNTHETIC",
+      "expected": [],
+      "note": "A `sk-svcacct-` right segment one byte off both contracted lengths (57/58; contracted 74 or 58) is rejected. Issue #375: the existing corpus only exercised the left segment for svcacct; this completes the right-segment boundary."
+    },
+    {
+      "id": "openai-boundary-svcacct-right-59",
+      "detector": "openai-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk-svcacct-SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTHT3BlbkFJSYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SYNTHETIC_R",
+      "expected": [],
+      "note": "A `sk-svcacct-` right segment one byte off both contracted lengths (59/58; contracted 74 or 58) is rejected. Issue #375: the existing corpus only exercised the left segment for svcacct; this completes the right-segment boundary."
+    },
+    {
+      "id": "openai-boundary-admin-right-57",
+      "detector": "openai-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk-admin-SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTHT3BlbkFJSYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SYNTHETIC",
+      "expected": [],
+      "note": "A `sk-admin-` right segment one byte off both contracted lengths (57/58; contracted 74 or 58) is rejected. Issue #375: the existing corpus only exercised the left segment for admin; this completes the right-segment boundary."
+    },
+    {
+      "id": "openai-boundary-admin-right-59",
+      "detector": "openai-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk-admin-SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTHT3BlbkFJSYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SYNTHETIC_R",
+      "expected": [],
+      "note": "A `sk-admin-` right segment one byte off both contracted lengths (59/58; contracted 74 or 58) is rejected. Issue #375: the existing corpus only exercised the left segment for admin; this completes the right-segment boundary."
+    },
+    {
+      "id": "digitalocean-boundary-missing-separator",
+      "detector": "digitalocean-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "mutation": {
+        "grammar": "digitalocean-v1",
+        "seedId": "digitalocean-v1-synthetic-seed",
+        "operation": "missing-separator",
+        "ordinal": 20
+      },
+      "input": "dopv11f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9",
+      "expected": [],
+      "note": "Issue #375: the `_v1_` separator itself was never mutated before. Removing both underscores (`dopv1<hex>`) breaks the literal prefix match entirely, so no provider finding is produced."
+    },
+    {
+      "id": "digitalocean-boundary-replaced-separator",
+      "detector": "digitalocean-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "mutation": {
+        "grammar": "digitalocean-v1",
+        "seedId": "digitalocean-v1-synthetic-seed",
+        "operation": "replaced-separator",
+        "ordinal": 21
+      },
+      "input": "dop-v1-1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9",
+      "expected": [],
+      "note": "Issue #375: the `_v1_` separator replaced with dashes (`dop-v1-<hex>`) breaks the literal prefix match, so no provider finding is produced."
+    },
+    {
+      "id": "digitalocean-negative-invalid-alphabet-json",
+      "detector": "digitalocean-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"token\":\"dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cadg\"}",
+      "expected": [],
+      "note": "Malformed twin (invalid-alphabet body byte `g`) of the digitalocean JSON positive, in the same JSON context. Issue #375 context-pairing evidence."
+    },
+    {
+      "id": "digitalocean-negative-uppercase-hex-log",
+      "detector": "digitalocean-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-18T00:00:00Z token=dop_v1_1f24601fD1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9",
+      "expected": [],
+      "note": "Malformed twin (uppercase-hex body byte) in a log line. Issue #375 context-pairing evidence."
+    },
+    {
+      "id": "digitalocean-negative-short-length-toml",
+      "detector": "digitalocean-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "toml"
+      ],
+      "input": "[tool]\ntoken = \"dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad\"\n",
+      "expected": [],
+      "note": "Malformed twin (one byte short of the contracted 64-hex body) in TOML. Issue #375 context-pairing evidence."
+    },
+    {
+      "id": "digitalocean-negative-wrong-prefix-markdown",
+      "detector": "digitalocean-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "markdown"
+      ],
+      "input": "Rotate `dov_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9` immediately.\n",
+      "expected": [],
+      "note": "Malformed twin (invalid prefix `dov_v1_`) inside inline markdown code span. Issue #375 context-pairing evidence."
+    },
+    {
+      "id": "huggingface-boundary-uppercase-prefix",
+      "detector": "huggingface-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "HF_SyntheticRevokedHuggingFaceTokenAB",
+      "expected": [],
+      "note": "The documented `hf_` prefix is matched case-sensitively; an uppercased prefix with an otherwise valid 34-byte body is not classified. Issue #375 boundary evidence."
+    },
+    {
+      "id": "huggingface-negative-json",
+      "detector": "huggingface-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"huggingface_api_key\": \"hf_SyntheticRevokedHuggingFaceTokenA\"}",
+      "expected": [],
+      "note": "Malformed twin (one byte short of the contracted 34-byte body) of huggingface-positive-json in the same JSON context. Issue #375 context-pairing evidence."
+    },
+    {
+      "id": "huggingface-negative-yaml",
+      "detector": "huggingface-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "huggingface_api_key: hf_SyntheticRevokedH!ggingFaceTokenAB\n",
+      "expected": [],
+      "note": "Malformed twin (invalid-alphabet body byte `!`) of huggingface-positive-yaml in the same YAML context. Issue #375 context-pairing evidence."
+    },
+    {
+      "id": "huggingface-negative-log",
+      "detector": "huggingface-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-18T00:00:00Z INFO calling huggingface key=hf_SyntheticRevokedHuggingFaceTokenA status=401",
+      "expected": [],
+      "note": "Malformed twin (one byte short) of huggingface-positive-log in the same log context. Issue #375 context-pairing evidence."
+    },
+    {
+      "id": "huggingface-negative-shell-quoted",
+      "detector": "huggingface-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export HUGGINGFACE_API_KEY=\"hf_SyntheticRevokedH_ggingFaceTokenAB\"\n",
+      "expected": [],
+      "note": "Malformed twin (underscore-in-body) of huggingface-positive-shell-quoted in the same shell context. Issue #375 context-pairing evidence."
+    },
+    {
+      "id": "huggingface-negative-markdown-delimiter",
+      "detector": "huggingface-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "markdown"
+      ],
+      "input": "`hf_SyntheticRevokedHuggingFaceTokenA` must be rotated before reuse.",
+      "expected": [],
+      "note": "Malformed twin (one byte short) of huggingface-positive-markdown-delimiter in the same markdown context. Issue #375 context-pairing evidence."
+    },
+    {
+      "id": "huggingface-positive-dotenv",
+      "detector": "huggingface-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "HUGGINGFACE_API_KEY=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\n",
+      "expected": [
+        {
+          "detector": "huggingface-token",
+          "type": "huggingface_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 20,
+          "end": 57
+        }
+      ],
+      "note": "The exact-length token is still classified as a dotenv assignment value. Issue #375 host-context evidence: dotenv was previously unexercised for huggingface-token."
+    },
+    {
+      "id": "huggingface-negative-dotenv",
+      "detector": "huggingface-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "HUGGINGFACE_API_KEY=hf_SyntheticRevokedHuggingFaceTokenA\n",
+      "expected": [],
+      "note": "Malformed twin (one byte short) of huggingface-positive-dotenv in the same dotenv context. Issue #375 context-pairing evidence."
+    },
+    {
+      "id": "huggingface-positive-toml",
+      "detector": "huggingface-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "toml"
+      ],
+      "input": "[tool]\nhuggingface_api_key = \"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\"\n",
+      "expected": [
+        {
+          "detector": "huggingface-token",
+          "type": "huggingface_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 30,
+          "end": 67
+        }
+      ],
+      "note": "The exact-length token is still classified inside a TOML table value. Issue #375 host-context evidence: toml was previously unexercised for huggingface-token."
+    },
+    {
+      "id": "huggingface-negative-toml",
+      "detector": "huggingface-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "toml"
+      ],
+      "input": "[tool]\nhuggingface_api_key = \"hf_SyntheticRevokedH!ggingFaceTokenAB\"\n",
+      "expected": [],
+      "note": "Malformed twin (invalid-alphabet body byte) of huggingface-positive-toml in the same TOML context. Issue #375 context-pairing evidence."
+    },
+    {
+      "id": "huggingface-overlap-malformed-assignment",
+      "detector": "huggingface-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "access_token=hf_SyntheticRevokedHuggingFaceTokenA",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 13,
+          "end": 49
+        }
+      ],
+      "note": "The one-byte-short twin is silent for huggingface-token, but under an `access_token=` assignment generic-token still redacts it as a contextual secret. Issue #375 checkbox 5: provider-only (silent) vs default-registry (masked) evidence."
+    },
+    {
+      "id": "huggingface-overlap-malformed-bearer",
+      "detector": "huggingface-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer hf_SyntheticRevokedHuggingFaceTokenA",
+      "expected": [
+        {
+          "detector": "bearer-token",
+          "type": "bearer_token",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 22,
+          "end": 58
+        }
+      ],
+      "note": "The one-byte-short twin is silent for huggingface-token, but as a Bearer credential bearer-token still redacts it at structural specificity. Issue #375 checkbox 5 evidence."
+    },
+    {
+      "id": "cloudflare-paired-dotenv-malformed-body-short",
+      "detector": "cloudflare-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "CLOUDFLARE_API_TOKEN=cfut_SYNTHETICREVOKEDCLOUDFLAREAPITOKENVALUEdeadbeef\n",
+      "expected": [],
+      "note": "Malformed twin (39-byte body, one short of the contracted 40) of cloudflare-positive-dotenv in the same dotenv context. Issue #375 context-pairing evidence."
+    },
+    {
+      "id": "cloudflare-paired-json-malformed-checksum-nonhex",
+      "detector": "cloudflare-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"cloudflareApiToken\": \"cfut_SYNTHETICREVOKEDCLOUDFLAREAPITOKENVALUE1ghijklmn\"}",
+      "expected": [],
+      "note": "Malformed twin (non-hex checksum suffix) of cloudflare-positive-json in the same JSON context. Issue #375 context-pairing evidence."
+    },
+    {
+      "id": "cloudflare-paired-yaml-malformed-checksum-uppercase",
+      "detector": "cloudflare-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "cloudflare_api_token: cfut_SYNTHETICREVOKEDCLOUDFLAREAPITOKENVALUE1DEADBEEF\n",
+      "expected": [],
+      "note": "Malformed twin (uppercase-hex checksum) of cloudflare-positive-yaml in the same YAML context. Issue #375 context-pairing evidence."
+    },
+    {
+      "id": "cloudflare-paired-log-malformed-body-long",
+      "detector": "cloudflare-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-16T00:00:00Z INFO purging cache key=cfut_SYNTHETICREVOKEDCLOUDFLAREAPITOKENVALUE11deadbeef zone=example.com",
+      "expected": [],
+      "note": "Malformed twin (41-byte body, one long of the contracted 40) of cloudflare-positive-log in the same log context. Issue #375 context-pairing evidence."
+    },
+    {
+      "id": "cloudflare-positive-shell-quoted",
+      "detector": "cloudflare-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export CLOUDFLARE_API_TOKEN='cfut_SYNTHETICREVOKEDCLOUDFLAREAPITOKENVALUE1deadbeef'\n",
+      "expected": [
+        {
+          "detector": "cloudflare-token",
+          "type": "cloudflare_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 29,
+          "end": 82
+        }
+      ],
+      "note": "The contracted token is still classified inside a single-quoted shell export. Issue #375 host-context evidence: shell (quoted) was previously unexercised for cloudflare-token."
+    },
+    {
+      "id": "cloudflare-negative-shell-quoted",
+      "detector": "cloudflare-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export CLOUDFLARE_API_TOKEN='cfut_SYNTHETICREVOKEDCLOUDFLAREAPITOKENVALUEdeadbeef'\n",
+      "expected": [],
+      "note": "Malformed twin (39-byte body) of cloudflare-positive-shell-quoted in the same shell context. Issue #375 context-pairing evidence."
+    },
+    {
+      "id": "cloudflare-positive-markdown",
+      "detector": "cloudflare-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "markdown"
+      ],
+      "input": "`cfut_SYNTHETICREVOKEDCLOUDFLAREAPITOKENVALUE1deadbeef` must be rotated before reuse.",
+      "expected": [
+        {
+          "detector": "cloudflare-token",
+          "type": "cloudflare_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1,
+          "end": 54
+        }
+      ],
+      "note": "The contracted token is still classified inside an inline markdown code span. Issue #375 host-context evidence: markdown was previously unexercised for cloudflare-token."
+    },
+    {
+      "id": "cloudflare-negative-markdown",
+      "detector": "cloudflare-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "markdown"
+      ],
+      "input": "`cfut_SYNTHETICREVOKEDCLOUDFLAREAPITOKENVALUE1ghijklmn` must be rotated before reuse.",
+      "expected": [],
+      "note": "Malformed twin (non-hex checksum) of cloudflare-positive-markdown in the same markdown context. Issue #375 context-pairing evidence."
+    },
+    {
+      "id": "cloudflare-positive-toml",
+      "detector": "cloudflare-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "toml"
+      ],
+      "input": "[tool]\ncloudflare_api_token = \"cfut_SYNTHETICREVOKEDCLOUDFLAREAPITOKENVALUE1deadbeef\"\n",
+      "expected": [
+        {
+          "detector": "cloudflare-token",
+          "type": "cloudflare_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 31,
+          "end": 84
+        }
+      ],
+      "note": "The contracted token is still classified inside a TOML table value. Issue #375 host-context evidence: toml was previously unexercised for cloudflare-token."
+    },
+    {
+      "id": "cloudflare-negative-toml",
+      "detector": "cloudflare-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "toml"
+      ],
+      "input": "[tool]\ncloudflare_api_token = \"cfut_SYNTHETICREVOKEDCLOUDFLAREAPITOKENVALUE1DEADBEEF\"\n",
+      "expected": [],
+      "note": "Malformed twin (uppercase-hex checksum) of cloudflare-positive-toml in the same TOML context. Issue #375 context-pairing evidence."
+    },
+    {
+      "id": "cloudflare-boundary-prefix-truncated-full-length-body",
+      "detector": "cloudflare-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "cfu_SYNTHETICREVOKEDCLOUDFLAREAPITOKENVALUE1deadbeef",
+      "expected": [],
+      "note": "The prefix is truncated by one byte (`cfu_`) but the body and checksum are otherwise a full, realistic 48-byte length; the literal prefix match still fails regardless of the body's own length. Issue #375 boundary evidence, complementing the existing short-body truncated-prefix negative."
+    },
+    {
+      "id": "cloudflare-boundary-prefix-case-mismatch-full-length",
+      "detector": "cloudflare-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "CFUT_SYNTHETICREVOKEDCLOUDFLAREAPITOKENVALUE1deadbeef",
+      "expected": [],
+      "note": "The documented `cfut_` prefix is matched case-sensitively; an uppercased prefix with an otherwise valid 48-byte body+checksum is not classified. Issue #375 boundary evidence, complementing the existing short-body case-sensitivity negative."
+    },
+    {
+      "id": "cloudflare-overlap-malformed-provider-generic-assignment",
+      "detector": "cloudflare-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "api_key=cfut_SYNTHETICREVOKEDCLOUDFLAREAPITOKENVALUEdeadbeef",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 8,
+          "end": 60
+        }
+      ],
+      "note": "The 39-byte-body twin is silent for cloudflare-token, but under an `api_key=` assignment generic-token still redacts it as a contextual secret. Issue #375 checkbox 5: provider-only (silent) vs default-registry (masked) evidence."
+    },
+    {
+      "id": "cloudflare-overlap-malformed-provider-bearer-context",
+      "detector": "cloudflare-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer cfut_SYNTHETICREVOKEDCLOUDFLAREAPITOKENVALUE1ghijklmn",
+      "expected": [
+        {
+          "detector": "bearer-token",
+          "type": "bearer_token",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 22,
+          "end": 75
+        }
+      ],
+      "note": "The non-hex-checksum twin is silent for cloudflare-token, but as a Bearer credential bearer-token still redacts it at structural specificity. Issue #375 checkbox 5 evidence."
+    },
+    {
+      "id": "linear-positive-dotenv",
+      "detector": "linear-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "LINEAR_API_KEY=lin_api_SyntheticRevokedLinearApiTokenABCDEF0123\n",
+      "expected": [
+        {
+          "detector": "linear-token",
+          "type": "linear_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 15,
+          "end": 63
+        }
+      ],
+      "note": "The exact-length token is still classified as a dotenv assignment value. Issue #375 host-context evidence: dotenv was previously unexercised for linear-token."
+    },
+    {
+      "id": "linear-negative-dotenv",
+      "detector": "linear-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "LINEAR_API_KEY=lin_api_SyntheticRevokedLinearApiTokenABCDEF012\n",
+      "expected": [],
+      "note": "Malformed twin (39-byte body) of linear-positive-dotenv in the same dotenv context. Issue #375 context-pairing evidence."
+    },
+    {
+      "id": "linear-positive-toml",
+      "detector": "linear-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "toml"
+      ],
+      "input": "[tool]\nlinear_api_key = \"lin_api_SyntheticRevokedLinearApiTokenABCDEF0123\"\n",
+      "expected": [
+        {
+          "detector": "linear-token",
+          "type": "linear_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 73
+        }
+      ],
+      "note": "The exact-length token is still classified inside a TOML table value. Issue #375 host-context evidence: toml was previously unexercised for linear-token."
+    },
+    {
+      "id": "linear-negative-toml",
+      "detector": "linear-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "toml"
+      ],
+      "input": "[tool]\nlinear_api_key = \"lin_api_Synth!ticRevokedLinearApiTokenABCDEF0123\"\n",
+      "expected": [],
+      "note": "Malformed twin (invalid-alphabet body byte) of linear-positive-toml in the same TOML context. Issue #375 context-pairing evidence."
+    },
+    {
+      "id": "linear-overlap-json-malformed-one-short",
+      "detector": "linear-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"apiKey\": \"lin_api_SyntheticRevokedLinearApiTokenABCDEF012\"}",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 12,
+          "end": 59
+        }
+      ],
+      "note": "The 39-byte-body twin is silent for linear-token, but under the JSON `apiKey` assignment generic-token still redacts it as a contextual secret, matching linear-positive-json's context. Issue #375 checkbox 5 evidence."
+    },
+    {
+      "id": "linear-paired-yaml-malformed-invalid-alphabet",
+      "detector": "linear-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "linear_api_key: lin_api_Synth!ticRevokedLinearApiTokenABCDEF0123\n",
+      "expected": [],
+      "note": "Malformed twin (invalid-alphabet body byte) of linear-positive-yaml in the same YAML context. Issue #375 context-pairing evidence."
+    },
+    {
+      "id": "linear-paired-log-malformed-underscore-in-body",
+      "detector": "linear-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-16T00:00:00Z INFO calling linear key=lin_api_Synth_ticRevokedLinearApiTokenABCDEF0123 status=401",
+      "expected": [],
+      "note": "Malformed twin (underscore-in-body) of linear-positive-log in the same log context. Issue #375 context-pairing evidence."
+    },
+    {
+      "id": "linear-paired-markdown-malformed-dash-in-body",
+      "detector": "linear-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "markdown"
+      ],
+      "input": "`lin_api_Synth-ticRevokedLinearApiTokenABCDEF0123` must be rotated before reuse.",
+      "expected": [],
+      "note": "Malformed twin (dash-in-body) of linear-positive-markdown-delimiter in the same markdown context. Issue #375 context-pairing evidence."
+    },
+    {
+      "id": "linear-paired-shell-malformed-one-long",
+      "detector": "linear-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export LINEAR_API_KEY=\"lin_api_SyntheticRevokedLinearApiTokenABCDEF01239\"\n",
+      "expected": [],
+      "note": "Malformed twin (41-byte body, one long) of linear-positive-shell-quoted in the same shell context. Issue #375 context-pairing evidence."
+    },
+    {
+      "id": "linear-boundary-prefix-case-mismatch-full-length",
+      "detector": "linear-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "LIN_API_SyntheticRevokedLinearApiTokenABCDEF0123",
+      "expected": [],
+      "note": "The documented `lin_api_` prefix is matched case-sensitively; an uppercased prefix with an otherwise valid 40-byte body is not classified. Issue #375 boundary evidence, complementing the existing short-body case-sensitivity negative."
+    },
+    {
+      "id": "linear-boundary-undocumented-segment-scim",
+      "detector": "linear-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "lin_scim_SyntheticRevokedLinearApiTokenABCDEF0123",
+      "expected": [],
+      "note": "`lin_scim_` is an undocumented segment name; only `lin_api_` and the retained interim `lin_oauth_` guard are recognized. Issue #375 boundary evidence, corpus mirror of the existing Rust-only rejects_an_undocumented_segment_name unit test."
+    },
+    {
+      "id": "linear-boundary-oauth-below-min-floor",
+      "detector": "linear-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "lin_oauth_SYNTHETIC_REVOKED_S",
+      "expected": [],
+      "note": "The retained interim `lin_oauth_` guard keeps beta.4's 20-byte minimum unchanged; a 19-byte body is one below that floor and produces no finding. Issue #375 checkbox 6: explicit boundary evidence for the OAuth guard alongside the existing linear-positive-all-prefixes fixture."
+    },
+    {
+      "id": "linear-overlap-malformed-api-bearer-context",
+      "detector": "linear-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer lin_api_SyntheticRevokedLinearApiTokenABCDEF012",
+      "expected": [
+        {
+          "detector": "bearer-token",
+          "type": "bearer_token",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 22,
+          "end": 69
+        }
+      ],
+      "note": "The 39-byte-body twin is silent for linear-token, but as a Bearer credential bearer-token still redacts it at structural specificity. Issue #375 checkbox 5 evidence."
+    },
+    {
+      "id": "slack-positive-bot-grammar-plain",
+      "detector": "slack-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xoxb-1234567890123-3210987654321-SYNTHETICREVOKEDBOTSECRET1",
+      "expected": [
+        {
+          "detector": "slack-token",
+          "type": "slack_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 59
+        }
+      ],
+      "note": "The full three-section bot grammar (13/13-digit sections, 26-byte secret) classified bare, with no assignment wrapper. Issue #375: the corpus previously only exercised this grammar under an `access_token=` assignment."
+    },
+    {
+      "id": "slack-positive-bot-grammar-json",
+      "detector": "slack-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"apiKey\": \"xoxb-1234567890123-3210987654321-SYNTHETICREVOKEDBOTSECRET1\"}",
+      "expected": [
+        {
+          "detector": "slack-token",
+          "type": "slack_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 12,
+          "end": 71
+        }
+      ],
+      "note": "The full bot grammar is still classified inside a JSON `apiKey` assignment, pairing with the now-rejected broad-shape twin already recorded at slack-positive-json. Issue #375 context-pairing evidence."
+    },
+    {
+      "id": "slack-positive-bot-grammar-yaml",
+      "detector": "slack-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "slack_api_key: xoxb-1234567890123-3210987654321-SYNTHETICREVOKEDBOTSECRET1\n",
+      "expected": [
+        {
+          "detector": "slack-token",
+          "type": "slack_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 15,
+          "end": 74
+        }
+      ],
+      "note": "The full bot grammar is still classified in a YAML assignment, pairing with the now-rejected broad-shape twin at slack-positive-yaml. Issue #375 context-pairing evidence."
+    },
+    {
+      "id": "slack-positive-bot-grammar-log",
+      "detector": "slack-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-16T00:00:00Z INFO calling slack key=xoxb-1234567890123-3210987654321-SYNTHETICREVOKEDBOTSECRET1 status=200",
+      "expected": [
+        {
+          "detector": "slack-token",
+          "type": "slack_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 44,
+          "end": 103
+        }
+      ],
+      "note": "The full bot grammar is still classified in a log line, pairing with the now-rejected broad-shape twin at slack-positive-log. Issue #375 context-pairing evidence."
+    },
+    {
+      "id": "slack-positive-bot-grammar-shell-quoted",
+      "detector": "slack-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export SLACK_API_KEY=\"xoxb-1234567890123-3210987654321-SYNTHETICREVOKEDBOTSECRET1\"\n",
+      "expected": [
+        {
+          "detector": "slack-token",
+          "type": "slack_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 81
+        }
+      ],
+      "note": "The full bot grammar is still classified in a shell export, pairing with the now-rejected broad-shape twin at slack-positive-shell-quoted. Issue #375 context-pairing evidence."
+    },
+    {
+      "id": "slack-positive-bot-grammar-markdown",
+      "detector": "slack-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "markdown"
+      ],
+      "input": "`xoxb-1234567890123-3210987654321-SYNTHETICREVOKEDBOTSECRET1` must be rotated before reuse.",
+      "expected": [
+        {
+          "detector": "slack-token",
+          "type": "slack_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1,
+          "end": 60
+        }
+      ],
+      "note": "The full bot grammar is still classified inside an inline markdown code span, pairing with the now-rejected broad-shape twin at slack-positive-markdown-delimiter. Issue #375 context-pairing evidence."
+    },
+    {
+      "id": "slack-positive-bot-grammar-dotenv",
+      "detector": "slack-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "SLACK_API_KEY=xoxb-1234567890123-3210987654321-SYNTHETICREVOKEDBOTSECRET1\n",
+      "expected": [
+        {
+          "detector": "slack-token",
+          "type": "slack_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 73
+        }
+      ],
+      "note": "The full bot grammar is still classified as a dotenv assignment value. Issue #375 host-context evidence: dotenv was previously unexercised for slack-token."
+    },
+    {
+      "id": "slack-negative-bot-grammar-dotenv",
+      "detector": "slack-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "SLACK_API_KEY=xoxb-12345678901233210987654321-SYNTHETICREVOKEDBOTSECRET1\n",
+      "expected": [],
+      "note": "Malformed twin (missing separator between the two numeric sections) of slack-positive-bot-grammar-dotenv in the same dotenv context. Issue #375 context-pairing evidence."
+    },
+    {
+      "id": "slack-positive-bot-grammar-toml",
+      "detector": "slack-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "toml"
+      ],
+      "input": "[tool]\nslack_api_key = \"xoxb-1234567890123-3210987654321-SYNTHETICREVOKEDBOTSECRET1\"\n",
+      "expected": [
+        {
+          "detector": "slack-token",
+          "type": "slack_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 24,
+          "end": 83
+        }
+      ],
+      "note": "The full bot grammar is still classified inside a TOML table value. Issue #375 host-context evidence: toml was previously unexercised for slack-token."
+    },
+    {
+      "id": "slack-negative-bot-grammar-toml",
+      "detector": "slack-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "toml"
+      ],
+      "input": "[tool]\nslack_api_key = \"xoxb-1234567890123-3210987654321_SYNTHETICREVOKEDBOTSECRET1\"\n",
+      "expected": [],
+      "note": "Malformed twin (the separator before the secret section replaced with `_`) of slack-positive-bot-grammar-toml in the same TOML context. Issue #375 context-pairing evidence."
+    },
+    {
+      "id": "slack-boundary-segment1-9-digits",
+      "detector": "slack-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xoxb-111111111-3210987654321-SYNTHETICREVOKEDBOTSECRET1",
+      "expected": [],
+      "note": "The first numeric section is 9 digits, one past the documented 10-13 range. Issue #375 boundary evidence."
+    },
+    {
+      "id": "slack-boundary-segment1-14-digits",
+      "detector": "slack-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xoxb-11111111111111-3210987654321-SYNTHETICREVOKEDBOTSECRET1",
+      "expected": [],
+      "note": "The first numeric section is 14 digits, one past the documented 10-13 range. Issue #375 boundary evidence."
+    },
+    {
+      "id": "slack-positive-segment1-10-digits",
+      "detector": "slack-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xoxb-1111111111-3210987654321-SYNTHETICREVOKEDBOTSECRET1",
+      "expected": [
+        {
+          "detector": "slack-token",
+          "type": "slack_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 56
+        }
+      ],
+      "note": "The first numeric section is exactly 10 digits, the documented minimum. Issue #375 boundary evidence (previously only exercised at 13/13 in the corpus)."
+    },
+    {
+      "id": "slack-positive-segment1-13-digits",
+      "detector": "slack-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xoxb-1111111111111-3210987654321-SYNTHETICREVOKEDBOTSECRET1",
+      "expected": [
+        {
+          "detector": "slack-token",
+          "type": "slack_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 59
+        }
+      ],
+      "note": "The first numeric section is exactly 13 digits, the documented maximum. Issue #375 boundary evidence (previously only exercised at 13/13 in the corpus)."
+    },
+    {
+      "id": "slack-boundary-segment2-9-digits",
+      "detector": "slack-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xoxb-1234567890123-333333333-SYNTHETICREVOKEDBOTSECRET1",
+      "expected": [],
+      "note": "The second numeric section is 9 digits, one past the documented 10-13 range. Issue #375 boundary evidence."
+    },
+    {
+      "id": "slack-boundary-segment2-14-digits",
+      "detector": "slack-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xoxb-1234567890123-33333333333333-SYNTHETICREVOKEDBOTSECRET1",
+      "expected": [],
+      "note": "The second numeric section is 14 digits, one past the documented 10-13 range. Issue #375 boundary evidence."
+    },
+    {
+      "id": "slack-boundary-missing-first-separator",
+      "detector": "slack-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xoxb-12345678901233210987654321-SYNTHETICREVOKEDBOTSECRET1",
+      "expected": [],
+      "note": "The separator between the two numeric sections is missing, so the run reads as a single 26-digit section that never resolves the documented shape. Issue #375: `-`-separated sections are provider-documented, not adopted from tool agreement."
+    },
+    {
+      "id": "slack-boundary-missing-second-separator",
+      "detector": "slack-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xoxb-1234567890123-3210987654321SYNTHETICREVOKEDBOTSECRET1",
+      "expected": [],
+      "note": "The separator between the second numeric section and the secret is missing -- the exact beta.4/baseline-scanner shape the frozen contract explicitly rejects (both numeric sections run straight into the secret with no separator)."
+    },
+    {
+      "id": "slack-boundary-replaced-separator",
+      "detector": "slack-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xoxb-1234567890123_3210987654321-SYNTHETICREVOKEDBOTSECRET1",
+      "expected": [],
+      "note": "The separator between the two numeric sections is replaced with `_`; only `-` is the documented section separator."
+    },
+    {
+      "id": "slack-boundary-secret-17-bytes",
+      "detector": "slack-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xoxb-1234567890123-3210987654321-SSSSSSSSSSSSSSSSS",
+      "expected": [],
+      "note": "The secret section is exactly 17 bytes, one below the documented 18-byte floor. Issue #375 boundary evidence."
+    },
+    {
+      "id": "slack-positive-secret-18-bytes",
+      "detector": "slack-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xoxb-1234567890123-3210987654321-SSSSSSSSSSSSSSSSSS",
+      "expected": [
+        {
+          "detector": "slack-token",
+          "type": "slack_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 51
+        }
+      ],
+      "note": "The secret section is exactly 18 bytes, at the documented 18-byte floor. Issue #375 boundary evidence."
+    },
+    {
+      "id": "slack-positive-secret-19-bytes",
+      "detector": "slack-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xoxb-1234567890123-3210987654321-SSSSSSSSSSSSSSSSSSS",
+      "expected": [
+        {
+          "detector": "slack-token",
+          "type": "slack_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 52
+        }
+      ],
+      "note": "The secret section is exactly 19 bytes, one above the documented 18-byte floor. Issue #375 boundary evidence."
+    },
+    {
+      "id": "slack-boundary-secret-alphabet-violation",
+      "detector": "slack-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xoxb-1234567890123-3210987654321-SYNTHETIC-REVOKED-BOTSECRET",
+      "expected": [],
+      "note": "The secret section's alphabet is `[A-Za-z0-9]`, narrower than the `[A-Za-z0-9_-]` boundary: a `-` inside the secret still rejects the truncated candidate instead of being folded into the secret. Issue #375 boundary evidence."
+    },
+    {
+      "id": "slack-negative-interim-below-min-floor",
+      "detector": "slack-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xoxp-SSSSSSSSSSSSSSSSSSS",
+      "expected": [],
+      "note": "The retained interim `xoxp-` guard keeps beta.4's 20-byte minimum unchanged; a 19-byte body is one below that floor. Issue #375 checkbox 6: explicit boundary evidence for the rotating-forms guard alongside slack-positive-all-prefixes."
     }
   ]
 }

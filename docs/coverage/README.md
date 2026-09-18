@@ -232,6 +232,33 @@ Tests: `python3 -B -m unittest discover -s scripts/tests -p 'test_generate_cover
 
   Tests: `python3 -B -m unittest discover -s scripts/tests -p 'test_generate_fp_fn_summary.py'`.
 
+- [`precision-context-matrix.json`](./precision-context-matrix.json) — the
+  paired precision-regression matrix issue
+  [#375](https://github.com/redact-secret/redact-secret/issues/375) asks for,
+  covering the seven provider families issue
+  [#367](https://github.com/redact-secret/redact-secret/issues/367) froze:
+  one row per `conformance/fixtures/synchronous-corpus.json` and
+  `conformance/fixtures/incremental-corpus.json` fixture for those
+  detectors, keyed by fixture id, `kind`/contract tier/`support`, host
+  contexts, scan mode (synchronous/incremental), the declared runtime
+  consumers for that scan mode, and whether the fixture is currently
+  `flagged` or `silent` — plus `explicitlyUnsupportedFixtureIds`, so an
+  `intentionally-unsupported` row is stated, never omitted. The one genuine,
+  measured before/after in this repo — beta.4's actual ranges versus the
+  frozen contract's `expected`, for the 24 must-not-flag twins and their 24
+  paired positives — is reported separately as `beta4TwinBaseline` rather
+  than force-joined onto the live corpus rows by id (that baseline's ids are
+  audit-internal, not corpus fixture ids, and a guessed join would itself be
+  an unexercised parity claim). Regenerate after any change to either
+  corpus file:
+
+  ```sh
+  python3 -B scripts/generate-precision-context-matrix.py \
+    --out docs/coverage/precision-context-matrix.json
+  ```
+
+  Tests: `python3 -B -m unittest discover -s scripts/tests -p 'test_generate_precision_context_matrix.py'`.
+
 ## Coverage drift is a CI failure
 
 `npm run ci` runs `npm run coverage:check`, which fails the build if:
