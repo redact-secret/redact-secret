@@ -14,6 +14,7 @@ mod atlassian;
 mod aws;
 mod azure_devops;
 mod bearer_token;
+mod cloudflare;
 mod connection_string;
 mod datadog;
 mod discord;
@@ -63,7 +64,7 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(additional_providers::PYPI),
         Box::new(additional_providers::HUGGING_FACE),
         Box::new(additional_providers::DOCKER),
-        Box::new(additional_providers::CLOUDFLARE),
+        Box::new(cloudflare::CloudflareTokenDetector),
         Box::new(additional_providers::DIGITALOCEAN),
         Box::new(additional_providers::LINEAR),
         Box::new(additional_providers::SUPABASE),
@@ -267,7 +268,10 @@ mod tests {
             ("pypi-token", pypi_input.as_str()),
             ("huggingface-token", "hf_SYNTHETICREVOKEDHUGGINGFACETOKEN01"),
             ("docker-token", "dckr_pat_SYNTHETICREVOKEDDOCKERPAT00"),
-            ("cloudflare-token", "cfut_SYNTHETICREVOKEDPROVIDERVALUE"),
+            (
+                "cloudflare-token",
+                "cfut_SYNTHETICREVOKEDCLOUDFLAREAPITOKENVALUE1deadbeef",
+            ),
             (
                 "digitalocean-token",
                 "dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9",

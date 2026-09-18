@@ -1440,12 +1440,11 @@
         {
           "dimension": "positive",
           "evidenceFixtureIds": [
+            "cloudflare-positive-checksum-suffix",
             "cloudflare-positive-crlf-unicode-prefix",
-            "cloudflare-positive-doc-style-placeholder",
             "cloudflare-positive-dotenv",
             "cloudflare-positive-json",
             "cloudflare-positive-log",
-            "cloudflare-positive-min-length",
             "cloudflare-positive-punctuation-adjacent",
             "cloudflare-positive-qualified",
             "cloudflare-positive-repeated-value",
@@ -1472,9 +1471,18 @@
           "evidenceFixtureIds": [
             "cloudflare-boundary-below-min",
             "cloudflare-boundary-case-sensitivity",
+            "cloudflare-boundary-checksum-non-hex",
+            "cloudflare-boundary-checksum-one-long",
+            "cloudflare-boundary-checksum-one-short",
+            "cloudflare-boundary-checksum-uppercase-hex",
             "cloudflare-boundary-delimiter",
             "cloudflare-boundary-invalid-alphabet",
-            "cloudflare-boundary-short"
+            "cloudflare-boundary-invalid-alphabet-checksum-suffix",
+            "cloudflare-boundary-one-long-checksum-suffix",
+            "cloudflare-boundary-one-short-checksum-suffix",
+            "cloudflare-boundary-short",
+            "cloudflare-positive-doc-style-placeholder",
+            "cloudflare-positive-min-length"
           ],
           "state": "supported"
         },
@@ -1497,9 +1505,18 @@
           "evidenceFixtureIds": [
             "cloudflare-boundary-below-min",
             "cloudflare-boundary-case-sensitivity",
+            "cloudflare-boundary-checksum-non-hex",
+            "cloudflare-boundary-checksum-one-long",
+            "cloudflare-boundary-checksum-one-short",
+            "cloudflare-boundary-checksum-uppercase-hex",
             "cloudflare-boundary-delimiter",
             "cloudflare-boundary-invalid-alphabet",
-            "cloudflare-boundary-short"
+            "cloudflare-boundary-invalid-alphabet-checksum-suffix",
+            "cloudflare-boundary-one-long-checksum-suffix",
+            "cloudflare-boundary-one-short-checksum-suffix",
+            "cloudflare-boundary-short",
+            "cloudflare-positive-doc-style-placeholder",
+            "cloudflare-positive-min-length"
           ],
           "state": "supported"
         },

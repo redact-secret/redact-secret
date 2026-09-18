@@ -5,6 +5,48 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+- Narrowed `cloudflare-token` to Cloudflare's reviewed scannable user-token
+  contract: `cfut_` followed by exactly 40 bytes of `[A-Za-z0-9]` (the body)
+  and then exactly 8 bytes of `[0-9a-f]` (the checksum), bounded by the
+  existing `[A-Za-z0-9_-]` boundary alphabet (issue #373, contract review
+  #367). Cloudflare's token documentation establishes the `cfut_` prefix and
+  the 40-byte alphanumeric body; trufflehog v3.97.4's `cloudflareapitoken` v2
+  rule additionally corroborates the 8-byte lowercase-hex checksum segment
+  that follows it — the provider states a checksum follows the body but does
+  not publish its width or alphabet, so its existence is provider evidence
+  (a bare 40-byte body is malformed) while its width and alphabet are a
+  single-tool-corroborated support-policy adoption, validated lexically only:
+  no checksum algorithm is computed or claimed. The previous rule accepted
+  any 20-or-more-byte `[A-Za-z0-9_-]` suffix, so
+  `@redact-secret/core@0.1.0-beta.4` flagged an eight-byte non-hex twin of the
+  benchmark's paired positive; that twin is now rejected while the paired
+  positive keeps its exact byte range. Intentional behavior changes: a body
+  one byte short of or past 40 bytes, an underscore or dash inside an
+  otherwise documented-length body, a checksum one byte short of or past 8
+  bytes, or an uppercase-hex checksum no longer match. The detector moved out
+  of the shared `KnownFormatProviderDetector` shape in
+  `additional_providers.rs` into its own `cloudflare.rs` module, composed
+  directly from the shared `pattern` primitives plus a post-hoc checksum
+  check, the same way `grafana-service-account-token` and `sendgrid-token`
+  already handle their own two-segment shapes. The earlier broad-shape
+  positives in the conformance corpus were re-authored with a contracted
+  body and checksum; the repeated-`x` filler placeholder
+  (`cloudflare-positive-doc-style-placeholder`) and the retired minimum-length
+  positive (`cloudflare-positive-min-length`) are now reclassified as
+  intentional false negatives in favor of a dedicated
+  `cloudflare-token-checksum-suffix` grammar-mutation family (identity,
+  body-one-short, body-one-long, body-invalid-alphabet, checksum-one-short,
+  checksum-one-long, checksum-non-hex, checksum-uppercase-hex —
+  `conformance/fixtures/cloudflare-token-mutations.ts` reproduces every case
+  byte-for-byte), and the `cloudflare-adversarial-long-suffix` input now
+  yields exactly one finding bounded to the documented 48-byte suffix instead
+  of matching the whole 11251-byte run. No detector id, finding type,
+  confidence, specificity, default policy, or public interface changed. The
+  fixed release-qualification accuracy corpus is deliberately not rewritten:
+  its `logs-additional-provider-tokens-one` fixture's underscore-bearing
+  Cloudflare value now records as a false negative until the beta.5
+  precision gate (#376) re-versions that corpus.
+
 - Narrowed `huggingface-token` to Hugging Face's reviewed user-access-token
   contract: `hf_` followed by exactly 34 bytes, matched case-sensitively and
   bounded by the existing `[A-Za-z0-9_-]` boundary alphabet (issue #372,

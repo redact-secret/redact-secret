@@ -1,5 +1,5 @@
-//! Stripe, `PyPI`, Hugging Face, Docker, Cloudflare, `DigitalOcean`, Linear,
-//! Supabase, Vercel, npm, Google, and Grafana Cloud API key detection.
+//! Stripe, `PyPI`, Hugging Face, Docker, `DigitalOcean`, Linear, Supabase,
+//! Vercel, npm, Google, and Grafana Cloud API key detection.
 //!
 //! Mirrors the retired `src/detectors/additional-providers.ts` oracle. Every
 //! one of these providers reduces to the same shape as [`super::gitlab`] or
@@ -13,7 +13,10 @@
 //! needs a `-`-separated section grammar this generic shape cannot express,
 //! while its other prefixes keep this same "prefix plus a minimum-length
 //! run" shape as an interim guard, composed directly from the shared
-//! `pattern` primitives instead of through this type.
+//! `pattern` primitives instead of through this type. Cloudflare moved out
+//! to [`super::cloudflare`] (issue #373): its reviewed contract needs a
+//! post-hoc check on the matched run's trailing bytes (a checksum-shaped
+//! tail) this type cannot express.
 
 use crate::detectors::pattern::{self, Alphabet, PrefixShape};
 use crate::error::DetectorFailure;
@@ -155,20 +158,6 @@ pub(super) const DOCKER: KnownFormatProviderDetector = KnownFormatProviderDetect
 pub(super) const DOCKER_PAT_SUFFIX_LEN: usize = 27;
 /// The exact suffix length after `dckr_oat_`.
 pub(super) const DOCKER_OAT_SUFFIX_LEN: usize = 32;
-
-/// Cloudflare's current scannable user and account API-token namespace. A
-/// truncated or misspelled prefix is deliberately excluded, and the
-/// legacy unprefixed Global API Key format is a known false negative this
-/// detector does not attempt, since it is indistinguishable from ordinary
-/// opaque hex without a prefix to anchor on.
-pub(super) const CLOUDFLARE: KnownFormatProviderDetector = KnownFormatProviderDetector {
-    id: "cloudflare-token",
-    type_name: "cloudflare_api_token",
-    signals: &["cloudflare-scannable-prefix", "opaque-suffix"],
-    shapes: &[PrefixShape::at_least("cfut_", 20)],
-    alphabet: pattern::is_alnum_dash,
-    boundary: pattern::is_alnum_dash,
-};
 
 /// `DigitalOcean` personal (`dop_v1_`), `OAuth` access (`doo_v1_`), and
 /// `OAuth` refresh (`dor_v1_`) token families.
@@ -397,7 +386,6 @@ mod tests {
                 DOCKER_PAT_BODY,
                 "dckr_pat_SYNTHETIC_SHORT",
             ),
-            family(CLOUDFLARE, "cfut_", BODY, "cfut_SYNTHETIC_SHORT"),
             family(
                 DIGITALOCEAN,
                 "dop_v1_",
@@ -623,7 +611,6 @@ mod tests {
         vec![
             docker_variant("dckr_pat_", INFRA_SUFFIX),
             docker_variant("dckr_oat_", DOCKER_OAT_SUFFIX),
-            opaque_variant(&CLOUDFLARE, "cfut_"),
             digitalocean_variant("dop_v1_", DIGITALOCEAN_BODY),
             digitalocean_variant("doo_v1_", DIGITALOCEAN_OAUTH_BODY),
             digitalocean_variant("dor_v1_", DIGITALOCEAN_REFRESH_BODY),
@@ -843,14 +830,6 @@ mod tests {
         }
     }
 
-    /// A Cloudflare zone/account resource ID is an ordinary 32-character hex
-    /// identifier, not a secret, and carries none of the `cfut_` prefix.
-    #[test]
-    fn cloudflare_rejects_an_ordinary_zone_resource_id() {
-        let input = "CF-Zone-ID: 023e105f4ecef8ad9ca31a8372d0c353";
-        assert_eq!(detect(&CLOUDFLARE, input).len(), 0);
-    }
-
     /// A `DigitalOcean` App Platform deployment/resource identifier is an
     /// ordinary UUID with no `v1` token prefix.
     #[test]
@@ -879,18 +858,6 @@ mod tests {
             let candidates = detect(variant.detector, &input);
             assert_eq!(candidates.len(), 2, "{}", variant.detector.id());
         }
-    }
-
-    /// Issue #320 follow-up: unlike Docker/`DigitalOcean`/Vercel, Cloudflare
-    /// has only one documented prefix, so it never got a wrong-prefix
-    /// control with a realistic-length (not three-character) body. A
-    /// truncated prefix (the documented `cfut_` with its final letter
-    /// dropped) is exactly the "misspelled prefix" scenario the module doc
-    /// comment already claims is excluded, now with corpus/test evidence.
-    #[test]
-    fn cloudflare_rejects_a_truncated_prefix_with_a_realistic_length_body() {
-        let input = format!("cfu_{INFRA_SUFFIX}");
-        assert_eq!(detect(&CLOUDFLARE, &input).len(), 0);
     }
 
     /// Issue #321: these dimensions are scoped to `HUGGING_FACE` and

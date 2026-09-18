@@ -630,7 +630,7 @@
     {
       "detector": "cloudflare-token",
       "evidence": {
-        "fixtureCount": 25,
+        "fixtureCount": 33,
         "hostContextsExercised": [
           "dotenv",
           "json",
@@ -651,12 +651,11 @@
         ]
       },
       "evidenceFixtureIds": [
+        "cloudflare-positive-checksum-suffix",
         "cloudflare-positive-crlf-unicode-prefix",
-        "cloudflare-positive-doc-style-placeholder",
         "cloudflare-positive-dotenv",
         "cloudflare-positive-json",
         "cloudflare-positive-log",
-        "cloudflare-positive-min-length",
         "cloudflare-positive-punctuation-adjacent",
         "cloudflare-positive-qualified",
         "cloudflare-positive-repeated-value",
