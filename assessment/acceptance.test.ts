@@ -41,6 +41,45 @@ function candidate(): CompleteAssessment {
   };
 }
 
+// Dated waiver (2026-09-18, issue #415): the pinned macOS baseline
+// (results/complete-v4/) fails these exact 46-check evaluation's checks --
+// every non-Rust surface's processing-p95-ms and
+// throughput-minimum-bytes-per-second, plus two initialization-p95-ms misses
+// -- for reasons documented in results/complete-v4/README.md and
+// assessment/README.md#fixed-rc-performance-and-resource-acceptance:
+// reproduced on real hardware outside any sandbox, uniformly across five
+// independently implemented runtimes, and unrelated to the accuracy-corpus
+// re-pin that baseline otherwise supports. Listing the exact keys (rather
+// than accepting any failure whose key merely contains ":performance:") is
+// what makes "accept the representative baseline-shaped candidate" below
+// able to fail again: a further regression -- a new check going red, or the
+// checked count drifting from 46 -- changes this list and the test catches
+// it. Narrowing this list requires either the separate, deliberate
+// threshold review assessment/README.md calls for (options (a)/(b) on issue
+// #415) or, for a check that stops failing, updating this waiver to match.
+const MACOS_PERFORMANCE_WAIVER_2026_09_18: readonly string[] = [
+  "browser-wasm:performance:scale-logs-medium-fixed4096:processing-p95-ms",
+  "browser-wasm:performance:scale-logs-medium-fixed4096:throughput-minimum-bytes-per-second",
+  "browser-wasm:performance:scale-logs-small-whole:processing-p95-ms",
+  "browser-wasm:performance:scale-logs-small-whole:throughput-minimum-bytes-per-second",
+  "cli:performance:scale-logs-medium-fixed4096:initialization-p95-ms",
+  "cli:performance:scale-logs-medium-fixed4096:processing-p95-ms",
+  "cli:performance:scale-logs-medium-fixed4096:throughput-minimum-bytes-per-second",
+  "cli:performance:scale-logs-small-whole:initialization-p95-ms",
+  "cli:performance:scale-logs-small-whole:processing-p95-ms",
+  "cli:performance:scale-logs-small-whole:throughput-minimum-bytes-per-second",
+  "node:performance:scale-logs-medium-fixed4096:initialization-p95-ms",
+  "node:performance:scale-logs-medium-fixed4096:processing-p95-ms",
+  "node:performance:scale-logs-medium-fixed4096:throughput-minimum-bytes-per-second",
+  "node:performance:scale-logs-small-whole:processing-p95-ms",
+  "node:performance:scale-logs-small-whole:throughput-minimum-bytes-per-second",
+  "python:performance:scale-logs-medium-fixed4096:initialization-p95-ms",
+  "python:performance:scale-logs-medium-fixed4096:processing-p95-ms",
+  "python:performance:scale-logs-medium-fixed4096:throughput-minimum-bytes-per-second",
+  "python:performance:scale-logs-small-whole:processing-p95-ms",
+  "python:performance:scale-logs-small-whole:throughput-minimum-bytes-per-second",
+];
+
 describe("fixed RC acceptance criteria", () => {
   test("criteria are bound to the reviewed baseline and durable candidate evidence", () => {
     expect(criteria.baseline.sourceCommit).toBe(baseline.sourceCommit);
@@ -66,23 +105,18 @@ describe("fixed RC acceptance criteria", () => {
     }
   });
 
-  test("accept the representative baseline-shaped candidate's accuracy and identity", () => {
-    // Performance thresholds were fixed once at an earlier commit
-    // (assessment/README.md) and are currently known to fail on every
-    // non-Rust surface for reasons that predate and are independent of the
-    // pinned accuracy corpus (see assessment/results/complete-v4/README.md:
-    // reproduced on real hardware outside any sandbox, uniformly across
-    // independently implemented runtimes). This asserts the pinned baseline
-    // is a correct accuracy-and-identity reference -- the thing a corpus
-    // re-pin actually changes -- not that it clears the untouched
-    // performance thresholds.
+  test("accept the representative baseline-shaped candidate's accuracy and identity against the dated macOS performance waiver", () => {
+    // This asserts the pinned baseline is a correct accuracy-and-identity
+    // reference -- the thing a corpus re-pin actually changes -- while still
+    // holding every performance check to account, via
+    // MACOS_PERFORMANCE_WAIVER_2026_09_18 above, rather than waving through
+    // any failure merely because its key contains ":performance:".
     const evaluation = evaluateAcceptance(candidate(), criteria);
     const nonPerformanceFailures = evaluation.failures.filter((failure) => !failure.includes(":performance:"));
     expect(nonPerformanceFailures).toEqual([]);
-    // Every failure that does remain is a numeric performance-threshold miss
-    // (see the file-level comment above), never an identity, environment, or
-    // accuracy mismatch.
-    expect(evaluation.failures.every((failure) => failure.includes(":performance:"))).toBe(true);
+    expect(evaluation.checks).toHaveLength(46);
+    const failingCheckKeys = evaluation.checks.filter((item) => !item.passed).map((item) => item.key).sort();
+    expect(failingCheckKeys).toEqual(MACOS_PERFORMANCE_WAIVER_2026_09_18);
   });
 
   test("a rust-core performance run built without --release cannot bypass release-build evidence", () => {
