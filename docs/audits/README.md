@@ -34,6 +34,7 @@ and [qualification follow-up](release-qualification-follow-up.md) describe beta.
 | Release-regression discovery evidence triage (#402) | [Candidate ec1f86b0c07e regression triage](evidence/402/README.md) |
 | OpenAI token shapes 1-3 discovery evidence triage (#405) | [Candidate fe4f1d1 regression triage](evidence/405/README.md) |
 | Release-regression discovery evidence triage, Slack shape-1 (#406) | [Candidate fe4f1d1 regression triage](evidence/406/README.md) |
+| Release-regression discovery evidence triage, Cloudflare shape-1 (#408) | [Candidate fe4f1d1 regression triage](evidence/408/README.md) |
 | Release-regression discovery evidence triage, Docker shape-1 (#407) | [Candidate fe4f1d1 regression triage](evidence/407/README.md) |
 | Detection assurance | [Epic closeout](detection-assurance-epic-closeout.md), [historical closeout](detection-assurance-closeout-audit.md), [residual evidence](detection-assurance-residual-evidence-backlog.md) |
 | Repository transfer | [Transfer evidence](repository-transfer-evidence.md) |
