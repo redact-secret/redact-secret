@@ -372,41 +372,77 @@ application code from capturing plaintext through closures or global state.
 ## Detector profiles
 
 The built-in detectors are split into two internal packs. `common` holds the
-structural and contextual detectors, and `provider` holds the issuer-specific
-ones. Two profiles are built from them: `full` (every built-in, the default on
-every surface) and `common` (an opt-in, smaller profile for preventive browser
-and small-process use). A smaller profile gets its size from link-time
-reachability of its own registry constructor, not from Cargo features on the
-core. Each profile keeps the canonical order as a subsequence, and no detector
-id behaves differently between profiles. Python and the CLI stay `full` only.
-The contract is accepted in
+structural and contextual detectors (a PEM/OpenSSH private key, an RFC 7519
+JWT, an `otpauth://` URI, a credential-bearing connection URI, an HTTP
+`Bearer` header, and a contextual assignment), and `provider` holds every
+issuer-specific one. Two profiles are built from them: `full` (every
+built-in, the default and compatibility baseline on every surface) and
+`common` (an opt-in, smaller profile for preventive browser and small-process
+use). A smaller profile gets its size from link-time reachability of its own
+registry constructor, not from Cargo features on the core. Each profile keeps
+the canonical order as a subsequence, and no detector id behaves differently
+between profiles. Python and the CLI stay `full` only. The contract is
+accepted in
 [Define the detector profile and pack contract](./docs/decisions/2026-09-18-define-detector-profile-and-pack-contract.md).
-Issue #380 lands the Rust-core mechanism: `DetectorRegistry::with_common_built_in`
-and `IncrementalSanitizer::with_common_built_in` build the `common` profile
-alongside the unchanged `full` constructors, both reporting their `Profile`.
-Issue #381 builds the `common` WebAssembly artifact from the same
-`bindings/wasm` crate. The default build is `full`, and `--no-default-features`
-(`npm run wasm:build:common`) builds `common`. Each artifact reports its
-profile through `profile()`. The measured savings and the build evidence are
-in [the #381 record](./docs/audits/evidence/381/README.md). Issue #382
-qualifies `common` on every surface that exposes it and adds the package
-exports: `@redact-secret/core` gains a `./common` entry (same public API as
-the root export, plus a `PROFILE` constant), `@redact-secret/wasm` gains a
-`common` subpath shipping its own glue and `.wasm`, and `bindings/node` gains
-`common` counterparts to every registry-backed export
-(`initializeCommon`/`scanCommon`/`scanAndRedactCommon`/
-`createIncrementalSanitizerCommon`/`profileCommon`) on the one compiled
-addon that serves both profiles. `initialize()` on every entry point rejects
-with `INITIALIZATION_FAILED` if the artifact it loaded reports a different
-profile than the entry point that loaded it. CI builds, qualifies, and
-packages both WASM artifacts and both Node profiles on every run, and the
-release workflow verifies the published root `@redact-secret/wasm` artifact
-reports `profile() === "full"` before publishing. Evidence, remaining
-limitations (`@redact-secret/core/web-stream` and `/node-stream` are not yet
-profile-aware), and the named-pack recommendation are in
-[the #382 record](./docs/audits/evidence/382/README.md). Publishing a
-released version with these exports still requires the explicit release
-approval `AGENTS.md` describes.
+
+**Entry point per surface.**
+
+- **Rust core.** `DetectorRegistry::with_common_built_in` and
+  `IncrementalSanitizer::with_common_built_in` build the `common` profile
+  alongside the unchanged `full` constructors (`with_built_in`), both
+  reporting their identity through `profile()`. A profile constructor rejects
+  a custom detector that reuses any `full` built-in id, including a
+  `provider` id `common` does not itself register.
+  `DetectorRegistry::register` applies no profile's reserved-id rule, so
+  extending a registry through it clears `profile()` to `None`.
+- **WebAssembly (`bindings/wasm`).** One default-on Cargo feature, `full`.
+  The default build (`npm run wasm:build`) links the `full` registry
+  constructors; `npm run wasm:build:common` builds
+  `--no-default-features`, linking only the `common` ones. Each artifact
+  reports its profile through its own `profile()` export. Measured savings
+  and build evidence are in
+  [the #381 record](./docs/audits/evidence/381/README.md).
+- **Node addon (`bindings/node`).** One compiled addon serves both
+  profiles: it exports `profile()` plus a `common` counterpart to every
+  registry-backed export (`initializeCommon`/`scanCommon`/
+  `scanAndRedactCommon`/`createIncrementalSanitizerCommon`/`profileCommon`).
+  `redact()` is unchanged and shared — it never touches the registry. There
+  is no second native binary.
+- **`@redact-secret/core`.** The root export stays `full`; a `./common`
+  subpath mirrors its full public API and reports `PROFILE` as `"common"`
+  (the root reports `"full"`). `initialize()` on either entry point rejects
+  with `INITIALIZATION_FAILED` if the artifact it loaded reports a different
+  profile than the entry point that loaded it — the same detail-free
+  rejection an unusable or version-mismatched artifact already gets.
+- **`@redact-secret/wasm`.** The published package carries two built
+  artifacts under one identity: the unchanged root (`full`) glue and
+  `.wasm`, and a `common` subpath shipping the `common` build's own glue and
+  `.wasm` beside them.
+
+**Stream limitation.** `@redact-secret/core/web-stream` and `/node-stream`
+are not profile-aware: their convenience `createWebStreamSanitizer`/
+`createNodeStreamSanitizer` always open a session against `full`, regardless
+of which entry point a consumer also imported. The
+`WebStreamSanitizer`/`NodeStreamSanitizer` classes themselves are
+profile-agnostic — they wrap whichever session they are given — so a
+`common` consumer constructs the class directly with a session from
+`@redact-secret/core/common`'s own `createIncrementalSanitizer`.
+
+**Mismatch check.** CI builds, qualifies, and packages both WASM artifacts
+and both Node profiles on every run, and the release workflow instantiates
+the downloaded root `@redact-secret/wasm` artifact and asks it — rather than
+trusting the download's artifact name — that `profile() === "full"` before
+publishing, refusing to publish a `common` or otherwise non-`full` build
+under the `full`/default package identity.
+
+Evidence and the named-pack recommendation are in
+[the #382 record](./docs/audits/evidence/382/README.md); user-facing usage is
+in the [detection reference](./docs/reference/detection.md#detector-profiles),
+[API concepts](./docs/reference/api-contract.md#detector-profiles), and the
+[JavaScript](./docs/guides/javascript.md#detector-profiles) and
+[Rust](./docs/guides/rust.md#detector-profiles) guides. Publishing a released
+version with these exports still requires the explicit release approval
+`AGENTS.md` describes.
 
 ## Error and telemetry constraints
 

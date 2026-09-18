@@ -51,6 +51,24 @@ Only `redact` and `block` consume placeholders. Default labels are `<SECRET_1>`,
 `<SECRET_2>`, etc.; `warn` and `allow` preserve input. Placeholders are not an
 encoding of the removed text and cannot be used to recover it.
 
+## Detector profiles
+
+Two detector profiles exist: `full` (every built-in detector, the default and
+compatibility baseline everywhere) and `common` (a smaller, opt-in
+structural/contextual subset for preventive use). Both Node and browser
+`@redact-secret/core` entry points and the Rust `DetectorRegistry`/
+`IncrementalSanitizer` constructors expose which profile they were built
+from — the `PROFILE` constant in JavaScript (`"full"` on the root export,
+`"common"` on `./common`), and `DetectorRegistry::profile()` /
+`IncrementalSanitizer::profile()` in Rust. JavaScript `initialize()` rejects
+with `INITIALIZATION_FAILED` if the loaded native artifact reports a
+different profile than the entry point that loaded it, the same detail-free
+rejection an unusable or version-mismatched artifact already gets. Python and
+the CLI expose `full` only. See [detection coverage](detection.md#detector-profiles)
+for profile membership and the false-negative tradeoff, and the
+[JavaScript](../guides/javascript.md#detector-profiles) and
+[Rust](../guides/rust.md#detector-profiles) guides for per-runtime usage.
+
 ## Errors and extensions
 
 Failures use fixed codes and input-free messages. JavaScript exposes

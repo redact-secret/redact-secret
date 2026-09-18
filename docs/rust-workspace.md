@@ -172,6 +172,14 @@ side-effect free, on top of the dependency boundary above:
   `forbidden-dependencies` because the bindings depend on those crates
   legitimately; only the core may not.
 
+  `bindings/wasm` is a binding, not the core, so this constraint does not
+  reach it: it declares one default-on Cargo feature, `full`. The default
+  build (`npm run wasm:build`) links the `full` registry constructors;
+  `npm run wasm:build:common` builds `--no-default-features`, linking only
+  the `common` ones instead. Each built artifact reports which one it linked
+  through a `profile()` export. See
+  [detector profiles](../ARCHITECTURE.md#detector-profiles).
+
 ### Package contents
 
 `crates/secret-scan-core/Cargo.toml` declares `include`, so the published

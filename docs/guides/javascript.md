@@ -42,6 +42,37 @@ formats. To reject a request, choose `block` and check the returned actions
 before any downstream use. [Safe integration](safe-integration.md) explains
 that distinction and failure handling.
 
+## Detector profiles
+
+`@redact-secret/core` is `full`: every built-in detector, and the default and
+compatibility baseline on every surface. `@redact-secret/core/common` is a
+smaller, opt-in built-in detector set for size- or latency-sensitive
+**preventive** consumers — browser UX and small agent or tool processes.
+Switch by changing the import; the rest of the API is identical:
+
+```ts
+import { initialize, scanAndRedact, PROFILE } from "@redact-secret/core/common";
+
+await initialize();
+console.log(PROFILE); // "common"
+```
+
+Both entry points export a `PROFILE` constant identifying which profile that
+module is built from (`"full"` on the root export, `"common"` on `./common`).
+`initialize()` rejects with `INITIALIZATION_FAILED` if the artifact it loaded
+reports a different profile than the entry point that loaded it — the same
+detail-free rejection an unusable or version-mismatched artifact already gets,
+so mixing a `full` addon/Wasm build with the `./common` entry point (or vice
+versa) fails closed rather than silently running the wrong detector set.
+
+`common` only detects the structural and contextual patterns (a private key,
+a JWT, an `otpauth://` URI, a credential-bearing connection URI, a `Bearer`
+header, and a contextual assignment); it never detects a bare, unadorned
+provider token. See [detection coverage](../reference/detection.md#detector-profiles)
+for the false-negative tradeoff and the
+[README's profile section](../../README.md#opt-in-detector-profiles) for
+measured savings. Python and the CLI stay `full` only.
+
 ## Browser loading
 
 The package's conditions select the browser loader and its `@redact-secret/wasm`

@@ -14,6 +14,11 @@ A secret may cross any chunk boundary. Scanning each chunk independently can
 leak it. A session retains unresolved text until its detection window closes,
 then emits text and findings. An append may legitimately return empty text.
 
+`createIncrementalSanitizer` and `IncrementalSanitizer::with_common_built_in`
+support the opt-in `common` detector profile on every surface that exposes
+it; the two stream factories in the table above do not — see
+[streaming under the `common` profile](#streaming-under-the-common-profile).
+
 ## JavaScript incremental example
 
 Both installed JavaScript artifacts expose the same root API. Findings count
@@ -71,6 +76,38 @@ package README contains the complete typed example. Repository tests
 type-check those Markdown examples, and artifact qualification executes the
 same public incremental and stream calls from clean candidate-package installs
 on Node.js 20, 22, and 24 and in Chromium, Firefox, and WebKit.
+
+### Streaming under the `common` profile
+
+`@redact-secret/core/node-stream` and `@redact-secret/core/web-stream` are not
+profile-aware: their convenience `createNodeStreamSanitizer` and
+`createWebStreamSanitizer` factories always open a session against `full`,
+regardless of which entry point a consumer also imported. The
+`NodeStreamSanitizer`/`WebStreamSanitizer` classes themselves are
+profile-agnostic — they wrap whichever session they are given — so construct
+the class directly with a session opened by
+[`@redact-secret/core/common`](javascript.md#detector-profiles)'s own
+`createIncrementalSanitizer`:
+
+```ts
+import { pipeline } from "node:stream/promises";
+import { initialize, createIncrementalSanitizer } from "@redact-secret/core/common";
+import { NodeStreamSanitizer } from "@redact-secret/core/node-stream";
+
+await initialize();
+const session = createIncrementalSanitizer({
+  limits: {
+    maxInputCodeUnits: 32_768,
+    maxBufferedCodeUnits: 16_512,
+    maxTokenCodeUnits: 8_192,
+    maxMultilineCodeUnits: 16_384,
+  },
+});
+await pipeline(process.stdin, new NodeStreamSanitizer(session), process.stdout);
+```
+
+The browser equivalent constructs `new WebStreamSanitizer(session)` with a
+session from the same `@redact-secret/core/common` import.
 
 ## Python example
 
