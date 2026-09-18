@@ -193,11 +193,11 @@ function buildWasm(outDir) {
   run("node", ["scripts/build-browser-artifact.mjs", "--out-dir", outDir]);
 }
 
-function gzipSize(buffer) {
+export function gzipSize(buffer) {
   return gzipSync(buffer, { level: 9 }).length;
 }
 
-function brotliSize(buffer) {
+export function brotliSize(buffer) {
   return brotliCompressSync(buffer, {
     params: { [zlibConstants.BROTLI_PARAM_QUALITY]: 11 },
   }).length;

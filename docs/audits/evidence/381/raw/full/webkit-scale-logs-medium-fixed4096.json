@@ -1,0 +1,130 @@
+{
+  "schemaVersion": "3",
+  "surface": "browser-wasm",
+  "profileId": "scale-logs-medium-fixed4096",
+  "performance": {
+    "initialization": {
+      "unit": "milliseconds",
+      "samples": [
+        14,
+        15,
+        11,
+        12,
+        14,
+        13,
+        13,
+        10,
+        15,
+        14
+      ],
+      "minimum": 10,
+      "median": 13.5,
+      "p95": 15,
+      "maximum": 15,
+      "mean": 13.1,
+      "standardDeviation": 1.57797338380595
+    },
+    "processing": {
+      "unit": "milliseconds",
+      "samples": [
+        123,
+        119,
+        92,
+        100,
+        87,
+        87,
+        86,
+        91,
+        99,
+        94
+      ],
+      "minimum": 86,
+      "median": 93,
+      "p95": 123,
+      "maximum": 123,
+      "mean": 97.8,
+      "standardDeviation": 12.480384609458156
+    },
+    "throughput": {
+      "unit": "bytes-per-second",
+      "samples": [
+        2131333.3333333335,
+        2202974.7899159663,
+        2849500,
+        2621540,
+        3013264.367816092,
+        3013264.367816092,
+        3048302.3255813955,
+        2880813.186813187,
+        2648020.202020202,
+        2788872.340425532
+      ],
+      "minimum": 2131333.3333333335,
+      "median": 2819186.170212766,
+      "p95": 3048302.3255813955,
+      "maximum": 3048302.3255813955,
+      "mean": 2719788.49137218,
+      "standardDeviation": 309173.64927126304
+    },
+    "memory": {
+      "nodeHeap": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "A browser process does not expose Node heapUsed.",
+        "samplingLimit": "No samples were available."
+      },
+      "nodeRss": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "Browser pages do not expose process RSS through a standard API.",
+        "samplingLimit": "No samples were available."
+      },
+      "nodeExternal": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "Browser pages do not expose Node external memory.",
+        "samplingLimit": "No samples were available."
+      },
+      "browserJsHeap": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "This engine does not expose performance.memory.usedJSHeapSize.",
+        "samplingLimit": "No samples were available."
+      },
+      "wasmLinearMemory": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "The package intentionally keeps its WebAssembly.Memory handle private; the test harness cannot read linear-memory size without adding product instrumentation.",
+        "samplingLimit": "No samples were available."
+      },
+      "pythonHeap": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "The browser surface does not run inside a Python allocator.",
+        "samplingLimit": "No samples were available."
+      },
+      "processRss": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "Browser pages do not expose whole-process RSS through a standard API.",
+        "samplingLimit": "No samples were available."
+      },
+      "streamingBuffer": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "The public incremental session exposes lifecycle state but intentionally does not expose retained plaintext buffer size.",
+        "samplingLimit": "No samples were available."
+      }
+    }
+  },
+  "provenance": {
+    "commit": "6bceee2c05f4838e9d9ede3f4bf617bf25ba4922",
+    "artifactIdentity": "@redact-secret/wasm@0.1.0-beta.4",
+    "corpusVersion": "1",
+    "corpusHash": "b4db2cd22b4c008c9d63789df8ca2e21e697a21a84699466ea5f96c89d8e2806",
+    "os": "darwin-25.5.0",
+    "cpu": "arm64",
+    "runtime": "webkit-26.6",
+    "command": "node scripts/assessment-browser-performance.mjs --engine webkit --detector-profile full --artifact-dir target/wasm-profiles/full --profile scale-logs-medium-fixed4096 --runs 10 --json-out docs/audits/evidence/381/raw/full/webkit-scale-logs-medium-fixed4096.json"
+  }
+}

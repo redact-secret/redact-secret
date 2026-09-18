@@ -23,6 +23,11 @@
 //!   `bindings/node` and `bindings/python` wrap, with an explicit
 //!   `accepting`/`finalized`/`aborted`/`failed` lifecycle and absolute
 //!   UTF-16 ranges.
+//! - One Cargo feature, default-on `full`, picks which built-in registry the
+//!   artifact links (`decision-define-detector-profile-and-pack-contract`):
+//!   the default build is the `full` artifact; `--no-default-features`
+//!   builds the `common` artifact, whose linked code references only the
+//!   `common` registry constructor. [`profile`] reports which one was built.
 //! - This crate's dependency graph contains only `wasm-bindgen`, `js-sys`,
 //!   and the core: nothing Node-only, so it builds and runs for
 //!   `wasm32-unknown-unknown` in any browser.
@@ -55,6 +60,18 @@ use error::to_js_error;
 #[must_use]
 pub fn version() -> String {
     redact_secret::VERSION.to_owned()
+}
+
+/// Returns the detector profile this artifact was compiled for: `"full"`
+/// (the default build) or `"common"` (`--no-default-features`)
+/// (`decision-define-detector-profile-and-pack-contract`).
+///
+/// Fixed at compile time and readable before [`initialize`], so a loader can
+/// reject an artifact of the wrong profile before using it.
+#[wasm_bindgen]
+#[must_use]
+pub fn profile() -> String {
+    lifecycle::PROFILE.as_str().to_owned()
 }
 
 /// Idempotently initializes the module: builds and caches the built-in
@@ -182,26 +199,66 @@ pub fn scan_and_redact(
     Ok(ScanAndRedactResultJs::new(text, findings))
 }
 
+/// A synthetic, never-issued secret that the compiled profile detects, shared
+/// by this crate's scan tests so they hold for both the `full` and the
+/// `common` artifact.
+#[cfg(test)]
+pub(crate) mod synthetic {
+    /// A secret-bearing text, the span its one finding selects, and that
+    /// finding's type.
+    pub(crate) struct Secret {
+        pub(crate) text: String,
+        pub(crate) matched: String,
+        pub(crate) type_name: &'static str,
+    }
+
+    /// `full`: a bare AWS-shaped access key id, a `provider` detector.
+    #[cfg(feature = "full")]
+    pub(crate) fn secret() -> Secret {
+        let key = format!("AKIA{}", "SYNTHETICEXAMPLE");
+        Secret {
+            text: key.clone(),
+            matched: key,
+            type_name: "aws_access_key_id",
+        }
+    }
+
+    /// `common`: a connection-URI password, a `common` detector.
+    #[cfg(not(feature = "full"))]
+    pub(crate) fn secret() -> Secret {
+        let password = format!("SYNTHETIC_REVOKED_{}", "PASSWORD");
+        Secret {
+            text: format!("postgres://user:{password}@example.test:5432/db"),
+            matched: password,
+            type_name: "connection_string_password",
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    /// A synthetic AWS-shaped access key ahead of an astral (supplementary
-    /// plane) character, exercising the same evidence
+    /// A synthetic secret the compiled profile detects, after an astral
+    /// (supplementary plane) character, exercising the same evidence
     /// `conformance/fixtures/unicode-conversion-corpus.json` documents
     /// (`decision-govern-cross-language-conformance`) through the full
     /// `scan`/`redact` surface rather than the isolated range conversion.
     fn synthetic_input() -> String {
-        format!("prefix \u{1F511} AKIA{} suffix", "SYNTHETICEXAMPLE")
+        format!("prefix \u{1F511} {} suffix", synthetic::secret().text)
+    }
+
+    /// `synthetic_input` with its one finding replaced by `placeholder`.
+    fn redacted_input(placeholder: &str) -> String {
+        synthetic_input().replace(&synthetic::secret().matched, placeholder)
     }
 
     /// Canonical synchronous conformance, exercised through the exported
     /// `scan`/`redact`/`scanAndRedact` functions themselves (with no custom
     /// `policy`/`formatter`, so no JavaScript callback is invoked and this
-    /// runs on a native host, not just `wasm32`): the built-in AWS detector
-    /// fires, the default policy redacts a `Confidence::High`
-    /// `aws_access_key_id` finding (`ALWAYS_REDACT_TYPES` in
-    /// `redact_secret::policy`), and the default formatter replaces it with
+    /// runs on a native host, not just `wasm32`): the profile's built-in
+    /// detector fires, the default policy redacts its `Confidence::High`
+    /// finding, and the default formatter replaces it with
     /// `<SECRET_1>` — deterministically, on every call, for the same input,
     /// whether `scan` and `redact` are called separately or as one
     /// `scanAndRedact` call.
@@ -212,16 +269,47 @@ mod tests {
 
         let findings = scan(&input, None).unwrap();
         assert_eq!(findings.len(), 1);
-        assert_eq!(findings[0].type_name(), "aws_access_key_id");
+        assert_eq!(findings[0].type_name(), synthetic::secret().type_name);
         assert_eq!(findings[0].action(), "redact");
 
         let output = redact(&input, findings, None).unwrap();
-        assert_eq!(output, "prefix \u{1F511} <SECRET_1> suffix");
+        assert_eq!(output, redacted_input("<SECRET_1>"));
 
         let combined = scan_and_redact(&input, None, None).unwrap();
         assert_eq!(combined.text(), output);
         assert_eq!(combined.findings().len(), 1);
-        assert_eq!(combined.findings()[0].type_name(), "aws_access_key_id");
+        assert_eq!(
+            combined.findings()[0].type_name(),
+            synthetic::secret().type_name
+        );
+    }
+
+    /// The `common` artifact links no `provider` detector, so a bare
+    /// provider-format token with no credential-bearing context is not
+    /// detected at all: the documented false-negative cost of `common`
+    /// (`decision-define-detector-profile-and-pack-contract`). The `full`
+    /// artifact detects the same input.
+    #[test]
+    fn a_bare_provider_token_is_detected_only_by_the_full_profile() {
+        initialize().unwrap();
+        let input = format!("prefix \u{1F511} AKIA{} suffix", "SYNTHETICEXAMPLE");
+        let findings = scan(&input, None).unwrap();
+        if cfg!(feature = "full") {
+            assert_eq!(findings.len(), 1);
+            assert_eq!(findings[0].detector(), "aws-access-key");
+        } else {
+            assert!(findings.is_empty());
+        }
+    }
+
+    #[test]
+    fn profile_reports_the_compiled_profile() {
+        let expected = if cfg!(feature = "full") {
+            "full"
+        } else {
+            "common"
+        };
+        assert_eq!(profile(), expected);
     }
 
     /// The finding's range converts to UTF-16 code units without changing
@@ -237,7 +325,7 @@ mod tests {
         let utf16: Vec<u16> = input.encode_utf16().collect();
         let matched =
             String::from_utf16(&utf16[range.start() as usize..range.end() as usize]).unwrap();
-        assert_eq!(matched, format!("AKIA{}", "SYNTHETICEXAMPLE"));
+        assert_eq!(matched, synthetic::secret().matched);
     }
 
     /// A call made before `initialize()` succeeds fails deterministically,
@@ -281,7 +369,7 @@ mod tests {
         let output = redact(&input, findings, Some(formatter)).unwrap();
         assert_eq!(
             output,
-            "prefix \u{1F511} [REDACTED:aws_access_key_id] suffix"
+            redacted_input(&format!("[REDACTED:{}]", synthetic::secret().type_name))
         );
     }
 }

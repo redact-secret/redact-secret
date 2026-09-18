@@ -4,25 +4,50 @@
  * (`decision-define-runtime-bindings`).
  *
  * This module is served next to the artifact it imports, so the generated
- * `default()` init resolves `redact_secret_wasm_bg.wasm` from the same
- * directory and the whole surface is exercised exactly as a browser consumer
- * loads it: a real `fetch` of a real `.wasm` response, instantiated by the
- * engine under test.
+ * `default()` init resolves the artifact's `.wasm` from the same directory
+ * and the whole surface is exercised exactly as a browser consumer loads it:
+ * a real `fetch` of a real `.wasm` response, instantiated by the engine
+ * under test. `./artifact.js` is a one-line re-export of the glue for the
+ * detector profile under test (`redact_secret_wasm.js` for `full`,
+ * `redact_secret_wasm_common.js` for `common`), staged by the runner.
  *
  * Every fixture comes from the canonical corpus
  * (`decision-govern-cross-language-conformance`), served alongside as
  * `fixtures.json`, and every input in it is synthetic or explicitly revoked.
+ * For `common`, each fixture's expectation is the reviewed
+ * `conformance/fixtures/common-profile-expectations.json` entry instead of
+ * the `full` one (`decision-define-detector-profile-and-pack-contract`).
  * Nothing this module reports carries an input, a matched value, or a
  * placeholder: a failure names the fixture and the metadata tuples only.
  */
 
 import init, {
+  createIncrementalSanitizer,
   initialize,
+  profile,
   redact,
   scan,
   scanAndRedact,
   version,
-} from "./redact_secret_wasm.js";
+} from "./artifact.js";
+
+/**
+ * Fixtures above this many UTF-8 bytes are left to the whole-input checks.
+ * Every construct in a smaller fixture then fits the session's token and
+ * multiline limits, so no limit can make the two paths diverge.
+ */
+const INCREMENTAL_MAX_INPUT_BYTES = 64 * 1024;
+/**
+ * `createIncrementalSanitizer` limits: input, buffered (the construct
+ * limit plus the core's 128-byte lookaround, as
+ * `IncrementalLimits::minimum_buffered_bytes` derives it), token, multiline.
+ */
+const INCREMENTAL_LIMITS = [
+  1 << 20,
+  INCREMENTAL_MAX_INPUT_BYTES + 128,
+  INCREMENTAL_MAX_INPUT_BYTES,
+  INCREMENTAL_MAX_INPUT_BYTES,
+];
 
 const results = [];
 let failures = 0;
@@ -125,6 +150,10 @@ export async function qualify(fixtures) {
     assertEqual(version(), fixtures.version, "artifact version");
   });
 
+  check("profile reports the compiled detector profile", () => {
+    assertEqual(profile(), fixtures.profile, "artifact profile");
+  });
+
   const synchronous = fixtures.synchronous;
   check("the canonical synchronous corpus is not vacuous", () => {
     assert(synchronous.length >= 100, `only ${synchronous.length} fixtures`);
@@ -150,6 +179,55 @@ export async function qualify(fixtures) {
     assert(
       mismatched.length === 0,
       `${mismatched.length} fixture(s) disagreed: ${JSON.stringify(mismatched.slice(0, 5))}`,
+    );
+  });
+
+  // A `common` artifact that linked or ran a `provider` detector would
+  // report a finding under an id outside its profile, on either path.
+  check("every finding comes from a detector in the profile", () => {
+    const allowed = new Set(fixtures.detectors);
+    const foreign = new Set();
+    for (const fixture of synchronous) {
+      for (const finding of scan(fixture.input)) {
+        if (!allowed.has(finding.detector)) foreign.add(finding.detector);
+      }
+    }
+    assertEqual([...foreign], [], "detectors outside the profile");
+  });
+
+  // The incremental session must build the same profile's registry as the
+  // whole-input path: split each positive fixture in two at a code-point
+  // boundary and compare against `scanAndRedact` on the same artifact.
+  check("an incremental session matches scanAndRedact on the same artifact", () => {
+    const mismatched = [];
+    let compared = 0;
+    for (const fixture of synchronous) {
+      if (fixture.expected.length === 0) continue;
+      if (encoder.encode(fixture.input).length > INCREMENTAL_MAX_INPUT_BYTES) continue;
+      let split = Math.floor(fixture.input.length / 2);
+      const unit = fixture.input.charCodeAt(split);
+      if (unit >= 0xdc00 && unit <= 0xdfff) split += 1;
+      const session = createIncrementalSanitizer(...INCREMENTAL_LIMITS);
+      const results = [
+        session.append(fixture.input.slice(0, split)),
+        session.append(fixture.input.slice(split)),
+        session.finalize(),
+      ];
+      const text = results.map((result) => result.text).join("");
+      const findings = actualTuples(results.flatMap((result) => result.findings));
+      const whole = scanAndRedact(fixture.input);
+      compared += 1;
+      if (
+        text !== whole.text ||
+        JSON.stringify(findings) !== JSON.stringify(actualTuples(whole.findings))
+      ) {
+        mismatched.push(fixture.id);
+      }
+    }
+    assert(compared > 0, "no fixture exercised the incremental session");
+    assert(
+      mismatched.length === 0,
+      `${mismatched.length} fixture(s) disagreed: ${mismatched.slice(0, 5).join(", ")}`,
     );
   });
 
@@ -250,9 +328,18 @@ export async function qualify(fixtures) {
     }
   });
 
+  // The first fixture whose default-policy findings include one that is
+  // redacted. Under `common` the first positive fixture can resolve only to
+  // a `warn` finding, which a placeholder formatter never sees.
+  const redacting = synchronous.find((entry) =>
+    scan(entry.input).some(
+      (finding) => finding.action === "redact" || finding.action === "block",
+    ),
+  );
+
   check("a throwing policy callback surfaces POLICY_FAILURE", () => {
-    const fixture = synchronous.find((entry) => entry.expected.length > 0);
-    assert(fixture !== undefined, "no positive fixture to drive the policy");
+    const fixture = redacting;
+    assert(fixture !== undefined, "no redacting fixture to drive the policy");
     let thrown;
     try {
       scan(fixture.input, () => {
@@ -270,7 +357,8 @@ export async function qualify(fixtures) {
   });
 
   check("a custom policy callback controls the action", () => {
-    const fixture = synchronous.find((entry) => entry.expected.length > 0);
+    const fixture = redacting;
+    assert(fixture !== undefined, "no redacting fixture to drive the policy");
     const findings = scan(fixture.input, () => "warn");
     assert(findings.length > 0, "no finding to apply the policy to");
     for (const finding of findings) {
@@ -279,7 +367,8 @@ export async function qualify(fixtures) {
   });
 
   check("a custom placeholder formatter controls redaction output", () => {
-    const fixture = synchronous.find((entry) => entry.expected.length > 0);
+    const fixture = redacting;
+    assert(fixture !== undefined, "no redacting fixture to drive the formatter");
     const output = redact(
       fixture.input,
       scan(fixture.input),

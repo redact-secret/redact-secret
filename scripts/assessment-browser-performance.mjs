@@ -1,8 +1,16 @@
-/** External, test-only browser/WASM performance runner for scale profiles. */
+/**
+ * External, test-only browser/WASM performance runner for scale profiles.
+ *
+ * `--detector-profile common` measures the `common` artifact
+ * (`npm run wasm:build:common`, default directory `bindings/wasm/pkg-common`)
+ * through the same `@redact-secret/core` facade and protocol as `full`
+ * (`decision-define-detector-profile-and-pack-contract`): only the glue the
+ * facade's `@redact-secret/wasm` import resolves to changes.
+ */
 import { createServer } from "node:http";
 import { copyFileSync, existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, extname, join } from "node:path";
+import { dirname, extname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { buildAndEmitPerformanceResult, loadAssessmentSchema } from "./lib/assessment-emit.mjs";
@@ -14,7 +22,21 @@ import {
 
 const SCRIPTS_DIR = dirname(fileURLToPath(import.meta.url));
 const PACKAGE_ENTRY = join(REPO_ROOT, "packages", "javascript", "dist", "index.js");
-const DEFAULT_ARTIFACT_DIR = join(REPO_ROOT, "bindings", "wasm", "pkg");
+/** Per detector profile: the glue and binary to stage, and the default build directory. */
+const DETECTOR_PROFILES = {
+  full: {
+    glue: "redact_secret_wasm.js",
+    binary: "redact_secret_wasm_bg.wasm",
+    defaultArtifactDir: join(REPO_ROOT, "bindings", "wasm", "pkg"),
+    buildCommand: "npm run wasm:build",
+  },
+  common: {
+    glue: "redact_secret_wasm_common.js",
+    binary: "redact_secret_wasm_common_bg.wasm",
+    defaultArtifactDir: join(REPO_ROOT, "bindings", "wasm", "pkg-common"),
+    buildCommand: "npm run wasm:build:common",
+  },
+};
 const WASM_PACKAGE_JSON = join(REPO_ROOT, "bindings", "wasm", "npm", "package.json");
 const ENGINES = ["chromium", "firefox", "webkit"];
 const CONTENT_TYPES = { ".html": "text/html", ".js": "text/javascript", ".json": "application/json", ".wasm": "application/wasm" };
@@ -23,19 +45,22 @@ const BOUNDARY_LIMIT = "Sampled immediately before and after processing; short-l
 function fail(message) { console.error(message); process.exit(1); }
 
 function parseArguments(argv) {
-  const options = { engine: "chromium", artifactDir: DEFAULT_ARTIFACT_DIR, profile: "scale-logs-small-whole", runs: 10, jsonOut: "-", markdownOut: undefined };
+  const options = { engine: "chromium", artifactDir: undefined, detectorProfile: "full", profile: "scale-logs-small-whole", runs: 10, jsonOut: "-", markdownOut: undefined };
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index];
     const value = argv[index + 1];
     if (argument === "--engine") { options.engine = value; index += 1; }
-    else if (argument === "--artifact-dir") { options.artifactDir = value; index += 1; }
+    else if (argument === "--artifact-dir") { options.artifactDir = resolve(REPO_ROOT, value); index += 1; }
     else if (argument === "--profile") { options.profile = value; index += 1; }
+    else if (argument === "--detector-profile") { options.detectorProfile = value; index += 1; }
     else if (argument === "--runs") { options.runs = Number(value); index += 1; }
     else if (argument === "--json-out") { options.jsonOut = value; index += 1; }
     else if (argument === "--markdown-out") { options.markdownOut = value; index += 1; }
     else fail(`unknown argument: ${argument}`);
   }
   if (!ENGINES.includes(options.engine)) fail(`--engine must be one of ${ENGINES.join(", ")}`);
+  if (!Object.hasOwn(DETECTOR_PROFILES, options.detectorProfile ?? "")) fail(`--detector-profile must be one of ${Object.keys(DETECTOR_PROFILES).join(", ")}`);
+  options.artifactDir ??= DETECTOR_PROFILES[options.detectorProfile].defaultArtifactDir;
   if (!Number.isSafeInteger(options.runs) || options.runs < 2 || options.runs > 100) fail("--runs must be an integer from 2 through 100");
   return options;
 }
@@ -44,19 +69,20 @@ function renderPage() {
   return "<script type=\"module\" src=\"./run.js\"></script>";
 }
 
-async function stage(artifactDir, profile) {
+async function stage(artifactDir, detectorProfile, profile) {
   if (!existsSync(PACKAGE_ENTRY)) fail(`${PACKAGE_ENTRY}: missing; run \`npm run js:build\` first`);
+  const artifact = DETECTOR_PROFILES[detectorProfile];
   const directory = mkdtempSync(join(tmpdir(), "redact-secret-performance-"));
-  for (const name of ["redact_secret_wasm.js", "redact_secret_wasm_bg.wasm"]) {
+  for (const name of [artifact.glue, artifact.binary]) {
     try { copyFileSync(join(artifactDir, name), join(directory, name)); }
-    catch { rmSync(directory, { recursive: true, force: true }); fail(`${join(artifactDir, name)}: missing; run \`npm run wasm:build\` first`); }
+    catch { rmSync(directory, { recursive: true, force: true }); fail(`${join(artifactDir, name)}: missing; run \`${artifact.buildCommand}\` first`); }
   }
   const { build } = await import("esbuild");
   await build({
     entryPoints: [join(SCRIPTS_DIR, "assessment-browser-performance-harness.mjs")],
     outfile: join(directory, "harness.js"), bundle: true, format: "esm", platform: "browser",
     conditions: ["browser", "import"],
-    alias: { "@redact-secret/core": PACKAGE_ENTRY, "@redact-secret/wasm": join(artifactDir, "redact_secret_wasm.js") },
+    alias: { "@redact-secret/core": PACKAGE_ENTRY, "@redact-secret/wasm": join(artifactDir, artifact.glue) },
     logLevel: "silent",
   });
   writeFileSync(join(directory, "index.html"), renderPage());
@@ -97,7 +123,7 @@ async function main() {
 
   let playwright;
   try { playwright = await import("playwright"); } catch { fail("playwright is not installed; run `npm ci`"); }
-  const directory = await stage(options.artifactDir, profile);
+  const directory = await stage(options.artifactDir, options.detectorProfile, profile);
   let server;
   let browser;
   let browserVersion;
@@ -147,7 +173,8 @@ async function main() {
   const result = await buildAndEmitPerformanceResult({
     surface: "browser-wasm", profileId: profile.id, performance: performanceMetrics,
     provenance: {
-      commit: gitCommit(), artifactIdentity: `@redact-secret/wasm@${readPackageVersion(WASM_PACKAGE_JSON)}`,
+      commit: gitCommit(),
+      artifactIdentity: `@redact-secret/wasm@${readPackageVersion(WASM_PACKAGE_JSON)}${options.detectorProfile === "full" ? "" : ` (${options.detectorProfile})`}`,
       corpusVersion: "1", corpusHash: workloadProfilesHash(), os: hostOs(), cpu: hostCpu(),
       runtime: `${options.engine}-${browserVersion}`,
       command: `node scripts/assessment-browser-performance.mjs ${process.argv.slice(2).join(" ")}`.trim(),

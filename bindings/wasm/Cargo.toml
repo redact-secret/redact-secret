@@ -14,6 +14,17 @@ publish = false
 [lib]
 crate-type = ["cdylib", "rlib"]
 
+# The one profile-selection feature (`decision-define-detector-profile-and-pack-contract`).
+# Default on: the default build is the `full` artifact, unchanged. Building
+# with `--no-default-features` links only the `common` registry constructor,
+# so no `provider` detector code is reachable from the artifact. This crate is
+# a leaf nothing depends on, so feature unification cannot reach it from
+# outside; forgetting `--no-default-features` yields `full` (more detection,
+# never less), which the artifact's `profile()` export makes detectable.
+[features]
+default = ["full"]
+full = []
+
 [dependencies]
 redact-secret.workspace = true
 wasm-bindgen.workspace = true

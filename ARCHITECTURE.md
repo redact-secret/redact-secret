@@ -384,9 +384,13 @@ The contract is accepted in
 Issue #380 lands the Rust-core mechanism: `DetectorRegistry::with_common_built_in`
 and `IncrementalSanitizer::with_common_built_in` build the `common` profile
 alongside the unchanged `full` constructors, both reporting their `Profile`.
-No public artifact or package exposes `common` yet — that is #381 (the
-WebAssembly artifact) and #382 (qualification and package exports). Until
-those land, every published surface still builds and ships `full` only.
+Issue #381 builds the `common` WebAssembly artifact from the same
+`bindings/wasm` crate. The default build is `full`, and `--no-default-features`
+(`npm run wasm:build:common`) builds `common`. Each artifact reports its
+profile through `profile()`. The measured savings and the build evidence are
+in [the #381 record](./docs/audits/evidence/381/README.md). No package exposes
+`common` yet: the `./common` package exports belong to #382 (qualification
+and package exports). Until then, every published surface ships `full` only.
 
 ## Error and telemetry constraints
 

@@ -1,8 +1,8 @@
 //! Explicit, idempotent module initialization
 //! (`decision-define-runtime-bindings`).
 //!
-//! [`initialize`] builds and caches the canonical built-in detector registry
-//! exactly once. Every synchronous operation this crate exports reads that
+//! [`initialize`] builds and caches the built-in detector registry of the
+//! profile this artifact was compiled for ([`PROFILE`]) exactly once. Every synchronous operation this crate exports reads that
 //! cache through [`with_registry`] or [`ensure_initialized`] instead of
 //! rebuilding it, and fails deterministically, before touching its input,
 //! when [`initialize`] has not yet succeeded.
@@ -16,17 +16,70 @@
 
 use std::cell::OnceCell;
 
-use redact_secret::DetectorRegistry;
+use redact_secret::{
+    DetectorRegistry, IncrementalLimits, IncrementalPolicy, IncrementalSanitizer,
+    PlaceholderFormatter, Profile, SecretScanError,
+};
 
 use crate::error::WasmErrorCode;
 
-/// Builds the canonical built-in detector registry with no custom detectors.
+/// The detector profile this artifact was compiled for
+/// (`decision-define-detector-profile-and-pack-contract`): `full` under the
+/// default-on `full` Cargo feature, `common` without it.
+#[cfg(feature = "full")]
+pub(crate) const PROFILE: Profile = Profile::Full;
+/// See the `full` variant above.
+#[cfg(not(feature = "full"))]
+pub(crate) const PROFILE: Profile = Profile::Common;
+
+/// Builds this artifact's profile registry with no custom detectors.
+///
+/// Exactly one registry constructor is referenced per build, selected at
+/// compile time rather than by a runtime `match` on [`PROFILE`]: the
+/// reachability rule that keeps every `provider` detector out of the
+/// `common` artifact's linked code, with no reliance on constant
+/// propagation.
 ///
 /// This has no input and no side effect beyond the returned value, so its
 /// failure (today, never observed: the built-in detectors always register
 /// cleanly) is fixed and input-free by construction.
+#[cfg(feature = "full")]
 fn build_registry() -> Result<DetectorRegistry, WasmErrorCode> {
     DetectorRegistry::with_built_in([]).map_err(|_| WasmErrorCode::InitializationFailed)
+}
+
+/// See the `full` variant above.
+#[cfg(not(feature = "full"))]
+fn build_registry() -> Result<DetectorRegistry, WasmErrorCode> {
+    DetectorRegistry::with_common_built_in([]).map_err(|_| WasmErrorCode::InitializationFailed)
+}
+
+/// Creates an incremental session over this artifact's profile's built-in
+/// detectors: the incremental counterpart of [`build_registry`], selected
+/// the same compile-time way so the `common` artifact's streaming path
+/// neither behaves as `full` nor links a `provider` detector.
+///
+/// # Errors
+///
+/// Returns the core's error when the built-in registry cannot be built,
+/// which cannot happen for the detectors the core ships.
+#[cfg(feature = "full")]
+pub(crate) fn new_incremental_session(
+    limits: IncrementalLimits,
+    policy: Box<dyn IncrementalPolicy>,
+    formatter: Box<dyn PlaceholderFormatter>,
+) -> Result<IncrementalSanitizer, SecretScanError> {
+    IncrementalSanitizer::with_policy_and_formatter(limits, policy, formatter)
+}
+
+/// See the `full` variant above.
+#[cfg(not(feature = "full"))]
+pub(crate) fn new_incremental_session(
+    limits: IncrementalLimits,
+    policy: Box<dyn IncrementalPolicy>,
+    formatter: Box<dyn PlaceholderFormatter>,
+) -> Result<IncrementalSanitizer, SecretScanError> {
+    IncrementalSanitizer::with_common_built_in_policy_and_formatter(limits, policy, formatter)
 }
 
 thread_local! {
@@ -107,5 +160,20 @@ mod tests {
         assert_eq!(first, second);
         assert!(first > 0);
         assert_eq!(ensure_initialized(), Ok(()));
+    }
+
+    #[test]
+    fn the_cached_registry_is_the_compiled_profile() {
+        assert_eq!(initialize(), Ok(()));
+        assert_eq!(
+            with_registry(DetectorRegistry::profile).unwrap(),
+            Some(PROFILE)
+        );
+        let expected = if cfg!(feature = "full") {
+            Profile::Full
+        } else {
+            Profile::Common
+        };
+        assert_eq!(PROFILE, expected);
     }
 }

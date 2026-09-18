@@ -1,0 +1,106 @@
+ok - chromium · artifact · operations before initialize fail with NOT_INITIALIZED
+ok - chromium · artifact · initialize is idempotent
+ok - chromium · artifact · version reports the shared product version
+ok - chromium · artifact · profile reports the compiled detector profile
+ok - chromium · artifact · the canonical synchronous corpus is not vacuous
+ok - chromium · artifact · scan matches the canonical synchronous corpus
+ok - chromium · artifact · every finding comes from a detector in the profile
+ok - chromium · artifact · an incremental session matches scanAndRedact on the same artifact
+ok - chromium · artifact · the corpus exercises an astral character before a finding
+ok - chromium · artifact · an astral character around a finding does not perturb its span
+ok - chromium · artifact · scanAndRedact equals scan then redact and removes every match
+ok - chromium · artifact · a throwing policy callback surfaces POLICY_FAILURE
+ok - chromium · artifact · a custom policy callback controls the action
+ok - chromium · artifact · a custom placeholder formatter controls redaction output
+ok - chromium · package · operations before initialize fail with NOT_INITIALIZED
+ok - chromium · package · the package reports its documented identity
+ok - chromium · package · invalid incremental input is terminal with fixed diagnostics
+ok - chromium · package · the package matches the canonical synchronous corpus
+ok - chromium · package · every published finding is frozen and carries no extra key
+ok - chromium · package · scanAndRedact equals scan then redact and removes every match
+ok - chromium · package · a policy callback sees a frozen finding with numeric offsets
+ok - chromium · package · createIncrementalSanitizer opens a real session on the real artifact
+ok - chromium · package · a session outside accepting rejects further operations with INVALID_STATE
+ok - chromium · package · the Web stream adapter matches the whole-input result at every byte boundary on the real artifact
+ok - chromium · package · the Web stream adapter preserves BOMs while matching whole-input scanning on the real artifact
+ok - chromium · package · the Web stream adapter's findings are frozen on the real artifact
+ok - chromium · package · an explicit abort() on the real artifact discards retained plaintext and wins over a later close
+ok - chromium · package · malformed UTF-8 on the real artifact rejects with INVALID_UTF8 and flushes no retained plaintext
+ok - chromium · package · truncated UTF-8 on the real artifact rejects with INVALID_UTF8
+ok - chromium · package · readable backpressure on the real artifact stalls a write until a pull resumes it
+ok - chromium · package · cancelling the readable side on the real artifact discards retained plaintext
+ok - chromium · package · aborting the writable side on the real artifact keeps finalized output but discards retained plaintext
+ok - chromium · package · a throwing placeholder formatter on the real artifact propagates PLACEHOLDER_FAILURE and releases no plaintext
+chromium: 33 check(s) passed in 6.0s
+
+ok - firefox · artifact · operations before initialize fail with NOT_INITIALIZED
+ok - firefox · artifact · initialize is idempotent
+ok - firefox · artifact · version reports the shared product version
+ok - firefox · artifact · profile reports the compiled detector profile
+ok - firefox · artifact · the canonical synchronous corpus is not vacuous
+ok - firefox · artifact · scan matches the canonical synchronous corpus
+ok - firefox · artifact · every finding comes from a detector in the profile
+ok - firefox · artifact · an incremental session matches scanAndRedact on the same artifact
+ok - firefox · artifact · the corpus exercises an astral character before a finding
+ok - firefox · artifact · an astral character around a finding does not perturb its span
+ok - firefox · artifact · scanAndRedact equals scan then redact and removes every match
+ok - firefox · artifact · a throwing policy callback surfaces POLICY_FAILURE
+ok - firefox · artifact · a custom policy callback controls the action
+ok - firefox · artifact · a custom placeholder formatter controls redaction output
+ok - firefox · package · operations before initialize fail with NOT_INITIALIZED
+ok - firefox · package · the package reports its documented identity
+ok - firefox · package · invalid incremental input is terminal with fixed diagnostics
+ok - firefox · package · the package matches the canonical synchronous corpus
+ok - firefox · package · every published finding is frozen and carries no extra key
+ok - firefox · package · scanAndRedact equals scan then redact and removes every match
+ok - firefox · package · a policy callback sees a frozen finding with numeric offsets
+ok - firefox · package · createIncrementalSanitizer opens a real session on the real artifact
+ok - firefox · package · a session outside accepting rejects further operations with INVALID_STATE
+ok - firefox · package · the Web stream adapter matches the whole-input result at every byte boundary on the real artifact
+ok - firefox · package · the Web stream adapter preserves BOMs while matching whole-input scanning on the real artifact
+ok - firefox · package · the Web stream adapter's findings are frozen on the real artifact
+ok - firefox · package · an explicit abort() on the real artifact discards retained plaintext and wins over a later close
+ok - firefox · package · malformed UTF-8 on the real artifact rejects with INVALID_UTF8 and flushes no retained plaintext
+ok - firefox · package · truncated UTF-8 on the real artifact rejects with INVALID_UTF8
+ok - firefox · package · readable backpressure on the real artifact stalls a write until a pull resumes it
+ok - firefox · package · cancelling the readable side on the real artifact discards retained plaintext
+ok - firefox · package · aborting the writable side on the real artifact keeps finalized output but discards retained plaintext
+ok - firefox · package · a throwing placeholder formatter on the real artifact propagates PLACEHOLDER_FAILURE and releases no plaintext
+firefox: 33 check(s) passed in 9.9s
+
+ok - webkit · artifact · operations before initialize fail with NOT_INITIALIZED
+ok - webkit · artifact · initialize is idempotent
+ok - webkit · artifact · version reports the shared product version
+ok - webkit · artifact · profile reports the compiled detector profile
+ok - webkit · artifact · the canonical synchronous corpus is not vacuous
+ok - webkit · artifact · scan matches the canonical synchronous corpus
+ok - webkit · artifact · every finding comes from a detector in the profile
+ok - webkit · artifact · an incremental session matches scanAndRedact on the same artifact
+ok - webkit · artifact · the corpus exercises an astral character before a finding
+ok - webkit · artifact · an astral character around a finding does not perturb its span
+ok - webkit · artifact · scanAndRedact equals scan then redact and removes every match
+ok - webkit · artifact · a throwing policy callback surfaces POLICY_FAILURE
+ok - webkit · artifact · a custom policy callback controls the action
+ok - webkit · artifact · a custom placeholder formatter controls redaction output
+ok - webkit · package · operations before initialize fail with NOT_INITIALIZED
+ok - webkit · package · the package reports its documented identity
+ok - webkit · package · invalid incremental input is terminal with fixed diagnostics
+ok - webkit · package · the package matches the canonical synchronous corpus
+ok - webkit · package · every published finding is frozen and carries no extra key
+ok - webkit · package · scanAndRedact equals scan then redact and removes every match
+ok - webkit · package · a policy callback sees a frozen finding with numeric offsets
+ok - webkit · package · createIncrementalSanitizer opens a real session on the real artifact
+ok - webkit · package · a session outside accepting rejects further operations with INVALID_STATE
+ok - webkit · package · the Web stream adapter matches the whole-input result at every byte boundary on the real artifact
+ok - webkit · package · the Web stream adapter preserves BOMs while matching whole-input scanning on the real artifact
+ok - webkit · package · the Web stream adapter's findings are frozen on the real artifact
+ok - webkit · package · an explicit abort() on the real artifact discards retained plaintext and wins over a later close
+ok - webkit · package · malformed UTF-8 on the real artifact rejects with INVALID_UTF8 and flushes no retained plaintext
+ok - webkit · package · truncated UTF-8 on the real artifact rejects with INVALID_UTF8
+ok - webkit · package · readable backpressure on the real artifact stalls a write until a pull resumes it
+ok - webkit · package · cancelling the readable side on the real artifact discards retained plaintext
+ok - webkit · package · aborting the writable side on the real artifact keeps finalized output but discards retained plaintext
+ok - webkit · package · a throwing placeholder formatter on the real artifact propagates PLACEHOLDER_FAILURE and releases no plaintext
+webkit: 33 check(s) passed in 6.4s
+
+browser qualification passed in chromium, firefox, webkit
