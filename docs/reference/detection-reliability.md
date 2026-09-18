@@ -10,13 +10,13 @@ precision, recall, or detector-count claim.
 
 ## Measured corpus and artifact identity
 
-The committed [v3 assessment](../../assessment/results/complete-v3/summary.json)
+The committed [v4 assessment](../../assessment/results/complete-v4/summary.json)
 contains 18 hand-reviewed synthetic whole-input fixtures, 26 expected findings,
 and 3 expected-empty fixtures. All five surfaces (Rust, Python, Node, browser
-WebAssembly, CLI) produced the same accuracy result. This is beta.2-era evidence
-from source `9359f59596f03443254f662db60d553b0610809e`, not a measurement of the
-published beta.3 packages. Accuracy corpus version `3` has SHA-256
-`cc4cb42028fd700bc98dd06dacebe421c5462dd59a46cf013154a4d185849979`.
+WebAssembly, CLI) produced the same accuracy result. This is evidence from
+source `944341903d5b85686a056d3218f4c33110d7d57b`, not a measurement of any
+published package. Accuracy corpus version `3` has SHA-256
+`438df062ddde47dcb32ae0aefc4297ed8b8c9e2c3270778c2b1f8809e40bd0dd`.
 
 | Result | Count / denominator | Interpretation |
 | --- | ---: | --- |
@@ -29,7 +29,7 @@ published beta.3 packages. Accuracy corpus version `3` has SHA-256
 The one extra Bearer finding covers the credential value, while the expected
 range includes the `Bearer` scheme. This single range disagreement contributes
 both one FP and one FN; it is not a false alarm in an ordinary-negative file.
-The [safe mismatch records](../../assessment/results/complete-v3/rust-core/accuracy-corpus-mismatches.json)
+The [safe mismatch records](../../assessment/results/complete-v4/rust-core/accuracy-corpus-mismatches.json)
 contain only metadata and offsets.
 
 The remaining misses are two shortened GitHub tokens, a shortened AWS access

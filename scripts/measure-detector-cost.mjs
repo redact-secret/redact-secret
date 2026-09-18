@@ -47,7 +47,7 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { brotliCompressSync, constants as zlibConstants, gzipSync } from "node:zlib";
 
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -166,19 +166,21 @@ function runCapture(command, args) {
   return execFileSync(command, args, { cwd: REPO_ROOT, encoding: "utf8" });
 }
 
-/** Patches `mod.rs`, runs `fn`, and restores the file (even on failure) before returning/rethrowing. */
+/**
+ * Patches `mod.rs`, runs `fn`, and writes the original bytes back (even on
+ * failure). Refuses a locally modified `mod.rs`: the measurement is only
+ * meaningful against committed source.
+ */
 function withPatchedRegistry(excludeIds, fn) {
+  if (runCapture("git", ["status", "--porcelain", "--", MOD_RS]).trim() !== "") {
+    throw new Error(`${MOD_RS} has uncommitted changes; commit or stash them first`);
+  }
   const original = readFileSync(MOD_RS, "utf8");
-  const patched = buildPatchedSource(original, excludeIds);
-  writeFileSync(MOD_RS, patched);
+  writeFileSync(MOD_RS, buildPatchedSource(original, excludeIds));
   try {
     return fn();
   } finally {
-    execFileSync("git", ["checkout", "--", MOD_RS], { cwd: REPO_ROOT });
-    const status = runCapture("git", ["status", "--porcelain", "crates/"]);
-    if (status.trim() !== "") {
-      throw new Error(`crates/ not clean after restoring mod.rs:\n${status}`);
-    }
+    writeFileSync(MOD_RS, original);
   }
 }
 
@@ -352,6 +354,6 @@ async function main() {
   await runVariant(options.variant, outDir, scratchRoot);
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] && pathToFileURL(resolve(process.argv[1])).href === import.meta.url) {
   await main();
 }

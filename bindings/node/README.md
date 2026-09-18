@@ -3,8 +3,11 @@
 N-API native addon (`napi-rs`) for Node.js. Crate: `redact-secret-node`.
 
 - Owns Node-specific loading, buffer handling, and UTF-16 range conversion.
-- Exports `version`, `initialize`, `scan`, `redact`, `scanAndRedact`, and
-  `createIncrementalSanitizer`.
+- Exports `version`, `profile`, `initialize`, `scan`, `redact`,
+  `scanAndRedact`, and `createIncrementalSanitizer` for the default `full`
+  detector profile, and `profileCommon`, `initializeCommon`, `scanCommon`,
+  `scanAndRedactCommon`, and `createIncrementalSanitizerCommon` for `common`.
+  `redact` is shared; one compiled addon serves both profiles.
 - This directory's own `package.json` is `private` and only carries the
   `napi` build configuration; it is never published itself. `npm/` holds one
   tiny publication package per `node-publish-targets` platform triple

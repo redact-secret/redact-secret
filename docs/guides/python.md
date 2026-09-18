@@ -51,5 +51,5 @@ positions count Unicode code points.
 The package ships type stubs and `py.typed`. CPython abi3 wheels and source
 build requirements are documented in [Python packaging](../python-packaging.md).
 To require a prebuilt wheel instead of a source build, use
-`python -m pip install --only-binary=:all: redact-secret` after publication.
+`python -m pip install --only-binary=:all: redact-secret`.
 See the [binding README](../../bindings/python/README.md) for development details.

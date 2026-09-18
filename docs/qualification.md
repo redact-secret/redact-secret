@@ -51,7 +51,7 @@ are built and qualified but have no npm package. On top of that: Chromium,
 Firefox and WebKit for the browser, and Node.js 20, 22 and 24.
 
 `scripts/check-artifact-matrix.py` (run by `npm run artifacts:check`, and by
-the `Matrix declaration` job every other job waits on) fails when any of the
+the `Artifact matrix policy` job every other job waits on) fails when any of the
 places that must agree with those lists drifts:
 
 - `bindings/node/package.json` `napi.targets` against `node-addon-targets`;

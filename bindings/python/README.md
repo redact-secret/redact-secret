@@ -12,8 +12,9 @@ The distribution is `redact-secret` and the import name is
 identity, so no registry fallback name is needed — see
 [docs/rust-workspace.md](https://github.com/redact-secret/redact-secret/blob/main/docs/rust-workspace.md#registry-names).
 
-> No release is authorized by the version currently in the development
-> manifests. Installation applies only after a separately approved release.
+> The version in the development manifests is not a published release. See
+> [release status](https://github.com/redact-secret/redact-secret/blob/main/docs/releases/status.md)
+> for installable versions.
 
 This directory is the canonical Python binding
 `decision-release-bindings-in-lockstep` requires before the separately created

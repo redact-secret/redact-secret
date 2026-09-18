@@ -61,8 +61,35 @@ evidence is linked from each published version.
   on Chromium, Firefox, and WebKit
   ([evidence](docs/audits/evidence/381/README.md)). Its reviewed findings over
   the canonical corpus are pinned in
-  `conformance/fixtures/common-profile-expectations.json`. Nothing publishes
-  or exports the `common` artifact yet. Package exports are #382.
+  `conformance/fixtures/common-profile-expectations.json`.
+- Added the `common` detector profile to the Rust public API (issue #380,
+  epic #377, `decision-define-detector-profile-and-pack-contract`): `Profile`,
+  `DetectorRegistry::with_common_built_in`, `DetectorRegistry::profile`,
+  `IncrementalSanitizer::with_common_built_in`, and
+  `IncrementalSanitizer::with_common_built_in_policy_and_formatter`. A profile
+  constructor rejects a custom detector that reuses any `full` built-in id.
+  `DetectorRegistry::register` applies no profile's reserved-id rule, so
+  extending a registry through it clears `profile()` to `None`. Additive:
+  `with_built_in` and its findings are unchanged.
+- Corrected four release-qualification accuracy-corpus fixtures to the
+  frozen provider grammars below and re-pinned both acceptance-criteria
+  files to `assessment/results/complete-v4/` and
+  `assessment/results/complete-linux-x64-v4/` (issue #376,
+  `decision-gate-beta5-on-precision-gains-and-positive-preservation`).
+  Accuracy counts are unchanged (21 true positives, 1 false positive, 5 false
+  negatives on all five surfaces); only the corpus bytes and hash moved. The
+  macOS profile's fixed performance thresholds are not re-derived, and every
+  non-Rust surface currently misses them by roughly 20–30%; the decision
+  record describes that open gap.
+- Added `npm run benchmark:candidate`, which builds the committed source as
+  immutable npm tarballs and evaluates them at one exact
+  `redact-secret-benchmarks` commit (issue #390,
+  [guide](docs/benchmark-candidate.md)). Development tooling only; no
+  published package changes.
+- Fixed `slack-token` reporting a rotating `xoxe.xoxb-` value whose body also
+  satisfies the `xoxb-` bot grammar as two overlapping candidates, which left
+  the `xoxe.` prefix outside the redacted range. The whole value is one
+  finding again, as in beta.4.
 - Narrowed `linear-token`'s `lin_api_` variant to Linear's reviewed API-key
   contract: `lin_api_` followed by exactly 40 bytes of `[A-Za-z0-9]`, bounded
   by the existing `[A-Za-z0-9_-]` boundary alphabet (issue #374, contract
@@ -120,11 +147,7 @@ evidence is linked from each published version.
   byte-for-byte), and the `cloudflare-adversarial-long-suffix` input now
   yields exactly one finding bounded to the documented 48-byte suffix instead
   of matching the whole 11251-byte run. No detector id, finding type,
-  confidence, specificity, default policy, or public interface changed. The
-  fixed release-qualification accuracy corpus is deliberately not rewritten:
-  its `logs-additional-provider-tokens-one` fixture's underscore-bearing
-  Cloudflare value now records as a false negative until the beta.5
-  precision gate (#376) re-versions that corpus.
+  confidence, specificity, default policy, or public interface changed.
 
 - Narrowed `huggingface-token` to Hugging Face's reviewed user-access-token
   contract: `hf_` followed by exactly 34 bytes, matched case-sensitively and
@@ -155,10 +178,7 @@ evidence is linked from each published version.
   `huggingface-adversarial-long-suffix` input now yields exactly one finding
   bounded to the documented 34-byte body instead of matching the whole
   11250-byte run. No detector id, finding type, confidence, specificity,
-  default policy, or public interface changed. The fixed release-qualification
-  accuracy corpus is deliberately not rewritten: its `code-additional-provider-tokens-one`
-  fixture's underscore-bearing Hugging Face value now records as a false
-  negative until the beta.5 precision gate (#376) re-versions that corpus.
+  default policy, or public interface changed.
 
 - Narrowed the `slack-token` detector's `xoxb-` bot form (issue #371,
   `docs/decisions/2026-09-17-freeze-slack-bot-token-segment-grammar.md`) from
@@ -212,11 +232,7 @@ evidence is linked from each published version.
   value under a generic assignment key (`docker-overlap-context`) is now
   owned by `generic-token` as a `contextual_secret` and is still redacted.
   Detector id, finding type, confidence, specificity, default policy, and
-  every public interface are unchanged. The fixed release-qualification
-  accuracy corpus is deliberately not rewritten: its one 26-byte Docker
-  value (`logs-additional-provider-tokens-one`) now records as a false
-  negative (Rust adapter 21/1/5 to 20/1/6) until the beta.5 precision gate
-  (#376) re-versions that corpus. Internally, `pattern.rs` gains
+  every public interface are unchanged. Internally, `pattern.rs` gains
   `PrefixShape` and `scan_prefixed_shapes` so one detector can carry a
   different run length per prefix; every other prefix-run detector's
   behavior is unchanged.
@@ -265,11 +281,7 @@ evidence is linked from each published version.
   `digitalocean-v1` identity/short-length mutation pair, and the
   `digitalocean-adversarial-long-suffix` input now yields zero findings. No
   detector id, finding type, policy class, public option, or result shape
-  changed. The `assessment/fixtures/accuracy-corpus.json` fixture
-  `logs-additional-provider-tokens-one` still carries a pre-contract
-  DigitalOcean value with a `redact` expectation; that corpus is
-  hash-pinned to the committed acceptance results, so it is left for the
-  beta.5 qualification pass (#376) to re-version rather than edited here.
+  changed.
 
 - Froze reviewed precision contracts for the `openai-token`,
   `digitalocean-token`, `docker-token`, `slack-token`, `huggingface-token`,

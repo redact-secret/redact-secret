@@ -110,6 +110,8 @@ async function buildCandidate(productCheckout, artifactDirectory, scratch) {
   await run(npm, ['run', 'build'], path.join(productCheckout, 'bindings/node'), 'node-addon-build-failed');
   const wasmOutput = path.join(scratch, 'wasm-output');
   await run(npm, ['run', 'wasm:build', '--', '--out-dir', wasmOutput], productCheckout, 'wasm-build-failed');
+  const wasmCommonOutput = path.join(scratch, 'wasm-common-output');
+  await run(npm, ['run', 'wasm:build:common', '--', '--out-dir', wasmCommonOutput], productCheckout, 'wasm-common-build-failed');
   await mkdir(artifactDirectory, { recursive: true });
   const core = await pack(path.join(productCheckout, 'packages/javascript'), artifactDirectory);
   const runtime = await import(`${pathToFileURL(path.join(productCheckout, 'packages/javascript/dist/runtime/node.js')).href}?candidate=${Date.now()}`);
@@ -125,6 +127,7 @@ async function buildCandidate(productCheckout, artifactDirectory, scratch) {
   const wasmStage = path.join(scratch, 'wasm-package');
   await cp(path.join(productCheckout, 'bindings/wasm/npm'), wasmStage, { recursive: true });
   await cp(wasmOutput, wasmStage, { recursive: true });
+  await cp(wasmCommonOutput, wasmStage, { recursive: true });
   const wasm = await pack(wasmStage, artifactDirectory);
   return { core, node, wasm, coreSha256: await sha256File(core) };
 }

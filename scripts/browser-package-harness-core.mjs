@@ -387,9 +387,9 @@ export async function qualify(fixtures, api) {
     "the Web stream adapter preserves BOMs while matching whole-input scanning on the real artifact",
     async () => {
       const bomCases = [
-        "﻿",
-        `﻿${FINALIZED}`,
-        `ordinary prefix ﻿ ${FINALIZED}`,
+        "\uFEFF",
+        `\uFEFF${FINALIZED}`,
+        `ordinary prefix \uFEFF ${FINALIZED}`,
       ];
       const diverged = [];
       for (const bomCase of bomCases) {
