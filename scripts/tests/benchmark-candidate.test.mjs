@@ -59,9 +59,10 @@ test('section summaries distinguish unknown baselines from findings', () => {
     { corpusSection: 'expanded-corpus', kind: 'must-not-flag', expectedSpans: 0, actualFindings: 0, outcome: 'observed:0', baseline: { outcome: null } },
     { corpusSection: 'expanded-corpus', kind: 'must-not-flag', expectedSpans: 0, actualFindings: 0, outcome: 'clean', baseline: { outcome: 'flagged:1' } },
     { corpusSection: 'expanded-corpus', kind: 'must-redact', expectedSpans: 1, actualFindings: 1, outcome: 'EXACT', baseline: { outcome: null } },
+    { corpusSection: 'expanded-corpus', kind: 'policy', expectedSpans: 1, actualFindings: 0, outcome: 'MISS', baseline: { outcome: 'EXACT' } },
   ] };
   assert.deepEqual(summarizeSection(report, 'expanded-corpus'), {
-    rows: 3,
+    rows: 4,
     negativeBefore: 1,
     negativeBaselined: 1,
     negativeAfter: 0,
@@ -70,5 +71,7 @@ test('section summaries distinguish unknown baselines from findings', () => {
     positiveBaselined: 0,
     missesAfter: 0,
     positiveTotal: 1,
+    policyMisses: 1,
+    policyTotal: 1,
   });
 });

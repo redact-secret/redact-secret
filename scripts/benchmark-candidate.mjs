@@ -71,7 +71,8 @@ export async function withTemporaryDirectory(prefix, action) {
 export function summarizeSection(report, section) {
   const rows = report.results.filter(row => row.corpusSection === section);
   const negatives = rows.filter(row => row.kind === 'must-not-flag');
-  const positives = rows.filter(row => row.expectedSpans > 0);
+  const positives = rows.filter(row => row.kind === 'must-redact' && row.expectedSpans > 0);
+  const policy = rows.filter(row => row.kind === 'policy' && row.expectedSpans > 0);
   const baselineNegatives = negatives.filter(row => row.baseline.outcome !== null);
   const baselinePositives = positives.filter(row => row.baseline.outcome !== null);
   return {
@@ -84,6 +85,8 @@ export function summarizeSection(report, section) {
     positiveBaselined: baselinePositives.length,
     missesAfter: positives.filter(row => String(row.outcome).includes('MISS')).length,
     positiveTotal: positives.length,
+    policyMisses: policy.filter(row => String(row.outcome).includes('MISS')).length,
+    policyTotal: policy.length,
   };
 }
 
@@ -176,8 +179,8 @@ export async function main(argv = process.argv.slice(2)) {
       const fixed = summarizeSection(report, 'fixed-corpus'), expanded = summarizeSection(report, 'expanded-corpus');
       console.log(`Candidate ${productCommit} against benchmark ${benchmarkCommit}`);
       console.log(`Artifact SHA-256: ${artifacts.coreSha256}`);
-      console.log(`Fixed corpus (${fixed.rows} fixtures): negative flags ${fixed.negativeBefore} before (${fixed.negativeBaselined}/${fixed.negativeTotal} baselined) / ${fixed.negativeAfter} after; positive misses ${fixed.missesBefore} before (${fixed.positiveBaselined}/${fixed.positiveTotal} baselined) / ${fixed.missesAfter} after.`);
-      console.log(`Expanded corpus (${expanded.rows} fixtures): negative flags ${expanded.negativeBefore} before (${expanded.negativeBaselined}/${expanded.negativeTotal} baselined) / ${expanded.negativeAfter} after; positive misses ${expanded.missesBefore} before (${expanded.positiveBaselined}/${expanded.positiveTotal} baselined) / ${expanded.missesAfter} after.`);
+      console.log(`Fixed corpus (${fixed.rows} fixtures): negative flags ${fixed.negativeBefore} before (${fixed.negativeBaselined}/${fixed.negativeTotal} baselined) / ${fixed.negativeAfter} after; required-positive misses ${fixed.missesBefore} before (${fixed.positiveBaselined}/${fixed.positiveTotal} baselined) / ${fixed.missesAfter} after; policy misses ${fixed.policyMisses}/${fixed.policyTotal}.`);
+      console.log(`Expanded corpus (${expanded.rows} fixtures): negative flags ${expanded.negativeBefore} before (${expanded.negativeBaselined}/${expanded.negativeTotal} baselined) / ${expanded.negativeAfter} after; required-positive misses ${expanded.missesBefore} before (${expanded.positiveBaselined}/${expanded.positiveTotal} baselined) / ${expanded.missesAfter} after; policy misses ${expanded.policyMisses}/${expanded.policyTotal}.`);
       console.log(`Evidence: ${evidence}`);
       return { evidence, report };
     } finally {
