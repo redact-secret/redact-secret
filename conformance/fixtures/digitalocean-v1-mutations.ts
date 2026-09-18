@@ -74,6 +74,11 @@ export function generateDigitaloceanV1Mutations(): readonly DigitaloceanV1Mutati
     ["encoded-prefix", `dop%5Fv1%5F${PAT_BODY}`],
     ["host-embedding", `https://example.test/?token=${TOKEN}&x=1`],
     ["repeated", `${TOKEN} ${TOKEN}`],
+    // Issue #375: the `_v1_` separator itself was never mutated (only the
+    // prefix and body were). Appended after `repeated` so every existing
+    // fixture's `mutation.ordinal` stays stable.
+    ["missing-separator", `dopv1${PAT_BODY}`],
+    ["replaced-separator", `dop-v1-${PAT_BODY}`],
   ];
 
   return operations.map(([operation, input], ordinal) => ({

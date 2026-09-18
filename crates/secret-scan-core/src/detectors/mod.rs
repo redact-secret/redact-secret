@@ -340,4 +340,80 @@ mod tests {
         ];
         assert_provider_candidates(&cases);
     }
+
+    /// Issue #375 checkbox 5: a contract-rejected shape from one of the
+    /// seven frozen provider families must stay silent when that provider's
+    /// detector runs alone (`built_in_detectors` filtered to just its id,
+    /// mirroring `assert_provider_candidates` above), while the *default*
+    /// registry -- the full built-in set -- still masks the same value
+    /// through `bearer-token` under a `Bearer` credential. No global
+    /// suppression follows from one provider's own rejection.
+    #[test]
+    fn provider_only_scan_stays_silent_while_the_default_registry_still_masks_the_malformed_shape()
+    {
+        let cases: &[(&str, &str)] = &[
+            (
+                "openai-token",
+                // Legacy left segment one byte short of the contracted 20.
+                "sk-SYNTHETIC_REVOKED_1T3BlbkFJSYNTHETIC_REVOKED_0002",
+            ),
+            (
+                "digitalocean-token",
+                // 63 lowercase-hex bytes, one short of the contracted 64.
+                "dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954ca",
+            ),
+            (
+                "docker-token",
+                // 26-byte PAT body, one short of the contracted 27.
+                "dckr_pat_SYNTHETICREVOKEDDOCKERPA",
+            ),
+            (
+                "slack-token",
+                // The two numeric bot sections run straight into the secret
+                // with no separator: the exact beta.4 shape the frozen
+                // contract rejects.
+                "xoxb-1234567890123-3210987654321SYNTHETICREVOKEDBOTSECRET1",
+            ),
+            (
+                "huggingface-token",
+                // 33-byte body, one short of the contracted 34.
+                "hf_SyntheticRevokedHuggingFaceTokenA",
+            ),
+            (
+                "cloudflare-token",
+                // Non-hex checksum suffix.
+                "cfut_SYNTHETICREVOKEDCLOUDFLAREAPITOKENVALUE1ghijklmn",
+            ),
+            (
+                "linear-token",
+                // 39-byte body, one short of the contracted 40.
+                "lin_api_SyntheticRevokedLinearApiTokenABCDEF012",
+            ),
+        ];
+
+        let all_detectors = built_in_detectors();
+        for (id, malformed) in cases {
+            let provider_only = all_detectors
+                .iter()
+                .find(|detector| detector.id() == *id)
+                .expect("every case id names a registered built-in detector");
+            let context = DetectorContext::new(malformed.len());
+            let candidates = provider_only.detect(malformed, &context).unwrap();
+            assert!(
+                candidates.is_empty(),
+                "{id}: provider-only scan of a contract-rejected shape must stay silent"
+            );
+
+            let wrapped = format!("Authorization: Bearer {malformed}");
+            let default_registry = crate::DetectorRegistry::with_built_in([]).unwrap();
+            let findings = crate::scan(&wrapped, &default_registry, &crate::DefaultPolicy).unwrap();
+            assert_eq!(
+                findings.len(),
+                1,
+                "{id}: the default registry must still mask the same value as a Bearer credential"
+            );
+            assert_eq!(findings[0].detector(), "bearer-token", "{id}");
+            assert_eq!(findings[0].type_name(), "bearer_token", "{id}");
+        }
+    }
 }

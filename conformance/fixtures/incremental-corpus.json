@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 66,
+  "fixtureCount": 72,
   "fixtures": [
     {
       "id": "synthetic-regression-malformed-authority",
@@ -1044,6 +1044,84 @@
         }
       ],
       "note": "issue #368: the three Unicode/CRLF positives and their twins from the issue's self-contained reproduction, concatenated; each astral emoji and CRLF shifts the byte offsets and every partition must still resolve exactly the three positives."
+    },
+    {
+      "id": "openai-admin-length-twin-discriminating-boundary",
+      "input": "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\nsk-admin-SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTT3BlbkFJSYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SY",
+      "text": "<SECRET_1>\nsk-admin-SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTT3BlbkFJSYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SY",
+      "expected": [
+        {
+          "detector": "openai-token",
+          "type": "openai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 165
+        }
+      ],
+      "note": "issue #375: admin-namespace incremental parity, mirroring issue #368's project/svcacct coverage — the positive and its twin differ in one structural property (73-byte left segment vs the contracted 74), so every UTF-8 byte and char partition must resolve the same single finding as the whole-input scan, including splits inside the `T3BlbkFJ` marker and at the 73/74-byte segment boundary."
+    },
+    {
+      "id": "digitalocean-separator-boundary-discriminating-boundary",
+      "input": "dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9\ndopv11f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9",
+      "text": "<SECRET_1>\ndopv11f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9",
+      "expected": [
+        {
+          "detector": "digitalocean-token",
+          "type": "digitalocean_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 71
+        }
+      ],
+      "note": "issue #375: every UTF-8 byte and char partition must resolve the same single finding as the whole-input scan, including splits inside the `_v1_` separator itself; the twin drops both underscores from the separator."
+    },
+    {
+      "id": "huggingface-incremental-exact-length-positive",
+      "input": "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",
+      "text": "<SECRET_1>",
+      "expected": [
+        {
+          "detector": "huggingface-token",
+          "type": "huggingface_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 37
+        }
+      ],
+      "note": "issue #375: the exact-length whole-input positive was missing from the incremental corpus (only a lookalike negative existed), so every UTF-8 byte and char partition of a real 37-byte token had never been proven to reproduce the whole-input reference."
+    },
+    {
+      "id": "huggingface-incremental-one-short-negative",
+      "input": "hf_SyntheticRevokedHuggingFaceTokenA",
+      "text": "hf_SyntheticRevokedHuggingFaceTokenA",
+      "expected": [],
+      "note": "issue #375: the one-byte-short twin of huggingface-incremental-exact-length-positive confirms no partition of the contract-rejected shape ever accidentally emits a finding."
+    },
+    {
+      "id": "slack-incremental-bot-grammar-positive",
+      "input": "xoxb-1234567890123-3210987654321-SYNTHETICREVOKEDBOTSECRET1",
+      "text": "<SECRET_1>",
+      "expected": [
+        {
+          "detector": "slack-token",
+          "type": "slack_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 59
+        }
+      ],
+      "note": "issue #375: the full three-section bot grammar was missing from the incremental corpus (only a lookalike negative existed), so every UTF-8 byte and char partition of a real bot token -- including splits inside both `-` separators and the secret section -- had never been proven to reproduce the whole-input reference."
+    },
+    {
+      "id": "slack-incremental-secret-floor-boundary",
+      "input": "xoxb-1234567890123-3210987654321-SSSSSSSSSSSSSSSSS",
+      "text": "xoxb-1234567890123-3210987654321-SSSSSSSSSSSSSSSSS",
+      "expected": [],
+      "note": "issue #375: the 17-byte (one-below-floor) secret twin of slack-incremental-bot-grammar-positive confirms no partition of the contract-rejected shape ever accidentally emits a finding."
     }
   ]
 }
