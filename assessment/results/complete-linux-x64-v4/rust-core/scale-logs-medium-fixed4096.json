@@ -1,0 +1,136 @@
+{
+  "performance": {
+    "initialization": {
+      "maximum": 0.017683,
+      "mean": 0.010126800000000002,
+      "median": 0.007795000000000001,
+      "minimum": 0.007073,
+      "p95": 0.017683,
+      "samples": [
+        0.017683,
+        0.010409,
+        0.007795000000000001,
+        0.007673999999999999,
+        0.007073
+      ],
+      "standardDeviation": 0.003948544258331164,
+      "unit": "milliseconds"
+    },
+    "memory": {
+      "browserJsHeap": {
+        "samples": [],
+        "samplingLimit": "No samples were available.",
+        "unavailableReason": "The Rust library does not run inside a browser JavaScript heap.",
+        "unit": "bytes"
+      },
+      "nodeExternal": {
+        "samples": [],
+        "samplingLimit": "No samples were available.",
+        "unavailableReason": "The Rust library has no Node external-memory category.",
+        "unit": "bytes"
+      },
+      "nodeHeap": {
+        "samples": [],
+        "samplingLimit": "No samples were available.",
+        "unavailableReason": "The Rust library does not run inside a Node.js heap.",
+        "unit": "bytes"
+      },
+      "nodeRss": {
+        "samples": [],
+        "samplingLimit": "No samples were available.",
+        "unavailableReason": "The Rust library does not run inside a Node.js process.",
+        "unit": "bytes"
+      },
+      "processRss": {
+        "samples": [
+          {
+            "baselineBytes": 3694592,
+            "maximumObservedBytes": 3698688
+          },
+          {
+            "baselineBytes": 3719168,
+            "maximumObservedBytes": 3727360
+          },
+          {
+            "baselineBytes": 3739648,
+            "maximumObservedBytes": 3739648
+          },
+          {
+            "baselineBytes": 3743744,
+            "maximumObservedBytes": 3743744
+          },
+          {
+            "baselineBytes": 3747840,
+            "maximumObservedBytes": 3747840
+          }
+        ],
+        "samplingLimit": "Sampled immediately before and after processing; short-lived peaks between those boundaries may be missed, so maxima are observed samples, not guaranteed true peaks.",
+        "unit": "bytes"
+      },
+      "pythonHeap": {
+        "samples": [],
+        "samplingLimit": "No samples were available.",
+        "unavailableReason": "The Rust library does not run inside a Python allocator.",
+        "unit": "bytes"
+      },
+      "streamingBuffer": {
+        "samples": [],
+        "samplingLimit": "No samples were available.",
+        "unavailableReason": "The public incremental session exposes lifecycle state but intentionally does not expose retained plaintext buffer size.",
+        "unit": "bytes"
+      },
+      "wasmLinearMemory": {
+        "samples": [],
+        "samplingLimit": "No samples were available.",
+        "unavailableReason": "The Rust library surface does not use WebAssembly linear memory.",
+        "unit": "bytes"
+      }
+    },
+    "processing": {
+      "maximum": 125.68791100000001,
+      "mean": 123.75464280000001,
+      "median": 123.266649,
+      "minimum": 122.641972,
+      "p95": 125.68791100000001,
+      "samples": [
+        124.265146,
+        122.911536,
+        125.68791100000001,
+        122.641972,
+        123.266649
+      ],
+      "standardDeviation": 1.1122178549689685,
+      "unit": "milliseconds"
+    },
+    "throughput": {
+      "maximum": 2137555.3224144178,
+      "mean": 2118506.639168938,
+      "median": 2126722.857534644,
+      "minimum": 2085753.4978045737,
+      "p95": 2137555.3224144178,
+      "samples": [
+        2109634.184954806,
+        2132867.3331362484,
+        2085753.4978045737,
+        2137555.3224144178,
+        2126722.857534644
+      ],
+      "standardDeviation": 18910.72088450479,
+      "unit": "bytes-per-second"
+    }
+  },
+  "profileId": "scale-logs-medium-fixed4096",
+  "provenance": {
+    "artifactIdentity": "redact-secret@0.1.0-beta.4",
+    "buildProfile": "release",
+    "command": "[\"target/release/examples/assessment_adapter\",\"performance\",\"--profile\",\"scale-logs-medium-fixed4096\",\"--runs\",\"5\",\"--json-out\",\"assessment-output/rust-core/scale-logs-medium-fixed4096.json\",\"--markdown-out\",\"assessment-output/rust-core/scale-logs-medium-fixed4096.md\"]",
+    "commit": "944341903d5b85686a056d3218f4c33110d7d57b",
+    "corpusHash": "b4db2cd22b4c008c9d63789df8ca2e21e697a21a84699466ea5f96c89d8e2806",
+    "corpusVersion": "1",
+    "cpu": "x86_64",
+    "os": "linux-6.17.0-1022-azure",
+    "runtime": "rustc-1.98.1 (48a229cea 2026-09-01)"
+  },
+  "schemaVersion": "3",
+  "surface": "rust-core"
+}

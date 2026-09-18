@@ -113,7 +113,7 @@
       "id": "negative-text-unicode-astral",
       "category": "negative-text",
       "unicode": true,
-      "input": "\u5496\u5561\u5ea7 talk continued late into the night \ud83e\udd8e near the caf\u00e9, calm and uneventful.",
+      "input": "咖啡座 talk continued late into the night 🦎 near the café, calm and uneventful.",
       "expected": [],
       "note": "Negative baseline mixing CJK and an astral emoji with no credential-shaped content."
     },
@@ -121,7 +121,7 @@
       "id": "logs-unicode-astral-boundary",
       "category": "logs",
       "unicode": true,
-      "input": "\ud83d\udd11 token=ghp_ASSESSMENTSYNTHETIC0000000000000000 seen-in=caf\u00e9-fixture",
+      "input": "🔑 token=ghp_ASSESSMENTSYNTHETIC0000000000000000 seen-in=café-fixture",
       "expected": [
         {
           "detector": "github-token",
@@ -139,7 +139,7 @@
       "id": "code-openai-api-key",
       "category": "code",
       "unicode": false,
-      "input": "const openaiApiKey = \"sk-ASSESSMENTSYNTHETIC_OPENAI_KEY_0000000000\";",
+      "input": "const openaiApiKey = \"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\";",
       "expected": [
         {
           "detector": "openai-token",
@@ -147,11 +147,11 @@
           "confidence": "high",
           "specificity": "provider",
           "start": 22,
-          "end": 66,
+          "end": 73,
           "policyOutcome": "redact"
         }
       ],
-      "note": "Provider behavior class (docs/coverage/evidence-requirements.md #1): OpenAI's bare sk- token format assigned to a variable in source code; always-redact type at high confidence."
+      "note": "Provider behavior class (docs/coverage/evidence-requirements.md #1): OpenAI's frozen legacy sk- contract (marker T3BlbkFJ, 20-byte segments; issue #368, contract review #367) assigned to a variable in source code; always-redact type at high confidence. Value and offsets re-pinned by the beta.5 precision gate (#376); the previous bare 41-byte suffix no longer matches the reviewed grammar."
     },
     {
       "id": "logs-stripe-secret-key",
@@ -229,7 +229,7 @@
       "id": "logs-additional-provider-tokens-one",
       "category": "logs",
       "unicode": false,
-      "input": "2026-09-14T00:03:00Z INFO secrets-scan hits: anthropic=sk-ant-api03-SYNTHETIC_REVOKED_ANTHROPIC_1 cloudflare=cfut_SYNTHETIC_REVOKED_CLOUDFLARE_1 digitalocean=dop_v1_SYNTHETIC_REVOKED_DIGITALOCEAN1 docker=dckr_pat_SYNTHETIC_REVOKED_DOCKER_1 gitlab=glpat-SYNTHETIC_REVOKED_GITLAB_1 request_id=fixture-3",
+      "input": "2026-09-14T00:03:00Z INFO secrets-scan hits: anthropic=sk-ant-api03-SYNTHETIC_REVOKED_ANTHROPIC_1 cloudflare=cfut_ASSESSMENTSYNTHETICCLOUDFLARE1111111111100ab12cd digitalocean=dop_v1_4d9324e072be8d4b9190e8d1bca0dfa10e6ab3e6f73aff8975bdb372d20fdc95 docker=dckr_pat_ASSESSMENTSYNTHETICDOCKER11 gitlab=glpat-SYNTHETIC_REVOKED_GITLAB_1 request_id=fixture-3",
       "expected": [
         {
           "detector": "anthropic-token",
@@ -246,7 +246,7 @@
           "confidence": "high",
           "specificity": "provider",
           "start": 109,
-          "end": 144,
+          "end": 162,
           "policyOutcome": "redact"
         },
         {
@@ -254,8 +254,8 @@
           "type": "digitalocean_token",
           "confidence": "high",
           "specificity": "provider",
-          "start": 158,
-          "end": 196,
+          "start": 176,
+          "end": 247,
           "policyOutcome": "redact"
         },
         {
@@ -263,8 +263,8 @@
           "type": "docker_token",
           "confidence": "high",
           "specificity": "provider",
-          "start": 204,
-          "end": 239,
+          "start": 255,
+          "end": 291,
           "policyOutcome": "redact"
         },
         {
@@ -272,18 +272,18 @@
           "type": "gitlab_token",
           "confidence": "high",
           "specificity": "provider",
-          "start": 247,
-          "end": 279,
+          "start": 299,
+          "end": 331,
           "policyOutcome": "redact"
         }
       ],
-      "note": "Five provider tokens (Anthropic, Cloudflare, DigitalOcean, Docker, GitLab) dumped in one secrets-scan log line; always-redact provider types at high confidence."
+      "note": "Five provider tokens (Anthropic, Cloudflare, DigitalOcean, Docker, GitLab) dumped in one secrets-scan log line; always-redact provider types at high confidence. Cloudflare, DigitalOcean and Docker values and offsets re-pinned to their beta.5 frozen contracts (issues #373, #369, #370; contract review #367) by the beta.5 precision gate (#376); Anthropic and GitLab are unchanged."
     },
     {
       "id": "code-additional-provider-tokens-one",
       "category": "code",
       "unicode": false,
-      "input": "const leakedTokens = {\n  huggingFaceToken: \"hf_SYNTHETIC_REVOKED_HUGGINGFACE1\",\n  linearApiKey: \"lin_api_SYNTHETIC_REVOKED_LINEAR_1\",\n  npmToken: \"npm_SYNTHETICREVOKEDNPMACCESSTOKEN000001\",\n  pypiToken: \"pypi-SYNTHETIC_REVOKED_PYPI_API_TOKEN_MACAROON_FIXTURE_VALUE_0000000000000000000000000000000000\",\n  shopifyAccessToken: \"shpat_SYNTHETIC_REVOKED_SHOPIFY_1\",\n};",
+      "input": "const leakedTokens = {\n  huggingFaceToken: \"hf_ASSESSMENTSYNTHETICHUGGINGFACE1111\",\n  linearApiKey: \"lin_api_ASSESSMENTSYNTHETICLINEARAPIKEY111111111\",\n  npmToken: \"npm_SYNTHETICREVOKEDNPMACCESSTOKEN000001\",\n  pypiToken: \"pypi-SYNTHETIC_REVOKED_PYPI_API_TOKEN_MACAROON_FIXTURE_VALUE_0000000000000000000000000000000000\",\n  shopifyAccessToken: \"shpat_SYNTHETIC_REVOKED_SHOPIFY_1\",\n};",
       "expected": [
         {
           "detector": "huggingface-token",
@@ -291,7 +291,7 @@
           "confidence": "high",
           "specificity": "provider",
           "start": 44,
-          "end": 77,
+          "end": 81,
           "policyOutcome": "redact"
         },
         {
@@ -299,8 +299,8 @@
           "type": "linear_token",
           "confidence": "high",
           "specificity": "provider",
-          "start": 97,
-          "end": 131,
+          "start": 101,
+          "end": 149,
           "policyOutcome": "redact"
         },
         {
@@ -308,8 +308,8 @@
           "type": "npm_access_token",
           "confidence": "high",
           "specificity": "provider",
-          "start": 147,
-          "end": 187,
+          "start": 165,
+          "end": 205,
           "policyOutcome": "redact"
         },
         {
@@ -317,8 +317,8 @@
           "type": "pypi_api_token",
           "confidence": "high",
           "specificity": "provider",
-          "start": 204,
-          "end": 299,
+          "start": 222,
+          "end": 317,
           "policyOutcome": "redact"
         },
         {
@@ -326,18 +326,18 @@
           "type": "shopify_access_token",
           "confidence": "high",
           "specificity": "provider",
-          "start": 325,
-          "end": 358,
+          "start": 343,
+          "end": 376,
           "policyOutcome": "redact"
         }
       ],
-      "note": "Five provider tokens (Hugging Face, Linear, npm, PyPI, Shopify) assigned as object properties in source code; always-redact provider types at high confidence."
+      "note": "Five provider tokens (Hugging Face, Linear, npm, PyPI, Shopify) assigned as object properties in source code; always-redact provider types at high confidence. Hugging Face and Linear values and offsets re-pinned to their beta.5 frozen contracts (issues #372, #374; contract review #367) by the beta.5 precision gate (#376); npm, PyPI and Shopify are unchanged."
     },
     {
       "id": "chat-additional-provider-tokens-one",
       "category": "chat",
       "unicode": false,
-      "input": "here are the leaked values from the audit: slack=xoxb-SYNTHETIC_REVOKED_SLACK_1 supabase=sb_secret_SYNTHETIC_REVOKED_SUPABASE_1 vault=hvs.SYNTHETIC_REVOKED_VAULT_TOKEN1 vercel=vcp_SYNTHETIC_REVOKED_VERCEL_1 please rotate all four now",
+      "input": "here are the leaked values from the audit: slack=xoxb-1234567890123-3210987654321-ASSESSMENTSYNTHETICSLACK1 supabase=sb_secret_SYNTHETIC_REVOKED_SUPABASE_1 vault=hvs.SYNTHETIC_REVOKED_VAULT_TOKEN1 vercel=vcp_SYNTHETIC_REVOKED_VERCEL_1 please rotate all four now",
       "expected": [
         {
           "detector": "slack-token",
@@ -345,7 +345,7 @@
           "confidence": "high",
           "specificity": "provider",
           "start": 49,
-          "end": 79,
+          "end": 107,
           "policyOutcome": "redact"
         },
         {
@@ -353,8 +353,8 @@
           "type": "supabase_secret_key",
           "confidence": "high",
           "specificity": "provider",
-          "start": 89,
-          "end": 127,
+          "start": 117,
+          "end": 155,
           "policyOutcome": "redact"
         },
         {
@@ -362,8 +362,8 @@
           "type": "vault_token",
           "confidence": "high",
           "specificity": "provider",
-          "start": 134,
-          "end": 168,
+          "start": 162,
+          "end": 196,
           "policyOutcome": "redact"
         },
         {
@@ -371,12 +371,12 @@
           "type": "vercel_token",
           "confidence": "high",
           "specificity": "provider",
-          "start": 176,
-          "end": 206,
+          "start": 204,
+          "end": 234,
           "policyOutcome": "redact"
         }
       ],
-      "note": "Four provider tokens (Slack, Supabase, Vault, Vercel) pasted mid-sentence in a chat message; always-redact provider types at high confidence."
+      "note": "Four provider tokens (Slack, Supabase, Vault, Vercel) pasted mid-sentence in a chat message; always-redact provider types at high confidence. Slack's value and offsets re-pinned to its beta.5 frozen bot-token contract (issue #371, contract review #367) by the beta.5 precision gate (#376); Supabase, Vault and Vercel are unchanged."
     },
     {
       "id": "code-otpauth-provisioning-uri",

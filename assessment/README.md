@@ -187,14 +187,26 @@ thresholds were derived once, from the first complete baseline at commit
 accuracy corpus moves to a new reviewed revision, so a candidate built from
 the current corpus is not rejected on a stale identity mismatch before any
 timing threshold is even checked; the criteria currently point at the
-five-repetition run at commit `9359f59596f03443254f662db60d553b0610809e`
+five-repetition run at commit `944341903d5b85686a056d3218f4c33110d7d57b`
 (accuracy corpus version `3`, hash
-`cc4cb42028fd700bc98dd06dacebe421c5462dd59a46cf013154a4d185849979`),
-committed under [`results/complete-v3/`](./results/complete-v3/). They cover
-the two representative log-processing profiles: 64 KiB whole-input and 256
-KiB fixed-4096 incremental input (standard input for the CLI). Five
-repetitions are required so a two-sample exploratory baseline cannot be
-mistaken for formal acceptance evidence.
+`438df062ddde47dcb32ae0aefc4297ed8b8c9e2c3270778c2b1f8809e40bd0dd`),
+committed under [`results/complete-v4/`](./results/complete-v4/). The prior
+pin, at commit `9359f59596f03443254f662db60d553b0610809e` (accuracy corpus
+hash `cc4cb42028fd700bc98dd06dacebe421c5462dd59a46cf013154a4d185849979`),
+remains as historical evidence under
+[`results/complete-v3/`](./results/complete-v3/), byte-for-byte unchanged.
+`results/complete-v4/` re-pins the accuracy identity only, after the beta.5
+precision gate ([#376](https://github.com/redact-secret/redact-secret/issues/376))
+corrected four accuracy-corpus fixtures to the seven provider contracts
+frozen by [#367](https://github.com/redact-secret/redact-secret/issues/367);
+see [`results/complete-v4/README.md`](./results/complete-v4/README.md) for
+why its own performance/resource acceptance intentionally still reports
+`rejected` in that directory's committed evidence, and why the performance
+thresholds below are unchanged by that gate. They cover the two
+representative log-processing profiles: 64 KiB whole-input and 256 KiB
+fixed-4096 incremental input (standard input for the CLI). Five repetitions
+are required so a two-sample exploratory baseline cannot be mistaken for
+formal acceptance evidence.
 
 The environment profile is deliberately narrow: macOS on arm64/aarch64, Node
 22, Chromium, CPython 3, and the host Rust toolchain. This is the environment
@@ -299,14 +311,25 @@ that run, and have not changed since. The criteria file's `baseline` pointer
 and pinned accuracy counts are re-pinned whenever the accuracy corpus moves
 to a new reviewed revision, so they currently point at the later
 five-repetition `ubuntu-latest` run at commit
-`9359f59596f03443254f662db60d553b0610809e` (accuracy corpus version `3`,
-hash `cc4cb42028fd700bc98dd06dacebe421c5462dd59a46cf013154a4d185849979`),
+`944341903d5b85686a056d3218f4c33110d7d57b` (accuracy corpus version `3`,
+hash `438df062ddde47dcb32ae0aefc4297ed8b8c9e2c3270778c2b1f8809e40bd0dd`),
 committed under
-[`results/complete-linux-x64-v3/`](./results/complete-linux-x64-v3/) and
+[`results/complete-linux-x64-v4/`](./results/complete-linux-x64-v4/) and
 evaluated as `accepted` in
-[`results/complete-linux-x64-v3/acceptance.md`](./results/complete-linux-x64-v3/acceptance.md).
-Both runs pin the same workload-profiles identity as the macOS profile,
-since that corpus is unchanged.
+[`results/complete-linux-x64-v4/acceptance.md`](./results/complete-linux-x64-v4/acceptance.md),
+dispatched from the beta.5 precision gate
+([#376](https://github.com/redact-secret/redact-secret/issues/376)) after it
+corrected four accuracy-corpus fixtures to the seven provider contracts
+frozen by [#367](https://github.com/redact-secret/redact-secret/issues/367);
+see [`results/complete-linux-x64-v4/README.md`](./results/complete-linux-x64-v4/README.md).
+The prior pin, at commit `9359f59596f03443254f662db60d553b0610809e` (accuracy
+corpus hash `cc4cb42028fd700bc98dd06dacebe421c5462dd59a46cf013154a4d185849979`),
+remains as historical evidence under
+[`results/complete-linux-x64-v3/`](./results/complete-linux-x64-v3/),
+byte-for-byte unchanged. Both v3 and v4 pin the same workload-profiles
+identity as the macOS profile, since that corpus is unchanged, and unlike the
+macOS profile's `complete-v4`, this Linux x86_64 evidence is fully `accepted`
+— performance thresholds pass cleanly on the qualified `ubuntu-latest` host.
 
 The environment profile is `linux-x64-node22-chromium`: Linux on x86_64, Node
 22, Chromium, CPython 3, and the host Rust toolchain — otherwise the same

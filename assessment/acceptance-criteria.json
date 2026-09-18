@@ -3,10 +3,10 @@
   "criteriaId": "rc-performance-resource-v2",
   "fixedAt": "2026-09-16",
   "baseline": {
-    "summaryPath": "assessment/results/complete-v3/summary.json",
-    "sourceCommit": "9359f59596f03443254f662db60d553b0610809e",
+    "summaryPath": "assessment/results/complete-v4/summary.json",
+    "sourceCommit": "944341903d5b85686a056d3218f4c33110d7d57b",
     "accuracyCorpusVersion": "3",
-    "accuracyCorpusHash": "cc4cb42028fd700bc98dd06dacebe421c5462dd59a46cf013154a4d185849979",
+    "accuracyCorpusHash": "438df062ddde47dcb32ae0aefc4297ed8b8c9e2c3270778c2b1f8809e40bd0dd",
     "workloadProfilesVersion": "1",
     "workloadProfilesHash": "b4db2cd22b4c008c9d63789df8ca2e21e697a21a84699466ea5f96c89d8e2806"
   },

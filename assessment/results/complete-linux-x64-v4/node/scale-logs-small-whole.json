@@ -1,0 +1,175 @@
+{
+  "schemaVersion": "3",
+  "surface": "node",
+  "profileId": "scale-logs-small-whole",
+  "performance": {
+    "initialization": {
+      "unit": "milliseconds",
+      "samples": [
+        2.235405,
+        2.2186939999999993,
+        2.2359560000000016,
+        2.2325699999999955,
+        2.254962000000006
+      ],
+      "minimum": 2.2186939999999993,
+      "median": 2.235405,
+      "p95": 2.254962000000006,
+      "maximum": 2.254962000000006,
+      "mean": 2.2355174000000004,
+      "standardDeviation": 0.011575935618344555
+    },
+    "processing": {
+      "unit": "milliseconds",
+      "samples": [
+        23.03142299999999,
+        23.14348199999999,
+        23.357832000000002,
+        22.949961000000002,
+        23.426551000000003
+      ],
+      "minimum": 22.949961000000002,
+      "median": 23.14348199999999,
+      "p95": 23.426551000000003,
+      "maximum": 23.426551000000003,
+      "mean": 23.1818498,
+      "standardDeviation": 0.18369601944451888
+    },
+    "throughput": {
+      "unit": "bytes-per-second",
+      "samples": [
+        2846285.268608893,
+        2832503.76931181,
+        2806510.4672385687,
+        2856388.296258978,
+        2798277.9027096215
+      ],
+      "minimum": 2798277.9027096215,
+      "median": 2832503.76931181,
+      "p95": 2856388.296258978,
+      "maximum": 2856388.296258978,
+      "mean": 2827993.1408255743,
+      "standardDeviation": 22386.304746441994
+    },
+    "memory": {
+      "nodeHeap": {
+        "unit": "bytes",
+        "samples": [
+          {
+            "baselineBytes": 6968440,
+            "maximumObservedBytes": 7069680
+          },
+          {
+            "baselineBytes": 6972400,
+            "maximumObservedBytes": 7069824
+          },
+          {
+            "baselineBytes": 7000664,
+            "maximumObservedBytes": 7071368
+          },
+          {
+            "baselineBytes": 6968168,
+            "maximumObservedBytes": 7069680
+          },
+          {
+            "baselineBytes": 6967968,
+            "maximumObservedBytes": 7069824
+          }
+        ],
+        "samplingLimit": "Sampled immediately before and after processing; short-lived peaks between those boundaries may be missed, so maxima are observed samples, not guaranteed true peaks."
+      },
+      "nodeRss": {
+        "unit": "bytes",
+        "samples": [
+          {
+            "baselineBytes": 66289664,
+            "maximumObservedBytes": 66293760
+          },
+          {
+            "baselineBytes": 66043904,
+            "maximumObservedBytes": 66043904
+          },
+          {
+            "baselineBytes": 66441216,
+            "maximumObservedBytes": 66445312
+          },
+          {
+            "baselineBytes": 66678784,
+            "maximumObservedBytes": 66678784
+          },
+          {
+            "baselineBytes": 66531328,
+            "maximumObservedBytes": 66531328
+          }
+        ],
+        "samplingLimit": "Sampled immediately before and after processing; short-lived peaks between those boundaries may be missed, so maxima are observed samples, not guaranteed true peaks."
+      },
+      "nodeExternal": {
+        "unit": "bytes",
+        "samples": [
+          {
+            "baselineBytes": 2289891,
+            "maximumObservedBytes": 2289931
+          },
+          {
+            "baselineBytes": 2289891,
+            "maximumObservedBytes": 2289931
+          },
+          {
+            "baselineBytes": 2289891,
+            "maximumObservedBytes": 2289931
+          },
+          {
+            "baselineBytes": 2289891,
+            "maximumObservedBytes": 2289931
+          },
+          {
+            "baselineBytes": 2289891,
+            "maximumObservedBytes": 2289931
+          }
+        ],
+        "samplingLimit": "Sampled immediately before and after processing; short-lived peaks between those boundaries may be missed, so maxima are observed samples, not guaranteed true peaks. External memory can overlap RSS and must not be summed with it."
+      },
+      "browserJsHeap": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "The Node process does not expose a browser JavaScript heap.",
+        "samplingLimit": "No samples were available."
+      },
+      "wasmLinearMemory": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "The Node N-API surface does not use WebAssembly linear memory.",
+        "samplingLimit": "No samples were available."
+      },
+      "pythonHeap": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "The Node process does not run inside a Python allocator.",
+        "samplingLimit": "No samples were available."
+      },
+      "processRss": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "Node process RSS is reported as nodeRss; duplicating it as processRss would report one overlapping measure twice.",
+        "samplingLimit": "No samples were available."
+      },
+      "streamingBuffer": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "The public incremental session exposes lifecycle state but intentionally does not expose retained plaintext buffer size.",
+        "samplingLimit": "No samples were available."
+      }
+    }
+  },
+  "provenance": {
+    "commit": "944341903d5b85686a056d3218f4c33110d7d57b",
+    "artifactIdentity": "@redact-secret/core@0.1.0-beta.4",
+    "corpusVersion": "1",
+    "corpusHash": "b4db2cd22b4c008c9d63789df8ca2e21e697a21a84699466ea5f96c89d8e2806",
+    "os": "linux-6.17.0-1022-azure",
+    "cpu": "x64",
+    "runtime": "node-22.23.2",
+    "command": "node scripts/assessment-node-performance.mjs --profile scale-logs-small-whole --runs 5 --addon-dir bindings/node --json-out assessment-output/node/scale-logs-small-whole.json --markdown-out assessment-output/node/scale-logs-small-whole.md"
+  }
+}
