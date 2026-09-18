@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 1212,
+  "fixtureCount": 1213,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -16193,6 +16193,28 @@
         }
       ],
       "note": "A 4-byte astral character (U+1F511) precedes the assignment; the token's UTF-8 byte offsets advance by its real byte width, not its UTF-16 code-unit count."
+    },
+    {
+      "id": "sendgrid-token-regression-crlf-and-unicode-prefix",
+      "detector": "sendgrid-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 café\r\nSG.SYNTHETIC_REVOKED_0000.SYNTHETIC_REVOKED_SENDGRID_SECRET_000000000\r\n",
+      "expected": [
+        {
+          "detector": "sendgrid-token",
+          "type": "sendgrid_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 83
+        }
+      ],
+      "note": "An astral character and CRLF line endings on a comment line ahead of the token line do not shift the match's UTF-8 byte offsets (product issue #404)."
     },
     {
       "id": "sendgrid-negative-common-identifier",

@@ -2279,7 +2279,8 @@
             "sendgrid-positive-shell-quoted",
             "sendgrid-positive-trailing-url-safe-characters",
             "sendgrid-positive-unicode-prefix",
-            "sendgrid-positive-yaml"
+            "sendgrid-positive-yaml",
+            "sendgrid-token-regression-crlf-and-unicode-prefix"
           ],
           "state": "supported"
         },

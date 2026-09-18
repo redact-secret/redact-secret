@@ -953,7 +953,7 @@
     {
       "detector": "sendgrid-token",
       "evidence": {
-        "fixtureCount": 24,
+        "fixtureCount": 25,
         "hostContextsExercised": [
           "dotenv",
           "http",
@@ -988,7 +988,8 @@
         "sendgrid-positive-shell-quoted",
         "sendgrid-positive-trailing-url-safe-characters",
         "sendgrid-positive-unicode-prefix",
-        "sendgrid-positive-yaml"
+        "sendgrid-positive-yaml",
+        "sendgrid-token-regression-crlf-and-unicode-prefix"
       ],
       "policyClass": "always-redact",
       "schemeRows": "not-applicable",
