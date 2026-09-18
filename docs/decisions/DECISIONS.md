@@ -38,4 +38,5 @@ future planning and implementation but do not authorize Git or release actions.
 - [Freeze the OpenAI API key grammar as a marker-gated shape with exact segment lengths](2026-09-17-freeze-openai-api-key-grammar.md)
 - [Freeze the Slack bot token grammar as a three-section dash-separated shape](2026-09-17-freeze-slack-bot-token-segment-grammar.md)
 - [Govern benchmark-originated product regressions](2026-09-18-govern-benchmark-regression-promotion.md)
+- [Define the detector profile and pack contract](2026-09-18-define-detector-profile-and-pack-contract.md)
 - [Gate beta.5 on precision gains and positive preservation](2026-09-18-gate-beta5-on-precision-gains-and-positive-preservation.md)

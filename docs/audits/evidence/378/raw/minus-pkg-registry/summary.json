@@ -1,0 +1,62 @@
+{
+  "variant": "minus-pkg-registry",
+  "detectorCount": 39,
+  "includedIds": [
+    "private-key",
+    "aws-access-key",
+    "github-token",
+    "gitlab-token",
+    "openai-token",
+    "anthropic-token",
+    "shopify-token",
+    "vault-token",
+    "stripe-token",
+    "slack-token",
+    "huggingface-token",
+    "cloudflare-token",
+    "digitalocean-token",
+    "linear-token",
+    "supabase-token",
+    "vercel-token",
+    "google-api-key",
+    "sendgrid-token",
+    "microsoft-entra-client-secret",
+    "azure-devops-personal-access-token",
+    "notion-token",
+    "atlassian-api-token",
+    "twilio-auth-token",
+    "twilio-api-key-secret",
+    "telegram-bot-token",
+    "discord-bot-token",
+    "sentry-user-auth-token",
+    "sentry-org-auth-token",
+    "datadog-api-key",
+    "datadog-application-key",
+    "grafana-service-account-token",
+    "grafana-cloud-access-policy-token",
+    "new-relic-user-api-key",
+    "new-relic-license-key",
+    "jwt",
+    "bearer-token",
+    "connection-string",
+    "otpauth-uri",
+    "generic-token"
+  ],
+  "excludedIds": [
+    "pypi-token",
+    "docker-token",
+    "npm-token"
+  ],
+  "sizes": {
+    "nativeRawBytes": 631168,
+    "wasmRawBytes": 280643,
+    "wasmGzipBytes": 96036,
+    "wasmBrotliBytes": 77332,
+    "jsGlueRawBytes": 28873
+  },
+  "rawFiles": {
+    "cliWhole": "cli-whole.json",
+    "wasmWhole": "wasm-whole.json",
+    "wasmFixed4096": "wasm-fixed4096.json"
+  }
+}
