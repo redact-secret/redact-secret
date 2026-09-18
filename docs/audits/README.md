@@ -32,6 +32,7 @@ and [qualification follow-up](release-qualification-follow-up.md) describe beta.
 | Modular detector profile qualification (#382) | [Node/WASM runtime qualification, package exports, CI/release wiring, known limitations](evidence/382/README.md) |
 | Modular detector profiles and size-aware WASM distribution (#377) | [Epic closeout](modular-detector-profiles-epic-closeout.md) |
 | Release-regression discovery evidence triage (#402) | [Candidate ec1f86b0c07e regression triage](evidence/402/README.md) |
+| OpenAI token shapes 1-3 discovery evidence triage (#405) | [Candidate fe4f1d1 regression triage](evidence/405/README.md) |
 | Release-regression discovery evidence triage, Slack shape-1 (#406) | [Candidate fe4f1d1 regression triage](evidence/406/README.md) |
 | Detection assurance | [Epic closeout](detection-assurance-epic-closeout.md), [historical closeout](detection-assurance-closeout-audit.md), [residual evidence](detection-assurance-residual-evidence-backlog.md) |
 | Repository transfer | [Transfer evidence](repository-transfer-evidence.md) |
