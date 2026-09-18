@@ -1196,11 +1196,11 @@
         {
           "dimension": "positive",
           "evidenceFixtureIds": [
-            "huggingface-positive-doc-style-placeholder",
+            "huggingface-positive-digit-bearing-body",
+            "huggingface-positive-exact-length",
             "huggingface-positive-json",
             "huggingface-positive-log",
             "huggingface-positive-markdown-delimiter",
-            "huggingface-positive-min-length",
             "huggingface-positive-punctuation-adjacent",
             "huggingface-positive-qualified",
             "huggingface-positive-repeated-value",
@@ -1230,9 +1230,16 @@
           "evidenceFixtureIds": [
             "huggingface-boundary-below-min",
             "huggingface-boundary-case-sensitivity",
+            "huggingface-boundary-dash-in-body",
             "huggingface-boundary-delimiter",
             "huggingface-boundary-invalid-alphabet",
-            "huggingface-boundary-short"
+            "huggingface-boundary-invalid-alphabet-exact-length",
+            "huggingface-boundary-one-long-exact-length",
+            "huggingface-boundary-one-short-exact-length",
+            "huggingface-boundary-short",
+            "huggingface-boundary-underscore-in-body",
+            "huggingface-positive-doc-style-placeholder",
+            "huggingface-positive-min-length"
           ],
           "state": "supported"
         },
@@ -1253,9 +1260,16 @@
           "evidenceFixtureIds": [
             "huggingface-boundary-below-min",
             "huggingface-boundary-case-sensitivity",
+            "huggingface-boundary-dash-in-body",
             "huggingface-boundary-delimiter",
             "huggingface-boundary-invalid-alphabet",
-            "huggingface-boundary-short"
+            "huggingface-boundary-invalid-alphabet-exact-length",
+            "huggingface-boundary-one-long-exact-length",
+            "huggingface-boundary-one-short-exact-length",
+            "huggingface-boundary-short",
+            "huggingface-boundary-underscore-in-body",
+            "huggingface-positive-doc-style-placeholder",
+            "huggingface-positive-min-length"
           ],
           "state": "supported"
         },

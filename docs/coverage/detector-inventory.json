@@ -93,7 +93,7 @@
       "type": "huggingface_token",
       "detector": "huggingface-token",
       "policyClass": "always-redact",
-      "reconciliationTrigger": "hf_SYNTHETICREVOKEDPROVIDERVALUE",
+      "reconciliationTrigger": "hf_SYNTHETICREVOKEDHUGGINGFACETOKEN01",
       "schemes": null
     },
     {

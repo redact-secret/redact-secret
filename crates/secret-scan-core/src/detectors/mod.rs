@@ -265,7 +265,7 @@ mod tests {
                 "xoxb-1234567890123-3210987654321-SYNTHETICREVOKEDBOTSECRET1",
             ),
             ("pypi-token", pypi_input.as_str()),
-            ("huggingface-token", "hf_SYNTHETICREVOKEDPROVIDERVALUE"),
+            ("huggingface-token", "hf_SYNTHETICREVOKEDHUGGINGFACETOKEN01"),
             ("docker-token", "dckr_pat_SYNTHETICREVOKEDDOCKERPAT00"),
             ("cloudflare-token", "cfut_SYNTHETICREVOKEDPROVIDERVALUE"),
             (

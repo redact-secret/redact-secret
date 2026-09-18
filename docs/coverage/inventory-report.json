@@ -538,7 +538,7 @@
     {
       "detector": "huggingface-token",
       "evidence": {
-        "fixtureCount": 25,
+        "fixtureCount": 32,
         "hostContextsExercised": [
           "http",
           "json",
@@ -560,11 +560,11 @@
         ]
       },
       "evidenceFixtureIds": [
-        "huggingface-positive-doc-style-placeholder",
+        "huggingface-positive-digit-bearing-body",
+        "huggingface-positive-exact-length",
         "huggingface-positive-json",
         "huggingface-positive-log",
         "huggingface-positive-markdown-delimiter",
-        "huggingface-positive-min-length",
         "huggingface-positive-punctuation-adjacent",
         "huggingface-positive-qualified",
         "huggingface-positive-repeated-value",

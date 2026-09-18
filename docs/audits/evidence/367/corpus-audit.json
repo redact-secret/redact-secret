@@ -219,16 +219,16 @@
       "disposition": "broad-shape",
       "expectedRanges": [
         {
-          "end": 306,
-          "start": 265
+          "end": 304,
+          "start": 263
         }
       ],
       "id": "additional-provider-families",
       "kind": null,
       "lostRanges": [
         {
-          "end": 306,
-          "start": 265
+          "end": 304,
+          "start": 263
         }
       ],
       "policyOutcomes": [],
@@ -269,8 +269,8 @@
       "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 378,
-          "start": 307
+          "end": 376,
+          "start": 305
         }
       ],
       "id": "additional-provider-families",
@@ -278,8 +278,8 @@
       "lostRanges": [],
       "retainedRanges": [
         {
-          "end": 378,
-          "start": 307
+          "end": 376,
+          "start": 305
         }
       ],
       "support": null,
@@ -394,23 +394,22 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/incremental",
       "detector": "huggingface-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 218,
+          "end": 216,
           "start": 179
         }
       ],
       "id": "additional-provider-families",
       "kind": null,
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 218,
+          "end": 216,
           "start": 179
         }
       ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
       "support": null,
       "tier": null
     },
@@ -419,23 +418,22 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/incremental",
       "detector": "huggingface-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 76,
+          "end": 74,
           "start": 37
         }
       ],
       "id": "huggingface-lookalike-token-discriminating-boundary",
       "kind": null,
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 76,
+          "end": 74,
           "start": 37
         }
       ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
       "support": null,
       "tier": null
     },
@@ -447,16 +445,16 @@
       "disposition": "broad-shape",
       "expectedRanges": [
         {
-          "end": 423,
-          "start": 379
+          "end": 421,
+          "start": 377
         }
       ],
       "id": "additional-provider-families",
       "kind": null,
       "lostRanges": [
         {
-          "end": 423,
-          "start": 379
+          "end": 421,
+          "start": 377
         }
       ],
       "policyOutcomes": [],
@@ -3392,23 +3390,22 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "huggingface-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 11253,
+          "end": 37,
           "start": 0
         }
       ],
       "id": "huggingface-adversarial-long-suffix",
       "kind": "adversarial",
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 11253,
+          "end": 37,
           "start": 0
         }
       ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
       "support": "supported",
       "tier": "adversarial"
     },
@@ -3438,6 +3435,22 @@
       "disposition": "silent",
       "expectedRanges": [],
       "id": "huggingface-boundary-case-sensitivity",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "huggingface-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "huggingface-boundary-dash-in-body",
       "kind": "boundary",
       "lostRanges": [],
       "retainedRanges": [],
@@ -3485,7 +3498,71 @@
       "detector": "huggingface-token",
       "disposition": "silent",
       "expectedRanges": [],
+      "id": "huggingface-boundary-invalid-alphabet-exact-length",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "huggingface-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "huggingface-boundary-one-long-exact-length",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "huggingface-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "huggingface-boundary-one-short-exact-length",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "huggingface-token",
+      "disposition": "silent",
+      "expectedRanges": [],
       "id": "huggingface-boundary-short",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "huggingface-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "huggingface-boundary-underscore-in-body",
       "kind": "boundary",
       "lostRanges": [],
       "retainedRanges": [],
@@ -3595,23 +3672,22 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "huggingface-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 52,
+          "end": 50,
           "start": 13
         }
       ],
       "id": "huggingface-overlap-context",
       "kind": "overlap",
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 52,
+          "end": 50,
           "start": 13
         }
       ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
       "support": "supported",
       "tier": "contextual"
     },
@@ -3622,23 +3698,64 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "huggingface-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 23,
+          "end": 37,
           "start": 0
         }
       ],
-      "id": "huggingface-positive-doc-style-placeholder",
+      "id": "huggingface-positive-digit-bearing-body",
       "kind": "positive",
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 23,
+          "end": 37,
           "start": 0
         }
       ],
-      "policyOutcomes": [],
+      "support": "supported",
+      "tier": "canonical"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "huggingface-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "huggingface-positive-doc-style-placeholder",
+      "kind": "boundary",
+      "lostRanges": [],
       "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "huggingface-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 37,
+          "start": 0
+        }
+      ],
+      "id": "huggingface-positive-exact-length",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 37,
+          "start": 0
+        }
+      ],
       "support": "supported",
       "tier": "canonical"
     },
@@ -3649,23 +3766,22 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "huggingface-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 48,
+          "end": 49,
           "start": 12
         }
       ],
       "id": "huggingface-positive-json",
       "kind": "positive",
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 48,
+          "end": 49,
           "start": 12
         }
       ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
       "support": "supported",
       "tier": "contextual"
     },
@@ -3676,23 +3792,22 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "huggingface-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 86,
+          "end": 87,
           "start": 50
         }
       ],
       "id": "huggingface-positive-log",
       "kind": "positive",
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 86,
+          "end": 87,
           "start": 50
         }
       ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
       "support": "supported",
       "tier": "contextual"
     },
@@ -3703,23 +3818,22 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "huggingface-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 37,
+          "end": 38,
           "start": 1
         }
       ],
       "id": "huggingface-positive-markdown-delimiter",
       "kind": "positive",
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 37,
+          "end": 38,
           "start": 1
         }
       ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
       "support": "supported",
       "tier": "contextual"
     },
@@ -3730,25 +3844,14 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "huggingface-token",
-      "disposition": "broad-shape",
-      "expectedRanges": [
-        {
-          "end": 23,
-          "start": 0
-        }
-      ],
+      "disposition": "silent",
+      "expectedRanges": [],
       "id": "huggingface-positive-min-length",
-      "kind": "positive",
-      "lostRanges": [
-        {
-          "end": 23,
-          "start": 0
-        }
-      ],
-      "policyOutcomes": [],
+      "kind": "boundary",
+      "lostRanges": [],
       "retainedRanges": [],
-      "support": "supported",
-      "tier": "canonical"
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
     },
     {
       "contexts": [
@@ -3757,23 +3860,22 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "huggingface-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 37,
+          "end": 44,
           "start": 7
         }
       ],
       "id": "huggingface-positive-punctuation-adjacent",
       "kind": "positive",
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 37,
+          "end": 44,
           "start": 7
         }
       ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
       "support": "supported",
       "tier": "contextual"
     },
@@ -3784,23 +3886,22 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "huggingface-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 39,
+          "end": 37,
           "start": 0
         }
       ],
       "id": "huggingface-positive-qualified",
       "kind": "positive",
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 39,
+          "end": 37,
           "start": 0
         }
       ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
       "support": "supported",
       "tier": "canonical"
     },
@@ -3811,31 +3912,30 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "huggingface-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 36,
+          "end": 37,
           "start": 0
         },
         {
-          "end": 73,
-          "start": 37
+          "end": 75,
+          "start": 38
         }
       ],
       "id": "huggingface-positive-repeated-value",
       "kind": "positive",
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 36,
+          "end": 37,
           "start": 0
         },
         {
-          "end": 73,
-          "start": 37
+          "end": 75,
+          "start": 38
         }
       ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
       "support": "supported",
       "tier": "contextual"
     },
@@ -3846,23 +3946,22 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "huggingface-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 64,
+          "end": 65,
           "start": 28
         }
       ],
       "id": "huggingface-positive-shell-quoted",
       "kind": "positive",
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 64,
+          "end": 65,
           "start": 28
         }
       ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
       "support": "supported",
       "tier": "contextual"
     },
@@ -3873,23 +3972,22 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "huggingface-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 63,
+          "end": 64,
           "start": 27
         }
       ],
       "id": "huggingface-positive-unicode-byte-offset",
       "kind": "positive",
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 63,
+          "end": 64,
           "start": 27
         }
       ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
       "support": "supported",
       "tier": "contextual"
     },
@@ -3900,23 +3998,22 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "huggingface-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 57,
+          "end": 58,
           "start": 21
         }
       ],
       "id": "huggingface-positive-yaml",
       "kind": "positive",
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 57,
+          "end": 58,
           "start": 21
         }
       ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
       "support": "supported",
       "tier": "contextual"
     },
@@ -3927,23 +4024,22 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "huggingface-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 57,
+          "end": 58,
           "start": 21
         }
       ],
       "id": "huggingface-positive-yaml-crlf",
       "kind": "positive",
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 57,
+          "end": 58,
           "start": 21
         }
       ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
       "support": "supported",
       "tier": "contextual"
     },
@@ -6681,22 +6777,22 @@
       "contractOnlyMatches": [],
       "corpus": "docs/coverage/detector-inventory.json#reconciliationTrigger",
       "detector": "huggingface-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 32,
+          "end": 37,
           "start": 0
         }
       ],
       "id": "huggingface_token",
       "kind": "reconciliation-trigger",
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 32,
+          "end": 37,
           "start": 0
         }
       ],
-      "retainedRanges": [],
       "support": null,
       "tier": null
     },
@@ -6794,10 +6890,10 @@
       "silent": 30
     },
     "huggingface-token": {
-      "broad-shape": 18,
-      "retained": 0,
+      "broad-shape": 1,
+      "retained": 17,
       "review": 0,
-      "silent": 11
+      "silent": 18
     },
     "linear-token": {
       "broad-shape": 18,

@@ -30,6 +30,10 @@ import {
   DIGITALOCEAN_V1_SEED_ID,
   generateDigitaloceanV1Mutations,
 } from "./fixtures/digitalocean-v1-mutations.js";
+import {
+  HUGGINGFACE_TOKEN_EXACT_LENGTH_SEED_ID,
+  generateHuggingFaceTokenMutations,
+} from "./fixtures/huggingface-token-mutations.js";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..");
@@ -392,6 +396,46 @@ describe("digitalocean-v1 mutation reproducibility (issue #369)", () => {
       expect(mutation.seedId).toBe(DIGITALOCEAN_V1_SEED_ID);
       expect(mutation.operation).toBe(reproduced!.operation);
       expect(fixture.input).toBe(reproduced!.input);
+    }
+  });
+});
+
+describe("huggingface-token-exact-length mutation reproducibility (issue #372)", () => {
+  test("regenerating the seeded mutation set is byte-identical", () => {
+    expect(generateHuggingFaceTokenMutations()).toEqual(generateHuggingFaceTokenMutations());
+  });
+
+  test("every corpus fixture declaring this grammar reproduces byte-for-byte", () => {
+    const generated = new Map(
+      generateHuggingFaceTokenMutations().map((mutation) => [mutation.ordinal, mutation]),
+    );
+    const declared = corpus.fixtures.filter(
+      (fixture) => fixture.mutation?.grammar === "huggingface-token-exact-length",
+    );
+
+    expect(declared.length).toBe(generated.size);
+    for (const fixture of declared) {
+      const mutation = fixture.mutation!;
+      const reproduced = generated.get(mutation.ordinal);
+      expect(reproduced, `${fixture.id}: no generated case for ordinal ${mutation.ordinal}`)
+        .toBeDefined();
+      expect(mutation.seedId).toBe(HUGGINGFACE_TOKEN_EXACT_LENGTH_SEED_ID);
+      expect(mutation.operation).toBe(reproduced!.operation);
+      expect(fixture.input).toBe(reproduced!.input);
+    }
+  });
+
+  test("only the identity and digit-bearing cases are supported positives", () => {
+    const declared = corpus.fixtures.filter(
+      (fixture) => fixture.mutation?.grammar === "huggingface-token-exact-length",
+    );
+    for (const fixture of declared) {
+      const operation = fixture.mutation!.operation;
+      const isPositive = operation === "identity" || operation === "digit-bearing";
+      expect(fixture.expected.length, fixture.id).toBe(isPositive ? 1 : 0);
+      expect(fixture.support, fixture.id).toBe(
+        isPositive ? "supported" : "intentionally-unsupported",
+      );
     }
   });
 });
