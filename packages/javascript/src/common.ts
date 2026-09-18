@@ -36,10 +36,12 @@
  * this API, and no internal module of this package is reachable through its
  * `exports` map.
  *
- * Byte streams are served by the two adapter subpaths,
- * `@redact-secret/core/node-stream` and
- * `@redact-secret/core/web-stream`, each of which drives one incremental
- * session per stream. This root module never resolves a `node:` module.
+ * The `createNodeStreamSanitizer` and `createWebStreamSanitizer` factories of
+ * `@redact-secret/core/node-stream` and `@redact-secret/core/web-stream`
+ * always open a `full` session. For a `common` byte stream, pass a session
+ * from this module's `createIncrementalSanitizer` to the `NodeStreamSanitizer`
+ * or `WebStreamSanitizer` class instead. This module never resolves a `node:`
+ * module.
  */
 
 import { runtime } from "./session-common.js";

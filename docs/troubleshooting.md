@@ -5,9 +5,8 @@
 | Symptom / code | What to check |
 | --- | --- |
 | `NOT_INITIALIZED` in JavaScript | Await `initialize()` before synchronous work |
-| `INITIALIZATION_FAILED` on Node | Supported Node major and target, installed optional addon, matching package versions; npm has no musl/Alpine addon |
-| `INITIALIZATION_FAILED` in browser | Browser export conditions, Wasm asset URL, HTTP response, MIME type, and matching artifact version |
-| `INCREMENTAL_UNAVAILABLE` | Every current artifact (Node, browser WebAssembly, Python, Rust, CLI) supports incremental sanitization; this fires only against a stale Node addon on disk that predates the export |
+| `INITIALIZATION_FAILED` on Node | Supported Node major and target, installed optional addon, matching package versions, and an addon whose profile matches the entry point (`@redact-secret/core` or `/common`); npm has no musl/Alpine addon |
+| `INITIALIZATION_FAILED` in browser | Browser import conditions, Wasm asset URL, HTTP response, MIME type, and an artifact whose version and profile match the entry point (`@redact-secret/core` or `/common`) |
 | `UNPAIRED_SURROGATE` | JavaScript text contains an invalid standalone UTF-16 surrogate; correct input handling before scanning |
 | `INVALID_FINDINGS` | Findings belong to the same original text, have valid native-unit bounds, and do not overlap |
 | `INVALID_PLACEHOLDER` | Formatter output is non-empty, no more than 256 UTF-8 bytes, and does not reproduce a replaced value |

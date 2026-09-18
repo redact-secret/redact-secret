@@ -70,7 +70,7 @@ qualified.
 
 ## JavaScript quick start
 
-The replacement JavaScript package presents one typed API across Node.js and
+The JavaScript package presents one typed API across Node.js and
 modern browsers. Its explicit initialization contract makes native or
 WebAssembly loading failures observable without making every scan asynchronous.
 
@@ -204,8 +204,8 @@ Built-in Rust detection covers:
 - JWTs and bearer, Basic, and Token authorization credentials;
 - OpenAI, Anthropic, Shopify, and modern HashiCorp Vault credentials;
 - qualified Stripe, Slack, PyPI, Hugging Face, Docker Hub, Cloudflare,
-  DigitalOcean, Linear, Supabase, Vercel, SendGrid, Google Cloud/Gemini,
-  Notion, Atlassian Cloud (Jira / Confluence), Twilio Auth Token/API Key
+  DigitalOcean, Linear, Supabase, Vercel, npm, SendGrid, Google Cloud/Gemini,
+  Microsoft Entra client secret, Azure DevOps personal access token, Notion, Atlassian Cloud (Jira / Confluence), Twilio Auth Token/API Key
   Secret, Telegram Bot API, Discord bot, Sentry user/organization auth token,
   Datadog API/Application Key, Grafana service account, and Grafana Cloud access
   policy, and New Relic User API Key/License Key credentials;
@@ -462,8 +462,8 @@ packages/javascript     unified JavaScript package, published as @redact-secret/
 
 Release qualification must build and test the Rust crate, npm package, Python
 package, and CLI from the same commit without publishing. The artifacts share
-one SemVer version and one eventual `v{version}` tag. The `Qualification
-Matrix` workflow is that run: it builds the N-API addon, the CPython abi3
+one SemVer version and one eventual `v{version}` tag. The `Artifact
+qualification` workflow is that run: it builds the N-API addon, the CPython abi3
 wheels, the browser WebAssembly artifact, and the CLI binary for every
 declared target, smoke-tests each on the architecture it targets, exercises
 the browser artifact in Chromium, Firefox, and WebKit, and records an artifact
@@ -493,7 +493,7 @@ snapshot, log, or diagnostic.
 A release requires explicit approval after tests pass and the public API and
 changelog have been reviewed. Readiness checks do not authorize selecting a
 version, creating a tag, publishing a package, deploying, or archiving another
-repository. See the [candidate changelog](./CHANGELOG.md).
+repository. See the [changelog](./CHANGELOG.md).
 
 The accepted architectural decisions are indexed in
 [docs/decisions/DECISIONS.md](./docs/decisions/DECISIONS.md).

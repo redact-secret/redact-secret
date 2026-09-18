@@ -135,10 +135,10 @@ impl DetectorRegistry {
     {
         let mut registry = Self::new();
         for detector in built_in_detectors() {
-            registry.register(detector)?;
+            registry.push_validated(detector, false)?;
         }
         for detector in custom {
-            registry.register(detector)?;
+            registry.push_validated(detector, false)?;
         }
         registry.profile = Some(Profile::Full);
         Ok(registry)
@@ -168,13 +168,10 @@ impl DetectorRegistry {
     {
         let mut registry = Self::new();
         for detector in common_built_in_detectors() {
-            registry.register(detector)?;
+            registry.push_validated(detector, false)?;
         }
         for detector in custom {
-            if built_in_ids().any(|reserved| reserved == detector.id()) {
-                return Err(SecretScanErrorCode::InvalidDetector.into());
-            }
-            registry.register(detector)?;
+            registry.push_validated(detector, true)?;
         }
         registry.profile = Some(Profile::Common);
         Ok(registry)
@@ -183,15 +180,16 @@ impl DetectorRegistry {
     /// Which profile this registry was built from, when it carries one.
     ///
     /// `Some` only for a registry built through [`Self::with_built_in`] or
-    /// [`Self::with_common_built_in`]. A registry assembled through
-    /// [`Self::new`] and [`Self::register`] carries no profile guarantee and
-    /// reports `None`.
+    /// [`Self::with_common_built_in`] and not extended since. A registry
+    /// assembled or extended through [`Self::register`] carries no profile
+    /// guarantee and reports `None`.
     #[must_use]
     pub const fn profile(&self) -> Option<Profile> {
         self.profile
     }
 
-    /// Appends `detector`.
+    /// Appends `detector`. This path applies no profile's reserved-id rule,
+    /// so a successful call clears [`Self::profile`].
     ///
     /// # Errors
     ///
@@ -199,15 +197,30 @@ impl DetectorRegistry {
     /// not satisfy [`is_identifier`] or is already registered. The registry
     /// is unchanged on error.
     pub fn register(&mut self, detector: Box<dyn Detector>) -> Result<&mut Self, SecretScanError> {
+        self.push_validated(detector, false)?;
+        self.profile = None;
+        Ok(self)
+    }
+
+    /// Reads the id once, validates it, and appends. `reject_built_in_ids`
+    /// additionally refuses any `full` built-in id.
+    fn push_validated(
+        &mut self,
+        detector: Box<dyn Detector>,
+        reject_built_in_ids: bool,
+    ) -> Result<(), SecretScanError> {
         let id = detector.id();
-        if !is_identifier(id) || self.contains(id) {
+        if !is_identifier(id)
+            || self.contains(id)
+            || (reject_built_in_ids && built_in_ids().any(|reserved| reserved == id))
+        {
             return Err(SecretScanErrorCode::InvalidDetector.into());
         }
         self.detectors.push(RegisteredDetector {
             id: id.to_owned(),
             detector,
         });
-        Ok(self)
+        Ok(())
     }
 
     /// Detectors in registration order.
@@ -372,6 +385,46 @@ mod tests {
                 .profile(),
             Some(Profile::Common)
         );
+    }
+
+    #[test]
+    fn extending_a_profile_registry_clears_its_profile_identity() {
+        let mut registry = DetectorRegistry::with_common_built_in([]).unwrap();
+        registry.register(Box::new(Named("github-token"))).unwrap();
+        assert_eq!(registry.profile(), None);
+
+        let mut rejected = DetectorRegistry::with_common_built_in([]).unwrap();
+        rejected.register(Box::new(Named("Bad"))).unwrap_err();
+        assert_eq!(rejected.profile(), Some(Profile::Common));
+    }
+
+    #[test]
+    fn a_profile_constructor_reads_a_custom_id_once() {
+        struct Flipping(std::sync::atomic::AtomicUsize);
+
+        impl Detector for Flipping {
+            fn id(&self) -> &str {
+                if self.0.fetch_add(1, std::sync::atomic::Ordering::Relaxed) == 0 {
+                    "github-token"
+                } else {
+                    "custom-token"
+                }
+            }
+
+            fn detect(
+                &self,
+                _: &str,
+                _: &DetectorContext,
+            ) -> Result<Vec<Candidate>, DetectorFailure> {
+                Ok(Vec::new())
+            }
+        }
+
+        let error = DetectorRegistry::with_common_built_in([Box::new(Flipping(
+            std::sync::atomic::AtomicUsize::new(0),
+        )) as Box<dyn Detector>])
+        .unwrap_err();
+        assert_eq!(error.code(), SecretScanErrorCode::InvalidDetector);
     }
 
     #[test]

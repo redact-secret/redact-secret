@@ -37,15 +37,11 @@ Use ordinary Markdown, descriptive headings, relative links, and synthetic
 examples. Keep current behavior distinguishable from historical audits and
 future work. Describe only capabilities that the shipping runtime can execute.
 
-The guide tree can later become a wiki or be rendered to static HTML for
-S3 and CloudFront. A future site build should resolve repository links, copy
-assets, and validate generated navigation. This checkout does not yet contain
-that renderer or a deployment configuration. Existing audit and decision URLs
-are preserved for traceability.
+Existing audit and decision URLs are preserved for traceability.
 
 ## Release boundary
 
-Review changes to the public API and [candidate changelog](../CHANGELOG.md).
+Review changes to the public API and [changelog](../CHANGELOG.md).
 Local green tests are not cross-platform qualification or registry verification.
 Release approval, version selection, tagging, publication, and deployment follow
 [the repository's release authority](../AGENTS.md); editing or reviewing the

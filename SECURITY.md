@@ -2,13 +2,13 @@
 
 ## Supported versions
 
-Redact Secret has public prereleases, including `0.1.0-beta.1`,
-`0.1.0-beta.2`, and `0.1.0-beta.3`. Beta publication is not a stable-release
+Redact Secret has public prereleases, listed in
+[release status](docs/releases/status.md). Beta publication is not a stable-release
 support guarantee. Security fixes target the latest beta; users of older betas
 should upgrade. Backports and fixed response or remediation times are not
 promised. Report suspected vulnerabilities in any version through the private
-channel below. See [release status](docs/releases/status.md) for registry and
-GitHub Release evidence.
+channel below. Release status also records registry and GitHub Release
+evidence.
 
 ## Reporting a vulnerability
 
@@ -55,7 +55,8 @@ Findings supplied directly to `redact` are trusted caller assertions. The
 library validates their metadata and ranges but does not verify that they came
 from `scan` or that the selected action matches server policy. A placeholder is
 rejected if it contains any replaced matched range that can fit within the
-256-code-unit placeholder bound, including ranges shorter than four code units.
+256-UTF-8-byte placeholder bound, including ranges shorter than four native
+range units.
 `warn` and `allow` findings deliberately leave the original text unchanged.
 
 ## Authoritative server limits

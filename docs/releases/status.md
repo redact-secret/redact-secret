@@ -1,8 +1,11 @@
 # Public beta release status
 
-Observed 2026-09-16. [Registry observation](registry-observation.json) records
-version availability, npm integrity values, crate and Python checksums, npm
-dist-tags, and annotated tag targets. Registry publication, workflow completion,
+Beta.1 through beta.3 were observed on 2026-09-16:
+[registry observation](registry-observation.json) records their version
+availability, npm integrity values, crate and Python checksums, npm dist-tags,
+and annotated tag targets. Beta.4's registry checksums and tag target are in its
+[durable release record](0.1.0-beta.4/README.md); the npm dist-tags below were
+observed on 2026-09-18. Registry publication, workflow completion,
 and a GitHub Release page are separate facts.
 
 | Version | Registry artifacts | Annotated source tag | GitHub Release |
@@ -10,10 +13,11 @@ and a GitHub Release page are separate facts.
 | 0.1.0-beta.1 | 8 npm packages, 2 crates, 9 Python files | `7bbd345be0604b8c3d50335985e0bfbbbe3703c9` | [Published](https://github.com/redact-secret/redact-secret/releases/tag/v0.1.0-beta.1) |
 | 0.1.0-beta.2 | 8 npm packages, 2 crates, 9 Python files | `8cdc1b118449a15be545ecf70bb7f0df53f6126e` | Missing; [body prepared](beta.2-release-notes.md) |
 | 0.1.0-beta.3 | 8 npm packages, 2 crates, 9 Python files | `34ea9b92ed8879082e99f56f8f4715ee4e4f1f35` | Missing; [body prepared](beta.3-release-notes.md) |
+| 0.1.0-beta.4 | 8 npm packages, 2 crates, 9 Python files | `b4a9ae83d737d367ebc1d6d1732e634b44b2452a` | Missing; [record](0.1.0-beta.4/README.md) |
 
-For `@redact-secret/core`, npm `beta` points to beta.3 and `latest` still points
-to beta.1. Use `@redact-secret/core@0.1.0-beta.3` or `@redact-secret/core@beta`
-when selecting the current beta. Python spells beta.3 as `0.1.0b3`.
+For `@redact-secret/core`, npm `beta` points to beta.4 and `latest` still points
+to beta.1. Use `@redact-secret/core@0.1.0-beta.4` or `@redact-secret/core@beta`
+when selecting the current beta. Python spells beta.4 as `0.1.0b4`.
 No dist-tag was changed as part of this review.
 
 Beta.2's [durable release record](0.1.0-beta.2/README.md) preserves its initial

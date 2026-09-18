@@ -1,8 +1,8 @@
 # Contributing to Redact Secret
 
 Redact Secret provides deterministic secret detection and redaction through one
-Rust core shared by JavaScript, Python, Rust, and CLI consumers. The first beta
-is a prerelease; describe current support and limitations without claiming v1
+Rust core shared by JavaScript, Python, Rust, and CLI consumers. Beta releases
+are prereleases; describe current support and limitations without claiming v1
 stability.
 
 ## Before opening a change
@@ -128,8 +128,8 @@ using the durable release manifest and matching qualified artifacts.
 
 ### Release evidence
 
-The [beta.1 record](docs/releases/0.1.0-beta.1/README.md) describes the completed
-first publication and recovery. Subsequent development is recorded under
-`Unreleased` in the [changelog](CHANGELOG.md). The
-[beta.2 review](docs/audits/beta2-final-code-review.md) records the current
-pre-release findings; its verification is not approval to publish.
+[Release status](docs/releases/status.md) lists every published version and
+its durable record. Subsequent development is recorded under `Unreleased` in
+the [changelog](CHANGELOG.md). Candidate reviews live under
+[docs/audits](docs/audits/README.md); their verification is not approval to
+publish.

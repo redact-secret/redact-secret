@@ -42,23 +42,10 @@
  * asserts every finding comes from a detector inside the `common`
  * membership list. Passes 4 (Integrate) and 5 (Stream) also run for
  * `common`, against `@redact-secret/core/common` and the same
- * `common-profile-expectations.json` (pass 5 uses `COMMON_STREAM_FIXTURE_ID`
- * instead of `CANONICAL_FIXTURE_ID` — see its own comment). This differs
- * from the browser script, which cannot qualify `@redact-secret/core/common`
- * on a bundled package page for `common` at all
- * (`scripts/browser-package-harness-common.mjs`'s module comment): the
- * browser problem is that `common`'s WebAssembly artifact is a second,
- * separate compiled binary, and a bundler eagerly resolves every literal
- * `import()` it finds while walking a module graph, even one behind an
- * unused export. Node has no such second artifact — one compiled addon
- * links both profiles' exports — and this script never bundles anything;
- * `require(specifier)` on that one addon file happens only when
- * `initialize()`/`scan()` is actually called, not merely by importing
- * `dist/common.js`'s module graph, so there is nothing for either profile's
- * entry point to accidentally pull in from the other. There is nothing to
- * select with `--target`/`--artifact-dir`-style directory switching:
- * `--detector-profile` only changes which exports, expectations, and
- * fixtures every pass uses.
+ * `common-profile-expectations.json`, on `COMMON_REDACT_FIXTURE_ID` instead
+ * of `CANONICAL_FIXTURE_ID` (see its own comment). One compiled addon links
+ * both profiles' exports, so `--detector-profile` only changes which
+ * exports, expectations, and fixtures every pass uses.
  */
 
 import { execFileSync } from "node:child_process";
@@ -86,17 +73,17 @@ import {
 } from "./qualify-runtime-fixture.mjs";
 
 /**
- * The stream-adapter fixture for `common` (`decision-define-detector-profile-
- * and-pack-contract`). `CANONICAL_FIXTURE_ID` (`host-dotenv-github`) is a
+ * The package-integration and stream-adapter fixture for `common`
+ * (`decision-define-detector-profile-and-pack-contract`). `CANONICAL_FIXTURE_ID` (`host-dotenv-github`) is a
  * `github-token` (provider-pack) finding under `full`; `common` falls back to
  * `generic-token` at `warn`, which leaves the input text unredacted and would
- * make this file's "the real addon left a known secret unredacted" sanity
- * check vacuous. `jwt-positive-structured` is a `common`-pack (`jwt`) finding
- * that is `redact` and identical — same detector, type, confidence, and range
- * — in both `full` and `common` (per-detector invariance), single-finding,
- * and pure ASCII, the same constraints `CANONICAL_FIXTURE_ID` satisfies.
+ * make this file's redaction checks vacuous. `jwt-positive-structured` is a
+ * `common`-pack (`jwt`) finding that is `redact` and identical — same
+ * detector, type, confidence, and range — in both `full` and `common`
+ * (per-detector invariance), single-finding, and pure ASCII, the same
+ * constraints `CANONICAL_FIXTURE_ID` satisfies.
  */
-const COMMON_STREAM_FIXTURE_ID = "jwt-positive-structured";
+const COMMON_REDACT_FIXTURE_ID = "jwt-positive-structured";
 
 import { qualifyIncrementalInput } from "./qualify-incremental-input.mjs";
 
@@ -486,7 +473,9 @@ async function integrateWithPackage(detectorProfile, commonExpectations) {
     `${entry}: missing; build the package with \`npm run js:build\``,
   );
 
-  const fixture = await loadCanonicalFixture(CANONICAL_FIXTURE_ID);
+  const fixture = await loadCanonicalFixture(
+    detectorProfile === "common" ? COMMON_REDACT_FIXTURE_ID : CANONICAL_FIXTURE_ID,
+  );
   const expectedVersion = await packageVersion();
 
   const link = await linkAddon();
@@ -859,7 +848,7 @@ async function main() {
   );
 
   const streamFixtureId =
-    detectorProfile === "common" ? COMMON_STREAM_FIXTURE_ID : CANONICAL_FIXTURE_ID;
+    detectorProfile === "common" ? COMMON_REDACT_FIXTURE_ID : CANONICAL_FIXTURE_ID;
   const streamFixture = fixtures.find((fixture) => fixture.id === streamFixtureId);
   assert(streamFixture !== undefined, `no ${streamFixtureId} fixture in the synchronous corpus`);
   await reportAsync(

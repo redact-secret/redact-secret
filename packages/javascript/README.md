@@ -3,7 +3,7 @@
 Deterministic secret detection and redaction for browser and server
 JavaScript/TypeScript applications.
 
-One typed API, two artifacts: the package's `exports` map selects the Node
+One typed API, two artifacts: the package's `imports` map selects the Node
 N-API addon on Node.js and the browser WebAssembly build everywhere else
 (`decision-define-runtime-bindings`). Every built-in detector runs in the Rust
 core, so both runtimes see the same findings for the same input.
@@ -14,7 +14,6 @@ core, so both runtimes see the same findings for the same input.
 npm install @redact-secret/core
 ```
 
-These registry instructions apply after an approved release is published.
 Node.js 20, 22, and 24 are supported, on glibc Linux, macOS, and Windows
 (x64 and arm64). npm does not ship a musl/Alpine addon. Browser applications
 need ES2022 and WebAssembly support. The package is ESM only.
@@ -249,7 +248,8 @@ mapped to the same fixed error vocabulary.
 
 Runtime values: `initialize`, `scan`, `redact`, `scanAndRedact`,
 `createIncrementalSanitizer`, `defaultPlaceholderFormatter`,
-`typedPlaceholderFormatter`, `SecretScanError`, `RANGE_UNIT`, `VERSION`.
+`typedPlaceholderFormatter`, `SecretScanError`, `RANGE_UNIT`, `VERSION`,
+`PROFILE`.
 
 Types: `DetectedSecretFinding`, `SecretFinding`, `SecretAction`,
 `SecretConfidence`, `SecretPolicy`, `PolicyContext`, `PlaceholderFormatter`,
@@ -264,7 +264,19 @@ Stream subpaths: `@redact-secret/core/node-stream` exports
 `@redact-secret/core/web-stream` exports `createWebStreamSanitizer`,
 `WebStreamSanitizer`, and `SecretScanError`.
 
-The root export and those two stream subpaths are the executable public API.
+`@redact-secret/core/common` exports the same runtime values and types as the
+root, backed by the opt-in `common` detector profile: `PROFILE` is `"common"`
+there and `"full"` on the root. `common` omits every provider detector, so a
+bare provider token is not detected. `initialize()` rejects with
+`INITIALIZATION_FAILED` when the loaded artifact reports a different profile
+than the entry point that loaded it. The `createNodeStreamSanitizer` and
+`createWebStreamSanitizer` factories always open a `full` session; for a
+`common` byte stream, pass a session from `@redact-secret/core/common`'s
+`createIncrementalSanitizer` to the `NodeStreamSanitizer` or
+`WebStreamSanitizer` class.
+
+The root export, `@redact-secret/core/common`, and the two stream subpaths are
+the executable public API.
 `@redact-secret/core/package.json` also exposes package metadata. Internal
 modules are unreachable through the `exports` map. `VERSION` is
 the shared product version; the Rust crate, this package, the Python package,

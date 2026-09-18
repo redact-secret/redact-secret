@@ -36,6 +36,8 @@ use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
 
 const BOT_PREFIX: &str = "xoxb-";
+/// What precedes `xoxb-` in the rotating `xoxe.xoxb-` interim prefix.
+const ROTATING_LEAD: &str = "xoxe.";
 /// Each numeric section's documented width (tool-agreement; the provider
 /// establishes only that sections are `-`-separated).
 const BOT_SECTION_MIN: usize = 10;
@@ -100,10 +102,10 @@ impl Detector for SlackTokenDetector {
 }
 
 /// Every match, `xoxb-` bot values and interim-guarded prefixes together,
-/// left to right by start offset. No two prefixes here share a leading
-/// substring with another, so scanning each family independently and
-/// merging by position reproduces the same left-to-right, longest-prefix
-/// result a single combined scan would.
+/// left to right by start offset. The only prefix that contains another is
+/// `xoxe.xoxb-`, which [`scan_bot`] leaves to the interim guard, so scanning
+/// each family independently and merging by position reproduces the same
+/// left-to-right, longest-prefix result a single combined scan would.
 fn scan(input: &str) -> Vec<(usize, usize, &'static [&'static str; 2])> {
     let mut matches: Vec<(usize, usize, &'static [&'static str; 2])> = scan_bot(input)
         .into_iter()
@@ -122,7 +124,8 @@ fn scan(input: &str) -> Vec<(usize, usize, &'static [&'static str; 2])> {
 /// attempt advances by one byte; a shape-complete attempt advances past the
 /// whole value whether or not the boundary check keeps it, so a wider
 /// identifier that embeds a bot prefix never yields a second, shorter
-/// reading of the same bytes.
+/// reading of the same bytes. A `xoxb-` that is the tail of the rotating
+/// `xoxe.xoxb-` prefix belongs to the interim guard and is skipped.
 fn scan_bot(input: &str) -> Vec<(usize, usize)> {
     let bytes = input.as_bytes();
     let digit_ends = pattern::run_ends(bytes, BOT_DIGIT_ALPHABET);
@@ -130,7 +133,9 @@ fn scan_bot(input: &str) -> Vec<(usize, usize)> {
     let mut matches = Vec::new();
     let mut start = 0;
     while start < bytes.len() {
-        if !bytes[start..].starts_with(BOT_PREFIX.as_bytes()) {
+        if !bytes[start..].starts_with(BOT_PREFIX.as_bytes())
+            || bytes[..start].ends_with(ROTATING_LEAD.as_bytes())
+        {
             start += 1;
             continue;
         }
@@ -338,6 +343,13 @@ mod tests {
             let input = format!("{prefix}{body}");
             assert_eq!(ranges(&input), vec![(0, input.len())], "{prefix}");
         }
+    }
+
+    #[test]
+    fn a_rotating_bot_value_with_a_valid_bot_body_is_one_whole_value_match() {
+        let input = "xoxe.xoxb-1234567890-1234567890-SYNTHETICREVOKED00";
+        assert_eq!(ranges(input), vec![(0, input.len())]);
+        assert!(ranges(&format!("a{input}")).is_empty());
     }
 
     #[test]

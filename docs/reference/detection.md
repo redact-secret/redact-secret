@@ -9,11 +9,14 @@ text. It does not determine whether a credential is active, expired, or valid.
 | --- | --- |
 | Private keys | PEM-style private-key blocks |
 | Provider credentials | AWS access-key IDs; GitHub, GitLab, OpenAI, Anthropic, Shopify, modern Vault patterns |
-| Additional provider formats | Qualified Stripe, Slack, PyPI, Hugging Face, Docker Hub, Cloudflare, DigitalOcean (`dop_v1_`/`doo_v1_`/`dor_v1_` plus exactly 64 lowercase hex bytes), Linear, Supabase, Vercel patterns |
+| Additional provider formats | Qualified Stripe, Slack, PyPI, Hugging Face, Docker Hub, Cloudflare, DigitalOcean (`dop_v1_`/`doo_v1_`/`dor_v1_` plus exactly 64 lowercase hex bytes), Linear, Supabase, Vercel, npm, SendGrid, Google Cloud/Gemini, Microsoft Entra client secret, Azure DevOps personal access token, Notion, Atlassian Cloud, Twilio, Telegram Bot API, Discord bot, Sentry, Datadog, Grafana, and New Relic patterns |
 | Authorization | JWT, Bearer, Basic, and Token credentials |
 | Context | Credential assignments, including AWS secret-access-key and session-token names |
 | Connections | Credential-bearing PostgreSQL, MySQL, MariaDB, MongoDB, Redis, AMQP URLs |
 | One-time password provisioning | `otpauth://totp` and `otpauth://hotp` with base32 shared secrets |
+
+The opt-in `common` detector profile omits both provider rows; see the
+[README's profile section](../../README.md#opt-in-detector-profiles).
 
 This is a family overview, not a promise to match every token each provider
 issues. Exact supported grammars and evidence are recorded in the
