@@ -371,17 +371,17 @@
       "rule_id": "sast.rules.javascript.lang.security.html-in-template-string",
       "rationale": "The template string builds a `<SECRET_N>` / `<TYPE_N>` redaction placeholder label for test-fixture comparison or CLI output text; it is never assigned to `innerHTML`, rendered into a DOM, or otherwise interpreted as markup, so the XSS this rule guards against cannot occur here."
     },
-    "6bb55e758f12519d": {
+    "daf7338151872bd1": {
       "classification": "false_positive",
       "path": "scripts/qualify-node-addon.mjs",
-      "line": 208,
+      "line": 195,
       "rule_id": "sast.rules.javascript.lang.security.html-in-template-string",
       "rationale": "The template string builds a `<SECRET_N>` / `<TYPE_N>` redaction placeholder label for test-fixture comparison or CLI output text; it is never assigned to `innerHTML`, rendered into a DOM, or otherwise interpreted as markup, so the XSS this rule guards against cannot occur here."
     },
-    "a804d0383192d58f": {
+    "a7aa587861c6f7d9": {
       "classification": "false_positive",
       "path": "scripts/qualify-node-addon.mjs",
-      "line": 358,
+      "line": 345,
       "rule_id": "sast.rules.javascript.lang.security.audit.unsafe-dynamic-method",
       "rationale": "The dynamic member access selects a method name from the hardcoded `DETECTOR_PROFILES` map, whose two entries (`full`/`common`) are literal object keys in this file; `detectorProfile` is validated against `Object.hasOwn(DETECTOR_PROFILES, ...)` before this call, so the invoked name is always one of the two fixed literal strings `initialize` / `initializeCommon`, never attacker- or externally-controlled input. This is a local build-qualification script, not a network-facing service."
     }
