@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 1,
+  "lifecycleAuthority": "https://github.com/redact-secret/redact-secret-benchmarks/blob/main/docs/decisions/2026-09-18-govern-benchmark-promotion.md",
+  "records": [
+    {
+      "id": "benchmark-gap-292",
+      "benchmarkRecordId": "product-292",
+      "benchmarkIssue": "https://github.com/redact-secret/redact-secret-benchmarks/issues/10",
+      "productIssue": "https://github.com/redact-secret/redact-secret/issues/292",
+      "benchmarkFixtureIds": [
+        "reference-syntax--windows-env",
+        "reference-syntax--sql-bind"
+      ],
+      "corpusHashes": [
+        "2788a206fdc04b281d6fa58dcf0bb4b6718d6bb96a76aa2759e9bcb85da944fa"
+      ],
+      "fixingCommit": "8d8d5b4e8dae8de1b42e174d8d21dc0075147fc6",
+      "canonicalFixtures": {
+        "synchronous": [],
+        "incremental": []
+      },
+      "gates": {
+        "productConformance": {
+          "status": "pending",
+          "evidence": []
+        },
+        "benchmarkRevalidation": {
+          "status": "pending",
+          "evidence": []
+        }
+      },
+      "note": "The detector repair and unit controls landed historically, but no canonical cross-surface fixture or fixed-candidate benchmark rerun is recorded. The closed issue remains closed; these gates remain pending."
+    },
+    {
+      "id": "benchmark-gap-293",
+      "benchmarkRecordId": "product-293",
+      "benchmarkIssue": "https://github.com/redact-secret/redact-secret-benchmarks/issues/10",
+      "productIssue": "https://github.com/redact-secret/redact-secret/issues/293",
+      "benchmarkFixtureIds": [
+        "reference-syntax--azure-keyvault"
+      ],
+      "corpusHashes": [
+        "2788a206fdc04b281d6fa58dcf0bb4b6718d6bb96a76aa2759e9bcb85da944fa"
+      ],
+      "fixingCommit": "a62339e7bb2de616bbc200476c9e043bfd429c30",
+      "canonicalFixtures": {
+        "synchronous": [
+          "contextual-negative-azure-keyvault-secreturi-non-azure-host",
+          "contextual-negative-azure-keyvault-secreturi-sovereign-host",
+          "contextual-negative-azure-keyvault-secreturi-crlf",
+          "contextual-negative-azure-keyvault-vaultname-unicode-prefix",
+          "contextual-positive-azure-keyvault-single-label-host-detected"
+        ],
+        "incremental": []
+      },
+      "gates": {
+        "productConformance": {
+          "status": "pending",
+          "evidence": []
+        },
+        "benchmarkRevalidation": {
+          "status": "pending",
+          "evidence": []
+        }
+      },
+      "note": "Canonical whole-input cases exist, but the closed issue does not record the required supported-surface conformance evidence or a fixed-candidate benchmark rerun."
+    },
+    {
+      "id": "benchmark-gap-294",
+      "benchmarkRecordId": "product-294",
+      "benchmarkIssue": "https://github.com/redact-secret/redact-secret-benchmarks/issues/10",
+      "productIssue": "https://github.com/redact-secret/redact-secret/issues/294",
+      "benchmarkFixtureIds": [
+        "detector-coverage--generic-token-api-key-quoted",
+        "detector-coverage--generic-token-password-quoted",
+        "detector-coverage--generic-token-client-secret-quoted"
+      ],
+      "corpusHashes": [
+        "4d4b8d4530a780321b18ffb07f317054fdf71ba759543dc2260a9b4d3540b824"
+      ],
+      "fixingCommit": "49f41ea95958c87e6c132471b15cd4c50642f721",
+      "canonicalFixtures": {
+        "synchronous": [
+          "contextual-positive-nested-no-separator-api-key",
+          "contextual-positive-nested-no-separator-password",
+          "contextual-positive-nested-no-separator-client-secret"
+        ],
+        "incremental": [
+          "contextual-assignment-nested-no-separator-inside-quote",
+          "contextual-assignment-nested-no-separator-masked-value",
+          "contextual-assignment-nested-no-separator-crlf"
+        ]
+      },
+      "gates": {
+        "productConformance": {
+          "status": "pending",
+          "evidence": []
+        },
+        "benchmarkRevalidation": {
+          "status": "pending",
+          "evidence": []
+        }
+      },
+      "note": "Whole-input and incremental cases exist, but the closed issue does not record the required supported-surface conformance evidence or a fixed-candidate benchmark rerun."
+    }
+  ]
+}
