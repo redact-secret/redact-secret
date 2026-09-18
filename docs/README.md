@@ -20,6 +20,7 @@ Python, Rust, and the CLI share one deterministic Rust implementation.
 | Can I process a stream? | [Streaming](guides/streaming.md) |
 | Why did initialization or sanitization fail? | [Troubleshooting](troubleshooting.md) |
 | How do I contribute or run checks? | [Developer onboarding](onboarding.md) · [Contribution guide](../CONTRIBUTION.md) |
+| How do I benchmark an unreleased local candidate? | [Local candidate benchmark](benchmark-candidate.md) |
 | How do I prepare, publish, or recover a release? | [Release runbook](releasing.md) |
 
 JavaScript, Rust, Python, and CLI standard input all support incremental

@@ -13,6 +13,7 @@
 
 # graft's local graph cache — regenerable, not committed (run `graft build`).
 /graft/
+/benchmark-evidence/
 
 # Rust build output
 /target/
