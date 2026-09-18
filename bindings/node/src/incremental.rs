@@ -517,25 +517,26 @@ impl JsIncrementalSanitizer {
     }
 }
 
-/// Creates a bounded incremental sanitization session over the built-in
-/// detectors (`decision-define-runtime-bindings`).
-///
-/// `options.policy`, when given, is called once per finalized finding as
-/// `(finding: JsDetectedFinding, context: JsIncrementalPolicyContext) =>
-/// string`, returning `"redact"`, `"block"`, `"warn"`, or `"allow"`.
-/// `options.formatter`, when given, is called once per replaced finding as
-/// `(finding: JsFinding, context: JsPlaceholderContext) => string`. Both
-/// receive only safe metadata carrying absolute UTF-16 offsets, never the
-/// input or a matched value, and both are numbered across the whole session
-/// rather than per call.
+/// Shared setup for [`create_incremental_sanitizer`] and
+/// [`create_incremental_sanitizer_common`]: validates `options.limits`,
+/// builds the UTF-16 offset index and callback adapters, then hands the
+/// resulting `(limits, policy, formatter)` triple to `constructor` — the only
+/// part that differs between the two profiles
+/// (`decision-define-detector-profile-and-pack-contract`).
 ///
 /// # Errors
 ///
 /// Returns `INVALID_LIMITS` when `options.limits` is missing, non-positive,
 /// or does not satisfy the documented relationship between the four bounds.
-#[napi]
-pub fn create_incremental_sanitizer(
+/// Otherwise returns whatever `constructor` itself returns, mapped to its
+/// sanitized JavaScript error.
+fn build(
     options: JsIncrementalOptions<'_>,
+    constructor: impl FnOnce(
+        IncrementalLimits,
+        Box<dyn IncrementalPolicy>,
+        Box<dyn PlaceholderFormatter>,
+    ) -> Result<IncrementalSanitizer, CoreError>,
 ) -> napi::Result<JsIncrementalSanitizer, String> {
     let limits = to_core_limits(&options.limits).map_err(to_js_error)?;
     let index = Rc::new(RefCell::new(Utf16Index::new(limits.max_buffered_bytes())));
@@ -574,8 +575,7 @@ pub fn create_incremental_sanitizer(
         }
     };
 
-    let session = IncrementalSanitizer::with_policy_and_formatter(limits, policy, formatter)
-        .map_err(to_js_error)?;
+    let session = constructor(limits, policy, formatter).map_err(to_js_error)?;
 
     Ok(JsIncrementalSanitizer {
         session,
@@ -583,6 +583,49 @@ pub fn create_incremental_sanitizer(
         policy_failure,
         current_env,
     })
+}
+
+/// Creates a bounded incremental sanitization session over the `full`
+/// built-in detectors (`decision-define-runtime-bindings`).
+///
+/// `options.policy`, when given, is called once per finalized finding as
+/// `(finding: JsDetectedFinding, context: JsIncrementalPolicyContext) =>
+/// string`, returning `"redact"`, `"block"`, `"warn"`, or `"allow"`.
+/// `options.formatter`, when given, is called once per replaced finding as
+/// `(finding: JsFinding, context: JsPlaceholderContext) => string`. Both
+/// receive only safe metadata carrying absolute UTF-16 offsets, never the
+/// input or a matched value, and both are numbered across the whole session
+/// rather than per call.
+///
+/// # Errors
+///
+/// Returns `INVALID_LIMITS` when `options.limits` is missing, non-positive,
+/// or does not satisfy the documented relationship between the four bounds.
+#[napi]
+pub fn create_incremental_sanitizer(
+    options: JsIncrementalOptions<'_>,
+) -> napi::Result<JsIncrementalSanitizer, String> {
+    build(options, IncrementalSanitizer::with_policy_and_formatter)
+}
+
+/// The `common`-profile analogue of [`create_incremental_sanitizer`]
+/// (`decision-define-detector-profile-and-pack-contract`): identical except
+/// the session is built over the `common` built-in detectors
+/// (`IncrementalSanitizer::with_common_built_in_policy_and_formatter`,
+/// `crates/secret-scan-core/src/incremental.rs`), whose smaller detector set
+/// never emits a provider-only finding.
+///
+/// # Errors
+///
+/// The same as [`create_incremental_sanitizer`].
+#[napi]
+pub fn create_incremental_sanitizer_common(
+    options: JsIncrementalOptions<'_>,
+) -> napi::Result<JsIncrementalSanitizer, String> {
+    build(
+        options,
+        IncrementalSanitizer::with_common_built_in_policy_and_formatter,
+    )
 }
 
 #[cfg(test)]
@@ -745,5 +788,27 @@ mod tests {
         output.push_str(session.finalize().unwrap().text());
         assert_eq!(output, "api_key=<SECRET_1>\ntail");
         assert!(!output.contains(MARKER));
+    }
+
+    /// A `common`-profile incremental session
+    /// (`IncrementalSanitizer::with_common_built_in`, which
+    /// [`create_incremental_sanitizer_common`] builds through [`build`])
+    /// links no `provider` detector, so a bare provider-shaped token with no
+    /// credential-bearing context is never emitted as a finding — the same
+    /// false-negative cost `lib.rs`'s
+    /// `a_bare_provider_token_is_detected_only_by_the_full_profile` documents
+    /// for the synchronous path. Mirrors
+    /// `crates/secret-scan-core/src/incremental.rs::full_and_common_sessions_report_the_profile_they_were_built_from`
+    /// in spirit, against this binding's own session type.
+    #[test]
+    fn a_common_incremental_session_never_emits_a_provider_only_finding() {
+        let mut session = IncrementalSanitizer::with_common_built_in(generous_limits()).unwrap();
+        let input = format!("prefix \u{1F511} AKIA{} suffix", "SYNTHETICEXAMPLE");
+        let mut findings = Vec::new();
+        let (_, released) = session.append(&input).unwrap().into_parts();
+        findings.extend(released);
+        let (_, released) = session.finalize().unwrap().into_parts();
+        findings.extend(released);
+        assert!(findings.is_empty());
     }
 }

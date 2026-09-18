@@ -260,6 +260,50 @@ return modelGateway.respond({ input: result.text });
 
 Never log raw request or tool bodies before authoritative scanning.
 
+## Opt-in detector profiles
+
+Everything above uses `full`, the default on every surface: every officially
+supported built-in detector, and the compatibility baseline. Keep the
+authoritative server boundary above on `full`.
+
+For size- or latency-sensitive **preventive** consumers — browser UX and
+small agent or tool processes — `common` is a smaller, opt-in built-in
+detector set: only the structural and contextual detectors (a PEM/OpenSSH
+private key, an RFC 7519 JWT, an `otpauth://` URI, a credential-bearing
+connection URI, an HTTP `Bearer` header, and a contextual assignment), not
+any one issuer's token format. Switch by changing the import, or the Rust
+constructor:
+
+```ts
+import { initialize, scanAndRedact } from "@redact-secret/core/common";
+```
+
+```rust
+let registry = DetectorRegistry::with_common_built_in(std::iter::empty())?;
+```
+
+`common`'s false-negative tradeoff: a bare provider token (for example a raw
+GitHub or AWS credential, with no surrounding `Bearer` header or contextual
+assignment) is not detected at all, and a provider token that *is* caught by
+a `common` detector's context is reported under that detector's type and
+confidence instead of the provider-specific one — for example `warn` where
+`full` would `redact`. It adds no false positive: it only drops candidates
+`full` would have reported. Measured against `full` over the whole canonical
+corpus, `common` saves about 16% transfer size and processes 3–6× faster in
+the browser, with zero new false positives and identical findings wherever
+no provider detector would have competed
+([evidence](./docs/audits/evidence/382/README.md)).
+
+`@redact-secret/core/web-stream` and `@redact-secret/core/node-stream` are
+not profile-aware yet: their convenience `createWebStreamSanitizer`/
+`createNodeStreamSanitizer` always open a `full` session. Construct
+`WebStreamSanitizer`/`NodeStreamSanitizer` directly with a session from
+`@redact-secret/core/common`'s own `createIncrementalSanitizer` to stream
+under `common` today.
+
+Python and the CLI stay `full` only — the CLI is a pre-commit/CI enforcement
+tool, where a smaller profile would only weaken enforcement.
+
 ## Mask secrets in traces
 
 Wire the same detection into LLM tracing SDKs so prompts, tool calls, and

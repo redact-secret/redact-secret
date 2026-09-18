@@ -87,7 +87,19 @@ def source_commit() -> str:
 
 def collect(artifacts: Path) -> list[dict]:
     """One entry per file, with the artifact directory naming its family and
-    target the way the workflow uploaded it."""
+    target the way the workflow uploaded it.
+
+    ``wasm-web-common`` (issue #382,
+    ``decision-define-detector-profile-and-pack-contract``) is the `common`
+    detector profile's browser artifact, uploaded from the same `browser` job
+    as `wasm-web`, on the chromium leg only. It is recorded as its own
+    `browser-common` family -- satisfying the qualification obligation that
+    the inventory record each artifact's profile, size, and SHA-256 -- but is
+    not added to `require_matrix`'s required-family list: the upload step's
+    own `if-no-files-found: error` already fails the `browser` job (and so
+    this workflow) if it is missing, the same guard `wasm-web` relies on
+    structurally rather than through this script.
+    """
     collected: list[dict] = []
     for directory in sorted(p for p in artifacts.iterdir() if p.is_dir()):
         name = directory.name
@@ -103,6 +115,8 @@ def collect(artifacts: Path) -> list[dict]:
             family, target = "python-sdist", None
         elif name == "wasm-web":
             family, target = "browser", None
+        elif name == "wasm-web-common":
+            family, target = "browser-common", None
         else:
             family, target = "unknown", None
         for path in sorted(p for p in directory.rglob("*") if p.is_file()):

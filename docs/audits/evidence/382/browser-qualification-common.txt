@@ -1,0 +1,26 @@
+ok - chromium · artifact · operations before initialize fail with NOT_INITIALIZED
+ok - chromium · artifact · initialize is idempotent
+ok - chromium · artifact · version reports the shared product version
+ok - chromium · artifact · profile reports the compiled detector profile
+ok - chromium · artifact · the canonical synchronous corpus is not vacuous
+ok - chromium · artifact · scan matches the canonical synchronous corpus
+ok - chromium · artifact · every finding comes from a detector in the profile
+ok - chromium · artifact · an incremental session matches scanAndRedact on the same artifact
+ok - chromium · artifact · the corpus exercises an astral character before a finding
+ok - chromium · artifact · an astral character around a finding does not perturb its span
+ok - chromium · artifact · scanAndRedact equals scan then redact and removes every match
+ok - chromium · artifact · a throwing policy callback surfaces POLICY_FAILURE
+ok - chromium · artifact · a custom policy callback controls the action
+ok - chromium · artifact · a custom placeholder formatter controls redaction output
+ok - chromium · package · operations before initialize fail with NOT_INITIALIZED
+ok - chromium · package · the package reports its documented identity
+ok - chromium · package · invalid incremental input is terminal with fixed diagnostics
+ok - chromium · package · the package matches the canonical synchronous corpus
+ok - chromium · package · every published finding is frozen and carries no extra key
+ok - chromium · package · scanAndRedact equals scan then redact and removes every match
+ok - chromium · package · a policy callback sees a frozen finding with numeric offsets
+ok - chromium · package · createIncrementalSanitizer opens a real session on the real artifact
+ok - chromium · package · a session outside accepting rejects further operations with INVALID_STATE
+chromium: 23 check(s) passed in 1.0s
+
+browser qualification passed in chromium

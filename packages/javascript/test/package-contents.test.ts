@@ -44,8 +44,12 @@ describe("package contents", () => {
     expect(paths).toContain("LICENSE");
     expect(paths).toContain("dist/index.js");
     expect(paths).toContain("dist/index.d.ts");
+    expect(paths).toContain("dist/common.js");
+    expect(paths).toContain("dist/common.d.ts");
     expect(paths).toContain("dist/runtime/node.js");
     expect(paths).toContain("dist/runtime/browser.js");
+    expect(paths).toContain("dist/runtime/node-common.js");
+    expect(paths).toContain("dist/runtime/browser-common.js");
     expect(paths).toContain("dist/adapters/node-stream.js");
     expect(paths).toContain("dist/adapters/node-stream.d.ts");
     expect(paths).toContain("dist/adapters/web-stream.js");
@@ -89,17 +93,23 @@ describe("package contents", () => {
       readFileSync(join(PACKAGE_ROOT, "package.json"), "utf8"),
     ) as { exports: Record<string, unknown>; imports: Record<string, unknown> };
 
-    // The root API plus the two stream adapters. Each adapter is its own
-    // subpath so that resolving the Web one never reaches `node:stream`.
+    // The root API, its `common`-profile sibling, plus the two stream
+    // adapters. Each adapter is its own subpath so that resolving the Web
+    // one never reaches `node:stream`.
     expect(Object.keys(manifest.exports).sort()).toEqual([
       ".",
+      "./common",
       "./node-stream",
       "./package.json",
       "./web-stream",
     ]);
-    // `#native` is a subpath *import*: it is how this package selects its own
-    // runtime adapter and is not reachable from outside.
-    expect(Object.keys(manifest.imports)).toEqual(["#native"]);
+    // `#native`/`#native-common` are subpath *imports*: how this package
+    // selects its own runtime adapter for each profile, and are not
+    // reachable from outside.
+    expect(Object.keys(manifest.imports).sort()).toEqual([
+      "#native",
+      "#native-common",
+    ]);
   });
 
   it("keeps the Web adapter free of Node-only modules", () => {
@@ -119,13 +129,13 @@ describe("package contents", () => {
   });
 
   it("keeps implementation details out of the published declarations", () => {
-    const declarations = readFileSync(
-      join(PACKAGE_ROOT, "dist", "index.d.ts"),
-      "utf8",
-    );
+    const declarations =
+      readFileSync(join(PACKAGE_ROOT, "dist", "index.d.ts"), "utf8") +
+      readFileSync(join(PACKAGE_ROOT, "dist", "common.d.ts"), "utf8");
 
     for (const internal of [
       "#native",
+      "#native-common",
       "NATIVE_HANDLE",
       "NativeBinding",
       "createRedactSecretRuntime",

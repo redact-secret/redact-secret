@@ -98,6 +98,8 @@ export interface NativeIncrementalSanitizer {
 export interface NativeBinding {
   /** The shared product version this artifact was built from. */
   version(): string;
+  /** The detector profile this artifact was built from: `"full"` or `"common"`. */
+  profile(): string;
   /** Idempotent native setup. May be a no-op, as it is on Node. */
   initialize(): void;
   scan(

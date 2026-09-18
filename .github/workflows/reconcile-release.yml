@@ -21,7 +21,11 @@
 #   workspace `package.json` at the repository root;
 # - each missing npm dependency package is reconciled with
 #   `scripts/publish-dependency-package.mjs`, from the exact qualified
-#   artifact the original run built, never rebuilt here;
+#   artifact the original run built, never rebuilt here; the wasm package
+#   also carries the `common` detector profile's artifact under its own file
+#   names (issue #382, `decision-define-detector-profile-and-pack-contract`),
+#   staged from its own qualified artifact (`wasm-web-common`) alongside the
+#   full one before that one package is repacked;
 # - `redact-secret-cli` is only published after `redact-secret` (core) is
 #   verified, by content checksum, to belong to this source revision --
 #   `scripts/reconcile-artifact-plan.py` enforces that ordering so a
@@ -224,17 +228,18 @@ jobs:
             [win32-x64-msvc]=x86_64-pc-windows-msvc
           )
 
-          reconcile_dependency() {
-            local package_dir=$1 artifact_name=$2 asset_glob=$3
-            git show "$SOURCE_REVISION:$package_dir/package.json" > "$package_dir/package.json"
-            local name version tag
-            name=$(node -p "require('./$package_dir/package.json').name")
-            version=$(node -p "require('./$package_dir/package.json').version")
-            if [[ "$version" == *-* ]]; then tag=beta; else tag=latest; fi
-
+          # Downloads one qualified artifact's assets into a package directory,
+          # verified against the original run's inventory. Shared by
+          # `reconcile_dependency` below for both the required artifact and,
+          # for the wasm package only, its `common`-profile companion
+          # (issue #382, `decision-define-detector-profile-and-pack-contract`):
+          # `bindings/wasm/npm` is one package whose manifest lists both
+          # artifacts' files, so both must be staged before it is packed.
+          stage_recovery_asset() {
+            local package_dir=$1 artifact_name=$2 asset_glob=$3 label=$4
             rm -rf "reconcile-artifact/$artifact_name"
             if ! gh run download "$RUN_ID" --name "$artifact_name" --dir "reconcile-artifact/$artifact_name"; then
-              echo "$name@$version is not published and its qualified artifact ($artifact_name) is no longer available (expired). A full release run is required to republish it." >&2
+              echo "$label is not published and its qualified artifact ($artifact_name) is no longer available (expired). A full release run is required to republish it." >&2
               exit 1
             fi
             python3 -B scripts/verify-recovery-artifact.py --inventory original-inventory/artifact-inventory.json --artifact "$artifact_name" --directory "reconcile-artifact/$artifact_name"
@@ -244,6 +249,21 @@ jobs:
             # native artifacts, and npm includes that mode in the tarball.
             # Normalize recovery assets so repacking is byte-for-byte identical.
             chmod 0644 "$package_dir"/$asset_glob
+          }
+
+          reconcile_dependency() {
+            local package_dir=$1 artifact_name=$2 asset_glob=$3
+            local extra_artifact_name=${4:-} extra_asset_glob=${5:-}
+            git show "$SOURCE_REVISION:$package_dir/package.json" > "$package_dir/package.json"
+            local name version tag
+            name=$(node -p "require('./$package_dir/package.json').name")
+            version=$(node -p "require('./$package_dir/package.json').version")
+            if [[ "$version" == *-* ]]; then tag=beta; else tag=latest; fi
+
+            stage_recovery_asset "$package_dir" "$artifact_name" "$asset_glob" "$name@$version"
+            if [[ -n "$extra_artifact_name" ]]; then
+              stage_recovery_asset "$package_dir" "$extra_artifact_name" "$extra_asset_glob" "$name@$version"
+            fi
 
             if [[ "${{ inputs.dry_run }}" == "true" ]]; then
               node scripts/publish-dependency-package.mjs --package-dir "$package_dir" --tag "$tag" --dry-run
@@ -257,7 +277,7 @@ jobs:
             reconcile_dependency "bindings/node/npm/$platform" "node-addon-$target" "redact-secret.$platform.node"
           done
 
-          reconcile_dependency "bindings/wasm/npm" "wasm-web" "redact_secret_wasm*"
+          reconcile_dependency "bindings/wasm/npm" "wasm-web" "redact_secret_wasm*" "wasm-web-common" "redact_secret_wasm_common*"
 
       # `redact-secret-cli`'s Cargo.toml depends on `redact-secret`'s registry
       # release, so publishing it after only checking crates.io's raw

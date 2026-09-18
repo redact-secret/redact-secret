@@ -74,6 +74,13 @@ export { VERSION } from "./version.js";
 /** The string-index unit of every range this package reports. */
 export const RANGE_UNIT: RangeUnit = "utf16-code-units";
 
+/**
+ * The detector profile this entry point is built from: the full 42-detector
+ * registry. `@redact-secret/core/common` exports the same constant as
+ * `"common"` (`decision-define-detector-profile-and-pack-contract`).
+ */
+export const PROFILE = "full" as const;
+
 export type {
   DetectedSecretFinding,
   IncrementalLimits,

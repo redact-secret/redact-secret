@@ -91,6 +91,12 @@ jobs:
             else
               package_dir="bindings/wasm/npm"
               cp "$artifact_dir"/redact_secret_wasm* "$package_dir/"
+              # The `common` detector profile's browser artifact (issue #382,
+              # `decision-define-detector-profile-and-pack-contract`) ships
+              # inside this same package, under its own file names, so it
+              # has to be assembled in too before the content check below can
+              # see every file `bindings/wasm/npm/package.json` declares.
+              cp qualification-artifacts/wasm-web-common/redact_secret_wasm_common* "$package_dir/"
             fi
             node scripts/publish-dependency-package.mjs --package-dir "$package_dir" --dry-run
           done < <(jq -c '.dependencies[]' dependency-cutover-plan.json)

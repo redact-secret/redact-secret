@@ -1,0 +1,74 @@
+{
+  "source": {
+    "commit": "922d4dada304a7b550fc13be5779fa8e4104ee2a",
+    "workingTreeClean": false
+  },
+  "toolchain": {
+    "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)",
+    "cargo": "cargo 1.98.1 (797e8a9bc 2026-08-05)",
+    "wasmBindgen": "wasm-bindgen 0.2.128",
+    "node": "v22.16.0",
+    "releaseProfile": [
+      "codegen-units = 1",
+      "lto = \"fat\""
+    ],
+    "target": "wasm32-unknown-unknown",
+    "wasmOpt": "not invoked (the build pipeline runs no post-link optimizer)"
+  },
+  "profiles": {
+    "full": {
+      "sizes": {
+        "wasmRawBytes": 281549,
+        "wasmGzipBytes": 96415,
+        "wasmBrotliBytes": 77485,
+        "glueRawBytes": 29548,
+        "glueGzipBytes": 6459,
+        "glueBrotliBytes": 5571
+      },
+      "sha256": {
+        "wasm": "137934a8b50cd6c061bda657e0c04fae9ccdfb9b3ca62b7f0f2a211b88c354d6",
+        "glue": "edda9cc6a63b5ea1e79e39da068b5fc0e344772cf13e29c3da4734ababe4c5c7"
+      }
+    },
+    "common": {
+      "sizes": {
+        "wasmRawBytes": 225195,
+        "wasmGzipBytes": 79832,
+        "wasmBrotliBytes": 65263,
+        "glueRawBytes": 29569,
+        "glueGzipBytes": 6463,
+        "glueBrotliBytes": 5574
+      },
+      "sha256": {
+        "wasm": "d40ba6527da575f70d2ebc70195578353aaa5b9aaaccbd6a716051a7296d14f9",
+        "glue": "983c0d52aaf0ad149f690841f7a8a5d710424a140fa0446c48edd284bc5d10d9"
+      }
+    }
+  },
+  "commonSavedVersusFull": {
+    "wasmRaw": {
+      "bytes": 56354,
+      "percent": 20.02
+    },
+    "wasmGzip": {
+      "bytes": 16583,
+      "percent": 17.2
+    },
+    "wasmBrotli": {
+      "bytes": 12222,
+      "percent": 15.77
+    }
+  },
+  "deltaVersus378Estimate": {
+    "full": {
+      "baselineVariant": "full",
+      "wasmRawBytes": 203,
+      "wasmBrotliBytes": 78
+    },
+    "common": {
+      "baselineVariant": "tiny-common",
+      "wasmRawBytes": 316,
+      "wasmBrotliBytes": 28
+    }
+  }
+}

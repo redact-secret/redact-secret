@@ -162,6 +162,19 @@ target, and is then qualified in a musl image, which is where it runs.
    same way the whole-input API would, and rejecting a post-`finalize`
    `append` with `INVALID_STATE`.
 
+`--detector-profile common` (`decision-define-detector-profile-and-pack-contract`)
+runs pass 3 against `conformance/fixtures/common-profile-expectations.json`
+instead of the corpus's own `full` expectations, asserts every finding comes
+from a detector in `common`'s membership, and asserts
+`profile()`/`profileCommon()` report the fixed `"full"`/`"common"` strings.
+Passes 4 and 5 (below) run against `@redact-secret/core/common` instead of
+the root export, using `jwt-positive-structured` rather than the shared
+stream fixture for the reason its own comment in the script gives (the
+shared fixture is a `provider`-pack finding under `full`, which `common`
+does not redact). One compiled addon links both profiles, so there is no
+second `.node` file to select between — `--detector-profile` only changes
+which exports, expectations, and fixture each pass uses.
+
 ### `scripts/qualify-browser-artifact.mjs`
 
 `npm run wasm:build` (`scripts/build-browser-artifact.mjs`) compiles the
@@ -194,8 +207,16 @@ exports:
 expectation is then its reviewed entry in
 `conformance/fixtures/common-profile-expectations.json`, which the Rust core
 asserts in `crates/secret-scan-core/tests/common_profile_corpus.rs`. The
-package page below is skipped for `common` until `@redact-secret/core` has a
-`common` entry (issue #382).
+package page below also runs for `common`, but against
+`scripts/browser-package-harness-common.mjs`, which drives
+`@redact-secret/core/common` instead of the root export — bundled with its
+own literal `import("@redact-secret/wasm/common")` and
+`import("@redact-secret/core/common")` specifiers, never the `full` ones, so
+a consumer's bundler behavior is reproduced exactly rather than assumed. It
+skips the Web stream adapter's checks: `@redact-secret/core/web-stream` is
+not profile-aware yet (see the README's "Opt-in detector profiles" section),
+and importing it at all would bundle the `full` artifact into the `common`
+check.
 
 The "astral character *within* a finding" case is not observable end to end,
 because no built-in detector matches a span containing one; it is asserted at

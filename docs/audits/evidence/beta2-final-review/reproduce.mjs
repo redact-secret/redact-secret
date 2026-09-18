@@ -9,7 +9,7 @@ import { createStreamSanitizerRuntime } from "../../../../packages/javascript/di
 const root = fileURLToPath(new URL("../../../../", import.meta.url));
 const addonModule = { exports: {} };
 process.dlopen(addonModule, resolve(root, process.argv[2] ?? "target/debug/libredact_secret_node.dylib"));
-const runtime = createRedactSecretRuntime(async () => createBindingFromAddon(addonModule.exports));
+const runtime = createRedactSecretRuntime(async () => createBindingFromAddon(addonModule.exports), "full");
 await runtime.initialize();
 const limits = {
   maxInputCodeUnits: 6_000_000,

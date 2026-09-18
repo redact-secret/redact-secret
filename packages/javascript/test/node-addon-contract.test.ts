@@ -10,7 +10,10 @@
 
 import { describe, expect, it } from "vitest";
 
-import { createBindingFromAddon } from "../src/runtime/node.js";
+import {
+  createBindingFromAddon,
+  createBindingFromCommonAddon,
+} from "../src/runtime/node.js";
 import { sampleFinding } from "./fake-binding.js";
 
 const LIMITS = {
@@ -25,6 +28,7 @@ describe("Node addon binding: createIncrementalSanitizer", () => {
     const calls: string[] = [];
     const binding = createBindingFromAddon({
       version: () => "0.0.0-test",
+      profile: () => "full",
       initialize: () => {},
       scan: () => [],
       redact: (input) => input,
@@ -51,6 +55,7 @@ describe("Node addon binding: scanAndRedact result shape", () => {
   it("renames the addon's redacted field to the contract's text", () => {
     const binding = createBindingFromAddon({
       version: () => "0.0.0-test",
+      profile: () => "full",
       initialize: () => {},
       scan: () => [],
       redact: (input) => input,
@@ -67,5 +72,112 @@ describe("Node addon binding: scanAndRedact result shape", () => {
       text: "<SECRET_1>",
       findings: [sampleFinding],
     });
+  });
+});
+
+describe("Node addon binding: createBindingFromCommonAddon", () => {
+  it("routes every operation through the addon's *Common exports", () => {
+    const calls: string[] = [];
+    const binding = createBindingFromCommonAddon({
+      version: () => "0.0.0-test",
+      profileCommon: () => "common",
+      initializeCommon: () => {
+        calls.push("initializeCommon");
+      },
+      scanCommon: () => {
+        calls.push("scanCommon");
+        return [];
+      },
+      redact: (input) => {
+        calls.push("redact");
+        return input;
+      },
+      scanAndRedactCommon: (input) => {
+        calls.push("scanAndRedactCommon");
+        return { findings: [sampleFinding], redacted: input };
+      },
+      createIncrementalSanitizerCommon: (options) => {
+        calls.push(
+          `createIncrementalSanitizerCommon:${options.limits.maxInputCodeUnits}`,
+        );
+        return {
+          state: "accepting",
+          append: (chunk) => ({ text: chunk, findings: [] }),
+          finalize: () => ({ text: "", findings: [sampleFinding] }),
+          abort: () => {},
+        };
+      },
+    });
+
+    expect(binding.version()).toBe("0.0.0-test");
+    expect(binding.profile()).toBe("common");
+    binding.initialize();
+    expect(binding.scan("input", undefined)).toEqual([]);
+    expect(binding.redact("input", [], undefined)).toBe("input");
+    expect(binding.scanAndRedact("input", undefined, undefined)).toEqual({
+      text: "input",
+      findings: [sampleFinding],
+    });
+    binding.createIncrementalSanitizer({ limits: LIMITS });
+
+    expect(calls).toEqual([
+      "initializeCommon",
+      "scanCommon",
+      "redact",
+      "scanAndRedactCommon",
+      `createIncrementalSanitizerCommon:${LIMITS.maxInputCodeUnits}`,
+    ]);
+  });
+
+  it("renames the addon's redacted field to the contract's text", () => {
+    const binding = createBindingFromCommonAddon({
+      version: () => "0.0.0-test",
+      profileCommon: () => "common",
+      initializeCommon: () => {},
+      scanCommon: () => [],
+      redact: (input) => input,
+      scanAndRedactCommon: () => ({
+        findings: [sampleFinding],
+        redacted: "<SECRET_1>",
+      }),
+      createIncrementalSanitizerCommon: () => ({
+        state: "accepting",
+        append: (chunk) => ({ text: chunk, findings: [] }),
+        finalize: () => ({ text: "", findings: [] }),
+        abort: () => {},
+      }),
+    });
+
+    expect(binding.scanAndRedact("input", undefined, undefined)).toEqual({
+      text: "<SECRET_1>",
+      findings: [sampleFinding],
+    });
+  });
+
+  it("shares the same redact export as the full-profile binding", () => {
+    const calls: string[] = [];
+    const binding = createBindingFromCommonAddon({
+      version: () => "0.0.0-test",
+      profileCommon: () => "common",
+      initializeCommon: () => {},
+      scanCommon: () => [],
+      redact: (input, findings, formatter) => {
+        calls.push(
+          `redact:${input}:${findings.length}:${formatter === undefined ? "builtin" : "custom"}`,
+        );
+        return input;
+      },
+      scanAndRedactCommon: (input) => ({ findings: [], redacted: input }),
+      createIncrementalSanitizerCommon: () => ({
+        state: "accepting",
+        append: (chunk) => ({ text: chunk, findings: [] }),
+        finalize: () => ({ text: "", findings: [] }),
+        abort: () => {},
+      }),
+    });
+
+    binding.redact("api_key=x", [sampleFinding], undefined);
+
+    expect(calls).toEqual(["redact:api_key=x:1:builtin"]);
   });
 });

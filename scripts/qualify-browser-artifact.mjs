@@ -30,12 +30,13 @@
  *
  * `--detector-profile common` qualifies the `common` artifact
  * (`npm run wasm:build:common`, default directory `bindings/wasm/pkg-common`)
- * instead (`decision-define-detector-profile-and-pack-contract`): the
- * artifact page runs against the reviewed
- * `conformance/fixtures/common-profile-expectations.json`, and must report
- * the `common` profile and only `common` detector ids. The package page is
- * skipped for `common`: `@redact-secret/core` has no `common` entry yet
- * (issue #382), so it would load the `full` artifact.
+ * instead (`decision-define-detector-profile-and-pack-contract`): both pages
+ * run against the reviewed
+ * `conformance/fixtures/common-profile-expectations.json`. The artifact page
+ * must report the `common` profile and only `common` detector ids; the
+ * package page drives the opt-in `@redact-secret/core/common` entry
+ * (`scripts/browser-package-harness-common.mjs`) on the same artifact,
+ * instead of the default entry the `full` package page drives.
  *
  * Every corpus input is synthetic or explicitly revoked, and no diagnostic
  * this script prints carries an input, a matched value, or a placeholder.
@@ -73,12 +74,13 @@ const DETECTOR_PROFILES = {
     glue: "redact_secret_wasm_common.js",
     binary: "redact_secret_wasm_common_bg.wasm",
     defaultArtifactDir: join(REPO_ROOT, "bindings", "wasm", "pkg-common"),
-    pages: ["artifact"],
+    pages: ["artifact", "package"],
     buildCommand: "npm run wasm:build:common",
   },
 };
 const COMMON_EXPECTATIONS = "common-profile-expectations.json";
 const PACKAGE_ENTRY = join(REPO_ROOT, "packages", "javascript", "dist", "index.js");
+const PACKAGE_COMMON_ENTRY = join(REPO_ROOT, "packages", "javascript", "dist", "common.js");
 const PACKAGE_WEB_STREAM_ENTRY = join(
   REPO_ROOT,
   "packages",
@@ -238,26 +240,46 @@ function buildFixtures(detectorProfile) {
  *
  * The package resolves its runtime through its own `imports` map, so the
  * `browser` condition has to be the one a bundler applies — that is what
- * selects `dist/runtime/browser.js` over the Node adapter — and the artifact
+ * selects `dist/runtime/browser.js` (or, for `common`,
+ * `dist/runtime/browser-common.js`) over the Node adapter — and the artifact
  * specifier is aliased to the glue being served, so the bundle loads the same
  * `.wasm` the artifact page does. `import.meta.url` inside the generated glue
  * survives bundling, and the output sits beside the binary, so the module's
  * own `default()` fetches it exactly as a deployed consumer would.
+ *
+ * `common` bundles a different entry point (`browser-package-harness-common.mjs`,
+ * importing `@redact-secret/core/common`) and aliases the `/common` specifiers
+ * instead of the root ones, so the bundle never pulls in the `full` package
+ * entry or the `full` `.wasm`.
  */
-async function bundlePackageHarness(artifactDir, outFile) {
+async function bundlePackageHarness(artifactDir, outFile, detectorProfile) {
   const { build } = await import("esbuild");
+  const entry =
+    detectorProfile === "common"
+      ? join(SCRIPTS_DIR, "browser-package-harness-common.mjs")
+      : join(SCRIPTS_DIR, "browser-package-harness.mjs");
+  const alias =
+    detectorProfile === "common"
+      ? {
+          // No `@redact-secret/core/web-stream` alias: the common harness
+          // does not import it (see its own module comment — that adapter
+          // is not profile-aware yet).
+          "@redact-secret/core/common": PACKAGE_COMMON_ENTRY,
+          "@redact-secret/wasm/common": join(artifactDir, "redact_secret_wasm_common.js"),
+        }
+      : {
+          "@redact-secret/core": PACKAGE_ENTRY,
+          "@redact-secret/core/web-stream": PACKAGE_WEB_STREAM_ENTRY,
+          "@redact-secret/wasm": join(artifactDir, "redact_secret_wasm.js"),
+        };
   const result = await build({
-    entryPoints: [join(SCRIPTS_DIR, "browser-package-harness.mjs")],
+    entryPoints: [entry],
     outfile: outFile,
     bundle: true,
     format: "esm",
     platform: "browser",
     conditions: ["browser", "import"],
-    alias: {
-      "@redact-secret/core": PACKAGE_ENTRY,
-      "@redact-secret/core/web-stream": PACKAGE_WEB_STREAM_ENTRY,
-      "@redact-secret/wasm": join(artifactDir, "redact_secret_wasm.js"),
-    },
+    alias,
     logLevel: "silent",
   });
   if (result.errors.length > 0) {
@@ -268,7 +290,11 @@ async function bundlePackageHarness(artifactDir, outFile) {
 async function stageServeDirectory(artifactDir, detectorProfile, pages) {
   const profile = DETECTOR_PROFILES[detectorProfile];
   const packaged = pages.some(({ name }) => name === "package");
-  for (const entry of packaged ? [PACKAGE_ENTRY, PACKAGE_WEB_STREAM_ENTRY] : []) {
+  const requiredEntries =
+    detectorProfile === "common"
+      ? [PACKAGE_COMMON_ENTRY]
+      : [PACKAGE_ENTRY, PACKAGE_WEB_STREAM_ENTRY];
+  for (const entry of packaged ? requiredEntries : []) {
     if (!existsSync(entry)) {
       fail(`${entry}: missing; build the package with \`npm run js:build\``);
     }
@@ -294,7 +320,11 @@ async function stageServeDirectory(artifactDir, detectorProfile, pages) {
     join(directory, "browser-harness.mjs"),
   );
   if (packaged) {
-    await bundlePackageHarness(artifactDir, join(directory, "package-harness.js"));
+    await bundlePackageHarness(
+      artifactDir,
+      join(directory, "package-harness.js"),
+      detectorProfile,
+    );
   }
   for (const { file, module } of pages) {
     writeFileSync(join(directory, file), renderPage(module));

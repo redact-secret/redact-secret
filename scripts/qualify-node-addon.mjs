@@ -31,6 +31,34 @@
  * printed here carries an input, a matched value, or a placeholder. Usage:
  *
  *     node scripts/qualify-node-addon.mjs --target aarch64-apple-darwin
+ *
+ * `--detector-profile common` qualifies the addon's `common` exports
+ * (`scanCommon`, `initializeCommon`, ...) instead of its default `full`
+ * ones (`decision-define-detector-profile-and-pack-contract`), mirroring
+ * `scripts/qualify-browser-artifact.mjs`'s own `--detector-profile` flag:
+ * pass 3 (Conform) checks the addon's `common` findings against the
+ * reviewed `conformance/fixtures/common-profile-expectations.json`
+ * expectations instead of the canonical corpus's own `full` ones, and
+ * asserts every finding comes from a detector inside the `common`
+ * membership list. Passes 4 (Integrate) and 5 (Stream) also run for
+ * `common`, against `@redact-secret/core/common` and the same
+ * `common-profile-expectations.json` (pass 5 uses `COMMON_STREAM_FIXTURE_ID`
+ * instead of `CANONICAL_FIXTURE_ID` — see its own comment). This differs
+ * from the browser script, which cannot qualify `@redact-secret/core/common`
+ * on a bundled package page for `common` at all
+ * (`scripts/browser-package-harness-common.mjs`'s module comment): the
+ * browser problem is that `common`'s WebAssembly artifact is a second,
+ * separate compiled binary, and a bundler eagerly resolves every literal
+ * `import()` it finds while walking a module graph, even one behind an
+ * unused export. Node has no such second artifact — one compiled addon
+ * links both profiles' exports — and this script never bundles anything;
+ * `require(specifier)` on that one addon file happens only when
+ * `initialize()`/`scan()` is actually called, not merely by importing
+ * `dist/common.js`'s module graph, so there is nothing for either profile's
+ * entry point to accidentally pull in from the other. There is nothing to
+ * select with `--target`/`--artifact-dir`-style directory switching:
+ * `--detector-profile` only changes which exports, expectations, and
+ * fixtures every pass uses.
  */
 
 import { execFileSync } from "node:child_process";
@@ -56,6 +84,19 @@ import {
   loadCanonicalFixture,
   packageVersion,
 } from "./qualify-runtime-fixture.mjs";
+
+/**
+ * The stream-adapter fixture for `common` (`decision-define-detector-profile-
+ * and-pack-contract`). `CANONICAL_FIXTURE_ID` (`host-dotenv-github`) is a
+ * `github-token` (provider-pack) finding under `full`; `common` falls back to
+ * `generic-token` at `warn`, which leaves the input text unredacted and would
+ * make this file's "the real addon left a known secret unredacted" sanity
+ * check vacuous. `jwt-positive-structured` is a `common`-pack (`jwt`) finding
+ * that is `redact` and identical — same detector, type, confidence, and range
+ * — in both `full` and `common` (per-detector invariance), single-finding,
+ * and pure ASCII, the same constraints `CANONICAL_FIXTURE_ID` satisfies.
+ */
+const COMMON_STREAM_FIXTURE_ID = "jwt-positive-structured";
 
 import { qualifyIncrementalInput } from "./qualify-incremental-input.mjs";
 
@@ -91,6 +132,24 @@ const GENEROUS_LIMITS = Object.freeze({
   maxTokenCodeUnits: 8_192,
   maxMultilineCodeUnits: 16_384,
 });
+
+/**
+ * Per detector profile: which of the addon's exports pass 3 (Conform) uses
+ * (`decision-define-detector-profile-and-pack-contract`). N-API's camelCase
+ * conversion turns `bindings/node/src/lib.rs`'s `scan_common`/
+ * `initialize_common` into these names. The profile check call below asserts
+ * both `profile()` and `profileCommon()` unconditionally, regardless of
+ * `detectorProfile` — one compiled addon always exposes both, so there is
+ * nothing per-profile to select there.
+ */
+const DETECTOR_PROFILES = {
+  full: { initialize: "initialize", scan: "scan" },
+  common: {
+    initialize: "initializeCommon",
+    scan: "scanCommon",
+  },
+};
+const COMMON_EXPECTATIONS_FILE = "common-profile-expectations.json";
 
 const failures = [];
 
@@ -154,7 +213,7 @@ function expectedRedaction(input, findings) {
 }
 
 function parseArguments(argv) {
-  const options = { target: undefined };
+  const options = { target: undefined, detectorProfile: "full" };
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index];
     if (argument === "--target") {
@@ -167,6 +226,16 @@ function parseArguments(argv) {
         process.exit(1);
       }
       options.target = value;
+    } else if (argument === "--detector-profile") {
+      index += 1;
+      const value = argv[index];
+      if (!Object.hasOwn(DETECTOR_PROFILES, value ?? "")) {
+        console.error(
+          `--detector-profile must be one of ${Object.keys(DETECTOR_PROFILES).join(", ")}`,
+        );
+        process.exit(1);
+      }
+      options.detectorProfile = value;
     } else {
       console.error(`unknown argument: ${argument}`);
       process.exit(1);
@@ -202,6 +271,42 @@ function loadSynchronousCorpus() {
   );
 }
 
+/**
+ * The reviewed `common`-profile expectations for every canonical synchronous
+ * fixture (`decision-define-detector-profile-and-pack-contract`): the same
+ * file `scripts/qualify-browser-artifact.mjs` qualifies the browser
+ * artifact's `common` build against, so the two artifacts are held to one
+ * reviewed set of expected findings rather than two.
+ */
+function loadCommonExpectations() {
+  const common = JSON.parse(
+    readFileSync(join(FIXTURES_DIR, COMMON_EXPECTATIONS_FILE), "utf8"),
+  );
+  assert(
+    common.profile === "common" && common.offsetUnit === "utf8-byte",
+    `${COMMON_EXPECTATIONS_FILE}: not a utf8-byte common expectation set`,
+  );
+  return common;
+}
+
+/**
+ * The canonical `full` detector ids, in order, from the corpus's own oracle.
+ * Duplicated from `scripts/qualify-browser-artifact.mjs`'s own
+ * `fullDetectorIds` rather than imported: that script runs its own `main()`
+ * unconditionally at module load (`await main()` at file scope, with no
+ * "am I the entry point" guard), so importing anything from it would launch
+ * a full browser qualification run as a side effect.
+ */
+function fullDetectorIds() {
+  const source = readFileSync(
+    join(REPO_ROOT, "crates", "secret-scan-core", "src", "detectors", "mod.rs"),
+    "utf8",
+  );
+  const table = source.match(/BUILT_IN_PACKS: &\[\(&str, Pack\)\] = &\[([\s\S]*?)\n\];/);
+  if (table === null) throw new Error("detectors/mod.rs: BUILT_IN_PACKS not found");
+  return [...table[1].matchAll(/\("([a-z0-9-]+)", Pack::/g)].map((match) => match[1]);
+}
+
 function inspectAddon(target) {
   const entries = readdirSync(ADDON_DIR).filter(
     (name) => name !== "node_modules" && name !== "src",
@@ -234,21 +339,53 @@ function runSmokeTest() {
   });
 }
 
-function conformAddon(fixtures) {
+/**
+ * Pass 3 (Conform): drives the addon's `scan`/`scanCommon` export over
+ * every canonical fixture and checks both its findings and their detector
+ * membership.
+ *
+ * For `full`, `expected` comes from the fixture itself and `allowed` is
+ * `fullDetectorIds()`. For `common`
+ * (`decision-define-detector-profile-and-pack-contract`), `expected` comes
+ * from `commonExpectations` (matched by fixture id — the corpus's own
+ * fixtures carry only the `full` expectation) and `allowed` is
+ * `commonExpectations.detectors`; a `common` addon that linked or ran a
+ * `provider` detector would report a finding under an id outside that list.
+ */
+function conformAddon(fixtures, detectorProfile, commonExpectations) {
+  const exports = DETECTOR_PROFILES[detectorProfile];
   const addon = createRequire(join(ADDON_DIR, "index.js"))("./index.js");
-  addon.initialize();
+  addon[exports.initialize]();
+
+  const expectationsById =
+    commonExpectations === undefined
+      ? undefined
+      : new Map(commonExpectations.fixtures.map(({ id, expected }) => [id, expected]));
+  const allowed = new Set(
+    commonExpectations === undefined ? fullDetectorIds() : commonExpectations.detectors,
+  );
+
   const mismatched = [];
+  const foreign = new Set();
   for (const fixture of fixtures) {
-    const actual = addon
-      .scan(fixture.input)
-      .map((finding) => [
-        finding.detector,
-        finding.type,
-        finding.confidence,
-        finding.start,
-        finding.end,
-      ]);
-    const expected = fixture.expected.map((item) => [
+    const expectedSource = expectationsById?.get(fixture.id) ?? fixture.expected;
+    if (expectationsById !== undefined) {
+      assert(
+        expectationsById.has(fixture.id),
+        `${COMMON_EXPECTATIONS_FILE}: no entry for ${fixture.id}`,
+      );
+    }
+    const actual = addon[exports.scan](fixture.input).map((finding) => [
+      finding.detector,
+      finding.type,
+      finding.confidence,
+      finding.start,
+      finding.end,
+    ]);
+    for (const [detector] of actual) {
+      if (!allowed.has(detector)) foreign.add(detector);
+    }
+    const expected = expectedSource.map((item) => [
       item.detector,
       item.type,
       item.confidence,
@@ -262,6 +399,10 @@ function conformAddon(fixtures) {
   assert(
     mismatched.length === 0,
     `${mismatched.length} fixture(s) disagreed: ${JSON.stringify(mismatched.slice(0, 5))}`,
+  );
+  assert(
+    foreign.size === 0,
+    `finding(s) from detector(s) outside the ${detectorProfile} profile: ${[...foreign].join(", ")}`,
   );
 }
 
@@ -294,6 +435,29 @@ async function linkAddon() {
 }
 
 /**
+ * The finding shape `commonExpectations` (a `common-profile-expectations.json`
+ * entry) records for `fixtureId`, compared against `assertMatchesFixture`'s
+ * exact field set (detector, type, confidence, start, end — offsets already
+ * UTF-16 for this file's pure-ASCII fixtures, the same reasoning
+ * `qualify-runtime-fixture.mjs` documents for `CANONICAL_FIXTURE_ID`).
+ */
+function assertMatchesCommonExpectation(finding, commonExpectations, fixtureId) {
+  const entry = commonExpectations.fixtures.find(({ id }) => id === fixtureId);
+  assert(entry !== undefined, `${COMMON_EXPECTATIONS_FILE}: no entry for ${fixtureId}`);
+  assert(
+    entry.expected.length === 1,
+    `fixture ${fixtureId} common expectation must have exactly one finding, found ${entry.expected.length}`,
+  );
+  const expected = entry.expected[0];
+  const mismatches = ["detector", "type", "confidence", "start", "end"]
+    .filter((key) => finding?.[key] !== expected[key])
+    .map((key) => `${key}: expected ${JSON.stringify(expected[key])}, got ${JSON.stringify(finding?.[key])}`);
+  if (mismatches.length > 0) {
+    throw new Error(`fixture ${fixtureId} common mismatch:\n${mismatches.join("\n")}`);
+  }
+}
+
+/**
  * Drives the published package's public API against the real addon,
  * resolved under the specifier an installed consumer resolves.
  *
@@ -307,10 +471,16 @@ async function linkAddon() {
  * The single-fixture assertion goes through `qualify-runtime-fixture.mjs`,
  * so this script embeds no fixture input of its own beyond a fixed synthetic
  * marker for the incremental session; the whole-corpus pass above already
- * covers the addon's own `scan`.
+ * covers the addon's own `scan`/`scanCommon`. For `common`, `entry` is
+ * `@redact-secret/core/common` and the finding is checked against
+ * `commonExpectations` instead of `fixture`'s own `full` expectation.
  */
-async function integrateWithPackage() {
-  const entry = join(JS_PACKAGE_DIR, "dist", "index.js");
+async function integrateWithPackage(detectorProfile, commonExpectations) {
+  const entry = join(
+    JS_PACKAGE_DIR,
+    "dist",
+    detectorProfile === "common" ? "common.js" : "index.js",
+  );
   assert(
     existsSync(entry),
     `${entry}: missing; build the package with \`npm run js:build\``,
@@ -330,10 +500,15 @@ async function integrateWithPackage() {
     qualifyIncrementalInput(api.createIncrementalSanitizer, api.SecretScanError);
     assertEqual(api.VERSION, expectedVersion, "the package's reported version");
     assertEqual(api.RANGE_UNIT, "utf16-code-units", "RANGE_UNIT");
+    assertEqual(api.PROFILE, detectorProfile, "the package's reported PROFILE");
 
     const findings = api.scan(fixture.input);
     assertEqual(findings.length, 1, `fixture ${fixture.id} finding count`);
-    assertMatchesFixture(findings[0], fixture);
+    if (detectorProfile === "common") {
+      assertMatchesCommonExpectation(findings[0], commonExpectations, fixture.id);
+    } else {
+      assertMatchesFixture(findings[0], fixture);
+    }
     assert(Object.isFrozen(findings[0]), "the package returned a mutable finding");
 
     const { text, findings: combined } = api.scanAndRedact(fixture.input);
@@ -398,9 +573,17 @@ async function integrateWithPackage() {
  *
  * Every expectation is self-consistent — computed from one whole-input pass
  * of the same real session (`oracle`) rather than a hardcoded string — so
- * this does not encode the addon's redaction format a second time.
+ * this does not encode the addon's redaction format a second time. For
+ * `common`, `createIncrementalSanitizer`/`initialize`/`scanAndRedact` come
+ * from `@redact-secret/core/common` instead of the root entry — `oracle`
+ * then reflects `common`'s own findings, not `full`'s, so no fixed expected
+ * shape needs to change here. `NodeStreamSanitizer` itself is always
+ * imported from the one `dist/adapters/node-stream.js` (there is no
+ * `common` variant — see this script's module comment): its class wraps
+ * whichever session object it is given and never reads the module-level
+ * `runtime` `node-stream.ts` also exports, which stays `full`-bound.
  */
-async function qualifyNodeStreamAdapter(fixture) {
+async function qualifyNodeStreamAdapter(fixture, detectorProfile) {
   const entry = join(JS_PACKAGE_DIR, "dist", "adapters", "node-stream.js");
   assert(
     existsSync(entry),
@@ -409,8 +592,13 @@ async function qualifyNodeStreamAdapter(fixture) {
 
   const link = await linkAddon();
   try {
+    const packageEntry = join(
+      JS_PACKAGE_DIR,
+      "dist",
+      detectorProfile === "common" ? "common.js" : "index.js",
+    );
     const { createIncrementalSanitizer, initialize, scanAndRedact } = await import(
-      pathToFileURL(join(JS_PACKAGE_DIR, "dist", "index.js")).href
+      pathToFileURL(packageEntry).href
     );
     const { NodeStreamSanitizer } = await import(pathToFileURL(entry).href);
     await initialize();
@@ -634,32 +822,49 @@ async function qualifyNodeStreamAdapter(fixture) {
 
 async function main() {
   const options = parseArguments(process.argv.slice(2));
+  const { detectorProfile } = options;
   const fixtures = loadSynchronousCorpus();
   assert(fixtures.length >= 100, `only ${fixtures.length} corpus fixtures`);
 
-  console.log(`# node ${process.version} on ${process.platform}-${process.arch}`);
+  const commonExpectations =
+    detectorProfile === "common" ? loadCommonExpectations() : undefined;
+  if (commonExpectations !== undefined) {
+    assert(
+      commonExpectations.fixtures.length === fixtures.length,
+      `${COMMON_EXPECTATIONS_FILE} covers ${commonExpectations.fixtures.length} ` +
+        `fixtures, the corpus evaluates ${fixtures.length}; regenerate it (see its Rust test)`,
+    );
+  }
+
+  console.log(
+    `# node ${process.version} on ${process.platform}-${process.arch} ` +
+      `(detector profile: ${detectorProfile})`,
+  );
   report("the addon directory holds exactly one compiled artifact", () =>
     inspectAddon(options.target),
   );
   report("the addon passes its own consumer smoke test", runSmokeTest);
-  report("the addon matches the canonical synchronous corpus", () =>
-    conformAddon(fixtures),
+  report(`the addon matches the canonical synchronous corpus (${detectorProfile})`, () =>
+    conformAddon(fixtures, detectorProfile, commonExpectations),
   );
+  report(`profile()/profileCommon() report the ${detectorProfile} contract`, () => {
+    const addon = createRequire(join(ADDON_DIR, "index.js"))("./index.js");
+    assertEqual(addon.profile(), "full", "addon.profile()");
+    assertEqual(addon.profileCommon(), "common", "addon.profileCommon()");
+  });
+
   await reportAsync(
-    "the JavaScript package's public API runs on the real addon",
-    integrateWithPackage,
+    `the JavaScript package's public API runs on the real addon (${detectorProfile})`,
+    () => integrateWithPackage(detectorProfile, commonExpectations),
   );
 
-  const streamFixture = fixtures.find(
-    (fixture) => fixture.id === CANONICAL_FIXTURE_ID,
-  );
-  assert(
-    streamFixture !== undefined,
-    `no ${CANONICAL_FIXTURE_ID} fixture in the synchronous corpus`,
-  );
+  const streamFixtureId =
+    detectorProfile === "common" ? COMMON_STREAM_FIXTURE_ID : CANONICAL_FIXTURE_ID;
+  const streamFixture = fixtures.find((fixture) => fixture.id === streamFixtureId);
+  assert(streamFixture !== undefined, `no ${streamFixtureId} fixture in the synchronous corpus`);
   await reportAsync(
-    "the Node stream adapter runs on the real addon",
-    () => qualifyNodeStreamAdapter(streamFixture),
+    `the Node stream adapter runs on the real addon (${detectorProfile})`,
+    () => qualifyNodeStreamAdapter(streamFixture, detectorProfile),
   );
 
   if (failures.length > 0) {

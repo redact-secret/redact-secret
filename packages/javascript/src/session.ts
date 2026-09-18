@@ -15,4 +15,4 @@ import { loadNativeBinding } from "#native";
 
 import { createRedactSecretRuntime } from "./runtime.js";
 
-export const runtime = createRedactSecretRuntime(loadNativeBinding);
+export const runtime = createRedactSecretRuntime(loadNativeBinding, "full");

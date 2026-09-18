@@ -29,6 +29,7 @@ and [qualification follow-up](release-qualification-follow-up.md) describe beta.
 | Beta.5 precision gate (#376) | [Candidate comparison, policy changes, and accuracy-corpus re-pin](evidence/376/README.md) |
 | Per-detector artifact/runtime cost baseline (#378) | [Compositions, artifact sizes, runtime cost](evidence/378/README.md) |
 | Full and common WebAssembly artifacts (#381) | [Real-artifact sizes, build evidence, performance, browser qualification, decision gate](evidence/381/README.md) |
+| Modular detector profile qualification (#382) | [Node/WASM runtime qualification, package exports, CI/release wiring, known limitations](evidence/382/README.md) |
 | Detection assurance | [Epic closeout](detection-assurance-epic-closeout.md), [historical closeout](detection-assurance-closeout-audit.md), [residual evidence](detection-assurance-residual-evidence-backlog.md) |
 | Repository transfer | [Transfer evidence](repository-transfer-evidence.md) |
 | Release authority and publishers | [Recorded evidence](release-approval-and-registry-publisher-evidence.md) |

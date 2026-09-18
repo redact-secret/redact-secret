@@ -30,6 +30,10 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
+    "./common": {
+      "types": "./dist/common.d.ts",
+      "import": "./dist/common.js"
+    },
     "./node-stream": {
       "types": "./dist/adapters/node-stream.d.ts",
       "import": "./dist/adapters/node-stream.js"
@@ -45,6 +49,11 @@
       "node": "./dist/runtime/node.js",
       "browser": "./dist/runtime/browser.js",
       "default": "./dist/runtime/browser.js"
+    },
+    "#native-common": {
+      "node": "./dist/runtime/node-common.js",
+      "browser": "./dist/runtime/browser-common.js",
+      "default": "./dist/runtime/browser-common.js"
     }
   },
   "types": "./dist/index.d.ts",

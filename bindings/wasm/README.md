@@ -27,8 +27,12 @@
   `pkg-common/redact_secret_wasm_common*`) links only the `common` registry
   constructors, for both whole-input and incremental scans, so no `provider`
   detector code is in that binary. `profile()` returns `"full"` or `"common"`.
-  Only `full` is packaged today. The `common` package export is issue #382.
-  Measurements are in `docs/audits/evidence/381/README.md`.
+  Both profiles are packaged: `@redact-secret/wasm`'s root export stays the
+  `full` artifact, unchanged, and a `common` subpath export ships the
+  `common` artifact's own glue and `.wasm` beside it
+  (`bindings/wasm/npm/package.json`). Measurements are in
+  `docs/audits/evidence/381/README.md`; qualification and the package export
+  are in `docs/audits/evidence/382/README.md`.
 - `initialize` is this crate's own synchronous, idempotent setup step (it
   builds and caches the built-in detector registry) — distinct from, and in
   addition to, wasm-bindgen's own generated `init()`/default export, which a

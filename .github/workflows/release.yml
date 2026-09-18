@@ -18,7 +18,12 @@ name: Release
 # each carries, published, and verified on the registry -- and `publish`
 # (the wrapper) declares both in `needs:`, so it cannot become eligible ahead
 # of them. `scripts/check-release-gate.py` enforces that `needs:` edge the way
-# it already enforces the qualification gates.
+# it already enforces the qualification gates. `@redact-secret/wasm` also
+# carries the `common` profile artifact (`wasm-web-common`, issue #382,
+# `decision-define-detector-profile-and-pack-contract`) under its `./common`
+# subpath; `publish-wasm-dependency` assembles both artifacts into the one
+# package directory before packing, and asserts the root artifact still
+# reports the `full` profile before anything is published.
 #
 # This is the one first-npm-cutover path, not two: `scripts/publish-dependency-package.mjs`
 # is idempotent by registry state, not by a cutover-vs-routine switch. The
@@ -176,10 +181,13 @@ jobs:
           path: registry-state.json
           if-no-files-found: error
 
-  # Publishes `@redact-secret/wasm` from the `wasm-web` artifact
-  # `artifact-qualification` already qualified for this commit -- never
-  # rebuilt here, the same "already-qualified artifacts" requirement
-  # `publish-native-dependencies` follows.
+  # Publishes `@redact-secret/wasm` from the `wasm-web` and `wasm-web-common`
+  # artifacts `artifact-qualification` already qualified for this commit --
+  # never rebuilt here, the same "already-qualified artifacts" requirement
+  # `publish-native-dependencies` follows. Both artifacts come from the
+  # `browser` job of that reusable workflow (the `common` build is an
+  # additional step there, not a separate job), so no extra `needs:` edge is
+  # required beyond the existing `artifact-qualification` dependency.
   publish-wasm-dependency:
     name: Publish npm dependency (wasm)
     needs: [ci, python-wheels, artifact-qualification]
@@ -225,6 +233,38 @@ jobs:
         with:
           name: wasm-web
           path: bindings/wasm/npm
+
+      # The `common` profile artifact (`decision-define-detector-profile-and-pack-contract`,
+      # issue #382): lands in the same package directory as the full
+      # artifact above, under its own file names, so one pack/publish covers
+      # both the unchanged root export and the `./common` subpath.
+      - name: Download the qualified common browser artifact
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: wasm-web-common
+          path: bindings/wasm/npm
+
+      # AC7: never publish a tiny artifact under the full/default package
+      # identity. The root export and `redact_secret_wasm_bg.wasm` must stay
+      # the `full` build byte-for-byte; instantiating the actual downloaded
+      # module and asking it, rather than trusting the artifact name, is the
+      # same "ask the artifact, don't trust the label" approach
+      # `scripts/qualify-browser-artifact.mjs` uses in-browser.
+      - name: Verify the root artifact reports the full profile
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE_VERIFY'
+          import { readFileSync } from "node:fs";
+          import init, { profile } from "./bindings/wasm/npm/redact_secret_wasm.js";
+          await init(readFileSync("./bindings/wasm/npm/redact_secret_wasm_bg.wasm"));
+          const reported = profile();
+          if (reported !== "full") {
+            throw new Error(
+              `bindings/wasm/npm/redact_secret_wasm.js reports profile "${reported}", not "full" -- refusing to publish a non-full build under the full package identity`,
+            );
+          }
+          console.log('bindings/wasm/npm/redact_secret_wasm.js reports profile "full" as expected.');
+          NODE_VERIFY
 
       - name: Pack, content-check, publish, and verify
         run: node scripts/publish-dependency-package.mjs --package-dir bindings/wasm/npm --tag "${{ steps.tag.outputs.tag }}"

@@ -36,6 +36,7 @@ import type {
  */
 interface NodeAddon {
   version(): string;
+  profile(): string;
   initialize(): void;
   scan(
     input: string,
@@ -54,6 +55,37 @@ interface NodeAddon {
   createIncrementalSanitizer(
     options: NativeIncrementalOptions,
   ): NativeIncrementalSanitizer;
+}
+
+/**
+ * The addon's `common`-profile export surface: the same operations as
+ * {@link NodeAddon}, each named for the `common` registry it runs against,
+ * except `version` and `redact` — profile-independent, so both operate the
+ * same way regardless of which registry produced a finding, and are shared
+ * between both profiles on the one addon file that exports both
+ * (`bindings/node/src/lib.rs`).
+ */
+interface CommonNodeAddon {
+  version(): string;
+  initializeCommon(): void;
+  scanCommon(
+    input: string,
+    policy?: NativePolicyCallback,
+  ): readonly NativeFinding[];
+  redact(
+    input: string,
+    findings: readonly NativeFinding[],
+    formatter?: NativeFormatterCallback,
+  ): string;
+  scanAndRedactCommon(
+    input: string,
+    policy?: NativePolicyCallback,
+    formatter?: NativeFormatterCallback,
+  ): { readonly findings: readonly NativeFinding[]; readonly redacted: string };
+  createIncrementalSanitizerCommon(
+    options: NativeIncrementalOptions,
+  ): NativeIncrementalSanitizer;
+  profileCommon(): string;
 }
 
 /**
@@ -111,23 +143,35 @@ export function resolveAddonSpecifier(): string | undefined {
   return PLATFORM_PACKAGES[process.platform]?.[process.arch];
 }
 
-function loadAddon(): NodeAddon {
+/**
+ * Resolves this host's platform addon specifier and `require`s it, without
+ * validating which exports it carries.
+ *
+ * Shared by {@link loadAddon} (full) and {@link loadCommonAddon} so the
+ * specifier resolution and the `require` try/catch are not duplicated: the
+ * two callers differ only in which exports they then require present.
+ */
+function requireAddon(): Partial<NodeAddon> & Partial<CommonNodeAddon> {
   const specifier = resolveAddonSpecifier();
   if (specifier === undefined) {
     throw new SecretScanError("INITIALIZATION_FAILED");
   }
 
   const require = createRequire(import.meta.url);
-  let addon: Partial<NodeAddon>;
   try {
-    addon = require(specifier) as Partial<NodeAddon>;
+    return require(specifier) as Partial<NodeAddon> & Partial<CommonNodeAddon>;
   } catch {
     // Not installed (an optional dependency npm skipped, or one that failed
     // to install) and a corrupt addon both fail the same fixed way.
     throw new SecretScanError("INITIALIZATION_FAILED");
   }
+}
+
+function loadAddon(): NodeAddon {
+  const addon = requireAddon();
   for (const name of [
     "version",
+    "profile",
     "initialize",
     "scan",
     "redact",
@@ -142,6 +186,29 @@ function loadAddon(): NodeAddon {
 }
 
 /**
+ * Loads the same per-platform addon {@link loadAddon} does, requiring its
+ * `common`-profile exports instead of its full-profile ones
+ * (`bindings/node/src/lib.rs`'s `*_common` N-API functions).
+ */
+export function loadCommonAddon(): CommonNodeAddon {
+  const addon = requireAddon();
+  for (const name of [
+    "version",
+    "initializeCommon",
+    "scanCommon",
+    "redact",
+    "scanAndRedactCommon",
+    "createIncrementalSanitizerCommon",
+    "profileCommon",
+  ] as const) {
+    if (typeof addon[name] !== "function") {
+      throw new SecretScanError("INITIALIZATION_FAILED");
+    }
+  }
+  return addon as CommonNodeAddon;
+}
+
+/**
  * Builds the internal binding contract from an already-loaded addon.
  *
  * Exported so a test double can exercise this exact normalization without
@@ -151,6 +218,7 @@ function loadAddon(): NodeAddon {
 export function createBindingFromAddon(addon: NodeAddon): NativeBinding {
   return {
     version: () => addon.version(),
+    profile: () => addon.profile(),
     initialize: () => {
       addon.initialize();
     },
@@ -163,6 +231,36 @@ export function createBindingFromAddon(addon: NodeAddon): NativeBinding {
     },
     createIncrementalSanitizer: (options) =>
       addon.createIncrementalSanitizer(options),
+  };
+}
+
+/**
+ * Builds the internal binding contract from an already-loaded `common`-profile
+ * addon, mirroring {@link createBindingFromAddon}'s normalization but against
+ * the `*Common` exports. `redact` is shared: it is profile-independent, so
+ * the same addon export backs both bindings.
+ *
+ * Exported so a test double can exercise this exact normalization without
+ * loading the real addon.
+ */
+export function createBindingFromCommonAddon(
+  addon: CommonNodeAddon,
+): NativeBinding {
+  return {
+    version: () => addon.version(),
+    profile: () => addon.profileCommon(),
+    initialize: () => {
+      addon.initializeCommon();
+    },
+    scan: (input, policy) => addon.scanCommon(input, policy),
+    redact: (input, findings, formatter) =>
+      addon.redact(input, findings, formatter),
+    scanAndRedact: (input, policy, formatter): NativeScanAndRedactResult => {
+      const result = addon.scanAndRedactCommon(input, policy, formatter);
+      return { text: result.redacted, findings: result.findings };
+    },
+    createIncrementalSanitizer: (options) =>
+      addon.createIncrementalSanitizerCommon(options),
   };
 }
 

@@ -27,9 +27,10 @@ name: Artifact qualification
 # fan-out is expensive, and every commit that reaches `main` runs it in full.
 #
 # `release.yml` calls this workflow (`workflow_call`) before publishing and
-# consumes the `node-addon-<target>`, `wasm-web` and `cli-<target>` artifacts
-# it uploads, so a release ships the exact binaries qualified here rather
-# than rebuilding them (`decision-ship-first-release-artifact-set`).
+# consumes the `node-addon-<target>`, `wasm-web`, `wasm-web-common` and
+# `cli-<target>` artifacts it uploads, so a release ships the exact binaries
+# qualified here rather than rebuilding them
+# (`decision-ship-first-release-artifact-set`).
 
 on:
   workflow_dispatch:
@@ -284,6 +285,16 @@ jobs:
         if: matrix.smoke == 'host'
         run: node scripts/qualify-node-addon.mjs --target ${{ matrix.target }}
 
+      # One compiled addon exposes both profiles (unlike the WASM artifact,
+      # which is one profile per build), so its `common` exports only need
+      # qualifying once per target rather than on every Node major above --
+      # the majors above already prove the addon loads and runs on each
+      # runtime; this proves the same compiled binary's `common` surface
+      # (`decision-define-detector-profile-and-pack-contract`, issue #382).
+      - name: Qualify the addon's common profile
+        if: matrix.smoke == 'host'
+        run: node scripts/qualify-node-addon.mjs --target ${{ matrix.target }} --detector-profile common
+
       - name: Set up Node 22
         if: matrix.smoke == 'host'
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
@@ -316,6 +327,14 @@ jobs:
               -v "$PWD:/io" -w /io "node:${major}-alpine" \
               node scripts/qualify-node-addon.mjs --target ${{ matrix.target }}
           done
+
+      # Same "once per target, not per major" reasoning as the host leg above.
+      - name: Qualify the addon's common profile on musl
+        if: matrix.smoke == 'alpine'
+        run: |
+          docker run --rm --user "$(id -u):$(id -g)" -e HOME=/tmp \
+            -v "$PWD:/io" -w /io node:20-alpine \
+            node scripts/qualify-node-addon.mjs --target ${{ matrix.target }} --detector-profile common
 
       - name: Upload the addon
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -377,6 +396,13 @@ jobs:
       - name: Build the browser artifact
         run: npm run wasm:build
 
+      # The `common` profile artifact (`decision-define-detector-profile-and-pack-contract`,
+      # issue #382): a second, smaller WebAssembly build qualified the same
+      # way and, on the chromium leg only, uploaded alongside the full
+      # artifact so `release.yml` can publish both from this one revision.
+      - name: Build the common browser artifact
+        run: npm run wasm:build:common
+
       # The second page drives the published package on top of that
       # artifact, so its compiled entry point has to exist.
       - name: Build the JavaScript package
@@ -388,12 +414,23 @@ jobs:
       - name: Qualify the browser artifact
         run: node scripts/qualify-browser-artifact.mjs --engine ${{ matrix.engine }}
 
+      - name: Qualify the common browser artifact
+        run: node scripts/qualify-browser-artifact.mjs --engine ${{ matrix.engine }} --detector-profile common
+
       - name: Upload the browser artifact
         if: matrix.engine == 'chromium'
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: wasm-web
           path: bindings/wasm/pkg/
+          if-no-files-found: error
+
+      - name: Upload the common browser artifact
+        if: matrix.engine == 'chromium'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: wasm-web-common
+          path: bindings/wasm/pkg-common/
           if-no-files-found: error
 
   cli:

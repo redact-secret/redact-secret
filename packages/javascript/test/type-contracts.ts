@@ -21,6 +21,7 @@ import {
   createIncrementalSanitizer,
   defaultPlaceholderFormatter,
   initialize,
+  PROFILE,
   RANGE_UNIT,
   redact,
   scan,
@@ -74,6 +75,9 @@ type OffsetsAreNumbers = Expect<
     : false
 >;
 type RangeUnitIsUtf16 = Expect<Equal<RangeUnit, "utf16-code-units">>;
+
+/** The full-profile entry states its profile as a literal, not a wide string. */
+type ProfileIsFullLiteral = Expect<Equal<typeof PROFILE, "full">>;
 
 /** Custom detector callbacks and internal surfaces are not published. */
 type NoDetectorRegistry = Expect<IsAbsent<"DetectorRegistry">>;

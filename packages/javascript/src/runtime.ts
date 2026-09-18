@@ -197,12 +197,14 @@ export interface RedactSecretRuntime {
  * `initialize` is the whole lifecycle contract: it may be awaited any number
  * of times from any number of call sites and loads at most once, it verifies
  * that the loaded artifact reports this package's version
- * (`decision-release-bindings-in-lockstep`), and every synchronous operation
- * below fails with `NOT_INITIALIZED` until exactly one call has succeeded. A
- * failed attempt is not cached: a caller may retry.
+ * (`decision-release-bindings-in-lockstep`) and the expected detector profile
+ * (`decision-define-detector-profile-and-pack-contract`), and every
+ * synchronous operation below fails with `NOT_INITIALIZED` until exactly one
+ * call has succeeded. A failed attempt is not cached: a caller may retry.
  */
 export function createRedactSecretRuntime(
   loadNativeBinding: NativeBindingLoader,
+  expectedProfile: "full" | "common",
 ): RedactSecretRuntime {
   let binding: NativeBinding | undefined;
   let pending: Promise<void> | undefined;
@@ -212,6 +214,9 @@ export function createRedactSecretRuntime(
     try {
       loaded = await loadNativeBinding();
       if (loaded.version() !== VERSION) {
+        throw new SecretScanError("INITIALIZATION_FAILED");
+      }
+      if (loaded.profile() !== expectedProfile) {
         throw new SecretScanError("INITIALIZATION_FAILED");
       }
       loaded.initialize();

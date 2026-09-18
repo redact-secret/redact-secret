@@ -1,0 +1,36 @@
+ok - chromium · artifact · operations before initialize fail with NOT_INITIALIZED
+ok - chromium · artifact · initialize is idempotent
+ok - chromium · artifact · version reports the shared product version
+ok - chromium · artifact · profile reports the compiled detector profile
+ok - chromium · artifact · the canonical synchronous corpus is not vacuous
+ok - chromium · artifact · scan matches the canonical synchronous corpus
+ok - chromium · artifact · every finding comes from a detector in the profile
+ok - chromium · artifact · an incremental session matches scanAndRedact on the same artifact
+ok - chromium · artifact · the corpus exercises an astral character before a finding
+ok - chromium · artifact · an astral character around a finding does not perturb its span
+ok - chromium · artifact · scanAndRedact equals scan then redact and removes every match
+ok - chromium · artifact · a throwing policy callback surfaces POLICY_FAILURE
+ok - chromium · artifact · a custom policy callback controls the action
+ok - chromium · artifact · a custom placeholder formatter controls redaction output
+ok - chromium · package · operations before initialize fail with NOT_INITIALIZED
+ok - chromium · package · the package reports its documented identity
+ok - chromium · package · invalid incremental input is terminal with fixed diagnostics
+ok - chromium · package · the package matches the canonical synchronous corpus
+ok - chromium · package · every published finding is frozen and carries no extra key
+ok - chromium · package · scanAndRedact equals scan then redact and removes every match
+ok - chromium · package · a policy callback sees a frozen finding with numeric offsets
+ok - chromium · package · createIncrementalSanitizer opens a real session on the real artifact
+ok - chromium · package · a session outside accepting rejects further operations with INVALID_STATE
+ok - chromium · package · the Web stream adapter matches the whole-input result at every byte boundary on the real artifact
+ok - chromium · package · the Web stream adapter preserves BOMs while matching whole-input scanning on the real artifact
+ok - chromium · package · the Web stream adapter's findings are frozen on the real artifact
+ok - chromium · package · an explicit abort() on the real artifact discards retained plaintext and wins over a later close
+ok - chromium · package · malformed UTF-8 on the real artifact rejects with INVALID_UTF8 and flushes no retained plaintext
+ok - chromium · package · truncated UTF-8 on the real artifact rejects with INVALID_UTF8
+ok - chromium · package · readable backpressure on the real artifact stalls a write until a pull resumes it
+ok - chromium · package · cancelling the readable side on the real artifact discards retained plaintext
+ok - chromium · package · aborting the writable side on the real artifact keeps finalized output but discards retained plaintext
+ok - chromium · package · a throwing placeholder formatter on the real artifact propagates PLACEHOLDER_FAILURE and releases no plaintext
+chromium: 33 check(s) passed in 8.3s
+
+browser qualification passed in chromium
