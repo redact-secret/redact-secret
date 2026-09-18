@@ -6777,22 +6777,22 @@
       "contractOnlyMatches": [],
       "corpus": "docs/coverage/detector-inventory.json#reconciliationTrigger",
       "detector": "huggingface-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 32,
+          "end": 37,
           "start": 0
         }
       ],
       "id": "huggingface_token",
       "kind": "reconciliation-trigger",
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 32,
+          "end": 37,
           "start": 0
         }
       ],
-      "retainedRanges": [],
       "support": null,
       "tier": null
     },
@@ -6890,8 +6890,8 @@
       "silent": 30
     },
     "huggingface-token": {
-      "broad-shape": 2,
-      "retained": 16,
+      "broad-shape": 1,
+      "retained": 17,
       "review": 0,
       "silent": 18
     },
