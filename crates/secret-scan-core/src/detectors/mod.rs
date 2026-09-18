@@ -23,6 +23,7 @@ mod github;
 mod gitlab;
 mod grafana;
 mod jwt;
+mod linear;
 mod microsoft_entra;
 mod new_relic;
 mod notion;
@@ -66,7 +67,7 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(additional_providers::DOCKER),
         Box::new(cloudflare::CloudflareTokenDetector),
         Box::new(additional_providers::DIGITALOCEAN),
-        Box::new(additional_providers::LINEAR),
+        Box::new(linear::LinearTokenDetector),
         Box::new(additional_providers::SUPABASE),
         Box::new(additional_providers::VERCEL),
         Box::new(additional_providers::NPM),
@@ -276,7 +277,10 @@ mod tests {
                 "digitalocean-token",
                 "dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9",
             ),
-            ("linear-token", "lin_api_SYNTHETICREVOKEDPROVIDERVALUE"),
+            (
+                "linear-token",
+                "lin_api_SYNTHETICREVOKEDLINEARAPITOKENVALUE01234",
+            ),
             ("supabase-token", "sb_secret_SYNTHETICREVOKEDPROVIDERVALUE"),
             ("vercel-token", "vcp_SYNTHETICREVOKEDPROVIDERVALUE"),
             ("npm-token", "npm_SYNTHETICREVOKEDNPMACCESSTOKENVALUE1"),

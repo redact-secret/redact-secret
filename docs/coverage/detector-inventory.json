@@ -121,7 +121,7 @@
       "type": "linear_token",
       "detector": "linear-token",
       "policyClass": "always-redact",
-      "reconciliationTrigger": "lin_api_SYNTHETICREVOKEDPROVIDERVALUE",
+      "reconciliationTrigger": "lin_api_SYNTHETICREVOKEDLINEARAPITOKENVALUE01234",
       "schemes": null
     },
     {

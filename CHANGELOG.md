@@ -5,6 +5,27 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+- Narrowed `linear-token`'s `lin_api_` variant to Linear's reviewed API-key
+  contract: `lin_api_` followed by exactly 40 bytes of `[A-Za-z0-9]`, bounded
+  by the existing `[A-Za-z0-9_-]` boundary alphabet (issue #374, contract
+  review #367). gitleaks v8.30.1's `linear-api-key` rule and trufflehog
+  v3.97.4's `linearapi` rule independently pin the body to this exact length
+  and agree it excludes `_`/`-`. The previous rule accepted any
+  20-or-more-byte `[A-Za-z0-9_-]` suffix, so `@redact-secret/core@0.1.0-beta.4`
+  flagged a 39-byte twin of the benchmark's paired positive; that twin is now
+  rejected while the paired positive keeps its exact byte range. Intentional
+  behavior changes: a body one byte short of or past 40 bytes, or an
+  underscore or dash inside an otherwise documented-length body, no longer
+  match. `lin_oauth_` is unaffected: no consulted provider or tool source
+  documents its grammar (Linear's own OAuth example is a bare 64-character
+  hex string), so it keeps beta.4's 20-byte-minimum `[A-Za-z0-9_-]` rule
+  unchanged as a separate interim guard, and the 40-byte API-key length is
+  deliberately not reused for it. The detector moved out of the shared
+  `KnownFormatProviderDetector` shape in `additional_providers.rs` into its
+  own `linear.rs` module, composed directly from the shared `pattern`
+  primitives, because the two prefixes now need different suffix alphabets
+  that single shared type cannot express — the same way `slack-token` and
+  `cloudflare-token` moved out for their own per-prefix needs.
 - Narrowed `cloudflare-token` to Cloudflare's reviewed scannable user-token
   contract: `cfut_` followed by exactly 40 bytes of `[A-Za-z0-9]` (the body)
   and then exactly 8 bytes of `[0-9a-f]` (the checksum), bounded by the

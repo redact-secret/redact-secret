@@ -416,48 +416,22 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/incremental",
       "detector": "linear-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 421,
-          "start": 377
-        }
-      ],
-      "id": "additional-provider-families",
-      "kind": null,
-      "lostRanges": [
-        {
-          "end": 421,
-          "start": 377
-        }
-      ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
-      "support": null,
-      "tier": null
-    },
-    {
-      "contexts": [],
-      "contractOnlyMatches": [],
-      "corpus": "conformance/incremental",
-      "detector": "linear-token",
-      "disposition": "broad-shape",
-      "expectedRanges": [
-        {
-          "end": 76,
+          "end": 80,
           "start": 32
         }
       ],
       "id": "linear-lookalike-token-discriminating-boundary",
       "kind": null,
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 76,
+          "end": 80,
           "start": 32
         }
       ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
       "support": null,
       "tier": null
     },
@@ -4130,23 +4104,22 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "linear-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 11258,
+          "end": 48,
           "start": 0
         }
       ],
       "id": "linear-adversarial-long-suffix",
       "kind": "adversarial",
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 11258,
+          "end": 48,
           "start": 0
         }
       ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
       "support": "supported",
       "tier": "adversarial"
     },
@@ -4176,6 +4149,22 @@
       "disposition": "silent",
       "expectedRanges": [],
       "id": "linear-boundary-case-sensitivity",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "linear-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "linear-boundary-dash-in-body",
       "kind": "boundary",
       "lostRanges": [],
       "retainedRanges": [],
@@ -4223,7 +4212,71 @@
       "detector": "linear-token",
       "disposition": "silent",
       "expectedRanges": [],
+      "id": "linear-boundary-invalid-alphabet-exact-length",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "linear-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "linear-boundary-one-long-exact-length",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "linear-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "linear-boundary-one-short-exact-length",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "linear-token",
+      "disposition": "silent",
+      "expectedRanges": [],
       "id": "linear-boundary-short",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "linear-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "linear-boundary-underscore-in-body",
       "kind": "boundary",
       "lostRanges": [],
       "retainedRanges": [],
@@ -4333,23 +4386,22 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "linear-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 57,
+          "end": 61,
           "start": 13
         }
       ],
       "id": "linear-overlap-context",
       "kind": "overlap",
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 57,
+          "end": 61,
           "start": 13
         }
       ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
       "support": "supported",
       "tier": "contextual"
     },
@@ -4386,23 +4438,38 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "linear-token",
-      "disposition": "broad-shape",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "linear-positive-doc-style-placeholder",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "linear-token",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 28,
+          "end": 48,
           "start": 0
         }
       ],
-      "id": "linear-positive-doc-style-placeholder",
+      "id": "linear-positive-exact-length",
       "kind": "positive",
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 28,
+          "end": 48,
           "start": 0
         }
       ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
       "support": "supported",
       "tier": "canonical"
     },
@@ -4413,23 +4480,22 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "linear-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 53,
+          "end": 60,
           "start": 12
         }
       ],
       "id": "linear-positive-json",
       "kind": "positive",
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 53,
+          "end": 60,
           "start": 12
         }
       ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
       "support": "supported",
       "tier": "contextual"
     },
@@ -4440,23 +4506,22 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "linear-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 86,
+          "end": 93,
           "start": 45
         }
       ],
       "id": "linear-positive-log",
       "kind": "positive",
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 86,
+          "end": 93,
           "start": 45
         }
       ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
       "support": "supported",
       "tier": "contextual"
     },
@@ -4467,23 +4532,22 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "linear-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 42,
+          "end": 49,
           "start": 1
         }
       ],
       "id": "linear-positive-markdown-delimiter",
       "kind": "positive",
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 42,
+          "end": 49,
           "start": 1
         }
       ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
       "support": "supported",
       "tier": "contextual"
     },
@@ -4494,25 +4558,14 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "linear-token",
-      "disposition": "broad-shape",
-      "expectedRanges": [
-        {
-          "end": 28,
-          "start": 0
-        }
-      ],
+      "disposition": "silent",
+      "expectedRanges": [],
       "id": "linear-positive-min-length",
-      "kind": "positive",
-      "lostRanges": [
-        {
-          "end": 28,
-          "start": 0
-        }
-      ],
-      "policyOutcomes": [],
+      "kind": "boundary",
+      "lostRanges": [],
       "retainedRanges": [],
-      "support": "supported",
-      "tier": "canonical"
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
     },
     {
       "contexts": [
@@ -4521,23 +4574,22 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "linear-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 42,
+          "end": 55,
           "start": 7
         }
       ],
       "id": "linear-positive-punctuation-adjacent",
       "kind": "positive",
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 42,
+          "end": 55,
           "start": 7
         }
       ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
       "support": "supported",
       "tier": "contextual"
     },
@@ -4548,23 +4600,22 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "linear-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 44,
+          "end": 48,
           "start": 0
         }
       ],
       "id": "linear-positive-qualified",
       "kind": "positive",
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 44,
+          "end": 48,
           "start": 0
         }
       ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
       "support": "supported",
       "tier": "canonical"
     },
@@ -4575,31 +4626,30 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "linear-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 41,
+          "end": 48,
           "start": 0
         },
         {
-          "end": 83,
-          "start": 42
+          "end": 97,
+          "start": 49
         }
       ],
       "id": "linear-positive-repeated-value",
       "kind": "positive",
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 41,
+          "end": 48,
           "start": 0
         },
         {
-          "end": 83,
-          "start": 42
+          "end": 97,
+          "start": 49
         }
       ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
       "support": "supported",
       "tier": "contextual"
     },
@@ -4610,23 +4660,22 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "linear-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 64,
+          "end": 71,
           "start": 23
         }
       ],
       "id": "linear-positive-shell-quoted",
       "kind": "positive",
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 64,
+          "end": 71,
           "start": 23
         }
       ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
       "support": "supported",
       "tier": "contextual"
     },
@@ -4637,23 +4686,22 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "linear-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 68,
+          "end": 75,
           "start": 27
         }
       ],
       "id": "linear-positive-unicode-byte-offset",
       "kind": "positive",
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 68,
+          "end": 75,
           "start": 27
         }
       ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
       "support": "supported",
       "tier": "contextual"
     },
@@ -4664,23 +4712,22 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "linear-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 57,
+          "end": 64,
           "start": 16
         }
       ],
       "id": "linear-positive-yaml",
       "kind": "positive",
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 57,
+          "end": 64,
           "start": 16
         }
       ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
       "support": "supported",
       "tier": "contextual"
     },
@@ -4691,23 +4738,22 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "linear-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 57,
+          "end": 64,
           "start": 16
         }
       ],
       "id": "linear-positive-yaml-crlf",
       "kind": "positive",
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 57,
+          "end": 64,
           "start": 16
         }
       ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
       "support": "supported",
       "tier": "contextual"
     },
@@ -6881,22 +6927,22 @@
       "contractOnlyMatches": [],
       "corpus": "docs/coverage/detector-inventory.json#reconciliationTrigger",
       "detector": "linear-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 37,
+          "end": 48,
           "start": 0
         }
       ],
       "id": "linear_token",
       "kind": "reconciliation-trigger",
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 37,
+          "end": 48,
           "start": 0
         }
       ],
-      "retainedRanges": [],
       "support": null,
       "tier": null
     },
@@ -6976,10 +7022,10 @@
       "silent": 18
     },
     "linear-token": {
-      "broad-shape": 18,
-      "retained": 1,
+      "broad-shape": 1,
+      "retained": 16,
       "review": 0,
-      "silent": 11
+      "silent": 18
     },
     "openai-token": {
       "broad-shape": 3,
