@@ -234,6 +234,24 @@ under the governed [synthetic regression convention](../conventions/synthetic-se
    metadata. If safe reproduction is impossible, document the excluded shape
    without retaining the report material.
 
+### Benchmark-originated regressions
+
+The product-side ownership and acceptance rules are fixed by
+[`decision-govern-benchmark-regression-promotion`](../docs/decisions/2026-09-18-govern-benchmark-regression-promotion.md).
+Place the minimal whole-input behavior in
+`fixtures/synchronous-corpus.json` with `tier: "regression"`. Add a matching
+case to `fixtures/incremental-corpus.json` only when chunk boundaries, retained
+state, or finalization can affect the result. Keep exact UTF-8 ranges and the
+smallest relevant positive and negative controls in these existing corpora so
+all supported consumers use the same contract.
+
+Record cross-repository identity and the two acceptance gates in
+[`benchmark-regressions.json`](./benchmark-regressions.json). Its validator
+checks canonical fixture references and evidence links without adding
+benchmark-specific fields to findings. Discovery matrices, generated variants,
+competitor output, holdout material, score reports, and raw benchmark results
+remain in `redact-secret-benchmarks`.
+
 ## What this directory is not (yet)
 
 This item defines the schema, the UTF-8 range model, and the canonical

@@ -37,3 +37,4 @@ future planning and implementation but do not authorize Git or release actions.
 - [Freeze reviewed precision contracts for seven provider families and refine their default rules in place](2026-09-17-freeze-precision-contracts-for-seven-provider-families.md)
 - [Freeze the OpenAI API key grammar as a marker-gated shape with exact segment lengths](2026-09-17-freeze-openai-api-key-grammar.md)
 - [Freeze the Slack bot token grammar as a three-section dash-separated shape](2026-09-17-freeze-slack-bot-token-segment-grammar.md)
+- [Govern benchmark-originated product regressions](2026-09-18-govern-benchmark-regression-promotion.md)
