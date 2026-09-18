@@ -3,7 +3,7 @@
   "corpus": "synchronous-corpus.json",
   "offsetUnit": "utf8-byte",
   "detectors": ["private-key","jwt","bearer-token","connection-string","otpauth-uri","generic-token"],
-  "fixtureCount": 1212,
+  "fixtureCount": 1213,
   "fixtures": [
     {"expected":[{"action":"warn","confidence":"medium","detector":"generic-token","end":48,"start":8,"type":"contextual_secret"}],"id":"host-dotenv-github"},
     {"expected":[{"action":"warn","confidence":"medium","detector":"generic-token","end":52,"start":12,"type":"contextual_secret"}],"id":"host-json-github"},
@@ -779,6 +779,7 @@
     {"expected":[{"action":"redact","confidence":"high","detector":"generic-token","end":77,"start":8,"type":"contextual_secret"}],"id":"sendgrid-overlap-generic-context"},
     {"expected":[],"id":"sendgrid-positive-crlf-host"},
     {"expected":[],"id":"sendgrid-positive-unicode-prefix"},
+    {"expected":[],"id":"sendgrid-token-regression-crlf-and-unicode-prefix"},
     {"expected":[],"id":"sendgrid-negative-common-identifier"},
     {"expected":[],"id":"sendgrid-negative-placeholder"},
     {"expected":[],"id":"sendgrid-boundary-truncated-id"},
