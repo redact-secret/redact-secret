@@ -468,7 +468,7 @@
     {
       "detector": "slack-token",
       "evidence": {
-        "fixtureCount": 26,
+        "fixtureCount": 27,
         "hostContextsExercised": [
           "http",
           "json",
@@ -490,19 +490,7 @@
         ]
       },
       "evidenceFixtureIds": [
-        "slack-positive-all-prefixes",
-        "slack-positive-doc-style-placeholder",
-        "slack-positive-json",
-        "slack-positive-log",
-        "slack-positive-markdown-delimiter",
-        "slack-positive-min-length",
-        "slack-positive-punctuation-adjacent",
-        "slack-positive-qualified",
-        "slack-positive-repeated-value",
-        "slack-positive-shell-quoted",
-        "slack-positive-unicode-byte-offset",
-        "slack-positive-yaml",
-        "slack-positive-yaml-crlf"
+        "slack-positive-all-prefixes"
       ],
       "policyClass": "always-redact",
       "schemeRows": "not-applicable",

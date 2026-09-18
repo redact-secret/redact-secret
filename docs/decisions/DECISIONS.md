@@ -36,3 +36,4 @@ future planning and implementation but do not authorize Git or release actions.
 - [Freeze the Docker Hub access token grammar as two separately-sized exact-length prefixed shapes](2026-09-17-freeze-docker-pat-oat-exact-length-grammar.md)
 - [Freeze reviewed precision contracts for seven provider families and refine their default rules in place](2026-09-17-freeze-precision-contracts-for-seven-provider-families.md)
 - [Freeze the OpenAI API key grammar as a marker-gated shape with exact segment lengths](2026-09-17-freeze-openai-api-key-grammar.md)
+- [Freeze the Slack bot token grammar as a three-section dash-separated shape](2026-09-17-freeze-slack-bot-token-segment-grammar.md)

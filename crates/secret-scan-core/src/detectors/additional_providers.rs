@@ -1,6 +1,5 @@
-//! Stripe, Slack, `PyPI`, Hugging Face, Docker, Cloudflare, `DigitalOcean`,
-//! Linear, Supabase, Vercel, npm, Google, and Grafana Cloud API key
-//! detection.
+//! Stripe, `PyPI`, Hugging Face, Docker, Cloudflare, `DigitalOcean`, Linear,
+//! Supabase, Vercel, npm, Google, and Grafana Cloud API key detection.
 //!
 //! Mirrors the retired `src/detectors/additional-providers.ts` oracle. Every
 //! one of these providers reduces to the same shape as [`super::gitlab`] or
@@ -10,6 +9,11 @@
 //! [`Detector`] implementation instead of one bespoke type each. Prefixes of
 //! one provider may carry different lengths (Docker Hub's `dckr_pat_` and
 //! `dckr_oat_`), which is why each prefix is a [`PrefixShape`] of its own.
+//! Slack moved out to [`super::slack`] (issue #371): its `xoxb-` bot prefix
+//! needs a `-`-separated section grammar this generic shape cannot express,
+//! while its other prefixes keep this same "prefix plus a minimum-length
+//! run" shape as an interim guard, composed directly from the shared
+//! `pattern` primitives instead of through this type.
 
 use crate::detectors::pattern::{self, Alphabet, PrefixShape};
 use crate::error::DetectorFailure;
@@ -73,27 +77,6 @@ pub(super) const STRIPE: KnownFormatProviderDetector = KnownFormatProviderDetect
         PrefixShape::at_least("whsec_", 20),
     ],
     alphabet: pattern::is_alnum,
-    boundary: pattern::is_alnum_dash,
-};
-
-/// Current Slack bot, user, app, workflow, rotating, and refresh tokens.
-/// Every documented prefix requires its trailing `-`; a prefix missing that
-/// delimiter, or any undocumented prefix, is an intentional false negative
-/// rather than a fuzzy match.
-pub(super) const SLACK: KnownFormatProviderDetector = KnownFormatProviderDetector {
-    id: "slack-token",
-    type_name: "slack_token",
-    signals: &["slack-documented-prefix", "opaque-suffix"],
-    shapes: &[
-        PrefixShape::at_least("xoxb-", 20),
-        PrefixShape::at_least("xoxp-", 20),
-        PrefixShape::at_least("xapp-", 20),
-        PrefixShape::at_least("xwfp-", 20),
-        PrefixShape::at_least("xoxe-", 20),
-        PrefixShape::at_least("xoxe.xoxb-", 20),
-        PrefixShape::at_least("xoxe.xoxp-", 20),
-    ],
-    alphabet: pattern::is_alnum_dash,
     boundary: pattern::is_alnum_dash,
 };
 
@@ -379,7 +362,6 @@ mod tests {
     fn families() -> Vec<Family> {
         vec![
             family(STRIPE, "sk_live_", BODY, "sk_live_SYNTHETICSHORT"),
-            family(SLACK, "xoxb-", BODY, "xoxb-SYNTHETICSHORT"),
             family(
                 PYPI,
                 "pypi-",
@@ -462,21 +444,16 @@ mod tests {
     fn detects_every_documented_prefix_variant() {
         // Docker's two prefixes carry different exact lengths, so they are
         // asserted by `docker_accepts_each_segment_at_exactly_its_own_length`
-        // instead of against the shared minimum-length `BODY`.
-        let cases: [(&KnownFormatProviderDetector, &str); 23] = [
+        // instead of against the shared minimum-length `BODY`. Slack moved
+        // out to `super::slack` (issue #371) and is covered by its own
+        // tests there.
+        let cases: [(&KnownFormatProviderDetector, &str); 16] = [
             (&STRIPE, "sk_test_"),
             (&STRIPE, "sk_live_"),
             (&STRIPE, "rk_test_"),
             (&STRIPE, "rk_live_"),
             (&STRIPE, "sk_org_"),
             (&STRIPE, "whsec_"),
-            (&SLACK, "xoxb-"),
-            (&SLACK, "xoxp-"),
-            (&SLACK, "xapp-"),
-            (&SLACK, "xwfp-"),
-            (&SLACK, "xoxe-"),
-            (&SLACK, "xoxe.xoxb-"),
-            (&SLACK, "xoxe.xoxp-"),
             (&DIGITALOCEAN, "dop_v1_"),
             (&DIGITALOCEAN, "doo_v1_"),
             (&DIGITALOCEAN, "dor_v1_"),
@@ -894,15 +871,13 @@ mod tests {
         assert_eq!(detect(&CLOUDFLARE, &input).len(), 0);
     }
 
-    /// Issue #321: these dimensions are scoped to `HUGGING_FACE`, `LINEAR`,
-    /// and `SLACK`, without widening the shared [`families`] list.
+    /// Issue #321: these dimensions are scoped to `HUGGING_FACE` and
+    /// `LINEAR`, without widening the shared [`families`] list. Slack moved
+    /// out to `super::slack` (issue #371) and repeats these dimensions
+    /// there for its own interim-guarded prefixes.
     #[test]
     fn application_providers_accept_an_all_valid_alphabet_documentation_placeholder() {
-        for (detector, prefix) in [
-            (&HUGGING_FACE, "hf_"),
-            (&LINEAR, "lin_api_"),
-            (&SLACK, "xoxb-"),
-        ] {
+        for (detector, prefix) in [(&HUGGING_FACE, "hf_"), (&LINEAR, "lin_api_")] {
             let value = format!("{prefix}{}", "x".repeat(20));
             let candidates = detect(detector, &value);
             assert_eq!(candidates.len(), 1, "{}", detector.id());
@@ -917,11 +892,7 @@ mod tests {
 
     #[test]
     fn application_providers_reject_the_prefix_embedded_in_a_wider_identifier() {
-        for (detector, prefix) in [
-            (&HUGGING_FACE, "hf_"),
-            (&LINEAR, "lin_api_"),
-            (&SLACK, "xoxb-"),
-        ] {
+        for (detector, prefix) in [(&HUGGING_FACE, "hf_"), (&LINEAR, "lin_api_")] {
             let value = format!("legacy{prefix}SYNTHETIC_REVOKED_KEY_VALUE");
             assert_eq!(detect(detector, &value).len(), 0, "{}", detector.id());
         }
@@ -932,7 +903,6 @@ mod tests {
         for (detector, value) in [
             (&HUGGING_FACE, "hf%5FSYNTHETIC_REVOKED_CONFORMANCE_KEY"),
             (&LINEAR, "lin%5Fapi_SYNTHETIC_REVOKED_CONFORMANCE_KEY"),
-            (&SLACK, "xoxb%2DSYNTHETIC_REVOKED_CONFORMANCE_KEY"),
         ] {
             assert_eq!(detect(detector, value).len(), 0, "{}", detector.id());
         }
@@ -940,11 +910,7 @@ mod tests {
 
     #[test]
     fn application_providers_report_a_repeated_identical_value_once_per_occurrence() {
-        for (detector, prefix) in [
-            (&HUGGING_FACE, "hf_"),
-            (&LINEAR, "lin_api_"),
-            (&SLACK, "xoxb-"),
-        ] {
+        for (detector, prefix) in [(&HUGGING_FACE, "hf_"), (&LINEAR, "lin_api_")] {
             let value = format!("{prefix}SYNTHETIC_REVOKED_KEY_VALUE");
             let input = format!("{value} {value}");
             let candidates = detect(detector, &input);

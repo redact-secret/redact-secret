@@ -5,6 +5,36 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+- Narrowed the `slack-token` detector's `xoxb-` bot form (issue #371,
+  `docs/decisions/2026-09-17-freeze-slack-bot-token-segment-grammar.md`) from
+  one shared 20-byte minimum of `[A-Za-z0-9_-]` to the reviewed three-section
+  shape `xoxb-<10-13 digits>-<10-13 digits>-<18+ alphanumeric>`: the
+  provider documents sections as `-`-separated with the final section as the
+  secret, so a value whose second numeric section runs straight into the
+  secret with no separator is now an intentional false negative, not a
+  fuzzy match. The published beta.4 package flagged the benchmark's two
+  missing-separator twins of this shape; both are now silent, and both
+  paired positives are preserved. Every other documented prefix (`xoxp-`,
+  `xapp-`, `xwfp-`, `xoxe-`, `xoxe.xoxb-`, `xoxe.xoxp-`) keeps beta.4's rule
+  unchanged as a separate interim guard. Thirteen synchronous and two
+  incremental conformance fixtures that had been authored to the retired
+  shared minimum with no digit sections keep their inputs and have their
+  expectations corrected in place, each note naming the decision; a
+  full-grammar value under a generic assignment key
+  (`slack-overlap-context-bot-grammar`) still resolves to `slack-token`
+  over `generic-token`'s contextual candidate, while a body with no digit
+  sections under the same key (`slack-overlap-context`) is now owned by
+  `generic-token` instead, and the same body after a literal `Bearer`
+  scheme (`slack-positive-unicode-byte-offset`) is now owned by
+  `bearer-token`. Detector id, finding type, confidence, specificity,
+  default policy, and every public interface are unchanged. Internally,
+  Slack moved out of the shared `KnownFormatProviderDetector` shape into
+  its own module (`crates/secret-scan-core/src/detectors/slack.rs`), since
+  the bot section grammar needs a `-`-separated section shape the shared
+  prefix-plus-run primitives cannot express; its other prefixes keep the
+  same interim shape, composed directly from the shared `pattern`
+  primitives.
+
 - Narrowed the `docker-token` detector (issue #370,
   `decision-freeze-docker-pat-oat-exact-length-grammar`) from one shared
   20-byte minimum under either prefix to two separately validated

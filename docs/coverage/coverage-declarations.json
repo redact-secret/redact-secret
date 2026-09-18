@@ -999,26 +999,14 @@
         {
           "dimension": "positive",
           "evidenceFixtureIds": [
-            "slack-positive-all-prefixes",
-            "slack-positive-doc-style-placeholder",
-            "slack-positive-json",
-            "slack-positive-log",
-            "slack-positive-markdown-delimiter",
-            "slack-positive-min-length",
-            "slack-positive-punctuation-adjacent",
-            "slack-positive-qualified",
-            "slack-positive-repeated-value",
-            "slack-positive-shell-quoted",
-            "slack-positive-unicode-byte-offset",
-            "slack-positive-yaml",
-            "slack-positive-yaml-crlf"
+            "slack-positive-all-prefixes"
           ],
           "state": "supported"
         },
         {
           "dimension": "overlap",
           "evidenceFixtureIds": [
-            "slack-overlap-context"
+            "slack-overlap-context-bot-grammar"
           ],
           "state": "supported"
         },
@@ -1036,7 +1024,17 @@
             "slack-boundary-case-sensitivity",
             "slack-boundary-delimiter",
             "slack-boundary-invalid-alphabet",
-            "slack-boundary-short"
+            "slack-boundary-short",
+            "slack-positive-doc-style-placeholder",
+            "slack-positive-log",
+            "slack-positive-markdown-delimiter",
+            "slack-positive-min-length",
+            "slack-positive-punctuation-adjacent",
+            "slack-positive-qualified",
+            "slack-positive-repeated-value",
+            "slack-positive-shell-quoted",
+            "slack-positive-yaml",
+            "slack-positive-yaml-crlf"
           ],
           "state": "supported"
         },
@@ -1059,7 +1057,17 @@
             "slack-boundary-case-sensitivity",
             "slack-boundary-delimiter",
             "slack-boundary-invalid-alphabet",
-            "slack-boundary-short"
+            "slack-boundary-short",
+            "slack-positive-doc-style-placeholder",
+            "slack-positive-log",
+            "slack-positive-markdown-delimiter",
+            "slack-positive-min-length",
+            "slack-positive-punctuation-adjacent",
+            "slack-positive-qualified",
+            "slack-positive-repeated-value",
+            "slack-positive-shell-quoted",
+            "slack-positive-yaml",
+            "slack-positive-yaml-crlf"
           ],
           "state": "supported"
         },
