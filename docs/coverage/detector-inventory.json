@@ -79,7 +79,7 @@
       "type": "slack_token",
       "detector": "slack-token",
       "policyClass": "always-redact",
-      "reconciliationTrigger": "xoxb-SYNTHETICREVOKEDPROVIDERVALUE",
+      "reconciliationTrigger": "xoxb-1234567890123-3210987654321-SYNTHETICREVOKEDBOTSECRET1",
       "schemes": null
     },
     {

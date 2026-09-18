@@ -34,6 +34,11 @@ pub(super) fn is_alnum_dash(byte: u8) -> bool {
     is_alnum(byte) || byte == b'_' || byte == b'-'
 }
 
+/// `[0-9]`.
+pub(super) fn is_digit(byte: u8) -> bool {
+    byte.is_ascii_digit()
+}
+
 /// `[A-Za-z0-9_.-]`.
 pub(super) fn is_alnum_dash_dot(byte: u8) -> bool {
     is_alnum_dash(byte) || byte == b'.'
@@ -209,6 +214,7 @@ mod tests {
         assert!(is_alnum_underscore(b'_') && !is_alnum_underscore(b'-'));
         assert!(is_alnum_dash(b'-') && is_alnum_dash(b'_') && !is_alnum_dash(b'.'));
         assert!(is_alnum_dash_dot(b'.') && is_alnum_dash_dot(b'-'));
+        assert!(is_digit(b'0') && is_digit(b'9') && !is_digit(b'a') && !is_digit(b'-'));
         assert!(
             is_lower_hex(b'0')
                 && is_lower_hex(b'f')

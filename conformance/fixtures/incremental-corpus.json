@@ -60,7 +60,7 @@
     {
       "id": "additional-provider-families",
       "input": "sk_live_SYNTHETICREVOKEDSYNTHETICREVOKED\nxoxb-SYNTHETIC-REVOKED-SYNTHETIC-REVOKED-\npypi-SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\nhf_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\ndckr_pat_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\ncfut_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\ndop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9\nlin_api_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\nsb_secret_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\nvcp_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_",
-      "text": "<SECRET_1>\n<SECRET_2>\n<SECRET_3>\n<SECRET_4>\ndckr_pat_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\n<SECRET_5>\n<SECRET_6>\n<SECRET_7>\n<SECRET_8>\n<SECRET_9>",
+      "text": "<SECRET_1>\nxoxb-SYNTHETIC-REVOKED-SYNTHETIC-REVOKED-\n<SECRET_2>\n<SECRET_3>\ndckr_pat_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\n<SECRET_4>\n<SECRET_5>\n<SECRET_6>\n<SECRET_7>\n<SECRET_8>",
       "expected": [
         {
           "detector": "stripe-token",
@@ -69,14 +69,6 @@
           "specificity": "provider",
           "start": 0,
           "end": 40
-        },
-        {
-          "detector": "slack-token",
-          "type": "slack_token",
-          "confidence": "high",
-          "specificity": "provider",
-          "start": 41,
-          "end": 82
         },
         {
           "detector": "pypi-token",
@@ -135,7 +127,7 @@
           "end": 511
         }
       ],
-      "note": "Every newly qualified variable-length provider family remains whole across partitions. Reclassified by issue #370 (decision-freeze-docker-pat-oat-exact-length-grammar): the dckr_pat_ line carries a 36-byte suffix, which is neither documented Docker Hub length, so it now stays as plain text at every partition while its neighbours are still redacted; docker-pat-oat-exact-length-partitions carries the exact-length shapes. Input unchanged; expectation corrected. The DigitalOcean line carries the reviewed exact 64-byte hex contract (issue #369); later offsets shifted accordingly."
+      "note": "Every newly qualified variable-length provider family remains whole across partitions. Reclassified by issue #370 (decision-freeze-docker-pat-oat-exact-length-grammar): the dckr_pat_ line carries a 36-byte suffix, which is neither documented Docker Hub length, so it now stays as plain text at every partition while its neighbours are still redacted; docker-pat-oat-exact-length-partitions carries the exact-length shapes. Input unchanged; expectation corrected. The DigitalOcean line carries the reviewed exact 64-byte hex contract (issue #369); later offsets shifted accordingly. Reclassified again by issue #371 (docs/decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md): the xoxb- line has no digit sections, so it now stays as plain text at every partition too; every other detector's byte offsets into the unchanged input are unaffected."
     },
     {
       "id": "fixed-width-unicode",
@@ -762,18 +754,9 @@
     {
       "id": "slack-lookalike-token-discriminating-boundary",
       "input": "slack-documentation-identifier\nxoxb-SYNTHETIC-REVOKED-SYNTHETIC-REVOKED-",
-      "text": "slack-documentation-identifier\n<SECRET_1>",
-      "expected": [
-        {
-          "detector": "slack-token",
-          "type": "slack_token",
-          "confidence": "high",
-          "specificity": "provider",
-          "start": 31,
-          "end": 72
-        }
-      ],
-      "note": "issue #321: an ordinary Slack-related identifier with no credential shape and a real documented token on adjacent lines stay correctly discriminated at every chunk split, including splits that fall inside the 'xoxb-' prefix itself."
+      "text": "slack-documentation-identifier\nxoxb-SYNTHETIC-REVOKED-SYNTHETIC-REVOKED-",
+      "expected": [],
+      "note": "issue #321: an ordinary Slack-related identifier with no credential shape on the first line stays undetected at every chunk split. Reclassified by issue #371 (docs/decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md): the second line's xoxb- value has no digit sections under the corrected bot section grammar, so it is now an intentional false negative too, and the whole input stays plain text at every partition. Input unchanged; expectation corrected."
     },
     {
       "id": "sendgrid-lookalike-token-discriminating-boundary",

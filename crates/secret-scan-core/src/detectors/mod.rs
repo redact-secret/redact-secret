@@ -32,6 +32,7 @@ mod private_key;
 mod sendgrid;
 mod sentry;
 mod shopify;
+mod slack;
 mod telegram;
 mod text;
 mod twilio;
@@ -58,7 +59,7 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(shopify::ShopifyTokenDetector),
         Box::new(vault::VaultTokenDetector),
         Box::new(additional_providers::STRIPE),
-        Box::new(additional_providers::SLACK),
+        Box::new(slack::SlackTokenDetector),
         Box::new(additional_providers::PYPI),
         Box::new(additional_providers::HUGGING_FACE),
         Box::new(additional_providers::DOCKER),
@@ -259,7 +260,10 @@ mod tests {
             ("shopify-token", "shpat_SYNTHETIC_REVOKED_SHOPIFY_TOKEN"),
             ("vault-token", "hvs.SYNTHETIC_REVOKED_VAULT_TOKEN"),
             ("stripe-token", "sk_live_SYNTHETICREVOKEDPROVIDERVALUE"),
-            ("slack-token", "xoxb-SYNTHETICREVOKEDPROVIDERVALUE"),
+            (
+                "slack-token",
+                "xoxb-1234567890123-3210987654321-SYNTHETICREVOKEDBOTSECRET1",
+            ),
             ("pypi-token", pypi_input.as_str()),
             ("huggingface-token", "hf_SYNTHETICREVOKEDPROVIDERVALUE"),
             ("docker-token", "dckr_pat_SYNTHETICREVOKEDDOCKERPAT00"),
