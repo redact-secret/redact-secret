@@ -27,10 +27,10 @@ use redact_secret::{
     DetectorContext, DetectorFailure, DetectorRegistry, Finding, FormatterFailure,
     IncrementalLimits, IncrementalPolicy, IncrementalPolicyContext, IncrementalResult,
     IncrementalSanitizer, MAX_IDENTIFIER_LENGTH, MAX_PLACEHOLDER_LENGTH, PlaceholderContext,
-    PlaceholderFormatter, Policy, PolicyContext, PolicyFailure, RANGE_UNIT, RegisteredDetector,
-    ScanResult, SecretScanError, SecretScanErrorCode, SessionState, Specificity, VERSION,
-    default_placeholder_formatter, is_identifier, redact, run_detector_pipeline, scan,
-    scan_and_redact, shannon_entropy, typed_placeholder_formatter,
+    PlaceholderFormatter, Policy, PolicyContext, PolicyFailure, Profile, RANGE_UNIT,
+    RegisteredDetector, ScanResult, SecretScanError, SecretScanErrorCode, SessionState,
+    Specificity, VERSION, default_placeholder_formatter, is_identifier, redact,
+    run_detector_pipeline, scan, scan_and_redact, shannon_entropy, typed_placeholder_formatter,
 };
 
 /// The canonical corpus fixture used wherever one detected value is enough.
@@ -517,4 +517,124 @@ fn built_in_detectors_are_reachable_only_through_the_registry() {
             .unwrap()
             .is_empty()
     );
+}
+
+// ---------------------------------------------------------------------------
+// the `common` profile
+// ---------------------------------------------------------------------------
+
+/// The `common` profile's canonical membership
+/// (`decision-define-detector-profile-and-pack-contract`): a strict,
+/// order-preserving subset of `full`.
+const COMMON_IDS: [&str; 6] = [
+    "private-key",
+    "jwt",
+    "bearer-token",
+    "connection-string",
+    "otpauth-uri",
+    "generic-token",
+];
+
+#[test]
+fn common_profile_registers_its_declared_membership_in_canonical_order() {
+    let common = DetectorRegistry::with_common_built_in([]).unwrap();
+    assert_eq!(common.profile(), Some(Profile::Common));
+    assert_eq!(common.ids().collect::<Vec<_>>(), COMMON_IDS);
+
+    let full = registry_full();
+    assert_eq!(full.profile(), Some(Profile::Full));
+    for id in COMMON_IDS {
+        assert!(full.contains(id));
+    }
+}
+
+fn registry_full() -> DetectorRegistry {
+    DetectorRegistry::with_built_in([]).unwrap()
+}
+
+/// "openai-token" is a `provider` id: `common` never registers it itself,
+/// but it is still reserved.
+struct ReservedIdDetector;
+
+impl Detector for ReservedIdDetector {
+    fn id(&self) -> &str {
+        "openai-token"
+    }
+
+    fn detect(&self, _: &str, _: &DetectorContext) -> Result<Vec<Candidate>, DetectorFailure> {
+        Ok(Vec::new())
+    }
+}
+
+#[test]
+fn common_registry_rejects_a_custom_detector_that_reuses_a_full_built_in_id() {
+    // An id no built-in uses registers normally.
+    let registry =
+        DetectorRegistry::with_common_built_in([Box::new(MarkerDetector) as Box<dyn Detector>])
+            .unwrap();
+    assert!(registry.contains("marker"));
+
+    let error =
+        DetectorRegistry::with_common_built_in([Box::new(ReservedIdDetector) as Box<dyn Detector>])
+            .unwrap_err();
+    assert_eq!(error.code(), SecretScanErrorCode::InvalidDetector);
+}
+
+#[test]
+fn common_profile_finding_can_differ_from_full_by_design() {
+    // A validly shaped legacy OpenAI key (`sk-<20>T3BlbkFJ<20>`) inside a
+    // `Bearer` header: `full` claims it as `openai-token`
+    // (provider-specific), while `common` — which does not register that
+    // detector — reports it only as `bearer-token`. This is the documented
+    // false-negative tradeoff of `common`, not a bug.
+    let input = "Authorization: Bearer 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";
+
+    let full_findings = scan(input, &registry_full(), &DefaultPolicy).unwrap();
+    assert!(full_findings.iter().any(|f| f.detector() == "openai-token"));
+
+    let common_registry = DetectorRegistry::with_common_built_in([]).unwrap();
+    let common_findings = scan(input, &common_registry, &DefaultPolicy).unwrap();
+    assert!(
+        common_findings
+            .iter()
+            .any(|f| f.detector() == "bearer-token")
+    );
+    assert!(
+        !common_findings
+            .iter()
+            .any(|f| f.detector() == "openai-token")
+    );
+}
+
+#[test]
+fn common_profile_incremental_session_selects_the_same_built_ins_as_the_whole_input_path() {
+    let limits = IncrementalLimits::new(
+        1 << 20,
+        IncrementalLimits::minimum_buffered_bytes(8_192, 16_384),
+        8_192,
+        16_384,
+    )
+    .unwrap();
+    let mut session = IncrementalSanitizer::with_common_built_in(limits).unwrap();
+    assert_eq!(session.profile(), Some(Profile::Common));
+
+    let input = "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000";
+    let registry = DetectorRegistry::with_common_built_in([]).unwrap();
+    let expected = scan_and_redact(
+        input,
+        &registry,
+        &DefaultPolicy,
+        &default_placeholder_formatter,
+    )
+    .unwrap();
+
+    let (piece, released) = session.append(input).unwrap().into_parts();
+    let mut text = piece;
+    let mut findings = released;
+    let result = session.finalize().unwrap();
+    text.push_str(result.text());
+    findings.extend(result.findings().iter().cloned());
+
+    assert_eq!(text, expected.text());
+    assert_eq!(findings, expected.findings().to_vec());
 }

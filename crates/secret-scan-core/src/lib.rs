@@ -48,6 +48,7 @@
 //! | Result | [`ScanResult`], [`IncrementalResult`] |
 //! | Sanitized error | [`SecretScanError`], [`SecretScanErrorCode`], [`DetectorFailure`], [`PolicyFailure`], [`FormatterFailure`] |
 //! | Custom detectors | [`Detector`], [`Candidate`], [`DetectorContext`], [`DetectorRegistry`], [`RegisteredDetector`] |
+//! | Profiles | [`Profile`] |
 //! | Identifiers and units | [`is_identifier`], [`MAX_IDENTIFIER_LENGTH`], [`RANGE_UNIT`], [`VERSION`] |
 //! | Detector building blocks | [`shannon_entropy`] |
 //!
@@ -55,11 +56,14 @@
 //! exports, and `[workspace.metadata.redact-secret] core-public-api` in the
 //! workspace manifest repeats it so a name cannot join or leave without a
 //! reviewed manifest change. Everything else is private. In particular, the
-//! built-in detector set is reached only through
-//! [`DetectorRegistry::with_built_in`], and the retention tuning the incremental
-//! session depends on is derived through
+//! built-in detector set of each profile is reached only through
+//! [`DetectorRegistry::with_built_in`] (`full`) and
+//! [`DetectorRegistry::with_common_built_in`] (`common`), and the retention
+//! tuning the incremental session depends on is derived through
 //! [`IncrementalLimits::minimum_buffered_bytes`] rather than exposed as a
 //! constant, so both can change without breaking a caller.
+//! `decision-define-detector-profile-and-pack-contract` fixes which built-in
+//! detectors each [`Profile`] holds and its compatibility class.
 //!
 //! # Examples
 //!
@@ -122,7 +126,7 @@ pub use policy::DefaultPolicy;
 pub use redact::{
     MAX_PLACEHOLDER_LENGTH, default_placeholder_formatter, redact, typed_placeholder_formatter,
 };
-pub use registry::{DetectorRegistry, RegisteredDetector};
+pub use registry::{DetectorRegistry, Profile, RegisteredDetector};
 pub use types::{
     Action, ByteRange, Candidate, Confidence, DetectedFinding, Detector, DetectorContext, Finding,
     MAX_IDENTIFIER_LENGTH, PlaceholderContext, PlaceholderFormatter, Policy, PolicyContext,

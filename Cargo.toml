@@ -118,6 +118,7 @@ core-public-api = [
   "Policy",
   "PolicyContext",
   "PolicyFailure",
+  "Profile",
   "RANGE_UNIT",
   "RegisteredDetector",
   "ScanResult",

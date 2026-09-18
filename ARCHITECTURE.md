@@ -381,8 +381,12 @@ core. Each profile keeps the canonical order as a subsequence, and no detector
 id behaves differently between profiles. Python and the CLI stay `full` only.
 The contract is accepted in
 [Define the detector profile and pack contract](./docs/decisions/2026-09-18-define-detector-profile-and-pack-contract.md).
-Its implementation is planned under issues #380–#382. Until that lands, every
-surface builds `full` only.
+Issue #380 lands the Rust-core mechanism: `DetectorRegistry::with_common_built_in`
+and `IncrementalSanitizer::with_common_built_in` build the `common` profile
+alongside the unchanged `full` constructors, both reporting their `Profile`.
+No public artifact or package exposes `common` yet — that is #381 (the
+WebAssembly artifact) and #382 (qualification and package exports). Until
+those land, every published surface still builds and ships `full` only.
 
 ## Error and telemetry constraints
 
