@@ -15,25 +15,22 @@
       "contractOnlyMatches": [],
       "corpus": "assessment/accuracy",
       "detector": "cloudflare-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 144,
+          "end": 162,
           "start": 109
         }
       ],
       "id": "logs-additional-provider-tokens-one",
       "kind": null,
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 144,
+          "end": 162,
           "start": 109
         }
       ],
-      "policyOutcomes": [
-        "redact"
-      ],
-      "retainedRanges": [],
       "support": null,
       "tier": null
     },
@@ -44,25 +41,22 @@
       "contractOnlyMatches": [],
       "corpus": "assessment/accuracy",
       "detector": "digitalocean-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 196,
-          "start": 158
+          "end": 247,
+          "start": 176
         }
       ],
       "id": "logs-additional-provider-tokens-one",
       "kind": null,
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 196,
-          "start": 158
+          "end": 247,
+          "start": 176
         }
       ],
-      "policyOutcomes": [
-        "redact"
-      ],
-      "retainedRanges": [],
       "support": null,
       "tier": null
     },
@@ -73,25 +67,22 @@
       "contractOnlyMatches": [],
       "corpus": "assessment/accuracy",
       "detector": "docker-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 239,
-          "start": 204
+          "end": 291,
+          "start": 255
         }
       ],
       "id": "logs-additional-provider-tokens-one",
       "kind": null,
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 239,
-          "start": 204
+          "end": 291,
+          "start": 255
         }
       ],
-      "policyOutcomes": [
-        "redact"
-      ],
-      "retainedRanges": [],
       "support": null,
       "tier": null
     },
@@ -102,25 +93,22 @@
       "contractOnlyMatches": [],
       "corpus": "assessment/accuracy",
       "detector": "huggingface-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 77,
+          "end": 81,
           "start": 44
         }
       ],
       "id": "code-additional-provider-tokens-one",
       "kind": null,
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 77,
+          "end": 81,
           "start": 44
         }
       ],
-      "policyOutcomes": [
-        "redact"
-      ],
-      "retainedRanges": [],
       "support": null,
       "tier": null
     },
@@ -131,25 +119,22 @@
       "contractOnlyMatches": [],
       "corpus": "assessment/accuracy",
       "detector": "linear-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 131,
-          "start": 97
+          "end": 149,
+          "start": 101
         }
       ],
       "id": "code-additional-provider-tokens-one",
       "kind": null,
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 131,
-          "start": 97
+          "end": 149,
+          "start": 101
         }
       ],
-      "policyOutcomes": [
-        "redact"
-      ],
-      "retainedRanges": [],
       "support": null,
       "tier": null
     },
@@ -160,25 +145,22 @@
       "contractOnlyMatches": [],
       "corpus": "assessment/accuracy",
       "detector": "openai-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 66,
+          "end": 73,
           "start": 22
         }
       ],
       "id": "code-openai-api-key",
       "kind": null,
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 66,
+          "end": 73,
           "start": 22
         }
       ],
-      "policyOutcomes": [
-        "redact"
-      ],
-      "retainedRanges": [],
       "support": null,
       "tier": null
     },
@@ -189,25 +171,22 @@
       "contractOnlyMatches": [],
       "corpus": "assessment/accuracy",
       "detector": "slack-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 79,
+          "end": 107,
           "start": 49
         }
       ],
       "id": "chat-additional-provider-tokens-one",
       "kind": null,
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
-          "end": 79,
+          "end": 107,
           "start": 49
         }
       ],
-      "policyOutcomes": [
-        "redact"
-      ],
-      "retainedRanges": [],
       "support": null,
       "tier": null
     },
@@ -8575,44 +8554,44 @@
   "schemaVersion": 1,
   "summary": {
     "cloudflare-token": {
-      "broad-shape": 1,
-      "retained": 16,
+      "broad-shape": 0,
+      "retained": 17,
       "review": 0,
       "silent": 33
     },
     "digitalocean-token": {
-      "broad-shape": 1,
-      "retained": 32,
+      "broad-shape": 0,
+      "retained": 33,
       "review": 0,
       "silent": 37
     },
     "docker-token": {
-      "broad-shape": 1,
-      "retained": 22,
+      "broad-shape": 0,
+      "retained": 23,
       "review": 0,
       "silent": 30
     },
     "huggingface-token": {
-      "broad-shape": 1,
-      "retained": 20,
+      "broad-shape": 0,
+      "retained": 21,
       "review": 0,
       "silent": 28
     },
     "linear-token": {
-      "broad-shape": 1,
-      "retained": 18,
+      "broad-shape": 0,
+      "retained": 19,
       "review": 0,
       "silent": 29
     },
     "openai-token": {
-      "broad-shape": 4,
-      "retained": 32,
+      "broad-shape": 3,
+      "retained": 33,
       "review": 0,
       "silent": 62
     },
     "slack-token": {
-      "broad-shape": 1,
-      "retained": 16,
+      "broad-shape": 0,
+      "retained": 17,
       "review": 0,
       "silent": 37
     }
