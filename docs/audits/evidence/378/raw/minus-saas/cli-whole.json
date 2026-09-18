@@ -1,0 +1,170 @@
+{
+  "schemaVersion": "3",
+  "surface": "cli",
+  "profileId": "scale-logs-small-whole",
+  "performance": {
+    "initialization": {
+      "unit": "milliseconds",
+      "samples": [
+        3.3985830000000306,
+        3.0664170000000013,
+        3.0512919999999895,
+        3.0413330000000087,
+        3.1859170000000177,
+        3.463792000000012,
+        8.203459000000066,
+        3.386459000000059,
+        3.2145420000000513,
+        4.129041000000029
+      ],
+      "minimum": 3.0413330000000087,
+      "median": 3.300500500000055,
+      "p95": 8.203459000000066,
+      "maximum": 8.203459000000066,
+      "mean": 3.8140835000000264,
+      "standardDeviation": 1.494525529563444
+    },
+    "processing": {
+      "unit": "milliseconds",
+      "samples": [
+        25.399167000000034,
+        25.394833000000006,
+        25.05966699999999,
+        24.902957999999956,
+        25.11058300000002,
+        22.704667000000086,
+        22.86795799999993,
+        22.678792000000044,
+        26.42416700000001,
+        26.943624999999997
+      ],
+      "minimum": 22.678792000000044,
+      "median": 25.085125000000005,
+      "p95": 26.943624999999997,
+      "maximum": 26.943624999999997,
+      "mean": 24.748641700000007,
+      "standardDeviation": 1.439330274015033
+    },
+    "throughput": {
+      "unit": "bytes-per-second",
+      "samples": [
+        2580950.784724551,
+        2581391.261757854,
+        2615916.6440639463,
+        2632378.049226125,
+        2610612.4258445115,
+        2887247.806805524,
+        2866631.1176538016,
+        2890541.965374517,
+        2480835.0628422825,
+        2433005.952242878
+      ],
+      "minimum": 2433005.952242878,
+      "median": 2613264.534954229,
+      "p95": 2890541.965374517,
+      "maximum": 2890541.965374517,
+      "mean": 2657951.1070535993,
+      "standardDeviation": 157684.98158041175
+    },
+    "memory": {
+      "nodeHeap": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "The CLI is a native process, not a Node.js process.",
+        "samplingLimit": "No samples were available."
+      },
+      "nodeRss": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "The CLI is a native process, not a Node.js process.",
+        "samplingLimit": "No samples were available."
+      },
+      "nodeExternal": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "The CLI is a native process, not a Node.js process.",
+        "samplingLimit": "No samples were available."
+      },
+      "browserJsHeap": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "The CLI is a native process, not a browser JavaScript environment.",
+        "samplingLimit": "No samples were available."
+      },
+      "wasmLinearMemory": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "The CLI is a native process and does not use WebAssembly linear memory.",
+        "samplingLimit": "No samples were available."
+      },
+      "pythonHeap": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "The CLI is a native process, not a Python allocator.",
+        "samplingLimit": "No samples were available."
+      },
+      "processRss": {
+        "unit": "bytes",
+        "samples": [
+          {
+            "baselineBytes": 0,
+            "maximumObservedBytes": 2326528
+          },
+          {
+            "baselineBytes": 0,
+            "maximumObservedBytes": 2310144
+          },
+          {
+            "baselineBytes": 0,
+            "maximumObservedBytes": 2359296
+          },
+          {
+            "baselineBytes": 0,
+            "maximumObservedBytes": 2326528
+          },
+          {
+            "baselineBytes": 0,
+            "maximumObservedBytes": 2326528
+          },
+          {
+            "baselineBytes": 0,
+            "maximumObservedBytes": 2310144
+          },
+          {
+            "baselineBytes": 0,
+            "maximumObservedBytes": 2326528
+          },
+          {
+            "baselineBytes": 0,
+            "maximumObservedBytes": 2310144
+          },
+          {
+            "baselineBytes": 0,
+            "maximumObservedBytes": 2310144
+          },
+          {
+            "baselineBytes": 0,
+            "maximumObservedBytes": 2293760
+          }
+        ],
+        "samplingLimit": "A separate, untimed /usr/bin/time-wrapped repetition's whole-process maximum resident set size; it includes process startup, argument parsing, the Rust runtime, and the entire scan, and cannot isolate steady-state or Rust-only memory."
+      },
+      "streamingBuffer": {
+        "unit": "bytes",
+        "samples": [],
+        "unavailableReason": "The CLI's standard-input path streams through the incremental core, but the public contract exposes no retained plaintext buffer size.",
+        "samplingLimit": "No samples were available."
+      }
+    }
+  },
+  "provenance": {
+    "commit": "8131459fb7f26658c95a1c7eb09f96bf7e141443",
+    "artifactIdentity": "redact-secret@0.1.0-beta.4",
+    "corpusVersion": "1",
+    "corpusHash": "b4db2cd22b4c008c9d63789df8ca2e21e697a21a84699466ea5f96c89d8e2806",
+    "os": "darwin-25.5.0",
+    "cpu": "arm64",
+    "runtime": "rustc 1.98.1 (48a229cea 2026-09-01)",
+    "command": "node scripts/assessment-cli-performance.mjs --binary /private/tmp/claude-501/-Users-minhokang-orca-workspaces-redact-secret-measure-per-detector-and-profile-artifact-runtim/ba6f791c-7eac-4a15-8f2a-baf67ed598d0/scratchpad/detector-cost-378/minus-saas/redact-secret --profile scale-logs-small-whole --runs 10 --json-out /Users/minhokang/orca/workspaces/redact-secret/measure-per-detector-and-profile-artifact-runtim/docs/audits/evidence/378/raw/minus-saas/cli-whole.json"
+  }
+}
