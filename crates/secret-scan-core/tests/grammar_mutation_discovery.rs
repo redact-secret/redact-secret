@@ -207,8 +207,8 @@ const HUGGING_FACE: Grammar = Grammar {
     id: "huggingface-token",
     type_name: "huggingface_token",
     prefixes: &["hf_"],
-    run: Run::AtLeast(20),
-    alphabet: is_alnum_dash,
+    run: Run::Exact(34),
+    alphabet: is_alnum,
     boundary: is_alnum_dash,
 };
 
