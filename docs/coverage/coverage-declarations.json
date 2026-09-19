@@ -2280,7 +2280,9 @@
             "sendgrid-positive-trailing-url-safe-characters",
             "sendgrid-positive-unicode-prefix",
             "sendgrid-positive-yaml",
-            "sendgrid-token-regression-crlf-and-unicode-prefix"
+            "sendgrid-token-regression-crlf-and-unicode-prefix",
+            "sendgrid-token-regression-generic-key-embedded-underscore",
+            "sendgrid-token-regression-generic-key-trailing-dash-full-span"
           ],
           "state": "supported"
         },
@@ -3365,6 +3367,8 @@
             "contextual-positive-template-embedded-still-detected",
             "contextual-positive-template-prefix-only-still-detected",
             "contextual-positive-vals-scheme-prefix-still-detected",
+            "generic-token-regression-sql-bind-lookalike-still-detected",
+            "generic-token-regression-windows-env-lookalike-still-detected",
             "regression-nested-credential-under-parent-key",
             "regression-placeholder-embedded-in-high-entropy-value",
             "regression-placeholder-word-with-unrelated-tokens",
@@ -3531,6 +3535,8 @@
             "contextual-positive-template-embedded-still-detected",
             "contextual-positive-template-prefix-only-still-detected",
             "contextual-positive-vals-scheme-prefix-still-detected",
+            "generic-token-regression-sql-bind-lookalike-still-detected",
+            "generic-token-regression-windows-env-lookalike-still-detected",
             "regression-nested-credential-under-parent-key",
             "regression-placeholder-embedded-in-high-entropy-value",
             "regression-placeholder-word-with-unrelated-tokens",

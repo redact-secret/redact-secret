@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 1213,
+  "fixtureCount": 1217,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -16063,6 +16063,50 @@
       "note": "issue #278: paired positive fixture -- a real-looking unquoted value containing '.' with no known code-reference root and no lower_snake_case segment (every segment is SCREAMING_CASE) does not satisfy either new exclusion and stays detected, the false-negative boundary the new exclusions deliberately do not cross."
     },
     {
+      "id": "generic-token-regression-windows-env-lookalike-still-detected",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "password=%SYNTHETIC-REVOKED-WINDOWS-ENV-LOOKALIKE%",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 9,
+          "end": 50
+        }
+      ],
+      "note": "issue #428, promoted from redact-secret-benchmarks' reference-syntax 'Literal-secret positive controls' assertion (benchmark issue #10): a value that starts and ends with '%' like issue #292's cmd.exe-style %IDENTIFIER% reference does not satisfy is_windows_env_reference, because its interior contains '-' and is_env_var_identifier rejects any non-alphanumeric/underscore byte -- so the literal stays detected rather than being swallowed by the reference exclusion. Verified before adding: this already passes, closing an uncovered contract (a fix that loosened is_env_var_identifier to accept '-' would regress here) rather than reproducing a live regression."
+    },
+    {
+      "id": "generic-token-regression-sql-bind-lookalike-still-detected",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "password=:SYNTHETIC-REVOKED-SQL-BIND-LOOKALIKE-VALUE",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 9,
+          "end": 52
+        }
+      ],
+      "note": "issue #428, promoted from redact-secret-benchmarks' reference-syntax 'Literal-secret positive controls' assertion (benchmark issue #10): a value that starts with ':' like issue #292's SQL named bind parameter (:new_password_hash) does not satisfy is_sql_bind_parameter, because its interior contains '-' and is_env_var_identifier rejects any non-alphanumeric/underscore byte -- so the literal stays detected rather than being swallowed by the reference exclusion. Verified before adding: this already passes, closing an uncovered contract rather than reproducing a live regression."
+    },
+    {
       "id": "sendgrid-positive-bare",
       "detector": "sendgrid-token",
       "kind": "positive",
@@ -16215,6 +16259,50 @@
         }
       ],
       "note": "An astral character and CRLF line endings on a comment line ahead of the token line do not shift the match's UTF-8 byte offsets (product issue #404)."
+    },
+    {
+      "id": "sendgrid-token-regression-generic-key-trailing-dash-full-span",
+      "detector": "sendgrid-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "api_key=SG.SYNTHETIC_REVOKED_0000.SYNTHETIC_REVOKED_SENDGRID_SECRET_00000000-\n",
+      "expected": [
+        {
+          "detector": "sendgrid-token",
+          "type": "sendgrid_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 8,
+          "end": 77
+        }
+      ],
+      "note": "issue #428, promoted from redact-secret-benchmarks' sendgrid-regressions 'trailing-dash-generic-key' assertion (benchmark issue #10): the secret segment's last byte is '-', pinning that the full 69-byte SG.<22>.<43> span is detected with the trailing dash included, not trimmed off as a boundary character. Verified before adding: the detector's fixed-length match (match_at in sendgrid.rs) never inspects or trims a character inside its documented ID_LEN/SECRET_LEN window, so this already passes -- the fixture closes an uncovered contract rather than reproducing a live regression."
+    },
+    {
+      "id": "sendgrid-token-regression-generic-key-embedded-underscore",
+      "detector": "sendgrid-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "api_key=SG.SYNTHETIC_REVOKED-_000.SYNTHETIC_REVOKED_SENDGRID_SECRET-_00000000\n",
+      "expected": [
+        {
+          "detector": "sendgrid-token",
+          "type": "sendgrid_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 8,
+          "end": 77
+        }
+      ],
+      "note": "issue #428, promoted from redact-secret-benchmarks' sendgrid-regressions 'url-safe-generic-key' assertion (benchmark issue #10): both the id and secret segments carry an embedded '-_' pair mid-run, exercising the full [A-Za-z0-9_-] alphabet rather than only the single '_' every other fixture in this file already happens to use as a word separator. Verified before adding: this already passes for the same reason as the trailing-dash case above -- an uncovered contract, not a live regression."
     },
     {
       "id": "sendgrid-negative-common-identifier",
