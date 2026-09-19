@@ -465,29 +465,13 @@ bindings/python         Python PyO3 binding and package
 packages/javascript     unified JavaScript package, published as @redact-secret/core
 ```
 
-Release qualification must build and test the Rust crate, npm package, Python
-package, and CLI from the same commit without publishing. The artifacts share
-one SemVer version and one eventual `v{version}` tag. The `Artifact
-qualification` workflow is that run: it builds the N-API addon, the CPython abi3
-wheels, the browser WebAssembly artifact, and the CLI binary for every
-declared target, smoke-tests each on the architecture it targets, exercises
-the browser artifact in Chromium, Firefox, and WebKit, and records an artifact
-inventory tied to the source commit. `[workspace.metadata.redact-secret]`
-declares those matrices once and `npm run artifacts:check` fails when any file
-that consumes them drifts. See
-[docs/qualification.md](./docs/qualification.md).
-
-On both JavaScript runtimes the matrix loads `@redact-secret/core` on the real
-artifact — the N-API addon on every target's own runner, and the WebAssembly
-build in each browser engine — and runs the canonical corpus through its
-public API. It then packs the candidate wrapper, native addon, and WebAssembly
-packages, installs them in clean consumer directories, and exercises the
-public incremental and stream APIs on Node.js 20, 22, and 24 and in Chromium,
-Firefox, and WebKit. Each installed-package result records the source revision
-and SHA-256 identities of those candidate packages. Both artifacts open the
-same core `IncrementalSanitizer` session the Python binding wraps; the Node
-`Transform` and Web `TransformStream` adapters add one fatal stateful UTF-8
-decoder plus host backpressure and cancellation behavior.
+Release qualification builds, tests, and smoke-tests the Rust crate, npm
+package, Python package, and CLI from the same commit without publishing,
+across every declared target and browser engine, and records an artifact
+inventory tied to the source commit. See
+[Versioning, qualification, and release](./ARCHITECTURE.md#versioning-qualification-and-release)
+in ARCHITECTURE.md for the full workflow and
+[docs/qualification.md](./docs/qualification.md) for how to run it locally.
 
 ## Security and release process
 
@@ -503,35 +487,13 @@ repository. See the [changelog](./CHANGELOG.md).
 The accepted architectural decisions are indexed in
 [docs/decisions/DECISIONS.md](./docs/decisions/DECISIONS.md).
 
-Criterion-level acceptance evidence for the closed Rust-core migration issues,
-including the gaps that remain open, is recorded in
-[docs/audits/closed-issue-acceptance-evidence-ledger.md](./docs/audits/closed-issue-acceptance-evidence-ledger.md).
-It records evidence only; it does not authorize any release operation.
-
-An independent review of the canonical core, the conformance contract, and the
-CLI boundary, with its findings and their exit conditions, is recorded in
-[docs/audits/core-conformance-cli-boundary-review.md](./docs/audits/core-conformance-cli-boundary-review.md).
-It records evidence only; it does not authorize any release operation.
-
-An independent review of the JavaScript and Python runtime adapters and the
-package contracts they declare, with its findings and their exit conditions, is
-recorded in
-[docs/audits/javascript-python-bindings-package-contracts-review.md](./docs/audits/javascript-python-bindings-package-contracts-review.md).
-It records evidence only; it does not authorize any release operation.
-
-An independent review of CI, the release and reconcile automation, the
-documented support matrices, and the supply-chain controls behind them, with its
-findings and their exit conditions, is recorded in
-[docs/audits/ci-release-automation-supply-chain-review.md](./docs/audits/ci-release-automation-supply-chain-review.md).
-It records evidence only; it does not authorize any release operation.
-
-One disposition for every finding those four documents produced — which findings
-block a release, which are deferred, and which are intentional exclusions — with
-the bounded remediation Task each blocker becomes, is recorded in
-[docs/audits/release-gap-disposition.md](./docs/audits/release-gap-disposition.md),
-and the deferred remainder in
-[docs/audits/deferred-quality-backlog.md](./docs/audits/deferred-quality-backlog.md).
-They classify and specify work only; they do not authorize any release operation.
+Acceptance evidence and independent reviews — the closed-issue migration
+ledger, the core/conformance/CLI boundary review, the JavaScript and Python
+binding review, the CI and supply-chain review, and their release-gap
+disposition and deferred-quality backlog — are indexed in
+[docs/audits/README.md](./docs/audits/README.md). These documents record
+evidence and classify work only; none of them authorizes any release
+operation.
 
 ## License
 

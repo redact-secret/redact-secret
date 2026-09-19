@@ -89,9 +89,9 @@ canonical source. It was not always: `scripts/migrate-conformance-corpus.ts`
 and `scripts/migrate-incremental-corpus.ts` originally generated these files
 from a parallel TypeScript-only corpus and the now-retired TypeScript
 detector, policy, redaction, and incremental-sanitizer implementation they
-exercised (`npm run corpus:migrate`, `npm run corpus:migrate:incremental`).
-Both the migration scripts and that TypeScript oracle were removed once the
-Rust core reached parity and qualification completed (`RB-2`, issue #72);
+exercised. Both the migration scripts and that TypeScript oracle were removed
+once the Rust core reached parity and qualification completed (`RB-2`, issue
+#72);
 `convert.ts` and `schema.ts` remain as the UTF-16/UTF-8 conversion and
 validation infrastructure a new fixture author or binding runner can still
 reach for.
@@ -271,7 +271,7 @@ raw benchmark results remain in `redact-secret-benchmarks`.
 
 ## What this directory is not (yet)
 
-This item defines the schema, the UTF-8 range model, and the canonical
+This directory defines the schema, the UTF-8 range model, and the canonical
 synchronous, incremental, Unicode-conversion, and safe-error corpora. The
 Rust core consumes the canonical corpus directly
 (`crates/secret-scan-core/tests/canonical_corpus.rs`, plus the incremental and
