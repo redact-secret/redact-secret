@@ -573,7 +573,8 @@ impl IncrementalSanitizer {
                 local.detector(),
                 local.confidence(),
                 global_range,
-            )?;
+            )?
+            .with_obfuscation(local.obfuscation());
             let context = IncrementalPolicyContext::new(self.finding_count);
             let action = self
                 .policy
@@ -592,14 +593,15 @@ impl IncrementalSanitizer {
                         .ok_or_else(|| {
                             SecretScanError::from(SecretScanErrorCode::InvalidCandidate)
                         })?;
-                Finding::new(
+                Ok(DetectedFinding::new(
                     finding.id(),
                     finding.type_name(),
                     finding.detector(),
                     finding.confidence(),
-                    finding.action(),
                     local_range,
-                )
+                )?
+                .with_obfuscation(finding.obfuscation())
+                .with_action(finding.action()))
             })
             .collect::<Result<Vec<_>, SecretScanError>>()?;
 

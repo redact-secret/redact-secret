@@ -49,7 +49,7 @@ FIXTURES = _fixtures()
 
 def _summary(findings: list[redact_secret.Finding]) -> list[tuple]:
     return [
-        (f.id, f.detector, f.type, f.confidence, f.action, f.start, f.end)
+        (f.id, f.detector, f.type, f.confidence, f.action, f.obfuscation, f.start, f.end)
         for f in findings
     ]
 

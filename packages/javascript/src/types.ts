@@ -22,6 +22,14 @@ export type SecretConfidence = "high" | "medium" | "low";
 export type SecretAction = "redact" | "block" | "warn" | "allow";
 
 /**
+ * Whether a finding's reported range shows evidence of invisible-character
+ * obfuscation: at least one zero-rendering or format code point was removed
+ * from inside it before detection. Carries no value, no offset into the
+ * secret, and no plaintext.
+ */
+export type SecretObfuscation = "none" | "invisible-characters";
+
+/**
  * A finding before policy evaluation: the safe metadata a policy callback
  * receives. It never carries the input or the matched value.
  */
@@ -33,6 +41,7 @@ export interface DetectedSecretFinding {
   /** Id of the detector that produced this finding. */
   readonly detector: string;
   readonly confidence: SecretConfidence;
+  readonly obfuscation: SecretObfuscation;
   /** Start offset, in UTF-16 code units. */
   readonly start: number;
   /** End offset (exclusive), in UTF-16 code units. */

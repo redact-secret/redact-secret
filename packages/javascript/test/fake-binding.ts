@@ -110,6 +110,7 @@ export const sampleFinding: NativeFinding = Object.freeze({
   detector: "generic-token",
   confidence: "high",
   action: "redact",
+  obfuscation: "none",
   start: 8,
   end: 39,
 });

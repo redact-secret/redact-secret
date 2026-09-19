@@ -90,6 +90,7 @@ class DetectedFinding:
     type: str
     detector: str
     confidence: str
+    obfuscation: str
     start: int
     end: int
 
@@ -107,6 +108,7 @@ class Finding:
     detector: str
     confidence: str
     action: str
+    obfuscation: str
     start: int
     end: int
 

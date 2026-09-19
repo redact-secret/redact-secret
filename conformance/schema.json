@@ -65,6 +65,9 @@
         "entropy"
       ]
     },
+    "obfuscation": {
+      "enum": ["none", "invisible-characters"]
+    },
     "mutation": {
       "type": "object",
       "additionalProperties": false,
@@ -96,6 +99,7 @@
         "type": { "$ref": "#/$defs/identifier" },
         "confidence": { "$ref": "#/$defs/confidence" },
         "specificity": { "$ref": "#/$defs/specificity" },
+        "obfuscation": { "$ref": "#/$defs/obfuscation" },
         "start": {
           "type": "integer",
           "minimum": 0,

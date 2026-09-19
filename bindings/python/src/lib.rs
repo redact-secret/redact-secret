@@ -26,8 +26,8 @@ use pyo3::{create_exception, wrap_pyfunction};
 
 use redact_secret::{
     Action, ByteRange, Confidence, DefaultPolicy, DetectedFinding, DetectorRegistry,
-    Finding as CoreFinding, PlaceholderContext, PlaceholderFormatter, Policy, PolicyContext,
-    SecretScanError as CoreError, SecretScanErrorCode,
+    Finding as CoreFinding, Obfuscation, PlaceholderContext, PlaceholderFormatter, Policy,
+    PolicyContext, SecretScanError as CoreError, SecretScanErrorCode,
     default_placeholder_formatter as core_default_formatter, redact as core_redact,
     run_detector_pipeline, typed_placeholder_formatter as core_typed_formatter,
 };
@@ -372,6 +372,9 @@ pub(crate) struct PyDetectedFinding {
     /// `"high"`, `"medium"`, or `"low"`.
     #[pyo3(get)]
     confidence: String,
+    /// `"none"` or `"invisible-characters"`.
+    #[pyo3(get)]
+    obfuscation: String,
     /// Inclusive start offset, in Unicode code points.
     #[pyo3(get)]
     start: usize,
@@ -379,6 +382,7 @@ pub(crate) struct PyDetectedFinding {
     #[pyo3(get)]
     end: usize,
     confidence_value: Confidence,
+    obfuscation_value: Obfuscation,
     byte_range: ByteRange,
 }
 
@@ -389,9 +393,11 @@ impl PyDetectedFinding {
             type_name: finding.type_name().to_owned(),
             detector: finding.detector().to_owned(),
             confidence: finding.confidence().as_str().to_owned(),
+            obfuscation: finding.obfuscation().as_str().to_owned(),
             start,
             end,
             confidence_value: finding.confidence(),
+            obfuscation_value: finding.obfuscation(),
             byte_range: finding.range(),
         }
     }
@@ -405,6 +411,7 @@ impl PyDetectedFinding {
             self.confidence_value,
             self.byte_range,
         )
+        .map(|finding| finding.with_obfuscation(self.obfuscation_value))
         .map_err(map_core_error)
     }
 }
@@ -413,8 +420,14 @@ impl PyDetectedFinding {
 impl PyDetectedFinding {
     fn __repr__(&self) -> String {
         format!(
-            "DetectedFinding(id={:?}, type={:?}, detector={:?}, confidence={:?}, start={}, end={})",
-            self.id, self.type_name, self.detector, self.confidence, self.start, self.end
+            "DetectedFinding(id={:?}, type={:?}, detector={:?}, confidence={:?}, obfuscation={:?}, start={}, end={})",
+            self.id,
+            self.type_name,
+            self.detector,
+            self.confidence,
+            self.obfuscation,
+            self.start,
+            self.end
         )
     }
 }
@@ -472,6 +485,9 @@ pub(crate) struct PyFinding {
     /// `"redact"`, `"block"`, `"warn"`, or `"allow"`.
     #[pyo3(get)]
     action: String,
+    /// `"none"` or `"invisible-characters"`.
+    #[pyo3(get)]
+    obfuscation: String,
     /// Inclusive start offset, in Unicode code points.
     #[pyo3(get)]
     start: usize,
@@ -489,6 +505,7 @@ impl PyFinding {
             detector: finding.detector().to_owned(),
             confidence: finding.confidence().as_str().to_owned(),
             action: finding.action().as_str().to_owned(),
+            obfuscation: finding.obfuscation().as_str().to_owned(),
             start,
             end,
             inner: finding,
@@ -500,12 +517,13 @@ impl PyFinding {
 impl PyFinding {
     fn __repr__(&self) -> String {
         format!(
-            "Finding(id={:?}, type={:?}, detector={:?}, confidence={:?}, action={:?}, start={}, end={})",
+            "Finding(id={:?}, type={:?}, detector={:?}, confidence={:?}, action={:?}, obfuscation={:?}, start={}, end={})",
             self.id,
             self.type_name,
             self.detector,
             self.confidence,
             self.action,
+            self.obfuscation,
             self.start,
             self.end
         )

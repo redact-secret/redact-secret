@@ -115,8 +115,9 @@ mod tests {
             "if (Object.prototype.hasOwnProperty.call(finding, 'input')) { throw new Error('leak'); }
              const findingOk = finding.id === 'finding-1' && finding.type === 'aws_access_key_id'
                && finding.detector === 'aws-access-key' && finding.confidence === 'high'
+               && finding.obfuscation === 'none'
                && finding.range.start === 0 && finding.range.end === 4
-               && Object.keys(finding).sort().join(',') === 'confidence,detector,id,range,type';
+               && Object.keys(finding).sort().join(',') === 'confidence,detector,id,obfuscation,range,type';
              const contextOk = context.findingIndex === 0 && context.findingCount === 1;
              return (findingOk && contextOk) ? 'redact' : 'warn';",
         );

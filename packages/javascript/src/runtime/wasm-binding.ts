@@ -40,6 +40,7 @@ export interface WasmFinding {
   readonly detector: string;
   readonly confidence: string;
   readonly action: string;
+  readonly obfuscation: string;
   readonly range: { readonly start: number; readonly end: number };
 }
 
@@ -54,6 +55,7 @@ export interface WasmDetectedFindingMetadata {
   readonly type: string;
   readonly detector: string;
   readonly confidence: string;
+  readonly obfuscation: string;
   readonly range: { readonly start: number; readonly end: number };
 }
 
@@ -167,6 +169,7 @@ function toNativeFinding(finding: WasmFinding): NativeFinding {
     detector: finding.detector,
     confidence: finding.confidence,
     action: finding.action,
+    obfuscation: finding.obfuscation,
     start,
     end,
     [NATIVE_HANDLE]: finding,
@@ -194,6 +197,7 @@ function toNativeDetectedFinding(
     type: finding.type,
     detector: finding.detector,
     confidence: finding.confidence,
+    obfuscation: finding.obfuscation,
     start,
     end,
   });
@@ -210,6 +214,7 @@ function toNativeFormatterMetadata(
     detector: finding.detector,
     confidence: finding.confidence,
     action: finding.action,
+    obfuscation: finding.obfuscation,
     start,
     end,
   });
