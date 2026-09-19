@@ -429,7 +429,7 @@ mod tests {
             ),
             (
                 "digitalocean-token",
-                "dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9",
+                "dop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
             ),
             (
                 "linear-token",
@@ -514,7 +514,7 @@ mod tests {
             (
                 "digitalocean-token",
                 // 63 lowercase-hex bytes, one short of the contracted 64.
-                "dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954ca",
+                "dop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcd",
             ),
             (
                 "docker-token",

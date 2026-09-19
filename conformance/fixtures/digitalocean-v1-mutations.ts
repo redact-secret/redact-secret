@@ -22,8 +22,10 @@
  * property of the identity case, so an accepted or rejected outcome follows
  * from construction.
  *
- * The bodies are the locally constructed synthetic values from the issue's
- * self-contained snapshot. They were never provider-issued.
+ * The bodies are locally constructed, unmistakably patterned hex runs (issue
+ * #419 replaced the issue's original real-looking random snapshot with these,
+ * keeping every byte length exactly as reviewed). They were never
+ * provider-issued.
  */
 
 export const DIGITALOCEAN_V1_SEED_ID = "digitalocean-v1-synthetic-seed";
@@ -32,12 +34,12 @@ const PAT_PREFIX = "dop_v1_";
 const OAUTH_ACCESS_PREFIX = "doo_v1_";
 const OAUTH_REFRESH_PREFIX = "dor_v1_";
 
-/** Exactly 64 lowercase hex bytes each; index 8 (the `d` in the PAT body) is
- * the fixed byte the `uppercase-hex`, `invalid-alphabet`, and
- * `whitespace-insertion` operations mutate. */
-const PAT_BODY = "1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9";
-const OAUTH_ACCESS_BODY = "025343c0555235768c29735f523ad644fbfe1569b1d88f46b4f506628ae8b08a";
-const OAUTH_REFRESH_BODY = "686b232b8722f7ab110b24d01fd9a96539cdec166f27e643ae9852b28d2b0da5";
+/** Exactly 64 lowercase hex bytes each; index 8 is the fixed byte position
+ * the `uppercase-hex`, `invalid-alphabet`, and `whitespace-insertion`
+ * operations mutate, replacing whatever character is there. */
+const PAT_BODY = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+const OAUTH_ACCESS_BODY = "fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210";
+const OAUTH_REFRESH_BODY = "123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0";
 
 const TOKEN = PAT_PREFIX + PAT_BODY;
 

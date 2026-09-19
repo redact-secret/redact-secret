@@ -4988,7 +4988,7 @@
         "operation": "identity",
         "ordinal": 0
       },
-      "input": "dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9",
+      "input": "dop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
       "expected": [
         {
           "detector": "digitalocean-token",
@@ -5042,7 +5042,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "access_token=dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9",
+      "input": "access_token=dop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
       "expected": [
         {
           "detector": "digitalocean-token",
@@ -5070,7 +5070,7 @@
         "operation": "short-length",
         "ordinal": 3
       },
-      "input": "dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad",
+      "input": "dop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcde",
       "expected": [],
       "note": "Length 63 vs contracted 64: the paired positive with its final byte dropped is rejected. This is the beta.4 regression reproduced by issue #369 (benchmark fixture digitalocean-token-dop-plain-twin, flagged by @redact-secret/core@0.1.0-beta.4 under the earlier 20-byte minimum). A fixed digitalocean-v1 grammar mutation (issue #369) records the accepted boundary or neighboring rejected form; exactly one structural property differs from the identity case. DigitalOcean API release notes 2022-03-29 (prefixes); gitleaks v8.30.1 digitalocean-pat/-access-token/-refresh-token and trufflehog v3.97.4 digitaloceanv2 ([a-f0-9]{64})."
     },
@@ -5089,7 +5089,7 @@
         "operation": "invalid-alphabet",
         "ordinal": 6
       },
-      "input": "dop_v1_1f24601fg1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9",
+      "input": "dop_v1_01234567g9abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
       "expected": [],
       "note": "One byte outside [0-9a-f] inside an otherwise contracted 64-byte body breaks the run, so no candidate is emitted. A fixed digitalocean-v1 grammar mutation (issue #369) records the accepted boundary or neighboring rejected form; exactly one structural property differs from the identity case. DigitalOcean API release notes 2022-03-29 (prefixes); gitleaks v8.30.1 digitalocean-pat/-access-token/-refresh-token and trufflehog v3.97.4 digitaloceanv2 ([a-f0-9]{64})."
     },
@@ -5108,7 +5108,7 @@
         "operation": "whitespace-insertion",
         "ordinal": 7
       },
-      "input": "dop_v1_1f24601f d1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9",
+      "input": "dop_v1_01234567 89abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
       "expected": [],
       "note": "An inserted space inside the body breaks the run instead of being silently bridged. A fixed digitalocean-v1 grammar mutation (issue #369) records the accepted boundary or neighboring rejected form; exactly one structural property differs from the identity case. DigitalOcean API release notes 2022-03-29 (prefixes); gitleaks v8.30.1 digitalocean-pat/-access-token/-refresh-token and trufflehog v3.97.4 digitaloceanv2 ([a-f0-9]{64})."
     },
@@ -5121,7 +5121,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "DOP_V1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9\nDOO_V1_025343c0555235768c29735f523ad644fbfe1569b1d88f46b4f506628ae8b08a\nDOR_V1_686b232b8722f7ab110b24d01fd9a96539cdec166f27e643ae9852b28d2b0da5",
+      "input": "DOP_V1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\nDOO_V1_fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210\nDOR_V1_123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0",
       "expected": [],
       "note": "Every documented prefix is matched case-sensitively; each uppercased prefix is followed by a contracted 64-byte body so the prefix case is the only differing property. gitleaks v8.30.1 alone matches dor_v1_ case-insensitively, a tool convenience with no provider evidence behind it, so all three prefixes stay case-sensitive here."
     },
@@ -5153,7 +5153,7 @@
         "operation": "version-lookalike",
         "ordinal": 10
       },
-      "input": "dop_v2_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9",
+      "input": "dop_v2_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
       "expected": [],
       "note": "Only the documented v1 DigitalOcean token namespace is matched; an unreleased version with an otherwise contracted body is a future false negative. A fixed digitalocean-v1 grammar mutation (issue #369) records the accepted boundary or neighboring rejected form; exactly one structural property differs from the identity case. DigitalOcean API release notes 2022-03-29 (prefixes); gitleaks v8.30.1 digitalocean-pat/-access-token/-refresh-token and trufflehog v3.97.4 digitaloceanv2 ([a-f0-9]{64})."
     },
@@ -5166,7 +5166,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "doo_v1_025343c0555235768c29735f523ad644fbfe1569b1d88f46b4f506628ae8b08a\ndor_v1_686b232b8722f7ab110b24d01fd9a96539cdec166f27e643ae9852b28d2b0da5",
+      "input": "doo_v1_fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210\ndor_v1_123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0",
       "expected": [
         {
           "detector": "digitalocean-token",
@@ -5227,7 +5227,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "legacydop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9\nlegacydoo_v1_025343c0555235768c29735f523ad644fbfe1569b1d88f46b4f506628ae8b08a\nlegacydor_v1_686b232b8722f7ab110b24d01fd9a96539cdec166f27e643ae9852b28d2b0da5",
+      "input": "legacydop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\nlegacydoo_v1_fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210\nlegacydor_v1_123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0",
       "expected": [],
       "note": "Every supported DigitalOcean prefix immediately preceded by an alphanumeric/dash character is a truncated slice of a wider benign identifier, not a boundary-delimited credential, so no candidate is emitted even though a contracted 64-byte body follows; a real secret substring is never carved out of a longer surrounding token."
     },
@@ -5240,7 +5240,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "Rotate dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9, then redeploy.",
+      "input": "Rotate dop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef, then redeploy.",
       "expected": [
         {
           "detector": "digitalocean-token",
@@ -5288,7 +5288,7 @@
       "contexts": [
         "dotenv"
       ],
-      "input": "DIGITALOCEAN_TOKEN=dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9",
+      "input": "DIGITALOCEAN_TOKEN=dop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
       "expected": [
         {
           "detector": "digitalocean-token",
@@ -5310,7 +5310,7 @@
       "contexts": [
         "json"
       ],
-      "input": "{\"digitaloceanToken\": \"dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9\"}",
+      "input": "{\"digitaloceanToken\": \"dop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\"}",
       "expected": [
         {
           "detector": "digitalocean-token",
@@ -5332,7 +5332,7 @@
       "contexts": [
         "yaml"
       ],
-      "input": "digitalocean_token: dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9\n",
+      "input": "digitalocean_token: dop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\n",
       "expected": [
         {
           "detector": "digitalocean-token",
@@ -5354,7 +5354,7 @@
       "contexts": [
         "log"
       ],
-      "input": "2026-09-16T00:00:00Z INFO provisioning droplet key=dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9 region=nyc3",
+      "input": "2026-09-16T00:00:00Z INFO provisioning droplet key=dop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef region=nyc3",
       "expected": [
         {
           "detector": "digitalocean-token",
@@ -5376,7 +5376,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\ndop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9\r\n",
+      "input": "# 🔑 café\r\ndop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\r\n",
       "expected": [
         {
           "detector": "digitalocean-token",
@@ -5417,7 +5417,7 @@
         "operation": "oauth-access-prefix",
         "ordinal": 1
       },
-      "input": "doo_v1_025343c0555235768c29735f523ad644fbfe1569b1d88f46b4f506628ae8b08a",
+      "input": "doo_v1_fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210",
       "expected": [
         {
           "detector": "digitalocean-token",
@@ -5445,7 +5445,7 @@
         "operation": "oauth-refresh-prefix",
         "ordinal": 2
       },
-      "input": "dor_v1_686b232b8722f7ab110b24d01fd9a96539cdec166f27e643ae9852b28d2b0da5",
+      "input": "dor_v1_123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0",
       "expected": [
         {
           "detector": "digitalocean-token",
@@ -5473,7 +5473,7 @@
         "operation": "long-length",
         "ordinal": 4
       },
-      "input": "dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad90",
+      "input": "dop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0",
       "expected": [],
       "note": "Length 65 vs contracted 64: one extra hex byte makes the whole run a wider identifier, and no 64-byte token is carved out of it. A fixed digitalocean-v1 grammar mutation (issue #369) records the accepted boundary or neighboring rejected form; exactly one structural property differs from the identity case. DigitalOcean API release notes 2022-03-29 (prefixes); gitleaks v8.30.1 digitalocean-pat/-access-token/-refresh-token and trufflehog v3.97.4 digitaloceanv2 ([a-f0-9]{64})."
     },
@@ -5492,7 +5492,7 @@
         "operation": "uppercase-hex",
         "ordinal": 5
       },
-      "input": "dop_v1_1f24601fD1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9",
+      "input": "dop_v1_01234567D9abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
       "expected": [],
       "note": "One uppercase hex digit inside the body is outside the contracted lowercase [0-9a-f] alphabet, so the run breaks and no candidate is emitted. A fixed digitalocean-v1 grammar mutation (issue #369) records the accepted boundary or neighboring rejected form; exactly one structural property differs from the identity case. DigitalOcean API release notes 2022-03-29 (prefixes); gitleaks v8.30.1 digitalocean-pat/-access-token/-refresh-token and trufflehog v3.97.4 digitaloceanv2 ([a-f0-9]{64})."
     },
@@ -5511,7 +5511,7 @@
         "operation": "invalid-prefix",
         "ordinal": 8
       },
-      "input": "dov_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9",
+      "input": "dov_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
       "expected": [],
       "note": "A one-letter-off prefix (dov_v1_) with a contracted body is not fuzzy-matched. A fixed digitalocean-v1 grammar mutation (issue #369) records the accepted boundary or neighboring rejected form; exactly one structural property differs from the identity case. DigitalOcean API release notes 2022-03-29 (prefixes); gitleaks v8.30.1 digitalocean-pat/-access-token/-refresh-token and trufflehog v3.97.4 digitaloceanv2 ([a-f0-9]{64})."
     },
@@ -5530,7 +5530,7 @@
         "operation": "uppercase-prefix",
         "ordinal": 9
       },
-      "input": "DOP_V1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9",
+      "input": "DOP_V1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
       "expected": [],
       "note": "An uppercased prefix with a contracted body is a wrong prefix; prefixes are matched case-sensitively. A fixed digitalocean-v1 grammar mutation (issue #369) records the accepted boundary or neighboring rejected form; exactly one structural property differs from the identity case. DigitalOcean API release notes 2022-03-29 (prefixes); gitleaks v8.30.1 digitalocean-pat/-access-token/-refresh-token and trufflehog v3.97.4 digitaloceanv2 ([a-f0-9]{64})."
     },
@@ -5549,7 +5549,7 @@
         "operation": "leading-embedding",
         "ordinal": 11
       },
-      "input": "legacydop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9",
+      "input": "legacydop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
       "expected": [],
       "note": "An identifier fragment joined directly before the prefix makes the whole span a wider identifier; the contracted 64-byte token inside it is never extracted. A fixed digitalocean-v1 grammar mutation (issue #369) records the accepted boundary or neighboring rejected form; exactly one structural property differs from the identity case. DigitalOcean API release notes 2022-03-29 (prefixes); gitleaks v8.30.1 digitalocean-pat/-access-token/-refresh-token and trufflehog v3.97.4 digitaloceanv2 ([a-f0-9]{64})."
     },
@@ -5568,7 +5568,7 @@
         "operation": "trailing-embedding",
         "ordinal": 12
       },
-      "input": "dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9_backup",
+      "input": "dop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef_backup",
       "expected": [],
       "note": "An underscore-joined segment directly after the 64-byte body makes the whole span a wider identifier; the contracted token inside it is never extracted. A fixed digitalocean-v1 grammar mutation (issue #369) records the accepted boundary or neighboring rejected form; exactly one structural property differs from the identity case. DigitalOcean API release notes 2022-03-29 (prefixes); gitleaks v8.30.1 digitalocean-pat/-access-token/-refresh-token and trufflehog v3.97.4 digitaloceanv2 ([a-f0-9]{64})."
     },
@@ -5587,7 +5587,7 @@
         "operation": "dash-embedding",
         "ordinal": 13
       },
-      "input": "dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9-1",
+      "input": "dop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef-1",
       "expected": [],
       "note": "A dash-joined segment directly after the 64-byte body joins a wider identifier under the [A-Za-z0-9_-] boundary alphabet, so nothing is extracted. This is stricter than trufflehog's \\b word boundary, which treats '-' as a delimiter; the repository keeps its existing boundary rule (issue #320) rather than carving a token out of a dash-joined identifier. A fixed digitalocean-v1 grammar mutation (issue #369) records the accepted boundary or neighboring rejected form; exactly one structural property differs from the identity case. DigitalOcean API release notes 2022-03-29 (prefixes); gitleaks v8.30.1 digitalocean-pat/-access-token/-refresh-token and trufflehog v3.97.4 digitaloceanv2 ([a-f0-9]{64})."
     },
@@ -5606,7 +5606,7 @@
         "operation": "punctuation-boundary",
         "ordinal": 14
       },
-      "input": "dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9,",
+      "input": "dop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef,",
       "expected": [
         {
           "detector": "digitalocean-token",
@@ -5634,7 +5634,7 @@
         "operation": "quoted",
         "ordinal": 15
       },
-      "input": "\"dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9\"",
+      "input": "\"dop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\"",
       "expected": [
         {
           "detector": "digitalocean-token",
@@ -5662,7 +5662,7 @@
         "operation": "markdown-code-span",
         "ordinal": 16
       },
-      "input": "`dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9`",
+      "input": "`dop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef`",
       "expected": [
         {
           "detector": "digitalocean-token",
@@ -5690,7 +5690,7 @@
         "operation": "encoded-prefix",
         "ordinal": 17
       },
-      "input": "dop%5Fv1%5F1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9",
+      "input": "dop%5Fv1%5F0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
       "expected": [],
       "note": "A percent-encoded delimiter lookalike in the prefix is not the documented literal prefix, so nothing is classified. A fixed digitalocean-v1 grammar mutation (issue #369) records the accepted boundary or neighboring rejected form; exactly one structural property differs from the identity case. DigitalOcean API release notes 2022-03-29 (prefixes); gitleaks v8.30.1 digitalocean-pat/-access-token/-refresh-token and trufflehog v3.97.4 digitaloceanv2 ([a-f0-9]{64})."
     },
@@ -5709,7 +5709,7 @@
         "operation": "host-embedding",
         "ordinal": 18
       },
-      "input": "https://example.test/?token=dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9&x=1",
+      "input": "https://example.test/?token=dop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef&x=1",
       "expected": [
         {
           "detector": "digitalocean-token",
@@ -5731,7 +5731,7 @@
       "contexts": [
         "toml"
       ],
-      "input": "token = \"doo_v1_025343c0555235768c29735f523ad644fbfe1569b1d88f46b4f506628ae8b08a\"\n",
+      "input": "token = \"doo_v1_fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210\"\n",
       "expected": [
         {
           "detector": "digitalocean-token",
@@ -5753,7 +5753,7 @@
       "contexts": [
         "shell"
       ],
-      "input": "export DIGITALOCEAN_ACCESS_TOKEN=\"dor_v1_686b232b8722f7ab110b24d01fd9a96539cdec166f27e643ae9852b28d2b0da5\"",
+      "input": "export DIGITALOCEAN_ACCESS_TOKEN=\"dor_v1_123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0\"",
       "expected": [
         {
           "detector": "digitalocean-token",
@@ -5775,7 +5775,7 @@
       "contexts": [
         "markdown"
       ],
-      "input": "```sh\ndoctl auth init --access-token dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9\n```\n",
+      "input": "```sh\ndoctl auth init --access-token dop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\n```\n",
       "expected": [
         {
           "detector": "digitalocean-token",
@@ -5819,7 +5819,7 @@
       "contexts": [
         "dotenv"
       ],
-      "input": "DIGITALOCEAN_TOKEN=dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad",
+      "input": "DIGITALOCEAN_TOKEN=dop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcde",
       "expected": [],
       "note": "A 63-byte twin under a provider-named dotenv assignment: the provider detector rejects it under the exact-length contract and no other default detector claims the value, so the default scan is silent."
     },
@@ -5832,7 +5832,7 @@
       "contexts": [
         "dotenv"
       ],
-      "input": "api_key=dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad",
+      "input": "api_key=dop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcde",
       "expected": [
         {
           "detector": "generic-token",
@@ -5854,7 +5854,7 @@
       "contexts": [
         "http"
       ],
-      "input": "Authorization: Bearer dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad",
+      "input": "Authorization: Bearer dop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcde",
       "expected": [
         {
           "detector": "bearer-token",
@@ -5876,7 +5876,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad\n\n",
+      "input": "dop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcde\n\n",
       "expected": [],
       "note": "Regression frozen from issue #369's self-contained synthetic snapshot (benchmark fixture digitalocean-token-dop-plain-twin; published @redact-secret/core@0.1.0-beta.4, default detectors, measurement protocol v4, local benchmark run 2026-09-17T21:26:02.204Z-3390af, corpus SHA-256 19ca47f5dbf21acc94c6712a51d6586c9fd1653b3da132172622c0e7c4b08fb8). Negative twin (length 63 vs contracted 64) that beta.4 flagged at bytes [0,70); silence follows from construction. The value is locally constructed and was never provider-issued."
     },
@@ -5889,7 +5889,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9\n\n",
+      "input": "dop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\n\n",
       "expected": [
         {
           "detector": "digitalocean-token",
@@ -5911,7 +5911,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 reviewed format\r\ndop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad\n\r\n",
+      "input": "# 🔑 reviewed format\r\ndop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcde\n\r\n",
       "expected": [],
       "note": "Regression frozen from issue #369's self-contained synthetic snapshot (benchmark fixture digitalocean-token-dop-unicode-crlf-twin; published @redact-secret/core@0.1.0-beta.4, default detectors, measurement protocol v4, local benchmark run 2026-09-17T21:26:02.204Z-3390af, corpus SHA-256 19ca47f5dbf21acc94c6712a51d6586c9fd1653b3da132172622c0e7c4b08fb8). Negative twin (length 63 vs contracted 64) after a Unicode comment and CRLF that beta.4 flagged at bytes [24,94); silence follows from construction. The value is locally constructed and was never provider-issued."
     },
@@ -5924,7 +5924,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 reviewed format\r\ndop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9\n\r\n",
+      "input": "# 🔑 reviewed format\r\ndop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\n\r\n",
       "expected": [
         {
           "detector": "digitalocean-token",
@@ -5946,7 +5946,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "doo_v1_025343c0555235768c29735f523ad644fbfe1569b1d88f46b4f506628ae8b08\n\n",
+      "input": "doo_v1_fedcba9876543210fedcba9876543210fedcba9876543210fedcba987654321\n\n",
       "expected": [],
       "note": "Regression frozen from issue #369's self-contained synthetic snapshot (benchmark fixture digitalocean-token-doo-plain-twin; published @redact-secret/core@0.1.0-beta.4, default detectors, measurement protocol v4, local benchmark run 2026-09-17T21:26:02.204Z-3390af, corpus SHA-256 19ca47f5dbf21acc94c6712a51d6586c9fd1653b3da132172622c0e7c4b08fb8). Negative twin (length 63 vs contracted 64) that beta.4 flagged at bytes [0,70); silence follows from construction. The value is locally constructed and was never provider-issued."
     },
@@ -5959,7 +5959,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "doo_v1_025343c0555235768c29735f523ad644fbfe1569b1d88f46b4f506628ae8b08a\n\n",
+      "input": "doo_v1_fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210\n\n",
       "expected": [
         {
           "detector": "digitalocean-token",
@@ -5981,7 +5981,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 reviewed format\r\ndoo_v1_025343c0555235768c29735f523ad644fbfe1569b1d88f46b4f506628ae8b08\n\r\n",
+      "input": "# 🔑 reviewed format\r\ndoo_v1_fedcba9876543210fedcba9876543210fedcba9876543210fedcba987654321\n\r\n",
       "expected": [],
       "note": "Regression frozen from issue #369's self-contained synthetic snapshot (benchmark fixture digitalocean-token-doo-unicode-crlf-twin; published @redact-secret/core@0.1.0-beta.4, default detectors, measurement protocol v4, local benchmark run 2026-09-17T21:26:02.204Z-3390af, corpus SHA-256 19ca47f5dbf21acc94c6712a51d6586c9fd1653b3da132172622c0e7c4b08fb8). Negative twin (length 63 vs contracted 64) after a Unicode comment and CRLF that beta.4 flagged at bytes [24,94); silence follows from construction. The value is locally constructed and was never provider-issued."
     },
@@ -5994,7 +5994,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 reviewed format\r\ndoo_v1_025343c0555235768c29735f523ad644fbfe1569b1d88f46b4f506628ae8b08a\n\r\n",
+      "input": "# 🔑 reviewed format\r\ndoo_v1_fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210\n\r\n",
       "expected": [
         {
           "detector": "digitalocean-token",
@@ -6016,7 +6016,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "dor_v1_686b232b8722f7ab110b24d01fd9a96539cdec166f27e643ae9852b28d2b0da\n\n",
+      "input": "dor_v1_123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\n\n",
       "expected": [],
       "note": "Regression frozen from issue #369's self-contained synthetic snapshot (benchmark fixture digitalocean-token-dor-plain-twin; published @redact-secret/core@0.1.0-beta.4, default detectors, measurement protocol v4, local benchmark run 2026-09-17T21:26:02.204Z-3390af, corpus SHA-256 19ca47f5dbf21acc94c6712a51d6586c9fd1653b3da132172622c0e7c4b08fb8). Negative twin (length 63 vs contracted 64) that beta.4 flagged at bytes [0,70); silence follows from construction. The value is locally constructed and was never provider-issued."
     },
@@ -6029,7 +6029,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "dor_v1_686b232b8722f7ab110b24d01fd9a96539cdec166f27e643ae9852b28d2b0da5\n\n",
+      "input": "dor_v1_123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0\n\n",
       "expected": [
         {
           "detector": "digitalocean-token",
@@ -6051,7 +6051,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 reviewed format\r\ndor_v1_686b232b8722f7ab110b24d01fd9a96539cdec166f27e643ae9852b28d2b0da\n\r\n",
+      "input": "# 🔑 reviewed format\r\ndor_v1_123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\n\r\n",
       "expected": [],
       "note": "Regression frozen from issue #369's self-contained synthetic snapshot (benchmark fixture digitalocean-token-dor-unicode-crlf-twin; published @redact-secret/core@0.1.0-beta.4, default detectors, measurement protocol v4, local benchmark run 2026-09-17T21:26:02.204Z-3390af, corpus SHA-256 19ca47f5dbf21acc94c6712a51d6586c9fd1653b3da132172622c0e7c4b08fb8). Negative twin (length 63 vs contracted 64) after a Unicode comment and CRLF that beta.4 flagged at bytes [24,94); silence follows from construction. The value is locally constructed and was never provider-issued."
     },
@@ -6064,7 +6064,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 reviewed format\r\ndor_v1_686b232b8722f7ab110b24d01fd9a96539cdec166f27e643ae9852b28d2b0da5\n\r\n",
+      "input": "# 🔑 reviewed format\r\ndor_v1_123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0\n\r\n",
       "expected": [
         {
           "detector": "digitalocean-token",
@@ -10006,7 +10006,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "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\n\n",
+      "input": "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\n\n",
       "expected": [
         {
           "detector": "openai-token",
@@ -10028,7 +10028,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "sk-CETkIjobDgQhiCSRBjSgT3BlbkFKjwnQ0FqBPH7mULVtCSjs\n\n",
+      "input": "sk-SYNTHETICREVOKED0001T3BlbkFKSYNTHETICREVOKED0002\n\n",
       "expected": [],
       "note": "Negative twin of the paired positive differing in exactly one structural property (internal marker `T3BlbkFK` vs contracted `T3BlbkFJ`); beta.4 flagged it at the same range as its positive. Issue #368 self-contained synthetic reproduction; independent benchmark fixture id `openai-token-legacy-plain-twin` (redact-secret-benchmarks common-formats, measurement protocol v4, T2). Never provider-issued."
     },
@@ -10041,7 +10041,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "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\n\n",
+      "input": "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\n\n",
       "expected": [
         {
           "detector": "openai-token",
@@ -10063,7 +10063,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "sk-proj-XQaEbXdYpB2bY4iugTKGKEsfpzbarfDE4qLowLdD4YAe8PTMyFPUAxlT3gVQhyppB4rNDqRBuT3BlbkFJs3wTeLdTFRFjZCzIBROCBs0r30BvMe4LSjGlMmIQjdpQfuWnojoR0WCEDCvGp09Cf68wvz90Ng\n\n",
+      "input": "sk-proj-SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTT3BlbkFJSYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SY\n\n",
       "expected": [],
       "note": "Negative twin of the paired positive differing in exactly one structural property (73-byte left segment vs contracted 74); beta.4 flagged it at the same range as its positive. Issue #368 self-contained synthetic reproduction; independent benchmark fixture id `openai-token-proj-plain-twin` (redact-secret-benchmarks common-formats, measurement protocol v4, T2). Never provider-issued."
     },
@@ -10076,7 +10076,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "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\n\n",
+      "input": "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\n\n",
       "expected": [
         {
           "detector": "openai-token",
@@ -10098,7 +10098,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "sk-svcacct-vOuQp18EMEQEexlPHizducCt2ZpSuVfwijDiYEVKQUDWDw9W1yvOhrgPkZdA5dgmxJl2lbPXYT3BlbkFJFFBjTH5S5JmqBkLzL8FupQ65xXFRMDWZoyHUcRFMmsOEL2SBu2ptiTCJBWqgqUwVrscOG1VYQD\n\n",
+      "input": "sk-svcacct-SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTT3BlbkFJSYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SY\n\n",
       "expected": [],
       "note": "Negative twin of the paired positive differing in exactly one structural property (73-byte left segment vs contracted 74); beta.4 flagged it at the same range as its positive. Issue #368 self-contained synthetic reproduction; independent benchmark fixture id `openai-token-svcacct-plain-twin` (redact-secret-benchmarks common-formats, measurement protocol v4, T2). Never provider-issued."
     },
@@ -10111,7 +10111,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 reviewed format\r\n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\n\r\n",
+      "input": "# 🔑 reviewed format\r\n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\n\r\n",
       "expected": [
         {
           "detector": "openai-token",
@@ -10133,7 +10133,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 reviewed format\r\nsk-CETkIjobDgQhiCSRBjSgT3BlbkFKjwnQ0FqBPH7mULVtCSjs\n\r\n",
+      "input": "# 🔑 reviewed format\r\nsk-SYNTHETICREVOKED0001T3BlbkFKSYNTHETICREVOKED0002\n\r\n",
       "expected": [],
       "note": "Negative twin of the paired positive differing in exactly one structural property (internal marker `T3BlbkFK` vs contracted `T3BlbkFJ`); beta.4 flagged it at the same range as its positive. Issue #368 self-contained synthetic reproduction; independent benchmark fixture id `openai-token-legacy-unicode-crlf-twin` (redact-secret-benchmarks common-formats, measurement protocol v4, T2). Never provider-issued."
     },
@@ -10146,7 +10146,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 reviewed format\r\n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\n\r\n",
+      "input": "# 🔑 reviewed format\r\n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\n\r\n",
       "expected": [
         {
           "detector": "openai-token",
@@ -10168,7 +10168,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 reviewed format\r\nsk-proj-XQaEbXdYpB2bY4iugTKGKEsfpzbarfDE4qLowLdD4YAe8PTMyFPUAxlT3gVQhyppB4rNDqRBuT3BlbkFJs3wTeLdTFRFjZCzIBROCBs0r30BvMe4LSjGlMmIQjdpQfuWnojoR0WCEDCvGp09Cf68wvz90Ng\n\r\n",
+      "input": "# 🔑 reviewed format\r\nsk-proj-SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTT3BlbkFJSYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SY\n\r\n",
       "expected": [],
       "note": "Negative twin of the paired positive differing in exactly one structural property (73-byte left segment vs contracted 74); beta.4 flagged it at the same range as its positive. Issue #368 self-contained synthetic reproduction; independent benchmark fixture id `openai-token-proj-unicode-crlf-twin` (redact-secret-benchmarks common-formats, measurement protocol v4, T2). Never provider-issued."
     },
@@ -10181,7 +10181,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 reviewed format\r\n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\n\r\n",
+      "input": "# 🔑 reviewed format\r\n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\n\r\n",
       "expected": [
         {
           "detector": "openai-token",
@@ -10203,7 +10203,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 reviewed format\r\nsk-svcacct-vOuQp18EMEQEexlPHizducCt2ZpSuVfwijDiYEVKQUDWDw9W1yvOhrgPkZdA5dgmxJl2lbPXYT3BlbkFJFFBjTH5S5JmqBkLzL8FupQ65xXFRMDWZoyHUcRFMmsOEL2SBu2ptiTCJBWqgqUwVrscOG1VYQD\n\r\n",
+      "input": "# 🔑 reviewed format\r\nsk-svcacct-SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTT3BlbkFJSYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SY\n\r\n",
       "expected": [],
       "note": "Negative twin of the paired positive differing in exactly one structural property (73-byte left segment vs contracted 74); beta.4 flagged it at the same range as its positive. Issue #368 self-contained synthetic reproduction; independent benchmark fixture id `openai-token-svcacct-unicode-crlf-twin` (redact-secret-benchmarks common-formats, measurement protocol v4, T2). Never provider-issued."
     },
@@ -25841,7 +25841,7 @@
         "operation": "repeated",
         "ordinal": 19
       },
-      "input": "dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9 dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9",
+      "input": "dop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef dop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
       "expected": [
         {
           "detector": "digitalocean-token",
@@ -26936,7 +26936,7 @@
         "operation": "missing-separator",
         "ordinal": 20
       },
-      "input": "dopv11f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9",
+      "input": "dopv10123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
       "expected": [],
       "note": "Issue #375: the `_v1_` separator itself was never mutated before. Removing both underscores (`dopv1<hex>`) breaks the literal prefix match entirely, so no provider finding is produced."
     },
@@ -26955,7 +26955,7 @@
         "operation": "replaced-separator",
         "ordinal": 21
       },
-      "input": "dop-v1-1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9",
+      "input": "dop-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
       "expected": [],
       "note": "Issue #375: the `_v1_` separator replaced with dashes (`dop-v1-<hex>`) breaks the literal prefix match, so no provider finding is produced."
     },
@@ -26968,7 +26968,7 @@
       "contexts": [
         "json"
       ],
-      "input": "{\"token\":\"dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cadg\"}",
+      "input": "{\"token\":\"dop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdeg\"}",
       "expected": [],
       "note": "Malformed twin (invalid-alphabet body byte `g`) of the digitalocean JSON positive, in the same JSON context. Issue #375 context-pairing evidence."
     },
@@ -26981,7 +26981,7 @@
       "contexts": [
         "log"
       ],
-      "input": "2026-09-18T00:00:00Z token=dop_v1_1f24601fD1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9",
+      "input": "2026-09-18T00:00:00Z token=dop_v1_01234567D9abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
       "expected": [],
       "note": "Malformed twin (uppercase-hex body byte) in a log line. Issue #375 context-pairing evidence."
     },
@@ -26994,7 +26994,7 @@
       "contexts": [
         "toml"
       ],
-      "input": "[tool]\ntoken = \"dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad\"\n",
+      "input": "[tool]\ntoken = \"dop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcde\"\n",
       "expected": [],
       "note": "Malformed twin (one byte short of the contracted 64-hex body) in TOML. Issue #375 context-pairing evidence."
     },
@@ -27007,7 +27007,7 @@
       "contexts": [
         "markdown"
       ],
-      "input": "Rotate `dov_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9` immediately.\n",
+      "input": "Rotate `dov_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef` immediately.\n",
       "expected": [],
       "note": "Malformed twin (invalid prefix `dov_v1_`) inside inline markdown code span. Issue #375 context-pairing evidence."
     },

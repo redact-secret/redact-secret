@@ -59,7 +59,7 @@
     },
     {
       "id": "additional-provider-families",
-      "input": "sk_live_SYNTHETICREVOKEDSYNTHETICREVOKED\nxoxb-SYNTHETIC-REVOKED-SYNTHETIC-REVOKED-\npypi-SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\n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\ndckr_pat_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\ncfut_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\ndop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9\nlin_api_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\nsb_secret_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\nvcp_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_",
+      "input": "sk_live_SYNTHETICREVOKEDSYNTHETICREVOKED\nxoxb-SYNTHETIC-REVOKED-SYNTHETIC-REVOKED-\npypi-SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\n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\ndckr_pat_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\ncfut_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\ndop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\nlin_api_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\nsb_secret_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\nvcp_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_",
       "text": "<SECRET_1>\nxoxb-SYNTHETIC-REVOKED-SYNTHETIC-REVOKED-\n<SECRET_2>\n<SECRET_3>\ndckr_pat_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\ncfut_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\n<SECRET_4>\nlin_api_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\n<SECRET_5>\n<SECRET_6>",
       "expected": [
         {
@@ -856,8 +856,8 @@
     },
     {
       "id": "digitalocean-embedded-identifier-discriminating-boundary",
-      "input": "legacydop_v1_025343c0555235768c29735f523ad644fbfe1569b1d88f46b4f506628ae8b08a\ndop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9",
-      "text": "legacydop_v1_025343c0555235768c29735f523ad644fbfe1569b1d88f46b4f506628ae8b08a\n<SECRET_1>",
+      "input": "legacydop_v1_fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210\ndop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      "text": "legacydop_v1_fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210\n<SECRET_1>",
       "expected": [
         {
           "detector": "digitalocean-token",
@@ -872,8 +872,8 @@
     },
     {
       "id": "digitalocean-length-twin-discriminating-boundary",
-      "input": "dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad\ndop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9\n",
-      "text": "dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad\n<SECRET_1>\n",
+      "input": "dop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcde\ndop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\n",
+      "text": "dop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcde\n<SECRET_1>\n",
       "expected": [
         {
           "detector": "digitalocean-token",
@@ -888,8 +888,8 @@
     },
     {
       "id": "digitalocean-length-twin-unicode-crlf-boundary",
-      "input": "# 🔑 reviewed format\r\ndop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad\n\r\n# 🔑 reviewed format\r\ndoo_v1_025343c0555235768c29735f523ad644fbfe1569b1d88f46b4f506628ae8b08a\n\r\n",
-      "text": "# 🔑 reviewed format\r\ndop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad\n\r\n# 🔑 reviewed format\r\n<SECRET_1>\n\r\n",
+      "input": "# 🔑 reviewed format\r\ndop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcde\n\r\n# 🔑 reviewed format\r\ndoo_v1_fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210\n\r\n",
+      "text": "# 🔑 reviewed format\r\ndop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcde\n\r\n# 🔑 reviewed format\r\n<SECRET_1>\n\r\n",
       "expected": [
         {
           "detector": "digitalocean-token",
@@ -1015,8 +1015,8 @@
     },
     {
       "id": "openai-368-unicode-crlf-pairs",
-      "input": "# 🔑 reviewed format\r\n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\n\r\n# 🔑 reviewed format\r\nsk-CETkIjobDgQhiCSRBjSgT3BlbkFKjwnQ0FqBPH7mULVtCSjs\n\r\n# 🔑 reviewed format\r\n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\n\r\n# 🔑 reviewed format\r\nsk-proj-XQaEbXdYpB2bY4iugTKGKEsfpzbarfDE4qLowLdD4YAe8PTMyFPUAxlT3gVQhyppB4rNDqRBuT3BlbkFJs3wTeLdTFRFjZCzIBROCBs0r30BvMe4LSjGlMmIQjdpQfuWnojoR0WCEDCvGp09Cf68wvz90Ng\n\r\n# 🔑 reviewed format\r\n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\n\r\n# 🔑 reviewed format\r\nsk-svcacct-vOuQp18EMEQEexlPHizducCt2ZpSuVfwijDiYEVKQUDWDw9W1yvOhrgPkZdA5dgmxJl2lbPXYT3BlbkFJFFBjTH5S5JmqBkLzL8FupQ65xXFRMDWZoyHUcRFMmsOEL2SBu2ptiTCJBWqgqUwVrscOG1VYQD\n\r\n",
-      "text": "# 🔑 reviewed format\r\n<SECRET_1>\n\r\n# 🔑 reviewed format\r\nsk-CETkIjobDgQhiCSRBjSgT3BlbkFKjwnQ0FqBPH7mULVtCSjs\n\r\n# 🔑 reviewed format\r\n<SECRET_2>\n\r\n# 🔑 reviewed format\r\nsk-proj-XQaEbXdYpB2bY4iugTKGKEsfpzbarfDE4qLowLdD4YAe8PTMyFPUAxlT3gVQhyppB4rNDqRBuT3BlbkFJs3wTeLdTFRFjZCzIBROCBs0r30BvMe4LSjGlMmIQjdpQfuWnojoR0WCEDCvGp09Cf68wvz90Ng\n\r\n# 🔑 reviewed format\r\n<SECRET_3>\n\r\n# 🔑 reviewed format\r\nsk-svcacct-vOuQp18EMEQEexlPHizducCt2ZpSuVfwijDiYEVKQUDWDw9W1yvOhrgPkZdA5dgmxJl2lbPXYT3BlbkFJFFBjTH5S5JmqBkLzL8FupQ65xXFRMDWZoyHUcRFMmsOEL2SBu2ptiTCJBWqgqUwVrscOG1VYQD\n\r\n",
+      "input": "# 🔑 reviewed format\r\n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\n\r\n# 🔑 reviewed format\r\nsk-SYNTHETICREVOKED0001T3BlbkFKSYNTHETICREVOKED0002\n\r\n# 🔑 reviewed format\r\n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\n\r\n# 🔑 reviewed format\r\nsk-proj-SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTT3BlbkFJSYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SY\n\r\n# 🔑 reviewed format\r\n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\n\r\n# 🔑 reviewed format\r\nsk-svcacct-SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTT3BlbkFJSYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SY\n\r\n",
+      "text": "# 🔑 reviewed format\r\n<SECRET_1>\n\r\n# 🔑 reviewed format\r\nsk-SYNTHETICREVOKED0001T3BlbkFKSYNTHETICREVOKED0002\n\r\n# 🔑 reviewed format\r\n<SECRET_2>\n\r\n# 🔑 reviewed format\r\nsk-proj-SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTT3BlbkFJSYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SY\n\r\n# 🔑 reviewed format\r\n<SECRET_3>\n\r\n# 🔑 reviewed format\r\nsk-svcacct-SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTT3BlbkFJSYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SY\n\r\n",
       "expected": [
         {
           "detector": "openai-token",
@@ -1063,8 +1063,8 @@
     },
     {
       "id": "digitalocean-separator-boundary-discriminating-boundary",
-      "input": "dop_v1_1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9\ndopv11f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9",
-      "text": "<SECRET_1>\ndopv11f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9",
+      "input": "dop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\ndopv10123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      "text": "<SECRET_1>\ndopv10123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
       "expected": [
         {
           "detector": "digitalocean-token",
