@@ -5,6 +5,28 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+- **Security fix:** overlap resolution could pick a more specific but
+  weaker-resolving candidate over a less specific candidate that would have
+  redacted, leaving a credential in plaintext (issue #450,
+  `decision-resolve-overlap-precedence-by-resolved-action-severity`).
+  `new_relic_license_key`'s only emission path reports `Confidence::Medium`,
+  which `DefaultPolicy` warns on rather than redacts, and its `Provider`
+  specificity outranked a lower-specificity, but stricter-resolving,
+  overlapping candidate for the same span (for example a structural
+  `bearer_token` candidate, which always redacts) — a shape the conformance
+  corpus already exercised without recognizing it as a defect. Overlap
+  resolution now ranks by resolved-action severity (`Block > Redact > Warn >
+  Allow`, from the crate's fixed default classification) before specificity,
+  so a weaker-resolving candidate can no longer displace a stricter-resolving
+  one. This affects five declared types found in the identical shape —
+  `new_relic_license_key`, `twilio_auth_token`, `twilio_api_key_secret`,
+  `datadog_api_key`, and `datadog_application_key` — but only when one of
+  them overlaps another candidate that would resolve a stricter action; none
+  of the five is added to `ALWAYS_REDACT_TYPES`, and none of their standalone
+  (non-overlapping) detections changes action. **Migration:** a caller whose
+  input triggers one of these five types' medium-confidence path *and* a
+  competing, stricter-resolving detector on the identical span now sees the
+  stricter candidate win instead. No other input is affected.
 - **Breaking change:** whole-input `scan`, `redact`, and `scan_and_redact`
   (and every binding's equivalent) now default to a bounded input: 64 MiB and
   50,000 findings (issue #439,

@@ -12,6 +12,7 @@ use std::collections::BTreeMap;
 use crate::error::{SecretScanError, SecretScanErrorCode};
 use crate::limits::WholeInputLimits;
 use crate::normalize::NormalizedInput;
+use crate::policy::default_action_for;
 use crate::redact::redact_with_limits;
 use crate::registry::{DetectorRegistry, RegisteredDetector};
 use crate::types::{
@@ -45,6 +46,16 @@ struct RankedCandidate<'a> {
     detector: &'a str,
     confidence: Confidence,
     specificity: Specificity,
+    /// [`Action::overlap_resolution_severity`] of the action this candidate
+    /// would resolve to under the crate's fixed default classification
+    /// (`crate::policy::default_action_for`) — never the caller's active
+    /// [`Policy`], which is not yet chosen at this stage and, for an
+    /// incremental session, cannot be evaluated before a finding is final.
+    /// The first, dominant priority key
+    /// (`decision-resolve-overlap-precedence-by-resolved-action-severity`):
+    /// a candidate that would resolve to a weaker action can never displace
+    /// one that would resolve to a stricter one, regardless of specificity.
+    resolved_severity: u8,
     range: ByteRange,
     obfuscation: Obfuscation,
     detector_order: usize,
@@ -52,13 +63,15 @@ struct RankedCandidate<'a> {
 }
 
 impl RankedCandidate<'_> {
-    /// Conflict precedence: specificity, confidence, narrower span, registry
-    /// order, then emission order. The last two keys are unique per
-    /// candidate, so the ordering is total and needs no further tie breaker.
+    /// Conflict precedence: resolved-action severity, specificity,
+    /// confidence, narrower span, registry order, then emission order. The
+    /// last two keys are unique per candidate, so the ordering is total and
+    /// needs no further tie breaker.
     fn priority(&self, other: &Self) -> Ordering {
         other
-            .specificity
-            .cmp(&self.specificity)
+            .resolved_severity
+            .cmp(&self.resolved_severity)
+            .then_with(|| other.specificity.cmp(&self.specificity))
             .then_with(|| other.confidence.cmp(&self.confidence))
             .then_with(|| self.range.len().cmp(&other.range.len()))
             .then_with(|| self.detector_order.cmp(&other.detector_order))
@@ -111,11 +124,15 @@ fn validate_candidate<'a>(
         Obfuscation::None
     };
 
+    let confidence = candidate.confidence();
+    let resolved_severity = default_action_for(type_name, confidence).overlap_resolution_severity();
+
     Ok(RankedCandidate {
         type_name,
         detector: registered.id(),
-        confidence: candidate.confidence(),
+        confidence,
         specificity: candidate.effective_specificity(),
+        resolved_severity,
         range,
         obfuscation,
         detector_order,

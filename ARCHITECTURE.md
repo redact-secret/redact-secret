@@ -163,10 +163,11 @@ Candidate validation rejects malformed, empty, out-of-bounds, or invalid UTF-8
 boundary ranges. It runs against the scan copy the candidate was detected in;
 the range is then translated into the original input and re-checked there, so
 ranking, overlap resolution, finding numbering, and redaction operate on
-original coordinates only. Candidates are then ranked by specificity, confidence, span
-width, detector registration order, and detector emission order. A deterministic
-greedy pass accepts only mutually disjoint ranges. Final findings are ordered by
-their original-input position and assigned stable one-based IDs.
+original coordinates only. Candidates are then ranked by resolved-action
+severity, specificity, confidence, span width, detector registration order,
+and detector emission order. A deterministic greedy pass accepts only
+mutually disjoint ranges. Final findings are ordered by their original-input
+position and assigned stable one-based IDs.
 
 Specific provider or structural evidence outranks broad contextual evidence.
 This favors precision and bounded redaction. The tradeoff is explicit: strict
@@ -175,11 +176,35 @@ miss truncated, new, malformed, or unsupported credential variants. Entropy is
 only a supporting signal and never sufficient by itself for aggressive
 classification.
 
+Resolved-action severity is checked first and overrides that specificity
+ordering: a candidate that would resolve to a weaker action (by the crate's
+fixed default classification, `Block > Redact > Warn > Allow`) can never
+displace an overlapping candidate that would resolve to a stricter one, even
+when the displaced candidate has higher specificity
+(`decision-resolve-overlap-precedence-by-resolved-action-severity`). A
+handful of `Provider`-specificity types (`twilio_auth_token`,
+`twilio_api_key_secret`, `datadog_api_key`, `datadog_application_key`,
+`new_relic_license_key`) are deliberately confidence-gated rather than
+always-redact, each per its own documented `decision-freeze-*` grammar
+record; this key is what keeps that deliberate choice from silently
+weakening overlap resolution when one of them overlaps a lower-specificity
+candidate that would redact.
+
 ## Detection and policy separation
 
 Detection answers what a range appears to be. Policy independently chooses one
 of `redact`, `block`, `warn`, or `allow` from immutable finding metadata.
 Policy callbacks never receive the input or matched value.
+
+Overlap resolution's resolved-action severity key (above) consults this same
+default classification directly, on a candidate's already-known type and
+confidence — never the caller's active policy. `run_detector_pipeline` runs
+before a `Policy` is chosen and returns before one is ever invoked, and a
+policy's context (finding index, whole-session finding count) does not exist
+until overlap resolution has already finished. So which candidate wins an
+overlap is identical under every policy for the same input; a custom, stricter,
+or weaker consumer policy changes only the enforcement action applied to the
+winning candidate, never which candidate is selected.
 
 The default policy blocks private-key material, redacts known provider,
 authorization, connection, and other high-confidence credentials, and warns on

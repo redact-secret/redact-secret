@@ -2991,7 +2991,10 @@
         {
           "dimension": "overlap",
           "evidenceFixtureIds": [
-            "bearer-overlap-contextual-assignment"
+            "bearer-overlap-contextual-assignment",
+            "bearer-token-overlap-beats-new-relic-license-key",
+            "bearer-token-overlap-beats-twilio-api-key-secret",
+            "bearer-token-overlap-beats-twilio-auth-token"
           ],
           "state": "supported"
         },
@@ -3881,7 +3884,7 @@
         {
           "dimension": "overlap",
           "evidenceFixtureIds": [
-            "twilio-auth-token-overlap-beats-bearer-token"
+            "twilio-auth-token-overlap-generic-context"
           ],
           "state": "supported"
         },
@@ -3964,7 +3967,7 @@
         {
           "dimension": "overlap",
           "evidenceFixtureIds": [
-            "twilio-api-key-secret-overlap-beats-bearer-token"
+            "twilio-api-key-secret-overlap-generic-context"
           ],
           "state": "supported"
         },
@@ -4653,7 +4656,7 @@
         {
           "dimension": "overlap",
           "evidenceFixtureIds": [
-            "new-relic-license-key-overlap-beats-bearer-token"
+            "new-relic-license-key-overlap-generic-context"
           ],
           "state": "supported"
         },

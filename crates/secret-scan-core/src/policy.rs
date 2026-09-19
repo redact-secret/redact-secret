@@ -6,6 +6,22 @@ use crate::types::{Action, Confidence, DetectedFinding, Policy, PolicyContext};
 
 /// Finding types that are always redacted regardless of confidence, because
 /// their format alone is specific enough to be actionable.
+///
+/// Not every [`Specificity::Provider`](crate::types::Specificity) type is
+/// here: `twilio_auth_token`, `twilio_api_key_secret`, `datadog_api_key`,
+/// `datadog_application_key`, and `new_relic_license_key` are deliberately
+/// left confidence-gated (redact at [`Confidence::High`], warn otherwise)
+/// even though that is a weaker action than their specificity alone would
+/// suggest — each has a documented `decision-freeze-*` grammar record
+/// explaining why a bare keyword-cooccurrence match at medium confidence is
+/// too weak (an opaque hex blob sharing a line with a vendor keyword) to
+/// redact by default. Overlap resolution's resolved-action severity ranking
+/// (`decision-resolve-overlap-precedence-by-resolved-action-severity`)
+/// exists precisely so this list does not have to be exhaustive over every
+/// `Provider`/`Structural`/`PrivateKey` type for overlap resolution to stay
+/// correct: a confidence-gated type here can still lose an overlap to a
+/// stricter-resolving lower-specificity candidate, without needing to be
+/// added to this list.
 const ALWAYS_REDACT_TYPES: [&str; 36] = [
     "anthropic_api_key",
     "atlassian_api_token",
@@ -45,24 +61,35 @@ const ALWAYS_REDACT_TYPES: [&str; 36] = [
     "vercel_token",
 ];
 
-/// Chooses the default action for `finding`.
+/// Chooses the default action for a candidate identified only by `type_name`
+/// and `confidence` — the metadata overlap resolution already holds before a
+/// [`DetectedFinding`] exists. [`default_action`] is this crate's only other
+/// caller; `crate::pipeline` calls this directly so ranking never has to
+/// fabricate a placeholder finding just to read a resolved action back out
+/// of one.
 ///
 /// - `private_key` always blocks.
 /// - Every type in [`ALWAYS_REDACT_TYPES`] always redacts.
 /// - Everything else redacts at [`Confidence::High`] and warns otherwise.
 #[must_use]
-fn default_action(finding: &DetectedFinding) -> Action {
-    if finding.type_name() == "private_key" {
+pub(crate) fn default_action_for(type_name: &str, confidence: Confidence) -> Action {
+    if type_name == "private_key" {
         return Action::Block;
     }
-    if ALWAYS_REDACT_TYPES.contains(&finding.type_name()) {
+    if ALWAYS_REDACT_TYPES.contains(&type_name) {
         return Action::Redact;
     }
-    if finding.confidence() == Confidence::High {
+    if confidence == Confidence::High {
         Action::Redact
     } else {
         Action::Warn
     }
+}
+
+/// Chooses the default action for `finding`. See [`default_action_for`].
+#[must_use]
+fn default_action(finding: &DetectedFinding) -> Action {
+    default_action_for(finding.type_name(), finding.confidence())
 }
 
 /// The default [`Policy`]: deterministic, infallible, and independent of

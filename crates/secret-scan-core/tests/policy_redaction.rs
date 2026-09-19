@@ -314,7 +314,16 @@ fn build_zone_fixture() -> (String, DetectorRegistry, ZoneMarkers) {
         ),
         (
             "z1-provider",
-            "provider_secret",
+            // A real always-redact type name (`ALWAYS_REDACT_TYPES` in
+            // `src/policy.rs`), not a synthetic label like this zone's other
+            // candidates: it pins this candidate's resolved-action severity
+            // to `Redact` regardless of its `Low` confidence, matching
+            // `wide_entropy`'s `High`-confidence severity, so this zone
+            // isolates specificity beating confidence
+            // (`decision-resolve-overlap-precedence-by-resolved-action-severity`
+            // ranks resolved severity before specificity) rather than
+            // severity deciding it instead.
+            "openai_api_key",
             Confidence::Low,
             Specificity::Provider,
             z1_range,
@@ -417,7 +426,7 @@ fn zone_policy(
     _context: &redact_secret::PolicyContext,
 ) -> Result<Action, redact_secret::PolicyFailure> {
     Ok(match finding.type_name() {
-        "provider_secret" => Action::Block,
+        "openai_api_key" => Action::Block,
         "inner_secret" => Action::Warn,
         "first_secret" => Action::Allow,
         "high_wide" | "adjacent_left" | "adjacent_right" | "disjoint_secret" => Action::Redact,
@@ -436,7 +445,7 @@ fn overlap_resolution_axes_feed_a_multi_outcome_policy() {
     assert_eq!(
         actual,
         [
-            ("provider_secret", Action::Block),
+            ("openai_api_key", Action::Block),
             ("high_wide", Action::Redact),
             ("inner_secret", Action::Warn),
             ("first_secret", Action::Allow),

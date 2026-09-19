@@ -167,6 +167,23 @@ impl Action {
     pub const fn replaces_text(self) -> bool {
         matches!(self, Self::Redact | Self::Block)
     }
+
+    /// Enforcement strength used only to keep overlap resolution
+    /// (`crate::pipeline::RankedCandidate::priority`) from letting a
+    /// candidate that would resolve to a weaker action displace one that
+    /// would resolve to a stricter action. Not exposed publicly: `Action`
+    /// has no general total order, and this fixed `Block > Redact > Warn >
+    /// Allow` ranking is specific to that one use
+    /// (`decision-resolve-overlap-precedence-by-resolved-action-severity`).
+    #[must_use]
+    pub(crate) const fn overlap_resolution_severity(self) -> u8 {
+        match self {
+            Self::Block => 3,
+            Self::Redact => 2,
+            Self::Warn => 1,
+            Self::Allow => 0,
+        }
+    }
 }
 
 /// Whether a finding's reported range shows evidence of
