@@ -110,6 +110,17 @@ The binding and package layout is:
 | `packages/javascript` | One typed API with runtime-specific loading | `@redact-secret/core` |
 | `conformance` | Language-neutral behavioral fixtures and schema | Repository contract, not a package |
 | `assessment` | Language-neutral evaluation protocol: assessment corpus, workload profiles, result contract | Repository protocol, not a package, not a release gate |
+| [`redact-secret/redact-secret-adapters`](https://github.com/redact-secret/redact-secret-adapters) (separate repository) | Host-integration packages (pino, Python `logging`, OpenTelemetry `SpanProcessor`) built against this repository's public core API only | `@redact-secret/adapter*` (npm), PyPI `redact-secret-adapters` |
+
+Host integrations live in that separate repository, not here, so a host-SDK
+release never re-qualifies this repository's own release matrix
+(`decision-graduate-adapters-to-a-separate-repository`). MCP is deliberately
+excluded from that repository: `examples/mcp-redact/` wraps the incremental
+sanitizer, a stateful surface materially wider than the four-item core
+contract (`initialize()`, `scanAndRedact()`'s result shape, `finding.action`,
+`findings` as an array) that repository's adapters depend on, and it is not
+protected by any declared host version range. It stays an example in this
+repository.
 
 Detailed workspace dependency, lint, unsafe-code, MSRV, public-API,
 package-content, and registry-name policies live in
@@ -626,3 +637,4 @@ The accepted records governing this architecture are:
 - [Measure JavaScript performance externally](./docs/decisions/2026-09-12-measure-javascript-performance-externally.md)
 - [Define the detector profile and pack contract](./docs/decisions/2026-09-18-define-detector-profile-and-pack-contract.md)
 - [Normalize invisible characters before detection](./docs/decisions/2026-09-19-normalize-invisible-characters-before-detection.md)
+- [Graduate logging and tracing adapters to a separate repository](./docs/decisions/2026-09-19-graduate-adapters-to-a-separate-repository.md)

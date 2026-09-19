@@ -46,3 +46,4 @@ future planning and implementation but do not authorize Git or release actions.
 - [Resolve overlap precedence by resolved-action severity](2026-09-19-resolve-overlap-precedence-by-resolved-action-severity.md)
 - [Select optimal disjoint candidates by total evidence weight](2026-09-19-select-optimal-disjoint-candidates-by-total-evidence-weight.md)
 - [Define the declarative detector ruleset contract](2026-09-19-define-declarative-detector-ruleset-contract.md)
+- [Graduate logging and tracing adapters to a separate repository](2026-09-19-graduate-adapters-to-a-separate-repository.md)
