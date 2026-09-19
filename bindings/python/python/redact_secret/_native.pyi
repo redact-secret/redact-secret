@@ -72,6 +72,9 @@ class TokenLimitExceededError(SecretScanError):
 class MultilineLimitExceededError(SecretScanError):
     code: str
 
+class FindingLimitExceededError(SecretScanError):
+    code: str
+
 class InvalidStateError(SecretScanError):
     code: str
 
@@ -174,6 +177,18 @@ class IncrementalLimits:
     @property
     def max_multiline_bytes(self) -> int: ...
 
+class WholeInputLimits:
+    """Explicit byte and finding-count bounds for scan(), redact(), and
+    scan_and_redact(). Both are keyword-only. Omit an instance (pass
+    ``limits=None``, the default) to use the core's default whole-input
+    bound."""
+
+    def __init__(self, *, max_input_bytes: int, max_findings: int) -> None: ...
+    @property
+    def max_input_bytes(self) -> int: ...
+    @property
+    def max_findings(self) -> int: ...
+
 class IncrementalSanitizer:
     """A bounded incremental sanitization session. Findings carry absolute
     Unicode code point offsets into the logical whole-session input."""
@@ -205,14 +220,22 @@ class IncrementalSanitizer:
 
 def version() -> str: ...
 def byte_offset_to_char_offset(text: str, byte_offset: int) -> int: ...
-def scan(text: str, policy: Policy | None = None) -> list[Finding]: ...
+def scan(
+    text: str,
+    policy: Policy | None = None,
+    limits: WholeInputLimits | None = None,
+) -> list[Finding]: ...
 def redact(
-    text: str, findings: list[Finding], formatter: Formatter | None = None
+    text: str,
+    findings: list[Finding],
+    formatter: Formatter | None = None,
+    limits: WholeInputLimits | None = None,
 ) -> str: ...
 def scan_and_redact(
     text: str,
     policy: Policy | None = None,
     formatter: Formatter | None = None,
+    limits: WholeInputLimits | None = None,
 ) -> ScanResult: ...
 def default_policy(finding: DetectedFinding, context: PolicyContext) -> str: ...
 def default_placeholder_formatter(

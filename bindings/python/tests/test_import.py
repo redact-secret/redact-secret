@@ -40,10 +40,10 @@ def test_exception_hierarchy_is_importable_and_rooted() -> None:
 
 def test_no_custom_detector_callback_surface() -> None:
     """`decision-define-runtime-bindings`: the first stable API excludes a
-    custom detector callback surface. `scan` only accepts `text` and
-    `policy`; nothing named after a detector or registry is exported."""
+    custom detector callback surface. `scan` only accepts `text`, `policy`,
+    and `limits`; nothing named after a detector or registry is exported."""
     scan_params = set(inspect.signature(redact_secret.scan).parameters)
-    assert scan_params <= {"text", "policy"}
+    assert scan_params <= {"text", "policy", "limits"}
     for name in redact_secret.__all__:
         assert "detector" not in name.lower() or name in {
             "DetectorFailureError",

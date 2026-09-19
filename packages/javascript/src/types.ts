@@ -76,12 +76,29 @@ export type PlaceholderFormatter = (
   context: PlaceholderContext,
 ) => string;
 
+/**
+ * Explicit byte and finding-count bounds for {@link scan}, {@link redact},
+ * and {@link scanAndRedact}. Omit to use the core's default — 64 MiB of
+ * input and 50,000 findings
+ * (`decision-bound-whole-input-operations-by-default`). Exceeding either
+ * bound fails with a fixed `INPUT_LIMIT_EXCEEDED`/`FINDING_LIMIT_EXCEEDED`
+ * error rather than truncating.
+ */
+export interface WholeInputLimits {
+  /** UTF-8 byte ceiling on the whole input. */
+  readonly maxInputBytes: number;
+  /** Ceiling on the number of accepted findings. */
+  readonly maxFindings: number;
+}
+
 export interface ScanOptions {
   readonly policy?: SecretPolicy;
+  readonly limits?: WholeInputLimits;
 }
 
 export interface RedactOptions {
   readonly placeholderFormatter?: PlaceholderFormatter;
+  readonly limits?: WholeInputLimits;
 }
 
 export interface ScanAndRedactOptions extends ScanOptions, RedactOptions {}
@@ -128,8 +145,15 @@ export interface IncrementalLimits {
   readonly maxMultilineCodeUnits: number;
 }
 
-export interface IncrementalSanitizerOptions extends RedactOptions {
+/**
+ * Does not extend {@link RedactOptions}: that interface's `limits` is a
+ * whole-input {@link WholeInputLimits}, a different shape from this
+ * interface's own required incremental `limits`, so the two field
+ * declarations would collide under one property name.
+ */
+export interface IncrementalSanitizerOptions {
   readonly limits: IncrementalLimits;
+  readonly placeholderFormatter?: PlaceholderFormatter;
   readonly policy?: IncrementalSecretPolicy;
 }
 

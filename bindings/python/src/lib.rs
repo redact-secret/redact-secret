@@ -27,8 +27,8 @@ use pyo3::{create_exception, wrap_pyfunction};
 use redact_secret::{
     Action, ByteRange, Confidence, DefaultPolicy, DetectedFinding, DetectorRegistry,
     Finding as CoreFinding, PlaceholderContext, PlaceholderFormatter, Policy, PolicyContext,
-    SecretScanError as CoreError, SecretScanErrorCode,
-    default_placeholder_formatter as core_default_formatter, redact as core_redact,
+    SecretScanError as CoreError, SecretScanErrorCode, WholeInputLimits,
+    default_placeholder_formatter as core_default_formatter, redact_with_limits as core_redact,
     run_detector_pipeline, typed_placeholder_formatter as core_typed_formatter,
 };
 
@@ -110,21 +110,27 @@ create_exception!(
     SecretScanError,
     "The placeholder formatter returned an empty, oversized, or matched-value-reproducing placeholder."
 );
-// The six codes below belong to the incremental sanitizer
-// (`decision-define-runtime-bindings`). This module's synchronous
-// `scan`/`redact`/`scan_and_redact` never trigger them; a session created
-// by `incremental::PyIncrementalSanitizer` does.
+// `InvalidLimitsError`, `InputLimitExceededError`, and
+// `FindingLimitExceededError` are shared between an incremental session's
+// `IncrementalLimits` and this module's synchronous `scan`/`redact`/
+// `scan_and_redact` `WholeInputLimits`
+// (`decision-bound-whole-input-operations-by-default`).
+// `BufferLimitExceededError`, `TokenLimitExceededError`,
+// `MultilineLimitExceededError`, and `InvalidStateError` remain
+// incremental-only: only a session created by
+// `incremental::PyIncrementalSanitizer` can trigger them
+// (`decision-define-runtime-bindings`).
 create_exception!(
     redact_secret._native,
     InvalidLimitsError,
     SecretScanError,
-    "An incremental session's limits were missing, non-positive, or did not satisfy the documented relationship between them."
+    "An incremental session's or whole-input operation's limits were missing, non-positive, or did not satisfy the documented relationship between them."
 );
 create_exception!(
     redact_secret._native,
     InputLimitExceededError,
     SecretScanError,
-    "An incremental session's total accepted input would exceed its input limit."
+    "An incremental session's total accepted input, or a whole-input scan/redact/scan_and_redact call's input, would exceed its input limit."
 );
 create_exception!(
     redact_secret._native,
@@ -143,6 +149,12 @@ create_exception!(
     MultilineLimitExceededError,
     SecretScanError,
     "An incremental session's open PEM-style private-key block would exceed its multiline limit without closing."
+);
+create_exception!(
+    redact_secret._native,
+    FindingLimitExceededError,
+    SecretScanError,
+    "A whole-input scan's accepted finding count would exceed its finding-count limit."
 );
 create_exception!(
     redact_secret._native,
@@ -183,6 +195,9 @@ pub(crate) fn map_error_code(code: SecretScanErrorCode) -> PyErr {
         }
         SecretScanErrorCode::MultilineLimitExceeded => {
             PyErr::new::<MultilineLimitExceededError, _>(message)
+        }
+        SecretScanErrorCode::FindingLimitExceeded => {
+            PyErr::new::<FindingLimitExceededError, _>(message)
         }
         SecretScanErrorCode::InvalidState => PyErr::new::<InvalidStateError, _>(message),
     }
@@ -279,6 +294,11 @@ fn register_exceptions(module: &Bound<'_, PyModule>) -> PyResult<()> {
         "MultilineLimitExceededError",
         MultilineLimitExceededError,
         SecretScanErrorCode::MultilineLimitExceeded
+    );
+    register!(
+        "FindingLimitExceededError",
+        FindingLimitExceededError,
+        SecretScanErrorCode::FindingLimitExceeded
     );
     register!(
         "InvalidStateError",
@@ -559,6 +579,65 @@ impl PyScanResult {
     }
 }
 
+/// Explicit byte and finding-count bounds for `scan`, `redact`, and
+/// `scan_and_redact`. Omit (pass `None`, the default) to use the core's
+/// default whole-input bound
+/// (`decision-bound-whole-input-operations-by-default`).
+#[pyclass(
+    module = "redact_secret._native",
+    name = "WholeInputLimits",
+    frozen,
+    skip_from_py_object
+)]
+#[derive(Clone, Copy)]
+pub(crate) struct PyWholeInputLimits {
+    inner: WholeInputLimits,
+}
+
+#[pymethods]
+impl PyWholeInputLimits {
+    /// Validates and creates a limit set.
+    ///
+    /// # Errors
+    ///
+    /// Raises `InvalidLimitsError` when either bound is zero.
+    #[new]
+    #[pyo3(signature = (*, max_input_bytes, max_findings))]
+    fn new(max_input_bytes: usize, max_findings: usize) -> PyResult<Self> {
+        let inner = WholeInputLimits::new(max_input_bytes, max_findings).map_err(map_core_error)?;
+        Ok(Self { inner })
+    }
+
+    /// The largest whole-input byte length accepted.
+    #[getter]
+    const fn max_input_bytes(&self) -> usize {
+        self.inner.max_input_bytes()
+    }
+
+    /// The largest accepted finding count.
+    #[getter]
+    const fn max_findings(&self) -> usize {
+        self.inner.max_findings()
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "WholeInputLimits(max_input_bytes={}, max_findings={})",
+            self.inner.max_input_bytes(),
+            self.inner.max_findings(),
+        )
+    }
+}
+
+impl PyWholeInputLimits {
+    /// Resolves an optional `PyWholeInputLimits` to a core
+    /// [`WholeInputLimits`], using the core's default when `limits` is
+    /// `None`.
+    fn resolve(limits: Option<&Self>) -> WholeInputLimits {
+        limits.map_or_else(WholeInputLimits::default, |limits| limits.inner)
+    }
+}
+
 // ---------------------------------------------------------------------
 // Detection and policy
 // ---------------------------------------------------------------------
@@ -570,9 +649,19 @@ fn registry() -> PyResult<DetectorRegistry> {
 }
 
 /// Runs every built-in detector over `text` and resolves overlaps.
-fn detect(text: &str) -> PyResult<Vec<DetectedFinding>> {
+///
+/// Checks `limits` explicitly: this function calls `run_detector_pipeline`
+/// directly rather than a core function that already applies a limit set, so
+/// it does not inherit the default whole-input bound for free
+/// (`decision-bound-whole-input-operations-by-default`).
+fn detect(text: &str, limits: &WholeInputLimits) -> PyResult<Vec<DetectedFinding>> {
+    limits.check_input(text).map_err(map_core_error)?;
     let registry = registry()?;
-    run_detector_pipeline(text, &registry).map_err(map_core_error)
+    let detected = run_detector_pipeline(text, &registry).map_err(map_core_error)?;
+    limits
+        .check_findings(detected.len())
+        .map_err(map_core_error)?;
+    Ok(detected)
 }
 
 /// Evaluates the default policy for one finding. Infallible in practice;
@@ -696,18 +785,21 @@ impl PlaceholderFormatter for PyFormatterAdapter<'_, '_> {
     }
 }
 
-/// Runs `redact_secret::redact` with `formatter` (or the default formatter
-/// when `None`).
+/// Runs `redact_secret::redact_with_limits` with `formatter` (or the default
+/// formatter when `None`) against `limits`.
 fn redact_core(
     text: &str,
     findings: &[CoreFinding],
     formatter: Option<&Bound<'_, PyAny>>,
+    limits: &WholeInputLimits,
 ) -> PyResult<String> {
     match formatter {
-        None => core_redact(text, findings, &core_default_formatter).map_err(map_core_error),
+        None => {
+            core_redact(text, findings, &core_default_formatter, limits).map_err(map_core_error)
+        }
         Some(callable) => {
             let adapter = PyFormatterAdapter { callable, text };
-            core_redact(text, findings, &adapter).map_err(map_core_error)
+            core_redact(text, findings, &adapter, limits).map_err(map_core_error)
         }
     }
 }
@@ -729,21 +821,31 @@ fn redact_core(
 ///
 /// # Errors
 ///
+/// `limits`, when given, overrides the core's default whole-input bound
+/// (`decision-bound-whole-input-operations-by-default`).
+///
+/// # Errors
+///
 /// Raises a `SecretScanError` subclass: `InvalidInputError` when `text` is
-/// not a string, `DetectorFailureError` or `InvalidCandidateError` for an
+/// not a string, `InputLimitExceededError` when `text` exceeds
+/// `limits.max_input_bytes` (or the default), `FindingLimitExceededError`
+/// when the accepted finding count exceeds `limits.max_findings` (or the
+/// default), `DetectorFailureError` or `InvalidCandidateError` for an
 /// internal detector fault, or `PolicyFailureError` /
 /// `InvalidPolicyActionError` for a failing or malformed `policy` callback.
 #[pyfunction]
-#[pyo3(signature = (text, policy=None))]
+#[pyo3(signature = (text, policy=None, limits=None))]
 // pyo3 argument extraction produces owned `Bound`/`Option<Bound>` values;
 // there is no borrowed form to take instead.
 #[allow(clippy::needless_pass_by_value)]
 fn scan<'py>(
     text: Bound<'py, PyAny>,
     policy: Option<Bound<'py, PyAny>>,
+    limits: Option<PyRef<'py, PyWholeInputLimits>>,
 ) -> PyResult<Vec<PyFinding>> {
     let text_owned = extract_text(&text)?;
-    let detected = detect(&text_owned)?;
+    let limits = PyWholeInputLimits::resolve(limits.as_deref());
+    let detected = detect(&text_owned, &limits)?;
     let findings = apply_policy(&text_owned, detected, policy.as_ref())?;
     findings_to_py(&text_owned, findings)
 }
@@ -759,46 +861,57 @@ fn scan<'py>(
 ///
 /// # Errors
 ///
+/// `limits`, when given, overrides the core's default whole-input bound
+/// (`decision-bound-whole-input-operations-by-default`).
+///
+/// # Errors
+///
 /// Raises a `SecretScanError` subclass: `InvalidInputError` when `text` is
-/// not a string, `InvalidFindingsError` when a finding's range falls
-/// outside `text`, is misaligned, or overlaps another finding,
-/// `PlaceholderFailureError` for a failing or non-string `formatter`
-/// callback, or `InvalidPlaceholderError` when its return value is empty,
-/// oversized, or reproduces a matched value.
+/// not a string, `InputLimitExceededError` when `text` exceeds
+/// `limits.max_input_bytes` (or the default), `FindingLimitExceededError`
+/// when `len(findings)` exceeds `limits.max_findings` (or the default),
+/// `InvalidFindingsError` when a finding's range falls outside `text`, is
+/// misaligned, or overlaps another finding, `PlaceholderFailureError` for a
+/// failing or non-string `formatter` callback, or `InvalidPlaceholderError`
+/// when its return value is empty, oversized, or reproduces a matched value.
 #[pyfunction]
-#[pyo3(signature = (text, findings, formatter=None))]
+#[pyo3(signature = (text, findings, formatter=None, limits=None))]
 #[allow(clippy::needless_pass_by_value)]
 fn redact<'py>(
     text: Bound<'py, PyAny>,
     findings: Vec<PyRef<'py, PyFinding>>,
     formatter: Option<Bound<'py, PyAny>>,
+    limits: Option<PyRef<'py, PyWholeInputLimits>>,
 ) -> PyResult<String> {
     let text_owned = extract_text(&text)?;
+    let limits = PyWholeInputLimits::resolve(limits.as_deref());
     let core_findings: Vec<CoreFinding> = findings
         .iter()
         .map(|finding| finding.inner.clone())
         .collect();
-    redact_core(&text_owned, &core_findings, formatter.as_ref())
+    redact_core(&text_owned, &core_findings, formatter.as_ref(), &limits)
 }
 
 /// Scans `text` and redacts it in one call, guaranteeing the returned
 /// `ScanResult.findings` are exactly the findings used to produce
 /// `ScanResult.text`.
 ///
-/// See `scan` and `redact` for the `policy` and `formatter` callback
+/// See `scan` and `redact` for the `policy`, `formatter`, and `limits`
 /// contracts and error conditions.
 #[pyfunction]
-#[pyo3(signature = (text, policy=None, formatter=None))]
+#[pyo3(signature = (text, policy=None, formatter=None, limits=None))]
 #[allow(clippy::needless_pass_by_value)]
 fn scan_and_redact<'py>(
     text: Bound<'py, PyAny>,
     policy: Option<Bound<'py, PyAny>>,
     formatter: Option<Bound<'py, PyAny>>,
+    limits: Option<PyRef<'py, PyWholeInputLimits>>,
 ) -> PyResult<PyScanResult> {
     let text_owned = extract_text(&text)?;
-    let detected = detect(&text_owned)?;
+    let limits = PyWholeInputLimits::resolve(limits.as_deref());
+    let detected = detect(&text_owned, &limits)?;
     let findings = apply_policy(&text_owned, detected, policy.as_ref())?;
-    let redacted_text = redact_core(&text_owned, &findings, formatter.as_ref())?;
+    let redacted_text = redact_core(&text_owned, &findings, formatter.as_ref(), &limits)?;
     let py_findings = findings_to_py(&text_owned, findings)?;
     Ok(PyScanResult {
         text: redacted_text,
@@ -886,6 +999,7 @@ fn _native(module: &Bound<'_, PyModule>) -> PyResult<()> {
     module.add_class::<PyPolicyContext>()?;
     module.add_class::<PyPlaceholderContext>()?;
     module.add_class::<PyScanResult>()?;
+    module.add_class::<PyWholeInputLimits>()?;
 
     incremental::register(module)?;
     register_exceptions(module)?;

@@ -91,12 +91,16 @@ retained unresolved plaintext, an open single-line construct, and an open
 PEM-style block.
 
 The construct limits bound the streamed path only — a path read whole is
-bounded by the input limit alone — so they are sized for what a pipeline
-actually carries rather than for what a credential needs. The core applies the
-token limit to every unresolved logical line, so a limit tuned to credential
-length would reject a minified bundle, a lockfile entry, or a base64 blob on
-standard input while the same file scanned by path succeeded. One mebibyte
-covers those and still bounds retained plaintext.
+bounded by the input limit and, independently, the core's own default
+whole-input finding-count bound (50,000;
+`decision-bound-whole-input-operations-by-default`), which `--help` does not
+print because it is the library's own default rather than a CLI-declared
+value — so the construct limits are sized for what a pipeline actually
+carries rather than for what a credential needs. The core applies the token
+limit to every unresolved logical line, so a limit tuned to credential length
+would reject a minified bundle, a lockfile entry, or a base64 blob on standard
+input while the same file scanned by path succeeded. One mebibyte covers
+those and still bounds retained plaintext.
 
 Every failure path leaves the session holding nothing. A partial read, a
 decoding failure, a limit failure, and a closed downstream pipe each either

@@ -42,6 +42,28 @@ Catch `redact_secret.SecretScanError` for library failures and stop downstream
 processing. Do not fall back to the raw input. The binding maps callback
 failures to fixed exceptions instead of forwarding the callback's message.
 
+## Whole-input limits
+
+`scan`, `redact`, and `scan_and_redact` default to a 64 MiB input bound and a
+50,000 finding-count bound (`decision-bound-whole-input-operations-by-default`),
+raising `InputLimitExceededError`/`FindingLimitExceededError` rather than
+returning a truncated result. Pass an explicit `limits` argument to raise or
+lower the bound:
+
+```python
+import redact_secret
+
+limits = redact_secret.WholeInputLimits(
+    max_input_bytes=128 * 1024 * 1024,
+    max_findings=100_000,
+)
+result = redact_secret.scan_and_redact(
+    "API_KEY=SYNTHETIC_REVOKED_CONTEXT_VALUE",
+    limits=limits,
+)
+assert result.text == "API_KEY=<SECRET_1>"
+```
+
 ## Incremental input and packaging
 
 Python provides working bounded incremental sessions. See the complete

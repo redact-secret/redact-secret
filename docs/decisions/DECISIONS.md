@@ -42,3 +42,4 @@ future planning and implementation but do not authorize Git or release actions.
 - [Gate beta.5 on precision gains and positive preservation](2026-09-18-gate-beta5-on-precision-gains-and-positive-preservation.md)
 - [Resolve real-looking twin fixtures as unmistakably synthetic](2026-09-18-resolve-real-looking-twin-fixtures-as-unmistakably-synthetic.md)
 - [Normalize invisible characters before detection](2026-09-19-normalize-invisible-characters-before-detection.md)
+- [Bound whole-input operations by default](2026-09-19-bound-whole-input-operations-by-default.md)

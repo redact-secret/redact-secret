@@ -49,6 +49,7 @@ import type {
   SecretFinding,
   SecretPolicy,
   SecretScanErrorCode,
+  WholeInputLimits,
 } from "../src/index.js";
 
 type Expect<T extends true> = T;
@@ -117,10 +118,15 @@ const formatter: PlaceholderFormatter = (
   context: PlaceholderContext,
 ) => `<${finding.type}_${context.placeholderIndex}>`;
 
-const scanOptions: ScanOptions = { policy };
+const wholeInputLimits: WholeInputLimits = {
+  maxInputBytes: 64 * 1024 * 1024,
+  maxFindings: 50_000,
+};
+const scanOptions: ScanOptions = { policy, limits: wholeInputLimits };
 const scanAndRedactOptions: ScanAndRedactOptions = {
   policy,
   placeholderFormatter: formatter,
+  limits: wholeInputLimits,
 };
 
 const incrementalOptions: IncrementalSanitizerOptions = {

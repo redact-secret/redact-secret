@@ -492,9 +492,15 @@ tuning are private, so both can change without breaking a dependent.
 Core algorithms must be deterministic, avoid catastrophic regular-expression
 behavior, avoid unnecessary full-input copies, resolve overlaps in
 `O(n log n)` time after prioritization, and reconstruct redacted output in one
-pass after findings are finalized. Whole-input APIs have no implicit input or
-finding-count limit, so authoritative hosts must enforce transport, decoded
-input, accepted finding, sanitized output, concurrency, and memory limits.
+pass after findings are finalized. Whole-input APIs default to a declared
+`WholeInputLimits` bound — 64 MiB of input, 50,000 findings — and fail closed
+with a fixed error rather than truncating when either is exceeded; a caller
+may widen the bound explicitly (`scan_with_limits`/`redact_with_limits`/
+`scan_and_redact_with_limits` in Rust, an equivalent `limits` option in every
+binding) (`decision-bound-whole-input-operations-by-default`). This is a
+library-level default, not a substitute for host-side bounding: authoritative
+hosts must still enforce transport, decoded input, sanitized output,
+concurrency, and memory limits.
 
 ## Versioning, qualification, and release
 

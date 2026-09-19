@@ -25,6 +25,7 @@ import {
   type NativeIncrementalPolicyCallback,
   type NativeIncrementalSanitizer,
   type NativePolicyCallback,
+  type NativeWholeInputLimits,
 } from "./native.js";
 import { VERSION } from "./version.js";
 import type {
@@ -143,6 +144,34 @@ function toFormatterCallback(
   return (finding, context) => formatter(toSecretFinding(finding), context);
 }
 
+/**
+ * Converts an optional public {@link WholeInputLimits} to its native shape.
+ * `undefined` passes through unchanged so the binding applies the core's
+ * default (`decision-bound-whole-input-operations-by-default`); a value that
+ * is present but malformed throws `INVALID_OPTIONS` here rather than
+ * reaching the binding as a nonsensical native call. A value that is present
+ * and well-shaped but numerically invalid (for example zero) is left to the
+ * binding, which reports it as `INVALID_LIMITS` — the same division of labor
+ * `toNativeIncrementalOptions` already uses for `limits`.
+ */
+function toNativeWholeInputLimits(
+  limits: ScanOptions["limits"],
+): NativeWholeInputLimits | undefined {
+  if (limits === undefined) return undefined;
+  if (
+    typeof limits !== "object" ||
+    limits === null ||
+    typeof limits.maxInputBytes !== "number" ||
+    typeof limits.maxFindings !== "number"
+  ) {
+    throw new SecretScanError("INVALID_OPTIONS");
+  }
+  return {
+    maxInputBytes: limits.maxInputBytes,
+    maxFindings: limits.maxFindings,
+  };
+}
+
 function toNativeIncrementalOptions(
   options: IncrementalSanitizerOptions,
 ): NativeIncrementalOptions {
@@ -246,8 +275,9 @@ export function createRedactSecretRuntime(
     const native = active();
     const text = requireString(input);
     const policy = toPolicyCallback(options?.policy);
+    const limits = toNativeWholeInputLimits(options?.limits);
     try {
-      return toSecretFindings(native.scan(text, policy));
+      return toSecretFindings(native.scan(text, policy, limits));
     } catch (thrown) {
       throw toSecretScanError(thrown, "DETECTOR_FAILURE");
     }
@@ -264,8 +294,14 @@ export function createRedactSecretRuntime(
       throw new SecretScanError("INVALID_FINDINGS");
     }
     const formatter = toFormatterCallback(options?.placeholderFormatter);
+    const limits = toNativeWholeInputLimits(options?.limits);
     try {
-      return native.redact(text, findings.map(toNativeFinding), formatter);
+      return native.redact(
+        text,
+        findings.map(toNativeFinding),
+        formatter,
+        limits,
+      );
     } catch (thrown) {
       throw toSecretScanError(thrown, "INVALID_FINDINGS");
     }
@@ -279,9 +315,10 @@ export function createRedactSecretRuntime(
     const text = requireString(input);
     const policy = toPolicyCallback(options?.policy);
     const formatter = toFormatterCallback(options?.placeholderFormatter);
+    const limits = toNativeWholeInputLimits(options?.limits);
     let result;
     try {
-      result = native.scanAndRedact(text, policy, formatter);
+      result = native.scanAndRedact(text, policy, formatter, limits);
     } catch (thrown) {
       throw toSecretScanError(thrown, "DETECTOR_FAILURE");
     }

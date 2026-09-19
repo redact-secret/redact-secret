@@ -63,8 +63,12 @@ detection because that would change lexical meaning and original coordinates.
 
 An empty result means no supported pattern matched. It does not certify that
 text is secret-free. This is not a general DLP or repository-history scanner.
-Whole-input operations have no implicit resource cap; the host must impose one.
-See [safe integration](../guides/safe-integration.md).
+Whole-input operations default to a 64 MiB input bound and a 50,000
+finding-count bound, failing closed with `INPUT_LIMIT_EXCEEDED`/
+`FINDING_LIMIT_EXCEEDED` rather than truncating
+(`decision-bound-whole-input-operations-by-default`); the host must still
+impose its own transport, output, concurrency, and memory bounds. See
+[safe integration](../guides/safe-integration.md).
 
 To report a missed detection or false positive, provide a minimal synthetic
 reproducer, the runtime and product version, and expected safe metadata. Never

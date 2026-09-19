@@ -41,6 +41,33 @@ detector callbacks.
 minimum with `IncrementalLimits::minimum_buffered_bytes`; do not copy internal
 retention constants. See [streaming](streaming.md) for lifecycle and failure rules.
 
+`scan`, `redact`, and `scan_and_redact` default to `WholeInputLimits::default()`
+(64 MiB of input, 50,000 findings —
+`decision-bound-whole-input-operations-by-default`), failing closed with
+`InputLimitExceeded`/`FindingLimitExceeded` rather than truncating. Call the
+`_with_limits` sibling to raise or lower the bound explicitly:
+
+```rust
+use redact_secret::{
+    DefaultPolicy, DetectorRegistry, SecretScanError, WholeInputLimits,
+    default_placeholder_formatter, scan_and_redact_with_limits,
+};
+
+fn main() -> Result<(), SecretScanError> {
+    let registry = DetectorRegistry::with_built_in([])?;
+    let limits = WholeInputLimits::new(128 * 1024 * 1024, 100_000)?;
+    let result = scan_and_redact_with_limits(
+        "API_KEY=SYNTHETIC_REVOKED_CONTEXT_VALUE",
+        &registry,
+        &DefaultPolicy,
+        &default_placeholder_formatter,
+        &limits,
+    )?;
+    assert_eq!(result.text(), "API_KEY=<SECRET_1>");
+    Ok(())
+}
+```
+
 ## Detector profiles
 
 `DetectorRegistry::with_built_in` builds `full`: every built-in detector, and

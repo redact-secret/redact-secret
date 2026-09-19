@@ -72,7 +72,9 @@ describe("Node addon binding: scanAndRedact result shape", () => {
       }),
     });
 
-    expect(binding.scanAndRedact("input", undefined, undefined)).toEqual({
+    expect(
+      binding.scanAndRedact("input", undefined, undefined, undefined),
+    ).toEqual({
       text: "<SECRET_1>",
       findings: [sampleFinding],
     });
@@ -116,9 +118,11 @@ describe("Node addon binding: createBindingFromCommonAddon", () => {
     expect(binding.version()).toBe("0.0.0-test");
     expect(binding.profile()).toBe("common");
     binding.initialize();
-    expect(binding.scan("input", undefined)).toEqual([]);
-    expect(binding.redact("input", [], undefined)).toBe("input");
-    expect(binding.scanAndRedact("input", undefined, undefined)).toEqual({
+    expect(binding.scan("input", undefined, undefined)).toEqual([]);
+    expect(binding.redact("input", [], undefined, undefined)).toBe("input");
+    expect(
+      binding.scanAndRedact("input", undefined, undefined, undefined),
+    ).toEqual({
       text: "input",
       findings: [sampleFinding],
     });
@@ -152,7 +156,9 @@ describe("Node addon binding: createBindingFromCommonAddon", () => {
       }),
     });
 
-    expect(binding.scanAndRedact("input", undefined, undefined)).toEqual({
+    expect(
+      binding.scanAndRedact("input", undefined, undefined, undefined),
+    ).toEqual({
       text: "<SECRET_1>",
       findings: [sampleFinding],
     });
@@ -200,8 +206,8 @@ describe("Node addon binding: createBindingFromCommonAddon", () => {
       }),
     });
 
-    fullBinding.redact("api_key=x", [sampleFinding], undefined);
-    commonBinding.redact("api_key=x", [sampleFinding], undefined);
+    fullBinding.redact("api_key=x", [sampleFinding], undefined, undefined);
+    commonBinding.redact("api_key=x", [sampleFinding], undefined, undefined);
 
     // Both bindings called the exact same `redact` function, not a
     // per-profile copy of it.

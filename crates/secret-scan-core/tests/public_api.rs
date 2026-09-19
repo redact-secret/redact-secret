@@ -23,14 +23,15 @@
 mod support;
 
 use redact_secret::{
-    Action, ByteRange, Candidate, Confidence, DefaultPolicy, DetectedFinding, Detector,
-    DetectorContext, DetectorFailure, DetectorRegistry, Finding, FormatterFailure,
-    IncrementalLimits, IncrementalPolicy, IncrementalPolicyContext, IncrementalResult,
-    IncrementalSanitizer, MAX_IDENTIFIER_LENGTH, MAX_PLACEHOLDER_LENGTH, PlaceholderContext,
-    PlaceholderFormatter, Policy, PolicyContext, PolicyFailure, Profile, RANGE_UNIT,
-    RegisteredDetector, ScanResult, SecretScanError, SecretScanErrorCode, SessionState,
-    Specificity, VERSION, default_placeholder_formatter, is_identifier, redact,
-    run_detector_pipeline, scan, scan_and_redact, shannon_entropy, typed_placeholder_formatter,
+    Action, ByteRange, Candidate, Confidence, DEFAULT_MAX_FINDINGS, DEFAULT_MAX_INPUT_BYTES,
+    DefaultPolicy, DetectedFinding, Detector, DetectorContext, DetectorFailure, DetectorRegistry,
+    Finding, FormatterFailure, IncrementalLimits, IncrementalPolicy, IncrementalPolicyContext,
+    IncrementalResult, IncrementalSanitizer, MAX_IDENTIFIER_LENGTH, MAX_PLACEHOLDER_LENGTH,
+    PlaceholderContext, PlaceholderFormatter, Policy, PolicyContext, PolicyFailure, Profile,
+    RANGE_UNIT, RegisteredDetector, ScanResult, SecretScanError, SecretScanErrorCode, SessionState,
+    Specificity, VERSION, WholeInputLimits, default_placeholder_formatter, is_identifier, redact,
+    redact_with_limits, run_detector_pipeline, scan, scan_and_redact, scan_and_redact_with_limits,
+    scan_with_limits, shannon_entropy, typed_placeholder_formatter,
 };
 
 /// The canonical corpus fixture used wherever one detected value is enough.
@@ -85,6 +86,32 @@ fn scan_and_redact_returns_the_text_and_the_findings_together() {
     let (text, findings) = result.into_parts();
     assert_eq!(text, "API_KEY=<SECRET_1>");
     assert_eq!(findings[0].id(), "finding-1");
+}
+
+#[test]
+fn the_with_limits_variants_are_usable_and_agree_with_their_default_counterparts() {
+    let registry = registry();
+    let limits = WholeInputLimits::new(DEFAULT_MAX_INPUT_BYTES, DEFAULT_MAX_FINDINGS).unwrap();
+
+    let findings = scan_with_limits(FIXTURE, &registry, &DefaultPolicy, &limits).unwrap();
+    assert_eq!(findings, scan(FIXTURE, &registry, &DefaultPolicy).unwrap());
+
+    let text =
+        redact_with_limits(FIXTURE, &findings, &default_placeholder_formatter, &limits).unwrap();
+    assert_eq!(
+        text,
+        redact(FIXTURE, &findings, &default_placeholder_formatter).unwrap()
+    );
+
+    let result = scan_and_redact_with_limits(
+        FIXTURE,
+        &registry,
+        &DefaultPolicy,
+        &default_placeholder_formatter,
+        &limits,
+    )
+    .unwrap();
+    assert_eq!(result.text(), text);
 }
 
 #[test]

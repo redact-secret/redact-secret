@@ -9,6 +9,7 @@
 use std::collections::{BTreeMap, BTreeSet};
 
 use crate::error::{FormatterFailure, SecretScanError, SecretScanErrorCode};
+use crate::limits::WholeInputLimits;
 use crate::types::{ByteRange, Finding, PlaceholderContext, PlaceholderFormatter};
 
 /// Maximum length in bytes of a placeholder a [`PlaceholderFormatter`] may
@@ -164,6 +165,11 @@ fn ordered_and_disjoint<'a>(
 ///
 /// # Errors
 ///
+/// - [`SecretScanErrorCode::InputLimitExceeded`] when `input` exceeds the
+///   default [`WholeInputLimits::max_input_bytes`](crate::WholeInputLimits::max_input_bytes).
+/// - [`SecretScanErrorCode::FindingLimitExceeded`] when `findings.len()`
+///   exceeds the default
+///   [`WholeInputLimits::max_findings`](crate::WholeInputLimits::max_findings).
 /// - [`SecretScanErrorCode::InvalidFindings`] when a finding's range falls
 ///   outside `input`, is not character-aligned, or overlaps another
 ///   finding.
@@ -173,12 +179,30 @@ fn ordered_and_disjoint<'a>(
 ///   [`MAX_PLACEHOLDER_LENGTH`], or a placeholder that reproduces any
 ///   eligible matched value.
 ///
-/// No error carries `input`, a matched value, or a placeholder.
+/// No error carries `input`, a matched value, or a placeholder. See
+/// [`redact_with_limits`] to use a different limit set.
 pub fn redact(
     input: &str,
     findings: &[Finding],
     formatter: &dyn PlaceholderFormatter,
 ) -> Result<String, SecretScanError> {
+    redact_with_limits(input, findings, formatter, &WholeInputLimits::default())
+}
+
+/// Same as [`redact`], against `limits` instead of the default
+/// [`WholeInputLimits`].
+///
+/// # Errors
+///
+/// Every [`redact`] error, checked against `limits` instead of the default.
+pub fn redact_with_limits(
+    input: &str,
+    findings: &[Finding],
+    formatter: &dyn PlaceholderFormatter,
+    limits: &WholeInputLimits,
+) -> Result<String, SecretScanError> {
+    limits.check_input(input)?;
+    limits.check_findings(findings.len())?;
     let ordered = ordered_and_disjoint(findings, input)?;
     let forbidden = ForbiddenMatchedText::build(input, &ordered);
 

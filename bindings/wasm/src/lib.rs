@@ -44,7 +44,8 @@ mod util;
 
 use js_sys::Function;
 use redact_secret::{
-    DefaultPolicy, DetectorRegistry, Finding, SecretScanError, default_placeholder_formatter,
+    DefaultPolicy, DetectorRegistry, Finding, SecretScanError, WholeInputLimits,
+    default_placeholder_formatter,
 };
 use wasm_bindgen::JsValue;
 use wasm_bindgen::prelude::wasm_bindgen;
@@ -87,16 +88,40 @@ pub fn initialize() -> Result<(), JsValue> {
     lifecycle::initialize().map_err(to_js_error)
 }
 
+/// Resolves the two optional whole-input bound arguments every exported
+/// `scan`/`redact`/`scanAndRedact` accepts to a core [`WholeInputLimits`],
+/// using the core's default when both are omitted
+/// (`decision-bound-whole-input-operations-by-default`).
+fn resolve_whole_input_limits(
+    max_input_bytes: Option<u32>,
+    max_findings: Option<u32>,
+) -> Result<WholeInputLimits, SecretScanError> {
+    match (max_input_bytes, max_findings) {
+        (None, None) => Ok(WholeInputLimits::default()),
+        (input, findings) => {
+            let defaults = WholeInputLimits::default();
+            WholeInputLimits::new(
+                input.map_or(defaults.max_input_bytes(), |value| value as usize),
+                findings.map_or(defaults.max_findings(), |value| value as usize),
+            )
+        }
+    }
+}
+
 fn run_scan(
     input: &str,
     registry: &DetectorRegistry,
     policy: Option<&Function>,
+    limits: &WholeInputLimits,
 ) -> Result<Vec<Finding>, SecretScanError> {
     match policy {
-        Some(function) => {
-            redact_secret::scan(input, registry, &callbacks::JsPolicy::new(input, function))
-        }
-        None => redact_secret::scan(input, registry, &DefaultPolicy),
+        Some(function) => redact_secret::scan_with_limits(
+            input,
+            registry,
+            &callbacks::JsPolicy::new(input, function),
+            limits,
+        ),
+        None => redact_secret::scan_with_limits(input, registry, &DefaultPolicy, limits),
     }
 }
 
@@ -104,21 +129,32 @@ fn run_redact(
     input: &str,
     findings: &[Finding],
     formatter: Option<&Function>,
+    limits: &WholeInputLimits,
 ) -> Result<String, SecretScanError> {
     match formatter {
-        Some(function) => redact_secret::redact(
+        Some(function) => redact_secret::redact_with_limits(
             input,
             findings,
             &callbacks::JsPlaceholderFormatter::new(input, function),
+            limits,
         ),
-        None => redact_secret::redact(input, findings, &default_placeholder_formatter),
+        None => redact_secret::redact_with_limits(
+            input,
+            findings,
+            &default_placeholder_formatter,
+            limits,
+        ),
     }
 }
 
 /// [`lifecycle::with_registry`] plus [`run_scan`], flattened into the one
 /// `JsValue` error every exported function reports.
-fn scan_after_initialize(input: &str, policy: Option<&Function>) -> Result<Vec<Finding>, JsValue> {
-    lifecycle::with_registry(|registry| run_scan(input, registry, policy))
+fn scan_after_initialize(
+    input: &str,
+    policy: Option<&Function>,
+    limits: &WholeInputLimits,
+) -> Result<Vec<Finding>, JsValue> {
+    lifecycle::with_registry(|registry| run_scan(input, registry, policy, limits))
         .map_err(to_js_error)?
         .map_err(|error| to_js_error(error.into()))
 }
@@ -129,20 +165,31 @@ fn scan_after_initialize(input: &str, policy: Option<&Function>) -> Result<Vec<F
 ///
 /// `policy`, when given, is called as `policy(findingMetadata, context)` and
 /// must return one of `"redact"`, `"block"`, `"warn"`, or `"allow"`.
+/// `maxInputBytes`/`maxFindings`, when omitted, use the core's default whole-
+/// input bound (`decision-bound-whole-input-operations-by-default`).
 ///
 /// # Errors
 ///
 /// Returns a fixed `NOT_INITIALIZED` error, without inspecting `input`, when
 /// [`initialize`] has not yet succeeded. Otherwise returns the sanitized,
-/// input-free error the core pipeline or a failing `policy` call produces.
+/// input-free error the core pipeline or a failing `policy` call produces,
+/// including `INPUT_LIMIT_EXCEEDED`, `FINDING_LIMIT_EXCEEDED`, and
+/// `INVALID_LIMITS`.
 // `policy` cannot be `Option<&Function>`: wasm-bindgen only implements
 // `FromWasmAbi` for owned imported types across an exported function
 // boundary, so this crate takes ownership at every such boundary and
 // borrows internally instead.
 #[allow(clippy::needless_pass_by_value)]
 #[wasm_bindgen]
-pub fn scan(input: &str, policy: Option<Function>) -> Result<Vec<FindingJs>, JsValue> {
-    let findings = scan_after_initialize(input, policy.as_ref())?;
+pub fn scan(
+    input: &str,
+    policy: Option<Function>,
+    max_input_bytes: Option<u32>,
+    max_findings: Option<u32>,
+) -> Result<Vec<FindingJs>, JsValue> {
+    let limits = resolve_whole_input_limits(max_input_bytes, max_findings)
+        .map_err(|error| to_js_error(error.into()))?;
+    let findings = scan_after_initialize(input, policy.as_ref(), &limits)?;
     Ok(findings
         .into_iter()
         .map(|finding| FindingJs::new(input, finding))
@@ -156,23 +203,31 @@ pub fn scan(input: &str, policy: Option<Function>) -> Result<Vec<FindingJs>, JsV
 ///
 /// `formatter`, when given, is called as `formatter(findingMetadata,
 /// context)` and must return the placeholder string.
+/// `maxInputBytes`/`maxFindings`, when omitted, use the core's default whole-
+/// input bound (`decision-bound-whole-input-operations-by-default`).
 ///
 /// # Errors
 ///
 /// Returns a fixed `NOT_INITIALIZED` error, without inspecting `input`, when
 /// [`initialize`] has not yet succeeded. Otherwise returns the sanitized,
 /// input-free error the core redaction pass or a failing `formatter` call
-/// produces.
+/// produces, including `INPUT_LIMIT_EXCEEDED`, `FINDING_LIMIT_EXCEEDED`, and
+/// `INVALID_LIMITS`.
 #[allow(clippy::needless_pass_by_value)]
 #[wasm_bindgen]
 pub fn redact(
     input: &str,
     findings: Vec<FindingJs>,
     formatter: Option<Function>,
+    max_input_bytes: Option<u32>,
+    max_findings: Option<u32>,
 ) -> Result<String, JsValue> {
     lifecycle::ensure_initialized().map_err(to_js_error)?;
+    let limits = resolve_whole_input_limits(max_input_bytes, max_findings)
+        .map_err(|error| to_js_error(error.into()))?;
     let findings: Vec<Finding> = findings.into_iter().map(FindingJs::into_inner).collect();
-    run_redact(input, &findings, formatter.as_ref()).map_err(|error| to_js_error(error.into()))
+    run_redact(input, &findings, formatter.as_ref(), &limits)
+        .map_err(|error| to_js_error(error.into()))
 }
 
 /// Scans `input`, then redacts it with the resulting findings, in one call.
@@ -188,9 +243,13 @@ pub fn scan_and_redact(
     input: &str,
     policy: Option<Function>,
     formatter: Option<Function>,
+    max_input_bytes: Option<u32>,
+    max_findings: Option<u32>,
 ) -> Result<ScanAndRedactResultJs, JsValue> {
-    let findings = scan_after_initialize(input, policy.as_ref())?;
-    let text = run_redact(input, &findings, formatter.as_ref())
+    let limits = resolve_whole_input_limits(max_input_bytes, max_findings)
+        .map_err(|error| to_js_error(error.into()))?;
+    let findings = scan_after_initialize(input, policy.as_ref(), &limits)?;
+    let text = run_redact(input, &findings, formatter.as_ref(), &limits)
         .map_err(|error| to_js_error(error.into()))?;
     let findings = findings
         .into_iter()
@@ -253,6 +312,89 @@ mod tests {
         synthetic_input().replace(&synthetic::secret().matched, placeholder)
     }
 
+    // The limit-resolution and `run_scan`/`run_redact` tests below exercise
+    // plain `Result<_, SecretScanError>` values, so — unlike the exported
+    // `#[wasm_bindgen]` functions, whose `JsValue` errors need a real
+    // JavaScript engine — they run natively, not just under `wasm32`.
+
+    #[test]
+    fn resolve_whole_input_limits_defaults_when_both_are_omitted() {
+        let limits = resolve_whole_input_limits(None, None).unwrap();
+        assert_eq!(limits, WholeInputLimits::default());
+    }
+
+    #[test]
+    fn resolve_whole_input_limits_uses_explicit_values() {
+        let limits = resolve_whole_input_limits(Some(1024), Some(10)).unwrap();
+        assert_eq!(limits.max_input_bytes(), 1024);
+        assert_eq!(limits.max_findings(), 10);
+    }
+
+    #[test]
+    fn resolve_whole_input_limits_rejects_a_zero_value() {
+        let error = resolve_whole_input_limits(Some(0), Some(10)).unwrap_err();
+        assert_eq!(
+            error.code(),
+            redact_secret::SecretScanErrorCode::InvalidLimits
+        );
+    }
+
+    #[test]
+    fn run_scan_rejects_input_over_an_explicit_byte_limit() {
+        initialize().unwrap();
+        let limits = WholeInputLimits::new(5, 50).unwrap();
+        let error =
+            lifecycle::with_registry(|registry| run_scan("abcdef", registry, None, &limits))
+                .unwrap()
+                .unwrap_err();
+        assert_eq!(
+            error.code(),
+            redact_secret::SecretScanErrorCode::InputLimitExceeded
+        );
+    }
+
+    /// Only meaningful for the `full` profile, which links the `provider`
+    /// detector this input needs two disjoint findings from; `common` finds
+    /// nothing here (the documented false-negative cost of `common`), so
+    /// there is no finding count to bound.
+    #[test]
+    fn run_scan_rejects_a_finding_count_over_an_explicit_bound() {
+        if !cfg!(feature = "full") {
+            return;
+        }
+        initialize().unwrap();
+        let input = format!(
+            "prefix AKIA{} middle AKIA{} suffix",
+            "SYNTHETICEXAMPLE", "SYNTHETICEXAMPL2"
+        );
+        let at_bound = WholeInputLimits::new(1024, 2).unwrap();
+        let found =
+            lifecycle::with_registry(|registry| run_scan(&input, registry, None, &at_bound))
+                .unwrap()
+                .unwrap();
+        assert_eq!(found.len(), 2);
+
+        let one_under = WholeInputLimits::new(1024, 1).unwrap();
+        let error =
+            lifecycle::with_registry(|registry| run_scan(&input, registry, None, &one_under))
+                .unwrap()
+                .unwrap_err();
+        assert_eq!(
+            error.code(),
+            redact_secret::SecretScanErrorCode::FindingLimitExceeded
+        );
+    }
+
+    #[test]
+    fn run_redact_rejects_input_over_an_explicit_byte_limit() {
+        let limits = WholeInputLimits::new(5, 50).unwrap();
+        let error = run_redact("abcdef", &[], None, &limits).unwrap_err();
+        assert_eq!(
+            error.code(),
+            redact_secret::SecretScanErrorCode::InputLimitExceeded
+        );
+    }
+
     /// Canonical synchronous conformance, exercised through the exported
     /// `scan`/`redact`/`scanAndRedact` functions themselves (with no custom
     /// `policy`/`formatter`, so no JavaScript callback is invoked and this
@@ -267,15 +409,15 @@ mod tests {
         initialize().unwrap();
         let input = synthetic_input();
 
-        let findings = scan(&input, None).unwrap();
+        let findings = scan(&input, None, None, None).unwrap();
         assert_eq!(findings.len(), 1);
         assert_eq!(findings[0].type_name(), synthetic::secret().type_name);
         assert_eq!(findings[0].action(), "redact");
 
-        let output = redact(&input, findings, None).unwrap();
+        let output = redact(&input, findings, None, None, None).unwrap();
         assert_eq!(output, redacted_input("<SECRET_1>"));
 
-        let combined = scan_and_redact(&input, None, None).unwrap();
+        let combined = scan_and_redact(&input, None, None, None, None).unwrap();
         assert_eq!(combined.text(), output);
         assert_eq!(combined.findings().len(), 1);
         assert_eq!(
@@ -293,7 +435,7 @@ mod tests {
     fn a_bare_provider_token_is_detected_only_by_the_full_profile() {
         initialize().unwrap();
         let input = format!("prefix \u{1F511} AKIA{} suffix", "SYNTHETICEXAMPLE");
-        let findings = scan(&input, None).unwrap();
+        let findings = scan(&input, None, None, None).unwrap();
         if cfg!(feature = "full") {
             assert_eq!(findings.len(), 1);
             assert_eq!(findings[0].detector(), "aws-access-key");
@@ -319,7 +461,7 @@ mod tests {
     fn finding_range_uses_utf16_offsets_end_to_end() {
         initialize().unwrap();
         let input = synthetic_input();
-        let findings = scan(&input, None).unwrap();
+        let findings = scan(&input, None, None, None).unwrap();
         let range = findings[0].range();
 
         let utf16: Vec<u16> = input.encode_utf16().collect();
@@ -358,7 +500,7 @@ mod tests {
         let input = synthetic_input();
 
         let policy = Function::new_with_args("finding, context", "return 'block';");
-        let findings = scan(&input, Some(policy)).unwrap();
+        let findings = scan(&input, Some(policy), None, None).unwrap();
         assert_eq!(findings.len(), 1);
         assert_eq!(findings[0].action(), "block");
 
@@ -366,7 +508,7 @@ mod tests {
             "finding, context",
             "return '[REDACTED:' + finding.type + ']';",
         );
-        let output = redact(&input, findings, Some(formatter)).unwrap();
+        let output = redact(&input, findings, Some(formatter), None, None).unwrap();
         assert_eq!(
             output,
             redacted_input(&format!("[REDACTED:{}]", synthetic::secret().type_name))

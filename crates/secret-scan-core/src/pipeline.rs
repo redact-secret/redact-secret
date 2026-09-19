@@ -10,8 +10,9 @@ use std::cmp::Ordering;
 use std::collections::BTreeMap;
 
 use crate::error::{SecretScanError, SecretScanErrorCode};
+use crate::limits::WholeInputLimits;
 use crate::normalize::NormalizedInput;
-use crate::redact::redact;
+use crate::redact::redact_with_limits;
 use crate::registry::{DetectorRegistry, RegisteredDetector};
 use crate::types::{
     Action, ByteRange, Candidate, Confidence, DetectedFinding, DetectorContext, Finding,
@@ -249,13 +250,35 @@ pub fn run_detector_pipeline(
 /// # Errors
 ///
 /// Every [`run_detector_pipeline`] error, plus
-/// [`SecretScanErrorCode::PolicyFailure`] when the policy fails.
+/// [`SecretScanErrorCode::PolicyFailure`] when the policy fails,
+/// [`SecretScanErrorCode::InputLimitExceeded`] when `input` exceeds the
+/// default [`WholeInputLimits::max_input_bytes`], and
+/// [`SecretScanErrorCode::FindingLimitExceeded`] when the accepted finding
+/// count exceeds the default [`WholeInputLimits::max_findings`]. See
+/// [`scan_with_limits`] to use a different limit set.
 pub fn scan(
     input: &str,
     registry: &DetectorRegistry,
     policy: &dyn Policy,
 ) -> Result<Vec<Finding>, SecretScanError> {
+    scan_with_limits(input, registry, policy, &WholeInputLimits::default())
+}
+
+/// Same as [`scan`], against `limits` instead of the default
+/// [`WholeInputLimits`].
+///
+/// # Errors
+///
+/// Every [`scan`] error, checked against `limits` instead of the default.
+pub fn scan_with_limits(
+    input: &str,
+    registry: &DetectorRegistry,
+    policy: &dyn Policy,
+    limits: &WholeInputLimits,
+) -> Result<Vec<Finding>, SecretScanError> {
+    limits.check_input(input)?;
     let detected = run_detector_pipeline(input, registry)?;
+    limits.check_findings(detected.len())?;
     let finding_count = detected.len();
     detected
         .into_iter()
@@ -308,8 +331,35 @@ pub fn scan_and_redact(
     policy: &dyn Policy,
     formatter: &dyn PlaceholderFormatter,
 ) -> Result<ScanResult, SecretScanError> {
-    let findings = scan(input, registry, policy)?;
-    let text = redact(input, &findings, formatter)?;
+    scan_and_redact_with_limits(
+        input,
+        registry,
+        policy,
+        formatter,
+        &WholeInputLimits::default(),
+    )
+}
+
+/// Same as [`scan_and_redact`], against `limits` instead of the default
+/// [`WholeInputLimits`].
+///
+/// Equivalent to [`scan_with_limits`] followed by
+/// [`redact_with_limits`](crate::redact_with_limits) with the same
+/// `limits`.
+///
+/// # Errors
+///
+/// Every [`scan_and_redact`] error, checked against `limits` instead of the
+/// default.
+pub fn scan_and_redact_with_limits(
+    input: &str,
+    registry: &DetectorRegistry,
+    policy: &dyn Policy,
+    formatter: &dyn PlaceholderFormatter,
+    limits: &WholeInputLimits,
+) -> Result<ScanResult, SecretScanError> {
+    let findings = scan_with_limits(input, registry, policy, limits)?;
+    let text = redact_with_limits(input, &findings, formatter, limits)?;
     Ok(ScanResult::new(text, findings))
 }
 

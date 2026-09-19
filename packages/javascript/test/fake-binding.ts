@@ -13,6 +13,7 @@ import type {
   NativeBinding,
   NativeFinding,
   NativeIncrementalSanitizer,
+  NativeWholeInputLimits,
 } from "../src/native.js";
 import type { IncrementalSanitizerState } from "../src/types.js";
 
@@ -27,6 +28,14 @@ export interface FakeBindingOptions {
 
 export interface FakeBinding extends NativeBinding {
   readonly calls: string[];
+  /**
+   * The `limits` argument the most recent `scan`/`redact`/`scanAndRedact`
+   * call received — `undefined` both when no such call has happened yet and
+   * when the most recent one omitted `limits` (i.e. used the default), so a
+   * test that needs to distinguish those two cases should check `calls`
+   * first.
+   */
+  readonly lastLimits: NativeWholeInputLimits | undefined;
 }
 
 export function createFakeBinding(
@@ -35,6 +44,7 @@ export function createFakeBinding(
   const calls: string[] = [];
   const findings = options.findings ?? [];
   const redacted = options.redacted ?? "<SECRET_1>";
+  let lastLimits: NativeWholeInputLimits | undefined;
 
   function session(): NativeIncrementalSanitizer {
     let state: IncrementalSanitizerState = "accepting";
@@ -78,18 +88,21 @@ export function createFakeBinding(
         throw options.throwOnInitialize;
       }
     },
-    scan: (input, policy) => {
+    scan: (input, policy, limits) => {
+      lastLimits = limits;
       calls.push(`scan:${input}:${policy === undefined ? "builtin" : "custom"}`);
       if (options.throwOnScan !== undefined) throw options.throwOnScan;
       return findings;
     },
-    redact: (input, given, formatter) => {
+    redact: (input, given, formatter, limits) => {
+      lastLimits = limits;
       calls.push(
         `redact:${input}:${given.length}:${formatter === undefined ? "builtin" : "custom"}`,
       );
       return redacted;
     },
-    scanAndRedact: (input, policy, formatter) => {
+    scanAndRedact: (input, policy, formatter, limits) => {
+      lastLimits = limits;
       calls.push(
         `scanAndRedact:${input}:${policy === undefined ? "builtin" : "custom"}:${formatter === undefined ? "builtin" : "custom"}`,
       );
@@ -100,6 +113,9 @@ export function createFakeBinding(
         `createIncrementalSanitizer:${incrementalOptions.limits.maxInputCodeUnits}`,
       );
       return session();
+    },
+    get lastLimits() {
+      return lastLimits;
     },
   };
 }
