@@ -418,6 +418,10 @@ pub trait Detector {
 
     /// Scans `input` and returns candidates in emission order.
     ///
+    /// Inside the pipeline, `input` is the scan copy: the caller's text with
+    /// invisible code points removed. Candidate ranges index that copy, and
+    /// the pipeline translates them back to the caller's text.
+    ///
     /// # Errors
     ///
     /// Returns [`DetectorFailure`] on any internal failure. The pipeline

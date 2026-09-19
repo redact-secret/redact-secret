@@ -10,7 +10,7 @@ name: Release
 # workflow is running for, and `publish-pypi` downloads the wheels
 # `python-wheels` already qualified rather than rebuilding them.
 #
-# `packages/javascript` depends on six native `@redact-secret/node-<platform>`
+# `packages/javascript` depends on eight native `@redact-secret/node-<platform>`
 # packages and `@redact-secret/wasm` (issue #79); `publish-native-dependencies`
 # and `publish-wasm-dependency` (issue #141) publish those from the exact
 # `node-addon-<target>`/`wasm-web` artifacts `artifact-qualification` already
@@ -76,7 +76,7 @@ jobs:
     permissions:
       contents: read
 
-  # Publishes the six native dependency packages from the addons
+  # Publishes the eight native dependency packages from the addons
   # `artifact-qualification` already built and qualified for this commit --
   # never rebuilt here (issue #141's "consumes the already-qualified
   # artifacts" requirement). Runs on one runner per platform, not a matching
@@ -159,7 +159,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       # `needs.<job>.outputs` on a matrix job carries only the last leg's
-      # value, not all six (GitHub Actions does not merge matrix outputs), so
+      # value, not all eight (GitHub Actions does not merge matrix outputs), so
       # each leg's registry state is recorded as its own artifact instead and
       # `record-manifest` downloads and merges all of them.
       - name: Report registry state
@@ -660,8 +660,14 @@ jobs:
             runner: macos-15-intel
           - target: aarch64-unknown-linux-gnu
             runner: ubuntu-24.04-arm
+          - target: aarch64-unknown-linux-musl
+            runner: ubuntu-24.04-arm
+            libc: musl
           - target: x86_64-unknown-linux-gnu
             runner: ubuntu-latest
+          - target: x86_64-unknown-linux-musl
+            runner: ubuntu-latest
+            libc: musl
           - target: aarch64-pc-windows-msvc
             runner: windows-11-arm
           - target: x86_64-pc-windows-msvc
@@ -674,6 +680,7 @@ jobs:
           persist-credentials: false
 
       - name: Set up Node.js
+        if: matrix.libc != 'musl'
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version: 22
@@ -683,10 +690,23 @@ jobs:
       # lane needs it); the node lane below never calls it, but still needs
       # it importable.
       - name: Install dependencies
+        if: matrix.libc != 'musl'
         run: npm ci --ignore-scripts
 
       - name: Verify the registry-backed clean install
+        if: matrix.libc != 'musl'
         run: node scripts/verify-registry-install.mjs --lane node
+
+      # A musl addon cannot be loaded by the glibc runner's Node.js, so the
+      # musl lanes install and verify inside a musl image of the same
+      # architecture, as `artifact-qualification.yml`'s addon lanes do.
+      # `--user` keeps the checkout free of root-owned files.
+      - name: Verify the registry-backed clean install on musl
+        if: matrix.libc == 'musl'
+        run: |
+          docker run --rm --user "$(id -u):$(id -g)" -e HOME=/tmp \
+            -v "$PWD:/io" -w /io node:22-alpine \
+            sh -c 'npm ci --ignore-scripts && node scripts/verify-registry-install.mjs --lane node'
 
   verify-registry-install-browser:
     name: Verify registry install (browser)
@@ -786,10 +806,10 @@ jobs:
         with:
           persist-credentials: false
 
-      # `needs.publish-native-dependencies.outputs` cannot carry all six
+      # `needs.publish-native-dependencies.outputs` cannot carry all eight
       # matrix legs' registry state (GitHub Actions keeps only the last one),
       # so each leg uploaded its own `registry-state-native-<platform>`
-      # artifact instead; this downloads all six into one directory. A leg
+      # artifact instead; this downloads all eight into one directory. A leg
       # that failed before its own upload step leaves nothing here, which the
       # merge below tolerates the same way it tolerates an empty job output.
       - name: Download native dependency registry states

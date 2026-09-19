@@ -147,15 +147,35 @@ function toFormatterCallback(
   return (finding, context) => formatter(toSecretFinding(finding), context);
 }
 
+/** Largest value the native bindings' `u32` limit fields can hold. */
+const MAX_NATIVE_LIMIT = 0xffff_ffff;
+
+/**
+ * Rejects a limit that the bindings' `u32` conversion would silently wrap or
+ * truncate instead of refusing: `-1` would become 4 GiB, `2 ** 32 + 4` would
+ * become 4, and `1.5` would become 1. Zero is in range here and left to the
+ * binding, which rejects it with the same `INVALID_LIMITS`.
+ */
+function toNativeLimit(value: unknown): number {
+  if (
+    typeof value !== "number" ||
+    !Number.isInteger(value) ||
+    value < 0 ||
+    value > MAX_NATIVE_LIMIT
+  ) {
+    throw new SecretScanError("INVALID_LIMITS");
+  }
+  return value;
+}
+
 /**
  * Converts an optional public {@link WholeInputLimits} to its native shape.
  * `undefined` passes through unchanged so the binding applies the core's
  * default (`decision-bound-whole-input-operations-by-default`); a value that
  * is present but malformed throws `INVALID_OPTIONS` here rather than
- * reaching the binding as a nonsensical native call. A value that is present
- * and well-shaped but numerically invalid (for example zero) is left to the
- * binding, which reports it as `INVALID_LIMITS` — the same division of labor
- * `toNativeIncrementalOptions` already uses for `limits`.
+ * reaching the binding as a nonsensical native call. A well-shaped value
+ * outside the native range throws `INVALID_LIMITS` ({@link toNativeLimit});
+ * zero is left to the binding, which reports the same `INVALID_LIMITS`.
  */
 function toNativeWholeInputLimits(
   limits: ScanOptions["limits"],
@@ -170,8 +190,8 @@ function toNativeWholeInputLimits(
     throw new SecretScanError("INVALID_OPTIONS");
   }
   return {
-    maxInputBytes: limits.maxInputBytes,
-    maxFindings: limits.maxFindings,
+    maxInputBytes: toNativeLimit(limits.maxInputBytes),
+    maxFindings: toNativeLimit(limits.maxFindings),
   };
 }
 
@@ -199,10 +219,10 @@ function toNativeIncrementalOptions(
           policy.evaluate(toDetectedSecretFinding(finding), context);
   return {
     limits: {
-      maxInputCodeUnits: limits.maxInputCodeUnits,
-      maxBufferedCodeUnits: limits.maxBufferedCodeUnits,
-      maxTokenCodeUnits: limits.maxTokenCodeUnits,
-      maxMultilineCodeUnits: limits.maxMultilineCodeUnits,
+      maxInputCodeUnits: toNativeLimit(limits.maxInputCodeUnits),
+      maxBufferedCodeUnits: toNativeLimit(limits.maxBufferedCodeUnits),
+      maxTokenCodeUnits: toNativeLimit(limits.maxTokenCodeUnits),
+      maxMultilineCodeUnits: toNativeLimit(limits.maxMultilineCodeUnits),
     },
     ...(policyCallback === undefined ? {} : { policy: policyCallback }),
     ...(formatter === undefined ? {} : { formatter }),

@@ -33,7 +33,7 @@ class Repository:
         self.napi_targets = list(ADDON_TARGETS)
         self.workflow_addon_targets = list(ADDON_TARGETS)
         self.qualifier_addon_targets = list(ADDON_TARGETS)
-        # The non-musl target in ADDON_TARGETS; npm ships glibc only.
+        # A strict subset of ADDON_TARGETS, so the subset rule is exercised.
         self.publish_targets = ["aarch64-apple-darwin"]
         # `None` means "derive from publish_targets through the same
         # target-to-platform-name mapping `build()` writes into the
@@ -42,6 +42,11 @@ class Repository:
         self.npm_manifest_name_overrides: dict[str, str] = {}
         self.js_optional_deps: list[str] | None = None
         self.runtime_node_packages: list[str] | None = None
+        # Each `None` derives from publish_targets, like the fields above.
+        self.release_publish_targets: list[str] | None = None
+        self.release_verify_targets: list[str] | None = None
+        self.reconcile_verify_targets: list[str] | None = None
+        self.reconcile_platform_targets: dict[str, str] | None = None
         self.cli_targets = list(CLI_TARGETS)
         self.workflow_cli_targets = list(CLI_TARGETS)
         self.qualifier_cli_targets = list(CLI_TARGETS)
@@ -163,7 +168,55 @@ class Repository:
             ".github/workflows/artifact-qualification.yml",
             self._qualification(),
         )
+        self.write(".github/workflows/release.yml", self._release())
+        self.write(
+            ".github/workflows/reconcile-release.yml",
+            self._reconcile({target: platform_map[target] for target in self.publish_targets if target in platform_map}),
+        )
         return self.root
+
+    def _job(self, name: str, targets: list[str], steps: str = "") -> str:
+        matrix = "".join(f"          - target: {target}\n" for target in targets)
+        return (
+            f"  {name}:\n    runs-on: ubuntu-latest\n"
+            "    permissions:\n      contents: read\n"
+            "    strategy:\n      matrix:\n        include:\n"
+            f"{matrix}"
+            "    steps:\n"
+            f"      - uses: {self.checkout}\n"
+            f"{steps}"
+        )
+
+    def _release(self) -> str:
+        publish = self.release_publish_targets
+        verify = self.release_verify_targets
+        return (
+            "name: Release\non:\n  workflow_dispatch:\npermissions: {}\njobs:\n"
+            + self._job("publish-native-dependencies", self.publish_targets if publish is None else publish)
+            + self._job("verify-registry-install", self.publish_targets if verify is None else verify)
+        )
+
+    def _reconcile(self, platforms: dict[str, str]) -> str:
+        pairs = self.reconcile_platform_targets
+        if pairs is None:
+            pairs = {platform: target for target, platform in platforms.items()}
+        entries = "".join(f"            [{platform}]={target}\n" for platform, target in pairs.items())
+        verify = self.reconcile_verify_targets
+        reconcile = (
+            "  reconcile:\n    runs-on: ubuntu-latest\n"
+            "    permissions:\n      contents: read\n"
+            "    steps:\n"
+            f"      - uses: {self.checkout}\n"
+            "      - run: |\n"
+            "          declare -A PLATFORM_TARGETS=(\n"
+            f"{entries}"
+            "          )\n"
+        )
+        return (
+            "name: Reconcile Release\non:\n  workflow_dispatch:\npermissions: {}\njobs:\n"
+            + reconcile
+            + self._job("verify-registry-install", self.publish_targets if verify is None else verify)
+        )
 
     def _qualification(self) -> str:
         addon = "".join(
@@ -417,6 +470,61 @@ class MatrixTests(unittest.TestCase):
             "which Cargo.toml does not declare",
         )
 
+    def test_a_publish_target_the_release_does_not_publish_fails(self) -> None:
+        def configure(repository: Repository) -> None:
+            repository.release_publish_targets = []
+
+        self.assertOneError(
+            configure,
+            "release.yml: job 'publish-native-dependencies''s target matrix omits aarch64-apple-darwin",
+        )
+
+    def test_a_publish_target_the_release_does_not_install_verify_fails(self) -> None:
+        def configure(repository: Repository) -> None:
+            repository.release_verify_targets = []
+
+        self.assertOneError(
+            configure,
+            "release.yml: job 'verify-registry-install''s target matrix omits aarch64-apple-darwin",
+        )
+
+    def test_a_release_install_lane_for_an_unpublished_target_fails(self) -> None:
+        def configure(repository: Repository) -> None:
+            repository.release_verify_targets = ["aarch64-apple-darwin", "x86_64-unknown-linux-musl"]
+
+        self.assertOneError(
+            configure,
+            "release.yml: job 'verify-registry-install''s target matrix names x86_64-unknown-linux-musl, "
+            "which Cargo.toml does not declare",
+        )
+
+    def test_a_publish_target_reconcile_cannot_install_verify_fails(self) -> None:
+        def configure(repository: Repository) -> None:
+            repository.reconcile_verify_targets = []
+
+        self.assertOneError(
+            configure,
+            "reconcile-release.yml: job 'verify-registry-install''s target matrix omits aarch64-apple-darwin",
+        )
+
+    def test_a_publish_target_reconcile_cannot_repair_fails(self) -> None:
+        def configure(repository: Repository) -> None:
+            repository.reconcile_platform_targets = {}
+
+        self.assertOneError(
+            configure,
+            "reconcile-release.yml: job 'reconcile''s PLATFORM_TARGETS omits platform-0=aarch64-apple-darwin",
+        )
+
+    def test_a_reconcile_platform_mapped_to_the_wrong_target_fails(self) -> None:
+        def configure(repository: Repository) -> None:
+            repository.reconcile_platform_targets = {"platform-0": "x86_64-unknown-linux-musl"}
+
+        errors = self.validate(configure)
+        self.assertEqual(len(errors), 2, errors)
+        self.assertIn("PLATFORM_TARGETS omits platform-0=aarch64-apple-darwin", errors[0])
+        self.assertIn("PLATFORM_TARGETS names platform-0=x86_64-unknown-linux-musl", errors[1])
+
     def test_node_publish_targets_missing_declaration_fails(self) -> None:
         def configure(repository: Repository) -> None:
             repository.publish_targets = []
@@ -538,7 +646,9 @@ class MatrixTests(unittest.TestCase):
             repository.checkout = "actions/checkout@v6"
 
         errors = self.validate(configure)
-        self.assertEqual(len(errors), 6, errors)
+        # One per checkout step: five in qualification, one in CI, two each
+        # in the release and reconcile workflows.
+        self.assertEqual(len(errors), 10, errors)
         for error in errors:
             self.assertIn("is not pinned to a commit SHA", error)
 

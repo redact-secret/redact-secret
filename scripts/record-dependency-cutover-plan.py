@@ -2,7 +2,7 @@
 """Record the npm dependency cutover's intended publish order and inventory.
 
 Issue #141: before `@redact-secret/core` (the wrapper) may publish, every
-runtime dependency package it declares -- the six native
+runtime dependency package it declares -- the eight native
 `@redact-secret/node-<platform>` packages and `@redact-secret/wasm`
 -- must already be packed, content-checked, published, and verified at its
 declared, immutable version. `.github/workflows/release.yml` enforces the

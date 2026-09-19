@@ -21,14 +21,15 @@ The version examples here do not authorize selecting or publishing them.
 | --- | --- |
 | npm | `@redact-secret/core` facade |
 | npm | `@redact-secret/wasm` runtime |
-| npm | Six `@redact-secret/node-<platform>` runtime packages |
+| npm | Eight `@redact-secret/node-<platform>` runtime packages, including two musl |
 | crates.io | `redact-secret` library and `redact-secret-cli` CLI crate |
 | PyPI | `redact-secret` distribution: eight abi3 wheels and one sdist |
 | Actions qualification artifacts | Six native CLI binaries |
 
-There are eight npm package identities, two crate identities, and one Python
-distribution across three registries. The two musl Node addons are qualified
-but not published to npm. The exact matrices belong to
+There are ten npm package identities, two crate identities, and one Python
+distribution across three registries. Both musl Node addons are published to
+npm (`decision-publish-musl-node-addons`); the CLI still ships no musl binary.
+The exact matrices belong to
 `Cargo.toml`'s `[workspace.metadata.redact-secret]`; see
 [qualification](qualification.md) and [Python packaging](python-packaging.md).
 
@@ -161,8 +162,9 @@ before the facade; publishes the core crate before the CLI crate; and uploads
 the qualified Python wheel/sdist files. Prerelease npm packages use `beta`,
 stable packages use `latest`.
 
-The post-publication jobs clean-install the exact npm version on all six Node
-platforms and Chromium. `tag-release` waits for publication and those install
+The post-publication jobs clean-install the exact npm version on all eight
+native Node platforms (the two musl lanes run in `node:22-alpine` containers)
+and Chromium. `tag-release` waits for publication and those install
 checks, then creates annotated `v<version>` at the workflow source SHA. The
 current graph has no equivalent post-publication Rust/Python clean-install
 matrix: retain their registry file/checksum evidence and verify exact-version

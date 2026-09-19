@@ -25,10 +25,11 @@ establish availability. To build this checkout, use the
 [source setup](./docs/getting-started.md).
 
 Pino, Python `logging`, and OpenTelemetry `SpanProcessor` integrations are
-published as versioned packages in a separate repository,
-[`redact-secret-adapters`](https://github.com/redact-secret/redact-secret-adapters)
-(`@redact-secret/adapter-pino`, `@redact-secret/adapter-otel`, and the PyPI
-`redact-secret-adapters` distribution) — see
+being graduated to a separate repository,
+[`redact-secret-adapters`](https://github.com/redact-secret/redact-secret-adapters),
+as `@redact-secret/adapter-pino`, `@redact-secret/adapter-otel`, and the PyPI
+`redact-secret-adapters` distribution; none of those packages is published
+yet — see
 [`docs/decisions/2026-09-19-graduate-adapters-to-a-separate-repository.md`](./docs/decisions/2026-09-19-graduate-adapters-to-a-separate-repository.md)
 for why, including why this repository's own release matrix is unaffected.
 Model context (MCP) and LangChain remain application use cases with no

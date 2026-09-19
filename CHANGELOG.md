@@ -5,412 +5,166 @@ evidence is linked from each published version.
 
 ## Unreleased
 
-- **Security fix:** overlap resolution could pick a more specific but
-  weaker-resolving candidate over a less specific candidate that would have
-  redacted, leaving a credential in plaintext (issue #450,
-  `decision-resolve-overlap-precedence-by-resolved-action-severity`).
-  `new_relic_license_key`'s only emission path reports `Confidence::Medium`,
-  which `DefaultPolicy` warns on rather than redacts, and its `Provider`
-  specificity outranked a lower-specificity, but stricter-resolving,
-  overlapping candidate for the same span (for example a structural
-  `bearer_token` candidate, which always redacts) — a shape the conformance
-  corpus already exercised without recognizing it as a defect. Overlap
-  resolution now ranks by resolved-action severity (`Block > Redact > Warn >
-  Allow`, from the crate's fixed default classification) before specificity,
-  so a weaker-resolving candidate can no longer displace a stricter-resolving
-  one. This affects five declared types found in the identical shape —
-  `new_relic_license_key`, `twilio_auth_token`, `twilio_api_key_secret`,
-  `datadog_api_key`, and `datadog_application_key` — but only when one of
-  them overlaps another candidate that would resolve a stricter action; none
-  of the five is added to `ALWAYS_REDACT_TYPES`, and none of their standalone
-  (non-overlapping) detections changes action. **Migration:** a caller whose
-  input triggers one of these five types' medium-confidence path *and* a
-  competing, stricter-resolving detector on the identical span now sees the
-  stricter candidate win instead. No other input is affected.
-- **Internal:** overlap resolution's greedy accept pass is replaced with
-  optimal weighted-interval selection (issue #451,
-  `decision-select-optimal-disjoint-candidates-by-total-evidence-weight`).
-  The previous pass walked candidates in priority order and accepted the
-  first disjoint one it reached, which could discard two or more mutually
-  disjoint candidates in favor of a single overlapping one even when their
-  combined evidence was higher; the new pass finds the disjoint subset that
-  actually maximizes total evidence, in the same `O(n log n)` complexity
-  class. Measured against the full canonical corpus (1233 fixtures), no
-  fixture's expectation changes — the shape this fixes is not reachable from
-  the current built-in detector set, so this release carries no observable
-  behavior change; it forecloses a latent defect for future detectors rather
-  than fixing one visible today.
-- **Breaking change:** whole-input `scan`, `redact`, and `scan_and_redact`
-  (and every binding's equivalent) now default to a bounded input: 64 MiB and
-  50,000 findings (issue #439,
-  `decision-bound-whole-input-operations-by-default`). Previously these
-  operations had no implicit input-size or finding-count limit at all, unlike
-  the incremental sanitizer, which has always required explicit,
-  positive `IncrementalLimits`. Exceeding either default now fails closed with
-  a fixed, input-free `INPUT_LIMIT_EXCEEDED`/`FINDING_LIMIT_EXCEEDED` error —
-  the same `INPUT_LIMIT_EXCEEDED` code an incremental session and the CLI's
-  own file-size bound already used — rather than scanning without bound.
-  **Migration:** a caller whose whole-input calls stay under 64 MiB and 50,000
-  findings sees no behavior change. A caller with larger input or denser
-  findings now gets a fixed error instead of an unbounded scan; either bound
-  and chunk its input (for example through the incremental API) or explicitly
-  raise the limit: `scan_with_limits`/`redact_with_limits`/
-  `scan_and_redact_with_limits` and a `WholeInputLimits` value in Rust, a
-  `limits` option accepting `{ maxInputBytes, maxFindings }` in Node and the
-  browser/WebAssembly package, and a `limits=redact_secret.WholeInputLimits(...)`
-  keyword argument in Python. The CLI's own file-read and standard-input
-  bounds are unchanged in value (64 MiB), now derived from the same core
-  default instead of a separately declared constant; CLI file-path scanning
-  also newly inherits the 50,000-finding bound, which it never had before.
-  `INVALID_LIMITS` and the message text of `INPUT_LIMIT_EXCEEDED` are now
-  described as shared between incremental sessions and whole-input operations
-  rather than incremental-only, and a new `FINDING_LIMIT_EXCEEDED` code
-  covers the finding-count bound, which has no incremental equivalent.
-- **Security fix:** an invisible code point inside a credential no longer
-  defeats detection (issues #438, #445,
-  `decision-normalize-invisible-characters-before-detection`). One zero-width
-  character inside a token, a Bearer credential, a connection URI password, or
-  the keyword of a `name = value` assignment previously produced no finding on
-  every detector, left the text unredacted, and let `check` exit `0`. The core
-  now removes `Default_Ignorable_Code_Point ∪ Cf` (4,206 code points, derived
-  from a pinned UCD 17.0.0 snapshot checked in as generated data — zero-width
-  characters, bidi controls, the Unicode Tags block, variation selectors,
-  Hangul fillers, soft hyphen) into a scan copy before detection and
-  translates every range back. No public API changes: ranges still index the
-  original input in every binding's unit, and a removed code point strictly
-  inside a value is part of its range, so one placeholder replaces all of it.
-  One adjacent to a match is not absorbed. The incremental sanitizer judges
-  open constructs and private-key delimiters on the same scan copy, so
-  partition equivalence holds, while its limits still measure original bytes.
-  The fix is in the Rust core, so Rust, the CLI, Node, WebAssembly, and Python
-  all receive it with no binding change. Behavior change: text that is
-  credential-shaped only once its invisible characters are removed is now a
-  finding, and an invisible character between a word and a token no longer
-  acts as a token boundary.
-- **Additive:** every finding now carries an `Obfuscation` signal — `Rust`:
-  `Finding::obfuscation()` / `DetectedFinding::obfuscation()`; `CLI`: an
-  `obfuscation` JSON field and an `obfuscation=` text-report field; `Node`:
-  `JsFinding.obfuscation` / `JsDetectedFinding.obfuscation`; `WebAssembly`:
-  `Finding.obfuscation`; `Python`: `Finding.obfuscation` /
-  `DetectedFinding.obfuscation`; `@redact-secret/core`:
-  `SecretFinding.obfuscation` / `DetectedSecretFinding.obfuscation` (issue
-  #447, sub-issue D of #438,
-  `decision-normalize-invisible-characters-before-detection`). Set to
-  `"invisible-characters"` when a finding's translated original range
-  **strictly contains** at least one code point the normalization pass
-  (#445) removed — a removed code point merely adjacent to the range does
-  not count — and `"none"` otherwise. Carries no value, no offset into the
-  secret, and no plaintext, consistent with the existing rule that neither a
-  candidate nor a finding ever carries matched text. `DefaultPolicy`
-  behavior is unchanged: promoting `warn` to `block` on obfuscation is a
-  separate precision decision left for future evidence. `conformance/schema.ts`
-  / `schema.json` gain `obfuscation` as an **optional** field on
-  `CanonicalExpectation`, so every one of the existing fixtures stays valid
-  unchanged; it is set explicitly on the invisible-character fixtures #445
-  added.
-- Added `@redact-secret/core/common/node-stream` and
-  `@redact-secret/core/common/web-stream` (issue #416), the `common`-profile
-  counterparts to `@redact-secret/core/node-stream` and
-  `@redact-secret/core/web-stream`: the same `createNodeStreamSanitizer`/
-  `createWebStreamSanitizer` factories and `NodeStreamSanitizer`/
-  `WebStreamSanitizer` classes, opened against `common` instead of `full`.
-  Resolving one of the two new subpaths never reaches the `full` runtime
-  module or the root `@redact-secret/wasm` artifact specifier in a browser
-  bundle, closing the known limitation the #382 evidence record left open.
-  Additive: the root entry and the existing `./node-stream`/`./web-stream`
-  subpaths are unchanged and still always open a `full` session.
-- Qualified the `common` detector profile on every surface that exposes it
-  and added its package exports (issue #382, epic #377,
-  `decision-define-detector-profile-and-pack-contract`). Additive and minor:
-  `full` stays the default and unchanged everywhere, and every new surface is
-  opt-in.
-  - `bindings/node` gains `profile()`, and a `common` counterpart to every
-    registry-backed export: `initializeCommon()`, `scanCommon()`,
-    `scanAndRedactCommon()`, `createIncrementalSanitizerCommon()`, and
-    `profileCommon()`. `redact()` is unchanged and shared — it never touches
-    the registry. One compiled addon serves both profiles; there is no
-    second native binary.
-  - `@redact-secret/core` gains a `./common` export mirroring the root
-    export's full public API, and a `PROFILE` constant (`"full"` on the root
-    export, `"common"` on `./common`) on both. `initialize()` now rejects
-    with `INITIALIZATION_FAILED` if the artifact it loaded reports a
-    different profile than the entry point that loaded it — the same
-    detail-free rejection an unusable or version-mismatched artifact already
-    got.
-  - `@redact-secret/wasm` gains a `common` subpath export, shipping the
-    `common` artifact's own glue and `.wasm` beside the unchanged root
-    (`full`) files.
-  - `common`'s findings differ from `full`'s by design: it omits every
-    `provider`-pack detector, so a bare provider token is not detected, and a
-    provider token inside a `common`-detector's context (a `Bearer` header or
-    a contextual assignment) is reported under that detector's type and
-    confidence instead — for example `warn` where `full` would `redact`.
-    Reviewed `common` expectations for the whole canonical corpus are pinned
-    in `conformance/fixtures/common-profile-expectations.json`.
-  - `@redact-secret/core/web-stream` and `@redact-secret/core/node-stream`
-    are not profile-aware yet: their `createWebStreamSanitizer`/
-    `createNodeStreamSanitizer` convenience exports always open a session
-    against `full`, regardless of which entry point a consumer also
-    imported. The `WebStreamSanitizer`/`NodeStreamSanitizer` classes
-    themselves are profile-agnostic — they wrap whichever session they are
-    given — so a `common` consumer can call `createIncrementalSanitizer` from
-    `@redact-secret/core/common` and pass that session into either class
-    directly. Recorded as a known limitation, not fixed by this change
-    ([evidence](docs/audits/evidence/382/README.md)).
-  - CI now builds, qualifies, and uploads the `common` WebAssembly artifact
-    and Node addon exports on every run, and the release workflow verifies
-    the published `@redact-secret/wasm` root artifact reports `profile()
-    === "full"` before publishing, so a `common`/tiny build can never publish
-    under the `full`/default package identity.
-- Built the `common` detector-profile WebAssembly artifact beside the
-  default `full` one (issue #381, epic #377,
-  `decision-define-detector-profile-and-pack-contract`). `bindings/wasm` gains
-  one default-on Cargo feature, `full`. `npm run wasm:build` is unchanged, and
-  `npm run wasm:build:common` builds with `--no-default-features`, linking only
-  the `common` registry constructors for both whole-input and incremental
-  scans. Both artifacts export a new `profile()` function (`"full"` or
-  `"common"`). Additive: `full` findings are unchanged, and its `.wasm` is
-  +140 B raw / −41 B brotli with no removed export. Measured on the real
-  artifacts, `common` saves 12,222 B brotli (15.8%) and scans 2.9–6.1× faster
-  on Chromium, Firefox, and WebKit
-  ([evidence](docs/audits/evidence/381/README.md)). Its reviewed findings over
-  the canonical corpus are pinned in
-  `conformance/fixtures/common-profile-expectations.json`.
-- Added the `common` detector profile to the Rust public API (issue #380,
-  epic #377, `decision-define-detector-profile-and-pack-contract`): `Profile`,
-  `DetectorRegistry::with_common_built_in`, `DetectorRegistry::profile`,
-  `IncrementalSanitizer::with_common_built_in`, and
-  `IncrementalSanitizer::with_common_built_in_policy_and_formatter`. A profile
-  constructor rejects a custom detector that reuses any `full` built-in id.
-  `DetectorRegistry::register` applies no profile's reserved-id rule, so
-  extending a registry through it clears `profile()` to `None`. Additive:
-  `with_built_in` and its findings are unchanged.
-- Corrected four release-qualification accuracy-corpus fixtures to the
-  frozen provider grammars below and re-pinned both acceptance-criteria
-  files to `assessment/results/complete-v4/` and
-  `assessment/results/complete-linux-x64-v4/` (issue #376,
-  `decision-gate-beta5-on-precision-gains-and-positive-preservation`).
-  Accuracy counts are unchanged (21 true positives, 1 false positive, 5 false
-  negatives on all five surfaces); only the corpus bytes and hash moved. The
-  macOS profile's fixed performance thresholds are not re-derived, and every
-  non-Rust surface currently misses them by roughly 20–30%; the decision
-  record describes that open gap.
-- Added `npm run benchmark:candidate`, which builds the committed source as
-  immutable npm tarballs and evaluates them at one exact
-  `redact-secret-benchmarks` commit (issue #390,
-  [guide](docs/benchmark-candidate.md)). Development tooling only; no
-  published package changes.
-- Fixed `slack-token` reporting a rotating `xoxe.xoxb-` value whose body also
-  satisfies the `xoxb-` bot grammar as two overlapping candidates, which left
-  the `xoxe.` prefix outside the redacted range. The whole value is one
-  finding again, as in beta.4.
-- Narrowed `linear-token`'s `lin_api_` variant to Linear's reviewed API-key
-  contract: `lin_api_` followed by exactly 40 bytes of `[A-Za-z0-9]`, bounded
-  by the existing `[A-Za-z0-9_-]` boundary alphabet (issue #374, contract
-  review #367). gitleaks v8.30.1's `linear-api-key` rule and trufflehog
-  v3.97.4's `linearapi` rule independently pin the body to this exact length
-  and agree it excludes `_`/`-`. The previous rule accepted any
-  20-or-more-byte `[A-Za-z0-9_-]` suffix, so `@redact-secret/core@0.1.0-beta.4`
-  flagged a 39-byte twin of the benchmark's paired positive; that twin is now
-  rejected while the paired positive keeps its exact byte range. Intentional
-  behavior changes: a body one byte short of or past 40 bytes, or an
-  underscore or dash inside an otherwise documented-length body, no longer
-  match. `lin_oauth_` is unaffected: no consulted provider or tool source
-  documents its grammar (Linear's own OAuth example is a bare 64-character
-  hex string), so it keeps beta.4's 20-byte-minimum `[A-Za-z0-9_-]` rule
-  unchanged as a separate interim guard, and the 40-byte API-key length is
-  deliberately not reused for it. The detector moved out of the shared
-  `KnownFormatProviderDetector` shape in `additional_providers.rs` into its
-  own `linear.rs` module, composed directly from the shared `pattern`
-  primitives, because the two prefixes now need different suffix alphabets
-  that single shared type cannot express — the same way `slack-token` and
-  `cloudflare-token` moved out for their own per-prefix needs.
-- Narrowed `cloudflare-token` to Cloudflare's reviewed scannable user-token
-  contract: `cfut_` followed by exactly 40 bytes of `[A-Za-z0-9]` (the body)
-  and then exactly 8 bytes of `[0-9a-f]` (the checksum), bounded by the
-  existing `[A-Za-z0-9_-]` boundary alphabet (issue #373, contract review
-  #367). Cloudflare's token documentation establishes the `cfut_` prefix and
-  the 40-byte alphanumeric body; trufflehog v3.97.4's `cloudflareapitoken` v2
-  rule additionally corroborates the 8-byte lowercase-hex checksum segment
-  that follows it — the provider states a checksum follows the body but does
-  not publish its width or alphabet, so its existence is provider evidence
-  (a bare 40-byte body is malformed) while its width and alphabet are a
-  single-tool-corroborated support-policy adoption, validated lexically only:
-  no checksum algorithm is computed or claimed. The previous rule accepted
-  any 20-or-more-byte `[A-Za-z0-9_-]` suffix, so
-  `@redact-secret/core@0.1.0-beta.4` flagged an eight-byte non-hex twin of the
-  benchmark's paired positive; that twin is now rejected while the paired
-  positive keeps its exact byte range. Intentional behavior changes: a body
-  one byte short of or past 40 bytes, an underscore or dash inside an
-  otherwise documented-length body, a checksum one byte short of or past 8
-  bytes, or an uppercase-hex checksum no longer match. The detector moved out
-  of the shared `KnownFormatProviderDetector` shape in
-  `additional_providers.rs` into its own `cloudflare.rs` module, composed
-  directly from the shared `pattern` primitives plus a post-hoc checksum
-  check, the same way `grafana-service-account-token` and `sendgrid-token`
-  already handle their own two-segment shapes. The earlier broad-shape
-  positives in the conformance corpus were re-authored with a contracted
-  body and checksum; the repeated-`x` filler placeholder
-  (`cloudflare-positive-doc-style-placeholder`) and the retired minimum-length
-  positive (`cloudflare-positive-min-length`) are now reclassified as
-  intentional false negatives in favor of a dedicated
-  `cloudflare-token-checksum-suffix` grammar-mutation family (identity,
-  body-one-short, body-one-long, body-invalid-alphabet, checksum-one-short,
-  checksum-one-long, checksum-non-hex, checksum-uppercase-hex —
-  `conformance/fixtures/cloudflare-token-mutations.ts` reproduces every case
-  byte-for-byte), and the `cloudflare-adversarial-long-suffix` input now
-  yields exactly one finding bounded to the documented 48-byte suffix instead
-  of matching the whole 11251-byte run. No detector id, finding type,
-  confidence, specificity, default policy, or public interface changed.
+Beta.5 narrows seven provider grammars for precision, closes two detection
+gaps and an unbounded-input default, and adds the opt-in `common` detector
+profile, a Node WebAssembly fallback, musl Node packages, and Cloudflare
+Workers support. Grammar provenance, measurements, and intentional false
+negatives stay in the linked decision records and `docs/audits/evidence/`.
 
-- Narrowed `huggingface-token` to Hugging Face's reviewed user-access-token
-  contract: `hf_` followed by exactly 34 bytes, matched case-sensitively and
-  bounded by the existing `[A-Za-z0-9_-]` boundary alphabet (issue #372,
-  contract review #367). gitleaks v8.30.1 and trufflehog v3.97.4 independently
-  agree on the 34-byte length; the two tools disagree on the body alphabet
-  (gitleaks: letters only; trufflehog: letters and digits), and that conflict
-  is resolved as a support-policy choice for the union `[A-Za-z0-9]` rather
-  than guessed into the letters-only intersection, so a digit-bearing body is
-  still accepted even though it stays unscored (T0) in the benchmark corpus
-  pending independent review. The previous rule accepted any 20-or-more-byte
-  `[A-Za-z0-9_-]` suffix, so `@redact-secret/core@0.1.0-beta.4` flagged a
-  33-byte twin of the benchmark's paired positive; that twin is now rejected
-  while the paired positive keeps its exact byte range. Intentional behavior
-  changes: an underscore or dash inside an otherwise documented-length body,
-  or a body one byte short of or past 34 bytes, no longer matches — both tools
-  agree the body excludes `_`/`-`, so that acceptance under the retired shared
-  rule was a shared-rule artifact, not evidence. The earlier broad-shape
-  positives in the conformance corpus were re-authored with contracted
-  bodies; the repeated-`x` filler placeholder
-  (`huggingface-positive-doc-style-placeholder`) and the retired minimum-length
-  positive (`huggingface-positive-min-length`) are now reclassified as
-  intentional false negatives in favor of a dedicated
-  `huggingface-token-exact-length` grammar-mutation family (identity,
-  one-short, one-long, invalid-alphabet, underscore-in-body, dash-in-body,
-  digit-bearing — `conformance/fixtures/huggingface-token-mutations.ts`
-  reproduces every case byte-for-byte), and the
-  `huggingface-adversarial-long-suffix` input now yields exactly one finding
-  bounded to the documented 34-byte body instead of matching the whole
-  11250-byte run. No detector id, finding type, confidence, specificity,
-  default policy, or public interface changed.
+### Breaking and compatibility changes
 
-- Narrowed the `slack-token` detector's `xoxb-` bot form (issue #371,
-  `docs/decisions/2026-09-17-freeze-slack-bot-token-segment-grammar.md`) from
-  one shared 20-byte minimum of `[A-Za-z0-9_-]` to the reviewed three-section
-  shape `xoxb-<10-13 digits>-<10-13 digits>-<18+ alphanumeric>`: the
-  provider documents sections as `-`-separated with the final section as the
-  secret, so a value whose second numeric section runs straight into the
-  secret with no separator is now an intentional false negative, not a
-  fuzzy match. The published beta.4 package flagged the benchmark's two
-  missing-separator twins of this shape; both are now silent, and both
-  paired positives are preserved. Every other documented prefix (`xoxp-`,
-  `xapp-`, `xwfp-`, `xoxe-`, `xoxe.xoxb-`, `xoxe.xoxp-`) keeps beta.4's rule
-  unchanged as a separate interim guard. Thirteen synchronous and two
-  incremental conformance fixtures that had been authored to the retired
-  shared minimum with no digit sections keep their inputs and have their
-  expectations corrected in place, each note naming the decision; a
-  full-grammar value under a generic assignment key
-  (`slack-overlap-context-bot-grammar`) still resolves to `slack-token`
-  over `generic-token`'s contextual candidate, while a body with no digit
-  sections under the same key (`slack-overlap-context`) is now owned by
-  `generic-token` instead, and the same body after a literal `Bearer`
-  scheme (`slack-positive-unicode-byte-offset`) is now owned by
-  `bearer-token`. Detector id, finding type, confidence, specificity,
-  default policy, and every public interface are unchanged. Internally,
-  Slack moved out of the shared `KnownFormatProviderDetector` shape into
-  its own module (`crates/secret-scan-core/src/detectors/slack.rs`), since
-  the bot section grammar needs a `-`-separated section shape the shared
-  prefix-plus-run primitives cannot express; its other prefixes keep the
-  same interim shape, composed directly from the shared `pattern`
-  primitives.
+- Whole-input `scan`, `redact`, and `scan_and_redact` on every binding now
+  default to 64 MiB of input and 50,000 findings, and fail closed beyond them
+  with `INPUT_LIMIT_EXCEEDED` or the new `FINDING_LIMIT_EXCEEDED` (#439,
+  `decision-bound-whole-input-operations-by-default`). Raise the limits with
+  `scan_with_limits`/`redact_with_limits`/`scan_and_redact_with_limits` and
+  `WholeInputLimits` in Rust, a `limits: { maxInputBytes, maxFindings }`
+  option in JavaScript, or `limits=redact_secret.WholeInputLimits(...)` in
+  Python, or chunk through the incremental API. The CLI's 64 MiB read bound
+  is unchanged; its file scans now also stop at 50,000 findings. The messages
+  for `INVALID_LIMITS` and `INPUT_LIMIT_EXCEEDED` now describe both whole-input
+  and incremental limits. JavaScript rejects a negative, fractional, or
+  larger-than-`u32` limit with `INVALID_LIMITS` instead of letting the binding
+  wrap it (for example `-1` to 4 GiB); this also applies to incremental limits.
+- Every finding now carries `obfuscation` (#447, below). `redact()` on the
+  Node addon rejects a finding without it with `INVALID_FINDINGS`, and
+  TypeScript requires it on `SecretFinding`. Findings returned by `scan()`
+  for the same input, the documented contract, are unaffected; a hand-built
+  finding or one serialized from beta.4 is not. The CLI text report inserts
+  `obfuscation=` before `id=`.
+- Rust: `SecretScanErrorCode` gains `FindingLimitExceeded` and is not
+  `#[non_exhaustive]`, so an exhaustive `match` needs a new arm.
+- `@redact-secret/wasm` now declares an `exports` map (`.`, `./common`, the two
+  `.wasm` binaries, and `./package.json`). Deep imports of its other files no
+  longer resolve. The package is an implementation dependency of
+  `@redact-secret/core` and is not meant for direct use.
 
-- Narrowed the `docker-token` detector (issue #370,
-  `decision-freeze-docker-pat-oat-exact-length-grammar`) from one shared
-  20-byte minimum under either prefix to two separately validated
-  exact-length shapes: `dckr_pat_` followed by exactly 27 bytes of
-  `[A-Za-z0-9_-]` (personal access token) and `dckr_oat_` followed by
-  exactly 32 bytes of the same alphabet (organization access token), the
-  lengths trufflehog's `dockerhub` v2 detector (`v3.97.4`) enforces. The
-  published beta.4 package flagged the benchmark's 26-byte and 31-byte
-  near-miss twins of both shapes; those, a one-byte-long suffix, and either
-  length under the other prefix are now intentional false negatives. Every
-  previously supported 27-byte fixture is preserved, and both exact shapes
-  are now covered bare, quoted, in JSON/dotenv/YAML/log/Markdown, after
-  Unicode/CRLF, repeated, adjacent to their twins, under contextual
-  assignment keys, and across every incremental chunk split
-  (`conformance/fixtures/docker-token-mutations.ts` reproduces the
-  boundary mutations byte-for-byte). Seven synchronous and two incremental
-  conformance fixtures that had been authored to the retired minimum with
-  20-, 25-, 36-, or 11250-byte suffixes keep their inputs and have their
-  expectations corrected in place, each note naming the decision; a 36-byte
-  value under a generic assignment key (`docker-overlap-context`) is now
-  owned by `generic-token` as a `contextual_secret` and is still redacted.
-  Detector id, finding type, confidence, specificity, default policy, and
-  every public interface are unchanged. Internally, `pattern.rs` gains
-  `PrefixShape` and `scan_prefixed_shapes` so one detector can carry a
-  different run length per prefix; every other prefix-run detector's
-  behavior is unchanged.
+### Security fixes
 
-- Narrowed `openai-token` to OpenAI's actual key grammar (issue #368,
-  `docs/decisions/2026-09-17-freeze-openai-api-key-grammar.md`). A value is
-  now classified only when it carries the literal `T3BlbkFJ` marker (base64
-  `OpenAI`) between two segments of a source-documented exact length:
-  `sk-` + 20 + marker + 20 alphanumerics (legacy), or
-  `sk-proj-`/`sk-svcacct-`/`sk-admin-` + 74 or 58 + marker + 74 or 58 bytes
-  of `[A-Za-z0-9_-]`, each variant validated independently with no fallback
-  from a malformed namespaced form to the legacy form. The previous rule
-  accepted any `sk-` value with a 20-byte minimum suffix, which flagged the
-  six beta.4 benchmark controls that differ from a real key by one marker
-  byte or one segment byte. Marker-less `sk-` values are no longer
-  classified by this detector; an assignment such as `api_key=` or a Bearer
-  credential carrying one still surfaces through `generic-token` or
-  `bearer-token`. `sk-admin-` is newly named as a supported namespace (it
-  was already caught by the old bare branch); `sk-service-` is documented
-  as unsupported. Detector id, finding type, confidence, policy class, and
-  the public API are unchanged. The fourteen pre-existing marker-less
-  corpus positives are kept and reclassified in place, with
-  contract-conformant counterparts, the issue's twelve inputs, and
-  one-byte-off boundary mutations added to the synchronous and incremental
-  corpora. The assessment accuracy corpus's `code-openai-api-key` fixture is
-  intentionally left for the next evidence re-pin (see the decision record).
+- Overlap resolution ranks candidates by resolved action (`Block > Redact >
+  Warn > Allow`) before specificity (#450,
+  `decision-resolve-overlap-precedence-by-resolved-action-severity`). A
+  medium-confidence `new_relic_license_key`, `twilio_auth_token`,
+  `twilio_api_key_secret`, `datadog_api_key`, or `datadog_application_key`
+  candidate could previously displace a stricter-resolving candidate on the
+  same span, such as `bearer_token`, and leave the credential warned but
+  unredacted. Only inputs with that overlap change.
+- An invisible code point inside a credential no longer defeats detection
+  (#438, #445, `decision-normalize-invisible-characters-before-detection`).
+  The core removes `Default_Ignorable_Code_Point ∪ Cf` (pinned UCD 17.0.0)
+  into a scan copy before detection and translates every range back to the
+  original input in each binding's unit. A removed code point inside a value
+  is redacted with it. Text that is credential-shaped only after removal is
+  now a finding, and an invisible character no longer acts as a token
+  boundary. Custom Rust detectors also receive the scan copy.
 
-- Narrowed `digitalocean-token` to DigitalOcean's reviewed v1 token contract:
-  each documented prefix (`dop_v1_` personal access token, `doo_v1_` OAuth
-  access token, `dor_v1_` OAuth refresh token) followed by exactly 64
-  lowercase hexadecimal bytes, matched case-sensitively and bounded by the
-  existing `[A-Za-z0-9_-]` boundary alphabet (issue #369, contract review
-  #367). DigitalOcean's API release notes (2022-03-29) establish the prefixes;
-  gitleaks v8.30.1 and trufflehog v3.97.4 independently pin the body to
-  `[a-f0-9]{64}`. The previous rule accepted any 20-or-more-byte
-  `[A-Za-z0-9_-]` suffix, so `@redact-secret/core@0.1.0-beta.4` flagged a
-  63-byte twin of every paired positive (six must-not-flag benchmark files);
-  those twins are now rejected while every paired positive keeps its exact
-  byte range. Intentional behavior changes: a 65-byte or wider hex run, an
-  uppercase hex digit, a non-hex body byte, or a body shorter than 64 bytes no
-  longer matches, so the earlier broad-shape positives in the conformance
-  corpus were re-authored with contracted bodies; the repeated-`x` filler
-  placeholder (`digitalocean-positive-doc-style-placeholder`) is now the
-  negative `digitalocean-negative-doc-style-placeholder`, the minimum-length
-  positive `digitalocean-positive-min-length` was retired in favor of the
-  `digitalocean-v1` identity/short-length mutation pair, and the
-  `digitalocean-adversarial-long-suffix` input now yields zero findings. No
-  detector id, finding type, policy class, public option, or result shape
-  changed.
+### Added
 
-- Froze reviewed precision contracts for the `openai-token`,
-  `digitalocean-token`, `docker-token`, `slack-token`, `huggingface-token`,
-  `cloudflare-token` and `linear-token` detectors (issue #367, decision
-  `docs/decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md`).
-  This is evidence and tooling only: `docs/audits/evidence/367/` records each
-  family's supported variants, segment grammar, lengths, alphabets, markers,
-  source provenance and resolved source conflicts, freezes the beta.4
-  negative-twin baseline by construction recipe and content hash, and audits
-  every existing fixture for those families against the contract.
-  `npm run precision-contracts:check` (now part of `npm run ci`) keeps the
-  derived evidence consistent. No detector behavior, public interface,
-  detector id or finding type changes in this entry; the behavior changes
-  the contracts call for land with issues #368-#374 and are described in the
-  decision record.
+- The opt-in `common` detector profile in Rust, the Node addon, WebAssembly,
+  and `@redact-secret/core`, but not Python or the CLI (#377: #380, #381,
+  #382, #416, `decision-define-detector-profile-and-pack-contract`).
+  `full` stays the default and is unchanged. `common` omits the provider-pack
+  detectors, so a bare provider token is not detected, and one inside a
+  `Bearer` header or contextual assignment is reported under that detector's
+  type and confidence, for example warned where `full` redacts. Its reviewed
+  corpus expectations are pinned in
+  `conformance/fixtures/common-profile-expectations.json`. The `common`
+  WebAssembly artifact is 15.8% smaller (brotli) and scans 2.9–6.1× faster in
+  the three browser engines ([evidence](docs/audits/evidence/381/README.md)).
+  - Rust: `Profile`, `DetectorRegistry::with_common_built_in` and `profile()`,
+    and `IncrementalSanitizer::with_common_built_in`,
+    `with_common_built_in_policy_and_formatter`, and `profile()`. A profile
+    constructor rejects a custom detector that reuses a `full` built-in id;
+    `DetectorRegistry::register` clears `profile()` to `None`.
+  - Node addon: `profile()` and `initializeCommon`, `scanCommon`,
+    `scanAndRedactCommon`, `createIncrementalSanitizerCommon`, and
+    `profileCommon`, served by the same compiled addon.
+  - `@redact-secret/wasm`: `profile()` and a `common` subpath shipping that
+    build's own glue and `.wasm`.
+  - `@redact-secret/core`: `./common`, `./common/node-stream`,
+    `./common/web-stream`, and a `PROFILE` constant. `initialize()` rejects
+    with `INITIALIZATION_FAILED` when the loaded artifact reports a different
+    profile. The `./common` stream subpaths never load the `full` artifact.
+  - The release workflow checks that the root `@redact-secret/wasm` artifact
+    reports `full` and the companion reports `common` before publishing (#417).
+- `obfuscation` on every finding (#447): `"invisible-characters"` when the
+  finding's range strictly contains a code point the normalization removed,
+  otherwise `"none"`. It carries no value or offset. Rust `Obfuscation` with
+  `Finding::obfuscation()` and `DetectedFinding::obfuscation()`; the CLI's
+  `obfuscation` JSON and `obfuscation=` text fields; and an `obfuscation`
+  property on Node, WebAssembly, Python, and `@redact-secret/core` findings
+  (typed `SecretObfuscation`).
+  `DefaultPolicy` does not act on it.
+- Node WebAssembly fallback (#443, `decision-add-node-wasm-fallback`): when
+  the native addon is unavailable — an unsupported platform, a failed
+  optional-dependency install, or an unloadable addon — `initialize()` loads
+  the `@redact-secret/wasm` artifact for the same profile instead of rejecting.
+  A version or profile mismatch still rejects. The new `artifact()` export
+  (`ArtifactKind`) reports `"addon"` or `"wasm"`.
+- musl Linux Node packages `@redact-secret/node-linux-x64-musl` and
+  `@redact-secret/node-linux-arm64-musl` (#443,
+  `decision-publish-musl-node-addons`). On Linux the loader picks the glibc or
+  musl package by the detected libc. npm now carries ten package identities.
+  The CLI still ships no musl binary.
+- Cloudflare Workers support (#462, `decision-verify-edge-runtimes`): a
+  `workerd` import condition loads the WebAssembly binary through new
+  `@redact-secret/wasm/redact_secret_wasm_bg.wasm` and
+  `redact_secret_wasm_common_bg.wasm` subpath exports. Vercel Edge was tested
+  and remains unsupported.
+
+### Changed detection
+
+- Seven provider detectors now match only their reviewed grammars (#367–#374,
+  `decision-freeze-precision-contracts-seven-provider-families`). Each rejects
+  the near-miss twins beta.4 flagged, and every paired positive keeps its
+  exact range. Fixed-corpus twin discrimination rose from 32/56 to 56/56 with
+  every required positive preserved
+  (`decision-gate-beta5-on-precision-gains-and-positive-preservation`).
+  Detector ids, finding types, confidence, specificity, and default policy
+  are unchanged.
+  - `openai-token`: the `T3BlbkFJ` marker between exact-length segments —
+    `sk-` 20 + 20, or `sk-proj-`/`sk-svcacct-`/`sk-admin-` 74 or 58 on each
+    side (`decision-freeze-openai-api-key-grammar`). Marker-less `sk-` values
+    surface only through `generic-token` or `bearer-token` context.
+  - `digitalocean-token`: `dop_v1_`, `doo_v1_`, or `dor_v1_` and exactly 64
+    lowercase hex characters.
+  - `docker-token`: `dckr_pat_` and 27, or `dckr_oat_` and 32, characters of
+    `[A-Za-z0-9_-]` (`decision-freeze-docker-pat-oat-exact-length-grammar`).
+  - `slack-token` `xoxb-`: `<10–13 digits>-<10–13 digits>-<18+ alphanumerics>`
+    (`decision-freeze-slack-bot-token-segment-grammar`). Other Slack prefixes
+    keep beta.4's rule, and a rotating `xoxe.xoxb-` value is still one finding.
+  - `huggingface-token`: `hf_` and exactly 34 characters of `[A-Za-z0-9]`.
+  - `cloudflare-token`: `cfut_`, 40 characters of `[A-Za-z0-9]`, and an 8-character
+    lowercase-hex checksum, validated lexically only.
+  - `linear-token` `lin_api_`: exactly 40 characters of `[A-Za-z0-9]`;
+    `lin_oauth_` is unchanged.
+
+  Per-family provenance, the beta.4 negative-twin baseline, and fixture
+  reclassifications are in `docs/audits/evidence/367/` and
+  `docs/audits/evidence/376/`.
+
+### Internal, tooling, and qualification
+
+- Overlap resolution selects the disjoint candidate subset with the greatest
+  total evidence instead of a greedy pass (#451,
+  `decision-select-optimal-disjoint-candidates-by-total-evidence-weight`). No
+  canonical fixture changes.
+- Artifact qualification now runs the Node WebAssembly fallback and the
+  Cloudflare Workers path for both profiles. The Node consumer lanes require
+  `artifact()` to report `"addon"`, so a silent fallback cannot pass them. The
+  release and reconcile workflows publish, repair, and registry-install-verify
+  all eight native packages, the musl lanes in Alpine containers.
+  `check-artifact-matrix.py` enforces those matrices against
+  `node-publish-targets`, and `check-rust-workspace.py` enforces the facade's
+  exact runtime-package pins.
+- `npm run benchmark:candidate` (#390), a benchmark pin drift check and
+  regression ledger (#426–#429), a re-pinned release accuracy corpus (#376),
+  and a dated macOS performance waiver asserted by the acceptance test
+  (#415). Development tooling only.
+- Decision records for a declarative detector ruleset contract (#441; not yet
+  implemented) and for moving the pino, Python `logging`, and OpenTelemetry
+  adapters to the separate `redact-secret-adapters` repository (#442). No
+  package in this repository changes.
 
 ## 0.1.0-beta.4 — 2026-09-17
 

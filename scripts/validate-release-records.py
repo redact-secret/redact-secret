@@ -15,15 +15,26 @@ EXPECTED_ARTIFACTS = {
     "crate:redact-secret", "crate:redact-secret-cli", "npm:@redact-secret/core",
     "npm:@redact-secret/wasm", "npm:@redact-secret/node-darwin-arm64",
     "npm:@redact-secret/node-darwin-x64", "npm:@redact-secret/node-linux-arm64-gnu",
-    "npm:@redact-secret/node-linux-x64-gnu", "npm:@redact-secret/node-win32-arm64-msvc",
+    "npm:@redact-secret/node-linux-arm64-musl", "npm:@redact-secret/node-linux-x64-gnu",
+    "npm:@redact-secret/node-linux-x64-musl", "npm:@redact-secret/node-win32-arm64-msvc",
     "npm:@redact-secret/node-win32-x64-msvc", "pypi:redact-secret",
 }
-# `decision-publish-musl-node-addons` extends `node-publish-targets` to eight
-# triples, but every recorded release under `docs/releases/` to date
-# (0.1.0-beta.1/2/4) genuinely shipped only these eleven artifacts — this set
-# validates those real, frozen records and must not be edited to match a
-# capability this repository has not yet released under. Add the two musl
-# npm artifacts here only once an actual release record reflects them.
+MUSL_ARTIFACTS = {"npm:@redact-secret/node-linux-arm64-musl", "npm:@redact-secret/node-linux-x64-musl"}
+# Every release published before `decision-publish-musl-node-addons` shipped
+# eleven artifacts and verified six Node install lanes. Their records are
+# frozen evidence, so they keep that shape; every later release publishes and
+# install-verifies the two musl addon packages as well.
+PRE_MUSL_RELEASES = frozenset({"0.1.0-beta.1", "0.1.0-beta.2", "0.1.0-beta.3", "0.1.0-beta.4"})
+
+
+def expected_artifacts(version: str) -> set[str]:
+    return EXPECTED_ARTIFACTS - MUSL_ARTIFACTS if version in PRE_MUSL_RELEASES else EXPECTED_ARTIFACTS
+
+
+def expected_node_lanes(version: str) -> int:
+    return 6 if version in PRE_MUSL_RELEASES else 8
+
+
 SHA40 = re.compile(r"^[0-9a-f]{40}$")
 SHA64 = re.compile(r"^[0-9a-f]{64}$")
 VERSION = re.compile(r"^(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-[0-9A-Za-z.-]+)?$")
@@ -59,8 +70,10 @@ def conformance_identity(root: Path, source: str) -> str | None:
 def validate_evidence(manifest: dict, inventory: dict, label: str) -> None:
     evidence = manifest.get("release_evidence") or manifest.get("recovery_evidence")
     require(isinstance(evidence, dict), f"{label}: missing release/recovery evidence")
+    version = manifest["version"]
+    artifacts = expected_artifacts(version)
     registries = evidence.get("registries")
-    require(isinstance(registries, dict) and set(registries) == EXPECTED_ARTIFACTS,
+    require(isinstance(registries, dict) and set(registries) == artifacts,
             f"{label}: registry evidence artifact set mismatch")
     for artifact, record in registries.items():
         require(isinstance(record, dict), f"{label}: {artifact} evidence must be an object")
@@ -91,7 +104,8 @@ def validate_evidence(manifest: dict, inventory: dict, label: str) -> None:
                 f"{label}: invalid workflow run reference")
     verification = evidence.get("verification")
     require(isinstance(verification, dict), f"{label}: missing clean-install verification")
-    require(len(verification.get("node", [])) == 6, f"{label}: six Node install lanes required")
+    lanes = expected_node_lanes(version)
+    require(len(verification.get("node", [])) == lanes, f"{label}: {lanes} Node install lanes required")
     require(verification.get("browser") == "chromium", f"{label}: Chromium verification required")
 
 
@@ -107,9 +121,10 @@ def validate_record(root: Path, directory: Path, changelog: str) -> None:
     require(manifest.get("version") == version and inventory.get("productVersion") == version,
             f"{label}: version mismatch")
     require(inventory.get("sourceCommit") == source, f"{label}: source revision mismatch")
-    require(set(manifest.get("artifact_set", [])) == EXPECTED_ARTIFACTS, f"{label}: artifact set mismatch")
+    artifacts = expected_artifacts(version)
+    require(set(manifest.get("artifact_set", [])) == artifacts, f"{label}: artifact set mismatch")
     state = manifest.get("registry_state")
-    require(isinstance(state, dict) and set(state) == EXPECTED_ARTIFACTS,
+    require(isinstance(state, dict) and set(state) == artifacts,
             f"{label}: registry state artifact set mismatch")
     require(set(state.values()) == {"published"}, f"{label}: final registry state must be complete and published")
     fixtures = inventory.get("conformanceFixtures")

@@ -9,8 +9,9 @@ name: Artifact qualification
 # workflow; the N-API addon for every triple in `node-addon-targets`; the
 # browser WebAssembly artifact in every engine in `browser-engines`; the CLI
 # binary for every triple in `cli-release-targets`; clean installed-package
-# streaming checks across every declared Node major and browser engine; and
-# finally one inventory job that records what was produced and qualified,
+# streaming checks across every declared Node major and browser engine; the
+# Node WebAssembly fallback and Cloudflare Workers paths; and finally one
+# inventory job that records what was produced and qualified,
 # tied to the source commit.
 #
 # `[workspace.metadata.redact-secret]` in the root Cargo.toml is the single
@@ -115,6 +116,10 @@ jobs:
                   break
                   ;;
                 scripts/qualify-runtime-fixture.mjs|scripts/record-artifact-inventory.py)
+                  pr=true
+                  break
+                  ;;
+                scripts/qualify-node-wasm-fallback.mjs|scripts/qualify-workerd-artifact.mjs)
                   pr=true
                   break
                   ;;
@@ -681,6 +686,62 @@ jobs:
           name: installed-javascript-browser-${{ matrix.engine }}
           path: installed-javascript-browser-${{ matrix.engine }}.json
           if-no-files-found: error
+
+  # The Node WebAssembly fallback (`decision-add-node-wasm-fallback`) and the
+  # Cloudflare Workers path (`decision-verify-edge-runtimes`) run the
+  # `browser` job's builds rather than an artifact of their own, so both are
+  # qualified here against exactly those builds, for both detector profiles.
+  # No native addon is downloaded, so Node has to take the fallback; Workers
+  # runs in a real local `workerd` through `wrangler dev`.
+  package-consumer-wasm-runtimes:
+    name: Node WebAssembly fallback and Cloudflare Workers
+    runs-on: ubuntu-latest
+    needs: [plan, browser]
+    if: needs.plan.outputs.full == 'true'
+    timeout-minutes: 20
+    permissions:
+      contents: read
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Build the JavaScript package
+        run: npm run js:build
+
+      - name: Download the qualified wasm-bindgen build
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: wasm-web
+          path: dist/wasm-web
+
+      - name: Download the qualified common wasm-bindgen build
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: wasm-web-common
+          path: dist/wasm-web-common
+
+      - name: Qualify the Node WebAssembly fallback
+        run: |
+          node scripts/qualify-node-wasm-fallback.mjs --wasm-dir dist/wasm-web
+          node scripts/qualify-node-wasm-fallback.mjs --wasm-dir dist/wasm-web-common --detector-profile common
+
+      - name: Qualify the Cloudflare Workers runtime path
+        run: |
+          node scripts/qualify-workerd-artifact.mjs --wasm-dir dist/wasm-web
+          node scripts/qualify-workerd-artifact.mjs --wasm-dir dist/wasm-web-common --detector-profile common
+
   inventory:
     name: Artifact inventory
     runs-on: ubuntu-latest
@@ -695,6 +756,7 @@ jobs:
       - pr-macos-smoke
       - package-consumer-node
       - package-consumer-browser
+      - package-consumer-wasm-runtimes
     if: always()
     permissions:
       contents: read
@@ -737,6 +799,7 @@ jobs:
           CLI_RESULT: ${{ needs.cli.result }}
           NODE_CONSUMER_RESULT: ${{ needs.package-consumer-node.result }}
           BROWSER_CONSUMER_RESULT: ${{ needs.package-consumer-browser.result }}
+          WASM_RUNTIMES_RESULT: ${{ needs.package-consumer-wasm-runtimes.result }}
         run: |
           for result in \
             "$POLICY_RESULT" \
@@ -746,7 +809,8 @@ jobs:
             "$BROWSER_RESULT" \
             "$CLI_RESULT" \
             "$NODE_CONSUMER_RESULT" \
-            "$BROWSER_CONSUMER_RESULT"; do
+            "$BROWSER_CONSUMER_RESULT" \
+            "$WASM_RUNTIMES_RESULT"; do
             if [[ "$result" != "success" ]]; then
               echo "Artifact inventory cannot pass because an upstream job finished with '$result'." >&2
               exit 1

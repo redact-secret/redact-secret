@@ -109,6 +109,7 @@ pull request does not trigger it.
 | `cli` | Builds the CLI for each triple and qualifies the binary |
 | `package-consumer-node` | Installs packed candidate packages in a clean directory and exercises public scan, incremental, and Node stream APIs on Node.js 20, 22, and 24 |
 | `package-consumer-browser` | Installs the same candidates and exercises public scan, incremental, and Web stream APIs in Chromium, Firefox, and WebKit |
+| `package-consumer-wasm-runtimes` | Qualifies the Node WebAssembly fallback and the Cloudflare Workers path against the `browser` job's builds, for both detector profiles |
 | `inventory` | Requires the whole declared matrix and records what was built |
 
 Because `rust` and `python` are called workflows rather than copies, their
@@ -292,6 +293,12 @@ never be allowed to load in the first place. The package-level pass here
 links the local build under whichever specifier the runtime resolves, which
 is why it passes on musl too.
 
+After publication, the release workflow's `verify-registry-install` job
+clean-installs the exact published version on all eight native platforms:
+six host lanes, plus the two musl lanes, which install and verify inside a
+`node:22-alpine` container of the same architecture. `Reconcile Release`
+covers the same eight.
+
 `scripts/check-artifact-matrix.py` keeps this boundary from drifting: adding
 a target to `node-publish-targets` without also adding its
 `bindings/node/npm/<platform>/package.json`, its
@@ -323,12 +330,14 @@ loader resolves, deliberately without linking any addon, then drives the
 published package's public API — `initialize()`, `artifact()`, a
 synchronous scan, an incremental session, and the Node `Transform` stream
 adapter — and asserts every one of them matches the same artifact's
-whole-input result. Unlike `node-addon`/`browser`, this is not (yet) its own
-CI qualification job: no host in the current matrix is missing a native
-addon by design, so there is no natural place in the fan-out to run it
-against every platform the way the addon and browser artifacts are. Run it
-locally after `npm run wasm:build` and `npm run js:build` (see "Running it
-locally" below); a dedicated CI lane is left to a follow-up.
+whole-input result. The artifact-qualification workflow's
+`package-consumer-wasm-runtimes` job runs it on every full qualification
+run, for both detector profiles, against the `browser` job's own builds;
+it downloads no addon, so Node has to take the fallback. It runs on one
+Linux host rather than across the native fan-out, since no host in that
+matrix is missing an addon by design. Run it locally after
+`npm run wasm:build` and `npm run js:build` (see "Running it locally"
+below).
 
 ## Cloudflare Workers and Vercel Edge (`decision-verify-edge-runtimes`)
 
@@ -360,10 +369,9 @@ from disk.
 this against the real, built package in a real `wrangler dev` sandbox, for
 both detector profiles: `initialize()`, `artifact()` (asserted `"wasm"`), a
 synchronous scan against the canonical fixture, `redact`, `scanAndRedact`,
-and one incremental session. As with `node-wasm-fallback:qualify`, this is
-not (yet) wired into `npm run ci` or the artifact-qualification workflow's
-matrix — no host in the current CI matrix runs `workerd` — so a dedicated CI
-lane is left to a follow-up.
+and one incremental session. The same `package-consumer-wasm-runtimes` job
+runs it on every full qualification run, for both profiles, in a real local
+`workerd` through `wrangler dev`. It is not part of `npm run ci`.
 
 **Vercel Edge remains unsupported.** `@edge-runtime/vm` — the reference
 engine Vercel publishes and that `next dev`/`vercel dev` use locally to run

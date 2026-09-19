@@ -105,8 +105,10 @@ body, and scan again at the authoritative server boundary.
 
 ## Current limitations
 
-Node support is 20, 22, and 24 on the six published non-musl targets. Retain npm
-optional dependencies so the matching native addon can be installed. Both the
+Node support is 20, 22, and 24 on the eight published targets, glibc and
+musl Linux included. Retain npm optional dependencies so the matching native
+addon can be installed; without one, `initialize()` falls back to the
+WebAssembly artifact and `artifact()` returns `"wasm"`. Both the
 Node artifact and the browser (WebAssembly) artifact support
 `createIncrementalSanitizer` and their respective stream factories
 (`createNodeStreamSanitizer`, `createWebStreamSanitizer`); do not scan

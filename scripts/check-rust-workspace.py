@@ -14,7 +14,8 @@ Checks, in order:
    ``packages/javascript/package.json``), the WebAssembly package manifest
    (``bindings/wasm/npm/package.json``), and every native platform package
    manifest discovered under ``bindings/node/npm/*/package.json`` share one
-   product version.
+   product version, and every ``@redact-secret/*`` dependency those manifests
+   declare is pinned to exactly that version.
 4. Node engines: every manifest in ``LOCKSTEP_MANIFESTS`` and every native
    platform package manifest declares ``engines.node`` as exactly the Node
    majors ``ci.yml``'s ``test`` job matrix exercises, so the promised
@@ -220,9 +221,19 @@ def check_version_lockstep(root: Path, metadata: dict, root_manifest: dict) -> l
         if not path.is_file():
             errors.append(f"{relative}: missing lockstep manifest")
             continue
-        found = json.loads(path.read_text(encoding="utf-8")).get("version")
+        manifest = json.loads(path.read_text(encoding="utf-8"))
+        found = manifest.get("version")
         if found != version:
             errors.append(f"{relative}: version {found} differs from workspace version {version}")
+        # The facade pins its runtime packages exactly. Pre-publish consumer
+        # qualification substitutes local tarballs for them, so a stale pin
+        # would first surface as a registry install of the wrong version.
+        for field in ("dependencies", "optionalDependencies"):
+            for name, pinned in sorted((manifest.get(field) or {}).items()):
+                if name.startswith("@redact-secret/") and pinned != version:
+                    errors.append(
+                        f"{relative}: {field} pins {name} to {pinned}, not workspace version {version}"
+                    )
     return errors
 
 

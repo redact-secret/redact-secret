@@ -354,6 +354,9 @@ fn select_optimal_disjoint_set(mut ranked: Vec<RankedCandidate<'_>>) -> Vec<Rank
 /// surviving findings ordered by input offset with ids `finding-1`,
 /// `finding-2`, and so on.
 ///
+/// Detectors run over a scan copy of `input` with invisible code points
+/// removed; every returned range indexes `input` itself.
+///
 /// A candidate whose full matched text exactly equals a documented
 /// vendor-placeholder literal (an internal, fixed exemption list) is
 /// dropped before validation, regardless of which detector proposed it.

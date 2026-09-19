@@ -30,7 +30,7 @@ span in the input; it never carries the bytes in that span, and no renderer
 has the input available to resolve one.
 
 ```text
-<source>:<start>-<end> <type> detector=<id> confidence=<level> action=<action> id=<finding>
+<source>:<start>-<end> <type> detector=<id> confidence=<level> action=<action> obfuscation=<none|invisible-characters> id=<finding>
 ```
 
 `--json` writes one object with `version`, `rangeUnit`, `findingCount`, a

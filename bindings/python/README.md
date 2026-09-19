@@ -51,6 +51,12 @@ Ranges on every `DetectedFinding` and `Finding` are Unicode code point offsets
 (`redact_secret.RANGE_UNIT == "unicode-code-points"`), so they index a `str` the
 way Python itself does.
 
+`scan`, `redact`, and `scan_and_redact` default to a 64 MiB input bound and a
+50,000 finding-count bound, raising `InputLimitExceededError`/
+`FindingLimitExceededError` rather than returning a truncated result. Pass
+`limits=redact_secret.WholeInputLimits(max_input_bytes=..., max_findings=...)`
+to raise or lower them.
+
 For input that arrives in pieces, `IncrementalSanitizer` sanitizes a bounded
 session chunk by chunk. Independently scanning chunks is unsafe, because a
 credential may cross any chunk boundary; a session carries the boundary state

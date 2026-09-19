@@ -201,7 +201,7 @@ jobs:
           git show "$SOURCE_REVISION:packages/javascript/package.json" > /tmp/reconcile-package.json
           [[ "$(node -p "require('/tmp/reconcile-package.json').version")" == "$VERSION" ]]
 
-      # Reconciles each of the six native `@redact-secret/node-<platform>`
+      # Reconciles each of the eight native `@redact-secret/node-<platform>`
       # packages and `@redact-secret/wasm` independently
       # (`scripts/reconcile-artifact-plan.py`'s `plan_independent` shape):
       # already-published packages are left alone,
@@ -223,7 +223,9 @@ jobs:
             [darwin-arm64]=aarch64-apple-darwin
             [darwin-x64]=x86_64-apple-darwin
             [linux-arm64-gnu]=aarch64-unknown-linux-gnu
+            [linux-arm64-musl]=aarch64-unknown-linux-musl
             [linux-x64-gnu]=x86_64-unknown-linux-gnu
+            [linux-x64-musl]=x86_64-unknown-linux-musl
             [win32-arm64-msvc]=aarch64-pc-windows-msvc
             [win32-x64-msvc]=x86_64-pc-windows-msvc
           )
@@ -494,8 +496,14 @@ jobs:
             runner: macos-15-intel
           - target: aarch64-unknown-linux-gnu
             runner: ubuntu-24.04-arm
+          - target: aarch64-unknown-linux-musl
+            runner: ubuntu-24.04-arm
+            libc: musl
           - target: x86_64-unknown-linux-gnu
             runner: ubuntu-latest
+          - target: x86_64-unknown-linux-musl
+            runner: ubuntu-latest
+            libc: musl
           - target: aarch64-pc-windows-msvc
             runner: windows-11-arm
           - target: x86_64-pc-windows-msvc
@@ -514,6 +522,7 @@ jobs:
         run: git show "$GITHUB_SHA:scripts/verify-registry-install.mjs" > scripts/verify-registry-install.mjs
 
       - name: Set up Node.js
+        if: matrix.libc != 'musl'
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version: 22
@@ -523,10 +532,23 @@ jobs:
       # lane needs it); the node lane below never calls it, but still needs
       # it importable.
       - name: Install dependencies
+        if: matrix.libc != 'musl'
         run: npm ci --ignore-scripts
 
       - name: Verify the registry-backed clean install
+        if: matrix.libc != 'musl'
         run: node scripts/verify-registry-install.mjs --lane node
+
+      # A musl addon cannot be loaded by the glibc runner's Node.js, so the
+      # musl lanes install and verify inside a musl image of the same
+      # architecture, as `artifact-qualification.yml`'s addon lanes do.
+      # `--user` keeps the checkout free of root-owned files.
+      - name: Verify the registry-backed clean install on musl
+        if: matrix.libc == 'musl'
+        run: |
+          docker run --rm --user "$(id -u):$(id -g)" -e HOME=/tmp \
+            -v "$PWD:/io" -w /io node:22-alpine \
+            sh -c 'npm ci --ignore-scripts && node scripts/verify-registry-install.mjs --lane node'
 
   verify-registry-install-browser:
     name: Verify registry install (browser)

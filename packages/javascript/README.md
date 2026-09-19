@@ -14,9 +14,13 @@ core, so both runtimes see the same findings for the same input.
 npm install @redact-secret/core
 ```
 
-Node.js 20, 22, and 24 are supported, on glibc Linux, macOS, and Windows
-(x64 and arm64). npm does not ship a musl/Alpine addon. Browser applications
-need ES2022 and WebAssembly support. The package is ESM only.
+Node.js 20, 22, and 24 are supported, on glibc and musl Linux, macOS, and
+Windows (x64 and arm64). Where no addon can load — an unsupported platform, a
+failed optional-dependency install, or an unloadable addon — `initialize()`
+falls back to the WebAssembly artifact, and `artifact()` reports `"addon"` or
+`"wasm"`. Cloudflare Workers is supported through the `workerd` export
+condition; Vercel Edge is not. Browser applications need ES2022 and
+WebAssembly support. The package is ESM only.
 
 See the [JavaScript guide](https://github.com/redact-secret/redact-secret/blob/main/docs/guides/javascript.md)
 for browser asset loading and troubleshooting.
@@ -60,9 +64,14 @@ const redacted = redact(input, findings);
 
 `scanAndRedact` does the same in one call, so the text and the findings cannot
 disagree. `redact` expects the findings `scan` returned for that same input.
+Each call is bounded by default to 64 MiB of input and 50,000 findings; pass
+`limits: { maxInputBytes, maxFindings }` to change that. Exceeding a bound
+fails with `INPUT_LIMIT_EXCEEDED` or `FINDING_LIMIT_EXCEEDED` rather than
+truncating.
 
 Every finding is frozen and carries only safe metadata — id, type, detector,
-confidence, action, and a range. It never carries the matched value.
+confidence, action, a range, and `obfuscation` (`"none"` or
+`"invisible-characters"`). It never carries the matched value.
 
 ## Offsets are UTF-16 code units
 
@@ -246,15 +255,15 @@ mapped to the same fixed error vocabulary.
 
 ## Public API
 
-Runtime values: `initialize`, `scan`, `redact`, `scanAndRedact`,
+Runtime values: `initialize`, `artifact`, `scan`, `redact`, `scanAndRedact`,
 `createIncrementalSanitizer`, `defaultPlaceholderFormatter`,
 `typedPlaceholderFormatter`, `SecretScanError`, `RANGE_UNIT`, `VERSION`,
 `PROFILE`.
 
-Types: `DetectedSecretFinding`, `SecretFinding`, `SecretAction`,
-`SecretConfidence`, `SecretPolicy`, `PolicyContext`, `PlaceholderFormatter`,
+Types: `ArtifactKind`, `DetectedSecretFinding`, `SecretFinding`, `SecretAction`,
+`SecretConfidence`, `SecretObfuscation`, `SecretPolicy`, `PolicyContext`, `PlaceholderFormatter`,
 `PlaceholderContext`, `ScanOptions`, `RedactOptions`, `ScanAndRedactOptions`,
-`ScanResult`, `IncrementalSanitizer`, `IncrementalSanitizerOptions`,
+`ScanResult`, `WholeInputLimits`, `IncrementalSanitizer`, `IncrementalSanitizerOptions`,
 `IncrementalSanitizerResult`, `IncrementalSanitizerState`,
 `IncrementalLimits`, `IncrementalSecretPolicy`, `IncrementalPolicyContext`,
 `RangeUnit`, `SecretScanErrorCode`.

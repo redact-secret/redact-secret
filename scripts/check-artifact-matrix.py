@@ -21,13 +21,14 @@ Checks, in order:
    matrix and the target list in ``scripts/qualify-cli-binary.mjs``. It is a
    subset of the addon's: the CLI ships no musl variant.
 3. Node publish matrix: ``node-publish-targets`` (a subset of
-   ``node-addon-targets``: npm ships glibc only, so the addon's two musl
-   triples are qualified but never published) equals the platform
-   directories under ``bindings/node/npm/``, each directory's
-   ``package.json`` ``name``, ``packages/javascript/package.json``'s
-   ``optionalDependencies``, and the package names
-   ``packages/javascript/src/runtime/node.ts`` maps hosts to — so a target
-   cannot gain or lose a publication path in one file alone.
+   ``node-addon-targets``) equals the platform directories under
+   ``bindings/node/npm/``, each directory's ``package.json`` ``name``,
+   ``packages/javascript/package.json``'s ``optionalDependencies``, the
+   package names ``packages/javascript/src/runtime/node.ts`` maps hosts to,
+   the release workflow's publish and registry-install matrices, and the
+   reconcile workflow's platform map and registry-install matrix — so a
+   target cannot gain or lose a publication, repair, or install-verification
+   path in one file alone.
 4. Browser engines: ``browser-engines`` equals the ``browser`` job's matrix
    and the engine list in ``scripts/qualify-browser-artifact.mjs``.
 5. Node.js support: ``node-support-majors`` equals the ``node-version``
@@ -56,6 +57,14 @@ from pathlib import Path
 
 WORKFLOWS = Path(".github") / "workflows"
 WORKFLOW = WORKFLOWS / "artifact-qualification.yml"
+RELEASE_WORKFLOW = WORKFLOWS / "release.yml"
+RECONCILE_WORKFLOW = WORKFLOWS / "reconcile-release.yml"
+# Every job whose matrix names one leg per published native platform package.
+NODE_PUBLISH_JOBS = (
+    (RELEASE_WORKFLOW, "publish-native-dependencies"),
+    (RELEASE_WORKFLOW, "verify-registry-install"),
+    (RECONCILE_WORKFLOW, "verify-registry-install"),
+)
 CI = WORKFLOWS / "ci.yml"
 NODE_PACKAGE = Path("bindings") / "node" / "package.json"
 NATIVE_NPM_DIR = Path("bindings") / "node" / "npm"
@@ -99,6 +108,8 @@ MATRIX_ITEM = re.compile(r"^[ \t]*-[ \t]*(\S+)[ \t]*$", re.M)
 # A `uses:` value: either a local path (`./.github/...`) or `owner/repo@ref`.
 USES = re.compile(r"^\s*(?:-\s+)?uses:\s*(\S+)\s*$", re.M)
 PINNED = re.compile(r"^[^@\s]+@[0-9a-f]{40}$")
+# One `[<platform>]=<target>` entry of the reconcile job's `PLATFORM_TARGETS`.
+PLATFORM_TARGET = re.compile(r"^\s*\[([a-z0-9-]+)\]=([a-z0-9_]+-[a-z0-9_-]+)\s*$", re.M)
 TOP_LEVEL_PERMISSIONS = re.compile(r"^permissions:(?P<inline>[^\n]*)$", re.M)
 JOB_PERMISSION = re.compile(r"^\s{6}(?P<scope>[a-z-]+):\s*(?P<level>\S+)\s*$", re.M)
 
@@ -152,16 +163,17 @@ def compare(label: str, declared, found, where: str) -> list[str]:
 
 
 def check_job_matrix(
-    *, label: str, declared: list[str], workflow: str, job_name: str, key: str
+    *, label: str, declared: list[str], workflow: str, job_name: str, key: str,
+    path: Path = WORKFLOW,
 ) -> list[str]:
     body = job_body(workflow, job_name)
     if body is None:
-        return [f"{WORKFLOW.as_posix()}: missing job {job_name!r}"]
+        return [f"{path.as_posix()}: missing job {job_name!r}"]
     return compare(
         f"job {job_name!r}'s {key} matrix",
         declared,
         matrix_values(body, key),
-        WORKFLOW.as_posix(),
+        path.as_posix(),
     )
 
 
@@ -270,6 +282,29 @@ def check_node_publish_targets(root: Path, policy: dict) -> list[str]:
     else:
         referenced = set(re.findall(r'"(@redact-secret/node-[a-z0-9-]+)"', runtime))
         errors.extend(compare("the platform-package mapping", expected_packages, referenced, RUNTIME_NODE.as_posix()))
+
+    for path, job_name in NODE_PUBLISH_JOBS:
+        workflow = read_text(root, path)
+        if workflow is None:
+            errors.append(f"{path.as_posix()}: missing workflow")
+            continue
+        errors.extend(
+            check_job_matrix(
+                label="publish", declared=declared, workflow=workflow,
+                job_name=job_name, key="target", path=path,
+            )
+        )
+
+    reconcile = read_text(root, RECONCILE_WORKFLOW)
+    body = job_body(reconcile, "reconcile") if reconcile is not None else None
+    if body is not None:
+        expected_pairs = {f"{names[target]}={target}" for target in declared if target in names}
+        found_pairs = {f"{platform}={target}" for platform, target in PLATFORM_TARGET.findall(body)}
+        errors.extend(
+            compare("job 'reconcile''s PLATFORM_TARGETS", expected_pairs, found_pairs, RECONCILE_WORKFLOW.as_posix())
+        )
+    elif reconcile is not None:
+        errors.append(f"{RECONCILE_WORKFLOW.as_posix()}: missing job 'reconcile'")
 
     return errors
 

@@ -12,10 +12,11 @@ N-API native addon (`napi-rs`) for Node.js. Crate: `redact-secret-node`.
   `napi` build configuration; it is never published itself. `npm/` holds one
   tiny publication package per `node-publish-targets` platform triple
   (`@redact-secret/node-<platform>`), each carrying only that platform's
-  built `.node` file. The six packages support Node.js 20, 22, and 24 on
-  glibc Linux, macOS, and Windows, x64 and arm64. `napi.targets` also includes
-  two musl targets that are qualified but have no npm publication package.
-  `packages/javascript` depends on the six publication packages through
+  built `.node` file. The eight packages support Node.js 20, 22, and 24 on
+  glibc and musl Linux, macOS, and Windows, x64 and arm64
+  (`decision-publish-musl-node-addons`); on Linux the loader picks `gnu` or
+  `musl` by detected libc. `packages/javascript` depends on the eight
+  publication packages through
   `optionalDependencies`, and npm's `os`/`cpu`/`libc` fields skip the ones
   that do not match a given install.
 - `createIncrementalSanitizer` wraps the core's `IncrementalSanitizer` the

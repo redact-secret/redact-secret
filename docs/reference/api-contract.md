@@ -13,10 +13,21 @@ additionally takes a registry, policy, and formatter. Python uses optional
 `policy` and `formatter`; JavaScript uses an options object with `policy` and
 `placeholderFormatter`.
 
+Whole-input operations are bounded by default to 64 MiB of input and 50,000
+findings (`decision-bound-whole-input-operations-by-default`). Exceeding a
+bound fails with `INPUT_LIMIT_EXCEEDED` or `FINDING_LIMIT_EXCEEDED` rather
+than truncating. Raise or lower it with JavaScript's
+`limits: { maxInputBytes, maxFindings }` option, Python's
+`limits=WholeInputLimits(...)`, or Rust's `WholeInputLimits` with
+`scan_with_limits`, `redact_with_limits`, and `scan_and_redact_with_limits`.
+
 ## Findings and coordinates
 
-Each finding has `id`, `type`, `detector`, `confidence`, `action`, `start`, and
-`end` (Rust exposes methods and a range object). No matched value is included.
+Each finding has `id`, `type`, `detector`, `confidence`, `action`,
+`obfuscation`, `start`, and `end` (Rust exposes methods and a range object).
+`obfuscation` is `none`, or `invisible-characters` when zero-rendering or
+format code points were removed from the matched span before detection. No
+matched value is included.
 Ranges are half-open: `start` is included and `end` excluded.
 
 | Surface | Unit | Exported `RANGE_UNIT` |
@@ -38,9 +49,13 @@ identities across changed inputs or separate scans.
 
 ## Overlap and replacement
 
-Candidate precedence is specificity, confidence, narrower span, detector order,
-then emission order. The pipeline greedily chooses non-overlapping candidates.
-A policy runs on the selected findings afterward.
+Candidate precedence is resolved-action severity (`block` > `redact` > `warn`
+> `allow`, by the default classification), specificity, confidence, narrower
+span, detector order, then emission order. The pipeline selects the
+non-overlapping subset with the greatest total evidence weight, not a greedy
+walk, so a weaker candidate never displaces an overlapping stricter one, but
+several disjoint candidates can outweigh one overlapping candidate that ties
+them on the stronger keys. A policy runs on the selected findings afterward.
 
 Direct `redact` accepts unsorted findings, sorts them, and rejects overlaps,
 invalid bounds, and ranges off character boundaries. It does not resolve
@@ -55,13 +70,15 @@ encoding of the removed text and cannot be used to recover it.
 
 Two detector profiles exist: `full` (every built-in detector, the default and
 compatibility baseline everywhere) and `common` (a smaller, opt-in
-structural/contextual subset for preventive use). Both Node and browser
-`@redact-secret/core` entry points and the Rust `DetectorRegistry`/
+structural/contextual subset for preventive use). The `@redact-secret/core`
+root and `./common` entry points (in Node, browser, and `workerd` builds;
+`./common/node-stream` and `./common/web-stream` bind streams to `common`)
+and the Rust `DetectorRegistry`/
 `IncrementalSanitizer` constructors expose which profile they were built
 from — the `PROFILE` constant in JavaScript (`"full"` on the root export,
 `"common"` on `./common`), and `DetectorRegistry::profile()` /
 `IncrementalSanitizer::profile()` in Rust. JavaScript `initialize()` rejects
-with `INITIALIZATION_FAILED` if the loaded native artifact reports a
+with `INITIALIZATION_FAILED` if the loaded artifact reports a
 different profile than the entry point that loaded it, the same detail-free
 rejection an unusable or version-mismatched artifact already gets. Python and
 the CLI expose `full` only. See [detection coverage](detection.md#detector-profiles)
