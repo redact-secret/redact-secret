@@ -214,6 +214,19 @@ the declared cap exactly for an optimized one — but never to a value derived
 from the machine it happens to run on. The caps exist to catch superlinear
 blowup, which is orders of magnitude, not a constant factor.
 
+The `invisible-*` fixtures in that tier are the contract for
+`decision-normalize-invisible-characters-before-detection`: a zero-rendering
+or format code point inside a credential, or inside the keyword that gives it
+context, must not change the finding. They cover the five shapes of issue
+#438 (provider grammar, structural authorization header, contextual assignment
+keyword, contextual assignment value, connection URI password), one fixture
+per removed class outside the five-code-point zero-width set (bidi control,
+Tags block, variation selector, Hangul filler, soft hyphen), and
+`invisible-adversarial-dense-seams`, which bounds the worst-case offset map.
+Expected ranges are UTF-8 byte offsets into the **original** input and include
+every removed code point strictly inside the value; a runner that scans a
+normalized copy must translate back before comparing.
+
 ## Fixture safety review
 
 Any addition to the corpus — a new detector's positive case, a hand-authored

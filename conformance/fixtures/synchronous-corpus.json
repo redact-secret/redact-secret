@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 1219,
+  "fixtureCount": 1230,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -28168,6 +28168,303 @@
       "input": "xoxp-SSSSSSSSSSSSSSSSSSS",
       "expected": [],
       "note": "The retained interim `xoxp-` guard keeps beta.4's 20-byte minimum unchanged; a 19-byte body is one below that floor. Issue #375 checkbox 6: explicit boundary evidence for the rotating-forms guard alongside slack-positive-all-prefixes."
+    },
+    {
+      "id": "invisible-provider-grammar-zwnj",
+      "detector": "github-token",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "yaml"
+      ],
+      "resource": {
+        "maxInputBytes": 256,
+        "maxFindings": 1,
+        "maxRuntimeMs": 250
+      },
+      "input": "token: ghp_SYNTHETIC\u200cREVOKED00000000000000000000\n",
+      "expected": [
+        {
+          "detector": "github-token",
+          "type": "github_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 7,
+          "end": 50
+        }
+      ],
+      "note": "U+200C inside a provider-grammar token: detected like its control, and the UTF-8 byte range into the original input includes the interior code point so one placeholder replaces the whole value. Issue #438; decision-normalize-invisible-characters-before-detection."
+    },
+    {
+      "id": "invisible-structural-authorization-zwsp",
+      "detector": "bearer-token",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "http"
+      ],
+      "resource": {
+        "maxInputBytes": 256,
+        "maxFindings": 1,
+        "maxRuntimeMs": 250
+      },
+      "input": "Authorization: Bearer SYNTHETIC\u200bREVOKED_BEARER_VALUE_1234\n",
+      "expected": [
+        {
+          "detector": "bearer-token",
+          "type": "bearer_token",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 22,
+          "end": 59
+        }
+      ],
+      "note": "U+200B inside a Bearer credential: the structural authorization header is detected like its control, range includes the interior code point. Issue #438; decision-normalize-invisible-characters-before-detection."
+    },
+    {
+      "id": "invisible-contextual-keyword-zwsp",
+      "detector": "generic-token",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "dotenv"
+      ],
+      "resource": {
+        "maxInputBytes": 256,
+        "maxFindings": 1,
+        "maxRuntimeMs": 250
+      },
+      "input": "api\u200b_key = SYNTHETIC_REVOKED_VALUE_1234\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 13,
+          "end": 41
+        }
+      ],
+      "note": "U+200B inside the assignment keyword, not the value: the keyword still reads as high-signal on the scan copy; the range selects the untouched value, shifted by the removed code point's three bytes. Issue #438; decision-normalize-invisible-characters-before-detection."
+    },
+    {
+      "id": "invisible-contextual-value-zwsp",
+      "detector": "generic-token",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "dotenv"
+      ],
+      "resource": {
+        "maxInputBytes": 256,
+        "maxFindings": 1,
+        "maxRuntimeMs": 250
+      },
+      "input": "api_key = SYNTHETIC_REVOKED\u200b_VALUE_1234\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 10,
+          "end": 41
+        }
+      ],
+      "note": "U+200B inside a contextual assignment value: detected like its control, range includes the interior code point. Issue #438; decision-normalize-invisible-characters-before-detection."
+    },
+    {
+      "id": "invisible-connection-uri-password-zwsp",
+      "detector": "connection-string",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 256,
+        "maxFindings": 1,
+        "maxRuntimeMs": 250
+      },
+      "input": "postgres://svc:SYNTHETIC\u200bREVOKEDPW@db:5432/app\n",
+      "expected": [
+        {
+          "detector": "connection-string",
+          "type": "connection_string_password",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 15,
+          "end": 36
+        }
+      ],
+      "note": "U+200B inside a connection URI password: detected like its control, range includes the interior code point and excludes the userinfo delimiters. Issue #438; decision-normalize-invisible-characters-before-detection."
+    },
+    {
+      "id": "invisible-class-bidi-override",
+      "detector": "github-token",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "yaml"
+      ],
+      "resource": {
+        "maxInputBytes": 256,
+        "maxFindings": 1,
+        "maxRuntimeMs": 250
+      },
+      "input": "token: ghp_SYNTHETIC\u202eREVOKED00000000000000000000\n",
+      "expected": [
+        {
+          "detector": "github-token",
+          "type": "github_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 7,
+          "end": 50
+        }
+      ],
+      "note": "Non-parity class, bidi control (Trojan Source): U+202E RIGHT-TO-LEFT OVERRIDE inside a provider token is removed from the scan copy. Issue #438; decision-normalize-invisible-characters-before-detection."
+    },
+    {
+      "id": "invisible-class-tag-block",
+      "detector": "github-token",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "yaml"
+      ],
+      "resource": {
+        "maxInputBytes": 256,
+        "maxFindings": 1,
+        "maxRuntimeMs": 250
+      },
+      "input": "token: ghp_\udb40\udc41SYNTHETIC\udb40\udc41REVOKED00000000000000000000\n",
+      "expected": [
+        {
+          "detector": "github-token",
+          "type": "github_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 7,
+          "end": 55
+        }
+      ],
+      "note": "Non-parity class, Unicode Tags block (ASCII smuggling): two astral U+E0041 TAG LATIN CAPITAL LETTER A split a provider token; four UTF-8 bytes each, both inside the range. Removal only: a credential encoded entirely in tag characters is a documented follow-up. Issue #438; decision-normalize-invisible-characters-before-detection."
+    },
+    {
+      "id": "invisible-class-variation-selector",
+      "detector": "github-token",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "yaml"
+      ],
+      "resource": {
+        "maxInputBytes": 256,
+        "maxFindings": 1,
+        "maxRuntimeMs": 250
+      },
+      "input": "token: ghp_SYNTHETICREVOKED0000000000000000000\ufe0f0\n",
+      "expected": [
+        {
+          "detector": "github-token",
+          "type": "github_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 7,
+          "end": 50
+        }
+      ],
+      "note": "Non-parity class, variation selector: U+FE0F before the final character of a provider token. Issue #438; decision-normalize-invisible-characters-before-detection."
+    },
+    {
+      "id": "invisible-class-hangul-filler",
+      "detector": "github-token",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "yaml"
+      ],
+      "resource": {
+        "maxInputBytes": 256,
+        "maxFindings": 1,
+        "maxRuntimeMs": 250
+      },
+      "input": "token: g\u3164hp_SYNTHETICREVOKED00000000000000000000\n",
+      "expected": [
+        {
+          "detector": "github-token",
+          "type": "github_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 7,
+          "end": 50
+        }
+      ],
+      "note": "Non-parity class, Hangul filler: U+3164 inside the provider prefix itself, after its first character. Issue #438; decision-normalize-invisible-characters-before-detection."
+    },
+    {
+      "id": "invisible-class-soft-hyphen-run",
+      "detector": "github-token",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "yaml"
+      ],
+      "resource": {
+        "maxInputBytes": 256,
+        "maxFindings": 1,
+        "maxRuntimeMs": 250
+      },
+      "input": "token: ghp_SYNTHETIC\u00ad\u00ad\u2060REVOKED00000000000000000000\n",
+      "expected": [
+        {
+          "detector": "github-token",
+          "type": "github_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 7,
+          "end": 54
+        }
+      ],
+      "note": "Non-parity class, soft hyphen: a run of U+00AD U+00AD U+2060 inside a provider token is one removed run and one offset-map seam; the range includes all of it. Issue #438; decision-normalize-invisible-characters-before-detection."
+    },
+    {
+      "id": "invisible-adversarial-dense-seams",
+      "detector": "github-token",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "log"
+      ],
+      "resource": {
+        "maxInputBytes": 8192,
+        "maxFindings": 1,
+        "maxRuntimeMs": 250
+      },
+      "input": "x\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00ad\ntoken: ghp_SYNTHETIC\u200cREVOKED00000000000000000000\n",
+      "expected": [
+        {
+          "detector": "github-token",
+          "type": "github_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 6152,
+          "end": 6195
+        }
+      ],
+      "note": "Worst-case offset map: 2,048 alternating kept/removed code points (U+00AD) make two thirds of the line removed bytes and one seam per kept character, then a provider token split by U+200C follows. Bounds normalization and range translation through the adversarial runtime caps rather than a normalization threshold, which would itself be a bypass; the range is translated across every preceding seam. Issue #438; decision-normalize-invisible-characters-before-detection."
     }
   ]
 }

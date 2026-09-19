@@ -237,7 +237,14 @@
         {
           "dimension": "adversarial",
           "evidenceFixtureIds": [
-            "github-adversarial-long-suffix"
+            "github-adversarial-long-suffix",
+            "invisible-adversarial-dense-seams",
+            "invisible-class-bidi-override",
+            "invisible-class-hangul-filler",
+            "invisible-class-soft-hyphen-run",
+            "invisible-class-tag-block",
+            "invisible-class-variation-selector",
+            "invisible-provider-grammar-zwnj"
           ],
           "state": "supported"
         },
@@ -321,6 +328,13 @@
             "host-typescript-github",
             "host-xml-github",
             "host-yaml-github",
+            "invisible-adversarial-dense-seams",
+            "invisible-class-bidi-override",
+            "invisible-class-hangul-filler",
+            "invisible-class-soft-hyphen-run",
+            "invisible-class-tag-block",
+            "invisible-class-variation-selector",
+            "invisible-provider-grammar-zwnj",
             "mutation-github-00-identity",
             "mutation-github-06-punctuation-boundary",
             "mutation-github-07-quoted",
@@ -2903,7 +2917,8 @@
         {
           "dimension": "adversarial",
           "evidenceFixtureIds": [
-            "bearer-adversarial-punctuation"
+            "bearer-adversarial-punctuation",
+            "invisible-structural-authorization-zwsp"
           ],
           "state": "supported"
         },
@@ -3003,7 +3018,8 @@
           "evidenceFixtureIds": [
             "connection-adversarial-azure-overlong",
             "connection-adversarial-malformed-authority",
-            "connection-adversarial-overlong"
+            "connection-adversarial-overlong",
+            "invisible-connection-uri-password-zwsp"
           ],
           "state": "supported"
         },
@@ -3196,6 +3212,7 @@
             "connection-positive-redis-password-only",
             "connection-positive-rediss-fragment",
             "connection-regression-placeholder-embedded-in-password",
+            "invisible-connection-uri-password-zwsp",
             "regression-malformed-percent-authority"
           ],
           "state": "supported"
@@ -3387,7 +3404,9 @@
         {
           "dimension": "adversarial",
           "evidenceFixtureIds": [
-            "contextual-adversarial-overlong"
+            "contextual-adversarial-overlong",
+            "invisible-contextual-keyword-zwsp",
+            "invisible-contextual-value-zwsp"
           ],
           "state": "supported"
         },
@@ -3541,6 +3560,8 @@
             "contextual-positive-vals-scheme-prefix-still-detected",
             "generic-token-regression-sql-bind-lookalike-still-detected",
             "generic-token-regression-windows-env-lookalike-still-detected",
+            "invisible-contextual-keyword-zwsp",
+            "invisible-contextual-value-zwsp",
             "regression-nested-credential-under-parent-key",
             "regression-placeholder-embedded-in-high-entropy-value",
             "regression-placeholder-word-with-unrelated-tokens",
@@ -4693,6 +4714,17 @@
             "grafana-cloud-access-policy-token-adversarial-long-suffix",
             "grafana-service-account-token-adversarial-near-miss-body",
             "huggingface-adversarial-long-suffix",
+            "invisible-adversarial-dense-seams",
+            "invisible-class-bidi-override",
+            "invisible-class-hangul-filler",
+            "invisible-class-soft-hyphen-run",
+            "invisible-class-tag-block",
+            "invisible-class-variation-selector",
+            "invisible-connection-uri-password-zwsp",
+            "invisible-contextual-keyword-zwsp",
+            "invisible-contextual-value-zwsp",
+            "invisible-provider-grammar-zwnj",
+            "invisible-structural-authorization-zwsp",
             "jwt-adversarial-incomplete",
             "linear-adversarial-long-suffix",
             "microsoft-entra-client-secret-adversarial-long-padding",
@@ -5040,6 +5072,17 @@
             "grafana-cloud-access-policy-token-adversarial-long-suffix",
             "grafana-service-account-token-adversarial-near-miss-body",
             "huggingface-adversarial-long-suffix",
+            "invisible-adversarial-dense-seams",
+            "invisible-class-bidi-override",
+            "invisible-class-hangul-filler",
+            "invisible-class-soft-hyphen-run",
+            "invisible-class-tag-block",
+            "invisible-class-variation-selector",
+            "invisible-connection-uri-password-zwsp",
+            "invisible-contextual-keyword-zwsp",
+            "invisible-contextual-value-zwsp",
+            "invisible-provider-grammar-zwnj",
+            "invisible-structural-authorization-zwsp",
             "jwt-adversarial-incomplete",
             "linear-adversarial-long-suffix",
             "microsoft-entra-client-secret-adversarial-long-padding",

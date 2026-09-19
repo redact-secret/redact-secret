@@ -138,7 +138,7 @@
     {
       "detector": "github-token",
       "evidence": {
-        "fixtureCount": 47,
+        "fixtureCount": 54,
         "hostContextsExercised": [
           "chat",
           "curl",
@@ -1181,8 +1181,9 @@
     {
       "detector": "bearer-token",
       "evidence": {
-        "fixtureCount": 15,
+        "fixtureCount": 16,
         "hostContextsExercised": [
+          "http",
           "json",
           "log",
           "plain-text"
@@ -1214,7 +1215,7 @@
     {
       "detector": "connection-string",
       "evidence": {
-        "fixtureCount": 85,
+        "fixtureCount": 86,
         "hostContextsExercised": [
           "dotenv",
           "javascript",
@@ -1412,7 +1413,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 115,
+        "fixtureCount": 117,
         "hostContextsExercised": [
           "chat",
           "dotenv",
@@ -1492,7 +1493,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 115,
+        "fixtureCount": 117,
         "hostContextsExercised": [
           "chat",
           "dotenv",

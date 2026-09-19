@@ -107,6 +107,8 @@ mod detectors;
 mod entropy;
 mod error;
 mod incremental;
+mod invisible_table;
+mod normalize;
 mod pipeline;
 mod policy;
 mod redact;

@@ -160,7 +160,10 @@ incremental-sanitization consequence. Detectors are unchanged and inspect the
 scan copy; they cannot tell normalization occurred.
 
 Candidate validation rejects malformed, empty, out-of-bounds, or invalid UTF-8
-boundary ranges. Candidates are then ranked by specificity, confidence, span
+boundary ranges. It runs against the scan copy the candidate was detected in;
+the range is then translated into the original input and re-checked there, so
+ranking, overlap resolution, finding numbering, and redaction operate on
+original coordinates only. Candidates are then ranked by specificity, confidence, span
 width, detector registration order, and detector emission order. A deterministic
 greedy pass accepts only mutually disjoint ranges. Final findings are ordered by
 their original-input position and assigned stable one-based IDs.
