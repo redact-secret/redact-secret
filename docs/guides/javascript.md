@@ -42,6 +42,24 @@ formats. To reject a request, choose `block` and check the returned actions
 before any downstream use. [Safe integration](safe-integration.md) explains
 that distinction and failure handling.
 
+## Whole-input limits
+
+`scan`, `redact`, and `scanAndRedact` default to a 64 MiB input bound and a
+50,000 finding-count bound (`decision-bound-whole-input-operations-by-default`),
+failing closed with `INPUT_LIMIT_EXCEEDED`/`FINDING_LIMIT_EXCEEDED` — never a
+truncated result. Pass an explicit `limits` option to raise or lower the
+bound:
+
+```ts
+import { initialize, scanAndRedact } from "@redact-secret/core";
+
+await initialize();
+const result = scanAndRedact("API_KEY=SYNTHETIC_REVOKED_CONTEXT_VALUE", {
+  limits: { maxInputBytes: 128 * 1024 * 1024, maxFindings: 100_000 },
+});
+console.log(result.text); // API_KEY=<SECRET_1>
+```
+
 ## Detector profiles
 
 `@redact-secret/core` is `full`: every built-in detector, and the default and

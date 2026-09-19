@@ -72,6 +72,16 @@ export interface NativeScanAndRedactResult {
   readonly findings: readonly NativeFinding[];
 }
 
+/**
+ * Explicit byte and finding-count bounds for `scan`, `redact`, and
+ * `scanAndRedact`. Omit to use the core's default
+ * (`decision-bound-whole-input-operations-by-default`).
+ */
+export interface NativeWholeInputLimits {
+  readonly maxInputBytes: number;
+  readonly maxFindings: number;
+}
+
 export interface NativeIncrementalLimits {
   readonly maxInputCodeUnits: number;
   readonly maxBufferedCodeUnits: number;
@@ -107,16 +117,19 @@ export interface NativeBinding {
   scan(
     input: string,
     policy: NativePolicyCallback | undefined,
+    limits: NativeWholeInputLimits | undefined,
   ): readonly NativeFinding[];
   redact(
     input: string,
     findings: readonly NativeFinding[],
     formatter: NativeFormatterCallback | undefined,
+    limits: NativeWholeInputLimits | undefined,
   ): string;
   scanAndRedact(
     input: string,
     policy: NativePolicyCallback | undefined,
     formatter: NativeFormatterCallback | undefined,
+    limits: NativeWholeInputLimits | undefined,
   ): NativeScanAndRedactResult;
   createIncrementalSanitizer(
     options: NativeIncrementalOptions,

@@ -3,8 +3,12 @@
  *
  * Every code and message below is fixed and input-free: no error carries the
  * scanned input, a matched value, a placeholder, or a failing callback's own
- * message (`decision-define-runtime-bindings`). Sixteen codes come from the
- * Rust core; `NOT_INITIALIZED` and `INITIALIZATION_FAILED` are produced by the
+ * message (`decision-define-runtime-bindings`). Seventeen codes come from the
+ * Rust core — including `FINDING_LIMIT_EXCEEDED` and the broadened
+ * `INPUT_LIMIT_EXCEEDED`/`INVALID_LIMITS`, shared between incremental
+ * sessions and whole-input `scan`/`redact`/`scanAndRedact`
+ * (`decision-bound-whole-input-operations-by-default`); `NOT_INITIALIZED` and
+ * `INITIALIZATION_FAILED` are produced by the
  * binding layer, `INVALID_CHUNK` and `INVALID_UTF8` by the stream adapters,
  * `UNPAIRED_SURROGATE` by this package's own runtime-neutral input check. The
  * package normalizes all of them into the same class so
@@ -35,6 +39,7 @@ export type SecretScanErrorCode =
   | "INVALID_PLACEHOLDER"
   | "INVALID_LIMITS"
   | "INPUT_LIMIT_EXCEEDED"
+  | "FINDING_LIMIT_EXCEEDED"
   | "BUFFER_LIMIT_EXCEEDED"
   | "TOKEN_LIMIT_EXCEEDED"
   | "MULTILINE_LIMIT_EXCEEDED"
@@ -57,8 +62,9 @@ const ERROR_MESSAGES: Readonly<Record<SecretScanErrorCode, string>> = {
   INVALID_FINDINGS: "Redaction findings are invalid.",
   PLACEHOLDER_FAILURE: "The placeholder formatter failed.",
   INVALID_PLACEHOLDER: "The placeholder formatter returned an invalid value.",
-  INVALID_LIMITS: "Incremental sanitizer limits are invalid.",
-  INPUT_LIMIT_EXCEEDED: "Incremental sanitizer input limit exceeded.",
+  INVALID_LIMITS: "Secret scan limits are invalid.",
+  INPUT_LIMIT_EXCEEDED: "Secret scan input limit exceeded.",
+  FINDING_LIMIT_EXCEEDED: "Secret scan finding limit exceeded.",
   BUFFER_LIMIT_EXCEEDED: "Incremental sanitizer buffer limit exceeded.",
   TOKEN_LIMIT_EXCEEDED: "Incremental sanitizer token limit exceeded.",
   MULTILINE_LIMIT_EXCEEDED: "Incremental sanitizer multiline limit exceeded.",

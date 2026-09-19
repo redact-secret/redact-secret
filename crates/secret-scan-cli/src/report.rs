@@ -444,7 +444,7 @@ mod tests {
         report.write_diagnostics(&mut diagnostics).unwrap();
         assert_eq!(
             String::from_utf8(diagnostics).unwrap(),
-            "redact-secret: b.bin: INPUT_LIMIT_EXCEEDED: Incremental sanitizer input limit exceeded.\n"
+            "redact-secret: b.bin: INPUT_LIMIT_EXCEEDED: Secret scan input limit exceeded.\n"
         );
     }
 

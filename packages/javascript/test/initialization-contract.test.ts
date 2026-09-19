@@ -173,6 +173,48 @@ describe("finding normalization", () => {
     expect(Object.isFrozen(findings)).toBe(true);
   });
 
+  it("passes whole-input limits through to the binding, and omits them by default", async () => {
+    const binding = createFakeBinding({ findings: [sampleFinding] });
+    const runtime = createRedactSecretRuntime(async () => binding, "full");
+    await runtime.initialize();
+
+    runtime.scan("API_KEY=x");
+    expect(binding.lastLimits).toBeUndefined();
+
+    runtime.scan("API_KEY=x", {
+      limits: { maxInputBytes: 1_024, maxFindings: 10 },
+    });
+    expect(binding.lastLimits).toEqual({ maxInputBytes: 1_024, maxFindings: 10 });
+
+    runtime.redact("API_KEY=x", [], {
+      limits: { maxInputBytes: 2_048, maxFindings: 20 },
+    });
+    expect(binding.lastLimits).toEqual({ maxInputBytes: 2_048, maxFindings: 20 });
+
+    runtime.scanAndRedact("API_KEY=x", {
+      limits: { maxInputBytes: 4_096, maxFindings: 40 },
+    });
+    expect(binding.lastLimits).toEqual({ maxInputBytes: 4_096, maxFindings: 40 });
+  });
+
+  it("rejects a malformed whole-input limits value before it reaches the binding", async () => {
+    const binding = createFakeBinding();
+    const runtime = createRedactSecretRuntime(async () => binding, "full");
+    await runtime.initialize();
+
+    expect(() =>
+      runtime.scan("x", {
+        limits: { maxInputBytes: "not a number" } as never,
+      }),
+    ).toThrowError(
+      expect.objectContaining({
+        name: "SecretScanError",
+        code: "INVALID_OPTIONS",
+      }),
+    );
+    expect(binding.calls).toEqual(["initialize"]);
+  });
+
   it("routes the exported default formatter to the binding's own built-in", async () => {
     const { defaultPlaceholderFormatter, typedPlaceholderFormatter } =
       await import("../src/formatters.js");

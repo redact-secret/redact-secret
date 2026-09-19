@@ -19,8 +19,8 @@ use napi_derive::napi;
 use redact_secret::{
     Action, ByteRange, Confidence, DefaultPolicy, DetectedFinding, DetectorRegistry, Finding,
     FormatterFailure, Obfuscation, PlaceholderContext, PlaceholderFormatter, Policy, PolicyContext,
-    Profile, SecretScanError, SecretScanErrorCode, default_placeholder_formatter,
-    redact as core_redact, run_detector_pipeline,
+    Profile, SecretScanError, SecretScanErrorCode, WholeInputLimits, default_placeholder_formatter,
+    redact_with_limits as core_redact_with_limits, run_detector_pipeline,
 };
 
 use crate::error::to_js_error;
@@ -108,6 +108,32 @@ pub struct JsScanAndRedactResult {
     pub findings: Vec<JsFinding>,
     /// `input` with `redact`/`block` findings replaced by placeholders.
     pub redacted: String,
+}
+
+/// Explicit byte and finding-count bounds for [`scan`], [`redact`], and
+/// [`scan_and_redact`] (and their `common`-profile counterparts). Omit to use
+/// the core's default (`decision-bound-whole-input-operations-by-default`).
+#[napi(object)]
+#[allow(clippy::struct_field_names)]
+pub struct JsWholeInputLimits {
+    /// The largest whole-input byte length accepted.
+    pub max_input_bytes: u32,
+    /// The largest accepted finding count.
+    pub max_findings: u32,
+}
+
+/// Resolves an optional [`JsWholeInputLimits`] to a core [`WholeInputLimits`],
+/// using the core's default when `limits` is omitted.
+fn resolve_whole_input_limits(
+    limits: Option<&JsWholeInputLimits>,
+) -> Result<WholeInputLimits, SecretScanError> {
+    match limits {
+        Some(limits) => WholeInputLimits::new(
+            limits.max_input_bytes as usize,
+            limits.max_findings as usize,
+        ),
+        None => Ok(WholeInputLimits::default()),
+    }
 }
 
 /// A JavaScript policy callback: `(finding, context) => action`.
@@ -266,12 +292,19 @@ fn from_js_finding(input: &str, finding: &JsFinding) -> Result<Finding, SecretSc
 
 /// Runs the detector pipeline over `input` and evaluates `policy` (or the
 /// core's [`DefaultPolicy`] when absent) once per finding.
+///
+/// Checks `limits` explicitly: unlike [`run_redact`], this function calls
+/// `run_detector_pipeline` directly rather than a core function that already
+/// applies a limit set, so it does not inherit the default bound for free.
 fn run_scan(
     input: &str,
     registry: &DetectorRegistry,
     policy: Option<&PolicyCallback<'_>>,
+    limits: &WholeInputLimits,
 ) -> Result<Vec<Finding>, SecretScanError> {
+    limits.check_input(input)?;
     let detected = run_detector_pipeline(input, registry)?;
+    limits.check_findings(detected.len())?;
     let finding_count = detected.len();
     detected
         .into_iter()
@@ -328,13 +361,14 @@ fn run_redact(
     input: &str,
     findings: &[Finding],
     formatter: Option<&FormatterCallback<'_>>,
+    limits: &WholeInputLimits,
 ) -> Result<String, SecretScanError> {
     match formatter {
         Some(callback) => {
             let adapter = JsFormatterAdapter { callback, input };
-            core_redact(input, findings, &adapter)
+            core_redact_with_limits(input, findings, &adapter, limits)
         }
-        None => core_redact(input, findings, &default_placeholder_formatter),
+        None => core_redact_with_limits(input, findings, &default_placeholder_formatter, limits),
     }
 }
 
@@ -343,16 +377,25 @@ fn run_scan_for_profile(
     profile: Profile,
     input: &str,
     policy: Option<&PolicyCallback<'_>>,
+    limits: &WholeInputLimits,
 ) -> Result<Vec<Finding>, SecretScanError> {
-    with_profile_registry(profile, |registry| run_scan(input, registry, policy))
+    with_profile_registry(profile, |registry| {
+        run_scan(input, registry, policy, limits)
+    })
 }
 
 /// Scans `input` and returns every finding, in input order, with UTF-16
 /// ranges. When `policy` is omitted, the core's default policy chooses each
-/// finding's action.
+/// finding's action. When `limits` is omitted, the core's default whole-input
+/// bound applies (`decision-bound-whole-input-operations-by-default`).
 ///
 /// # Errors
 ///
+/// - `INPUT_LIMIT_EXCEEDED` when `input` exceeds `limits.maxInputBytes` (or
+///   the default).
+/// - `FINDING_LIMIT_EXCEEDED` when the accepted finding count exceeds
+///   `limits.maxFindings` (or the default).
+/// - `INVALID_LIMITS` when `limits` is given and either field is zero.
 /// - `DETECTOR_FAILURE` / `INVALID_CANDIDATE` from the detector pipeline.
 /// - `POLICY_FAILURE` when `policy` throws.
 /// - `INVALID_POLICY_ACTION` when `policy` returns something other than
@@ -367,9 +410,11 @@ pub fn scan(
     input: String,
     #[napi(ts_arg_type = "(finding: JsDetectedFinding, context: JsPolicyContext) => string")]
     policy: Option<PolicyCallback<'_>>,
+    limits: Option<JsWholeInputLimits>,
 ) -> napi::Result<Vec<JsFinding>, String> {
-    let findings =
-        run_scan_for_profile(Profile::Full, &input, policy.as_ref()).map_err(to_js_error)?;
+    let limits = resolve_whole_input_limits(limits.as_ref()).map_err(to_js_error)?;
+    let findings = run_scan_for_profile(Profile::Full, &input, policy.as_ref(), &limits)
+        .map_err(to_js_error)?;
     Ok(findings.iter().map(|f| to_js_finding(&input, f)).collect())
 }
 
@@ -390,19 +435,28 @@ pub fn scan_common(
     input: String,
     #[napi(ts_arg_type = "(finding: JsDetectedFinding, context: JsPolicyContext) => string")]
     policy: Option<PolicyCallback<'_>>,
+    limits: Option<JsWholeInputLimits>,
 ) -> napi::Result<Vec<JsFinding>, String> {
-    let findings =
-        run_scan_for_profile(Profile::Common, &input, policy.as_ref()).map_err(to_js_error)?;
+    let limits = resolve_whole_input_limits(limits.as_ref()).map_err(to_js_error)?;
+    let findings = run_scan_for_profile(Profile::Common, &input, policy.as_ref(), &limits)
+        .map_err(to_js_error)?;
     Ok(findings.iter().map(|f| to_js_finding(&input, f)).collect())
 }
 
 /// Replaces `redact`/`block` findings in `input` with placeholder text,
 /// leaving `warn`/`allow` findings untouched. `findings` is normally the
 /// output of [`scan`] and need not be pre-sorted. When `formatter` is
-/// omitted, the core's default `<SECRET_N>` formatter is used.
+/// omitted, the core's default `<SECRET_N>` formatter is used. When `limits`
+/// is omitted, the core's default whole-input bound applies
+/// (`decision-bound-whole-input-operations-by-default`).
 ///
 /// # Errors
 ///
+/// - `INPUT_LIMIT_EXCEEDED` when `input` exceeds `limits.maxInputBytes` (or
+///   the default).
+/// - `FINDING_LIMIT_EXCEEDED` when `findings.length` exceeds
+///   `limits.maxFindings` (or the default).
+/// - `INVALID_LIMITS` when `limits` is given and either field is zero.
 /// - `INVALID_FINDINGS` when a finding's range is out of bounds, splits a
 ///   UTF-16 surrogate pair, or overlaps another finding, or its `confidence`
 ///   / `action` is not a fixed wire name.
@@ -419,13 +473,15 @@ pub fn redact(
     findings: Vec<JsFinding>,
     #[napi(ts_arg_type = "(finding: JsFinding, context: JsPlaceholderContext) => string")]
     formatter: Option<FormatterCallback<'_>>,
+    limits: Option<JsWholeInputLimits>,
 ) -> napi::Result<String, String> {
+    let limits = resolve_whole_input_limits(limits.as_ref()).map_err(to_js_error)?;
     let native_findings: Vec<Finding> = findings
         .iter()
         .map(|finding| from_js_finding(&input, finding))
         .collect::<Result<_, _>>()
         .map_err(to_js_error)?;
-    run_redact(&input, &native_findings, formatter.as_ref()).map_err(to_js_error)
+    run_redact(&input, &native_findings, formatter.as_ref(), &limits).map_err(to_js_error)
 }
 
 /// Runs [`run_scan_for_profile`] then [`run_redact`] against `profile`,
@@ -435,9 +491,10 @@ fn run_scan_and_redact_for_profile(
     input: &str,
     policy: Option<&PolicyCallback<'_>>,
     formatter: Option<&FormatterCallback<'_>>,
+    limits: &WholeInputLimits,
 ) -> Result<JsScanAndRedactResult, SecretScanError> {
-    let findings = run_scan_for_profile(profile, input, policy)?;
-    let redacted = run_redact(input, &findings, formatter)?;
+    let findings = run_scan_for_profile(profile, input, policy, limits)?;
+    let redacted = run_redact(input, &findings, formatter, limits)?;
     let js_findings = findings.iter().map(|f| to_js_finding(input, f)).collect();
     Ok(JsScanAndRedactResult {
         findings: js_findings,
@@ -461,9 +518,17 @@ pub fn scan_and_redact(
     policy: Option<PolicyCallback<'_>>,
     #[napi(ts_arg_type = "(finding: JsFinding, context: JsPlaceholderContext) => string")]
     formatter: Option<FormatterCallback<'_>>,
+    limits: Option<JsWholeInputLimits>,
 ) -> napi::Result<JsScanAndRedactResult, String> {
-    run_scan_and_redact_for_profile(Profile::Full, &input, policy.as_ref(), formatter.as_ref())
-        .map_err(to_js_error)
+    let limits = resolve_whole_input_limits(limits.as_ref()).map_err(to_js_error)?;
+    run_scan_and_redact_for_profile(
+        Profile::Full,
+        &input,
+        policy.as_ref(),
+        formatter.as_ref(),
+        &limits,
+    )
+    .map_err(to_js_error)
 }
 
 /// The `common`-profile analogue of [`scan_and_redact`]
@@ -482,9 +547,17 @@ pub fn scan_and_redact_common(
     policy: Option<PolicyCallback<'_>>,
     #[napi(ts_arg_type = "(finding: JsFinding, context: JsPlaceholderContext) => string")]
     formatter: Option<FormatterCallback<'_>>,
+    limits: Option<JsWholeInputLimits>,
 ) -> napi::Result<JsScanAndRedactResult, String> {
-    run_scan_and_redact_for_profile(Profile::Common, &input, policy.as_ref(), formatter.as_ref())
-        .map_err(to_js_error)
+    let limits = resolve_whole_input_limits(limits.as_ref()).map_err(to_js_error)?;
+    run_scan_and_redact_for_profile(
+        Profile::Common,
+        &input,
+        policy.as_ref(),
+        formatter.as_ref(),
+        &limits,
+    )
+    .map_err(to_js_error)
 }
 
 #[cfg(test)]
@@ -507,7 +580,10 @@ mod tests {
     }
 
     fn scan_default(input: &str) -> Vec<Finding> {
-        with_profile_registry(Profile::Full, |registry| run_scan(input, registry, None)).unwrap()
+        with_profile_registry(Profile::Full, |registry| {
+            run_scan(input, registry, None, &WholeInputLimits::default())
+        })
+        .unwrap()
     }
 
     #[test]
@@ -544,7 +620,7 @@ mod tests {
         );
         assert!(js_finding.start >= 3);
 
-        let redacted = run_redact(input, &findings, None).unwrap();
+        let redacted = run_redact(input, &findings, None, &WholeInputLimits::default()).unwrap();
         assert!(redacted.starts_with("\u{1F511} Authorization: Bearer <SECRET_1>"));
         assert!(!redacted.contains("sk-syntheticRevokedExampleToken"));
     }
@@ -611,12 +687,12 @@ mod tests {
     fn scan_and_redact_matches_separate_scan_then_redact() {
         let input = "Authorization: Bearer sk-syntheticRevokedExampleToken00000000000000000000";
         let findings = scan_default(input);
-        let redacted = run_redact(input, &findings, None).unwrap();
+        let redacted = run_redact(input, &findings, None, &WholeInputLimits::default()).unwrap();
         let js_findings: Vec<JsFinding> =
             findings.iter().map(|f| to_js_finding(input, f)).collect();
         assert_eq!(js_findings.len(), 1);
 
-        let combined = scan_and_redact(input.to_owned(), None, None).unwrap();
+        let combined = scan_and_redact(input.to_owned(), None, None, None).unwrap();
         assert_eq!(
             combined
                 .findings
@@ -629,7 +705,10 @@ mod tests {
     }
 
     fn scan_common_default(input: &str) -> Vec<Finding> {
-        with_profile_registry(Profile::Common, |registry| run_scan(input, registry, None)).unwrap()
+        with_profile_registry(Profile::Common, |registry| {
+            run_scan(input, registry, None, &WholeInputLimits::default())
+        })
+        .unwrap()
     }
 
     #[test]
@@ -675,12 +754,12 @@ mod tests {
         let input = "postgres://user:SYNTHETIC_REVOKED_PASSWORD@example.test:5432/db";
         let findings = scan_common_default(input);
         assert_eq!(findings.len(), 1);
-        let redacted = run_redact(input, &findings, None).unwrap();
+        let redacted = run_redact(input, &findings, None, &WholeInputLimits::default()).unwrap();
         assert!(!redacted.contains("SYNTHETIC_REVOKED_PASSWORD"));
         let js_findings: Vec<JsFinding> =
             findings.iter().map(|f| to_js_finding(input, f)).collect();
 
-        let combined = scan_and_redact_common(input.to_owned(), None, None).unwrap();
+        let combined = scan_and_redact_common(input.to_owned(), None, None, None).unwrap();
         assert_eq!(
             combined
                 .findings
@@ -690,5 +769,76 @@ mod tests {
             js_findings.iter().map(finding_key).collect::<Vec<_>>()
         );
         assert_eq!(combined.redacted, redacted);
+    }
+
+    /// Asserts `result` is an `Err` whose `status` is `expected`, without
+    /// requiring the `Ok` type to implement `Debug` (several of this
+    /// module's `Ok` types deliberately do not, so plain `unwrap_err()`
+    /// does not typecheck here).
+    fn assert_err_status<T>(result: napi::Result<T, String>, expected: &str) {
+        let error = result.err().expect("expected an error");
+        assert_eq!(error.status, expected);
+    }
+
+    fn tight_limits() -> JsWholeInputLimits {
+        JsWholeInputLimits {
+            max_input_bytes: 5,
+            max_findings: 50,
+        }
+    }
+
+    #[test]
+    fn scan_rejects_input_over_an_explicit_byte_limit() {
+        let input = "abcdef".to_owned();
+        let result = scan(input, None, Some(tight_limits()));
+        assert_err_status(result, "INPUT_LIMIT_EXCEEDED");
+    }
+
+    #[test]
+    fn scan_rejects_a_finding_count_over_an_explicit_bound() {
+        let input = format!(
+            "prefix \u{1F511} AKIA{} suffix ghp_SYNTHETICREVOKED00000000000000000000",
+            "SYNTHETICEXAMPLE"
+        );
+        // Confirms the ordinary default finds more than one, so a limit of 1
+        // is a genuine rejection, not a coincidence of the input.
+        assert!(scan_default(&input).len() > 1);
+
+        let result = scan(
+            input,
+            None,
+            Some(JsWholeInputLimits {
+                max_input_bytes: 1024,
+                max_findings: 1,
+            }),
+        );
+        assert_err_status(result, "FINDING_LIMIT_EXCEEDED");
+    }
+
+    #[test]
+    fn scan_rejects_a_zero_valued_explicit_limit() {
+        let result = scan(
+            "input".to_owned(),
+            None,
+            Some(JsWholeInputLimits {
+                max_input_bytes: 0,
+                max_findings: 50,
+            }),
+        );
+        assert_err_status(result, "INVALID_LIMITS");
+    }
+
+    #[test]
+    fn redact_and_scan_and_redact_also_honor_an_explicit_limit() {
+        let input = "abcdef".to_owned();
+
+        assert_err_status(
+            redact(input.clone(), Vec::new(), None, Some(tight_limits())),
+            "INPUT_LIMIT_EXCEEDED",
+        );
+        assert_err_status(
+            scan_and_redact(input, None, None, Some(tight_limits())),
+            "INPUT_LIMIT_EXCEEDED",
+        );
     }
 }

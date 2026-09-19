@@ -22,6 +22,7 @@ import type {
   NativeIncrementalSanitizer,
   NativePolicyCallback,
   NativeScanAndRedactResult,
+  NativeWholeInputLimits,
 } from "../native.js";
 
 /**
@@ -41,16 +42,19 @@ interface NodeAddon {
   scan(
     input: string,
     policy?: NativePolicyCallback,
+    limits?: NativeWholeInputLimits,
   ): readonly NativeFinding[];
   redact(
     input: string,
     findings: readonly NativeFinding[],
     formatter?: NativeFormatterCallback,
+    limits?: NativeWholeInputLimits,
   ): string;
   scanAndRedact(
     input: string,
     policy?: NativePolicyCallback,
     formatter?: NativeFormatterCallback,
+    limits?: NativeWholeInputLimits,
   ): { readonly findings: readonly NativeFinding[]; readonly redacted: string };
   createIncrementalSanitizer(
     options: NativeIncrementalOptions,
@@ -71,16 +75,19 @@ interface CommonNodeAddon {
   scanCommon(
     input: string,
     policy?: NativePolicyCallback,
+    limits?: NativeWholeInputLimits,
   ): readonly NativeFinding[];
   redact(
     input: string,
     findings: readonly NativeFinding[],
     formatter?: NativeFormatterCallback,
+    limits?: NativeWholeInputLimits,
   ): string;
   scanAndRedactCommon(
     input: string,
     policy?: NativePolicyCallback,
     formatter?: NativeFormatterCallback,
+    limits?: NativeWholeInputLimits,
   ): { readonly findings: readonly NativeFinding[]; readonly redacted: string };
   createIncrementalSanitizerCommon(
     options: NativeIncrementalOptions,
@@ -224,11 +231,13 @@ interface ProfiledAddonMethods {
   scan(
     input: string,
     policy?: NativePolicyCallback,
+    limits?: NativeWholeInputLimits,
   ): readonly NativeFinding[];
   scanAndRedact(
     input: string,
     policy?: NativePolicyCallback,
     formatter?: NativeFormatterCallback,
+    limits?: NativeWholeInputLimits,
   ): { readonly findings: readonly NativeFinding[]; readonly redacted: string };
   createIncrementalSanitizer(
     options: NativeIncrementalOptions,
@@ -251,11 +260,16 @@ function buildBinding(
     initialize: () => {
       methods.initialize();
     },
-    scan: (input, policy) => methods.scan(input, policy),
-    redact: (input, findings, formatter) =>
-      addon.redact(input, findings, formatter),
-    scanAndRedact: (input, policy, formatter): NativeScanAndRedactResult => {
-      const result = methods.scanAndRedact(input, policy, formatter);
+    scan: (input, policy, limits) => methods.scan(input, policy, limits),
+    redact: (input, findings, formatter, limits) =>
+      addon.redact(input, findings, formatter, limits),
+    scanAndRedact: (
+      input,
+      policy,
+      formatter,
+      limits,
+    ): NativeScanAndRedactResult => {
+      const result = methods.scanAndRedact(input, policy, formatter, limits);
       return { text: result.redacted, findings: result.findings };
     },
     createIncrementalSanitizer: (options) =>
@@ -274,9 +288,9 @@ export function createBindingFromAddon(addon: NodeAddon): NativeBinding {
   return buildBinding(addon, {
     profile: () => addon.profile(),
     initialize: () => addon.initialize(),
-    scan: (input, policy) => addon.scan(input, policy),
-    scanAndRedact: (input, policy, formatter) =>
-      addon.scanAndRedact(input, policy, formatter),
+    scan: (input, policy, limits) => addon.scan(input, policy, limits),
+    scanAndRedact: (input, policy, formatter, limits) =>
+      addon.scanAndRedact(input, policy, formatter, limits),
     createIncrementalSanitizer: (options) =>
       addon.createIncrementalSanitizer(options),
   });
@@ -297,9 +311,9 @@ export function createBindingFromCommonAddon(
   return buildBinding(addon, {
     profile: () => addon.profileCommon(),
     initialize: () => addon.initializeCommon(),
-    scan: (input, policy) => addon.scanCommon(input, policy),
-    scanAndRedact: (input, policy, formatter) =>
-      addon.scanAndRedactCommon(input, policy, formatter),
+    scan: (input, policy, limits) => addon.scanCommon(input, policy, limits),
+    scanAndRedact: (input, policy, formatter, limits) =>
+      addon.scanAndRedactCommon(input, policy, formatter, limits),
     createIncrementalSanitizer: (options) =>
       addon.createIncrementalSanitizerCommon(options),
   });

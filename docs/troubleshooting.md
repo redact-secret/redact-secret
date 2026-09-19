@@ -12,8 +12,10 @@
 | `INVALID_PLACEHOLDER` | Formatter output is non-empty, no more than 256 UTF-8 bytes, and does not reproduce a replaced value |
 | `POLICY_FAILURE` / `PLACEHOLDER_FAILURE` | Trusted callback raised; use synthetic input to debug the callback |
 | `INVALID_POLICY_ACTION` | Policy must return `redact`, `block`, `warn`, or `allow` |
-| `INVALID_LIMITS` | Positive explicit session limits and sufficient retained buffer; use the minimum-buffer helper |
-| `INPUT_LIMIT_EXCEEDED`, `BUFFER_LIMIT_EXCEEDED`, `TOKEN_LIMIT_EXCEEDED`, `MULTILINE_LIMIT_EXCEEDED` | Input exceeded a declared bound; long ordinary lines also count |
+| `INVALID_LIMITS` | Positive explicit session limits and sufficient retained buffer for an incremental session; a positive `maxInputBytes`/`maxFindings` for whole-input `scan`/`redact`/`scanAndRedact` |
+| `INPUT_LIMIT_EXCEEDED` | An incremental session's total accepted input, or a whole-input `scan`/`redact`/`scanAndRedact` call's input, exceeded its byte limit (64 MiB by default for whole-input) |
+| `FINDING_LIMIT_EXCEEDED` | A whole-input `scan`/`redact`/`scanAndRedact` call's accepted finding count exceeded its limit (50,000 by default); raise it via the `limits` option or chunk the input through the incremental API |
+| `BUFFER_LIMIT_EXCEEDED`, `TOKEN_LIMIT_EXCEEDED`, `MULTILINE_LIMIT_EXCEEDED` | Incremental session input exceeded a declared bound; long ordinary lines also count |
 | `INVALID_STATE` | The session already finalized, aborted, or failed; create a new session for new input |
 | CLI exit 2 | Read the fixed stderr diagnostic; output may be incomplete |
 

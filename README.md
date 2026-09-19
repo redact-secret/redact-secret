@@ -225,9 +225,16 @@ placeholder exclusions favor precision. The tradeoff is that truncated, short,
 new, or unsupported credential formats can be missed. The core never performs
 runtime provider lookups, and Redact Secret is not a complete DLP system.
 
-Whole-input operations have no implicit input-size or finding-count limit.
-Authoritative servers must bound transport bytes, decoded input, accepted
-findings, sanitized output, concurrency, and memory before downstream use.
+Whole-input `scan`, `redact`, and `scan_and_redact` default to a 64 MiB input
+bound and a 50,000 finding-count bound
+(`decision-bound-whole-input-operations-by-default`). Exceeding either fails
+closed with a fixed `INPUT_LIMIT_EXCEEDED`/`FINDING_LIMIT_EXCEEDED` error
+rather than a truncated result; a caller that genuinely needs a wider bound
+raises it explicitly (`scan_with_limits` and its siblings in Rust, a `limits`
+option in every binding). This is a library-level backstop, not a substitute
+for host-side bounding: authoritative servers must still bound transport
+bytes, decoded input, sanitized output, concurrency, and memory before
+downstream use.
 
 ## Browser and server boundaries
 

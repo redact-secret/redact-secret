@@ -3,7 +3,12 @@
 //! Neither mode ever hands the core an unbounded input or an unbounded
 //! retention window: standard input is streamed under an
 //! [`IncrementalLimits`] set derived from these constants, and a file is read
-//! whole under the same total-input bound.
+//! whole under the same total-input bound. [`MAX_INPUT_BYTES`] is the core's
+//! own [`redact_secret::DEFAULT_MAX_INPUT_BYTES`], the whole-input bound
+//! `scan`/`redact`/`scan_and_redact` already apply by default
+//! (`decision-bound-whole-input-operations-by-default`), so the CLI, the
+//! library default, and a caller who does nothing all agree on one number
+//! instead of two.
 //!
 //! The construct limits are sized for what a real pipeline carries, not for
 //! what a credential needs. The core applies `max_token_bytes` to *every*
@@ -16,7 +21,7 @@
 use redact_secret::{IncrementalLimits, SecretScanError};
 
 /// The largest logical input a single source may supply, streamed or whole.
-pub const MAX_INPUT_BYTES: usize = 64 * 1024 * 1024;
+pub const MAX_INPUT_BYTES: usize = redact_secret::DEFAULT_MAX_INPUT_BYTES;
 /// The largest open single-line construct a streamed run holds unresolved.
 pub const MAX_TOKEN_BYTES: usize = 1024 * 1024;
 /// The largest open PEM-style block a streamed run holds unresolved.

@@ -5,6 +5,32 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+- **Breaking change:** whole-input `scan`, `redact`, and `scan_and_redact`
+  (and every binding's equivalent) now default to a bounded input: 64 MiB and
+  50,000 findings (issue #439,
+  `decision-bound-whole-input-operations-by-default`). Previously these
+  operations had no implicit input-size or finding-count limit at all, unlike
+  the incremental sanitizer, which has always required explicit,
+  positive `IncrementalLimits`. Exceeding either default now fails closed with
+  a fixed, input-free `INPUT_LIMIT_EXCEEDED`/`FINDING_LIMIT_EXCEEDED` error —
+  the same `INPUT_LIMIT_EXCEEDED` code an incremental session and the CLI's
+  own file-size bound already used — rather than scanning without bound.
+  **Migration:** a caller whose whole-input calls stay under 64 MiB and 50,000
+  findings sees no behavior change. A caller with larger input or denser
+  findings now gets a fixed error instead of an unbounded scan; either bound
+  and chunk its input (for example through the incremental API) or explicitly
+  raise the limit: `scan_with_limits`/`redact_with_limits`/
+  `scan_and_redact_with_limits` and a `WholeInputLimits` value in Rust, a
+  `limits` option accepting `{ maxInputBytes, maxFindings }` in Node and the
+  browser/WebAssembly package, and a `limits=redact_secret.WholeInputLimits(...)`
+  keyword argument in Python. The CLI's own file-read and standard-input
+  bounds are unchanged in value (64 MiB), now derived from the same core
+  default instead of a separately declared constant; CLI file-path scanning
+  also newly inherits the 50,000-finding bound, which it never had before.
+  `INVALID_LIMITS` and the message text of `INPUT_LIMIT_EXCEEDED` are now
+  described as shared between incremental sessions and whole-input operations
+  rather than incremental-only, and a new `FINDING_LIMIT_EXCEEDED` code
+  covers the finding-count bound, which has no incremental equivalent.
 - **Security fix:** an invisible code point inside a credential no longer
   defeats detection (issues #438, #445,
   `decision-normalize-invisible-characters-before-detection`). One zero-width

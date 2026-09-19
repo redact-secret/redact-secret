@@ -18,6 +18,15 @@ Typical usage::
     result = redact_secret.scan_and_redact(text)
     result.text, result.findings
 
+``scan``, ``redact``, and ``scan_and_redact`` apply a default
+:class:`WholeInputLimits` — 64 MiB of input, 50,000 accepted findings —
+before doing any work, and fail with ``InputLimitExceededError`` or
+``FindingLimitExceededError`` rather than truncating. Pass an explicit
+``limits`` to raise or lower it::
+
+    limits = redact_secret.WholeInputLimits(max_input_bytes=1_000_000, max_findings=1_000)
+    findings = redact_secret.scan(text, limits=limits)
+
 For input that arrives in pieces, :class:`IncrementalSanitizer` sanitizes a
 bounded session chunk by chunk::
 
@@ -52,6 +61,7 @@ from redact_secret._native import (
     DetectedFinding,
     DetectorFailureError,
     Finding,
+    FindingLimitExceededError,
     IncrementalLimits,
     IncrementalPolicyContext,
     IncrementalResult,
@@ -74,6 +84,7 @@ from redact_secret._native import (
     ScanResult,
     SecretScanError,
     TokenLimitExceededError,
+    WholeInputLimits,
     default_incremental_policy,
     default_placeholder_formatter,
     default_policy,
@@ -92,6 +103,7 @@ __all__ = [
     "DetectedFinding",
     "DetectorFailureError",
     "Finding",
+    "FindingLimitExceededError",
     "IncrementalLimits",
     "IncrementalPolicyContext",
     "IncrementalResult",
@@ -114,6 +126,7 @@ __all__ = [
     "ScanResult",
     "SecretScanError",
     "TokenLimitExceededError",
+    "WholeInputLimits",
     "default_incremental_policy",
     "default_placeholder_formatter",
     "default_policy",

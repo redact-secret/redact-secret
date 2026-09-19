@@ -41,11 +41,13 @@ pub enum SecretScanErrorCode {
     /// The placeholder formatter returned an empty, oversized, or
     /// matched-value-reproducing placeholder.
     InvalidPlaceholder,
-    /// An incremental session's limits were missing, non-positive, or did
-    /// not satisfy the documented relationship between them.
+    /// An incremental session's or whole-input operation's limits were
+    /// missing, non-positive, or did not satisfy the documented relationship
+    /// between them.
     InvalidLimits,
-    /// An incremental session's total accepted input would exceed
-    /// `max_input_bytes`.
+    /// An accepted input would exceed the configured input-byte limit: an
+    /// incremental session's total accepted input across every append, or a
+    /// whole-input `scan`/`redact`/`scan_and_redact` call's input.
     InputLimitExceeded,
     /// An incremental session's retained, unresolved plaintext would exceed
     /// `max_buffered_bytes`.
@@ -56,6 +58,11 @@ pub enum SecretScanErrorCode {
     /// An incremental session's open PEM-style private-key block would
     /// exceed `max_multiline_bytes` without closing.
     MultilineLimitExceeded,
+    /// The accepted finding count from a whole-input scan would exceed the
+    /// configured finding-count limit. Only whole-input `scan` and
+    /// `scan_and_redact` (and `redact` given an externally-constructed
+    /// finding list) produce this code; there is no incremental equivalent.
+    FindingLimitExceeded,
     /// An incremental session received `append`, `finalize`, or `abort`
     /// after it left the accepting state.
     InvalidState,
@@ -63,7 +70,7 @@ pub enum SecretScanErrorCode {
 
 impl SecretScanErrorCode {
     /// Every code, in declaration order.
-    pub const ALL: [Self; 16] = [
+    pub const ALL: [Self; 17] = [
         Self::InvalidInput,
         Self::InvalidOptions,
         Self::InvalidDetector,
@@ -79,6 +86,7 @@ impl SecretScanErrorCode {
         Self::BufferLimitExceeded,
         Self::TokenLimitExceeded,
         Self::MultilineLimitExceeded,
+        Self::FindingLimitExceeded,
         Self::InvalidState,
     ];
 
@@ -101,6 +109,7 @@ impl SecretScanErrorCode {
             Self::BufferLimitExceeded => "BUFFER_LIMIT_EXCEEDED",
             Self::TokenLimitExceeded => "TOKEN_LIMIT_EXCEEDED",
             Self::MultilineLimitExceeded => "MULTILINE_LIMIT_EXCEEDED",
+            Self::FindingLimitExceeded => "FINDING_LIMIT_EXCEEDED",
             Self::InvalidState => "INVALID_STATE",
         }
     }
@@ -119,11 +128,12 @@ impl SecretScanErrorCode {
             Self::InvalidFindings => "Redaction findings are invalid.",
             Self::PlaceholderFailure => "The placeholder formatter failed.",
             Self::InvalidPlaceholder => "The placeholder formatter returned an invalid value.",
-            Self::InvalidLimits => "Incremental sanitizer limits are invalid.",
-            Self::InputLimitExceeded => "Incremental sanitizer input limit exceeded.",
+            Self::InvalidLimits => "Secret scan limits are invalid.",
+            Self::InputLimitExceeded => "Secret scan input limit exceeded.",
             Self::BufferLimitExceeded => "Incremental sanitizer buffer limit exceeded.",
             Self::TokenLimitExceeded => "Incremental sanitizer token limit exceeded.",
             Self::MultilineLimitExceeded => "Incremental sanitizer multiline limit exceeded.",
+            Self::FindingLimitExceeded => "Secret scan finding limit exceeded.",
             Self::InvalidState => "The incremental sanitizer is no longer accepting input.",
         }
     }
@@ -244,14 +254,8 @@ mod tests {
                 "INVALID_PLACEHOLDER",
                 "The placeholder formatter returned an invalid value.",
             ),
-            (
-                "INVALID_LIMITS",
-                "Incremental sanitizer limits are invalid.",
-            ),
-            (
-                "INPUT_LIMIT_EXCEEDED",
-                "Incremental sanitizer input limit exceeded.",
-            ),
+            ("INVALID_LIMITS", "Secret scan limits are invalid."),
+            ("INPUT_LIMIT_EXCEEDED", "Secret scan input limit exceeded."),
             (
                 "BUFFER_LIMIT_EXCEEDED",
                 "Incremental sanitizer buffer limit exceeded.",
@@ -263,6 +267,10 @@ mod tests {
             (
                 "MULTILINE_LIMIT_EXCEEDED",
                 "Incremental sanitizer multiline limit exceeded.",
+            ),
+            (
+                "FINDING_LIMIT_EXCEEDED",
+                "Secret scan finding limit exceeded.",
             ),
             (
                 "INVALID_STATE",

@@ -51,9 +51,9 @@ def test_package_declares_pep_561_support() -> None:
 
 def test_functions_carry_introspectable_signatures() -> None:
     expected = {
-        "scan": {"text", "policy"},
-        "redact": {"text", "findings", "formatter"},
-        "scan_and_redact": {"text", "policy", "formatter"},
+        "scan": {"text", "policy", "limits"},
+        "redact": {"text", "findings", "formatter", "limits"},
+        "scan_and_redact": {"text", "policy", "formatter", "limits"},
         "default_policy": {"finding", "context"},
         "default_placeholder_formatter": {"finding", "context"},
         "typed_placeholder_formatter": {"finding", "context"},

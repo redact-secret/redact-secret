@@ -34,13 +34,23 @@
 //! [`PlaceholderFormatter`] and validating that formatter's output.
 //! [`scan_and_redact`] runs both and returns a [`ScanResult`].
 //!
+//! [`scan`], [`redact`], and [`scan_and_redact`] apply a default
+//! [`WholeInputLimits`] before doing any work — [`DEFAULT_MAX_INPUT_BYTES`]
+//! and [`DEFAULT_MAX_FINDINGS`] — and fail with
+//! [`SecretScanErrorCode::InputLimitExceeded`] or
+//! [`SecretScanErrorCode::FindingLimitExceeded`] rather than truncating.
+//! [`scan_with_limits`], [`redact_with_limits`], and
+//! [`scan_and_redact_with_limits`] accept an explicit [`WholeInputLimits`]
+//! instead (`decision-bound-whole-input-operations-by-default`).
+//!
 //! # Public surface
 //!
 //! | Concern | API |
 //! | --- | --- |
-//! | Scan | [`scan`], [`run_detector_pipeline`] |
-//! | Redact | [`redact`], [`MAX_PLACEHOLDER_LENGTH`] |
-//! | Scan and redact | [`scan_and_redact`] |
+//! | Scan | [`scan`], [`scan_with_limits`], [`run_detector_pipeline`] |
+//! | Redact | [`redact`], [`redact_with_limits`], [`MAX_PLACEHOLDER_LENGTH`] |
+//! | Scan and redact | [`scan_and_redact`], [`scan_and_redact_with_limits`] |
+//! | Whole-input limits | [`WholeInputLimits`], [`DEFAULT_MAX_INPUT_BYTES`], [`DEFAULT_MAX_FINDINGS`] |
 //! | Incremental | [`IncrementalSanitizer`], [`IncrementalLimits`], [`SessionState`], [`IncrementalPolicy`], [`IncrementalPolicyContext`] |
 //! | Policy | [`Policy`], [`PolicyContext`], [`DefaultPolicy`], [`Action`] |
 //! | Formatter | [`PlaceholderFormatter`], [`PlaceholderContext`], [`default_placeholder_formatter`], [`typed_placeholder_formatter`] |
@@ -108,6 +118,7 @@ mod entropy;
 mod error;
 mod incremental;
 mod invisible_table;
+mod limits;
 mod normalize;
 mod pipeline;
 mod policy;
@@ -123,10 +134,14 @@ pub use incremental::{
     IncrementalLimits, IncrementalPolicy, IncrementalPolicyContext, IncrementalResult,
     IncrementalSanitizer, SessionState,
 };
-pub use pipeline::{run_detector_pipeline, scan, scan_and_redact};
+pub use limits::{DEFAULT_MAX_FINDINGS, DEFAULT_MAX_INPUT_BYTES, WholeInputLimits};
+pub use pipeline::{
+    run_detector_pipeline, scan, scan_and_redact, scan_and_redact_with_limits, scan_with_limits,
+};
 pub use policy::DefaultPolicy;
 pub use redact::{
-    MAX_PLACEHOLDER_LENGTH, default_placeholder_formatter, redact, typed_placeholder_formatter,
+    MAX_PLACEHOLDER_LENGTH, default_placeholder_formatter, redact, redact_with_limits,
+    typed_placeholder_formatter,
 };
 pub use registry::{DetectorRegistry, Profile, RegisteredDetector};
 pub use types::{
