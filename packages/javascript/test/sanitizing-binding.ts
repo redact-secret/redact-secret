@@ -93,6 +93,7 @@ export function createSanitizingBinding(): NativeBinding {
           detector: "generic-token",
           confidence: "high",
           action: "redact",
+          obfuscation: "none",
           start,
           end: start + value.length,
         };

@@ -36,6 +36,7 @@ export interface NativeFinding {
   readonly detector: string;
   readonly confidence: string;
   readonly action: string;
+  readonly obfuscation: string;
   readonly start: number;
   readonly end: number;
   readonly [NATIVE_HANDLE]?: unknown;
@@ -46,6 +47,7 @@ export interface NativeDetectedFinding {
   readonly type: string;
   readonly detector: string;
   readonly confidence: string;
+  readonly obfuscation: string;
   readonly start: number;
   readonly end: number;
 }

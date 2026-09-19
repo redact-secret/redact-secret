@@ -197,6 +197,7 @@ impl IncrementalPolicy for JsIncrementalPolicyAdapter {
             r#type: finding.type_name().to_owned(),
             detector: finding.detector().to_owned(),
             confidence: finding.confidence().as_str().to_owned(),
+            obfuscation: finding.obfuscation().as_str().to_owned(),
             start,
             end,
         };
@@ -249,6 +250,7 @@ impl PlaceholderFormatter for JsIncrementalFormatterAdapter {
             detector: finding.detector().to_owned(),
             confidence: finding.confidence().as_str().to_owned(),
             action: finding.action().as_str().to_owned(),
+            obfuscation: finding.obfuscation().as_str().to_owned(),
             start,
             end,
         };
@@ -392,6 +394,7 @@ impl JsIncrementalSanitizer {
                         detector: finding.detector().to_owned(),
                         confidence: finding.confidence().as_str().to_owned(),
                         action: finding.action().as_str().to_owned(),
+                        obfuscation: finding.obfuscation().as_str().to_owned(),
                         start,
                         end,
                     })

@@ -16,7 +16,8 @@ use crate::redact::redact_with_limits;
 use crate::registry::{DetectorRegistry, RegisteredDetector};
 use crate::types::{
     Action, ByteRange, Candidate, Confidence, DetectedFinding, DetectorContext, Finding,
-    PlaceholderFormatter, Policy, PolicyContext, ScanResult, Specificity, is_identifier,
+    Obfuscation, PlaceholderFormatter, Policy, PolicyContext, ScanResult, Specificity,
+    is_identifier,
 };
 
 /// Vendor-published placeholder credentials that can never be real secrets:
@@ -45,6 +46,7 @@ struct RankedCandidate<'a> {
     confidence: Confidence,
     specificity: Specificity,
     range: ByteRange,
+    obfuscation: Obfuscation,
     detector_order: usize,
     candidate_order: usize,
 }
@@ -98,12 +100,24 @@ fn validate_candidate<'a>(
         .filter(|range| range.is_char_aligned_in(input))
         .ok_or(SecretScanErrorCode::InvalidCandidate)?;
 
+    // Either source claiming obfuscation is enough: a detector's own signal
+    // is honored even though none currently sets one, and the pipeline's own
+    // check is independent of it.
+    let obfuscation = if candidate.obfuscation() == Obfuscation::InvisibleCharacters
+        || normalized.contains_removed_run(scanned_range)
+    {
+        Obfuscation::InvisibleCharacters
+    } else {
+        Obfuscation::None
+    };
+
     Ok(RankedCandidate {
         type_name,
         detector: registered.id(),
         confidence: candidate.confidence(),
         specificity: candidate.effective_specificity(),
         range,
+        obfuscation,
         detector_order,
         candidate_order,
     })
@@ -213,13 +227,14 @@ pub fn run_detector_pipeline(
         .into_iter()
         .enumerate()
         .map(|(index, candidate)| {
-            DetectedFinding::new(
+            Ok(DetectedFinding::new(
                 format!("finding-{}", index + 1),
                 candidate.type_name,
                 candidate.detector,
                 candidate.confidence,
                 candidate.range,
-            )
+            )?
+            .with_obfuscation(candidate.obfuscation))
         })
         .collect()
 }
@@ -421,6 +436,35 @@ mod tests {
         let findings = run_detector_pipeline("AKIAIOSFODNN7EXAMPLF", &registry).unwrap();
         assert_eq!(findings.len(), 1);
         assert_eq!(findings[0].type_name(), "aws_access_key_id");
+    }
+
+    #[test]
+    fn a_removed_code_point_strictly_inside_the_range_reports_obfuscation() {
+        let registry = built_in_registry();
+        let input = "token: ghp_SYNTHETIC\u{200c}REVOKED00000000000000000000\n";
+        let findings = run_detector_pipeline(input, &registry).unwrap();
+        assert_eq!(findings.len(), 1);
+        assert_eq!(findings[0].obfuscation(), Obfuscation::InvisibleCharacters);
+    }
+
+    #[test]
+    fn a_clean_finding_reports_no_obfuscation() {
+        let registry = built_in_registry();
+        let input = "token: ghp_SYNTHETICREVOKED00000000000000000000\n";
+        let findings = run_detector_pipeline(input, &registry).unwrap();
+        assert_eq!(findings.len(), 1);
+        assert_eq!(findings[0].obfuscation(), Obfuscation::None);
+    }
+
+    #[test]
+    fn a_removed_code_point_adjacent_to_the_range_does_not_report_obfuscation() {
+        // The ZWSP sits inside the assignment keyword, not the reported
+        // value range: adjacency alone does not count.
+        let registry = built_in_registry();
+        let input = "api\u{200b}_key = SYNTHETIC_REVOKED_VALUE_1234\n";
+        let findings = run_detector_pipeline(input, &registry).unwrap();
+        assert_eq!(findings.len(), 1);
+        assert_eq!(findings[0].obfuscation(), Obfuscation::None);
     }
 
     #[test]

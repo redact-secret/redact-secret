@@ -54,7 +54,7 @@
 //! | Incremental | [`IncrementalSanitizer`], [`IncrementalLimits`], [`SessionState`], [`IncrementalPolicy`], [`IncrementalPolicyContext`] |
 //! | Policy | [`Policy`], [`PolicyContext`], [`DefaultPolicy`], [`Action`] |
 //! | Formatter | [`PlaceholderFormatter`], [`PlaceholderContext`], [`default_placeholder_formatter`], [`typed_placeholder_formatter`] |
-//! | Finding | [`Finding`], [`DetectedFinding`], [`ByteRange`], [`Confidence`], [`Specificity`] |
+//! | Finding | [`Finding`], [`DetectedFinding`], [`ByteRange`], [`Confidence`], [`Specificity`], [`Obfuscation`] |
 //! | Result | [`ScanResult`], [`IncrementalResult`] |
 //! | Sanitized error | [`SecretScanError`], [`SecretScanErrorCode`], [`DetectorFailure`], [`PolicyFailure`], [`FormatterFailure`] |
 //! | Custom detectors | [`Detector`], [`Candidate`], [`DetectorContext`], [`DetectorRegistry`], [`RegisteredDetector`] |
@@ -146,8 +146,8 @@ pub use redact::{
 pub use registry::{DetectorRegistry, Profile, RegisteredDetector};
 pub use types::{
     Action, ByteRange, Candidate, Confidence, DetectedFinding, Detector, DetectorContext, Finding,
-    MAX_IDENTIFIER_LENGTH, PlaceholderContext, PlaceholderFormatter, Policy, PolicyContext,
-    ScanResult, Specificity, is_identifier,
+    MAX_IDENTIFIER_LENGTH, Obfuscation, PlaceholderContext, PlaceholderFormatter, Policy,
+    PolicyContext, ScanResult, Specificity, is_identifier,
 };
 
 /// The shared product version. Every crate, binding, and package in the

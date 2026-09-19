@@ -27,11 +27,11 @@ use redact_secret::{
     DefaultPolicy, DetectedFinding, Detector, DetectorContext, DetectorFailure, DetectorRegistry,
     Finding, FormatterFailure, IncrementalLimits, IncrementalPolicy, IncrementalPolicyContext,
     IncrementalResult, IncrementalSanitizer, MAX_IDENTIFIER_LENGTH, MAX_PLACEHOLDER_LENGTH,
-    PlaceholderContext, PlaceholderFormatter, Policy, PolicyContext, PolicyFailure, Profile,
-    RANGE_UNIT, RegisteredDetector, ScanResult, SecretScanError, SecretScanErrorCode, SessionState,
-    Specificity, VERSION, WholeInputLimits, default_placeholder_formatter, is_identifier, redact,
-    redact_with_limits, run_detector_pipeline, scan, scan_and_redact, scan_and_redact_with_limits,
-    scan_with_limits, shannon_entropy, typed_placeholder_formatter,
+    Obfuscation, PlaceholderContext, PlaceholderFormatter, Policy, PolicyContext, PolicyFailure,
+    Profile, RANGE_UNIT, RegisteredDetector, ScanResult, SecretScanError, SecretScanErrorCode,
+    SessionState, Specificity, VERSION, WholeInputLimits, default_placeholder_formatter,
+    is_identifier, redact, redact_with_limits, run_detector_pipeline, scan, scan_and_redact,
+    scan_and_redact_with_limits, scan_with_limits, shannon_entropy, typed_placeholder_formatter,
 };
 
 /// The canonical corpus fixture used wherever one detected value is enough.
@@ -525,6 +525,13 @@ fn enum_names_round_trip_through_their_public_wire_form() {
     ] {
         assert_eq!(action.as_str(), name);
         assert_eq!(Action::from_name(name), Some(action));
+    }
+    for (obfuscation, name) in [
+        (Obfuscation::None, "none"),
+        (Obfuscation::InvisibleCharacters, "invisible-characters"),
+    ] {
+        assert_eq!(obfuscation.as_str(), name);
+        assert_eq!(Obfuscation::from_name(name), Some(obfuscation));
     }
 }
 

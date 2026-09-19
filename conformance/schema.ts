@@ -25,6 +25,8 @@ export type CanonicalSpecificity =
   | "contextual"
   | "entropy";
 
+export type CanonicalObfuscation = "none" | "invisible-characters";
+
 export type CanonicalCaseKind =
   | "positive"
   | "negative"
@@ -94,6 +96,12 @@ export interface CanonicalExpectation {
   readonly type: string;
   readonly confidence: CanonicalConfidence;
   readonly specificity: CanonicalSpecificity;
+  /**
+   * Whether the reported range shows evidence of invisible-character
+   * obfuscation. Optional so every fixture predating this field stays valid
+   * unchanged.
+   */
+  readonly obfuscation?: CanonicalObfuscation;
   /** UTF-8 byte offset, inclusive. */
   readonly start: number;
   /** UTF-8 byte offset, exclusive. */
@@ -214,11 +222,16 @@ const SPECIFICITY: readonly CanonicalSpecificity[] = [
   "contextual",
   "entropy",
 ];
+const OBFUSCATION: readonly CanonicalObfuscation[] = [
+  "none",
+  "invisible-characters",
+];
 const EXPECTATION_KEYS = new Set([
   "detector",
   "type",
   "confidence",
   "specificity",
+  "obfuscation",
   "start",
   "end",
 ]);
@@ -354,6 +367,8 @@ export function validateCanonicalFixtures(
         !IDENTIFIER_PATTERN.test(expected.type) ||
         !CONFIDENCE.includes(expected.confidence) ||
         !SPECIFICITY.includes(expected.specificity) ||
+        (expected.obfuscation !== undefined &&
+          !OBFUSCATION.includes(expected.obfuscation)) ||
         !Number.isInteger(expected.start) ||
         !Number.isInteger(expected.end) ||
         expected.start < previousEnd ||
@@ -394,6 +409,7 @@ function validateExpectationList(
       !IDENTIFIER_PATTERN.test(item.type) ||
       !CONFIDENCE.includes(item.confidence) ||
       !SPECIFICITY.includes(item.specificity) ||
+      (item.obfuscation !== undefined && !OBFUSCATION.includes(item.obfuscation)) ||
       !Number.isInteger(item.start) ||
       !Number.isInteger(item.end) ||
       item.start < previousEnd ||

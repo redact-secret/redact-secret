@@ -36,6 +36,11 @@ fn detected_finding_object_with_range(
         "confidence",
         &JsValue::from_str(finding.confidence().as_str()),
     )?;
+    set(
+        &object,
+        "obfuscation",
+        &JsValue::from_str(finding.obfuscation().as_str()),
+    )?;
 
     let range_object = Object::new();
     set(&range_object, "start", &JsValue::from_f64(f64::from(start)))?;

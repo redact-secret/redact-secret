@@ -70,12 +70,22 @@ def test_finding_and_context_types_expose_documented_attributes() -> None:
     )
     assert findings
     finding = findings[0]
-    for attribute in ("id", "type", "detector", "confidence", "action", "start", "end"):
+    for attribute in (
+        "id",
+        "type",
+        "detector",
+        "confidence",
+        "action",
+        "obfuscation",
+        "start",
+        "end",
+    ):
         assert hasattr(finding, attribute)
     assert isinstance(finding.start, int)
     assert isinstance(finding.end, int)
     assert isinstance(finding.confidence, str)
     assert isinstance(finding.action, str)
+    assert isinstance(finding.obfuscation, str)
 
 
 def test_incremental_session_methods_carry_introspectable_signatures() -> None:

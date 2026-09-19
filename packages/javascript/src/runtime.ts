@@ -41,7 +41,7 @@ import type {
   SecretFinding,
 } from "./types.js";
 
-/** Freezes the five documented fields a policy callback is allowed to see. */
+/** Freezes the six documented fields a policy callback is allowed to see. */
 function toDetectedSecretFinding(
   finding: NativeDetectedFinding,
 ): DetectedSecretFinding {
@@ -50,12 +50,13 @@ function toDetectedSecretFinding(
     type: finding.type,
     detector: finding.detector,
     confidence: finding.confidence as DetectedSecretFinding["confidence"],
+    obfuscation: finding.obfuscation as DetectedSecretFinding["obfuscation"],
     start: finding.start,
     end: finding.end,
   });
 }
 
-/** Freezes the seven documented fields, preserving any binding handle. */
+/** Freezes the eight documented fields, preserving any binding handle. */
 function toSecretFinding(finding: NativeFinding): SecretFinding {
   const published: SecretFinding = {
     id: finding.id,
@@ -63,6 +64,7 @@ function toSecretFinding(finding: NativeFinding): SecretFinding {
     detector: finding.detector,
     confidence: finding.confidence as SecretFinding["confidence"],
     action: finding.action as SecretFinding["action"],
+    obfuscation: finding.obfuscation as SecretFinding["obfuscation"],
     start: finding.start,
     end: finding.end,
   };

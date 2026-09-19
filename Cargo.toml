@@ -115,6 +115,7 @@ core-public-api = [
   "IncrementalSanitizer",
   "MAX_IDENTIFIER_LENGTH",
   "MAX_PLACEHOLDER_LENGTH",
+  "Obfuscation",
   "PlaceholderContext",
   "PlaceholderFormatter",
   "Policy",

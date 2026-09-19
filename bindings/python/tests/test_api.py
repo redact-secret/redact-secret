@@ -31,8 +31,12 @@ def test_scan_and_redact_agrees_with_separate_scan_and_redact_calls() -> None:
     result = redact_secret.scan_and_redact(SYNTHETIC_INPUT)
 
     assert result.text == redacted
-    assert [(f.id, f.type, f.detector, f.confidence, f.action, f.start, f.end) for f in result.findings] == [
-        (f.id, f.type, f.detector, f.confidence, f.action, f.start, f.end) for f in findings
+    assert [
+        (f.id, f.type, f.detector, f.confidence, f.action, f.obfuscation, f.start, f.end)
+        for f in result.findings
+    ] == [
+        (f.id, f.type, f.detector, f.confidence, f.action, f.obfuscation, f.start, f.end)
+        for f in findings
     ]
 
 
@@ -47,7 +51,10 @@ def test_scan_and_redact_agrees_with_separate_scan_and_redact_calls() -> None:
 )
 def test_repeated_scan_and_redact_is_deterministic(text: str) -> None:
     def summary(findings: list[redact_secret.Finding]) -> list[tuple]:
-        return [(f.id, f.type, f.detector, f.confidence, f.action, f.start, f.end) for f in findings]
+        return [
+            (f.id, f.type, f.detector, f.confidence, f.action, f.obfuscation, f.start, f.end)
+            for f in findings
+        ]
 
     first = redact_secret.scan(text)
     second = redact_secret.scan(text)
@@ -77,6 +84,19 @@ def test_redact_rejects_overlapping_findings() -> None:
     with pytest.raises(redact_secret.InvalidFindingsError) as excinfo:
         redact_secret.redact(SYNTHETIC_INPUT, [findings[0], findings[0]])
     assert excinfo.value.code == "INVALID_FINDINGS"
+
+
+def test_scan_reports_invisible_character_obfuscation() -> None:
+    clean = redact_secret.scan(SYNTHETIC_INPUT)
+    assert len(clean) == 1
+    assert clean[0].obfuscation == "none"
+
+    obfuscated_input = SYNTHETIC_INPUT.replace(
+        "ghp_SYNTHETICREVOKED", "ghp_SYNTHETIC‌REVOKED"
+    )
+    findings = redact_secret.scan(obfuscated_input)
+    assert len(findings) == 1
+    assert findings[0].obfuscation == "invisible-characters"
 
 
 def test_findings_are_returned_in_input_order() -> None:

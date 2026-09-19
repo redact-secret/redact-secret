@@ -26,8 +26,8 @@ use pyo3::{create_exception, wrap_pyfunction};
 
 use redact_secret::{
     Action, ByteRange, Confidence, DefaultPolicy, DetectedFinding, DetectorRegistry,
-    Finding as CoreFinding, PlaceholderContext, PlaceholderFormatter, Policy, PolicyContext,
-    SecretScanError as CoreError, SecretScanErrorCode, WholeInputLimits,
+    Finding as CoreFinding, Obfuscation, PlaceholderContext, PlaceholderFormatter, Policy,
+    PolicyContext, SecretScanError as CoreError, SecretScanErrorCode, WholeInputLimits,
     default_placeholder_formatter as core_default_formatter, redact_with_limits as core_redact,
     run_detector_pipeline, typed_placeholder_formatter as core_typed_formatter,
 };
@@ -392,6 +392,9 @@ pub(crate) struct PyDetectedFinding {
     /// `"high"`, `"medium"`, or `"low"`.
     #[pyo3(get)]
     confidence: String,
+    /// `"none"` or `"invisible-characters"`.
+    #[pyo3(get)]
+    obfuscation: String,
     /// Inclusive start offset, in Unicode code points.
     #[pyo3(get)]
     start: usize,
@@ -399,6 +402,7 @@ pub(crate) struct PyDetectedFinding {
     #[pyo3(get)]
     end: usize,
     confidence_value: Confidence,
+    obfuscation_value: Obfuscation,
     byte_range: ByteRange,
 }
 
@@ -409,9 +413,11 @@ impl PyDetectedFinding {
             type_name: finding.type_name().to_owned(),
             detector: finding.detector().to_owned(),
             confidence: finding.confidence().as_str().to_owned(),
+            obfuscation: finding.obfuscation().as_str().to_owned(),
             start,
             end,
             confidence_value: finding.confidence(),
+            obfuscation_value: finding.obfuscation(),
             byte_range: finding.range(),
         }
     }
@@ -425,6 +431,7 @@ impl PyDetectedFinding {
             self.confidence_value,
             self.byte_range,
         )
+        .map(|finding| finding.with_obfuscation(self.obfuscation_value))
         .map_err(map_core_error)
     }
 }
@@ -433,8 +440,14 @@ impl PyDetectedFinding {
 impl PyDetectedFinding {
     fn __repr__(&self) -> String {
         format!(
-            "DetectedFinding(id={:?}, type={:?}, detector={:?}, confidence={:?}, start={}, end={})",
-            self.id, self.type_name, self.detector, self.confidence, self.start, self.end
+            "DetectedFinding(id={:?}, type={:?}, detector={:?}, confidence={:?}, obfuscation={:?}, start={}, end={})",
+            self.id,
+            self.type_name,
+            self.detector,
+            self.confidence,
+            self.obfuscation,
+            self.start,
+            self.end
         )
     }
 }
@@ -492,6 +505,9 @@ pub(crate) struct PyFinding {
     /// `"redact"`, `"block"`, `"warn"`, or `"allow"`.
     #[pyo3(get)]
     action: String,
+    /// `"none"` or `"invisible-characters"`.
+    #[pyo3(get)]
+    obfuscation: String,
     /// Inclusive start offset, in Unicode code points.
     #[pyo3(get)]
     start: usize,
@@ -509,6 +525,7 @@ impl PyFinding {
             detector: finding.detector().to_owned(),
             confidence: finding.confidence().as_str().to_owned(),
             action: finding.action().as_str().to_owned(),
+            obfuscation: finding.obfuscation().as_str().to_owned(),
             start,
             end,
             inner: finding,
@@ -520,12 +537,13 @@ impl PyFinding {
 impl PyFinding {
     fn __repr__(&self) -> String {
         format!(
-            "Finding(id={:?}, type={:?}, detector={:?}, confidence={:?}, action={:?}, start={}, end={})",
+            "Finding(id={:?}, type={:?}, detector={:?}, confidence={:?}, action={:?}, obfuscation={:?}, start={}, end={})",
             self.id,
             self.type_name,
             self.detector,
             self.confidence,
             self.action,
+            self.obfuscation,
             self.start,
             self.end
         )
@@ -1033,6 +1051,24 @@ mod tests {
                 1,
                 30,
             ),
+            // issue #446: `unicode-conversion-invisible-within-bmp` -- a
+            // code point normalization removes before detection, inside
+            // rather than adjacent to the span.
+            ("TOKEN_\u{200B}_SYNTHETIC_REVOKED_VALUE", 0, 33, 0, 31),
+            // `unicode-conversion-invisible-within-removed-run` -- a
+            // three-code-point removed run (one maximal seam) inside the
+            // span.
+            (
+                "TOKEN_\u{00AD}\u{00AD}\u{2060}_SYNTHETIC_REVOKED_VALUE",
+                0,
+                37,
+                0,
+                33,
+            ),
+            // `unicode-conversion-invisible-astral-within` -- U+E0041, both
+            // removed by normalization and astral (a surrogate pair in
+            // UTF-16, one Python code point), inside the span.
+            ("TOKEN_\u{E0041}_SYNTHETIC_REVOKED", 0, 28, 0, 25),
         ];
         for (input, byte_start, byte_end, char_start, char_end) in cases {
             assert_eq!(

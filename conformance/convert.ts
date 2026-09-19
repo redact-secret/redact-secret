@@ -21,6 +21,7 @@ export interface Utf16Expectation {
   readonly type: string;
   readonly confidence: CanonicalExpectation["confidence"];
   readonly specificity: CanonicalExpectation["specificity"];
+  readonly obfuscation?: CanonicalExpectation["obfuscation"];
   readonly start: number;
   readonly end: number;
 }
@@ -120,6 +121,9 @@ function convertExpectation(
     type: expected.type,
     confidence: expected.confidence,
     specificity: expected.specificity,
+    ...(expected.obfuscation !== undefined
+      ? { obfuscation: expected.obfuscation }
+      : {}),
     start: utf16OffsetToUtf8ByteOffset(input, expected.start),
     end: utf16OffsetToUtf8ByteOffset(input, expected.end),
   };

@@ -52,6 +52,27 @@ evidence is linked from each published version.
   credential-shaped only once its invisible characters are removed is now a
   finding, and an invisible character between a word and a token no longer
   acts as a token boundary.
+- **Additive:** every finding now carries an `Obfuscation` signal — `Rust`:
+  `Finding::obfuscation()` / `DetectedFinding::obfuscation()`; `CLI`: an
+  `obfuscation` JSON field and an `obfuscation=` text-report field; `Node`:
+  `JsFinding.obfuscation` / `JsDetectedFinding.obfuscation`; `WebAssembly`:
+  `Finding.obfuscation`; `Python`: `Finding.obfuscation` /
+  `DetectedFinding.obfuscation`; `@redact-secret/core`:
+  `SecretFinding.obfuscation` / `DetectedSecretFinding.obfuscation` (issue
+  #447, sub-issue D of #438,
+  `decision-normalize-invisible-characters-before-detection`). Set to
+  `"invisible-characters"` when a finding's translated original range
+  **strictly contains** at least one code point the normalization pass
+  (#445) removed — a removed code point merely adjacent to the range does
+  not count — and `"none"` otherwise. Carries no value, no offset into the
+  secret, and no plaintext, consistent with the existing rule that neither a
+  candidate nor a finding ever carries matched text. `DefaultPolicy`
+  behavior is unchanged: promoting `warn` to `block` on obfuscation is a
+  separate precision decision left for future evidence. `conformance/schema.ts`
+  / `schema.json` gain `obfuscation` as an **optional** field on
+  `CanonicalExpectation`, so every one of the existing fixtures stays valid
+  unchanged; it is set explicitly on the invisible-character fixtures #445
+  added.
 - Added `@redact-secret/core/common/node-stream` and
   `@redact-secret/core/common/web-stream` (issue #416), the `common`-profile
   counterparts to `@redact-secret/core/node-stream` and

@@ -83,6 +83,14 @@ impl FindingJs {
         self.inner.action().as_str().to_owned()
     }
 
+    /// The invisible-character-obfuscation signal: `"none"` or
+    /// `"invisible-characters"`.
+    #[wasm_bindgen(getter)]
+    #[must_use]
+    pub fn obfuscation(&self) -> String {
+        self.inner.obfuscation().as_str().to_owned()
+    }
+
     /// The finding's range, in UTF-16 code units.
     #[wasm_bindgen(getter)]
     #[must_use]
@@ -143,6 +151,7 @@ mod tests {
         assert_eq!(finding.detector(), "aws-access-key");
         assert_eq!(finding.confidence(), "high");
         assert_eq!(finding.action(), "redact");
+        assert_eq!(finding.obfuscation(), "none");
         assert_eq!((finding.range().start(), finding.range().end()), (3, 32));
     }
 

@@ -151,6 +151,24 @@ impl<'a> NormalizedInput<'a> {
             range.end() + self.removed_before(before_end),
         )
     }
+
+    /// Whether a removed run lies strictly inside `range` (of
+    /// [`text`](Self::text)): the same "interior" definition
+    /// [`to_original`](Self::to_original) uses to fold a run into a
+    /// translated span. A run merely adjacent to either boundary does not
+    /// count.
+    pub(crate) fn contains_removed_run(&self, range: ByteRange) -> bool {
+        if self.seams.is_empty() {
+            return false;
+        }
+        let through_start = self
+            .seams
+            .partition_point(|seam| seam.normalized <= range.start());
+        let before_end = self
+            .seams
+            .partition_point(|seam| seam.normalized < range.end());
+        before_end > through_start
+    }
 }
 
 #[cfg(test)]
@@ -286,6 +304,26 @@ mod tests {
         // The neighbours on each side still translate to themselves.
         assert_eq!(selected(&input, &view, range(0, 2)), "x=");
         assert_eq!(selected(&input, &view, range(6, 7)), ";");
+    }
+
+    #[test]
+    fn contains_removed_run_matches_the_interior_definition() {
+        let input = format!("x=ab{ZWNJ}{ZWSP}cd;");
+        let view = NormalizedInput::new(&input);
+        assert!(view.contains_removed_run(range(2, 6)));
+        assert!(!view.contains_removed_run(range(0, 2)));
+        // The run sits exactly at this range's start, so it is adjacent, not
+        // interior.
+        assert!(!view.contains_removed_run(range(4, 6)));
+
+        let input = format!("x={ZWSP}abcd{ZWSP};");
+        let view = NormalizedInput::new(&input);
+        // Both runs are adjacent to this range's boundaries, not interior.
+        assert!(!view.contains_removed_run(range(2, 6)));
+        assert!(view.contains_removed_run(range(0, 7)));
+
+        let view = NormalizedInput::new("plain");
+        assert!(!view.contains_removed_run(range(1, 4)));
     }
 
     #[test]
