@@ -417,15 +417,18 @@ mod tests {
         assert_eq!(ranges(&input), vec![(start, start + BOT_POSITIVE.len())]);
     }
 
-    /// The exact synthetic inputs issue #371 attached, with the ranges it
-    /// expects: the negative twin differs from its paired positive in
-    /// exactly one structural property — the dash before the secret
-    /// section.
+    /// The shape issue #371 attached, with the ranges it expects: the
+    /// negative twin differs from its paired positive in exactly one
+    /// structural property — the dash before the secret section. Issue #419
+    /// replaced the original snapshot's real-looking random bytes with the
+    /// same canonical digit sections and `SYNTHETIC…` secret marker used by
+    /// [`BOT_POSITIVE`] above, keeping every byte length exactly as
+    /// reviewed.
     #[test]
     fn issue_371_twins_are_rejected_and_their_paired_positives_preserved() {
         const UNICODE_CRLF: &str = "# \u{1F511} reviewed format\r\n";
-        let bot_positive = "xoxb-535105338178-098272152943-YyL0MDH0GlAxLV9GoqXpfgI4";
-        let bot_twin = "xoxb-535105338178-098272152943YyL0MDH0GlAxLV9GoqXpfgI4";
+        let bot_positive = "xoxb-1234567890123-3210987654321-SYNTHETICBOTSECRETSYNT";
+        let bot_twin = "xoxb-1234567890123-3210987654321SYNTHETICBOTSECRETSYNT";
 
         let cases: [Case; 4] = [
             ("bot-plain", format!("{bot_positive}\n\n"), vec![(0, 55)]),

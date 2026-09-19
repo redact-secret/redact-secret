@@ -421,18 +421,21 @@ mod tests {
         );
     }
 
-    /// The exact synthetic inputs issue #368 attached, with the ranges it
-    /// expects: each negative twin differs from its paired positive in one
-    /// structural property (the marker, or the left segment's length).
+    /// The shapes issue #368 attached, with the ranges it expects: each
+    /// negative twin differs from its paired positive in one structural
+    /// property (the marker, or the left segment's length). Issue #419
+    /// replaced the original snapshot's real-looking random bytes with the
+    /// same `SYNTHETIC…`-marked construction already used by the canonical
+    /// literals above, keeping every byte length exactly as reviewed.
     #[test]
     fn issue_368_twins_are_rejected_and_their_paired_positives_preserved() {
         const UNICODE_CRLF: &str = "# \u{1F511} reviewed format\r\n";
-        let legacy_positive = "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";
-        let legacy_twin = "sk-CETkIjobDgQhiCSRBjSgT3BlbkFKjwnQ0FqBPH7mULVtCSjs";
-        let project_positive = "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";
-        let project_twin = "sk-proj-XQaEbXdYpB2bY4iugTKGKEsfpzbarfDE4qLowLdD4YAe8PTMyFPUAxlT3gVQhyppB4rNDqRBuT3BlbkFJs3wTeLdTFRFjZCzIBROCBs0r30BvMe4LSjGlMmIQjdpQfuWnojoR0WCEDCvGp09Cf68wvz90Ng";
-        let service_positive = "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";
-        let service_twin = "sk-svcacct-vOuQp18EMEQEexlPHizducCt2ZpSuVfwijDiYEVKQUDWDw9W1yvOhrgPkZdA5dgmxJl2lbPXYT3BlbkFJFFBjTH5S5JmqBkLzL8FupQ65xXFRMDWZoyHUcRFMmsOEL2SBu2ptiTCJBWqgqUwVrscOG1VYQD";
+        let legacy_positive = LEGACY_KEY.to_string();
+        let legacy_twin = format!("{PREFIX}{LEGACY_LEFT}T3BlbkFK{LEGACY_RIGHT}");
+        let project_positive = PROJECT_KEY.to_string();
+        let project_twin = format!("{PREFIX}proj-{}{MARKER}{}", left(73), right(74));
+        let service_positive = SERVICE_ACCOUNT_KEY.to_string();
+        let service_twin = format!("{PREFIX}svcacct-{}{MARKER}{}", left(73), right(74));
 
         let cases: [Case; 12] = [
             (

@@ -9,7 +9,11 @@
 //! twins under the earlier 20-byte `[A-Za-z0-9_-]` minimum; this file pins
 //! the corrected behavior on the whole-input surface, the provider detector
 //! in isolation, and every UTF-8 byte partition of the incremental surface.
-//! Every value is locally constructed and was never provider-issued.
+//! Every value is locally constructed and was never provider-issued. Issue
+//! #419 replaced the snapshot's random-looking hex bodies with the
+//! unmistakably patterned hex runs also used in
+//! `crates/secret-scan-core/src/detectors/additional_providers.rs`, keeping
+//! every byte length exactly as reviewed.
 #![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 
 mod support;
@@ -20,9 +24,9 @@ use redact_secret::{
 };
 use support::{as_chunks, run, utf8_byte_partitions, whole_input};
 
-const PAT_BODY: &str = "1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9";
-const OAUTH_ACCESS_BODY: &str = "025343c0555235768c29735f523ad644fbfe1569b1d88f46b4f506628ae8b08a";
-const OAUTH_REFRESH_BODY: &str = "686b232b8722f7ab110b24d01fd9a96539cdec166f27e643ae9852b28d2b0da5";
+const PAT_BODY: &str = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+const OAUTH_ACCESS_BODY: &str = "fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210";
+const OAUTH_REFRESH_BODY: &str = "123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0";
 
 /// One snapshot pair: the benchmark fixture id stem, the positive input, and
 /// the UTF-8 byte range the positive must match at (the twin is the same

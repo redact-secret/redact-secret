@@ -320,14 +320,17 @@ mod tests {
     const _: () = assert!(DOCKER_OAT_BODY.len() == DOCKER_OAT_SUFFIX_LEN);
     /// `DigitalOcean`'s suffix is exactly 64 lowercase hex bytes (issue
     /// #369), so each documented prefix gets its own fixed-length synthetic
-    /// body. These are the locally constructed values from the issue's
-    /// self-contained snapshot; none was ever provider-issued.
+    /// body. The hex-only alphabet admits no `SYNTHETIC…` marker, so each
+    /// body is instead an unmistakably patterned hex run — the same
+    /// counting idiom [`super::datadog`] and [`super::new_relic`] already use
+    /// for their own hex-only bodies — rather than the look-alike random
+    /// bytes issue #419 replaced. None was ever provider-issued.
     const DIGITALOCEAN_BODY: &str =
-        "1f24601fd1e661dc9b0a5f6e206888cac4ba0147c46563ccd2d81004e954cad9";
+        "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
     const DIGITALOCEAN_OAUTH_BODY: &str =
-        "025343c0555235768c29735f523ad644fbfe1569b1d88f46b4f506628ae8b08a";
+        "fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210";
     const DIGITALOCEAN_REFRESH_BODY: &str =
-        "686b232b8722f7ab110b24d01fd9a96539cdec166f27e643ae9852b28d2b0da5";
+        "123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0";
 
     fn detect(detector: &KnownFormatProviderDetector, input: &str) -> Vec<Candidate> {
         detector

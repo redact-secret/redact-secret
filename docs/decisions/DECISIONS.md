@@ -40,3 +40,4 @@ future planning and implementation but do not authorize Git or release actions.
 - [Govern benchmark-originated product regressions](2026-09-18-govern-benchmark-regression-promotion.md)
 - [Define the detector profile and pack contract](2026-09-18-define-detector-profile-and-pack-contract.md)
 - [Gate beta.5 on precision gains and positive preservation](2026-09-18-gate-beta5-on-precision-gains-and-positive-preservation.md)
+- [Resolve real-looking twin fixtures as unmistakably synthetic](2026-09-18-resolve-real-looking-twin-fixtures-as-unmistakably-synthetic.md)
