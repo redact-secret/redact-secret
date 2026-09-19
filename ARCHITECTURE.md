@@ -123,6 +123,9 @@ identity, abi3 contract, wheel matrix, and artifact qualification live in
 UTF-8 input
     |
     v
+Invisible-character removal into a scan copy
+    |
+    v
 Built-in Rust detector registry
     |
     v
@@ -144,9 +147,17 @@ One-pass redaction
 Sanitized text + findings without matched values
 ```
 
-The core does not normalize or decode the input before detection when doing so
-would change source coordinates or lexical meaning. Detectors inspect the
-original UTF-8 string and produce candidate ranges into it.
+The core removes zero-rendering and format code points
+(`Default_Ignorable_Code_Point ∪ Cf`, derived from a pinned UCD version) into
+a scan copy before detection, and translates every reported range back into
+the original input. It does not case-fold, apply NFKC, decode, or unescape;
+none of those change source coordinates in a way this step's range
+translation covers, and each remains a deliberate exclusion (see below). See
+[Normalize invisible characters before
+detection](./docs/decisions/2026-09-19-normalize-invisible-characters-before-detection.md)
+for the derived set, its v1 exclusions, the span translation rule, and its
+incremental-sanitization consequence. Detectors are unchanged and inspect the
+scan copy; they cannot tell normalization occurred.
 
 Candidate validation rejects malformed, empty, out-of-bounds, or invalid UTF-8
 boundary ranges. Candidates are then ranked by specificity, confidence, span
@@ -535,6 +546,19 @@ The first stable architecture does not include:
 Those capabilities may wrap or follow Redact Secret, but they must not weaken
 the deterministic core or create another authoritative detector implementation.
 
+The invisible-character normalization step above deliberately excludes, each
+tracked by its own future issue:
+
+- confusable and homoglyph skeleton matching (UTS #39);
+- whitespace folding (`U+00A0`, `U+2000..U+200A`, `U+3000`);
+- decoding the Unicode Tags block back to ASCII (`U+E0020..E007F`), as
+  opposed to removing it; and
+- base64, percent-encoding, or backslash-escape decoding.
+
+See [Normalize invisible characters before
+detection](./docs/decisions/2026-09-19-normalize-invisible-characters-before-detection.md)
+for why each is out of scope for v1.
+
 ## Decision sources
 
 The accepted records governing this architecture are:
@@ -547,3 +571,4 @@ The accepted records governing this architecture are:
 - [Define the cross-language evaluation protocol](./docs/decisions/2026-09-12-define-cross-language-evaluation-protocol.md)
 - [Measure JavaScript performance externally](./docs/decisions/2026-09-12-measure-javascript-performance-externally.md)
 - [Define the detector profile and pack contract](./docs/decisions/2026-09-18-define-detector-profile-and-pack-contract.md)
+- [Normalize invisible characters before detection](./docs/decisions/2026-09-19-normalize-invisible-characters-before-detection.md)
