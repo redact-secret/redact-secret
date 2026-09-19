@@ -164,7 +164,16 @@ export async function qualify(fixtures, api) {
     assert(Object.isFrozen(finding), "the package returned a mutable finding");
     assertEqual(
       Object.keys(finding).sort(),
-      ["action", "confidence", "detector", "end", "id", "start", "type"],
+      [
+        "action",
+        "confidence",
+        "detector",
+        "end",
+        "id",
+        "obfuscation",
+        "start",
+        "type",
+      ],
       "published finding keys",
     );
   });

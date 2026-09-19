@@ -58,6 +58,15 @@ fn scan_matches_the_canonical_synchronous_corpus() {
             })
             .collect();
         assert_eq!(actual, expected, "{}", fixture.id);
+
+        // `obfuscation` is optional in the schema; only the fixtures that
+        // declare it are asserted, so every pre-existing fixture stays valid
+        // unchanged.
+        for (finding, expectation) in findings.iter().zip(fixture.declared_expectations()) {
+            if let Some(declared) = &expectation.obfuscation {
+                assert_eq!(finding.obfuscation().as_str(), declared, "{}", fixture.id);
+            }
+        }
     }
 }
 

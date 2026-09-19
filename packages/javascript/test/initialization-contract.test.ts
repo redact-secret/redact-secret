@@ -151,6 +151,7 @@ describe("finding normalization", () => {
       detector: "generic-token",
       confidence: "high",
       action: "redact",
+      obfuscation: "none",
       start: 8,
       end: 39,
     });
@@ -290,6 +291,7 @@ describe("binding handles", () => {
       detector: "generic-token",
       confidence: "high",
       action: "redact",
+      obfuscation: "none",
       start: 8,
       end: 39,
     });

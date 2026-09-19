@@ -66,6 +66,20 @@ check("reported ranges are valid JavaScript UTF-16 slice boundaries", () => {
   assert.equal(matched.startsWith("sk-syntheticRevokedExampleToken"), true);
 });
 
+check("scan reports invisible-character obfuscation on a split token", () => {
+  const cleanFindings = scan(SYNTHETIC_TOKEN);
+  assert.equal(cleanFindings.length, 1);
+  assert.equal(cleanFindings[0].obfuscation, "none");
+
+  const obfuscatedToken = SYNTHETIC_TOKEN.replace(
+    "sk-syntheticRevokedExampleToken",
+    "sk-synthetic‌RevokedExampleToken",
+  );
+  const findings = scan(obfuscatedToken);
+  assert.equal(findings.length, 1);
+  assert.equal(findings[0].obfuscation, "invisible-characters");
+});
+
 check("scanAndRedact matches scan + redact", () => {
   const { findings, redacted } = scanAndRedact(SYNTHETIC_TOKEN);
   assert.equal(findings.length, 1);
@@ -137,6 +151,7 @@ check("malformed findings passed to redact are rejected as input-free errors", (
           detector: "synthetic",
           confidence: "high",
           action: "delete",
+          obfuscation: "none",
           start: 0,
           end: 5,
         },

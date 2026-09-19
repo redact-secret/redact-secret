@@ -132,6 +132,7 @@ describe("WebAssembly-shaped binding: finding normalization", () => {
       detector: "generic-token",
       confidence: "high",
       action: "redact",
+      obfuscation: "none",
       start: 8,
       end: 39,
     });
@@ -174,6 +175,7 @@ describe("WebAssembly-shaped binding: policy and formatter callbacks", () => {
       type: "contextual_secret",
       detector: "generic-token",
       confidence: "high",
+      obfuscation: "none",
       start: 8,
       end: 39,
     });
@@ -203,6 +205,7 @@ describe("WebAssembly-shaped binding: policy and formatter callbacks", () => {
       detector: "generic-token",
       confidence: "high",
       action: "redact",
+      obfuscation: "none",
       start: 8,
       end: 39,
     });
@@ -280,6 +283,7 @@ describe("WebAssembly-shaped binding: incremental sanitization", () => {
         detector: "generic-token",
         confidence: "high",
         action: "redact",
+        obfuscation: "none",
         start: 8,
         end: 39,
       },
@@ -314,6 +318,7 @@ describe("WebAssembly-shaped binding: incremental sanitization", () => {
       type: "contextual_secret",
       detector: "generic-token",
       confidence: "high",
+      obfuscation: "none",
       start: 8,
       end: 39,
     });
@@ -345,6 +350,7 @@ describe("WebAssembly-shaped binding: incremental sanitization", () => {
       detector: "generic-token",
       confidence: "high",
       action: "redact",
+      obfuscation: "none",
       start: 8,
       end: 39,
     });

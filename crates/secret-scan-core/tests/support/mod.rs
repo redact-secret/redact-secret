@@ -46,6 +46,10 @@ pub struct CanonicalExpectation {
     pub specificity: String,
     pub start: usize,
     pub end: usize,
+    /// The wire name of the declared [`Obfuscation`](redact_secret::Obfuscation),
+    /// or `None` when the fixture leaves it unspecified (every fixture
+    /// predating this optional field).
+    pub obfuscation: Option<String>,
 }
 
 /// The declared input, finding-count, and runtime caps an adversarial
@@ -152,6 +156,14 @@ fn parse_expectations(object: &Value, fixture: &str) -> Option<Vec<CanonicalExpe
                     specificity: text_field(expected, "specificity", fixture),
                     start: offset_field(expected, "start", fixture),
                     end: offset_field(expected, "end", fixture),
+                    obfuscation: expected
+                        .get("obfuscation")
+                        .map(|value| {
+                            value.as_str().unwrap_or_else(|| {
+                                panic!("canonical fixture {fixture} has a non-string obfuscation")
+                            })
+                        })
+                        .map(str::to_owned),
                 }
             })
             .collect(),

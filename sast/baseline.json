@@ -384,6 +384,118 @@
       "line": 328,
       "rule_id": "sast.rules.javascript.lang.security.audit.unsafe-dynamic-method",
       "rationale": "The dynamic member access selects a method name from the hardcoded `DETECTOR_PROFILES` map, whose two entries (`full`/`common`) are literal object keys in this file; `detectorProfile` is validated against `Object.hasOwn(DETECTOR_PROFILES, ...)` before this call, so the invoked name is always one of the two fixed literal strings `initialize` / `initializeCommon`, never attacker- or externally-controlled input. This is a local build-qualification script, not a network-facing service."
+    },
+    "cb10861efa643c2d": {
+      "classification": "false_positive",
+      "line": 290,
+      "path": "conformance/schema.ts",
+      "rationale": "The matched pattern is one of this file's three module-level constant regexes (CASE_ID_PATTERN, IDENTIFIER_PATTERN, ERROR_CODE_PATTERN), each a linear-time character-class repetition with no nested or overlapping quantifiers -- the rule's generic backtracking heuristic cannot see that '-' / '.' / '_' separators are disjoint from the surrounding [a-z0-9] class, so there is no ambiguous split point for the engine to backtrack over. Inputs are also schema-validated fixture/case identifiers, not attacker-controlled request data.",
+      "rule_id": "sast.rules.javascript.lang.security.audit.detect-redos"
+    },
+    "4257c0484813a3bf": {
+      "classification": "false_positive",
+      "line": 298,
+      "path": "conformance/schema.ts",
+      "rationale": "The matched pattern is one of this file's three module-level constant regexes (CASE_ID_PATTERN, IDENTIFIER_PATTERN, ERROR_CODE_PATTERN), each a linear-time character-class repetition with no nested or overlapping quantifiers -- the rule's generic backtracking heuristic cannot see that '-' / '.' / '_' separators are disjoint from the surrounding [a-z0-9] class, so there is no ambiguous split point for the engine to backtrack over. Inputs are also schema-validated fixture/case identifiers, not attacker-controlled request data.",
+      "rule_id": "sast.rules.javascript.lang.security.audit.detect-redos"
+    },
+    "63273c6d95d5e58d": {
+      "classification": "false_positive",
+      "line": 316,
+      "path": "conformance/schema.ts",
+      "rationale": "The matched pattern is one of this file's three module-level constant regexes (CASE_ID_PATTERN, IDENTIFIER_PATTERN, ERROR_CODE_PATTERN), each a linear-time character-class repetition with no nested or overlapping quantifiers -- the rule's generic backtracking heuristic cannot see that '-' / '.' / '_' separators are disjoint from the surrounding [a-z0-9] class, so there is no ambiguous split point for the engine to backtrack over. Inputs are also schema-validated fixture/case identifiers, not attacker-controlled request data.",
+      "rule_id": "sast.rules.javascript.lang.security.audit.detect-redos"
+    },
+    "6ab8e1a3d2345fe7": {
+      "classification": "false_positive",
+      "line": 317,
+      "path": "conformance/schema.ts",
+      "rationale": "The matched pattern is one of this file's three module-level constant regexes (CASE_ID_PATTERN, IDENTIFIER_PATTERN, ERROR_CODE_PATTERN), each a linear-time character-class repetition with no nested or overlapping quantifiers -- the rule's generic backtracking heuristic cannot see that '-' / '.' / '_' separators are disjoint from the surrounding [a-z0-9] class, so there is no ambiguous split point for the engine to backtrack over. Inputs are also schema-validated fixture/case identifiers, not attacker-controlled request data.",
+      "rule_id": "sast.rules.javascript.lang.security.audit.detect-redos"
+    },
+    "aef52ae2d691abc3": {
+      "classification": "false_positive",
+      "line": 318,
+      "path": "conformance/schema.ts",
+      "rationale": "The matched pattern is one of this file's three module-level constant regexes (CASE_ID_PATTERN, IDENTIFIER_PATTERN, ERROR_CODE_PATTERN), each a linear-time character-class repetition with no nested or overlapping quantifiers -- the rule's generic backtracking heuristic cannot see that '-' / '.' / '_' separators are disjoint from the surrounding [a-z0-9] class, so there is no ambiguous split point for the engine to backtrack over. Inputs are also schema-validated fixture/case identifiers, not attacker-controlled request data.",
+      "rule_id": "sast.rules.javascript.lang.security.audit.detect-redos"
+    },
+    "4fde4419b646f5cd": {
+      "classification": "false_positive",
+      "line": 366,
+      "path": "conformance/schema.ts",
+      "rationale": "The matched pattern is one of this file's three module-level constant regexes (CASE_ID_PATTERN, IDENTIFIER_PATTERN, ERROR_CODE_PATTERN), each a linear-time character-class repetition with no nested or overlapping quantifiers -- the rule's generic backtracking heuristic cannot see that '-' / '.' / '_' separators are disjoint from the surrounding [a-z0-9] class, so there is no ambiguous split point for the engine to backtrack over. Inputs are also schema-validated fixture/case identifiers, not attacker-controlled request data.",
+      "rule_id": "sast.rules.javascript.lang.security.audit.detect-redos"
+    },
+    "63fbcb5daf64ffdc": {
+      "classification": "false_positive",
+      "line": 367,
+      "path": "conformance/schema.ts",
+      "rationale": "The matched pattern is one of this file's three module-level constant regexes (CASE_ID_PATTERN, IDENTIFIER_PATTERN, ERROR_CODE_PATTERN), each a linear-time character-class repetition with no nested or overlapping quantifiers -- the rule's generic backtracking heuristic cannot see that '-' / '.' / '_' separators are disjoint from the surrounding [a-z0-9] class, so there is no ambiguous split point for the engine to backtrack over. Inputs are also schema-validated fixture/case identifiers, not attacker-controlled request data.",
+      "rule_id": "sast.rules.javascript.lang.security.audit.detect-redos"
+    },
+    "edc4aa4c0b8c6e61": {
+      "classification": "false_positive",
+      "line": 408,
+      "path": "conformance/schema.ts",
+      "rationale": "The matched pattern is one of this file's three module-level constant regexes (CASE_ID_PATTERN, IDENTIFIER_PATTERN, ERROR_CODE_PATTERN), each a linear-time character-class repetition with no nested or overlapping quantifiers -- the rule's generic backtracking heuristic cannot see that '-' / '.' / '_' separators are disjoint from the surrounding [a-z0-9] class, so there is no ambiguous split point for the engine to backtrack over. Inputs are also schema-validated fixture/case identifiers, not attacker-controlled request data.",
+      "rule_id": "sast.rules.javascript.lang.security.audit.detect-redos"
+    },
+    "22cbf265ad31f4dc": {
+      "classification": "false_positive",
+      "line": 409,
+      "path": "conformance/schema.ts",
+      "rationale": "The matched pattern is one of this file's three module-level constant regexes (CASE_ID_PATTERN, IDENTIFIER_PATTERN, ERROR_CODE_PATTERN), each a linear-time character-class repetition with no nested or overlapping quantifiers -- the rule's generic backtracking heuristic cannot see that '-' / '.' / '_' separators are disjoint from the surrounding [a-z0-9] class, so there is no ambiguous split point for the engine to backtrack over. Inputs are also schema-validated fixture/case identifiers, not attacker-controlled request data.",
+      "rule_id": "sast.rules.javascript.lang.security.audit.detect-redos"
+    },
+    "9fa7d6ca68162829": {
+      "classification": "false_positive",
+      "line": 446,
+      "path": "conformance/schema.ts",
+      "rationale": "The matched pattern is one of this file's three module-level constant regexes (CASE_ID_PATTERN, IDENTIFIER_PATTERN, ERROR_CODE_PATTERN), each a linear-time character-class repetition with no nested or overlapping quantifiers -- the rule's generic backtracking heuristic cannot see that '-' / '.' / '_' separators are disjoint from the surrounding [a-z0-9] class, so there is no ambiguous split point for the engine to backtrack over. Inputs are also schema-validated fixture/case identifiers, not attacker-controlled request data.",
+      "rule_id": "sast.rules.javascript.lang.security.audit.detect-redos"
+    },
+    "9be756ae602e06d5": {
+      "classification": "false_positive",
+      "line": 541,
+      "path": "conformance/schema.ts",
+      "rationale": "The matched pattern is one of this file's three module-level constant regexes (CASE_ID_PATTERN, IDENTIFIER_PATTERN, ERROR_CODE_PATTERN), each a linear-time character-class repetition with no nested or overlapping quantifiers -- the rule's generic backtracking heuristic cannot see that '-' / '.' / '_' separators are disjoint from the surrounding [a-z0-9] class, so there is no ambiguous split point for the engine to backtrack over. Inputs are also schema-validated fixture/case identifiers, not attacker-controlled request data.",
+      "rule_id": "sast.rules.javascript.lang.security.audit.detect-redos"
+    },
+    "da06ed3db448df82": {
+      "classification": "false_positive",
+      "line": 569,
+      "path": "conformance/schema.ts",
+      "rationale": "The matched pattern is one of this file's three module-level constant regexes (CASE_ID_PATTERN, IDENTIFIER_PATTERN, ERROR_CODE_PATTERN), each a linear-time character-class repetition with no nested or overlapping quantifiers -- the rule's generic backtracking heuristic cannot see that '-' / '.' / '_' separators are disjoint from the surrounding [a-z0-9] class, so there is no ambiguous split point for the engine to backtrack over. Inputs are also schema-validated fixture/case identifiers, not attacker-controlled request data.",
+      "rule_id": "sast.rules.javascript.lang.security.audit.detect-redos"
+    },
+    "d2105a3ab40ab571": {
+      "classification": "false_positive",
+      "line": 602,
+      "path": "conformance/schema.ts",
+      "rationale": "The matched pattern is one of this file's three module-level constant regexes (CASE_ID_PATTERN, IDENTIFIER_PATTERN, ERROR_CODE_PATTERN), each a linear-time character-class repetition with no nested or overlapping quantifiers -- the rule's generic backtracking heuristic cannot see that '-' / '.' / '_' separators are disjoint from the surrounding [a-z0-9] class, so there is no ambiguous split point for the engine to backtrack over. Inputs are also schema-validated fixture/case identifiers, not attacker-controlled request data.",
+      "rule_id": "sast.rules.javascript.lang.security.audit.detect-redos"
+    },
+    "88c088ccd4f38718": {
+      "classification": "false_positive",
+      "line": 893,
+      "path": "conformance/schema.ts",
+      "rationale": "The matched pattern is one of this file's three module-level constant regexes (CASE_ID_PATTERN, IDENTIFIER_PATTERN, ERROR_CODE_PATTERN), each a linear-time character-class repetition with no nested or overlapping quantifiers -- the rule's generic backtracking heuristic cannot see that '-' / '.' / '_' separators are disjoint from the surrounding [a-z0-9] class, so there is no ambiguous split point for the engine to backtrack over. Inputs are also schema-validated fixture/case identifiers, not attacker-controlled request data.",
+      "rule_id": "sast.rules.javascript.lang.security.audit.detect-redos"
+    },
+    "b4df2a179690b50c": {
+      "classification": "false_positive",
+      "line": 894,
+      "path": "conformance/schema.ts",
+      "rationale": "The matched pattern is one of this file's three module-level constant regexes (CASE_ID_PATTERN, IDENTIFIER_PATTERN, ERROR_CODE_PATTERN), each a linear-time character-class repetition with no nested or overlapping quantifiers -- the rule's generic backtracking heuristic cannot see that '-' / '.' / '_' separators are disjoint from the surrounding [a-z0-9] class, so there is no ambiguous split point for the engine to backtrack over. Inputs are also schema-validated fixture/case identifiers, not attacker-controlled request data.",
+      "rule_id": "sast.rules.javascript.lang.security.audit.detect-redos"
+    },
+    "360f48b699b6f2d8": {
+      "classification": "false_positive",
+      "path": "scripts/browser-package-harness-core.mjs",
+      "line": 207,
+      "rule_id": "sast.rules.javascript.lang.security.html-in-template-string",
+      "rationale": "The template string builds a `<SECRET_N>` / `<TYPE_N>` redaction placeholder label for test-fixture comparison or CLI output text; it is never assigned to `innerHTML`, rendered into a DOM, or otherwise interpreted as markup, so the XSS this rule guards against cannot occur here."
     }
   },
   "known_errors": {

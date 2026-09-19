@@ -169,6 +169,46 @@ impl Action {
     }
 }
 
+/// Whether a finding's reported range shows evidence of
+/// invisible-character obfuscation.
+///
+/// Carries no value, no offset into the secret, and no plaintext —
+/// consistent with the rule that neither [`Candidate`] nor [`Finding`] ever
+/// carries matched text
+/// (`decision-normalize-invisible-characters-before-detection`).
+/// [`DefaultPolicy`](crate::DefaultPolicy) does not change behavior based on
+/// this value.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+#[non_exhaustive]
+pub enum Obfuscation {
+    /// No removed code point lies inside the reported range.
+    None,
+    /// At least one invisible/format code point was removed from inside the
+    /// candidate.
+    InvisibleCharacters,
+}
+
+impl Obfuscation {
+    /// The wire name (`"none"`, `"invisible-characters"`).
+    #[must_use]
+    pub const fn as_str(self) -> &'static str {
+        match self {
+            Self::None => "none",
+            Self::InvisibleCharacters => "invisible-characters",
+        }
+    }
+
+    /// Parses a wire name.
+    #[must_use]
+    pub fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "none" => Some(Self::None),
+            "invisible-characters" => Some(Self::InvisibleCharacters),
+            _ => None,
+        }
+    }
+}
+
 /// A non-empty half-open range `[start, end)` of UTF-8 byte offsets.
 ///
 /// Construction only guarantees `start < end`; whether the range fits the
@@ -259,10 +299,12 @@ pub struct Candidate {
     specificity: Option<Specificity>,
     range: ByteRange,
     signals: Vec<String>,
+    obfuscation: Obfuscation,
 }
 
 impl Candidate {
-    /// Creates a candidate with no explicit specificity and no signals.
+    /// Creates a candidate with no explicit specificity, no signals, and no
+    /// claimed obfuscation.
     #[must_use]
     pub fn new(type_name: impl Into<String>, confidence: Confidence, range: ByteRange) -> Self {
         Self {
@@ -271,6 +313,7 @@ impl Candidate {
             specificity: None,
             range,
             signals: Vec::new(),
+            obfuscation: Obfuscation::None,
         }
     }
 
@@ -278,6 +321,15 @@ impl Candidate {
     #[must_use]
     pub const fn with_specificity(mut self, specificity: Specificity) -> Self {
         self.specificity = Some(specificity);
+        self
+    }
+
+    /// Sets the claimed invisible-character-obfuscation signal. The
+    /// pipeline also derives this independently from the translated range;
+    /// either source setting [`Obfuscation::InvisibleCharacters`] is enough.
+    #[must_use]
+    pub const fn with_obfuscation(mut self, obfuscation: Obfuscation) -> Self {
+        self.obfuscation = obfuscation;
         self
     }
 
@@ -329,6 +381,12 @@ impl Candidate {
     pub fn signals(&self) -> &[String] {
         &self.signals
     }
+
+    /// The claimed invisible-character-obfuscation signal.
+    #[must_use]
+    pub const fn obfuscation(&self) -> Obfuscation {
+        self.obfuscation
+    }
 }
 
 /// An independent detection unit.
@@ -365,10 +423,13 @@ pub struct DetectedFinding {
     detector: String,
     confidence: Confidence,
     range: ByteRange,
+    obfuscation: Obfuscation,
 }
 
 impl DetectedFinding {
-    /// Creates a finding from already-validated identifiers.
+    /// Creates a finding from already-validated identifiers, with no
+    /// obfuscation signal. Use [`with_obfuscation`](Self::with_obfuscation)
+    /// to attach one.
     ///
     /// # Errors
     ///
@@ -393,7 +454,15 @@ impl DetectedFinding {
             detector,
             confidence,
             range,
+            obfuscation: Obfuscation::None,
         })
+    }
+
+    /// Attaches the invisible-character-obfuscation signal.
+    #[must_use]
+    pub const fn with_obfuscation(mut self, obfuscation: Obfuscation) -> Self {
+        self.obfuscation = obfuscation;
+        self
     }
 
     /// Deterministic finding id (`finding-1`, `finding-2`, ...).
@@ -424,6 +493,12 @@ impl DetectedFinding {
     #[must_use]
     pub const fn range(&self) -> ByteRange {
         self.range
+    }
+
+    /// Invisible-character-obfuscation signal for this finding's range.
+    #[must_use]
+    pub const fn obfuscation(&self) -> Obfuscation {
+        self.obfuscation
     }
 
     /// Attaches a policy action, producing the public [`Finding`].
@@ -495,6 +570,12 @@ impl Finding {
     #[must_use]
     pub const fn range(&self) -> ByteRange {
         self.detected.range()
+    }
+
+    /// Invisible-character-obfuscation signal for this finding's range.
+    #[must_use]
+    pub const fn obfuscation(&self) -> Obfuscation {
+        self.detected.obfuscation()
     }
 
     /// The pre-policy metadata.
@@ -720,9 +801,16 @@ mod tests {
         for action in [Action::Redact, Action::Block, Action::Warn, Action::Allow] {
             assert_eq!(Action::from_name(action.as_str()), Some(action));
         }
+        for obfuscation in [Obfuscation::None, Obfuscation::InvisibleCharacters] {
+            assert_eq!(
+                Obfuscation::from_name(obfuscation.as_str()),
+                Some(obfuscation)
+            );
+        }
         assert_eq!(Confidence::from_name("HIGH"), None);
         assert_eq!(Specificity::from_name("private_key"), None);
         assert_eq!(Action::from_name(""), None);
+        assert_eq!(Obfuscation::from_name("None"), None);
     }
 
     #[test]
@@ -849,13 +937,16 @@ mod tests {
         assert_eq!(candidate.specificity(), None);
         assert_eq!(candidate.effective_specificity(), Specificity::Entropy);
         assert!(candidate.signals().is_empty());
+        assert_eq!(candidate.obfuscation(), Obfuscation::None);
         let candidate = candidate
             .with_specificity(Specificity::Provider)
-            .with_signals(["prefix"]);
+            .with_signals(["prefix"])
+            .with_obfuscation(Obfuscation::InvisibleCharacters);
         assert_eq!(candidate.effective_specificity(), Specificity::Provider);
         assert_eq!(candidate.signals(), ["prefix"]);
         assert_eq!(candidate.type_name(), "token");
         assert_eq!(candidate.range(), range);
+        assert_eq!(candidate.obfuscation(), Obfuscation::InvisibleCharacters);
     }
 
     #[test]
@@ -873,6 +964,14 @@ mod tests {
         assert_eq!(finding.id(), "finding-1");
         assert_eq!(finding.detected().detector(), "jwt");
         assert_eq!(finding.action(), Action::Redact);
+        assert_eq!(finding.obfuscation(), Obfuscation::None);
+        assert_eq!(finding.detected().obfuscation(), Obfuscation::None);
+
+        let obfuscated = DetectedFinding::new("finding-2", "jwt", "jwt", Confidence::High, range)
+            .unwrap()
+            .with_obfuscation(Obfuscation::InvisibleCharacters)
+            .with_action(Action::Redact);
+        assert_eq!(obfuscated.obfuscation(), Obfuscation::InvisibleCharacters);
         for (id, type_name, detector) in [
             ("Finding-1", "jwt", "jwt"),
             ("finding-1", "JWT", "jwt"),

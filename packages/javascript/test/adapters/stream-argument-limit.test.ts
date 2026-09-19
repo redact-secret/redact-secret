@@ -23,6 +23,7 @@ function finding(index: number, start = index * 2): SecretFinding {
     detector: "synthetic-regression",
     confidence: "high",
     action: "redact",
+    obfuscation: "none",
     start,
     end: start + 1,
   });

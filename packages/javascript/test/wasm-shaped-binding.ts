@@ -60,6 +60,7 @@ function toDetectedFindingMetadata(
     type: finding.type,
     detector: finding.detector,
     confidence: finding.confidence,
+    obfuscation: finding.obfuscation,
     range: finding.range,
   };
 }
@@ -183,5 +184,6 @@ export const sampleWasmFinding: WasmFinding = Object.freeze({
   detector: "generic-token",
   confidence: "high",
   action: "redact",
+  obfuscation: "none",
   range: Object.freeze({ start: 8, end: 39 }),
 });

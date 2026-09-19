@@ -20,6 +20,7 @@ pub struct SafeFinding {
     action: &'static str,
     start: usize,
     end: usize,
+    obfuscation: &'static str,
 }
 
 impl From<&Finding> for SafeFinding {
@@ -32,6 +33,7 @@ impl From<&Finding> for SafeFinding {
             action: finding.action().as_str(),
             start: finding.range().start(),
             end: finding.range().end(),
+            obfuscation: finding.obfuscation().as_str(),
         }
     }
 }
@@ -123,7 +125,7 @@ impl Report {
             for finding in &source.findings {
                 writeln!(
                     out,
-                    "{}:{}-{} {} detector={} confidence={} action={} id={}",
+                    "{}:{}-{} {} detector={} confidence={} action={} obfuscation={} id={}",
                     identity,
                     finding.start,
                     finding.end,
@@ -131,6 +133,7 @@ impl Report {
                     finding.detector,
                     finding.confidence,
                     finding.action,
+                    finding.obfuscation,
                     finding.id,
                 )?;
             }
@@ -198,6 +201,9 @@ impl Report {
                 writeln!(out, ",")?;
                 write!(out, "          \"action\": ")?;
                 write_json_string(out, finding.action)?;
+                writeln!(out, ",")?;
+                write!(out, "          \"obfuscation\": ")?;
+                write_json_string(out, finding.obfuscation)?;
                 writeln!(out, ",")?;
                 writeln!(out, "          \"start\": {},", finding.start)?;
                 writeln!(out, "          \"end\": {}", finding.end)?;
@@ -304,6 +310,7 @@ mod tests {
             action: "redact",
             start,
             end,
+            obfuscation: "none",
         }
     }
 
@@ -326,7 +333,7 @@ mod tests {
         report.write_text(&mut out, &mut diagnostics).unwrap();
         assert_eq!(
             String::from_utf8(out).unwrap(),
-            "a.txt:8-48 github_token detector=github-token confidence=high action=redact id=finding-1\n"
+            "a.txt:8-48 github_token detector=github-token confidence=high action=redact obfuscation=none id=finding-1\n"
         );
         assert!(
             String::from_utf8(diagnostics)
@@ -408,6 +415,7 @@ mod tests {
         assert!(rendered.contains("\"findingCount\": 1"));
         assert!(rendered.contains("\"source\": \"a.txt\""));
         assert!(rendered.contains("\"type\": \"github_token\""));
+        assert!(rendered.contains("\"obfuscation\": \"none\""));
         assert!(rendered.contains("\"start\": 8"));
         assert!(rendered.contains("\"end\": 48"));
         assert!(rendered.contains("\"code\": \"NOT_UTF8\""));

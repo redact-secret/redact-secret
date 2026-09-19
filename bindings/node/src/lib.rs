@@ -18,9 +18,9 @@ use napi::bindgen_prelude::{FnArgs, Function};
 use napi_derive::napi;
 use redact_secret::{
     Action, ByteRange, Confidence, DefaultPolicy, DetectedFinding, DetectorRegistry, Finding,
-    FormatterFailure, PlaceholderContext, PlaceholderFormatter, Policy, PolicyContext, Profile,
-    SecretScanError, SecretScanErrorCode, default_placeholder_formatter, redact as core_redact,
-    run_detector_pipeline,
+    FormatterFailure, Obfuscation, PlaceholderContext, PlaceholderFormatter, Policy, PolicyContext,
+    Profile, SecretScanError, SecretScanErrorCode, default_placeholder_formatter,
+    redact as core_redact, run_detector_pipeline,
 };
 
 use crate::error::to_js_error;
@@ -54,6 +54,8 @@ pub struct JsDetectedFinding {
     pub detector: String,
     /// `"high"`, `"medium"`, or `"low"`.
     pub confidence: String,
+    /// `"none"` or `"invisible-characters"`.
+    pub obfuscation: String,
     /// Start offset in UTF-16 code units.
     pub start: u32,
     /// End offset in UTF-16 code units (exclusive).
@@ -84,6 +86,8 @@ pub struct JsFinding {
     pub confidence: String,
     /// `"redact"`, `"block"`, `"warn"`, or `"allow"`.
     pub action: String,
+    /// `"none"` or `"invisible-characters"`.
+    pub obfuscation: String,
     /// Start offset in UTF-16 code units.
     pub start: u32,
     /// End offset in UTF-16 code units (exclusive).
@@ -213,6 +217,7 @@ fn to_js_detected_finding(input: &str, finding: &DetectedFinding) -> JsDetectedF
         r#type: finding.type_name().to_owned(),
         detector: finding.detector().to_owned(),
         confidence: finding.confidence().as_str().to_owned(),
+        obfuscation: finding.obfuscation().as_str().to_owned(),
         start: byte_to_utf16(input, finding.range().start()),
         end: byte_to_utf16(input, finding.range().end()),
     }
@@ -225,6 +230,7 @@ fn to_js_finding(input: &str, finding: &Finding) -> JsFinding {
         detector: finding.detector().to_owned(),
         confidence: finding.confidence().as_str().to_owned(),
         action: finding.action().as_str().to_owned(),
+        obfuscation: finding.obfuscation().as_str().to_owned(),
         start: byte_to_utf16(input, finding.range().start()),
         end: byte_to_utf16(input, finding.range().end()),
     }
@@ -245,14 +251,17 @@ fn from_js_finding(input: &str, finding: &JsFinding) -> Result<Finding, SecretSc
     let confidence =
         Confidence::from_name(&finding.confidence).ok_or(SecretScanErrorCode::InvalidFindings)?;
     let action = Action::from_name(&finding.action).ok_or(SecretScanErrorCode::InvalidFindings)?;
-    Finding::new(
+    let obfuscation =
+        Obfuscation::from_name(&finding.obfuscation).ok_or(SecretScanErrorCode::InvalidFindings)?;
+    Ok(DetectedFinding::new(
         &finding.id,
         &finding.r#type,
         &finding.detector,
         confidence,
-        action,
         range,
-    )
+    )?
+    .with_obfuscation(obfuscation)
+    .with_action(action))
 }
 
 /// Runs the detector pipeline over `input` and evaluates `policy` (or the
@@ -484,13 +493,14 @@ mod tests {
 
     /// Comparable field tuple for a [`JsFinding`], which has no [`PartialEq`]
     /// of its own.
-    fn finding_key(finding: &JsFinding) -> (&str, &str, &str, &str, &str, u32, u32) {
+    fn finding_key(finding: &JsFinding) -> (&str, &str, &str, &str, &str, &str, u32, u32) {
         (
             &finding.id,
             &finding.r#type,
             &finding.detector,
             &finding.confidence,
             &finding.action,
+            &finding.obfuscation,
             finding.start,
             finding.end,
         )
@@ -572,6 +582,7 @@ mod tests {
             detector: "synthetic".to_owned(),
             confidence: "high".to_owned(),
             action: "redact".to_owned(),
+            obfuscation: "none".to_owned(),
             start: 1,
             end: 2,
         };
@@ -588,6 +599,7 @@ mod tests {
             detector: "synthetic".to_owned(),
             confidence: "high".to_owned(),
             action: "delete".to_owned(),
+            obfuscation: "none".to_owned(),
             start: 0,
             end: 5,
         };

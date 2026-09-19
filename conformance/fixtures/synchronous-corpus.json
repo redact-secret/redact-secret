@@ -28190,6 +28190,7 @@
           "type": "github_token",
           "confidence": "high",
           "specificity": "provider",
+          "obfuscation": "invisible-characters",
           "start": 7,
           "end": 50
         }
@@ -28217,6 +28218,7 @@
           "type": "bearer_token",
           "confidence": "high",
           "specificity": "structural",
+          "obfuscation": "invisible-characters",
           "start": 22,
           "end": 59
         }
@@ -28244,6 +28246,7 @@
           "type": "contextual_secret",
           "confidence": "high",
           "specificity": "contextual",
+          "obfuscation": "none",
           "start": 13,
           "end": 41
         }
@@ -28271,6 +28274,7 @@
           "type": "contextual_secret",
           "confidence": "high",
           "specificity": "contextual",
+          "obfuscation": "invisible-characters",
           "start": 10,
           "end": 41
         }
@@ -28298,6 +28302,7 @@
           "type": "connection_string_password",
           "confidence": "high",
           "specificity": "structural",
+          "obfuscation": "invisible-characters",
           "start": 15,
           "end": 36
         }
@@ -28325,6 +28330,7 @@
           "type": "github_token",
           "confidence": "high",
           "specificity": "provider",
+          "obfuscation": "invisible-characters",
           "start": 7,
           "end": 50
         }
@@ -28352,6 +28358,7 @@
           "type": "github_token",
           "confidence": "high",
           "specificity": "provider",
+          "obfuscation": "invisible-characters",
           "start": 7,
           "end": 55
         }
@@ -28379,6 +28386,7 @@
           "type": "github_token",
           "confidence": "high",
           "specificity": "provider",
+          "obfuscation": "invisible-characters",
           "start": 7,
           "end": 50
         }
@@ -28406,6 +28414,7 @@
           "type": "github_token",
           "confidence": "high",
           "specificity": "provider",
+          "obfuscation": "invisible-characters",
           "start": 7,
           "end": 50
         }
@@ -28433,6 +28442,7 @@
           "type": "github_token",
           "confidence": "high",
           "specificity": "provider",
+          "obfuscation": "invisible-characters",
           "start": 7,
           "end": 54
         }
@@ -28460,6 +28470,7 @@
           "type": "github_token",
           "confidence": "high",
           "specificity": "provider",
+          "obfuscation": "invisible-characters",
           "start": 6152,
           "end": 6195
         }
