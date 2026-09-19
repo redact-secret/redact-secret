@@ -698,7 +698,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [plan, browser]
     if: needs.plan.outputs.full == 'true'
-    timeout-minutes: 20
+    timeout-minutes: 12
     permissions:
       contents: read
 
@@ -737,10 +737,13 @@ jobs:
           node scripts/qualify-node-wasm-fallback.mjs --wasm-dir dist/wasm-web
           node scripts/qualify-node-wasm-fallback.mjs --wasm-dir dist/wasm-web-common --detector-profile common
 
+      # One step per profile: each starts its own `wrangler dev`, so a hang
+      # names the profile that caused it instead of the pair.
       - name: Qualify the Cloudflare Workers runtime path
-        run: |
-          node scripts/qualify-workerd-artifact.mjs --wasm-dir dist/wasm-web
-          node scripts/qualify-workerd-artifact.mjs --wasm-dir dist/wasm-web-common --detector-profile common
+        run: node scripts/qualify-workerd-artifact.mjs --wasm-dir dist/wasm-web
+
+      - name: Qualify the Cloudflare Workers runtime path (common profile)
+        run: node scripts/qualify-workerd-artifact.mjs --wasm-dir dist/wasm-web-common --detector-profile common
 
   inventory:
     name: Artifact inventory

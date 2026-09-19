@@ -119,7 +119,12 @@ Local checks on `aarch64-apple-darwin`:
 
 The new `package-consumer-wasm-runtimes` job runs only in full qualification,
 which a pull request does not trigger; dispatch it on the branch or observe
-its first `main` run. The musl registry-install lanes and reconcile changes
+its first `main` run. Its first real run, on `rc/0.1.0-beta.5` at `0324c80`
+(run 35472611837), found a defect this local pass could not: `npx` does not
+forward signals to `wrangler`, so `scripts/qualify-workerd-artifact.mjs` left
+`workerd` alive holding its pipes and never exited, and the job was cancelled
+at its timeout. The qualifier now stops the whole process group and releases
+those pipes. The musl registry-install lanes and reconcile changes
 can only run against a real publication. These checks do not qualify an RC
 revision, establish cross-platform behavior, or prove the absence of
 defects. After review and merge, candidate preparation follows
