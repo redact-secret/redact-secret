@@ -690,6 +690,139 @@ mod tests {
         assert_eq!(selected, vec![(0, 40), (60, 100)]);
     }
 
+    #[test]
+    fn select_optimal_disjoint_set_keeps_every_disjoint_preferred_pair_at_a_large_candidate_count()
+    {
+        // The same shape as
+        // `select_optimal_disjoint_set_prefers_two_disjoint_candidates_over_one_higher_priority_overlapper`,
+        // tiled across many independent, non-adjacent groups. A candidate
+        // count no small fixture reaches, so a future regression that only
+        // gets the tiny cases right (for example an off-by-one in the
+        // predecessor binary search that happens to not matter at n < 10)
+        // has somewhere to show up.
+        const GROUPS: usize = 5_000;
+        let mut candidates = Vec::with_capacity(GROUPS * 3);
+        for i in 0..GROUPS {
+            let start = i * 6;
+            // The wide overlapper: higher specificity and confidence than
+            // either half of the pair, so it individually outranks each of
+            // them under `RankedCandidate::priority` alone.
+            candidates.push(synthetic(
+                2,
+                Specificity::Provider,
+                Confidence::High,
+                start,
+                start + 5,
+                0,
+                i,
+            ));
+            // The disjoint pair it overlaps, tied with it on resolved
+            // severity so their combined weight outranks the single
+            // overlapper's.
+            candidates.push(synthetic(
+                2,
+                Specificity::Contextual,
+                Confidence::Low,
+                start,
+                start + 2,
+                1,
+                2 * i,
+            ));
+            candidates.push(synthetic(
+                2,
+                Specificity::Contextual,
+                Confidence::Low,
+                start + 3,
+                start + 5,
+                1,
+                2 * i + 1,
+            ));
+        }
+
+        let mut selected: Vec<(usize, usize)> = select_optimal_disjoint_set(candidates)
+            .iter()
+            .map(|candidate| (candidate.range.start(), candidate.range.end()))
+            .collect();
+        selected.sort_unstable();
+
+        // Every group keeps its disjoint pair, never the wide overlapper:
+        // exactly 2 selected candidates per group.
+        assert_eq!(selected.len(), GROUPS * 2);
+        for (i, pair) in selected.chunks(2).enumerate() {
+            let start = i * 6;
+            assert_eq!(pair, [(start, start + 2), (start + 3, start + 5)]);
+        }
+    }
+
+    #[test]
+    fn select_optimal_disjoint_set_stays_within_a_time_budget_at_a_large_candidate_count() {
+        // `select_optimal_disjoint_set` is documented (see its doc comment
+        // and `ARCHITECTURE.md`) as `O(n log n)` in the pipeline's own
+        // candidate count, which `run_detector_pipeline` never externally
+        // bounds — `decision-bound-whole-input-operations-by-default`
+        // deliberately leaves `n` itself unbounded, applying
+        // `WholeInputLimits` only at the `scan`/`redact`/`scan_and_redact`
+        // entry points. This is the adversarial case for that bound: a
+        // candidate count no fixture or unit test above reaches, built so
+        // every candidate overlaps several neighbors and every predecessor
+        // lookup does real binary-search work, run once and timed. A
+        // regression to a quadratic (or worse) selection strategy blows this
+        // budget by orders of magnitude; `O(n log n)` does not.
+        //
+        // Debug builds (`cargo test`'s default) run this several times
+        // slower than an optimized build, and hosted CI runners add further
+        // variance under load; `adversarial_bounds.rs`'s runtime-cap tests
+        // document the same tradeoff for the whole-pipeline case. The budget
+        // here is sized generously enough to absorb both while still
+        // catching an asymptotic regression, which would miss it by more
+        // than an order of magnitude, not a small multiple.
+        const CANDIDATES: usize = 60_000;
+        const DEBUG_RUNTIME_BUDGET_MS: u128 = 2_000;
+        const RELEASE_RUNTIME_BUDGET_MS: u128 = 200;
+
+        let mut candidates = Vec::with_capacity(CANDIDATES);
+        for i in 0..CANDIDATES {
+            // Width 5, stride 1: each candidate overlaps its several
+            // neighbors, so the end-sorted order interleaves heavily and
+            // predecessor searches do not degenerate into "always the
+            // immediately preceding index".
+            candidates.push(synthetic(
+                u8::try_from(i % 3).unwrap(),
+                Specificity::Provider,
+                Confidence::High,
+                i,
+                i + 5,
+                0,
+                i,
+            ));
+        }
+
+        let budget = if cfg!(debug_assertions) {
+            DEBUG_RUNTIME_BUDGET_MS
+        } else {
+            RELEASE_RUNTIME_BUDGET_MS
+        };
+        let started_at = std::time::Instant::now();
+        let selected = select_optimal_disjoint_set(candidates);
+        let elapsed = started_at.elapsed().as_millis();
+        assert!(
+            elapsed <= budget,
+            "select_optimal_disjoint_set took {elapsed}ms for {CANDIDATES} candidates, above the {budget}ms budget",
+        );
+
+        // Pairwise disjoint, the defining property regardless of candidate
+        // count.
+        let mut ranges: Vec<(usize, usize)> = selected
+            .iter()
+            .map(|candidate| (candidate.range.start(), candidate.range.end()))
+            .collect();
+        ranges.sort_unstable();
+        assert!(!ranges.is_empty());
+        for pair in ranges.windows(2) {
+            assert!(pair[0].1 <= pair[1].0, "{ranges:?} has an overlap");
+        }
+    }
+
     fn built_in_registry() -> DetectorRegistry {
         DetectorRegistry::with_built_in([]).unwrap()
     }
