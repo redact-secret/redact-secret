@@ -690,6 +690,70 @@ mod tests {
         assert_eq!(selected, vec![(0, 40), (60, 100)]);
     }
 
+    #[test]
+    fn select_optimal_disjoint_set_keeps_every_disjoint_preferred_pair_at_a_large_candidate_count()
+    {
+        // The same shape as
+        // `select_optimal_disjoint_set_prefers_two_disjoint_candidates_over_one_higher_priority_overlapper`,
+        // tiled across many independent, non-adjacent groups. A candidate
+        // count no small fixture reaches, so a future regression that only
+        // gets the tiny cases right (for example an off-by-one in the
+        // predecessor binary search that happens to not matter at n < 10)
+        // has somewhere to show up.
+        const GROUPS: usize = 5_000;
+        let mut candidates = Vec::with_capacity(GROUPS * 3);
+        for i in 0..GROUPS {
+            let start = i * 6;
+            // The wide overlapper: higher specificity and confidence than
+            // either half of the pair, so it individually outranks each of
+            // them under `RankedCandidate::priority` alone.
+            candidates.push(synthetic(
+                2,
+                Specificity::Provider,
+                Confidence::High,
+                start,
+                start + 5,
+                0,
+                i,
+            ));
+            // The disjoint pair it overlaps, tied with it on resolved
+            // severity so their combined weight outranks the single
+            // overlapper's.
+            candidates.push(synthetic(
+                2,
+                Specificity::Contextual,
+                Confidence::Low,
+                start,
+                start + 2,
+                1,
+                2 * i,
+            ));
+            candidates.push(synthetic(
+                2,
+                Specificity::Contextual,
+                Confidence::Low,
+                start + 3,
+                start + 5,
+                1,
+                2 * i + 1,
+            ));
+        }
+
+        let mut selected: Vec<(usize, usize)> = select_optimal_disjoint_set(candidates)
+            .iter()
+            .map(|candidate| (candidate.range.start(), candidate.range.end()))
+            .collect();
+        selected.sort_unstable();
+
+        // Every group keeps its disjoint pair, never the wide overlapper:
+        // exactly 2 selected candidates per group.
+        assert_eq!(selected.len(), GROUPS * 2);
+        for (i, pair) in selected.chunks(2).enumerate() {
+            let start = i * 6;
+            assert_eq!(pair, [(start, start + 2), (start + 3, start + 5)]);
+        }
+    }
+
     fn built_in_registry() -> DetectorRegistry {
         DetectorRegistry::with_built_in([]).unwrap()
     }

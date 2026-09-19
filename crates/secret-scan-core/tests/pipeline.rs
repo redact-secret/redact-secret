@@ -891,6 +891,87 @@ fn large_finding_set_resolves_and_numbers_deterministically() {
 }
 
 #[test]
+fn overlap_resolution_stays_within_a_time_budget_at_a_large_candidate_count() {
+    // `select_optimal_disjoint_set` (`crates/secret-scan-core/src/pipeline.rs`)
+    // is documented as `O(n log n)` in the pipeline's own candidate count,
+    // which `run_detector_pipeline` never externally bounds —
+    // `decision-bound-whole-input-operations-by-default` deliberately leaves
+    // `n` itself unbounded, applying `WholeInputLimits` only at the
+    // `scan`/`redact`/`scan_and_redact` entry points. This is the
+    // adversarial case for that bound: a candidate count no fixture or unit
+    // test above reaches, built so every candidate overlaps several
+    // neighbors and every predecessor lookup does real binary-search work,
+    // run once through the whole pipeline and timed. A regression to a
+    // quadratic (or worse) selection strategy blows this budget by orders
+    // of magnitude; `O(n log n)` does not.
+    //
+    // `select_optimal_disjoint_set` is private, and `std::time` is forbidden
+    // inside the core crate's `src/` boundary (`check-rust-workspace.py`'s
+    // `FORBIDDEN_SOURCE` — the core performs no runtime I/O, clock reads
+    // included), so this measures the whole pipeline through the public
+    // `run_detector_pipeline` entry point from this integration test crate
+    // instead of the selection function alone. Candidate collection and
+    // validation add their own (linear) cost on top of selection's, but at
+    // this candidate count selection dominates.
+    //
+    // Debug builds (`cargo test`'s default) run this several times slower
+    // than an optimized build, and hosted CI runners add further variance
+    // under load; `adversarial_bounds.rs`'s runtime-cap tests document the
+    // same tradeoff for the whole-pipeline case there, at a 250ms release
+    // cap needing up to a 16x debug allowance to absorb loaded-runner
+    // variance. Measured locally (unloaded), this test takes ~6ms in a
+    // release build and ~57ms in an unoptimized build; the budgets below
+    // give both over an order of magnitude of headroom, enough to absorb
+    // hosted-runner variance while still catching an asymptotic regression,
+    // which would miss it by more than an order of magnitude, not a small
+    // multiple.
+    const COUNT: usize = 60_000;
+    const DEBUG_RUNTIME_BUDGET_MS: u128 = 2_000;
+    const RELEASE_RUNTIME_BUDGET_MS: u128 = 200;
+
+    // Width 5, stride 1: each candidate overlaps its several neighbors, so
+    // the end-sorted order interleaves heavily and predecessor searches do
+    // not degenerate into "always the immediately preceding index".
+    let input = "x".repeat(COUNT + 5);
+    let mut candidates = Vec::with_capacity(COUNT);
+    for index in 0..COUNT {
+        candidates.push(candidate(
+            "wide",
+            Confidence::High,
+            Specificity::Provider,
+            index,
+            index + 5,
+        ));
+    }
+    let registry = single("wide", candidates);
+
+    let started_at = std::time::Instant::now();
+    let findings = run_detector_pipeline(&input, &registry).unwrap();
+    let elapsed = started_at.elapsed().as_millis();
+    let budget = if cfg!(debug_assertions) {
+        DEBUG_RUNTIME_BUDGET_MS
+    } else {
+        RELEASE_RUNTIME_BUDGET_MS
+    };
+    assert!(
+        elapsed <= budget,
+        "run_detector_pipeline took {elapsed}ms for {COUNT} overlapping candidates, above the {budget}ms budget",
+    );
+
+    // Pairwise disjoint, the defining property regardless of candidate
+    // count.
+    assert!(!findings.is_empty());
+    for pair in findings.windows(2) {
+        assert!(
+            pair[0].range().end() <= pair[1].range().start(),
+            "finding {} and {} overlap",
+            pair[0].id(),
+            pair[1].id(),
+        );
+    }
+}
+
+#[test]
 fn many_nested_candidates_leave_exactly_one_winner() {
     // Every span nests inside the previous one; ties are broken by narrower
     // span, so the innermost candidate wins whatever emission order says.
