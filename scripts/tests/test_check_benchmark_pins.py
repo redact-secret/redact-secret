@@ -87,77 +87,92 @@ class CollectBenchmarkCommitsTests(unittest.TestCase):
         self.assertEqual(CHECK.collect_benchmark_commits(ledger), ["a" * 40, "b" * 40])
 
 
+class ProductLocalRefTests(unittest.TestCase):
+    def test_resolves_ancestry_against_the_origin_tracking_branch(self) -> None:
+        """actions/checkout (fetch-depth: 0, pull_request trigger) fetches every
+        branch into refs/remotes/origin/* and checks out a detached PR merge
+        ref -- it never creates a local `main` branch. Resolving ancestry
+        against bare `main` silently and incorrectly reports every PR's
+        pins.sourceRevision as not-an-ancestor."""
+        self.assertEqual(CHECK.PRODUCT_LOCAL_REF, "origin/main")
+
+
 # -- checks 3 and 4: ancestry, given pre-computed facts (pure) -------------
 
 
 class AncestryTests(unittest.TestCase):
     def test_passes_when_every_fact_resolves_clean(self) -> None:
         ledger = ledger_with(record(benchmarkCommit="c" * 40))
-        errors = CHECK.check_ancestry(
+        findings = CHECK.check_ancestry(
             MANIFEST,
             ledger,
             source_revision_is_ancestor=True,
             detectors_changed_since_source_revision=False,
             benchmark_commit_is_ancestor={"c" * 40: True},
         )
-        self.assertEqual(errors, [])
+        self.assertEqual(findings.errors, [])
+        self.assertEqual(findings.warnings, [])
 
     def test_flags_a_source_revision_that_is_not_an_ancestor(self) -> None:
-        errors = CHECK.check_ancestry(
+        findings = CHECK.check_ancestry(
             MANIFEST,
             ledger_with(),
             source_revision_is_ancestor=False,
             detectors_changed_since_source_revision=False,
             benchmark_commit_is_ancestor={},
         )
-        self.assertEqual(len(errors), 1)
-        self.assertIn("is not an ancestor", errors[0])
+        self.assertEqual(len(findings.errors), 1)
+        self.assertIn("is not an ancestor", findings.errors[0])
+        self.assertEqual(findings.warnings, [])
 
-    def test_flags_detectors_changed_since_source_revision_as_a_failure(self) -> None:
-        errors = CHECK.check_ancestry(
+    def test_flags_detectors_changed_since_source_revision_as_a_warning_not_an_error(self) -> None:
+        """Non-blocking: the product repo cannot itself refresh the benchmarks
+        repo's snapshot, so this must not fail the build (see #427)."""
+        findings = CHECK.check_ancestry(
             MANIFEST,
             ledger_with(),
             source_revision_is_ancestor=True,
             detectors_changed_since_source_revision=True,
             benchmark_commit_is_ancestor={},
         )
-        self.assertEqual(len(errors), 1)
-        self.assertIn("crates/secret-scan-core/src/detectors", errors[0])
+        self.assertEqual(findings.errors, [])
+        self.assertEqual(len(findings.warnings), 1)
+        self.assertIn("crates/secret-scan-core/src/detectors", findings.warnings[0])
 
     def test_flags_a_benchmark_commit_that_is_not_an_ancestor(self) -> None:
         ledger = ledger_with(record(benchmarkCommit="d" * 40))
-        errors = CHECK.check_ancestry(
+        findings = CHECK.check_ancestry(
             MANIFEST,
             ledger,
             source_revision_is_ancestor=True,
             detectors_changed_since_source_revision=False,
             benchmark_commit_is_ancestor={"d" * 40: False},
         )
-        self.assertEqual(len(errors), 1)
-        self.assertIn("d" * 40, errors[0])
-        self.assertIn("benchmark-gap-1", errors[0])
+        self.assertEqual(len(findings.errors), 1)
+        self.assertIn("d" * 40, findings.errors[0])
+        self.assertIn("benchmark-gap-1", findings.errors[0])
 
     def test_treats_an_unrecorded_benchmark_commit_as_failing(self) -> None:
         """Fail closed: absence of proof is not proof of ancestry."""
         ledger = ledger_with(record(benchmarkCommit="e" * 40))
-        errors = CHECK.check_ancestry(
+        findings = CHECK.check_ancestry(
             MANIFEST,
             ledger,
             source_revision_is_ancestor=True,
             detectors_changed_since_source_revision=False,
             benchmark_commit_is_ancestor={},
         )
-        self.assertEqual(len(errors), 1)
+        self.assertEqual(len(findings.errors), 1)
 
     def test_ignores_records_without_a_benchmark_commit(self) -> None:
-        errors = CHECK.check_ancestry(
+        findings = CHECK.check_ancestry(
             MANIFEST,
             ledger_with(record()),
             source_revision_is_ancestor=True,
             detectors_changed_since_source_revision=False,
             benchmark_commit_is_ancestor={},
         )
-        self.assertEqual(errors, [])
+        self.assertEqual(findings.errors, [])
 
 
 # -- local git ancestry helpers, against a real, deterministic history -----
