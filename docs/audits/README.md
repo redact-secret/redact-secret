@@ -39,3 +39,4 @@ and [qualification follow-up](release-qualification-follow-up.md) describe beta.
 | Detection assurance | [Epic closeout](detection-assurance-epic-closeout.md), [historical closeout](detection-assurance-closeout-audit.md), [residual evidence](detection-assurance-residual-evidence-backlog.md) |
 | Repository transfer | [Transfer evidence](repository-transfer-evidence.md) |
 | Release authority and publishers | [Recorded evidence](release-approval-and-registry-publisher-evidence.md) |
+| Closing the six gates in benchmark-regressions.json (#429) | [Product conformance and benchmark rerun evidence, pin-manifest staleness finding](evidence/429/README.md) |

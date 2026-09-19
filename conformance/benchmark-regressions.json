@@ -15,8 +15,12 @@
         "0fe3363d4e0aec300b81bb823929f73928c7e06eb9e1d43064cf7b5b7f0d977e"
       ],
       "fixingCommit": "8d8d5b4e8dae8de1b42e174d8d21dc0075147fc6",
+      "benchmarkCommit": "0fa424ae64b7c44967b146758bc035a92dd65ee8",
       "canonicalFixtures": {
-        "synchronous": [],
+        "synchronous": [
+          "contextual-negative-windows-env-reference-excluded",
+          "contextual-negative-sql-bind-parameter-excluded"
+        ],
         "incremental": []
       },
       "gates": {
@@ -25,11 +29,13 @@
           "evidence": []
         },
         "benchmarkRevalidation": {
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            "https://github.com/redact-secret/redact-secret/blob/workbench/429-close-benchmark-gates/docs/audits/evidence/429/candidate-evidence-summary.json"
+          ]
         }
       },
-      "note": "The detector repair and unit controls landed historically, but no canonical cross-surface fixture or fixed-candidate benchmark rerun is recorded. The closed issue remains closed; these gates remain pending."
+      "note": "The detector repair and unit controls landed historically. Issue #429 added the missing canonical cross-surface fixtures (contextual-negative-windows-env-reference-excluded, contextual-negative-sql-bind-parameter-excluded) and a fixed-candidate benchmark rerun (docs/audits/evidence/429/README.md), which passed: benchmarkRevalidation is closed. productConformance stays pending because these fixtures have not yet run in a recorded CI evidence -- no supported-surface run has executed them yet; close it once this change's own CI run is recorded."
     },
     {
       "id": "benchmark-gap-293",
@@ -43,6 +49,7 @@
         "0fe3363d4e0aec300b81bb823929f73928c7e06eb9e1d43064cf7b5b7f0d977e"
       ],
       "fixingCommit": "a62339e7bb2de616bbc200476c9e043bfd429c30",
+      "benchmarkCommit": "0fa424ae64b7c44967b146758bc035a92dd65ee8",
       "canonicalFixtures": {
         "synchronous": [
           "contextual-negative-azure-keyvault-secreturi-non-azure-host",
@@ -55,15 +62,19 @@
       },
       "gates": {
         "productConformance": {
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            "https://github.com/redact-secret/redact-secret/actions/runs/35439980831"
+          ]
         },
         "benchmarkRevalidation": {
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            "https://github.com/redact-secret/redact-secret/blob/workbench/429-close-benchmark-gates/docs/audits/evidence/429/candidate-evidence-summary.json"
+          ]
         }
       },
-      "note": "Canonical whole-input cases exist, but the closed issue does not record the required supported-surface conformance evidence or a fixed-candidate benchmark rerun."
+      "note": "Canonical whole-input cases were already recorded. Issue #429 closed both gates: productConformance cites the Artifact qualification run at commit f6769c4 (Rust core, Python binding, N-API addon, browser WebAssembly x3, CLI, all through built artifacts), a descendant of this record's fixing commit; benchmarkRevalidation cites a fixed-candidate rerun whose reference-syntax corpus hash matches this record's corpusHashes exactly and whose fixtures came back clean (docs/audits/evidence/429/README.md)."
     },
     {
       "id": "benchmark-gap-294",
@@ -93,15 +104,17 @@
       },
       "gates": {
         "productConformance": {
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            "https://github.com/redact-secret/redact-secret/actions/runs/35439980831"
+          ]
         },
         "benchmarkRevalidation": {
           "status": "pending",
           "evidence": []
         }
       },
-      "note": "Whole-input and incremental cases exist, but the closed issue does not record the required supported-surface conformance evidence or a fixed-candidate benchmark rerun."
+      "note": "Whole-input and incremental cases were already recorded. Issue #429 closed productConformance, citing the Artifact qualification run at commit f6769c4 (Rust core, Python binding, N-API addon, browser WebAssembly x3, CLI, all through built artifacts), a descendant of this record's fixing commit. benchmarkRevalidation stays pending: a fixed-candidate rerun completed, and this record's three fixtures individually came back EXACT, but the rerun's detector-coverage corpus hash (0d5800251b19d7ee0d2cc2ad489d09a619d7626c578bf9b28a5c9fce791610eb, verified directly against the redact-secret-benchmarks tree at the pinned commit) does not match this record's corpusHashes -- this repository's committed benchmarks/pin-manifest.json is stale for that category despite its revision label (docs/audits/evidence/429/README.md). Needs a follow-up issue against #427's manifest-sync process before this gate can close."
     },
     {
       "id": "sendgrid-generic-key-full-span-promotion",

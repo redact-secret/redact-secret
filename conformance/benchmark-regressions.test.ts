@@ -68,6 +68,7 @@ describe("benchmark regression provenance", () => {
 
   test("rejects a passed benchmark revalidation gate without benchmarkCommit", () => {
     const candidate = clone();
+    delete candidate.records[0].benchmarkCommit;
     (candidate.records[0].gates.benchmarkRevalidation as { status: string; evidence: string[] }).status = "passed";
     (candidate.records[0].gates.benchmarkRevalidation as { status: string; evidence: string[] }).evidence = [
       "https://example.invalid/evidence",
