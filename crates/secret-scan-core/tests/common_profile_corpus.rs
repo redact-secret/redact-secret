@@ -146,18 +146,31 @@ fn common_findings_match_the_committed_common_expectations() {
     );
 }
 
-/// Every `common` finding comes from a `common` detector. A finding under a
-/// `provider` id would mean the registry, not just its overlap outcomes,
-/// changed.
+/// Every `common` finding comes from a `common` detector, never a
+/// `provider`-only one. Checking `finding.detector()` against `common`'s own
+/// `registry.ids()` would be true by construction — `scan` can only
+/// attribute a finding to a detector actually in the registry it was given —
+/// so this instead checks against the `provider`-only ids `full` has and
+/// `common` does not: a finding under one of those would mean the registry,
+/// not just its overlap outcomes, changed.
 #[test]
 fn common_findings_come_only_from_common_detectors() {
     let registry = common();
-    let ids: Vec<&str> = registry.ids().collect();
+    let common_ids: Vec<&str> = registry.ids().collect();
+    let full_registry = DetectorRegistry::with_built_in([]).unwrap();
+    let provider_only_ids: Vec<&str> = full_registry
+        .ids()
+        .filter(|id| !common_ids.contains(id))
+        .collect();
+    assert!(
+        !provider_only_ids.is_empty(),
+        "sanity: full must have detectors common does not"
+    );
     for fixture in evaluated_fixtures() {
         for finding in scan(&fixture.input, &registry, &DefaultPolicy).unwrap() {
             assert!(
-                ids.contains(&finding.detector()),
-                "{}: {}",
+                !provider_only_ids.contains(&finding.detector()),
+                "{}: {} is a provider-only detector",
                 fixture.id,
                 finding.detector()
             );

@@ -566,6 +566,19 @@ impl Detector for ReservedIdDetector {
     }
 }
 
+/// "private-key" is a `common` id the profile already registers.
+struct DuplicateCommonIdDetector;
+
+impl Detector for DuplicateCommonIdDetector {
+    fn id(&self) -> &str {
+        "private-key"
+    }
+
+    fn detect(&self, _: &str, _: &DetectorContext) -> Result<Vec<Candidate>, DetectorFailure> {
+        Ok(Vec::new())
+    }
+}
+
 #[test]
 fn common_registry_rejects_a_custom_detector_that_reuses_a_full_built_in_id() {
     // An id no built-in uses registers normally.
@@ -577,6 +590,12 @@ fn common_registry_rejects_a_custom_detector_that_reuses_a_full_built_in_id() {
     let error =
         DetectorRegistry::with_common_built_in([Box::new(ReservedIdDetector) as Box<dyn Detector>])
             .unwrap_err();
+    assert_eq!(error.code(), SecretScanErrorCode::InvalidDetector);
+
+    let error = DetectorRegistry::with_common_built_in([
+        Box::new(DuplicateCommonIdDetector) as Box<dyn Detector>
+    ])
+    .unwrap_err();
     assert_eq!(error.code(), SecretScanErrorCode::InvalidDetector);
 }
 

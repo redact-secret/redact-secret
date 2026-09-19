@@ -18,6 +18,7 @@ import { dirname, extname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { buildAndEmitPerformanceResult, loadAssessmentSchema } from "./lib/assessment-emit.mjs";
+import { DETECTOR_PROFILES as WASM_PROFILES } from "./lib/detector-profiles.mjs";
 import { loadTsModule } from "./lib/load-ts-module.mjs";
 import {
   gitCommit, hostCpu, hostOs, loadWorkloadProfiles, readPackageVersion,
@@ -27,21 +28,22 @@ import {
 const SCRIPTS_DIR = dirname(fileURLToPath(import.meta.url));
 const PACKAGE_ENTRY = join(REPO_ROOT, "packages", "javascript", "dist", "index.js");
 const PACKAGE_COMMON_ENTRY = join(REPO_ROOT, "packages", "javascript", "dist", "common.js");
-/** Per detector profile: the glue and binary to stage, and the default build directory. */
-const DETECTOR_PROFILES = {
-  full: {
-    glue: "redact_secret_wasm.js",
-    binary: "redact_secret_wasm_bg.wasm",
-    defaultArtifactDir: join(REPO_ROOT, "bindings", "wasm", "pkg"),
-    buildCommand: "npm run wasm:build",
-  },
-  common: {
-    glue: "redact_secret_wasm_common.js",
-    binary: "redact_secret_wasm_common_bg.wasm",
-    defaultArtifactDir: join(REPO_ROOT, "bindings", "wasm", "pkg-common"),
-    buildCommand: "npm run wasm:build:common",
-  },
-};
+/**
+ * This script's own view of `./lib/detector-profiles.mjs`'s shared table:
+ * the glue and binary to stage, and the default build directory, resolved
+ * to an absolute path.
+ */
+const DETECTOR_PROFILES = Object.fromEntries(
+  Object.entries(WASM_PROFILES).map(([key, wasmProfile]) => [
+    key,
+    {
+      glue: wasmProfile.glue,
+      binary: wasmProfile.binary,
+      defaultArtifactDir: join(REPO_ROOT, wasmProfile.relativeDir),
+      buildCommand: wasmProfile.buildCommand,
+    },
+  ]),
+);
 const WASM_PACKAGE_JSON = join(REPO_ROOT, "bindings", "wasm", "npm", "package.json");
 const ENGINES = ["chromium", "firefox", "webkit"];
 const CONTENT_TYPES = { ".html": "text/html", ".js": "text/javascript", ".json": "application/json", ".wasm": "application/wasm" };

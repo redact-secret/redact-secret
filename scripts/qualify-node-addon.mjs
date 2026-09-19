@@ -71,6 +71,7 @@ import {
   loadCanonicalFixture,
   packageVersion,
 } from "./qualify-runtime-fixture.mjs";
+import { fullDetectorIds } from "./lib/full-detector-ids.mjs";
 
 /**
  * The package-integration and stream-adapter fixture for `common`
@@ -274,24 +275,6 @@ function loadCommonExpectations() {
     `${COMMON_EXPECTATIONS_FILE}: not a utf8-byte common expectation set`,
   );
   return common;
-}
-
-/**
- * The canonical `full` detector ids, in order, from the corpus's own oracle.
- * Duplicated from `scripts/qualify-browser-artifact.mjs`'s own
- * `fullDetectorIds` rather than imported: that script runs its own `main()`
- * unconditionally at module load (`await main()` at file scope, with no
- * "am I the entry point" guard), so importing anything from it would launch
- * a full browser qualification run as a side effect.
- */
-function fullDetectorIds() {
-  const source = readFileSync(
-    join(REPO_ROOT, "crates", "secret-scan-core", "src", "detectors", "mod.rs"),
-    "utf8",
-  );
-  const table = source.match(/BUILT_IN_PACKS: &\[\(&str, Pack\)\] = &\[([\s\S]*?)\n\];/);
-  if (table === null) throw new Error("detectors/mod.rs: BUILT_IN_PACKS not found");
-  return [...table[1].matchAll(/\("([a-z0-9-]+)", Pack::/g)].map((match) => match[1]);
 }
 
 function inspectAddon(target) {

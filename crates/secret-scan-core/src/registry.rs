@@ -328,7 +328,13 @@ mod tests {
     }
 
     #[test]
-    fn common_built_in_come_first_and_are_an_ordered_subset_of_full() {
+    fn common_built_in_come_first() {
+        // Whether `common_built_in_detectors()`'s ids are themselves an
+        // order-preserving subsequence of `built_in_detectors()`'s is
+        // `detectors::mod`'s own invariant
+        // (`common_built_in_detectors_are_exactly_the_common_pack_in_canonical_order`);
+        // this test owns only what `with_common_built_in` itself does with
+        // whatever that list is: register it first, then `custom`.
         let registry =
             DetectorRegistry::with_common_built_in(
                 [Box::new(Named("custom")) as Box<dyn Detector>],
@@ -342,35 +348,14 @@ mod tests {
         assert_eq!(ids.len(), common.len() + 1);
         assert_eq!(ids[..common.len()], common);
         assert_eq!(ids[common.len()], "custom");
-
-        let full: Vec<String> = built_in_detectors()
-            .iter()
-            .map(|d| d.id().to_owned())
-            .collect();
-        let mut cursor = 0;
-        for id in &common {
-            let found = full[cursor..].iter().position(|f| f == id).unwrap();
-            cursor += found + 1;
-        }
     }
 
-    #[test]
-    fn common_rejects_a_custom_detector_that_reuses_any_full_built_in_id() {
-        // "github-token" is a `provider` id, never registered by `common`
-        // itself, but still reserved.
-        let error = DetectorRegistry::with_common_built_in([
-            Box::new(Named("github-token")) as Box<dyn Detector>
-        ])
-        .unwrap_err();
-        assert_eq!(error.code(), SecretScanErrorCode::InvalidDetector);
-
-        // "private-key" is a `common` id the profile already registers.
-        let error = DetectorRegistry::with_common_built_in([
-            Box::new(Named("private-key")) as Box<dyn Detector>
-        ])
-        .unwrap_err();
-        assert_eq!(error.code(), SecretScanErrorCode::InvalidDetector);
-    }
+    // `with_common_built_in`'s rejection of a custom detector that reuses a
+    // reserved id — either a `provider`-only id or an already-registered
+    // `common` id — is a public-API-level contract, covered by
+    // `tests/public_api.rs`'s
+    // `common_registry_rejects_a_custom_detector_that_reuses_a_full_built_in_id`,
+    // not repeated here.
 
     #[test]
     fn profile_identity_matches_how_the_registry_was_built() {

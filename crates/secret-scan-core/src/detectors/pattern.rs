@@ -74,32 +74,71 @@ pub(super) enum RunLength {
     AtLeast(usize),
 }
 
+/// An extra structural check a matched run must pass, applied after the
+/// boundary check: `(bytes, start, end)` of the whole match, e.g.
+/// Cloudflare's checksum-shaped tail.
+pub(super) type PostCheck = fn(&[u8], usize, usize) -> bool;
+
 /// One literal prefix paired with the run length its own documented grammar
 /// requires, for detectors whose prefixes do not all share a single length
 /// (Docker Hub's `dckr_pat_` is followed by exactly 27 bytes, `dckr_oat_` by
 /// exactly 32). A detector whose prefixes do share one length can keep using
 /// [`scan_prefixed_runs`], which is this shape with the same `run` repeated.
+///
+/// `alphabet` and `signals` are carried per shape, not per scan, so
+/// [`scan_prefixed_shapes`] can combine prefixes that need different
+/// alphabets or different finding signals into the one left-to-right,
+/// longest-prefix-wins pass a single combined regex alternation would give —
+/// the same pass every other shape already gets — instead of a detector
+/// scanning each such group separately and merging the results by position,
+/// which is easy to get wrong exactly when one group's prefix is a literal
+/// substring of another's.
 #[derive(Clone, Copy, Debug)]
 pub(super) struct PrefixShape<'a> {
     pub(super) prefix: &'a str,
     pub(super) run: RunLength,
+    pub(super) alphabet: Alphabet,
+    pub(super) signals: &'static [&'static str],
+    pub(super) post_check: Option<PostCheck>,
 }
 
 impl<'a> PrefixShape<'a> {
     /// `prefix` followed by exactly `len` alphabet bytes (`{n}`).
-    pub(super) const fn exact(prefix: &'a str, len: usize) -> Self {
+    pub(super) const fn exact(
+        prefix: &'a str,
+        len: usize,
+        alphabet: Alphabet,
+        signals: &'static [&'static str],
+    ) -> Self {
         Self {
             prefix,
             run: RunLength::Exact(len),
+            alphabet,
+            signals,
+            post_check: None,
         }
     }
 
     /// `prefix` followed by at least `len` alphabet bytes (`{n,}`).
-    pub(super) const fn at_least(prefix: &'a str, len: usize) -> Self {
+    pub(super) const fn at_least(
+        prefix: &'a str,
+        len: usize,
+        alphabet: Alphabet,
+        signals: &'static [&'static str],
+    ) -> Self {
         Self {
             prefix,
             run: RunLength::AtLeast(len),
+            alphabet,
+            signals,
+            post_check: None,
         }
+    }
+
+    /// Attaches a [`PostCheck`] a match under this shape must also pass.
+    pub(super) const fn with_post_check(mut self, post_check: PostCheck) -> Self {
+        self.post_check = Some(post_check);
+        self
     }
 }
 
@@ -151,38 +190,81 @@ pub(super) fn scan_prefixed_runs(
 ) -> Vec<(usize, usize)> {
     let shapes: Vec<PrefixShape<'_>> = prefixes
         .iter()
-        .map(|prefix| PrefixShape { prefix, run })
+        .map(|prefix| PrefixShape {
+            prefix,
+            run,
+            alphabet,
+            signals: &[],
+            post_check: None,
+        })
         .collect();
-    scan_prefixed_shapes(input, &shapes, alphabet, boundary)
+    scan_prefixed_shapes(input, &shapes, boundary)
+        .into_iter()
+        .map(|(start, end, _signals)| (start, end))
+        .collect()
 }
 
-/// [`scan_prefixed_runs`] generalized to one run length per prefix: the
-/// regex equivalent is `(?:prefix1run1|prefix2run2|...)`, still matched left
-/// to right with the longest literal prefix winning at each position, and
-/// each prefix's own `{n}` / `{n,}` quantifier applied to the run that
-/// follows it.
+/// [`scan_prefixed_runs`] generalized to one run length, alphabet, and
+/// signal set per prefix: the regex equivalent is
+/// `(?:prefix1run1|prefix2run2|...)`, still matched left to right with the
+/// longest literal prefix winning at each position, and each prefix's own
+/// `{n}` / `{n,}` quantifier and alphabet applied to the run that follows
+/// it. A shape's [`PostCheck`], when set, is applied after the boundary
+/// check.
 ///
-/// Returns already boundary-filtered `(start, end)` byte ranges.
+/// Because each shape carries its own alphabet, prefixes that need
+/// different suffix alphabets are matched in the same left-to-right pass
+/// instead of one pass per alphabet merged afterward by position — the
+/// merge-by-position approach a caller could otherwise reach for, and get
+/// wrong, when one group's prefix is a literal substring of another's.
+///
+/// Returns already boundary- and post-check-filtered `(start, end,
+/// signals)` triples.
 pub(super) fn scan_prefixed_shapes(
     input: &str,
     shapes: &[PrefixShape<'_>],
-    alphabet: Alphabet,
     boundary: Alphabet,
-) -> Vec<(usize, usize)> {
+) -> Vec<(usize, usize, &'static [&'static str])> {
     let bytes = input.as_bytes();
-    let ends = run_ends(bytes, alphabet);
+    // Function-pointer identity (`std::ptr::fn_addr_eq`, not `==`, whose
+    // result the compiler does not guarantee is meaningful) is enough here:
+    // grouping and lookup both use it, so a same-address false positive
+    // between two distinct `Alphabet` functions would only make this scan
+    // share a run-ends table those functions' identical code already makes
+    // interchangeable. `shape_table[i]` records, once, which table each
+    // `shapes[i]` resolved to, so matching a shape later is a plain index
+    // rather than a fallible re-lookup.
+    let mut alphabets: Vec<Alphabet> = Vec::new();
+    let shape_table: Vec<usize> = shapes
+        .iter()
+        .map(|shape| {
+            if let Some(index) = alphabets
+                .iter()
+                .position(|&a| std::ptr::fn_addr_eq(a, shape.alphabet))
+            {
+                index
+            } else {
+                alphabets.push(shape.alphabet);
+                alphabets.len() - 1
+            }
+        })
+        .collect();
+    let tables: Vec<Vec<usize>> = alphabets.iter().map(|&a| run_ends(bytes, a)).collect();
+
     let mut matches = Vec::new();
     let mut start = 0;
     while start < bytes.len() {
-        let Some(shape) = shapes
+        let Some((shape_index, shape)) = shapes
             .iter()
-            .filter(|shape| bytes[start..].starts_with(shape.prefix.as_bytes()))
-            .max_by_key(|shape| shape.prefix.len())
+            .enumerate()
+            .filter(|(_, shape)| bytes[start..].starts_with(shape.prefix.as_bytes()))
+            .max_by_key(|(_, shape)| shape.prefix.len())
         else {
             start += 1;
             continue;
         };
 
+        let ends = &tables[shape_table[shape_index]];
         let suffix_start = start + shape.prefix.len();
         let available = ends[suffix_start] - suffix_start;
         let matched_len = match shape.run {
@@ -195,8 +277,12 @@ pub(super) fn scan_prefixed_shapes(
         };
 
         let end = suffix_start + matched_len;
-        if boundary_ok(bytes, start, end, boundary) {
-            matches.push((start, end));
+        let post_check_ok = match shape.post_check {
+            Some(check) => check(bytes, start, end),
+            None => true,
+        };
+        if post_check_ok && boundary_ok(bytes, start, end, boundary) {
+            matches.push((start, end, shape.signals));
         }
         start = end;
     }

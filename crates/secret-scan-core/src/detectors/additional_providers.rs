@@ -4,37 +4,50 @@
 //! Mirrors the retired `src/detectors/additional-providers.ts` oracle. Every
 //! one of these providers reduces to the same shape as [`super::gitlab`] or
 //! [`super::anthropic`] — a documented literal prefix set, each prefix
-//! followed by a fixed- or minimum-length run of a documented alphabet,
-//! with a boundary alphabet of `[A-Za-z0-9_-]` — so they share one generic
-//! [`Detector`] implementation instead of one bespoke type each. Prefixes of
-//! one provider may carry different lengths (Docker Hub's `dckr_pat_` and
-//! `dckr_oat_`), which is why each prefix is a [`PrefixShape`] of its own.
-//! Slack moved out to [`super::slack`] (issue #371): its `xoxb-` bot prefix
-//! needs a `-`-separated section grammar this generic shape cannot express,
-//! while its other prefixes keep this same "prefix plus a minimum-length
-//! run" shape as an interim guard, composed directly from the shared
-//! `pattern` primitives instead of through this type. Cloudflare moved out
-//! to [`super::cloudflare`] (issue #373): its reviewed contract needs a
-//! post-hoc check on the matched run's trailing bytes (a checksum-shaped
-//! tail) this type cannot express. Linear moved out to [`super::linear`]
-//! (issue #374): its reviewed `lin_api_` contract needs a narrower suffix
-//! alphabet (`[A-Za-z0-9]`) than the interim-guarded `lin_oauth_` prefix
-//! (`[A-Za-z0-9_-]`), and this type's single alphabet field is shared by
-//! every shape, not per-prefix.
+//! followed by a fixed- or minimum-length run of a documented alphabet, an
+//! optional post-hoc check, and the finding signals a match carries — so
+//! they share one generic, table-driven [`Detector`] implementation instead
+//! of one bespoke type each. [`super::cloudflare`] and [`super::linear`] are
+//! this same detector: a [`PrefixShape`]'s alphabet, signals, and
+//! [`pattern::PostCheck`] are each carried per shape, not per detector, so
+//! Cloudflare's checksum-shaped tail and Linear's two differently-alphabet'd
+//! prefixes are both expressible as data, matched in one left-to-right,
+//! longest-prefix-wins pass. [`super::slack`] is the one exception: its
+//! `xoxb-` bot prefix needs a `-`-separated section grammar no
+//! [`PrefixShape`] can express, so it stays a bespoke `Detector`; its other
+//! prefixes keep this same "prefix plus a minimum-length run" shape as an
+//! interim guard, merged with the bot scan's results by position.
 
 use crate::detectors::pattern::{self, Alphabet, PrefixShape};
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
 
-/// A detector defined purely by a literal prefix set, a following
-/// character-class run, and the resulting finding's metadata.
+/// A detector defined purely by a table of [`PrefixShape`]s (each carrying
+/// its own alphabet and finding signals) and a shared boundary alphabet.
 pub(super) struct KnownFormatProviderDetector {
     id: &'static str,
     type_name: &'static str,
-    signals: &'static [&'static str],
     shapes: &'static [PrefixShape<'static>],
-    alphabet: Alphabet,
     boundary: Alphabet,
+}
+
+impl KnownFormatProviderDetector {
+    /// Constructs a detector from its table, for use by sibling detector
+    /// modules ([`super::cloudflare`], [`super::linear`]) whose own reviewed
+    /// contract is this same shape.
+    pub(super) const fn new(
+        id: &'static str,
+        type_name: &'static str,
+        shapes: &'static [PrefixShape<'static>],
+        boundary: Alphabet,
+    ) -> Self {
+        Self {
+            id,
+            type_name,
+            shapes,
+            boundary,
+        }
+    }
 }
 
 impl Detector for KnownFormatProviderDetector {
@@ -48,8 +61,8 @@ impl Detector for KnownFormatProviderDetector {
         _context: &DetectorContext,
     ) -> Result<Vec<Candidate>, DetectorFailure> {
         let mut candidates = Vec::new();
-        for (start, end) in
-            pattern::scan_prefixed_shapes(input, self.shapes, self.alphabet, self.boundary)
+        for (start, end, signals) in
+            pattern::scan_prefixed_shapes(input, self.shapes, self.boundary)
         {
             let Some(range) = ByteRange::new(start, end) else {
                 continue;
@@ -57,7 +70,7 @@ impl Detector for KnownFormatProviderDetector {
             candidates.push(
                 Candidate::new(self.type_name, Confidence::High, range)
                     .with_specificity(Specificity::Provider)
-                    .with_signals(self.signals.iter().copied()),
+                    .with_signals(signals.iter().copied()),
             );
         }
         Ok(candidates)
@@ -71,19 +84,19 @@ impl Detector for KnownFormatProviderDetector {
 /// `pk_test_`) is deliberately excluded: it names a public identifier, not
 /// a secret, so treating it as a match would be a false positive. Newer or
 /// undocumented prefixes are false negatives until added.
+const STRIPE_SIGNALS: [&str; 2] = ["stripe-documented-prefix", "opaque-suffix"];
+
 pub(super) const STRIPE: KnownFormatProviderDetector = KnownFormatProviderDetector {
     id: "stripe-token",
     type_name: "stripe_credential",
-    signals: &["stripe-documented-prefix", "opaque-suffix"],
     shapes: &[
-        PrefixShape::at_least("sk_test_", 20),
-        PrefixShape::at_least("sk_live_", 20),
-        PrefixShape::at_least("rk_test_", 20),
-        PrefixShape::at_least("rk_live_", 20),
-        PrefixShape::at_least("sk_org_", 20),
-        PrefixShape::at_least("whsec_", 20),
+        PrefixShape::at_least("sk_test_", 20, pattern::is_alnum, &STRIPE_SIGNALS),
+        PrefixShape::at_least("sk_live_", 20, pattern::is_alnum, &STRIPE_SIGNALS),
+        PrefixShape::at_least("rk_test_", 20, pattern::is_alnum, &STRIPE_SIGNALS),
+        PrefixShape::at_least("rk_live_", 20, pattern::is_alnum, &STRIPE_SIGNALS),
+        PrefixShape::at_least("sk_org_", 20, pattern::is_alnum, &STRIPE_SIGNALS),
+        PrefixShape::at_least("whsec_", 20, pattern::is_alnum, &STRIPE_SIGNALS),
     ],
-    alphabet: pattern::is_alnum,
     boundary: pattern::is_alnum_dash,
 };
 
@@ -92,40 +105,45 @@ pub(super) const STRIPE: KnownFormatProviderDetector = KnownFormatProviderDetect
 /// only) and the 85-byte minimum favors precision: a shorter or
 /// differently-cased example is an intentional false negative rather than
 /// a loosened match.
+const PYPI_SIGNALS: [&str; 2] = ["pypi-documented-prefix", "macaroon-minimum-length"];
+
 pub(super) const PYPI: KnownFormatProviderDetector = KnownFormatProviderDetector {
     id: "pypi-token",
     type_name: "pypi_api_token",
-    signals: &["pypi-documented-prefix", "macaroon-minimum-length"],
-    shapes: &[PrefixShape::at_least("pypi-", 85)],
-    alphabet: pattern::is_alnum_dash,
+    shapes: &[PrefixShape::at_least(
+        "pypi-",
+        85,
+        pattern::is_alnum_dash,
+        &PYPI_SIGNALS,
+    )],
     boundary: pattern::is_alnum_dash,
 };
 
-/// Hugging Face user access tokens in the provider's `hf_` namespace.
-/// Issue #372 (following the frozen precision contract from issue #367,
-/// `docs/audits/evidence/367/precision-contracts.json`) narrows the
-/// retired `hf_` + 20-byte-minimum shared shape to the reviewed grammar:
-/// gitleaks 8.30.1 and trufflehog 3.97.4 independently agree on an exact
-/// 34-byte body, so a body one byte short of 34 (the beta.4
-/// `huggingface-token-user-plain-twin` regression) is now an intentional
-/// false negative instead of a match. The two tools disagree on the body
-/// alphabet (gitleaks: letters only; trufflehog: letters and digits); that
-/// conflict is resolved as a support-policy choice for the union
-/// `[A-Za-z0-9]` rather than guessed into the letters-only intersection, so
-/// a digit-bearing body is still accepted even though it stays unscored
-/// (T0) in the benchmark corpus pending independent review. Both tools
-/// agree the body excludes `_`/`-`, so — unlike the shared "prefix plus a
-/// minimum-length run" shape most of this module's providers still use —
-/// an underscore or dash inside the body is now evidence-backed exclusion,
-/// not merely a length shortfall. A dash in place of the documented
-/// underscore prefix, or any other undocumented prefix, remains an
-/// intentional false negative.
+/// Hugging Face user access tokens in the provider's `hf_` namespace: the
+/// reviewed grammar (issue #372, following the frozen precision contract
+/// from issue #367, `docs/audits/evidence/367/precision-contracts.json`) is
+/// `hf_` plus an exact 34-byte body, matched to the union alphabet
+/// `[A-Za-z0-9]`. gitleaks 8.30.1 and trufflehog 3.97.4 independently agree
+/// on the 34-byte exact length, so a body one byte short is an intentional
+/// false negative; they disagree on the body alphabet (gitleaks: letters
+/// only; trufflehog: letters and digits), resolved as a support-policy
+/// choice for the union rather than the letters-only intersection, so a
+/// digit-bearing body is accepted even though it stays unscored (T0) in the
+/// benchmark corpus pending independent review. Both tools agree the body
+/// excludes `_`/`-`, an evidence-backed exclusion rather than merely a
+/// length shortfall. A dash in place of the documented underscore prefix, or
+/// any other undocumented prefix, is an intentional false negative.
+const HUGGING_FACE_SIGNALS: [&str; 2] = ["huggingface-documented-prefix", "base62-exact-length"];
+
 pub(super) const HUGGING_FACE: KnownFormatProviderDetector = KnownFormatProviderDetector {
     id: "huggingface-token",
     type_name: "huggingface_token",
-    signals: &["huggingface-documented-prefix", "base62-exact-length"],
-    shapes: &[PrefixShape::exact("hf_", 34)],
-    alphabet: pattern::is_alnum,
+    shapes: &[PrefixShape::exact(
+        "hf_",
+        34,
+        pattern::is_alnum,
+        &HUGGING_FACE_SIGNALS,
+    )],
     boundary: pattern::is_alnum_dash,
 };
 
@@ -146,15 +164,25 @@ pub(super) const HUGGING_FACE: KnownFormatProviderDetector = KnownFormatProvider
 /// documented segment names are matched; an undocumented segment name is an
 /// intentional false negative, and legacy Docker Hub passwords (which carry
 /// no distinguishing prefix at all) are out of scope for this detector.
+const DOCKER_SIGNALS: [&str; 2] = ["docker-documented-prefix", "exact-length-suffix"];
+
 pub(super) const DOCKER: KnownFormatProviderDetector = KnownFormatProviderDetector {
     id: "docker-token",
     type_name: "docker_token",
-    signals: &["docker-documented-prefix", "exact-length-suffix"],
     shapes: &[
-        PrefixShape::exact("dckr_pat_", DOCKER_PAT_SUFFIX_LEN),
-        PrefixShape::exact("dckr_oat_", DOCKER_OAT_SUFFIX_LEN),
+        PrefixShape::exact(
+            "dckr_pat_",
+            DOCKER_PAT_SUFFIX_LEN,
+            pattern::is_alnum_dash,
+            &DOCKER_SIGNALS,
+        ),
+        PrefixShape::exact(
+            "dckr_oat_",
+            DOCKER_OAT_SUFFIX_LEN,
+            pattern::is_alnum_dash,
+            &DOCKER_SIGNALS,
+        ),
     ],
-    alphabet: pattern::is_alnum_dash,
     boundary: pattern::is_alnum_dash,
 };
 
@@ -181,16 +209,17 @@ pub(super) const DOCKER_OAT_SUFFIX_LEN: usize = 32;
 /// case-sensitive. Only the documented `v1` namespace is matched; a future
 /// version bump (`dop_v2_` and siblings) is an intentional false negative
 /// until that shape is confirmed and added.
+const DIGITALOCEAN_SIGNALS: [&str; 2] =
+    ["digitalocean-documented-prefix", "fixed-length-hex-suffix"];
+
 pub(super) const DIGITALOCEAN: KnownFormatProviderDetector = KnownFormatProviderDetector {
     id: "digitalocean-token",
     type_name: "digitalocean_token",
-    signals: &["digitalocean-documented-prefix", "fixed-length-hex-suffix"],
     shapes: &[
-        PrefixShape::exact("dop_v1_", 64),
-        PrefixShape::exact("doo_v1_", 64),
-        PrefixShape::exact("dor_v1_", 64),
+        PrefixShape::exact("dop_v1_", 64, pattern::is_lower_hex, &DIGITALOCEAN_SIGNALS),
+        PrefixShape::exact("doo_v1_", 64, pattern::is_lower_hex, &DIGITALOCEAN_SIGNALS),
+        PrefixShape::exact("dor_v1_", 64, pattern::is_lower_hex, &DIGITALOCEAN_SIGNALS),
     ],
-    alphabet: pattern::is_lower_hex,
     boundary: pattern::is_alnum_dash,
 };
 
@@ -198,29 +227,34 @@ pub(super) const DIGITALOCEAN: KnownFormatProviderDetector = KnownFormatProvider
 /// deliberately excluded — it names a public identifier, not a secret —
 /// so classifying it would be a false positive; an undocumented prefix is
 /// a false negative.
+const SUPABASE_SIGNALS: [&str; 2] = ["supabase-secret-prefix", "elevated-access-key"];
+
 pub(super) const SUPABASE: KnownFormatProviderDetector = KnownFormatProviderDetector {
     id: "supabase-token",
     type_name: "supabase_secret_key",
-    signals: &["supabase-secret-prefix", "elevated-access-key"],
-    shapes: &[PrefixShape::at_least("sb_secret_", 20)],
-    alphabet: pattern::is_alnum_dash,
+    shapes: &[PrefixShape::at_least(
+        "sb_secret_",
+        20,
+        pattern::is_alnum_dash,
+        &SUPABASE_SIGNALS,
+    )],
     boundary: pattern::is_alnum_dash,
 };
 
 /// Vercel personal, integration, app, refresh, and API-key credentials. An
 /// undocumented prefix letter is an intentional false negative.
+const VERCEL_SIGNALS: [&str; 2] = ["vercel-documented-prefix", "opaque-suffix"];
+
 pub(super) const VERCEL: KnownFormatProviderDetector = KnownFormatProviderDetector {
     id: "vercel-token",
     type_name: "vercel_token",
-    signals: &["vercel-documented-prefix", "opaque-suffix"],
     shapes: &[
-        PrefixShape::at_least("vcp_", 20),
-        PrefixShape::at_least("vci_", 20),
-        PrefixShape::at_least("vca_", 20),
-        PrefixShape::at_least("vcr_", 20),
-        PrefixShape::at_least("vck_", 20),
+        PrefixShape::at_least("vcp_", 20, pattern::is_alnum_dash, &VERCEL_SIGNALS),
+        PrefixShape::at_least("vci_", 20, pattern::is_alnum_dash, &VERCEL_SIGNALS),
+        PrefixShape::at_least("vca_", 20, pattern::is_alnum_dash, &VERCEL_SIGNALS),
+        PrefixShape::at_least("vcr_", 20, pattern::is_alnum_dash, &VERCEL_SIGNALS),
+        PrefixShape::at_least("vck_", 20, pattern::is_alnum_dash, &VERCEL_SIGNALS),
     ],
-    alphabet: pattern::is_alnum_dash,
     boundary: pattern::is_alnum_dash,
 };
 
@@ -231,12 +265,17 @@ pub(super) const VERCEL: KnownFormatProviderDetector = KnownFormatProviderDetect
 /// a prefix with the token truncated below 36 bytes, or with the `npm_`
 /// prefix stripped entirely, is an intentional false negative; the fixed
 /// prefix, alphabet, and length keep false-positive risk low.
+const NPM_SIGNALS: [&str; 2] = ["npm-documented-prefix", "base62-exact-length"];
+
 pub(super) const NPM: KnownFormatProviderDetector = KnownFormatProviderDetector {
     id: "npm-token",
     type_name: "npm_access_token",
-    signals: &["npm-documented-prefix", "base62-exact-length"],
-    shapes: &[PrefixShape::exact("npm_", 36)],
-    alphabet: pattern::is_alnum,
+    shapes: &[PrefixShape::exact(
+        "npm_",
+        36,
+        pattern::is_alnum,
+        &NPM_SIGNALS,
+    )],
     boundary: pattern::is_alnum_dash,
 };
 
@@ -257,12 +296,17 @@ pub(super) const NPM: KnownFormatProviderDetector = KnownFormatProviderDetector 
 /// service-scoped Cloud/Gemini use, so this detector reports the shape at
 /// `Confidence::High` and leaves the redact/warn action call to policy, the
 /// same tradeoff npm and the other known-format providers above make.
+const GOOGLE_SIGNALS: [&str; 2] = ["google-documented-prefix", "exact-length-suffix"];
+
 pub(super) const GOOGLE: KnownFormatProviderDetector = KnownFormatProviderDetector {
     id: "google-api-key",
     type_name: "google_api_key",
-    signals: &["google-documented-prefix", "exact-length-suffix"],
-    shapes: &[PrefixShape::exact("AIza", 35)],
-    alphabet: pattern::is_alnum_dash,
+    shapes: &[PrefixShape::exact(
+        "AIza",
+        35,
+        pattern::is_alnum_dash,
+        &GOOGLE_SIGNALS,
+    )],
     boundary: pattern::is_alnum_dash,
 };
 
@@ -281,12 +325,18 @@ pub(super) const GOOGLE: KnownFormatProviderDetector = KnownFormatProviderDetect
 /// would encode an implementation detail of a single external tool rather
 /// than an independently confirmed provider fact. An undocumented prefix,
 /// or a body shorter than the minimum, is an intentional false negative.
+const GRAFANA_CLOUD_SIGNALS: [&str; 2] =
+    ["grafana-cloud-documented-prefix", "base64-opaque-suffix"];
+
 pub(super) const GRAFANA_CLOUD: KnownFormatProviderDetector = KnownFormatProviderDetector {
     id: "grafana-cloud-access-policy-token",
     type_name: "grafana_cloud_access_policy_token",
-    signals: &["grafana-cloud-documented-prefix", "base64-opaque-suffix"],
-    shapes: &[PrefixShape::at_least("glc_", 32)],
-    alphabet: pattern::is_base64_body,
+    shapes: &[PrefixShape::at_least(
+        "glc_",
+        32,
+        pattern::is_base64_body,
+        &GRAFANA_CLOUD_SIGNALS,
+    )],
     boundary: pattern::is_alnum_dash,
 };
 
@@ -958,27 +1008,11 @@ mod tests {
         }
     }
 
-    /// The reproduced beta.4 failure: a 63-byte body -- the paired positive
-    /// with its final byte dropped -- was accepted under the old 20-byte
-    /// minimum and is now rejected, both bare and in the Unicode/CRLF
-    /// framing the benchmark used, while the paired positive keeps its exact
-    /// UTF-8 byte range.
-    #[test]
-    fn digitalocean_rejects_a_sixty_three_byte_twin_of_every_prefix() {
-        for token in digitalocean_tokens() {
-            let twin = &token[..token.len() - 1];
-            for input in [
-                format!("{twin}\n\n"),
-                format!("# \u{1F511} reviewed format\r\n{twin}\n\r\n"),
-            ] {
-                assert!(detect(&DIGITALOCEAN, &input).is_empty(), "{input}");
-            }
-            let framed = format!("# \u{1F511} reviewed format\r\n{token}\n\r\n");
-            let candidates = detect(&DIGITALOCEAN, &framed);
-            assert_eq!(candidates.len(), 1, "{framed}");
-            assert_eq!(candidates[0].range(), ByteRange::new(24, 95).unwrap());
-        }
-    }
+    // The reproduced beta.4 failure -- a 63-byte body (the paired positive
+    // with its final byte dropped) accepted under the old 20-byte minimum,
+    // both bare and in the Unicode/CRLF framing the benchmark used -- is the
+    // exact scenario `tests/digitalocean_precision.rs` exists to pin, at
+    // both the whole-input and isolated-detector level; not repeated here.
 
     /// A longer run of the boundary alphabet is a wider identifier, not a
     /// token with a valid-looking 64-byte substring: nothing is carved out

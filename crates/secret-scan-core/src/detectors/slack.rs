@@ -55,15 +55,25 @@ const BOT_SIGNALS: [&str; 2] = ["slack-documented-prefix", "bot-section-grammar"
 /// Every other documented prefix, unchanged from beta.4.
 const INTERIM_MIN_LEN: usize = 20;
 const INTERIM_ALPHABET: Alphabet = pattern::is_alnum_dash;
-const INTERIM_SHAPES: [PrefixShape<'static>; 6] = [
-    PrefixShape::at_least("xoxp-", INTERIM_MIN_LEN),
-    PrefixShape::at_least("xapp-", INTERIM_MIN_LEN),
-    PrefixShape::at_least("xwfp-", INTERIM_MIN_LEN),
-    PrefixShape::at_least("xoxe-", INTERIM_MIN_LEN),
-    PrefixShape::at_least("xoxe.xoxb-", INTERIM_MIN_LEN),
-    PrefixShape::at_least("xoxe.xoxp-", INTERIM_MIN_LEN),
-];
 const INTERIM_SIGNALS: [&str; 2] = ["slack-documented-prefix", "opaque-suffix"];
+const INTERIM_SHAPES: [PrefixShape<'static>; 6] = [
+    PrefixShape::at_least("xoxp-", INTERIM_MIN_LEN, INTERIM_ALPHABET, &INTERIM_SIGNALS),
+    PrefixShape::at_least("xapp-", INTERIM_MIN_LEN, INTERIM_ALPHABET, &INTERIM_SIGNALS),
+    PrefixShape::at_least("xwfp-", INTERIM_MIN_LEN, INTERIM_ALPHABET, &INTERIM_SIGNALS),
+    PrefixShape::at_least("xoxe-", INTERIM_MIN_LEN, INTERIM_ALPHABET, &INTERIM_SIGNALS),
+    PrefixShape::at_least(
+        "xoxe.xoxb-",
+        INTERIM_MIN_LEN,
+        INTERIM_ALPHABET,
+        &INTERIM_SIGNALS,
+    ),
+    PrefixShape::at_least(
+        "xoxe.xoxp-",
+        INTERIM_MIN_LEN,
+        INTERIM_ALPHABET,
+        &INTERIM_SIGNALS,
+    ),
+];
 
 /// A value is never a slice of a wider `[A-Za-z0-9_-]` identifier.
 const BOUNDARY: Alphabet = pattern::is_alnum_dash;
@@ -106,16 +116,16 @@ impl Detector for SlackTokenDetector {
 /// `xoxe.xoxb-`, which [`scan_bot`] leaves to the interim guard, so scanning
 /// each family independently and merging by position reproduces the same
 /// left-to-right, longest-prefix result a single combined scan would.
-fn scan(input: &str) -> Vec<(usize, usize, &'static [&'static str; 2])> {
-    let mut matches: Vec<(usize, usize, &'static [&'static str; 2])> = scan_bot(input)
+fn scan(input: &str) -> Vec<(usize, usize, &'static [&'static str])> {
+    let mut matches: Vec<(usize, usize, &'static [&'static str])> = scan_bot(input)
         .into_iter()
-        .map(|(start, end)| (start, end, &BOT_SIGNALS))
+        .map(|(start, end)| (start, end, BOT_SIGNALS.as_slice()))
         .collect();
-    matches.extend(
-        pattern::scan_prefixed_shapes(input, &INTERIM_SHAPES, INTERIM_ALPHABET, BOUNDARY)
-            .into_iter()
-            .map(|(start, end)| (start, end, &INTERIM_SIGNALS)),
-    );
+    matches.extend(pattern::scan_prefixed_shapes(
+        input,
+        &INTERIM_SHAPES,
+        BOUNDARY,
+    ));
     matches.sort_unstable_by_key(|&(start, _, _)| start);
     matches
 }
@@ -155,8 +165,8 @@ fn scan_bot(input: &str) -> Vec<(usize, usize)> {
 /// three `-`-separated sections the provider documents, the last being the
 /// secret. Because each run is maximal, a section wider than its documented
 /// range is rejected rather than truncated, and a missing separator before
-/// the secret section — the beta.4 defect issue #371 fixes — is rejected
-/// too, rather than being re-read as a longer second numeric section.
+/// the secret section is rejected too, rather than being re-read as a
+/// longer second numeric section.
 fn bot_end(
     bytes: &[u8],
     digit_ends: &[usize],
@@ -354,8 +364,8 @@ mod tests {
 
     #[test]
     fn a_bot_section_grammar_failure_never_falls_back_to_the_interim_guard() {
-        // A long enough `xoxb-` body with no section grammar at all — the
-        // exact beta.4 shape this issue retires for the bot prefix.
+        // A long enough `xoxb-` body with no `-`-separated section grammar
+        // at all.
         let input = "xoxb-SYNTHETICREVOKEDPROVIDERVALUE00000000";
         assert!(ranges(input).is_empty());
     }

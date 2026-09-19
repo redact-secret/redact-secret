@@ -33,6 +33,32 @@ function typeScriptExamples(document = README): readonly string[] {
   );
 }
 
+/**
+ * The text of `dist/<declarationPath>`, plus the text of every `.d.ts` it
+ * re-exports from via `export * from "./foo.js"`, recursively: a name a
+ * declaration file exposes only through such a re-export (e.g. `index.d.ts`
+ * re-exporting `entry-core.d.ts`'s types) would otherwise never appear in
+ * the literal text this test scans for it.
+ */
+function declaredText(declarationPath: string, seen = new Set<string>()): string {
+  if (seen.has(declarationPath)) return "";
+  seen.add(declarationPath);
+
+  const absolute = join(PACKAGE_ROOT, "dist", declarationPath);
+  const text = readFileSync(absolute, "utf8");
+  const directory = declarationPath.includes("/")
+    ? declarationPath.slice(0, declarationPath.lastIndexOf("/") + 1)
+    : "";
+
+  let combined = text;
+  for (const [, specifier] of text.matchAll(
+    /export \* from "\.\/([^"]+)\.js"/g,
+  )) {
+    combined += declaredText(`${directory}${specifier}.d.ts`, seen);
+  }
+  return combined;
+}
+
 /** Every name a README example imports from `subpath` of the package. */
 function importedNames(example: string, subpath = ""): readonly string[] {
   const names: string[] = [];
@@ -102,10 +128,7 @@ describe("README examples", () => {
     ]) {
       const module = `@redact-secret/core${subpath}`;
       const publicApi = (await import(module)) as Record<string, unknown>;
-      const declared = readFileSync(
-        join(PACKAGE_ROOT, "dist", declarations ?? ""),
-        "utf8",
-      );
+      const declared = declaredText(declarations ?? "");
 
       for (const name of new Set(
         typeScriptExamples().flatMap((example) =>

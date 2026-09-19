@@ -87,9 +87,10 @@ describe("WebAssembly-shaped binding: lifecycle", () => {
   });
 
   it("accepts a common-profile artifact against the common-profile runtime", async () => {
-    // Exercises the exact normalization `runtime/browser-common.ts` reuses
-    // from `runtime/browser.ts`'s `createBindingFromWasmModule`: a WebAssembly
-    // module built from the `common` registry, mapped to `profile()`.
+    // Exercises `wasm-binding.ts`'s `createBindingFromWasmModule`, the
+    // normalization `runtime/browser.ts` and `runtime/browser-common.ts`
+    // both import: a WebAssembly module built from the `common` registry,
+    // mapped to `profile()`.
     const wasm = createWasmShapedBinding({ profile: "common" });
     const runtime = createRedactSecretRuntime(wasm.load, "common");
 
