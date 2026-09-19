@@ -1,0 +1,54 @@
+diff --git a/bindings/wasm/src/lib.rs b/bindings/wasm/src/lib.rs
+index af523a4..b867488 100644
+--- a/bindings/wasm/src/lib.rs
++++ b/bindings/wasm/src/lib.rs
+@@ -85,6 +85,19 @@ pub fn profile() -> String {
+ /// registry cannot be built.
+ #[wasm_bindgen]
+ pub fn initialize() -> Result<(), JsValue> {
++    // THROWAWAY — issue #441 measurement scaffold only. Keeps
++    // `redact_secret::__ruleset_prototype_probe` (and the module behind it)
++    // reachable under LTO so `scripts/measure-detector-cost.mjs` measures a
++    // real compiled artifact instead of an estimate.
++    // `black_box` marks both sides as externally observable so the call
++    // cannot be proven pure and folded away; `initialize`'s own behavior is
++    // unchanged because the sample below always parses successfully.
++    const RULESET_PROTOTYPE_MEASUREMENT_SAMPLE: &[u8] = b"ruleset-revision: 1\ndetector: acme-internal-token\nspecificity: contextual\nprefix: \"ACME_\"\nalphabet: alnum-dash\nrun: at-least 20\nvalidator: none\n";
++    if !std::hint::black_box(redact_secret::__ruleset_prototype_probe(
++        std::hint::black_box(RULESET_PROTOTYPE_MEASUREMENT_SAMPLE),
++    )) {
++        return Err(to_js_error(crate::error::WasmErrorCode::InitializationFailed));
++    }
+     lifecycle::initialize().map_err(to_js_error)
+ }
+ 
+diff --git a/crates/secret-scan-core/src/lib.rs b/crates/secret-scan-core/src/lib.rs
+index 2d58e92..308ba9e 100644
+--- a/crates/secret-scan-core/src/lib.rs
++++ b/crates/secret-scan-core/src/lib.rs
+@@ -124,6 +124,7 @@ mod pipeline;
+ mod policy;
+ mod redact;
+ mod registry;
++mod ruleset_prototype;
+ mod types;
+ 
+ pub use entropy::shannon_entropy;
+@@ -160,6 +161,17 @@ pub const VERSION: &str = env!("CARGO_PKG_VERSION");
+ /// JavaScript uses UTF-16 code units and Python uses Unicode code points.
+ pub const RANGE_UNIT: &str = "utf8-bytes";
+ 
++/// THROWAWAY — issue #441 WASM-size measurement scaffold only, never part of
++/// the reviewed public surface or `core-public-api` manifest. Exists so
++/// `bindings/wasm` can call into [`ruleset_prototype`] and keep it reachable
++/// under LTO for `scripts/measure-detector-cost.mjs`. Removed with `git
++/// checkout --` once `docs/audits/evidence/441/` is recorded.
++#[doc(hidden)]
++#[must_use]
++pub fn __ruleset_prototype_probe(bytes: &[u8]) -> bool {
++    ruleset_prototype::parse_ruleset_prototype(bytes).is_ok()
++}
++
+ #[cfg(test)]
+ mod tests {
+     use super::*;
