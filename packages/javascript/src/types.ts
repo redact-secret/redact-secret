@@ -15,6 +15,14 @@
 /** The string-index unit every public range in this package uses. */
 export type RangeUnit = "utf16-code-units";
 
+/**
+ * Which artifact this runtime loaded: the native addon, or the WebAssembly
+ * fallback engaged when the addon path could not produce a usable binding
+ * (`decision-add-node-wasm-fallback`). Always `"wasm"` in a browser, where
+ * WebAssembly is the only artifact.
+ */
+export type ArtifactKind = "addon" | "wasm";
+
 /** How specific a detector considers a match. */
 export type SecretConfidence = "high" | "medium" | "low";
 

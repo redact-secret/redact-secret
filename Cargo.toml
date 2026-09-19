@@ -210,18 +210,20 @@ node-addon-targets = [
 # package: `bindings/node/npm/<platform>/package.json` must exist for each,
 # `packages/javascript/package.json`'s `optionalDependencies` and
 # `runtime/node.ts`'s host-to-package mapping must name exactly these
-# packages, and no others. `decision-ship-first-release-artifact-set` is the
-# accepted decision that npm ships glibc only: the addon's two musl triples
-# are qualified (`node-addon-targets`) but never published, so this list is a
-# strict subset of the addon's eight, the same asymmetry
-# `cli-release-targets` records for the CLI. See docs/qualification.md.
+# packages, and no others. `decision-publish-musl-node-addons` extended this
+# list to the addon's full eight triples, publishing the two musl addons
+# `node-addon-targets` already builds and qualifies; `cli-release-targets`
+# still records a musl exclusion of its own, unaffected by this list. See
+# docs/qualification.md.
 node-publish-targets = [
   "aarch64-apple-darwin",
   "aarch64-pc-windows-msvc",
   "aarch64-unknown-linux-gnu",
+  "aarch64-unknown-linux-musl",
   "x86_64-apple-darwin",
   "x86_64-pc-windows-msvc",
   "x86_64-unknown-linux-gnu",
+  "x86_64-unknown-linux-musl",
 ]
 # Every target a CLI release must build and smoke-test a `redact-secret` binary
 # for. The CLI ships no musl variant, so this is the six triples the addon

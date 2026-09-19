@@ -133,6 +133,22 @@ describe("initialization contract", () => {
 
     expect(runtime.scan("API_KEY=SYNTHETIC")).toEqual([]);
   });
+
+  it("requires initialize before reporting which artifact loaded", () => {
+    const runtime = createRedactSecretRuntime(async () => createFakeBinding(), "full");
+
+    expect(() => runtime.artifact()).toThrowError(
+      expect.objectContaining({ code: "NOT_INITIALIZED" }),
+    );
+  });
+
+  it("reports the loaded binding's own artifact kind", async () => {
+    const runtime = createRedactSecretRuntime(async () => createFakeBinding(), "full");
+
+    await runtime.initialize();
+
+    expect(runtime.artifact()).toBe("addon");
+  });
 });
 
 describe("finding normalization", () => {

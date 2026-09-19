@@ -103,7 +103,16 @@ export interface WasmIncrementalSanitizer {
 }
 
 export interface WasmModule {
-  default(): Promise<unknown>;
+  /**
+   * `runtime/browser.ts`/`browser-common.ts` call this with no argument,
+   * which `fetch`es the `.wasm` binary relative to the generated glue's own
+   * `import.meta.url`. `runtime/node.ts`'s WebAssembly fallback
+   * (`decision-add-node-wasm-fallback`) instead passes
+   * `{ module_or_path: <bytes already read from disk> }`, instantiating
+   * directly rather than through `fetch` — the same generated function, one
+   * documented alternate calling convention, not a second build target.
+   */
+  default(source?: { module_or_path: Uint8Array }): Promise<unknown>;
   version(): string;
   profile(): string;
   initialize(): void;
@@ -275,6 +284,7 @@ export function createBindingFromWasmModule(wasm: WasmModule): NativeBinding {
   return {
     version: () => wasm.version(),
     profile: () => wasm.profile(),
+    artifact: () => "wasm",
     initialize: () => {
       wasm.initialize();
     },

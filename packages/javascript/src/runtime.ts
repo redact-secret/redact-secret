@@ -29,6 +29,7 @@ import {
 } from "./native.js";
 import { VERSION } from "./version.js";
 import type {
+  ArtifactKind,
   DetectedSecretFinding,
   IncrementalSanitizer,
   IncrementalSanitizerOptions,
@@ -210,6 +211,7 @@ function toNativeIncrementalOptions(
 
 export interface RedactSecretRuntime {
   initialize(): Promise<void>;
+  artifact(): ArtifactKind;
   scan(input: string, options?: ScanOptions): readonly SecretFinding[];
   redact(
     input: string,
@@ -268,6 +270,11 @@ export function createRedactSecretRuntime(
   function active(): NativeBinding {
     if (binding === undefined) throw new SecretScanError("NOT_INITIALIZED");
     return binding;
+  }
+
+  /** Which artifact `initialize()` loaded. Requires initialization, like every other operation here. */
+  function artifact(): ArtifactKind {
+    return active().artifact();
   }
 
   function scan(
@@ -407,6 +414,7 @@ export function createRedactSecretRuntime(
 
   return {
     initialize,
+    artifact,
     scan,
     redact,
     scanAndRedact,

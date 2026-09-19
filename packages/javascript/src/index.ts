@@ -23,6 +23,11 @@
  * frozen. Every failure is a {@link SecretScanError} carrying nothing but a
  * fixed code and message.
  *
+ * On Node, `initialize()` normally loads the native addon; it falls back to
+ * a WebAssembly artifact when the addon cannot produce a usable binding
+ * (`decision-add-node-wasm-fallback`). {@link artifact} reports which one
+ * actually loaded.
+ *
  * Built-in detectors all run in Rust; there is no custom detector callback in
  * this API, and no internal module of this package is reachable through its
  * `exports` map.
@@ -44,6 +49,15 @@ import { runtime } from "./session.js";
  * built from a different product version than this package.
  */
 export const initialize = runtime.initialize;
+
+/**
+ * Which artifact `initialize()` loaded: `"addon"` (the native N-API addon)
+ * or `"wasm"` (the WebAssembly fallback engaged when the addon could not
+ * produce a usable binding, `decision-add-node-wasm-fallback`; always
+ * `"wasm"` in a browser). Requires `initialize()` to have already succeeded,
+ * the same as every other operation here.
+ */
+export const artifact = runtime.artifact;
 
 /** Scans `input` and returns every finding, in input order. */
 export const scan = runtime.scan;

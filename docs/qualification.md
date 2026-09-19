@@ -42,13 +42,13 @@ supported surface once:
 
 The native lists are the same platform story: Linux glibc and musl on x64
 and arm64, macOS on x64 and arm64, and Windows on x64 and arm64 — eight
-triples — with two deliberate exceptions, both narrower than the addon's own
-matrix and both required to stay a subset of `node-addon-targets`. **The CLI
-ships no musl variant**, so `cli-release-targets` is six non-musl triples.
-**npm ships glibc only** (`decision-ship-first-release-artifact-set`), so
-`node-publish-targets` is the same six triples: the addon's two musl targets
-are built and qualified but have no npm package. On top of that: Chromium,
-Firefox and WebKit for the browser, and Node.js 20, 22 and 24.
+triples. `node-addon-targets` and `node-publish-targets` are the same eight
+(`decision-publish-musl-node-addons`): every addon this matrix builds and
+qualifies is also published. **The CLI still ships no musl variant**, so
+`cli-release-targets` remains six non-musl triples, the one deliberate
+exception left, narrower than the addon's own matrix and required to stay a
+subset of `node-addon-targets`. On top of that: Chromium, Firefox and
+WebKit for the browser, and Node.js 20, 22 and 24.
 
 `scripts/check-artifact-matrix.py` (run by `npm run artifacts:check`, and by
 the `Artifact matrix policy` job every other job waits on) fails when any of the
@@ -274,28 +274,61 @@ version; and pass/fail results for initialization, scan, incremental, and
 stream behavior. The inventory rejects a missing runtime row, mismatched
 revision, incomplete artifact identity, or non-passing result.
 
-## The musl addon has a qualification path, not a publication path
+## The musl addon is published, selected by detection
 
-`node-addon-targets` builds and qualifies eight addons, but `npm ships glibc
-only` is an accepted decision
-(`decision-ship-first-release-artifact-set`, issue #79): `node-publish-targets`
-is the six non-musl triples, `packages/javascript` declares exactly those six
-per-platform `optionalDependencies`, and `runtime/node.ts` selects between
-them by `process.platform`/`process.arch` alone — there is deliberately no
-libc dimension, because there is nothing for one to select between. An npm
-install on Alpine therefore resolves the *gnu* package, which a musl host
-cannot load; that failure surfaces as the same `INITIALIZATION_FAILED` an
-unsupported platform gets, not a distinct musl error. The two musl addons
-this matrix builds are qualified artifacts with no publication path, by
-design, and the package-level pass here links the local build under
-whichever specifier the runtime resolves, which is why it passes on musl
-too.
+`node-addon-targets` builds and qualifies eight addons, and since
+`decision-publish-musl-node-addons` all eight are published:
+`node-publish-targets` matches it exactly, `packages/javascript` declares
+one `optionalDependencies` entry per platform including both musl triples,
+and `runtime/node.ts` selects between a Linux host's `gnu` and `musl`
+package by **detecting** the running libc
+(`process.report.getReport().header.glibcVersionRuntime`), never by trying
+one and falling back to the other. Detection is required, not merely
+convenient: an addon linked against the wrong libc does not fail at
+`require()` the way a missing or corrupt addon does. The failure surfaces
+later, at the first unresolved symbol touch, as a process-fatal `symbol
+lookup error` outside any `try`/`catch`'s reach, so the wrong candidate must
+never be allowed to load in the first place. The package-level pass here
+links the local build under whichever specifier the runtime resolves, which
+is why it passes on musl too.
 
 `scripts/check-artifact-matrix.py` keeps this boundary from drifting: adding
 a target to `node-publish-targets` without also adding its
 `bindings/node/npm/<platform>/package.json`, its
 `packages/javascript/package.json` `optionalDependencies` entry, and its
 `runtime/node.ts` mapping (or the reverse) fails `npm run artifacts:check`.
+
+## The Node WebAssembly fallback
+
+`decision-add-node-wasm-fallback` adds a second path once the addon path has
+already failed for any reason: an unsupported platform or architecture, a
+matching optional dependency that did not install, or a corrupt addon. Since
+`decision-publish-musl-node-addons`, this no longer includes musl — that
+host now has its own qualified, faster native addon — but it still covers
+FreeBSD and other unsupported hosts, and a broken install on any platform.
+Instead of the fixed `INITIALIZATION_FAILED` those cases used to reach
+unconditionally, `initialize()` now also tries the same WebAssembly artifact
+`@redact-secret/wasm` publishes for browsers, reusing its `--target web`
+build unmodified: the Node loader reads the `.wasm` binary from disk and
+instantiates the generated glue's `default()` export with
+`{ module_or_path: <bytes> }` instead of the `fetch`-based path a browser
+takes. `artifact()` reports which artifact actually loaded (`"addon"` or
+`"wasm"`), so an application can log or assert it; it always reports
+`"wasm"` in a browser.
+
+`scripts/qualify-node-wasm-fallback.mjs` qualifies this path against the
+real published artifact: it links the built WebAssembly package into
+`packages/javascript`'s own `node_modules` at the specifier the fallback
+loader resolves, deliberately without linking any addon, then drives the
+published package's public API — `initialize()`, `artifact()`, a
+synchronous scan, an incremental session, and the Node `Transform` stream
+adapter — and asserts every one of them matches the same artifact's
+whole-input result. Unlike `node-addon`/`browser`, this is not (yet) its own
+CI qualification job: no host in the current matrix is missing a native
+addon by design, so there is no natural place in the fan-out to run it
+against every platform the way the addon and browser artifacts are. Run it
+locally after `npm run wasm:build` and `npm run js:build` (see "Running it
+locally" below); a dedicated CI lane is left to a follow-up.
 
 ## Incremental sanitization is qualified on every JavaScript runtime
 
@@ -345,6 +378,9 @@ npx playwright install --with-deps chromium firefox webkit
 npm run browser:qualify                 # or --engine chromium
 npm run wasm:build:common
 npm run browser:qualify -- --detector-profile common
+
+npm run node-wasm-fallback:qualify -- --wasm-dir bindings/wasm/pkg
+npm run node-wasm-fallback:qualify -- --wasm-dir bindings/wasm/pkg-common --detector-profile common
 
 # Clean installed-candidate checks (repeat across the declared matrices).
 node scripts/qualify-package-consumer.mjs --lane node \

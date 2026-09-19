@@ -27,6 +27,27 @@ const LIMITS = {
   maxMultilineCodeUnits: 256,
 };
 
+describe("Node addon binding: artifact", () => {
+  it("reports its artifact kind as addon, never wasm", () => {
+    const binding = createBindingFromAddon({
+      version: () => "0.0.0-test",
+      profile: () => "full",
+      initialize: () => {},
+      scan: () => [],
+      redact: (input) => input,
+      scanAndRedact: (input) => ({ findings: [], redacted: input }),
+      createIncrementalSanitizer: () => ({
+        state: "accepting",
+        append: (chunk) => ({ text: chunk, findings: [] }),
+        finalize: () => ({ text: "", findings: [] }),
+        abort: () => {},
+      }),
+    });
+
+    expect(binding.artifact()).toBe("addon");
+  });
+});
+
 describe("Node addon binding: createIncrementalSanitizer", () => {
   it("delegates to the required addon's own export", () => {
     const calls: string[] = [];

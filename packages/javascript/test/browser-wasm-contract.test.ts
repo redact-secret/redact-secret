@@ -74,6 +74,15 @@ describe("WebAssembly-shaped binding: lifecycle", () => {
     expect(runtime.scan("API_KEY=SYNTHETIC")).toEqual([]);
   });
 
+  it("reports its artifact kind as wasm, never addon", async () => {
+    const wasm = createWasmShapedBinding();
+    const runtime = createRedactSecretRuntime(wasm.load, "full");
+
+    await runtime.initialize();
+
+    expect(runtime.artifact()).toBe("wasm");
+  });
+
   it("rejects an artifact that reports a different detector profile", async () => {
     const wasm = createWasmShapedBinding({ profile: "common" });
     const runtime = createRedactSecretRuntime(wasm.load, "full");

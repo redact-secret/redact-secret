@@ -57,6 +57,15 @@ import { runtime } from "./session-common.js";
  */
 export const initialize = runtime.initialize;
 
+/**
+ * Which artifact `initialize()` loaded: `"addon"` (the native N-API addon)
+ * or `"wasm"` (the WebAssembly fallback engaged when the addon could not
+ * produce a usable binding, `decision-add-node-wasm-fallback`; always
+ * `"wasm"` in a browser). Requires `initialize()` to have already succeeded,
+ * the same as every other operation here.
+ */
+export const artifact = runtime.artifact;
+
 /** Scans `input` and returns every finding, in input order. */
 export const scan = runtime.scan;
 

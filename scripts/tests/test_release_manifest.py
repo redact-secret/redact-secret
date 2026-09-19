@@ -266,7 +266,7 @@ class WorkflowOutputTests(unittest.TestCase):
                                 "GITHUB_OUTPUT": str(directory / "output")},
                            check=True, capture_output=True)
             manifest = json.loads((directory / "manifest.json").read_text())
-            self.assertEqual(len(manifest["artifact_set"]), 11)
+            self.assertEqual(len(manifest["artifact_set"]), 13)
             self.assertEqual(set(manifest["artifact_set"]), set(manifest["registry_state"]))
             self.assertEqual(set(manifest["registry_state"].values()), {"unknown"})
             self.assertIn("pypi:redact-secret", manifest["artifact_set"])
