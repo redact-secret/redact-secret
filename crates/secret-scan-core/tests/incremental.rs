@@ -448,6 +448,56 @@ fn final_findings_reproduce_the_synchronous_ids_ordering_and_absolute_ranges() {
     assert_eq!(ids, ["finding-1", "finding-2", "finding-3"]);
 }
 
+/// `select_optimal_disjoint_set` (issue #451) replaced the pipeline's
+/// greedy overlap-acceptance walk with a dynamic program, run once per
+/// closed unit exactly as the greedy pass was
+/// (`crate::incremental::process_unit` calls the same
+/// `run_detector_pipeline` a whole-input `scan` does). Partition equivalence
+/// for that change follows from the same invariant that already covered the
+/// greedy walk: no candidate ever crosses a closed-unit boundary, so each
+/// unit's optimal selection is decided entirely from that unit's own
+/// candidates, independent of anything in an earlier or later unit.
+///
+/// This fixture exercises exactly that: the first line alone is a closed
+/// unit carrying a genuine overlap (`bearer_token` outranks the wider
+/// `contextual_secret` reading of the same quoted value, resolved and
+/// flushed as `finding-1` as soon as the line closes), and only afterwards
+/// does a multi-chunk PEM block open and close as its own, later unit. The
+/// earlier unit's overlap winner is already finalized by the time the PEM
+/// construct even starts, let alone closes — the one incremental-specific
+/// shape the two-unit, single-shot `final_findings_reproduce_the_synchronous_ids_ordering_and_absolute_ranges`
+/// case above does not cover, because none of its lines contain an overlap.
+#[test]
+fn a_construct_closes_after_an_earlier_units_overlap_winner_was_already_emitted() {
+    let chunks = [
+        "auth = \"Bearer SYNTHETIC_REVOKED_BEARER_OVERLAP_1234\"\n",
+        "-----BEGIN PRIVATE KEY-----\n",
+        "U1lOVEhFVElDX1JFVk9LRUQ=\n",
+        "-----END PRIVATE KEY-----\n",
+    ];
+    let (expected_text, expected_findings) = whole_input(&chunks.concat());
+    assert_eq!(
+        expected_findings.len(),
+        2,
+        "the fixture must carry exactly the overlap winner and the private key"
+    );
+    assert_eq!(expected_findings[0].detector(), "bearer-token");
+
+    let (text, findings) = run(&chunks);
+    assert_eq!(text, expected_text);
+    assert_eq!(findings, expected_findings);
+
+    // Splitting the PEM block byte by byte cannot change the already-closed
+    // first line's overlap winner.
+    let pem = chunks[1..].concat();
+    let one_byte_at_a_time: Vec<&str> = (0..pem.len()).map(|i| &pem[i..=i]).collect();
+    let mut split_chunks = vec![chunks[0]];
+    split_chunks.extend(one_byte_at_a_time);
+    let (split_text, split_findings) = run(&split_chunks);
+    assert_eq!(split_text, expected_text);
+    assert_eq!(split_findings, expected_findings);
+}
+
 #[test]
 fn absolute_ranges_are_offsets_into_the_whole_session_input() {
     let first = "ordinary line\n";
