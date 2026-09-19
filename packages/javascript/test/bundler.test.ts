@@ -25,13 +25,20 @@ const COMMON_NODE_STREAM_CONSUMER =
 async function bundle(
   platform: "browser" | "node",
   contents: string = ROOT_CONSUMER,
+  conditions?: readonly string[],
 ) {
   const result = await build({
     bundle: true,
     format: "esm",
     metafile: true,
     platform,
-    external: ["@redact-secret/wasm", "@redact-secret/wasm/common"],
+    ...(conditions === undefined ? {} : { conditions: [...conditions] }),
+    external: [
+      "@redact-secret/wasm",
+      "@redact-secret/wasm/common",
+      "@redact-secret/wasm/redact_secret_wasm_bg.wasm",
+      "@redact-secret/wasm/redact_secret_wasm_common_bg.wasm",
+    ],
     stdin: {
       contents,
       loader: "js",
@@ -47,6 +54,12 @@ async function bundle(
     output: result.outputFiles[0]?.text ?? "",
   };
 }
+
+/** The exact esbuild resolve conditions `wrangler`'s bundler applies, per
+ * `decision-add-node-wasm-fallback`'s own research and confirmed while
+ * implementing `decision-verify-edge-runtimes` against a real `wrangler dev`
+ * sandbox. */
+const WORKERD_CONDITIONS = ["workerd", "worker", "browser", "import"];
 
 describe("bundler conditions", () => {
   it("routes a browser build through the WebAssembly adapter only", async () => {
@@ -170,5 +183,48 @@ describe("bundler conditions", () => {
     // The WebAssembly artifact is reached through a dynamic import, so a
     // bundle that never calls initialize() never loads it.
     expect(output).toContain('import("@redact-secret/wasm")');
+  });
+
+  it("routes a Cloudflare Workers build through the workerd adapter, not browser or node (decision-verify-edge-runtimes)", async () => {
+    const { inputs, output } = await bundle(
+      "browser",
+      ROOT_CONSUMER,
+      WORKERD_CONDITIONS,
+    );
+
+    expect(
+      inputs.some((path) => path.endsWith("dist/runtime/workerd.js")),
+    ).toBe(true);
+    expect(inputs.some((path) => path.endsWith("dist/runtime/browser.js"))).toBe(
+      false,
+    );
+    expect(inputs.some((path) => path.endsWith("dist/runtime/node.js"))).toBe(
+      false,
+    );
+    // The `.wasm` binary is imported by its own literal specifier, the same
+    // way the browser adapter's `@redact-secret/wasm` specifier stays
+    // discoverable to a bundler.
+    expect(output).toContain('"@redact-secret/wasm/redact_secret_wasm_bg.wasm"');
+  });
+
+  it("routes a /common Cloudflare Workers build through the workerd-common adapter only", async () => {
+    const { inputs, output } = await bundle(
+      "browser",
+      COMMON_WEB_STREAM_CONSUMER,
+      WORKERD_CONDITIONS,
+    );
+
+    expect(
+      inputs.some((path) => path.endsWith("dist/runtime/workerd-common.js")),
+    ).toBe(true);
+    expect(
+      inputs.some((path) => path.endsWith("dist/runtime/browser-common.js")),
+    ).toBe(false);
+    expect(
+      inputs.some((path) => path.endsWith("dist/runtime/workerd.js")),
+    ).toBe(false);
+    expect(output).toContain(
+      '"@redact-secret/wasm/redact_secret_wasm_common_bg.wasm"',
+    );
   });
 });

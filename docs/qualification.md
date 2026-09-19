@@ -330,6 +330,62 @@ against every platform the way the addon and browser artifacts are. Run it
 locally after `npm run wasm:build` and `npm run js:build` (see "Running it
 locally" below); a dedicated CI lane is left to a follow-up.
 
+## Cloudflare Workers and Vercel Edge (`decision-verify-edge-runtimes`)
+
+`decision-add-node-wasm-fallback`'s own research established that both
+platforms resolve this package's `browser` condition (never
+`runtime/node.ts`), and left whether that path actually works under either
+platform's real runtime an explicit open question (issue #462). Full
+transcripts for everything below: `docs/audits/evidence/462/README.md`.
+
+**Cloudflare Workers is a verified, supported runtime.** Against a real
+`wrangler dev` sandbox — a real local `workerd` server, the same engine that
+runs Cloudflare Workers in production — `import.meta.url` is `undefined`
+inside a `workerd` module worker, so `runtime/browser.ts`'s generated-glue
+no-argument `default()` throws `Invalid URL` before it ever reaches the
+network. `packages/javascript/package.json`'s `#native`/`#native-common`
+import maps now carry a `workerd` condition ahead of `browser`, resolving to
+`runtime/workerd.ts`/`workerd-common.ts`: each imports its profile's `.wasm`
+binary by its own literal specifier
+(`@redact-secret/wasm/redact_secret_wasm_bg.wasm` /
+`.../redact_secret_wasm_common_bg.wasm`, new bare-string subpath exports on
+`bindings/wasm/npm/package.json`), which `wrangler`'s bundler resolves to an
+already-compiled `WebAssembly.Module` via its default `CompiledWasm` module
+rule instead of fetching bytes, and passes that module to the generated
+glue's `default({ module_or_path: <module> })` — the same alternate calling
+convention the Node WebAssembly fallback above already uses for bytes read
+from disk.
+
+`scripts/qualify-workerd-artifact.mjs` (`npm run workerd:qualify`) qualifies
+this against the real, built package in a real `wrangler dev` sandbox, for
+both detector profiles: `initialize()`, `artifact()` (asserted `"wasm"`), a
+synchronous scan against the canonical fixture, `redact`, `scanAndRedact`,
+and one incremental session. As with `node-wasm-fallback:qualify`, this is
+not (yet) wired into `npm run ci` or the artifact-qualification workflow's
+matrix — no host in the current CI matrix runs `workerd` — so a dedicated CI
+lane is left to a follow-up.
+
+**Vercel Edge remains unsupported.** `@edge-runtime/vm` — the reference
+engine Vercel publishes and that `next dev`/`vercel dev` use locally to run
+Edge Functions and Middleware — executes code as a plain classic script with
+no ES module loader at all: `import`/`export`/`import.meta` syntax is a
+`SyntaxError` in whatever is handed to it. This is a stronger constraint
+than `workerd`'s, which still executes a real module graph a package
+condition can redirect within. Whatever hands this reference engine its
+code must already have resolved every import, `.wasm` included, into one
+import-free script before evaluation — a transform this package's own
+`imports`/`exports` conditions cannot reach or verify, since it happens
+entirely inside the consumer's own build tool. Vercel documents a
+`?module`-suffixed `.wasm` import convention implying their tooling performs
+exactly this transform, but confirming that requires observing Vercel's own
+production build output for a real Edge Function or Next.js Edge Runtime
+route, which this investigation did not do — no Vercel account or
+deployment was created. No `edge-light` condition or loader ships on the
+strength of the documented convention alone; doing so without observing it
+resolve correctly end to end would be an unverified edge-runtime claim,
+which `AGENTS.md`'s change rules forbid. Resolving this remains open to a
+follow-up with that verification available.
+
 ## Incremental sanitization is qualified on every JavaScript runtime
 
 `bindings/wasm` builds a real, bounded `IncrementalSanitizer` session
@@ -381,6 +437,9 @@ npm run browser:qualify -- --detector-profile common
 
 npm run node-wasm-fallback:qualify -- --wasm-dir bindings/wasm/pkg
 npm run node-wasm-fallback:qualify -- --wasm-dir bindings/wasm/pkg-common --detector-profile common
+
+npm run workerd:qualify -- --wasm-dir bindings/wasm/pkg
+npm run workerd:qualify -- --wasm-dir bindings/wasm/pkg-common --detector-profile common
 
 # Clean installed-candidate checks (repeat across the declared matrices).
 node scripts/qualify-package-consumer.mjs --lane node \
