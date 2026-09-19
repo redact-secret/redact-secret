@@ -419,14 +419,18 @@ accepted in
   `.wasm`, and a `common` subpath shipping the `common` build's own glue and
   `.wasm` beside them.
 
-**Stream limitation.** `@redact-secret/core/web-stream` and `/node-stream`
-are not profile-aware: their convenience `createWebStreamSanitizer`/
-`createNodeStreamSanitizer` always open a session against `full`, regardless
-of which entry point a consumer also imported. The
-`WebStreamSanitizer`/`NodeStreamSanitizer` classes themselves are
-profile-agnostic — they wrap whichever session they are given — so a
-`common` consumer constructs the class directly with a session from
-`@redact-secret/core/common`'s own `createIncrementalSanitizer`.
+**Stream subpaths.** `@redact-secret/core/web-stream` and `/node-stream`'s
+convenience `createWebStreamSanitizer`/`createNodeStreamSanitizer` always
+open a session against `full`; unchanged, since they are the pre-existing
+`full` entry points. `@redact-secret/core/common/web-stream` and
+`/common/node-stream` are the `common` counterparts: same factories, same
+`WebStreamSanitizer`/`NodeStreamSanitizer` classes, opened against `common`
+instead. Resolving a `common` subpath from a browser bundle never reaches
+`full`'s runtime module or the root `@redact-secret/wasm` artifact specifier
+(issue #416). The classes themselves are also profile-agnostic — they wrap
+whichever session they are given — so a consumer can still construct one
+directly with a session from `@redact-secret/core/common`'s own
+`createIncrementalSanitizer`.
 
 **Mismatch check.** CI builds, qualifies, and packages both WASM artifacts
 and both Node profiles on every run, and the release workflow instantiates

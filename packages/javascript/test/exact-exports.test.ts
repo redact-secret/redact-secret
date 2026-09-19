@@ -26,7 +26,9 @@ const PUBLIC_RUNTIME_EXPORTS = [
 /**
  * Each stream adapter subpath, in full. Both re-export `SecretScanError` so a
  * consumer of one adapter can catch its failures without also importing the
- * root, and neither adds an error type of its own.
+ * root, and neither adds an error type of its own. The `common` counterparts
+ * export the exact same names as their `full` sibling — only which runtime
+ * `create*StreamSanitizer` opens differs.
  */
 const PUBLIC_ADAPTER_EXPORTS = {
   "@redact-secret/core/node-stream": [
@@ -35,6 +37,16 @@ const PUBLIC_ADAPTER_EXPORTS = {
     "createNodeStreamSanitizer",
   ],
   "@redact-secret/core/web-stream": [
+    "SecretScanError",
+    "WebStreamSanitizer",
+    "createWebStreamSanitizer",
+  ],
+  "@redact-secret/core/common/node-stream": [
+    "NodeStreamSanitizer",
+    "SecretScanError",
+    "createNodeStreamSanitizer",
+  ],
+  "@redact-secret/core/common/web-stream": [
     "SecretScanError",
     "WebStreamSanitizer",
     "createWebStreamSanitizer",
@@ -81,6 +93,8 @@ describe("exact exports", () => {
       "@redact-secret/core/session",
       "@redact-secret/core/session-common",
       "@redact-secret/core/adapters/shared",
+      "@redact-secret/core/adapters/node-stream-core",
+      "@redact-secret/core/adapters/web-stream-core",
       "@redact-secret/core/dist/index.js",
       "@redact-secret/core/runtime/node",
       "@redact-secret/core/runtime/node-common",

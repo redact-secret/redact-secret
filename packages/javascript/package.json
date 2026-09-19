@@ -34,6 +34,14 @@
       "types": "./dist/common.d.ts",
       "import": "./dist/common.js"
     },
+    "./common/node-stream": {
+      "types": "./dist/adapters/node-stream-common.d.ts",
+      "import": "./dist/adapters/node-stream-common.js"
+    },
+    "./common/web-stream": {
+      "types": "./dist/adapters/web-stream-common.d.ts",
+      "import": "./dist/adapters/web-stream-common.js"
+    },
     "./node-stream": {
       "types": "./dist/adapters/node-stream.d.ts",
       "import": "./dist/adapters/node-stream.js"

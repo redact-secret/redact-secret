@@ -262,21 +262,29 @@ Types: `DetectedSecretFinding`, `SecretFinding`, `SecretAction`,
 Stream subpaths: `@redact-secret/core/node-stream` exports
 `createNodeStreamSanitizer`, `NodeStreamSanitizer`, and `SecretScanError`;
 `@redact-secret/core/web-stream` exports `createWebStreamSanitizer`,
-`WebStreamSanitizer`, and `SecretScanError`.
+`WebStreamSanitizer`, and `SecretScanError`. `@redact-secret/core/common/node-stream`
+and `@redact-secret/core/common/web-stream` export the same names, bound to
+the `common` runtime instead of `full` (see below).
 
 `@redact-secret/core/common` exports the same runtime values and types as the
 root, backed by the opt-in `common` detector profile: `PROFILE` is `"common"`
 there and `"full"` on the root. `common` omits every provider detector, so a
 bare provider token is not detected. `initialize()` rejects with
 `INITIALIZATION_FAILED` when the loaded artifact reports a different profile
-than the entry point that loaded it. The `createNodeStreamSanitizer` and
+than the entry point that loaded it. `@redact-secret/core/node-stream` and
+`@redact-secret/core/web-stream`'s `createNodeStreamSanitizer` and
 `createWebStreamSanitizer` factories always open a `full` session; for a
-`common` byte stream, pass a session from `@redact-secret/core/common`'s
-`createIncrementalSanitizer` to the `NodeStreamSanitizer` or
-`WebStreamSanitizer` class.
+`common` byte stream, use `createNodeStreamSanitizer`/`createWebStreamSanitizer`
+from `@redact-secret/core/common/node-stream`/`@redact-secret/core/common/web-stream`
+instead — a browser bundle resolving one of those two subpaths never resolves
+the `full` runtime or the root `@redact-secret/wasm` artifact. The
+`NodeStreamSanitizer`/`WebStreamSanitizer` classes themselves are
+profile-agnostic and identical across all four subpaths, so constructing one
+directly with a session from `@redact-secret/core/common`'s
+`createIncrementalSanitizer` still works too.
 
-The root export, `@redact-secret/core/common`, and the two stream subpaths are
-the executable public API.
+The root export, `@redact-secret/core/common`, and the four stream subpaths
+are the executable public API.
 `@redact-secret/core/package.json` also exposes package metadata. Internal
 modules are unreachable through the `exports` map. `VERSION` is
 the shared product version; the Rust crate, this package, the Python package,

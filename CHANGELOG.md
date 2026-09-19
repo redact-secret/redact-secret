@@ -5,6 +5,17 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+- Added `@redact-secret/core/common/node-stream` and
+  `@redact-secret/core/common/web-stream` (issue #416), the `common`-profile
+  counterparts to `@redact-secret/core/node-stream` and
+  `@redact-secret/core/web-stream`: the same `createNodeStreamSanitizer`/
+  `createWebStreamSanitizer` factories and `NodeStreamSanitizer`/
+  `WebStreamSanitizer` classes, opened against `common` instead of `full`.
+  Resolving one of the two new subpaths never reaches the `full` runtime
+  module or the root `@redact-secret/wasm` artifact specifier in a browser
+  bundle, closing the known limitation the #382 evidence record left open.
+  Additive: the root entry and the existing `./node-stream`/`./web-stream`
+  subpaths are unchanged and still always open a `full` session.
 - Qualified the `common` detector profile on every surface that exposes it
   and added its package exports (issue #382, epic #377,
   `decision-define-detector-profile-and-pack-contract`). Additive and minor:

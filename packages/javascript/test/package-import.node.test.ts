@@ -127,6 +127,61 @@ describe("Node package import", () => {
     });
   });
 
+  it("resolves both common-profile stream adapter subpaths through the exports map", () => {
+    const output = runInNode(
+      [
+        "const node = await import('@redact-secret/core/common/node-stream');",
+        "const web = await import('@redact-secret/core/common/web-stream');",
+        "const fullNode = await import('@redact-secret/core/node-stream');",
+        "const fullWeb = await import('@redact-secret/core/web-stream');",
+        "console.log(JSON.stringify({",
+        "  node: Object.keys(node).sort(),",
+        "  web: Object.keys(web).sort(),",
+        "  sharedNodeClass: node.NodeStreamSanitizer === fullNode.NodeStreamSanitizer,",
+        "  sharedWebClass: web.WebStreamSanitizer === fullWeb.WebStreamSanitizer,",
+        "}));",
+      ].join(" "),
+    );
+
+    expect(JSON.parse(output)).toEqual({
+      node: [
+        "NodeStreamSanitizer",
+        "SecretScanError",
+        "createNodeStreamSanitizer",
+      ],
+      web: [
+        "SecretScanError",
+        "WebStreamSanitizer",
+        "createWebStreamSanitizer",
+      ],
+      // The two profile subpaths share one session-free class; only the
+      // factory's runtime differs (issue #416).
+      sharedNodeClass: true,
+      sharedWebClass: true,
+    });
+  });
+
+  it("opens a common-profile stream against the common runtime, not the full one", () => {
+    const output = runInNode(
+      [
+        "const { createNodeStreamSanitizer } = await import('@redact-secret/core/common/node-stream');",
+        "const { createWebStreamSanitizer } = await import('@redact-secret/core/common/web-stream');",
+        "const limits = { maxInputCodeUnits: 1024, maxBufferedCodeUnits: 384, maxTokenCodeUnits: 128, maxMultilineCodeUnits: 256 };",
+        "const codes = [];",
+        "for (const open of [createNodeStreamSanitizer, createWebStreamSanitizer]) {",
+        "  try { open({ limits }); codes.push('resolved'); }",
+        "  catch (error) { codes.push(error.code); }",
+        "}",
+        "console.log(JSON.stringify(codes));",
+      ].join(" "),
+    );
+
+    // Uninitialized like every other synchronous entry point in a source
+    // checkout with no built addon, proving these factories reach a real
+    // runtime binding of their own rather than throwing something else.
+    expect(JSON.parse(output)).toEqual(["NOT_INITIALIZED", "NOT_INITIALIZED"]);
+  });
+
   it("shares one initialization state across the root and the adapters", () => {
     const output = runInNode(
       [

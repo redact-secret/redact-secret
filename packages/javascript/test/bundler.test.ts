@@ -10,6 +10,12 @@ const ROOT_CONSUMER =
 const WEB_STREAM_CONSUMER =
   'import { createWebStreamSanitizer } from "@redact-secret/core/web-stream"; globalThis.secretScanEntry = [createWebStreamSanitizer];';
 
+const COMMON_WEB_STREAM_CONSUMER =
+  'import { createWebStreamSanitizer } from "@redact-secret/core/common/web-stream"; globalThis.secretScanEntry = [createWebStreamSanitizer];';
+
+const COMMON_NODE_STREAM_CONSUMER =
+  'import { createNodeStreamSanitizer } from "@redact-secret/core/common/node-stream"; globalThis.secretScanEntry = [createNodeStreamSanitizer];';
+
 /**
  * The Node addon is one of six `optionalDependencies`, selected at runtime
  * by `process.platform`/`process.arch` (`runtime/node.ts`), so unlike the
@@ -25,7 +31,7 @@ async function bundle(
     format: "esm",
     metafile: true,
     platform,
-    external: ["@redact-secret/wasm"],
+    external: ["@redact-secret/wasm", "@redact-secret/wasm/common"],
     stdin: {
       contents,
       loader: "js",
@@ -98,6 +104,52 @@ describe("bundler conditions", () => {
     ).toBe(true);
     expect(inputs.some((path) => path.endsWith("dist/runtime/node.js"))).toBe(
       true,
+    );
+  });
+
+  it("routes a /common Web adapter build through the common WebAssembly adapter only", async () => {
+    const { inputs, output } = await bundle("browser", COMMON_WEB_STREAM_CONSUMER);
+
+    expect(
+      inputs.some((path) => path.endsWith("dist/adapters/web-stream-common.js")),
+    ).toBe(true);
+    expect(
+      inputs.some((path) => path.endsWith("dist/adapters/web-stream-core.js")),
+    ).toBe(true);
+    expect(
+      inputs.some((path) => path.endsWith("dist/runtime/browser-common.js")),
+    ).toBe(true);
+    // The whole point of a `/common` subpath: it never reaches the `full`
+    // runtime loader or the root `@redact-secret/wasm` artifact specifier.
+    expect(inputs.some((path) => path.endsWith("dist/runtime/browser.js"))).toBe(
+      false,
+    );
+    expect(inputs.some((path) => path.endsWith("dist/adapters/web-stream.js"))).toBe(
+      false,
+    );
+    expect(inputs.some((path) => path.startsWith("node:"))).toBe(false);
+    expect(output).not.toContain('import("@redact-secret/wasm")');
+    expect(output).toContain('import("@redact-secret/wasm/common")');
+  });
+
+  it("bundles the /common Node adapter for Node, through node-stream-common only", async () => {
+    const { inputs } = await bundle("node", COMMON_NODE_STREAM_CONSUMER);
+
+    expect(
+      inputs.some((path) => path.endsWith("dist/adapters/node-stream-common.js")),
+    ).toBe(true);
+    expect(
+      inputs.some((path) => path.endsWith("dist/adapters/node-stream-core.js")),
+    ).toBe(true);
+    expect(inputs.some((path) => path.endsWith("dist/runtime/node-common.js"))).toBe(
+      true,
+    );
+    // Unlike the browser WASM artifacts, one compiled Node addon serves both
+    // profiles (`runtime/node-common.ts` imports `runtime/node.ts` directly),
+    // so `dist/runtime/node.js` legitimately appears here too; only the
+    // adapter's own factory module differs by profile.
+    expect(inputs.some((path) => path.endsWith("dist/adapters/node-stream.js"))).toBe(
+      false,
     );
   });
 

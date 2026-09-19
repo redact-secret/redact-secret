@@ -13,10 +13,12 @@ import {
   createNodeStreamSanitizer,
   NodeStreamSanitizer,
 } from "../src/adapters/node-stream.js";
+import { createNodeStreamSanitizer as createCommonNodeStreamSanitizer } from "../src/adapters/node-stream-common.js";
 import {
   createWebStreamSanitizer,
   WebStreamSanitizer,
 } from "../src/adapters/web-stream.js";
+import { createWebStreamSanitizer as createCommonWebStreamSanitizer } from "../src/adapters/web-stream-common.js";
 import {
   createIncrementalSanitizer,
   defaultPlaceholderFormatter,
@@ -193,3 +195,21 @@ function documentedStreamUsage(session: IncrementalSanitizer): void {
 }
 
 void documentedStreamUsage;
+
+/**
+ * The `common`-profile stream subpaths report the exact same
+ * `NodeStreamSanitizer`/`WebStreamSanitizer` types as their `full` siblings:
+ * only which runtime the factory opens a session against differs.
+ */
+function documentedCommonStreamUsage(): void {
+  const commonNode: NodeStreamSanitizer = createCommonNodeStreamSanitizer(
+    incrementalOptions,
+  );
+  const commonWeb: WebStreamSanitizer = createCommonWebStreamSanitizer(
+    incrementalOptions,
+  );
+
+  void [commonNode, commonWeb];
+}
+
+void documentedCommonStreamUsage;
