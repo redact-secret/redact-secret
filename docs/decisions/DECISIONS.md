@@ -45,3 +45,4 @@ future planning and implementation but do not authorize Git or release actions.
 - [Bound whole-input operations by default](2026-09-19-bound-whole-input-operations-by-default.md)
 - [Resolve overlap precedence by resolved-action severity](2026-09-19-resolve-overlap-precedence-by-resolved-action-severity.md)
 - [Select optimal disjoint candidates by total evidence weight](2026-09-19-select-optimal-disjoint-candidates-by-total-evidence-weight.md)
+- [Define the declarative detector ruleset contract](2026-09-19-define-declarative-detector-ruleset-contract.md)

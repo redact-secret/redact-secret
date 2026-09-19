@@ -338,7 +338,13 @@ For every supported profile and surface that exposes it:
 ## Non-goals
 
 - No crate or npm package per vendor, and no feature per vendor.
-- No dynamic, network-loaded, or user-supplied rule packs or plugins.
+- No dynamic or network-loaded rule packs or plugins. (Amended by
+  `decision-define-declarative-detector-ruleset-contract`: a caller-supplied
+  **declarative ruleset** — data the core parses and validates itself, never
+  executable code, never fetched over a network, never read from a path by
+  the core — is in scope. This line's exclusion is narrowed to keep out only
+  a dynamically loaded, network-fetched, or callback-shaped extension
+  mechanism, which stays excluded.)
 - No online credential validation.
 - No custom detector callbacks across FFI, and no user-composed profiles.
 - No `common` profile for Python or the CLI in this contract.

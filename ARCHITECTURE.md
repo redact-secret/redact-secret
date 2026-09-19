@@ -416,6 +416,14 @@ stable cross-language contract. Rust consumers retain the native `Detector`
 traits and `DetectorRegistry` listed in the core public API; that native
 extension is not a JavaScript or Python callback surface.
 
+Excluding a *callback* is not the same as excluding all extension:
+`decision-define-declarative-detector-ruleset-contract` fixes the contract
+for a caller-supplied **declarative ruleset** — data the core parses and
+matches itself through the existing `pattern.rs` engine, never host code
+run per candidate — as the accepted path for JavaScript, Python, and the
+CLI. See that decision for the matching vocabulary, cost bounds, ordering
+cap, and implementation status.
+
 Extensions are trusted in-process code, not a sandbox. Fixed library errors can
 sanitize an exception crossing a callback boundary, but cannot prevent trusted
 application code from capturing plaintext through closures or global state.
