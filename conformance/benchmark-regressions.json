@@ -102,6 +102,72 @@
         }
       },
       "note": "Whole-input and incremental cases exist, but the closed issue does not record the required supported-surface conformance evidence or a fixed-candidate benchmark rerun."
+    },
+    {
+      "id": "sendgrid-generic-key-full-span-promotion",
+      "benchmarkRecordId": "product-428-sendgrid",
+      "benchmarkIssue": "https://github.com/redact-secret/redact-secret-benchmarks/issues/10",
+      "productIssue": "https://github.com/redact-secret/redact-secret/issues/428",
+      "benchmarkFixtureIds": [
+        "sendgrid-regressions--trailing-dash-generic-key",
+        "sendgrid-regressions--url-safe-generic-key"
+      ],
+      "corpusHashes": [
+        "8f1962b1eb77dec0862bc07a9ba1052f198b30899aaa93cb42fad309a3287778"
+      ],
+      "canonicalFixtures": {
+        "synchronous": [
+          "sendgrid-token-regression-generic-key-trailing-dash-full-span",
+          "sendgrid-token-regression-generic-key-embedded-underscore"
+        ],
+        "incremental": []
+      },
+      "gates": {
+        "productConformance": {
+          "status": "pending",
+          "evidence": []
+        },
+        "benchmarkRevalidation": {
+          "status": "pending",
+          "evidence": []
+        }
+      },
+      "note": "Promotes 'SendGrid generic-key control detects the entire token, including a trailing dash' out of redact-secret-benchmarks' regressions.test.mjs (benchmarks issue #16), which pins two properties across the corpus's three '-generic-key' fixtures: a secret segment ending in '-' and an id/secret pair carrying an embedded '_'. Each property got its own canonical fixture per the split-by-property rule so a failure names which one broke. Both were confirmed to already pass against the current detector before being added, so this closes an uncovered contract rather than a live regression; gates stay pending until supported-surface evidence and a fixed-candidate benchmark rerun are recorded. No benchmark fixture input or discovery-matrix material was copied -- both canonical inputs are freshly constructed synthetic values."
+    },
+    {
+      "id": "reference-syntax-literal-secret-controls-promotion",
+      "benchmarkRecordId": "product-428-reference-syntax",
+      "benchmarkIssue": "https://github.com/redact-secret/redact-secret-benchmarks/issues/10",
+      "productIssue": "https://github.com/redact-secret/redact-secret/issues/428",
+      "benchmarkFixtureIds": [
+        "reference-syntax--api-key",
+        "reference-syntax--password",
+        "reference-syntax--dotted-password",
+        "reference-syntax--quoted-password",
+        "reference-syntax--client-secret",
+        "reference-syntax--unicode-crlf"
+      ],
+      "corpusHashes": [
+        "0fe3363d4e0aec300b81bb823929f73928c7e06eb9e1d43064cf7b5b7f0d977e"
+      ],
+      "canonicalFixtures": {
+        "synchronous": [
+          "generic-token-regression-windows-env-lookalike-still-detected",
+          "generic-token-regression-sql-bind-lookalike-still-detected"
+        ],
+        "incremental": []
+      },
+      "gates": {
+        "productConformance": {
+          "status": "pending",
+          "evidence": []
+        },
+        "benchmarkRevalidation": {
+          "status": "pending",
+          "evidence": []
+        }
+      },
+      "note": "Promotes 'positive reference controls remain detectable by the public npm surface' out of redact-secret-benchmarks' regressions.test.mjs (benchmarks issue #16). The negative direction (reference/pointer syntax excluded) is already canonical via issues #292 and #293; this record supplies the missing positive direction -- that generic-token's reference-syntax exclusions do not also swallow literal credentials. The two canonical fixtures sit on the issue #292 boundary directly (is_env_var_identifier in generic_token.rs): a %...%- or :-delimited value whose interior contains '-' is not a bare identifier, so it fails the Windows-env/SQL-bind reference grammar and stays detected. Both were confirmed to already pass against the current detector before being added, so this closes an uncovered contract rather than a live regression; gates stay pending until supported-surface evidence and a fixed-candidate benchmark rerun are recorded. No benchmark fixture input or discovery-matrix material was copied -- both canonical inputs are freshly constructed synthetic values."
     }
   ]
 }
