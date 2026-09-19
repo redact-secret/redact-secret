@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 1230,
+  "fixtureCount": 1233,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -18441,8 +18441,8 @@
       "note": "A value one byte short of the required 32-byte length is rejected rather than truncated, even with Twilio context present."
     },
     {
-      "id": "twilio-auth-token-overlap-beats-bearer-token",
-      "detector": "twilio-auth-token",
+      "id": "bearer-token-overlap-beats-twilio-auth-token",
+      "detector": "bearer-token",
       "kind": "overlap",
       "support": "supported",
       "tier": "contextual",
@@ -18452,19 +18452,19 @@
       "input": "twilio Authorization: Bearer fedcba9876543210fedcba9876543210",
       "expected": [
         {
-          "detector": "twilio-auth-token",
-          "type": "twilio_auth_token",
-          "confidence": "medium",
-          "specificity": "provider",
+          "detector": "bearer-token",
+          "type": "bearer_token",
+          "confidence": "high",
+          "specificity": "structural",
           "start": 29,
           "end": 61
         }
       ],
-      "note": "Provider specificity outranks bearer-token's structural specificity for the same span, even though the bearer-token detector's own confidence is high and this detector's is only medium."
+      "note": "Issue #450: resolved-action severity is checked before specificity (`decision-resolve-overlap-precedence-by-resolved-action-severity`). twilio_auth_token's medium-confidence keyword-cooccurrence path only warns under DefaultPolicy, while bearer_token always redacts, so bearer-token now wins this span despite its lower (structural, not provider) specificity. Previously twilio-auth-token won on specificity alone, which would have warned instead of redacting -- the exact inversion this decision closes."
     },
     {
-      "id": "twilio-api-key-secret-overlap-beats-bearer-token",
-      "detector": "twilio-api-key-secret",
+      "id": "bearer-token-overlap-beats-twilio-api-key-secret",
+      "detector": "bearer-token",
       "kind": "overlap",
       "support": "supported",
       "tier": "contextual",
@@ -18474,15 +18474,59 @@
       "input": "twilio Authorization: Bearer zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE",
       "expected": [
         {
-          "detector": "twilio-api-key-secret",
-          "type": "twilio_api_key_secret",
-          "confidence": "medium",
-          "specificity": "provider",
+          "detector": "bearer-token",
+          "type": "bearer_token",
+          "confidence": "high",
+          "specificity": "structural",
           "start": 29,
           "end": 61
         }
       ],
-      "note": "Provider specificity outranks bearer-token's structural specificity for the same span, even though the bearer-token detector's own confidence is high and this detector's is only medium."
+      "note": "Issue #450: resolved-action severity is checked before specificity (`decision-resolve-overlap-precedence-by-resolved-action-severity`). twilio_api_key_secret's medium-confidence keyword-cooccurrence path only warns under DefaultPolicy, while bearer_token always redacts, so bearer-token now wins this span despite its lower (structural, not provider) specificity. Previously twilio-api-key-secret won on specificity alone, which would have warned instead of redacting -- the exact inversion this decision closes."
+    },
+    {
+      "id": "twilio-auth-token-overlap-generic-context",
+      "detector": "twilio-auth-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "api_key=a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0 twilio",
+      "expected": [
+        {
+          "detector": "twilio-auth-token",
+          "type": "twilio_auth_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 8,
+          "end": 40
+        }
+      ],
+      "note": "api_key is a recognized generic-token field name, so this assignment also proposes a contextual-secret candidate at the same medium confidence (this value's entropy is below generic-token's high-confidence threshold) as this keyword-gated bare hex format. Same resolved-action severity (both warn under DefaultPolicy), so the provider-specific candidate's higher specificity still decides the overlap, exactly as `decision-resolve-overlap-precedence-by-resolved-action-severity` intends: severity is checked first but only overrides specificity when it actually differs."
+    },
+    {
+      "id": "twilio-api-key-secret-overlap-generic-context",
+      "detector": "twilio-api-key-secret",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "api_key=aA0aA0aA0aA0aA0aA0aA0aA0aA0aA0aA twilio",
+      "expected": [
+        {
+          "detector": "twilio-api-key-secret",
+          "type": "twilio_api_key_secret",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 8,
+          "end": 40
+        }
+      ],
+      "note": "api_key is a recognized generic-token field name, so this assignment also proposes a contextual-secret candidate at the same medium confidence (this value's entropy is below generic-token's high-confidence threshold) as this keyword-gated bare mixed-alphanumeric format. Same resolved-action severity (both warn under DefaultPolicy), so the provider-specific candidate's higher specificity still decides the overlap, exactly as `decision-resolve-overlap-precedence-by-resolved-action-severity` intends: severity is checked first but only overrides specificity when it actually differs."
     },
     {
       "id": "twilio-auth-token-adversarial-dense-findings",
@@ -23699,8 +23743,8 @@
       "note": "A masked placeholder value of a single repeated hex digit, though within the documented alphabet and length, is excluded as classic redaction-style filler rather than a real key."
     },
     {
-      "id": "new-relic-license-key-overlap-beats-bearer-token",
-      "detector": "new-relic-license-key",
+      "id": "bearer-token-overlap-beats-new-relic-license-key",
+      "detector": "bearer-token",
       "kind": "overlap",
       "support": "supported",
       "tier": "contextual",
@@ -23710,15 +23754,37 @@
       "input": "newrelic Authorization: Bearer 0123456789abcdef0123456789abcdef01234567",
       "expected": [
         {
-          "detector": "new-relic-license-key",
-          "type": "new_relic_license_key",
-          "confidence": "medium",
-          "specificity": "provider",
+          "detector": "bearer-token",
+          "type": "bearer_token",
+          "confidence": "high",
+          "specificity": "structural",
           "start": 31,
           "end": 71
         }
       ],
-      "note": "Provider specificity outranks bearer-token's structural specificity for the same span, even though the bearer-token detector's own confidence is high and this detector's is only medium."
+      "note": "Issue #450: resolved-action severity is checked before specificity (`decision-resolve-overlap-precedence-by-resolved-action-severity`). new_relic_license_key's medium-confidence keyword-cooccurrence path only warns under DefaultPolicy, while bearer_token always redacts, so bearer-token now wins this span despite its lower (structural, not provider) specificity. Previously new-relic-license-key won on specificity alone, which would have warned instead of redacting and left the credential in plaintext -- the exact inversion this decision closes (this is the shape the issue reported)."
+    },
+    {
+      "id": "new-relic-license-key-overlap-generic-context",
+      "detector": "new-relic-license-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "api_key=a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0 newrelic",
+      "expected": [
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 8,
+          "end": 48
+        }
+      ],
+      "note": "api_key is a recognized generic-token field name, so this assignment also proposes a contextual-secret candidate at the same medium confidence (this value's entropy is below generic-token's high-confidence threshold) as this keyword-gated bare hex format. Same resolved-action severity (both warn under DefaultPolicy), so the provider-specific candidate's higher specificity still decides the overlap, exactly as `decision-resolve-overlap-precedence-by-resolved-action-severity` intends: severity is checked first but only overrides specificity when it actually differs."
     },
     {
       "id": "new-relic-license-key-boundary-wrong-length",

@@ -137,6 +137,42 @@ fn bearer_candidate_wins_contextual_overlap_and_redacts() {
     assert_eq!(result.text(), "auth = \"Bearer <SECRET_1>\"");
 }
 
+/// fixture: bearer-token-overlap-beats-new-relic-license-key
+///
+/// Issue #450: `new_relic_license_key`'s only emission path reports
+/// `Confidence::Medium`, which `DefaultPolicy` warns on rather than
+/// redacts, and its `Provider` specificity used to outrank the overlapping
+/// `bearer_token` candidate's `Structural` specificity regardless of
+/// action, leaving the credential in plaintext -- the exact shape the issue
+/// reported. Resolved-action severity is now checked before specificity
+/// (`decision-resolve-overlap-precedence-by-resolved-action-severity`), so
+/// `bearer_token` (which always redacts) wins this span instead, and the
+/// value is redacted.
+#[test]
+fn bearer_token_overlap_winner_redacts_the_new_relic_license_key_shape() {
+    let registry = DetectorRegistry::with_built_in([]).unwrap();
+    let input = "newrelic Authorization: Bearer 0123456789abcdef0123456789abcdef01234567";
+
+    let result = scan_and_redact(
+        input,
+        &registry,
+        &DefaultPolicy,
+        &default_placeholder_formatter,
+    )
+    .unwrap();
+
+    assert_eq!(result.findings().len(), 1);
+    assert_eq!(result.findings()[0].detector(), "bearer-token");
+    assert_eq!(result.findings()[0].type_name(), "bearer_token");
+    assert_eq!(result.findings()[0].action(), Action::Redact);
+    assert_eq!(result.text(), "newrelic Authorization: Bearer <SECRET_1>");
+    assert!(
+        !result
+            .text()
+            .contains("0123456789abcdef0123456789abcdef01234567")
+    );
+}
+
 /// fixture: jwt-positive-structured, bearer-positive-scheme,
 /// contextual-positive-assignment
 ///

@@ -1181,7 +1181,7 @@
     {
       "detector": "bearer-token",
       "evidence": {
-        "fixtureCount": 16,
+        "fixtureCount": 19,
         "hostContextsExercised": [
           "http",
           "json",

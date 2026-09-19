@@ -114,6 +114,15 @@ fn warn_policy() -> impl Policy {
 
 const INPUT: &str = "0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz";
 
+/// A finding type whose default action is `Redact` at every confidence
+/// (it is in the crate's internal `ALWAYS_REDACT_TYPES`). Overlap resolution
+/// ranks by resolved-action severity before specificity, confidence, or span
+/// (`decision-resolve-overlap-precedence-by-resolved-action-severity`), so a
+/// test isolating one of those later keys gives both compared candidates
+/// this type name to pin their severity equal and keep severity out of the
+/// comparison.
+const ALWAYS_REDACT_TYPE_NAME: &str = "jwt";
+
 // --- validation ------------------------------------------------------------
 
 #[test]
@@ -349,13 +358,96 @@ fn astral_characters_before_inside_and_after_a_finding_keep_byte_offsets() {
 
 // --- overlap precedence and tie breakers -----------------------------------
 
+/// Issue #450: a candidate that would resolve to a weaker action must not
+/// displace an overlapping candidate that would resolve to a stricter one,
+/// even when the weaker candidate has higher specificity. Neither type name
+/// is in `ALWAYS_REDACT_TYPES`, so each resolves by confidence alone
+/// (`decision-resolve-overlap-precedence-by-resolved-action-severity`): the
+/// medium-confidence provider candidate would only warn, and the
+/// high-confidence contextual candidate would redact, so the redacting one
+/// must win despite its lower specificity.
+#[test]
+fn resolved_action_severity_outranks_specificity() {
+    let registry = registry(vec![
+        Box::new(Fixed {
+            id: "weak-provider",
+            candidates: vec![candidate(
+                "unlisted_provider_type",
+                Confidence::Medium,
+                Specificity::Provider,
+                0,
+                10,
+            )],
+        }),
+        Box::new(Fixed {
+            id: "strong-contextual",
+            candidates: vec![candidate(
+                "unlisted_contextual_type",
+                Confidence::High,
+                Specificity::Contextual,
+                0,
+                10,
+            )],
+        }),
+    ]);
+    let findings = run_detector_pipeline(INPUT, &registry).unwrap();
+    assert_eq!(
+        summary(&findings),
+        [(
+            "finding-1",
+            "unlisted_contextual_type",
+            "strong-contextual",
+            0,
+            10
+        )]
+    );
+}
+
+/// The same shape as [`resolved_action_severity_outranks_specificity`], but
+/// via `private_key`'s unconditional `Block` rather than a confidence-driven
+/// `Redact`: `Block` outranks every other action, so even a `PrivateKey`-
+/// specificity candidate loses to it once resolved severity is the first
+/// key.
+#[test]
+fn a_blocking_candidate_outranks_a_higher_specificity_non_blocking_one() {
+    let registry = registry(vec![
+        Box::new(Fixed {
+            id: "weak-private-key-shaped",
+            candidates: vec![candidate(
+                "unlisted_type",
+                Confidence::High,
+                Specificity::PrivateKey,
+                0,
+                10,
+            )],
+        }),
+        Box::new(Fixed {
+            id: "blocking",
+            candidates: vec![candidate(
+                "private_key",
+                Confidence::Low,
+                Specificity::Entropy,
+                0,
+                10,
+            )],
+        }),
+    ]);
+    let findings = run_detector_pipeline(INPUT, &registry).unwrap();
+    assert_eq!(
+        summary(&findings),
+        [("finding-1", "private_key", "blocking", 0, 10)]
+    );
+}
+
 #[test]
 fn higher_specificity_wins_over_confidence_and_span() {
+    // Both candidates share `ALWAYS_REDACT_TYPE_NAME` so they resolve equal
+    // severity; only specificity, confidence, and span differ.
     let registry = registry(vec![
         Box::new(Fixed {
             id: "entropy",
             candidates: vec![candidate(
-                "generic",
+                ALWAYS_REDACT_TYPE_NAME,
                 Confidence::High,
                 Specificity::Entropy,
                 0,
@@ -365,7 +457,7 @@ fn higher_specificity_wins_over_confidence_and_span() {
         Box::new(Fixed {
             id: "provider",
             candidates: vec![candidate(
-                "provider",
+                ALWAYS_REDACT_TYPE_NAME,
                 Confidence::Low,
                 Specificity::Provider,
                 0,
@@ -376,51 +468,73 @@ fn higher_specificity_wins_over_confidence_and_span() {
     let findings = run_detector_pipeline(INPUT, &registry).unwrap();
     assert_eq!(
         summary(&findings),
-        [("finding-1", "provider", "provider", 0, 20)]
+        [("finding-1", ALWAYS_REDACT_TYPE_NAME, "provider", 0, 20)]
     );
 }
 
 #[test]
 fn specificity_ladder_is_private_key_provider_structural_contextual_entropy() {
     let ladder = [
-        ("private-key", Specificity::PrivateKey),
-        ("provider", Specificity::Provider),
-        ("structural", Specificity::Structural),
-        ("contextual", Specificity::Contextual),
-        ("entropy", Specificity::Entropy),
+        Specificity::PrivateKey,
+        Specificity::Provider,
+        Specificity::Structural,
+        Specificity::Contextual,
+        Specificity::Entropy,
     ];
     for pair in ladder.windows(2) {
         let (weaker, stronger) = (pair[1], pair[0]);
-        // Weaker registered first, higher confidence, narrower span: still loses.
+        // Weaker registered first, higher confidence, narrower span: still
+        // loses. Both share `ALWAYS_REDACT_TYPE_NAME` so severity ties and
+        // specificity alone decides.
         let registry = registry(vec![
             Box::new(Fixed {
                 id: "first",
-                candidates: vec![candidate(weaker.0, Confidence::High, weaker.1, 2, 6)],
+                candidates: vec![candidate(
+                    ALWAYS_REDACT_TYPE_NAME,
+                    Confidence::High,
+                    weaker,
+                    2,
+                    6,
+                )],
             }),
             Box::new(Fixed {
                 id: "second",
-                candidates: vec![candidate(stronger.0, Confidence::Low, stronger.1, 0, 10)],
+                candidates: vec![candidate(
+                    ALWAYS_REDACT_TYPE_NAME,
+                    Confidence::Low,
+                    stronger,
+                    0,
+                    10,
+                )],
             }),
         ]);
         let findings = run_detector_pipeline(INPUT, &registry).unwrap();
         assert_eq!(
             summary(&findings),
-            [("finding-1", stronger.0, "second", 0, 10)]
+            [("finding-1", ALWAYS_REDACT_TYPE_NAME, "second", 0, 10)]
         );
     }
 }
 
 #[test]
 fn omitted_specificity_ranks_as_entropy() {
+    // "custom" and "ctx" overlap and both use `ALWAYS_REDACT_TYPE_NAME` so
+    // they resolve equal severity, isolating the specificity comparison
+    // (omitted defaults to `Entropy`, weaker than `Contextual`). "custom2"
+    // is disjoint and keeps an arbitrary type name.
     let registry = registry(vec![
         Box::new(Fixed {
             id: "unclassified",
-            candidates: vec![Candidate::new("custom", Confidence::High, range(0, 5))],
+            candidates: vec![Candidate::new(
+                ALWAYS_REDACT_TYPE_NAME,
+                Confidence::High,
+                range(0, 5),
+            )],
         }),
         Box::new(Fixed {
             id: "contextual",
             candidates: vec![candidate(
-                "ctx",
+                ALWAYS_REDACT_TYPE_NAME,
                 Confidence::Low,
                 Specificity::Contextual,
                 0,
@@ -436,7 +550,7 @@ fn omitted_specificity_ranks_as_entropy() {
     assert_eq!(
         summary(&findings),
         [
-            ("finding-1", "ctx", "contextual", 0, 30),
+            ("finding-1", ALWAYS_REDACT_TYPE_NAME, "contextual", 0, 30),
             ("finding-2", "custom2", "other-unclassified", 40, 45),
         ]
     );

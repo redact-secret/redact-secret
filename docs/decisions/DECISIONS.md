@@ -43,3 +43,4 @@ future planning and implementation but do not authorize Git or release actions.
 - [Resolve real-looking twin fixtures as unmistakably synthetic](2026-09-18-resolve-real-looking-twin-fixtures-as-unmistakably-synthetic.md)
 - [Normalize invisible characters before detection](2026-09-19-normalize-invisible-characters-before-detection.md)
 - [Bound whole-input operations by default](2026-09-19-bound-whole-input-operations-by-default.md)
+- [Resolve overlap precedence by resolved-action severity](2026-09-19-resolve-overlap-precedence-by-resolved-action-severity.md)
