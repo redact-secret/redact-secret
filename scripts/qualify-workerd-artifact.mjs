@@ -60,6 +60,8 @@ const COMMON_REDACT_FIXTURE_ID = "jwt-positive-structured";
 /** Long enough for `wrangler dev` to bundle and start a fresh `workerd`
  * instance on a slow CI runner, short enough to fail fast otherwise. */
 const READY_TIMEOUT_MS = 60_000;
+/** How long the process group gets to exit on `SIGTERM` before `SIGKILL`. */
+const STOP_TIMEOUT_MS = 5_000;
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -244,7 +246,15 @@ async function startWrangler(directory, port) {
   const child = spawn(
     process.platform === "win32" ? "npx.cmd" : "npx",
     ["wrangler", "dev", "--port", String(port), "--local", "--ip", "127.0.0.1"],
-    { cwd: directory, stdio: ["ignore", "pipe", "pipe"] },
+    {
+      cwd: directory,
+      stdio: ["ignore", "pipe", "pipe"],
+      // `npx` does not forward signals to the `wrangler` it spawns, and
+      // `wrangler` starts `workerd` in turn, so signalling the direct child
+      // alone leaves both running. A detached child leads its own process
+      // group, which `stopWrangler` can signal as a whole.
+      detached: process.platform !== "win32",
+    },
   );
   let output = "";
   child.stdout.on("data", (chunk) => (output += chunk));
@@ -267,13 +277,37 @@ async function startWrangler(directory, port) {
       await new Promise((resolveDelay) => setTimeout(resolveDelay, 500));
     }
   }
-  child.kill();
+  await stopWrangler(child);
   throw new Error(`wrangler dev did not become ready within ${READY_TIMEOUT_MS}ms:\n${output}`);
 }
 
+/** Stops the whole `npx` → `wrangler` → `workerd` group and releases its
+ * pipes. A surviving grandchild holds the write end of this child's `stdout`
+ * and `stderr`, which keeps this process's event loop alive after the last
+ * check has already passed: the script hangs until CI cancels the job at its
+ * timeout, leaving orphan `workerd` processes behind. */
 async function stopWrangler(child) {
-  child.kill();
-  await new Promise((resolveExit) => child.once("exit", resolveExit));
+  const exited = new Promise((resolveExit) => child.once("exit", resolveExit));
+  const signal = (name) => {
+    try {
+      if (process.platform === "win32") child.kill(name);
+      else process.kill(-child.pid, name);
+    } catch {
+      // Already gone, or never started: nothing left to signal.
+    }
+  };
+  signal("SIGTERM");
+  let timer;
+  await Promise.race([
+    exited,
+    new Promise((resolveTimeout) => {
+      timer = setTimeout(resolveTimeout, STOP_TIMEOUT_MS);
+    }),
+  ]);
+  clearTimeout(timer);
+  signal("SIGKILL");
+  child.stdout?.destroy();
+  child.stderr?.destroy();
 }
 
 async function main() {
