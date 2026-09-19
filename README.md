@@ -90,11 +90,19 @@ architecture, a matching optional dependency that failed to install, or a
 corrupt addon — `initialize()` falls back to the same WebAssembly artifact
 browsers use instead of failing outright. Call `artifact()` after
 `initialize()` to see which one actually loaded: `"addon"` or `"wasm"`. Bun
-and Deno get this fallback for free; Cloudflare Workers and Vercel Edge are
-unaffected either way, since both already resolve the browser entry point
-directly. See [docs/qualification.md](./docs/qualification.md) for the full
-target matrix, exactly which failures engage the fallback, and how CI keeps
-both from drifting.
+and Deno get this fallback for free. **Cloudflare Workers is a verified,
+supported runtime**: it resolves its own `workerd` package condition to a
+loader that instantiates the WebAssembly artifact from a bundler-compiled
+`WebAssembly.Module` instead of the generated glue's `import.meta.url`-based
+`fetch`, which does not work under a real `workerd` sandbox
+(`decision-verify-edge-runtimes`). **Vercel Edge is not yet supported**: it
+resolves the plain browser entry point, whose `fetch`-based initialization
+fails there for a related but distinct reason, verified against Vercel's own
+reference Edge Runtime engine; see
+[docs/qualification.md](./docs/qualification.md) for the verified root cause
+and why the Cloudflare Workers fix does not carry over. See that document
+also for the full target matrix, exactly which failures engage the Node
+fallback, and how CI keeps both from drifting.
 
 ```ts
 import { artifact, initialize, scanAndRedact } from "@redact-secret/core";

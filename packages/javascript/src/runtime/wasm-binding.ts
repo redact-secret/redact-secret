@@ -111,8 +111,16 @@ export interface WasmModule {
    * `{ module_or_path: <bytes already read from disk> }`, instantiating
    * directly rather than through `fetch` — the same generated function, one
    * documented alternate calling convention, not a second build target.
+   * `runtime/workerd.ts`/`workerd-common.ts` (`decision-verify-edge-runtimes`)
+   * pass a third: an already-compiled module object a bundler's `.wasm`
+   * import resolved, typed here as `object` rather than the real
+   * `WebAssembly.Module` because this package's `lib.ES2022`-only
+   * `tsconfig.json` deliberately excludes `dom`, so no runtime file's
+   * type-checking depends on browser-only globals.
    */
-  default(source?: { module_or_path: Uint8Array }): Promise<unknown>;
+  default(source?: {
+    module_or_path: Uint8Array | object;
+  }): Promise<unknown>;
   version(): string;
   profile(): string;
   initialize(): void;
