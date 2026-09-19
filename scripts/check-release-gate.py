@@ -25,6 +25,15 @@ first cutover and every routine release after it the same graph rather than
 two: there is no separate "cutover mode" that could be skipped by mistake,
 because the wrapper's own `needs:` makes the dependency gate unconditional.
 
+Issue #417 pins a third thing this graph alone did not cover: `needs:` gets
+the qualification jobs to run, but nothing verified that the `common` and
+`full` browser artifacts `publish-wasm-dependency` is about to pack still are
+what their package identities promise. This script now requires that job to
+carry a `PROFILE_VERIFICATION_STEP` step, that it precedes `WASM_PUBLISH_STEP`
+(packing an artifact nothing has just checked would defeat the point), and
+that its body still asserts on both the `full` root artifact and the `common`
+artifact -- not just whichever one a future edit happened to keep.
+
 This intentionally parses the workflow YAML with plain text and regular
 expressions rather than a YAML library, matching
 `check-python-package.py`'s wheel-matrix check: no third-party dependency is
@@ -57,6 +66,21 @@ PUBLISH_JOBS = ("publish", "publish-crates", "publish-pypi")
 # ahead of. crates.io and PyPI have no equivalent dependency-package gate, so
 # this applies to `publish` alone, not every job in PUBLISH_JOBS.
 NPM_DEPENDENCY_GATES = ("publish-native-dependencies", "publish-wasm-dependency")
+
+# Issue #417: `publish-wasm-dependency` must verify, at publish time, that the
+# artifact it is about to pack under the `@redact-secret/wasm` package
+# identity actually reports the profile that identity promises -- and that
+# check must run before the step that packs and publishes it, not after.
+# Without this, the verification step could be deleted, reordered after the
+# publish step, or narrowed to skip the `common` artifact, and nothing here
+# would notice.
+WASM_DEPENDENCY_JOB = "publish-wasm-dependency"
+PROFILE_VERIFICATION_STEP = "Verify the root artifact reports the full profile"
+WASM_PUBLISH_STEP = "Pack, content-check, publish, and verify"
+FULL_ARTIFACT_GLUE = "redact_secret_wasm.js"
+FULL_PROFILE_ASSERTION = '!== "full"'
+COMMON_ARTIFACT_GLUE = "redact_secret_wasm_common.js"
+COMMON_PROFILE_ASSERTION = '!== "common"'
 
 JOB_HEADER_PREFIX = "  "
 ATTRIBUTE_PREFIX = "    "
@@ -130,6 +154,25 @@ def has_workflow_call_trigger(text: str) -> bool:
     return any(line.strip() == "workflow_call:" for line in text.splitlines())
 
 
+def extract_step_blocks(job_body: str) -> list[tuple[int, str, str]]:
+    """Return `(offset, name, body)` for every step in a job, in file order.
+
+    Steps share `needs:`'s list-item indent (`LIST_ITEM_PREFIX`), so a step
+    header is exactly that prefix followed by `name: `.
+    """
+    step_name_prefix = LIST_ITEM_PREFIX + "name: "
+    headers = [
+        (offset, line[len(step_name_prefix) :].strip())
+        for offset, line in _line_starts(job_body)
+        if line.startswith(step_name_prefix)
+    ]
+    blocks = []
+    for index, (offset, name) in enumerate(headers):
+        end = headers[index + 1][0] if index + 1 < len(headers) else len(job_body)
+        blocks.append((offset, name, job_body[offset:end]))
+    return blocks
+
+
 def validate(root: Path) -> list[str]:
     errors: list[str] = []
     release_path = root / RELEASE_WORKFLOW
@@ -179,6 +222,47 @@ def validate(root: Path) -> list[str]:
                 f"{RELEASE_WORKFLOW.as_posix()}: publish job does not need {', '.join(missing)} "
                 "-- the wrapper must not be publishable ahead of its runtime dependency packages"
             )
+
+    wasm_job = jobs.get(WASM_DEPENDENCY_JOB)
+    if wasm_job is None:
+        errors.append(
+            f"{RELEASE_WORKFLOW.as_posix()}: missing job '{WASM_DEPENDENCY_JOB}'"
+        )
+    else:
+        steps = extract_step_blocks(wasm_job)
+        verify_step = next(
+            (step for step in steps if step[1] == PROFILE_VERIFICATION_STEP), None
+        )
+        publish_step = next(
+            (step for step in steps if step[1] == WASM_PUBLISH_STEP), None
+        )
+        if verify_step is None:
+            errors.append(
+                f"{RELEASE_WORKFLOW.as_posix()}: job '{WASM_DEPENDENCY_JOB}' is missing "
+                f"the '{PROFILE_VERIFICATION_STEP}' step"
+            )
+        if publish_step is None:
+            errors.append(
+                f"{RELEASE_WORKFLOW.as_posix()}: job '{WASM_DEPENDENCY_JOB}' is missing "
+                f"the '{WASM_PUBLISH_STEP}' step"
+            )
+        if verify_step is not None and publish_step is not None and verify_step[0] > publish_step[0]:
+            errors.append(
+                f"{RELEASE_WORKFLOW.as_posix()}: '{PROFILE_VERIFICATION_STEP}' must precede "
+                f"'{WASM_PUBLISH_STEP}' in job '{WASM_DEPENDENCY_JOB}'"
+            )
+        if verify_step is not None:
+            body = verify_step[2]
+            if FULL_ARTIFACT_GLUE not in body or FULL_PROFILE_ASSERTION not in body:
+                errors.append(
+                    f"{RELEASE_WORKFLOW.as_posix()}: '{PROFILE_VERIFICATION_STEP}' does not "
+                    'assert the root artifact reports "full"'
+                )
+            if COMMON_ARTIFACT_GLUE not in body or COMMON_PROFILE_ASSERTION not in body:
+                errors.append(
+                    f"{RELEASE_WORKFLOW.as_posix()}: '{PROFILE_VERIFICATION_STEP}' does not "
+                    'assert the common artifact reports "common"'
+                )
 
     reconcile_path = root / ".github/workflows/reconcile-release.yml"
     if reconcile_path.is_file():
