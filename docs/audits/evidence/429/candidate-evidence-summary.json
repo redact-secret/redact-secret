@@ -1,0 +1,64 @@
+{
+  "issue": 429,
+  "recorded_at": "2026-09-19T11:48:19Z",
+  "purpose": "benchmarkRevalidation evidence for conformance/benchmark-regressions.json records benchmark-gap-292, benchmark-gap-293, and benchmark-gap-294",
+  "command": "npm run benchmark:candidate -- --benchmark-ref 0fa424ae64b7c44967b146758bc035a92dd65ee8",
+  "candidate": {
+    "sourceCommit": "2545c1afd5c8875b8102fcd2ac3dd8bb6cad835b",
+    "sourceState": "clean",
+    "packageName": "@redact-secret/core",
+    "declaredVersion": "0.1.0-beta.4",
+    "artifactSha256": "75ade2ca26ac83c4a257e6702f122d1662fb0281a7fccfa919d782d28a802a59"
+  },
+  "benchmark": {
+    "sourceCommit": "0fa424ae64b7c44967b146758bc035a92dd65ee8",
+    "dirty": false,
+    "lockfileSha256": "3bf4138d31d1774e189f85a834fd78afb0e3ae14e53bd26b2d878fe8956fd817"
+  },
+  "run": {
+    "runId": "8e12bb66-0a55-4d82-98e6-9fbf30f345c4",
+    "startedAt": "2026-09-19T11:48:18.390Z",
+    "finishedAt": "2026-09-19T11:48:19.389Z",
+    "status": "complete",
+    "scannerConfigurationHash": "3e870048981e29783d8bec111af33e7f78220add57991a2cbe8d949ec2799a3e",
+    "selection": { "scope": "full-suite", "filter": null },
+    "completeness": { "selectedFixtures": 612, "scannedFixtures": 612 },
+    "failures": []
+  },
+  "corpusCategoryHashesObserved": {
+    "reference-syntax": "0fe3363d4e0aec300b81bb823929f73928c7e06eb9e1d43064cf7b5b7f0d977e",
+    "detector-coverage": "0d5800251b19d7ee0d2cc2ad489d09a619d7626c578bf9b28a5c9fce791610eb"
+  },
+  "records": [
+    {
+      "id": "benchmark-gap-292",
+      "corpusHashInLedger": "0fe3363d4e0aec300b81bb823929f73928c7e06eb9e1d43064cf7b5b7f0d977e",
+      "corpusHashMatch": true,
+      "fixtureOutcomes": [
+        { "fixtureId": "reference-syntax--windows-env", "kind": "must-not-flag", "outcome": "clean" },
+        { "fixtureId": "reference-syntax--sql-bind", "kind": "must-not-flag", "outcome": "clean" }
+      ],
+      "disposition": "benchmarkRevalidation evidence complete"
+    },
+    {
+      "id": "benchmark-gap-293",
+      "corpusHashInLedger": "0fe3363d4e0aec300b81bb823929f73928c7e06eb9e1d43064cf7b5b7f0d977e",
+      "corpusHashMatch": true,
+      "fixtureOutcomes": [
+        { "fixtureId": "reference-syntax--azure-keyvault", "kind": "must-not-flag", "outcome": "clean" }
+      ],
+      "disposition": "benchmarkRevalidation evidence complete"
+    },
+    {
+      "id": "benchmark-gap-294",
+      "corpusHashInLedger": "1012bdbabc75ab6228091cddfe9a54bb283c7c37a254c7484650bf367cfeab17",
+      "corpusHashMatch": false,
+      "fixtureOutcomes": [
+        { "fixtureId": "detector-coverage--generic-token-api-key-quoted", "kind": "policy", "outcome": "EXACT" },
+        { "fixtureId": "detector-coverage--generic-token-password-quoted", "kind": "policy", "outcome": "EXACT" },
+        { "fixtureId": "detector-coverage--generic-token-client-secret-quoted", "kind": "policy", "outcome": "EXACT" }
+      ],
+      "disposition": "benchmarkRevalidation evidence withheld -- see README.md, corpus-hash mismatch"
+    }
+  ]
+}

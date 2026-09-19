@@ -1412,7 +1412,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 113,
+        "fixtureCount": 115,
         "hostContextsExercised": [
           "chat",
           "dotenv",
@@ -1492,7 +1492,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 113,
+        "fixtureCount": 115,
         "hostContextsExercised": [
           "chat",
           "dotenv",

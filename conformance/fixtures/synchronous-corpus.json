@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 1217,
+  "fixtureCount": 1219,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -16061,6 +16061,32 @@
         }
       ],
       "note": "issue #278: paired positive fixture -- a real-looking unquoted value containing '.' with no known code-reference root and no lower_snake_case segment (every segment is SCREAMING_CASE) does not satisfy either new exclusion and stays detected, the false-negative boundary the new exclusions deliberately do not cross."
+    },
+    {
+      "id": "contextual-negative-windows-env-reference-excluded",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "PASSWORD=%DB_PASSWORD_SYNTHETIC_REVOKED%",
+      "expected": [],
+      "note": "issue #292: a cmd.exe/batch-style Windows environment-variable reference (%IDENTIFIER%) whose content is a bare identifier stays excluded, like the existing reference-syntax exclusions (is_windows_env_reference in generic_token.rs) -- the canonical cross-surface case the closed issue never recorded. #428's paired positive control covers the boundary: the same shape with a non-identifier interior ('-') stays detected."
+    },
+    {
+      "id": "contextual-negative-sql-bind-parameter-excluded",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "password = :new_password_hash_synthetic_revoked",
+      "expected": [],
+      "note": "issue #292: a SQL named bind parameter (:identifier) whose content is a bare identifier stays excluded, like the existing reference-syntax exclusions (is_sql_bind_parameter in generic_token.rs) -- the canonical cross-surface case the closed issue never recorded. #428's paired positive control covers the boundary: the same shape with a non-identifier interior ('-') stays detected."
     },
     {
       "id": "generic-token-regression-windows-env-lookalike-still-detected",
