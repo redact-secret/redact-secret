@@ -44,3 +44,4 @@ future planning and implementation but do not authorize Git or release actions.
 - [Normalize invisible characters before detection](2026-09-19-normalize-invisible-characters-before-detection.md)
 - [Bound whole-input operations by default](2026-09-19-bound-whole-input-operations-by-default.md)
 - [Resolve overlap precedence by resolved-action severity](2026-09-19-resolve-overlap-precedence-by-resolved-action-severity.md)
+- [Select optimal disjoint candidates by total evidence weight](2026-09-19-select-optimal-disjoint-candidates-by-total-evidence-weight.md)
