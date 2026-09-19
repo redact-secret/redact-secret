@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 72,
+  "fixtureCount": 75,
   "fixtures": [
     {
       "id": "synthetic-regression-malformed-authority",
@@ -1122,6 +1122,54 @@
       "text": "xoxb-1234567890123-3210987654321-SSSSSSSSSSSSSSSSS",
       "expected": [],
       "note": "issue #375: the 17-byte (one-below-floor) secret twin of slack-incremental-bot-grammar-positive confirms no partition of the contract-rejected shape ever accidentally emits a finding."
+    },
+    {
+      "id": "invisible-incremental-provider-grammar-zwnj",
+      "input": "token: ghp_SYNTHETIC‌REVOKED00000000000000000000\n",
+      "text": "token: <SECRET_1>\n",
+      "expected": [
+        {
+          "detector": "github-token",
+          "type": "github_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 7,
+          "end": 50
+        }
+      ],
+      "note": "issue #446: U+200C removed from the scan copy sits inside a provider-grammar token; every UTF-8 byte and host-native char partition -- including the ones that split exactly at the removed code point's own boundary -- must still reproduce the whole-input reference, not just the whole-input scan itself (`invisible_normalization.rs` covers the latter)."
+    },
+    {
+      "id": "invisible-incremental-contextual-value-zwsp",
+      "input": "api_key = SYNTHETIC_REVOKED​_VALUE_1234\n",
+      "text": "api_key = <SECRET_1>\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 10,
+          "end": 41
+        }
+      ],
+      "note": "issue #446: U+200B sits inside a contextual assignment's value, one seam past the value's own start; every partition boundary, including one that falls exactly on the seam, must still reproduce the whole-input reference."
+    },
+    {
+      "id": "invisible-incremental-structural-authorization-zwj",
+      "input": "Authorization: Bearer SYNTHETIC‍REVOKED_BEARER_VALUE_1234\n",
+      "text": "Authorization: Bearer <SECRET_1>\n",
+      "expected": [
+        {
+          "detector": "bearer-token",
+          "type": "bearer_token",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 22,
+          "end": 59
+        }
+      ],
+      "note": "issue #446: U+200D sits inside a structural Authorization header's Bearer value; every partition boundary must still reproduce the whole-input reference, including the byte and char boundaries that fall inside the removed code point's own 3-byte UTF-8 encoding."
     }
   ]
 }

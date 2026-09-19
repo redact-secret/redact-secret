@@ -797,6 +797,33 @@ mod tests {
                 32,
                 "TOKEN_SYNTHETIC_REVOKED_VALUE",
             ),
+            // issue #446: `unicode-conversion-invisible-within-bmp` -- a
+            // code point normalization removes before detection, inside
+            // rather than adjacent to the span.
+            (
+                "TOKEN_\u{200B}_SYNTHETIC_REVOKED_VALUE",
+                0,
+                33,
+                "TOKEN_\u{200B}_SYNTHETIC_REVOKED_VALUE",
+            ),
+            // `unicode-conversion-invisible-within-removed-run` -- a
+            // three-code-point removed run (one maximal seam) inside the
+            // span.
+            (
+                "TOKEN_\u{00AD}\u{00AD}\u{2060}_SYNTHETIC_REVOKED_VALUE",
+                0,
+                37,
+                "TOKEN_\u{00AD}\u{00AD}\u{2060}_SYNTHETIC_REVOKED_VALUE",
+            ),
+            // `unicode-conversion-invisible-astral-within` -- U+E0041, both
+            // removed by normalization and astral (a surrogate pair in
+            // UTF-16), inside the span.
+            (
+                "TOKEN_\u{E0041}_SYNTHETIC_REVOKED",
+                0,
+                28,
+                "TOKEN_\u{E0041}_SYNTHETIC_REVOKED",
+            ),
         ];
         for (input, start, end, expected_slice) in cases {
             let range = ByteRange::new(start, end).unwrap();

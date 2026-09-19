@@ -9,7 +9,8 @@
 //! which runs the full built-in registry, `DefaultPolicy` overlap
 //! resolution, and redaction together) across deterministically generated
 //! mutations of each grammar's prefix, length, alphabet, delimiter,
-//! surrounding host context, Unicode boundary, and chunk partition.
+//! surrounding host context, Unicode boundary, interior Unicode insertion,
+//! and chunk partition.
 //!
 //! Every generated input is built from a fixed, cycling synthetic body
 //! (`SYNTHETIC_BODY_POOL`, below) — never a real-looking secret — so every
@@ -305,6 +306,7 @@ const OPERATIONS: &[&str] = &[
     "delimiter",
     "context",
     "unicode-boundary",
+    "unicode-insertion",
     "chunk-partition",
 ];
 
@@ -441,6 +443,45 @@ fn unicode_boundary_pool(grammar: &Grammar) -> Vec<(String, String)> {
     pool
 }
 
+/// A Unicode marker from one of the classes the invisible-code-point table
+/// removes before detection, inserted at an interior offset of the match
+/// itself: just after the prefix, mid-run, and just before the final
+/// character -- never at either boundary, which [`unicode_boundary_pool`]
+/// already covers.
+///
+/// `predict`'s plain prefix/run/boundary model deliberately does not
+/// simulate normalization (see the module docs), so this operation cannot
+/// be compared against `predict` the way the other pools are: every
+/// interior insertion would disagree with it by construction, telling us
+/// nothing. It instead compares the real pipeline's finding on the mutated
+/// input against its own control (the unmutated literal), the same
+/// "obfuscated vs. control" shape `invisible_normalization.rs` uses --
+/// issue #446, the sub-issue this module's own docs point to as "the one
+/// that would have caught the #438 bypass in the first place".
+fn unicode_insertion_pool(grammar: &Grammar) -> Vec<(String, String, &'static str)> {
+    let literal = valid_literal(grammar);
+    let markers = ["\u{200B}", "\u{200D}", "\u{FE0F}", "\u{E0041}"];
+    let prefix_len = grammar.prefixes[0].len();
+    let run_len = literal.len() - prefix_len;
+    let mut interior = [prefix_len, prefix_len + run_len / 2, literal.len() - 1];
+    interior.sort_unstable();
+    let mut seen_offsets = Vec::new();
+    for offset in interior {
+        if offset > 0 && offset < literal.len() && !seen_offsets.contains(&offset) {
+            seen_offsets.push(offset);
+        }
+    }
+
+    let mut pool = Vec::new();
+    for marker in markers {
+        for &offset in &seen_offsets {
+            let mutated = format!("{}{marker}{}", &literal[..offset], &literal[offset..]);
+            pool.push((format!("interior:{offset}:{marker:?}"), mutated, marker));
+        }
+    }
+    pool
+}
+
 fn fixed_size_chunks(input: &str, chunk_bytes: usize) -> Vec<String> {
     let mut chunks = Vec::new();
     let mut cursor = 0;
@@ -481,6 +522,13 @@ enum CaseKind {
     /// Compare a chunked incremental session against the whole-input
     /// reference for the same (unmutated) input.
     ChunkPartition { chunks: Vec<String> },
+    /// Compare the real pipeline's finding on an interior-marker-mutated
+    /// input against its own finding on `control`, the unmutated literal,
+    /// asserting the inserted `marker` sits inside the finding's span.
+    UnicodeInsertion {
+        control: String,
+        marker: &'static str,
+    },
 }
 
 struct Case {
@@ -527,6 +575,33 @@ fn discover_cases() -> Vec<Case> {
                         note,
                         input: joined,
                         kind: CaseKind::ChunkPartition { chunks },
+                    });
+                }
+                continue;
+            }
+
+            if operation == "unicode-insertion" {
+                let control = valid_literal(grammar);
+                let pool = unicode_insertion_pool(grammar);
+                let selection = bounded_selection(grammar.id, operation, pool.len());
+                for (ordinal, index) in selection.into_iter().enumerate() {
+                    let (note, input, marker) = pool[index].clone();
+                    assert!(
+                        input.len() <= MAX_INPUT_BYTES,
+                        "{}/{operation}: {} bytes exceeds the {MAX_INPUT_BYTES}-byte resource bound",
+                        grammar.id,
+                        input.len(),
+                    );
+                    cases.push(Case {
+                        grammar,
+                        operation,
+                        ordinal,
+                        note,
+                        input,
+                        kind: CaseKind::UnicodeInsertion {
+                            control: control.clone(),
+                            marker,
+                        },
                     });
                 }
                 continue;
@@ -651,6 +726,7 @@ fn discovery_generates_a_bounded_deterministic_case_set() {
 }
 
 #[test]
+#[allow(clippy::too_many_lines)]
 fn every_generated_mutation_matches_its_oracle_or_is_an_expected_exploratory_difference() {
     let started = Instant::now();
     let mut exploratory_seen: HashSet<(String, String, String)> = HashSet::new();
@@ -694,6 +770,68 @@ fn every_generated_mutation_matches_its_oracle_or_is_an_expected_exploratory_dif
                     expected_findings,
                     "{}: findings",
                     case.id()
+                );
+            }
+            CaseKind::UnicodeInsertion { control, marker } => {
+                let (_, control_findings) = whole_input(control);
+                assert!(
+                    single_matching_range(&control_findings, case.grammar, &case).is_some(),
+                    "{}: the control literal produced no {} finding",
+                    case.id(),
+                    case.grammar.type_name,
+                );
+                let control_finding = control_findings
+                    .iter()
+                    .find(|finding| finding.type_name() == case.grammar.type_name)
+                    .unwrap();
+
+                let (_, findings) = whole_input(&case.input);
+                let range =
+                    single_matching_range(&findings, case.grammar, &case).unwrap_or_else(|| {
+                        panic!(
+                            "{}: interior {marker:?} defeated detection — predicted a {} \
+                             finding covering the marker, found none.\n\
+                             Promote as a canonical regression fixture:\n{}",
+                            case.id(),
+                            case.grammar.type_name,
+                            promotion_snippet(&case),
+                        )
+                    });
+                let finding = findings
+                    .iter()
+                    .find(|finding| finding.type_name() == case.grammar.type_name)
+                    .unwrap();
+
+                assert_eq!(
+                    finding.detector(),
+                    control_finding.detector(),
+                    "{}: detector",
+                    case.id(),
+                );
+                assert_eq!(
+                    finding.type_name(),
+                    control_finding.type_name(),
+                    "{}: type",
+                    case.id(),
+                );
+                assert_eq!(
+                    finding.confidence(),
+                    control_finding.confidence(),
+                    "{}: confidence",
+                    case.id(),
+                );
+
+                let span = &case.input[range.0..range.1];
+                assert!(
+                    span.contains(marker),
+                    "{}: the finding span does not cover the inserted marker",
+                    case.id(),
+                );
+                assert_eq!(
+                    span.replacen(marker, "", 1),
+                    *control,
+                    "{}: the span minus the marker must equal the control literal",
+                    case.id(),
                 );
             }
         }

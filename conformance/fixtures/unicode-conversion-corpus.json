@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 6,
+  "fixtureCount": 9,
   "fixtures": [
     {
       "id": "unicode-conversion-astral-before",
@@ -133,6 +133,72 @@
         }
       ],
       "note": "A 3-byte curly quote (U+201C, U+201D) touches the finding on both sides with no whitespace delimiter; the converted span must land exactly on the finding's own boundary, neither absorbing the adjacent punctuation's bytes nor leaving any of the finding's own bytes outside it."
+    },
+    {
+      "id": "unicode-conversion-invisible-within-bmp",
+      "detector": "unicode-conversion",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "TOKEN_​_SYNTHETIC_REVOKED_VALUE",
+      "expected": [
+        {
+          "detector": "unicode-conversion",
+          "type": "synthetic_token",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 0,
+          "end": 33
+        }
+      ],
+      "note": "issue #446: a 3-byte zero-width space (U+200B), one of the code points `secret-scan-core::normalize` removes from the scan copy before detection, sits inside the declared span rather than adjacent to it. Range-unit conversion is a pure function of the original bytes and offsets, so it must still advance UTF-16 code-unit and Python code-point counts by exactly one for this code point even though detection itself never sees it."
+    },
+    {
+      "id": "unicode-conversion-invisible-within-removed-run",
+      "detector": "unicode-conversion",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "TOKEN_­­⁠_SYNTHETIC_REVOKED_VALUE",
+      "expected": [
+        {
+          "detector": "unicode-conversion",
+          "type": "synthetic_token",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 0,
+          "end": 37
+        }
+      ],
+      "note": "issue #446: a three-code-point removed run (U+00AD U+00AD U+2060 -- one maximal seam in `NormalizedInput`) sits inside the declared span. Each removed code point still counts as its own UTF-16 code unit and Python code point; the conversion functions have no notion of a seam, only of the original bytes."
+    },
+    {
+      "id": "unicode-conversion-invisible-astral-within",
+      "detector": "unicode-conversion",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "TOKEN_󠁁_SYNTHETIC_REVOKED",
+      "expected": [
+        {
+          "detector": "unicode-conversion",
+          "type": "synthetic_token",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 0,
+          "end": 28
+        }
+      ],
+      "note": "issue #446: U+E0041 (a tag character, removed by normalization) is both invisible and astral, a 4-byte UTF-8 encoding requiring a surrogate pair in UTF-16 like `unicode-conversion-astral-within`'s visible U+1F511, but here inside a span that detection never actually saw as a single contiguous run."
     }
   ]
 }
