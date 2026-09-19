@@ -49,6 +49,7 @@ import type {
   SecretAction,
   SecretConfidence,
   SecretFinding,
+  SecretObfuscation,
   SecretPolicy,
   SecretScanErrorCode,
   WholeInputLimits,
@@ -108,6 +109,8 @@ type ScanAndRedactIsSync = Expect<
 const policy: SecretPolicy = {
   evaluate(finding: DetectedSecretFinding, context: PolicyContext): SecretAction {
     const confidence: SecretConfidence = finding.confidence;
+    const obfuscation: SecretObfuscation = finding.obfuscation;
+    void obfuscation;
     return context.findingIndex + 1 === context.findingCount &&
       confidence === "high"
       ? "block"

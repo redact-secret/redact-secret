@@ -247,7 +247,7 @@ and must be refreshed when an approved version changes. Policy tests reject
 version drift, including drift in the private root and native/Wasm packages.
 
 `npm run rust:check` runs the enforcement. First and subsequent publications
-use the same approved release graph, including all seven npm dependencies
+use the same approved release graph, including all nine npm dependencies
 before the wrapper; there is no separate first-cutover dispatch. A manifest
 value alone neither selects nor authorizes a release.
 

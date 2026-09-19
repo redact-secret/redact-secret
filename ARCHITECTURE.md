@@ -104,7 +104,7 @@ The binding and package layout is:
 | --- | --- | --- |
 | `crates/secret-scan-core` | Canonical detector, policy, redaction, and incremental behavior | crates.io library crate |
 | `crates/secret-scan-cli` | Process arguments, files, standard streams, output, and exit codes | `redact-secret` binary |
-| `bindings/node` | N-API conversion between Node.js and the Rust core | Six `@redact-secret/node-<platform>` packages |
+| `bindings/node` | N-API conversion between Node.js and the Rust core | Eight `@redact-secret/node-<platform>` packages (glibc and musl Linux, macOS, Windows) |
 | `bindings/wasm` | `wasm-bindgen` conversion between browsers and the Rust core | `@redact-secret/wasm` (root `full`, `./common`) |
 | `bindings/python` | PyO3 extension and Python-facing package surface | PyPI `redact-secret`, imported as `redact_secret` |
 | `packages/javascript` | One typed API with runtime-specific loading | `@redact-secret/core` |

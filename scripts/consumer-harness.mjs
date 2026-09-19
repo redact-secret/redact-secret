@@ -203,7 +203,7 @@ export function qualifyNode(
 ) {
   const source = [
     "const { Readable } = await import('node:stream');",
-    "const { createIncrementalSanitizer, initialize, scan, scanAndRedact, VERSION } = await import('@redact-secret/core');",
+    "const { artifact, createIncrementalSanitizer, initialize, scan, scanAndRedact, VERSION } = await import('@redact-secret/core');",
     "const { createNodeStreamSanitizer } = await import('@redact-secret/core/node-stream');",
     "const { createServerHandler } = await import('./safe-integration/server.mjs');",
     INCREMENTAL_CORPUS_HELPERS,
@@ -246,7 +246,7 @@ export function qualifyNode(
     "const eventText = JSON.stringify(events);",
     "const redactedMatch = integrationFixtures.redact.slice(redacted.findings[0].start, redacted.findings[0].end);",
     "const safeIntegration = { clean: clean.code === 'OK', redacted: redacted.code === 'OK' && forwarded[1] !== integrationFixtures.redact && !forwarded[1].includes(redactedMatch), warned: warned.code === 'SECRET_WARNING', blocked: blocked.code === 'SECRET_BLOCKED', failedClosed: failed.code === 'SCAN_FAILED', limited: limited.code === 'TRANSPORT_LIMIT_EXCEEDED', downstreamCalls: forwarded.length === 2, safeEvents: !Object.values(integrationFixtures).some((input) => eventText.includes(input)) };",
-    "console.log(JSON.stringify({ version: VERSION, findings, incremental: incrementalText === expectedIncrementalText, incrementalCorpus: incrementalCorpusSummary, stream: streamText === scanAndRedact(streamInput).text, streamFindings: transform.findings.length, safeIntegration }));",
+    "console.log(JSON.stringify({ version: VERSION, artifact: artifact(), findings, incremental: incrementalText === expectedIncrementalText, incrementalCorpus: incrementalCorpusSummary, stream: streamText === scanAndRedact(streamInput).text, streamFindings: transform.findings.length, safeIntegration }));",
   ].join("\n");
   const output = execFileSync(
     process.execPath,
@@ -270,6 +270,14 @@ export function qualifyNode(
   if (result.version !== expectedVersion) {
     throw new Error(
       `Node lane version mismatch: reports ${result.version}, expected ${expectedVersion}`,
+    );
+  }
+  // The WebAssembly fallback (`decision-add-node-wasm-fallback`) would let
+  // every check below pass on a host whose native addon never installed or
+  // loaded, so this lane only qualifies the addon if the addon is what ran.
+  if (result.artifact !== "addon") {
+    throw new Error(
+      `Node lane: expected the native addon to load, but artifact() reports ${result.artifact}`,
     );
   }
   if (result.findings.length !== 1) {

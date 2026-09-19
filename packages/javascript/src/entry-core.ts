@@ -41,6 +41,7 @@ export type {
   SecretAction,
   SecretConfidence,
   SecretFinding,
+  SecretObfuscation,
   SecretPolicy,
   WholeInputLimits,
 } from "./types.js";

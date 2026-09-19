@@ -229,6 +229,26 @@ class RustWorkspaceCheckTests(unittest.TestCase):
         errors = self.run_check(configure)
         self.assertTrue(any("packages/javascript/package.json: version 0.2.0" in error for error in errors), errors)
 
+    def test_a_stale_runtime_package_pin_is_rejected(self) -> None:
+        for field in ("dependencies", "optionalDependencies"):
+            with self.subTest(field=field):
+                def configure(workspace: Workspace, field: str = field) -> None:
+                    workspace.write(
+                        "packages/javascript/package.json",
+                        json.dumps({
+                            "version": VERSION,
+                            "engines": {"node": NODE_ENGINES},
+                            field: {"@redact-secret/wasm": "0.0.1", "unrelated": "1.0.0"},
+                        }),
+                    )
+
+                errors = self.run_check(configure)
+                self.assertEqual(
+                    [error for error in errors if "pins" in error],
+                    [f"packages/javascript/package.json: {field} pins @redact-secret/wasm to 0.0.1, "
+                     f"not workspace version {VERSION}"],
+                )
+
     def test_member_version_drift_is_rejected(self) -> None:
         def configure(workspace: Workspace) -> None:
             workspace.packages[1]["version"] = "0.2.0"

@@ -6,14 +6,18 @@
 
 | Runtime | Package / entry point | Current scope |
 | --- | --- | --- |
-| Node.js 20, 22, 24 | `@redact-secret/core` (ESM); `@redact-secret/core/common` (opt-in) | Whole-input and incremental; glibc Linux, macOS, Windows; x64 and arm64 |
-| Browser | `@redact-secret/core` with WebAssembly; `@redact-secret/core/common` (opt-in) | Whole-input and incremental; Chromium, Firefox, WebKit qualification |
+| Node.js 20, 22, 24 | `@redact-secret/core` (ESM); `@redact-secret/core/common` (opt-in) | Whole-input and incremental; glibc and musl Linux, macOS, Windows; x64 and arm64; WebAssembly fallback elsewhere |
+| Browser | `@redact-secret/core` with WebAssembly; `@redact-secret/core/common` (opt-in) | Whole-input and incremental; Chromium, Firefox, WebKit qualification; Cloudflare Workers via the `workerd` condition |
 | CPython 3.10+ | `redact-secret`, imported as `redact_secret` | Whole-input and incremental; see [wheel matrix](python-packaging.md) |
 | Rust 1.88+ | `redact-secret`, imported as `redact_secret` | Whole-input and incremental |
 | CLI | `redact-secret` binary | File checking/redaction and streamed standard input |
 
-Node npm packages and CLI release binaries do not include musl/Alpine builds.
-Python has a separate musllinux wheel matrix. A built test artifact is not
+npm ships musl/Alpine Node addons; CLI release binaries still do not include
+musl builds. Where no addon loads, `initialize()` falls back to the
+WebAssembly artifact, and `artifact()` reports `"addon"` or `"wasm"`. The musl
+addons, that fallback, and Cloudflare Workers support are newer than the
+published 0.1.0-beta.4. Vercel Edge is not supported. Python has a separate
+musllinux wheel matrix. A built test artifact is not
 necessarily a distributed package; [qualification](qualification.md) explains
 that distinction.
 

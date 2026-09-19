@@ -17,8 +17,9 @@ const COMMON_NODE_STREAM_CONSUMER =
   'import { createNodeStreamSanitizer } from "@redact-secret/core/common/node-stream"; globalThis.secretScanEntry = [createNodeStreamSanitizer];';
 
 /**
- * The Node addon is one of six `optionalDependencies`, selected at runtime
- * by `process.platform`/`process.arch` (`runtime/node.ts`), so unlike the
+ * The Node addon is one of eight `optionalDependencies`, selected at runtime
+ * by `process.platform`/`process.arch` and, on Linux, detected libc
+ * (`runtime/node.ts`), so unlike the
  * wasm glue below it is never a statically resolvable specifier for a
  * bundler to see — nothing here needs to mark it external.
  */

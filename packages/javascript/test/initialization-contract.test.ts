@@ -231,6 +231,49 @@ describe("finding normalization", () => {
     expect(binding.calls).toEqual(["initialize"]);
   });
 
+  it.each([-1, 1.5, 2 ** 32, 2 ** 32 + 4, Number.NaN, Number.POSITIVE_INFINITY])(
+    "rejects whole-input limit %s with INVALID_LIMITS instead of letting the binding wrap it",
+    async (value) => {
+      const binding = createFakeBinding();
+      const runtime = createRedactSecretRuntime(async () => binding, "full");
+      await runtime.initialize();
+
+      for (const limits of [
+        { maxInputBytes: value, maxFindings: 10 },
+        { maxInputBytes: 1_024, maxFindings: value },
+      ]) {
+        expect(() => runtime.scan("x", { limits })).toThrowError(
+          expect.objectContaining({ name: "SecretScanError", code: "INVALID_LIMITS" }),
+        );
+        expect(() => runtime.redact("x", [], { limits })).toThrowError(
+          expect.objectContaining({ name: "SecretScanError", code: "INVALID_LIMITS" }),
+        );
+        expect(() => runtime.scanAndRedact("x", { limits })).toThrowError(
+          expect.objectContaining({ name: "SecretScanError", code: "INVALID_LIMITS" }),
+        );
+      }
+      expect(binding.calls).toEqual(["initialize"]);
+    },
+  );
+
+  it.each([-1, 1.5, 2 ** 32, Number.NaN])(
+    "rejects incremental limit %s with INVALID_LIMITS instead of letting the binding wrap it",
+    async (value) => {
+      const binding = createFakeBinding();
+      const runtime = createRedactSecretRuntime(async () => binding, "full");
+      await runtime.initialize();
+
+      for (const key of Object.keys(LIMITS) as (keyof typeof LIMITS)[]) {
+        expect(() =>
+          runtime.createIncrementalSanitizer({ limits: { ...LIMITS, [key]: value } }),
+        ).toThrowError(
+          expect.objectContaining({ name: "SecretScanError", code: "INVALID_LIMITS" }),
+        );
+      }
+      expect(binding.calls).toEqual(["initialize"]);
+    },
+  );
+
   it("routes the exported default formatter to the binding's own built-in", async () => {
     const { defaultPlaceholderFormatter, typedPlaceholderFormatter } =
       await import("../src/formatters.js");

@@ -49,13 +49,14 @@ documentation, inside a function that returns `Result`.)
 
 | Concern | API |
 | --- | --- |
-| Scan | `scan`, `run_detector_pipeline` |
-| Redact | `redact`, `MAX_PLACEHOLDER_LENGTH` |
-| Scan and redact | `scan_and_redact` |
+| Scan | `scan`, `scan_with_limits`, `run_detector_pipeline` |
+| Redact | `redact`, `redact_with_limits`, `MAX_PLACEHOLDER_LENGTH` |
+| Scan and redact | `scan_and_redact`, `scan_and_redact_with_limits` |
+| Whole-input limits | `WholeInputLimits`, `DEFAULT_MAX_INPUT_BYTES`, `DEFAULT_MAX_FINDINGS` |
 | Incremental | `IncrementalSanitizer`, `IncrementalLimits`, `SessionState`, `IncrementalPolicy`, `IncrementalPolicyContext` |
 | Policy | `Policy`, `PolicyContext`, `DefaultPolicy`, `Action` |
 | Formatter | `PlaceholderFormatter`, `PlaceholderContext`, `default_placeholder_formatter`, `typed_placeholder_formatter` |
-| Finding | `Finding`, `DetectedFinding`, `ByteRange`, `Confidence`, `Specificity` |
+| Finding | `Finding`, `DetectedFinding`, `ByteRange`, `Confidence`, `Specificity`, `Obfuscation` |
 | Result | `ScanResult`, `IncrementalResult` |
 | Sanitized error | `SecretScanError`, `SecretScanErrorCode`, `DetectorFailure`, `PolicyFailure`, `FormatterFailure` |
 | Custom detectors | `Detector`, `Candidate`, `DetectorContext`, `DetectorRegistry`, `RegisteredDetector` |
