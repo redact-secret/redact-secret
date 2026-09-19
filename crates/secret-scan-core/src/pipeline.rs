@@ -7,7 +7,6 @@
 //! (`decision-normalize-invisible-characters-before-detection`).
 
 use std::cmp::Ordering;
-use std::collections::BTreeMap;
 
 use crate::error::{SecretScanError, SecretScanErrorCode};
 use crate::limits::WholeInputLimits;
@@ -159,17 +158,195 @@ fn collect_candidates(
         .collect()
 }
 
-/// Greedy acceptance over an ordered map of disjoint accepted spans keyed by
-/// start offset. Because accepted spans are disjoint, the span with the
-/// greatest start below `candidate.end()` is the only one that can overlap.
-fn try_accept(accepted: &mut BTreeMap<usize, usize>, range: ByteRange) -> bool {
-    if let Some((_, &end)) = accepted.range(..range.end()).next_back()
-        && end > range.start()
-    {
-        return false;
+/// This candidate's rank within [`Specificity`], `0` for [`Specificity::Entropy`]
+/// through `4` for [`Specificity::PrivateKey`] — written out rather than cast,
+/// so a new variant fails to compile here instead of silently taking on
+/// whatever discriminant `#[derive]` would assign it.
+const fn specificity_rank(specificity: Specificity) -> u32 {
+    match specificity {
+        Specificity::Entropy => 0,
+        Specificity::Contextual => 1,
+        Specificity::Structural => 2,
+        Specificity::Provider => 3,
+        Specificity::PrivateKey => 4,
     }
-    accepted.insert(range.start(), range.end());
-    true
+}
+
+/// This candidate's rank within [`Confidence`], `0` for [`Confidence::Low`]
+/// through `2` for [`Confidence::High`].
+const fn confidence_rank(confidence: Confidence) -> u32 {
+    match confidence {
+        Confidence::Low => 0,
+        Confidence::Medium => 1,
+        Confidence::High => 2,
+    }
+}
+
+/// A candidate's contribution to a disjoint selection's total weight: every
+/// key [`RankedCandidate::priority`] compares on, re-based so that a larger
+/// value is always the better one and the fields sit in the same dominance
+/// order (declaration order controls `#[derive(Ord)]`, most significant
+/// first), so summing this across a selection and comparing sums
+/// lexicographically reproduces `priority`'s pairwise order whenever exactly
+/// one candidate can occupy a span, and extends it to "which disjoint
+/// combination carries more total evidence" whenever more than one can.
+///
+/// Lexicographic order over vectors is compatible with component-wise
+/// addition (`a > b` implies `a + c > b + c`, since addition is applied
+/// independently to each field and the first field where `a` and `b` differ
+/// is unaffected by `c`), which is the one property the weighted-interval-
+/// scheduling optimality proof needs from a scalar weight. That proof
+/// therefore carries over unchanged to this vector weight.
+///
+/// `severity`, `specificity`, and `confidence` are each `base.pow(rank)`
+/// rather than a bare rank, where `base` is one more than the pipeline's own
+/// candidate count for this call (`select_optimal_disjoint_set`'s `n + 1`).
+/// A bare linear rank would let enough weaker candidates outvote one
+/// stronger one purely by count — for example two `Warn`-severity
+/// candidates (rank 1 each, summing to 2) outranking one `Redact`-severity
+/// candidate (rank 2) despite `Redact` being the strictly stricter action
+/// (`decision-resolve-overlap-precedence-by-resolved-action-severity`), even
+/// when the `Redact` candidate's span is not fully covered by the two
+/// weaker ones, which would leave part of it unflagged entirely rather than
+/// merely un-redacted. With `base > n`, no combination of at most `n`
+/// candidates at a lower rank can ever sum past one candidate at the next
+/// rank up (their sum is at most `n * base^(rank-1) < base * base^(rank-1)
+/// = base^rank`), so each of these three tiers behaves as true dominance —
+/// exactly reproducing today's "never displace a stricter one" rule
+/// (`ARCHITECTURE.md`'s overlap-resolution section) — while still letting
+/// several candidates that *tie* on a tier out-total a single one there,
+/// which is the actual "more total evidence" case this issue asks for.
+/// `narrowness` and the two order fields stay linear: unlike the three
+/// tiers above, more matched, better-registered candidates covering more of
+/// the input is exactly the improvement wanted, with no dominance to
+/// protect.
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Default)]
+struct EvidenceWeight {
+    severity: u128,
+    specificity: u128,
+    confidence: u128,
+    narrowness: u128,
+    detector_priority: u128,
+    candidate_priority: u128,
+}
+
+impl EvidenceWeight {
+    /// Exceeds any detector-registry size or per-detector candidate count
+    /// reachable in memory, so subtracting an order from it never underflows.
+    const ORDER_CAP: u128 = u32::MAX as u128;
+    /// Exceeds any candidate span length a `&str` can hold, so subtracting a
+    /// length from it never underflows.
+    const WIDTH_CAP: u128 = u64::MAX as u128;
+
+    /// `base` is `select_optimal_disjoint_set`'s candidate count plus one;
+    /// see the dominance argument on the type itself. `saturating_pow`
+    /// leaves dominance intact rather than wrapping if a pathological
+    /// candidate count and rank ever pushed the true value past `u128`,
+    /// which the tiny exponents here (specificity's rank 4 is the largest)
+    /// keep out of reach for any candidate count this pipeline could hold
+    /// in memory.
+    fn of(candidate: &RankedCandidate<'_>, base: u128) -> Self {
+        Self {
+            severity: base.saturating_pow(u32::from(candidate.resolved_severity)),
+            specificity: base.saturating_pow(specificity_rank(candidate.specificity)),
+            confidence: base.saturating_pow(confidence_rank(candidate.confidence)),
+            narrowness: Self::WIDTH_CAP - candidate.range.len() as u128,
+            detector_priority: Self::ORDER_CAP - candidate.detector_order as u128,
+            candidate_priority: Self::ORDER_CAP - candidate.candidate_order as u128,
+        }
+    }
+
+    fn plus(self, other: Self) -> Self {
+        Self {
+            severity: self.severity + other.severity,
+            specificity: self.specificity + other.specificity,
+            confidence: self.confidence + other.confidence,
+            narrowness: self.narrowness + other.narrowness,
+            detector_priority: self.detector_priority + other.detector_priority,
+            candidate_priority: self.candidate_priority + other.candidate_priority,
+        }
+    }
+}
+
+/// Selects the subset of `ranked` with pairwise-disjoint ranges that
+/// maximizes total [`EvidenceWeight`] — optimal weighted-interval selection,
+/// replacing the previous greedy walk that could discard two or more
+/// mutually disjoint candidates in favor of a single overlapping one even
+/// when their combined weight was higher
+/// (`decision-select-optimal-disjoint-candidates-by-total-evidence-weight`).
+///
+/// The classical `O(n log n)` dynamic program: sort by end offset, then for
+/// each candidate in that order take `max(skip it, take it + the best total
+/// among candidates that end at or before its start)`, with that
+/// predecessor found by binary search over the (already end-sorted) end
+/// offsets. One `O(n log n)` sort, `n` `O(log n)` predecessor searches, one
+/// `O(n)` forward pass, one `O(n)` backward reconstruction — the same
+/// complexity class as the previous sort-plus-`BTreeMap` walk, in `n`, the
+/// pipeline's own candidate count; `run_detector_pipeline` has no separate,
+/// externally imposed bound on `n` to lean on
+/// (`decision-bound-whole-input-operations-by-default` deliberately leaves
+/// it unbounded), so the bound is stated in `n` alone.
+///
+/// Determinism: the sort key below is total (no two candidates compare
+/// equal — `RankedCandidate::priority`'s final two keys, `detector_order`
+/// and `candidate_order`, are unique per candidate), so the sorted order,
+/// and therefore every predecessor lookup and DP value, is fixed regardless
+/// of the standard library's unstable-sort implementation. Where two
+/// candidate subsets' total weight ties exactly, the recurrence keeps the
+/// previously computed (excluding) state — a fixed rule fixed by the code,
+/// not by iteration order over an unordered collection — so a rerun, and
+/// every binding built on this same core, reproduce the identical selection.
+fn select_optimal_disjoint_set(mut ranked: Vec<RankedCandidate<'_>>) -> Vec<RankedCandidate<'_>> {
+    ranked.sort_unstable_by(|a, b| {
+        a.range
+            .end()
+            .cmp(&b.range.end())
+            .then_with(|| a.priority(b))
+    });
+
+    let n = ranked.len();
+    let ends: Vec<usize> = ranked
+        .iter()
+        .map(|candidate| candidate.range.end())
+        .collect();
+    // Strictly exceeds `n`, the number of candidates that could ever be
+    // summed at one dominance tier; see `EvidenceWeight`'s doc comment.
+    let base = n as u128 + 1;
+
+    let mut totals: Vec<EvidenceWeight> = Vec::with_capacity(n + 1);
+    totals.push(EvidenceWeight::default());
+    let mut include: Vec<bool> = Vec::with_capacity(n);
+
+    for (i, candidate) in ranked.iter().enumerate() {
+        let pred = ends[..i].partition_point(|&end| end <= candidate.range.start());
+        let with_candidate = EvidenceWeight::of(candidate, base).plus(totals[pred]);
+        let without_candidate = totals[i];
+        if with_candidate > without_candidate {
+            include.push(true);
+            totals.push(with_candidate);
+        } else {
+            include.push(false);
+            totals.push(without_candidate);
+        }
+    }
+
+    let mut selected_mask = vec![false; n];
+    let mut i = n;
+    while i > 0 {
+        if include[i - 1] {
+            selected_mask[i - 1] = true;
+            let start = ranked[i - 1].range.start();
+            i = ends[..i - 1].partition_point(|&end| end <= start);
+        } else {
+            i -= 1;
+        }
+    }
+
+    ranked
+        .into_iter()
+        .zip(selected_mask)
+        .filter_map(|(candidate, selected)| selected.then_some(candidate))
+        .collect()
 }
 
 /// Runs every registered detector over `input`, validates each candidate,
@@ -229,13 +406,7 @@ pub fn run_detector_pipeline(
         }
     }
 
-    ranked.sort_unstable_by(RankedCandidate::priority);
-
-    let mut accepted_spans = BTreeMap::new();
-    let mut accepted: Vec<RankedCandidate<'_>> = ranked
-        .into_iter()
-        .filter(|candidate| try_accept(&mut accepted_spans, candidate.range))
-        .collect();
+    let mut accepted = select_optimal_disjoint_set(ranked);
 
     // Accepted spans are disjoint, so start offsets are unique.
     accepted.sort_unstable_by_key(|candidate| candidate.range.start());
@@ -399,21 +570,124 @@ pub fn scan_and_redact_with_limits(
 mod tests {
     use super::*;
 
+    /// Builds a synthetic, otherwise-identical `RankedCandidate` so DP
+    /// selection can be tested without a real detector or `&str` behind it.
+    /// `severity` is 0-3 like [`crate::types::Action::overlap_resolution_severity`];
+    /// `type_name` and `detector` are stable per-test leaked strings so the
+    /// resulting `RankedCandidate` can outlive the function that builds it.
+    fn synthetic(
+        severity: u8,
+        specificity: Specificity,
+        confidence: Confidence,
+        start: usize,
+        end: usize,
+        detector_order: usize,
+        candidate_order: usize,
+    ) -> RankedCandidate<'static> {
+        RankedCandidate {
+            type_name: "synthetic_type",
+            detector: "synthetic-detector",
+            confidence,
+            specificity,
+            resolved_severity: severity,
+            range: ByteRange::new(start, end).unwrap(),
+            obfuscation: Obfuscation::None,
+            detector_order,
+            candidate_order,
+        }
+    }
+
     #[test]
-    fn try_accept_keeps_disjoint_spans_only() {
-        let mut spans = BTreeMap::new();
-        let range = |s, e| ByteRange::new(s, e).unwrap();
-        assert!(try_accept(&mut spans, range(10, 20)));
-        assert!(try_accept(&mut spans, range(30, 40)));
-        assert!(!try_accept(&mut spans, range(15, 35)));
-        assert!(!try_accept(&mut spans, range(5, 11)));
-        assert!(!try_accept(&mut spans, range(19, 25)));
-        assert!(!try_accept(&mut spans, range(0, 100)));
-        assert!(!try_accept(&mut spans, range(12, 13)));
-        assert!(try_accept(&mut spans, range(20, 30)));
-        assert!(try_accept(&mut spans, range(0, 10)));
-        assert!(try_accept(&mut spans, range(40, 41)));
-        assert_eq!(spans.len(), 5);
+    fn select_optimal_disjoint_set_keeps_disjoint_candidates_only() {
+        // Every candidate carries the same severity, specificity, and
+        // confidence, so the maximum achievable count (5, the same count
+        // `try_accept`'s equivalent case kept) dominates the total weight,
+        // and only the narrowness tier — summed span width, the lowest
+        // weight tier above per-candidate order — distinguishes between the
+        // several 5-candidate disjoint sets this input admits. Optimal
+        // selection picks the narrowest one rather than whichever a
+        // greedy, order-dependent walk would have reached first.
+        let candidates = vec![
+            synthetic(2, Specificity::Provider, Confidence::High, 10, 20, 0, 0),
+            synthetic(2, Specificity::Provider, Confidence::High, 30, 40, 0, 1),
+            synthetic(2, Specificity::Provider, Confidence::High, 15, 35, 0, 2),
+            synthetic(2, Specificity::Provider, Confidence::High, 5, 11, 0, 3),
+            synthetic(2, Specificity::Provider, Confidence::High, 19, 25, 0, 4),
+            synthetic(2, Specificity::Provider, Confidence::High, 0, 100, 0, 5),
+            synthetic(2, Specificity::Provider, Confidence::High, 12, 13, 0, 6),
+            synthetic(2, Specificity::Provider, Confidence::High, 20, 30, 0, 7),
+            synthetic(2, Specificity::Provider, Confidence::High, 0, 10, 0, 8),
+            synthetic(2, Specificity::Provider, Confidence::High, 40, 41, 0, 9),
+        ];
+        let selected = select_optimal_disjoint_set(candidates);
+
+        // Pairwise disjoint: the defining property `try_accept` also had to
+        // hold.
+        let mut ranges: Vec<(usize, usize)> = selected
+            .iter()
+            .map(|candidate| (candidate.range.start(), candidate.range.end()))
+            .collect();
+        ranges.sort_unstable();
+        for pair in ranges.windows(2) {
+            assert!(pair[0].1 <= pair[1].0, "{ranges:?} has an overlap");
+        }
+
+        // No disjoint combination of these ranges can seat more than 5.
+        assert_eq!(ranges.len(), 5);
+
+        // Among every 5-candidate disjoint set, this is the one with the
+        // least total covered width (24 bytes: 6 + 1 + 6 + 10 + 1), so it
+        // is the one with the greatest total narrowness weight.
+        assert_eq!(
+            ranges,
+            vec![(5, 11), (12, 13), (19, 25), (30, 40), (40, 41)]
+        );
+    }
+
+    #[test]
+    fn select_optimal_disjoint_set_prefers_a_higher_weight_single_candidate_when_no_combination_beats_it()
+     {
+        // A single Redact-severity, Provider-specificity candidate spans two
+        // lower-weight, mutually disjoint Warn-severity candidates it
+        // overlaps. No disjoint combination available anywhere in this
+        // input beats the wide candidate's own weight, so it wins, matching
+        // `RankedCandidate::priority`'s pairwise call on each pair.
+        let wide = synthetic(2, Specificity::Provider, Confidence::High, 0, 100, 0, 0);
+        let left = synthetic(1, Specificity::Contextual, Confidence::Low, 0, 40, 1, 0);
+        let right = synthetic(1, Specificity::Contextual, Confidence::Low, 60, 100, 1, 1);
+        assert_eq!(wide.priority(&left), Ordering::Less);
+        assert_eq!(wide.priority(&right), Ordering::Less);
+
+        let selected = select_optimal_disjoint_set(vec![wide, left, right]);
+        assert_eq!(selected.len(), 1);
+        assert_eq!(selected[0].range, ByteRange::new(0, 100).unwrap());
+    }
+
+    #[test]
+    fn select_optimal_disjoint_set_prefers_two_disjoint_candidates_over_one_higher_priority_overlapper()
+     {
+        // The shape greedy gets wrong: a single candidate individually
+        // outranks each of two mutually disjoint candidates it overlaps
+        // (so greedy, walking in priority order, accepts it and discards
+        // both), but the pair's combined resolved-action severity — the
+        // dominant weight tier (`decision-resolve-overlap-precedence-by-resolved-action-severity`)
+        // — exceeds the single candidate's alone. Optimal selection must
+        // keep the pair instead.
+        let single = synthetic(2, Specificity::Provider, Confidence::High, 0, 100, 0, 0);
+        let left = synthetic(2, Specificity::Contextual, Confidence::Low, 0, 40, 1, 0);
+        let right = synthetic(2, Specificity::Contextual, Confidence::Low, 60, 100, 1, 1);
+        // `single` individually outranks each of `left` and `right` — this
+        // is exactly what makes greedy pick it and discard the pair.
+        assert_eq!(single.priority(&left), Ordering::Less);
+        assert_eq!(single.priority(&right), Ordering::Less);
+
+        let mut selected: Vec<(usize, usize)> =
+            select_optimal_disjoint_set(vec![single, left, right])
+                .iter()
+                .map(|candidate| (candidate.range.start(), candidate.range.end()))
+                .collect();
+        selected.sort_unstable();
+        assert_eq!(selected, vec![(0, 40), (60, 100)]);
     }
 
     fn built_in_registry() -> DetectorRegistry {

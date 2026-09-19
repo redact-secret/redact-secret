@@ -165,9 +165,21 @@ the range is then translated into the original input and re-checked there, so
 ranking, overlap resolution, finding numbering, and redaction operate on
 original coordinates only. Candidates are then ranked by resolved-action
 severity, specificity, confidence, span width, detector registration order,
-and detector emission order. A deterministic greedy pass accepts only
-mutually disjoint ranges. Final findings are ordered by their original-input
-position and assigned stable one-based IDs.
+and detector emission order. Overlap resolution selects the pairwise-disjoint
+subset of candidates that maximizes total evidence weight — the classical
+`O(n log n)` weighted-interval-scheduling dynamic program, not a greedy walk
+— so two or more mutually disjoint candidates that an overlapping single
+candidate would have discarded can now be kept together when their combined
+weight is higher
+(`decision-select-optimal-disjoint-candidates-by-total-evidence-weight`).
+Each candidate's weight reuses exactly the same ranking keys above, summed
+across a selection and compared in the same dominance order; resolved-action
+severity, specificity, and confidence are scaled so that no combination of
+weaker candidates can outweigh one stronger one, preserving today's "never
+displace a stricter one" rule for any single overlap while still letting
+several candidates that tie on every stronger key out-total one candidate
+that does not. Final findings are ordered by their original-input position
+and assigned stable one-based IDs.
 
 Specific provider or structural evidence outranks broad contextual evidence.
 This favors precision and bounded redaction. The tradeoff is explicit: strict

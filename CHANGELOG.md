@@ -27,6 +27,19 @@ evidence is linked from each published version.
   input triggers one of these five types' medium-confidence path *and* a
   competing, stricter-resolving detector on the identical span now sees the
   stricter candidate win instead. No other input is affected.
+- **Internal:** overlap resolution's greedy accept pass is replaced with
+  optimal weighted-interval selection (issue #451,
+  `decision-select-optimal-disjoint-candidates-by-total-evidence-weight`).
+  The previous pass walked candidates in priority order and accepted the
+  first disjoint one it reached, which could discard two or more mutually
+  disjoint candidates in favor of a single overlapping one even when their
+  combined evidence was higher; the new pass finds the disjoint subset that
+  actually maximizes total evidence, in the same `O(n log n)` complexity
+  class. Measured against the full canonical corpus (1233 fixtures), no
+  fixture's expectation changes — the shape this fixes is not reachable from
+  the current built-in detector set, so this release carries no observable
+  behavior change; it forecloses a latent defect for future detectors rather
+  than fixing one visible today.
 - **Breaking change:** whole-input `scan`, `redact`, and `scan_and_redact`
   (and every binding's equivalent) now default to a bounded input: 64 MiB and
   50,000 findings (issue #439,
