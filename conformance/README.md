@@ -262,9 +262,12 @@ all supported consumers use the same contract.
 Record cross-repository identity and the two acceptance gates in
 [`benchmark-regressions.json`](./benchmark-regressions.json). Its validator
 checks canonical fixture references and evidence links without adding
-benchmark-specific fields to findings. Discovery matrices, generated variants,
-competitor output, holdout material, score reports, and raw benchmark results
-remain in `redact-secret-benchmarks`.
+benchmark-specific fields to findings. `benchmarkCommit` pins the
+`redact-secret-benchmarks` revision that produced the recorded evidence
+alongside `fixingCommit` (the product-side commit); it is required once
+`gates.benchmarkRevalidation.status` is `"passed"`. Discovery matrices,
+generated variants, competitor output, holdout material, score reports, and
+raw benchmark results remain in `redact-secret-benchmarks`.
 
 ## What this directory is not (yet)
 
