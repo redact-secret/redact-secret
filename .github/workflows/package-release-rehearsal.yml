@@ -95,8 +95,12 @@ jobs:
               # `decision-define-detector-profile-and-pack-contract`) ships
               # inside this same package, under its own file names, so it
               # has to be assembled in too before the content check below can
-              # see every file `bindings/wasm/npm/package.json` declares.
-              cp qualification-artifacts/wasm-web-common/redact_secret_wasm_common* "$package_dir/"
+              # see every file `bindings/wasm/npm/package.json` declares. The
+              # companion artifact's name comes from the plan entry (issue
+              # #417), the same as `expectedArtifact` above, not a second
+              # hard-coded path that could drift from it.
+              companion_dir="qualification-artifacts/$(jq -r '.companionArtifact' <<<"$entry")"
+              cp "$companion_dir"/redact_secret_wasm_common* "$package_dir/"
             fi
             node scripts/publish-dependency-package.mjs --package-dir "$package_dir" --dry-run
           done < <(jq -c '.dependencies[]' dependency-cutover-plan.json)

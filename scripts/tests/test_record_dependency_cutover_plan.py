@@ -91,10 +91,14 @@ class Repository:
     def artifacts(self, directory: Path, present: set[str] | None = None) -> Path:
         """A downloaded-artifact tree naming one directory per expected
         artifact; `present` restricts which ones actually exist, defaulting
-        to every declared target plus `wasm-web`."""
+        to every declared target plus `wasm-web` and its `wasm-web-common`
+        companion."""
         names = present
         if names is None:
-            names = {f"node-addon-{target}" for target in self.targets} | {"wasm-web"}
+            names = {f"node-addon-{target}" for target in self.targets} | {
+                "wasm-web",
+                "wasm-web-common",
+            }
         for name in names:
             (directory / name).mkdir(parents=True, exist_ok=True)
         return directory
@@ -149,7 +153,7 @@ class PlanTests(unittest.TestCase):
 
     def test_a_missing_native_artifact_is_reported_as_an_error(self) -> None:
         plan, artifacts = self.build_plan(
-            artifact_names={"node-addon-x86_64-unknown-linux-gnu", "wasm-web"}
+            artifact_names={"node-addon-x86_64-unknown-linux-gnu", "wasm-web", "wasm-web-common"}
         )
         errors = RECORD.plan_errors(plan, artifacts)
         self.assertEqual(
@@ -159,12 +163,28 @@ class PlanTests(unittest.TestCase):
 
     def test_a_missing_wasm_artifact_is_reported_as_an_error(self) -> None:
         plan, artifacts = self.build_plan(
-            artifact_names={
-                f"node-addon-{target}" for target in TARGETS
-            }
+            artifact_names={f"node-addon-{target}" for target in TARGETS} | {"wasm-web-common"}
         )
         errors = RECORD.plan_errors(plan, artifacts)
         self.assertEqual(errors, [f"wasm-web: no qualified artifact in {artifacts}"])
+
+    def test_a_missing_wasm_common_companion_artifact_is_reported_as_an_error(self) -> None:
+        plan, artifacts = self.build_plan(
+            artifact_names={f"node-addon-{target}" for target in TARGETS} | {"wasm-web"}
+        )
+        entry = next(e for e in plan["dependencies"] if e["kind"] == "wasm")
+        self.assertEqual(entry["companionArtifact"], "wasm-web-common")
+        self.assertFalse(entry["companionArtifactPresent"])
+        errors = RECORD.plan_errors(plan, artifacts)
+        self.assertEqual(
+            errors, [f"wasm-web-common: no qualified companion artifact in {artifacts}"]
+        )
+
+    def test_the_wasm_entry_carries_its_companion_artifact_name(self) -> None:
+        plan, _ = self.build_plan()
+        entry = next(e for e in plan["dependencies"] if e["kind"] == "wasm")
+        self.assertEqual(entry["companionArtifact"], "wasm-web-common")
+        self.assertTrue(entry["companionArtifactPresent"])
 
     def test_a_native_package_with_no_manifest_is_unresolved(self) -> None:
         def configure(repository: Repository) -> None:
@@ -184,7 +204,9 @@ class PlanTests(unittest.TestCase):
         def configure(repository: Repository) -> None:
             repository.targets = []
 
-        plan, artifacts = self.build_plan(configure, artifact_names={"wasm-web"})
+        plan, artifacts = self.build_plan(
+            configure, artifact_names={"wasm-web", "wasm-web-common"}
+        )
         self.assertEqual(len(plan["dependencies"]), 1)
         self.assertEqual(plan["dependencies"][0]["kind"], "wasm")
         self.assertEqual(RECORD.plan_errors(plan, artifacts), [])

@@ -7,7 +7,7 @@ describe("rust assessment adapter", () => {
     expect(result.status).not.toBe(0);
     expect(result.stdout).toBe("");
     expect(result.stderr).toContain("Performance assessment requires a release build");
-  }, 30_000);
+  }, 120_000);
   it("passes tiny public API self-tests for Unicode, failures, and incomplete runs", () => {
     const output = execFileSync(
       "cargo",

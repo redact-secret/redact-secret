@@ -15,6 +15,13 @@ was actually produced -- so a qualification run that silently dropped a
 target is caught here rather than surfacing as an obscure `npm publish`
 failure later. It publishes nothing and calls no registry.
 
+Issue #417: the `wasm` entry also names its companion `common`-profile
+artifact (`WASM_COMMON_ARTIFACT`) and whether it was produced, so
+`.github/workflows/package-release-rehearsal.yml` can assemble it from the
+name this plan gives rather than a second, independently hard-coded path,
+and so a qualification run that produced `wasm-web` but dropped
+`wasm-web-common` is caught here too.
+
     python3 -B scripts/record-dependency-cutover-plan.py \\
         --artifacts qualification-artifacts --out dependency-cutover-plan.json
 """
@@ -36,6 +43,14 @@ WASM_MANIFEST = Path("bindings") / "wasm" / "npm" / "package.json"
 WRAPPER_MANIFEST = Path("packages") / "javascript" / "package.json"
 ADDON_QUALIFIER = Path("scripts") / "qualify-node-addon.mjs"
 CHECK_ARTIFACT_MATRIX = Path(__file__).resolve().parent / "check-artifact-matrix.py"
+
+# The `common` detector profile's browser artifact (issue #382,
+# `decision-define-detector-profile-and-pack-contract`) ships inside the same
+# `@redact-secret/wasm` package as `wasm-web`, under its own file names, so it
+# is a companion of the `wasm` dependency entry rather than a dependency of
+# its own. Naming it here, once, is what lets `package-release-rehearsal.yml`
+# read it from the plan instead of hard-coding it a second time (issue #417).
+WASM_COMMON_ARTIFACT = "wasm-web-common"
 
 
 def _load_check_artifact_matrix():
@@ -115,6 +130,8 @@ def wasm_dependency_plan(root: Path, artifacts: Path) -> dict:
         "platform": None,
         "expectedArtifact": "wasm-web",
         "artifactPresent": (artifacts / "wasm-web").is_dir(),
+        "companionArtifact": WASM_COMMON_ARTIFACT,
+        "companionArtifactPresent": (artifacts / WASM_COMMON_ARTIFACT).is_dir(),
         "package": None,
         "version": None,
     }
@@ -152,13 +169,23 @@ def build_plan(root: Path, artifacts: Path) -> dict:
 
 def plan_errors(plan: dict, artifacts: Path) -> list[str]:
     missing = [entry for entry in plan["dependencies"] if not entry["artifactPresent"]]
-    unresolved = [entry for entry in plan["dependencies"] if entry["package"] is None]
-    return [
-        f"{entry['expectedArtifact']}: no qualified artifact in {artifacts}" for entry in missing
-    ] + [
-        f"{entry['expectedArtifact']}: no dependency package manifest resolved for it"
-        for entry in unresolved
+    missing_companions = [
+        entry
+        for entry in plan["dependencies"]
+        if entry.get("companionArtifact") and not entry["companionArtifactPresent"]
     ]
+    unresolved = [entry for entry in plan["dependencies"] if entry["package"] is None]
+    return (
+        [f"{entry['expectedArtifact']}: no qualified artifact in {artifacts}" for entry in missing]
+        + [
+            f"{entry['companionArtifact']}: no qualified companion artifact in {artifacts}"
+            for entry in missing_companions
+        ]
+        + [
+            f"{entry['expectedArtifact']}: no dependency package manifest resolved for it"
+            for entry in unresolved
+        ]
+    )
 
 
 def render_summary(plan: dict) -> str:
