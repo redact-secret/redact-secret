@@ -1,0 +1,19 @@
+{
+  "name": "@redact-secret/node-linux-arm64-musl",
+  "description": "N-API native addon for @redact-secret/core (linux-arm64-musl). Not intended for direct use; installed as an optional dependency of @redact-secret/core.",
+  "version": "0.1.0-beta.4",
+  "os": ["linux"],
+  "cpu": ["arm64"],
+  "libc": ["musl"],
+  "main": "redact-secret.linux-arm64-musl.node",
+  "files": ["redact-secret.linux-arm64-musl.node"],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/redact-secret/redact-secret.git",
+    "directory": "bindings/node"
+  },
+  "engines": {
+    "node": "20.x || 22.x || 24.x"
+  }
+}

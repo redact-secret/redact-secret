@@ -14,6 +14,7 @@ const PUBLIC_RUNTIME_EXPORTS = [
   "RANGE_UNIT",
   "SecretScanError",
   "VERSION",
+  "artifact",
   "createIncrementalSanitizer",
   "defaultPlaceholderFormatter",
   "initialize",

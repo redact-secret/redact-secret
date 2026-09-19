@@ -12,6 +12,7 @@
  */
 
 import type {
+  ArtifactKind,
   IncrementalPolicyContext,
   IncrementalSanitizerState,
   PlaceholderContext,
@@ -112,6 +113,8 @@ export interface NativeBinding {
   version(): string;
   /** The detector profile this artifact was built from: `"full"` or `"common"`. */
   profile(): string;
+  /** Which artifact this binding was built from. */
+  artifact(): ArtifactKind;
   /** Idempotent native setup. May be a no-op, as it is on Node. */
   initialize(): void;
   scan(

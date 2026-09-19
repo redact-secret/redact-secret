@@ -18,6 +18,12 @@ EXPECTED_ARTIFACTS = {
     "npm:@redact-secret/node-linux-x64-gnu", "npm:@redact-secret/node-win32-arm64-msvc",
     "npm:@redact-secret/node-win32-x64-msvc", "pypi:redact-secret",
 }
+# `decision-publish-musl-node-addons` extends `node-publish-targets` to eight
+# triples, but every recorded release under `docs/releases/` to date
+# (0.1.0-beta.1/2/4) genuinely shipped only these eleven artifacts — this set
+# validates those real, frozen records and must not be edited to match a
+# capability this repository has not yet released under. Add the two musl
+# npm artifacts here only once an actual release record reflects them.
 SHA40 = re.compile(r"^[0-9a-f]{40}$")
 SHA64 = re.compile(r"^[0-9a-f]{64}$")
 VERSION = re.compile(r"^(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-[0-9A-Za-z.-]+)?$")

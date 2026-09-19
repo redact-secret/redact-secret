@@ -82,6 +82,7 @@ export function createFakeBinding(
     calls,
     version: () => options.version ?? VERSION,
     profile: () => options.profile ?? "full",
+    artifact: () => "addon",
     initialize: () => {
       calls.push("initialize");
       if (options.throwOnInitialize !== undefined) {

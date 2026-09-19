@@ -74,6 +74,17 @@ describe("bundler conditions", () => {
     );
   });
 
+  it("does not statically inline the WebAssembly fallback into a Node build (decision-add-node-wasm-fallback)", async () => {
+    const { output } = await bundle("node");
+
+    // The fallback's `import()` specifier is a lookup into a map, not a
+    // string literal at the call site, so a bundler that only follows
+    // literal specifiers cannot discover or inline the browser-oriented
+    // glue and `.wasm` binary here.
+    expect(output).not.toContain('import("@redact-secret/wasm")');
+    expect(output).not.toContain('import("@redact-secret/wasm/common")');
+  });
+
   it("routes the Web adapter through the WebAssembly adapter only", async () => {
     const { inputs, output } = await bundle("browser", WEB_STREAM_CONSUMER);
 

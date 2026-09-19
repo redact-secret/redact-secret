@@ -8,6 +8,15 @@ decided_at: 2026-09-10
 
 # Ship the first release's full artifact set
 
+## Current application — 2026-09-19 (#443)
+
+The npm-ships-glibc-only clause below and in the 2026-09-12 update is
+superseded by
+[Publish the musl Node addon packages](2026-09-19-publish-musl-node-addon-packages.md):
+`node-publish-targets` now includes the two musl triples, published
+alongside the six already covered here. Nothing else in this record changes;
+the CLI's own musl exclusion (`cli-release-targets`) is untouched.
+
 ## Current application — 2026-09-12 (#181, #182)
 
 The full four-surface commitment remains accepted. The

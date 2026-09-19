@@ -20,6 +20,7 @@ import {
 } from "../src/adapters/web-stream.js";
 import { createWebStreamSanitizer as createCommonWebStreamSanitizer } from "../src/adapters/web-stream-common.js";
 import {
+  artifact,
   createIncrementalSanitizer,
   defaultPlaceholderFormatter,
   initialize,
@@ -33,6 +34,7 @@ import {
   VERSION,
 } from "../src/index.js";
 import type {
+  ArtifactKind,
   DetectedSecretFinding,
   IncrementalSanitizer,
   IncrementalSanitizerOptions,
@@ -146,6 +148,7 @@ const incrementalOptions: IncrementalSanitizerOptions = {
 async function documentedUsage(input: string): Promise<void> {
   await initialize();
 
+  const loaded: ArtifactKind = artifact();
   const findings: readonly SecretFinding[] = scan(input, scanOptions);
   const text: string = redact(input, findings, {
     placeholderFormatter: defaultPlaceholderFormatter,
@@ -163,7 +166,17 @@ async function documentedUsage(input: string): Promise<void> {
   const unit: RangeUnit = RANGE_UNIT;
   const version: string = VERSION;
 
-  void [text, result, appended, finalized, code, unit, version, session.state];
+  void [
+    loaded,
+    text,
+    result,
+    appended,
+    finalized,
+    code,
+    unit,
+    version,
+    session.state,
+  ];
 }
 
 void documentedUsage;

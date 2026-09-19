@@ -589,8 +589,11 @@ every manifest, script, and workflow matrix to them so a supported platform
 cannot be added or dropped in one file alone. That check also enforces
 least-privilege workflow permissions and commit-pinned third-party actions.
 See [docs/qualification.md](./docs/qualification.md), which also records the
-one remaining deliberate asymmetry: neither the CLI nor npm ships a musl
-variant. The musl N-API addons are built and qualified only.
+one remaining deliberate asymmetry: the CLI still ships no musl variant,
+while npm now ships musl N-API addons alongside glibc
+(`decision-publish-musl-node-addons`). A Node host with no usable addon at
+all falls back to the WebAssembly artifact browsers use
+(`decision-add-node-wasm-fallback`).
 
 Release readiness does not authorize selecting a version, tagging, publishing,
 deploying, or archiving another repository. Those actions require the separate

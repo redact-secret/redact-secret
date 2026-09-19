@@ -50,11 +50,15 @@ It depends on those bindings the N-API way
 per publishable `bindings/node/package.json` `napi.targets`
 (`@redact-secret/node-<platform>`, `os`/`cpu`/`libc`-scoped so npm skips
 the ones that do not match a given install), resolved at runtime by
-`process.platform`/`process.arch` in `src/runtime/node.ts`, plus an ordinary
-`dependencies` entry on `@redact-secret/wasm`. The `0.1.0-beta.1` release
-record confirms publication of the facade, all six publishable native
-packages, and the wasm package; the two musl N-API addons are qualified but
-not published to npm.
+`process.platform`/`process.arch` — and, on Linux, detected libc — in
+`src/runtime/node.ts`, plus an ordinary `dependencies` entry on
+`@redact-secret/wasm`, which that same runtime module falls back to when no
+addon can be loaded at all (`decision-add-node-wasm-fallback`). The
+`0.1.0-beta.1` release record confirms publication of the facade, all six
+then-publishable native packages, and the wasm package; the two musl N-API
+addons were qualified but not published to npm at that release.
+`decision-publish-musl-node-addons` extended publication to both of them in
+a later release; see `docs/qualification.md` for the current matrix.
 
 Publishing the dependency packages is not a separate one-time action gated
 apart from `packages/javascript` itself (issue #141):

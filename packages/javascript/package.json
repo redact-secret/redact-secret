@@ -76,7 +76,9 @@
     "@redact-secret/node-darwin-arm64": "0.1.0-beta.4",
     "@redact-secret/node-darwin-x64": "0.1.0-beta.4",
     "@redact-secret/node-linux-arm64-gnu": "0.1.0-beta.4",
+    "@redact-secret/node-linux-arm64-musl": "0.1.0-beta.4",
     "@redact-secret/node-linux-x64-gnu": "0.1.0-beta.4",
+    "@redact-secret/node-linux-x64-musl": "0.1.0-beta.4",
     "@redact-secret/node-win32-arm64-msvc": "0.1.0-beta.4",
     "@redact-secret/node-win32-x64-msvc": "0.1.0-beta.4"
   }

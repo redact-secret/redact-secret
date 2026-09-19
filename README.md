@@ -83,13 +83,25 @@ modern browsers. Its explicit initialization contract makes native or
 WebAssembly loading failures observable without making every scan asynchronous.
 
 On Node.js, `@redact-secret/core` installs a prebuilt N-API addon for
-glibc Linux, macOS, and Windows (x64 and arm64 each: six platform packages,
-`engines.node` `20.x || 22.x || 24.x`) as an optional dependency, since npm
-ships glibc addons only — musl Linux (e.g. Alpine) has no published
-package. `initialize()` rejects with `INITIALIZATION_FAILED` on a musl
-host, the same failure an unsupported platform/architecture gets. See
-[docs/qualification.md](./docs/qualification.md) for the full target matrix
-and how CI keeps it from drifting.
+glibc and musl Linux, macOS, and Windows (x64 and arm64 each: eight platform
+packages, `engines.node` `20.x || 22.x || 24.x`) as an optional dependency.
+On a host with no matching addon at all — an unsupported platform or
+architecture, a matching optional dependency that failed to install, or a
+corrupt addon — `initialize()` falls back to the same WebAssembly artifact
+browsers use instead of failing outright. Call `artifact()` after
+`initialize()` to see which one actually loaded: `"addon"` or `"wasm"`. Bun
+and Deno get this fallback for free; Cloudflare Workers and Vercel Edge are
+unaffected either way, since both already resolve the browser entry point
+directly. See [docs/qualification.md](./docs/qualification.md) for the full
+target matrix, exactly which failures engage the fallback, and how CI keeps
+both from drifting.
+
+```ts
+import { artifact, initialize, scanAndRedact } from "@redact-secret/core";
+
+await initialize();
+console.log(artifact()); // "addon" on a supported host, "wasm" on the fallback
+```
 
 ```ts
 import { initialize, scanAndRedact } from "@redact-secret/core";
