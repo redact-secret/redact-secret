@@ -92,6 +92,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -179,6 +182,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -351,6 +357,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -442,6 +451,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -625,6 +637,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -722,6 +737,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -819,6 +837,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -915,6 +936,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -1012,6 +1036,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -1152,6 +1179,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -1243,6 +1273,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -1365,6 +1398,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -1498,6 +1534,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -1626,6 +1665,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -1766,6 +1808,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -1890,6 +1935,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -1986,6 +2034,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -2083,6 +2134,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -2174,6 +2228,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -2266,6 +2323,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -2365,6 +2425,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -2448,6 +2511,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -2534,6 +2600,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -2620,6 +2689,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -2707,6 +2779,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -2793,6 +2868,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -2883,6 +2961,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -2966,6 +3047,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -3226,6 +3310,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -3335,6 +3422,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -3580,6 +3670,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -3668,6 +3761,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -3756,6 +3852,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -3837,6 +3936,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -3916,6 +4018,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -4000,6 +4105,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -4082,6 +4190,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -4167,6 +4278,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -4249,6 +4363,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -4332,6 +4449,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -4422,6 +4542,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -4501,6 +4624,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -4579,6 +4705,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -4607,6 +4736,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -4652,6 +4784,9 @@
             "huggingface-incremental-exact-length-positive",
             "huggingface-incremental-one-short-negative",
             "huggingface-lookalike-token-discriminating-boundary",
+            "invisible-incremental-contextual-value-zwsp",
+            "invisible-incremental-provider-grammar-zwnj",
+            "invisible-incremental-structural-authorization-zwj",
             "jwt-near-miss-short-signature-discriminating-boundary",
             "legacy-variable-detector-families",
             "linear-lookalike-token-discriminating-boundary",
@@ -4791,6 +4926,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -4849,6 +4987,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -4907,6 +5048,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -4952,6 +5096,9 @@
             "huggingface-incremental-exact-length-positive",
             "huggingface-incremental-one-short-negative",
             "huggingface-lookalike-token-discriminating-boundary",
+            "invisible-incremental-contextual-value-zwsp",
+            "invisible-incremental-provider-grammar-zwnj",
+            "invisible-incremental-structural-authorization-zwj",
             "jwt-near-miss-short-signature-discriminating-boundary",
             "legacy-variable-detector-families",
             "linear-lookalike-token-discriminating-boundary",
@@ -5035,6 +5182,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -5149,6 +5299,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -5207,6 +5360,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -5265,6 +5421,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -5323,6 +5482,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -5368,6 +5530,9 @@
             "huggingface-incremental-exact-length-positive",
             "huggingface-incremental-one-short-negative",
             "huggingface-lookalike-token-discriminating-boundary",
+            "invisible-incremental-contextual-value-zwsp",
+            "invisible-incremental-provider-grammar-zwnj",
+            "invisible-incremental-structural-authorization-zwj",
             "jwt-near-miss-short-signature-discriminating-boundary",
             "legacy-variable-detector-families",
             "linear-lookalike-token-discriminating-boundary",
@@ -5451,6 +5616,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
@@ -5509,6 +5677,9 @@
             "unicode-conversion-astral-before",
             "unicode-conversion-astral-within",
             "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
             "unicode-conversion-multibyte-bmp-before"
           ],
           "state": "supported"
