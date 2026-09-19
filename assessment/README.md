@@ -308,9 +308,9 @@ workflow's `ubuntu-latest` runner at commit
 historical evidence and stays byte-for-byte unchanged as the corpus moves
 forward. Its performance and resource thresholds were derived once, from
 that run, and have not changed since. The criteria file's `baseline` pointer
-and pinned accuracy counts are re-pinned whenever the accuracy corpus moves
-to a new reviewed revision, so they currently point at the later
-five-repetition `ubuntu-latest` run at commit
+and pinned accuracy counts re-pin the same way as the macOS profile's above;
+they currently point at the later five-repetition `ubuntu-latest` run at
+commit
 `944341903d5b85686a056d3218f4c33110d7d57b` (accuracy corpus version `3`,
 hash `438df062ddde47dcb32ae0aefc4297ed8b8c9e2c3270778c2b1f8809e40bd0dd`),
 committed under
@@ -590,7 +590,7 @@ conformance gate or release authorization.
 
 ## What this directory is not (yet)
 
-This item defines the schema, the corpus, the workload profiles, and the
+This directory defines the schema, the corpus, the workload profiles, and the
 result contract — the common language every surface's evaluation reports
 through. The Node, browser WebAssembly, Rust library, installed Python, and
 CLI runners above execute profiles, collect real `accuracy` or `performance`

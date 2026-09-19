@@ -63,11 +63,12 @@ range units.
 
 Whole-input scanning has no built-in request-size, candidate-count,
 finding-count, output-size, or concurrency limit. Before scanning, servers
-should enforce transport-byte and decoded-string code-unit limits. Custom
-detectors should reject rather than truncate above a declared per-request
-candidate limit; servers should additionally bound accepted findings,
-sanitized output, and concurrent synchronous scans according to measured
-latency and memory budgets.
+should enforce transport-byte and decoded-input length limits, the latter in
+each runtime's native range unit (UTF-8 bytes, UTF-16 code units, or Unicode
+code points). Custom detectors should reject rather than truncate above a
+declared per-request candidate limit; servers should additionally bound
+accepted findings, sanitized output, and concurrent synchronous scans
+according to measured latency and memory budgets.
 
 Incremental scanning requires explicit total-input, retained-plaintext, token,
 and multiline limits, but callers remain responsible for limiting accumulated
