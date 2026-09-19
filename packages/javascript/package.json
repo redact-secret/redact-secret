@@ -55,11 +55,13 @@
   "imports": {
     "#native": {
       "node": "./dist/runtime/node.js",
+      "workerd": "./dist/runtime/workerd.js",
       "browser": "./dist/runtime/browser.js",
       "default": "./dist/runtime/browser.js"
     },
     "#native-common": {
       "node": "./dist/runtime/node-common.js",
+      "workerd": "./dist/runtime/workerd-common.js",
       "browser": "./dist/runtime/browser-common.js",
       "default": "./dist/runtime/browser-common.js"
     }
