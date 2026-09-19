@@ -167,9 +167,25 @@ function requireAddon(): Partial<NodeAddon> & Partial<CommonNodeAddon> {
   }
 }
 
+/**
+ * Asserts every one of `names` is a function on `addon`, the shared body
+ * {@link loadAddon} and {@link loadCommonAddon} apply to their own required
+ * export lists.
+ */
+function requireExports<T>(
+  addon: Partial<NodeAddon> & Partial<CommonNodeAddon>,
+  names: readonly (keyof T)[],
+): T {
+  for (const name of names) {
+    if (typeof (addon as Record<string, unknown>)[name as string] !== "function") {
+      throw new SecretScanError("INITIALIZATION_FAILED");
+    }
+  }
+  return addon as T;
+}
+
 function loadAddon(): NodeAddon {
-  const addon = requireAddon();
-  for (const name of [
+  return requireExports<NodeAddon>(requireAddon(), [
     "version",
     "profile",
     "initialize",
@@ -177,12 +193,7 @@ function loadAddon(): NodeAddon {
     "redact",
     "scanAndRedact",
     "createIncrementalSanitizer",
-  ] as const) {
-    if (typeof addon[name] !== "function") {
-      throw new SecretScanError("INITIALIZATION_FAILED");
-    }
-  }
-  return addon as NodeAddon;
+  ]);
 }
 
 /**
@@ -191,8 +202,7 @@ function loadAddon(): NodeAddon {
  * (`bindings/node/src/lib.rs`'s `*_common` N-API functions).
  */
 export function loadCommonAddon(): CommonNodeAddon {
-  const addon = requireAddon();
-  for (const name of [
+  return requireExports<CommonNodeAddon>(requireAddon(), [
     "version",
     "initializeCommon",
     "scanCommon",
@@ -200,12 +210,57 @@ export function loadCommonAddon(): CommonNodeAddon {
     "scanAndRedactCommon",
     "createIncrementalSanitizerCommon",
     "profileCommon",
-  ] as const) {
-    if (typeof addon[name] !== "function") {
-      throw new SecretScanError("INITIALIZATION_FAILED");
-    }
-  }
-  return addon as CommonNodeAddon;
+  ]);
+}
+
+/**
+ * The profile-selected addon methods {@link buildBinding} normalizes:
+ * `version` and `redact` are not part of this shape because they are
+ * profile-independent, called directly on the addon by every binding.
+ */
+interface ProfiledAddonMethods {
+  profile(): string;
+  initialize(): void;
+  scan(
+    input: string,
+    policy?: NativePolicyCallback,
+  ): readonly NativeFinding[];
+  scanAndRedact(
+    input: string,
+    policy?: NativePolicyCallback,
+    formatter?: NativeFormatterCallback,
+  ): { readonly findings: readonly NativeFinding[]; readonly redacted: string };
+  createIncrementalSanitizer(
+    options: NativeIncrementalOptions,
+  ): NativeIncrementalSanitizer;
+}
+
+/**
+ * Builds the internal binding contract from an addon's shared `version` and
+ * `redact` exports plus its profile-selected methods — {@link NodeAddon}
+ * itself for {@link createBindingFromAddon}, or a `CommonNodeAddon` view
+ * onto its `*Common` exports for {@link createBindingFromCommonAddon}.
+ */
+function buildBinding(
+  addon: Pick<NodeAddon, "version" | "redact">,
+  methods: ProfiledAddonMethods,
+): NativeBinding {
+  return {
+    version: () => addon.version(),
+    profile: () => methods.profile(),
+    initialize: () => {
+      methods.initialize();
+    },
+    scan: (input, policy) => methods.scan(input, policy),
+    redact: (input, findings, formatter) =>
+      addon.redact(input, findings, formatter),
+    scanAndRedact: (input, policy, formatter): NativeScanAndRedactResult => {
+      const result = methods.scanAndRedact(input, policy, formatter);
+      return { text: result.redacted, findings: result.findings };
+    },
+    createIncrementalSanitizer: (options) =>
+      methods.createIncrementalSanitizer(options),
+  };
 }
 
 /**
@@ -216,22 +271,15 @@ export function loadCommonAddon(): CommonNodeAddon {
  * `createBindingFromWasmModule` does for the WebAssembly artifact.
  */
 export function createBindingFromAddon(addon: NodeAddon): NativeBinding {
-  return {
-    version: () => addon.version(),
+  return buildBinding(addon, {
     profile: () => addon.profile(),
-    initialize: () => {
-      addon.initialize();
-    },
+    initialize: () => addon.initialize(),
     scan: (input, policy) => addon.scan(input, policy),
-    redact: (input, findings, formatter) =>
-      addon.redact(input, findings, formatter),
-    scanAndRedact: (input, policy, formatter): NativeScanAndRedactResult => {
-      const result = addon.scanAndRedact(input, policy, formatter);
-      return { text: result.redacted, findings: result.findings };
-    },
+    scanAndRedact: (input, policy, formatter) =>
+      addon.scanAndRedact(input, policy, formatter),
     createIncrementalSanitizer: (options) =>
       addon.createIncrementalSanitizer(options),
-  };
+  });
 }
 
 /**
@@ -246,22 +294,15 @@ export function createBindingFromAddon(addon: NodeAddon): NativeBinding {
 export function createBindingFromCommonAddon(
   addon: CommonNodeAddon,
 ): NativeBinding {
-  return {
-    version: () => addon.version(),
+  return buildBinding(addon, {
     profile: () => addon.profileCommon(),
-    initialize: () => {
-      addon.initializeCommon();
-    },
+    initialize: () => addon.initializeCommon(),
     scan: (input, policy) => addon.scanCommon(input, policy),
-    redact: (input, findings, formatter) =>
-      addon.redact(input, findings, formatter),
-    scanAndRedact: (input, policy, formatter): NativeScanAndRedactResult => {
-      const result = addon.scanAndRedactCommon(input, policy, formatter);
-      return { text: result.redacted, findings: result.findings };
-    },
+    scanAndRedact: (input, policy, formatter) =>
+      addon.scanAndRedactCommon(input, policy, formatter),
     createIncrementalSanitizer: (options) =>
       addon.createIncrementalSanitizerCommon(options),
-  };
+  });
 }
 
 export const loadNativeBinding = async (): Promise<NativeBinding> =>

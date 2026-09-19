@@ -34,7 +34,6 @@
  */
 
 import { runtime } from "./session.js";
-import type { RangeUnit } from "./types.js";
 
 /**
  * Loads this runtime's binding and prepares it for use.
@@ -63,16 +62,7 @@ export const scanAndRedact = runtime.scanAndRedact;
 /** Opens a bounded incremental session over text supplied in chunks. */
 export const createIncrementalSanitizer = runtime.createIncrementalSanitizer;
 
-export {
-  defaultPlaceholderFormatter,
-  typedPlaceholderFormatter,
-} from "./formatters.js";
-export { SecretScanError } from "./errors.js";
-export type { SecretScanErrorCode } from "./errors.js";
-export { VERSION } from "./version.js";
-
-/** The string-index unit of every range this package reports. */
-export const RANGE_UNIT: RangeUnit = "utf16-code-units";
+export * from "./entry-core.js";
 
 /**
  * The detector profile this entry point is built from: the full 42-detector
@@ -80,26 +70,3 @@ export const RANGE_UNIT: RangeUnit = "utf16-code-units";
  * `"common"` (`decision-define-detector-profile-and-pack-contract`).
  */
 export const PROFILE = "full" as const;
-
-export type {
-  DetectedSecretFinding,
-  IncrementalLimits,
-  IncrementalPolicyContext,
-  IncrementalSanitizer,
-  IncrementalSanitizerOptions,
-  IncrementalSanitizerResult,
-  IncrementalSanitizerState,
-  IncrementalSecretPolicy,
-  PlaceholderContext,
-  PlaceholderFormatter,
-  PolicyContext,
-  RangeUnit,
-  RedactOptions,
-  ScanAndRedactOptions,
-  ScanOptions,
-  ScanResult,
-  SecretAction,
-  SecretConfidence,
-  SecretFinding,
-  SecretPolicy,
-} from "./types.js";

@@ -319,212 +319,134 @@ describe("validateCanonicalErrorCodes rejects unsafe shapes (issue #116)", () =>
   });
 });
 
-describe("github-classic mutation reproducibility (issue #116)", () => {
-  test("regenerating the seeded mutation set is byte-identical", () => {
-    expect(generateGithubClassicMutations()).toEqual(generateGithubClassicMutations());
-  });
+/** One generator's mutation case shape: every `generate*Mutations()` function
+ * returns this, `readonly` fields and all. */
+interface GrammarMutationCase {
+  readonly operation: string;
+  readonly ordinal: number;
+  readonly input: string;
+}
 
-  test("every corpus fixture declaring this grammar reproduces byte-for-byte", () => {
-    const generated = new Map(
-      generateGithubClassicMutations().map((mutation) => [mutation.ordinal, mutation]),
-    );
-    const declared = corpus.fixtures.filter(
-      (fixture) => fixture.mutation?.grammar === "github-classic",
-    );
+interface GrammarMutationFamily {
+  readonly grammar: string;
+  readonly issue: string;
+  readonly seedId: string;
+  readonly generate: () => readonly GrammarMutationCase[];
+  /**
+   * A full positive/negative partition: every declared fixture's operation
+   * must be a single supported positive when this returns `true`, and an
+   * intentionally-unsupported non-match otherwise. Omitted for a grammar
+   * whose fixtures do not reduce to that binary split (`github-classic`'s
+   * own multi-shape boundary cases; `digitalocean-v1`'s context-embedding
+   * operations, which are supported positives for a reason orthogonal to
+   * its documented-prefix identity shapes — see `identityOperations`
+   * below).
+   */
+  readonly isFullPartitionPositive?: (operation: string) => boolean;
+  /**
+   * Operations that must each be the grammar's single supported positive
+   * match for one documented prefix — checked as a subset of `declared`,
+   * not a full partition. The direct analogue of a full-partition
+   * grammar's `identity` case, generalized to a grammar with more than one
+   * documented-prefix identity shape (`digitalocean-v1`'s three prefixes).
+   */
+  readonly identityOperations?: readonly string[];
+}
 
-    expect(declared.length).toBe(generated.size);
-    for (const fixture of declared) {
-      const mutation = fixture.mutation!;
-      const reproduced = generated.get(mutation.ordinal);
-      expect(reproduced, `${fixture.id}: no generated case for ordinal ${mutation.ordinal}`)
-        .toBeDefined();
-      expect(mutation.seedId).toBe(GITHUB_CLASSIC_SEED_ID);
-      expect(mutation.operation).toBe(reproduced!.operation);
-      expect(fixture.input).toBe(reproduced!.input);
+const GRAMMAR_MUTATION_FAMILIES: readonly GrammarMutationFamily[] = [
+  {
+    grammar: "github-classic",
+    issue: "#116",
+    seedId: GITHUB_CLASSIC_SEED_ID,
+    generate: generateGithubClassicMutations,
+  },
+  {
+    grammar: "docker-token-exact-length",
+    issue: "#370",
+    seedId: DOCKER_TOKEN_EXACT_LENGTH_SEED_ID,
+    generate: generateDockerTokenMutations,
+    isFullPartitionPositive: (operation) => operation.endsWith("-identity"),
+  },
+  {
+    grammar: "digitalocean-v1",
+    issue: "#369",
+    seedId: DIGITALOCEAN_V1_SEED_ID,
+    generate: generateDigitaloceanV1Mutations,
+    identityOperations: ["identity", "oauth-access-prefix", "oauth-refresh-prefix"],
+  },
+  {
+    grammar: "huggingface-token-exact-length",
+    issue: "#372",
+    seedId: HUGGINGFACE_TOKEN_EXACT_LENGTH_SEED_ID,
+    generate: generateHuggingFaceTokenMutations,
+    isFullPartitionPositive: (operation) => operation === "identity" || operation === "digit-bearing",
+  },
+  {
+    grammar: "cloudflare-token-checksum-suffix",
+    issue: "#373",
+    seedId: CLOUDFLARE_TOKEN_CHECKSUM_SUFFIX_SEED_ID,
+    generate: generateCloudflareTokenMutations,
+    isFullPartitionPositive: (operation) => operation === "identity",
+  },
+  {
+    grammar: "linear-token-api-exact-length",
+    issue: "#374",
+    seedId: LINEAR_TOKEN_API_EXACT_LENGTH_SEED_ID,
+    generate: generateLinearTokenMutations,
+    isFullPartitionPositive: (operation) => operation === "identity",
+  },
+];
+
+describe.each(GRAMMAR_MUTATION_FAMILIES)(
+  "$grammar mutation reproducibility (issue $issue)",
+  ({ grammar, seedId, generate, isFullPartitionPositive, identityOperations }) => {
+    function declaredFixtures(): readonly CanonicalFixture[] {
+      return corpus.fixtures.filter((fixture) => fixture.mutation?.grammar === grammar);
     }
-  });
-});
 
-describe("docker-token-exact-length mutation reproducibility (issue #370)", () => {
-  test("regenerating the seeded mutation set is byte-identical", () => {
-    expect(generateDockerTokenMutations()).toEqual(generateDockerTokenMutations());
-  });
+    test("every corpus fixture declaring this grammar reproduces byte-for-byte", () => {
+      const generated = new Map(generate().map((mutation) => [mutation.ordinal, mutation]));
+      const declared = declaredFixtures();
 
-  test("every corpus fixture declaring this grammar reproduces byte-for-byte", () => {
-    const generated = new Map(
-      generateDockerTokenMutations().map((mutation) => [mutation.ordinal, mutation]),
-    );
-    const declared = corpus.fixtures.filter(
-      (fixture) => fixture.mutation?.grammar === "docker-token-exact-length",
-    );
+      expect(declared.length).toBe(generated.size);
+      for (const fixture of declared) {
+        const mutation = fixture.mutation!;
+        const reproduced = generated.get(mutation.ordinal);
+        expect(reproduced, `${fixture.id}: no generated case for ordinal ${mutation.ordinal}`)
+          .toBeDefined();
+        expect(mutation.seedId).toBe(seedId);
+        expect(mutation.operation).toBe(reproduced!.operation);
+        expect(fixture.input).toBe(reproduced!.input);
+      }
+    });
 
-    expect(declared.length).toBe(generated.size);
-    for (const fixture of declared) {
-      const mutation = fixture.mutation!;
-      const reproduced = generated.get(mutation.ordinal);
-      expect(reproduced, `${fixture.id}: no generated case for ordinal ${mutation.ordinal}`)
-        .toBeDefined();
-      expect(mutation.seedId).toBe(DOCKER_TOKEN_EXACT_LENGTH_SEED_ID);
-      expect(mutation.operation).toBe(reproduced!.operation);
-      expect(fixture.input).toBe(reproduced!.input);
-    }
-  });
-
-  test("each identity case is the only supported positive in its family", () => {
-    const declared = corpus.fixtures.filter(
-      (fixture) => fixture.mutation?.grammar === "docker-token-exact-length",
-    );
-    for (const fixture of declared) {
-      const identity = fixture.mutation!.operation.endsWith("-identity");
-      expect(fixture.expected.length, fixture.id).toBe(identity ? 1 : 0);
-      expect(fixture.support, fixture.id).toBe(identity ? "supported" : "intentionally-unsupported");
-    }
-  });
-});
-
-describe("digitalocean-v1 mutation reproducibility (issue #369)", () => {
-  test("regenerating the seeded mutation set is byte-identical", () => {
-    expect(generateDigitaloceanV1Mutations()).toEqual(generateDigitaloceanV1Mutations());
-  });
-
-  test("every corpus fixture declaring this grammar reproduces byte-for-byte", () => {
-    const generated = new Map(
-      generateDigitaloceanV1Mutations().map((mutation) => [mutation.ordinal, mutation]),
-    );
-    const declared = corpus.fixtures.filter(
-      (fixture) => fixture.mutation?.grammar === "digitalocean-v1",
+    test.runIf(isFullPartitionPositive !== undefined)(
+      "each supported positive is exactly the operations this grammar's documented shape allows",
+      () => {
+        for (const fixture of declaredFixtures()) {
+          const isPositive = isFullPartitionPositive!(fixture.mutation!.operation);
+          expect(fixture.expected.length, fixture.id).toBe(isPositive ? 1 : 0);
+          expect(fixture.support, fixture.id).toBe(
+            isPositive ? "supported" : "intentionally-unsupported",
+          );
+        }
+      },
     );
 
-    expect(declared.length).toBe(generated.size);
-    for (const fixture of declared) {
-      const mutation = fixture.mutation!;
-      const reproduced = generated.get(mutation.ordinal);
-      expect(reproduced, `${fixture.id}: no generated case for ordinal ${mutation.ordinal}`)
-        .toBeDefined();
-      expect(mutation.seedId).toBe(DIGITALOCEAN_V1_SEED_ID);
-      expect(mutation.operation).toBe(reproduced!.operation);
-      expect(fixture.input).toBe(reproduced!.input);
-    }
-  });
-});
-
-describe("huggingface-token-exact-length mutation reproducibility (issue #372)", () => {
-  test("regenerating the seeded mutation set is byte-identical", () => {
-    expect(generateHuggingFaceTokenMutations()).toEqual(generateHuggingFaceTokenMutations());
-  });
-
-  test("every corpus fixture declaring this grammar reproduces byte-for-byte", () => {
-    const generated = new Map(
-      generateHuggingFaceTokenMutations().map((mutation) => [mutation.ordinal, mutation]),
+    test.runIf(identityOperations !== undefined)(
+      "each documented-prefix identity case is a single supported positive",
+      () => {
+        const declared = declaredFixtures();
+        for (const operation of identityOperations!) {
+          const fixture = declared.find((candidate) => candidate.mutation!.operation === operation);
+          expect(fixture, `${grammar}: no fixture for operation ${operation}`).toBeDefined();
+          expect(fixture!.expected.length, `${grammar}:${operation}`).toBe(1);
+          expect(fixture!.support, `${grammar}:${operation}`).toBe("supported");
+        }
+      },
     );
-    const declared = corpus.fixtures.filter(
-      (fixture) => fixture.mutation?.grammar === "huggingface-token-exact-length",
-    );
-
-    expect(declared.length).toBe(generated.size);
-    for (const fixture of declared) {
-      const mutation = fixture.mutation!;
-      const reproduced = generated.get(mutation.ordinal);
-      expect(reproduced, `${fixture.id}: no generated case for ordinal ${mutation.ordinal}`)
-        .toBeDefined();
-      expect(mutation.seedId).toBe(HUGGINGFACE_TOKEN_EXACT_LENGTH_SEED_ID);
-      expect(mutation.operation).toBe(reproduced!.operation);
-      expect(fixture.input).toBe(reproduced!.input);
-    }
-  });
-
-  test("only the identity and digit-bearing cases are supported positives", () => {
-    const declared = corpus.fixtures.filter(
-      (fixture) => fixture.mutation?.grammar === "huggingface-token-exact-length",
-    );
-    for (const fixture of declared) {
-      const operation = fixture.mutation!.operation;
-      const isPositive = operation === "identity" || operation === "digit-bearing";
-      expect(fixture.expected.length, fixture.id).toBe(isPositive ? 1 : 0);
-      expect(fixture.support, fixture.id).toBe(
-        isPositive ? "supported" : "intentionally-unsupported",
-      );
-    }
-  });
-});
-
-describe("cloudflare-token-checksum-suffix mutation reproducibility (issue #373)", () => {
-  test("regenerating the seeded mutation set is byte-identical", () => {
-    expect(generateCloudflareTokenMutations()).toEqual(generateCloudflareTokenMutations());
-  });
-
-  test("every corpus fixture declaring this grammar reproduces byte-for-byte", () => {
-    const generated = new Map(
-      generateCloudflareTokenMutations().map((mutation) => [mutation.ordinal, mutation]),
-    );
-    const declared = corpus.fixtures.filter(
-      (fixture) => fixture.mutation?.grammar === "cloudflare-token-checksum-suffix",
-    );
-
-    expect(declared.length).toBe(generated.size);
-    for (const fixture of declared) {
-      const mutation = fixture.mutation!;
-      const reproduced = generated.get(mutation.ordinal);
-      expect(reproduced, `${fixture.id}: no generated case for ordinal ${mutation.ordinal}`)
-        .toBeDefined();
-      expect(mutation.seedId).toBe(CLOUDFLARE_TOKEN_CHECKSUM_SUFFIX_SEED_ID);
-      expect(mutation.operation).toBe(reproduced!.operation);
-      expect(fixture.input).toBe(reproduced!.input);
-    }
-  });
-
-  test("only the identity case is a supported positive", () => {
-    const declared = corpus.fixtures.filter(
-      (fixture) => fixture.mutation?.grammar === "cloudflare-token-checksum-suffix",
-    );
-    for (const fixture of declared) {
-      const isPositive = fixture.mutation!.operation === "identity";
-      expect(fixture.expected.length, fixture.id).toBe(isPositive ? 1 : 0);
-      expect(fixture.support, fixture.id).toBe(
-        isPositive ? "supported" : "intentionally-unsupported",
-      );
-    }
-  });
-});
-
-describe("linear-token-api-exact-length mutation reproducibility (issue #374)", () => {
-  test("regenerating the seeded mutation set is byte-identical", () => {
-    expect(generateLinearTokenMutations()).toEqual(generateLinearTokenMutations());
-  });
-
-  test("every corpus fixture declaring this grammar reproduces byte-for-byte", () => {
-    const generated = new Map(
-      generateLinearTokenMutations().map((mutation) => [mutation.ordinal, mutation]),
-    );
-    const declared = corpus.fixtures.filter(
-      (fixture) => fixture.mutation?.grammar === "linear-token-api-exact-length",
-    );
-
-    expect(declared.length).toBe(generated.size);
-    for (const fixture of declared) {
-      const mutation = fixture.mutation!;
-      const reproduced = generated.get(mutation.ordinal);
-      expect(reproduced, `${fixture.id}: no generated case for ordinal ${mutation.ordinal}`)
-        .toBeDefined();
-      expect(mutation.seedId).toBe(LINEAR_TOKEN_API_EXACT_LENGTH_SEED_ID);
-      expect(mutation.operation).toBe(reproduced!.operation);
-      expect(fixture.input).toBe(reproduced!.input);
-    }
-  });
-
-  test("only the identity case is a supported positive", () => {
-    const declared = corpus.fixtures.filter(
-      (fixture) => fixture.mutation?.grammar === "linear-token-api-exact-length",
-    );
-    for (const fixture of declared) {
-      const isPositive = fixture.mutation!.operation === "identity";
-      expect(fixture.expected.length, fixture.id).toBe(isPositive ? 1 : 0);
-      expect(fixture.support, fixture.id).toBe(
-        isPositive ? "supported" : "intentionally-unsupported",
-      );
-    }
-  });
-});
+  },
+);
 
 describe("docs/coverage/coverage-declarations.json migrates deterministically", () => {
   test("validates against the real detector-inventory.json and corpus context", () => {

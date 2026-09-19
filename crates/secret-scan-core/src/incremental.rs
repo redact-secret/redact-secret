@@ -884,34 +884,11 @@ mod tests {
         assert_eq!(common.profile(), Some(Profile::Common));
     }
 
-    /// The whole-input path ([`crate::scan_and_redact`] over a `common`
-    /// registry) and the incremental path
-    /// ([`IncrementalSanitizer::with_common_built_in`]) select the `common`
-    /// profile's built-in detectors the same way, so they must agree on the
-    /// same input (`decision-define-detector-profile-and-pack-contract`).
-    #[test]
-    fn common_profile_incremental_session_matches_the_whole_input_reference() {
-        let input = "API_KEY=SYNTHETIC_REVOKED_GENERIC_TOKEN_VALUE_0001234567890\ntail";
-        let registry = DetectorRegistry::with_common_built_in([]).unwrap();
-        let expected = crate::scan_and_redact(
-            input,
-            &registry,
-            &DefaultPolicy,
-            &default_placeholder_formatter,
-        )
-        .unwrap();
-
-        let mut session = IncrementalSanitizer::with_common_built_in(generous_limits()).unwrap();
-        let mut text = String::new();
-        let mut findings = Vec::new();
-        let (piece, released) = session.append(input).unwrap().into_parts();
-        text.push_str(&piece);
-        findings.extend(released);
-        let finalized = session.finalize().unwrap();
-        text.push_str(finalized.text());
-        findings.extend(finalized.findings().iter().cloned());
-
-        assert_eq!(text, expected.text());
-        assert_eq!(findings, expected.findings().to_vec());
-    }
+    // Whether a `common` incremental session's cumulative output matches
+    // the whole-input path ([`crate::scan_and_redact`] over a `common`
+    // registry) is a public-API-level contract
+    // (`decision-define-detector-profile-and-pack-contract`), covered by
+    // `tests/public_api.rs`'s
+    // `common_profile_incremental_session_selects_the_same_built_ins_as_the_whole_input_path`,
+    // not repeated here.
 }

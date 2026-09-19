@@ -35,27 +35,14 @@ import { mkdirSync, rmSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
+import { DETECTOR_PROFILES } from "./lib/detector-profiles.mjs";
+
+export { DETECTOR_PROFILES };
+
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
 /** The crate whose cdylib becomes the browser artifact. */
 const CRATE = "redact-secret-wasm";
-/**
- * Per detector profile: the Cargo feature arguments, the `--out-name` given
- * to `wasm-bindgen` (every emitted file uses it), and the default output
- * directory. The `cargo` output file is `redact_secret_wasm.wasm` either way.
- */
-export const DETECTOR_PROFILES = {
-  full: {
-    cargoArgs: [],
-    outName: "redact_secret_wasm",
-    defaultOutDir: join("bindings", "wasm", "pkg"),
-  },
-  common: {
-    cargoArgs: ["--no-default-features"],
-    outName: "redact_secret_wasm_common",
-    defaultOutDir: join("bindings", "wasm", "pkg-common"),
-  },
-};
 /** The `cargo` output name of the cdylib, whichever profile it was built for. */
 const CARGO_OUT_NAME = "redact_secret_wasm";
 
@@ -95,7 +82,7 @@ function parseArguments(argv) {
       fail(`unknown argument: ${argument}`);
     }
   }
-  options.outDir ??= DETECTOR_PROFILES[options.detectorProfile].defaultOutDir;
+  options.outDir ??= DETECTOR_PROFILES[options.detectorProfile].relativeDir;
   return options;
 }
 

@@ -18,7 +18,7 @@ use napi::bindgen_prelude::{FnArgs, Function};
 use napi_derive::napi;
 use redact_secret::{
     Action, ByteRange, Confidence, DefaultPolicy, DetectedFinding, DetectorRegistry, Finding,
-    FormatterFailure, PlaceholderContext, PlaceholderFormatter, Policy, PolicyContext,
+    FormatterFailure, PlaceholderContext, PlaceholderFormatter, Policy, PolicyContext, Profile,
     SecretScanError, SecretScanErrorCode, default_placeholder_formatter, redact as core_redact,
     run_detector_pipeline,
 };
@@ -132,52 +132,48 @@ thread_local! {
     static REGISTRY_COMMON: OnceCell<Result<DetectorRegistry, SecretScanError>> = const { OnceCell::new() };
 }
 
-/// Runs `f` against the shared built-in `full` detector registry, building it
-/// on first use.
-fn with_registry<T>(
+/// Runs `f` against the shared built-in registry for `profile`, building it
+/// on first use and caching it independently per profile
+/// (`decision-define-detector-profile-and-pack-contract`): a process that
+/// only ever asks for `Profile::Common` never builds the `Profile::Full`
+/// registry, and vice versa.
+fn with_profile_registry<T>(
+    profile: Profile,
     f: impl FnOnce(&DetectorRegistry) -> Result<T, SecretScanError>,
 ) -> Result<T, SecretScanError> {
-    REGISTRY.with(|cell| {
-        match cell.get_or_init(|| DetectorRegistry::with_built_in(std::iter::empty())) {
-            Ok(registry) => f(registry),
-            Err(error) => Err(*error),
-        }
-    })
-}
-
-/// Runs `f` against the shared built-in `common` detector registry
-/// (`decision-define-detector-profile-and-pack-contract`), building it on
-/// first use. Mirrors [`with_registry`] for the smaller, opt-in profile.
-fn with_common_registry<T>(
-    f: impl FnOnce(&DetectorRegistry) -> Result<T, SecretScanError>,
-) -> Result<T, SecretScanError> {
-    REGISTRY_COMMON.with(|cell| {
-        match cell.get_or_init(|| DetectorRegistry::with_common_built_in(std::iter::empty())) {
-            Ok(registry) => f(registry),
-            Err(error) => Err(*error),
-        }
-    })
+    match profile {
+        Profile::Full => REGISTRY.with(|cell| {
+            match cell.get_or_init(|| DetectorRegistry::with_built_in(std::iter::empty())) {
+                Ok(registry) => f(registry),
+                Err(error) => Err(*error),
+            }
+        }),
+        Profile::Common => REGISTRY_COMMON.with(|cell| {
+            match cell.get_or_init(|| DetectorRegistry::with_common_built_in(std::iter::empty())) {
+                Ok(registry) => f(registry),
+                Err(error) => Err(*error),
+            }
+        }),
+    }
 }
 
 /// Returns the detector profile the default exports ([`scan`], [`redact`],
-/// [`scan_and_redact`], [`initialize`]) operate on: always `"full"`, this
-/// binding's only build (`decision-define-detector-profile-and-pack-contract`).
-/// Mirrors `bindings/wasm`'s compile-time `profile()`, but Node links both
-/// profiles into one addon and exposes each through its own function rather
-/// than a Cargo feature, so this is a constant, not a build-time switch.
+/// [`scan_and_redact`], [`initialize`]) operate on. Mirrors `bindings/wasm`'s
+/// compile-time `profile()`, but Node links both profiles into one addon and
+/// exposes each through its own function rather than a Cargo feature, so
+/// this is a constant, not a build-time switch.
 #[napi]
 #[must_use]
 pub fn profile() -> String {
-    "full".to_owned()
+    Profile::Full.as_str().to_owned()
 }
 
 /// Returns the detector profile the `*Common` exports ([`scan_common`],
-/// [`scan_and_redact_common`], [`initialize_common`]) operate on: always
-/// `"common"`.
+/// [`scan_and_redact_common`], [`initialize_common`]) operate on.
 #[napi]
 #[must_use]
 pub fn profile_common() -> String {
-    "common".to_owned()
+    Profile::Common.as_str().to_owned()
 }
 
 /// Idempotent initialization hook required by the cross-runtime contract:
@@ -193,7 +189,7 @@ pub fn profile_common() -> String {
 /// happen.
 #[napi]
 pub fn initialize() -> napi::Result<(), String> {
-    with_registry(|_| Ok(())).map_err(to_js_error)
+    with_profile_registry(Profile::Full, |_| Ok(())).map_err(to_js_error)
 }
 
 /// The `common`-profile analogue of [`initialize`]
@@ -208,7 +204,7 @@ pub fn initialize() -> napi::Result<(), String> {
 /// proves cannot happen.
 #[napi]
 pub fn initialize_common() -> napi::Result<(), String> {
-    with_common_registry(|_| Ok(())).map_err(to_js_error)
+    with_profile_registry(Profile::Common, |_| Ok(())).map_err(to_js_error)
 }
 
 fn to_js_detected_finding(input: &str, finding: &DetectedFinding) -> JsDetectedFinding {
@@ -333,6 +329,15 @@ fn run_redact(
     }
 }
 
+/// Runs [`run_scan`] against `profile`'s cached registry.
+fn run_scan_for_profile(
+    profile: Profile,
+    input: &str,
+    policy: Option<&PolicyCallback<'_>>,
+) -> Result<Vec<Finding>, SecretScanError> {
+    with_profile_registry(profile, |registry| run_scan(input, registry, policy))
+}
+
 /// Scans `input` and returns every finding, in input order, with UTF-16
 /// ranges. When `policy` is omitted, the core's default policy chooses each
 /// finding's action.
@@ -354,8 +359,8 @@ pub fn scan(
     #[napi(ts_arg_type = "(finding: JsDetectedFinding, context: JsPolicyContext) => string")]
     policy: Option<PolicyCallback<'_>>,
 ) -> napi::Result<Vec<JsFinding>, String> {
-    let findings = with_registry(|registry| run_scan(&input, registry, policy.as_ref()))
-        .map_err(to_js_error)?;
+    let findings =
+        run_scan_for_profile(Profile::Full, &input, policy.as_ref()).map_err(to_js_error)?;
     Ok(findings.iter().map(|f| to_js_finding(&input, f)).collect())
 }
 
@@ -377,8 +382,8 @@ pub fn scan_common(
     #[napi(ts_arg_type = "(finding: JsDetectedFinding, context: JsPolicyContext) => string")]
     policy: Option<PolicyCallback<'_>>,
 ) -> napi::Result<Vec<JsFinding>, String> {
-    let findings = with_common_registry(|registry| run_scan(&input, registry, policy.as_ref()))
-        .map_err(to_js_error)?;
+    let findings =
+        run_scan_for_profile(Profile::Common, &input, policy.as_ref()).map_err(to_js_error)?;
     Ok(findings.iter().map(|f| to_js_finding(&input, f)).collect())
 }
 
@@ -414,6 +419,23 @@ pub fn redact(
     run_redact(&input, &native_findings, formatter.as_ref()).map_err(to_js_error)
 }
 
+/// Runs [`run_scan_for_profile`] then [`run_redact`] against `profile`,
+/// converting the result to its N-API shape.
+fn run_scan_and_redact_for_profile(
+    profile: Profile,
+    input: &str,
+    policy: Option<&PolicyCallback<'_>>,
+    formatter: Option<&FormatterCallback<'_>>,
+) -> Result<JsScanAndRedactResult, SecretScanError> {
+    let findings = run_scan_for_profile(profile, input, policy)?;
+    let redacted = run_redact(input, &findings, formatter)?;
+    let js_findings = findings.iter().map(|f| to_js_finding(input, f)).collect();
+    Ok(JsScanAndRedactResult {
+        findings: js_findings,
+        redacted,
+    })
+}
+
 /// Scans `input` and redacts it in one call, returning both the findings and
 /// the redacted text. Equivalent to calling [`scan`] then [`redact`], but
 /// avoids reconverting findings through their public UTF-16 shape.
@@ -431,14 +453,8 @@ pub fn scan_and_redact(
     #[napi(ts_arg_type = "(finding: JsFinding, context: JsPlaceholderContext) => string")]
     formatter: Option<FormatterCallback<'_>>,
 ) -> napi::Result<JsScanAndRedactResult, String> {
-    let findings = with_registry(|registry| run_scan(&input, registry, policy.as_ref()))
-        .map_err(to_js_error)?;
-    let redacted = run_redact(&input, &findings, formatter.as_ref()).map_err(to_js_error)?;
-    let js_findings = findings.iter().map(|f| to_js_finding(&input, f)).collect();
-    Ok(JsScanAndRedactResult {
-        findings: js_findings,
-        redacted,
-    })
+    run_scan_and_redact_for_profile(Profile::Full, &input, policy.as_ref(), formatter.as_ref())
+        .map_err(to_js_error)
 }
 
 /// The `common`-profile analogue of [`scan_and_redact`]
@@ -458,22 +474,30 @@ pub fn scan_and_redact_common(
     #[napi(ts_arg_type = "(finding: JsFinding, context: JsPlaceholderContext) => string")]
     formatter: Option<FormatterCallback<'_>>,
 ) -> napi::Result<JsScanAndRedactResult, String> {
-    let findings = with_common_registry(|registry| run_scan(&input, registry, policy.as_ref()))
-        .map_err(to_js_error)?;
-    let redacted = run_redact(&input, &findings, formatter.as_ref()).map_err(to_js_error)?;
-    let js_findings = findings.iter().map(|f| to_js_finding(&input, f)).collect();
-    Ok(JsScanAndRedactResult {
-        findings: js_findings,
-        redacted,
-    })
+    run_scan_and_redact_for_profile(Profile::Common, &input, policy.as_ref(), formatter.as_ref())
+        .map_err(to_js_error)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
+    /// Comparable field tuple for a [`JsFinding`], which has no [`PartialEq`]
+    /// of its own.
+    fn finding_key(finding: &JsFinding) -> (&str, &str, &str, &str, &str, u32, u32) {
+        (
+            &finding.id,
+            &finding.r#type,
+            &finding.detector,
+            &finding.confidence,
+            &finding.action,
+            finding.start,
+            finding.end,
+        )
+    }
+
     fn scan_default(input: &str) -> Vec<Finding> {
-        with_registry(|registry| run_scan(input, registry, None)).unwrap()
+        with_profile_registry(Profile::Full, |registry| run_scan(input, registry, None)).unwrap()
     }
 
     #[test]
@@ -482,7 +506,7 @@ mod tests {
         assert!(initialize().is_ok());
         assert!(initialize().is_ok());
         // The registry built on the first call is reused, not rebuilt.
-        assert!(with_registry(|registry| Ok(!registry.is_empty())).unwrap());
+        assert!(with_profile_registry(Profile::Full, |registry| Ok(!registry.is_empty())).unwrap());
     }
 
     /// A synthetic, revoked-looking synchronous conformance smoke case:
@@ -578,13 +602,22 @@ mod tests {
         let redacted = run_redact(input, &findings, None).unwrap();
         let js_findings: Vec<JsFinding> =
             findings.iter().map(|f| to_js_finding(input, f)).collect();
-
         assert_eq!(js_findings.len(), 1);
-        assert_eq!(redacted, run_redact(input, &findings, None).unwrap());
+
+        let combined = scan_and_redact(input.to_owned(), None, None).unwrap();
+        assert_eq!(
+            combined
+                .findings
+                .iter()
+                .map(finding_key)
+                .collect::<Vec<_>>(),
+            js_findings.iter().map(finding_key).collect::<Vec<_>>()
+        );
+        assert_eq!(combined.redacted, redacted);
     }
 
     fn scan_common_default(input: &str) -> Vec<Finding> {
-        with_common_registry(|registry| run_scan(input, registry, None)).unwrap()
+        with_profile_registry(Profile::Common, |registry| run_scan(input, registry, None)).unwrap()
     }
 
     #[test]
@@ -599,7 +632,9 @@ mod tests {
         assert!(initialize_common().is_ok());
         assert!(initialize_common().is_ok());
         // The registry built on the first call is reused, not rebuilt.
-        assert!(with_common_registry(|registry| Ok(!registry.is_empty())).unwrap());
+        assert!(
+            with_profile_registry(Profile::Common, |registry| Ok(!registry.is_empty())).unwrap()
+        );
     }
 
     /// The `common` registry links no `provider` detector, so a bare
@@ -630,5 +665,18 @@ mod tests {
         assert_eq!(findings.len(), 1);
         let redacted = run_redact(input, &findings, None).unwrap();
         assert!(!redacted.contains("SYNTHETIC_REVOKED_PASSWORD"));
+        let js_findings: Vec<JsFinding> =
+            findings.iter().map(|f| to_js_finding(input, f)).collect();
+
+        let combined = scan_and_redact_common(input.to_owned(), None, None).unwrap();
+        assert_eq!(
+            combined
+                .findings
+                .iter()
+                .map(finding_key)
+                .collect::<Vec<_>>(),
+            js_findings.iter().map(finding_key).collect::<Vec<_>>()
+        );
+        assert_eq!(combined.redacted, redacted);
     }
 }

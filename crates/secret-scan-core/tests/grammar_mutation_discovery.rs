@@ -34,12 +34,12 @@
 //!   express, which `EXPECTED_EXPLORATORY_DIFFERENCES` names explicitly.
 //!   The suite also asserts every declared entry actually fires, so a stale
 //!   allowance (the exclusion changing or disappearing) is itself caught.
-//!   The list is empty today: `openai-token` used to be the one entry (its
-//!   `sk-ant-` exclusion), but since issue #368 that detector requires a
-//!   literal `T3BlbkFJ` marker between two exact-length segments, a
-//!   compound shape this model does not describe at all, so it is no longer
-//!   a grammar here. Its boundary mutations live as explicit fixtures in
-//!   `conformance/fixtures/synchronous-corpus.json` instead.
+//!   The list is empty: every detector [`predict`] can model matches the
+//!   real pipeline outright. `openai-token` requires a literal `T3BlbkFJ`
+//!   marker between two exact-length segments, a compound shape outside
+//!   this model's plain prefix/run/boundary grammar entirely, so it is not
+//!   one of [`GRAMMARS`] here; its boundary mutations live as explicit
+//!   fixtures in `conformance/fixtures/synchronous-corpus.json` instead.
 
 #![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 

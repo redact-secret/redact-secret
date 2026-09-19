@@ -16,9 +16,9 @@
  *   binary's `name` section still carries after link-time dead-code
  *   removal, classified as `common`, shared engine, or `provider` code, and
  *   the export list both artifacts must share;
- * - initialization and processing time through `@redact-secret/core`,
- *   using the #378 protocol unchanged: `scripts/assessment-browser-performance.mjs`,
- *   `scale-logs-small-whole` and `scale-logs-medium-fixed4096`, 10 runs.
+ * - initialization and processing time through `@redact-secret/core`, via
+ *   `scripts/assessment-browser-performance.mjs`, `scale-logs-small-whole`
+ *   and `scale-logs-medium-fixed4096`, 10 runs.
  *
  * It exits non-zero, after writing what it measured, when a guard fails:
  * the `common` binary is not smaller than `full`, links a `provider`
@@ -30,7 +30,7 @@
  *
  * The two builds land in `--scratch-dir` (default `target/wasm-profiles`).
  *
- * `--engine` may repeat; the default is `chromium`, the #378 protocol.
+ * `--engine` may repeat; the default is `chromium`.
  * Writes `<out-dir>/artifact-sizes.json`, `build-evidence.json`,
  * `performance.json`, and `raw/<profile>/<engine>-<workload>.json`.
  */
@@ -328,7 +328,7 @@ function main() {
   writeJson(join(outDir, "performance.json"), {
     source,
     runs: options.runs,
-    protocol: "scripts/assessment-browser-performance.mjs through @redact-secret/core, one fresh browser context per run (#378)",
+    protocol: "scripts/assessment-browser-performance.mjs through @redact-secret/core, one fresh browser context per run",
     engines: performance,
   });
 

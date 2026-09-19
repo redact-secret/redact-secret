@@ -649,6 +649,22 @@ mod tests {
         IncrementalSanitizer::new(generous_limits()).unwrap()
     }
 
+    /// [`generous_limits`], in the wire shape [`create_incremental_sanitizer_common`]
+    /// (and [`create_incremental_sanitizer`]) accept.
+    // `generous_limits`'s values are small fixed test constants, always in
+    // range; the fallible-looking cast is the wire shape's own `u32`, not a
+    // real truncation risk.
+    #[allow(clippy::cast_possible_truncation)]
+    fn generous_js_limits() -> JsIncrementalLimits {
+        let limits = generous_limits();
+        JsIncrementalLimits {
+            max_input_code_units: limits.max_input_bytes() as u32,
+            max_buffered_code_units: limits.max_buffered_bytes() as u32,
+            max_token_code_units: limits.max_token_bytes() as u32,
+            max_multiline_code_units: limits.max_multiline_bytes() as u32,
+        }
+    }
+
     // ---------------------------------------------------------------
     // Utf16Index
     // ---------------------------------------------------------------
@@ -790,24 +806,35 @@ mod tests {
         assert!(!output.contains(MARKER));
     }
 
-    /// A `common`-profile incremental session
-    /// (`IncrementalSanitizer::with_common_built_in`, which
-    /// [`create_incremental_sanitizer_common`] builds through [`build`])
-    /// links no `provider` detector, so a bare provider-shaped token with no
-    /// credential-bearing context is never emitted as a finding — the same
-    /// false-negative cost `lib.rs`'s
-    /// `a_bare_provider_token_is_detected_only_by_the_full_profile` documents
-    /// for the synchronous path. Mirrors
+    /// A `common`-profile incremental session, built through
+    /// [`create_incremental_sanitizer_common`] itself rather than the core's
+    /// `IncrementalSanitizer::with_common_built_in` directly, so this proves
+    /// the binding's constructor — not just the core — wires the `common`
+    /// profile through. `common` links no `provider` detector, so a bare
+    /// provider-shaped token with no credential-bearing context is never
+    /// emitted as a finding — the same false-negative cost `lib.rs`'s
+    /// `a_bare_provider_token_is_detected_only_by_the_full_profile`
+    /// documents for the synchronous path. Mirrors
     /// `crates/secret-scan-core/src/incremental.rs::full_and_common_sessions_report_the_profile_they_were_built_from`
-    /// in spirit, against this binding's own session type.
+    /// in spirit.
+    ///
+    /// `append`/`finalize` normally take an `Env`, which only exists inside
+    /// a real N-API call; with no JS policy or formatter callback supplied,
+    /// the session never needs it, so this drives its underlying
+    /// `IncrementalSanitizer` — the one the binding itself built — directly.
     #[test]
     fn a_common_incremental_session_never_emits_a_provider_only_finding() {
-        let mut session = IncrementalSanitizer::with_common_built_in(generous_limits()).unwrap();
+        let options = JsIncrementalOptions {
+            limits: generous_js_limits(),
+            policy: None,
+            formatter: None,
+        };
+        let mut sanitizer = create_incremental_sanitizer_common(options).unwrap();
         let input = format!("prefix \u{1F511} AKIA{} suffix", "SYNTHETICEXAMPLE");
         let mut findings = Vec::new();
-        let (_, released) = session.append(&input).unwrap().into_parts();
+        let (_, released) = sanitizer.session.append(&input).unwrap().into_parts();
         findings.extend(released);
-        let (_, released) = session.finalize().unwrap().into_parts();
+        let (_, released) = sanitizer.session.finalize().unwrap().into_parts();
         findings.extend(released);
         assert!(findings.is_empty());
     }

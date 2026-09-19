@@ -1,110 +1,67 @@
 //! Linear API key and OAuth access token detection.
 //!
-//! Issue #374 (following the frozen precision contract from issue #367,
-//! `docs/audits/evidence/367/precision-contracts.json`, `families.
-//! linear-token`) narrows the retired `lin_api_`/`lin_oauth_` shared
-//! 20-byte-minimum shape to the reviewed API-key grammar
-//! `lin_api_[A-Za-z0-9]{40}`: gitleaks 8.30.1's `linear-api-key` and
-//! trufflehog 3.97.4's `linearapi` rules independently pin the body to an
-//! exact 40-byte alphanumeric run, with no `_`/`-`. A body one byte short of
-//! 40 -- the beta.4 `linear-token-api-plain-twin` regression -- is now an
-//! intentional false negative instead of a match.
+//! The reviewed API-key grammar (issue #374, following the frozen precision
+//! contract from issue #367, `docs/audits/evidence/367/precision-contracts.json`,
+//! `families.linear-token`) is `lin_api_[A-Za-z0-9]{40}`: gitleaks 8.30.1's
+//! `linear-api-key` and trufflehog 3.97.4's `linearapi` rules independently
+//! pin the body to an exact 40-byte alphanumeric run, with no `_`/`-`. A
+//! body one byte short of 40 is an intentional false negative.
 //!
 //! Neither tool documents a `lin_oauth_` rule, and Linear's own OAuth
 //! documentation shows only a bare 64-character hex access token with no
 //! distinguishing prefix at all, so the 40-byte API-key length must not be
-//! reused for it. `lin_oauth_` therefore keeps beta.4's rule unchanged as a
-//! separate interim guard, pending (T0) in the benchmark corpus: a
-//! documented prefix followed by a run of 20 or more `[A-Za-z0-9_-]` bytes.
+//! reused for it. `lin_oauth_` is instead a separate interim guard, pending
+//! (T0) in the benchmark corpus: a documented prefix followed by a run of 20
+//! or more `[A-Za-z0-9_-]` bytes.
 //!
-//! The two prefixes now need different suffix alphabets -- something
-//! [`super::additional_providers::KnownFormatProviderDetector`]'s single
-//! shared alphabet field cannot express -- so this module composes both
-//! shapes directly from the shared `pattern` primitives instead, the same
-//! way [`super::slack`] and [`super::cloudflare`] moved out of that shared
-//! type for their own per-prefix needs.
+//! The two prefixes need different suffix alphabets and different finding
+//! signals, both of which a [`PrefixShape`] carries per shape, so this is
+//! the same table-driven
+//! [`super::additional_providers::KnownFormatProviderDetector`] every other
+//! provider in that module uses: `lin_api_` and `lin_oauth_` are matched in
+//! the same left-to-right, longest-prefix pass instead of two passes merged
+//! by position afterward.
 
+use crate::detectors::additional_providers::KnownFormatProviderDetector;
 use crate::detectors::pattern::{self, Alphabet, PrefixShape};
-use crate::error::DetectorFailure;
-use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
 
 const API_PREFIX: &str = "lin_api_";
 /// The reviewed contract's exact body length (tool-agreement).
 const API_BODY_LEN: usize = 40;
-/// Both tools agree the body excludes `_`/`-`; the beta.4 acceptance of
-/// those bytes was a shared-rule artifact, not evidence-backed.
+/// Both tools agree the body excludes `_`/`-`, an evidence-backed exclusion.
 const API_ALPHABET: Alphabet = pattern::is_alnum;
-const API_SHAPES: [PrefixShape<'static>; 1] = [PrefixShape::exact(API_PREFIX, API_BODY_LEN)];
 const API_SIGNALS: [&str; 2] = ["linear-documented-prefix", "base62-exact-length"];
 
-/// `lin_oauth_`, unchanged from beta.4: no consulted provider or tool source
-/// shows this prefix's grammar (the provider's own OAuth example is a bare
-/// hex string), so it stays a support-policy interim guard rather than an
-/// evidence-backed contract.
+/// `lin_oauth_`: no consulted provider or tool source shows this prefix's
+/// grammar (the provider's own OAuth example is a bare hex string), so it
+/// stays a support-policy interim guard rather than an evidence-backed
+/// contract.
 const OAUTH_PREFIX: &str = "lin_oauth_";
 const OAUTH_MIN_LEN: usize = 20;
 const OAUTH_ALPHABET: Alphabet = pattern::is_alnum_dash;
-const OAUTH_SHAPES: [PrefixShape<'static>; 1] =
-    [PrefixShape::at_least(OAUTH_PREFIX, OAUTH_MIN_LEN)];
 const OAUTH_SIGNALS: [&str; 2] = ["linear-scannable-prefix", "opaque-suffix"];
 
 /// A value is never a slice of a wider `[A-Za-z0-9_-]` identifier. Every
-/// contract and the interim guard alike keep beta.4's boundary rule.
+/// contract and the interim guard alike share this boundary rule.
 const BOUNDARY: Alphabet = pattern::is_alnum_dash;
 
 /// Requires the `lin_api_` API key to carry its full reviewed 40-byte body;
-/// `lin_oauth_` keeps the beta.4 interim guard unchanged. An undocumented
-/// segment name in place of `api`/`oauth` is an intentional false negative.
-pub(super) struct LinearTokenDetector;
-
-impl Detector for LinearTokenDetector {
-    fn id(&self) -> &'static str {
-        "linear-token"
-    }
-
-    fn detect(
-        &self,
-        input: &str,
-        _context: &DetectorContext,
-    ) -> Result<Vec<Candidate>, DetectorFailure> {
-        let mut candidates = Vec::new();
-        for (start, end, signals) in scan(input) {
-            let Some(range) = ByteRange::new(start, end) else {
-                continue;
-            };
-            candidates.push(
-                Candidate::new("linear_token", Confidence::High, range)
-                    .with_specificity(Specificity::Provider)
-                    .with_signals(signals.iter().copied()),
-            );
-        }
-        Ok(candidates)
-    }
-}
-
-/// Every match, the `lin_api_` contract and the interim-guarded
-/// `lin_oauth_` prefix together, left to right by start offset. Neither
-/// prefix is a substring of the other, so scanning each family
-/// independently and merging by position reproduces the same left-to-right,
-/// longest-prefix result a single combined scan would.
-fn scan(input: &str) -> Vec<(usize, usize, &'static [&'static str; 2])> {
-    let mut matches: Vec<(usize, usize, &'static [&'static str; 2])> =
-        pattern::scan_prefixed_shapes(input, &API_SHAPES, API_ALPHABET, BOUNDARY)
-            .into_iter()
-            .map(|(start, end)| (start, end, &API_SIGNALS))
-            .collect();
-    matches.extend(
-        pattern::scan_prefixed_shapes(input, &OAUTH_SHAPES, OAUTH_ALPHABET, BOUNDARY)
-            .into_iter()
-            .map(|(start, end)| (start, end, &OAUTH_SIGNALS)),
-    );
-    matches.sort_unstable_by_key(|&(start, _, _)| start);
-    matches
-}
+/// `lin_oauth_` keeps its interim guard. An undocumented segment name in
+/// place of `api`/`oauth` is an intentional false negative.
+pub(super) const LINEAR: KnownFormatProviderDetector = KnownFormatProviderDetector::new(
+    "linear-token",
+    "linear_token",
+    &[
+        PrefixShape::exact(API_PREFIX, API_BODY_LEN, API_ALPHABET, &API_SIGNALS),
+        PrefixShape::at_least(OAUTH_PREFIX, OAUTH_MIN_LEN, OAUTH_ALPHABET, &OAUTH_SIGNALS),
+    ],
+    BOUNDARY,
+);
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
 
     /// Exactly [`API_BODY_LEN`] bytes from `[A-Za-z0-9]`: the documented
     /// `lin_api_` body length (issue #374). Locally constructed synthetic
@@ -116,7 +73,7 @@ mod tests {
     const OAUTH_BODY: &str = "SYNTHETICREVOKEDPROVIDERVALUE";
 
     fn detect(input: &str) -> Vec<Candidate> {
-        LinearTokenDetector
+        LINEAR
             .detect(input, &DetectorContext::new(input.len()))
             .unwrap()
     }

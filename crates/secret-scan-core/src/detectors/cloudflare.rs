@@ -1,9 +1,8 @@
 //! Cloudflare scannable API token detection.
 //!
-//! Issue #373 (following the frozen precision contract from issue #367,
-//! `docs/audits/evidence/367/precision-contracts.json`, `families.
-//! cloudflare-token`) narrows the retired `cfut_` + 20-byte-minimum shared
-//! shape to the reviewed grammar `cfut_[A-Za-z0-9]{40}[0-9a-f]{8}`:
+//! The reviewed grammar (issue #373, following the frozen precision
+//! contract from issue #367, `docs/audits/evidence/367/precision-contracts.json`,
+//! `families.cloudflare-token`) is `cfut_[A-Za-z0-9]{40}[0-9a-f]{8}`:
 //! Cloudflare's token documentation and creation flow establish the `cfut_`
 //! prefix and a 40-character alphanumeric body; trufflehog 3.97.4's
 //! `cloudflareapitoken` v2 rule additionally corroborates that the body is
@@ -12,24 +11,24 @@
 //! width or alphabet, so a bare 40-byte body is malformed; the checksum's
 //! width and lowercase-hex alphabet are a single-tool-corroborated
 //! support-policy adoption, validated lexically only -- no checksum
-//! algorithm is computed or claimed. A body one byte short of 40 (the
-//! beta.4 `cloudflare-token-user-plain-twin` regression shape) and a
-//! non-hex or uppercase-hex checksum (the beta.4
-//! `cloudflare-token-user-plain-twin` alphabet-mutation regression) are now
-//! intentional false negatives instead of matches.
+//! algorithm is computed or claimed. A body one byte short of 40, or a
+//! non-hex or uppercase-hex checksum, is an intentional false negative
+//! rather than a match.
 //!
 //! Unlike [`super::grafana`] and [`super::sendgrid`], the two segments here
-//! carry no literal separator. That still fits
-//! [`super::pattern::scan_prefixed_shapes`]'s single prefix-then-run shape,
-//! because the checksum's `[0-9a-f]` alphabet is a subset of the body's
-//! `[A-Za-z0-9]` alphabet: the whole 48-byte suffix is one contiguous
-//! alphanumeric run, so an exact-length `cfut_` shape already finds its
-//! true extent (a shorter run, or a longer one the boundary check would
-//! reject, both fail the same way every other exact-length provider grammar
-//! in `additional_providers.rs` does). This module only adds what that
-//! shared shape cannot express: a post-hoc check that the run's last 8
-//! bytes are lowercase hex, rejecting a body-shaped run whose tail is not
-//! checksum-shaped.
+//! carry no literal separator. That still fits a single prefix-then-run
+//! [`PrefixShape`], because the checksum's `[0-9a-f]` alphabet is a subset
+//! of the body's `[A-Za-z0-9]` alphabet: the whole 48-byte suffix is one
+//! contiguous alphanumeric run, so an exact-length `cfut_` shape already
+//! finds its true extent (a shorter run, or a longer one the boundary check
+//! would reject, both fail the same way every other exact-length provider
+//! grammar in `additional_providers.rs` does). The shape's own
+//! [`super::pattern::PostCheck`] carries what the run length alone cannot:
+//! that the run's last 8 bytes are lowercase hex, rejecting a body-shaped
+//! run whose tail is not checksum-shaped. That keeps this detector the same
+//! table-driven
+//! [`super::additional_providers::KnownFormatProviderDetector`] every other
+//! provider in that module uses, not a bespoke `detect` body.
 //!
 //! Cloudflare's `cfat_` (account token) and `cfk_` (scannable global key)
 //! namespaces are provider-documented with the same shape but not matched
@@ -40,9 +39,8 @@
 //! hex Global API Key remain out of scope: both are indistinguishable from
 //! ordinary opaque values without a prefix to anchor on.
 
-use crate::detectors::pattern::{self, PrefixShape, is_alnum, is_lower_hex};
-use crate::error::DetectorFailure;
-use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
+use crate::detectors::additional_providers::KnownFormatProviderDetector;
+use crate::detectors::pattern::{PrefixShape, is_alnum, is_alnum_dash, is_lower_hex};
 
 const PREFIX: &str = "cfut_";
 /// The documented body length.
@@ -54,49 +52,32 @@ const CHECKSUM_LEN: usize = 8;
 /// length.
 const SUFFIX_LEN: usize = BODY_LEN + CHECKSUM_LEN;
 
-const SHAPES: [PrefixShape<'static>; 1] = [PrefixShape::exact(PREFIX, SUFFIX_LEN)];
+const SIGNALS: [&str; 2] = ["cloudflare-scannable-prefix", "checksum-shaped-suffix"];
+
+/// `true` when the matched run's last [`CHECKSUM_LEN`] bytes are lowercase
+/// hex — the [`PrefixShape::post_check`] this shape's exact-length body
+/// alone cannot express.
+fn checksum_tail_is_lower_hex(bytes: &[u8], _start: usize, end: usize) -> bool {
+    let checksum_start = end - CHECKSUM_LEN;
+    bytes[checksum_start..end].iter().copied().all(is_lower_hex)
+}
 
 /// Requires the exact `cfut_<40 alnum><8 lowercase-hex>` shape. A body or
 /// checksum segment short of its documented length, a checksum containing a
 /// non-hex or uppercase-hex byte, or a run embedded in a wider identifier is
 /// an intentional false negative rather than a fuzzy match.
-pub(super) struct CloudflareTokenDetector;
-
-impl Detector for CloudflareTokenDetector {
-    fn id(&self) -> &'static str {
-        "cloudflare-token"
-    }
-
-    fn detect(
-        &self,
-        input: &str,
-        _context: &DetectorContext,
-    ) -> Result<Vec<Candidate>, DetectorFailure> {
-        let bytes = input.as_bytes();
-        let mut candidates = Vec::new();
-        for (start, end) in
-            pattern::scan_prefixed_shapes(input, &SHAPES, is_alnum, pattern::is_alnum_dash)
-        {
-            let checksum_start = end - CHECKSUM_LEN;
-            if !bytes[checksum_start..end].iter().copied().all(is_lower_hex) {
-                continue;
-            }
-            let Some(range) = ByteRange::new(start, end) else {
-                continue;
-            };
-            candidates.push(
-                Candidate::new("cloudflare_api_token", Confidence::High, range)
-                    .with_specificity(Specificity::Provider)
-                    .with_signals(["cloudflare-scannable-prefix", "checksum-shaped-suffix"]),
-            );
-        }
-        Ok(candidates)
-    }
-}
+pub(super) const CLOUDFLARE: KnownFormatProviderDetector = KnownFormatProviderDetector::new(
+    "cloudflare-token",
+    "cloudflare_api_token",
+    &[PrefixShape::exact(PREFIX, SUFFIX_LEN, is_alnum, &SIGNALS)
+        .with_post_check(checksum_tail_is_lower_hex)],
+    is_alnum_dash,
+);
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
 
     const BODY: &str = "SYNTHETICREVOKEDCLOUDFLAREAPITOKENVALUE1";
     const CHECKSUM: &str = "deadbeef";
@@ -109,7 +90,7 @@ mod tests {
     }
 
     fn detect(input: &str) -> Vec<Candidate> {
-        CloudflareTokenDetector
+        CLOUDFLARE
             .detect(input, &DetectorContext::new(input.len()))
             .unwrap()
     }

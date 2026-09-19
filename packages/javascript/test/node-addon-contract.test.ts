@@ -10,6 +10,10 @@
 
 import { describe, expect, it } from "vitest";
 
+import type {
+  NativeFinding,
+  NativeFormatterCallback,
+} from "../src/native.js";
 import {
   createBindingFromAddon,
   createBindingFromCommonAddon,
@@ -156,17 +160,37 @@ describe("Node addon binding: createBindingFromCommonAddon", () => {
 
   it("shares the same redact export as the full-profile binding", () => {
     const calls: string[] = [];
-    const binding = createBindingFromCommonAddon({
+    const redact = (
+      input: string,
+      findings: readonly NativeFinding[],
+      formatter?: NativeFormatterCallback,
+    ) => {
+      calls.push(
+        `redact:${input}:${findings.length}:${formatter === undefined ? "builtin" : "custom"}`,
+      );
+      return input;
+    };
+
+    const fullBinding = createBindingFromAddon({
+      version: () => "0.0.0-test",
+      profile: () => "full",
+      initialize: () => {},
+      scan: () => [],
+      redact,
+      scanAndRedact: (input) => ({ findings: [], redacted: input }),
+      createIncrementalSanitizer: () => ({
+        state: "accepting",
+        append: (chunk) => ({ text: chunk, findings: [] }),
+        finalize: () => ({ text: "", findings: [] }),
+        abort: () => {},
+      }),
+    });
+    const commonBinding = createBindingFromCommonAddon({
       version: () => "0.0.0-test",
       profileCommon: () => "common",
       initializeCommon: () => {},
       scanCommon: () => [],
-      redact: (input, findings, formatter) => {
-        calls.push(
-          `redact:${input}:${findings.length}:${formatter === undefined ? "builtin" : "custom"}`,
-        );
-        return input;
-      },
+      redact,
       scanAndRedactCommon: (input) => ({ findings: [], redacted: input }),
       createIncrementalSanitizerCommon: () => ({
         state: "accepting",
@@ -176,8 +200,14 @@ describe("Node addon binding: createBindingFromCommonAddon", () => {
       }),
     });
 
-    binding.redact("api_key=x", [sampleFinding], undefined);
+    fullBinding.redact("api_key=x", [sampleFinding], undefined);
+    commonBinding.redact("api_key=x", [sampleFinding], undefined);
 
-    expect(calls).toEqual(["redact:api_key=x:1:builtin"]);
+    // Both bindings called the exact same `redact` function, not a
+    // per-profile copy of it.
+    expect(calls).toEqual([
+      "redact:api_key=x:1:builtin",
+      "redact:api_key=x:1:builtin",
+    ]);
   });
 });
