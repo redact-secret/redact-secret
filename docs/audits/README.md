@@ -40,3 +40,4 @@ and [qualification follow-up](release-qualification-follow-up.md) describe beta.
 | Repository transfer | [Transfer evidence](repository-transfer-evidence.md) |
 | Release authority and publishers | [Recorded evidence](release-approval-and-registry-publisher-evidence.md) |
 | Closing the six gates in benchmark-regressions.json (#429) | [Product conformance and benchmark rerun evidence, pin-manifest staleness finding](evidence/429/README.md) |
+| Declarative ruleset parser WebAssembly size increment (#441) | [Before/after artifact sizes, prototype parser, build evidence](evidence/441/README.md) |

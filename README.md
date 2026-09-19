@@ -145,7 +145,11 @@ The default policy is:
 The first stable cross-language extension surface includes custom policy and
 placeholder formatter callbacks. Custom detector callbacks are excluded: all
 built-in detectors run in Rust, and bindings must not create another detector
-implementation.
+implementation. A caller with an internal credential format is not left
+without a path: `decision-define-declarative-detector-ruleset-contract`
+fixes the contract for a caller-supplied **declarative ruleset** — data the
+core parses and matches itself, never a callback — for JavaScript, Python,
+and the CLI; see that decision for status.
 
 ## Incremental sanitization
 

@@ -1,0 +1,35 @@
+{
+  "measuredAtCommit": "341c34413d7246bec4037c9969368f2478dd1bbf",
+  "branch": "workbench/441-declarative-rulesets",
+  "detectorProfile": "full",
+  "variants": {
+    "before": {
+      "description": "Unmodified tree at the measured commit. `npm run wasm:build` equivalent (scripts/build-browser-artifact.mjs, default full profile).",
+      "wasmRawBytes": 289029,
+      "wasmGzipBytes": 99463,
+      "wasmBrotliBytes": 80014,
+      "jsGlueRawBytes": 31344
+    },
+    "after": {
+      "description": "Same tree plus crates/secret-scan-core/src/ruleset_prototype.rs (371 lines, see ruleset_prototype.rs in this directory) wired reachably through bindings/wasm/src/lib.rs::initialize() (see scaffold.diff). Never committed to the shipped tree; reverted after this measurement.",
+      "wasmRawBytes": 295802,
+      "wasmGzipBytes": 102331,
+      "wasmBrotliBytes": 82344,
+      "jsGlueRawBytes": 31344
+    }
+  },
+  "delta": {
+    "wasmRawBytes": 6773,
+    "wasmRawPercentOfBefore": 2.34,
+    "wasmGzipBytes": 2868,
+    "wasmGzipPercentOfBefore": 2.88,
+    "wasmBrotliBytes": 2330,
+    "wasmBrotliPercentOfBefore": 2.91,
+    "jsGlueRawBytes": 0
+  },
+  "referenceBaseline378": {
+    "description": "docs/audits/evidence/378/artifact-sizes.json full variant, for comparison only -- measured at a different commit, before several unrelated size-affecting changes landed, so it is not the 'before' this delta is computed against.",
+    "wasmRawBytes": 281346,
+    "wasmBrotliBytes": 77407
+  }
+}
