@@ -22,6 +22,23 @@ class instances, tuples, ...) are left unchanged.
 | [`mask-secrets.mjs`](./mask-secrets.mjs) / [`python/mask_secrets.py`](./python/mask_secrets.py) | Pure, dependency-injected recursive walker (`maskSecretsWith`/`mask_secrets_with`). No `@redact-secret/core` import, so it's testable without the built native addon — mirrors [`examples/safe-integration/integration.mjs`](../safe-integration/integration.mjs). |
 | [`langfuse-mask.mjs`](./langfuse-mask.mjs) / [`python/langfuse_mask.py`](./python/langfuse_mask.py) | The live wrapper: real `scanAndRedact`/`scan_and_redact`, shaped to drop into Langfuse's `mask` hook directly. |
 
+**Support level — example-only; not a maintained package.**
+`decision-graduate-adapters-to-a-separate-repository` graduated pino, Python
+`logging`, and OpenTelemetry `SpanProcessor` into the separate
+[`redact-secret-adapters`](https://github.com/redact-secret/redact-secret-adapters)
+repository; the Langfuse masking callback did not, because it needs no
+package — it is `mask-secrets.mjs`'s shared walker plus the one line of host
+code shown above, with no wiring subtle enough to justify a maintained
+dependency. Langfuse itself is not installed in this workspace (unlike
+pino or `opentelemetry-sdk`, both real, pinned `devDependencies` here), so
+there is no exact SDK version pinned against; `langfuse-mask.mjs`/
+`langfuse_mask.py` are confirmed against Langfuse's published masking docs
+(https://langfuse.com/docs/observability/features/masking) as of resolving
+issue #326, not against an installed, version-pinned package. Copy this file
+out of the repository to use it; from that point on, tracking Langfuse's own
+`mask` contract for drift is the integrator's responsibility, not this
+repository's.
+
 **Block findings.** `scanAndRedact` already substitutes `block` findings in
 place, like `redact` ones — but an inline placeholder still leaves the rest
 of the string visible. The masking callback goes further: a leaf with a
@@ -47,6 +64,16 @@ See `DEFAULT_LIMITS` in `mask-leaf.mjs`/`mask_leaf.py`; override via the
 `limits` option.
 
 ## OpenTelemetry `SpanProcessor`
+
+This integration graduated: `@redact-secret/adapter-otel` in the separate
+[`redact-secret-adapters`](https://github.com/redact-secret/redact-secret-adapters)
+repository builds on the same approach documented here
+(`decision-graduate-adapters-to-a-separate-repository`). That package is
+currently `private: true`, pending a real-span test confirming
+`ReadableSpan.attributes` mutability at both ends of its declared
+`@opentelemetry/sdk-trace-base ^2.0.0` range — see that repository for
+current status. This directory's example stays as the executable reference
+for the approach until that package is public.
 
 | File | Role |
 | --- | --- |

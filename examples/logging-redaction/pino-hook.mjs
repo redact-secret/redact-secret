@@ -1,8 +1,10 @@
 /**
  * `createRedactingLogMethodWith`: a pino `hooks.logMethod` (pinned against
- * pino `9.x`, https://github.com/pinojs/pino/blob/main/docs/api.md#hooks
- * and https://github.com/pinojs/pino/blob/main/lib/tools.js, confirmed
- * while resolving issue #328) that redacts a secret out of the message,
+ * pino `10.x` — the exact `10.3.1` this workspace tests against, matching
+ * `@redact-secret/adapter-pino`'s declared `pino ^10.0.0` range —
+ * https://github.com/pinojs/pino/blob/main/docs/api.md#hooks and
+ * https://github.com/pinojs/pino/blob/main/lib/tools.js, confirmed while
+ * resolving issue #328) that redacts a secret out of the message,
  * every string field of a merging object, and a serialized `err.message`,
  * before pino ever serializes or writes the line.
  *

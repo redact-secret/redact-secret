@@ -7,6 +7,30 @@ decided_at: 2026-09-10
 ---
 # Adopt the Redact Secret naming contract
 
+## Current application — 2026-09-19 (#442)
+
+The naming matrix below gains one row: `@redact-secret/adapter*` (npm) and
+`redact-secret-adapters` (PyPI), for the host-integration packages
+`decision-graduate-adapters-to-a-separate-repository` graduates into the
+separate `redact-secret/redact-secret-adapters` repository. That repository
+owns its own naming and release authority; this contract only records the
+identity it uses, the same way this document already records identities for
+surfaces this repository does not itself publish (the six
+`@redact-secret/node-<platform>` packages).
+
+**Three meanings of "adapter" now coexist in this project, and this
+contract disambiguates them so a future reader does not conflate them:**
+*stream adapters* (`packages/javascript/src/adapters/`, the `Transform`/
+`TransformStream` wrappers inside `@redact-secret/core` described in
+[`ARCHITECTURE.md`](../../ARCHITECTURE.md)'s "Incremental and streaming
+behavior"), *host adapters* (the CLI and the language bindings themselves —
+"the CLI is a host adapter over the same core," per `README.md` and
+`ARCHITECTURE.md`'s "Command-line host behavior" section), and these new
+*host-integration packages* (`@redact-secret/adapter*` / `redact-secret-
+adapters`, published from the separate adapters repository). None of the
+three is renamed by this update; the disambiguation exists because the third
+meaning is new as of this decision.
+
 ## Current application — 2026-09-11 (#144)
 
 The accepted naming matrix below is implemented. The canonical repository is
@@ -43,6 +67,8 @@ this naming matrix:
 | CLI binary | `secret-scan` | `redact-secret` |
 | PyPI distribution | `omiologic-secret-scan` | `redact-secret` |
 | Python import | `secret_scan` | `redact_secret` |
+| npm host-integration packages (separate `redact-secret-adapters` repository) | — (new as of 2026-09-19, #442) | `@redact-secret/adapter*` |
+| PyPI host-integration distribution (separate `redact-secret-adapters` repository) | — (new as of 2026-09-19, #442) | `redact-secret-adapters` |
 
 The product's behavioral description does not change: this remains
 "Deterministic secret detection and redaction." Renaming the product name does

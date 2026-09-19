@@ -24,9 +24,17 @@ for verified versions and artifacts. Development manifest versions alone do not
 establish availability. To build this checkout, use the
 [source setup](./docs/getting-started.md).
 
-Logging, telemetry, model context, and MCP are application use cases. This
-repository provides core APIs and generic integration examples, but no dedicated
-LangChain, OpenTelemetry, pino, Python logging, or MCP integration packages.
+Pino, Python `logging`, and OpenTelemetry `SpanProcessor` integrations are
+published as versioned packages in a separate repository,
+[`redact-secret-adapters`](https://github.com/redact-secret/redact-secret-adapters)
+(`@redact-secret/adapter-pino`, `@redact-secret/adapter-otel`, and the PyPI
+`redact-secret-adapters` distribution) — see
+[`docs/decisions/2026-09-19-graduate-adapters-to-a-separate-repository.md`](./docs/decisions/2026-09-19-graduate-adapters-to-a-separate-repository.md)
+for why, including why this repository's own release matrix is unaffected.
+Model context (MCP) and LangChain remain application use cases with no
+dedicated package: [`examples/mcp-redact/`](examples/mcp-redact/) is a
+tested, example-only integration — see its README for its stated support
+level — and no LangChain integration exists in this repository at all.
 
 ## Architecture at a glance
 

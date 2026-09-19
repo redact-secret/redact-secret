@@ -12,6 +12,24 @@ Both languages are examples, not package exports: no new dependency is
 added to `@redact-secret/core` or `redact-secret`, and no MCP SDK is
 installed in this workspace — see [SDK versions](#sdk-versions).
 
+## Support level
+
+**Example-only; not a maintained package, and not planned to become one.**
+`decision-graduate-adapters-to-a-separate-repository` graduated pino, Python
+`logging`, and OpenTelemetry `SpanProcessor` integrations into the separate
+[`redact-secret-adapters`](https://github.com/redact-secret/redact-secret-adapters)
+repository, on the strength of a narrow, structurally-typed dependency on
+this repository's core. MCP stays out of that graduation: this directory's
+middleware wraps the core's incremental sanitizer, a stateful surface wider
+than the four-item contract the graduated adapters depend on, and it is not
+protected by any declared host SDK version range. Copy this code out of the
+repository to use it; from that point on you own the copy — there is no
+version, no changelog, and no notification here when
+`@modelcontextprotocol/sdk` or `mcp` moves. The exact versions this
+directory is verified against are pinned in [SDK versions](#sdk-versions)
+below; nothing here is tested against, or claimed to work against, any other
+version.
+
 ## Files
 
 | File | Role |
