@@ -204,6 +204,24 @@ real FFI boundary, with a `// SAFETY:` comment that
 `clippy::undocumented_unsafe_blocks` requires, and the review must record why
 the binding macros were insufficient.
 
+### Generated invisible-code-point table
+
+`crates/secret-scan-core/src/invisible_table.rs` is generated data, not a
+dependency: the removed set of
+`decision-normalize-invisible-characters-before-detection`
+(`Default_Ignorable_Code_Point ∪ Cf`) derived from a pinned UCD version, so
+`allowed-dependencies` stays empty. `scripts/generate-invisible-table.py`
+derives it in two offline steps. `--refresh-ucd DIR` verifies the full
+`DerivedCoreProperties.txt` and `UnicodeData.txt` against the SHA-256 values
+pinned in the script and writes verbatim line extracts to
+`crates/secret-scan-core/ucd/`; with no flag the script regenerates the table
+from those extracts. `npm run rust:check` runs it with `--check` and fails on
+a stale or hand-edited table, and `crates/secret-scan-core/tests/invisible_table.rs`
+re-derives the set from the same extracts with its own parser, so
+`cargo test` asserts it too. A UCD bump changes the pinned version and hashes,
+the extracts, the table, and the ADR together, each as a reviewable diff. The
+extracts sit outside `include`, so they never enter the published package.
+
 ### Version lockstep
 
 Every workspace member's Cargo version and every JSON manifest carrying the

@@ -5,6 +5,27 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+- **Security fix:** an invisible code point inside a credential no longer
+  defeats detection (issues #438, #445,
+  `decision-normalize-invisible-characters-before-detection`). One zero-width
+  character inside a token, a Bearer credential, a connection URI password, or
+  the keyword of a `name = value` assignment previously produced no finding on
+  every detector, left the text unredacted, and let `check` exit `0`. The core
+  now removes `Default_Ignorable_Code_Point ∪ Cf` (4,206 code points, derived
+  from a pinned UCD 17.0.0 snapshot checked in as generated data — zero-width
+  characters, bidi controls, the Unicode Tags block, variation selectors,
+  Hangul fillers, soft hyphen) into a scan copy before detection and
+  translates every range back. No public API changes: ranges still index the
+  original input in every binding's unit, and a removed code point strictly
+  inside a value is part of its range, so one placeholder replaces all of it.
+  One adjacent to a match is not absorbed. The incremental sanitizer judges
+  open constructs and private-key delimiters on the same scan copy, so
+  partition equivalence holds, while its limits still measure original bytes.
+  The fix is in the Rust core, so Rust, the CLI, Node, WebAssembly, and Python
+  all receive it with no binding change. Behavior change: text that is
+  credential-shaped only once its invisible characters are removed is now a
+  finding, and an invisible character between a word and a token no longer
+  acts as a token boundary.
 - Added `@redact-secret/core/common/node-stream` and
   `@redact-secret/core/common/web-stream` (issue #416), the `common`-profile
   counterparts to `@redact-secret/core/node-stream` and

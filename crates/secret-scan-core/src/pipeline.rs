@@ -1,10 +1,16 @@
-//! The deterministic synchronous pipeline: collect, validate, prioritize,
-//! resolve overlaps, number, then apply policy.
+//! The deterministic synchronous pipeline: normalize, collect, validate,
+//! translate, prioritize, resolve overlaps, number, then apply policy.
+//!
+//! Detectors scan a copy of the input with invisible code points removed
+//! ([`NormalizedInput`]); every later stage, and every public range, is in
+//! original-input coordinates
+//! (`decision-normalize-invisible-characters-before-detection`).
 
 use std::cmp::Ordering;
 use std::collections::BTreeMap;
 
 use crate::error::{SecretScanError, SecretScanErrorCode};
+use crate::normalize::NormalizedInput;
 use crate::redact::redact;
 use crate::registry::{DetectorRegistry, RegisteredDetector};
 use crate::types::{
@@ -57,26 +63,39 @@ impl RankedCandidate<'_> {
     }
 }
 
+/// Validates `candidate` against the scan copy it was detected in, then
+/// translates its range into `input`. Everything downstream ranks, accepts,
+/// and redacts in original coordinates only.
 fn validate_candidate<'a>(
     input: &str,
+    normalized: &NormalizedInput<'_>,
     registered: &'a RegisteredDetector,
     candidate: &'a Candidate,
     detector_order: usize,
     candidate_order: usize,
 ) -> Result<RankedCandidate<'a>, SecretScanError> {
     let type_name = candidate.type_name();
-    let range = candidate.range();
+    let scanned = normalized.text();
+    let scanned_range = candidate.range();
 
-    if !is_identifier(type_name) || !range.is_char_aligned_in(input) {
+    if !is_identifier(type_name) || !scanned_range.is_char_aligned_in(scanned) {
         return Err(SecretScanErrorCode::InvalidCandidate.into());
     }
 
     // A candidate whose matched text is exactly its public type or detector
     // id would let a public field mirror input; reject it as malformed.
-    let matched = &input[range.start()..range.end()];
+    let matched = &scanned[scanned_range.start()..scanned_range.end()];
     if matched == type_name || matched == registered.id() {
         return Err(SecretScanErrorCode::InvalidCandidate.into());
     }
+
+    // Removal is order-preserving, so a range aligned in the scan copy
+    // translates to one aligned in the input; re-asserted because every
+    // later stage slices `input` with it.
+    let range = normalized
+        .to_original(scanned_range)
+        .filter(|range| range.is_char_aligned_in(input))
+        .ok_or(SecretScanErrorCode::InvalidCandidate)?;
 
     Ok(RankedCandidate {
         type_name,
@@ -89,18 +108,20 @@ fn validate_candidate<'a>(
     })
 }
 
+/// Runs every detector over the scan copy. The returned ranges index
+/// `scanned`, not the original input.
 fn collect_candidates(
-    input: &str,
+    scanned: &str,
     registry: &DetectorRegistry,
 ) -> Result<Vec<Vec<Candidate>>, SecretScanError> {
-    let context = DetectorContext::new(input.len());
+    let context = DetectorContext::new(scanned.len());
     registry
         .detectors()
         .iter()
         .map(|registered| {
             registered
                 .detector()
-                .detect(input, &context)
+                .detect(scanned, &context)
                 .map_err(|_| SecretScanErrorCode::DetectorFailure.into())
         })
         .collect()
@@ -146,7 +167,13 @@ pub fn run_detector_pipeline(
         return Ok(Vec::new());
     }
 
-    let per_detector = collect_candidates(input, registry)?;
+    let normalized = NormalizedInput::new(input);
+    let scanned = normalized.text();
+    if scanned.is_empty() {
+        return Ok(Vec::new());
+    }
+
+    let per_detector = collect_candidates(scanned, registry)?;
 
     let mut ranked: Vec<RankedCandidate<'_>> = Vec::new();
     for ((detector_order, registered), candidates) in
@@ -154,13 +181,14 @@ pub fn run_detector_pipeline(
     {
         for (candidate_order, candidate) in candidates.iter().enumerate() {
             let range = candidate.range();
-            if range.is_char_aligned_in(input)
-                && is_known_vendor_placeholder_literal(&input[range.start()..range.end()])
+            if range.is_char_aligned_in(scanned)
+                && is_known_vendor_placeholder_literal(&scanned[range.start()..range.end()])
             {
                 continue;
             }
             ranked.push(validate_candidate(
                 input,
+                &normalized,
                 registered,
                 candidate,
                 detector_order,

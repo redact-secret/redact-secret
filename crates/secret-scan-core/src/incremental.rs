@@ -67,6 +67,7 @@ use crate::detectors::{
     PrivateKeyRetentionTracker, has_open_bearer_authorization, has_open_contextual_assignment,
 };
 use crate::error::{FormatterFailure, PolicyFailure, SecretScanError, SecretScanErrorCode};
+use crate::normalize::NormalizedInput;
 use crate::pipeline::run_detector_pipeline;
 use crate::policy::DefaultPolicy;
 use crate::redact::{default_placeholder_formatter, redact};
@@ -505,14 +506,25 @@ impl IncrementalSanitizer {
         error
     }
 
+    /// Judges the retained text the way [`process_unit`](Self::process_unit)
+    /// will scan it: on the scan copy. Judged on the raw buffer, a keyword
+    /// split by an invisible code point at a line end would not read as an
+    /// open construct, the unit would close early, and the same input would
+    /// yield different findings under a different partition.
     fn has_open_single_line_construct(&self) -> bool {
-        has_open_contextual_assignment(&self.retained)
-            || has_open_bearer_authorization(&self.retained)
+        let scanned = NormalizedInput::new(&self.retained).into_text();
+        has_open_contextual_assignment(&scanned) || has_open_bearer_authorization(&scanned)
     }
 
     fn append_retained(&mut self, piece: &str, closes_line: bool) -> Result<(), SecretScanError> {
         self.retained.push_str(piece);
-        let (has_begin, has_open) = self.private_key.append(piece);
+        // The tracker reads delimiters from the scan copy, as the detector
+        // will. A piece is whole code points, so normalizing piece by piece
+        // equals normalizing the unit. Only the tracker sees the copy: every
+        // limit below is a memory bound and stays measured in original bytes.
+        let (has_begin, has_open) = self
+            .private_key
+            .append(&NormalizedInput::new(piece).into_text());
         self.multiline_detected |= has_begin;
         self.multiline_open = has_open;
 
