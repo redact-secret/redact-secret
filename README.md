@@ -294,12 +294,17 @@ the browser, with zero new false positives and identical findings wherever
 no provider detector would have competed
 ([evidence](./docs/audits/evidence/382/README.md)).
 
-`@redact-secret/core/web-stream` and `@redact-secret/core/node-stream` are
-not profile-aware yet: their convenience `createWebStreamSanitizer`/
-`createNodeStreamSanitizer` always open a `full` session. Construct
-`WebStreamSanitizer`/`NodeStreamSanitizer` directly with a session from
-`@redact-secret/core/common`'s own `createIncrementalSanitizer` to stream
-under `common` today.
+`@redact-secret/core/web-stream` and `@redact-secret/core/node-stream`'s
+convenience `createWebStreamSanitizer`/`createNodeStreamSanitizer` always
+open a `full` session. For a `common` byte stream, use the same factories
+from `@redact-secret/core/common/web-stream`/`@redact-secret/core/common/node-stream`
+instead — resolving one of those two subpaths never reaches the `full`
+runtime or the root `@redact-secret/wasm` artifact in a browser bundle. The
+`WebStreamSanitizer`/`NodeStreamSanitizer` classes are profile-agnostic and
+shared across both pairs of subpaths, so constructing one directly with a
+session from `@redact-secret/core/common`'s own `createIncrementalSanitizer`
+still works too. See the
+[streaming guide](./docs/guides/streaming.md#streaming-under-the-common-profile).
 
 Python and the CLI stay `full` only — the CLI is a pre-commit/CI enforcement
 tool, where a smaller profile would only weaken enforcement.

@@ -54,6 +54,10 @@ describe("package contents", () => {
     expect(paths).toContain("dist/adapters/node-stream.d.ts");
     expect(paths).toContain("dist/adapters/web-stream.js");
     expect(paths).toContain("dist/adapters/web-stream.d.ts");
+    expect(paths).toContain("dist/adapters/node-stream-common.js");
+    expect(paths).toContain("dist/adapters/node-stream-common.d.ts");
+    expect(paths).toContain("dist/adapters/web-stream-common.js");
+    expect(paths).toContain("dist/adapters/web-stream-common.d.ts");
   });
 
   it("publishes nothing from the repository around it", () => {
@@ -94,11 +98,13 @@ describe("package contents", () => {
     ) as { exports: Record<string, unknown>; imports: Record<string, unknown> };
 
     // The root API, its `common`-profile sibling, plus the two stream
-    // adapters. Each adapter is its own subpath so that resolving the Web
-    // one never reaches `node:stream`.
+    // adapters and their `common`-profile counterparts. Each adapter is its
+    // own subpath so that resolving the Web one never reaches `node:stream`.
     expect(Object.keys(manifest.exports).sort()).toEqual([
       ".",
       "./common",
+      "./common/node-stream",
+      "./common/web-stream",
       "./node-stream",
       "./package.json",
       "./web-stream",
@@ -116,6 +122,10 @@ describe("package contents", () => {
     for (const file of [
       "web-stream.js",
       "web-stream.d.ts",
+      "web-stream-core.js",
+      "web-stream-core.d.ts",
+      "web-stream-common.js",
+      "web-stream-common.d.ts",
       "shared.js",
       "shared.d.ts",
     ]) {

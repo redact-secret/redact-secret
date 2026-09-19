@@ -119,6 +119,32 @@ describe("browser package import", () => {
     expect(output).not.toContain("require(");
   });
 
+  it("bundles the common-profile Web adapter without the full runtime or its artifact", async () => {
+    const output = await bundleForBrowser(
+      [
+        'import { createWebStreamSanitizer, WebStreamSanitizer } from "@redact-secret/core/common/web-stream";',
+        "globalThis.secretScanCommonWebStream = [",
+        "  typeof createWebStreamSanitizer,",
+        "  WebStreamSanitizer.prototype instanceof TransformStream,",
+        "];",
+      ].join("\n"),
+    );
+
+    await import(
+      `data:text/javascript;base64,${Buffer.from(output).toString("base64")}`
+    );
+    const globals = globalThis as typeof globalThis & {
+      secretScanCommonWebStream?: readonly unknown[];
+    };
+
+    expect(globals.secretScanCommonWebStream).toEqual(["function", true]);
+    expect(output).not.toContain("node:stream");
+    expect(output).not.toContain("require(");
+    // The issue #416 assertion: a `/common` browser bundle with streams
+    // never references the `full` artifact specifier, only its own.
+    expect(output).not.toContain('import("@redact-secret/wasm")');
+  });
+
   it("refuses synchronous operations before initialize succeeds", async () => {
     const output = await bundleForBrowser(
       [

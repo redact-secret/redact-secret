@@ -2,7 +2,13 @@
  * The Node.js stream adapter: a byte-to-byte `Transform` over one incremental
  * session (`decision-define-runtime-bindings`).
  *
- * This module is reached only through the package's `./node-stream` subpath.
+ * This module is reached only through the package's `./node-stream` subpath,
+ * and its `createNodeStreamSanitizer` always opens a `full`-profile session.
+ * For a `common` byte stream, use `@redact-secret/core/common/node-stream`
+ * instead, which shares the `NodeStreamSanitizer` class defined in
+ * `./node-stream-core.ts` with this module but binds the factory to the
+ * `common` runtime.
+ *
  * It is the one published module that imports `node:stream`; the root export
  * and `./web-stream` never resolve a Node-only module, so a browser bundle
  * that uses them pulls none of this in.
@@ -19,75 +25,14 @@
  * plaintext it was still deciding about is discarded rather than flushed.
  */
 
-import { Transform } from "node:stream";
-import type { TransformCallback } from "node:stream";
-
 import { runtime } from "../session.js";
-import type {
-  IncrementalSanitizer,
-  IncrementalSanitizerOptions,
-  SecretFinding,
-} from "../types.js";
+import type { IncrementalSanitizerOptions } from "../types.js";
 
-import { createStreamSanitizerRuntime } from "./shared.js";
-
-/** A byte-to-byte Node transform backed by one incremental session. */
-export class NodeStreamSanitizer extends Transform {
-  readonly #runtime;
-
-  /**
-   * Wraps `session`, which this transform owns: it is finalized when the
-   * stream ends normally and aborted on every other exit.
-   */
-  constructor(session: IncrementalSanitizer) {
-    super();
-    this.#runtime = createStreamSanitizerRuntime(session);
-  }
-
-  /**
-   * Every finding the session has finalized so far, frozen, with absolute
-   * UTF-16 offsets into the logical whole-stream input. It stays empty when
-   * the stream is destroyed before anything settles.
-   */
-  get findings(): readonly SecretFinding[] {
-    return this.#runtime.findings;
-  }
-
-  override _transform(
-    chunk: Uint8Array,
-    _encoding: BufferEncoding,
-    callback: TransformCallback,
-  ): void {
-    try {
-      const { text } = this.#runtime.append(chunk);
-      if (text.length > 0) this.push(text, "utf8");
-      callback();
-    } catch (error) {
-      callback(error as Error);
-    }
-  }
-
-  override _flush(callback: TransformCallback): void {
-    try {
-      const { text } = this.#runtime.finalize();
-      if (text.length > 0) this.push(text, "utf8");
-      callback();
-    } catch (error) {
-      callback(error as Error);
-    }
-  }
-
-  override _destroy(
-    error: Error | null,
-    callback: (error?: Error | null) => void,
-  ): void {
-    this.#runtime.abort();
-    callback(error);
-  }
-}
+import { NodeStreamSanitizer } from "./node-stream-core.js";
 
 /**
- * Opens one incremental session and wraps it in a Node transform.
+ * Opens one incremental `full`-profile session and wraps it in a Node
+ * transform.
  *
  * Requires a successful `await initialize()`, like every other synchronous
  * operation in this package; it throws `NOT_INITIALIZED` otherwise.
@@ -98,6 +43,7 @@ export function createNodeStreamSanitizer(
   return new NodeStreamSanitizer(runtime.createIncrementalSanitizer(options));
 }
 
+export { NodeStreamSanitizer } from "./node-stream-core.js";
 export { SecretScanError } from "../errors.js";
 export type { SecretScanErrorCode } from "../errors.js";
 export type {

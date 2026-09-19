@@ -16,7 +16,8 @@ then emits text and findings. An append may legitimately return empty text.
 
 `createIncrementalSanitizer` and `IncrementalSanitizer::with_common_built_in`
 support the opt-in `common` detector profile on every surface that exposes
-it; the two stream factories in the table above do not — see
+it; the JavaScript stream factories have their own `common`-profile
+subpaths — see
 [streaming under the `common` profile](#streaming-under-the-common-profile).
 
 ## JavaScript incremental example
@@ -79,20 +80,52 @@ on Node.js 20, 22, and 24 and in Chromium, Firefox, and WebKit.
 
 ### Streaming under the `common` profile
 
-`@redact-secret/core/node-stream` and `@redact-secret/core/web-stream` are not
-profile-aware: their convenience `createNodeStreamSanitizer` and
-`createWebStreamSanitizer` factories always open a session against `full`,
-regardless of which entry point a consumer also imported. The
-`NodeStreamSanitizer`/`WebStreamSanitizer` classes themselves are
-profile-agnostic — they wrap whichever session they are given — so construct
-the class directly with a session opened by
-[`@redact-secret/core/common`](javascript.md#detector-profiles)'s own
-`createIncrementalSanitizer`:
+`@redact-secret/core/common/node-stream` and
+`@redact-secret/core/common/web-stream` mirror `@redact-secret/core/node-stream`
+and `@redact-secret/core/web-stream`, except their `createNodeStreamSanitizer`
+and `createWebStreamSanitizer` factories open a session against `common`
+instead of `full`. Resolving one of these two subpaths from a browser bundle
+never reaches the `full` runtime or the root `@redact-secret/wasm` artifact
+specifier, so a `common` consumer's stream path pays only for the `common`
+WebAssembly build:
+
+```ts
+import { pipeline } from "node:stream/promises";
+import { initialize } from "@redact-secret/core/common";
+import { createNodeStreamSanitizer } from "@redact-secret/core/common/node-stream";
+
+await initialize();
+await pipeline(
+  process.stdin,
+  createNodeStreamSanitizer({
+    limits: {
+      maxInputCodeUnits: 32_768,
+      maxBufferedCodeUnits: 16_512,
+      maxTokenCodeUnits: 8_192,
+      maxMultilineCodeUnits: 16_384,
+    },
+  }),
+  process.stdout,
+);
+```
+
+The browser equivalent imports `createWebStreamSanitizer` from
+`@redact-secret/core/common/web-stream` and pipes through it the same way the
+[JavaScript incremental example](#javascript-incremental-example)'s stream
+snippet does.
+
+The `NodeStreamSanitizer`/`WebStreamSanitizer` classes themselves are
+profile-agnostic — they wrap whichever session they are given, and the same
+two classes back all four stream subpaths — so constructing one directly with
+a session from [`@redact-secret/core/common`](javascript.md#detector-profiles)'s
+own `createIncrementalSanitizer` still works, and is the only option when a
+session needs profile-specific policy or placeholder options the convenience
+factory does not expose:
 
 ```ts
 import { pipeline } from "node:stream/promises";
 import { initialize, createIncrementalSanitizer } from "@redact-secret/core/common";
-import { NodeStreamSanitizer } from "@redact-secret/core/node-stream";
+import { NodeStreamSanitizer } from "@redact-secret/core/common/node-stream";
 
 await initialize();
 const session = createIncrementalSanitizer({
@@ -105,9 +138,6 @@ const session = createIncrementalSanitizer({
 });
 await pipeline(process.stdin, new NodeStreamSanitizer(session), process.stdout);
 ```
-
-The browser equivalent constructs `new WebStreamSanitizer(session)` with a
-session from the same `@redact-secret/core/common` import.
 
 ## Python example
 
