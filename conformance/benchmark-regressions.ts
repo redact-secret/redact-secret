@@ -10,6 +10,7 @@ export interface BenchmarkRegressionRecord {
   readonly benchmarkFixtureIds: readonly string[];
   readonly corpusHashes: readonly string[];
   readonly fixingCommit?: string;
+  readonly benchmarkCommit?: string;
   readonly canonicalFixtures: {
     readonly synchronous: readonly string[];
     readonly incremental: readonly string[];
@@ -104,7 +105,7 @@ export function validateBenchmarkRegressionManifest(
       id === "unknown" ||
       !hasOnly(record, [
         "id", "benchmarkRecordId", "benchmarkIssue", "productIssue",
-        "benchmarkFixtureIds", "corpusHashes", "fixingCommit",
+        "benchmarkFixtureIds", "corpusHashes", "fixingCommit", "benchmarkCommit",
         "canonicalFixtures", "gates", "note",
       ]) ||
       typeof record.benchmarkRecordId !== "string" || !ID.test(record.benchmarkRecordId) ||
@@ -114,6 +115,7 @@ export function validateBenchmarkRegressionManifest(
       !validStringList(record.benchmarkFixtureIds, BENCHMARK_FIXTURE_ID) ||
       !validStringList(record.corpusHashes, SHA256) ||
       (record.fixingCommit !== undefined && !COMMIT.test(record.fixingCommit)) ||
+      (record.benchmarkCommit !== undefined && !COMMIT.test(record.benchmarkCommit)) ||
       typeof record.note !== "string" || record.note.length === 0 ||
       typeof record.canonicalFixtures !== "object" || record.canonicalFixtures === null ||
       !hasOnly(record.canonicalFixtures, ["synchronous", "incremental"]) ||
@@ -130,6 +132,10 @@ export function validateBenchmarkRegressionManifest(
       record.gates.productConformance.status === "passed" &&
       record.canonicalFixtures.synchronous.length + record.canonicalFixtures.incremental.length === 0
     ) invalid(id, "passed-without-canonical-fixture");
+    if (
+      record.gates.benchmarkRevalidation.status === "passed" &&
+      record.benchmarkCommit === undefined
+    ) invalid(id, "passed-without-benchmark-commit");
 
     for (const fixtureId of record.canonicalFixtures.synchronous) {
       if (!fixtures.synchronous.has(fixtureId)) invalid(id, "unknown-synchronous-fixture");
