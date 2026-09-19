@@ -12,7 +12,7 @@
         "reference-syntax--sql-bind"
       ],
       "corpusHashes": [
-        "2788a206fdc04b281d6fa58dcf0bb4b6718d6bb96a76aa2759e9bcb85da944fa"
+        "0fe3363d4e0aec300b81bb823929f73928c7e06eb9e1d43064cf7b5b7f0d977e"
       ],
       "fixingCommit": "8d8d5b4e8dae8de1b42e174d8d21dc0075147fc6",
       "canonicalFixtures": {
@@ -40,7 +40,7 @@
         "reference-syntax--azure-keyvault"
       ],
       "corpusHashes": [
-        "2788a206fdc04b281d6fa58dcf0bb4b6718d6bb96a76aa2759e9bcb85da944fa"
+        "0fe3363d4e0aec300b81bb823929f73928c7e06eb9e1d43064cf7b5b7f0d977e"
       ],
       "fixingCommit": "a62339e7bb2de616bbc200476c9e043bfd429c30",
       "canonicalFixtures": {
@@ -76,7 +76,7 @@
         "detector-coverage--generic-token-client-secret-quoted"
       ],
       "corpusHashes": [
-        "4d4b8d4530a780321b18ffb07f317054fdf71ba759543dc2260a9b4d3540b824"
+        "1012bdbabc75ab6228091cddfe9a54bb283c7c37a254c7484650bf367cfeab17"
       ],
       "fixingCommit": "49f41ea95958c87e6c132471b15cd4c50642f721",
       "canonicalFixtures": {
