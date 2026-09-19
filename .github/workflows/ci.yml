@@ -216,3 +216,34 @@ jobs:
           CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_RUNNER: wasm-bindgen-test-runner
           WASM_BINDGEN_TEST_ONLY_NODE: "1"
         run: cargo test -p redact-secret-wasm --no-default-features --target wasm32-unknown-unknown --locked
+
+  benchmark-pin-drift:
+    name: Benchmark pin drift (commit ancestry)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+
+    steps:
+      # scripts/check-benchmark-pins.py --check-ancestry resolves
+      # pins.sourceRevision locally against this repository's own history, so
+      # it needs the full history, not the default single-commit checkout the
+      # other jobs use.
+      - name: Check out repository with full history
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Every benchmarkCommit and pins.sourceRevision must trace to a real ancestor
+        run: npm run benchmark-pins:check:ancestry
