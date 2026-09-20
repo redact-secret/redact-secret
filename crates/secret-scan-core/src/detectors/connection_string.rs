@@ -19,7 +19,11 @@
 //! string split across log lines, is a false negative by design, same as
 //! this file's other structural false negatives above.
 
-use super::text::{is_repeated_character_filler, matches_placeholder_vocabulary};
+use super::text::{
+    is_command_substitution_reference, is_opencode_reference, is_repeated_character_filler,
+    is_ruby_interpolation_reference, is_template_reference, is_windows_env_reference,
+    matches_placeholder_vocabulary, starts_with_bare_dollar_reference,
+};
 use crate::entropy::shannon_entropy;
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
@@ -171,6 +175,9 @@ fn is_placeholder(value: &str) -> bool {
             return true;
         }
     }
+    if is_interpolation_or_env_reference(value) {
+        return true;
+    }
     if is_repeated_character_filler(value) {
         return true;
     }
@@ -178,6 +185,23 @@ fn is_placeholder(value: &str) -> bool {
         return true;
     }
     false
+}
+
+/// `true` for a password that is an interpolation, command-substitution, or
+/// environment-variable reference rather than a literal secret: the same
+/// non-secret-reference exclusions `generic-token` applies to a contextual
+/// `password = "..."` assignment (issue #279, #292), extended here so a
+/// connection URL's password position gets identical treatment (issue #469).
+/// Each of these is a whole-value shape — a value that merely starts with an
+/// opener, or that contains `$` without matching one of these forms, stays
+/// detected.
+fn is_interpolation_or_env_reference(value: &str) -> bool {
+    starts_with_bare_dollar_reference(value)
+        || is_command_substitution_reference(value)
+        || is_template_reference(value)
+        || is_ruby_interpolation_reference(value)
+        || is_opencode_reference(value)
+        || is_windows_env_reference(value)
 }
 
 /// Prose scaffolding meaning "put your own password here": a snake/kebab-case
@@ -892,6 +916,127 @@ mod tests {
         // trailing token is literally "here" nor the leading token is one of
         // the recognized prefixes.
         let candidates = detect("postgres://fixture:my_password_over_there@localhost/example");
+        assert_eq!(candidates.len(), 1);
+        assert_eq!(candidates[0].type_name(), "connection_string_password");
+    }
+
+    // --- issue #469: interpolation, command-substitution, and
+    // environment-variable reference exclusions --------------------------
+    //
+    // `is_placeholder` used to recognize only the braced `${...}` form.
+    // `is_interpolation_or_env_reference` shares the same non-secret-
+    // reference predicates `generic-token` applies to a contextual
+    // `password = "..."` assignment (issue #279, #292 --
+    // `super::super::generic_token`), so a connection URL's password
+    // position now gets identical treatment. Some of these (`{{...}}`,
+    // `#{...}`, `{env:...}`, `%...%`) were previously clean only by
+    // accident -- the authority terminator scan or
+    // `has_valid_userinfo_encoding` rejected the malformed-looking
+    // authority before `is_placeholder` ever ran -- rather than by
+    // exclusion; these fixtures pin the outcome as intentional so a future
+    // change to userinfo parsing or percent-encoding tolerance cannot
+    // silently turn them into false positives.
+
+    #[test]
+    fn a_braced_env_reference_password_is_ignored() {
+        assert_eq!(
+            detect("postgres://app:${DB_PASSWORD}@db.internal:5432/example"),
+            Vec::new()
+        );
+    }
+
+    #[test]
+    fn a_bare_shell_env_reference_password_is_ignored() {
+        for password in ["$DB_PASSWORD", "$_FOO"] {
+            let input = format!("postgres://app:{password}@db.internal:5432/example");
+            assert_eq!(
+                detect(&input),
+                Vec::new(),
+                "expected no findings for {input:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn a_powershell_env_reference_password_is_ignored() {
+        assert_eq!(
+            detect("postgres://app:$env:DB_PASSWORD@db.internal:5432/example"),
+            Vec::new()
+        );
+    }
+
+    #[test]
+    fn a_command_substitution_reference_password_is_ignored() {
+        for password in ["$(db_password)", "$(pass_show_db_prod)"] {
+            let input = format!("postgres://app:{password}@db.internal:5432/example");
+            assert_eq!(
+                detect(&input),
+                Vec::new(),
+                "expected no findings for {input:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn a_template_reference_password_is_ignored() {
+        assert_eq!(
+            detect("postgres://app:{{db_password}}@db.internal:5432/example"),
+            Vec::new()
+        );
+    }
+
+    #[test]
+    fn a_ruby_interpolation_reference_password_is_ignored() {
+        assert_eq!(
+            detect("postgres://app:#{db_password}@db.internal:5432/example"),
+            Vec::new()
+        );
+    }
+
+    #[test]
+    fn an_opencode_env_reference_password_is_ignored() {
+        assert_eq!(
+            detect("postgres://app:{env:DB_PASSWORD}@db.internal:5432/example"),
+            Vec::new()
+        );
+    }
+
+    #[test]
+    fn a_windows_env_reference_password_is_ignored() {
+        assert_eq!(
+            detect("postgres://app:%DB_PASSWORD%@db.internal:5432/example"),
+            Vec::new()
+        );
+    }
+
+    #[test]
+    fn a_real_looking_password_alongside_the_interpolation_forms_is_still_detected() {
+        let candidates = detect("postgres://app:SYNTHETICREVOKEDPW0000@db.internal:5432/x");
+        assert_eq!(candidates.len(), 1);
+        assert_eq!(candidates[0].type_name(), "connection_string_password");
+    }
+
+    #[test]
+    fn a_password_starting_with_dollar_but_not_a_recognized_reference_form_is_still_detected() {
+        // The byte after `$` is a digit, not an identifier-start character,
+        // so this does not satisfy the bare shell/PowerShell env-reference
+        // shape.
+        let candidates = detect("postgres://app:$3cretSyntheticRevoked@db.internal:5432/example");
+        assert_eq!(candidates.len(), 1);
+        assert_eq!(candidates[0].type_name(), "connection_string_password");
+    }
+
+    #[test]
+    fn a_password_merely_containing_dollar_is_still_detected() {
+        let candidates = detect("postgres://app:abcSyntheticRevoked$Def@db.internal:5432/example");
+        assert_eq!(candidates.len(), 1);
+        assert_eq!(candidates[0].type_name(), "connection_string_password");
+    }
+
+    #[test]
+    fn a_command_substitution_opener_without_its_closing_paren_is_still_detected() {
+        let candidates =
+            detect("postgres://app:$(SyntheticRevokedPassword@db.internal:5432/example");
         assert_eq!(candidates.len(), 1);
         assert_eq!(candidates[0].type_name(), "connection_string_password");
     }
