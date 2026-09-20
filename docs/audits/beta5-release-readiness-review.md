@@ -129,3 +129,53 @@ defects. After review and merge, candidate preparation follows
 
 No version, tag, package publication, workflow dispatch, or release approval
 was performed by this review.
+
+## Second readiness review — 2026-09-20
+
+Reviewed against `main` at `ceceba637a447f12010b9b8f3ee0562fc10af915`, thirteen
+commits past this report's original baseline: two provider-token coverage
+additions (#481 `cfat_`, #485 `api_org_`) and four false-positive fixes in
+`generic-token`, `bearer-token`, `connection-string`, and `jwt` (#467, #468,
+#469, #472), each already carrying its own decision record and tests, plus an
+unrelated documentation-only evidence update (PR #493, Google OAuth
+`GOCSPX-`/`1dio`/`ya29.` audit evidence, no runtime or detector change).
+
+Two gaps, the same shape as #443/#462's: the underlying code changes were
+each reviewed and merged individually, but nothing had rolled them into the
+release-facing record.
+
+- **`CHANGELOG.md`'s `Unreleased` section had no entries** for any of the
+  six detector changes above — confirmed by grep, every hit for their
+  identifying terms (`cfat_`, `api_org_`, `closed.call`, `filler`,
+  `supabase`, `interpolation`) fell under the already-released
+  `## 0.1.0-beta.4` heading, not `## Unreleased`. Fixed: `Changed detection`
+  now documents `cfat_`/`api_org_` on the existing `cloudflare-token`/
+  `huggingface-token` bullets, and a new `Reduced false positives` section
+  covers the four fixes; `Internal, tooling, and qualification` gains a
+  one-line note for #480 (no-behavior-change retention-hint question).
+- **`cfat_` and `api_org_` had no decision record**, breaking the pattern
+  every other frozen or adopted grammar in this registry follows (only
+  `docs/audits/evidence/367/precision-contracts.json` entries existed).
+  Fixed: `docs/decisions/2026-09-20-adopt-cloudflare-account-token-prefix.md`
+  and `docs/decisions/2026-09-20-adopt-huggingface-organization-token-prefix.md`,
+  indexed in `DECISIONS.md`.
+
+Everything else checked clean: the new Rust tests run under the existing
+`cargo test --workspace` wiring with no separate registration step; the new
+conformance mutation fixtures (`cloudflare-token-mutations.ts`,
+`huggingface-token-mutations.ts`) are already imported by
+`conformance/schema.test.ts` the same way `docker-token-mutations.ts` is;
+neither new prefix introduces a new public identifier (both reuse the
+existing `cloudflare_api_token`/`huggingface_token` detector ids), so
+`public_api.rs` and the artifact inventory are unaffected; and no user-facing
+doc enumerates individual detector grammars outside the changelog and
+evidence files, consistent with existing convention.
+`scripts/record-artifact-inventory.py`'s `CURRENT_PUBLIC_API_REVIEW` still
+points at `docs/audits/beta4-candidate-public-contract-review.md` — this is
+the pre-existing, not-yet-blocking gap the first review already recorded,
+addressed when candidate preparation adds
+`beta5-candidate-public-contract-review.md`.
+
+No open defect remains that blocks candidate preparation. No version, tag,
+package publication, workflow dispatch, or release approval was performed by
+this review.
