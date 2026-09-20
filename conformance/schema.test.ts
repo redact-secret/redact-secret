@@ -379,7 +379,12 @@ const GRAMMAR_MUTATION_FAMILIES: readonly GrammarMutationFamily[] = [
     issue: "#372",
     seedId: HUGGINGFACE_TOKEN_EXACT_LENGTH_SEED_ID,
     generate: generateHuggingFaceTokenMutations,
-    isFullPartitionPositive: (operation) => operation === "identity" || operation === "digit-bearing",
+    // Issue #485 added `organization-token-prefix`, a second documented-prefix
+    // identity shape (`api_org_`, alongside `hf_`'s `identity`), so this no
+    // longer reduces to a single-positive binary partition; the direct
+    // analogue is `digitalocean-v1`'s `identityOperations` above (and issue
+    // #481's `cloudflare-token-checksum-suffix`, below).
+    identityOperations: ["identity", "digit-bearing", "organization-token-prefix"],
   },
   {
     grammar: "cloudflare-token-checksum-suffix",

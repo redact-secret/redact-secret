@@ -133,17 +133,44 @@ pub(super) const PYPI: KnownFormatProviderDetector = KnownFormatProviderDetector
 /// excludes `_`/`-`, an evidence-backed exclusion rather than merely a
 /// length shortfall. A dash in place of the documented underscore prefix, or
 /// any other undocumented prefix, is an intentional false negative.
+///
+/// Hugging Face organization API tokens in the `api_org_` namespace (issue
+/// #485, re-tiering `docs/audits/evidence/367/precision-contracts.json`,
+/// `families.huggingface-token.pending.organization-token` from T0 to T2):
+/// the #367 audit deferred `api_org_` not for an evidence gap but as a scope
+/// boundary ("adding a variant is a coverage change, not a precision fix"),
+/// while the evidence itself already matched the `hf_` variant's own T2
+/// bar. gitleaks 8.30.1 registers `api_org_` as its own
+/// `huggingface-organization-api-token` rule (34-byte letters-only body) and
+/// trufflehog 3.97.4 matches both `hf_` and `api_org_` under one
+/// `(?:hf_|api_org_)[a-zA-Z0-9]{34}` rule — the identical dual-tool,
+/// 34-byte-exact-length agreement, and the identical gitleaks/trufflehog
+/// letters-only-vs-union alphabet conflict, that already ties `hf_`'s own
+/// length and alphabet to "tool-agreement" and "support-policy" rather than
+/// provider documentation. No Hugging Face page documents `api_org_`'s
+/// grammar, but none documents `hf_`'s length or alphabet either — only its
+/// bare prefix, as a placeholder. `api_org_` is therefore adopted as a
+/// second [`PrefixShape`] over `hf_`'s identical body grammar, not new
+/// matching logic, and the alphabet conflict is resolved identically (union
+/// `[A-Za-z0-9]`, support-policy).
 const HUGGING_FACE_SIGNALS: [&str; 2] = ["huggingface-documented-prefix", "base62-exact-length"];
+const HUGGING_FACE_ORGANIZATION_SIGNALS: [&str; 2] = [
+    "huggingface-organization-documented-prefix",
+    "base62-exact-length",
+];
 
 pub(super) const HUGGING_FACE: KnownFormatProviderDetector = KnownFormatProviderDetector {
     id: "huggingface-token",
     type_name: "huggingface_token",
-    shapes: &[PrefixShape::exact(
-        "hf_",
-        34,
-        pattern::is_alnum,
-        &HUGGING_FACE_SIGNALS,
-    )],
+    shapes: &[
+        PrefixShape::exact("hf_", 34, pattern::is_alnum, &HUGGING_FACE_SIGNALS),
+        PrefixShape::exact(
+            "api_org_",
+            34,
+            pattern::is_alnum,
+            &HUGGING_FACE_ORGANIZATION_SIGNALS,
+        ),
+    ],
     boundary: pattern::is_alnum_dash,
 };
 
@@ -976,6 +1003,102 @@ mod tests {
         let mut body = HUGGING_FACE_BODY.to_string();
         body.replace_range(0..2, "42");
         let value = format!("hf_{body}");
+        assert_eq!(detect(&HUGGING_FACE, &value).len(), 1, "{value}");
+    }
+
+    /// Issue #485: `api_org_` is adopted over the identical `hf_` body
+    /// grammar (34-byte `[A-Za-z0-9]`). Detected at exactly the documented
+    /// range, and `hf_` stays unaffected by the added shape.
+    #[test]
+    fn huggingface_organization_token_detects_the_api_org_prefix_at_the_documented_shape() {
+        let value = format!("api_org_{HUGGING_FACE_BODY}");
+        let candidates = detect(&HUGGING_FACE, &value);
+        assert_eq!(candidates.len(), 1);
+        assert_eq!(candidates[0].type_name(), "huggingface_token");
+        assert_eq!(candidates[0].confidence(), Confidence::High);
+        assert_eq!(candidates[0].effective_specificity(), Specificity::Provider);
+        assert_eq!(
+            candidates[0].range(),
+            ByteRange::new(0, value.len()).unwrap()
+        );
+
+        let user_value = format!("hf_{HUGGING_FACE_BODY}");
+        assert_eq!(detect(&HUGGING_FACE, &user_value).len(), 1);
+    }
+
+    /// Issue #485: an `api_org_` value and an `hf_` value in the same input
+    /// are both reported, at their own ranges, without either shape
+    /// swallowing the other.
+    #[test]
+    fn huggingface_organization_token_and_user_token_are_both_reported_independently() {
+        let user_value = format!("hf_{HUGGING_FACE_BODY}");
+        let org_value = format!("api_org_{HUGGING_FACE_BODY}");
+        let input = format!("{user_value} {org_value}");
+        let candidates = detect(&HUGGING_FACE, &input);
+        assert_eq!(candidates.len(), 2);
+        assert_eq!(
+            candidates[0].range(),
+            ByteRange::new(0, user_value.len()).unwrap()
+        );
+        let org_start = input.find(&org_value).unwrap();
+        assert_eq!(
+            candidates[1].range(),
+            ByteRange::new(org_start, org_start + org_value.len()).unwrap()
+        );
+    }
+
+    /// Issue #485: the frozen contract's exact 34-byte body applies
+    /// identically to `api_org_`. A 33-byte body — the `api_org_` twin of
+    /// the beta.4 `huggingface-token-user-plain-twin` regression — is an
+    /// intentional false negative, and a 35-byte body is not misread as the
+    /// exact shape followed by a trailing byte.
+    #[test]
+    fn huggingface_organization_token_rejects_a_body_one_byte_off_the_documented_length() {
+        for body in [
+            &HUGGING_FACE_BODY[..HUGGING_FACE_BODY.len() - 1],
+            &format!("{HUGGING_FACE_BODY}A"),
+        ] {
+            let value = format!("api_org_{body}");
+            assert_eq!(detect(&HUGGING_FACE, &value).len(), 0, "{value}");
+        }
+    }
+
+    /// Issue #485: an ordinary identifier that begins `api_org_` but does
+    /// not carry the documented 34-byte body (for example, a variable or
+    /// key name) does not match.
+    #[test]
+    fn huggingface_organization_token_rejects_an_ordinary_non_conforming_identifier() {
+        for value in ["api_org_name", "api_org_id", "api_org_12345"] {
+            assert_eq!(detect(&HUGGING_FACE, value).len(), 0, "{value}");
+        }
+    }
+
+    /// Issue #485: the prefix embedded in a wider identifier, or the
+    /// documented-length body containing `_`/`-`, is rejected for
+    /// `api_org_` exactly as it already is for `hf_` (issue #372) — the
+    /// same tool-agreed exclusion, not a length shortfall.
+    #[test]
+    fn huggingface_organization_token_rejects_embedded_prefix_and_underscore_or_dash_in_body() {
+        let embedded = format!("legacyapi_org_{HUGGING_FACE_BODY}");
+        assert_eq!(detect(&HUGGING_FACE, &embedded).len(), 0);
+
+        for byte in ['_', '-'] {
+            let mut body = HUGGING_FACE_BODY.to_string();
+            body.replace_range(4..5, &byte.to_string());
+            let value = format!("api_org_{body}");
+            assert_eq!(detect(&HUGGING_FACE, &value).len(), 0, "{value}");
+        }
+    }
+
+    /// Issue #485: the `hf_`/`api_org_` alphabet conflict (gitleaks:
+    /// letters only; trufflehog: letters and digits) is resolved identically
+    /// to `hf_` (issue #372) — the union, as a support-policy choice — so a
+    /// digit-bearing `api_org_` body is still accepted.
+    #[test]
+    fn huggingface_organization_token_accepts_a_digit_bearing_documented_length_body() {
+        let mut body = HUGGING_FACE_BODY.to_string();
+        body.replace_range(0..2, "42");
+        let value = format!("api_org_{body}");
         assert_eq!(detect(&HUGGING_FACE, &value).len(), 1, "{value}");
     }
 

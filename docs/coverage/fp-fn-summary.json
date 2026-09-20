@@ -404,7 +404,7 @@
       "detector": "huggingface-token",
       "falseNegativeGuards": {
         "actualFalseNegatives": 0,
-        "count": 14,
+        "count": 17,
         "fixtureIds": [
           "huggingface-positive-digit-bearing-body",
           "huggingface-positive-dotenv",
@@ -412,6 +412,9 @@
           "huggingface-positive-json",
           "huggingface-positive-log",
           "huggingface-positive-markdown-delimiter",
+          "huggingface-positive-organization-token",
+          "huggingface-positive-organization-token-quoted",
+          "huggingface-positive-organization-token-unicode-crlf",
           "huggingface-positive-punctuation-adjacent",
           "huggingface-positive-qualified",
           "huggingface-positive-repeated-value",

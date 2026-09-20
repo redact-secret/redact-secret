@@ -422,6 +422,78 @@
       "disposition": "retained",
       "expectedRanges": [
         {
+          "end": 42,
+          "start": 0
+        }
+      ],
+      "id": "huggingface-incremental-organization-token-positive",
+      "kind": null,
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 42,
+          "start": 0
+        }
+      ],
+      "support": null,
+      "tier": null
+    },
+    {
+      "contexts": [],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/incremental",
+      "detector": "huggingface-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 74,
+          "start": 32
+        }
+      ],
+      "id": "huggingface-incremental-organization-token-quoted-positive",
+      "kind": null,
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 74,
+          "start": 32
+        }
+      ],
+      "support": null,
+      "tier": null
+    },
+    {
+      "contexts": [],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/incremental",
+      "detector": "huggingface-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 56,
+          "start": 14
+        }
+      ],
+      "id": "huggingface-incremental-organization-token-unicode-crlf-positive",
+      "kind": null,
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 56,
+          "start": 14
+        }
+      ],
+      "support": null,
+      "tier": null
+    },
+    {
+      "contexts": [],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/incremental",
+      "detector": "huggingface-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
           "end": 74,
           "start": 37
         }
@@ -4068,6 +4140,22 @@
       "detector": "huggingface-token",
       "disposition": "silent",
       "expectedRanges": [],
+      "id": "huggingface-boundary-organization-token-one-short",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "huggingface-token",
+      "disposition": "silent",
+      "expectedRanges": [],
       "id": "huggingface-boundary-short",
       "kind": "boundary",
       "lostRanges": [],
@@ -4560,6 +4648,84 @@
       "retainedRanges": [],
       "support": "intentionally-unsupported",
       "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "huggingface-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 42,
+          "start": 0
+        }
+      ],
+      "id": "huggingface-positive-organization-token",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 42,
+          "start": 0
+        }
+      ],
+      "support": "supported",
+      "tier": "canonical"
+    },
+    {
+      "contexts": [
+        "shell"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "huggingface-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 74,
+          "start": 32
+        }
+      ],
+      "id": "huggingface-positive-organization-token-quoted",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 74,
+          "start": 32
+        }
+      ],
+      "support": "supported",
+      "tier": "contextual"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "huggingface-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 56,
+          "start": 14
+        }
+      ],
+      "id": "huggingface-positive-organization-token-unicode-crlf",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 56,
+          "start": 14
+        }
+      ],
+      "support": "supported",
+      "tier": "contextual"
     },
     {
       "contexts": [
@@ -8615,9 +8781,9 @@
     },
     "huggingface-token": {
       "broad-shape": 0,
-      "retained": 21,
+      "retained": 27,
       "review": 0,
-      "silent": 28
+      "silent": 29
     },
     "linear-token": {
       "broad-shape": 0,

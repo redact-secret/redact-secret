@@ -554,7 +554,7 @@
     {
       "detector": "huggingface-token",
       "evidence": {
-        "fixtureCount": 44,
+        "fixtureCount": 48,
         "hostContextsExercised": [
           "dotenv",
           "http",
@@ -584,6 +584,9 @@
         "huggingface-positive-json",
         "huggingface-positive-log",
         "huggingface-positive-markdown-delimiter",
+        "huggingface-positive-organization-token",
+        "huggingface-positive-organization-token-quoted",
+        "huggingface-positive-organization-token-unicode-crlf",
         "huggingface-positive-punctuation-adjacent",
         "huggingface-positive-qualified",
         "huggingface-positive-repeated-value",
