@@ -7,83 +7,107 @@
 //! `docs/audits/evidence/367/precision-contracts.json`), replacing the
 //! earlier "recognized prefix plus a 20-byte minimum suffix" rule that
 //! accepted any long enough `xoxb-` value regardless of its internal
-//! structure:
+//! structure. Issue #512 completes the family on the same evidentiary bar:
 //!
 //! ```text
-//! xoxb-<10-13 [0-9]>-<10-13 [0-9]>-<18+ [A-Za-z0-9]>   bot
+//! xoxb-<10-13 [0-9]>-<10-13 [0-9]>-<18+ [A-Za-z0-9]>              bot
+//! xoxp-<10-13 [0-9]>-<10-13 [0-9]>-<10-13 [0-9]>-<28+ [A-Za-z0-9]>  user
+//! xoxe-<1 [0-9]>-<20+ [A-Za-z0-9_-]>                              refresh
+//! xoxe.xoxb-<1 [0-9]>-<20+ [A-Za-z0-9_-]>                         rotating bot
+//! xoxe.xoxp-<1 [0-9]>-<20+ [A-Za-z0-9_-]>                         rotating user
 //! ```
 //!
-//! The two numeric section widths are tool-corroborated; the provider
-//! establishes only that sections are `-`-separated, which is why a value
-//! whose second numeric section runs straight into the secret with no
-//! separator — accepted by both baseline scanners' bare `[a-zA-Z0-9-]*`
-//! tail, and by beta.4's own minimum-length rule — is rejected here. The
-//! secret's 18-byte floor is a support-policy choice (the smallest bot
-//! secret width any consulted tool accepts); the provider documents no bot
-//! secret length.
+//! (`docs/decisions/2026-09-20-freeze-slack-user-and-rotation-token-grammar.md`).
+//! Every numeric section width above is tool-corroborated (gitleaks and
+//! trufflehog both use `10-13` for every Slack `-`-separated numeric
+//! section they recognize); the provider establishes only that sections are
+//! `-`-separated. The user secret's 28-byte floor is gitleaks'
+//! `slack-user-token` lower bound; the provider shows one full 32-byte
+//! example (`d6bc768406e5c2e6958cfc399b438004`,
+//! <https://docs.slack.dev/authentication/tokens>, observed 2026-09-20) but
+//! states no length rule, and pre-2016 6/10-byte secrets are documented as
+//! still rotatable. The rotation family's single-digit version section
+//! reproduces every provider example verbatim (`xoxe-1-...`,
+//! `xoxe.xoxb-1-...`, `xoxe.xoxp-1-1234-...`,
+//! <https://docs.slack.dev/authentication/using-token-rotation/>, observed
+//! 2026-09-20) and gitleaks' config-access/-refresh-token rules encode the
+//! same single digit; the body that follows keeps beta.4's opaque
+//! `[A-Za-z0-9_-]` interim guard and 20-byte minimum unchanged, since
+//! neither source constrains it (`xoxe.xoxp-`'s own extra `-1234-` section
+//! is a single uncorroborated example and is not decomposed further).
 //!
-//! Every other documented prefix (`xoxp-`, `xapp-`, `xwfp-`, `xoxe-`,
-//! `xoxe.xoxb-`, `xoxe.xoxp-`) keeps beta.4's rule unchanged as a separate
-//! interim guard, per prefix: none of them were measured flagging a
-//! must-not-flag twin, and their own section grammars are recorded as
-//! pending evidence, not adopted. The `regex` crate cannot be used here —
-//! this crate is dependency-free — so [`scan_bot`] and the interim guard
-//! compose the shape from the shared `pattern` primitives, the same way
-//! [`super::openai`] does for its own segmented grammar.
+//! `xapp-` and `xwfp-` keep beta.4's rule unchanged as a plain interim
+//! guard: `xapp-`'s only candidate structure is a single uncorroborated
+//! tool source (gitleaks, case-insensitive) and `xwfp-` has no tool source
+//! at all, so neither clears this project's two-source (or
+//! provider-plus-tool) bar for a structural contract
+//! (`docs/audits/evidence/367/precision-contracts.json`,
+//! `slack-token.variants[app-level|workflow]`). The `regex` crate cannot be
+//! used here — this crate is dependency-free — so [`scan_sectioned`] and the
+//! interim guard compose every shape from the shared `pattern` primitives,
+//! the same way [`super::openai`] does for its own segmented grammar.
 
 use crate::detectors::pattern::{self, Alphabet, PrefixShape};
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
 
 const BOT_PREFIX: &str = "xoxb-";
-/// What precedes `xoxb-` in the rotating `xoxe.xoxb-` interim prefix.
+const USER_PREFIX: &str = "xoxp-";
+const REFRESH_PREFIX: &str = "xoxe-";
+const ROTATING_BOT_PREFIX: &str = "xoxe.xoxb-";
+const ROTATING_USER_PREFIX: &str = "xoxe.xoxp-";
+/// What precedes `xoxb-` in the rotating `xoxe.xoxb-` prefix: the plain bot
+/// scan skips a `xoxb-` occurrence here so it is left to the rotating-bot
+/// scan instead of being read twice.
 const ROTATING_LEAD: &str = "xoxe.";
-/// Each numeric section's documented width (tool-agreement; the provider
+
+const DIGIT_ALPHABET: Alphabet = pattern::is_digit;
+/// Each numeric ID section's documented width, shared by the bot and user
+/// grammars (tool-agreement: gitleaks and trufflehog both use `10-13` for
+/// every Slack `-`-separated numeric section they recognize; the provider
 /// establishes only that sections are `-`-separated).
-const BOT_SECTION_MIN: usize = 10;
-const BOT_SECTION_MAX: usize = 13;
+const SECTION_MIN: usize = 10;
+const SECTION_MAX: usize = 13;
 /// Support-policy floor for the bot secret section: the smallest bot-secret
 /// width any consulted tool accepts (gitleaks' legacy-bot rule, 18).
 const BOT_SECRET_MIN: usize = 18;
-const BOT_DIGIT_ALPHABET: Alphabet = pattern::is_digit;
-/// The secret section's alphabet is `[A-Za-z0-9]`, narrower than the
-/// `[A-Za-z0-9_-]` boundary: a trailing `_` or `-` still rejects a truncated
-/// candidate instead of being folded into the secret.
-const BOT_SECRET_ALPHABET: Alphabet = pattern::is_alnum;
+/// Support-policy floor for the user secret section: gitleaks'
+/// `slack-user-token` lower bound (`{28,34}`); see the module doc for why no
+/// exact length is adopted.
+const USER_SECRET_MIN: usize = 28;
+/// `[A-Za-z0-9]`, narrower than the `[A-Za-z0-9_-]` boundary, shared by the
+/// bot and user secret sections: a trailing `_` or `-` still rejects a
+/// truncated candidate instead of being folded into the secret.
+const SECRET_ALPHABET: Alphabet = pattern::is_alnum;
 const BOT_SIGNALS: [&str; 2] = ["slack-documented-prefix", "bot-section-grammar"];
+const USER_SIGNALS: [&str; 2] = ["slack-documented-prefix", "user-section-grammar"];
 
-/// Every other documented prefix, unchanged from beta.4.
+/// The rotation family's documented version section (see the module doc).
+const ROTATION_DIGIT_WIDTH: usize = 1;
+const ROTATION_TAIL_MIN: usize = 20;
+const ROTATION_TAIL_ALPHABET: Alphabet = pattern::is_alnum_dash;
+const ROTATION_SIGNALS: [&str; 2] = ["slack-documented-prefix", "rotation-version-section"];
+const ROTATION_PREFIXES: [&str; 3] = [REFRESH_PREFIX, ROTATING_BOT_PREFIX, ROTATING_USER_PREFIX];
+
+/// `xapp-` and `xwfp-`, unchanged from beta.4 (see the module doc for why
+/// neither is promoted).
 const INTERIM_MIN_LEN: usize = 20;
 const INTERIM_ALPHABET: Alphabet = pattern::is_alnum_dash;
 const INTERIM_SIGNALS: [&str; 2] = ["slack-documented-prefix", "opaque-suffix"];
-const INTERIM_SHAPES: [PrefixShape<'static>; 6] = [
-    PrefixShape::at_least("xoxp-", INTERIM_MIN_LEN, INTERIM_ALPHABET, &INTERIM_SIGNALS),
+const INTERIM_SHAPES: [PrefixShape<'static>; 2] = [
     PrefixShape::at_least("xapp-", INTERIM_MIN_LEN, INTERIM_ALPHABET, &INTERIM_SIGNALS),
     PrefixShape::at_least("xwfp-", INTERIM_MIN_LEN, INTERIM_ALPHABET, &INTERIM_SIGNALS),
-    PrefixShape::at_least("xoxe-", INTERIM_MIN_LEN, INTERIM_ALPHABET, &INTERIM_SIGNALS),
-    PrefixShape::at_least(
-        "xoxe.xoxb-",
-        INTERIM_MIN_LEN,
-        INTERIM_ALPHABET,
-        &INTERIM_SIGNALS,
-    ),
-    PrefixShape::at_least(
-        "xoxe.xoxp-",
-        INTERIM_MIN_LEN,
-        INTERIM_ALPHABET,
-        &INTERIM_SIGNALS,
-    ),
 ];
 
 /// A value is never a slice of a wider `[A-Za-z0-9_-]` identifier.
 const BOUNDARY: Alphabet = pattern::is_alnum_dash;
 
-/// Requires the `xoxb-` bot form to carry its full section grammar; every
-/// other documented prefix keeps the beta.4 interim guard. A value that
-/// merely starts with a documented prefix and is long enough, but whose
-/// `xoxb-` body has no separator before the secret section, is not
-/// classified; a contextual assignment carrying one can still surface
-/// through `generic-token`.
+/// Requires `xoxb-`, `xoxp-`, and every `xoxe`-rooted rotation prefix to
+/// carry their full documented section grammar; `xapp-` and `xwfp-` keep
+/// the beta.4 interim guard. A value that merely starts with a documented
+/// prefix and is long enough, but is missing a required section separator,
+/// is not classified; a contextual assignment carrying one can still
+/// surface through `generic-token`.
 pub(super) struct SlackTokenDetector;
 
 impl Detector for SlackTokenDetector {
@@ -111,16 +135,36 @@ impl Detector for SlackTokenDetector {
     }
 }
 
-/// Every match, `xoxb-` bot values and interim-guarded prefixes together,
-/// left to right by start offset. The only prefix that contains another is
-/// `xoxe.xoxb-`, which [`scan_bot`] leaves to the interim guard, so scanning
-/// each family independently and merging by position reproduces the same
-/// left-to-right, longest-prefix result a single combined scan would.
+/// Every match, structural and interim-guarded prefixes together, left to
+/// right by start offset. The only prefix that contains another is
+/// `xoxe.xoxb-`, which [`scan_sectioned`]'s bot pass leaves to its own
+/// rotating-bot pass (`ROTATING_LEAD`), so scanning each family
+/// independently and merging by position reproduces the same left-to-right,
+/// longest-prefix result a single combined scan would.
 fn scan(input: &str) -> Vec<(usize, usize, &'static [&'static str])> {
     let mut matches: Vec<(usize, usize, &'static [&'static str])> = scan_bot(input)
         .into_iter()
         .map(|(start, end)| (start, end, BOT_SIGNALS.as_slice()))
         .collect();
+    matches.extend(
+        scan_user(input)
+            .into_iter()
+            .map(|(start, end)| (start, end, USER_SIGNALS.as_slice())),
+    );
+    let rotation_shape = SectionedShape {
+        section_count: 1,
+        digit_min: ROTATION_DIGIT_WIDTH,
+        digit_max: ROTATION_DIGIT_WIDTH,
+        tail_min: ROTATION_TAIL_MIN,
+        tail_alphabet: ROTATION_TAIL_ALPHABET,
+    };
+    for prefix in ROTATION_PREFIXES {
+        matches.extend(
+            scan_sectioned(input, prefix, None, rotation_shape)
+                .into_iter()
+                .map(|(start, end)| (start, end, ROTATION_SIGNALS.as_slice())),
+        );
+    }
     matches.extend(pattern::scan_prefixed_shapes(
         input,
         &INTERIM_SHAPES,
@@ -130,26 +174,82 @@ fn scan(input: &str) -> Vec<(usize, usize, &'static [&'static str])> {
     matches
 }
 
-/// Every boundary-delimited `xoxb-` bot value, left to right. A failed
-/// attempt advances by one byte; a shape-complete attempt advances past the
-/// whole value whether or not the boundary check keeps it, so a wider
-/// identifier that embeds a bot prefix never yields a second, shorter
-/// reading of the same bytes. A `xoxb-` that is the tail of the rotating
-/// `xoxe.xoxb-` prefix belongs to the interim guard and is skipped.
+/// Every boundary-delimited `xoxb-` bot value, left to right: two 10-13
+/// digit sections then an 18+ byte alnum secret. A `xoxb-` that is the tail
+/// of the rotating `xoxe.xoxb-` prefix belongs to that separate scan and is
+/// skipped here.
 fn scan_bot(input: &str) -> Vec<(usize, usize)> {
+    scan_sectioned(
+        input,
+        BOT_PREFIX,
+        Some(ROTATING_LEAD),
+        SectionedShape {
+            section_count: 2,
+            digit_min: SECTION_MIN,
+            digit_max: SECTION_MAX,
+            tail_min: BOT_SECRET_MIN,
+            tail_alphabet: SECRET_ALPHABET,
+        },
+    )
+}
+
+/// Every boundary-delimited `xoxp-` user value, left to right: three 10-13
+/// digit sections then a 28+ byte alnum secret.
+fn scan_user(input: &str) -> Vec<(usize, usize)> {
+    scan_sectioned(
+        input,
+        USER_PREFIX,
+        None,
+        SectionedShape {
+            section_count: 3,
+            digit_min: SECTION_MIN,
+            digit_max: SECTION_MAX,
+            tail_min: USER_SECRET_MIN,
+            tail_alphabet: SECRET_ALPHABET,
+        },
+    )
+}
+
+/// `section_count` `-`-separated digit sections (each within `[digit_min,
+/// digit_max]` bytes) followed by a `tail_min`-or-more run of
+/// `tail_alphabet`: the shape every documented Slack token family reduces
+/// to once its own section count and widths are known.
+#[derive(Clone, Copy)]
+struct SectionedShape {
+    section_count: usize,
+    digit_min: usize,
+    digit_max: usize,
+    tail_min: usize,
+    tail_alphabet: Alphabet,
+}
+
+/// Every boundary-delimited `prefix` value whose body matches `shape`, left
+/// to right. A failed attempt advances by one byte; a shape-complete
+/// attempt advances past the whole value whether or not the boundary check
+/// keeps it, so a wider identifier that embeds `prefix` never yields a
+/// second, shorter reading of the same bytes. `skip_if_preceded_by`, when
+/// set, skips a `prefix` occurrence that is itself the tail of a longer,
+/// more specific prefix scanned separately.
+fn scan_sectioned(
+    input: &str,
+    prefix: &str,
+    skip_if_preceded_by: Option<&str>,
+    shape: SectionedShape,
+) -> Vec<(usize, usize)> {
     let bytes = input.as_bytes();
-    let digit_ends = pattern::run_ends(bytes, BOT_DIGIT_ALPHABET);
-    let secret_ends = pattern::run_ends(bytes, BOT_SECRET_ALPHABET);
+    let digit_ends = pattern::run_ends(bytes, DIGIT_ALPHABET);
+    let tail_ends = pattern::run_ends(bytes, shape.tail_alphabet);
     let mut matches = Vec::new();
     let mut start = 0;
     while start < bytes.len() {
-        if !bytes[start..].starts_with(BOT_PREFIX.as_bytes())
-            || bytes[..start].ends_with(ROTATING_LEAD.as_bytes())
-        {
+        let skip =
+            skip_if_preceded_by.is_some_and(|lead| bytes[..start].ends_with(lead.as_bytes()));
+        if skip || !bytes[start..].starts_with(prefix.as_bytes()) {
             start += 1;
             continue;
         }
-        let Some(end) = bot_end(bytes, &digit_ends, &secret_ends, start + BOT_PREFIX.len()) else {
+        let Some(end) = sectioned_end(bytes, &digit_ends, &tail_ends, start + prefix.len(), shape)
+        else {
             start += 1;
             continue;
         };
@@ -161,43 +261,43 @@ fn scan_bot(input: &str) -> Vec<(usize, usize)> {
     matches
 }
 
-/// `<10-13 digits>-<10-13 digits>-<18+ alnum>` starting at `body_start`: the
-/// three `-`-separated sections the provider documents, the last being the
-/// secret. Because each run is maximal, a section wider than its documented
-/// range is rejected rather than truncated, and a missing separator before
-/// the secret section is rejected too, rather than being re-read as a
-/// longer second numeric section.
-fn bot_end(
+/// The end of `shape`'s `-`-separated digit sections followed by its tail
+/// run, starting at `cursor`. Because each run is maximal, a
+/// section wider than `shape.digit_max` is rejected rather than truncated,
+/// and a missing separator anywhere is rejected too, rather than being
+/// re-read as part of a wider section or the tail.
+fn sectioned_end(
     bytes: &[u8],
     digit_ends: &[usize],
-    secret_ends: &[usize],
-    body_start: usize,
+    tail_ends: &[usize],
+    mut cursor: usize,
+    shape: SectionedShape,
 ) -> Option<usize> {
-    let section_1_end = digit_section_end(digit_ends, body_start)?;
-    if bytes.get(section_1_end) != Some(&b'-') {
+    for _ in 0..shape.section_count {
+        let section_end = digit_section_end(digit_ends, cursor, shape.digit_min, shape.digit_max)?;
+        if bytes.get(section_end) != Some(&b'-') {
+            return None;
+        }
+        cursor = section_end + 1;
+    }
+    let tail_end = tail_ends[cursor];
+    if tail_end - cursor < shape.tail_min {
         return None;
     }
-    let section_2_start = section_1_end + 1;
-    let section_2_end = digit_section_end(digit_ends, section_2_start)?;
-    if bytes.get(section_2_end) != Some(&b'-') {
-        return None;
-    }
-    let secret_start = section_2_end + 1;
-    let secret_end = secret_ends[secret_start];
-    if secret_end - secret_start < BOT_SECRET_MIN {
-        return None;
-    }
-    Some(secret_end)
+    Some(tail_end)
 }
 
 /// The end of the maximal digit run starting at `start`, only when its
-/// length falls within the documented `10..=13` width.
-fn digit_section_end(digit_ends: &[usize], start: usize) -> Option<usize> {
+/// length falls within `[digit_min, digit_max]`.
+fn digit_section_end(
+    digit_ends: &[usize],
+    start: usize,
+    digit_min: usize,
+    digit_max: usize,
+) -> Option<usize> {
     let end = digit_ends[start];
     let len = end - start;
-    (BOT_SECTION_MIN..=BOT_SECTION_MAX)
-        .contains(&len)
-        .then_some(end)
+    (digit_min..=digit_max).contains(&len).then_some(end)
 }
 
 #[cfg(test)]
@@ -265,7 +365,7 @@ mod tests {
 
     #[test]
     fn accepts_every_documented_numeric_width_from_ten_to_thirteen() {
-        for len in BOT_SECTION_MIN..=BOT_SECTION_MAX {
+        for len in SECTION_MIN..=SECTION_MAX {
             let section = "7".repeat(len);
             let input = format!("xoxb-{section}-{section}-SYNTHETICREVOKEDBOTSECRET1");
             assert_eq!(ranges(&input), vec![(0, input.len())], "{len}");
@@ -299,70 +399,6 @@ mod tests {
     }
 
     #[test]
-    fn interim_prefixes_keep_the_beta4_minimum_length_rule_unchanged() {
-        for (prefix, len) in [
-            ("xoxp-", 20),
-            ("xapp-", 20),
-            ("xwfp-", 20),
-            ("xoxe-", 20),
-            ("xoxe.xoxb-", 20),
-            ("xoxe.xoxp-", 20),
-        ] {
-            let body = "SYNTHETICREVOKEDINTERIMVALUE0123456789";
-            let input = format!("{prefix}{}", &body[..len]);
-            assert_eq!(ranges(&input), vec![(0, input.len())], "{prefix}");
-            let one_short = format!("{prefix}{}", &body[..len - 1]);
-            assert!(ranges(&one_short).is_empty(), "{prefix} one-short");
-        }
-    }
-
-    /// Issue #321 dimensions, carried over from `additional_providers.rs`
-    /// for Slack's interim-guarded prefixes now that Slack has moved to its
-    /// own module (issue #371).
-    #[test]
-    fn interim_prefixes_accept_an_all_valid_alphabet_documentation_placeholder() {
-        let value = format!("xoxp-{}", "x".repeat(20));
-        let candidates = detect(&value);
-        assert_eq!(candidates.len(), 1);
-        assert_eq!(candidates[0].confidence(), Confidence::High);
-    }
-
-    #[test]
-    fn interim_prefixes_reject_the_prefix_embedded_in_a_wider_identifier() {
-        let value = "legacyxoxp-SYNTHETIC_REVOKED_KEY_VALUE";
-        assert!(ranges(value).is_empty());
-    }
-
-    #[test]
-    fn interim_prefixes_reject_a_percent_encoded_delimiter_lookalike() {
-        let value = "xoxp%2DSYNTHETIC_REVOKED_CONFORMANCE_KEY";
-        assert!(ranges(value).is_empty());
-    }
-
-    #[test]
-    fn interim_prefixes_report_a_repeated_identical_value_once_per_occurrence() {
-        let value = "xoxp-SYNTHETIC_REVOKED_KEY_VALUE";
-        let input = format!("{value} {value}");
-        assert_eq!(detect(&input).len(), 2);
-    }
-
-    #[test]
-    fn the_longest_matching_interim_prefix_wins_at_a_shared_position() {
-        let body = "SYNTHETICREVOKEDINTERIMVALUE0123456789";
-        for prefix in ["xoxe-", "xoxe.xoxb-", "xoxe.xoxp-"] {
-            let input = format!("{prefix}{body}");
-            assert_eq!(ranges(&input), vec![(0, input.len())], "{prefix}");
-        }
-    }
-
-    #[test]
-    fn a_rotating_bot_value_with_a_valid_bot_body_is_one_whole_value_match() {
-        let input = "xoxe.xoxb-1234567890-1234567890-SYNTHETICREVOKED00";
-        assert_eq!(ranges(input), vec![(0, input.len())]);
-        assert!(ranges(&format!("a{input}")).is_empty());
-    }
-
-    #[test]
     fn a_bot_section_grammar_failure_never_falls_back_to_the_interim_guard() {
         // A long enough `xoxb-` body with no `-`-separated section grammar
         // at all.
@@ -370,18 +406,234 @@ mod tests {
         assert!(ranges(input).is_empty());
     }
 
+    /// A synthetic, never-issued user token at exactly the documented shape:
+    /// three 13-digit sections and a 32-byte secret, the length of the
+    /// provider's own example secret
+    /// (`d6bc768406e5c2e6958cfc399b438004`,
+    /// <https://docs.slack.dev/authentication/tokens>, observed 2026-09-20).
+    const USER_POSITIVE: &str =
+        "xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1";
+    /// The same value with the separator before the secret section removed.
+    const USER_NO_SEPARATOR_TWIN: &str =
+        "xoxp-1234567890123-3210987654321-1112223334445SYNTHETICREVOKEDUSERSECRETVALUE1";
+
+    #[test]
+    fn the_user_canonical_literal_is_the_documented_shape() {
+        assert_eq!(USER_POSITIVE.len(), 5 + 13 + 1 + 13 + 1 + 13 + 1 + 32);
+        assert_ne!(USER_POSITIVE, USER_NO_SEPARATOR_TWIN);
+        assert_eq!(USER_NO_SEPARATOR_TWIN.len(), USER_POSITIVE.len() - 1);
+    }
+
+    #[test]
+    fn detects_the_user_form_with_exact_metadata() {
+        let candidates = detect(USER_POSITIVE);
+        assert_eq!(candidates.len(), 1);
+        assert_eq!(candidates[0].type_name(), "slack_token");
+        assert_eq!(candidates[0].confidence(), Confidence::High);
+        assert_eq!(candidates[0].effective_specificity(), Specificity::Provider);
+        assert_eq!(
+            candidates[0].range(),
+            ByteRange::new(0, USER_POSITIVE.len()).unwrap()
+        );
+    }
+
+    #[test]
+    fn rejects_a_user_value_missing_the_dash_before_the_secret_section() {
+        assert!(ranges(USER_NO_SEPARATOR_TWIN).is_empty());
+    }
+
+    #[test]
+    fn rejects_a_user_numeric_section_one_byte_off_from_the_documented_width() {
+        for bad_len in [9, 14] {
+            let bad = "1".repeat(bad_len);
+            let good = "1".repeat(SECTION_MIN);
+            let input = format!("xoxp-{bad}-{good}-{good}-SYNTHETICREVOKEDUSERSECRETVALUE1");
+            assert!(ranges(&input).is_empty(), "{bad_len}");
+        }
+    }
+
+    #[test]
+    fn accepts_every_documented_numeric_width_from_ten_to_thirteen_for_the_user_form() {
+        for len in SECTION_MIN..=SECTION_MAX {
+            let section = "7".repeat(len);
+            let input =
+                format!("xoxp-{section}-{section}-{section}-SYNTHETICREVOKEDUSERSECRETVALUE1");
+            assert_eq!(ranges(&input), vec![(0, input.len())], "{len}");
+        }
+    }
+
+    #[test]
+    fn rejects_a_user_secret_section_one_byte_short_of_the_twenty_eight_byte_floor() {
+        let short_secret = "S".repeat(USER_SECRET_MIN - 1);
+        let input = format!("xoxp-1234567890123-3210987654321-1112223334445-{short_secret}");
+        assert!(ranges(&input).is_empty());
+    }
+
+    #[test]
+    fn accepts_a_user_secret_section_at_exactly_the_twenty_eight_byte_floor() {
+        let secret = "S".repeat(USER_SECRET_MIN);
+        let input = format!("xoxp-1234567890123-3210987654321-1112223334445-{secret}");
+        assert_eq!(ranges(&input), vec![(0, input.len())]);
+    }
+
+    #[test]
+    fn rejects_a_user_secret_section_containing_a_dash_or_underscore() {
+        // The secret alphabet is `[A-Za-z0-9]` only, narrower than the
+        // `[A-Za-z0-9_-]` boundary, the same choice the bot secret makes.
+        for byte in ['_', '-'] {
+            let mut secret = "S".repeat(USER_SECRET_MIN);
+            secret.replace_range(5..6, &byte.to_string());
+            let input = format!("xoxp-1234567890123-3210987654321-1112223334445-{secret}");
+            assert!(ranges(&input).is_empty(), "{byte}");
+        }
+    }
+
+    #[test]
+    fn a_user_section_grammar_failure_never_falls_back_to_the_interim_guard() {
+        // A long enough `xoxp-` body with no `-`-separated section grammar
+        // at all: the shape the pre-#512 interim guard used to accept.
+        let input = "xoxp-SYNTHETICREVOKEDINTERIMVALUE0123456789";
+        assert!(ranges(input).is_empty());
+    }
+
     #[test]
     fn detects_every_variant_in_the_same_input_without_one_suppressing_another() {
-        let interim = "xoxp-SYNTHETICREVOKEDINTERIMVALUE01234567";
-        let input = format!("{BOT_POSITIVE}\n{interim}");
+        let input = format!("{BOT_POSITIVE}\n{USER_POSITIVE}");
         let second_start = BOT_POSITIVE.len() + 1;
         assert_eq!(
             ranges(&input),
             vec![
                 (0, BOT_POSITIVE.len()),
-                (second_start, second_start + interim.len())
+                (second_start, second_start + USER_POSITIVE.len())
             ]
         );
+    }
+
+    #[test]
+    fn rotation_prefixes_require_the_documented_single_digit_version_section() {
+        let tail = "SYNTHETICREVOKEDROTATIONVALUE01234";
+        for prefix in ["xoxe-", "xoxe.xoxb-", "xoxe.xoxp-"] {
+            let input = format!("{prefix}1-{tail}");
+            assert_eq!(ranges(&input), vec![(0, input.len())], "{prefix}");
+        }
+    }
+
+    #[test]
+    fn rotation_prefixes_reject_a_version_section_of_zero_or_two_digits() {
+        let tail = "SYNTHETICREVOKEDROTATIONVALUE01234";
+        for prefix in ["xoxe-", "xoxe.xoxb-", "xoxe.xoxp-"] {
+            // Zero digits: the shape the pre-#512 interim guard used to
+            // accept via its bare opaque-suffix rule.
+            let no_digit = format!("{prefix}{tail}");
+            assert!(ranges(&no_digit).is_empty(), "{prefix} zero-digit");
+            // Two digits: every provider example shows exactly one.
+            let two_digit = format!("{prefix}12-{tail}");
+            assert!(ranges(&two_digit).is_empty(), "{prefix} two-digit");
+        }
+    }
+
+    #[test]
+    fn rotation_prefixes_keep_the_beta4_twenty_byte_body_floor_after_the_version_section() {
+        let body = "SYNTHETICREVOKEDINTERIMVALUE0123456789";
+        for prefix in ["xoxe-", "xoxe.xoxb-", "xoxe.xoxp-"] {
+            let input = format!("{prefix}1-{}", &body[..ROTATION_TAIL_MIN]);
+            assert_eq!(ranges(&input), vec![(0, input.len())], "{prefix}");
+            let one_short = format!("{prefix}1-{}", &body[..ROTATION_TAIL_MIN - 1]);
+            assert!(ranges(&one_short).is_empty(), "{prefix} one-short");
+        }
+    }
+
+    #[test]
+    fn every_rotation_prefix_is_detected_independently_in_the_same_input() {
+        let tail = "SYNTHETICREVOKEDROTATIONVALUE01234";
+        let refresh = format!("xoxe-1-{tail}");
+        let rotating_bot = format!("xoxe.xoxb-1-{tail}");
+        let rotating_user = format!("xoxe.xoxp-1-{tail}");
+        let input = format!("{refresh}\n{rotating_bot}\n{rotating_user}");
+        let second_start = refresh.len() + 1;
+        let third_start = second_start + rotating_bot.len() + 1;
+        assert_eq!(
+            ranges(&input),
+            vec![
+                (0, refresh.len()),
+                (second_start, second_start + rotating_bot.len()),
+                (third_start, third_start + rotating_user.len())
+            ]
+        );
+    }
+
+    #[test]
+    fn a_bot_shaped_body_under_the_rotating_bot_prefix_is_not_reread_as_a_plain_bot_value() {
+        // The `xoxb-` tail of this value is itself a structurally valid bot
+        // token, but it is the tail of the more specific `xoxe.xoxb-`
+        // prefix, whose own rotation grammar this body does not satisfy
+        // (the version section is 13 digits, not the documented one), so it
+        // must not fall back to being read as a standalone bot match.
+        let input = "xoxe.xoxb-1234567890123-3210987654321-SYNTHETICREVOKEDBOTSECRET1";
+        assert!(ranges(input).is_empty());
+    }
+
+    #[test]
+    fn a_rotating_bot_value_matching_the_documented_shape_is_one_whole_value_match() {
+        let input = "xoxe.xoxb-1-SYNTHETICREVOKEDROTATIONVALUE01234";
+        assert_eq!(ranges(input), vec![(0, input.len())]);
+        assert!(ranges(&format!("a{input}")).is_empty());
+    }
+
+    #[test]
+    fn interim_prefixes_keep_the_beta4_minimum_length_rule_unchanged() {
+        for prefix in ["xapp-", "xwfp-"] {
+            let body = "SYNTHETICREVOKEDINTERIMVALUE0123456789";
+            let input = format!("{prefix}{}", &body[..INTERIM_MIN_LEN]);
+            assert_eq!(ranges(&input), vec![(0, input.len())], "{prefix}");
+            let one_short = format!("{prefix}{}", &body[..INTERIM_MIN_LEN - 1]);
+            assert!(ranges(&one_short).is_empty(), "{prefix} one-short");
+        }
+    }
+
+    /// Issue #321 dimensions, carried over from `additional_providers.rs`
+    /// for Slack's still-interim-guarded prefixes (issue #371 moved Slack
+    /// to its own module; issue #512 promoted every other prefix to a
+    /// structural contract, leaving only `xapp-`/`xwfp-` here).
+    #[test]
+    fn interim_prefixes_accept_an_all_valid_alphabet_documentation_placeholder() {
+        let value = format!("xapp-{}", "x".repeat(20));
+        let candidates = detect(&value);
+        assert_eq!(candidates.len(), 1);
+        assert_eq!(candidates[0].confidence(), Confidence::High);
+    }
+
+    #[test]
+    fn interim_prefixes_reject_the_prefix_embedded_in_a_wider_identifier() {
+        let value = "legacyxapp-SYNTHETIC_REVOKED_KEY_VALUE";
+        assert!(ranges(value).is_empty());
+    }
+
+    #[test]
+    fn interim_prefixes_reject_a_percent_encoded_delimiter_lookalike() {
+        let value = "xapp%2DSYNTHETIC_REVOKED_CONFORMANCE_KEY";
+        assert!(ranges(value).is_empty());
+    }
+
+    #[test]
+    fn interim_prefixes_report_a_repeated_identical_value_once_per_occurrence() {
+        let value = "xapp-SYNTHETIC_REVOKED_KEY_VALUE";
+        let input = format!("{value} {value}");
+        assert_eq!(detect(&input).len(), 2);
+    }
+
+    #[test]
+    fn xapp_and_xwfp_are_not_promoted_to_a_digit_section_grammar() {
+        // Issue #512: `xapp-`'s only candidate structure is a single
+        // uncorroborated tool source and `xwfp-` has no tool source at all
+        // (docs/audits/evidence/367/precision-contracts.json,
+        // `slack-token.variants[app-level|workflow]`), so a value shaped
+        // like the bot/user digit-section grammar is still accepted by the
+        // plain opaque-suffix guard rather than being required to have one.
+        for prefix in ["xapp-", "xwfp-"] {
+            let input = format!("{prefix}1234567890123-3210987654321-SYNTHETICREVOKED1");
+            assert_eq!(ranges(&input), vec![(0, input.len())], "{prefix}");
+        }
     }
 
     #[test]

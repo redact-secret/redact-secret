@@ -893,6 +893,8 @@
     "slack-boundary-missing-first-separator",
     "slack-boundary-missing-second-separator",
     "slack-boundary-replaced-separator",
+    "slack-boundary-rotation-two-digit-version",
+    "slack-boundary-rotation-zero-digit-version",
     "slack-boundary-secret-17-bytes",
     "slack-boundary-secret-alphabet-violation",
     "slack-boundary-segment1-14-digits",
@@ -900,6 +902,10 @@
     "slack-boundary-segment2-14-digits",
     "slack-boundary-segment2-9-digits",
     "slack-boundary-short",
+    "slack-boundary-user-missing-final-separator",
+    "slack-boundary-user-no-section-grammar",
+    "slack-boundary-user-secret-27-bytes",
+    "slack-boundary-user-segment-14-digits",
     "slack-negative-interim-below-min-floor",
     "slack-positive-doc-style-placeholder",
     "slack-positive-log",
@@ -918,7 +924,7 @@
     "issue": "https://github.com/redact-secret/redact-secret/issues/375",
     "synchronousCorpus": "conformance/fixtures/synchronous-corpus.json"
   },
-  "rowCount": 419,
+  "rowCount": 428,
   "rows": [
     {
       "contexts": [],
@@ -8024,6 +8030,44 @@
       "detector": "slack-token",
       "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
       "findingCount": 0,
+      "fixtureId": "slack-boundary-rotation-two-digit-version",
+      "kind": "boundary",
+      "note": "Issue #512: every provider rotation example shows exactly one digit before the next `-`; a two-digit version section is rejected rather than truncated to fit.",
+      "result": "silent",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "intentionally-unsupported"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractTier": "malformed",
+      "detector": "slack-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 0,
+      "fixtureId": "slack-boundary-rotation-zero-digit-version",
+      "kind": "boundary",
+      "note": "Issue #512: the shape the pre-#512 interim guard used to accept -- an opaque body with no leading digit section. Every provider rotation example (`xoxe-1-...`) shows the version section, so a body missing it entirely is now an intentional false negative.",
+      "result": "silent",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "intentionally-unsupported"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractTier": "malformed",
+      "detector": "slack-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 0,
       "fixtureId": "slack-boundary-secret-17-bytes",
       "kind": "boundary",
       "note": "The secret section is exactly 17 bytes, one below the documented 18-byte floor. Issue #375 boundary evidence.",
@@ -8151,6 +8195,82 @@
     },
     {
       "contexts": [
+        "plain-text"
+      ],
+      "contractTier": "malformed",
+      "detector": "slack-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 0,
+      "fixtureId": "slack-boundary-user-missing-final-separator",
+      "kind": "boundary",
+      "note": "Issue #512: the separator between the third numeric section and the secret is missing; the third section is still a valid 13-digit run, but with no `-` immediately after it the shape never resolves to the documented four-section grammar.",
+      "result": "silent",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "intentionally-unsupported"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractTier": "malformed",
+      "detector": "slack-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 0,
+      "fixtureId": "slack-boundary-user-no-section-grammar",
+      "kind": "boundary",
+      "note": "Issue #512: the user section grammar requires three `-`-separated 10-13 digit sections before the secret section; this value has none, so it is an intentional false negative, the same dimension issue #371 established for `xoxb-` (`slack-positive-qualified`).",
+      "result": "silent",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "intentionally-unsupported"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractTier": "malformed",
+      "detector": "slack-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 0,
+      "fixtureId": "slack-boundary-user-secret-27-bytes",
+      "kind": "boundary",
+      "note": "Issue #512: the secret section is exactly 27 bytes, one below the documented 28-byte floor (gitleaks' `slack-user-token` lower bound).",
+      "result": "silent",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "intentionally-unsupported"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractTier": "malformed",
+      "detector": "slack-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 0,
+      "fixtureId": "slack-boundary-user-segment-14-digits",
+      "kind": "boundary",
+      "note": "Issue #512: the first numeric section is 14 digits, one past the documented 10-13 range.",
+      "result": "silent",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "intentionally-unsupported"
+    },
+    {
+      "contexts": [
         "dotenv"
       ],
       "contractTier": "negative",
@@ -8216,7 +8336,7 @@
       "findingCount": 0,
       "fixtureId": "slack-negative-interim-below-min-floor",
       "kind": "boundary",
-      "note": "The retained interim `xoxp-` guard keeps beta.4's 20-byte minimum unchanged; a 19-byte body is one below that floor. Issue #375 checkbox 6: explicit boundary evidence for the rotating-forms guard alongside slack-positive-all-prefixes.",
+      "note": "The retained interim `xapp-` guard keeps beta.4's 20-byte minimum unchanged; a 19-byte body is one below that floor. Issue #375 checkbox 6: explicit boundary evidence for the still-interim-guarded prefixes alongside slack-positive-all-prefixes. Issue #512 promoted `xoxp-` to a structural contract, so this fixture was retargeted to `xapp-`, one of the two prefixes (with `xwfp-`) that remain interim-guarded.",
       "result": "silent",
       "runtimeConsumers": [
         "rust-core",
@@ -8303,6 +8423,44 @@
     },
     {
       "contexts": [
+        "plain-text"
+      ],
+      "contractTier": "negative",
+      "detector": "slack-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 0,
+      "fixtureId": "slack-negative-placeholder-rotation",
+      "kind": "negative",
+      "note": "Issue #512 benign control: a documentation placeholder value has no leading digit-version section and is not classified as a credential.",
+      "result": "silent",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "supported"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractTier": "negative",
+      "detector": "slack-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 0,
+      "fixtureId": "slack-negative-placeholder-user",
+      "kind": "negative",
+      "note": "Issue #512 benign control: a documentation placeholder value has no digit section grammar and is not classified as a credential.",
+      "result": "silent",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "supported"
+    },
+    {
+      "contexts": [
         "http"
       ],
       "contractTier": "negative",
@@ -8365,10 +8523,10 @@
       "contractTier": "contextual",
       "detector": "slack-token",
       "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
-      "findingCount": 6,
+      "findingCount": 2,
       "fixtureId": "slack-positive-all-prefixes",
       "kind": "positive",
-      "note": "Every remaining documented prefix variant is independently supported.",
+      "note": "Reclassified by issue #512 (docs/decisions/2026-09-20-freeze-slack-user-and-rotation-token-grammar.md): `xoxp-`, `xoxe-`, `xoxe.xoxb-`, and `xoxe.xoxp-` now require their own documented digit section, which none of these opaque bodies carry, so slack-token no longer claims them; `xapp-` and `xwfp-` are not promoted and still match at their original ranges. Input unchanged; expectation corrected. `slack-positive-structural-prefixes` is the corrected counterpart demonstrating every promoted family's full grammar.",
       "result": "flagged",
       "runtimeConsumers": [
         "rust-core",
@@ -8775,6 +8933,25 @@
       ],
       "scanMode": "synchronous",
       "support": "intentionally-unsupported"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractTier": "contextual",
+      "detector": "slack-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 4,
+      "fixtureId": "slack-positive-structural-prefixes",
+      "kind": "positive",
+      "note": "Issue #512 (docs/decisions/2026-09-20-freeze-slack-user-and-rotation-token-grammar.md): each of the four newly-promoted families (user, refresh, rotating-bot, rotating-user) is independently detected at its own full documented section grammar, the corrected counterpart of `slack-positive-all-prefixes` for these four prefixes.",
+      "result": "flagged",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "supported"
     },
     {
       "contexts": [
