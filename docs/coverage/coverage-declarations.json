@@ -962,6 +962,7 @@
             "stripe-positive-log",
             "stripe-positive-min-length",
             "stripe-positive-mixed-public-and-secret",
+            "stripe-positive-mixed-public-and-secret-sandbox-mode",
             "stripe-positive-qualified",
             "stripe-positive-yaml"
           ],
@@ -998,10 +999,15 @@
             "stripe-negative-interpolated-secret-prefix",
             "stripe-negative-lookalike",
             "stripe-negative-masked-secret-prefix",
+            "stripe-negative-no-rk-org-prefix",
             "stripe-negative-ordinary-reference",
             "stripe-negative-placeholder",
             "stripe-negative-public-prefix-punctuation",
+            "stripe-negative-public-prefix-sandbox-mode",
             "stripe-negative-public-prefix-unicode-crlf",
+            "stripe-negative-sk-org-missing-separator",
+            "stripe-negative-whsec-missing-separator",
+            "stripe-negative-whsec-wrong-separator",
             "stripe-negative-wrong-prefix"
           ],
           "state": "supported"

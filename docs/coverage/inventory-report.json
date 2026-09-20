@@ -430,7 +430,7 @@
     {
       "detector": "stripe-token",
       "evidence": {
-        "fixtureCount": 25,
+        "fixtureCount": 31,
         "hostContextsExercised": [
           "dotenv",
           "json",
@@ -459,6 +459,7 @@
         "stripe-positive-log",
         "stripe-positive-min-length",
         "stripe-positive-mixed-public-and-secret",
+        "stripe-positive-mixed-public-and-secret-sandbox-mode",
         "stripe-positive-qualified",
         "stripe-positive-yaml"
       ],
