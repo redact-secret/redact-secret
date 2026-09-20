@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 1242,
+  "fixtureCount": 1246,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -12180,6 +12180,85 @@
       "input": "eyJTWU5USEVUSUNfSEVBREVS.QUJDREVGR0hJSktMTU5PUA.SYNTHETIC_REVOKED_SIGNATURE",
       "expected": [],
       "note": "A JSON-object-prefixed header paired with a payload that does not itself start with the encoded-JSON prefix is excluded; both segments must carry the prefix."
+    },
+    {
+      "id": "jwt-negative-legacy-supabase-anon-claim",
+      "detector": "jwt",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5bnRocHJvaiIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzAwMDAwMDAwLCJleHAiOjE3OTk5OTk5OTl9.SYNTHETIC_REVOKED_SUPABASE_LEGACY_JWT_SIGNATURE",
+      "expected": [],
+      "note": "Issue #472: a legacy Supabase anon JWT whose payload decodes to `\"iss\":\"supabase\"` together with `\"role\":\"anon\"` is a public identifier by Supabase's own design, the same treatment the new-format sb_publishable_ key already receives, so it produces no finding."
+    },
+    {
+      "id": "jwt-positive-legacy-supabase-service-role-claim",
+      "detector": "jwt",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5bnRocHJvaiIsInJvbGUiOiJzZXJ2aWNlX3JvbGUiLCJpYXQiOjE3MDAwMDAwMDAsImV4cCI6MTc5OTk5OTk5OX0.SYNTHETIC_REVOKED_SUPABASE_LEGACY_JWT_SIGNATURE",
+      "expected": [
+        {
+          "detector": "jwt",
+          "type": "jwt",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 0,
+          "end": 208
+        }
+      ],
+      "note": "Issue #472: the paired secret half of the matrix. A legacy Supabase service_role JWT carries `\"role\":\"service_role\"`, not `\"role\":\"anon\"`, so the narrow carve-out does not apply and it is still detected at high confidence."
+    },
+    {
+      "id": "jwt-positive-anon-role-non-supabase-issuer",
+      "detector": "jwt",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJub3Qtc3VwYWJhc2UiLCJyZWYiOiJzeW50aHByb2oiLCJyb2xlIjoiYW5vbiJ9.SYNTHETIC_REVOKED_SUPABASE_LEGACY_JWT_SIGNATURE",
+      "expected": [
+        {
+          "detector": "jwt",
+          "type": "jwt",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 0,
+          "end": 157
+        }
+      ],
+      "note": "Issue #472: a `\"role\":\"anon\"` claim alone does not exempt a token; the carve-out requires `\"iss\":\"supabase\"` together with `\"role\":\"anon\"`, so a non-Supabase issuer claiming the anon role is still detected."
+    },
+    {
+      "id": "jwt-positive-malformed-payload-remainder",
+      "detector": "jwt",
+      "kind": "boundary",
+      "support": "supported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJAAAAAA.SYNTHETIC_REVOKED_SUPABASE_LEGACY_JWT_SIGNATURE",
+      "expected": [
+        {
+          "detector": "jwt",
+          "type": "jwt",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 0,
+          "end": 94
+        }
+      ],
+      "note": "Issue #472: the structural matcher bounds only the payload's minimum tail length, not its total length modulo 4. This 9-byte payload segment leaves a 1-sextet base64url remainder, which unpadded base64 can never legitimately produce, so the claim text cannot be decoded and the carve-out does not apply; the token is still detected."
     },
     {
       "id": "bearer-positive-scheme",

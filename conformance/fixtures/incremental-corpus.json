@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 76,
+  "fixtureCount": 77,
   "fixtures": [
     {
       "id": "synthetic-regression-malformed-authority",
@@ -521,6 +521,22 @@
         }
       ],
       "note": "issue #316: a public identifier prefix and a documented secret prefix on adjacent lines stay correctly discriminated at every chunk split, including splits that fall inside either prefix's own bytes."
+    },
+    {
+      "id": "jwt-legacy-supabase-anon-service-role-discriminating-boundary",
+      "input": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5bnRocHJvaiIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzAwMDAwMDAwLCJleHAiOjE3OTk5OTk5OTl9.SYNTHETIC_REVOKED_SUPABASE_LEGACY_JWT_SIGNATURE\neyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5bnRocHJvaiIsInJvbGUiOiJzZXJ2aWNlX3JvbGUiLCJpYXQiOjE3MDAwMDAwMDAsImV4cCI6MTc5OTk5OTk5OX0.SYNTHETIC_REVOKED_SUPABASE_LEGACY_JWT_SIGNATURE",
+      "text": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5bnRocHJvaiIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzAwMDAwMDAwLCJleHAiOjE3OTk5OTk5OTl9.SYNTHETIC_REVOKED_SUPABASE_LEGACY_JWT_SIGNATURE\n<SECRET_1>",
+      "expected": [
+        {
+          "detector": "jwt",
+          "type": "jwt",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 198,
+          "end": 406
+        }
+      ],
+      "note": "issue #472: a legacy Supabase anon JWT and a legacy Supabase service_role JWT on adjacent lines stay correctly discriminated at every chunk split, including splits that fall inside either token's payload segment."
     },
     {
       "id": "twilio-auth-token-line-scoped-context-same-line",

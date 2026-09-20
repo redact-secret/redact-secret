@@ -52,3 +52,4 @@ future planning and implementation but do not authorize Git or release actions.
 - [Verify @redact-secret/core on Cloudflare Workers and Vercel Edge](2026-09-19-verify-edge-runtimes.md)
 - [Exclude closed-call source-code expressions from generic-token's contextual values](2026-09-20-exclude-closed-call-code-expressions-as-contextual-values.md)
 - [Share generic-token's interpolation and environment-reference exclusions with connection-string's password check](2026-09-20-share-non-secret-reference-exclusions-with-connection-string.md)
+- [Scope a payload-trusting exclusion for the legacy Supabase anon JWT to iss+role together](2026-09-20-scope-supabase-legacy-anon-jwt-exclusion.md)

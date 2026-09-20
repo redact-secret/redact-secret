@@ -1148,7 +1148,7 @@
     {
       "detector": "jwt",
       "evidence": {
-        "fixtureCount": 17,
+        "fixtureCount": 21,
         "hostContextsExercised": [
           "json",
           "log",
@@ -1157,6 +1157,7 @@
         ],
         "kindsWithSupportedEvidence": [
           "adversarial",
+          "boundary",
           "negative",
           "overlap",
           "positive"
@@ -1167,9 +1168,11 @@
         ]
       },
       "evidenceFixtureIds": [
+        "jwt-positive-anon-role-non-supabase-issuer",
         "jwt-positive-context-json",
         "jwt-positive-context-log",
         "jwt-positive-context-shell",
+        "jwt-positive-legacy-supabase-service-role-claim",
         "jwt-positive-structural-despite-fabricated-claims",
         "jwt-positive-structured"
       ],
