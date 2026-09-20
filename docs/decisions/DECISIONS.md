@@ -51,4 +51,5 @@ future planning and implementation but do not authorize Git or release actions.
 - [Add a Node WebAssembly fallback when the native addon is unusable](2026-09-19-add-node-webassembly-fallback.md)
 - [Verify @redact-secret/core on Cloudflare Workers and Vercel Edge](2026-09-19-verify-edge-runtimes.md)
 - [Exclude closed-call source-code expressions from generic-token's contextual values](2026-09-20-exclude-closed-call-code-expressions-as-contextual-values.md)
+- [Share generic-token's interpolation and environment-reference exclusions with connection-string's password check](2026-09-20-share-non-secret-reference-exclusions-with-connection-string.md)
 - [Exclude repeated-character filler and whole-value placeholder vocabulary from bearer-token](2026-09-20-exclude-filler-and-placeholder-bearer-values.md)

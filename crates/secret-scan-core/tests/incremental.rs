@@ -498,6 +498,43 @@ fn a_construct_closes_after_an_earlier_units_overlap_winner_was_already_emitted(
     assert_eq!(split_findings, expected_findings);
 }
 
+/// `connection_string::is_placeholder` gained the same non-secret-reference
+/// exclusions `generic-token` already applied (issue #469). `connection_string`
+/// has no incremental-specific retention hint at all -- unlike
+/// `generic_token`'s `has_open_contextual_assignment` -- so nothing about
+/// splitting one of these reference forms across a chunk boundary should be
+/// able to change the outcome: a whole-input scan and a byte-by-byte
+/// incremental scan of the identical text must still agree.
+#[test]
+fn connection_string_interpolation_references_agree_between_whole_input_and_incremental() {
+    for password in [
+        "${DB_PASSWORD}",
+        "$DB_PASSWORD",
+        "$env:DB_PASSWORD",
+        "$(db_password)",
+        "{{db_password}}",
+        "{env:DB_PASSWORD}",
+        "%DB_PASSWORD%",
+    ] {
+        let input = format!("postgres://app:{password}@db.internal:5432/example\n");
+        let (expected_text, expected_findings) = whole_input(&input);
+        assert_eq!(
+            expected_findings,
+            Vec::new(),
+            "expected no findings for {input:?}"
+        );
+
+        let one_byte_at_a_time: Vec<&str> = (0..input.len()).map(|i| &input[i..=i]).collect();
+        let (text, findings) = run(&one_byte_at_a_time);
+
+        assert_eq!(text, expected_text, "byte-split mismatch for {input:?}");
+        assert_eq!(
+            findings, expected_findings,
+            "byte-split mismatch for {input:?}"
+        );
+    }
+}
+
 #[test]
 fn absolute_ranges_are_offsets_into_the_whole_session_input() {
     let first = "ordinary line\n";

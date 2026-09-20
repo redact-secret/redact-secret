@@ -6,9 +6,12 @@
 //! no candidates. Values above 4 KiB are left to more specific detectors.
 
 use super::text::{
-    ascii_run_len, char_at, ends_with_ci, is_horizontal_js_whitespace, is_js_whitespace,
-    is_line_start, is_repeated_character_filler, matches_placeholder_vocabulary, prev_char,
-    rskip_while_chars, skip_while_chars, starts_with_ci,
+    OPENCODE_REFERENCE_KINDS, ascii_run_len, char_at, ends_with_ci,
+    is_command_substitution_reference, is_env_var_identifier, is_fully_delimited,
+    is_horizontal_js_whitespace, is_js_whitespace, is_line_start, is_opencode_reference,
+    is_repeated_character_filler, is_ruby_interpolation_reference, is_template_reference,
+    is_windows_env_reference, matches_placeholder_vocabulary, prev_char, rskip_while_chars,
+    skip_while_chars, starts_with_bare_dollar_reference, starts_with_ci,
 };
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
@@ -173,10 +176,7 @@ fn starts_with_env_reference(value: &str) -> bool {
     if value.starts_with("${") {
         return true;
     }
-    if value.as_bytes().first() == Some(&b'$')
-        && let Some(second) = char_at(value, 1)
-        && (second.is_ascii_alphabetic() || second == '_')
-    {
+    if starts_with_bare_dollar_reference(value) {
         return true;
     }
     starts_with_ci(value, 0, "process.env.") || starts_with_ci(value, 0, "import.meta.env.")
@@ -203,18 +203,6 @@ fn ends_with_key_or_pem(value: &str) -> bool {
     ends_with_ci(value, ".key") || ends_with_ci(value, ".pem")
 }
 
-/// `true` when the whole value is delimited by `{{` and `}}`
-/// (`^\{\{.*\}\}$`) — the idiomatic Jinja/Helm/Go-template reference syntax
-/// Ansible, Helm, Salt, and Go templates use for a vaulted or injected
-/// value (`{{ vault_db_password }}`, `{{ .Values.postgresql.auth.password }}`).
-/// A value that only starts with `{{`, or that carries `{{...}}` inside a
-/// larger string, does not satisfy this and stays detected: only a value
-/// fully bounded by the delimiters is a bare reference rather than
-/// suspicious content the delimiters happen to appear in.
-fn is_template_reference(value: &str) -> bool {
-    value.starts_with("{{") && value.ends_with("}}") && value.len() >= 4
-}
-
 // --- interpolation / command-substitution reference exclusions
 // (issue #279) -----------------------------------------------------------
 //
@@ -225,45 +213,15 @@ fn is_template_reference(value: &str) -> bool {
 // records the supported syntaxes and the accompanying span-scanning fix
 // (`delimited_reference_value`) that lets the whole-value check see past a
 // closing `)`/`]`/backtick that a plain unquoted-value boundary scan would
-// otherwise cut short before.
-
-/// `true` when `value` is exactly `open` followed by anything followed by
-/// `close` -- the same whole-value shape `is_template_reference` checks for
-/// `{{`/`}}`, generalized to an arbitrary delimiter pair.
-fn is_fully_delimited(value: &str, open: &str, close: &str) -> bool {
-    value.starts_with(open) && value.ends_with(close) && value.len() >= open.len() + close.len()
-}
-
-/// `true` for a POSIX/shell, `Makefile`, or Kustomize variable or
-/// command-substitution reference (`$(registryPassword)`,
-/// `$(pass show db/prod)`): the value names a variable or command to
-/// resolve at runtime, not a secret.
-fn is_command_substitution_reference(value: &str) -> bool {
-    is_fully_delimited(value, "$(", ")")
-}
+// otherwise cut short before. `is_template_reference`, `is_fully_delimited`,
+// `is_command_substitution_reference`, `is_ruby_interpolation_reference`,
+// and `is_opencode_reference` live in `super::text`, shared with
+// `connection_string` (issue #469).
 
 /// `true` for an Azure Pipelines runtime-expression reference
 /// (`$[variables.x]`).
 fn is_runtime_expression_reference(value: &str) -> bool {
     is_fully_delimited(value, "$[", "]")
-}
-
-/// `true` for a Ruby string-interpolation reference
-/// (`#{ENV['DB_PASSWORD']}`).
-fn is_ruby_interpolation_reference(value: &str) -> bool {
-    is_fully_delimited(value, "#{", "}")
-}
-
-/// opencode config substitution kinds resolved from the environment or a
-/// file at load time rather than containing a secret directly.
-const OPENCODE_REFERENCE_KINDS: &[&str] = &["env", "file"];
-
-/// `true` for an opencode `{env:VAR}` or `{file:path}` substitution.
-fn is_opencode_reference(value: &str) -> bool {
-    OPENCODE_REFERENCE_KINDS.iter().any(|kind| {
-        let open = format!("{{{kind}:");
-        is_fully_delimited(value, &open, "}")
-    })
 }
 
 /// `true` for a value fully wrapped in a matching pair of backticks
@@ -316,15 +274,6 @@ fn is_path(value: &str) -> bool {
     !value.is_empty() && value.bytes().all(is_path_byte)
 }
 
-fn is_env_var_identifier(value: &str) -> bool {
-    let mut chars = value.chars();
-    match chars.next() {
-        Some(first) if first.is_ascii_alphabetic() || first == '_' => {}
-        _ => return false,
-    }
-    chars.all(|ch| ch.is_ascii_alphanumeric() || ch == '_')
-}
-
 // --- cmd-style Windows env reference and SQL bind parameter exclusions
 // (issue #292) ------------------------------------------------------------
 //
@@ -335,20 +284,8 @@ fn is_env_var_identifier(value: &str) -> bool {
 // `:` are common enough punctuation (a percentage-bounded range, a URL port,
 // a prose colon) that a bare delimiter-pair check would exclude values that
 // merely start and end with one, so the *content* must itself look like an
-// identifier.
-
-/// `true` for a cmd.exe/batch-style Windows environment-variable reference
-/// (`%DB_PASSWORD%`): the whole value is `%` + an identifier + `%`, expanded
-/// by the shell at runtime rather than a secret. A value missing either `%`
-/// delimiter, or one that carries the pair embedded inside a larger value,
-/// does not satisfy this and stays detected — the same whole-value
-/// requirement as `is_template_reference`.
-fn is_windows_env_reference(value: &str) -> bool {
-    value
-        .strip_prefix('%')
-        .and_then(|rest| rest.strip_suffix('%'))
-        .is_some_and(is_env_var_identifier)
-}
+// identifier. `is_env_var_identifier` and `is_windows_env_reference` live in
+// `super::text`, shared with `connection_string` (issue #469).
 
 /// `true` for a SQL named bind parameter (`:new_password_hash`): the whole
 /// value is `:` followed by an identifier, a placeholder the query engine

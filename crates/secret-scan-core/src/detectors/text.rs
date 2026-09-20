@@ -184,3 +184,91 @@ pub(super) fn is_repeated_character_filler(value: &str) -> bool {
     }
     count >= 3
 }
+
+// --- interpolation / environment-reference exclusions -------------------
+//
+// Shared by `generic_token` and `connection_string` (issue #279, #292,
+// #469) so a value that is a pointer to a runtime-resolved secret --
+// rather than the secret itself -- is treated the same way regardless of
+// which detector's grammar reaches it.
+
+/// `true` when `value` is exactly `open` followed by anything followed by
+/// `close` -- the whole-value delimiter shape `is_template_reference` uses,
+/// generalized to an arbitrary delimiter pair. A value that only starts
+/// with `open`, or that carries the pair embedded inside a larger string,
+/// does not satisfy this and stays detected.
+pub(super) fn is_fully_delimited(value: &str, open: &str, close: &str) -> bool {
+    value.starts_with(open) && value.ends_with(close) && value.len() >= open.len() + close.len()
+}
+
+/// `true` when the whole value is delimited by `{{` and `}}`
+/// (`^\{\{.*\}\}$`) -- the idiomatic Jinja/Helm/Go-template reference syntax
+/// Ansible, Helm, Salt, and Go templates use for a vaulted or injected value
+/// (`{{ vault_db_password }}`, `{{ .Values.postgresql.auth.password }}`).
+pub(super) fn is_template_reference(value: &str) -> bool {
+    is_fully_delimited(value, "{{", "}}")
+}
+
+/// `true` for a POSIX/shell, `Makefile`, or Kustomize variable or
+/// command-substitution reference (`$(registryPassword)`,
+/// `$(pass show db/prod)`): the value names a variable or command to
+/// resolve at runtime, not a secret.
+pub(super) fn is_command_substitution_reference(value: &str) -> bool {
+    is_fully_delimited(value, "$(", ")")
+}
+
+/// `true` for a Ruby string-interpolation reference
+/// (`#{ENV['DB_PASSWORD']}`).
+pub(super) fn is_ruby_interpolation_reference(value: &str) -> bool {
+    is_fully_delimited(value, "#{", "}")
+}
+
+/// opencode config substitution kinds resolved from the environment or a
+/// file at load time rather than containing a secret directly.
+pub(super) const OPENCODE_REFERENCE_KINDS: &[&str] = &["env", "file"];
+
+/// `true` for an opencode `{env:VAR}` or `{file:path}` substitution.
+pub(super) fn is_opencode_reference(value: &str) -> bool {
+    OPENCODE_REFERENCE_KINDS.iter().any(|kind| {
+        let open = format!("{{{kind}:");
+        is_fully_delimited(value, &open, "}")
+    })
+}
+
+/// `true` for a bare shell or PowerShell environment-variable reference:
+/// `$` immediately followed by an identifier-start character
+/// (`$DB_PASSWORD`, `$env:DB_PASSWORD` -- PowerShell's drive-qualified
+/// `env:` provider, itself a valid identifier-start run). Unlike
+/// [`is_fully_delimited`]'s whole-value checks, this is intentionally a
+/// prefix match: a shell variable reference consumes to the right for as
+/// long as the identifier continues, so the entire captured value is the
+/// reference regardless of what trails the identifier.
+pub(super) fn starts_with_bare_dollar_reference(value: &str) -> bool {
+    value.as_bytes().first() == Some(&b'$')
+        && char_at(value, 1).is_some_and(|second| second.is_ascii_alphabetic() || second == '_')
+}
+
+/// `true` for a byte allowed inside an environment-variable identifier:
+/// ASCII letter, digit, or `_`, matching shell/POSIX identifier rules.
+pub(super) fn is_env_var_identifier(value: &str) -> bool {
+    let mut chars = value.chars();
+    match chars.next() {
+        Some(first) if first.is_ascii_alphabetic() || first == '_' => {}
+        _ => return false,
+    }
+    chars.all(|ch| ch.is_ascii_alphanumeric() || ch == '_')
+}
+
+/// `true` for a cmd.exe/batch-style Windows environment-variable reference
+/// (`%DB_PASSWORD%`): the whole value is `%` + an identifier + `%`, expanded
+/// by the shell at runtime rather than a secret. `%` is common enough
+/// punctuation on its own (a percentage-bounded range) that a bare
+/// delimiter-pair check like [`is_fully_delimited`] would exclude values
+/// that merely start and end with one, so the content between the
+/// delimiters must itself look like an identifier.
+pub(super) fn is_windows_env_reference(value: &str) -> bool {
+    value
+        .strip_prefix('%')
+        .and_then(|rest| rest.strip_suffix('%'))
+        .is_some_and(is_env_var_identifier)
+}
