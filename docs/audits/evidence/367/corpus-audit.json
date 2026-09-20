@@ -3983,6 +3983,374 @@
       ],
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
+      "detector": "google-api-key",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 39,
+          "start": 0
+        }
+      ],
+      "id": "google-adversarial-long-suffix",
+      "kind": "adversarial",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 39,
+          "start": 0
+        }
+      ],
+      "support": "supported",
+      "tier": "adversarial"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "google-api-key",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "google-boundary-below-min",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "google-api-key",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "google-boundary-case-sensitivity",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "google-api-key",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "google-boundary-crlf",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "google-api-key",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "google-boundary-delimiter",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "google-api-key",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "google-boundary-invalid-alphabet",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "google-api-key",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "google-boundary-short",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "google-api-key",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "google-boundary-unicode-lookalike-prefix",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "google-api-key",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "google-negative-key-id",
+      "kind": "negative",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "negative"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "google-api-key",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "google-negative-masked",
+      "kind": "negative",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "negative"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "google-api-key",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "google-negative-placeholder",
+      "kind": "negative",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "negative"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "google-api-key",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 47,
+          "start": 8
+        }
+      ],
+      "id": "google-overlap-context",
+      "kind": "overlap",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 47,
+          "start": 8
+        }
+      ],
+      "support": "supported",
+      "tier": "contextual"
+    },
+    {
+      "contexts": [
+        "dotenv"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "google-api-key",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 54,
+          "start": 15
+        }
+      ],
+      "id": "google-positive-dotenv",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 54,
+          "start": 15
+        }
+      ],
+      "support": "supported",
+      "tier": "canonical"
+    },
+    {
+      "contexts": [
+        "javascript"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "google-api-key",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 75,
+          "start": 36
+        }
+      ],
+      "id": "google-positive-javascript-firebase-config",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 75,
+          "start": 36
+        }
+      ],
+      "support": "supported",
+      "tier": "canonical"
+    },
+    {
+      "contexts": [
+        "json"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "google-api-key",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 51,
+          "start": 12
+        }
+      ],
+      "id": "google-positive-json",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 51,
+          "start": 12
+        }
+      ],
+      "support": "supported",
+      "tier": "canonical"
+    },
+    {
+      "contexts": [
+        "log"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "google-api-key",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 77,
+          "start": 38
+        }
+      ],
+      "id": "google-positive-log",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 77,
+          "start": 38
+        }
+      ],
+      "support": "supported",
+      "tier": "canonical"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "google-api-key",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 39,
+          "start": 0
+        }
+      ],
+      "id": "google-positive-qualified",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 39,
+          "start": 0
+        }
+      ],
+      "support": "supported",
+      "tier": "canonical"
+    },
+    {
+      "contexts": [
+        "yaml"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "google-api-key",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 47,
+          "start": 8
+        }
+      ],
+      "id": "google-positive-yaml",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 47,
+          "start": 8
+        }
+      ],
+      "support": "supported",
+      "tier": "canonical"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
       "detector": "huggingface-token",
       "disposition": "retained",
       "expectedRanges": [
@@ -8666,6 +9034,30 @@
       "contexts": [],
       "contractOnlyMatches": [],
       "corpus": "docs/coverage/detector-inventory.json#reconciliationTrigger",
+      "detector": "google-api-key",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 39,
+          "start": 0
+        }
+      ],
+      "id": "google_api_key",
+      "kind": "reconciliation-trigger",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 39,
+          "start": 0
+        }
+      ],
+      "support": null,
+      "tier": null
+    },
+    {
+      "contexts": [],
+      "contractOnlyMatches": [],
+      "corpus": "docs/coverage/detector-inventory.json#reconciliationTrigger",
       "detector": "huggingface-token",
       "disposition": "retained",
       "expectedRanges": [
@@ -8778,6 +9170,12 @@
       "retained": 23,
       "review": 0,
       "silent": 30
+    },
+    "google-api-key": {
+      "broad-shape": 0,
+      "retained": 9,
+      "review": 0,
+      "silent": 10
     },
     "huggingface-token": {
       "broad-shape": 0,
