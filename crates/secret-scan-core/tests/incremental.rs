@@ -283,6 +283,55 @@ fn an_unrelated_open_line_does_not_block_flushing_a_prior_closed_line() {
 }
 
 // ---------------------------------------------------------------------------
+// mid-exclusion-prefix (issue #480 part B; see
+// docs/decisions/2026-09-20-connection-string-and-jwt-need-no-retention-hint.md)
+//
+// None of these three constructs need a dedicated retention hint: the
+// incremental scanner only runs detection once a line closes
+// (`append_retained(..., closes_line = true)` in `src/incremental.rs`), so a
+// bare, un-terminated prefix is always still buffered, never judged early,
+// regardless of whether a hint exists for it.
+// ---------------------------------------------------------------------------
+
+#[test]
+fn a_mid_exclusion_prefix_never_reaches_the_exclusion_predicate_early() {
+    let cases: [(&str, &str); 3] = [
+        (
+            "secret = SecretManagerServiceClient.access_secret_",
+            "version(req)\n",
+        ),
+        ("postgres://app:$DB_PASS", "WORD@db.internal:5432/example\n"),
+        (
+            "Authorization: Bearer xxxxxxxx",
+            "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n",
+        ),
+    ];
+    for (prefix, rest) in cases {
+        let mut sanitizer = session();
+        let held = sanitizer.append(prefix).unwrap();
+        assert_eq!(
+            held.text(),
+            "",
+            "{prefix:?}: prefix alone must release nothing"
+        );
+        assert!(
+            held.findings().is_empty(),
+            "{prefix:?}: prefix alone must not be judged yet",
+        );
+
+        let completed = sanitizer.append(rest).unwrap();
+        let whole = format!("{prefix}{rest}");
+        let (expected_text, expected_findings) = whole_input(&whole);
+        assert_eq!(completed.text(), expected_text, "{whole:?}: completed text");
+        assert_eq!(
+            completed.findings().len(),
+            expected_findings.len(),
+            "{whole:?}: completed finding count",
+        );
+    }
+}
+
+// ---------------------------------------------------------------------------
 // multiline
 // ---------------------------------------------------------------------------
 
