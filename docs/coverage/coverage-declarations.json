@@ -1066,7 +1066,8 @@
             "slack-positive-secret-18-bytes",
             "slack-positive-secret-19-bytes",
             "slack-positive-segment1-10-digits",
-            "slack-positive-segment1-13-digits"
+            "slack-positive-segment1-13-digits",
+            "slack-positive-structural-prefixes"
           ],
           "state": "supported"
         },
@@ -1094,6 +1095,8 @@
             "slack-boundary-missing-first-separator",
             "slack-boundary-missing-second-separator",
             "slack-boundary-replaced-separator",
+            "slack-boundary-rotation-two-digit-version",
+            "slack-boundary-rotation-zero-digit-version",
             "slack-boundary-secret-17-bytes",
             "slack-boundary-secret-alphabet-violation",
             "slack-boundary-segment1-14-digits",
@@ -1101,6 +1104,10 @@
             "slack-boundary-segment2-14-digits",
             "slack-boundary-segment2-9-digits",
             "slack-boundary-short",
+            "slack-boundary-user-missing-final-separator",
+            "slack-boundary-user-no-section-grammar",
+            "slack-boundary-user-secret-27-bytes",
+            "slack-boundary-user-segment-14-digits",
             "slack-negative-interim-below-min-floor",
             "slack-positive-doc-style-placeholder",
             "slack-positive-log",
@@ -1125,6 +1132,8 @@
             "slack-negative-ordinary-reference",
             "slack-negative-percent-encoded-lookalike",
             "slack-negative-placeholder",
+            "slack-negative-placeholder-rotation",
+            "slack-negative-placeholder-user",
             "slack-negative-team-channel-id"
           ],
           "state": "supported"
@@ -1139,6 +1148,8 @@
             "slack-boundary-missing-first-separator",
             "slack-boundary-missing-second-separator",
             "slack-boundary-replaced-separator",
+            "slack-boundary-rotation-two-digit-version",
+            "slack-boundary-rotation-zero-digit-version",
             "slack-boundary-secret-17-bytes",
             "slack-boundary-secret-alphabet-violation",
             "slack-boundary-segment1-14-digits",
@@ -1146,6 +1157,10 @@
             "slack-boundary-segment2-14-digits",
             "slack-boundary-segment2-9-digits",
             "slack-boundary-short",
+            "slack-boundary-user-missing-final-separator",
+            "slack-boundary-user-no-section-grammar",
+            "slack-boundary-user-secret-27-bytes",
+            "slack-boundary-user-segment-14-digits",
             "slack-negative-interim-below-min-floor",
             "slack-positive-doc-style-placeholder",
             "slack-positive-log",

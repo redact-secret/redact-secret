@@ -470,7 +470,7 @@
     {
       "detector": "slack-token",
       "evidence": {
-        "fixtureCount": 51,
+        "fixtureCount": 60,
         "hostContextsExercised": [
           "dotenv",
           "http",
@@ -506,7 +506,8 @@
         "slack-positive-secret-18-bytes",
         "slack-positive-secret-19-bytes",
         "slack-positive-segment1-10-digits",
-        "slack-positive-segment1-13-digits"
+        "slack-positive-segment1-13-digits",
+        "slack-positive-structural-prefixes"
       ],
       "policyClass": "always-redact",
       "schemeRows": "not-applicable",

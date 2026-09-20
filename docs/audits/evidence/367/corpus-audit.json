@@ -8099,6 +8099,38 @@
       "detector": "slack-token",
       "disposition": "silent",
       "expectedRanges": [],
+      "id": "slack-boundary-rotation-two-digit-version",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "slack-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "slack-boundary-rotation-zero-digit-version",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "slack-token",
+      "disposition": "silent",
+      "expectedRanges": [],
       "id": "slack-boundary-secret-17-bytes",
       "kind": "boundary",
       "lostRanges": [],
@@ -8196,6 +8228,70 @@
       "disposition": "silent",
       "expectedRanges": [],
       "id": "slack-boundary-short",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "slack-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "slack-boundary-user-missing-final-separator",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "slack-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "slack-boundary-user-no-section-grammar",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "slack-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "slack-boundary-user-secret-27-bytes",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "slack-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "slack-boundary-user-segment-14-digits",
       "kind": "boundary",
       "lostRanges": [],
       "retainedRanges": [],
@@ -8332,6 +8428,38 @@
     },
     {
       "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "slack-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "slack-negative-placeholder-rotation",
+      "kind": "negative",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "negative"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "slack-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "slack-negative-placeholder-user",
+      "kind": "negative",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "negative"
+    },
+    {
+      "contexts": [
         "http"
       ],
       "contractOnlyMatches": [],
@@ -8398,28 +8526,12 @@
       "disposition": "retained",
       "expectedRanges": [
         {
-          "end": 30,
-          "start": 0
-        },
-        {
           "end": 61,
           "start": 31
         },
         {
           "end": 92,
           "start": 62
-        },
-        {
-          "end": 123,
-          "start": 93
-        },
-        {
-          "end": 159,
-          "start": 124
-        },
-        {
-          "end": 195,
-          "start": 160
         }
       ],
       "id": "slack-positive-all-prefixes",
@@ -8427,28 +8539,12 @@
       "lostRanges": [],
       "retainedRanges": [
         {
-          "end": 30,
-          "start": 0
-        },
-        {
           "end": 61,
           "start": 31
         },
         {
           "end": 92,
           "start": 62
-        },
-        {
-          "end": 123,
-          "start": 93
-        },
-        {
-          "end": 159,
-          "start": 124
-        },
-        {
-          "end": 195,
-          "start": 160
         }
       ],
       "support": "supported",
@@ -8917,6 +9013,56 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "slack-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 75,
+          "start": 0
+        },
+        {
+          "end": 121,
+          "start": 76
+        },
+        {
+          "end": 172,
+          "start": 122
+        },
+        {
+          "end": 223,
+          "start": 173
+        }
+      ],
+      "id": "slack-positive-structural-prefixes",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 75,
+          "start": 0
+        },
+        {
+          "end": 121,
+          "start": 76
+        },
+        {
+          "end": 172,
+          "start": 122
+        },
+        {
+          "end": 223,
+          "start": 173
+        }
+      ],
+      "support": "supported",
+      "tier": "contextual"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "slack-token",
       "disposition": "silent",
       "expectedRanges": [],
       "id": "slack-positive-unicode-byte-offset",
@@ -9197,9 +9343,9 @@
     },
     "slack-token": {
       "broad-shape": 0,
-      "retained": 17,
+      "retained": 18,
       "review": 0,
-      "silent": 37
+      "silent": 45
     }
   }
 }

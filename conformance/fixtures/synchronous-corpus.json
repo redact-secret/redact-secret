@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 1293,
+  "fixtureCount": 1302,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -3590,14 +3590,6 @@
           "type": "slack_token",
           "confidence": "high",
           "specificity": "provider",
-          "start": 0,
-          "end": 30
-        },
-        {
-          "detector": "slack-token",
-          "type": "slack_token",
-          "confidence": "high",
-          "specificity": "provider",
           "start": 31,
           "end": 61
         },
@@ -3608,33 +3600,159 @@
           "specificity": "provider",
           "start": 62,
           "end": 92
-        },
-        {
-          "detector": "slack-token",
-          "type": "slack_token",
-          "confidence": "high",
-          "specificity": "provider",
-          "start": 93,
-          "end": 123
-        },
-        {
-          "detector": "slack-token",
-          "type": "slack_token",
-          "confidence": "high",
-          "specificity": "provider",
-          "start": 124,
-          "end": 159
-        },
-        {
-          "detector": "slack-token",
-          "type": "slack_token",
-          "confidence": "high",
-          "specificity": "provider",
-          "start": 160,
-          "end": 195
         }
       ],
-      "note": "Every remaining documented prefix variant is independently supported."
+      "note": "Reclassified by issue #512 (docs/decisions/2026-09-20-freeze-slack-user-and-rotation-token-grammar.md): `xoxp-`, `xoxe-`, `xoxe.xoxb-`, and `xoxe.xoxp-` now require their own documented digit section, which none of these opaque bodies carry, so slack-token no longer claims them; `xapp-` and `xwfp-` are not promoted and still match at their original ranges. Input unchanged; expectation corrected. `slack-positive-structural-prefixes` is the corrected counterpart demonstrating every promoted family's full grammar."
+    },
+    {
+      "id": "slack-positive-structural-prefixes",
+      "detector": "slack-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICUSERSECRETVALUEFIX1\nxoxe-1-SYNTHETICROTATIONVALUEFIXTUREPADDING00\nxoxe.xoxb-1-SYNTHETICROTATIONVALUEFIXTUREPADDING01\nxoxe.xoxp-1-SYNTHETICROTATIONVALUEFIXTUREPADDING02",
+      "expected": [
+        {
+          "detector": "slack-token",
+          "type": "slack_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 75
+        },
+        {
+          "detector": "slack-token",
+          "type": "slack_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 76,
+          "end": 121
+        },
+        {
+          "detector": "slack-token",
+          "type": "slack_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 122,
+          "end": 172
+        },
+        {
+          "detector": "slack-token",
+          "type": "slack_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 173,
+          "end": 223
+        }
+      ],
+      "note": "Issue #512 (docs/decisions/2026-09-20-freeze-slack-user-and-rotation-token-grammar.md): each of the four newly-promoted families (user, refresh, rotating-bot, rotating-user) is independently detected at its own full documented section grammar, the corrected counterpart of `slack-positive-all-prefixes` for these four prefixes."
+    },
+    {
+      "id": "slack-boundary-user-no-section-grammar",
+      "detector": "slack-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xoxp-SYNTHETIC-REVOKED-SYNTHETIC-REVOKED-",
+      "expected": [],
+      "note": "Issue #512: the user section grammar requires three `-`-separated 10-13 digit sections before the secret section; this value has none, so it is an intentional false negative, the same dimension issue #371 established for `xoxb-` (`slack-positive-qualified`)."
+    },
+    {
+      "id": "slack-boundary-user-missing-final-separator",
+      "detector": "slack-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xoxp-1234567890123-3210987654321-1112223334445SYNTHETICUSERSECRETVALUEFIX1",
+      "expected": [],
+      "note": "Issue #512: the separator between the third numeric section and the secret is missing; the third section is still a valid 13-digit run, but with no `-` immediately after it the shape never resolves to the documented four-section grammar."
+    },
+    {
+      "id": "slack-boundary-user-segment-14-digits",
+      "detector": "slack-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xoxp-12345678901234-3210987654321-1112223334445-SYNTHETICUSERSECRETVALUEFIX1",
+      "expected": [],
+      "note": "Issue #512: the first numeric section is 14 digits, one past the documented 10-13 range."
+    },
+    {
+      "id": "slack-boundary-user-secret-27-bytes",
+      "detector": "slack-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xoxp-1234567890123-3210987654321-1112223334445-SSSSSSSSSSSSSSSSSSSSSSSSSSS",
+      "expected": [],
+      "note": "Issue #512: the secret section is exactly 27 bytes, one below the documented 28-byte floor (gitleaks' `slack-user-token` lower bound)."
+    },
+    {
+      "id": "slack-boundary-rotation-zero-digit-version",
+      "detector": "slack-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xoxe-SYNTHETICREVOKEDROTATIONVALUE0123456789",
+      "expected": [],
+      "note": "Issue #512: the shape the pre-#512 interim guard used to accept -- an opaque body with no leading digit section. Every provider rotation example (`xoxe-1-...`) shows the version section, so a body missing it entirely is now an intentional false negative."
+    },
+    {
+      "id": "slack-boundary-rotation-two-digit-version",
+      "detector": "slack-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xoxe-12-SYNTHETICREVOKEDROTATIONVALUE0123456789",
+      "expected": [],
+      "note": "Issue #512: every provider rotation example shows exactly one digit before the next `-`; a two-digit version section is rejected rather than truncated to fit."
+    },
+    {
+      "id": "slack-negative-placeholder-user",
+      "detector": "slack-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xoxp-<YOUR_USER_TOKEN>",
+      "expected": [],
+      "note": "Issue #512 benign control: a documentation placeholder value has no digit section grammar and is not classified as a credential."
+    },
+    {
+      "id": "slack-negative-placeholder-rotation",
+      "detector": "slack-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xoxe.xoxb-<YOUR_ACCESS_TOKEN>",
+      "expected": [],
+      "note": "Issue #512 benign control: a documentation placeholder value has no leading digit-version section and is not classified as a credential."
     },
     {
       "id": "slack-adversarial-long-suffix",
@@ -28740,9 +28858,9 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "xoxp-SSSSSSSSSSSSSSSSSSS",
+      "input": "xapp-SSSSSSSSSSSSSSSSSSS",
       "expected": [],
-      "note": "The retained interim `xoxp-` guard keeps beta.4's 20-byte minimum unchanged; a 19-byte body is one below that floor. Issue #375 checkbox 6: explicit boundary evidence for the rotating-forms guard alongside slack-positive-all-prefixes."
+      "note": "The retained interim `xapp-` guard keeps beta.4's 20-byte minimum unchanged; a 19-byte body is one below that floor. Issue #375 checkbox 6: explicit boundary evidence for the still-interim-guarded prefixes alongside slack-positive-all-prefixes. Issue #512 promoted `xoxp-` to a structural contract, so this fixture was retargeted to `xapp-`, one of the two prefixes (with `xwfp-`) that remain interim-guarded."
     },
     {
       "id": "invisible-provider-grammar-zwnj",
