@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 1287,
+  "fixtureCount": 1289,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -27310,6 +27310,53 @@
       "input": "cfut_SYNTHETICREVOKEDCLOUDFLAREAPITOKENVALUE1DEADBEEF",
       "expected": [],
       "note": "Issue #373 (frozen precision contract in docs/audits/evidence/367/precision-contracts.json, families.cloudflare-token): the checksum alphabet is `[0-9a-f]`, not `[0-9A-Fa-f]` -- the single tool corroborating its shape states lowercase hex, so an uppercase-hex checksum is an intentional false negative rather than a case-insensitive match."
+    },
+    {
+      "id": "cloudflare-positive-account-checksum-suffix",
+      "detector": "cloudflare-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "mutation": {
+        "grammar": "cloudflare-token-checksum-suffix",
+        "seedId": "cloudflare-token-checksum-suffix-synthetic-seed",
+        "operation": "account-token-prefix",
+        "ordinal": 8
+      },
+      "input": "cfat_SYNTHETICREVOKEDCLOUDFLAREAPITOKENVALUE1deadbeef",
+      "expected": [
+        {
+          "detector": "cloudflare-token",
+          "type": "cloudflare_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 53
+        }
+      ],
+      "note": "Issue #481 (docs/audits/evidence/367/precision-contracts.json, families.cloudflare-token, adopted from `pending`): `cfat_` shares the exact `cfut_` body/checksum shape -- the provider's token-formats page documents both prefixes with the identical `[40 characters][checksum]` format cell, and trufflehog 3.97.4's `cf[ua]t_` alternation corroborates both. This is the family's paired positive for the account-token prefix."
+    },
+    {
+      "id": "cloudflare-boundary-account-checksum-non-hex",
+      "detector": "cloudflare-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "mutation": {
+        "grammar": "cloudflare-token-checksum-suffix",
+        "seedId": "cloudflare-token-checksum-suffix-synthetic-seed",
+        "operation": "account-checksum-non-hex",
+        "ordinal": 9
+      },
+      "input": "cfat_SYNTHETICREVOKEDCLOUDFLAREAPITOKENVALUE1ghijklmn",
+      "expected": [],
+      "note": "Issue #481: the account-token twin of `cloudflare-boundary-checksum-non-hex` -- an alphanumeric but non-hexadecimal eight-byte tail under the `cfat_` prefix. Retained as must-not-flag, matching `cloudflare-token-user-plain-twin`'s disposition exactly: the value carries no checksum segment of any shape a consulted source describes."
     },
     {
       "id": "openai-negative-marker-dotenv",

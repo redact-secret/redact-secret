@@ -779,6 +779,7 @@
     "slack-token"
   ],
   "explicitlyUnsupportedFixtureIds": [
+    "cloudflare-boundary-account-checksum-non-hex",
     "cloudflare-boundary-below-min",
     "cloudflare-boundary-case-sensitivity",
     "cloudflare-boundary-checksum-non-hex",
@@ -916,7 +917,7 @@
     "issue": "https://github.com/redact-secret/redact-secret/issues/375",
     "synchronousCorpus": "conformance/fixtures/synchronous-corpus.json"
   },
-  "rowCount": 408,
+  "rowCount": 410,
   "rows": [
     {
       "contexts": [],
@@ -953,6 +954,25 @@
       ],
       "scanMode": "synchronous",
       "support": "supported"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractTier": "malformed",
+      "detector": "cloudflare-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 0,
+      "fixtureId": "cloudflare-boundary-account-checksum-non-hex",
+      "kind": "boundary",
+      "note": "Issue #481: the account-token twin of `cloudflare-boundary-checksum-non-hex` -- an alphanumeric but non-hexadecimal eight-byte tail under the `cfat_` prefix. Retained as must-not-flag, matching `cloudflare-token-user-plain-twin`'s disposition exactly: the value carries no checksum segment of any shape a consulted source describes.",
+      "result": "silent",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "intentionally-unsupported"
     },
     {
       "contexts": [
@@ -1555,6 +1575,25 @@
       "kind": "negative",
       "note": "Malformed twin (uppercase-hex checksum) of cloudflare-positive-yaml in the same YAML context. Issue #375 context-pairing evidence.",
       "result": "silent",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "supported"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractTier": "canonical",
+      "detector": "cloudflare-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 1,
+      "fixtureId": "cloudflare-positive-account-checksum-suffix",
+      "kind": "positive",
+      "note": "Issue #481 (docs/audits/evidence/367/precision-contracts.json, families.cloudflare-token, adopted from `pending`): `cfat_` shares the exact `cfut_` body/checksum shape -- the provider's token-formats page documents both prefixes with the identical `[40 characters][checksum]` format cell, and trufflehog 3.97.4's `cf[ua]t_` alternation corroborates both. This is the family's paired positive for the account-token prefix.",
+      "result": "flagged",
       "runtimeConsumers": [
         "rust-core",
         "python-binding"
