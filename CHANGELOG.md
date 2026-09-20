@@ -8,8 +8,11 @@ evidence is linked from each published version.
 Beta.5 narrows seven provider grammars for precision, closes two detection
 gaps and an unbounded-input default, and adds the opt-in `common` detector
 profile, a Node WebAssembly fallback, musl Node packages, and Cloudflare
-Workers support. Grammar provenance, measurements, and intentional false
-negatives stay in the linked decision records and `docs/audits/evidence/`.
+Workers support. It also adds two provider-token coverage variants and
+closes four false-positive gaps in `generic-token`, `bearer-token`,
+`connection-string`, and `jwt`. Grammar provenance, measurements, and
+intentional false negatives stay in the linked decision records and
+`docs/audits/evidence/`.
 
 ### Breaking and compatibility changes
 
@@ -133,9 +136,16 @@ negatives stay in the linked decision records and `docs/audits/evidence/`.
   - `slack-token` `xoxb-`: `<10–13 digits>-<10–13 digits>-<18+ alphanumerics>`
     (`decision-freeze-slack-bot-token-segment-grammar`). Other Slack prefixes
     keep beta.4's rule, and a rotating `xoxe.xoxb-` value is still one finding.
-  - `huggingface-token`: `hf_` and exactly 34 characters of `[A-Za-z0-9]`.
+  - `huggingface-token`: `hf_` and exactly 34 characters of `[A-Za-z0-9]`;
+    `api_org_` over the identical body grammar, re-tiered from a known false
+    negative to a supported variant (#485,
+    `decision-adopt-huggingface-organization-token-prefix`).
   - `cloudflare-token`: `cfut_`, 40 characters of `[A-Za-z0-9]`, and an 8-character
-    lowercase-hex checksum, validated lexically only.
+    lowercase-hex checksum, validated lexically only; `cfat_` over the
+    identical body and checksum grammar, likewise adopted from a known false
+    negative (#481, `decision-adopt-cloudflare-account-token-prefix`). The
+    third documented prefix, `cfk_`, stays unsupported pending checksum
+    evidence (#486).
   - `linear-token` `lin_api_`: exactly 40 characters of `[A-Za-z0-9]`;
     `lin_oauth_` is unchanged.
 
@@ -143,12 +153,51 @@ negatives stay in the linked decision records and `docs/audits/evidence/`.
   reclassifications are in `docs/audits/evidence/367/` and
   `docs/audits/evidence/376/`.
 
+### Reduced false positives
+
+- `generic-token` no longer reports a complete or argument-truncated source-code
+  call expression assigned to a credential-named variable (#467,
+  `decision-exclude-closed-call-code-expressions-as-contextual-values`).
+  Previously an expression like `secret = getSecretOrThrow(SECRET_NAME)` was
+  redacted at high confidence; a truncated call boundary
+  (`crypto.createPrivateKey({ key: pem })`) produced corrupted output by
+  splitting the redaction mid-expression. A quoted literal that merely
+  resembles a call, or an interpolation fragment opened on punctuation
+  (`$(...)`, `#{...}`, `{{...}}`), is unaffected and still detected.
+- `bearer-token` now excludes repeated-character filler
+  (`xxxxxxxxxxxxxxxxxxxx`) and whole-value placeholder vocabulary
+  (`PASSWORD_SECRET_EXAMPLE`) the same way `generic-token` already does for
+  `Basic`/`Token` schemes, so all three `Authorization` schemes agree on a
+  masked or placeholder value (#468,
+  `decision-exclude-filler-and-placeholder-bearer-values`).
+- `connection-string` now excludes an environment-variable-reference password
+  (`$DB_PASSWORD`, `$(db_password)`, `$env:DB_PASSWORD`, `{{ db_password }}`,
+  `#{ENV['DB_PASSWORD']}`, `{env:DB_PASSWORD}`, `%DB_PASSWORD%`) the same way
+  `generic-token` already does for a contextual `password=` assignment,
+  sharing the predicates through `super::text` (#469,
+  `decision-share-non-secret-reference-exclusions-with-connection-string`).
+  Previously only the braced `${...}` form was recognized; a connection URL
+  whose password was one of these idioms — the default in `docker-compose.yml`,
+  `.env` templates, and Kubernetes manifests — was redacted.
+- `jwt` no longer reports a legacy-format Supabase anonymous key: a
+  structurally valid three-segment JWT is excluded only when its payload
+  decodes to text containing both `"iss":"supabase"` and `"role":"anon"`
+  (#472, `decision-scope-supabase-legacy-anon-jwt-exclusion`). Every other
+  claim, including `service_role`, is still reported; the detector's
+  signature is not and cannot be verified.
+
 ### Internal, tooling, and qualification
 
 - Overlap resolution selects the disjoint candidate subset with the greatest
   total evidence instead of a greedy pass (#451,
   `decision-select-optimal-disjoint-candidates-by-total-evidence-weight`). No
   canonical fixture changes.
+- Confirmed `connection-string` and `jwt` need no incremental `has_open_*`
+  retention hint of their own (#480,
+  `decision-connection-string-and-jwt-need-no-retention-hint`): neither
+  detector's value grammar can span a line terminator, so the incremental
+  scanner's existing closed-line-only dispatch already covers them. No
+  behavior change.
 - Artifact qualification now runs the Node WebAssembly fallback and the
   Cloudflare Workers path for both profiles. The Node consumer lanes require
   `artifact()` to report `"addon"`, so a silent fallback cannot pass them. The

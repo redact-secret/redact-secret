@@ -57,3 +57,5 @@ future planning and implementation but do not authorize Git or release actions.
 - [Exclude repeated-character filler and whole-value placeholder vocabulary from bearer-token](2026-09-20-exclude-filler-and-placeholder-bearer-values.md)
 - [connection-string and jwt need no incremental retention hint of their own](2026-09-20-connection-string-and-jwt-need-no-retention-hint.md)
 - [Defer encoded-input decoding out of scope, with reasoning](2026-09-20-defer-encoded-input-decoding.md)
+- [Adopt the Cloudflare account-token prefix under the frozen cfut_ contract](2026-09-20-adopt-cloudflare-account-token-prefix.md)
+- [Adopt the Hugging Face organization-token prefix under hf_'s frozen body grammar, re-tiered to T2](2026-09-20-adopt-huggingface-organization-token-prefix.md)
