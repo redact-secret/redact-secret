@@ -4,15 +4,61 @@
 //! characters. This keeps arbitrary identifiers out of scope but
 //! intentionally misses short development tokens. Only the credential
 //! value, not the header, is selected.
+//!
+//! A value that is classic redaction filler or built entirely from
+//! recognized placeholder vocabulary is excluded
+//! ([`is_non_secret_bearer_value`]), the same two exclusions
+//! `generic-token` applies to the `Basic`/`Token` schemes -- see issue #468
+//! and `docs/decisions/2026-09-20-exclude-filler-and-placeholder-bearer-values.md`.
 
 use super::text::{
-    ascii_run_len, ends_with_ci, is_js_whitespace, prev_char, rskip_while_chars, starts_with_ci,
+    ascii_run_len, ends_with_ci, is_js_whitespace, is_repeated_character_filler,
+    matches_placeholder_vocabulary, prev_char, rskip_while_chars, starts_with_ci,
 };
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
 
 const MIN_TOKEN_LEN: usize = 16;
 const MAX_TRAILING_EQUALS: usize = 2;
+
+/// Mirrors `generic_token::PLACEHOLDER_WORDS`: the same whole-value
+/// placeholder vocabulary `authorization_candidates` already applies to the
+/// `Basic`/`Token` schemes (issue #468). Kept as a local copy rather than a
+/// cross-module import, matching how `connection_string.rs` keeps its own
+/// placeholder-word list rather than depending on `generic_token`.
+const PLACEHOLDER_WORDS: &[&str] = &[
+    "example",
+    "sample",
+    "placeholder",
+    "redacted",
+    "changeme",
+    "password",
+    "secret",
+    "replaceme",
+];
+
+/// Mirrors `generic_token::DIGIT_SUFFIX_PLACEHOLDER_WORDS`.
+const DIGIT_SUFFIX_PLACEHOLDER_WORDS: &[&str] = &[
+    "example",
+    "sample",
+    "placeholder",
+    "redacted",
+    "changeme",
+    "replaceme",
+];
+
+/// `true` when `value` -- the credential run before any trailing `=`
+/// padding -- is classic redaction filler (`xxxxxxxxxxxxxxxxxxxx`,
+/// `00000000000000000000`) or is built entirely from recognized placeholder
+/// vocabulary (`PASSWORD_SECRET_EXAMPLE`), the same two exclusions
+/// `generic-token` already applies to `Basic`/`Token` authorization values
+/// (issue #468, following the #264 pattern). Compound placeholder forms that
+/// mix a listed word with an unlisted one (`EXAMPLE_TOKEN_VALUE`) are a
+/// documented, out-of-scope false negative here, same as for `generic-token`.
+fn is_non_secret_bearer_value(value: &str) -> bool {
+    is_repeated_character_filler(value)
+        || matches_placeholder_vocabulary(value, PLACEHOLDER_WORDS, DIGIT_SUFFIX_PLACEHOLDER_WORDS)
+}
 
 /// `true` for the token alphabet: `[A-Za-z0-9._~+/-]`.
 fn is_token_char(byte: u8) -> bool {
@@ -130,7 +176,11 @@ impl Detector for BearerTokenDetector {
             let value_end = token_end + trailing_equals;
 
             let boundary_blocked = cursor > 0 && is_boundary_identifier_char(bytes[cursor - 1]);
-            if !boundary_blocked && let Some(range) = ByteRange::new(value_start, value_end) {
+            let value = &input[value_start..token_end];
+            if !boundary_blocked
+                && !is_non_secret_bearer_value(value)
+                && let Some(range) = ByteRange::new(value_start, value_end)
+            {
                 candidates.push(
                     Candidate::new("bearer_token", Confidence::High, range)
                         .with_specificity(Specificity::Structural)
@@ -285,5 +335,49 @@ mod tests {
         let candidates = detect(input);
         let (start, end) = only_range(&candidates);
         assert_eq!(&input[start..end], "SYNTHETIC_REVOKED_BEARER_VALUE==");
+    }
+
+    #[test]
+    fn repeated_character_filler_values_are_excluded() {
+        // issue #468: matches generic-token's exclusion of the same values
+        // under the Basic/Token schemes.
+        for filler in [
+            "xxxxxxxxxxxxxxxxxxxx",
+            "00000000000000000000",
+            "aaaaaaaaaaaaaaaaaaaa",
+            "--------------------",
+        ] {
+            let input = format!("Authorization: Bearer {filler}");
+            assert!(detect(&input).is_empty(), "{input:?}");
+        }
+    }
+
+    #[test]
+    fn a_near_miss_of_repeated_character_filler_is_still_detected() {
+        // A trailing, distinct character breaks the uniform run.
+        assert!(!detect("Bearer xxxxxxxxxxxxxxxxxxxxy").is_empty());
+    }
+
+    #[test]
+    fn whole_value_placeholder_vocabulary_is_excluded() {
+        // issue #468: every token is itself a word on the shared
+        // placeholder vocabulary, mirroring `is_generic_placeholder_word`.
+        assert!(detect("Authorization: Bearer PASSWORD_SECRET_EXAMPLE").is_empty());
+    }
+
+    #[test]
+    fn compound_placeholder_forms_are_not_excluded() {
+        // Documented, out-of-scope false negative (issue #468): a value
+        // mixing a listed placeholder word with an unlisted one is not
+        // whole-value placeholder vocabulary and stays detected, same as
+        // `generic-token`'s `is_generic_placeholder_word`.
+        assert!(!detect("Bearer EXAMPLE_TOKEN_VALUE").is_empty());
+    }
+
+    #[test]
+    fn a_real_looking_value_is_still_detected_at_high_confidence() {
+        let candidates = detect("Bearer SYNTHETIC_REVOKED_BEARER_VALUE");
+        assert_eq!(candidates.len(), 1);
+        assert_eq!(candidates[0].confidence(), Confidence::High);
     }
 }
