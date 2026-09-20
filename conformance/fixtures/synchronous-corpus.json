@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 1256,
+  "fixtureCount": 1287,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -28913,6 +28913,535 @@
         }
       ],
       "note": "Worst-case offset map: 2,048 alternating kept/removed code points (U+00AD) make two thirds of the line removed bytes and one seam per kept character, then a provider token split by U+200C follows. Bounds normalization and range translation through the adversarial runtime caps rather than a normalization threshold, which would itself be a bypass; the range is translated across every preceding seam. Issue #438; decision-normalize-invisible-characters-before-detection."
+    },
+    {
+      "id": "connection-negative-postgres-braced-env-reference",
+      "detector": "connection-string",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "postgres://app:${DB_PASSWORD}@db.internal:5432/example",
+      "expected": [],
+      "note": "The braced ${VAR} environment-variable reference form is excluded by is_placeholder's own direct check (predating issue #469), but had no corpus fixture of its own; this pins it alongside the six #469 forms below so every recognized reference syntax has committed evidence, not just the ones the #469 fix added."
+    },
+    {
+      "id": "connection-negative-postgres-bare-dollar-env-reference",
+      "detector": "connection-string",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "postgres://app:$DB_PASSWORD@db.internal:5432/example",
+      "expected": [],
+      "note": "issue #469: a bare shell/PowerShell environment-variable reference password (starts_with_bare_dollar_reference, shared with generic-token's issue #279 exclusion) is a pointer to a runtime-resolved secret, not a literal, and is excluded."
+    },
+    {
+      "id": "connection-negative-postgres-powershell-env-reference",
+      "detector": "connection-string",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "postgres://app:$env:DB_PASSWORD@db.internal:5432/example",
+      "expected": [],
+      "note": "issue #469: PowerShell's drive-qualified $env:VAR form is itself a valid identifier-start run under starts_with_bare_dollar_reference, so it is excluded the same as a bare $VAR reference."
+    },
+    {
+      "id": "connection-negative-postgres-command-substitution-reference",
+      "detector": "connection-string",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "postgres://app:$(db_password)@db.internal:5432/example",
+      "expected": [],
+      "note": "issue #469: a POSIX/shell or Makefile command-substitution reference ($(...)) names a command to resolve at runtime, not a secret, and is excluded (is_command_substitution_reference, shared with generic-token's issue #279 exclusion)."
+    },
+    {
+      "id": "connection-negative-postgres-template-reference",
+      "detector": "connection-string",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "postgres://app:{{db_password}}@db.internal:5432/example",
+      "expected": [],
+      "note": "issue #469: the idiomatic Jinja/Helm/Go-template reference syntax ({{ ... }}) is excluded the same as generic-token's contextual assignment case (is_template_reference)."
+    },
+    {
+      "id": "connection-negative-postgres-ruby-interpolation-reference",
+      "detector": "connection-string",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "postgres://app:#{db_password}@db.internal:5432/example",
+      "expected": [],
+      "note": "issue #469: a Ruby string-interpolation reference (#{...}) is excluded the same as generic-token's contextual assignment case (is_ruby_interpolation_reference)."
+    },
+    {
+      "id": "connection-negative-postgres-opencode-env-reference",
+      "detector": "connection-string",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "postgres://app:{env:DB_PASSWORD}@db.internal:5432/example",
+      "expected": [],
+      "note": "issue #469: an opencode {env:VAR} config substitution, resolved from the environment at load time rather than containing a secret directly, is excluded (is_opencode_reference)."
+    },
+    {
+      "id": "connection-negative-postgres-windows-env-reference",
+      "detector": "connection-string",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "postgres://app:%DB_PASSWORD%@db.internal:5432/example",
+      "expected": [],
+      "note": "issue #469: a cmd.exe/batch-style Windows environment-variable reference (%IDENTIFIER%), expanded by the shell at runtime, is excluded (is_windows_env_reference)."
+    },
+    {
+      "id": "connection-positive-dollar-not-identifier-still-detected",
+      "detector": "connection-string",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "postgres://app:$3cretSyntheticRevoked@db.internal:5432/example",
+      "expected": [
+        {
+          "detector": "connection-string",
+          "type": "connection_string_password",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 15,
+          "end": 37
+        }
+      ],
+      "note": "issue #469: the byte after '$' is a digit, not an identifier-start character, so this does not satisfy the bare shell/PowerShell env-reference shape and stays detected -- the boundary the reference exclusions deliberately do not cross."
+    },
+    {
+      "id": "connection-positive-embedded-dollar-still-detected",
+      "detector": "connection-string",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "postgres://app:abcSyntheticRevoked$Def@db.internal:5432/example",
+      "expected": [
+        {
+          "detector": "connection-string",
+          "type": "connection_string_password",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 15,
+          "end": 38
+        }
+      ],
+      "note": "issue #469: a password merely containing '$' partway through, rather than starting with one of the recognized reference shapes, is not a reference and stays detected."
+    },
+    {
+      "id": "connection-positive-unclosed-command-substitution-still-detected",
+      "detector": "connection-string",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "postgres://app:$(SyntheticRevokedPassword@db.internal:5432/example",
+      "expected": [
+        {
+          "detector": "connection-string",
+          "type": "connection_string_password",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 15,
+          "end": 41
+        }
+      ],
+      "note": "issue #469: a command-substitution opener ($() without its closing paren is not fully delimited, so is_command_substitution_reference does not match and the value stays detected."
+    },
+    {
+      "id": "connection-negative-docker-compose-env-var-password",
+      "detector": "connection-string",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "docker-compose"
+      ],
+      "input": "services:\n  db:\n    image: postgres:16\n    restart: always\n    environment:\n      DATABASE_URL: postgres://app:$DB_PASSWORD@db:5432/appdb\n",
+      "expected": [],
+      "note": "issue #475: a docker-compose.yml service definition passing the database password through as a shell-expanded $VAR, the exact shape the issue's own probing found live -- realistic multi-line evidence for the #469 exclusion, not just a bare single-line URL."
+    },
+    {
+      "id": "connection-positive-docker-compose-real-password-still-detected",
+      "detector": "connection-string",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "docker-compose"
+      ],
+      "input": "services:\n  db:\n    image: postgres:16\n    restart: always\n    environment:\n      DATABASE_URL: postgres://app:SYNTHETICREVOKEDCOMPOSEPW1@db:5432/appdb\n",
+      "expected": [
+        {
+          "detector": "connection-string",
+          "type": "connection_string_password",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 111,
+          "end": 137
+        }
+      ],
+      "note": "issue #475: the docker-compose fixture's paired positive -- a real-looking literal password in the same YAML shape stays detected at high confidence."
+    },
+    {
+      "id": "connection-negative-json-config-env-var-password",
+      "detector": "connection-string",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\n  \"service\": \"billing\",\n  \"database\": {\n    \"url\": \"postgres://app:${DB_PASSWORD}@db.internal:5432/billing\"\n  }\n}\n",
+      "expected": [],
+      "note": "issue #475: a JSON application-config file whose database URL carries a braced ${VAR} reference stays clean -- connection-string had no JSON-context fixture at all before this issue."
+    },
+    {
+      "id": "connection-positive-json-config-real-password-still-detected",
+      "detector": "connection-string",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\n  \"service\": \"billing\",\n  \"database\": {\n    \"url\": \"postgres://app:SYNTHETICREVOKEDJSONPW01@db.internal:5432/billing\"\n  }\n}\n",
+      "expected": [
+        {
+          "detector": "connection-string",
+          "type": "connection_string_password",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 69,
+          "end": 93
+        }
+      ],
+      "note": "issue #475: the JSON-config fixture's paired positive -- a real-looking literal password in the same file shape stays detected at high confidence."
+    },
+    {
+      "id": "connection-negative-dotenv-example-braced-reference",
+      "detector": "connection-string",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "# .env.example\n# Copy to .env and fill in real credentials before running the service.\nDATABASE_URL=postgres://app:${DB_PASSWORD}@db.internal:5432/example\n",
+      "expected": [],
+      "note": "issue #475: a realistic multi-line .env.example file -- the exact host document the issue names -- stays clean when the password position is a ${VAR} reference; connection-string's only prior dotenv fixture (connection-host-dotenv) was a single line with no reference form."
+    },
+    {
+      "id": "connection-positive-dotenv-real-password-still-detected",
+      "detector": "connection-string",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "# .env\nDATABASE_URL=postgres://app:SYNTHETICREVOKEDDOTENVPW1@db.internal:5432/example\n",
+      "expected": [
+        {
+          "detector": "connection-string",
+          "type": "connection_string_password",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 35,
+          "end": 60
+        }
+      ],
+      "note": "issue #475: the .env.example fixture's paired positive -- a real .env file with a literal password stays detected at high confidence."
+    },
+    {
+      "id": "bearer-negative-repeated-character-filler-yaml",
+      "detector": "bearer-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "steps:\n  - name: Call internal API\n    run: |\n      curl -H \"Authorization: Bearer xxxxxxxxxxxxxxxxxxxx\" https://api.internal/health\n",
+      "expected": [],
+      "note": "issue #475: a CI step's curl command line carrying a repeated-character filler Bearer value stays clean; bearer-token had no yaml-context fixture at all before this issue."
+    },
+    {
+      "id": "bearer-positive-yaml-real-token-still-detected",
+      "detector": "bearer-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "steps:\n  - name: Call internal API\n    run: |\n      curl -H \"Authorization: Bearer SYNTHETIC_REVOKED_YAML_STEP_BEARER_VALUE\" https://api.internal/health\n",
+      "expected": [
+        {
+          "detector": "bearer-token",
+          "type": "bearer_token",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 83,
+          "end": 123
+        }
+      ],
+      "note": "issue #475: the CI-step fixture's paired positive -- a real-looking Bearer value in the same YAML shape stays detected at high confidence."
+    },
+    {
+      "id": "bearer-negative-repeated-character-filler-dotenv",
+      "detector": "bearer-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "# .env.example\n# Local development uses a filler value; CI injects the real token.\nAUTHORIZATION_HEADER=\"Bearer xxxxxxxxxxxxxxxxxxxx\"\n",
+      "expected": [],
+      "note": "issue #475: a realistic .env.example carrying a repeated-character filler Bearer value stays clean; bearer-token had no dotenv-context fixture at all before this issue."
+    },
+    {
+      "id": "bearer-positive-dotenv-real-token-still-detected",
+      "detector": "bearer-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "# .env\nAUTHORIZATION_HEADER=\"Bearer SYNTHETIC_REVOKED_DOTENV_BEARER_VALUE\"\n",
+      "expected": [
+        {
+          "detector": "bearer-token",
+          "type": "bearer_token",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 36,
+          "end": 73
+        }
+      ],
+      "note": "issue #475: the .env.example fixture's paired positive -- a real .env file with a literal Bearer value stays detected at high confidence."
+    },
+    {
+      "id": "bearer-negative-placeholder-markdown",
+      "detector": "bearer-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "markdown"
+      ],
+      "input": "## Authenticating\n\n```http\nGET /v1/resource HTTP/1.1\nAuthorization: Bearer PASSWORD_SECRET_EXAMPLE\n```\n",
+      "expected": [],
+      "note": "issue #475: a fenced HTTP example in API documentation whose Bearer value is whole-value placeholder vocabulary stays clean; bearer-token had no markdown-context fixture at all before this issue."
+    },
+    {
+      "id": "bearer-positive-markdown-real-token-still-detected",
+      "detector": "bearer-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "markdown"
+      ],
+      "input": "## Authenticating\n\n```http\nGET /v1/resource HTTP/1.1\nAuthorization: Bearer SYNTHETIC_REVOKED_MARKDOWN_BEARER_VALUE\n```\n",
+      "expected": [
+        {
+          "detector": "bearer-token",
+          "type": "bearer_token",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 75,
+          "end": 114
+        }
+      ],
+      "note": "issue #475: the fenced-example fixture's paired positive -- a real-looking Bearer value in the same Markdown shape stays detected at high confidence."
+    },
+    {
+      "id": "jwt-negative-legacy-supabase-anon-dotenv",
+      "detector": "jwt",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "# .env.example\nSUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5bnRocHJvaiIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzAwMDAwMDAwLCJleHAiOjE3OTk5OTk5OTl9.SYNTHETIC_REVOKED_SUPABASE_LEGACY_JWT_SIGNATURE\n",
+      "expected": [],
+      "note": "issue #475: a realistic .env.example exposing the public Supabase anon key by its conventional SUPABASE_ANON_KEY name stays clean under the #472 carve-out; jwt had no dotenv-context fixture at all before this issue."
+    },
+    {
+      "id": "jwt-positive-legacy-supabase-service-role-dotenv",
+      "detector": "jwt",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "# .env\nSUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5bnRocHJvaiIsInJvbGUiOiJzZXJ2aWNlX3JvbGUiLCJpYXQiOjE3MDAwMDAwMDAsImV4cCI6MTc5OTk5OTk5OX0.SYNTHETIC_REVOKED_SUPABASE_LEGACY_JWT_SIGNATURE\n",
+      "expected": [
+        {
+          "detector": "jwt",
+          "type": "jwt",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 33,
+          "end": 241
+        }
+      ],
+      "note": "issue #475: the .env.example fixture's paired positive -- a real .env file whose key is named and shaped as a service_role secret stays detected at high confidence."
+    },
+    {
+      "id": "jwt-negative-legacy-supabase-anon-yaml",
+      "detector": "jwt",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "env:\n  SUPABASE_URL: https://synthproj.supabase.co\n  SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5bnRocHJvaiIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzAwMDAwMDAwLCJleHAiOjE3OTk5OTk5OTl9.SYNTHETIC_REVOKED_SUPABASE_LEGACY_JWT_SIGNATURE\n",
+      "expected": [],
+      "note": "issue #475: a realistic CI/deployment YAML env block exposing the public Supabase anon key stays clean under the #472 carve-out; jwt had no yaml-context fixture at all before this issue."
+    },
+    {
+      "id": "jwt-positive-legacy-supabase-service-role-yaml",
+      "detector": "jwt",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "env:\n  SUPABASE_URL: https://synthproj.supabase.co\n  SUPABASE_SERVICE_ROLE_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5bnRocHJvaiIsInJvbGUiOiJzZXJ2aWNlX3JvbGUiLCJpYXQiOjE3MDAwMDAwMDAsImV4cCI6MTc5OTk5OTk5OX0.SYNTHETIC_REVOKED_SUPABASE_LEGACY_JWT_SIGNATURE\n",
+      "expected": [
+        {
+          "detector": "jwt",
+          "type": "jwt",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 80,
+          "end": 288
+        }
+      ],
+      "note": "issue #475: the CI/deployment YAML fixture's paired positive -- the same env block naming a service_role secret stays detected at high confidence."
+    },
+    {
+      "id": "jwt-negative-legacy-supabase-anon-markdown",
+      "detector": "jwt",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "markdown"
+      ],
+      "input": "## Client setup\n\n```js\nconst supabase = createClient(url, \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5bnRocHJvaiIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzAwMDAwMDAwLCJleHAiOjE3OTk5OTk5OTl9.SYNTHETIC_REVOKED_SUPABASE_LEGACY_JWT_SIGNATURE\")\n```\n",
+      "expected": [],
+      "note": "issue #475: a fenced client-side setup snippet in documentation, the idiomatic place the public Supabase anon key is meant to be shown, stays clean under the #472 carve-out; jwt had no markdown-context fixture at all before this issue."
+    },
+    {
+      "id": "jwt-positive-legacy-supabase-service-role-markdown",
+      "detector": "jwt",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "markdown"
+      ],
+      "input": "## Server setup\n\n```js\nconst supabase = createClient(url, \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5bnRocHJvaiIsInJvbGUiOiJzZXJ2aWNlX3JvbGUiLCJpYXQiOjE3MDAwMDAwMDAsImV4cCI6MTc5OTk5OTk5OX0.SYNTHETIC_REVOKED_SUPABASE_LEGACY_JWT_SIGNATURE\")\n```\n",
+      "expected": [
+        {
+          "detector": "jwt",
+          "type": "jwt",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 59,
+          "end": 267
+        }
+      ],
+      "note": "issue #475: the fenced client-setup fixture's paired positive -- a server-side snippet using a service_role secret in the same shape stays detected at high confidence."
+    },
+    {
+      "id": "contextual-positive-prose-high-signal-name-tradeoff",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Set password= followed by your chosen passphrase.",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "medium",
+          "specificity": "contextual",
+          "start": 14,
+          "end": 22
+        }
+      ],
+      "note": "issue #473: ordinary documentation prose naming a credential parameter (password=) followed by an ordinary English word is indistinguishable from a real weak credential at the character-grammar level and is classified as contextual_secret at Confidence::Medium/Action::Warn -- an accepted precision/recall tradeoff, not a bug (docs/decisions/2026-09-20-warn-unconditionally-on-high-signal-contextual-names.md), the same kind bearer-boundary-prose-long-word-tradeoff documents for bearer-token."
+    },
+    {
+      "id": "contextual-positive-prose-high-signal-name-tradeoff-markdown",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "markdown"
+      ],
+      "input": "## Authentication\n\nThe api_key: parameter is required for all authenticated endpoints.",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "medium",
+          "specificity": "contextual",
+          "start": 32,
+          "end": 41
+        }
+      ],
+      "note": "issue #473: the same accepted prose tradeoff in a realistic README-style Markdown section -- exactly the host document the issue's own proposal names as one that would have caught this class -- still warns at Confidence::Medium, pinning the tradeoff outside plain-text too."
     }
   ]
 }

@@ -1148,12 +1148,15 @@
     {
       "detector": "jwt",
       "evidence": {
-        "fixtureCount": 21,
+        "fixtureCount": 27,
         "hostContextsExercised": [
+          "dotenv",
           "json",
           "log",
+          "markdown",
           "plain-text",
-          "shell"
+          "shell",
+          "yaml"
         ],
         "kindsWithSupportedEvidence": [
           "adversarial",
@@ -1173,6 +1176,9 @@
         "jwt-positive-context-log",
         "jwt-positive-context-shell",
         "jwt-positive-legacy-supabase-service-role-claim",
+        "jwt-positive-legacy-supabase-service-role-dotenv",
+        "jwt-positive-legacy-supabase-service-role-markdown",
+        "jwt-positive-legacy-supabase-service-role-yaml",
         "jwt-positive-structural-despite-fabricated-claims",
         "jwt-positive-structured"
       ],
@@ -1184,12 +1190,15 @@
     {
       "detector": "bearer-token",
       "evidence": {
-        "fixtureCount": 25,
+        "fixtureCount": 31,
         "hostContextsExercised": [
+          "dotenv",
           "http",
           "json",
           "log",
-          "plain-text"
+          "markdown",
+          "plain-text",
+          "yaml"
         ],
         "kindsWithSupportedEvidence": [
           "adversarial",
@@ -1208,9 +1217,12 @@
         "bearer-positive-compound-placeholder-not-excluded",
         "bearer-positive-context-json",
         "bearer-positive-context-log",
+        "bearer-positive-dotenv-real-token-still-detected",
+        "bearer-positive-markdown-real-token-still-detected",
         "bearer-positive-near-miss-repeated-character-filler",
         "bearer-positive-scheme",
-        "bearer-positive-tab-and-uppercase"
+        "bearer-positive-tab-and-uppercase",
+        "bearer-positive-yaml-real-token-still-detected"
       ],
       "policyClass": "always-redact",
       "schemeRows": "not-applicable",
@@ -1220,10 +1232,12 @@
     {
       "detector": "connection-string",
       "evidence": {
-        "fixtureCount": 86,
+        "fixtureCount": 103,
         "hostContextsExercised": [
+          "docker-compose",
           "dotenv",
           "javascript",
+          "json",
           "log",
           "markdown",
           "plain-text",
@@ -1252,7 +1266,12 @@
         "connection-positive-azure-http",
         "connection-positive-azure-https",
         "connection-positive-azure-sovereign-suffix",
+        "connection-positive-docker-compose-real-password-still-detected",
+        "connection-positive-dollar-not-identifier-still-detected",
+        "connection-positive-dotenv-real-password-still-detected",
+        "connection-positive-embedded-dollar-still-detected",
         "connection-positive-encoded-ipv6",
+        "connection-positive-json-config-real-password-still-detected",
         "connection-positive-mariadb-percent-encoded",
         "connection-positive-mongodb-seed-list",
         "connection-positive-mongodb-srv",
@@ -1263,6 +1282,7 @@
         "connection-positive-postgresql",
         "connection-positive-redis-password-only",
         "connection-positive-rediss-fragment",
+        "connection-positive-unclosed-command-substitution-still-detected",
         "connection-regression-placeholder-embedded-in-password"
       ],
       "policyClass": "always-redact",
@@ -1418,7 +1438,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 130,
+        "fixtureCount": 132,
         "hostContextsExercised": [
           "chat",
           "dotenv",
@@ -1479,6 +1499,8 @@
         "contextual-positive-nested-no-separator-unicode-prefix",
         "contextual-positive-onepassword-scheme-prefix-still-detected",
         "contextual-positive-password-underscore-value-still-detected",
+        "contextual-positive-prose-high-signal-name-tradeoff",
+        "contextual-positive-prose-high-signal-name-tradeoff-markdown",
         "contextual-positive-quoted-unbalanced-paren-still-detected",
         "contextual-positive-remaining-declared-names",
         "contextual-positive-single-quoted-value",
@@ -1501,7 +1523,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 130,
+        "fixtureCount": 132,
         "hostContextsExercised": [
           "chat",
           "dotenv",

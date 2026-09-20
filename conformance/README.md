@@ -227,6 +227,20 @@ Expected ranges are UTF-8 byte offsets into the **original** input and include
 every removed code point strictly inside the value; a runner that scans a
 normalized copy must translate back before comparing.
 
+## Negative-coverage shape tracking
+
+For the structural and contextual detectors (`generic-token`, `bearer-token`,
+`connection-string`, `jwt`), negative coverage is tracked per valid-but-non-
+secret **shape** — an exclusion predicate or accepted tradeoff in the
+detector's own source, each with a paired negative/positive fixture proving
+it — not by a raw fixture count, which hides how unevenly coverage is
+distributed across shapes (issue #475).
+[`docs/audits/evidence/475/shape-inventory.json`](../docs/audits/evidence/475/shape-inventory.json)
+is the reviewed inventory, comparable in form to the provider-grammar
+contracts in [`docs/audits/evidence/367/precision-contracts.json`](../docs/audits/evidence/367/precision-contracts.json).
+A new exclusion or accepted tradeoff for one of these four detectors should
+add its shape (and cited fixtures) there, not just its fixtures here.
+
 ## Fixture safety review
 
 Any addition to the corpus — a new detector's positive case, a hand-authored
