@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 1246,
+  "fixtureCount": 1256,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -12554,6 +12554,102 @@
       "note": "A long invalid alphabet terminates without a finding."
     },
     {
+      "id": "bearer-negative-repeated-character-filler-run-of-x",
+      "detector": "bearer-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Authorization: Bearer xxxxxxxxxxxxxxxxxxxx",
+      "expected": [],
+      "note": "issue #468: a run of the same repeated ASCII character is classic redaction-style filler, the same exclusion generic-token already applies to the Basic/Token schemes (see authorization-negative-basic-repeated-character-filler)."
+    },
+    {
+      "id": "bearer-negative-repeated-character-filler-run-of-zero",
+      "detector": "bearer-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Authorization: Bearer 00000000000000000000",
+      "expected": [],
+      "note": "issue #468: matches bearer-negative-repeated-character-filler-run-of-x with a different filler character."
+    },
+    {
+      "id": "bearer-negative-repeated-character-filler-run-of-dash",
+      "detector": "bearer-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Authorization: Bearer --------------------",
+      "expected": [],
+      "note": "issue #468: matches bearer-negative-repeated-character-filler-run-of-x with a different filler character; `-` is a member of the Bearer token alphabet, unlike `*`."
+    },
+    {
+      "id": "bearer-negative-placeholder-whole-value",
+      "detector": "bearer-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Authorization: Bearer PASSWORD_SECRET_EXAMPLE",
+      "expected": [],
+      "note": "issue #468: every underscore-separated token is itself a recognized placeholder word, the same whole-value placeholder exclusion generic-token already applies to the Basic/Token schemes (see authorization-negative-basic-placeholder-whole-value)."
+    },
+    {
+      "id": "bearer-positive-near-miss-repeated-character-filler",
+      "detector": "bearer-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Bearer xxxxxxxxxxxxxxxxxxxxy",
+      "expected": [
+        {
+          "detector": "bearer-token",
+          "type": "bearer_token",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 7,
+          "end": 28
+        }
+      ],
+      "note": "issue #468: a trailing, distinct character breaks the uniform run, so the value is not repeated-character filler and stays detected."
+    },
+    {
+      "id": "bearer-positive-compound-placeholder-not-excluded",
+      "detector": "bearer-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Bearer EXAMPLE_TOKEN_VALUE",
+      "expected": [
+        {
+          "detector": "bearer-token",
+          "type": "bearer_token",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 7,
+          "end": 26
+        }
+      ],
+      "note": "issue #468: a listed placeholder word ('example') alongside unlisted tokens ('token', 'value') is not whole-value placeholder vocabulary and stays detected -- a documented, out-of-scope compound-placeholder false negative, the same tradeoff generic-token already accepts (see regression-placeholder-word-with-unrelated-tokens)."
+    },
+    {
       "id": "connection-positive-postgres",
       "detector": "connection-string",
       "kind": "positive",
@@ -13639,6 +13735,58 @@
       "input": "Authorization: Digest SYNTHETIC_REVOKED_DIGEST_VALUE_1234",
       "expected": [],
       "note": "A scheme other than Basic or Token is not a near-miss match."
+    },
+    {
+      "id": "authorization-negative-basic-repeated-character-filler",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Authorization: Basic xxxxxxxxxxxxxxxxxxxx",
+      "expected": [],
+      "note": "issue #468: committed coverage of the exclusion authorization_candidates already applies to the Basic scheme, alongside the equivalent bearer-token fixture."
+    },
+    {
+      "id": "authorization-negative-token-repeated-character-filler",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Authorization: Token xxxxxxxxxxxxxxxxxxxx",
+      "expected": [],
+      "note": "issue #468: committed coverage of the exclusion authorization_candidates already applies to the Token scheme, alongside the equivalent bearer-token fixture."
+    },
+    {
+      "id": "authorization-negative-basic-placeholder-whole-value",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Authorization: Basic PASSWORD_SECRET_EXAMPLE",
+      "expected": [],
+      "note": "issue #468: committed coverage of the whole-value placeholder exclusion authorization_candidates already applies to the Basic scheme, alongside the equivalent bearer-token fixture."
+    },
+    {
+      "id": "authorization-negative-token-placeholder-whole-value",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Authorization: Token PASSWORD_SECRET_EXAMPLE",
+      "expected": [],
+      "note": "issue #468: committed coverage of the whole-value placeholder exclusion authorization_candidates already applies to the Token scheme, alongside the equivalent bearer-token fixture."
     },
     {
       "id": "contextual-positive-assignment",

@@ -1334,6 +1334,79 @@ mod tests {
         assert_eq!(candidates[0].specificity(), Some(Specificity::Contextual));
     }
 
+    // issue #473: `assignment_confidence` returns `Some` unconditionally for
+    // any `HIGH_SIGNAL_NAMES` match — entropy and length only choose between
+    // `High` and `Medium`, they never reject. Ordinary documentation prose
+    // that names a credential parameter is, at the character-grammar level,
+    // indistinguishable from a real weak credential of the same shape: both
+    // are short, low-entropy, single unquoted "words" immediately after the
+    // assignment delimiter. See
+    // `docs/decisions/2026-09-20-warn-unconditionally-on-high-signal-contextual-names.md`
+    // for why no threshold separates them and this is an accepted tradeoff,
+    // the way `bearer_token.rs`'s
+    // `ordinary_prose_usage_of_bearer_is_safe_but_a_long_incidental_word_is_an_accepted_tradeoff`
+    // documents the equivalent tradeoff for that detector.
+    #[test]
+    fn high_signal_names_warn_on_ordinary_prose_as_an_accepted_precision_tradeoff() {
+        for (input, captured) in [
+            (
+                "The otpauth URI format includes a secret= parameter holding the shared seed.",
+                "parameter",
+            ),
+            (
+                "Set password= followed by your chosen passphrase.",
+                "followed",
+            ),
+            (
+                "The api_key: parameter is required for all authenticated endpoints.",
+                "parameter",
+            ),
+            (
+                "Use client_secret: obtained from the developer console.",
+                "obtained",
+            ),
+            (
+                "Each request needs an access_token: retrieved during the OAuth exchange.",
+                "retrieved",
+            ),
+            (
+                "The private_key: argument accepts a PEM-encoded string.",
+                "argument",
+            ),
+            (
+                "Pass secret: whichever value your provider issued.",
+                "whichever",
+            ),
+            (
+                "Configure password: something memorable but strong.",
+                "something",
+            ),
+            (
+                "The webhook_secret= configuration determines signature validation.",
+                "configuration",
+            ),
+            (
+                "Note that api_key= supports environment interpolation.",
+                "supports",
+            ),
+        ] {
+            let candidates = detect(input);
+            assert_eq!(candidates.len(), 1, "{input:?}");
+            assert_eq!(candidates[0].type_name(), "contextual_secret");
+            assert_eq!(candidates[0].confidence(), Confidence::Medium);
+            let (start, end) = only_range(&candidates);
+            assert_eq!(&input[start..end], captured, "{input:?}");
+        }
+
+        // A real weak credential of the same shape — short, low-entropy, a
+        // single unquoted word — classifies identically to the prose cases
+        // above: the constraint that makes them unfixable by threshold.
+        let input = "password=hunter2xyz";
+        let candidates = detect(input);
+        assert_eq!(candidates.len(), 1);
+        assert_eq!(candidates[0].confidence(), Confidence::Medium);
+    }
+
     #[test]
     fn escaped_quote_stays_inside_one_structured_value_span() {
         let input = "{\"api_key\":\"SYNTHETIC_REVOKED_\\\"QUOTED_VALUE\"}";

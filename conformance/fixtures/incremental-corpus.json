@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 77,
+  "fixtureCount": 78,
   "fixtures": [
     {
       "id": "synthetic-regression-malformed-authority",
@@ -837,6 +837,22 @@
         }
       ],
       "note": "issue #323: the word 'bearer' embedded inside a wider identifier ('notbearer', already excluded by the boundary check) sits directly before a genuine explicit Bearer scheme on the next line, sharing the same 'bearer' bytes the detector's scheme match inspects. Every UTF-8 chunk split, including splits that fall inside either line's 'bearer' text, must still discriminate the two the same way the whole-input scan does."
+    },
+    {
+      "id": "bearer-token-filler-and-placeholder-exclusion-boundary",
+      "input": "Authorization: Bearer xxxxxxxxxxxxxxxxxxxx\nBearer SYNTHETIC_REVOKED_BEARER_INCREMENTAL_VALUE",
+      "text": "Authorization: Bearer xxxxxxxxxxxxxxxxxxxx\nBearer <SECRET_1>",
+      "expected": [
+        {
+          "detector": "bearer-token",
+          "type": "bearer_token",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 50,
+          "end": 92
+        }
+      ],
+      "note": "issue #468: a repeated-character filler Bearer value on the first line is excluded and produces no finding, while a genuine Bearer credential on the second line is still reported; every UTF-8 chunk split, including splits inside the filler run or across the line boundary, must reproduce this whole-input reference."
     },
     {
       "id": "vault-embedded-identifier-discriminating-boundary",

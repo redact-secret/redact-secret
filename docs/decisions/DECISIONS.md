@@ -53,3 +53,5 @@ future planning and implementation but do not authorize Git or release actions.
 - [Exclude closed-call source-code expressions from generic-token's contextual values](2026-09-20-exclude-closed-call-code-expressions-as-contextual-values.md)
 - [Share generic-token's interpolation and environment-reference exclusions with connection-string's password check](2026-09-20-share-non-secret-reference-exclusions-with-connection-string.md)
 - [Scope a payload-trusting exclusion for the legacy Supabase anon JWT to iss+role together](2026-09-20-scope-supabase-legacy-anon-jwt-exclusion.md)
+- [Warn unconditionally on high-signal contextual-name assignments despite prose false positives](2026-09-20-warn-unconditionally-on-high-signal-contextual-names.md)
+- [Exclude repeated-character filler and whole-value placeholder vocabulary from bearer-token](2026-09-20-exclude-filler-and-placeholder-bearer-values.md)

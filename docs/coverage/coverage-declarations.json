@@ -2986,8 +2986,10 @@
           "evidenceFixtureIds": [
             "bearer-boundary-prose-long-word-tradeoff",
             "bearer-positive-authorization-extra-whitespace-and-case",
+            "bearer-positive-compound-placeholder-not-excluded",
             "bearer-positive-context-json",
             "bearer-positive-context-log",
+            "bearer-positive-near-miss-repeated-character-filler",
             "bearer-positive-scheme",
             "bearer-positive-tab-and-uppercase"
           ],
@@ -3024,7 +3026,11 @@
           "evidenceFixtureIds": [
             "bearer-negative-identifier",
             "bearer-negative-missing-value",
-            "bearer-negative-prose-ordinary"
+            "bearer-negative-placeholder-whole-value",
+            "bearer-negative-prose-ordinary",
+            "bearer-negative-repeated-character-filler-run-of-dash",
+            "bearer-negative-repeated-character-filler-run-of-x",
+            "bearer-negative-repeated-character-filler-run-of-zero"
           ],
           "state": "supported"
         },
@@ -3750,6 +3756,10 @@
         {
           "dimension": "near-miss-negative",
           "evidenceFixtureIds": [
+            "authorization-negative-basic-placeholder-whole-value",
+            "authorization-negative-basic-repeated-character-filler",
+            "authorization-negative-token-placeholder-whole-value",
+            "authorization-negative-token-repeated-character-filler",
             "authorization-negative-unsupported-scheme",
             "contextual-negative-unqualified-random-text"
           ],
@@ -3770,6 +3780,10 @@
             "authorization-host-log",
             "authorization-host-markdown",
             "authorization-host-shell",
+            "authorization-negative-basic-placeholder-whole-value",
+            "authorization-negative-basic-repeated-character-filler",
+            "authorization-negative-token-placeholder-whole-value",
+            "authorization-negative-token-repeated-character-filler",
             "authorization-negative-unsupported-scheme",
             "authorization-overlap-contextual-assignment",
             "authorization-positive-basic",
@@ -4778,6 +4792,7 @@
             "anthropic-legacy-versioned-prefix-discriminating-boundary",
             "aws-access-key-exact-length-discriminating-boundary",
             "aws-contextual-assignment",
+            "bearer-token-filler-and-placeholder-exclusion-boundary",
             "bearer-token-lookalike-identifier-discriminating-boundary",
             "cloudflare-embedded-identifier-discriminating-boundary",
             "contextual-assignment",
@@ -5092,6 +5107,7 @@
             "anthropic-legacy-versioned-prefix-discriminating-boundary",
             "aws-access-key-exact-length-discriminating-boundary",
             "aws-contextual-assignment",
+            "bearer-token-filler-and-placeholder-exclusion-boundary",
             "bearer-token-lookalike-identifier-discriminating-boundary",
             "cloudflare-embedded-identifier-discriminating-boundary",
             "contextual-assignment",
@@ -5528,6 +5544,7 @@
             "anthropic-legacy-versioned-prefix-discriminating-boundary",
             "aws-access-key-exact-length-discriminating-boundary",
             "aws-contextual-assignment",
+            "bearer-token-filler-and-placeholder-exclusion-boundary",
             "bearer-token-lookalike-identifier-discriminating-boundary",
             "cloudflare-embedded-identifier-discriminating-boundary",
             "contextual-assignment",
