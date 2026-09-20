@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 1233,
+  "fixtureCount": 1242,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -16061,6 +16061,150 @@
         }
       ],
       "note": "issue #278: paired positive fixture -- a real-looking unquoted value containing '.' with no known code-reference root and no lower_snake_case segment (every segment is SCREAMING_CASE) does not satisfy either new exclusion and stays detected, the false-negative boundary the new exclusions deliberately do not cross."
+    },
+    {
+      "id": "contextual-negative-pascal-case-member-call-expression",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "python"
+      ],
+      "input": "secret = SecretManagerServiceClient.access_secret_version(req)",
+      "expected": [],
+      "note": "issue #467 (#278 residual): a client type's member call is a '.'-separated identifier chain ending in a balanced '(...)' argument group that spans the whole value -- a call expression naming where a secret is fetched from, not a literal -- and is excluded."
+    },
+    {
+      "id": "contextual-negative-bare-function-call-expression",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "javascript"
+      ],
+      "input": "secret = getSecretOrThrow(SECRET_NAME_CONSTANT)",
+      "expected": [],
+      "note": "issue #467 (#278 residual): a bare function call with a constant argument is a single-segment call expression and is excluded; #278's checks saw neither a listed reference root nor a trailing open bracket here."
+    },
+    {
+      "id": "contextual-negative-dotted-chain-call-expression",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "python"
+      ],
+      "input": "secret = django.core.signing.get_cookie_signer(salt=SALT)",
+      "expected": [],
+      "note": "issue #467 (#278 residual): a dotted module chain ending in a keyword-argument call is excluded. The chain stops being all lower_snake_case once the call group is attached, so #278's snake_case-chain check never reached it."
+    },
+    {
+      "id": "contextual-negative-keyword-argument-call-expression",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "python"
+      ],
+      "input": "api_key = rsa.generate_private_key(public_exponent=65537)",
+      "expected": [],
+      "note": "issue #467 (#278 residual): a key-construction call assigned to a credential-named variable constructs a secret at runtime rather than containing one, and is excluded."
+    },
+    {
+      "id": "contextual-negative-call-truncated-at-object-literal",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "javascript"
+      ],
+      "input": "secret = crypto.createPrivateKey({ key: pem })",
+      "expected": [],
+      "note": "issue #467 (#278 residual): the unquoted-value scan stops at the space inside the object-literal argument, so the captured value is only 'crypto.createPrivateKey({' -- a call opened on an identifier and never closed. Redacting it used to strand ' key: pem })' on the line as syntactically broken output."
+    },
+    {
+      "id": "contextual-negative-call-truncated-at-argument-comma",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "python"
+      ],
+      "input": "secret = helper(FIRST_ARGUMENT, SECOND_ARGUMENT)",
+      "expected": [],
+      "note": "issue #467 (#278 residual): the unquoted-value scan stops at the comma between arguments, so the captured value is only 'helper(FIRST_ARGUMENT' -- the same cut-inside-the-group shape, which would otherwise strand ' SECOND_ARGUMENT)'."
+    },
+    {
+      "id": "contextual-positive-embedded-parentheses-still-detected",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "password: SYNTHETIC(REVOKED)_CONTEXT_VALUE",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 10,
+          "end": 42
+        }
+      ],
+      "note": "issue #467: paired positive fixture -- a real-looking unquoted value that merely embeds a balanced '(...)' has trailing characters after the group, so it is not a call expression end to end and stays detected. This is the false-negative boundary the closed-call exclusion deliberately does not cross."
+    },
+    {
+      "id": "contextual-positive-quoted-unbalanced-paren-still-detected",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "password: \"SYNTHETIC(REVOKED_CONTEXT_VALUE\"",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 11,
+          "end": 42
+        }
+      ],
+      "note": "issue #467: paired positive fixture -- a quoted value carries its own delimiters and is never cut mid-group, so the truncated-call exclusion does not apply to it and a parenthesized literal passphrase stays detected at high confidence."
+    },
+    {
+      "id": "contextual-positive-password-underscore-value-still-detected",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "password: SYNTHETIC_REVOKED_CONTEXT_VALUE",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 10,
+          "end": 41
+        }
+      ],
+      "note": "issue #467: the unchanged-detection control -- a plain underscored value under a high-signal name stays detected at high confidence across every surface, pinning that none of the new code-expression exclusions reaches an ordinary contextual secret."
     },
     {
       "id": "contextual-negative-windows-env-reference-excluded",
