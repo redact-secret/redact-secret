@@ -19,15 +19,45 @@ export async function viewPublished(name, version, request = fetch) {
   return metadata;
 }
 
+const POLL_INTERVAL_MS = 5000;
+// npm's own publish response warns the tarball "may take a few minutes to
+// become available" on this immutable per-version endpoint. A read that comes
+// back defined but with the wrong shasum during that window is the same
+// not-settled-yet state as a 404, not a real conflict -- keep polling on a
+// mismatch exactly as on a miss, instead of failing on the first response.
+const MAX_WAIT_MS = 3 * 60 * 1000;
+
+/**
+ * Poll the registry until the published metadata's shasum matches
+ * `expectedShasum`, or `maxWaitMs` elapses. With no `expectedShasum`, this is
+ * a single unretried read of current registry state (used by callers that
+ * want "what's there right now", such as before deciding whether to publish).
+ */
+export async function waitForPublished(
+  name,
+  version,
+  { expectedShasum, request = fetch, pollIntervalMs = POLL_INTERVAL_MS, maxWaitMs = MAX_WAIT_MS } = {},
+) {
+  if (!expectedShasum) return viewPublished(name, version, request);
+  const deadline = Date.now() + maxWaitMs;
+  let metadata;
+  for (;;) {
+    metadata = await viewPublished(name, version, request);
+    if (metadata !== undefined && metadata.dist.shasum === expectedShasum) return metadata;
+    if (Date.now() >= deadline) break;
+    await new Promise((resolve) => setTimeout(resolve, pollIntervalMs));
+  }
+  throw new Error(
+    metadata === undefined
+      ? `${name}@${version}: not visible on the registry after publishing`
+      : `${name}@${version}: registry checksum does not match qualified content ` +
+          `(saw ${metadata.dist.shasum}, expected ${expectedShasum})`,
+  );
+}
+
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const [name, version, expected] = process.argv.slice(2);
   if (!name || !version) throw new Error("usage: npm-registry-metadata.mjs <name> <version> [expected-shasum]");
-  let metadata;
-  for (let attempt = 0; attempt < (expected ? 12 : 1); attempt += 1) {
-    metadata = await viewPublished(name, version);
-    if (metadata || !expected) break;
-    await new Promise((resolve) => setTimeout(resolve, 5000));
-  }
-  if (expected && metadata?.dist.shasum !== expected) throw new Error(`${name}@${version}: registry checksum does not match qualified content`);
+  const metadata = await waitForPublished(name, version, { expectedShasum: expected || undefined });
   console.log(metadata?.dist.shasum ?? "unpublished");
 }
