@@ -2886,9 +2886,11 @@
         {
           "dimension": "positive",
           "evidenceFixtureIds": [
+            "jwt-positive-anon-role-non-supabase-issuer",
             "jwt-positive-context-json",
             "jwt-positive-context-log",
             "jwt-positive-context-shell",
+            "jwt-positive-legacy-supabase-service-role-claim",
             "jwt-positive-structural-despite-fabricated-claims",
             "jwt-positive-structured"
           ],
@@ -2916,7 +2918,8 @@
             "jwt-boundary-leading-identifier-char",
             "jwt-boundary-short-signature",
             "jwt-boundary-standard-base64-alphabet",
-            "jwt-boundary-two-segments"
+            "jwt-boundary-two-segments",
+            "jwt-positive-malformed-payload-remainder"
           ],
           "state": "supported"
         },
@@ -2925,6 +2928,7 @@
           "evidenceFixtureIds": [
             "jwt-negative-colon-delimiter",
             "jwt-negative-dotted-id",
+            "jwt-negative-legacy-supabase-anon-claim",
             "jwt-negative-ordinary-base64",
             "jwt-negative-payload-not-json-prefixed"
           ],
@@ -2938,7 +2942,8 @@
             "jwt-boundary-leading-identifier-char",
             "jwt-boundary-short-signature",
             "jwt-boundary-standard-base64-alphabet",
-            "jwt-boundary-two-segments"
+            "jwt-boundary-two-segments",
+            "jwt-positive-malformed-payload-remainder"
           ],
           "state": "supported"
         },
@@ -4824,6 +4829,7 @@
             "invisible-incremental-contextual-value-zwsp",
             "invisible-incremental-provider-grammar-zwnj",
             "invisible-incremental-structural-authorization-zwj",
+            "jwt-legacy-supabase-anon-service-role-discriminating-boundary",
             "jwt-near-miss-short-signature-discriminating-boundary",
             "legacy-variable-detector-families",
             "linear-lookalike-token-discriminating-boundary",
@@ -5138,6 +5144,7 @@
             "invisible-incremental-contextual-value-zwsp",
             "invisible-incremental-provider-grammar-zwnj",
             "invisible-incremental-structural-authorization-zwj",
+            "jwt-legacy-supabase-anon-service-role-discriminating-boundary",
             "jwt-near-miss-short-signature-discriminating-boundary",
             "legacy-variable-detector-families",
             "linear-lookalike-token-discriminating-boundary",
@@ -5574,6 +5581,7 @@
             "invisible-incremental-contextual-value-zwsp",
             "invisible-incremental-provider-grammar-zwnj",
             "invisible-incremental-structural-authorization-zwj",
+            "jwt-legacy-supabase-anon-service-role-discriminating-boundary",
             "jwt-near-miss-short-signature-discriminating-boundary",
             "legacy-variable-detector-families",
             "linear-lookalike-token-discriminating-boundary",
