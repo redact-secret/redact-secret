@@ -1181,7 +1181,7 @@
     {
       "detector": "bearer-token",
       "evidence": {
-        "fixtureCount": 19,
+        "fixtureCount": 25,
         "hostContextsExercised": [
           "http",
           "json",
@@ -1202,8 +1202,10 @@
       "evidenceFixtureIds": [
         "bearer-boundary-prose-long-word-tradeoff",
         "bearer-positive-authorization-extra-whitespace-and-case",
+        "bearer-positive-compound-placeholder-not-excluded",
         "bearer-positive-context-json",
         "bearer-positive-context-log",
+        "bearer-positive-near-miss-repeated-character-filler",
         "bearer-positive-scheme",
         "bearer-positive-tab-and-uppercase"
       ],
@@ -1413,7 +1415,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 126,
+        "fixtureCount": 130,
         "hostContextsExercised": [
           "chat",
           "dotenv",
@@ -1496,7 +1498,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 126,
+        "fixtureCount": 130,
         "hostContextsExercised": [
           "chat",
           "dotenv",
