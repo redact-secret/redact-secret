@@ -5,6 +5,10 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+## 0.1.0-beta.5 — 2026-09-20
+
+[Publication and qualification evidence](docs/releases/0.1.0-beta.5/README.md).
+
 Beta.5 narrows seven provider grammars for precision, closes two detection
 gaps and an unbounded-input default, and adds the opt-in `common` detector
 profile, a Node WebAssembly fallback, musl Node packages, and Cloudflare

@@ -407,14 +407,14 @@ dependencies = [
 
 [[package]]
 name = "redact-secret"
-version = "0.1.0-beta.4"
+version = "0.1.0-beta.5"
 dependencies = [
  "serde_json",
 ]
 
 [[package]]
 name = "redact-secret-cli"
-version = "0.1.0-beta.4"
+version = "0.1.0-beta.5"
 dependencies = [
  "redact-secret",
  "serde_json",
@@ -422,7 +422,7 @@ dependencies = [
 
 [[package]]
 name = "redact-secret-node"
-version = "0.1.0-beta.4"
+version = "0.1.0-beta.5"
 dependencies = [
  "napi",
  "napi-build",
@@ -433,7 +433,7 @@ dependencies = [
 
 [[package]]
 name = "redact-secret-python"
-version = "0.1.0-beta.4"
+version = "0.1.0-beta.5"
 dependencies = [
  "pyo3",
  "redact-secret",
@@ -441,7 +441,7 @@ dependencies = [
 
 [[package]]
 name = "redact-secret-wasm"
-version = "0.1.0-beta.4"
+version = "0.1.0-beta.5"
 dependencies = [
  "js-sys",
  "redact-secret",
