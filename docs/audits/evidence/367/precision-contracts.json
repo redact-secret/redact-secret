@@ -188,7 +188,7 @@
       "kind": "corroboration",
       "revision": "page shows no version; observed 2026-09-17",
       "observedAt": "2026-09-17",
-      "establishes": ["which token types each provider registers with GitHub's partner program (existence of a type, not its grammar): OpenAI API Key; DigitalOcean OAuth Token, Personal Access Token, Refresh Token, System Token; Docker Organization Access Token, Personal Access Token; Slack API Token; Hugging Face User Access Token, Organization API Token; Cloudflare Account API Token, Global User API Key, User API Token; Linear API Key, OAuth Access Token"],
+      "establishes": ["which token types each provider registers with GitHub's partner program (existence of a type, not its grammar): OpenAI API Key; DigitalOcean OAuth Token, Personal Access Token, Refresh Token, System Token; Docker Organization Access Token, Personal Access Token; Slack API Token; Hugging Face User Access Token, Organization API Token; Cloudflare Account API Token, Global User API Key, User API Token; Linear API Key, OAuth Access Token; Google OAuth Client ID (also lists `google_oauth_client_secret`), Google OAuth Access Token, Google OAuth Refresh Token (reobserved 2026-09-20 for issue #487)"],
       "doesNotEstablish": ["any prefix, length or alphabet"]
     },
     "benchmark-common-formats": {
@@ -198,6 +198,30 @@
       "observedAt": "2026-09-17",
       "establishes": ["the synthetic construction of every positive and negative twin frozen in beta4-twin-baseline.json; the benchmark's own tier assignment per family"],
       "doesNotEstablish": ["anything about provider formats: it is downstream of the same tool sources"]
+    },
+    "google-cloud-api-key-docs": {
+      "url": "https://cloud.google.com/docs/authentication/api-keys",
+      "kind": "provider",
+      "revision": "page shows no version; observed 2026-09-20",
+      "observedAt": "2026-09-20",
+      "establishes": ["a single example API key value, `AIzaSyDaGmWKa4JsXZ-HjGw7ISLn_3namBGewQe`, beginning with the `AIza` prefix and totaling 39 characters (35 after the prefix) — an example, not a stated grammar"],
+      "doesNotEstablish": ["a stated prefix, length, or alphabet rule in prose; the 35-byte length is counted from the one example, not asserted by the page"]
+    },
+    "google-oauth2-docs": {
+      "url": "https://developers.google.com/identity/protocols/oauth2",
+      "kind": "provider",
+      "revision": "page shows no version; observed 2026-09-20",
+      "observedAt": "2026-09-20",
+      "establishes": ["token size limits only: authorization codes ≤256 bytes, access tokens ≤2048 bytes, refresh tokens ≤512 bytes"],
+      "doesNotEstablish": ["the `GOCSPX-`, `1//`, or `ya29.` prefix; any body length or alphabet; no example value of any of the three credentials appears on the page, and a size ceiling alone does not distinguish a real credential from an arbitrary string of the same size"]
+    },
+    "flare-redact-1.6.1": {
+      "url": "https://github.com/flare-collection/flare-redact/blob/v1.6.1/spec/detectors.json",
+      "kind": "tool",
+      "revision": "tag v1.6.1 = commit c652ea7946028b70527069d7c282752b8a0ccee3",
+      "observedAt": "2026-09-20",
+      "establishes": ["the detector patterns quoted per family below; consulted only as an external behavioral reference per AGENTS.md, no code reproduced"],
+      "doesNotEstablish": ["provider issuance, liveness, or that a shape the rule accepts is the only shape a provider issues"]
     }
   },
   "families": [
@@ -453,6 +477,30 @@
       "mutations": [
         {"mutationKind": "length", "mutation": "length: 39 vs contracted 40", "fixtureIds": ["linear-token-api-plain-twin", "linear-token-api-unicode-crlf-twin"], "distinguishingProperty": "API-key body length exactly 40", "basis": "tool-agreement", "disposition": "retained", "reason": "Both tools state 40; silence follows from construction."}
       ]
+    },
+    {
+      "detector": "google-api-key",
+      "findingType": "google_api_key",
+      "implementation": "crates/secret-scan-core/src/detectors/additional_providers.rs (GOOGLE)",
+      "beta4Rule": "Not one of issue #367's seven frozen families. The default rule has been `AIza` plus an exact 35-byte suffix from `[A-Za-z0-9_-]` since the detector's introduction, already an exact-length grammar rather than beta.4's shared 20-byte minimum. Issue #487 (this entry) evaluates Google's three OAuth credential formats for coverage and leaves the `AIza` contract unchanged.",
+      "toolRules": {
+        "gitleaks-8.30.1": "gcp-api-key: `\\b(AIza[\\w-]{35})(?:[\\x60'\"\\s;]|\\\\[nr]|$)` — exact 35-byte body, alphabet `[A-Za-z0-9_-]`; no rule of any kind for `GOCSPX-`, `1//`, or `ya29.`",
+        "trufflehog-3.97.4": "googlegemini: `\\b(AIzaSy[A-Za-z0-9_-]{33})` — a narrower 6-byte `AIzaSy` prefix plus 33 bytes, the same 39-byte total length as gitleaks' 4-byte-prefix-plus-35 rule. googleoauth2: `\\b(ya29\\.(?i:[a-z0-9_-]{10,}))(?:[^a-z0-9_-]|\\z)` — open-ended minimum length, no ceiling. No rule for `GOCSPX-` or `1//` in any of this tag's four Google/GCP detector packages (`gcp`, `gcpapplicationdefaultcredentials`, `googlegemini`, `googleoauth2`); `gcpapplicationdefaultcredentials` only extracts an already-present `client_secret` JSON field value contextually, which is not a lexical grammar for the bare, dotenv, or log-line surfaces issue #487 reports as undetected.",
+        "flare-redact-1.6.1": "google_api_key: `AIza[0-9A-Za-z_-]{35}` — agrees with gitleaks exactly. gcp_refresh_token: `1//[A-Za-z0-9_-]{20,160}` — the only rule any consulted source ships for `1//`, single-tool and open-range. No rule for `GOCSPX-` or `ya29.`."
+      },
+      "variants": [
+        {"id": "api-key", "support": "supported", "tier": "T2", "grammar": "AIza[A-Za-z0-9_-]{35}", "segments": [{"name": "prefix", "literal": "AIza", "basis": "provider (one example value) and tool-agreement (gitleaks, trufflehog and flare-redact all match this literal prefix)"}, {"name": "body", "alphabet": "[A-Za-z0-9_-]", "length": 35, "basis": "length: the provider's one example is 39 characters total (35 after the prefix), corroborated by tool-agreement (gitleaks and flare-redact both state exactly 35; trufflehog states the same 39-byte total under a narrower 6-byte `AIzaSy` prefix split); alphabet: tool-agreement"}], "sources": ["google-cloud-api-key-docs", "gitleaks-8.30.1", "trufflehog-3.97.4", "flare-redact-1.6.1"]}
+      ],
+      "pending": [
+        {"id": "oauth-client-secret", "prefix": "GOCSPX-", "tier": "T0", "reason": "Issue #487. No consulted source corroborates a body grammar. Google's own OAuth 2.0 protocol page (reobserved 2026-09-20) shows no example value or format detail for any OAuth credential, only unrelated size ceilings that do not by themselves distinguish a real credential from an arbitrary string of the same size. Neither pinned tool registers a `GOCSPX-` rule at all: gitleaks 8.30.1's only Google rule is `gcp-api-key` (the `AIza` shape above); trufflehog 3.97.4 ships four Google/GCP detector packages and none matches a bare `GOCSPX-` value — `gcpapplicationdefaultcredentials` only extracts a value already sitting in a `client_secret` JSON field once `{...client_secret...}` structure and the `.apps.googleusercontent.com` keyword are present, contextual extraction rather than a lexical grammar, and it cannot help the bare, dotenv, or log-line surfaces this issue reports as undetected. flare-redact 1.6.1 ships `google_api_key` and `gcp_refresh_token` but no `GOCSPX-` rule of any kind. The one signal that exists is GitHub's secret-scanning partner-pattern listing, which names a Google OAuth Client ID type that also lists `google_oauth_client_secret`, with push protection enabled — existence corroboration only, the identical reading this file already applies to Cloudflare's `cfk_` (`families.cloudflare-token.pending`). Freezing a grammar here would be a guess, not a reviewed contract, so `GOCSPX-` is not adopted. If a future gitleaks or trufflehog release ships a `GOCSPX-`-specific rule, or Google's own documentation states the body's length or alphabet, this disposition should be revisited.", "sources": ["google-oauth2-docs", "gitleaks-8.30.1", "trufflehog-3.97.4", "flare-redact-1.6.1", "github-secret-scanning-patterns"]},
+        {"id": "oauth-refresh-token", "prefix": "1//", "tier": "T0", "reason": "Issue #487. The only rule any consulted source ships is flare-redact 1.6.1's `gcp_refresh_token`: `1//[A-Za-z0-9_-]{20,160}` — a bare 3-byte prefix plus a 20-to-160-byte minimum-to-maximum run of a common alphabet, single-tool and not independently corroborated by gitleaks (no rule) or trufflehog 3.97.4 (no `1//`-specific rule anywhere in its four Google/GCP detector packages). This is the same broad prefix-plus-minimum-length shape issue #367 found flags near-miss twins across seven other families; adopting a range this wide as a body grammar would reproduce that risk rather than establish a reviewed contract. Google's own OAuth 2.0 protocol page states an upper bound only (refresh tokens ≤512 bytes total) and shows no example value, so it corroborates neither this nor any narrower range. GitHub's secret-scanning partner-pattern listing names a Google OAuth Refresh Token type (push protection enabled) — existence only, the same reading as `GOCSPX-` above. Not adopted; left undetected and recorded, matching how this file already handles DigitalOcean's `dop_v2_` and Slack's legacy prefixes.", "sources": ["google-oauth2-docs", "gitleaks-8.30.1", "trufflehog-3.97.4", "flare-redact-1.6.1", "github-secret-scanning-patterns"]},
+        {"id": "oauth-access-token", "prefix": "ya29.", "tier": "T0", "reason": "Issue #487. trufflehog 3.97.4's `googleoauth2` package registers exactly one rule, for this prefix: `\\b(ya29\\.(?i:[a-z0-9_-]{10,}))(?:[^a-z0-9_-]|\\z)` — an open-ended minimum length (10-byte floor, no ceiling) over a common alphabet, corroborated by no other consulted source: gitleaks has no rule, and flare-redact 1.6.1 has no `ya29.` rule (only `google_api_key` and `gcp_refresh_token`). An open-ended minimum is a weaker shape than even `1//`'s bounded range above and carries the identical near-miss risk issue #367 already documented for bare-prefix-plus-minimum-length grammars. Google's own OAuth 2.0 protocol page states an upper bound only (access tokens ≤2048 bytes total) and shows no example value. GitHub's secret-scanning partner-pattern listing names a Google OAuth Access Token type (push protection enabled) — existence only. `ya29.` tokens are also short-lived by design, which lowers the value of detecting them even if a grammar existed. Not adopted; left undetected and recorded.", "sources": ["google-oauth2-docs", "trufflehog-3.97.4", "flare-redact-1.6.1", "github-secret-scanning-patterns"]}
+      ],
+      "excluded": [],
+      "conflicts": [
+        {"property": "existence of a `GOCSPX-`/`1//`/`ya29.` body grammar in the pinned tool inventory", "positions": {"issue-487-body": "names TruffleHog's `googleoauth2` registration and flare-redact's `gcp_refresh_token` detector as tool corroboration available for the three OAuth formats generally, and ranks `GOCSPX-` as \"the strongest candidate\"", "gitleaks-8.30.1": "registers no rule for any of the three formats", "trufflehog-3.97.4": "`googleoauth2` registers a rule for `ya29.` only (open-ended minimum length); no rule for `GOCSPX-` or `1//` exists in this package or any other Google/GCP detector directory in the pinned tag", "flare-redact-1.6.1": "`gcp_refresh_token` registers a rule for `1//` only (20-160 byte range); no rule for `GOCSPX-` or `ya29.`"}, "resolution": "Verified directly against each pinned tool's source rather than taken on the issue body's summary: neither cited tool's corroboration covers `GOCSPX-` at all, and each of the other two formats is covered by exactly one tool's open-ended or wide-range rule, not independently corroborated. `GOCSPX-` therefore has less tool corroboration than `1//` or `ya29.`, the reverse of the issue body's own tentative ranking. All three stay pending (T0) rather than any one being frozen on a single uncorroborated or absent rule."}
+      ],
+      "mutations": []
     }
   ]
 }
