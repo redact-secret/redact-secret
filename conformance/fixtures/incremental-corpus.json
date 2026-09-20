@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 80,
+  "fixtureCount": 85,
   "fixtures": [
     {
       "id": "synthetic-regression-malformed-authority",
@@ -1131,6 +1131,68 @@
       "text": "hf_SyntheticRevokedHuggingFaceTokenA",
       "expected": [],
       "note": "issue #375: the one-byte-short twin of huggingface-incremental-exact-length-positive confirms no partition of the contract-rejected shape ever accidentally emits a finding."
+    },
+    {
+      "id": "huggingface-incremental-organization-token-positive",
+      "input": "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",
+      "text": "<SECRET_1>",
+      "expected": [
+        {
+          "detector": "huggingface-token",
+          "type": "huggingface_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 42
+        }
+      ],
+      "note": "issue #485: the `api_org_` twin of huggingface-incremental-exact-length-positive, proving every UTF-8 byte and char partition of a real 42-byte organization token reproduces the whole-input reference."
+    },
+    {
+      "id": "huggingface-incremental-organization-token-one-short-negative",
+      "input": "api_org_SyntheticRevokedHuggingFaceTokenA",
+      "text": "api_org_SyntheticRevokedHuggingFaceTokenA",
+      "expected": [],
+      "note": "issue #485: the `api_org_` twin of huggingface-incremental-one-short-negative confirms no partition of the contract-rejected 33-byte-body shape ever accidentally emits a finding."
+    },
+    {
+      "id": "huggingface-incremental-organization-token-quoted-positive",
+      "input": "export HUGGINGFACE_ORG_API_KEY=\"api_org_SYNTHETICREVOKEDHUGGINGFACETOKEN01\"\n",
+      "text": "export HUGGINGFACE_ORG_API_KEY=\"<SECRET_1>\"\n",
+      "expected": [
+        {
+          "detector": "huggingface-token",
+          "type": "huggingface_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 32,
+          "end": 74
+        }
+      ],
+      "note": "issue #485: the quoted-context surface the acceptance criteria name for `api_org_` -- every UTF-8 byte and char partition of the double-quoted shell export value reproduces the whole-input reference, matching huggingface-positive-organization-token-quoted."
+    },
+    {
+      "id": "huggingface-incremental-organization-token-unicode-crlf-positive",
+      "input": "# 🔑 café\r\napi_org_SYNTHETICREVOKEDHUGGINGFACETOKEN01\r\n",
+      "text": "# 🔑 café\r\n<SECRET_1>\r\n",
+      "expected": [
+        {
+          "detector": "huggingface-token",
+          "type": "huggingface_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 56
+        }
+      ],
+      "note": "issue #485: the unicode-crlf surface the acceptance criteria name for `api_org_` -- every UTF-8 byte and char partition reproduces the whole-input reference, including splits inside the multi-byte emoji and the CRLF pair, matching huggingface-positive-organization-token-unicode-crlf."
+    },
+    {
+      "id": "huggingface-incremental-org-token-non-conforming-negative",
+      "input": "api_org_name",
+      "text": "api_org_name",
+      "expected": [],
+      "note": "issue #485: an ordinary identifier that begins `api_org_` but does not carry the documented 34-byte body confirms no partition ever accidentally emits a finding, matching huggingface_organization_token_rejects_an_ordinary_non_conforming_identifier's Rust-level coverage."
     },
     {
       "id": "slack-incremental-bot-grammar-positive",

@@ -27,6 +27,20 @@
  * identity case, so silence (or the identity match) follows from
  * construction.
  *
+ * Issue #485 adopts the `api_org_` (organization-token) prefix into the same
+ * family, re-tiering it from T0 to T2
+ * (`docs/audits/evidence/367/precision-contracts.json`,
+ * `families.huggingface-token`): gitleaks 8.30.1 registers `api_org_` as its
+ * own letters-only rule and trufflehog 3.97.4 matches it under the same
+ * `(?:hf_|api_org_)[a-zA-Z0-9]{34}` rule it uses for `hf_` — the identical
+ * dual-tool 34-byte-exact-length agreement `hf_` itself was tiered on.
+ * `organization-token-prefix` is `api_org_`'s paired positive (the same body
+ * as the identity case, just under the organization prefix) and
+ * `organization-token-one-short` is its paired negative twin, reproducing
+ * the same one-byte-short must-not-flag case `one-short` already proves for
+ * `hf_`. Both are appended after the existing operations so no previously
+ * committed fixture's `mutation.ordinal` shifts.
+ *
  * The base literal is an unmistakably synthetic, revoked-shaped value: never
  * a real or real-looking credential.
  */
@@ -35,6 +49,8 @@ export const HUGGINGFACE_TOKEN_EXACT_LENGTH_SEED_ID =
   "huggingface-token-exact-length-synthetic-seed";
 
 const PREFIX = "hf_";
+/** Issue #485: the organization-token namespace, sharing the same reviewed body shape. */
+const ORGANIZATION_PREFIX = "api_org_";
 /** Exactly the 34-byte, letters-only body the reviewed contract's identity case carries. */
 const BODY = "SyntheticRevokedHuggingFaceTokenAB";
 /** The fixed byte (inside `Hugging`) the `invalid-alphabet`, `underscore-in-body`,
@@ -82,6 +98,8 @@ export function generateHuggingFaceTokenMutations(): readonly HuggingFaceTokenMu
       "digit-bearing",
       PREFIX + "42" + BODY.slice(DIGIT_INDEX + 2),
     ],
+    ["organization-token-prefix", ORGANIZATION_PREFIX + BODY],
+    ["organization-token-one-short", ORGANIZATION_PREFIX + BODY.slice(0, -1)],
   ];
 
   return operations.map(([operation, input], ordinal) => ({

@@ -833,6 +833,7 @@
     "huggingface-boundary-invalid-alphabet-exact-length",
     "huggingface-boundary-one-long-exact-length",
     "huggingface-boundary-one-short-exact-length",
+    "huggingface-boundary-organization-token-one-short",
     "huggingface-boundary-short",
     "huggingface-boundary-underscore-in-body",
     "huggingface-boundary-uppercase-prefix",
@@ -917,7 +918,7 @@
     "issue": "https://github.com/redact-secret/redact-secret/issues/375",
     "synchronousCorpus": "conformance/fixtures/synchronous-corpus.json"
   },
-  "rowCount": 410,
+  "rowCount": 419,
   "rows": [
     {
       "contexts": [],
@@ -4155,6 +4156,91 @@
       "contractTier": null,
       "detector": "huggingface-token",
       "enforcedBy": "crates/secret-scan-core/tests/incremental_partitions.rs::every_fixture_reproduces_the_canonical_whole_input_reference",
+      "findingCount": 0,
+      "fixtureId": "huggingface-incremental-org-token-non-conforming-negative",
+      "kind": null,
+      "note": "issue #485: an ordinary identifier that begins `api_org_` but does not carry the documented 34-byte body confirms no partition ever accidentally emits a finding, matching huggingface_organization_token_rejects_an_ordinary_non_conforming_identifier's Rust-level coverage.",
+      "result": "silent",
+      "runtimeConsumers": [
+        "rust-core",
+        "javascript-package-consumer"
+      ],
+      "scanMode": "incremental",
+      "support": null
+    },
+    {
+      "contexts": [],
+      "contractTier": null,
+      "detector": "huggingface-token",
+      "enforcedBy": "crates/secret-scan-core/tests/incremental_partitions.rs::every_fixture_reproduces_the_canonical_whole_input_reference",
+      "findingCount": 0,
+      "fixtureId": "huggingface-incremental-organization-token-one-short-negative",
+      "kind": null,
+      "note": "issue #485: the `api_org_` twin of huggingface-incremental-one-short-negative confirms no partition of the contract-rejected 33-byte-body shape ever accidentally emits a finding.",
+      "result": "silent",
+      "runtimeConsumers": [
+        "rust-core",
+        "javascript-package-consumer"
+      ],
+      "scanMode": "incremental",
+      "support": null
+    },
+    {
+      "contexts": [],
+      "contractTier": null,
+      "detector": "huggingface-token",
+      "enforcedBy": "crates/secret-scan-core/tests/incremental_partitions.rs::every_fixture_reproduces_the_canonical_whole_input_reference",
+      "findingCount": 1,
+      "fixtureId": "huggingface-incremental-organization-token-positive",
+      "kind": null,
+      "note": "issue #485: the `api_org_` twin of huggingface-incremental-exact-length-positive, proving every UTF-8 byte and char partition of a real 42-byte organization token reproduces the whole-input reference.",
+      "result": "flagged",
+      "runtimeConsumers": [
+        "rust-core",
+        "javascript-package-consumer"
+      ],
+      "scanMode": "incremental",
+      "support": null
+    },
+    {
+      "contexts": [],
+      "contractTier": null,
+      "detector": "huggingface-token",
+      "enforcedBy": "crates/secret-scan-core/tests/incremental_partitions.rs::every_fixture_reproduces_the_canonical_whole_input_reference",
+      "findingCount": 1,
+      "fixtureId": "huggingface-incremental-organization-token-quoted-positive",
+      "kind": null,
+      "note": "issue #485: the quoted-context surface the acceptance criteria name for `api_org_` -- every UTF-8 byte and char partition of the double-quoted shell export value reproduces the whole-input reference, matching huggingface-positive-organization-token-quoted.",
+      "result": "flagged",
+      "runtimeConsumers": [
+        "rust-core",
+        "javascript-package-consumer"
+      ],
+      "scanMode": "incremental",
+      "support": null
+    },
+    {
+      "contexts": [],
+      "contractTier": null,
+      "detector": "huggingface-token",
+      "enforcedBy": "crates/secret-scan-core/tests/incremental_partitions.rs::every_fixture_reproduces_the_canonical_whole_input_reference",
+      "findingCount": 1,
+      "fixtureId": "huggingface-incremental-organization-token-unicode-crlf-positive",
+      "kind": null,
+      "note": "issue #485: the unicode-crlf surface the acceptance criteria name for `api_org_` -- every UTF-8 byte and char partition reproduces the whole-input reference, including splits inside the multi-byte emoji and the CRLF pair, matching huggingface-positive-organization-token-unicode-crlf.",
+      "result": "flagged",
+      "runtimeConsumers": [
+        "rust-core",
+        "javascript-package-consumer"
+      ],
+      "scanMode": "incremental",
+      "support": null
+    },
+    {
+      "contexts": [],
+      "contractTier": null,
+      "detector": "huggingface-token",
+      "enforcedBy": "crates/secret-scan-core/tests/incremental_partitions.rs::every_fixture_reproduces_the_canonical_whole_input_reference",
       "findingCount": 1,
       "fixtureId": "huggingface-lookalike-token-discriminating-boundary",
       "kind": null,
@@ -4330,6 +4416,25 @@
       "fixtureId": "huggingface-boundary-one-short-exact-length",
       "kind": "boundary",
       "note": "Issue #372: a 33-byte body \u2014 one byte short of the documented 34-byte length \u2014 is the beta.4 huggingface-token-user-plain-twin regression shape; silence follows from construction.",
+      "result": "silent",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "intentionally-unsupported"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractTier": "malformed",
+      "detector": "huggingface-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 0,
+      "fixtureId": "huggingface-boundary-organization-token-one-short",
+      "kind": "boundary",
+      "note": "Issue #485: the `api_org_` twin of `huggingface-boundary-one-short-exact-length` -- a 33-byte body, one byte short of the documented 34-byte length. Retained as must-not-flag, matching `huggingface-token-organization-plain-twin`'s disposition exactly: silence follows from construction.",
       "result": "silent",
       "runtimeConsumers": [
         "rust-core",
@@ -4850,6 +4955,63 @@
       ],
       "scanMode": "synchronous",
       "support": "intentionally-unsupported"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractTier": "canonical",
+      "detector": "huggingface-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 1,
+      "fixtureId": "huggingface-positive-organization-token",
+      "kind": "positive",
+      "note": "Issue #485 (re-tiered from T0 to T2 in docs/audits/evidence/367/precision-contracts.json, families.huggingface-token): `api_org_` shares the exact `hf_` body shape -- gitleaks 8.30.1 registers `api_org_` as its own letters-only rule and trufflehog 3.97.4 matches it under the same `(?:hf_|api_org_)[a-zA-Z0-9]{34}` rule it uses for `hf_`. This is the family's paired positive for the organization-token prefix.",
+      "result": "flagged",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "supported"
+    },
+    {
+      "contexts": [
+        "shell"
+      ],
+      "contractTier": "contextual",
+      "detector": "huggingface-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 1,
+      "fixtureId": "huggingface-positive-organization-token-quoted",
+      "kind": "positive",
+      "note": "Issue #485: a double-quoted shell export value is detected the same as a bare one, matching `huggingface-positive-shell-quoted`'s disposition for the organization-token prefix; the enclosing quotes are not part of the match.",
+      "result": "flagged",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "supported"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractTier": "contextual",
+      "detector": "huggingface-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 1,
+      "fixtureId": "huggingface-positive-organization-token-unicode-crlf",
+      "kind": "positive",
+      "note": "Issue #485: a match after a CRLF line ending and a Unicode-prefixed comment line is still found at the correct UTF-8 byte offset, matching `cloudflare-positive-crlf-unicode-prefix`'s disposition for the organization-token prefix.",
+      "result": "flagged",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "supported"
     },
     {
       "contexts": [
