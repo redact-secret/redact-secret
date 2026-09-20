@@ -11,6 +11,36 @@ Published versions and their evidence are listed in
 [release status](releases/status.md). Use the candidate's own source revision
 and review evidence when preparing the next release.
 
+## TL;DR: which workflow do I run
+
+All three are manual (`workflow_dispatch`) — nothing here fires on its own.
+`Release` and `Reconcile Release` share the `npm-release` concurrency group,
+so they queue and run one at a time; they never race each other.
+
+| | Package Release Rehearsal | Release | Reconcile Release |
+| --- | --- | --- | --- |
+| What it does | Packs and checks npm runtime dependency packages only | Publishes to crates.io, npm, and PyPI for real, then tags | Repairs a **partially** failed `Release`: fills in only what's missing |
+| Publishes anything? | No — nothing is ever published | Yes, everything | Only what the failed run didn't already publish |
+| When to run it | Optional, while preparing the RC | Once, after final approval | Only after a `Release` run fails partway, with separate recovery authorization |
+| Has a dry-run? | It *is* the dry-run | No — there is no rehearsal mode for `Release` itself | Yes: `dry_run=true` prints the plan before anything is touched |
+
+Normal path:
+
+```
+prepare rc/<version>
+  → (optional) Package Release Rehearsal   -- npm dependency check only, publishes nothing
+  → Artifact qualification + SAST + approval
+  → Release                                -- the actual publish, run once
+       success      → close out
+       partial fail → Reconcile Release (dry_run=true, review the plan, then dry_run=false)
+```
+
+`Reconcile Release` is not a second attempt at a normal release and is not
+interchangeable with re-running `Release`: re-running `Release` can fail hard
+on packages that already published successfully, since most registries reject
+publishing over an existing version. Details on why to prefer each workflow,
+and what evidence each requires, are in the sections below.
+
 ## Product and artifact identity
 
 All product packages share one SemVer version and source revision. Python uses

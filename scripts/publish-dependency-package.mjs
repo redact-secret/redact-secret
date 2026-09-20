@@ -43,7 +43,7 @@
 import { execFileSync } from "node:child_process";
 import { readFileSync, rmSync } from "node:fs";
 import { join, resolve } from "node:path";
-import { viewPublished } from "./npm-registry-metadata.mjs";
+import { viewPublished, waitForPublished } from "./npm-registry-metadata.mjs";
 
 const NPM = process.platform === "win32" ? "npm.cmd" : "npm";
 
@@ -113,19 +113,6 @@ function checkPackedContents(manifest, packResult) {
   }
 }
 
-async function sleep(ms) {
-  await new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-async function verifyPublished(name, version) {
-  for (let attempt = 0; attempt < 5; attempt += 1) {
-    const published = await viewPublished(name, version);
-    if (published !== undefined && published.version === version) return published;
-    await sleep(5000);
-  }
-  throw new Error(`${name}@${version}: could not be verified on the registry after publishing`);
-}
-
 async function main() {
   const { packageDir, tag, dryRun } = parseArgs(process.argv.slice(2));
   const manifest = readManifest(packageDir);
@@ -167,10 +154,7 @@ async function main() {
     execFileSync(NPM, ["publish", "--access", "public", "--tag", tag, tarball], {
       stdio: "inherit",
     });
-    const verified = await verifyPublished(name, version);
-    if (verified.dist.shasum !== packResult.shasum) {
-      throw new Error(`${name}@${version}: published content does not match the qualified tarball`);
-    }
+    const verified = await waitForPublished(name, version, { expectedShasum: packResult.shasum });
     console.log(
       `${name}@${version} published and verified (shasum ${verified.dist.shasum}).`,
     );
