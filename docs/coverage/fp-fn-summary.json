@@ -77,29 +77,45 @@
       "detector": "bearer-token",
       "falseNegativeGuards": {
         "actualFalseNegatives": 0,
-        "count": 6,
+        "count": 11,
         "fixtureIds": [
           "bearer-boundary-prose-long-word-tradeoff",
           "bearer-positive-authorization-extra-whitespace-and-case",
+          "bearer-positive-compound-placeholder-not-excluded",
           "bearer-positive-context-json",
           "bearer-positive-context-log",
+          "bearer-positive-dotenv-real-token-still-detected",
+          "bearer-positive-markdown-real-token-still-detected",
+          "bearer-positive-near-miss-repeated-character-filler",
           "bearer-positive-scheme",
-          "bearer-positive-tab-and-uppercase"
+          "bearer-positive-tab-and-uppercase",
+          "bearer-positive-yaml-real-token-still-detected"
         ]
       },
       "falsePositiveGuards": {
         "actualFalsePositives": 0,
-        "count": 3,
+        "count": 10,
         "fixtureIds": [
           "bearer-negative-identifier",
           "bearer-negative-missing-value",
-          "bearer-negative-prose-ordinary"
+          "bearer-negative-placeholder-markdown",
+          "bearer-negative-placeholder-whole-value",
+          "bearer-negative-prose-ordinary",
+          "bearer-negative-repeated-character-filler-dotenv",
+          "bearer-negative-repeated-character-filler-run-of-dash",
+          "bearer-negative-repeated-character-filler-run-of-x",
+          "bearer-negative-repeated-character-filler-run-of-zero",
+          "bearer-negative-repeated-character-filler-yaml"
         ]
       },
       "hostContextsExercised": [
+        "dotenv",
+        "http",
         "json",
         "log",
-        "plain-text"
+        "markdown",
+        "plain-text",
+        "yaml"
       ]
     },
     {
@@ -159,7 +175,7 @@
       "detector": "connection-string",
       "falseNegativeGuards": {
         "actualFalseNegatives": 0,
-        "count": 22,
+        "count": 28,
         "fixtureIds": [
           "connection-host-dotenv",
           "connection-host-javascript",
@@ -171,7 +187,12 @@
           "connection-positive-azure-http",
           "connection-positive-azure-https",
           "connection-positive-azure-sovereign-suffix",
+          "connection-positive-docker-compose-real-password-still-detected",
+          "connection-positive-dollar-not-identifier-still-detected",
+          "connection-positive-dotenv-real-password-still-detected",
+          "connection-positive-embedded-dollar-still-detected",
           "connection-positive-encoded-ipv6",
+          "connection-positive-json-config-real-password-still-detected",
           "connection-positive-mariadb-percent-encoded",
           "connection-positive-mongodb-seed-list",
           "connection-positive-mongodb-srv",
@@ -182,12 +203,13 @@
           "connection-positive-postgresql",
           "connection-positive-redis-password-only",
           "connection-positive-rediss-fragment",
+          "connection-positive-unclosed-command-substitution-still-detected",
           "connection-regression-placeholder-embedded-in-password"
         ]
       },
       "falsePositiveGuards": {
         "actualFalsePositives": 0,
-        "count": 38,
+        "count": 49,
         "fixtureIds": [
           "connection-negative-amqp-host-only",
           "connection-negative-amqp-malformed-percent",
@@ -196,7 +218,10 @@
           "connection-negative-azure-account-name-only",
           "connection-negative-azure-sas-token-no-account-key",
           "connection-negative-azure-unrelated-semicolon-config",
+          "connection-negative-docker-compose-env-var-password",
+          "connection-negative-dotenv-example-braced-reference",
           "connection-negative-host-only",
+          "connection-negative-json-config-env-var-password",
           "connection-negative-malformed-percent",
           "connection-negative-mariadb-host-only",
           "connection-negative-mariadb-malformed-percent",
@@ -210,6 +235,10 @@
           "connection-negative-mysql-host-only",
           "connection-negative-mysql-malformed-percent",
           "connection-negative-mysql-vendor-default-changeit",
+          "connection-negative-postgres-bare-dollar-env-reference",
+          "connection-negative-postgres-braced-env-reference",
+          "connection-negative-postgres-command-substitution-reference",
+          "connection-negative-postgres-opencode-env-reference",
           "connection-negative-postgres-placeholder-insert-password-here",
           "connection-negative-postgres-placeholder-repeated-x",
           "connection-negative-postgres-placeholder-repeated-zero",
@@ -217,7 +246,11 @@
           "connection-negative-postgres-placeholder-root-password-here",
           "connection-negative-postgres-placeholder-todo-set-password",
           "connection-negative-postgres-placeholder-your-password-here",
+          "connection-negative-postgres-powershell-env-reference",
+          "connection-negative-postgres-ruby-interpolation-reference",
+          "connection-negative-postgres-template-reference",
           "connection-negative-postgres-vendor-default-mysecretpassword",
+          "connection-negative-postgres-windows-env-reference",
           "connection-negative-postgresql-host-only",
           "connection-negative-postgresql-malformed-percent",
           "connection-negative-redis-host-only",
@@ -230,8 +263,10 @@
         ]
       },
       "hostContextsExercised": [
+        "docker-compose",
         "dotenv",
         "javascript",
+        "json",
         "log",
         "markdown",
         "plain-text",
@@ -421,30 +456,42 @@
       "detector": "jwt",
       "falseNegativeGuards": {
         "actualFalseNegatives": 0,
-        "count": 5,
+        "count": 10,
         "fixtureIds": [
+          "jwt-positive-anon-role-non-supabase-issuer",
           "jwt-positive-context-json",
           "jwt-positive-context-log",
           "jwt-positive-context-shell",
+          "jwt-positive-legacy-supabase-service-role-claim",
+          "jwt-positive-legacy-supabase-service-role-dotenv",
+          "jwt-positive-legacy-supabase-service-role-markdown",
+          "jwt-positive-legacy-supabase-service-role-yaml",
           "jwt-positive-structural-despite-fabricated-claims",
           "jwt-positive-structured"
         ]
       },
       "falsePositiveGuards": {
         "actualFalsePositives": 0,
-        "count": 4,
+        "count": 8,
         "fixtureIds": [
           "jwt-negative-colon-delimiter",
           "jwt-negative-dotted-id",
+          "jwt-negative-legacy-supabase-anon-claim",
+          "jwt-negative-legacy-supabase-anon-dotenv",
+          "jwt-negative-legacy-supabase-anon-markdown",
+          "jwt-negative-legacy-supabase-anon-yaml",
           "jwt-negative-ordinary-base64",
           "jwt-negative-payload-not-json-prefixed"
         ]
       },
       "hostContextsExercised": [
+        "dotenv",
         "json",
         "log",
+        "markdown",
         "plain-text",
-        "shell"
+        "shell",
+        "yaml"
       ]
     },
     {
@@ -614,7 +661,7 @@
       "detector": "sendgrid-token",
       "falseNegativeGuards": {
         "actualFalseNegatives": 0,
-        "count": 13,
+        "count": 16,
         "fixtureIds": [
           "sendgrid-positive-bare",
           "sendgrid-positive-crlf-host",
@@ -628,7 +675,10 @@
           "sendgrid-positive-shell-quoted",
           "sendgrid-positive-trailing-url-safe-characters",
           "sendgrid-positive-unicode-prefix",
-          "sendgrid-positive-yaml"
+          "sendgrid-positive-yaml",
+          "sendgrid-token-regression-crlf-and-unicode-prefix",
+          "sendgrid-token-regression-generic-key-embedded-underscore",
+          "sendgrid-token-regression-generic-key-trailing-dash-full-span"
         ]
       },
       "falsePositiveGuards": {
@@ -917,7 +967,8 @@
       "https://github.com/redact-secret/redact-secret/issues/368",
       "https://github.com/redact-secret/redact-secret/issues/369",
       "https://github.com/redact-secret/redact-secret/issues/370",
-      "https://github.com/redact-secret/redact-secret/issues/375"
+      "https://github.com/redact-secret/redact-secret/issues/375",
+      "https://github.com/redact-secret/redact-secret/issues/475"
     ]
   }
 }

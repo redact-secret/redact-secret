@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 78,
+  "fixtureCount": 79,
   "fixtures": [
     {
       "id": "synthetic-regression-malformed-authority",
@@ -1234,6 +1234,22 @@
         }
       ],
       "note": "issue #467: the five closed-call code expressions this issue reported as contextual secrets stay clean, and the three paired positives (an embedded balanced '(...)', a quoted unbalanced one, and a plain underscored value) stay redacted, at every core and stream partition boundary -- so incremental and whole-input agree on both sides of the new exclusion."
+    },
+    {
+      "id": "connection-string-interpolation-reference-exclusion-boundary",
+      "input": "postgres://app:$DB_PASSWORD@db.internal:5432/example\npostgres://app:SYNTHETIC_REVOKED_INCREMENTAL_CONNECTION_PW@db.internal:5432/example",
+      "text": "postgres://app:$DB_PASSWORD@db.internal:5432/example\npostgres://app:<SECRET_1>@db.internal:5432/example",
+      "expected": [
+        {
+          "detector": "connection-string",
+          "type": "connection_string_password",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 68,
+          "end": 111
+        }
+      ],
+      "note": "issue #469: a bare $VAR environment-variable reference password on the first line is excluded and produces no finding, while a genuine password on the second line is still reported; every UTF-8 chunk split, including splits inside the reference or across the line boundary, must reproduce this whole-input reference."
     }
   ]
 }

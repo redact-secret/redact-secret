@@ -1,0 +1,158 @@
+{
+  "schemaVersion": 1,
+  "issue": "https://github.com/redact-secret/redact-secret/issues/475",
+  "reviewedAt": "2026-09-20",
+  "note": "One row per valid-but-non-secret shape the four structural/contextual detectors (generic-token, bearer-token, connection-string, jwt) recognize, comparable in form to docs/audits/evidence/367/precision-contracts.json's provider-grammar contracts but adapted to detectors with no provider format to enumerate: a 'shape' here is an exclusion predicate or accepted-tradeoff branch in the Rust source, not a credential grammar. `basis.kind: \"code\"` cites the exclusion function itself as the evidence (the detector's own behavior, unconditional and already covered by Rust unit tests); `basis.kind: \"decision\"` cites the ADR that froze a tradeoff or scoped an exclusion. Every shape's `fixtures.negative` entries must produce no finding and every `fixtures.positive` entry must still be detected, both asserted by crates/secret-scan-core/tests/canonical_corpus.rs against conformance/fixtures/synchronous-corpus.json -- an actual regression here is a build failure, not a claim this document could misreport. This document does not change detector behavior; it catalogs behavior that already exists and closes the fixture gap issue #475 identified.",
+  "evidenceBasis": {
+    "code": "the cited function's own doc comment and implementation are the evidence: the shape is unconditional detector behavior, not a documented policy debate",
+    "decision": "an accepted ADR under docs/decisions/ records the tradeoff or scope this shape encodes"
+  },
+  "detectors": [
+    {
+      "detector": "generic-token",
+      "implementation": "crates/secret-scan-core/src/detectors/generic_token.rs",
+      "note": "Already the best-covered of the four before this issue (130 fixtures spanning dotenv, yaml, json, shell, log, markdown, http, chat, kubernetes, python, typescript, terraform, terminal). This section catalogs its existing shape coverage for completeness and closes its one remaining zero-coverage class (issue #473); it adds no new exclusion fixtures beyond that.",
+      "shapes": [
+        {
+          "id": "environment-and-interpolation-references",
+          "description": "A value that is a pointer to a runtime-resolved secret rather than the secret itself: ${VAR}/$VAR/$env:VAR, process.env.X, import.meta.env.X, $[..] (Azure Pipelines), $(...` (command substitution), #{...} (Ruby), {env:..}/{file:..} (opencode), `` `...` `` (backtick), {{...}} (Jinja/Helm/Go template), %VAR% (Windows).",
+          "basis": {"kind": "code", "ref": "generic_token.rs:starts_with_env_reference,is_interpolation_reference; text.rs:is_template_reference,is_command_substitution_reference,is_ruby_interpolation_reference,is_opencode_reference,starts_with_bare_dollar_reference,is_windows_env_reference (issues #279, #292)"},
+          "fixtures": {
+            "negative": ["contextual-negative-json-env-reference", "contextual-negative-quoted-jinja-template-reference", "contextual-negative-quoted-jinja-lookup-template-reference", "contextual-negative-quoted-salt-pillar-template-reference", "contextual-negative-json-template-reference", "contextual-negative-quoted-helm-template-reference", "contextual-negative-quoted-go-template-reference", "contextual-negative-windows-env-reference-excluded"],
+            "positive": ["contextual-positive-template-prefix-only-still-detected", "contextual-positive-template-embedded-still-detected", "generic-token-regression-windows-env-lookalike-still-detected"]
+          }
+        },
+        {
+          "id": "vendor-secret-manager-references",
+          "description": "A value naming where a secret lives in a third-party secret manager rather than containing it: 1Password (op://...), LiteLLM (os.environ/...), GCP Secret Manager (projects/.../secrets/.../versions/...), vals (ref+vault://...), bank-vaults (vault:...#...), AWS Secrets Manager ARN, Azure Key Vault (@Microsoft.KeyVault(...) and https://*.vault.azure.net/secrets/...).",
+          "basis": {"kind": "code", "ref": "generic_token.rs:is_onepassword_reference,is_litellm_env_reference,is_gcp_secret_manager_reference,is_vals_reference,is_bank_vaults_reference,is_aws_secretsmanager_arn,is_azure_keyvault_reference"},
+          "fixtures": {
+            "negative": ["contextual-negative-onepassword-secret-reference", "contextual-negative-litellm-os-environ-reference", "contextual-negative-gcp-secret-reference-with-version", "contextual-negative-gcp-secret-reference-no-version", "contextual-negative-vals-vault-reference", "contextual-negative-bank-vaults-injector-reference", "contextual-negative-aws-secretsmanager-arn", "contextual-negative-azure-keyvault-secreturi-reference", "contextual-negative-azure-keyvault-vaultname-reference", "contextual-negative-azure-keyvault-secreturi-non-azure-host", "contextual-negative-azure-keyvault-secreturi-sovereign-host", "contextual-negative-azure-keyvault-secreturi-crlf", "contextual-negative-azure-keyvault-vaultname-unicode-prefix"],
+            "positive": ["contextual-positive-azure-keyvault-single-label-host-detected", "contextual-positive-onepassword-scheme-prefix-still-detected", "contextual-positive-litellm-scheme-prefix-still-detected", "contextual-positive-gcp-secret-scheme-prefix-still-detected", "contextual-positive-vals-scheme-prefix-still-detected", "contextual-positive-bank-vaults-scheme-prefix-still-detected", "contextual-positive-aws-secretsmanager-arn-shape-still-detected", "contextual-positive-azure-keyvault-scheme-prefix-still-detected"]
+          }
+        },
+        {
+          "id": "code-reference-and-call-expressions",
+          "description": "An unquoted value that is source code naming where a secret is fetched or constructed, not a literal: a dotted attribute/subscript chain rooted in a known code-reference identifier (self, settings, os.environ, config, process.env, ...), or a call expression -- a bare/member/dotted-chain function call ending in a balanced (...), including one truncated mid-argument by the unquoted-value scan.",
+          "basis": {"kind": "code", "ref": "generic_token.rs:starts_with_code_reference_root,is_snake_case_attribute_chain,is_call_expression,is_truncated_call_expression,is_source_code_expression (issue #278, #467)"},
+          "fixtures": {
+            "negative": ["contextual-negative-django-settings-attribute-reference", "contextual-negative-typescript-config-member-reference", "contextual-negative-terraform-resource-attribute-reference", "contextual-negative-python-os-environ-subscript-reference", "contextual-negative-rust-generic-type-annotation", "contextual-negative-go-config-struct-field-reference", "contextual-negative-pascal-case-member-call-expression", "contextual-negative-bare-function-call-expression", "contextual-negative-dotted-chain-call-expression", "contextual-negative-keyword-argument-call-expression", "contextual-negative-call-truncated-at-object-literal", "contextual-negative-call-truncated-at-argument-comma"],
+            "positive": ["contextual-positive-dotted-screaming-case-value-still-detected", "contextual-positive-embedded-parentheses-still-detected", "contextual-positive-quoted-unbalanced-paren-still-detected", "contextual-positive-password-underscore-value-still-detected"]
+          }
+        },
+        {
+          "id": "sql-bind-parameter",
+          "description": "A `:name` or `@name`/`$1`-style SQL bind parameter placeholder in a query string is a parameter name, not a value.",
+          "basis": {"kind": "code", "ref": "generic_token.rs:is_sql_bind_parameter"},
+          "fixtures": {
+            "negative": ["contextual-negative-sql-bind-parameter-excluded"],
+            "positive": ["generic-token-regression-sql-bind-lookalike-still-detected"]
+          }
+        },
+        {
+          "id": "placeholder-vocabulary-and-filler",
+          "description": "A whole unquoted value built entirely from recognized placeholder words (example, sample, placeholder, redacted, changeme, replaceme, ...) on token boundaries, or classic redaction-style repeated-character filler.",
+          "basis": {"kind": "code", "ref": "generic_token.rs:is_generic_placeholder_word; text.rs:matches_placeholder_vocabulary,is_repeated_character_filler (issues #256, #257, #264)"},
+          "fixtures": {
+            "negative": ["contextual-negative-placeholder-redacted", "contextual-negative-placeholder-replaceme", "contextual-negative-placeholder-leading-separator", "contextual-negative-placeholder-appended-digit", "contextual-negative-placeholder-hyphenated-compound", "contextual-negative-repeated-asterisk-filler", "contextual-negative-repeated-bullet-filler"],
+            "positive": ["contextual-positive-near-miss-repeated-asterisk-filler", "regression-placeholder-embedded-in-high-entropy-value", "regression-placeholder-word-with-unrelated-tokens"]
+          }
+        },
+        {
+          "id": "prose-mentioning-a-high-signal-credential-name",
+          "description": "Documentation or README prose naming a credential parameter (secret=, api_key:, password= ...) followed by an ordinary short, low-entropy English word classifies identically to a real weak credential of the same shape and is still reported (contextual_secret, Confidence::Medium, Action::Warn). No threshold on length, entropy, or confidence separates the two populations, so this is an accepted precision/recall tradeoff, not a bug -- previously exercised only by a Rust unit test, never by a corpus fixture.",
+          "basis": {"kind": "decision", "ref": "docs/decisions/2026-09-20-warn-unconditionally-on-high-signal-contextual-names.md (issue #473)"},
+          "fixtures": {
+            "negative": [],
+            "positive": ["contextual-positive-prose-high-signal-name-tradeoff", "contextual-positive-prose-high-signal-name-tradeoff-markdown"]
+          }
+        }
+      ]
+    },
+    {
+      "detector": "bearer-token",
+      "implementation": "crates/secret-scan-core/src/detectors/bearer_token.rs",
+      "note": "Before issue #475 this detector's evidence was almost entirely plain-text (22 of 25 fixtures); dotenv, yaml, and markdown had zero fixtures, so the #468 exclusions below were provably correct only in the host contexts the corpus happened to already cover.",
+      "shapes": [
+        {
+          "id": "repeated-character-filler",
+          "description": "A Bearer value made of the same character repeated three or more times (xxxxxxxxxxxxxxxxxxxx, 00000000000000000000, --------------------) is classic redaction-style filler, not a credential.",
+          "basis": {"kind": "decision", "ref": "docs/decisions/2026-09-20-exclude-filler-and-placeholder-bearer-values.md (issue #468)"},
+          "fixtures": {
+            "negative": ["bearer-negative-repeated-character-filler-run-of-x", "bearer-negative-repeated-character-filler-run-of-zero", "bearer-negative-repeated-character-filler-run-of-dash", "bearer-negative-repeated-character-filler-yaml", "bearer-negative-repeated-character-filler-dotenv"],
+            "positive": ["bearer-positive-near-miss-repeated-character-filler", "bearer-positive-yaml-real-token-still-detected", "bearer-positive-dotenv-real-token-still-detected"]
+          }
+        },
+        {
+          "id": "whole-value-placeholder-vocabulary",
+          "description": "A Bearer value built entirely from recognized placeholder words on token boundaries (PASSWORD_SECRET_EXAMPLE). A compound value mixing a listed word with an unlisted one (EXAMPLE_TOKEN_VALUE) is a documented, out-of-scope false negative, same as generic-token's equivalent exclusion.",
+          "basis": {"kind": "decision", "ref": "docs/decisions/2026-09-20-exclude-filler-and-placeholder-bearer-values.md (issue #468)"},
+          "fixtures": {
+            "negative": ["bearer-negative-placeholder-whole-value", "bearer-negative-placeholder-markdown"],
+            "positive": ["bearer-positive-compound-placeholder-not-excluded", "bearer-positive-markdown-real-token-still-detected"]
+          }
+        },
+        {
+          "id": "ordinary-prose-usage-tradeoff",
+          "description": "Ordinary English prose using 'bearer' as a common noun immediately followed by a long hyphenated word is indistinguishable from a real credential at the character-grammar level and stays detected -- an accepted precision/recall tradeoff.",
+          "basis": {"kind": "code", "ref": "bearer_token.rs test ordinary_prose_usage_of_bearer_is_safe_but_a_long_incidental_word_is_an_accepted_tradeoff"},
+          "fixtures": {
+            "negative": ["bearer-negative-prose-ordinary"],
+            "positive": ["bearer-boundary-prose-long-word-tradeoff"]
+          }
+        }
+      ]
+    },
+    {
+      "detector": "connection-string",
+      "implementation": "crates/secret-scan-core/src/detectors/connection_string.rs",
+      "note": "Before issue #475, 80 of 86 fixtures were plain-text; dotenv and markdown had exactly one single-line fixture each and yaml/json had zero. Issue #469's fix (interpolation and environment-variable reference passwords) shipped with Rust unit tests only -- no corpus fixture at all -- despite being one of the two named zero-coverage classes this issue tracks.",
+      "shapes": [
+        {
+          "id": "interpolation-and-environment-references",
+          "description": "A password that is an interpolation, command-substitution, or environment-variable reference rather than a literal secret: ${VAR} (pre-existing), bare $VAR / PowerShell $env:VAR, $(cmd) command substitution, {{tmpl}} template, #{ruby} interpolation, {env:VAR} opencode reference, %VAR% Windows reference. Each is a whole-value shape; a value that merely starts with an opener, or that contains '$' without matching one of these forms, stays detected.",
+          "basis": {"kind": "decision", "ref": "docs/decisions/2026-09-20-share-non-secret-reference-exclusions-with-connection-string.md (issue #469)"},
+          "fixtures": {
+            "negative": ["connection-negative-postgres-braced-env-reference", "connection-negative-postgres-bare-dollar-env-reference", "connection-negative-postgres-powershell-env-reference", "connection-negative-postgres-command-substitution-reference", "connection-negative-postgres-template-reference", "connection-negative-postgres-ruby-interpolation-reference", "connection-negative-postgres-opencode-env-reference", "connection-negative-postgres-windows-env-reference", "connection-negative-docker-compose-env-var-password", "connection-negative-json-config-env-var-password", "connection-negative-dotenv-example-braced-reference"],
+            "positive": ["connection-positive-dollar-not-identifier-still-detected", "connection-positive-embedded-dollar-still-detected", "connection-positive-unclosed-command-substitution-still-detected", "connection-positive-docker-compose-real-password-still-detected", "connection-positive-json-config-real-password-still-detected", "connection-positive-dotenv-real-password-still-detected"]
+          }
+        },
+        {
+          "id": "placeholder-vocabulary-vendor-defaults-and-filler",
+          "description": "A password matching recognized placeholder words, well-known vendor tutorial defaults (mysecretpassword, changeit, supersecretpassword), an angle-bracket or braced placeholder (<password>), or repeated-character filler.",
+          "basis": {"kind": "code", "ref": "connection_string.rs:is_placeholder"},
+          "fixtures": {
+            "negative": ["connection-negative-postgres-vendor-default-mysecretpassword", "connection-negative-mysql-vendor-default-changeit", "connection-negative-mariadb-vendor-default-supersecretpassword", "connection-negative-redis-vendor-default-changeit", "connection-negative-mongodb-vendor-default-mysecretpassword", "connection-negative-postgres-placeholder-repeated-x", "connection-negative-postgres-placeholder-repeated-zero", "connection-negative-vendor-default-appended-digit"],
+            "positive": ["connection-regression-placeholder-embedded-in-password"]
+          }
+        },
+        {
+          "id": "fill-in-password-prose-scaffolding",
+          "description": "Prose scaffolding meaning \"put your own password here\": a snake/kebab-case value ending in _here/-here (your_password_here), or one starting with insert/replace/todo and containing password as its own token (REPLACE_ME_PASSWORD, TODO_SET_PASSWORD). Unlike generic-token, this exclusion is local to connection-string only.",
+          "basis": {"kind": "code", "ref": "connection_string.rs:is_fill_in_password_prose"},
+          "fixtures": {
+            "negative": ["connection-negative-postgres-placeholder-your-password-here", "connection-negative-postgres-placeholder-insert-password-here", "connection-negative-postgres-placeholder-replace-me-password", "connection-negative-postgres-placeholder-todo-set-password", "connection-negative-postgres-placeholder-root-password-here"],
+            "positive": []
+          }
+        }
+      ]
+    },
+    {
+      "detector": "jwt",
+      "implementation": "crates/secret-scan-core/src/detectors/jwt.rs",
+      "note": "Before issue #475, all 21 fixtures but one were plain-text or single-line JSON; dotenv, yaml, and markdown had zero fixtures for the #472 Supabase legacy-anon carve-out, despite it being a narrow, payload-content-dependent exclusion exactly the kind that most needs realistic host-document evidence.",
+      "shapes": [
+        {
+          "id": "supabase-legacy-anon-public-key",
+          "description": "A legacy-format Supabase JWT whose payload decodes to \"iss\":\"supabase\" together with \"role\":\"anon\" is a public identifier by Supabase's own design (the same treatment the new-format sb_publishable_ key already receives) and produces no finding. Invalid UTF-8, a non-Supabase iss, or any role other than anon (including service_role) all stay detected.",
+          "basis": {"kind": "decision", "ref": "docs/decisions/2026-09-20-scope-supabase-legacy-anon-jwt-exclusion.md (issue #472)"},
+          "fixtures": {
+            "negative": ["jwt-negative-legacy-supabase-anon-claim", "jwt-negative-legacy-supabase-anon-dotenv", "jwt-negative-legacy-supabase-anon-yaml", "jwt-negative-legacy-supabase-anon-markdown"],
+            "positive": ["jwt-positive-legacy-supabase-service-role-claim", "jwt-positive-legacy-supabase-service-role-dotenv", "jwt-positive-legacy-supabase-service-role-yaml", "jwt-positive-legacy-supabase-service-role-markdown", "jwt-positive-anon-role-non-supabase-issuer"],
+            "boundary": ["jwt-positive-malformed-payload-remainder"]
+          }
+        }
+      ]
+    }
+  ]
+}
