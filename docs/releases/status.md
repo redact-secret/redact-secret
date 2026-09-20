@@ -4,8 +4,9 @@ Beta.1 through beta.3 were observed on 2026-09-16:
 [registry observation](registry-observation.json) records their version
 availability, npm integrity values, crate and Python checksums, npm dist-tags,
 and annotated tag targets. Beta.4's registry checksums and tag target are in its
-[durable release record](0.1.0-beta.4/README.md); the npm dist-tags below were
-observed on 2026-09-18. Registry publication, workflow completion,
+[durable release record](0.1.0-beta.4/README.md); beta.5's are in its
+[durable release record](0.1.0-beta.5/README.md). The npm dist-tags below were
+observed on 2026-09-20. Registry publication, workflow completion,
 and a GitHub Release page are separate facts.
 
 | Version | Registry artifacts | Annotated source tag | GitHub Release |
@@ -14,11 +15,12 @@ and a GitHub Release page are separate facts.
 | 0.1.0-beta.2 | 8 npm packages, 2 crates, 9 Python files | `8cdc1b118449a15be545ecf70bb7f0df53f6126e` | Missing; [body prepared](beta.2-release-notes.md) |
 | 0.1.0-beta.3 | 8 npm packages, 2 crates, 9 Python files | `34ea9b92ed8879082e99f56f8f4715ee4e4f1f35` | Missing; [body prepared](beta.3-release-notes.md) |
 | 0.1.0-beta.4 | 8 npm packages, 2 crates, 9 Python files | `b4a9ae83d737d367ebc1d6d1732e634b44b2452a` | Missing; [record](0.1.0-beta.4/README.md) |
+| 0.1.0-beta.5 | 10 npm packages (including 2 musl), 2 crates, 9 Python files | `0cc48374d005a44334bf727e49125165ec7d4157` | Missing; [record](0.1.0-beta.5/README.md) |
 
-For `@redact-secret/core`, npm `beta` points to beta.4 and `latest` still points
-to beta.1. Use `@redact-secret/core@0.1.0-beta.4` or `@redact-secret/core@beta`
-when selecting the current beta. Python spells beta.4 as `0.1.0b4`.
-No dist-tag was changed as part of this review.
+For `@redact-secret/core`, npm `beta` points to beta.5 and `latest` still points
+to beta.1. Use `@redact-secret/core@0.1.0-beta.5` or `@redact-secret/core@beta`
+when selecting the current beta. Python spells beta.5 as `0.1.0b5`.
+No `latest` dist-tag was changed as part of this release.
 
 Beta.2's [durable release record](0.1.0-beta.2/README.md) preserves its initial
 partial failure and subsequent authorized repair. Beta.3 also had a failed
@@ -27,7 +29,10 @@ its [original manifest](beta.3-original-manifest.json) recorded two native npm
 packages as unpublished and the facade as unknown. The successful
 [reconciliation run](https://github.com/redact-secret/redact-secret/actions/runs/35129831469)
 and current registry observations establish the repaired publication state.
-The original manifest is preserved verbatim, not rewritten as success.
+The original manifest is preserved verbatim, not rewritten as success. Beta.5
+had the same shape of failure — npm registry propagation lag, not a real
+publish defect, first for seven npm packages and then for the facade alone —
+detailed in its [durable release record](0.1.0-beta.5/README.md).
 
 Current registry availability is not by itself a reconstruction of every
 artifact's original qualification chain. Beta.3's local closeout record is

@@ -1,0 +1,131 @@
+{
+  "record_schema_version": 1,
+  "record_kind": "reconstructed",
+  "source_revision": "0cc48374d005a44334bf727e49125165ec7d4157",
+  "conformance_identity": "07fdec9e901f451fce50d6092eb811f6914012ca",
+  "version": "0.1.0-beta.5",
+  "artifact_inventory_sha256": "85521dcca4851506bacbcc508831f352011b727fcae669dc932a448f8dca05c1",
+  "artifact_set": [
+    "crate:redact-secret",
+    "crate:redact-secret-cli",
+    "npm:@redact-secret/core",
+    "npm:@redact-secret/node-darwin-arm64",
+    "npm:@redact-secret/node-darwin-x64",
+    "npm:@redact-secret/node-linux-arm64-gnu",
+    "npm:@redact-secret/node-linux-arm64-musl",
+    "npm:@redact-secret/node-linux-x64-gnu",
+    "npm:@redact-secret/node-linux-x64-musl",
+    "npm:@redact-secret/node-win32-arm64-msvc",
+    "npm:@redact-secret/node-win32-x64-msvc",
+    "npm:@redact-secret/wasm",
+    "pypi:redact-secret"
+  ],
+  "registry_state": {
+    "crate:redact-secret": "published",
+    "crate:redact-secret-cli": "published",
+    "npm:@redact-secret/core": "published",
+    "npm:@redact-secret/node-darwin-arm64": "published",
+    "npm:@redact-secret/node-darwin-x64": "published",
+    "npm:@redact-secret/node-linux-arm64-gnu": "published",
+    "npm:@redact-secret/node-linux-arm64-musl": "published",
+    "npm:@redact-secret/node-linux-x64-gnu": "published",
+    "npm:@redact-secret/node-linux-x64-musl": "published",
+    "npm:@redact-secret/node-win32-arm64-msvc": "published",
+    "npm:@redact-secret/node-win32-x64-msvc": "published",
+    "npm:@redact-secret/wasm": "published",
+    "pypi:redact-secret": "published"
+  },
+  "release_evidence": {
+    "manifest_reconstructed": true,
+    "reason": "The Release workflow manifest captured partial registry state before reconciliation: npm's registry propagation lag caused seven native/wasm dependency packages' post-publish verification to time out, and the facade's first recovery attempt hit the same lag on its own verification window. Reconcile Release intentionally emits no replacement manifest, so final immutable registry metadata, successful clean-install jobs, and the annotated Git tag were combined with the preserved original manifest and inventory.",
+    "known_discrepancy": "The pypi:redact-secret file hashes below are the actually-published bytes, independently verified by downloading each wheel from files.pythonhosted.org and hashing it locally, then confirmed against PyPI's JSON API. release.yml builds Python wheels twice from the same source revision (python-wheels.yml, which publish-pypi actually uploads, and independently again inside artifact-qualification.yml, whose output originally populated this inventory's Python entries), and this release's two builds were not byte-reproducible (1-5 bytes off per file; the sdist, with no compiled step, matched exactly). The checked-in artifact-inventory.json's eight wheel entries were corrected post-hoc to these true published values so the durable record is accurate to what shipped; it is therefore not a byte-exact copy of the artifact-qualification.yml run's own Python wheel output. beta.4's equivalent comparison matched exactly for all nine files, so this is not a structural inevitability, and is unexplained beyond being a non-deterministic build input (most likely an embedded timestamp). See the README's dedicated section.",
+    "observed_at": "2026-09-20",
+    "original_run": 35528414802,
+    "original_manifest": {
+      "artifact_set": [
+        "crate:redact-secret", "crate:redact-secret-cli", "npm:@redact-secret/core",
+        "npm:@redact-secret/node-darwin-arm64", "npm:@redact-secret/node-darwin-x64",
+        "npm:@redact-secret/node-linux-arm64-gnu", "npm:@redact-secret/node-linux-arm64-musl",
+        "npm:@redact-secret/node-linux-x64-gnu", "npm:@redact-secret/node-linux-x64-musl",
+        "npm:@redact-secret/node-win32-arm64-msvc", "npm:@redact-secret/node-win32-x64-msvc",
+        "npm:@redact-secret/wasm", "pypi:redact-secret"
+      ],
+      "conformance_identity": "07fdec9e901f451fce50d6092eb811f6914012ca",
+      "registry_state": {
+        "crate:redact-secret": "published", "crate:redact-secret-cli": "published",
+        "npm:@redact-secret/core": "unknown", "npm:@redact-secret/node-darwin-arm64": "unpublished",
+        "npm:@redact-secret/node-darwin-x64": "unpublished", "npm:@redact-secret/node-linux-arm64-gnu": "unpublished",
+        "npm:@redact-secret/node-linux-arm64-musl": "published", "npm:@redact-secret/node-linux-x64-gnu": "unpublished",
+        "npm:@redact-secret/node-linux-x64-musl": "published", "npm:@redact-secret/node-win32-arm64-msvc": "unpublished",
+        "npm:@redact-secret/node-win32-x64-msvc": "unpublished", "npm:@redact-secret/wasm": "unpublished",
+        "pypi:redact-secret": "published"
+      },
+      "source_revision": "0cc48374d005a44334bf727e49125165ec7d4157",
+      "version": "0.1.0-beta.5"
+    },
+    "registries": {
+      "crate:redact-secret": {"checksum": "bf4ad628f9ebd41b565cfb37ae9c11cae9c503b505356d841e1cf916835eb8fc"},
+      "crate:redact-secret-cli": {"checksum": "886c5ddf377b2ce98c9e415d7fc3413113bfb53d6bda968258afbf8444309074"},
+      "npm:@redact-secret/core": {"shasum": "497b0cba3e4b17469dbf0fc75ef9e2828ab04af6", "integrity": "sha512-Hn3TMQcV3OEYucfosuOeyjhh08FrCszxmaaKqNF3P+KKkH/N8QeVzhJQaJOSECBpOfye3FFBceshMdoiGX/fJQ=="},
+      "npm:@redact-secret/wasm": {"shasum": "1be24cad4e6c1c47104e8c36ff4051f6404f8a9b", "integrity": "sha512-DfEbrU+oUxcWRD4uRE82OTlmTAkSnT/Q4ZAm6lML47YoYbFaxt0PxSX49urUukmpy/DkebWElJPRR7r5sQ+/Yg=="},
+      "npm:@redact-secret/node-darwin-arm64": {"shasum": "05cd7705958f8efe41023e751612e5aac0f8d11c", "integrity": "sha512-EkgEAcThQNFnYEBJC9iHS6wZIh0PUQvea1xNuQ48uSg1qK5aSsDNXFDQ4o/zcNRNvOM/ZjdVsFfDBkRdrgsvHg=="},
+      "npm:@redact-secret/node-darwin-x64": {"shasum": "37d60caa36e7a8c0918319f7a015401586e1052d", "integrity": "sha512-U/EyA51yJoMKieSZ8m39x7lZ/RBko5PuoZaRSxW/mj6z9vPbSf8bZ93mIvpInnNybLFA2VwTrfLmXxiIyRSqnQ=="},
+      "npm:@redact-secret/node-linux-arm64-gnu": {"shasum": "028e7639a68dc96a2f9c33ff4a8cb774d1e97684", "integrity": "sha512-rpSei6j3QsodTkp9hXq7Af3b+2EusdAaMsu/taW6YBveiGkPugZA5DC0Qe20mC1B09RR13Va1g0UjswLeFRHJw=="},
+      "npm:@redact-secret/node-linux-x64-gnu": {"shasum": "278136c77140d2b51545016d4b8babba84045985", "integrity": "sha512-T5JyJ93bw5MrRcVac4BX3RoZHl6ryBK2prWk7tUq3nc0Owq6qZmePMq0DnFgFxkbIudqCt/hgTzEc9kmeZkoNA=="},
+      "npm:@redact-secret/node-linux-arm64-musl": {"shasum": "c075546486a4c6a5a5840e56a886019a62e9c6af", "integrity": "sha512-DSDW7hhfb6m32jbNod6m8gclhJViU40vGjf8zZvQswYkP6y1xx+tGyR62gYs00ARzgkrVIBCCuDv6QJVAJ3Xfg=="},
+      "npm:@redact-secret/node-linux-x64-musl": {"shasum": "acecda6968cbc0161712d7f791abef5e170d3aaa", "integrity": "sha512-LqNbPy9i9DZ7T5M/r9bdiTkoMG/ANEGDmL+IpVPFYlBOCsP/UR2WCJrXsVRSH6H8A63ZXzIadKt1DJBlA1KSkw=="},
+      "npm:@redact-secret/node-win32-x64-msvc": {"shasum": "e1087a2a022712ed087be0fe3d73e7b6c6907a95", "integrity": "sha512-V/9L0GihgEJrfa+rnSvd17cizhAsPGFrCE34h4WlXQ8GkqtI7s/7y3AzkE5tYZO9XV+IOxxMSBn2FCp/AtyIlA=="},
+      "npm:@redact-secret/node-win32-arm64-msvc": {"shasum": "d834a0e666c9050b930af06f949a095b31b69470", "integrity": "sha512-9UESC0hlwqWbtm1Ij+Idix4ojqGEAUoL8ZzPAeyCwRX88SzzU5a+wVOMknoKYReCeAoZjhW7Mo+FNVjuwwdbIA=="},
+      "pypi:redact-secret": {
+        "files": [
+          {"filename": "redact_secret-0.1.0b5.tar.gz", "sha256": "e1bece9feae1796add7a1a2f1a73155b1bc2caaa90658295b07405576877c2a9"},
+          {"filename": "redact_secret-0.1.0b5-cp310-abi3-macosx_11_0_arm64.whl", "sha256": "dbf5ca38f6216574c9e6f35eacdbd1fd6335fb1a6c818ba4c16d3788bbe58e63"},
+          {"filename": "redact_secret-0.1.0b5-cp310-abi3-win_arm64.whl", "sha256": "4eda24b9c529e0e977b193e8b90676a9c156125f7b2879e5fde154fcb7afc399"},
+          {"filename": "redact_secret-0.1.0b5-cp310-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", "sha256": "3c09cb998d5f31aac74fd1972b57e582bdcc78d9253d0a12a5f75d2d33950342"},
+          {"filename": "redact_secret-0.1.0b5-cp310-abi3-musllinux_1_2_aarch64.whl", "sha256": "40e5b303129ad3657d41c1c808dd67e508bd91b7ec518e70cce2d1cc486c840b"},
+          {"filename": "redact_secret-0.1.0b5-cp310-abi3-macosx_10_12_x86_64.whl", "sha256": "62afa0a29d988b5e7528b81583a3ee7ba2f72f84941c8c68d4baae722cd6f5ad"},
+          {"filename": "redact_secret-0.1.0b5-cp310-abi3-win_amd64.whl", "sha256": "e10fcda88ba9849076add689a5e367f7f73d24a1e680a8b7b737da37b397a9d1"},
+          {"filename": "redact_secret-0.1.0b5-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", "sha256": "79b9d2f26da5e4eabf9227306e544d673269b8c575406db09882d979fd2ad478"},
+          {"filename": "redact_secret-0.1.0b5-cp310-abi3-musllinux_1_2_x86_64.whl", "sha256": "de7de3ff5ea06b7fa2b35f0b7d6eddab072be183d4ebf7d6a156bb3a7036eb37"}
+        ]
+      }
+    },
+    "runs": [
+      {"id": 35527412955, "result": "CI passed at the frozen source revision."},
+      {"id": 35527412967, "result": "SAST passed at the frozen source revision."},
+      {"id": 35527413163, "result": "Artifact qualification passed and produced the preserved inventory and qualified artifact set, including the two musl Node lanes."},
+      {"id": 35527425700, "result": "Package Release Rehearsal passed at the frozen source revision."},
+      {"id": 35528414802, "result": "Release published both crates, all nine PyPI files, and nine of ten npm packages; the npm facade and seven native/wasm dependency packages' post-publish verification timed out on npm registry propagation lag, though publication itself had already succeeded for all of them. The npm facade, registry-install matrix, and tag remained pending."},
+      {"id": 35530191051, "result": "Authorized dry-run reconciliation verified the preserved manifest and inventory, independently confirmed all nine already-published npm dependency packages by content-matching shasum, and planned publication only of the facade."},
+      {"id": 35530799370, "result": "Authorized recovery published @redact-secret/core, but npm processing again exceeded the workflow's one-minute metadata-verification window."},
+      {"id": 35531013273, "result": "Idempotent authorized recovery verified every registry artifact (the facade's content already matched, so nothing was republished), passed clean installs on all eight published Node targets and Chromium, and created annotated tag v0.1.0-beta.5 at the frozen source revision."}
+    ],
+    "verification": {
+      "run": 35531013273,
+      "node": ["aarch64-apple-darwin", "x86_64-apple-darwin", "aarch64-unknown-linux-gnu", "x86_64-unknown-linux-gnu", "aarch64-unknown-linux-musl", "x86_64-unknown-linux-musl", "aarch64-pc-windows-msvc", "x86_64-pc-windows-msvc"],
+      "browser": "chromium",
+      "rust": {
+        "observed_at": "2026-09-20",
+        "platform": "aarch64-apple-darwin",
+        "version": "0.1.0-beta.5",
+        "install": "cargo install redact-secret-cli --version 0.1.0-beta.5 --locked --root <empty-temporary-root>",
+        "checks": ["redact-secret --version", "clean standard-input scan"],
+        "result": "passed"
+      },
+      "python": {
+        "observed_at": "2026-09-20",
+        "platform": "macosx_11_0_arm64",
+        "version": "0.1.0b5",
+        "install": "python -m pip install redact-secret==0.1.0b5 in a new virtual environment",
+        "checks": ["importlib.metadata exact-version assertion", "clean scan_and_redact call"],
+        "files": 9,
+        "result": "passed"
+      }
+    },
+    "tag": {
+      "name": "v0.1.0-beta.5",
+      "object": "1e45a41143722a3bbc9ebfc8f2a9bbb99eb96bef",
+      "target": "0cc48374d005a44334bf727e49125165ec7d4157"
+    }
+  }
+}
