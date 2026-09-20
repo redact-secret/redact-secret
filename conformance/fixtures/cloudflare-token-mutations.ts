@@ -26,6 +26,18 @@
  * one structural property of the identity case, so silence (or the identity
  * match) follows from construction.
  *
+ * Issue #481 adopts the `cfat_` (account-token) prefix into the same family:
+ * the provider's token-formats page documents `cfat_` with the identical
+ * `[40 characters][checksum]` format cell as `cfut_`, and trufflehog
+ * 3.97.4's `cloudflareapitoken` v2 rule (`cf[ua]t_[a-zA-Z0-9]{40}[a-f0-9]{8}`)
+ * corroborates the same body and checksum shape for both prefixes.
+ * `account-token-prefix` is `cfat_`'s paired positive (the same body and
+ * checksum as the identity case, just under the account prefix) and
+ * `account-checksum-non-hex` is its paired negative twin, reproducing the
+ * same non-hexadecimal eight-byte tail must-not-flag case `checksum-non-hex`
+ * already proves for `cfut_`. Both are appended after the existing
+ * operations so no previously committed fixture's `mutation.ordinal` shifts.
+ *
  * The base literal is an unmistakably synthetic, revoked-shaped value: never
  * a real or real-looking credential.
  */
@@ -34,6 +46,8 @@ export const CLOUDFLARE_TOKEN_CHECKSUM_SUFFIX_SEED_ID =
   "cloudflare-token-checksum-suffix-synthetic-seed";
 
 const PREFIX = "cfut_";
+/** Issue #481: the account-token namespace, sharing the same reviewed body/checksum shape. */
+const ACCOUNT_PREFIX = "cfat_";
 /** Exactly the 40-byte, alphanumeric body the reviewed contract's identity case carries. */
 const BODY = "SYNTHETICREVOKEDCLOUDFLAREAPITOKENVALUE1";
 /** Exactly the 8-byte, lowercase-hex checksum the reviewed contract's identity case carries. */
@@ -79,6 +93,8 @@ export function generateCloudflareTokenMutations(): readonly CloudflareTokenMuta
     ["checksum-one-long", `${PREFIX}${BODY}${CHECKSUM}0`],
     ["checksum-non-hex", PREFIX + BODY + "ghijklmn"],
     ["checksum-uppercase-hex", PREFIX + BODY + CHECKSUM.toUpperCase()],
+    ["account-token-prefix", ACCOUNT_PREFIX + BODY + CHECKSUM],
+    ["account-checksum-non-hex", ACCOUNT_PREFIX + BODY + "ghijklmn"],
   ];
 
   return operations.map(([operation, input], ordinal) => ({

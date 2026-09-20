@@ -682,6 +682,22 @@
       "detector": "cloudflare-token",
       "disposition": "silent",
       "expectedRanges": [],
+      "id": "cloudflare-boundary-account-checksum-non-hex",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "cloudflare-token",
+      "disposition": "silent",
+      "expectedRanges": [],
       "id": "cloudflare-boundary-below-min",
       "kind": "boundary",
       "lostRanges": [],
@@ -1194,6 +1210,32 @@
       "retainedRanges": [],
       "support": "supported",
       "tier": "negative"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "cloudflare-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 53,
+          "start": 0
+        }
+      ],
+      "id": "cloudflare-positive-account-checksum-suffix",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 53,
+          "start": 0
+        }
+      ],
+      "support": "supported",
+      "tier": "canonical"
     },
     {
       "contexts": [
@@ -8555,9 +8597,9 @@
   "summary": {
     "cloudflare-token": {
       "broad-shape": 0,
-      "retained": 17,
+      "retained": 18,
       "review": 0,
-      "silent": 33
+      "silent": 34
     },
     "digitalocean-token": {
       "broad-shape": 0,

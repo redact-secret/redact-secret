@@ -1552,6 +1552,7 @@
         {
           "dimension": "positive",
           "evidenceFixtureIds": [
+            "cloudflare-positive-account-checksum-suffix",
             "cloudflare-positive-checksum-suffix",
             "cloudflare-positive-crlf-unicode-prefix",
             "cloudflare-positive-dotenv",
@@ -1584,6 +1585,7 @@
         {
           "dimension": "boundary",
           "evidenceFixtureIds": [
+            "cloudflare-boundary-account-checksum-non-hex",
             "cloudflare-boundary-below-min",
             "cloudflare-boundary-case-sensitivity",
             "cloudflare-boundary-checksum-non-hex",
@@ -1627,6 +1629,7 @@
         {
           "dimension": "malformed",
           "evidenceFixtureIds": [
+            "cloudflare-boundary-account-checksum-non-hex",
             "cloudflare-boundary-below-min",
             "cloudflare-boundary-case-sensitivity",
             "cloudflare-boundary-checksum-non-hex",

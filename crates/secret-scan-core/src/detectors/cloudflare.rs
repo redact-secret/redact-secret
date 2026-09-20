@@ -30,19 +30,41 @@
 //! [`super::additional_providers::KnownFormatProviderDetector`] every other
 //! provider in that module uses, not a bespoke `detect` body.
 //!
-//! Cloudflare's `cfat_` (account token) and `cfk_` (scannable global key)
-//! namespaces are provider-documented with the same shape but not matched
-//! by beta.4 or either consulted tool's `cfut_`-only rule; adding them is a
-//! coverage change for a separate issue, recorded as a known false negative
-//! (`docs/audits/evidence/367/precision-contracts.json`, `pending`). The
-//! legacy unprefixed 40-character alphanumeric token and 37-45-character
+//! Cloudflare's `cfat_` (account token) namespace shares this exact
+//! `[40 characters][checksum]` shape (issue #481, following the frozen
+//! precision contract from issue #367,
+//! `docs/audits/evidence/367/precision-contracts.json`,
+//! `families.cloudflare-token`): the provider's token-formats page
+//! documents `cfat_` with the identical `cfat_[40 characters][checksum]`
+//! format cell as `cfut_`, and trufflehog 3.97.4's `cloudflareapitoken` v2
+//! rule (`\b(cf[ua]t_[a-zA-Z0-9]{40}[a-f0-9]{8})\b`) matches both `cfut_`
+//! and `cfat_` with the same body and checksum shape. `cfat_` is therefore
+//! adopted as a second [`PrefixShape`] over the identical body length,
+//! alphabet, and checksum post-check as `cfut_`, not new matching logic.
+//!
+//! Cloudflare's `cfk_` (scannable global key) namespace is provider-documented
+//! to exist (`cfk_[40 characters][checksum]`) but, unlike `cfat_`, no
+//! consulted tool's rule corroborates its checksum width or alphabet --
+//! trufflehog's `cf[ua]t_` alternation does not include `k`, and gitleaks'
+//! `cloudflare-global-api-key` rule targets only the legacy unprefixed
+//! 37-45-character hex key, not the new scannable format. Freezing a
+//! grammar for `cfk_` without that corroboration would be a guess rather
+//! than a reviewed contract, so it stays excluded here, split into issue
+//! #486 (see `docs/audits/evidence/367/precision-contracts.json`,
+//! `families.cloudflare-token.pending`).
+//!
+//! The legacy unprefixed 40-character alphanumeric token and 37-45-character
 //! hex Global API Key remain out of scope: both are indistinguishable from
 //! ordinary opaque values without a prefix to anchor on.
 
 use crate::detectors::additional_providers::KnownFormatProviderDetector;
 use crate::detectors::pattern::{PrefixShape, is_alnum, is_alnum_dash, is_lower_hex};
 
-const PREFIX: &str = "cfut_";
+const USER_PREFIX: &str = "cfut_";
+/// Issue #481: the account-token namespace, sharing the `cfut_` contract's
+/// exact body length, alphabet, and checksum shape (provider format cell and
+/// trufflehog's `cf[ua]t_` alternation both corroborate the same shape).
+const ACCOUNT_PREFIX: &str = "cfat_";
 /// The documented body length.
 const BODY_LEN: usize = 40;
 /// The tool-corroborated checksum length.
@@ -52,7 +74,11 @@ const CHECKSUM_LEN: usize = 8;
 /// length.
 const SUFFIX_LEN: usize = BODY_LEN + CHECKSUM_LEN;
 
-const SIGNALS: [&str; 2] = ["cloudflare-scannable-prefix", "checksum-shaped-suffix"];
+const USER_SIGNALS: [&str; 2] = ["cloudflare-scannable-prefix", "checksum-shaped-suffix"];
+const ACCOUNT_SIGNALS: [&str; 2] = [
+    "cloudflare-account-scannable-prefix",
+    "checksum-shaped-suffix",
+];
 
 /// `true` when the matched run's last [`CHECKSUM_LEN`] bytes are lowercase
 /// hex — the [`PrefixShape::post_check`] this shape's exact-length body
@@ -62,15 +88,20 @@ fn checksum_tail_is_lower_hex(bytes: &[u8], _start: usize, end: usize) -> bool {
     bytes[checksum_start..end].iter().copied().all(is_lower_hex)
 }
 
-/// Requires the exact `cfut_<40 alnum><8 lowercase-hex>` shape. A body or
-/// checksum segment short of its documented length, a checksum containing a
-/// non-hex or uppercase-hex byte, or a run embedded in a wider identifier is
-/// an intentional false negative rather than a fuzzy match.
+/// Requires the exact `cfut_<40 alnum><8 lowercase-hex>` or
+/// `cfat_<40 alnum><8 lowercase-hex>` shape. A body or checksum segment short
+/// of its documented length, a checksum containing a non-hex or
+/// uppercase-hex byte, or a run embedded in a wider identifier is an
+/// intentional false negative rather than a fuzzy match.
 pub(super) const CLOUDFLARE: KnownFormatProviderDetector = KnownFormatProviderDetector::new(
     "cloudflare-token",
     "cloudflare_api_token",
-    &[PrefixShape::exact(PREFIX, SUFFIX_LEN, is_alnum, &SIGNALS)
-        .with_post_check(checksum_tail_is_lower_hex)],
+    &[
+        PrefixShape::exact(USER_PREFIX, SUFFIX_LEN, is_alnum, &USER_SIGNALS)
+            .with_post_check(checksum_tail_is_lower_hex),
+        PrefixShape::exact(ACCOUNT_PREFIX, SUFFIX_LEN, is_alnum, &ACCOUNT_SIGNALS)
+            .with_post_check(checksum_tail_is_lower_hex),
+    ],
     is_alnum_dash,
 );
 
@@ -85,8 +116,12 @@ mod tests {
     const _: () = assert!(BODY.len() == BODY_LEN);
     const _: () = assert!(CHECKSUM.len() == CHECKSUM_LEN);
 
-    fn token() -> String {
-        format!("{PREFIX}{BODY}{CHECKSUM}")
+    fn user_token() -> String {
+        format!("{USER_PREFIX}{BODY}{CHECKSUM}")
+    }
+
+    fn account_token() -> String {
+        format!("{ACCOUNT_PREFIX}{BODY}{CHECKSUM}")
     }
 
     fn detect(input: &str) -> Vec<Candidate> {
@@ -97,58 +132,78 @@ mod tests {
 
     #[test]
     fn detects_a_synthetic_credential_with_provider_specificity() {
-        let value = token();
-        let candidates = detect(&value);
-        assert_eq!(candidates.len(), 1);
-        assert_eq!(candidates[0].type_name(), "cloudflare_api_token");
-        assert_eq!(candidates[0].confidence(), Confidence::High);
-        assert_eq!(candidates[0].effective_specificity(), Specificity::Provider);
-        assert_eq!(
-            candidates[0].range(),
-            ByteRange::new(0, value.len()).unwrap()
-        );
+        for value in [user_token(), account_token()] {
+            let candidates = detect(&value);
+            assert_eq!(candidates.len(), 1, "{value}");
+            assert_eq!(candidates[0].type_name(), "cloudflare_api_token", "{value}");
+            assert_eq!(candidates[0].confidence(), Confidence::High, "{value}");
+            assert_eq!(
+                candidates[0].effective_specificity(),
+                Specificity::Provider,
+                "{value}"
+            );
+            assert_eq!(
+                candidates[0].range(),
+                ByteRange::new(0, value.len()).unwrap(),
+                "{value}"
+            );
+        }
     }
 
     #[test]
     fn detects_the_token_bare_in_env_and_control_contexts() {
-        let value = token();
-        for input in [
-            value.clone(),
-            format!("CLOUDFLARE_API_TOKEN={value}"),
-            format!("cloudflare_api_token: {value}"),
-            format!("{{\"token\": \"{value}\"}}"),
-        ] {
-            let candidates = detect(&input);
-            assert_eq!(candidates.len(), 1, "{input}");
-            let (start, end) = (candidates[0].range().start(), candidates[0].range().end());
-            assert_eq!(&input[start..end], value, "{input}");
+        for value in [user_token(), account_token()] {
+            for input in [
+                value.clone(),
+                format!("CLOUDFLARE_API_TOKEN={value}"),
+                format!("cloudflare_api_token: {value}"),
+                format!("{{\"token\": \"{value}\"}}"),
+            ] {
+                let candidates = detect(&input);
+                assert_eq!(candidates.len(), 1, "{input}");
+                let (start, end) = (candidates[0].range().start(), candidates[0].range().end());
+                assert_eq!(&input[start..end], value, "{input}");
+            }
         }
     }
 
     #[test]
     fn accepts_punctuation_boundaries() {
-        let value = token();
-        let input = format!("({value}).");
-        let candidates = detect(&input);
-        assert_eq!(candidates.len(), 1);
-        assert_eq!(
-            candidates[0].range(),
-            ByteRange::new(1, value.len() + 1).unwrap()
-        );
+        for value in [user_token(), account_token()] {
+            let input = format!("({value}).");
+            let candidates = detect(&input);
+            assert_eq!(candidates.len(), 1, "{value}");
+            assert_eq!(
+                candidates[0].range(),
+                ByteRange::new(1, value.len() + 1).unwrap(),
+                "{value}"
+            );
+        }
     }
 
     /// Issue #373: the beta.4 `cloudflare-token-user-plain-twin` regression
     /// shape -- a body one byte short of the documented 40-byte length.
+    /// Issue #481 extends the same regression coverage to `cfat_`.
     #[test]
     fn rejects_a_body_one_byte_short_of_the_documented_length() {
         let short_body = &BODY[..BODY_LEN - 1];
-        assert!(detect(&format!("{PREFIX}{short_body}{CHECKSUM}")).is_empty());
+        for prefix in [USER_PREFIX, ACCOUNT_PREFIX] {
+            assert!(
+                detect(&format!("{prefix}{short_body}{CHECKSUM}")).is_empty(),
+                "{prefix}"
+            );
+        }
     }
 
     #[test]
     fn rejects_a_checksum_one_byte_short_of_the_documented_length() {
         let short_checksum = &CHECKSUM[..CHECKSUM_LEN - 1];
-        assert!(detect(&format!("{PREFIX}{BODY}{short_checksum} ")).is_empty());
+        for prefix in [USER_PREFIX, ACCOUNT_PREFIX] {
+            assert!(
+                detect(&format!("{prefix}{BODY}{short_checksum} ")).is_empty(),
+                "{prefix}"
+            );
+        }
     }
 
     /// A run one byte longer than the documented combined length is
@@ -157,16 +212,27 @@ mod tests {
     /// `npm-token` already set for their own exact-length grammars.
     #[test]
     fn rejects_a_run_one_byte_longer_than_the_documented_length() {
-        assert!(detect(&format!("{PREFIX}{BODY}{CHECKSUM}a")).is_empty());
+        for prefix in [USER_PREFIX, ACCOUNT_PREFIX] {
+            assert!(
+                detect(&format!("{prefix}{BODY}{CHECKSUM}a")).is_empty(),
+                "{prefix}"
+            );
+        }
     }
 
     /// Issue #373: the reproduced beta.4 regression -- a checksum whose
     /// eight bytes are alphanumeric but not hexadecimal. Retained as
     /// must-not-flag: the value carries no checksum segment of any shape a
-    /// consulted source describes.
+    /// consulted source describes. Issue #481 extends the same must-not-flag
+    /// coverage to `cfat_`.
     #[test]
     fn rejects_a_non_hex_checksum() {
-        assert!(detect(&format!("{PREFIX}{BODY}ghijklmn")).is_empty());
+        for prefix in [USER_PREFIX, ACCOUNT_PREFIX] {
+            assert!(
+                detect(&format!("{prefix}{BODY}ghijklmn")).is_empty(),
+                "{prefix}"
+            );
+        }
     }
 
     /// The checksum alphabet is `[0-9a-f]`, not `[0-9A-Fa-f]`: the single
@@ -175,7 +241,12 @@ mod tests {
     /// a case-insensitive match.
     #[test]
     fn rejects_an_uppercase_hex_checksum() {
-        assert!(detect(&format!("{PREFIX}{BODY}DEADBEEF")).is_empty());
+        for prefix in [USER_PREFIX, ACCOUNT_PREFIX] {
+            assert!(
+                detect(&format!("{prefix}{BODY}DEADBEEF")).is_empty(),
+                "{prefix}"
+            );
+        }
     }
 
     /// Both consulted sources agree the body excludes `_`/`-`; a byte
@@ -184,37 +255,55 @@ mod tests {
     /// as it would under the retired `[A-Za-z0-9_-]` shared shape.
     #[test]
     fn rejects_a_body_containing_underscore_or_dash() {
-        for byte in ['_', '-'] {
-            let mut body = BODY.to_string();
-            body.replace_range(4..5, &byte.to_string());
-            assert!(detect(&format!("{PREFIX}{body}{CHECKSUM}")).is_empty());
+        for prefix in [USER_PREFIX, ACCOUNT_PREFIX] {
+            for byte in ['_', '-'] {
+                let mut body = BODY.to_string();
+                body.replace_range(4..5, &byte.to_string());
+                assert!(
+                    detect(&format!("{prefix}{body}{CHECKSUM}")).is_empty(),
+                    "{prefix}"
+                );
+            }
         }
     }
 
-    /// A truncated or misspelled prefix (the documented `cfut_` with its
-    /// final letter dropped) never anchors a match, even with an otherwise
-    /// realistic-length body and checksum following it.
+    /// A truncated or misspelled prefix (the documented `cfut_`/`cfat_` with
+    /// its final letter dropped) never anchors a match, even with an
+    /// otherwise realistic-length body and checksum following it.
     #[test]
     fn rejects_a_truncated_prefix_with_a_realistic_length_body() {
-        assert!(detect(&format!("cfu_{BODY}{CHECKSUM}")).is_empty());
+        for prefix in ["cfu_", "cfa_"] {
+            assert!(
+                detect(&format!("{prefix}{BODY}{CHECKSUM}")).is_empty(),
+                "{prefix}"
+            );
+        }
     }
 
     #[test]
     fn rejects_the_prefix_alone() {
-        assert!(detect(PREFIX).is_empty());
-        assert!(detect(&format!("{PREFIX}{BODY}")).is_empty());
+        for prefix in [USER_PREFIX, ACCOUNT_PREFIX] {
+            assert!(detect(prefix).is_empty(), "{prefix}");
+            assert!(detect(&format!("{prefix}{BODY}")).is_empty(), "{prefix}");
+        }
     }
 
     #[test]
     fn rejects_the_body_or_checksum_embedded_in_a_wider_identifier() {
-        let value = token();
-        assert!(detect(&format!("x{value}")).is_empty());
-        assert!(detect(&format!("{value}x")).is_empty());
+        for value in [user_token(), account_token()] {
+            assert!(detect(&format!("x{value}")).is_empty(), "{value}");
+            assert!(detect(&format!("{value}x")).is_empty(), "{value}");
+        }
     }
 
     #[test]
     fn rejects_a_masked_value() {
-        assert!(detect(&format!("{PREFIX}{}", "*".repeat(BODY_LEN + CHECKSUM_LEN))).is_empty());
+        for prefix in [USER_PREFIX, ACCOUNT_PREFIX] {
+            assert!(
+                detect(&format!("{prefix}{}", "*".repeat(BODY_LEN + CHECKSUM_LEN))).is_empty(),
+                "{prefix}"
+            );
+        }
     }
 
     #[test]
@@ -223,8 +312,8 @@ mod tests {
     }
 
     /// Cloudflare's own account-scoped and zone-scoped resource identifiers
-    /// are opaque hex UUID-shaped strings with no `cfut_` prefix; they must
-    /// not be misread as a truncated or malformed token.
+    /// are opaque hex UUID-shaped strings with no `cfut_`/`cfat_` prefix;
+    /// they must not be misread as a truncated or malformed token.
     #[test]
     fn rejects_an_ordinary_zone_resource_id() {
         assert!(detect("023e105f4ecef8ad9ca31a8372d0c353").is_empty());
@@ -232,28 +321,54 @@ mod tests {
 
     #[test]
     fn finds_a_match_across_crlf_and_a_unicode_prefix() {
-        let value = token();
-        let input = format!("# \u{1F511} caf\u{e9}\r\n{value}\r\n");
-        let candidates = detect(&input);
-        assert_eq!(candidates.len(), 1);
-        let start = input.find(&value).unwrap();
-        assert_eq!(
-            candidates[0].range(),
-            ByteRange::new(start, start + value.len()).unwrap()
-        );
+        for value in [user_token(), account_token()] {
+            let input = format!("# \u{1F511} caf\u{e9}\r\n{value}\r\n");
+            let candidates = detect(&input);
+            assert_eq!(candidates.len(), 1, "{value}");
+            let start = input.find(&value).unwrap();
+            assert_eq!(
+                candidates[0].range(),
+                ByteRange::new(start, start + value.len()).unwrap(),
+                "{value}"
+            );
+        }
     }
 
     #[test]
     fn reports_a_repeated_identical_value_once_per_occurrence() {
-        let value = token();
-        let input = format!("{value} {value}");
-        assert_eq!(detect(&input).len(), 2);
+        for value in [user_token(), account_token()] {
+            let input = format!("{value} {value}");
+            assert_eq!(detect(&input).len(), 2, "{value}");
+        }
     }
 
     #[test]
     fn finds_deterministic_findings_across_repeated_calls() {
-        let value = token();
-        assert_eq!(detect(&value), detect(&value));
+        for value in [user_token(), account_token()] {
+            assert_eq!(detect(&value), detect(&value), "{value}");
+        }
+    }
+
+    /// Issue #481: `cfut_` and `cfat_` occurrences in the same input are
+    /// both detected -- one prefix's contract does not suppress the other's,
+    /// the same guarantee `linear-token`'s `lin_api_`/`lin_oauth_` pair
+    /// already gives.
+    #[test]
+    fn detects_both_prefixes_in_the_same_input_without_one_suppressing_another() {
+        let user = user_token();
+        let account = account_token();
+        let input = format!("{user}\n{account}\n");
+        let candidates = detect(&input);
+        assert_eq!(candidates.len(), 2);
+        assert_eq!(
+            candidates[0].range(),
+            ByteRange::new(0, user.len()).unwrap()
+        );
+        let account_start = user.len() + 1;
+        assert_eq!(
+            candidates[1].range(),
+            ByteRange::new(account_start, account_start + account.len()).unwrap()
+        );
     }
 
     #[test]
@@ -262,7 +377,7 @@ mod tests {
         // length, so none matches; the scan must still stay linear instead
         // of rescanning from each failed prefix position.
         let short_body = &BODY[..BODY_LEN - 1];
-        let input = format!("{PREFIX}{short_body}{CHECKSUM} ").repeat(10_000);
+        let input = format!("{USER_PREFIX}{short_body}{CHECKSUM} ").repeat(10_000);
         assert_eq!(detect(&input).len(), 0);
     }
 }

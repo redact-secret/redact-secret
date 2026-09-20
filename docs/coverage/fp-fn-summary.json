@@ -122,8 +122,9 @@
       "detector": "cloudflare-token",
       "falseNegativeGuards": {
         "actualFalseNegatives": 0,
-        "count": 12,
+        "count": 13,
         "fixtureIds": [
+          "cloudflare-positive-account-checksum-suffix",
           "cloudflare-positive-checksum-suffix",
           "cloudflare-positive-crlf-unicode-prefix",
           "cloudflare-positive-dotenv",

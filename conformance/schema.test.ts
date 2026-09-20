@@ -386,7 +386,11 @@ const GRAMMAR_MUTATION_FAMILIES: readonly GrammarMutationFamily[] = [
     issue: "#373",
     seedId: CLOUDFLARE_TOKEN_CHECKSUM_SUFFIX_SEED_ID,
     generate: generateCloudflareTokenMutations,
-    isFullPartitionPositive: (operation) => operation === "identity",
+    // Issue #481 added `account-token-prefix`, a second documented-prefix
+    // identity shape (`cfat_`, alongside `cfut_`'s `identity`), so this no
+    // longer reduces to a single-positive binary partition; the direct
+    // analogue is `digitalocean-v1`'s `identityOperations` above.
+    identityOperations: ["identity", "account-token-prefix"],
   },
   {
     grammar: "linear-token-api-exact-length",

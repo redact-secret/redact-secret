@@ -650,7 +650,7 @@
     {
       "detector": "cloudflare-token",
       "evidence": {
-        "fixtureCount": 47,
+        "fixtureCount": 49,
         "hostContextsExercised": [
           "dotenv",
           "http",
@@ -674,6 +674,7 @@
         ]
       },
       "evidenceFixtureIds": [
+        "cloudflare-positive-account-checksum-suffix",
         "cloudflare-positive-checksum-suffix",
         "cloudflare-positive-crlf-unicode-prefix",
         "cloudflare-positive-dotenv",

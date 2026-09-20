@@ -3,7 +3,7 @@
   "corpus": "synchronous-corpus.json",
   "offsetUnit": "utf8-byte",
   "detectors": ["private-key","jwt","bearer-token","connection-string","otpauth-uri","generic-token"],
-  "fixtureCount": 1287,
+  "fixtureCount": 1289,
   "fixtures": [
     {"expected":[{"action":"warn","confidence":"medium","detector":"generic-token","end":48,"start":8,"type":"contextual_secret"}],"id":"host-dotenv-github"},
     {"expected":[{"action":"warn","confidence":"medium","detector":"generic-token","end":52,"start":12,"type":"contextual_secret"}],"id":"host-json-github"},
@@ -1170,6 +1170,8 @@
     {"expected":[],"id":"cloudflare-boundary-checksum-one-long"},
     {"expected":[],"id":"cloudflare-boundary-checksum-non-hex"},
     {"expected":[],"id":"cloudflare-boundary-checksum-uppercase-hex"},
+    {"expected":[],"id":"cloudflare-positive-account-checksum-suffix"},
+    {"expected":[],"id":"cloudflare-boundary-account-checksum-non-hex"},
     {"expected":[],"id":"openai-negative-marker-dotenv"},
     {"expected":[{"action":"redact","confidence":"high","detector":"generic-token","end":174,"start":11,"type":"contextual_secret"}],"id":"openai-overlap-marker-malformed-json-assignment"},
     {"expected":[],"id":"openai-negative-marker-log"},
