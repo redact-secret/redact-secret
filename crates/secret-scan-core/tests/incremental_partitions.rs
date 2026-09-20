@@ -226,6 +226,93 @@ fn a_multi_byte_partition_is_enumerated_inside_the_code_point() {
 }
 
 // ---------------------------------------------------------------------------
+// part D (issue #480): redaction integrity for the #467-#475 exclusion
+// shapes -- an excluded value's literal text must survive untouched, with
+// no stranded partial-value remnant, in both whole-input and every
+// incremental partition of these fixtures. #467's original report was
+// exactly this failure mode: a value boundary that stopped early left
+// ` key: pem })` stranded on the line.
+// ---------------------------------------------------------------------------
+
+/// Fixture id, paired with the excluded line(s) whose literal text must
+/// survive unredacted end to end. Scoped deliberately to the #467-#475
+/// exclusion-shape fixtures rather than the whole corpus: a corpus-wide
+/// version of this check would misfire on the deliberate, documented
+/// interpolation-fragment residual
+/// (`docs/decisions/2026-09-20-exclude-closed-call-code-expressions-as-contextual-values.md`'s
+/// "Known residual, out of scope" clause), which strands `}_CONTEXT_VALUE`
+/// by design and belongs to #266/#279, not to this issue.
+const EXCLUDED_LINE_FIXTURES: &[(&str, &[&str])] = &[
+    (
+        "contextual-closed-call-code-expressions",
+        &[
+            "secret = SecretManagerServiceClient.access_secret_version(req)",
+            "secret = getSecretOrThrow(SECRET_NAME_CONSTANT)",
+            "secret = django.core.signing.get_cookie_signer(salt=SALT)",
+            "secret = crypto.createPrivateKey({ key: pem })",
+            "api_key = rsa.generate_private_key(public_exponent=65537)",
+        ],
+    ),
+    (
+        "bearer-token-filler-and-placeholder-exclusion-boundary",
+        &["Authorization: Bearer xxxxxxxxxxxxxxxxxxxx"],
+    ),
+    (
+        "bearer-token-whole-value-placeholder-exclusion-boundary",
+        &["Authorization: Bearer PASSWORD_SECRET_EXAMPLE"],
+    ),
+    (
+        "connection-string-interpolation-reference-exclusion-boundary",
+        &["postgres://app:$DB_PASSWORD@db.internal:5432/example"],
+    ),
+    (
+        "jwt-legacy-supabase-anon-service-role-discriminating-boundary",
+        &[
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5bnRocHJvaiIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzAwMDAwMDAwLCJleHAiOjE3OTk5OTk5OTl9.SYNTHETIC_REVOKED_SUPABASE_LEGACY_JWT_SIGNATURE",
+        ],
+    ),
+];
+
+#[test]
+fn an_excluded_value_survives_unstranded_in_the_whole_input_reference() {
+    let corpus = incremental_corpus();
+    for (id, excluded_lines) in EXCLUDED_LINE_FIXTURES {
+        let fixture = corpus
+            .iter()
+            .find(|fixture| &fixture.id == id)
+            .unwrap_or_else(|| panic!("fixture {id} must exist in the incremental corpus"));
+        let (text, _) = reference(fixture);
+        for excluded_line in *excluded_lines {
+            assert!(
+                text.contains(excluded_line),
+                "{id}: excluded value {excluded_line:?} must survive unstranded in {text:?}",
+            );
+        }
+    }
+}
+
+#[test]
+fn an_excluded_value_survives_unstranded_at_every_incremental_partition_boundary() {
+    let corpus = incremental_corpus();
+    for (id, excluded_lines) in EXCLUDED_LINE_FIXTURES {
+        let fixture = corpus
+            .iter()
+            .find(|fixture| &fixture.id == id)
+            .unwrap_or_else(|| panic!("fixture {id} must exist in the incremental corpus"));
+        for chunks in char_boundary_partitions(&fixture.input) {
+            let run = run(&chunks);
+            for excluded_line in *excluded_lines {
+                assert!(
+                    run.text().contains(excluded_line),
+                    "{id}: excluded value {excluded_line:?} must survive unstranded at every partition boundary, got {:?}",
+                    run.text(),
+                );
+            }
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
 // criterion 3: acceptance is unchanged when safe output accumulates in one call
 // ---------------------------------------------------------------------------
 

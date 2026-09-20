@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 79,
+  "fixtureCount": 80,
   "fixtures": [
     {
       "id": "synthetic-regression-malformed-authority",
@@ -1250,6 +1250,22 @@
         }
       ],
       "note": "issue #469: a bare $VAR environment-variable reference password on the first line is excluded and produces no finding, while a genuine password on the second line is still reported; every UTF-8 chunk split, including splits inside the reference or across the line boundary, must reproduce this whole-input reference."
+    },
+    {
+      "id": "bearer-token-whole-value-placeholder-exclusion-boundary",
+      "input": "Authorization: Bearer PASSWORD_SECRET_EXAMPLE\nBearer SYNTHETIC_REVOKED_BEARER_INCREMENTAL_PLACEHOLDER_PAIR_VALUE",
+      "text": "Authorization: Bearer PASSWORD_SECRET_EXAMPLE\nBearer <SECRET_1>",
+      "expected": [
+        {
+          "detector": "bearer-token",
+          "type": "bearer_token",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 53,
+          "end": 112
+        }
+      ],
+      "note": "issue #480 (#468 residual): a whole-value placeholder-vocabulary Bearer credential on the first line is excluded and produces no finding, distinct from the repeated-character filler case already covered by bearer-token-filler-and-placeholder-exclusion-boundary, while a genuine Bearer credential on the second line is still reported; every UTF-8 chunk split, including splits inside the placeholder word or across the line boundary, must reproduce this whole-input reference."
     }
   ]
 }
