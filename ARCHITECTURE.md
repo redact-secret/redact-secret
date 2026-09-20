@@ -167,8 +167,12 @@ translation covers, and each remains a deliberate exclusion (see below). See
 [Normalize invisible characters before
 detection](./docs/decisions/2026-09-19-normalize-invisible-characters-before-detection.md)
 for the derived set, its v1 exclusions, the span translation rule, and its
-incremental-sanitization consequence. Detectors are unchanged and inspect the
-scan copy; they cannot tell normalization occurred.
+incremental-sanitization consequence, and [Defer encoded-input decoding out
+of scope, with
+reasoning](./docs/decisions/2026-09-20-defer-encoded-input-decoding.md) for
+why base64/percent/backslash decoding specifically stays out of scope.
+Detectors are unchanged and inspect the scan copy; they cannot tell
+normalization occurred.
 
 Candidate validation rejects malformed, empty, out-of-bounds, or invalid UTF-8
 boundary ranges. It runs against the scan copy the candidate was detected in;
