@@ -93,7 +93,11 @@ distinct reason:
   fixture presently marked `intentionally-unsupported`.
 - **NFKC normalization, case folding, and base64/percent/backslash
   decoding** — unchanged. None of these are invisibility; each changes
-  lexical meaning in ways this decision does not cover.
+  lexical meaning in ways this decision does not cover. Decoding
+  specifically was revisited in issue #491 and stays deferred; see
+  [Defer encoded-input decoding out of scope, with
+  reasoning](./2026-09-20-defer-encoded-input-decoding.md) for the measured
+  evidence and reasoning behind that outcome.
 
 ### Span translation rule
 
