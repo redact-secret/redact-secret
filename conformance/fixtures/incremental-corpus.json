@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 75,
+  "fixtureCount": 76,
   "fixtures": [
     {
       "id": "synthetic-regression-malformed-authority",
@@ -1170,6 +1170,38 @@
         }
       ],
       "note": "issue #446: U+200D sits inside a structural Authorization header's Bearer value; every partition boundary must still reproduce the whole-input reference, including the byte and char boundaries that fall inside the removed code point's own 3-byte UTF-8 encoding."
+    },
+    {
+      "id": "contextual-closed-call-code-expressions",
+      "input": "secret = SecretManagerServiceClient.access_secret_version(req)\nsecret = getSecretOrThrow(SECRET_NAME_CONSTANT)\nsecret = django.core.signing.get_cookie_signer(salt=SALT)\nsecret = crypto.createPrivateKey({ key: pem })\napi_key = rsa.generate_private_key(public_exponent=65537)\npassword: SYNTHETIC(REVOKED)_CONTEXT_VALUE\npassword: \"SYNTHETIC(REVOKED_CONTEXT_VALUE\"\npassword: SYNTHETIC_REVOKED_CONTEXT_VALUE\n",
+      "text": "secret = SecretManagerServiceClient.access_secret_version(req)\nsecret = getSecretOrThrow(SECRET_NAME_CONSTANT)\nsecret = django.core.signing.get_cookie_signer(salt=SALT)\nsecret = crypto.createPrivateKey({ key: pem })\napi_key = rsa.generate_private_key(public_exponent=65537)\npassword: <SECRET_1>\npassword: \"<SECRET_2>\"\npassword: <SECRET_3>\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 284,
+          "end": 316
+        },
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 328,
+          "end": 359
+        },
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 371,
+          "end": 402
+        }
+      ],
+      "note": "issue #467: the five closed-call code expressions this issue reported as contextual secrets stay clean, and the three paired positives (an embedded balanced '(...)', a quoted unbalanced one, and a plain underscored value) stay redacted, at every core and stream partition boundary -- so incremental and whole-input agree on both sides of the new exclusion."
     }
   ]
 }

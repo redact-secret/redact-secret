@@ -659,14 +659,152 @@ fn ends_with_open_call_or_subscript(value: &str) -> bool {
     matches!(value.as_bytes().last(), Some(b'(' | b'['))
 }
 
+fn is_identifier_byte(byte: u8) -> bool {
+    byte.is_ascii_alphanumeric() || byte == b'_'
+}
+
+fn closing_bracket_for(open: u8) -> u8 {
+    match open {
+        b'(' => b')',
+        b'[' => b']',
+        _ => b'}',
+    }
+}
+
+/// From the index of an opening bracket, the index just past its matching
+/// closer, or `None` when the group never closes inside `bytes` or a closer
+/// arrives out of order.
+fn balanced_group_end(bytes: &[u8], open: usize) -> Option<usize> {
+    let mut stack: Vec<u8> = Vec::new();
+    for (index, &byte) in bytes.iter().enumerate().skip(open) {
+        match byte {
+            b'(' | b'[' | b'{' => stack.push(byte),
+            b')' | b']' | b'}' => {
+                let opener = stack.pop()?;
+                if byte != closing_bracket_for(opener) {
+                    return None;
+                }
+                if stack.is_empty() {
+                    return Some(index + 1);
+                }
+            }
+            _ => {}
+        }
+    }
+    None
+}
+
+/// What [`scan_identifier_chain`] made of a value.
+enum ChainScan {
+    /// The value is, end to end, a `.`-separated chain of identifier
+    /// segments; `saw_call` records whether any segment carried a balanced
+    /// `(...)` argument group.
+    Complete { saw_call: bool },
+    /// The chain ran into a `(` or `[` — opened directly on an identifier
+    /// segment — that never closes before the value ends.
+    Truncated,
+    /// Not an identifier chain.
+    Other,
+}
+
+/// Walks a value as `Segment ( '.' Segment )*`, where a `Segment` is an
+/// identifier optionally followed by balanced `(...)` / `[...]` groups.
+///
+/// Anchoring every bracket group to the identifier that opens it is what
+/// separates a source-code call from a value that merely embeds punctuation:
+/// `$(`, `#{`, and `{{` all open on a non-identifier character, so the
+/// interpolation and template *fragments* that issues #266 and #279
+/// deliberately keep detected (`SYNTHETIC_REVOKED_{{`,
+/// `$(SYNTHETIC_REVOKED_CONTEXT_VALUE`) scan as [`ChainScan::Other`] rather
+/// than as truncated code.
+fn scan_identifier_chain(value: &str) -> ChainScan {
+    let bytes = value.as_bytes();
+    let mut index = 0usize;
+    let mut saw_call = false;
+    loop {
+        let segment_start = index;
+        while index < bytes.len() && is_identifier_byte(bytes[index]) {
+            index += 1;
+        }
+        if index == segment_start {
+            return ChainScan::Other;
+        }
+        while let Some(&open @ (b'(' | b'[')) = bytes.get(index) {
+            match balanced_group_end(bytes, index) {
+                Some(after) => {
+                    index = after;
+                    saw_call |= open == b'(';
+                }
+                None => return ChainScan::Truncated,
+            }
+        }
+        match bytes.get(index) {
+            None => return ChainScan::Complete { saw_call },
+            Some(b'.') => index += 1,
+            Some(_) => return ChainScan::Other,
+        }
+    }
+}
+
+/// `true` when the *whole* value is a call expression: a `.`-separated chain
+/// of identifier segments in which at least one segment is immediately
+/// followed by a balanced `(...)` argument group, with the value ending
+/// exactly where that chain does — `getSecretOrThrow(SECRET_NAME_CONSTANT)`,
+/// `SecretManagerServiceClient.access_secret_version(req)`,
+/// `django.core.signing.get_cookie_signer(salt=SALT)` (issue #467).
+///
+/// Requiring the chain to span the entire value is what keeps this from
+/// becoming the blanket "value contains `(`" rule issue #467 rejected: a
+/// passphrase that merely embeds parentheses (`SYNTHETIC(REVOKED)_CONTEXT_VALUE`)
+/// carries trailing characters that are neither `.` nor the end of the value,
+/// so it stays detected.
+fn is_call_expression(value: &str) -> bool {
+    matches!(
+        scan_identifier_chain(value),
+        ChainScan::Complete { saw_call: true }
+    )
+}
+
+/// `true` when the value is a call or subscript expression cut short *inside*
+/// its bracket group, which is what `unquoted_assignment_value` produces
+/// whenever its boundary set (whitespace, `,`, `;`, `}`, `]`, a quote) lands
+/// between the brackets: `crypto.createPrivateKey({` from
+/// `crypto.createPrivateKey({ key: pem })`, `helper(FIRST` from
+/// `helper(FIRST, SECOND)`, `os.environ[` from `os.environ["NAME"]`.
+///
+/// This generalizes [`ends_with_open_call_or_subscript`] from "ends with an
+/// open bracket" to "opens a bracket it never closes", which is what makes
+/// the anti-stranding guarantee hold: a value cut mid-group is exactly the
+/// value whose redaction would otherwise leave the rest of the group
+/// (` key: pem })`) behind as syntactically broken output (issue #467).
+fn is_truncated_call_expression(value: &str) -> bool {
+    matches!(scan_identifier_chain(value), ChainScan::Truncated)
+}
+
+/// Whether an assignment value carried its own `"`/`'` delimiters.
+///
+/// The distinction matters only for truncation: an unquoted value ends
+/// wherever `is_unquoted_value_boundary` says it does, so it can be cut in
+/// the middle of a bracket group, while a quoted value always spans its full
+/// literal content and never is. Keeping [`is_truncated_call_expression`]
+/// off quoted values is what preserves detection of a parenthesized *literal*
+/// passphrase such as `password: "SYNTHETIC(REVOKED_CONTEXT_VALUE"`.
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum ValueForm {
+    Quoted,
+    Unquoted,
+}
+
 /// `true` when the value is structurally a source-code expression — member
 /// access, a call, a subscript, or a generic type — that names *where* a
-/// value lives rather than containing the value itself (issue #278).
-fn is_source_code_expression(value: &str) -> bool {
+/// value lives rather than containing the value itself (issues #278, #467).
+fn is_source_code_expression(value: &str, form: ValueForm) -> bool {
     starts_with_code_reference_root(value)
         || is_snake_case_attribute_chain(value)
         || contains_generic_or_subscript_syntax(value)
         || ends_with_open_call_or_subscript(value)
+        || is_call_expression(value)
+        || (form == ValueForm::Unquoted && is_truncated_call_expression(value))
 }
 
 /// Shared by contextual assignment values and, via [`authorization_candidates`],
@@ -675,8 +813,10 @@ fn is_source_code_expression(value: &str) -> bool {
 /// `[`, `(`, `$`, `#`, `` ` ``) that `is_authorization_value_byte` already
 /// excludes from an authorization value's character class, so they can
 /// never fire there — this function's behavior for that caller is unchanged by
-/// them.
-fn is_non_secret_reference(value: &str) -> bool {
+/// them. That is also why the `form` an authorization value is passed is
+/// immaterial: the only check that reads it, [`is_truncated_call_expression`],
+/// needs a bracket the character class already forbids.
+fn is_non_secret_reference(value: &str, form: ValueForm) -> bool {
     let lower = value.to_ascii_lowercase();
     is_generic_placeholder_word(&lower)
         || is_boolean_null_or_digits(&lower)
@@ -687,17 +827,17 @@ fn is_non_secret_reference(value: &str) -> bool {
         || is_interpolation_reference(value)
         || is_secret_manager_reference(value)
         || is_repeated_character_filler(value)
-        || is_source_code_expression(value)
+        || is_source_code_expression(value, form)
         || is_windows_env_reference(value)
         || is_sql_bind_parameter(value)
 }
 
 // --- confidence -----------------------------------------------------------
 
-fn assignment_confidence(name: &str, value: &str) -> Option<Confidence> {
+fn assignment_confidence(name: &str, value: &str, form: ValueForm) -> Option<Confidence> {
     if value.len() < MIN_CONTEXT_VALUE_LENGTH
         || value.len() > MAX_CONTEXT_VALUE_LENGTH
-        || is_non_secret_reference(value)
+        || is_non_secret_reference(value, form)
     {
         return None;
     }
@@ -956,10 +1096,12 @@ fn unquoted_assignment_value(input: &str, start: usize) -> Option<(usize, usize)
     (cursor > start).then_some((start, cursor))
 }
 
-fn assignment_value(input: &str, start: usize) -> Option<(usize, usize)> {
+fn assignment_value(input: &str, start: usize) -> Option<(usize, usize, ValueForm)> {
     match char_at(input, start) {
-        Some('"' | '\'') => quoted_assignment_value(input, start),
-        _ => unquoted_assignment_value(input, start),
+        Some('"' | '\'') => quoted_assignment_value(input, start)
+            .map(|(value_start, value_end)| (value_start, value_end, ValueForm::Quoted)),
+        _ => unquoted_assignment_value(input, start)
+            .map(|(value_start, value_end)| (value_start, value_end, ValueForm::Unquoted)),
     }
 }
 
@@ -1056,10 +1198,10 @@ fn assignment_candidates(input: &str) -> Vec<Candidate> {
             continue;
         };
 
-        if let Some((value_start, value_end)) = assignment_value(input, prefix_end) {
+        if let Some((value_start, value_end, form)) = assignment_value(input, prefix_end) {
             let value = &input[value_start..value_end];
             let normalized = normalize_name(&input[name_start..name_end]);
-            if let Some(confidence) = assignment_confidence(&normalized, value)
+            if let Some(confidence) = assignment_confidence(&normalized, value, form)
                 && let Some(range) = ByteRange::new(value_start, value_end)
             {
                 let name_signal = if HIGH_SIGNAL_NAMES.contains(&normalized.as_str()) {
@@ -1166,7 +1308,7 @@ fn authorization_candidates(input: &str) -> Vec<Candidate> {
         };
 
         let value = &input[m.value_start..m.value_end];
-        if !is_non_secret_reference(value)
+        if !is_non_secret_reference(value, ValueForm::Unquoted)
             && let Some(range) = ByteRange::new(m.value_start, m.value_end)
         {
             let confidence = if value.len() >= MIN_HIGH_ENTROPY_LENGTH
@@ -1987,6 +2129,89 @@ mod tests {
         let candidates = detect(input);
         assert_eq!(candidates.len(), 1);
         assert_eq!(candidates[0].confidence(), Confidence::High);
+    }
+
+    // --- issue #467: the residual of #278 — a source-code expression whose
+    // call parentheses are *closed*, and one cut short inside them ----------
+
+    #[test]
+    fn a_closed_call_expression_is_excluded() {
+        for input in [
+            // A PascalCase client type's member call.
+            "secret = SecretManagerServiceClient.access_secret_version(req)",
+            // A bare function call.
+            "secret = getSecretOrThrow(SECRET_NAME_CONSTANT)",
+            // A dotted module chain ending in a keyword-argument call.
+            "secret = django.core.signing.get_cookie_signer(salt=SALT)",
+            // A call whose argument is a number.
+            "api_key = rsa.generate_private_key(public_exponent=65537)",
+        ] {
+            assert!(
+                detect(input).is_empty(),
+                "expected no findings for {input:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn a_call_expression_cut_short_inside_its_arguments_is_excluded() {
+        for input in [
+            // Cut at the space inside an object-literal argument: the shape
+            // whose redaction used to strand ` key: pem })` on the line.
+            "secret = crypto.createPrivateKey({ key: pem })",
+            // Cut at the comma between two arguments.
+            "secret = helper(FIRST_ARGUMENT, SECOND_ARGUMENT)",
+        ] {
+            assert!(
+                detect(input).is_empty(),
+                "expected no findings for {input:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn redaction_of_a_truncated_call_expression_strands_nothing() {
+        let input = "secret = crypto.createPrivateKey({ key: pem })";
+        assert!(
+            detect(input).is_empty(),
+            "a partially matched call expression would strand the rest of its argument group",
+        );
+    }
+
+    #[test]
+    fn a_value_that_merely_embeds_parentheses_is_still_detected() {
+        // A balanced `(...)` that does not end the value leaves trailing
+        // characters, so the value is not a call expression end to end.
+        let input = "password: SYNTHETIC(REVOKED)_CONTEXT_VALUE";
+        let candidates = detect(input);
+        assert_eq!(candidates.len(), 1);
+        assert_eq!(candidates[0].confidence(), Confidence::High);
+    }
+
+    #[test]
+    fn a_quoted_value_with_an_unbalanced_parenthesis_is_still_detected() {
+        // A quoted value carries its own delimiters, so it is never cut
+        // mid-group and the truncation check does not apply to it.
+        let input = "password: \"SYNTHETIC(REVOKED_CONTEXT_VALUE\"";
+        let candidates = detect(input);
+        assert_eq!(candidates.len(), 1);
+        assert_eq!(candidates[0].confidence(), Confidence::High);
+    }
+
+    #[test]
+    fn a_bracket_group_opened_by_a_non_identifier_is_not_truncated_code() {
+        // `$(`, `#{`, and `{{` open on punctuation rather than on an
+        // identifier, so #266's and #279's fragment shapes stay detected.
+        for input in [
+            "password=$(SYNTHETIC_REVOKED_CONTEXT_VALUE",
+            "password=SYNTHETIC_REVOKED_{{ x }}_CONTEXT_VALUE",
+            "password=SYNTHETIC_REVOKED_#{x}_CONTEXT_VALUE",
+        ] {
+            assert!(
+                !detect(input).is_empty(),
+                "expected a finding for {input:?}"
+            );
+        }
     }
 
     // --- issue #262: a contextual-assignment operator with no value before
