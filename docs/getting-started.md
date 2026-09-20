@@ -15,8 +15,8 @@
 npm ships musl/Alpine Node addons; CLI release binaries still do not include
 musl builds. Where no addon loads, `initialize()` falls back to the
 WebAssembly artifact, and `artifact()` reports `"addon"` or `"wasm"`. The musl
-addons, that fallback, and Cloudflare Workers support are newer than the
-published 0.1.0-beta.4. Vercel Edge is not supported. Python has a separate
+addons, that fallback, and Cloudflare Workers support are published starting
+with 0.1.0-beta.5. Vercel Edge is not supported. Python has a separate
 musllinux wheel matrix. A built test artifact is not
 necessarily a distributed package; [qualification](qualification.md) explains
 that distinction.
@@ -30,16 +30,16 @@ Python, Rust, and the CLI expose. See
 
 ## Install a published release
 
-The following versions were published on 2026-09-17; see
+The following versions were published on 2026-09-20; see
 [release status](releases/status.md). npm `latest` still points to beta.1, so
-select beta.4 explicitly rather than relying on an unqualified install.
+select beta.5 explicitly rather than relying on an unqualified install.
 Keep the selected version in your application's dependency lockfile.
 
 ```bash
-npm install @redact-secret/core@0.1.0-beta.4
-python -m pip install redact-secret==0.1.0b4
-cargo add redact-secret@0.1.0-beta.4
-cargo install redact-secret-cli --version 0.1.0-beta.4 --locked
+npm install @redact-secret/core@0.1.0-beta.5
+python -m pip install redact-secret==0.1.0b5
+cargo add redact-secret@0.1.0-beta.5
+cargo install redact-secret-cli --version 0.1.0-beta.5 --locked
 ```
 
 Run only the command for your runtime. Rust library and CLI source installs
