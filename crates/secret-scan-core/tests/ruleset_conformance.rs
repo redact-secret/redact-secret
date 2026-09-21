@@ -68,6 +68,46 @@ fn the_accepted_ruleset_parses_and_every_case_matches_as_declared() {
 }
 
 // ---------------------------------------------------------------------------
+// names: the declarative ruleset's names section (issue #484)
+// ---------------------------------------------------------------------------
+
+#[test]
+fn the_names_section_ruleset_parses_and_every_case_matches_as_declared() {
+    let document = document();
+    let names = &document["names"];
+    let ruleset_text = str_field(names, "ruleset");
+
+    let detectors = load_ruleset(ruleset_text.as_bytes())
+        .unwrap_or_else(|error| panic!("the reference names-section ruleset must load: {error:?}"));
+    let registry = DetectorRegistry::with_built_in(detectors).unwrap();
+
+    for case in names["cases"].as_array().unwrap() {
+        let id = str_field(case, "id");
+        let input = str_field(case, "input");
+        let findings = scan(input, &registry, &DefaultPolicy).unwrap();
+
+        if let Some(0) = case.get("findingCount").and_then(Value::as_u64) {
+            assert!(findings.is_empty(), "case {id}: expected no findings");
+            continue;
+        }
+
+        assert_eq!(findings.len(), 1, "case {id}: expected exactly one finding");
+        let finding = &findings[0];
+        assert_eq!(finding.detector(), str_field(case, "detector"), "case {id}");
+        assert_eq!(finding.type_name(), str_field(case, "type"), "case {id}");
+        assert_eq!(
+            finding.confidence(),
+            Confidence::from_name(str_field(case, "confidence")).unwrap(),
+            "case {id}"
+        );
+        let start = usize::try_from(case["start"].as_u64().unwrap()).unwrap();
+        let end = usize::try_from(case["end"].as_u64().unwrap()).unwrap();
+        assert_eq!(finding.range().start(), start, "case {id}");
+        assert_eq!(finding.range().end(), end, "case {id}");
+    }
+}
+
+// ---------------------------------------------------------------------------
 // ordering: a ruleset detector cannot overturn a built-in
 // ---------------------------------------------------------------------------
 
@@ -138,12 +178,28 @@ fn class_from_wire(name: &str) -> RulesetErrorClass {
         RulesetErrorClass::DuplicateDetectorId,
         RulesetErrorClass::ReservedDetectorId,
         RulesetErrorClass::EmptyRuleset,
+        RulesetErrorClass::NameBucketNotClaimable,
+        RulesetErrorClass::NameTooLong,
+        RulesetErrorClass::TooManyNames,
     ] {
         if class.as_str() == name {
             return class;
         }
     }
     panic!("unknown fixture class {name:?}");
+}
+
+/// Builds the `TOO_MANY_NAMES` ruleset: `count` unique ambiguous-bucket
+/// `name:` declarations in one `names: ambiguous` block (mirrors
+/// [`too_many_detectors_ruleset`]).
+fn too_many_names_ruleset(count: u64) -> String {
+    use std::fmt::Write;
+
+    let mut text = String::from("ruleset-revision: 1\nnames: ambiguous\n");
+    for index in 0..count {
+        let _ = writeln!(text, "name: corp-token-{index}");
+    }
+    text
 }
 
 #[test]
@@ -160,6 +216,8 @@ fn every_declared_rejection_class_is_reproduced() {
             "x".repeat(size).into_bytes()
         } else if let Some(count) = rejection.get("detectorCount") {
             too_many_detectors_ruleset(count.as_u64().unwrap()).into_bytes()
+        } else if let Some(count) = rejection.get("nameCount") {
+            too_many_names_ruleset(count.as_u64().unwrap()).into_bytes()
         } else {
             str_field(rejection, "ruleset").as_bytes().to_vec()
         };
@@ -205,6 +263,9 @@ fn every_class_the_core_defines_is_covered_exactly_once() {
         "DUPLICATE_DETECTOR_ID",
         "RESERVED_DETECTOR_ID",
         "EMPTY_RULESET",
+        "NAME_BUCKET_NOT_CLAIMABLE",
+        "NAME_TOO_LONG",
+        "TOO_MANY_NAMES",
     ];
     assert_eq!(names.len(), all_classes.len());
     for class in all_classes {

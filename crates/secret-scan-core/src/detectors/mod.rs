@@ -48,7 +48,10 @@ use connection_string::ConnectionStringDetector;
 use private_key::PrivateKeyDetector;
 
 pub(crate) use bearer_token::has_open_bearer_authorization;
-pub(crate) use generic_token::has_open_contextual_assignment;
+pub(crate) use generic_token::{
+    RULESET_NAMES_DETECTOR_ID, generic_token_ruleset_names_detector,
+    has_open_contextual_assignment, is_reserved_name, normalize_name,
+};
 pub(crate) use private_key::PrivateKeyRetentionTracker;
 pub(crate) use ruleset_adapter::RulesetDetector;
 

@@ -7,7 +7,7 @@ evidence is linked from each published version.
 
 ### Added
 
-- Declarative rulesets (#441, #483, #495,
+- Declarative rulesets (#441, #483, #495, #484,
   `decision-define-declarative-detector-ruleset-contract`): a caller-supplied
   internal credential format, described as small UTF-8 text (no code), can
   now be detected on every surface. A ruleset detector matches through the
@@ -18,6 +18,13 @@ evidence is linked from each published version.
   a whole with the new `INVALID_RULESET` code and one of a closed set of
   content-free rejection classes; see `README.md`'s "Declarative rulesets"
   section for the wire grammar.
+  - A `names: ambiguous` block adds an in-house assignment keyword
+    (`corp_token`) to `generic-token`'s ambiguous-name bucket, normalized the
+    same way a scanned input's captured name already is. A caller cannot add
+    to the high-signal bucket, remove or override a built-in name, or change
+    a built-in's entropy threshold or confidence; a name that already
+    normalizes to a built-in name is a silent no-op. A names-only ruleset
+    (no `detector:` blocks) is valid.
   - Rust: `load_ruleset`, `RulesetError`, `RulesetErrorClass`, and
     `SecretScanErrorCode::InvalidRuleset`. Register the result the same way
     as a native custom detector (`DetectorRegistry::with_built_in`).

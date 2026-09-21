@@ -53,8 +53,13 @@ const MIN_AUTHORIZATION_VALUE_LENGTH: usize = 12;
 /// Mirrors `name.replace(/([a-z0-9])([A-Z])/g, "$1_$2").toLowerCase().replace(/[.-]/g, "_")`.
 ///
 /// Capture names are `[A-Za-z][A-Za-z0-9_.-]*`, so this operates on ASCII
-/// bytes only.
-fn normalize_name(name: &str) -> String {
+/// bytes only. Also the comparison key the declarative ruleset's names
+/// section normalizes a caller-supplied `name:` value to before checking it
+/// against [`HIGH_SIGNAL_NAMES`]/[`AMBIGUOUS_NAMES`]
+/// (`crate::ruleset`, issue #484): the same function, applied to the same
+/// kind of input, so a ruleset author's `CorpToken` and a scanned input's
+/// `CorpToken=` assignment normalize to the identical key.
+pub(crate) fn normalize_name(name: &str) -> String {
     let bytes = name.as_bytes();
     let mut out = String::with_capacity(name.len() + 4);
     for (index, &byte) in bytes.iter().enumerate() {
@@ -77,6 +82,24 @@ fn normalize_name(name: &str) -> String {
 fn is_open_assignment_boundary_char(ch: char) -> bool {
     is_js_whitespace(ch) || matches!(ch, '{' | ',' | ';')
 }
+
+/// `true` when `normalized` (already passed through [`normalize_name`]) is
+/// already one of the built-in [`HIGH_SIGNAL_NAMES`]/[`AMBIGUOUS_NAMES`]
+/// entries. The declarative ruleset's names section uses this to make a
+/// caller-supplied name that normalizes to an existing built-in name a
+/// no-op rather than a duplicate entry or an error (issue #484, point 2:
+/// a caller cannot remove, override, or re-bucket a built-in name).
+#[must_use]
+pub(crate) fn is_reserved_name(normalized: &str) -> bool {
+    HIGH_SIGNAL_NAMES.contains(&normalized) || AMBIGUOUS_NAMES.contains(&normalized)
+}
+
+/// The fixed, reserved id of the internal detector the declarative
+/// ruleset's names section registers when a ruleset adds ambiguous-bucket
+/// names (issue #484). Never a caller's choice: `crate::ruleset`'s
+/// `detector:` block parser rejects this id the same way it rejects every
+/// other built-in id, so a ruleset cannot collide with it.
+pub(crate) const RULESET_NAMES_DETECTOR_ID: &str = "generic-token-ruleset-names";
 
 /// Internal retention hint for the built-in incremental scanner: `true` when
 /// the tail of `input` still looks like an in-progress contextual assignment
@@ -769,9 +792,42 @@ fn is_non_secret_reference(value: &str, form: ValueForm) -> bool {
         || is_sql_bind_parameter(value)
 }
 
+// --- names: built-in vs. ruleset-supplied ----------------------------------
+
+/// Where [`assignment_confidence`] draws its high-signal/ambiguous name
+/// vocabulary from. `BuiltIn` is exactly today's behavior — unchanged code
+/// path, so a caller who never loads a ruleset sees byte-identical output.
+/// `Ruleset` is the declarative ruleset's names section (issue #484): it
+/// checks only the caller-supplied list, never [`HIGH_SIGNAL_NAMES`] (point
+/// 1's "ambiguous names only" decision — a ruleset cannot add to the
+/// high-signal bucket in this revision), always at
+/// [`AMBIGUOUS_ENTROPY_THRESHOLD`] and always [`Confidence::Medium`], never
+/// promoted to [`Confidence::High`] regardless of entropy. That fixed
+/// ceiling is what re-establishes issue #495's containment argument for
+/// this path: registered as a separate custom detector
+/// ([`RULESET_NAMES_DETECTOR_ID`]) after every built-in, claiming only
+/// `Specificity::Contextual` and `Confidence::Medium`, it can never overturn
+/// a built-in's resolved finding through the pipeline's specificity or
+/// registration-order tie-break, the same property a value-section ruleset
+/// detector already has.
+#[derive(Clone, Debug, PartialEq, Eq)]
+enum NameSource {
+    /// The built-in [`HIGH_SIGNAL_NAMES`]/[`AMBIGUOUS_NAMES`] vocabulary.
+    BuiltIn,
+    /// A ruleset's caller-supplied ambiguous-bucket names, already
+    /// normalized and deduplicated against the built-in vocabulary by
+    /// `crate::ruleset`.
+    Ruleset(Vec<String>),
+}
+
 // --- confidence -----------------------------------------------------------
 
-fn assignment_confidence(name: &str, value: &str, form: ValueForm) -> Option<Confidence> {
+fn assignment_confidence(
+    name: &str,
+    value: &str,
+    form: ValueForm,
+    names: &NameSource,
+) -> Option<Confidence> {
     if value.len() < MIN_CONTEXT_VALUE_LENGTH
         || value.len() > MAX_CONTEXT_VALUE_LENGTH
         || is_non_secret_reference(value, form)
@@ -780,24 +836,39 @@ fn assignment_confidence(name: &str, value: &str, form: ValueForm) -> Option<Con
     }
 
     let entropy = crate::shannon_entropy(value);
-    if HIGH_SIGNAL_NAMES.contains(&name) {
-        return Some(
-            if value.len() >= MIN_HIGH_ENTROPY_LENGTH && entropy >= HIGH_ENTROPY_THRESHOLD {
-                Confidence::High
+
+    match names {
+        NameSource::BuiltIn => {
+            if HIGH_SIGNAL_NAMES.contains(&name) {
+                return Some(
+                    if value.len() >= MIN_HIGH_ENTROPY_LENGTH && entropy >= HIGH_ENTROPY_THRESHOLD {
+                        Confidence::High
+                    } else {
+                        Confidence::Medium
+                    },
+                );
+            }
+
+            if AMBIGUOUS_NAMES.contains(&name)
+                && value.len() >= MIN_HIGH_ENTROPY_LENGTH
+                && entropy >= AMBIGUOUS_ENTROPY_THRESHOLD
+            {
+                return Some(Confidence::Medium);
+            }
+
+            None
+        }
+        NameSource::Ruleset(extra_ambiguous_names) => {
+            if extra_ambiguous_names.iter().any(|extra| extra == name)
+                && value.len() >= MIN_HIGH_ENTROPY_LENGTH
+                && entropy >= AMBIGUOUS_ENTROPY_THRESHOLD
+            {
+                Some(Confidence::Medium)
             } else {
-                Confidence::Medium
-            },
-        );
+                None
+            }
+        }
     }
-
-    if AMBIGUOUS_NAMES.contains(&name)
-        && value.len() >= MIN_HIGH_ENTROPY_LENGTH
-        && entropy >= AMBIGUOUS_ENTROPY_THRESHOLD
-    {
-        return Some(Confidence::Medium);
-    }
-
-    None
 }
 
 // --- assignment value spans ------------------------------------------------
@@ -1124,7 +1195,7 @@ fn try_match_assignment_prefix(input: &str, pos: usize) -> Option<(usize, usize,
     None
 }
 
-fn assignment_candidates(input: &str) -> Vec<Candidate> {
+fn assignment_candidates(input: &str, names: &NameSource) -> Vec<Candidate> {
     let mut candidates = Vec::new();
     let mut cursor = 0usize;
 
@@ -1138,10 +1209,12 @@ fn assignment_candidates(input: &str) -> Vec<Candidate> {
         if let Some((value_start, value_end, form)) = assignment_value(input, prefix_end) {
             let value = &input[value_start..value_end];
             let normalized = normalize_name(&input[name_start..name_end]);
-            if let Some(confidence) = assignment_confidence(&normalized, value, form)
+            if let Some(confidence) = assignment_confidence(&normalized, value, form, names)
                 && let Some(range) = ByteRange::new(value_start, value_end)
             {
-                let name_signal = if HIGH_SIGNAL_NAMES.contains(&normalized.as_str()) {
+                let name_signal = if matches!(names, NameSource::BuiltIn)
+                    && HIGH_SIGNAL_NAMES.contains(&normalized.as_str())
+                {
                     "high-signal-name"
                 } else {
                     "ambiguous-name"
@@ -1268,11 +1341,16 @@ fn authorization_candidates(input: &str) -> Vec<Candidate> {
     candidates
 }
 
-struct GenericTokenDetector;
+struct GenericTokenDetector {
+    names: NameSource,
+}
 
 impl Detector for GenericTokenDetector {
     fn id(&self) -> &'static str {
-        "generic-token"
+        match &self.names {
+            NameSource::BuiltIn => "generic-token",
+            NameSource::Ruleset(_) => RULESET_NAMES_DETECTOR_ID,
+        }
     }
 
     fn detect(
@@ -1280,8 +1358,14 @@ impl Detector for GenericTokenDetector {
         input: &str,
         _context: &DetectorContext,
     ) -> Result<Vec<Candidate>, DetectorFailure> {
-        let mut candidates = assignment_candidates(input);
-        candidates.extend(authorization_candidates(input));
+        let mut candidates = assignment_candidates(input, &self.names);
+        // Authorization-scheme matching (`Basic`/`Token`) has nothing to do
+        // with names, so only the built-in instance runs it — the ruleset
+        // names extension would otherwise duplicate the built-in's own
+        // candidates for the same spans.
+        if matches!(self.names, NameSource::BuiltIn) {
+            candidates.extend(authorization_candidates(input));
+        }
         Ok(candidates)
     }
 }
@@ -1289,7 +1373,24 @@ impl Detector for GenericTokenDetector {
 /// The contextual assignment and `Basic`/`Token` authorization detector.
 #[must_use]
 pub fn generic_token_detector() -> Box<dyn Detector> {
-    Box::new(GenericTokenDetector)
+    Box::new(GenericTokenDetector {
+        names: NameSource::BuiltIn,
+    })
+}
+
+/// The declarative ruleset names-section detector (issue #484): matches
+/// contextual assignments whose normalized name is one of `names`, at the
+/// same [`AMBIGUOUS_ENTROPY_THRESHOLD`] and always [`Confidence::Medium`]
+/// the built-in ambiguous bucket already uses, never the high-signal
+/// bucket's lower entropy bar or `Confidence::High`. `names` must already be
+/// normalized and deduplicated against the built-in vocabulary —
+/// `crate::ruleset` does this at load time, so this constructor performs no
+/// further filtering.
+#[must_use]
+pub(crate) fn generic_token_ruleset_names_detector(names: Vec<String>) -> Box<dyn Detector> {
+    Box::new(GenericTokenDetector {
+        names: NameSource::Ruleset(names),
+    })
 }
 
 #[cfg(test)]
@@ -1297,9 +1398,19 @@ mod tests {
     use super::*;
 
     fn detect(input: &str) -> Vec<Candidate> {
-        GenericTokenDetector
-            .detect(input, &DetectorContext::new(input.len()))
-            .unwrap()
+        GenericTokenDetector {
+            names: NameSource::BuiltIn,
+        }
+        .detect(input, &DetectorContext::new(input.len()))
+        .unwrap()
+    }
+
+    fn detect_with_ruleset_names(input: &str, names: &[&str]) -> Vec<Candidate> {
+        GenericTokenDetector {
+            names: NameSource::Ruleset(names.iter().map(|name| (*name).to_owned()).collect()),
+        }
+        .detect(input, &DetectorContext::new(input.len()))
+        .unwrap()
     }
 
     fn only_range(candidates: &[Candidate]) -> (usize, usize) {
@@ -2315,5 +2426,77 @@ mod tests {
         ] {
             assert!(!has_open_contextual_assignment(closed), "{closed:?}");
         }
+    }
+
+    // --- issue #484: declarative ruleset names section ---------------------
+
+    #[test]
+    fn a_ruleset_supplied_ambiguous_name_is_medium_confidence_at_the_ambiguous_threshold() {
+        let input = "corp_token=SYNTHETIC_REVOKED_RULESET_AMBIGUOUS_1234";
+        let candidates = detect_with_ruleset_names(input, &["corp_token"]);
+        assert_eq!(only_range(&candidates), (11, input.len()));
+        assert_eq!(candidates[0].confidence(), Confidence::Medium);
+        assert_eq!(candidates[0].specificity(), Some(Specificity::Contextual));
+    }
+
+    #[test]
+    fn a_ruleset_supplied_name_never_reaches_high_confidence_regardless_of_entropy() {
+        // Same value shape that makes a `HIGH_SIGNAL_NAMES` match `High`
+        // (issue #484's hazard: a caller-supplied high-signal name would
+        // select the lower entropy bar and reach `High` on a `Contextual`
+        // candidate). The ruleset path is restricted to the ambiguous
+        // bucket, so it must stay `Medium` no matter how high the value's
+        // entropy is.
+        let input = "corp_token=SYNTHETIC_REVOKED_CONTEXT_VALUE";
+        let candidates = detect_with_ruleset_names(input, &["corp_token"]);
+        assert_eq!(candidates.len(), 1);
+        assert_eq!(candidates[0].confidence(), Confidence::Medium);
+    }
+
+    #[test]
+    fn a_ruleset_supplied_name_below_the_ambiguous_entropy_threshold_is_ignored() {
+        let input = "corp_token=aaaaaaaaaaaaaaaaaaaa";
+        let candidates = detect_with_ruleset_names(input, &["corp_token"]);
+        assert!(candidates.is_empty());
+    }
+
+    #[test]
+    fn an_unlisted_name_produces_no_ruleset_candidate() {
+        let input = "unrelated_field=SYNTHETIC_REVOKED_RULESET_AMBIGUOUS_1234";
+        let candidates = detect_with_ruleset_names(input, &["corp_token"]);
+        assert!(candidates.is_empty());
+    }
+
+    #[test]
+    fn the_ruleset_names_detector_never_matches_a_built_in_high_signal_name() {
+        // The ruleset path only ever consults its own caller-supplied list,
+        // never `HIGH_SIGNAL_NAMES` — a built-in name's presence in the
+        // input is irrelevant to this detector even if it were (incorrectly)
+        // passed in the extra list, since `crate::ruleset` never does that;
+        // this asserts the detector's own restriction as a second layer.
+        let input = "api_key=SYNTHETIC_REVOKED_CONTEXT_VALUE";
+        let candidates = detect_with_ruleset_names(input, &["corp_token"]);
+        assert!(candidates.is_empty());
+    }
+
+    #[test]
+    fn the_ruleset_names_detector_does_not_match_authorization_schemes() {
+        let input = "Authorization: Basic aGVsbG86d29ybGQtc3ludGhldGljLXJldm9rZWQ=";
+        let candidates = detect_with_ruleset_names(input, &["corp_token"]);
+        assert!(candidates.is_empty());
+    }
+
+    #[test]
+    fn the_ruleset_names_detector_claims_the_fixed_reserved_id() {
+        let detector = generic_token_ruleset_names_detector(vec!["corp_token".to_owned()]);
+        assert_eq!(detector.id(), RULESET_NAMES_DETECTOR_ID);
+    }
+
+    #[test]
+    fn is_reserved_name_covers_both_built_in_buckets() {
+        for name in HIGH_SIGNAL_NAMES.iter().chain(AMBIGUOUS_NAMES.iter()) {
+            assert!(is_reserved_name(name), "{name}");
+        }
+        assert!(!is_reserved_name("corp_token"));
     }
 }
