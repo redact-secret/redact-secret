@@ -1725,7 +1725,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 132,
+        "fixtureCount": 133,
         "hostContextsExercised": [
           "chat",
           "dotenv",
@@ -1796,6 +1796,7 @@
         "contextual-positive-vals-scheme-prefix-still-detected",
         "generic-token-regression-sql-bind-lookalike-still-detected",
         "generic-token-regression-windows-env-lookalike-still-detected",
+        "regression-generic-token-markdown-inline-code-boundary",
         "regression-nested-credential-under-parent-key",
         "regression-placeholder-embedded-in-high-entropy-value",
         "regression-placeholder-word-with-unrelated-tokens",
@@ -1810,7 +1811,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 132,
+        "fixtureCount": 133,
         "hostContextsExercised": [
           "chat",
           "dotenv",

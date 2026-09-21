@@ -880,13 +880,28 @@ fn assignment_confidence(
 /// quoted context with no separator of its own (`value="api_key="TOKEN""`,
 /// issue #294) rather than continuing the same value. `is_unquoted_value_boundary`
 /// already treats a bare quote as ending an unquoted value on the same
-/// reasoning.
+/// reasoning. A backtick is accepted for the same reason (issue #552): the
+/// closing backtick of an enclosing Markdown inline-code span
+/// (`` `api_key="TOKEN"` ``) sits directly against the value's own closing
+/// quote with no separator, and rejecting it would silently drop the whole
+/// assignment rather than merely mis-span it.
 fn is_quoted_value_boundary(ch: Option<char>) -> bool {
     match ch {
         None => true,
         Some(c) => matches!(
             c,
-            ' ' | '\t' | '\u{0B}' | '\u{0C}' | '\r' | '\n' | ',' | ';' | '}' | ']' | '"' | '\''
+            ' ' | '\t'
+                | '\u{0B}'
+                | '\u{0C}'
+                | '\r'
+                | '\n'
+                | ','
+                | ';'
+                | '}'
+                | ']'
+                | '"'
+                | '\''
+                | '`'
         ),
     }
 }
@@ -1125,8 +1140,15 @@ fn assignment_value(input: &str, start: usize) -> Option<(usize, usize, ValueFor
 // no separator between them (`value="api_key="TOKEN""`), the same way `;`
 // already does when a separator is present
 // (`nested_assignments_emit_overlapping_contextual_candidates`).
+// A backtick is accepted for the same reason (issue #552): Markdown inline
+// code (a value wrapped in a matching pair of backticks) opens directly on
+// the name with no whitespace or other separator, so without a backtick
+// alternative the whole assignment is invisible rather than merely
+// mis-spanned -- a metamorphic markdown-context transform of an
+// otherwise-detected assignment turns into a silent miss, not a
+// shifted-offset match.
 fn is_prefix_boundary_char(ch: char) -> bool {
-    is_js_whitespace(ch) || matches!(ch, '{' | ',' | ';' | '"' | '\'')
+    is_js_whitespace(ch) || matches!(ch, '{' | ',' | ';' | '"' | '\'' | '`')
 }
 
 /// Parses `["']?([A-Za-z][A-Za-z0-9_.-]*)["']?\s*(?:=|:)\s*` starting at
@@ -1434,6 +1456,30 @@ mod tests {
         assert_eq!(candidates[1].confidence(), Confidence::High);
         assert_eq!(candidates[1].range(), ByteRange::new(55, 93).unwrap());
         assert!(candidates[0].range().overlaps(candidates[1].range()));
+    }
+
+    // issue #552: `redact-secret-benchmarks`' `context.markdown` metamorphic
+    // operator wraps a whole fixture in a matching pair of backticks with no
+    // other change (Markdown inline code). Before this fix, the opening
+    // backtick sat directly against the key name with no recognized
+    // boundary before it, and the matching closing backtick sat directly
+    // against the quoted value's own closing quote with no recognized
+    // boundary after it -- either alone was enough to make a quoted
+    // assignment like this one invisible to `assignment_candidates`, a
+    // silent miss rather than a shifted-offset match.
+    #[test]
+    fn a_high_signal_assignment_wrapped_in_markdown_inline_code_is_still_detected() {
+        let input = "`api_key=\"SYNTHETIC_REVOKED_CONTEXT_VALUE\"`";
+        let candidates = detect(input);
+
+        assert_eq!(candidates.len(), 1);
+        assert_eq!(candidates[0].confidence(), Confidence::High);
+        let value_start = "`api_key=\"".len();
+        let value_end = value_start + "SYNTHETIC_REVOKED_CONTEXT_VALUE".len();
+        assert_eq!(
+            candidates[0].range(),
+            ByteRange::new(value_start, value_end).unwrap()
+        );
     }
 
     #[test]
