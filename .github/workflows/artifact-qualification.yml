@@ -853,6 +853,27 @@ jobs:
         with:
           path: qualification-artifacts
 
+      # Issue #528: every other artifact family qualified in this workflow is
+      # built exactly once, here, and the Node addon, browser, CLI, and
+      # Python jobs all upload what they built for `record-artifact-inventory.py`
+      # to hash. Neither crate was ever built before it reached the registry --
+      # `crate_contents()` only ever ran `cargo package --list`, which packages
+      # nothing -- so `cargo publish` was the first (and only) build of the
+      # bytes crates.io received, with nothing to compare them against.
+      # `--no-verify` skips extracting the package and compiling it in
+      # isolation: `redact-secret-cli` declares `redact-secret` as a registry
+      # dependency (`decision-ship-first-release-artifact-set`), which cannot
+      # resolve until `redact-secret` is actually live on crates.io, so that
+      # verify build fails this early in the run regardless of whether the
+      # packaged bytes are correct. Skipping it does not change the `.crate`
+      # tarball `cargo package` writes to `target/package/`, only whether it
+      # also compiles the extracted copy.
+      - name: Package the crates
+        if: needs.plan.outputs.full == 'true'
+        run: |
+          cargo package --no-verify --locked -p redact-secret
+          cargo package --no-verify --locked -p redact-secret-cli
+
       # Requires the whole declared matrix, records every artifact's size and
       # SHA-256 against the source commit, and lists the contents of each
       # package a release would publish. No publication happens here.

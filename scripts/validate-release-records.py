@@ -67,6 +67,39 @@ def conformance_identity(root: Path, source: str) -> str | None:
     return git_value(root, "rev-parse", f"{source}:conformance")
 
 
+def validate_artifact_digests(artifact_digests: object, label: str) -> None:
+    """Issue #528: a checked-in `artifact_digests` map must be internally
+    consistent -- every non-comparable record explains why, and no
+    comparable record's recorded stages disagree, for a record frozen as
+    published evidence."""
+    require(isinstance(artifact_digests, dict), f"{label}: artifact_digests must be an object")
+    for identity, records in artifact_digests.items():
+        require(isinstance(records, list), f"{label}: artifact_digests[{identity!r}] must be a list")
+        for record in records:
+            file_name = record.get("file", "unknown")
+            comparable = record.get("comparable")
+            require(
+                isinstance(comparable, bool),
+                f"{label}: {identity} ({file_name}): comparable must be a boolean",
+            )
+            if comparable is False:
+                require(
+                    bool(record.get("note")),
+                    f"{label}: {identity} ({file_name}): comparable=false requires a note",
+                )
+            elif comparable is True:
+                present = {
+                    stage: record.get(stage)
+                    for stage in ("built", "qualified", "published")
+                    if record.get(stage)
+                }
+                require(
+                    len(set(present.values())) <= 1,
+                    f"{label}: {identity} ({file_name}): digest mismatch across stages -- "
+                    + ", ".join(f"{stage}={value}" for stage, value in present.items()),
+                )
+
+
 def validate_evidence(manifest: dict, inventory: dict, label: str) -> None:
     evidence = manifest.get("release_evidence") or manifest.get("recovery_evidence")
     require(isinstance(evidence, dict), f"{label}: missing release/recovery evidence")
@@ -146,6 +179,11 @@ def validate_record(root: Path, directory: Path, changelog: str) -> None:
     if "artifact_inventory_sha256" in manifest:
         digest = hashlib.sha256(inventory_path.read_bytes()).hexdigest()
         require(manifest["artifact_inventory_sha256"] == digest, f"{label}: artifact inventory digest mismatch")
+    # Optional (issue #528): records from before this field existed have
+    # none, and are frozen evidence -- only validate the shape when present,
+    # the same "if present" rule `artifact_inventory_sha256` above follows.
+    if "artifact_digests" in manifest:
+        validate_artifact_digests(manifest["artifact_digests"], label)
     validate_evidence(manifest, inventory, label)
     require(f"docs/releases/{version}/README.md" in changelog,
             f"{label}: CHANGELOG.md lacks publication-evidence link")

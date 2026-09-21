@@ -160,8 +160,28 @@ jobs:
           name: node-addon-${{ matrix.target }}
           path: bindings/node
 
+      # `artifact-qualification`'s `inventory` job records this exact file's
+      # SHA-256 under the `node-addon` family; downloaded here so the step
+      # below can prove the file about to be packed is that same one.
+      - name: Download the qualified artifact inventory
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: artifact-inventory
+          path: qualification-inventory
+
       - name: Assemble the platform package
         run: cp "bindings/node/redact-secret.${{ matrix.platform }}.node" "bindings/node/npm/${{ matrix.platform }}/"
+
+      # Issue #528: this generalizes issue #527's Python check -- the
+      # compiled addon this job is about to pack must be byte-identical to
+      # the one `artifact-qualification` qualified, checked independently of
+      # whether the download/assemble steps above still do that correctly.
+      - name: Verify the assembled addon matches the qualified inventory
+        run: |
+          python3 -B scripts/verify-python-digest.py \
+            --inventory qualification-inventory/artifact-inventory.json \
+            --family node-addon --target "${{ matrix.target }}" \
+            "bindings/node/npm/${{ matrix.platform }}/redact-secret.${{ matrix.platform }}.node"
 
       - name: Pack, content-check, publish, and verify
         run: node scripts/publish-dependency-package.mjs --package-dir "bindings/node/npm/${{ matrix.platform }}" --tag "${{ steps.tag.outputs.tag }}"
@@ -197,6 +217,49 @@ jobs:
           path: registry-state.json
           if-no-files-found: error
 
+      # Issue #528: `comparable` is false here because npm re-packs this
+      # qualified file into a new versioned tarball before publishing --
+      # the tarball is not byte-comparable to the pre-pack file the step
+      # above verified. `published` records the registry's own tarball
+      # shasum (from `npm-registry-metadata.mjs`, the same helper "Report
+      # registry state" already calls) purely for traceability.
+      - name: Record artifact digest evidence
+        if: always()
+        shell: bash
+        run: |
+          package_name=$(node -p "require('./bindings/node/npm/${{ matrix.platform }}/package.json').name" 2>/dev/null || true)
+          version=$(node -p "require('./bindings/node/npm/${{ matrix.platform }}/package.json').version" 2>/dev/null || true)
+          qualified=$(jq -r --arg t "${{ matrix.target }}" \
+            '.artifacts[] | select(.family=="node-addon" and .target==$t) | .sha256' \
+            qualification-inventory/artifact-inventory.json 2>/dev/null || true)
+          file=$(jq -r --arg t "${{ matrix.target }}" \
+            '.artifacts[] | select(.family=="node-addon" and .target==$t) | .file' \
+            qualification-inventory/artifact-inventory.json 2>/dev/null || true)
+          published=""
+          if [[ -n "$package_name" && -n "$version" ]]; then
+            observed=$(node scripts/npm-registry-metadata.mjs "$package_name" "$version" 2>/dev/null || true)
+            [[ -n "$observed" && "$observed" != "unpublished" ]] && published="$observed"
+          fi
+          jq -cn \
+            --arg id "npm:${package_name:-unknown}" \
+            --arg file "${file:-unknown}" --arg qualified "${qualified:-}" --arg published "${published:-}" \
+            '{($id): [{
+              file: $file,
+              built: (if $qualified == "" then null else $qualified end),
+              qualified: (if $qualified == "" then null else $qualified end),
+              published: (if $published == "" then null else $published end),
+              comparable: false,
+              note: "npm repacks the qualified compiled addon into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack file. \"Verify the assembled addon matches the qualified inventory\" already verified the pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball'"'"'s own shasum, recorded for traceability rather than byte comparison."
+            }]}' > artifact-digest.json
+
+      - name: Upload artifact digest evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: artifact-digest-native-${{ matrix.platform }}
+          path: artifact-digest.json
+          if-no-files-found: error
+
   # Publishes `@redact-secret/wasm` from the `wasm-web` and `wasm-web-common`
   # artifacts `artifact-qualification` already qualified for this commit --
   # never rebuilt here, the same "already-qualified artifacts" requirement
@@ -214,6 +277,7 @@ jobs:
       contents: read
     outputs:
       registry_state_json: ${{ steps.state.outputs.registry_state_json }}
+      artifact_digest_json: ${{ steps.digest.outputs.artifact_digest_json }}
 
     steps:
       - name: Require a release candidate branch
@@ -295,6 +359,25 @@ jobs:
           console.log('bindings/wasm/npm/redact_secret_wasm_common.js reports profile "common" as expected.');
           NODE_VERIFY
 
+      # Issue #528's generalization of issue #527's Python check: both
+      # WebAssembly builds (`browser`, `browser-common`) about to be packed
+      # must be byte-identical to what `artifact-qualification` qualified.
+      - name: Download the qualified artifact inventory
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: artifact-inventory
+          path: qualification-inventory
+
+      - name: Verify the assembled browser artifacts match the qualified inventory
+        run: |
+          python3 -B scripts/verify-python-digest.py \
+            --inventory qualification-inventory/artifact-inventory.json \
+            --family browser --family browser-common \
+            bindings/wasm/npm/redact_secret_wasm.js \
+            bindings/wasm/npm/redact_secret_wasm_bg.wasm \
+            bindings/wasm/npm/redact_secret_wasm_common.js \
+            bindings/wasm/npm/redact_secret_wasm_common_bg.wasm
+
       - name: Pack, content-check, publish, and verify
         run: node scripts/publish-dependency-package.mjs --package-dir bindings/wasm/npm --tag "${{ steps.tag.outputs.tag }}"
         env:
@@ -319,6 +402,33 @@ jobs:
           json=$(jq -cn --arg artifact "npm:${package_name:-unknown}" --arg state "$state" '{($artifact): $state}')
           echo "registry_state_json=$json" >> "$GITHUB_OUTPUT"
 
+      # Issue #528: `comparable` is false for the same reason as the native
+      # dependency packages -- npm re-packs both qualified WebAssembly builds
+      # into one new versioned tarball before publishing.
+      - name: Record artifact digest evidence
+        id: digest
+        if: always()
+        shell: bash
+        run: |
+          package_name=$(node -p "require('./bindings/wasm/npm/package.json').name" 2>/dev/null || true)
+          version=$(node -p "require('./bindings/wasm/npm/package.json').version" 2>/dev/null || true)
+          published=""
+          if [[ -n "$package_name" && -n "$version" ]]; then
+            observed=$(node scripts/npm-registry-metadata.mjs "$package_name" "$version" 2>/dev/null || true)
+            [[ -n "$observed" && "$observed" != "unpublished" ]] && published="$observed"
+          fi
+          records=$(jq -c --arg published "${published:-}" '
+            [.artifacts[] | select(.family=="browser" or .family=="browser-common") | {
+              file: .file,
+              built: .sha256,
+              qualified: .sha256,
+              published: (if $published == "" then null else $published end),
+              comparable: false,
+              note: "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball'"'"'s own shasum, recorded for traceability rather than byte comparison."
+            }]' qualification-inventory/artifact-inventory.json 2>/dev/null || echo '[]')
+          json=$(jq -cn --arg id "npm:${package_name:-unknown}" --argjson records "$records" '{($id): $records}')
+          echo "artifact_digest_json=$json" >> "$GITHUB_OUTPUT"
+
   publish:
     name: Publish to npm
     runs-on: ubuntu-latest
@@ -341,6 +451,7 @@ jobs:
     outputs:
       package_version: ${{ steps.release.outputs.package_version }}
       registry_state_json: ${{ steps.state.outputs.registry_state_json }}
+      artifact_digest_json: ${{ steps.digest.outputs.artifact_digest_json }}
 
     steps:
       - name: Require a release candidate branch
@@ -413,6 +524,26 @@ jobs:
           echo "npm_tag=$npm_tag" >> "$GITHUB_OUTPUT"
           echo "tag_name=$tag_name" >> "$GITHUB_OUTPUT"
 
+      # Issue #528: the wrapper has no separate qualification build to
+      # compare against (unlike the Node addon, browser, crate, and Python
+      # artifacts, it is packed straight from this checkout by both this
+      # step and `npm publish`), so this records the shasum `npm pack` would
+      # produce right now, before anything publishes, as its "qualified"
+      # digest -- comparable to the published shasum below because packing
+      # this exact, unmodified tree is the whole identity here, not a
+      # pre-pack file that publication then repackages the way the runtime
+      # dependency packages do.
+      - name: Compute the wrapper package identity
+        id: pack
+        shell: bash
+        run: |
+          shasum=$(npm pack --dry-run --json ./packages/javascript | node -e "
+            let input = '';
+            process.stdin.on('data', (chunk) => { input += chunk; });
+            process.stdin.on('end', () => { process.stdout.write(JSON.parse(input)[0].shasum); });
+          ")
+          echo "shasum=$shasum" >> "$GITHUB_OUTPUT"
+
       - name: Qualify release
         run: npm run release:check
 
@@ -456,6 +587,31 @@ jobs:
           json=$(jq -cn --arg artifact "npm:${package_name:-unknown}" --arg state "$state" '{($artifact): $state}')
           echo "registry_state_json=$json" >> "$GITHUB_OUTPUT"
 
+      - name: Record artifact digest evidence
+        id: digest
+        if: always()
+        shell: bash
+        run: |
+          package_name=$(node -p "require('./packages/javascript/package.json').name" 2>/dev/null || true)
+          version=$(node -p "require('./packages/javascript/package.json').version" 2>/dev/null || true)
+          qualified="${{ steps.pack.outputs.shasum }}"
+          published=""
+          if [[ -n "$package_name" && -n "$version" ]]; then
+            observed=$(node scripts/npm-registry-metadata.mjs "$package_name" "$version" 2>/dev/null || true)
+            [[ -n "$observed" && "$observed" != "unpublished" ]] && published="$observed"
+          fi
+          json=$(jq -cn \
+            --arg id "npm:${package_name:-unknown}" --arg qualified "${qualified:-}" --arg published "${published:-}" \
+            '{($id): [{
+              file: "packages/javascript",
+              built: (if $qualified == "" then null else $qualified end),
+              qualified: (if $qualified == "" then null else $qualified end),
+              published: (if $published == "" then null else $published end),
+              comparable: true,
+              note: null
+            }]}')
+          echo "artifact_digest_json=$json" >> "$GITHUB_OUTPUT"
+
   publish-crates:
     name: Publish crates.io
     needs: [ci, artifact-qualification]
@@ -466,6 +622,7 @@ jobs:
       contents: read
     outputs:
       registry_state_json: ${{ steps.state.outputs.registry_state_json }}
+      artifact_digest_json: ${{ steps.digest.outputs.artifact_digest_json }}
 
     steps:
       - name: Require a release candidate branch
@@ -481,6 +638,17 @@ jobs:
 
       - name: Validate candidate branch version
         run: python3 -B scripts/check-release-refs.py --candidate-ref "$GITHUB_REF"
+
+      # `artifact-qualification`'s `inventory` job packages both crates once
+      # (issue #528) and records each one's SHA-256 under the `crate` family;
+      # the verify steps below compare that recorded digest against
+      # crates.io's own published checksum instead of trusting that this
+      # job's `cargo publish` reproduced the same bytes.
+      - name: Download the qualified artifact inventory
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: artifact-inventory
+          path: qualification-inventory
 
       - name: Set up stable Rust
         uses: dtolnay/rust-toolchain@6c977a6ca4077a0ceb28ffbe03f59d46e9ac8772 # v1
@@ -535,10 +703,48 @@ jobs:
           echo "redact-secret could not be verified on crates.io." >&2
           exit 1
 
+      # Issue #528: crates.io reports the exact SHA-256 of the `.crate` file
+      # it received, so this compares that checksum against what
+      # `artifact-qualification` qualified before the CLI (which depends on
+      # this exact published version) is allowed to publish.
+      - name: Verify redact-secret publication matches the qualified crate
+        shell: bash
+        run: |
+          checksum=$(curl -sS -A "redact-secret-release (https://github.com/redact-secret/redact-secret)" \
+            "https://crates.io/api/v1/crates/redact-secret/${{ steps.identity.outputs.version }}" | jq -r '.version.checksum')
+          python3 -B scripts/verify-crate-digest.py \
+            --inventory qualification-inventory/artifact-inventory.json \
+            --crate redact-secret \
+            --published-checksum "$checksum"
+
       - name: Publish redact-secret-cli
         run: cargo publish -p redact-secret-cli --locked
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+
+      - name: Wait for redact-secret-cli on crates.io
+        shell: bash
+        run: |
+          for attempt in 1 2 3 4 5 6; do
+            status=$(curl -s -A "redact-secret-release (https://github.com/redact-secret/redact-secret)" -o /dev/null -w '%{http_code}' \
+              "https://crates.io/api/v1/crates/redact-secret-cli/${{ steps.identity.outputs.version }}")
+            if [[ "$status" == "200" ]]; then
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "redact-secret-cli could not be verified on crates.io." >&2
+          exit 1
+
+      - name: Verify redact-secret-cli publication matches the qualified crate
+        shell: bash
+        run: |
+          checksum=$(curl -sS -A "redact-secret-release (https://github.com/redact-secret/redact-secret)" \
+            "https://crates.io/api/v1/crates/redact-secret-cli/${{ steps.identity.outputs.version }}" | jq -r '.version.checksum')
+          python3 -B scripts/verify-crate-digest.py \
+            --inventory qualification-inventory/artifact-inventory.json \
+            --crate redact-secret-cli \
+            --published-checksum "$checksum"
 
       - name: Report crates.io registry state
         id: state
@@ -566,6 +772,47 @@ jobs:
             '{($core): $core_state, ($cli): $cli_state}')
           echo "registry_state_json=$json" >> "$GITHUB_OUTPUT"
 
+      # Issue #528: records, into the durable release manifest (via
+      # `record-manifest`), the digest each crate carried at qualification
+      # and the checksum crates.io reports now -- independently of whether
+      # the verify steps above passed, so a failed run still leaves a record
+      # of what it observed (`record-manifest` runs `if: always()`).
+      - name: Record artifact digest evidence
+        id: digest
+        if: always()
+        shell: bash
+        run: |
+          version="${{ steps.identity.outputs.version }}"
+          json='{}'
+          if [[ -n "$version" && -f qualification-inventory/artifact-inventory.json ]]; then
+            for crate in redact-secret redact-secret-cli; do
+              qualified=$(jq -r --arg t "$crate" \
+                '.artifacts[] | select(.family=="crate" and .target==$t) | .sha256' \
+                qualification-inventory/artifact-inventory.json)
+              file=$(jq -r --arg t "$crate" \
+                '.artifacts[] | select(.family=="crate" and .target==$t) | .file' \
+                qualification-inventory/artifact-inventory.json)
+              published=""
+              if status=$(curl -s -A "redact-secret-release (https://github.com/redact-secret/redact-secret)" -o /dev/null -w '%{http_code}' \
+                "https://crates.io/api/v1/crates/$crate/$version") && [[ "$status" == "200" ]]; then
+                published=$(curl -s -A "redact-secret-release (https://github.com/redact-secret/redact-secret)" \
+                  "https://crates.io/api/v1/crates/$crate/$version" | jq -r '.version.checksum // empty')
+              fi
+              entry=$(jq -cn \
+                --arg file "${file:-unknown}" --arg qualified "${qualified:-}" --arg published "${published:-}" \
+                '[{
+                  file: $file,
+                  built: (if $qualified == "" then null else $qualified end),
+                  qualified: (if $qualified == "" then null else $qualified end),
+                  published: (if $published == "" then null else $published end),
+                  comparable: true,
+                  note: null
+                }]')
+              json=$(jq -cn --arg id "crate:$crate" --argjson entry "$entry" --argjson acc "$json" '$acc + {($id): $entry}')
+            done
+          fi
+          echo "artifact_digest_json=$json" >> "$GITHUB_OUTPUT"
+
   publish-pypi:
     name: Publish PyPI
     needs: [ci, artifact-qualification]
@@ -577,6 +824,7 @@ jobs:
       id-token: write
     outputs:
       registry_state_json: ${{ steps.state.outputs.registry_state_json }}
+      artifact_digest_json: ${{ steps.digest.outputs.artifact_digest_json }}
 
     steps:
       - name: Require a release candidate branch
@@ -665,6 +913,35 @@ jobs:
           fi
           json=$(jq -cn --arg artifact "pypi:${name:-unknown}" --arg state "$state" '{($artifact): $state}')
           echo "registry_state_json=$json" >> "$GITHUB_OUTPUT"
+
+      # Issue #528: PyPI reports the SHA-256 of every file it received
+      # (`urls[].digests.sha256`), the same field `scripts/verify-recovery-
+      # artifact.py` already reads, so this comparison is `comparable: true`
+      # -- unlike npm, PyPI does not repackage the distributions it publishes.
+      - name: Record artifact digest evidence
+        id: digest
+        if: always()
+        shell: bash
+        run: |
+          name="${{ steps.identity.outputs.name }}"
+          version="${{ steps.identity.outputs.version }}"
+          published_json='{}'
+          if [[ -n "$name" && -n "$version" ]]; then
+            if metadata=$(curl -sS -A "redact-secret-release (https://github.com/redact-secret/redact-secret)" "https://pypi.org/pypi/$name/$version/json" 2>/dev/null); then
+              published_json=$(jq -c '[.urls[] | {(.filename): .digests.sha256}] | add // {}' <<<"$metadata" 2>/dev/null || echo '{}')
+            fi
+          fi
+          records=$(jq -c --argjson published "$published_json" '
+            [.artifacts[] | select(.family=="python-wheel" or .family=="python-sdist") | {
+              file: .file,
+              built: .sha256,
+              qualified: .sha256,
+              published: ($published[.file] // null),
+              comparable: true,
+              note: null
+            }]' qualification-inventory/artifact-inventory.json 2>/dev/null || echo '[]')
+          json=$(jq -cn --arg id "pypi:${name:-unknown}" --argjson records "$records" '{($id): $records}')
+          echo "artifact_digest_json=$json" >> "$GITHUB_OUTPUT"
 
   # Issue #141's "registry-backed clean install" criterion: installs the
   # real, published `@redact-secret/core` -- no local tarball, no
@@ -851,12 +1128,30 @@ jobs:
           pattern: registry-state-native-*
           if-no-artifact-found: warn
 
+      # Issue #528: the same "matrix job outputs don't merge" limitation
+      # applies to per-artifact digest evidence, so each native leg uploaded
+      # its own `artifact-digest-native-<platform>` artifact too.
+      - name: Download native dependency artifact digests
+        if: always()
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        continue-on-error: true
+        with:
+          path: dependency-artifact-digests
+          pattern: artifact-digest-native-*
+          if-no-artifact-found: warn
+
       - name: Build and record the manifest
         id: manifest
         shell: bash
         run: |
           version=$(node -p "require('./packages/javascript/package.json').version" 2>/dev/null || true)
           conformance_identity=$(git rev-parse "$GITHUB_SHA:conformance" 2>/dev/null || true)
+          # Captured before the digest check below, which can exit nonzero:
+          # `record-manifest` runs `if: always()` specifically so this
+          # output -- and the manifest upload that names it -- survive a run
+          # that fails the new digest-mismatch check (issue #528 acceptance
+          # criterion 4).
+          echo "version=${version:-unknown}" >> "$GITHUB_OUTPUT"
 
           # A job that was skipped or failed before its own "report state"
           # step ran leaves its output empty, not `{}` -- default it here so
@@ -895,17 +1190,42 @@ jobs:
             registry_args+=(--registry-state "$key=$value")
           done < <(jq -r 'keys[]' <<<"$merged")
 
+          # Issue #528: the same defaulting rule as the registry-state
+          # variables above -- a job that never reached its digest-recording
+          # step leaves its output empty, so that contributes nothing rather
+          # than breaking the merge.
+          native_digest_json=$(jq -s 'add // {}' dependency-artifact-digests/*/artifact-digest.json 2>/dev/null) || native_digest_json='{}'
+          wasm_digest_json='${{ needs.publish-wasm-dependency.outputs.artifact_digest_json }}'
+          [[ -z "$wasm_digest_json" ]] && wasm_digest_json='{}'
+          wrapper_digest_json='${{ needs.publish.outputs.artifact_digest_json }}'
+          [[ -z "$wrapper_digest_json" ]] && wrapper_digest_json='{}'
+          crates_digest_json='${{ needs.publish-crates.outputs.artifact_digest_json }}'
+          [[ -z "$crates_digest_json" ]] && crates_digest_json='{}'
+          pypi_digest_json='${{ needs.publish-pypi.outputs.artifact_digest_json }}'
+          [[ -z "$pypi_digest_json" ]] && pypi_digest_json='{}'
+          artifact_digests=$(jq -cn \
+            --argjson native "$native_digest_json" \
+            --argjson wasm "$wasm_digest_json" \
+            --argjson wrapper "$wrapper_digest_json" \
+            --argjson crates "$crates_digest_json" \
+            --argjson pypi "$pypi_digest_json" \
+            '$native + $wasm + $wrapper + $crates + $pypi')
+
           python3 -B scripts/release-manifest.py \
             --source-revision "$GITHUB_SHA" \
             --conformance-identity "${conformance_identity:-unknown}" \
             --version "${version:-unknown}" \
             "${artifact_args[@]}" \
             "${registry_args[@]}" \
+            --artifact-digests "$artifact_digests" \
             --out manifest.json
 
-          echo "version=${version:-unknown}" >> "$GITHUB_OUTPUT"
-
+      # `if: always()` so a run that fails the digest-mismatch check in
+      # `release-manifest.py` -- which still writes `manifest.json` before
+      # reporting that failure -- still uploads the manifest it wrote,
+      # instead of the previous step's nonzero exit skipping this one.
       - name: Upload release manifest
+        if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: release-manifest-${{ steps.manifest.outputs.version }}
