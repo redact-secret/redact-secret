@@ -222,6 +222,44 @@
       "observedAt": "2026-09-20",
       "establishes": ["the detector patterns quoted per family below; consulted only as an external behavioral reference per AGENTS.md, no code reproduced"],
       "doesNotEstablish": ["provider issuance, liveness, or that a shape the rule accepts is the only shape a provider issues"]
+    },
+    "notion-changelog": {
+      "url": "https://developers.notion.com/page/changelog",
+      "kind": "provider",
+      "revision": "entry dated 2024-09-11 (effective 2024-09-25); page carries no per-entry version",
+      "observedAt": "2026-09-20",
+      "establishes": [
+        "\"Starting September 25, 2024, newly generated Public API tokens will automatically use the `ntn_` prefix instead of the `secret_` prefix.\"",
+        "\"Existing tokens with the `secret_` prefix remain functional with no required updates.\"",
+        "\"We strongly advise against using regular expressions (regex) to identify or validate Notion Public API tokens... Instead, treat the token as an opaque string and use it as provided.\""
+      ],
+      "doesNotEstablish": [
+        "the suffix length or alphabet of either prefix's body"
+      ]
+    },
+    "notion-docs-create-token": {
+      "url": "https://developers.notion.com/reference/create-a-token",
+      "kind": "provider",
+      "revision": "page shows no version or last-updated date",
+      "observedAt": "2026-09-20",
+      "establishes": [
+        "how an integration token is generated and retrieved through the Notion UI"
+      ],
+      "doesNotEstablish": [
+        "any token prefix, length, or alphabet; no example token value is shown"
+      ]
+    },
+    "notion-docs-authorization": {
+      "url": "https://developers.notion.com/guides/get-started/authorization",
+      "kind": "provider",
+      "revision": "page shows no version or last-updated date",
+      "observedAt": "2026-09-20",
+      "establishes": [
+        "one example OAuth refresh token value, `nrt_4991090011501Ejc6Xn4sHguI7jZIN449mKe9PRhpMfNK`, confirming the `nrt_` prefix and showing a 13-digit run before its body"
+      ],
+      "doesNotEstablish": [
+        "any `secret_`/`ntn_` integration-token detail; neither prefix appears on this page"
+      ]
     }
   },
   "families": [
@@ -502,6 +540,110 @@
         {"property": "existence of a `GOCSPX-`/`1//`/`ya29.` body grammar in the pinned tool inventory", "positions": {"issue-487-body": "names TruffleHog's `googleoauth2` registration and flare-redact's `gcp_refresh_token` detector as tool corroboration available for the three OAuth formats generally, and ranks `GOCSPX-` as \"the strongest candidate\"", "gitleaks-8.30.1": "registers no rule for any of the three formats", "trufflehog-3.97.4": "`googleoauth2` registers a rule for `ya29.` only (open-ended minimum length); no rule for `GOCSPX-` or `1//` exists in this package or any other Google/GCP detector directory in the pinned tag", "flare-redact-1.6.1": "`gcp_refresh_token` registers a rule for `1//` only (20-160 byte range); no rule for `GOCSPX-` or `ya29.`"}, "resolution": "Verified directly against each pinned tool's source rather than taken on the issue body's summary: neither cited tool's corroboration covers `GOCSPX-` at all, and each of the other two formats is covered by exactly one tool's open-ended or wide-range rule, not independently corroborated. `GOCSPX-` therefore has less tool corroboration than `1//` or `ya29.`, the reverse of the issue body's own tentative ranking. All three stay pending (T0) rather than any one being frozen on a single uncorroborated or absent rule."}
       ],
       "mutations": []
+    },
+    {
+      "detector": "notion-token",
+      "findingType": "notion_integration_token",
+      "implementation": "crates/secret-scan-core/src/detectors/notion.rs",
+      "beta4Rule": "Not one of issue #367's seven frozen families and not present in beta.4. Issue #300 (2026-09-16) introduced the detector with both shapes already frozen at introduction (docs/decisions/2026-09-16-freeze-notion-integration-token-grammar.md). Issue #514 (this entry) records the formal precision-contract evidence for that grammar; the grammar itself is unchanged.",
+      "toolRules": {
+        "gitleaks-8.30.1": "notion-api-token: `\\b(ntn_[0-9]{11}[A-Za-z0-9]{32}[A-Za-z0-9]{3})(?:[\\x60'\"\\s;]|\\\\[nr]|$)` \u2014 `ntn_` only; no rule for `secret_`.",
+        "trufflehog-3.97.4": "notion: `\\b(secret_[A-Za-z0-9]{43})\\b` \u2014 `secret_` only; no rule for `ntn_`.",
+        "flare-redact-1.6.1": "notion_token: `(?:ntn_[A-Za-z0-9]{40,50}|secret_[A-Za-z0-9]{43})` \u2014 covers both prefixes; the `ntn_` branch is an open 40-50 byte range over the full alnum alphabet with no digit-run distinction, looser than gitleaks' exact 11-digit-then-35-alnum split."
+      },
+      "variants": [
+        {
+          "id": "legacy",
+          "support": "supported",
+          "tier": "T2",
+          "grammar": "secret_[A-Za-z0-9]{43}",
+          "segments": [
+            {
+              "name": "prefix",
+              "literal": "secret_",
+              "basis": "tool-agreement (trufflehog and flare-redact both use this literal); the provider changelog also names it as the pre-2024-09-25 prefix that remains functional"
+            },
+            {
+              "name": "body",
+              "alphabet": "[A-Za-z0-9]",
+              "length": 43,
+              "basis": "tool-agreement: trufflehog and flare-redact both fix this at exactly 43"
+            }
+          ],
+          "sources": [
+            "notion-changelog",
+            "trufflehog-3.97.4",
+            "flare-redact-1.6.1"
+          ]
+        },
+        {
+          "id": "current",
+          "support": "supported",
+          "tier": "T2",
+          "grammar": "ntn_[0-9]{11}[A-Za-z0-9]{35}",
+          "segments": [
+            {
+              "name": "prefix",
+              "literal": "ntn_",
+              "basis": "provider: \"Starting September 25, 2024, newly generated Public API tokens will automatically use the `ntn_` prefix instead of the `secret_` prefix.\""
+            },
+            {
+              "name": "digit-run",
+              "alphabet": "[0-9]",
+              "length": 11,
+              "basis": "single-tool (gitleaks); flare-redact's `ntn_` branch does not distinguish a digit-only segment and trufflehog has no `ntn_` rule at all"
+            },
+            {
+              "name": "body",
+              "alphabet": "[A-Za-z0-9]",
+              "length": 35,
+              "basis": "single-tool (gitleaks) for the exact 35-byte split after the digit run; corroborated only loosely by flare-redact's 40-50 total-suffix-byte range (46 falls inside it), which does not itself require a digit run"
+            }
+          ],
+          "sources": [
+            "notion-changelog",
+            "gitleaks-8.30.1",
+            "flare-redact-1.6.1"
+          ]
+        }
+      ],
+      "excluded": [
+        {
+          "id": "oauth-refresh-token-nrt",
+          "basis": "provider",
+          "reason": "The authorization guide's only token example (`nrt_4991090011501Ejc6Xn4sHguI7jZIN449mKe9PRhpMfNK`) is an OAuth refresh token, not a Public API integration token; its 13-digit run does not match the current integration-token shape's 11, and neither tool source registers an `nrt_` rule. Deliberately unsupported per the 2026-09-16 grammar freeze."
+        },
+        {
+          "id": "oauth-access-token",
+          "basis": "provider",
+          "reason": "Notion's public-integration OAuth access tokens have no stable documented or community-converged prefix; the docs show only opaque/temporary example values."
+        },
+        {
+          "id": "page-database-block-ids",
+          "basis": "provider",
+          "reason": "UUID-shaped page/database/block identifiers and share-URL identifiers are public, not secrets, and carry neither the `secret_` nor `ntn_` prefix, so this detector never matches them regardless of length."
+        }
+      ],
+      "conflicts": [
+        {
+          "property": "ntn_ suffix structure and total length",
+          "positions": {
+            "gitleaks-8.30.1": "exact 11-digit run then exact 35-byte alnum run (46 total suffix bytes)",
+            "flare-redact-1.6.1": "no digit-run distinction; any 40-50 byte alnum run",
+            "trufflehog-3.97.4": "no rule for `ntn_` at all"
+          },
+          "resolution": "gitleaks' structurally-specific rule is adopted because it is the only source that encodes the digit-run boundary the frozen grammar (2026-09-16 decision) relies on; flare-redact's broader range is treated as directionally corroborating only (46 falls inside 40-50), not as an independent confirmation of the exact split."
+        },
+        {
+          "property": "tool coverage of the two prefixes",
+          "positions": {
+            "trufflehog-3.97.4": "`secret_` only",
+            "gitleaks-8.30.1": "`ntn_` only",
+            "flare-redact-1.6.1": "both `secret_` and `ntn_`"
+          },
+          "resolution": "No single external tool corroborates both shapes with the same rule; flare-redact is the only source that registers both prefixes at all, and its `ntn_` branch is looser than gitleaks'. Each shape's own exact-length contract is unaffected by the other tools' silence on it."
+        }
+      ]
     }
   ]
 }
