@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 1419,
+  "fixtureCount": 1420,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -30509,6 +30509,28 @@
         }
       ],
       "note": "issue #473: the same accepted prose tradeoff in a realistic README-style Markdown section -- exactly the host document the issue's own proposal names as one that would have caught this class -- still warns at Confidence::Medium, pinning the tradeoff outside plain-text too."
+    },
+    {
+      "id": "regression-generic-token-markdown-inline-code-boundary",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "markdown"
+      ],
+      "input": "`api_key=\"SYNTHETIC_REVOKED_CONTEXT_VALUE\"`",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 10,
+          "end": 41
+        }
+      ],
+      "note": "Permanent synthetic regression (issue #552): before this fix, a quoted contextual assignment (key=\"value\") whose whole span a Markdown inline-code pair of backticks wraps had no recognized boundary before the key name or after the value's closing quote, so the assignment went entirely undetected rather than merely mis-spanned. Reproduces the redact-secret-benchmarks detector-coverage--generic-token-{api-key,password,client-secret}-bare fixtures under that corpus's context.markdown metamorphic operator (a matching pair of backticks around the whole fixture, no other change)."
     },
     {
       "id": "notion-token-positive-dotenv-secret",
