@@ -2642,7 +2642,15 @@
           "dimension": "positive",
           "evidenceFixtureIds": [
             "notion-token-positive-bare-ntn",
-            "notion-token-positive-bare-secret"
+            "notion-token-positive-bare-secret",
+            "notion-token-positive-dotenv-ntn",
+            "notion-token-positive-dotenv-secret",
+            "notion-token-positive-json-ntn",
+            "notion-token-positive-json-secret",
+            "notion-token-positive-log-ntn",
+            "notion-token-positive-log-secret",
+            "notion-token-positive-yaml-ntn",
+            "notion-token-positive-yaml-secret"
           ],
           "state": "supported"
         },

@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 1302,
+  "fixtureCount": 1310,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -29698,6 +29698,182 @@
         }
       ],
       "note": "issue #473: the same accepted prose tradeoff in a realistic README-style Markdown section -- exactly the host document the issue's own proposal names as one that would have caught this class -- still warns at Confidence::Medium, pinning the tradeoff outside plain-text too."
+    },
+    {
+      "id": "notion-token-positive-dotenv-secret",
+      "detector": "notion-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "NOTION_TOKEN=secret_SYNTHETICREVOKEDNOTIONLEGACYTOKENVALUE00000\n",
+      "expected": [
+        {
+          "detector": "notion-token",
+          "type": "notion_integration_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 63
+        }
+      ],
+      "note": "Issue #514 host-context evidence: dotenv was previously unexercised for the legacy secret_ shape."
+    },
+    {
+      "id": "notion-token-positive-dotenv-ntn",
+      "detector": "notion-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "NOTION_TOKEN=ntn_00000000000SYNTHETICREVOKEDNOTIONCURRENTVAL000\n",
+      "expected": [
+        {
+          "detector": "notion-token",
+          "type": "notion_integration_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 63
+        }
+      ],
+      "note": "Issue #514 host-context evidence: dotenv was previously unexercised for the current ntn_ shape."
+    },
+    {
+      "id": "notion-token-positive-json-secret",
+      "detector": "notion-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"apiKey\": \"secret_SYNTHETICREVOKEDNOTIONLEGACYTOKENVALUE00000\"}",
+      "expected": [
+        {
+          "detector": "notion-token",
+          "type": "notion_integration_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 12,
+          "end": 62
+        }
+      ],
+      "note": "Issue #514 host-context evidence: json was previously unexercised for the legacy secret_ shape."
+    },
+    {
+      "id": "notion-token-positive-json-ntn",
+      "detector": "notion-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"apiKey\": \"ntn_00000000000SYNTHETICREVOKEDNOTIONCURRENTVAL000\"}",
+      "expected": [
+        {
+          "detector": "notion-token",
+          "type": "notion_integration_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 12,
+          "end": 62
+        }
+      ],
+      "note": "Issue #514 host-context evidence: json was previously unexercised for the current ntn_ shape."
+    },
+    {
+      "id": "notion-token-positive-yaml-secret",
+      "detector": "notion-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "notion_token: secret_SYNTHETICREVOKEDNOTIONLEGACYTOKENVALUE00000\n",
+      "expected": [
+        {
+          "detector": "notion-token",
+          "type": "notion_integration_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 64
+        }
+      ],
+      "note": "Issue #514 host-context evidence: yaml was previously unexercised for the legacy secret_ shape."
+    },
+    {
+      "id": "notion-token-positive-yaml-ntn",
+      "detector": "notion-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "notion_token: ntn_00000000000SYNTHETICREVOKEDNOTIONCURRENTVAL000\n",
+      "expected": [
+        {
+          "detector": "notion-token",
+          "type": "notion_integration_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 64
+        }
+      ],
+      "note": "Issue #514 host-context evidence: yaml was previously unexercised for the current ntn_ shape."
+    },
+    {
+      "id": "notion-token-positive-log-secret",
+      "detector": "notion-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-16T00:00:00Z INFO using token=secret_SYNTHETICREVOKEDNOTIONLEGACYTOKENVALUE00000 for sync",
+      "expected": [
+        {
+          "detector": "notion-token",
+          "type": "notion_integration_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 38,
+          "end": 88
+        }
+      ],
+      "note": "Issue #514 host-context evidence: log was previously unexercised for the legacy secret_ shape."
+    },
+    {
+      "id": "notion-token-positive-log-ntn",
+      "detector": "notion-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-16T00:00:00Z INFO using token=ntn_00000000000SYNTHETICREVOKEDNOTIONCURRENTVAL000 for sync",
+      "expected": [
+        {
+          "detector": "notion-token",
+          "type": "notion_integration_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 38,
+          "end": 88
+        }
+      ],
+      "note": "Issue #514 host-context evidence: log was previously unexercised for the current ntn_ shape."
     }
   ]
 }

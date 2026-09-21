@@ -6205,6 +6205,478 @@
       ],
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
+      "detector": "notion-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 50,
+          "start": 0
+        }
+      ],
+      "id": "notion-token-adversarial-long-padding",
+      "kind": "adversarial",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 50,
+          "start": 0
+        }
+      ],
+      "support": "supported",
+      "tier": "adversarial"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "notion-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "notion-token-boundary-above-max-ntn",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "notion-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "notion-token-boundary-above-max-secret",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "notion-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "notion-token-boundary-below-min-ntn",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "notion-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "notion-token-boundary-below-min-secret",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "notion-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "notion-token-boundary-invalid-alphabet-secret",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "notion-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "notion-token-boundary-missing-digit-ntn",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "malformed"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "notion-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "notion-token-negative-masked",
+      "kind": "negative",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "negative"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "notion-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "notion-token-negative-oauth-refresh-nrt",
+      "kind": "negative",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "negative"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "notion-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "notion-token-negative-page-id-uuid",
+      "kind": "negative",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "negative"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "notion-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "notion-token-negative-placeholder",
+      "kind": "negative",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "negative"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "notion-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 58,
+          "start": 8
+        }
+      ],
+      "id": "notion-token-overlap-generic-context",
+      "kind": "overlap",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 58,
+          "start": 8
+        }
+      ],
+      "support": "supported",
+      "tier": "contextual"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "notion-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 50,
+          "start": 0
+        }
+      ],
+      "id": "notion-token-positive-bare-ntn",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 50,
+          "start": 0
+        }
+      ],
+      "support": "supported",
+      "tier": "canonical"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "notion-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 50,
+          "start": 0
+        }
+      ],
+      "id": "notion-token-positive-bare-secret",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 50,
+          "start": 0
+        }
+      ],
+      "support": "supported",
+      "tier": "canonical"
+    },
+    {
+      "contexts": [
+        "dotenv"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "notion-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 63,
+          "start": 13
+        }
+      ],
+      "id": "notion-token-positive-dotenv-ntn",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 63,
+          "start": 13
+        }
+      ],
+      "support": "supported",
+      "tier": "contextual"
+    },
+    {
+      "contexts": [
+        "dotenv"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "notion-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 63,
+          "start": 13
+        }
+      ],
+      "id": "notion-token-positive-dotenv-secret",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 63,
+          "start": 13
+        }
+      ],
+      "support": "supported",
+      "tier": "contextual"
+    },
+    {
+      "contexts": [
+        "json"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "notion-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 62,
+          "start": 12
+        }
+      ],
+      "id": "notion-token-positive-json-ntn",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 62,
+          "start": 12
+        }
+      ],
+      "support": "supported",
+      "tier": "contextual"
+    },
+    {
+      "contexts": [
+        "json"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "notion-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 62,
+          "start": 12
+        }
+      ],
+      "id": "notion-token-positive-json-secret",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 62,
+          "start": 12
+        }
+      ],
+      "support": "supported",
+      "tier": "contextual"
+    },
+    {
+      "contexts": [
+        "log"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "notion-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 88,
+          "start": 38
+        }
+      ],
+      "id": "notion-token-positive-log-ntn",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 88,
+          "start": 38
+        }
+      ],
+      "support": "supported",
+      "tier": "contextual"
+    },
+    {
+      "contexts": [
+        "log"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "notion-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 88,
+          "start": 38
+        }
+      ],
+      "id": "notion-token-positive-log-secret",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 88,
+          "start": 38
+        }
+      ],
+      "support": "supported",
+      "tier": "contextual"
+    },
+    {
+      "contexts": [
+        "yaml"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "notion-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 64,
+          "start": 14
+        }
+      ],
+      "id": "notion-token-positive-yaml-ntn",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 64,
+          "start": 14
+        }
+      ],
+      "support": "supported",
+      "tier": "contextual"
+    },
+    {
+      "contexts": [
+        "yaml"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "notion-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 64,
+          "start": 14
+        }
+      ],
+      "id": "notion-token-positive-yaml-secret",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 64,
+          "start": 14
+        }
+      ],
+      "support": "supported",
+      "tier": "contextual"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
       "detector": "openai-token",
       "disposition": "retained",
       "expectedRanges": [
@@ -9252,6 +9724,30 @@
       "contexts": [],
       "contractOnlyMatches": [],
       "corpus": "docs/coverage/detector-inventory.json#reconciliationTrigger",
+      "detector": "notion-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 50,
+          "start": 0
+        }
+      ],
+      "id": "notion_integration_token",
+      "kind": "reconciliation-trigger",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 50,
+          "start": 0
+        }
+      ],
+      "support": null,
+      "tier": null
+    },
+    {
+      "contexts": [],
+      "contractOnlyMatches": [],
+      "corpus": "docs/coverage/detector-inventory.json#reconciliationTrigger",
       "detector": "openai-token",
       "disposition": "retained",
       "expectedRanges": [
@@ -9334,6 +9830,12 @@
       "retained": 19,
       "review": 0,
       "silent": 29
+    },
+    "notion-token": {
+      "broad-shape": 0,
+      "retained": 13,
+      "review": 0,
+      "silent": 10
     },
     "openai-token": {
       "broad-shape": 3,
