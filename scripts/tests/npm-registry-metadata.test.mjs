@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { viewPublished, waitForPublished } from "../npm-registry-metadata.mjs";
+import { viewPublished, waitForPublished, waitForVisible } from "../npm-registry-metadata.mjs";
 
 const name = "@redact-secret/test";
 const version = "0.1.0-beta.1";
@@ -54,7 +54,7 @@ test("waitForPublished keeps polling through 404s, exactly like a mismatch, unti
   assert.equal(calls, 3);
 });
 
-test("waitForPublished throws distinct errors for never-visible vs. never-matching once the deadline passes", async () => {
+test("waitForPublished throws distinct errors for never-visible vs. never-matching once the deadline passes, naming the timeout", async () => {
   const neverVisible = async () => new Response(null, { status: 404 });
   await assert.rejects(
     waitForPublished(name, version, {
@@ -63,7 +63,7 @@ test("waitForPublished throws distinct errors for never-visible vs. never-matchi
       pollIntervalMs: 0,
       maxWaitMs: 0,
     }),
-    /not visible on the registry after publishing/,
+    /not visible on the registry after waiting 0ms for publish propagation/,
   );
 
   const staleMetadata = { ...metadata, dist: { shasum: "b".repeat(40) } };
@@ -75,6 +75,26 @@ test("waitForPublished throws distinct errors for never-visible vs. never-matchi
       pollIntervalMs: 0,
       maxWaitMs: 0,
     }),
-    /registry checksum does not match qualified content \(saw b+, expected a+\)/,
+    /registry checksum still does not match qualified content after waiting 0ms \(saw b+, expected a+\)/,
+  );
+});
+
+test("waitForVisible keeps polling through 404s until the version is visible with any content -- a simulated slow-registry publish", async () => {
+  let calls = 0;
+  const request = async () => {
+    calls += 1;
+    if (calls < 3) return new Response(null, { status: 404 });
+    return Response.json(metadata);
+  };
+  const result = await waitForVisible(name, version, { request, pollIntervalMs: 0 });
+  assert.deepEqual(result, metadata);
+  assert.equal(calls, 3);
+});
+
+test("waitForVisible fails closed, naming the timeout, once the deadline passes with nothing visible", async () => {
+  const neverVisible = async () => new Response(null, { status: 404 });
+  await assert.rejects(
+    waitForVisible(name, version, { request: neverVisible, pollIntervalMs: 0, maxWaitMs: 0 }),
+    /not visible on the registry after waiting 0ms for publish propagation/,
   );
 });
