@@ -31,6 +31,9 @@ import {
   packageVersion,
 } from "./qualify-runtime-fixture.mjs";
 import { qualifyBrowser, qualifyNode } from "./consumer-harness.mjs";
+import { waitForVisible } from "./npm-registry-metadata.mjs";
+
+const WRAPPER_PACKAGE_NAME = "@redact-secret/core";
 
 const INTEGRATION_FIXTURE_IDS = Object.freeze({
   redact: CANONICAL_FIXTURE_ID,
@@ -65,7 +68,7 @@ async function buildConsumerProject(version) {
     private: true,
     type: "module",
     dependencies: {
-      "@redact-secret/core": version,
+      [WRAPPER_PACKAGE_NAME]: version,
     },
   };
   await writeFile(join(root, "package.json"), JSON.stringify(manifest, null, 2));
@@ -99,6 +102,13 @@ async function main() {
   );
   const expectedVersion = await packageVersion();
   const incrementalCorpus = await loadIncrementalCorpus();
+
+  // `npm install` below reads the registry too, but its own error for "not
+  // there yet" is indistinguishable from "never published" -- so name that
+  // read explicitly here first, with the same bounded wait and the same
+  // clear "still propagating" vs. "not visible" distinction every other
+  // registry-state read in the release pipeline gets.
+  await waitForVisible(WRAPPER_PACKAGE_NAME, expectedVersion);
 
   let consumerRoot;
   try {
