@@ -962,6 +962,7 @@
             "stripe-positive-log",
             "stripe-positive-min-length",
             "stripe-positive-mixed-public-and-secret",
+            "stripe-positive-mixed-public-and-secret-sandbox-mode",
             "stripe-positive-qualified",
             "stripe-positive-yaml"
           ],
@@ -998,10 +999,15 @@
             "stripe-negative-interpolated-secret-prefix",
             "stripe-negative-lookalike",
             "stripe-negative-masked-secret-prefix",
+            "stripe-negative-no-rk-org-prefix",
             "stripe-negative-ordinary-reference",
             "stripe-negative-placeholder",
             "stripe-negative-public-prefix-punctuation",
+            "stripe-negative-public-prefix-sandbox-mode",
             "stripe-negative-public-prefix-unicode-crlf",
+            "stripe-negative-sk-org-missing-separator",
+            "stripe-negative-whsec-missing-separator",
+            "stripe-negative-whsec-wrong-separator",
             "stripe-negative-wrong-prefix"
           ],
           "state": "supported"
@@ -2735,7 +2741,15 @@
           "dimension": "positive",
           "evidenceFixtureIds": [
             "notion-token-positive-bare-ntn",
-            "notion-token-positive-bare-secret"
+            "notion-token-positive-bare-secret",
+            "notion-token-positive-dotenv-ntn",
+            "notion-token-positive-dotenv-secret",
+            "notion-token-positive-json-ntn",
+            "notion-token-positive-json-secret",
+            "notion-token-positive-log-ntn",
+            "notion-token-positive-log-secret",
+            "notion-token-positive-yaml-ntn",
+            "notion-token-positive-yaml-secret"
           ],
           "state": "supported"
         },

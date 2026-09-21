@@ -401,62 +401,6 @@
       ]
     },
     {
-      "detector": "huggingface-token",
-      "falseNegativeGuards": {
-        "actualFalseNegatives": 0,
-        "count": 17,
-        "fixtureIds": [
-          "huggingface-positive-digit-bearing-body",
-          "huggingface-positive-dotenv",
-          "huggingface-positive-exact-length",
-          "huggingface-positive-json",
-          "huggingface-positive-log",
-          "huggingface-positive-markdown-delimiter",
-          "huggingface-positive-organization-token",
-          "huggingface-positive-organization-token-quoted",
-          "huggingface-positive-organization-token-unicode-crlf",
-          "huggingface-positive-punctuation-adjacent",
-          "huggingface-positive-qualified",
-          "huggingface-positive-repeated-value",
-          "huggingface-positive-shell-quoted",
-          "huggingface-positive-toml",
-          "huggingface-positive-unicode-byte-offset",
-          "huggingface-positive-yaml",
-          "huggingface-positive-yaml-crlf"
-        ]
-      },
-      "falsePositiveGuards": {
-        "actualFalsePositives": 0,
-        "count": 13,
-        "fixtureIds": [
-          "huggingface-negative-dotenv",
-          "huggingface-negative-embedded-in-wider-identifier",
-          "huggingface-negative-json",
-          "huggingface-negative-log",
-          "huggingface-negative-lookalike",
-          "huggingface-negative-markdown-delimiter",
-          "huggingface-negative-model-repository-name",
-          "huggingface-negative-ordinary-reference",
-          "huggingface-negative-percent-encoded-lookalike",
-          "huggingface-negative-placeholder",
-          "huggingface-negative-shell-quoted",
-          "huggingface-negative-toml",
-          "huggingface-negative-yaml"
-        ]
-      },
-      "hostContextsExercised": [
-        "dotenv",
-        "http",
-        "json",
-        "log",
-        "markdown",
-        "plain-text",
-        "shell",
-        "toml",
-        "yaml"
-      ]
-    },
-    {
       "detector": "jwt",
       "falseNegativeGuards": {
         "actualFalseNegatives": 0,
@@ -495,59 +439,6 @@
         "markdown",
         "plain-text",
         "shell",
-        "yaml"
-      ]
-    },
-    {
-      "detector": "linear-token",
-      "falseNegativeGuards": {
-        "actualFalseNegatives": 0,
-        "count": 14,
-        "fixtureIds": [
-          "linear-positive-all-prefixes",
-          "linear-positive-dotenv",
-          "linear-positive-exact-length",
-          "linear-positive-json",
-          "linear-positive-log",
-          "linear-positive-markdown-delimiter",
-          "linear-positive-punctuation-adjacent",
-          "linear-positive-qualified",
-          "linear-positive-repeated-value",
-          "linear-positive-shell-quoted",
-          "linear-positive-toml",
-          "linear-positive-unicode-byte-offset",
-          "linear-positive-yaml",
-          "linear-positive-yaml-crlf"
-        ]
-      },
-      "falsePositiveGuards": {
-        "actualFalsePositives": 0,
-        "count": 13,
-        "fixtureIds": [
-          "linear-boundary-undocumented-segment-scim",
-          "linear-negative-dotenv",
-          "linear-negative-embedded-in-wider-identifier",
-          "linear-negative-issue-identifier",
-          "linear-negative-lookalike",
-          "linear-negative-ordinary-reference",
-          "linear-negative-percent-encoded-lookalike",
-          "linear-negative-placeholder",
-          "linear-negative-toml",
-          "linear-paired-log-malformed-underscore-in-body",
-          "linear-paired-markdown-malformed-dash-in-body",
-          "linear-paired-shell-malformed-one-long",
-          "linear-paired-yaml-malformed-invalid-alphabet"
-        ]
-      },
-      "hostContextsExercised": [
-        "dotenv",
-        "http",
-        "json",
-        "log",
-        "markdown",
-        "plain-text",
-        "shell",
-        "toml",
         "yaml"
       ]
     },
@@ -662,51 +553,6 @@
       ]
     },
     {
-      "detector": "sendgrid-token",
-      "falseNegativeGuards": {
-        "actualFalseNegatives": 0,
-        "count": 16,
-        "fixtureIds": [
-          "sendgrid-positive-bare",
-          "sendgrid-positive-crlf-host",
-          "sendgrid-positive-doc-style-placeholder",
-          "sendgrid-positive-dotenv",
-          "sendgrid-positive-json",
-          "sendgrid-positive-log",
-          "sendgrid-positive-markdown-delimiter",
-          "sendgrid-positive-punctuation-adjacent",
-          "sendgrid-positive-repeated-value",
-          "sendgrid-positive-shell-quoted",
-          "sendgrid-positive-trailing-url-safe-characters",
-          "sendgrid-positive-unicode-prefix",
-          "sendgrid-positive-yaml",
-          "sendgrid-token-regression-crlf-and-unicode-prefix",
-          "sendgrid-token-regression-generic-key-embedded-underscore",
-          "sendgrid-token-regression-generic-key-trailing-dash-full-span"
-        ]
-      },
-      "falsePositiveGuards": {
-        "actualFalsePositives": 0,
-        "count": 4,
-        "fixtureIds": [
-          "sendgrid-negative-common-identifier",
-          "sendgrid-negative-harmless-url",
-          "sendgrid-negative-percent-encoded-lookalike",
-          "sendgrid-negative-placeholder"
-        ]
-      },
-      "hostContextsExercised": [
-        "dotenv",
-        "http",
-        "json",
-        "log",
-        "markdown",
-        "plain-text",
-        "shell",
-        "yaml"
-      ]
-    },
-    {
       "detector": "shopify-token",
       "falseNegativeGuards": {
         "actualFalseNegatives": 0,
@@ -748,57 +594,10 @@
       ]
     },
     {
-      "detector": "slack-token",
-      "falseNegativeGuards": {
-        "actualFalseNegatives": 0,
-        "count": 13,
-        "fixtureIds": [
-          "slack-positive-all-prefixes",
-          "slack-positive-bot-grammar-dotenv",
-          "slack-positive-bot-grammar-json",
-          "slack-positive-bot-grammar-log",
-          "slack-positive-bot-grammar-markdown",
-          "slack-positive-bot-grammar-plain",
-          "slack-positive-bot-grammar-shell-quoted",
-          "slack-positive-bot-grammar-toml",
-          "slack-positive-bot-grammar-yaml",
-          "slack-positive-secret-18-bytes",
-          "slack-positive-secret-19-bytes",
-          "slack-positive-segment1-10-digits",
-          "slack-positive-segment1-13-digits"
-        ]
-      },
-      "falsePositiveGuards": {
-        "actualFalsePositives": 0,
-        "count": 8,
-        "fixtureIds": [
-          "slack-negative-bot-grammar-dotenv",
-          "slack-negative-bot-grammar-toml",
-          "slack-negative-embedded-in-wider-identifier",
-          "slack-negative-lookalike",
-          "slack-negative-ordinary-reference",
-          "slack-negative-percent-encoded-lookalike",
-          "slack-negative-placeholder",
-          "slack-negative-team-channel-id"
-        ]
-      },
-      "hostContextsExercised": [
-        "dotenv",
-        "http",
-        "json",
-        "log",
-        "markdown",
-        "plain-text",
-        "shell",
-        "toml",
-        "yaml"
-      ]
-    },
-    {
       "detector": "stripe-token",
       "falseNegativeGuards": {
         "actualFalseNegatives": 0,
-        "count": 10,
+        "count": 11,
         "fixtureIds": [
           "stripe-positive-all-prefixes",
           "stripe-positive-crlf-unicode-prefix",
@@ -808,21 +607,27 @@
           "stripe-positive-log",
           "stripe-positive-min-length",
           "stripe-positive-mixed-public-and-secret",
+          "stripe-positive-mixed-public-and-secret-sandbox-mode",
           "stripe-positive-qualified",
           "stripe-positive-yaml"
         ]
       },
       "falsePositiveGuards": {
         "actualFalsePositives": 0,
-        "count": 8,
+        "count": 13,
         "fixtureIds": [
           "stripe-negative-interpolated-secret-prefix",
           "stripe-negative-lookalike",
           "stripe-negative-masked-secret-prefix",
+          "stripe-negative-no-rk-org-prefix",
           "stripe-negative-ordinary-reference",
           "stripe-negative-placeholder",
           "stripe-negative-public-prefix-punctuation",
+          "stripe-negative-public-prefix-sandbox-mode",
           "stripe-negative-public-prefix-unicode-crlf",
+          "stripe-negative-sk-org-missing-separator",
+          "stripe-negative-whsec-missing-separator",
+          "stripe-negative-whsec-wrong-separator",
           "stripe-negative-wrong-prefix"
         ]
       },
@@ -968,11 +773,8 @@
       "https://github.com/redact-secret/redact-secret/issues/323",
       "https://github.com/redact-secret/redact-secret/issues/324",
       "https://github.com/redact-secret/redact-secret/issues/325",
-      "https://github.com/redact-secret/redact-secret/issues/368",
-      "https://github.com/redact-secret/redact-secret/issues/369",
       "https://github.com/redact-secret/redact-secret/issues/370",
-      "https://github.com/redact-secret/redact-secret/issues/375",
-      "https://github.com/redact-secret/redact-secret/issues/475"
+      "https://github.com/redact-secret/redact-secret/issues/513"
     ]
   }
 }

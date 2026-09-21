@@ -130,7 +130,7 @@ Tests: `python3 -B -m unittest discover -s scripts/tests -p 'test_generate_cover
   from the canonical corpus only (never a fixture's `input` or a matched
   value). Defaults to `stripe-token`, `shopify-token`, and `supabase-token`;
   pass `--detector <id>` (repeatable) and `--issue <url>` (repeatable) to
-  report on others, as this file's current fifteen-detector, eight-issue
+  report on others, as this file's current fifteen-detector, nine-issue
   `provenance.issue` list already does:
 
   ```sh
@@ -149,6 +149,7 @@ Tests: `python3 -B -m unittest discover -s scripts/tests -p 'test_generate_cover
     --issue https://github.com/redact-secret/redact-secret/issues/324 \
     --issue https://github.com/redact-secret/redact-secret/issues/325 \
     --issue https://github.com/redact-secret/redact-secret/issues/370 \
+    --issue https://github.com/redact-secret/redact-secret/issues/513 \
     --out docs/coverage/fp-fn-summary.json
   ```
 
@@ -228,6 +229,19 @@ Tests: `python3 -B -m unittest discover -s scripts/tests -p 'test_generate_cover
     --detector linear-token \
     --issue https://github.com/redact-secret/redact-secret/issues/374 \
     --out docs/coverage/fp-fn-summary-374.json
+  ```
+
+- [`fp-fn-summary-513.json`](./fp-fn-summary-513.json) — the same report for
+  issue [#513](https://github.com/redact-secret/redact-secret/issues/513)'s
+  `stripe-token` coverage (the corpus view after the `sk_org_`/`whsec_`
+  family completion; `fp-fn-summary.json`'s own `stripe-token` row is the
+  live, all-detector view and is kept current alongside it):
+
+  ```sh
+  python3 -B scripts/generate-fp-fn-summary.py \
+    --detector stripe-token \
+    --issue https://github.com/redact-secret/redact-secret/issues/513 \
+    --out docs/coverage/fp-fn-summary-513.json
   ```
 
   Tests: `python3 -B -m unittest discover -s scripts/tests -p 'test_generate_fp_fn_summary.py'`.

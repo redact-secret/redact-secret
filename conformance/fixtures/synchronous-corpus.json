@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 1318,
+  "fixtureCount": 1332,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -3393,6 +3393,93 @@
         }
       ],
       "note": "A match after a CRLF line ending and a Unicode-prefixed comment line is still found at the correct UTF-8 byte offset."
+    },
+    {
+      "id": "stripe-negative-no-rk-org-prefix",
+      "detector": "stripe-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "rk_org_SYNTHETICREVOKEDSYNTHETICREVOKED",
+      "expected": [],
+      "note": "Issue #513: docs.stripe.com/keys/organization-api-keys (observed 2026-09-20) states organization keys all share the sk_org prefix and explicitly that there's no rk_org prefix, so this near-miss is a documented absence, not merely untested."
+    },
+    {
+      "id": "stripe-negative-sk-org-missing-separator",
+      "detector": "stripe-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk_orgSYNTHETICREVOKEDSYNTHETICREVOKED",
+      "expected": [],
+      "note": "Issue #513: the documented organization-key prefix is sk_org_ with a trailing underscore; a value missing that separator is an undocumented near-miss, never a fuzzy match."
+    },
+    {
+      "id": "stripe-negative-whsec-missing-separator",
+      "detector": "stripe-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "whsecSYNTHETICREVOKEDSYNTHETICREVOKED",
+      "expected": [],
+      "note": "Issue #513: the documented webhook signing secret prefix is whsec_ with a trailing underscore; a value missing that separator is an undocumented near-miss."
+    },
+    {
+      "id": "stripe-negative-whsec-wrong-separator",
+      "detector": "stripe-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "wh_sec_SYNTHETICREVOKEDSYNTHETICREVOKED",
+      "expected": [],
+      "note": "Issue #513: an underscore misplaced inside the documented whsec_ prefix is an undocumented near-miss, never a fuzzy match."
+    },
+    {
+      "id": "stripe-negative-public-prefix-sandbox-mode",
+      "detector": "stripe-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "pk_test_SYNTHETICREVOKEDSYNT",
+      "expected": [],
+      "note": "Issue #513: docs.stripe.com/keys (observed 2026-09-20) documents pk_test_ as equally safe to expose as pk_live_, so it stays unclassified the same way stripe-negative-lookalike's pk_live_ case does."
+    },
+    {
+      "id": "stripe-positive-mixed-public-and-secret-sandbox-mode",
+      "detector": "stripe-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "pk_test_SYNTHETICREVOKEDSYNT\nsk_test_SYNTHETICREVOKEDSYNTHETICREVOKED",
+      "expected": [
+        {
+          "detector": "stripe-token",
+          "type": "stripe_credential",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 29,
+          "end": 69
+        }
+      ],
+      "note": "Issue #513: the sandbox-mode counterpart of stripe-positive-mixed-public-and-secret. A public identifier and a secret credential on adjacent lines: the public prefix never generates a candidate, while the paired secret is still classified with the correct range."
     },
     {
       "id": "slack-positive-qualified",
@@ -29938,6 +30025,182 @@
         }
       ],
       "note": "issue #473: the same accepted prose tradeoff in a realistic README-style Markdown section -- exactly the host document the issue's own proposal names as one that would have caught this class -- still warns at Confidence::Medium, pinning the tradeoff outside plain-text too."
+    },
+    {
+      "id": "notion-token-positive-dotenv-secret",
+      "detector": "notion-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "NOTION_TOKEN=secret_SYNTHETICREVOKEDNOTIONLEGACYTOKENVALUE00000\n",
+      "expected": [
+        {
+          "detector": "notion-token",
+          "type": "notion_integration_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 63
+        }
+      ],
+      "note": "Issue #514 host-context evidence: dotenv was previously unexercised for the legacy secret_ shape."
+    },
+    {
+      "id": "notion-token-positive-dotenv-ntn",
+      "detector": "notion-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "NOTION_TOKEN=ntn_00000000000SYNTHETICREVOKEDNOTIONCURRENTVAL000\n",
+      "expected": [
+        {
+          "detector": "notion-token",
+          "type": "notion_integration_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 63
+        }
+      ],
+      "note": "Issue #514 host-context evidence: dotenv was previously unexercised for the current ntn_ shape."
+    },
+    {
+      "id": "notion-token-positive-json-secret",
+      "detector": "notion-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"apiKey\": \"secret_SYNTHETICREVOKEDNOTIONLEGACYTOKENVALUE00000\"}",
+      "expected": [
+        {
+          "detector": "notion-token",
+          "type": "notion_integration_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 12,
+          "end": 62
+        }
+      ],
+      "note": "Issue #514 host-context evidence: json was previously unexercised for the legacy secret_ shape."
+    },
+    {
+      "id": "notion-token-positive-json-ntn",
+      "detector": "notion-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"apiKey\": \"ntn_00000000000SYNTHETICREVOKEDNOTIONCURRENTVAL000\"}",
+      "expected": [
+        {
+          "detector": "notion-token",
+          "type": "notion_integration_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 12,
+          "end": 62
+        }
+      ],
+      "note": "Issue #514 host-context evidence: json was previously unexercised for the current ntn_ shape."
+    },
+    {
+      "id": "notion-token-positive-yaml-secret",
+      "detector": "notion-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "notion_token: secret_SYNTHETICREVOKEDNOTIONLEGACYTOKENVALUE00000\n",
+      "expected": [
+        {
+          "detector": "notion-token",
+          "type": "notion_integration_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 64
+        }
+      ],
+      "note": "Issue #514 host-context evidence: yaml was previously unexercised for the legacy secret_ shape."
+    },
+    {
+      "id": "notion-token-positive-yaml-ntn",
+      "detector": "notion-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "notion_token: ntn_00000000000SYNTHETICREVOKEDNOTIONCURRENTVAL000\n",
+      "expected": [
+        {
+          "detector": "notion-token",
+          "type": "notion_integration_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 64
+        }
+      ],
+      "note": "Issue #514 host-context evidence: yaml was previously unexercised for the current ntn_ shape."
+    },
+    {
+      "id": "notion-token-positive-log-secret",
+      "detector": "notion-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-16T00:00:00Z INFO using token=secret_SYNTHETICREVOKEDNOTIONLEGACYTOKENVALUE00000 for sync",
+      "expected": [
+        {
+          "detector": "notion-token",
+          "type": "notion_integration_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 38,
+          "end": 88
+        }
+      ],
+      "note": "Issue #514 host-context evidence: log was previously unexercised for the legacy secret_ shape."
+    },
+    {
+      "id": "notion-token-positive-log-ntn",
+      "detector": "notion-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-16T00:00:00Z INFO using token=ntn_00000000000SYNTHETICREVOKEDNOTIONCURRENTVAL000 for sync",
+      "expected": [
+        {
+          "detector": "notion-token",
+          "type": "notion_integration_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 38,
+          "end": 88
+        }
+      ],
+      "note": "Issue #514 host-context evidence: log was previously unexercised for the current ntn_ shape."
     }
   ]
 }
