@@ -14,16 +14,16 @@ mod offsets;
 
 use std::cell::OnceCell;
 
-use napi::bindgen_prelude::{FnArgs, Function};
+use napi::bindgen_prelude::{Buffer, FnArgs, Function};
 use napi_derive::napi;
 use redact_secret::{
     Action, ByteRange, Confidence, DefaultPolicy, DetectedFinding, DetectorRegistry, Finding,
     FormatterFailure, Obfuscation, PlaceholderContext, PlaceholderFormatter, Policy, PolicyContext,
     Profile, SecretScanError, SecretScanErrorCode, WholeInputLimits, default_placeholder_formatter,
-    redact_with_limits as core_redact_with_limits, run_detector_pipeline,
+    load_ruleset, redact_with_limits as core_redact_with_limits, run_detector_pipeline,
 };
 
-use crate::error::to_js_error;
+use crate::error::{JsError, to_js_error, to_js_ruleset_error};
 use crate::offsets::{byte_to_utf16, utf16_to_byte};
 // Re-exported so the incremental N-API surface (a public export like `scan`
 // or `redact`, just organized in its own module) is part of this crate's
@@ -372,16 +372,45 @@ fn run_redact(
     }
 }
 
-/// Runs [`run_scan`] against `profile`'s cached registry.
+/// Builds a registry over `ruleset`'s declared detectors, on top of
+/// `profile`'s built-in set. Unlike [`with_profile_registry`], this registry
+/// is built fresh for the call and never cached: a ruleset's content can
+/// differ on every call, where the built-in-only registry is the same value
+/// every time.
+fn registry_with_ruleset(profile: Profile, ruleset: &[u8]) -> Result<DetectorRegistry, JsError> {
+    let detectors = load_ruleset(ruleset).map_err(to_js_ruleset_error)?;
+    match profile {
+        Profile::Full => DetectorRegistry::with_built_in(detectors),
+        Profile::Common => DetectorRegistry::with_common_built_in(detectors),
+    }
+    .map_err(to_js_error)
+}
+
+/// Runs [`run_scan`] against `profile`'s registry: the shared cached
+/// built-in-only registry when `ruleset` is omitted, or a fresh registry
+/// built over `ruleset`'s declared detectors otherwise
+/// (`decision-define-declarative-detector-ruleset-contract`'s "Surface
+/// exposure": "a `Uint8Array`/`string` ruleset argument alongside the
+/// existing registry construction path"). A registry built either way still
+/// registers `profile`'s built-ins first, so a ruleset detector can add
+/// detections but never outrank a built-in's resolved finding.
 fn run_scan_for_profile(
     profile: Profile,
     input: &str,
     policy: Option<&PolicyCallback<'_>>,
     limits: &WholeInputLimits,
-) -> Result<Vec<Finding>, SecretScanError> {
-    with_profile_registry(profile, |registry| {
-        run_scan(input, registry, policy, limits)
-    })
+    ruleset: Option<&[u8]>,
+) -> napi::Result<Vec<Finding>, String> {
+    match ruleset {
+        None => with_profile_registry(profile, |registry| {
+            run_scan(input, registry, policy, limits)
+        })
+        .map_err(to_js_error),
+        Some(bytes) => {
+            let registry = registry_with_ruleset(profile, bytes)?;
+            run_scan(input, &registry, policy, limits).map_err(to_js_error)
+        }
+    }
 }
 
 /// Scans `input` and returns every finding, in input order, with UTF-16
@@ -400,8 +429,14 @@ fn run_scan_for_profile(
 /// - `POLICY_FAILURE` when `policy` throws.
 /// - `INVALID_POLICY_ACTION` when `policy` returns something other than
 ///   `"redact"`, `"block"`, `"warn"`, or `"allow"`.
+/// - `INVALID_RULESET` when `ruleset` is given and does not parse; the fixed
+///   rejection class is appended to the thrown error's message.
 ///
-/// No error carries `input` or a matched value.
+/// No error carries `input`, `ruleset`'s bytes, or a matched value.
+///
+/// When `ruleset` is given, its declared detectors register after every
+/// built-in, exactly as a native custom detector would
+/// (`decision-define-declarative-detector-ruleset-contract`).
 // N-API's generated argument conversion produces owned `String`/`Function`
 // values; there is no borrowed form to take instead.
 #[allow(clippy::needless_pass_by_value)]
@@ -411,10 +446,16 @@ pub fn scan(
     #[napi(ts_arg_type = "(finding: JsDetectedFinding, context: JsPolicyContext) => string")]
     policy: Option<PolicyCallback<'_>>,
     limits: Option<JsWholeInputLimits>,
+    ruleset: Option<Buffer>,
 ) -> napi::Result<Vec<JsFinding>, String> {
     let limits = resolve_whole_input_limits(limits.as_ref()).map_err(to_js_error)?;
-    let findings = run_scan_for_profile(Profile::Full, &input, policy.as_ref(), &limits)
-        .map_err(to_js_error)?;
+    let findings = run_scan_for_profile(
+        Profile::Full,
+        &input,
+        policy.as_ref(),
+        &limits,
+        ruleset.as_deref(),
+    )?;
     Ok(findings.iter().map(|f| to_js_finding(&input, f)).collect())
 }
 
@@ -436,10 +477,16 @@ pub fn scan_common(
     #[napi(ts_arg_type = "(finding: JsDetectedFinding, context: JsPolicyContext) => string")]
     policy: Option<PolicyCallback<'_>>,
     limits: Option<JsWholeInputLimits>,
+    ruleset: Option<Buffer>,
 ) -> napi::Result<Vec<JsFinding>, String> {
     let limits = resolve_whole_input_limits(limits.as_ref()).map_err(to_js_error)?;
-    let findings = run_scan_for_profile(Profile::Common, &input, policy.as_ref(), &limits)
-        .map_err(to_js_error)?;
+    let findings = run_scan_for_profile(
+        Profile::Common,
+        &input,
+        policy.as_ref(),
+        &limits,
+        ruleset.as_deref(),
+    )?;
     Ok(findings.iter().map(|f| to_js_finding(&input, f)).collect())
 }
 
@@ -492,9 +539,10 @@ fn run_scan_and_redact_for_profile(
     policy: Option<&PolicyCallback<'_>>,
     formatter: Option<&FormatterCallback<'_>>,
     limits: &WholeInputLimits,
-) -> Result<JsScanAndRedactResult, SecretScanError> {
-    let findings = run_scan_for_profile(profile, input, policy, limits)?;
-    let redacted = run_redact(input, &findings, formatter, limits)?;
+    ruleset: Option<&[u8]>,
+) -> napi::Result<JsScanAndRedactResult, String> {
+    let findings = run_scan_for_profile(profile, input, policy, limits, ruleset)?;
+    let redacted = run_redact(input, &findings, formatter, limits).map_err(to_js_error)?;
     let js_findings = findings.iter().map(|f| to_js_finding(input, f)).collect();
     Ok(JsScanAndRedactResult {
         findings: js_findings,
@@ -519,6 +567,7 @@ pub fn scan_and_redact(
     #[napi(ts_arg_type = "(finding: JsFinding, context: JsPlaceholderContext) => string")]
     formatter: Option<FormatterCallback<'_>>,
     limits: Option<JsWholeInputLimits>,
+    ruleset: Option<Buffer>,
 ) -> napi::Result<JsScanAndRedactResult, String> {
     let limits = resolve_whole_input_limits(limits.as_ref()).map_err(to_js_error)?;
     run_scan_and_redact_for_profile(
@@ -527,8 +576,8 @@ pub fn scan_and_redact(
         policy.as_ref(),
         formatter.as_ref(),
         &limits,
+        ruleset.as_deref(),
     )
-    .map_err(to_js_error)
 }
 
 /// The `common`-profile analogue of [`scan_and_redact`]
@@ -548,6 +597,7 @@ pub fn scan_and_redact_common(
     #[napi(ts_arg_type = "(finding: JsFinding, context: JsPlaceholderContext) => string")]
     formatter: Option<FormatterCallback<'_>>,
     limits: Option<JsWholeInputLimits>,
+    ruleset: Option<Buffer>,
 ) -> napi::Result<JsScanAndRedactResult, String> {
     let limits = resolve_whole_input_limits(limits.as_ref()).map_err(to_js_error)?;
     run_scan_and_redact_for_profile(
@@ -556,8 +606,8 @@ pub fn scan_and_redact_common(
         policy.as_ref(),
         formatter.as_ref(),
         &limits,
+        ruleset.as_deref(),
     )
-    .map_err(to_js_error)
 }
 
 #[cfg(test)]
@@ -692,7 +742,7 @@ mod tests {
             findings.iter().map(|f| to_js_finding(input, f)).collect();
         assert_eq!(js_findings.len(), 1);
 
-        let combined = scan_and_redact(input.to_owned(), None, None, None).unwrap();
+        let combined = scan_and_redact(input.to_owned(), None, None, None, None).unwrap();
         assert_eq!(
             combined
                 .findings
@@ -759,7 +809,7 @@ mod tests {
         let js_findings: Vec<JsFinding> =
             findings.iter().map(|f| to_js_finding(input, f)).collect();
 
-        let combined = scan_and_redact_common(input.to_owned(), None, None, None).unwrap();
+        let combined = scan_and_redact_common(input.to_owned(), None, None, None, None).unwrap();
         assert_eq!(
             combined
                 .findings
@@ -790,7 +840,7 @@ mod tests {
     #[test]
     fn scan_rejects_input_over_an_explicit_byte_limit() {
         let input = "abcdef".to_owned();
-        let result = scan(input, None, Some(tight_limits()));
+        let result = scan(input, None, Some(tight_limits()), None);
         assert_err_status(result, "INPUT_LIMIT_EXCEEDED");
     }
 
@@ -811,6 +861,7 @@ mod tests {
                 max_input_bytes: 1024,
                 max_findings: 1,
             }),
+            None,
         );
         assert_err_status(result, "FINDING_LIMIT_EXCEEDED");
     }
@@ -824,8 +875,73 @@ mod tests {
                 max_input_bytes: 0,
                 max_findings: 50,
             }),
+            None,
         );
         assert_err_status(result, "INVALID_LIMITS");
+    }
+
+    /// A minimal, valid declarative ruleset (issue #495).
+    const RULESET_FIXTURE: &[u8] = b"ruleset-revision: 1\n\
+detector: acme-internal-token\n\
+specificity: contextual\n\
+prefix: \"ACME_\"\n\
+alphabet: alnum-dash\n\
+run: at-least 20\n\
+validator: none\n";
+
+    #[test]
+    fn scan_accepts_a_ruleset_buffer_and_registers_it_after_the_built_ins() {
+        let value = "a".repeat(20);
+        let input = format!("ACME_{value}");
+        let without_ruleset = scan(input.clone(), None, None, None).unwrap();
+        assert!(
+            without_ruleset.is_empty(),
+            "no built-in detector claims ACME_"
+        );
+
+        let with_ruleset = scan(input, None, None, Some(Buffer::from(RULESET_FIXTURE))).unwrap();
+        assert_eq!(with_ruleset.len(), 1);
+        assert_eq!(with_ruleset[0].detector, "acme-internal-token");
+        assert_eq!(with_ruleset[0].confidence, "medium");
+    }
+
+    #[test]
+    fn scan_common_also_accepts_a_ruleset_and_keeps_its_own_built_in_set() {
+        let value = "a".repeat(20);
+        let input = format!("ACME_{value}");
+        let findings = scan_common(input, None, None, Some(Buffer::from(RULESET_FIXTURE))).unwrap();
+        assert_eq!(findings.len(), 1);
+        assert_eq!(findings[0].detector, "acme-internal-token");
+    }
+
+    #[test]
+    fn scan_and_redact_thread_the_ruleset_through_to_the_scan_step() {
+        let value = "a".repeat(20);
+        let input = format!("ACME_{value}");
+        let result =
+            scan_and_redact(input, None, None, None, Some(Buffer::from(RULESET_FIXTURE))).unwrap();
+        assert_eq!(result.findings.len(), 1);
+        assert_eq!(result.findings[0].detector, "acme-internal-token");
+        // `Confidence::Medium` warns rather than redacts under the default
+        // policy, so the text passes through unchanged — the same behavior
+        // an equal-confidence built-in already has.
+        assert!(result.redacted.contains(&value));
+    }
+
+    #[test]
+    fn scan_rejects_a_malformed_ruleset_with_the_fixed_code_and_class() {
+        let malformed = std::str::from_utf8(RULESET_FIXTURE)
+            .unwrap()
+            .replace("ruleset-revision: 1", "ruleset-revision: 2");
+        let result = scan(
+            "irrelevant".to_owned(),
+            None,
+            None,
+            Some(Buffer::from(malformed.into_bytes())),
+        );
+        let error = result.err().expect("expected an error");
+        assert_eq!(error.status, "INVALID_RULESET");
+        assert!(error.reason.contains("UNKNOWN_REVISION"));
     }
 
     #[test]
@@ -837,7 +953,7 @@ mod tests {
             "INPUT_LIMIT_EXCEEDED",
         );
         assert_err_status(
-            scan_and_redact(input, None, None, Some(tight_limits())),
+            scan_and_redact(input, None, None, Some(tight_limits()), None),
             "INPUT_LIMIT_EXCEEDED",
         );
     }

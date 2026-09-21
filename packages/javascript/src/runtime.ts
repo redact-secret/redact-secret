@@ -195,6 +195,24 @@ function toNativeWholeInputLimits(
   };
 }
 
+/**
+ * Converts an optional public `ruleset` (raw bytes or a UTF-8 string) to the
+ * `Uint8Array` every binding accepts (`decision-define-declarative-detector-
+ * ruleset-contract`'s "Surface exposure": "a `Uint8Array`/`string` ruleset
+ * argument"). A value that is present but neither shape throws
+ * `INVALID_OPTIONS` here rather than reaching the binding as a nonsensical
+ * native call; a malformed ruleset's own grammar is rejected by the core with
+ * `INVALID_RULESET`.
+ */
+function toNativeRuleset(
+  ruleset: ScanOptions["ruleset"],
+): Uint8Array | undefined {
+  if (ruleset === undefined) return undefined;
+  if (typeof ruleset === "string") return new TextEncoder().encode(ruleset);
+  if (ruleset instanceof Uint8Array) return ruleset;
+  throw new SecretScanError("INVALID_OPTIONS");
+}
+
 function toNativeIncrementalOptions(
   options: IncrementalSanitizerOptions,
 ): NativeIncrementalOptions {
@@ -305,8 +323,9 @@ export function createRedactSecretRuntime(
     const text = requireString(input);
     const policy = toPolicyCallback(options?.policy);
     const limits = toNativeWholeInputLimits(options?.limits);
+    const ruleset = toNativeRuleset(options?.ruleset);
     try {
-      return toSecretFindings(native.scan(text, policy, limits));
+      return toSecretFindings(native.scan(text, policy, limits, ruleset));
     } catch (thrown) {
       throw toSecretScanError(thrown, "DETECTOR_FAILURE");
     }
@@ -345,9 +364,10 @@ export function createRedactSecretRuntime(
     const policy = toPolicyCallback(options?.policy);
     const formatter = toFormatterCallback(options?.placeholderFormatter);
     const limits = toNativeWholeInputLimits(options?.limits);
+    const ruleset = toNativeRuleset(options?.ruleset);
     let result;
     try {
-      result = native.scanAndRedact(text, policy, formatter, limits);
+      result = native.scanAndRedact(text, policy, formatter, limits, ruleset);
     } catch (thrown) {
       throw toSecretScanError(thrown, "DETECTOR_FAILURE");
     }

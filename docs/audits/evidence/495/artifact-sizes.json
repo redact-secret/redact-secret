@@ -1,0 +1,39 @@
+{
+  "measuredAtCommit": "f67e1e5bf10cda086f734ac356c8cbb4f581e8cd",
+  "branch": "milocosmopolitan/expose-the-declarative-ruleset-detector-adapter",
+  "detectorProfile": "full",
+  "note": "The 'after' build includes both #483 (the crate-internal parser and IR) and this issue's #495 slice (the Detector adapter, the load_ruleset public API, and the bindings/wasm ruleset argument): #483 landed after the #441 baseline was measured and before this measurement, so this delta is the combined cost of both, matching the ADR's instruction to re-measure 'covering #483 and this slice together'.",
+  "variants": {
+    "before": {
+      "description": "docs/audits/evidence/441/artifact-sizes.json's 'before' variant: the unmodified tree at the #441 measurement commit, before #483 or #495.",
+      "wasmRawBytes": 289029,
+      "wasmGzipBytes": 99463,
+      "wasmBrotliBytes": 80014,
+      "jsGlueRawBytes": 31344
+    },
+    "after": {
+      "description": "This branch's working tree (main plus #483 and #495), built with `node scripts/build-browser-artifact.mjs --out-dir <dir>` (full profile, release, wasm-bindgen 0.2.128, matching the pinned CLI version).",
+      "wasmRawBytes": 312753,
+      "wasmGzipBytes": 108516,
+      "wasmBrotliBytes": 87181,
+      "jsGlueRawBytes": 32261
+    }
+  },
+  "delta": {
+    "wasmRawBytes": 23724,
+    "wasmRawPercentOfBefore": 8.21,
+    "wasmGzipBytes": 9053,
+    "wasmGzipPercentOfBefore": 9.10,
+    "wasmBrotliBytes": 7167,
+    "wasmBrotliPercentOfBefore": 8.96,
+    "jsGlueRawBytes": 917,
+    "jsGluePercentOfBefore": 2.93
+  },
+  "commonProfile": {
+    "description": "The common-profile artifact's current size, built the same way with --detector-profile common. No #441-equivalent 'before #483/#495' baseline exists for this profile specifically (#441's own measurement predates the common/full split's own evidence/381 baseline being re-run at this commit), so this is reported as the current state only, not a delta.",
+    "wasmRawBytes": 253978,
+    "wasmGzipBytes": 91316,
+    "wasmBrotliBytes": 74379,
+    "jsGlueRawBytes": 32282
+  }
+}

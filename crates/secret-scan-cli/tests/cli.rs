@@ -397,6 +397,120 @@ fn a_character_split_across_reads_is_not_mistaken_for_malformed_input() {
     assert_eq!(run.stdout, input);
 }
 
+// --- ruleset -------------------------------------------------------------
+
+/// A minimal, valid declarative ruleset (issue #495,
+/// `decision-define-declarative-detector-ruleset-contract`): one detector
+/// claiming a synthetic `ACME_`-prefixed internal token format.
+const RULESET_FIXTURE: &str = "ruleset-revision: 1\n\
+detector: acme-internal-token\n\
+specificity: contextual\n\
+prefix: \"ACME_\"\n\
+alphabet: alnum-dash\n\
+run: at-least 20\n\
+validator: none\n";
+
+#[test]
+fn ruleset_adds_a_detection_a_built_in_would_miss() {
+    let scratch = Scratch::new();
+    let ruleset = scratch.write("rules.txt", RULESET_FIXTURE);
+    let value = "a".repeat(20);
+    let source = scratch.write("secret.env", &format!("TOKEN=ACME_{value}\n"));
+
+    let without_ruleset = run(&[&source], b"");
+    assert_eq!(without_ruleset.code, 0, "no built-in detector claims ACME_");
+
+    let with_ruleset = run(&[Path::new("--ruleset"), &ruleset, &source], b"");
+    assert_eq!(with_ruleset.code, 1);
+    assert!(with_ruleset.stdout.contains("acme-internal-token"));
+    with_ruleset.leaks_nothing();
+    assert!(!with_ruleset.stdout.contains(&value));
+    assert!(!with_ruleset.stderr.contains(&value));
+}
+
+#[test]
+fn ruleset_applies_in_redact_mode_too_though_default_policy_only_warns_at_medium_confidence() {
+    // Every ruleset candidate carries `Confidence::Medium` (issue #495's
+    // "Decisions this issue settles" #1), and `DefaultPolicy` redacts only
+    // `Confidence::High` or an always-redact type. A ruleset detector is
+    // neither, so its default action is `Warn`, not `Redact`: the run still
+    // succeeds and the source's text passes through unchanged. This is the
+    // same conservative-by-default behavior an equal-confidence built-in
+    // ambiguous-name match already gets; a ruleset gets no special case.
+    let scratch = Scratch::new();
+    let ruleset = scratch.write("rules.txt", RULESET_FIXTURE);
+    let value = "a".repeat(20);
+    let input = format!("TOKEN=ACME_{value}\n");
+    let source = scratch.write("secret.env", &input);
+
+    let redacted = run(
+        &[
+            Path::new("--redact"),
+            Path::new("--ruleset"),
+            &ruleset,
+            &source,
+        ],
+        b"",
+    );
+    assert_eq!(redacted.code, 0);
+    assert_eq!(
+        redacted.stdout, input,
+        "a Warn-only finding leaves the text as is"
+    );
+
+    // The same registration is still visible in check mode's report.
+    let checked = run(&[Path::new("--ruleset"), &ruleset, &source], b"");
+    assert_eq!(checked.code, 1);
+    assert!(checked.stdout.contains("acme-internal-token"));
+    assert!(checked.stdout.contains("confidence=medium"));
+    assert!(checked.stdout.contains("action=warn"));
+}
+
+#[test]
+fn a_malformed_ruleset_fails_the_whole_run_before_any_source_is_scanned() {
+    let scratch = Scratch::new();
+    let canary = "S3CR3T_RULESET_CANARY_MARKER";
+    let ruleset = scratch.write(
+        "rules.txt",
+        &RULESET_FIXTURE.replace("validator: none", &format!("validator: {canary}")),
+    );
+    let source = scratch.write("secret.env", &format!("API_KEY={SYNTHETIC_TOKEN}\n"));
+
+    let run = run(&[Path::new("--ruleset"), &ruleset, &source], b"");
+    assert_eq!(run.code, 2);
+    assert_eq!(
+        run.stdout, "",
+        "a source is never scanned once the ruleset itself is rejected"
+    );
+    assert!(run.stderr.contains("INVALID_RULESET"));
+    assert!(!run.stderr.contains(canary));
+}
+
+#[test]
+fn ruleset_without_an_explicit_path_source_is_a_usage_failure() {
+    let scratch = Scratch::new();
+    let ruleset = scratch.write("rules.txt", RULESET_FIXTURE);
+
+    let run = run(&[Path::new("--ruleset"), &ruleset], b"irrelevant");
+    assert_eq!(run.code, 2);
+    assert!(run.stderr.contains("USAGE"));
+    assert!(
+        run.stderr
+            .contains("standard input does not accept a ruleset")
+    );
+}
+
+#[test]
+fn a_missing_ruleset_file_fails_closed_without_naming_an_operating_system_message() {
+    let scratch = Scratch::new();
+    let source = scratch.write("secret.env", "clean\n");
+    let missing = scratch.root.join("does-not-exist.txt");
+
+    let run = run(&[Path::new("--ruleset"), &missing, &source], b"");
+    assert_eq!(run.code, 2);
+    assert!(run.stderr.contains("READ_FAILED"));
+}
+
 // --- redact mode -------------------------------------------------------
 
 #[test]

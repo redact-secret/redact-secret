@@ -69,6 +69,23 @@ depend on `src/`.
   cross-language error-code registry (`fixtures/error-codes.source.ts`):
   every stable code the incremental sanitizer and its stream adapters can
   raise, paired with its fixed, input-free message.
+- [`fixtures/ruleset-reference.json`](./fixtures/ruleset-reference.json) —
+  the reference declarative ruleset fixture (issue #495,
+  `decision-define-declarative-detector-ruleset-contract`): a ruleset
+  exercising the whole value grammar (every named alphabet, both specificity
+  values a ruleset may claim, and the `trailing-lower-hex` validator), the
+  ordering fixture proving a ruleset detector cannot overturn a built-in's
+  resolved finding, and one rejection case per fixed `RulesetErrorClass`.
+  Unlike the detector corpora above, its shape is not the canonical
+  `input`/`expected[]` schema (`schema.ts` validates *detection* fixtures; a
+  ruleset fixture validates a *loader*, a different shape), so it is not
+  registered with `schema.ts`/`schema.json`. The Rust consumer is
+  `crates/secret-scan-core/tests/ruleset_conformance.rs`; the Python consumer
+  is `bindings/python/tests/test_ruleset_conformance.py`. The
+  `RULESET_TOO_LARGE` and `TOO_MANY_DETECTORS` cases are generator-described
+  (`oversizedBytes`/`detectorCount`) rather than literal text, the same
+  provenance idea [Mutation provenance](#mutation-provenance) uses for a
+  reproducible case too large to commit as data.
 - [`fixtures/common-profile-expectations.json`](./fixtures/common-profile-expectations.json) —
   the reviewed findings of the `common` detector profile for every evaluated
   `synchronous-corpus.json` fixture, by id

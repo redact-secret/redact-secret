@@ -121,6 +121,7 @@ export interface NativeBinding {
     input: string,
     policy: NativePolicyCallback | undefined,
     limits: NativeWholeInputLimits | undefined,
+    ruleset: Uint8Array | undefined,
   ): readonly NativeFinding[];
   redact(
     input: string,
@@ -133,6 +134,7 @@ export interface NativeBinding {
     policy: NativePolicyCallback | undefined,
     formatter: NativeFormatterCallback | undefined,
     limits: NativeWholeInputLimits | undefined,
+    ruleset: Uint8Array | undefined,
   ): NativeScanAndRedactResult;
   createIncrementalSanitizer(
     options: NativeIncrementalOptions,

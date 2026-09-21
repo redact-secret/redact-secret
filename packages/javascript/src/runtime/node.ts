@@ -52,6 +52,7 @@ interface NodeAddon {
     input: string,
     policy?: NativePolicyCallback,
     limits?: NativeWholeInputLimits,
+    ruleset?: Uint8Array,
   ): readonly NativeFinding[];
   redact(
     input: string,
@@ -64,6 +65,7 @@ interface NodeAddon {
     policy?: NativePolicyCallback,
     formatter?: NativeFormatterCallback,
     limits?: NativeWholeInputLimits,
+    ruleset?: Uint8Array,
   ): { readonly findings: readonly NativeFinding[]; readonly redacted: string };
   createIncrementalSanitizer(
     options: NativeIncrementalOptions,
@@ -85,6 +87,7 @@ interface CommonNodeAddon {
     input: string,
     policy?: NativePolicyCallback,
     limits?: NativeWholeInputLimits,
+    ruleset?: Uint8Array,
   ): readonly NativeFinding[];
   redact(
     input: string,
@@ -97,6 +100,7 @@ interface CommonNodeAddon {
     policy?: NativePolicyCallback,
     formatter?: NativeFormatterCallback,
     limits?: NativeWholeInputLimits,
+    ruleset?: Uint8Array,
   ): { readonly findings: readonly NativeFinding[]; readonly redacted: string };
   createIncrementalSanitizerCommon(
     options: NativeIncrementalOptions,
@@ -268,12 +272,14 @@ interface ProfiledAddonMethods {
     input: string,
     policy?: NativePolicyCallback,
     limits?: NativeWholeInputLimits,
+    ruleset?: Uint8Array,
   ): readonly NativeFinding[];
   scanAndRedact(
     input: string,
     policy?: NativePolicyCallback,
     formatter?: NativeFormatterCallback,
     limits?: NativeWholeInputLimits,
+    ruleset?: Uint8Array,
   ): { readonly findings: readonly NativeFinding[]; readonly redacted: string };
   createIncrementalSanitizer(
     options: NativeIncrementalOptions,
@@ -297,7 +303,8 @@ function buildBinding(
     initialize: () => {
       methods.initialize();
     },
-    scan: (input, policy, limits) => methods.scan(input, policy, limits),
+    scan: (input, policy, limits, ruleset) =>
+      methods.scan(input, policy, limits, ruleset),
     redact: (input, findings, formatter, limits) =>
       addon.redact(input, findings, formatter, limits),
     scanAndRedact: (
@@ -305,8 +312,15 @@ function buildBinding(
       policy,
       formatter,
       limits,
+      ruleset,
     ): NativeScanAndRedactResult => {
-      const result = methods.scanAndRedact(input, policy, formatter, limits);
+      const result = methods.scanAndRedact(
+        input,
+        policy,
+        formatter,
+        limits,
+        ruleset,
+      );
       return { text: result.redacted, findings: result.findings };
     },
     createIncrementalSanitizer: (options) =>
@@ -325,9 +339,10 @@ export function createBindingFromAddon(addon: NodeAddon): NativeBinding {
   return buildBinding(addon, {
     profile: () => addon.profile(),
     initialize: () => addon.initialize(),
-    scan: (input, policy, limits) => addon.scan(input, policy, limits),
-    scanAndRedact: (input, policy, formatter, limits) =>
-      addon.scanAndRedact(input, policy, formatter, limits),
+    scan: (input, policy, limits, ruleset) =>
+      addon.scan(input, policy, limits, ruleset),
+    scanAndRedact: (input, policy, formatter, limits, ruleset) =>
+      addon.scanAndRedact(input, policy, formatter, limits, ruleset),
     createIncrementalSanitizer: (options) =>
       addon.createIncrementalSanitizer(options),
   });
@@ -348,9 +363,10 @@ export function createBindingFromCommonAddon(
   return buildBinding(addon, {
     profile: () => addon.profileCommon(),
     initialize: () => addon.initializeCommon(),
-    scan: (input, policy, limits) => addon.scanCommon(input, policy, limits),
-    scanAndRedact: (input, policy, formatter, limits) =>
-      addon.scanAndRedactCommon(input, policy, formatter, limits),
+    scan: (input, policy, limits, ruleset) =>
+      addon.scanCommon(input, policy, limits, ruleset),
+    scanAndRedact: (input, policy, formatter, limits, ruleset) =>
+      addon.scanAndRedactCommon(input, policy, formatter, limits, ruleset),
     createIncrementalSanitizer: (options) =>
       addon.createIncrementalSanitizerCommon(options),
   });

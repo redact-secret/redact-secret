@@ -1,0 +1,180 @@
+{
+  "$schema": "ruleset-reference-v1",
+  "description": "The reference declarative ruleset fixture (issue #495, decision-define-declarative-detector-ruleset-contract). Every binding surface that accepts a ruleset in its first shipping slice (the Rust core, the CLI, and the JavaScript and Python bindings) runs this fixture as part of the shared behavioral contract, not a per-binding smoke test. Every ruleset text and scanned input here is synthetic; nothing reproduces a real credential.",
+  "accepted": {
+    "id": "ruleset-value-grammar",
+    "description": "One detector per named alphabet, plus the trailing-lower-hex validator and both specificity values a ruleset may claim. Exercises the whole value grammar in one committed ruleset.",
+    "ruleset": "ruleset-revision: 1\ndetector: acme-alnum-token\nspecificity: contextual\nprefix: \"ACME_AN_\"\nalphabet: alnum\nrun: at-least 20\nvalidator: none\ndetector: acme-alnum-dash-token\nspecificity: contextual\nprefix: \"ACME_AD_\"\nalphabet: alnum-dash\nrun: at-least 20\nvalidator: none\ndetector: acme-alnum-dash-dot-token\nspecificity: entropy\nprefix: \"ACME_ADD_\"\nalphabet: alnum-dash-dot\nrun: at-least 20\nvalidator: none\ndetector: acme-upper-alnum-token\nspecificity: contextual\nprefix: \"ACME_UA_\"\nalphabet: upper-alnum\nrun: exact 20\nvalidator: none\ndetector: acme-digit-token\nspecificity: entropy\nprefix: \"ACME_DG_\"\nalphabet: digit\nrun: exact 16\nvalidator: none\ndetector: acme-lower-hex-token\nspecificity: contextual\nprefix: \"ACME_LH_\"\nalphabet: lower-hex\nrun: exact 32\nvalidator: none\ndetector: acme-base64-token\nspecificity: entropy\nprefix: \"ACME_B64_\"\nalphabet: base64-body\nrun: at-least 20\nvalidator: none\ndetector: acme-checksum-token\nspecificity: contextual\nprefix: \"ACME_CK_\"\nalphabet: alnum\nrun: at-least 8\nvalidator: trailing-lower-hex\n",
+    "cases": [
+      {
+        "id": "alnum",
+        "detector": "acme-alnum-token",
+        "input": "ACME_AN_aB1cD2eF3gH4iJ5kL6mN",
+        "type": "acme-alnum-token",
+        "confidence": "medium",
+        "specificity": "contextual",
+        "start": 0,
+        "end": 28
+      },
+      {
+        "id": "alnum-dash",
+        "detector": "acme-alnum-dash-token",
+        "input": "ACME_AD_aB1-cD2_eF3-gH4_iJ5-",
+        "type": "acme-alnum-dash-token",
+        "confidence": "medium",
+        "specificity": "contextual",
+        "start": 0,
+        "end": 28
+      },
+      {
+        "id": "alnum-dash-dot",
+        "detector": "acme-alnum-dash-dot-token",
+        "input": "ACME_ADD_a.B1-cD2_eF3.gH4-iJ5",
+        "type": "acme-alnum-dash-dot-token",
+        "confidence": "medium",
+        "specificity": "entropy",
+        "start": 0,
+        "end": 29
+      },
+      {
+        "id": "upper-alnum",
+        "detector": "acme-upper-alnum-token",
+        "input": "ACME_UA_AB1CD2EF3GH4IJ5KL6MN",
+        "type": "acme-upper-alnum-token",
+        "confidence": "medium",
+        "specificity": "contextual",
+        "start": 0,
+        "end": 28
+      },
+      {
+        "id": "digit",
+        "detector": "acme-digit-token",
+        "input": "ACME_DG_0123456789012345",
+        "type": "acme-digit-token",
+        "confidence": "medium",
+        "specificity": "entropy",
+        "start": 0,
+        "end": 24
+      },
+      {
+        "id": "lower-hex",
+        "detector": "acme-lower-hex-token",
+        "input": "ACME_LH_deadbeefdeadbeefdeadbeefdeadbeef",
+        "type": "acme-lower-hex-token",
+        "confidence": "medium",
+        "specificity": "contextual",
+        "start": 0,
+        "end": 40
+      },
+      {
+        "id": "base64-body",
+        "detector": "acme-base64-token",
+        "input": "ACME_B64_QUJDRGVmZ2hpams+Lw/9QU",
+        "type": "acme-base64-token",
+        "confidence": "medium",
+        "specificity": "entropy",
+        "start": 0,
+        "end": 31
+      },
+      {
+        "id": "trailing-lower-hex-pass",
+        "detector": "acme-checksum-token",
+        "input": "ACME_CK_SYNTHETICdeadbeef",
+        "type": "acme-checksum-token",
+        "confidence": "medium",
+        "specificity": "contextual",
+        "start": 0,
+        "end": 25
+      },
+      {
+        "id": "trailing-lower-hex-fail",
+        "detector": "acme-checksum-token",
+        "input": "ACME_CK_SYNTHETICnothexZZ",
+        "findingCount": 0,
+        "note": "the final 8 bytes are not all lowercase hex, so the whole candidate is rejected"
+      }
+    ]
+  },
+  "ordering": {
+    "id": "ruleset-cannot-overturn-a-built-in",
+    "description": "A ruleset detector claiming the identical range, specificity, and (fixed) confidence as a built-in's own candidate must still lose the tie: built-ins register before any ruleset detector (decision-define-declarative-detector-ruleset-contract, 'Ordering and the specificity cap').",
+    "ruleset": "ruleset-revision: 1\ndetector: acme-tok-companion\nspecificity: contextual\nprefix: \"tok_\"\nalphabet: alnum\nrun: at-least 4\nvalidator: none\n",
+    "input": "AUTH_TOKEN=tok_a1B2c3D4e5F6g7H8i9\n",
+    "expectedWinner": {
+      "detector": "generic-token",
+      "type": "contextual_secret",
+      "confidence": "medium",
+      "start": 11,
+      "end": 33
+    }
+  },
+  "rejections": [
+    {
+      "class": "RULESET_TOO_LARGE",
+      "description": "The whole ruleset document exceeds the core's fixed byte bound.",
+      "oversizedBytes": 65537
+    },
+    {
+      "class": "UNKNOWN_REVISION",
+      "ruleset": "ruleset-revision: 2\n"
+    },
+    {
+      "class": "UNKNOWN_FIELD",
+      "ruleset": "ruleset-revision: 1\ndetector: acme-token\nspecificity: contextual\nprefix: \"ACME_\"\nalphabet: alnum-dash\nrun: at-least 20\nvalidator: none\nconfidence: high\n"
+    },
+    {
+      "class": "UNSUPPORTED_CONSTRUCT",
+      "ruleset": "ruleset-revision: 1\ndetector: acme-token\nspecificity: contextual\nprefix: ACME_\nalphabet: alnum-dash\nrun: at-least 20\nvalidator: none\n",
+      "note": "prefix is not a double-quoted literal"
+    },
+    {
+      "class": "UNKNOWN_ALPHABET",
+      "ruleset": "ruleset-revision: 1\ndetector: acme-token\nspecificity: contextual\nprefix: \"ACME_\"\nalphabet: mixed-case\nrun: at-least 20\nvalidator: none\n"
+    },
+    {
+      "class": "UNKNOWN_VALIDATOR",
+      "ruleset": "ruleset-revision: 1\ndetector: acme-token\nspecificity: contextual\nprefix: \"ACME_\"\nalphabet: alnum-dash\nrun: at-least 20\nvalidator: bogus-checksum\n"
+    },
+    {
+      "class": "SPECIFICITY_NOT_CLAIMABLE",
+      "ruleset": "ruleset-revision: 1\ndetector: acme-token\nspecificity: provider\nprefix: \"ACME_\"\nalphabet: alnum-dash\nrun: at-least 20\nvalidator: none\n",
+      "note": "reserved to built-ins; the same class also covers structural, private-key, and any name the enum does not define"
+    },
+    {
+      "class": "MISSING_FIELD",
+      "ruleset": "ruleset-revision: 1\ndetector: acme-token\nprefix: \"ACME_\"\nalphabet: alnum-dash\nrun: at-least 20\nvalidator: none\n",
+      "note": "specificity is omitted"
+    },
+    {
+      "class": "PREFIX_TOO_SHORT",
+      "ruleset": "ruleset-revision: 1\ndetector: acme-token\nspecificity: contextual\nprefix: \"AC\"\nalphabet: alnum-dash\nrun: at-least 20\nvalidator: none\n"
+    },
+    {
+      "class": "PREFIX_TOO_LONG",
+      "ruleset": "ruleset-revision: 1\ndetector: acme-token\nspecificity: contextual\nprefix: \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"\nalphabet: alnum-dash\nrun: at-least 20\nvalidator: none\n",
+      "note": "65 bytes, one over the 64-byte maximum"
+    },
+    {
+      "class": "RUN_LENGTH_OUT_OF_BOUNDS",
+      "ruleset": "ruleset-revision: 1\ndetector: acme-token\nspecificity: contextual\nprefix: \"ACME_\"\nalphabet: alnum-dash\nrun: at-least 0\nvalidator: none\n"
+    },
+    {
+      "class": "TOO_MANY_DETECTORS",
+      "detectorCount": 65,
+      "note": "65 detector blocks, one over the 64-detector maximum; each block otherwise matches the accepted fixture's acme-alnum-token shape with a unique id"
+    },
+    {
+      "class": "DUPLICATE_DETECTOR_ID",
+      "ruleset": "ruleset-revision: 1\ndetector: acme-token\nspecificity: contextual\nprefix: \"ACME_\"\nalphabet: alnum-dash\nrun: at-least 20\nvalidator: none\ndetector: acme-token\nspecificity: entropy\nprefix: \"ACME2_\"\nalphabet: alnum-dash\nrun: at-least 20\nvalidator: none\n"
+    },
+    {
+      "class": "RESERVED_DETECTOR_ID",
+      "ruleset": "ruleset-revision: 1\ndetector: github-token\nspecificity: contextual\nprefix: \"ACME_\"\nalphabet: alnum-dash\nrun: at-least 20\nvalidator: none\n",
+      "note": "collides with the full-profile built-in id github-token"
+    },
+    {
+      "class": "EMPTY_RULESET",
+      "ruleset": "ruleset-revision: 1\n"
+    }
+  ]
+}

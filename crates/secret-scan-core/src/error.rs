@@ -66,11 +66,17 @@ pub enum SecretScanErrorCode {
     /// An incremental session received `append`, `finalize`, or `abort`
     /// after it left the accepting state.
     InvalidState,
+    /// A caller-supplied declarative ruleset was rejected while loading
+    /// (`decision-define-declarative-detector-ruleset-contract`). The fixed
+    /// rejection class is carried separately by
+    /// [`RulesetError::class`](crate::RulesetError::class), never by this
+    /// code alone.
+    InvalidRuleset,
 }
 
 impl SecretScanErrorCode {
     /// Every code, in declaration order.
-    pub const ALL: [Self; 17] = [
+    pub const ALL: [Self; 18] = [
         Self::InvalidInput,
         Self::InvalidOptions,
         Self::InvalidDetector,
@@ -88,6 +94,7 @@ impl SecretScanErrorCode {
         Self::MultilineLimitExceeded,
         Self::FindingLimitExceeded,
         Self::InvalidState,
+        Self::InvalidRuleset,
     ];
 
     /// The stable `SCREAMING_SNAKE_CASE` code string.
@@ -111,6 +118,7 @@ impl SecretScanErrorCode {
             Self::MultilineLimitExceeded => "MULTILINE_LIMIT_EXCEEDED",
             Self::FindingLimitExceeded => "FINDING_LIMIT_EXCEEDED",
             Self::InvalidState => "INVALID_STATE",
+            Self::InvalidRuleset => "INVALID_RULESET",
         }
     }
 
@@ -135,6 +143,7 @@ impl SecretScanErrorCode {
             Self::MultilineLimitExceeded => "Incremental sanitizer multiline limit exceeded.",
             Self::FindingLimitExceeded => "Secret scan finding limit exceeded.",
             Self::InvalidState => "The incremental sanitizer is no longer accepting input.",
+            Self::InvalidRuleset => "The supplied ruleset is invalid.",
         }
     }
 }
@@ -276,6 +285,7 @@ mod tests {
                 "INVALID_STATE",
                 "The incremental sanitizer is no longer accepting input.",
             ),
+            ("INVALID_RULESET", "The supplied ruleset is invalid."),
         ];
         for (code, (name, message)) in SecretScanErrorCode::ALL.into_iter().zip(expected) {
             assert_eq!(code.as_str(), name);

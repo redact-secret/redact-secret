@@ -28,10 +28,11 @@ use redact_secret::{
     Finding, FormatterFailure, IncrementalLimits, IncrementalPolicy, IncrementalPolicyContext,
     IncrementalResult, IncrementalSanitizer, MAX_IDENTIFIER_LENGTH, MAX_PLACEHOLDER_LENGTH,
     Obfuscation, PlaceholderContext, PlaceholderFormatter, Policy, PolicyContext, PolicyFailure,
-    Profile, RANGE_UNIT, RegisteredDetector, ScanResult, SecretScanError, SecretScanErrorCode,
-    SessionState, Specificity, VERSION, WholeInputLimits, default_placeholder_formatter,
-    is_identifier, redact, redact_with_limits, run_detector_pipeline, scan, scan_and_redact,
-    scan_and_redact_with_limits, scan_with_limits, shannon_entropy, typed_placeholder_formatter,
+    Profile, RANGE_UNIT, RegisteredDetector, RulesetError, RulesetErrorClass, ScanResult,
+    SecretScanError, SecretScanErrorCode, SessionState, Specificity, VERSION, WholeInputLimits,
+    default_placeholder_formatter, is_identifier, load_ruleset, redact, redact_with_limits,
+    run_detector_pipeline, scan, scan_and_redact, scan_and_redact_with_limits, scan_with_limits,
+    shannon_entropy, typed_placeholder_formatter,
 };
 
 /// The canonical corpus fixture used wherever one detected value is enough.
@@ -345,6 +346,139 @@ fn a_custom_detector_registers_after_the_built_ins_and_reports_findings() {
     assert_eq!(findings[0].detector(), "marker");
     assert_eq!(findings[0].type_name(), "marker_value");
     assert_eq!(findings[0].action(), Action::Warn);
+}
+
+// ---------------------------------------------------------------------------
+// declarative rulesets (issue #495,
+// decision-define-declarative-detector-ruleset-contract)
+// ---------------------------------------------------------------------------
+
+const RULESET_FIXTURE: &[u8] = b"ruleset-revision: 1\n\
+detector: acme-internal-token\n\
+specificity: contextual\n\
+prefix: \"ACME_\"\n\
+alphabet: alnum-dash\n\
+run: at-least 20\n\
+validator: none\n";
+
+#[test]
+fn load_ruleset_registers_after_built_ins_and_preserves_profile_identity() {
+    let detectors = load_ruleset(RULESET_FIXTURE).unwrap();
+    assert_eq!(detectors.len(), 1);
+
+    let registry = DetectorRegistry::with_built_in(detectors).unwrap();
+    // The registry still reports `Full`: a ruleset sits outside profile
+    // identity (the ADR's "Profile interaction"). Ruleset presence is the
+    // separate fact `load_ruleset`'s own return length already gives the
+    // caller, before registration.
+    assert_eq!(registry.profile(), Some(Profile::Full));
+    assert_eq!(registry.ids().last().unwrap(), "acme-internal-token");
+
+    let value = "a".repeat(20);
+    let input = format!("ACME_{value}");
+    let findings = scan(&input, &registry, &DefaultPolicy).unwrap();
+    assert_eq!(findings.len(), 1);
+    assert_eq!(findings[0].detector(), "acme-internal-token");
+    assert_eq!(findings[0].type_name(), "acme-internal-token");
+    assert_eq!(findings[0].confidence(), Confidence::Medium);
+    // No matched value, in the input or anywhere else the finding exposes.
+    assert!(!format!("{findings:?}").contains(&value));
+
+    // The same guarantee holds for the `common` profile.
+    let common_detectors = load_ruleset(RULESET_FIXTURE).unwrap();
+    let common_registry = DetectorRegistry::with_common_built_in(common_detectors).unwrap();
+    assert_eq!(common_registry.profile(), Some(Profile::Common));
+    assert!(common_registry.contains("acme-internal-token"));
+}
+
+#[test]
+fn a_ruleset_detector_cannot_overturn_a_built_ins_resolved_finding_at_a_contextual_medium_tie() {
+    // `generic-token`'s own ambiguous-name contextual candidate for
+    // `AUTH_TOKEN=<value>` spans exactly `<value>` (never the key or `=`).
+    // The ruleset detector below declares its literal prefix as the value's
+    // own first four bytes, so its candidate range is byte-identical to
+    // `generic-token`'s: same start, same end, same
+    // `Specificity::Contextual`, same `Confidence::Medium` (fixed for every
+    // ruleset candidate). Every priority key up to registration order ties,
+    // so accepting this candidate set exercises `detector_order` itself —
+    // built-ins register before any custom or ruleset detector
+    // (`decision-define-detector-profile-and-pack-contract`), so
+    // `generic-token` must win
+    // (`decision-define-declarative-detector-ruleset-contract`, "Ordering
+    // and the specificity cap").
+    let value = "tok_a1B2c3D4e5F6g7H8i9";
+    assert!(
+        shannon_entropy(value) >= 3.5,
+        "fixture value must clear generic-token's ambiguous-name entropy threshold"
+    );
+    let input = format!("AUTH_TOKEN={value}\n");
+
+    let ruleset = b"ruleset-revision: 1\n\
+detector: acme-tok-companion\n\
+specificity: contextual\n\
+prefix: \"tok_\"\n\
+alphabet: alnum\n\
+run: at-least 4\n\
+validator: none\n";
+    let detectors = load_ruleset(ruleset).unwrap();
+    let registry = DetectorRegistry::with_built_in(detectors).unwrap();
+
+    let findings = scan(&input, &registry, &DefaultPolicy).unwrap();
+    assert_eq!(findings.len(), 1, "the tie resolves to exactly one finding");
+    assert_eq!(
+        findings[0].detector(),
+        "generic-token",
+        "the built-in must win the tie through detector_order"
+    );
+    assert_eq!(findings[0].confidence(), Confidence::Medium);
+    let expected_start = input.find(value).unwrap();
+    assert_eq!(
+        findings[0].range(),
+        ByteRange::new(expected_start, expected_start + value.len()).unwrap(),
+        "both candidates claimed the identical range"
+    );
+}
+
+#[test]
+fn load_ruleset_rejects_an_invalid_ruleset_with_the_fixed_code_and_class() {
+    let text = RULESET_FIXTURE.strip_suffix(b"validator: none\n").unwrap();
+    let canary = b"S3CR3T_RULESET_CANARY";
+    let mut malformed = text.to_vec();
+    malformed.extend_from_slice(b"validator: ");
+    malformed.extend_from_slice(canary);
+    malformed.push(b'\n');
+
+    let result: Result<Vec<Box<dyn Detector>>, RulesetError> = load_ruleset(&malformed);
+    let Err(error) = result else {
+        panic!("expected the malformed ruleset to be rejected");
+    };
+    assert_eq!(error.code(), SecretScanErrorCode::InvalidRuleset);
+    assert_eq!(error.class(), RulesetErrorClass::UnknownValidator);
+    assert_eq!(
+        error.message(),
+        SecretScanErrorCode::InvalidRuleset.message()
+    );
+    // No byte from the rejected ruleset survives into the error.
+    assert!(!format!("{error:?}").contains("S3CR3T_RULESET_CANARY"));
+    assert!(!error.to_string().contains("S3CR3T_RULESET_CANARY"));
+}
+
+#[test]
+fn a_ruleset_detector_cannot_claim_a_specificity_reserved_to_built_ins() {
+    for reserved in ["structural", "provider", "private-key"] {
+        let text = String::from_utf8(RULESET_FIXTURE.to_vec())
+            .unwrap()
+            .replacen(
+                "specificity: contextual",
+                &format!("specificity: {reserved}"),
+                1,
+            );
+        let Err(error) = load_ruleset(text.as_bytes()) else {
+            panic!("expected {reserved:?} to be rejected");
+        };
+        assert_eq!(error.code(), SecretScanErrorCode::InvalidRuleset);
+        assert_eq!(error.class(), RulesetErrorClass::SpecificityNotClaimable);
+    }
 }
 
 // ---------------------------------------------------------------------------

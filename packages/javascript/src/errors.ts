@@ -44,6 +44,7 @@ export type SecretScanErrorCode =
   | "TOKEN_LIMIT_EXCEEDED"
   | "MULTILINE_LIMIT_EXCEEDED"
   | "INVALID_STATE"
+  | "INVALID_RULESET"
   | "NOT_INITIALIZED"
   | "INITIALIZATION_FAILED"
   | "INVALID_CHUNK"
@@ -69,6 +70,12 @@ const ERROR_MESSAGES: Readonly<Record<SecretScanErrorCode, string>> = {
   TOKEN_LIMIT_EXCEEDED: "Incremental sanitizer token limit exceeded.",
   MULTILINE_LIMIT_EXCEEDED: "Incremental sanitizer multiline limit exceeded.",
   INVALID_STATE: "The incremental sanitizer is no longer accepting input.",
+  // The raw Node addon and WebAssembly errors append the fixed rejection
+  // class in parentheses (`RulesetErrorClass`, issue #495); this package's
+  // own `SecretScanError` keeps the same one-fixed-message-per-code
+  // invariant every other code already has, rather than special-casing this
+  // one code to carry variable content.
+  INVALID_RULESET: "The supplied ruleset is invalid.",
   NOT_INITIALIZED:
     "redact-secret is not initialized; await initialize() before this call.",
   INITIALIZATION_FAILED: "redact-secret failed to initialize.",

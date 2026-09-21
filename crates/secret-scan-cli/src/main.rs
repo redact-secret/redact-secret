@@ -45,8 +45,8 @@ use limits::{MAX_BUFFERED_BYTES, MAX_INPUT_BYTES, MAX_MULTILINE_BYTES, MAX_TOKEN
 
 /// The short usage block printed with a rejected command line.
 const USAGE: &str = "\
-usage: redact-secret [--json] [--] [<path>...]
-       redact-secret --redact [--] [<path>]
+usage: redact-secret [--json] [--ruleset <path>] [--] [<path>...]
+       redact-secret --redact [--ruleset <path>] [--] [<path>]
        redact-secret --version | -V
        redact-secret --help | -h";
 
@@ -113,8 +113,16 @@ where
             write_line(stdout, &format!("redact-secret {VERSION}"))?;
             Ok(Outcome::Clean)
         }
-        Command::Check { sources, format } => {
-            let report = modes::check(&sources, stdin);
+        Command::Check {
+            sources,
+            format,
+            ruleset,
+        } => {
+            let ruleset = ruleset
+                .as_deref()
+                .map(modes::load_ruleset_file)
+                .transpose()?;
+            let report = modes::check(&sources, stdin, ruleset.as_deref());
             let written = match format {
                 Format::Text => report.write_text(stdout, stderr),
                 Format::Json => report.write_json(stdout),
@@ -134,8 +142,12 @@ where
                 Ok(Outcome::Clean)
             }
         }
-        Command::Redact { source } => {
-            modes::redact(&source, stdin, stdout)?;
+        Command::Redact { source, ruleset } => {
+            let ruleset = ruleset
+                .as_deref()
+                .map(modes::load_ruleset_file)
+                .transpose()?;
+            modes::redact(&source, stdin, stdout, ruleset.as_deref())?;
             Ok(Outcome::Clean)
         }
     }
@@ -183,6 +195,14 @@ check mode (the default)
   Line format:
     <source>:<start>-<end> <type> detector=<id> confidence=<level> \
 action=<action> id=<finding>
+
+--ruleset <path>  Available in both modes. Loads a declarative ruleset from
+                  <path> and scans every path source with it, in addition to
+                  the built-in detectors. Requires an explicit path source:
+                  standard input's streaming session accepts no custom
+                  detector, ruleset or otherwise. A malformed ruleset fails
+                  the whole run with INVALID_RULESET before any source is
+                  scanned.
 
 redact mode
   Reads standard input, or exactly one path, and writes the sanitized text to

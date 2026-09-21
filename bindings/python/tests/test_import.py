@@ -32,6 +32,7 @@ def test_exception_hierarchy_is_importable_and_rooted() -> None:
         redact_secret.InvalidFindingsError,
         redact_secret.PlaceholderFailureError,
         redact_secret.InvalidPlaceholderError,
+        redact_secret.InvalidRulesetError,
     ]
     for exc_type in subclasses:
         assert issubclass(exc_type, redact_secret.SecretScanError)
@@ -40,10 +41,16 @@ def test_exception_hierarchy_is_importable_and_rooted() -> None:
 
 def test_no_custom_detector_callback_surface() -> None:
     """`decision-define-runtime-bindings`: the first stable API excludes a
-    custom detector callback surface. `scan` only accepts `text`, `policy`,
-    and `limits`; nothing named after a detector or registry is exported."""
+    custom detector *callback* surface. `scan` accepts `text`, `policy`,
+    `limits`, and `ruleset`; nothing named after a registry is exported.
+
+    `ruleset` (issue #495,
+    `decision-define-declarative-detector-ruleset-contract`) is not a
+    callback: it is caller-supplied data the core parses and matches
+    itself, never host code running per candidate, so it does not reopen
+    the excluded surface."""
     scan_params = set(inspect.signature(redact_secret.scan).parameters)
-    assert scan_params <= {"text", "policy", "limits"}
+    assert scan_params <= {"text", "policy", "limits", "ruleset"}
     for name in redact_secret.__all__:
         assert "detector" not in name.lower() or name in {
             "DetectorFailureError",

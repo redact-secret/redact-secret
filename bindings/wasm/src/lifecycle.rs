@@ -54,6 +54,35 @@ fn build_registry() -> Result<DetectorRegistry, WasmErrorCode> {
     DetectorRegistry::with_common_built_in([]).map_err(|_| WasmErrorCode::InitializationFailed)
 }
 
+/// Builds a registry over this artifact's compiled profile's built-ins,
+/// plus every detector `ruleset` declares (issue #495,
+/// `decision-define-declarative-detector-ruleset-contract`). Unlike
+/// [`build_registry`]'s cached result, this is built fresh per call:
+/// `ruleset`'s content can differ on every call, where the built-in-only
+/// registry is the same value every time. The compile-time profile
+/// selection is the same reachability rule [`build_registry`] documents, so
+/// a ruleset scanned by the `common` artifact still links no `provider`
+/// detector.
+///
+/// # Errors
+///
+/// A [`WasmErrorCode::Ruleset`] when `ruleset` does not parse, or
+/// [`WasmErrorCode::InitializationFailed`] on the same never-observed
+/// built-in registration failure [`build_registry`] documents.
+#[cfg(feature = "full")]
+pub(crate) fn registry_with_ruleset(ruleset: &[u8]) -> Result<DetectorRegistry, WasmErrorCode> {
+    let detectors = redact_secret::load_ruleset(ruleset)?;
+    DetectorRegistry::with_built_in(detectors).map_err(|_| WasmErrorCode::InitializationFailed)
+}
+
+/// See the `full` variant above.
+#[cfg(not(feature = "full"))]
+pub(crate) fn registry_with_ruleset(ruleset: &[u8]) -> Result<DetectorRegistry, WasmErrorCode> {
+    let detectors = redact_secret::load_ruleset(ruleset)?;
+    DetectorRegistry::with_common_built_in(detectors)
+        .map_err(|_| WasmErrorCode::InitializationFailed)
+}
+
 /// Creates an incremental session over this artifact's profile's built-in
 /// detectors: the incremental counterpart of [`build_registry`], selected
 /// the same compile-time way so the `common` artifact's streaming path

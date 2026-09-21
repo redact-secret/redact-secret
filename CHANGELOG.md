@@ -5,6 +5,35 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+### Added
+
+- Declarative rulesets (#441, #483, #495,
+  `decision-define-declarative-detector-ruleset-contract`): a caller-supplied
+  internal credential format, described as small UTF-8 text (no code), can
+  now be detected on every surface. A ruleset detector matches through the
+  same linear-time `pattern.rs` engine every built-in detector already uses
+  (no regex, no new engine), always carries `Confidence::Medium`, and
+  registers after every built-in — it can add detections but can never
+  outrank a built-in's resolved finding. A malformed ruleset is rejected as
+  a whole with the new `INVALID_RULESET` code and one of a closed set of
+  content-free rejection classes; see `README.md`'s "Declarative rulesets"
+  section for the wire grammar.
+  - Rust: `load_ruleset`, `RulesetError`, `RulesetErrorClass`, and
+    `SecretScanErrorCode::InvalidRuleset`. Register the result the same way
+    as a native custom detector (`DetectorRegistry::with_built_in`).
+  - CLI: `--ruleset <path>`, available in both check and redact mode against
+    an explicit file source. Standard input's streaming session still
+    accepts no custom detector, ruleset or otherwise.
+  - Node addon and `@redact-secret/wasm`: a `ruleset` argument on `scan`/
+    `scanAndRedact` (`Buffer`/`Uint8Array`).
+  - `@redact-secret/core`: a `ruleset` option (`Uint8Array | string`) on
+    `scan`/`scanAndRedact`.
+  - Python: a `ruleset` keyword argument (`bytes | bytearray | str`) on
+    `scan`/`scan_and_redact`, and the new `InvalidRulesetError` exception.
+  - Reference conformance fixture:
+    `conformance/fixtures/ruleset-reference.json`, run by the Rust core and
+    the Python binding.
+
 ### Changed detection
 
 - Added a `pulumi-access-token` detector recognizing Pulumi Cloud personal,

@@ -78,6 +78,12 @@ class FindingLimitExceededError(SecretScanError):
 class InvalidStateError(SecretScanError):
     code: str
 
+class InvalidRulesetError(SecretScanError):
+    """A `ruleset` argument to scan()/scan_and_redact() was rejected while
+    loading. The message carries the fixed rejection class in parentheses."""
+
+    code: str
+
 # ---------------------------------------------------------------------
 # Safe metadata types
 #
@@ -226,6 +232,7 @@ def scan(
     text: str,
     policy: Policy | None = None,
     limits: WholeInputLimits | None = None,
+    ruleset: bytes | bytearray | str | None = None,
 ) -> list[Finding]: ...
 def redact(
     text: str,
@@ -238,6 +245,7 @@ def scan_and_redact(
     policy: Policy | None = None,
     formatter: Formatter | None = None,
     limits: WholeInputLimits | None = None,
+    ruleset: bytes | bytearray | str | None = None,
 ) -> ScanResult: ...
 def default_policy(finding: DetectedFinding, context: PolicyContext) -> str: ...
 def default_placeholder_formatter(
