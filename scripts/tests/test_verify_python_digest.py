@@ -141,6 +141,112 @@ class VerifyPythonDigestTests(unittest.TestCase):
         finally:
             sys.argv = old_argv
 
+    def test_family_filter_selects_a_non_python_family(self) -> None:
+        addon_bytes = b"compiled addon"
+        addon = self._write("redact-secret.darwin-arm64.node", addon_bytes)
+        inventory = self._inventory(
+            [
+                {
+                    "family": "node-addon",
+                    "target": "aarch64-apple-darwin",
+                    "file": addon.name,
+                    "sha256": digest(addon_bytes),
+                },
+                {
+                    "family": "python-sdist",
+                    "target": None,
+                    "file": "redact_secret-0.1.0.tar.gz",
+                    "sha256": "0" * 64,
+                },
+            ]
+        )
+
+        qualified = CHECK.qualified_digests(inventory, ("node-addon",))
+        errors = CHECK.verify([addon], qualified)
+
+        self.assertEqual(qualified, {addon.name: digest(addon_bytes)})
+        self.assertEqual(errors, [])
+
+    def test_target_filter_excludes_other_targets_of_the_same_family(self) -> None:
+        inventory = self._inventory(
+            [
+                {
+                    "family": "node-addon",
+                    "target": "aarch64-apple-darwin",
+                    "file": "redact-secret.darwin-arm64.node",
+                    "sha256": "0" * 64,
+                },
+                {
+                    "family": "node-addon",
+                    "target": "x86_64-unknown-linux-gnu",
+                    "file": "redact-secret.linux-x64-gnu.node",
+                    "sha256": "1" * 64,
+                },
+            ]
+        )
+
+        qualified = CHECK.qualified_digests(inventory, ("node-addon",), target="aarch64-apple-darwin")
+
+        self.assertEqual(qualified, {"redact-secret.darwin-arm64.node": "0" * 64})
+
+    def test_cli_family_and_target_flags_select_the_matching_entry(self) -> None:
+        addon_bytes = b"compiled addon"
+        addon = self._write("redact-secret.darwin-arm64.node", addon_bytes)
+        inventory = self._inventory(
+            [
+                {
+                    "family": "node-addon",
+                    "target": "aarch64-apple-darwin",
+                    "file": addon.name,
+                    "sha256": digest(addon_bytes),
+                },
+                {
+                    "family": "node-addon",
+                    "target": "x86_64-unknown-linux-gnu",
+                    "file": "redact-secret.linux-x64-gnu.node",
+                    "sha256": "1" * 64,
+                },
+            ]
+        )
+
+        old_argv = sys.argv
+        sys.argv = [
+            "verify-python-digest.py",
+            str(addon),
+            "--inventory",
+            str(inventory),
+            "--family",
+            "node-addon",
+            "--target",
+            "aarch64-apple-darwin",
+        ]
+        try:
+            self.assertEqual(CHECK.main(), 0)
+        finally:
+            sys.argv = old_argv
+
+    def test_default_family_is_unchanged_when_no_flag_is_given(self) -> None:
+        wheel_bytes = b"wheel contents"
+        wheel = self._write("redact_secret-0.1.0-cp310-abi3-linux.whl", wheel_bytes)
+        inventory = self._inventory(
+            [
+                {
+                    "family": "python-wheel",
+                    "target": "x86_64-unknown-linux-gnu",
+                    "file": wheel.name,
+                    "sha256": digest(wheel_bytes),
+                },
+                {
+                    "family": "node-addon",
+                    "target": "x86_64-unknown-linux-gnu",
+                    "file": "redact-secret.linux-x64-gnu.node",
+                    "sha256": "1" * 64,
+                },
+            ]
+        )
+
+        self.assertEqual(CHECK.qualified_digests(inventory), {wheel.name: digest(wheel_bytes)})
+
     def test_missing_inventory_file_is_an_error(self) -> None:
         wheel = self._write("redact_secret-0.1.0-cp310-abi3-linux.whl", b"bytes")
 

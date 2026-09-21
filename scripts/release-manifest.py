@@ -11,6 +11,28 @@ step, with `if: always()`, so the manifest is emitted even when an earlier
 step in the same run failed; the workflow then uploads the result as a
 `release-manifest-<version>` artifact. `reconcile-release.yml` downloads that
 artifact and hands it to `reconcile-guard.py`.
+
+Issue #528 adds a sixth, optional field: `artifact_digests`. Issue #527
+proved, for Python alone, that "qualified" and "published" have to be the
+same bytes, not just the same workflow topology, and that the comparison has
+to fail loudly and independently of the build graph. `artifact_digests`
+generalizes the *recording* half of that to every artifact family (npm,
+WASM, crate, Python): each artifact identity (the same strings
+`artifact_set` already carries, e.g. `npm:@redact-secret/wasm`) maps to a
+list of per-file records with `built`, `qualified`, and `published` digests,
+a `comparable` flag, and a `note`. `built` and `qualified` are the same
+measurement for every family here, because every artifact is still built
+exactly once (issue #527's property, now general); `published` differs
+because some ecosystems re-pack the qualified bytes before upload (`npm
+publish` wraps a file in a new tarball) and a byte comparison against that
+repack is not meaningful -- `comparable: false` with a non-empty `note`
+records that explicitly instead of silently omitting the field. When
+`comparable` is true (crates.io and PyPI both publish the exact digest of
+the file they received), any two non-null stages that disagree are a defect
+this script fails loudly on, naming the artifact, the file, and both
+digests -- but the manifest is still written first, so `record-manifest`'s
+`if: always()` still leaves a durable record of a run that failed this
+check.
 """
 
 from __future__ import annotations
@@ -27,6 +49,54 @@ FIELDS = (
     "artifact_set",
     "registry_state",
 )
+
+DIGEST_STAGES = ("built", "qualified", "published")
+
+
+def normalize_artifact_digests(raw: dict) -> tuple[dict, list[str]]:
+    """Validate and sort `artifact_digests`, returning `(normalized, errors)`.
+
+    `errors` lists every digest mismatch found (comparable stages that
+    disagree) and every record missing a required `note`. The caller writes
+    the manifest regardless of `errors` -- a mismatch is a fact about this
+    run, not a reason to withhold the record of it.
+    """
+    normalized: dict[str, list[dict]] = {}
+    errors: list[str] = []
+    for identity in sorted(raw):
+        records = raw[identity]
+        if not isinstance(records, list):
+            errors.append(f"{identity}: artifact_digests entry must be a list of records")
+            continue
+        normalized_records = []
+        for record in records:
+            file_name = str(record.get("file") or "unknown")
+            comparable = bool(record.get("comparable", False))
+            note = record.get("note")
+            stages = {stage: record.get(stage) or None for stage in DIGEST_STAGES}
+            if not comparable and not note:
+                errors.append(
+                    f"{identity} ({file_name}): comparable=false requires a note explaining why "
+                    "a byte comparison across stages is not meaningful"
+                )
+            if comparable:
+                present = {stage: value for stage, value in stages.items() if value}
+                distinct = set(present.values())
+                if len(distinct) > 1:
+                    pairs = ", ".join(f"{stage}={value}" for stage, value in present.items())
+                    errors.append(
+                        f"{identity} ({file_name}): digest mismatch across stages -- {pairs}"
+                    )
+            normalized_records.append(
+                {
+                    "file": file_name,
+                    **stages,
+                    "comparable": comparable,
+                    "note": note or None,
+                }
+            )
+        normalized[identity] = normalized_records
+    return normalized, errors
 
 
 def build_manifest(
@@ -85,6 +155,14 @@ def main(argv: list[str] | None = None) -> int:
         default=[],
         help="repeatable: registry=state, e.g. npm=published",
     )
+    parser.add_argument(
+        "--artifact-digests",
+        default="{}",
+        help=(
+            "JSON object mapping an artifact identity (an artifact_set entry) to a list of "
+            "{file, built, qualified, published, comparable, note} records (issue #528)"
+        ),
+    )
     parser.add_argument("--out", required=True, type=Path)
     args = parser.parse_args(argv)
 
@@ -100,7 +178,33 @@ def main(argv: list[str] | None = None) -> int:
         print(f"ERROR {error}", file=sys.stderr)
         return 1
 
+    try:
+        raw_digests = json.loads(args.artifact_digests)
+    except json.JSONDecodeError as error:
+        print(f"ERROR --artifact-digests is not valid JSON: {error}", file=sys.stderr)
+        return 1
+    if not isinstance(raw_digests, dict):
+        print("ERROR --artifact-digests must be a JSON object", file=sys.stderr)
+        return 1
+    artifact_digests, digest_errors = normalize_artifact_digests(raw_digests)
+    manifest["artifact_digests"] = artifact_digests
+
+    # Written before the digest errors are evaluated: `record-manifest` runs
+    # `if: always()` specifically so a run that fails this new check still
+    # leaves a durable record of what it observed, the same as any other
+    # partial or failed release (issue #528 acceptance criterion 4).
     args.out.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+    if digest_errors:
+        for error in digest_errors:
+            print(f"ERROR {error}", file=sys.stderr)
+        print(
+            f"Recorded release manifest for {manifest['version']} at {args.out} "
+            f"({len(digest_errors)} artifact digest error(s))",
+            file=sys.stderr,
+        )
+        return 1
+
     print(f"Recorded release manifest for {manifest['version']} at {args.out}")
     return 0
 

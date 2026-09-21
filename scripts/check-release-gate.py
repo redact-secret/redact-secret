@@ -47,6 +47,14 @@ requires `publish-pypi` to carry a `PYPI_DIGEST_STEP` step that precedes
 published against `artifact-qualification`'s own recorded inventory cannot be
 silently deleted or reordered after the fact.
 
+Issue #528 generalizes that same "cannot be silently deleted or reordered"
+requirement to crates: `publish-crates` must carry a digest-verification step
+for each crate that runs `scripts/verify-crate-digest.py`. Unlike the PyPI
+and WASM checks, these run *after* their crate's publish step, not before --
+crates.io only reports the published checksum once the crate is live, so
+"verify, then publish" is not available here the way it is for an artifact
+already sitting in a local `dist/` directory.
+
 This intentionally parses the workflow YAML with plain text and regular
 expressions rather than a YAML library, matching
 `check-python-package.py`'s wheel-matrix check: no third-party dependency is
@@ -102,6 +110,17 @@ PYPI_JOB = "publish-pypi"
 PYPI_DIGEST_STEP = "Verify published wheels match the qualified inventory"
 PYPI_PUBLISH_STEP = "Publish to PyPI"
 PYPI_DIGEST_SCRIPT = "scripts/verify-python-digest.py"
+
+# Issue #528: `publish-crates` must verify each crate's crates.io checksum
+# against what `artifact-qualification` qualified, and that check must run
+# after the crate's own publish step (crates.io has nothing to check before
+# then) but must exist and must not be deleted silently.
+CRATES_JOB = "publish-crates"
+CRATE_DIGEST_SCRIPT = "scripts/verify-crate-digest.py"
+CRATE_DIGEST_STEPS = (
+    ("Publish redact-secret", "Verify redact-secret publication matches the qualified crate"),
+    ("Publish redact-secret-cli", "Verify redact-secret-cli publication matches the qualified crate"),
+)
 
 JOB_HEADER_PREFIX = "  "
 ATTRIBUTE_PREFIX = "    "
@@ -312,6 +331,36 @@ def validate(root: Path) -> list[str]:
                 f"{RELEASE_WORKFLOW.as_posix()}: '{PYPI_DIGEST_STEP}' does not run "
                 f"{PYPI_DIGEST_SCRIPT}"
             )
+
+    crates_job = jobs.get(CRATES_JOB)
+    if crates_job is None:
+        errors.append(f"{RELEASE_WORKFLOW.as_posix()}: missing job '{CRATES_JOB}'")
+    else:
+        steps = extract_step_blocks(crates_job)
+        for publish_step_name, digest_step_name in CRATE_DIGEST_STEPS:
+            publish_step = next((step for step in steps if step[1] == publish_step_name), None)
+            digest_step = next((step for step in steps if step[1] == digest_step_name), None)
+            if publish_step is None:
+                errors.append(
+                    f"{RELEASE_WORKFLOW.as_posix()}: job '{CRATES_JOB}' is missing "
+                    f"the '{publish_step_name}' step"
+                )
+            if digest_step is None:
+                errors.append(
+                    f"{RELEASE_WORKFLOW.as_posix()}: job '{CRATES_JOB}' is missing "
+                    f"the '{digest_step_name}' step"
+                )
+            if publish_step is not None and digest_step is not None and digest_step[0] < publish_step[0]:
+                errors.append(
+                    f"{RELEASE_WORKFLOW.as_posix()}: '{digest_step_name}' must follow "
+                    f"'{publish_step_name}' in job '{CRATES_JOB}' -- crates.io reports no checksum "
+                    "before that crate is published"
+                )
+            if digest_step is not None and CRATE_DIGEST_SCRIPT not in digest_step[2]:
+                errors.append(
+                    f"{RELEASE_WORKFLOW.as_posix()}: '{digest_step_name}' does not run "
+                    f"{CRATE_DIGEST_SCRIPT}"
+                )
 
     reconcile_path = root / ".github/workflows/reconcile-release.yml"
     if reconcile_path.is_file():
