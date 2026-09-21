@@ -113,6 +113,11 @@ def collect(artifacts: Path) -> list[dict]:
         name = directory.name
         if name.startswith("installed-javascript-"):
             continue
+        if name == "support-matrix-drift":
+            # Issue #511: a release-decision record consumed by release.yml's
+            # record-manifest job, not a per-target build artifact -- it has
+            # no family/target and isn't part of what require_matrix checks.
+            continue
         if name.startswith("node-addon-"):
             family, target = "node-addon", name.removeprefix("node-addon-")
         elif name.startswith("cli-"):
