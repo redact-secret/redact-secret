@@ -43,6 +43,19 @@ evidence is linked from each published version.
 
 ### Changed detection
 
+- `generic-token` now also redacts a bare, marker-less `sk-`/`sk-proj-`/
+  `sk-svcacct-`/`sk-admin-` value at OpenAI's documented legacy/early-project
+  body width (exactly 48 `[A-Za-z0-9]` bytes) with no surrounding context at
+  all — a pre-2024 legacy key that never carried the `T3BlbkFJ` marker, or a
+  near-miss that mutated it, the credential most likely to leak bare in a
+  notebook, `.env` file, or chat log (#552,
+  `decision-govern-bare-vendor-prefixed-policy-layer`). Classified
+  `vendor_prefixed_credential`, never `openai_api_key`: `decision-freeze-
+  openai-api-key-grammar`'s marker-gated contract is unchanged, and this new
+  layer is registered at a specificity below every provider contract so a
+  genuine `openai-token` match always wins overlap and keeps its own
+  finding. Always-redact despite the deliberately medium confidence, the
+  same way `authorization_credential` already is.
 - Added a `pulumi-access-token` detector recognizing Pulumi Cloud personal,
   organization, and team access tokens: the documented `pul-` prefix
   (Pulumi's own Cloud REST API reference) followed by an exact 40-byte

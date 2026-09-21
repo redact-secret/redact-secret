@@ -1000,7 +1000,7 @@
     {
       "id": "openai-legacy-marker-twin-discriminating-boundary",
       "input": "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\nsk-SYNTHETICREVOKED0001T3BlbkFKSYNTHETICREVOKED0002",
-      "text": "<SECRET_1>\nsk-SYNTHETICREVOKED0001T3BlbkFKSYNTHETICREVOKED0002",
+      "text": "<SECRET_1>\n<SECRET_2>",
       "expected": [
         {
           "detector": "openai-token",
@@ -1009,9 +1009,17 @@
           "specificity": "provider",
           "start": 0,
           "end": 51
+        },
+        {
+          "detector": "generic-token",
+          "type": "vendor_prefixed_credential",
+          "confidence": "medium",
+          "specificity": "entropy",
+          "start": 52,
+          "end": 103
         }
       ],
-      "note": "issue #368: the positive and its twin differ in one structural property, so every UTF-8 byte and char partition must resolve the same single finding as the whole-input scan, including splits inside the `T3BlbkFJ` marker and at the 73/74-byte segment boundary. Here the twin mutates the marker's last byte."
+      "note": "issue #368: the positive and its twin differ in one structural property, so every UTF-8 byte and char partition must resolve the same single finding as the whole-input scan, including splits inside the `T3BlbkFJ` marker and at the 73/74-byte segment boundary. Here the twin mutates the marker's last byte. Issue #552: the twin's marker-less-to-openai-token body is still an exact-48-byte `sk-` run, so the bare vendor-prefixed policy layer now claims it at generic classification, and every partition must resolve that second finding identically too."
     },
     {
       "id": "openai-project-length-twin-discriminating-boundary",
@@ -1048,7 +1056,7 @@
     {
       "id": "openai-368-unicode-crlf-pairs",
       "input": "# 🔑 reviewed format\r\n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\n\r\n# 🔑 reviewed format\r\nsk-SYNTHETICREVOKED0001T3BlbkFKSYNTHETICREVOKED0002\n\r\n# 🔑 reviewed format\r\n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\n\r\n# 🔑 reviewed format\r\nsk-proj-SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTT3BlbkFJSYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SY\n\r\n# 🔑 reviewed format\r\n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\n\r\n# 🔑 reviewed format\r\nsk-svcacct-SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTT3BlbkFJSYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SY\n\r\n",
-      "text": "# 🔑 reviewed format\r\n<SECRET_1>\n\r\n# 🔑 reviewed format\r\nsk-SYNTHETICREVOKED0001T3BlbkFKSYNTHETICREVOKED0002\n\r\n# 🔑 reviewed format\r\n<SECRET_2>\n\r\n# 🔑 reviewed format\r\nsk-proj-SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTT3BlbkFJSYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SY\n\r\n# 🔑 reviewed format\r\n<SECRET_3>\n\r\n# 🔑 reviewed format\r\nsk-svcacct-SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTT3BlbkFJSYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SY\n\r\n",
+      "text": "# 🔑 reviewed format\r\n<SECRET_1>\n\r\n# 🔑 reviewed format\r\n<SECRET_2>\n\r\n# 🔑 reviewed format\r\n<SECRET_3>\n\r\n# 🔑 reviewed format\r\nsk-proj-SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTT3BlbkFJSYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SY\n\r\n# 🔑 reviewed format\r\n<SECRET_4>\n\r\n# 🔑 reviewed format\r\nsk-svcacct-SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTT3BlbkFJSYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SY\n\r\n",
       "expected": [
         {
           "detector": "openai-token",
@@ -1057,6 +1065,14 @@
           "specificity": "provider",
           "start": 24,
           "end": 75
+        },
+        {
+          "detector": "generic-token",
+          "type": "vendor_prefixed_credential",
+          "confidence": "medium",
+          "specificity": "entropy",
+          "start": 102,
+          "end": 153
         },
         {
           "detector": "openai-token",
@@ -1075,7 +1091,7 @@
           "end": 728
         }
       ],
-      "note": "issue #368: the three Unicode/CRLF positives and their twins from the issue's self-contained reproduction, concatenated; each astral emoji and CRLF shifts the byte offsets and every partition must still resolve exactly the three positives."
+      "note": "issue #368: the three Unicode/CRLF positives and their twins from the issue's self-contained reproduction, concatenated; each astral emoji and CRLF shifts the byte offsets and every partition must still resolve exactly the three positives. Issue #552: the legacy twin's body is still an exact-48-byte `sk-` run (the proj/svcacct twins' underscored bodies are not), so the bare vendor-prefixed policy layer now also claims it at generic classification, shifting every later placeholder number by one."
     },
     {
       "id": "openai-admin-length-twin-discriminating-boundary",

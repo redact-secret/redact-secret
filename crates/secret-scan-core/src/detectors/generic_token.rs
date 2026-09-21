@@ -1,10 +1,11 @@
-//! Contextual assignment and structural `Basic`/`Token` authorization
-//! detector.
+//! Contextual assignment, structural `Basic`/`Token` authorization, and a
+//! bare vendor-prefixed high-entropy policy layer.
 //!
 //! Combines explicit credential names or authorization syntax with bounded
 //! entropy. A plain `token` name and entropy-only text intentionally produce
 //! no candidates. Values above 4 KiB are left to more specific detectors.
 
+use super::pattern::{self, PrefixShape};
 use super::text::{
     OPENCODE_REFERENCE_KINDS, ascii_run_len, char_at, ends_with_ci,
     is_command_substitution_reference, is_env_var_identifier, is_fully_delimited,
@@ -1363,6 +1364,69 @@ fn authorization_candidates(input: &str) -> Vec<Candidate> {
     candidates
 }
 
+// --- bare vendor-prefixed policy candidates -----------------------------
+
+/// `OpenAI` `sk-` namespaces whose legacy and early-project/service-account/
+/// admin body width is documented as exactly 48 `[A-Za-z0-9]` bytes
+/// (`docs/decisions/2026-09-17-freeze-openai-api-key-grammar.md`, issue
+/// #368). That decision requires the `T3BlbkFJ` marker for `openai-token`'s
+/// own `openai_api_key` classification; a value in this exact shape that
+/// lacks the marker — an unrotated pre-2024 legacy key, or a near-miss that
+/// merely mutated the marker — is not reclassified as one here. It is still
+/// the credential most likely to leak bare, in a `.env` file, a notebook, or
+/// a chat log, and no other default detector claims it (issue #552).
+/// Classified generic rather than `openai_api_key`, at [`Confidence::Medium`]
+/// and [`Specificity::Entropy`] — below every provider contract's
+/// [`Specificity::Provider`] — so an in-contract key always wins overlap and
+/// keeps its own finding untouched.
+const VENDOR_PREFIXED_POLICY_PREFIXES: [&str; 4] = ["sk-proj-", "sk-svcacct-", "sk-admin-", "sk-"];
+const VENDOR_PREFIXED_POLICY_BODY_LEN: usize = 48;
+
+/// Every boundary-delimited, high-entropy `sk-`-family bare value, left to
+/// right. [`pattern::scan_prefixed_shapes`] picks the longest matching
+/// namespace at each position, so `sk-proj-...` is never misread as a bare
+/// `sk-` run over the `proj-` literal. Exact length and an
+/// alphanumeric-only body are the whole discriminator: unlike Anthropic's
+/// `sk-ant-...` or `OpenRouter`'s `sk-or-...`, whose namespace dash sits well
+/// inside the first 48 bytes and so never reaches the required run length,
+/// no reject list is needed.
+fn bare_vendor_prefix_candidates(input: &str) -> Vec<Candidate> {
+    let shapes: Vec<PrefixShape<'_>> = VENDOR_PREFIXED_POLICY_PREFIXES
+        .iter()
+        .map(|prefix| {
+            PrefixShape::exact(
+                prefix,
+                VENDOR_PREFIXED_POLICY_BODY_LEN,
+                pattern::is_alnum,
+                &[],
+            )
+            .with_post_check(vendor_prefixed_policy_body_is_high_entropy)
+        })
+        .collect();
+    pattern::scan_prefixed_shapes(input, &shapes, pattern::is_alnum_dash)
+        .into_iter()
+        .filter_map(|(start, end, _signals)| {
+            let range = ByteRange::new(start, end)?;
+            Some(
+                Candidate::new("vendor_prefixed_credential", Confidence::Medium, range)
+                    .with_specificity(Specificity::Entropy)
+                    .with_signals(["vendor-prefix-policy"]),
+            )
+        })
+        .collect()
+}
+
+/// The 48-byte body is genuinely high entropy, not ordinary prose or an
+/// identifier that merely happens to start with a known prefix. Mirrors the
+/// bar a high-signal contextual assignment's value already has to clear
+/// ([`HIGH_ENTROPY_THRESHOLD`]).
+fn vendor_prefixed_policy_body_is_high_entropy(bytes: &[u8], _start: usize, end: usize) -> bool {
+    let body_start = end - VENDOR_PREFIXED_POLICY_BODY_LEN;
+    // The alphabet is `[A-Za-z0-9]` only, so this slice is always ASCII.
+    let body = std::str::from_utf8(&bytes[body_start..end]).unwrap_or_default();
+    crate::shannon_entropy(body) >= HIGH_ENTROPY_THRESHOLD
+}
+
 struct GenericTokenDetector {
     names: NameSource,
 }
@@ -1381,12 +1445,14 @@ impl Detector for GenericTokenDetector {
         _context: &DetectorContext,
     ) -> Result<Vec<Candidate>, DetectorFailure> {
         let mut candidates = assignment_candidates(input, &self.names);
-        // Authorization-scheme matching (`Basic`/`Token`) has nothing to do
-        // with names, so only the built-in instance runs it — the ruleset
-        // names extension would otherwise duplicate the built-in's own
-        // candidates for the same spans.
+        // Authorization-scheme matching (`Basic`/`Token`) and the bare
+        // vendor-prefixed policy layer have nothing to do with names, so
+        // only the built-in instance runs them — the ruleset names
+        // extension would otherwise duplicate the built-in's own candidates
+        // for the same spans.
         if matches!(self.names, NameSource::BuiltIn) {
             candidates.extend(authorization_candidates(input));
+            candidates.extend(bare_vendor_prefix_candidates(input));
         }
         Ok(candidates)
     }
@@ -2544,5 +2610,98 @@ mod tests {
             assert!(is_reserved_name(name), "{name}");
         }
         assert!(!is_reserved_name("corp_token"));
+    }
+
+    // --- bare vendor-prefixed policy candidates (issue #552) ------------
+
+    const VENDOR_PREFIX_LEGACY_BODY: &str = "SYNTHETICrevoked0001aaaaBBBBccccDDDD1234wxyzEFGH";
+    const VENDOR_PREFIX_PROJ_BODY: &str = "SYNTHETICrevoked0002bbbbCCCCddddEEEE5678uvwxIJKL";
+
+    #[test]
+    fn a_bare_sk_legacy_value_is_a_medium_confidence_entropy_specificity_candidate() {
+        let input = format!("sk-{VENDOR_PREFIX_LEGACY_BODY}");
+        let candidates = detect(&input);
+        assert_eq!(only_range(&candidates), (0, input.len()));
+        assert_eq!(candidates[0].type_name(), "vendor_prefixed_credential");
+        assert_eq!(candidates[0].confidence(), Confidence::Medium);
+        assert_eq!(candidates[0].specificity(), Some(Specificity::Entropy));
+    }
+
+    #[test]
+    fn every_documented_namespace_is_detected_independently() {
+        for prefix in ["sk-", "sk-proj-", "sk-svcacct-", "sk-admin-"] {
+            let input = format!("{prefix}{VENDOR_PREFIX_LEGACY_BODY}");
+            let candidates = detect(&input);
+            assert_eq!(only_range(&candidates), (0, input.len()), "{prefix}");
+            assert_eq!(
+                candidates[0].type_name(),
+                "vendor_prefixed_credential",
+                "{prefix}"
+            );
+        }
+    }
+
+    #[test]
+    fn a_low_entropy_bare_vendor_prefixed_body_is_not_detected() {
+        let input = format!("sk-{}", "A".repeat(48));
+        assert!(detect(&input).is_empty());
+    }
+
+    #[test]
+    fn a_bare_vendor_prefixed_body_one_byte_short_is_not_detected() {
+        let short_body = &VENDOR_PREFIX_LEGACY_BODY[..47];
+        let input = format!("sk-{short_body} end");
+        assert!(detect(&input).is_empty());
+    }
+
+    #[test]
+    fn a_bare_vendor_prefixed_value_embedded_in_a_wider_identifier_is_not_detected() {
+        let input = format!("sk-{VENDOR_PREFIX_LEGACY_BODY}9");
+        assert!(detect(&input).is_empty());
+    }
+
+    /// Anthropic's `sk-ant-` and `OpenRouter`'s `sk-or-` namespaces are never
+    /// claimed: their own namespace dash sits well inside the first 48
+    /// bytes, so the alphanumeric-only run never reaches the required
+    /// length. No reject list is needed.
+    #[test]
+    fn anthropic_and_openrouter_lookalike_prefixes_are_not_claimed() {
+        for prefix in ["sk-ant-", "sk-or-v1-"] {
+            let input = format!("{prefix}{}", "A".repeat(60));
+            assert!(detect(&input).is_empty(), "{prefix}");
+        }
+    }
+
+    #[test]
+    fn a_bare_vendor_prefixed_value_is_detected_quoted_and_across_unicode_crlf() {
+        let value = format!("sk-proj-{VENDOR_PREFIX_PROJ_BODY}");
+
+        let quoted = format!("{{\"value\": \"{value}\"}}");
+        let quoted_candidates = detect(&quoted);
+        let (start, end) = only_range(&quoted_candidates);
+        assert_eq!(&quoted[start..end], value);
+        assert_eq!(
+            quoted_candidates[0].type_name(),
+            "vendor_prefixed_credential"
+        );
+
+        let unicode_crlf = format!("# \u{1F511} reviewed format\r\n{value}\n");
+        let unicode_candidates = detect(&unicode_crlf);
+        let (start, end) = only_range(&unicode_candidates);
+        assert_eq!(&unicode_crlf[start..end], value);
+        assert_eq!(
+            unicode_candidates[0].type_name(),
+            "vendor_prefixed_credential"
+        );
+    }
+
+    /// The ruleset-names variant must not duplicate the built-in's bare
+    /// vendor-prefixed candidates, the same way it does not duplicate
+    /// `authorization_candidates`.
+    #[test]
+    fn the_ruleset_names_detector_does_not_match_bare_vendor_prefixed_values() {
+        let input = format!("sk-{VENDOR_PREFIX_LEGACY_BODY}");
+        let candidates = detect_with_ruleset_names(&input, &["corp_token"]);
+        assert!(candidates.is_empty());
     }
 }

@@ -39,7 +39,8 @@ and [qualification follow-up](release-qualification-follow-up.md) describe beta.
 | Release-regression discovery evidence triage, Slack shape-1 (#406) | [Candidate fe4f1d1 regression triage](evidence/406/README.md) |
 | Release-regression discovery evidence triage, Cloudflare shape-1 (#408) | [Candidate fe4f1d1 regression triage](evidence/408/README.md) |
 | Release-regression discovery evidence triage, Docker shape-1 (#407) | [Candidate fe4f1d1 regression triage](evidence/407/README.md) |
-| Metamorphic robustness and fixed-corpus miss root-cause synthesis (#552) | [Shared root cause across four families plus the confirmed `generic-token` markdown-boundary fix](evidence/552/README.md) |
+| Metamorphic robustness and fixed-corpus miss root-cause synthesis (#552) | [Shared root cause across four families plus the confirmed `generic-token` markdown-boundary fix](evidence/552/README.md) — `openai-token`'s disposition superseded, see the document's 2026-09-21 update |
+| Bare vendor-prefixed OpenAI value redacted under a generic policy layer (#552) | [`decision-govern-bare-vendor-prefixed-policy-layer`](../decisions/2026-09-21-govern-bare-vendor-prefixed-policy-layer.md): a marker-less `sk-`-family value at the provider-documented 48-byte body width now redacts as `vendor_prefixed_credential`, below every provider contract's specificity |
 | `bearer-token`/`sendgrid-token` twin-failure and differential-disagreement classification (#553) | [Five `flagged:1` twins traced to two already-shipped decisions; no detector defect, new decision recorded](evidence/553/README.md) |
 | Detection assurance | [Epic closeout](detection-assurance-epic-closeout.md), [historical closeout](detection-assurance-closeout-audit.md), [residual evidence](detection-assurance-residual-evidence-backlog.md) |
 | Repository transfer | [Transfer evidence](repository-transfer-evidence.md) |

@@ -7327,11 +7327,11 @@
       "disposition": "silent",
       "expectedRanges": [],
       "id": "openai-negative-368-legacy-plain-twin",
-      "kind": "negative",
+      "kind": "overlap",
       "lostRanges": [],
       "retainedRanges": [],
       "support": "supported",
-      "tier": "negative"
+      "tier": "regression"
     },
     {
       "contexts": [
@@ -7343,11 +7343,11 @@
       "disposition": "silent",
       "expectedRanges": [],
       "id": "openai-negative-368-legacy-unicode-crlf-twin",
-      "kind": "negative",
+      "kind": "overlap",
       "lostRanges": [],
       "retainedRanges": [],
       "support": "supported",
-      "tier": "negative"
+      "tier": "regression"
     },
     {
       "contexts": [
@@ -7439,11 +7439,11 @@
       "disposition": "silent",
       "expectedRanges": [],
       "id": "openai-negative-explicit-namespace-legacy-body",
-      "kind": "negative",
+      "kind": "overlap",
       "lostRanges": [],
       "retainedRanges": [],
       "support": "supported",
-      "tier": "negative"
+      "tier": "regression"
     },
     {
       "contexts": [
@@ -7487,11 +7487,11 @@
       "disposition": "silent",
       "expectedRanges": [],
       "id": "openai-negative-marker-dotenv",
-      "kind": "negative",
+      "kind": "overlap",
       "lostRanges": [],
       "retainedRanges": [],
       "support": "supported",
-      "tier": "negative"
+      "tier": "regression"
     },
     {
       "contexts": [
@@ -7615,11 +7615,11 @@
       "disposition": "silent",
       "expectedRanges": [],
       "id": "openai-negative-marker-toml",
-      "kind": "negative",
+      "kind": "overlap",
       "lostRanges": [],
       "retainedRanges": [],
       "support": "supported",
-      "tier": "negative"
+      "tier": "regression"
     },
     {
       "contexts": [
