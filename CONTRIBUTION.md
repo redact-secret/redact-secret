@@ -39,6 +39,73 @@ Pull requests should explain the observable change, its verification, and any
 compatibility impact. By contributing, you agree that your contribution is licensed
 under the repository's [MIT License](LICENSE).
 
+### New detector family checklist
+
+Coverage growth is the classic way to lose precision: recall rises, false
+positives rise faster, unless every new family arrives with the evidence
+that keeps its numbers honest. A detector family does not merge until its
+evidence lands with it -- this is a merge gate, not a follow-up, and it is
+machine-checked in [`redact-secret-benchmarks`](https://github.com/redact-secret/redact-secret-benchmarks)
+by `scripts/check-evidence-arrival.mjs` (`npm run arrival:check`, issue #52
+there). Satisfy every item below, in that repository's PR, so the check
+passes without anyone having to read the checker script itself:
+
+1. **Provider or tool evidence.** In `benchmarks/lib/assessment.ts`, record
+   a `providerSource`, `twinSource`, or `candidateSource` (each a `url`, an
+   `observedAt` date, a `formatVersion`, and what it `covers`), or at least
+   one `corroboration` entry (`tool`, `label`, `url`), for the family.
+   Anything not directly backed by provider documentation is a T2
+   (tool-corroborated) contract, not T1, and must say so rather than assert
+   provider grounding it doesn't have --
+   [`decision-freeze-pulumi-access-token-grammar`](docs/decisions/2026-09-21-freeze-pulumi-access-token-grammar.md)
+   shows a T1-prefix/T2-body contract written up this way.
+2. **Canonical positives.** At least one fixture carrying the family's
+   documented shape in a realistic context, run through the differential
+   method against the pinned scanners.
+3. **Negative twins.** At least one twin fixture (`twinOf` + `mutation` +
+   `mutationKind`) a near-identical non-secret must not flag. Where no
+   provider grammar exists to mutate, record
+   `contracts["<family>"].unprobeable` with a `reason` and an `observedAt`
+   date instead of authoring one -- Datadog's API key, Discord's bot token,
+   Twilio's Auth Token and API Key Secret, Telegram's bot token, and
+   Microsoft Entra's application client secret already use this escape
+   hatch in `benchmarks/support-matrix.json`, each with a reason tied to
+   what the provider's page does and doesn't state.
+4. **Adversarial benign controls.** At least one control fixture -- a
+   public identifier, placeholder, reference, or ordinary prose -- that
+   must not be flagged.
+5. **Metamorphic cases.** At least one fixture carrying an encoding,
+   whitespace, CRLF, Unicode, or chunk-boundary variant
+   (`benchmarks/operators/context.ts`).
+6. **Mutation cases.** At least one fixture whose prefix, length, alphabet,
+   or separator can be mutated (`benchmarks/operators/lexical.ts`).
+7. **Differential observation.** At least one fixture assigned to the
+   family in `benchmarks/fixture-detectors.json` so it runs against the
+   pinned scanners.
+
+**The detector and its contract land together.** The support matrix derives
+its family list from the contracts registered in `assessment.ts`, so a
+detector merged here without a matching contract in
+`redact-secret-benchmarks` isn't `provisional` -- it's invisible to the
+support matrix until someone notices the family count is wrong. Coordinate
+the product PR and the benchmarks PR to land in the same window rather than
+sequencing detector-then-contract; the family identifiers `assessment.ts`
+keys its contracts by come from `redact-secret-benchmarks`' own
+`benchmarks/support/taxonomy.json`, not from this repository's detector
+registry, so a new provider or credential family needs a taxonomy entry
+there too before it has an id for the contract to key on.
+
+**This checklist is necessary, never sufficient, for `stable`.** Clearing
+it means the evidence *exists*; reaching `stable` in
+[`docs/support-matrix.md`](docs/support-matrix.md) also requires the
+pass-rate floors `redact-secret-benchmarks`' `benchmarks/support/status-criteria.json`
+checks over that evidence (issue #503) -- five twin pairs, five benign
+cases, zero unresolved critical mutation or metamorphic findings, zero
+unresolved differential contract disagreements, and a T1 positive contract.
+A family can clear this checklist and still classify `provisional`; it
+cannot classify anything but `provisional` (at best) without clearing this
+checklist first.
+
 ### Benchmark-originated bug checklist
 
 For a bug found by
