@@ -45,6 +45,17 @@ FIXTURES = ROOT / "conformance" / "fixtures"
 
 NPM_PACKAGE = Path("packages") / "javascript"
 CRATE = "redact-secret"
+# Issue #528: unlike the Node addon, browser, and Python artifacts, neither
+# crate was ever packaged (only listed, via `crate_contents()`'s `cargo
+# package --list`) before this run reached the registry -- `cargo publish`
+# built and hashed each `.crate` file for the first time. `.github/workflows/
+# artifact-qualification.yml`'s `inventory` job now runs `cargo package
+# --no-verify --locked` for both crates before this script, so their bytes
+# are recorded here the same way every other artifact family's are, and
+# `publish-crates` can compare crates.io's own published checksum against
+# this recorded digest instead of trusting the two builds agree.
+CRATES = (CRATE, "redact-secret-cli")
+CRATE_PACKAGE_DIR = Path("target") / "package"
 PUBLIC_API_REVIEW = Path("docs/audits/candidate-public-contract-review.md")
 CURRENT_PUBLIC_API_REVIEW = Path("docs/audits/beta5-candidate-public-contract-review.md")
 CHANGELOG = Path("CHANGELOG.md")
@@ -305,6 +316,51 @@ def crate_contents() -> list[str]:
     return sorted(line for line in result.stdout.splitlines() if line)
 
 
+def crate_package_digests(package_dir: Path | None = None) -> list[dict]:
+    """Hash whatever `.crate` files `cargo package` already produced.
+
+    Issue #528: `cargo package --no-verify --locked` runs once, in the same
+    `inventory` job as this script, for each crate in `CRATES` -- `--no-verify`
+    because `redact-secret-cli` packages a registry dependency on
+    `redact-secret` that does not resolve until `redact-secret` is actually
+    live on crates.io (`decision-ship-first-release-artifact-set`); skipping
+    the verify build does not change the tarball bytes it produces, only
+    whether it compiles the extracted copy. An empty or missing directory
+    (a PR run that skipped `full` qualification) yields no entries rather
+    than an error -- `require_crates` is what turns their absence into a
+    failure when a full qualification run was expected to produce them.
+    """
+    directory = package_dir if package_dir is not None else (ROOT / CRATE_PACKAGE_DIR)
+    if not directory.is_dir():
+        return []
+    names_by_length = sorted(CRATES, key=len, reverse=True)
+    entries: list[dict] = []
+    for path in sorted(directory.glob("*.crate")):
+        target = next((name for name in names_by_length if path.name.startswith(f"{name}-")), "unknown")
+        entries.append(
+            {
+                "family": "crate",
+                "target": target,
+                "artifact": "crate-package",
+                "file": path.name,
+                "bytes": path.stat().st_size,
+                "sha256": digest(path),
+            }
+        )
+    return entries
+
+
+def require_crates(crate_entries: list[dict]) -> list[str]:
+    errors: list[str] = []
+    built = {entry["target"] for entry in crate_entries}
+    declared = set(CRATES)
+    for missing in sorted(declared - built):
+        errors.append(f"crate: no packaged .crate artifact for {missing}")
+    for extra in sorted(built - declared):
+        errors.append(f"crate: packaged {extra}, which is not a declared crate")
+    return errors
+
+
 def corpus_identity() -> dict[str, str]:
     return {
         path.name: digest(path)
@@ -428,6 +484,8 @@ def main() -> int:
 
     matrix = declared_matrix()
     collected = collect(arguments.artifacts)
+    crate_entries = crate_package_digests()
+    collected = collected + crate_entries
     qualification, qualification_errors = collect_installed_javascript_qualification(
         arguments.artifacts
     )
@@ -435,6 +493,7 @@ def main() -> int:
     with (ROOT / NPM_PACKAGE / "package.json").open(encoding="utf-8") as handle:
         product_version = json.load(handle)["version"]
     errors = require_matrix(matrix, collected)
+    errors.extend(require_crates(crate_entries))
     errors.extend(qualification_errors)
     errors.extend(
         require_installed_javascript_qualification(

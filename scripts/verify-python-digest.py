@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fail loudly if a Python artifact about to publish differs from the one qualified.
+"""Fail loudly if an artifact about to publish differs from the one qualified.
 
 Issue #527: `release.yml` used to build the Python wheels and source
 distribution twice from the same commit -- once in the standalone
@@ -15,7 +15,17 @@ reintroduces a second build fails here even if nobody notices the extra
 `uses:` line, because the two builds would then disagree on bytes the way
 beta.5's did.
 
+Issue #528 generalizes this beyond Python: `--family` (repeatable, defaulting
+to the Python wheel and source-distribution families so the `publish-pypi`
+call below is unchanged) and `--target` (optional) let `publish-native-
+dependencies` and `publish-wasm-dependency` run the exact same check against
+the single compiled addon or WebAssembly build they are about to pack, before
+packing it -- the same "built once, compared at publish time" property,
+independently of which registry ends up repackaging the qualified bytes.
+
     scripts/verify-python-digest.py --inventory artifact-inventory.json dist/*
+    scripts/verify-python-digest.py --inventory artifact-inventory.json \\
+        --family node-addon --target aarch64-apple-darwin bindings/node/redact-secret.darwin-arm64.node
 """
 
 from __future__ import annotations
@@ -33,12 +43,14 @@ def digest(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def qualified_digests(inventory_path: Path) -> dict[str, str]:
+def qualified_digests(
+    inventory_path: Path, families: tuple[str, ...] = QUALIFIED_FAMILIES, target: str | None = None
+) -> dict[str, str]:
     inventory = json.loads(inventory_path.read_text(encoding="utf-8"))
     return {
         entry["file"]: entry["sha256"]
         for entry in inventory["artifacts"]
-        if entry["family"] in QUALIFIED_FAMILIES
+        if entry["family"] in families and (target is None or entry["target"] == target)
     }
 
 
@@ -73,7 +85,7 @@ def verify(artifacts: list[Path], qualified: dict[str, str]) -> list[str]:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument(
-        "artifacts", nargs="+", type=Path, help="wheels and the source distribution about to publish"
+        "artifacts", nargs="+", type=Path, help="the artifact file(s) about to publish"
     )
     parser.add_argument(
         "--inventory",
@@ -81,20 +93,33 @@ def main() -> int:
         type=Path,
         help="artifact-inventory.json recorded by artifact-qualification.yml",
     )
+    parser.add_argument(
+        "--family",
+        dest="families",
+        action="append",
+        default=[],
+        help="repeatable: the artifact family/families to check (default: python-wheel, python-sdist)",
+    )
+    parser.add_argument(
+        "--target",
+        default=None,
+        help="restrict the qualified inventory to entries with this target (e.g. a Rust triple)",
+    )
     args = parser.parse_args()
+    families = tuple(args.families) if args.families else QUALIFIED_FAMILIES
 
     if not args.inventory.is_file():
         print(f"ERROR {args.inventory}: not a file")
-        print("Python artifact digest verification complete: 0 artifact(s) checked, 1 error(s)")
+        print("Artifact digest verification complete: 0 artifact(s) checked, 1 error(s)")
         return 1
 
-    qualified = qualified_digests(args.inventory)
+    qualified = qualified_digests(args.inventory, families, args.target)
     errors = verify(args.artifacts, qualified)
 
     for error in errors:
         print(f"ERROR {error}")
     print(
-        f"Python artifact digest verification complete: {len(args.artifacts)} artifact(s) checked, "
+        f"Artifact digest verification complete: {len(args.artifacts)} artifact(s) checked, "
         f"{len(errors)} error(s)"
     )
     return 1 if errors else 0

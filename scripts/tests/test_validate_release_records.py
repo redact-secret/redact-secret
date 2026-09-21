@@ -146,6 +146,39 @@ class ValidateReleaseRecordsTests(unittest.TestCase):
         with self.assertRaisesRegex(MODULE.InvalidRecord, "CHANGELOG"):
             self.validate(self.fixture(), changelog="")
 
+    def test_manifest_without_artifact_digests_is_accepted(self) -> None:
+        # Frozen historical records (beta.1 through beta.5) predate this
+        # field entirely (issue #528).
+        self.validate(self.fixture())
+
+    def test_comparable_stages_that_agree_are_accepted(self) -> None:
+        digest = "a" * 64
+        MODULE.validate_artifact_digests(
+            {"pypi:redact-secret": [{"file": "x.whl", "built": digest, "qualified": digest,
+                                      "published": digest, "comparable": True}]},
+            "label",
+        )
+
+    def test_comparable_stages_that_disagree_are_rejected(self) -> None:
+        with self.assertRaisesRegex(MODULE.InvalidRecord, "digest mismatch across stages"):
+            MODULE.validate_artifact_digests(
+                {"crate:redact-secret": [{"file": "x.crate", "qualified": "a" * 64,
+                                           "published": "b" * 64, "comparable": True}]},
+                "label",
+            )
+
+    def test_non_comparable_without_note_is_rejected(self) -> None:
+        with self.assertRaisesRegex(MODULE.InvalidRecord, "requires a note"):
+            MODULE.validate_artifact_digests(
+                {"npm:@redact-secret/wasm": [{"file": "x.wasm", "comparable": False}]}, "label",
+            )
+
+    def test_non_comparable_with_note_is_accepted(self) -> None:
+        MODULE.validate_artifact_digests(
+            {"npm:@redact-secret/wasm": [{"file": "x.wasm", "comparable": False, "note": "repacked"}]},
+            "label",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

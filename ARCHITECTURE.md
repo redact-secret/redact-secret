@@ -576,6 +576,20 @@ is not transactional; only an explicitly authorized reconcile operation may
 complete a partially published matching version without rebuilding artifacts
 that already succeeded.
 
+Every artifact family — npm (native dependency packages, the WebAssembly
+package, and the wrapper), the two Rust crates, and the Python wheels and
+source distribution — is built exactly once per release run; qualification
+and publication both consume that one build rather than rebuilding it
+(`decision-release-bindings-in-lockstep`). The release manifest carries each
+artifact's digest at every stage that measured it (built, qualified,
+published), so what was qualified and what was published are comparable
+without re-deriving them from workflow structure, and a runtime check fails
+the run, naming the artifact and both digests, if they ever disagree. Where a
+registry repackages the qualified bytes before upload (`npm publish` wraps a
+file in a new tarball) a byte comparison against that repack is not
+meaningful; the manifest records that explicitly instead of silently omitting
+the published digest.
+
 The `Artifact qualification` workflow is that candidate run. From one revision it
 calls the Rust and CPython workflows and additionally builds the N-API addon,
 the browser WebAssembly artifact, and the CLI binary for every declared target,

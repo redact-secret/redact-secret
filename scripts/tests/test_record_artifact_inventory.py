@@ -378,5 +378,60 @@ class InventoryTests(unittest.TestCase):
         )
 
 
+class CratePackageDigestTests(unittest.TestCase):
+    def test_no_directory_yields_no_entries(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            missing = Path(directory) / "target" / "package"
+            self.assertEqual(RECORD.crate_package_digests(missing), [])
+
+    def test_each_crate_file_is_recorded_with_its_matching_target(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            package_dir = Path(directory)
+            core = package_dir / "redact-secret-0.1.0.crate"
+            cli = package_dir / "redact-secret-cli-0.1.0.crate"
+            core.write_bytes(b"core bytes")
+            cli.write_bytes(b"cli bytes")
+
+            entries = {entry["target"]: entry for entry in RECORD.crate_package_digests(package_dir)}
+
+            self.assertEqual(set(entries), {"redact-secret", "redact-secret-cli"})
+            self.assertEqual(entries["redact-secret"]["family"], "crate")
+            self.assertEqual(entries["redact-secret"]["file"], "redact-secret-0.1.0.crate")
+            self.assertEqual(entries["redact-secret"]["bytes"], len(b"core bytes"))
+            self.assertEqual(len(entries["redact-secret"]["sha256"]), 64)
+            # `redact-secret-cli-0.1.0.crate` must not be misattributed to
+            # `redact-secret` by a naive substring match.
+            self.assertEqual(entries["redact-secret-cli"]["file"], "redact-secret-cli-0.1.0.crate")
+
+    def test_an_unrecognized_crate_file_is_still_recorded_as_unknown(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            package_dir = Path(directory)
+            (package_dir / "some-other-crate-0.1.0.crate").write_bytes(b"x")
+
+            entries = RECORD.crate_package_digests(package_dir)
+
+            self.assertEqual(entries[0]["target"], "unknown")
+
+
+class RequireCratesTests(unittest.TestCase):
+    def test_both_crates_present_passes(self) -> None:
+        entries = [{"target": name} for name in RECORD.CRATES]
+        self.assertEqual(RECORD.require_crates(entries), [])
+
+    def test_a_missing_crate_fails(self) -> None:
+        entries = [{"target": RECORD.CRATE}]
+        self.assertEqual(
+            RECORD.require_crates(entries),
+            ["crate: no packaged .crate artifact for redact-secret-cli"],
+        )
+
+    def test_an_undeclared_crate_fails(self) -> None:
+        entries = [{"target": name} for name in RECORD.CRATES] + [{"target": "unknown"}]
+        self.assertEqual(
+            RECORD.require_crates(entries),
+            ["crate: packaged unknown, which is not a declared crate"],
+        )
+
+
 if __name__ == "__main__":
     unittest.main()

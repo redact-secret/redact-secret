@@ -107,6 +107,18 @@ jobs:
       - name: Check out repository
         run: echo noop
 
+      - name: Publish redact-secret
+        run: echo noop
+
+      - name: Verify redact-secret publication matches the qualified crate
+        run: python3 -B scripts/verify-crate-digest.py --inventory qualification-inventory/artifact-inventory.json --crate redact-secret --published-checksum deadbeef
+
+      - name: Publish redact-secret-cli
+        run: echo noop
+
+      - name: Verify redact-secret-cli publication matches the qualified crate
+        run: python3 -B scripts/verify-crate-digest.py --inventory qualification-inventory/artifact-inventory.json --crate redact-secret-cli --published-checksum deadbeef
+
   publish-pypi:
     name: Publish PyPI
     needs: [ci, artifact-qualification]
@@ -476,6 +488,70 @@ class ReleaseGateTests(unittest.TestCase):
         self.assertTrue(
             any(
                 "does not run scripts/verify-python-digest.py" in error
+                for error in errors
+            )
+        )
+
+    def test_missing_crate_digest_step_is_an_error(self) -> None:
+        broken = RELEASE_YML.replace(
+            "      - name: Verify redact-secret publication matches the qualified crate\n"
+            "        run: python3 -B scripts/verify-crate-digest.py --inventory qualification-inventory/artifact-inventory.json --crate redact-secret --published-checksum deadbeef\n\n",
+            "",
+        )
+        self.assertNotEqual(broken, RELEASE_YML)
+        self._write("release.yml", broken)
+        errors = CHECK.validate(self.root)
+        self.assertTrue(
+            any(
+                "is missing the 'Verify redact-secret publication matches the qualified crate' step" in error
+                for error in errors
+            )
+        )
+
+    def test_missing_crate_publish_step_is_an_error(self) -> None:
+        broken = RELEASE_YML.replace(
+            "      - name: Publish redact-secret-cli\n        run: echo noop\n\n",
+            "",
+        )
+        self.assertNotEqual(broken, RELEASE_YML)
+        self._write("release.yml", broken)
+        errors = CHECK.validate(self.root)
+        self.assertTrue(
+            any(
+                "is missing the 'Publish redact-secret-cli' step" in error
+                for error in errors
+            )
+        )
+
+    def test_crate_digest_step_before_publish_step_is_an_error(self) -> None:
+        digest_step = (
+            "      - name: Verify redact-secret publication matches the qualified crate\n"
+            "        run: python3 -B scripts/verify-crate-digest.py --inventory qualification-inventory/artifact-inventory.json --crate redact-secret --published-checksum deadbeef\n\n"
+        )
+        publish_step = "      - name: Publish redact-secret\n        run: echo noop\n\n"
+        broken = RELEASE_YML.replace(publish_step + digest_step, digest_step + publish_step)
+        self.assertNotEqual(broken, RELEASE_YML)
+        self._write("release.yml", broken)
+        errors = CHECK.validate(self.root)
+        self.assertTrue(
+            any(
+                "'Verify redact-secret publication matches the qualified crate' must follow "
+                "'Publish redact-secret'" in error
+                for error in errors
+            )
+        )
+
+    def test_crate_digest_step_not_running_the_script_is_an_error(self) -> None:
+        broken = RELEASE_YML.replace(
+            "python3 -B scripts/verify-crate-digest.py --inventory qualification-inventory/artifact-inventory.json --crate redact-secret --published-checksum deadbeef",
+            "echo noop",
+        )
+        self.assertNotEqual(broken, RELEASE_YML)
+        self._write("release.yml", broken)
+        errors = CHECK.validate(self.root)
+        self.assertTrue(
+            any(
+                "does not run scripts/verify-crate-digest.py" in error
                 for error in errors
             )
         )

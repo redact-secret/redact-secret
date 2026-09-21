@@ -72,6 +72,103 @@ class BuildManifestTests(unittest.TestCase):
         self.assertEqual(list(manifest["registry_state"]), ["npm", "pypi"])
 
 
+class NormalizeArtifactDigestsTests(unittest.TestCase):
+    def test_matching_stages_produce_no_errors(self) -> None:
+        digest = "a" * 64
+        normalized, errors = RELEASE_MANIFEST.normalize_artifact_digests(
+            {
+                "pypi:redact-secret": [
+                    {
+                        "file": "redact_secret-0.1.0.tar.gz",
+                        "built": digest,
+                        "qualified": digest,
+                        "published": digest,
+                        "comparable": True,
+                    }
+                ]
+            }
+        )
+        self.assertEqual(errors, [])
+        self.assertEqual(
+            normalized["pypi:redact-secret"],
+            [
+                {
+                    "file": "redact_secret-0.1.0.tar.gz",
+                    "built": digest,
+                    "qualified": digest,
+                    "published": digest,
+                    "comparable": True,
+                    "note": None,
+                }
+            ],
+        )
+
+    def test_disagreeing_comparable_stages_are_an_error_naming_both_digests(self) -> None:
+        qualified = "a" * 64
+        published = "b" * 64
+        _, errors = RELEASE_MANIFEST.normalize_artifact_digests(
+            {
+                "crate:redact-secret": [
+                    {
+                        "file": "redact-secret-0.1.0.crate",
+                        "qualified": qualified,
+                        "published": published,
+                        "comparable": True,
+                    }
+                ]
+            }
+        )
+        self.assertEqual(len(errors), 1)
+        self.assertIn("crate:redact-secret", errors[0])
+        self.assertIn("redact-secret-0.1.0.crate", errors[0])
+        self.assertIn(qualified, errors[0])
+        self.assertIn(published, errors[0])
+
+    def test_non_comparable_record_without_note_is_an_error(self) -> None:
+        _, errors = RELEASE_MANIFEST.normalize_artifact_digests(
+            {
+                "npm:@redact-secret/wasm": [
+                    {"file": "redact_secret_wasm_bg.wasm", "qualified": "a" * 64, "comparable": False}
+                ]
+            }
+        )
+        self.assertEqual(len(errors), 1)
+        self.assertIn("requires a note", errors[0])
+
+    def test_non_comparable_record_with_note_is_accepted(self) -> None:
+        normalized, errors = RELEASE_MANIFEST.normalize_artifact_digests(
+            {
+                "npm:@redact-secret/wasm": [
+                    {
+                        "file": "redact_secret_wasm_bg.wasm",
+                        "built": "a" * 64,
+                        "qualified": "a" * 64,
+                        "published": "c" * 40,
+                        "comparable": False,
+                        "note": "npm repacks the artifact into a new tarball before publishing.",
+                    }
+                ]
+            }
+        )
+        self.assertEqual(errors, [])
+        self.assertEqual(normalized["npm:@redact-secret/wasm"][0]["published"], "c" * 40)
+
+    def test_missing_stage_values_are_not_a_mismatch(self) -> None:
+        _, errors = RELEASE_MANIFEST.normalize_artifact_digests(
+            {
+                "pypi:redact-secret": [
+                    {"file": "redact_secret-0.1.0.tar.gz", "qualified": "a" * 64, "comparable": True}
+                ]
+            }
+        )
+        self.assertEqual(errors, [])
+
+    def test_entry_must_be_a_list(self) -> None:
+        _, errors = RELEASE_MANIFEST.normalize_artifact_digests({"pypi:redact-secret": {"file": "x"}})
+        self.assertEqual(len(errors), 1)
+        self.assertIn("must be a list", errors[0])
+
+
 class CliTests(unittest.TestCase):
     def test_writes_the_manifest_json(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -122,6 +219,92 @@ class CliTests(unittest.TestCase):
     def test_registry_state_requires_name_equals_state(self) -> None:
         with self.assertRaises(ValueError):
             RELEASE_MANIFEST._parse_registry_state(["npm"])
+
+    def test_defaults_artifact_digests_to_empty_object(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp) / "manifest.json"
+            status = RELEASE_MANIFEST.main(
+                [
+                    "--source-revision",
+                    VALID_FIELDS["source_revision"],
+                    "--conformance-identity",
+                    VALID_FIELDS["conformance_identity"],
+                    "--version",
+                    VALID_FIELDS["version"],
+                    "--artifact",
+                    "npm:@redact-secret/core",
+                    "--registry-state",
+                    "npm=published",
+                    "--out",
+                    str(out),
+                ]
+            )
+            self.assertEqual(status, 0)
+            recorded = json.loads(out.read_text(encoding="utf-8"))
+            self.assertEqual(recorded["artifact_digests"], {})
+
+    def test_digest_mismatch_still_writes_the_manifest_but_fails(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp) / "manifest.json"
+            digests = json.dumps(
+                {
+                    "crate:redact-secret": [
+                        {
+                            "file": "redact-secret-0.1.0.crate",
+                            "qualified": "a" * 64,
+                            "published": "b" * 64,
+                            "comparable": True,
+                        }
+                    ]
+                }
+            )
+            status = RELEASE_MANIFEST.main(
+                [
+                    "--source-revision",
+                    VALID_FIELDS["source_revision"],
+                    "--conformance-identity",
+                    VALID_FIELDS["conformance_identity"],
+                    "--version",
+                    VALID_FIELDS["version"],
+                    "--artifact",
+                    "crate:redact-secret",
+                    "--registry-state",
+                    "crate=published",
+                    "--artifact-digests",
+                    digests,
+                    "--out",
+                    str(out),
+                ]
+            )
+            self.assertEqual(status, 1)
+            self.assertTrue(out.exists())
+            recorded = json.loads(out.read_text(encoding="utf-8"))
+            self.assertEqual(recorded["artifact_digests"]["crate:redact-secret"][0]["qualified"], "a" * 64)
+            self.assertEqual(recorded["artifact_digests"]["crate:redact-secret"][0]["published"], "b" * 64)
+
+    def test_invalid_artifact_digests_json_fails_without_writing(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp) / "manifest.json"
+            status = RELEASE_MANIFEST.main(
+                [
+                    "--source-revision",
+                    VALID_FIELDS["source_revision"],
+                    "--conformance-identity",
+                    VALID_FIELDS["conformance_identity"],
+                    "--version",
+                    VALID_FIELDS["version"],
+                    "--artifact",
+                    "npm:@redact-secret/core",
+                    "--registry-state",
+                    "npm=published",
+                    "--artifact-digests",
+                    "not json",
+                    "--out",
+                    str(out),
+                ]
+            )
+            self.assertEqual(status, 1)
+            self.assertFalse(out.exists())
 
 
 class WorkflowOutputTests(unittest.TestCase):
