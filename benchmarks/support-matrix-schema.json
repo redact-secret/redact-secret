@@ -1,0 +1,94 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:redact-secret-benchmarks:support-matrix:1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "taxonomySchemaVersion", "sourceReport", "providerCount", "familyCount", "distribution", "families"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "taxonomySchemaVersion": { "const": 1 },
+    "sourceReport": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "generatedAt", "runId", "revision", "dirty", "criteriaSchemaVersion"],
+      "properties": {
+        "schemaVersion": { "const": 1 },
+        "generatedAt": { "type": "string" },
+        "runId": { "type": "string" },
+        "revision": { "type": "string" },
+        "dirty": { "type": ["boolean", "null"] },
+        "criteriaSchemaVersion": { "const": 1 }
+      }
+    },
+    "providerCount": { "type": "integer", "minimum": 0 },
+    "familyCount": { "type": "integer", "minimum": 0 },
+    "distribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stable", "provisional", "pending", "unsupported"],
+      "properties": {
+        "stable": { "type": "integer", "minimum": 0 },
+        "provisional": { "type": "integer", "minimum": 0 },
+        "pending": { "type": "integer", "minimum": 0 },
+        "unsupported": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "families": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["provider", "family", "familyName", "status", "evidenceTier", "providerSource", "corroboratingScanners", "twinCoverage", "unresolvedCriticalItems", "detectors", "reason"],
+        "properties": {
+          "provider": { "type": ["string", "null"] },
+          "family": { "type": "string" },
+          "familyName": { "type": "string" },
+          "status": { "enum": ["stable", "provisional", "pending", "unsupported"] },
+          "evidenceTier": { "enum": ["T0", "T1", "T2", "T3", null] },
+          "providerSource": {
+            "type": ["object", "null"],
+            "additionalProperties": false,
+            "required": ["url", "observedAt", "formatVersion", "covers"],
+            "properties": {
+              "url": { "type": "string" },
+              "observedAt": { "type": "string" },
+              "formatVersion": { "type": "string" },
+              "covers": { "type": "string" }
+            }
+          },
+          "corroboratingScanners": { "type": "array", "items": { "type": "string" } },
+          "twinCoverage": {
+            "type": ["object", "null"],
+            "additionalProperties": false,
+            "required": ["pairs", "failures", "unprobeable"],
+            "properties": {
+              "pairs": { "type": "integer", "minimum": 0 },
+              "failures": { "type": "integer", "minimum": 0 },
+              "unprobeable": {
+                "type": ["object", "null"],
+                "additionalProperties": false,
+                "required": ["reason", "observedAt"],
+                "properties": {
+                  "reason": { "type": "string", "minLength": 1 },
+                  "observedAt": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" }
+                }
+              }
+            }
+          },
+          "unresolvedCriticalItems": {
+            "type": ["object", "null"],
+            "additionalProperties": false,
+            "required": ["metamorphic", "mutation", "differential"],
+            "properties": {
+              "metamorphic": { "type": "integer", "minimum": 0 },
+              "mutation": { "type": "integer", "minimum": 0 },
+              "differential": { "type": "integer", "minimum": 0 }
+            }
+          },
+          "detectors": { "type": "array", "items": { "type": "string" } },
+          "reason": { "type": ["string", "null"] }
+        }
+      }
+    }
+  }
+}

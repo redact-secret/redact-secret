@@ -5,6 +5,18 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+### Internal, tooling, and qualification
+
+- README and a new [support matrix](docs/support-matrix.md) now render from a
+  pinned copy of `redact-secret-benchmarks`' generated evidence
+  (`benchmarks/support-matrix.json`) instead of stating detector support by
+  hand (#510, `decision-project-the-support-matrix-into-docs-and-release-notes`).
+  `npm run support-matrix:check` (wired into `npm run ci`) fails the build if
+  either surface drifts from the pinned matrix. Release notes gain a
+  generated status-distribution fragment
+  (`generate-support-matrix-docs.py --release-note`); see
+  [the release runbook](docs/releasing.md#close-out).
+
 ## 0.1.0-beta.5 — 2026-09-20
 
 [Publication and qualification evidence](docs/releases/0.1.0-beta.5/README.md).
