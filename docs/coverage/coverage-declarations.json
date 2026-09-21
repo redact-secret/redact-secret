@@ -951,7 +951,9 @@
             "gitlab-boundary-case-sensitivity",
             "gitlab-boundary-custom-prefix",
             "gitlab-boundary-delimiter",
-            "gitlab-boundary-invalid-alphabet"
+            "gitlab-boundary-invalid-alphabet",
+            "gitlab-boundary-routable-short-payload",
+            "gitlab-boundary-routable-truncated-match"
           ],
           "state": "supported"
         },
@@ -960,7 +962,10 @@
           "evidenceFixtureIds": [
             "gitlab-negative-commit-hash",
             "gitlab-negative-common-identifier",
+            "gitlab-negative-legacy-runner-registration-token",
+            "gitlab-negative-numeric-resource-ids",
             "gitlab-negative-placeholder",
+            "gitlab-negative-session-cookie",
             "gitlab-negative-url-truncated-token-param"
           ],
           "state": "supported"
@@ -972,7 +977,9 @@
             "gitlab-boundary-case-sensitivity",
             "gitlab-boundary-custom-prefix",
             "gitlab-boundary-delimiter",
-            "gitlab-boundary-invalid-alphabet"
+            "gitlab-boundary-invalid-alphabet",
+            "gitlab-boundary-routable-short-payload",
+            "gitlab-boundary-routable-truncated-match"
           ],
           "state": "supported"
         },
