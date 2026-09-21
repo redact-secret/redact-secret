@@ -2960,7 +2960,9 @@
           "evidenceFixtureIds": [
             "google-negative-key-id",
             "google-negative-masked",
-            "google-negative-placeholder"
+            "google-negative-oauth-client-id",
+            "google-negative-placeholder",
+            "google-negative-service-account-email"
           ],
           "state": "supported"
         },

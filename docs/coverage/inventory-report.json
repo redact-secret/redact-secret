@@ -1190,7 +1190,7 @@
     {
       "detector": "google-api-key",
       "evidence": {
-        "fixtureCount": 18,
+        "fixtureCount": 23,
         "hostContextsExercised": [
           "dotenv",
           "javascript",
