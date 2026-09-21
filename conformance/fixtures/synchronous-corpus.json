@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 1349,
+  "fixtureCount": 1354,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -9724,7 +9724,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "gloas-SYNTHETIC_REVOKED_SYNTHET\ngldt-SYNTHETIC_REVOKED_SYNTHET\nglrt-SYNTHETIC_REVOKED_SYNTHET\nglrtr-SYNTHETIC_REVOKED_SYNTHET\nglcbt-SYNTHETIC_REVOKED_SYNTHET\nglptt-SYNTHETIC_REVOKED_SYNTHET\nglft-SYNTHETIC_REVOKED_SYNTHET\nglimt-SYNTHETIC_REVOKED_SYNTHET\nglagent-SYNTHETIC_REVOKED_SYNTHET\nglwt-SYNTHETIC_REVOKED_SYNTHET",
+      "input": "gloas-SYNTHETIC_REVOKED_SYNTHET\ngldt-SYNTHETIC_REVOKED_SYNTHET\nglrt-SYNTHETIC_REVOKED_SYNTHET\nglrtr-SYNTHETIC_REVOKED_SYNTHET\nglcbt-SYNTHETIC_REVOKED_SYNTHET\nglptt-SYNTHETIC_REVOKED_SYNTHET\nglft-SYNTHETIC_REVOKED_SYNTHET\nglimt-SYNTHETIC_REVOKED_SYNTHET\nglagent-SYNTHETIC_REVOKED_SYNTHET\nglwt-SYNTHETIC_REVOKED_SYNTHET\nglsoat-SYNTHETIC_REVOKED_SYNTHET\nglffct-SYNTHETIC_REVOKED_SYNTHET",
       "expected": [
         {
           "detector": "gitlab-token",
@@ -9805,6 +9805,22 @@
           "specificity": "provider",
           "start": 287,
           "end": 317
+        },
+        {
+          "detector": "gitlab-token",
+          "type": "gitlab_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 318,
+          "end": 350
+        },
+        {
+          "detector": "gitlab-token",
+          "type": "gitlab_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 351,
+          "end": 383
         }
       ],
       "note": "Every remaining documented prefix variant is independently supported."
@@ -9971,6 +9987,80 @@
       "input": "https://gitlab.example.com/api/v4/projects?private_token=glpat-",
       "expected": [],
       "note": "A GitLab API URL query parameter whose value is truncated to just the documented prefix, with no suffix at all, never reaches the minimum 20-byte opaque-suffix length."
+    },
+    {
+      "id": "gitlab-negative-numeric-resource-ids",
+      "detector": "gitlab-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "http"
+      ],
+      "input": "GET /api/v4/projects/278964/repository/commits?group_id=9970 HTTP/1.1",
+      "expected": [],
+      "note": "Issue #518: benign control. Numeric GitLab project and group IDs, as they appear in the REST API path/query shape, carry no documented token prefix and are not credentials."
+    },
+    {
+      "id": "gitlab-negative-session-cookie",
+      "detector": "gitlab-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "http"
+      ],
+      "input": "Cookie: _gitlab_session=abcdef0123456789abcdef0123456789abcdef01",
+      "expected": [],
+      "note": "Issue #518 inventory: the GitLab session cookie (`_gitlab_session=`) is a documented row in GitLab's token-prefix table but is recorded unsupported here — its name=value cookie shape, not a `glXXX-`-prefixed bearer credential, is outside this detector's grammar, and a dedicated cookie-value rule would risk matching arbitrary opaque session identifiers generally."
+    },
+    {
+      "id": "gitlab-negative-legacy-runner-registration-token",
+      "detector": "gitlab-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "shell"
+      ],
+      "input": "gitlab-runner register --registration-token f7c2b1a9e4d6038f5a1c2e9b0d7f4a63",
+      "expected": [],
+      "note": "Issue #518 inventory: the legacy, unprefixed runner registration token (distinct from the `glrt-`/`glrtr-` runner authentication token) carries no documented prefix and is provider-deprecated in favor of the new runner-creation workflow; it is not, and cannot be, a candidate for this prefix-anchored grammar. Recorded unsupported, not silently excluded."
+    },
+    {
+      "id": "gitlab-boundary-routable-short-payload",
+      "detector": "gitlab-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "glrt-t3_short.0a.SYNTHETICCHECKSUM",
+      "expected": [],
+      "note": "Issue #518 inventory: a routable runner authentication token's `.`-delimited version/checksum tail sits outside the alnum/dash/underscore alphabet, so the scan sees only the base64 payload before the first `.`. A short payload (here, under the 20-byte floor) is missed entirely rather than partially matched. No source corroborates the payload's own length, so this is recorded pending/unsupported rather than given an invented grammar (see docs/decisions/2026-09-20-inventory-gitlab-token-families.md)."
+    },
+    {
+      "id": "gitlab-boundary-routable-truncated-match",
+      "detector": "gitlab-token",
+      "kind": "boundary",
+      "support": "supported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "glrt-t3_QmFzZTY0UGF5bG9hZA.0a.SYNTHETICREVOKEDCHECKSUM",
+      "expected": [
+        {
+          "detector": "gitlab-token",
+          "type": "gitlab_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 26
+        }
+      ],
+      "note": "Issue #518 inventory: when a routable runner authentication token's base64 payload alone reaches the 20-byte floor, the existing grammar still matches — truncated at the first `.`, missing the version/checksum tail, but still flagging and redacting the credential. This is the existing, deliberate maximal-run behavior, not a bug; the precise end offset is not corroborated to the routable format's real segment boundary, which is why the family stays pending rather than scored."
     },
     {
       "id": "openai-positive-project",

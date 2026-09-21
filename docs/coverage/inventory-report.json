@@ -451,17 +451,19 @@
     {
       "detector": "gitlab-token",
       "evidence": {
-        "fixtureCount": 19,
+        "fixtureCount": 24,
         "hostContextsExercised": [
           "dotenv",
           "http",
           "json",
           "log",
           "plain-text",
+          "shell",
           "yaml"
         ],
         "kindsWithSupportedEvidence": [
           "adversarial",
+          "boundary",
           "negative",
           "overlap",
           "positive"
