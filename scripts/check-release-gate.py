@@ -34,6 +34,19 @@ carry a `PROFILE_VERIFICATION_STEP` step, that it precedes `WASM_PUBLISH_STEP`
 that its body still asserts on both the `full` root artifact and the `common`
 artifact -- not just whichever one a future edit happened to keep.
 
+Issue #527 removed `python-wheels` from `REQUIRED_GATES`: this workflow used
+to call `./.github/workflows/python-wheels.yml` a second time as its own
+top-level job, on top of the call `artifact-qualification.yml` already makes
+internally, so every Python wheel and the source distribution were built
+twice from independent, non-byte-reproducible builds. `python-wheels.yml` is
+now only ever invoked from inside `artifact-qualification`, which remains a
+required gate. That structural fix removes the second build, but it does not
+by itself prove the property the issue asks for -- this script additionally
+requires `publish-pypi` to carry a `PYPI_DIGEST_STEP` step that precedes
+`PYPI_PUBLISH_STEP`, so a runtime check comparing what is about to be
+published against `artifact-qualification`'s own recorded inventory cannot be
+silently deleted or reordered after the fact.
+
 This intentionally parses the workflow YAML with plain text and regular
 expressions rather than a YAML library, matching
 `check-python-package.py`'s wheel-matrix check: no third-party dependency is
@@ -52,7 +65,6 @@ RELEASE_WORKFLOW = Path(".github") / "workflows" / "release.yml"
 # job id -> the reusable workflow it must call.
 REQUIRED_GATES = {
     "ci": "./.github/workflows/ci.yml",
-    "python-wheels": "./.github/workflows/python-wheels.yml",
     "artifact-qualification": "./.github/workflows/artifact-qualification.yml",
 }
 
@@ -81,6 +93,15 @@ FULL_ARTIFACT_GLUE = "redact_secret_wasm.js"
 FULL_PROFILE_ASSERTION = '!== "full"'
 COMMON_ARTIFACT_GLUE = "redact_secret_wasm_common.js"
 COMMON_PROFILE_ASSERTION = '!== "common"'
+
+# Issue #527: `publish-pypi` must verify, at publish time, that the wheels
+# and source distribution it is about to hand to PyPI are byte-identical to
+# what `artifact-qualification` qualified for this commit -- and that check
+# must run before the step that actually publishes them, not after.
+PYPI_JOB = "publish-pypi"
+PYPI_DIGEST_STEP = "Verify published wheels match the qualified inventory"
+PYPI_PUBLISH_STEP = "Publish to PyPI"
+PYPI_DIGEST_SCRIPT = "scripts/verify-python-digest.py"
 
 JOB_HEADER_PREFIX = "  "
 ATTRIBUTE_PREFIX = "    "
@@ -263,6 +284,34 @@ def validate(root: Path) -> list[str]:
                     f"{RELEASE_WORKFLOW.as_posix()}: '{PROFILE_VERIFICATION_STEP}' does not "
                     'assert the common artifact reports "common"'
                 )
+
+    pypi_job = jobs.get(PYPI_JOB)
+    if pypi_job is None:
+        errors.append(f"{RELEASE_WORKFLOW.as_posix()}: missing job '{PYPI_JOB}'")
+    else:
+        steps = extract_step_blocks(pypi_job)
+        digest_step = next((step for step in steps if step[1] == PYPI_DIGEST_STEP), None)
+        publish_step = next((step for step in steps if step[1] == PYPI_PUBLISH_STEP), None)
+        if digest_step is None:
+            errors.append(
+                f"{RELEASE_WORKFLOW.as_posix()}: job '{PYPI_JOB}' is missing "
+                f"the '{PYPI_DIGEST_STEP}' step"
+            )
+        if publish_step is None:
+            errors.append(
+                f"{RELEASE_WORKFLOW.as_posix()}: job '{PYPI_JOB}' is missing "
+                f"the '{PYPI_PUBLISH_STEP}' step"
+            )
+        if digest_step is not None and publish_step is not None and digest_step[0] > publish_step[0]:
+            errors.append(
+                f"{RELEASE_WORKFLOW.as_posix()}: '{PYPI_DIGEST_STEP}' must precede "
+                f"'{PYPI_PUBLISH_STEP}' in job '{PYPI_JOB}'"
+            )
+        if digest_step is not None and PYPI_DIGEST_SCRIPT not in digest_step[2]:
+            errors.append(
+                f"{RELEASE_WORKFLOW.as_posix()}: '{PYPI_DIGEST_STEP}' does not run "
+                f"{PYPI_DIGEST_SCRIPT}"
+            )
 
     reconcile_path = root / ".github/workflows/reconcile-release.yml"
     if reconcile_path.is_file():

@@ -3,12 +3,24 @@ name: Release
 # One dispatch publishes the whole product in lockstep
 # (decision-release-bindings-in-lockstep, decision-ship-first-release-artifact-set):
 # the npm package, the `redact-secret` and `redact-secret-cli` crates, and the
-# `redact-secret` PyPI distribution. `ci`, `python-wheels`, and
-# `artifact-qualification` call the qualification workflows as reusable
-# workflows (issue #77, RB-7) so every publish job below -- `publish`,
-# `publish-crates`, and `publish-pypi` -- gates on the exact same commit this
-# workflow is running for, and `publish-pypi` downloads the wheels
-# `python-wheels` already qualified rather than rebuilding them.
+# `redact-secret` PyPI distribution. `ci` and `artifact-qualification` call the
+# qualification workflows as reusable workflows (issue #77, RB-7) so every
+# publish job below -- `publish`, `publish-crates`, and `publish-pypi` --
+# gates on the exact same commit this workflow is running for.
+#
+# Issue #527: this workflow used to also call `python-wheels.yml` directly as
+# its own top-level job, on top of the call `artifact-qualification.yml`
+# already makes internally to qualify the Python wheels and source
+# distribution -- building all nine Python artifacts twice, from
+# independent, non-byte-reproducible builds. `python-wheels.yml` is now
+# invoked exactly once per release run, from inside `artifact-qualification`
+# alone, the same way the Node addon, browser, and CLI artifacts are only
+# ever built there; `publish-pypi` downloads the wheels and source
+# distribution that single build produced rather than rebuilding them, and
+# additionally verifies each file's SHA-256 against
+# `artifact-qualification`'s own recorded inventory before publishing -- a
+# runtime check that fails loudly on any digest mismatch independently of
+# whether the build topology ever regresses to two builds.
 #
 # `packages/javascript` depends on eight native `@redact-secret/node-<platform>`
 # packages and `@redact-secret/wasm` (issue #79); `publish-native-dependencies`
@@ -64,12 +76,10 @@ jobs:
     permissions:
       contents: read
 
-  python-wheels:
-    name: Python wheels
-    uses: ./.github/workflows/python-wheels.yml
-    permissions:
-      contents: read
-
+  # Qualifies the Node addon, browser, and CLI artifacts, and -- issue #527 --
+  # is the only place `python-wheels.yml` is invoked from this workflow, so
+  # every Python wheel and the source distribution are built exactly once
+  # per release run.
   artifact-qualification:
     name: Artifact qualification
     uses: ./.github/workflows/artifact-qualification.yml
@@ -84,7 +94,7 @@ jobs:
   # toolchain, only the artifact and `npm publish`.
   publish-native-dependencies:
     name: Publish npm dependency ${{ matrix.platform }}
-    needs: [ci, python-wheels, artifact-qualification]
+    needs: [ci, artifact-qualification]
     runs-on: ubuntu-latest
     environment:
       name: release
@@ -196,7 +206,7 @@ jobs:
   # required beyond the existing `artifact-qualification` dependency.
   publish-wasm-dependency:
     name: Publish npm dependency (wasm)
-    needs: [ci, python-wheels, artifact-qualification]
+    needs: [ci, artifact-qualification]
     runs-on: ubuntu-latest
     environment:
       name: release
@@ -321,7 +331,6 @@ jobs:
     # published and verified.
     needs:
       - ci
-      - python-wheels
       - artifact-qualification
       - publish-native-dependencies
       - publish-wasm-dependency
@@ -449,7 +458,7 @@ jobs:
 
   publish-crates:
     name: Publish crates.io
-    needs: [ci, python-wheels, artifact-qualification]
+    needs: [ci, artifact-qualification]
     runs-on: ubuntu-latest
     environment:
       name: release
@@ -559,7 +568,7 @@ jobs:
 
   publish-pypi:
     name: Publish PyPI
-    needs: [ci, python-wheels, artifact-qualification]
+    needs: [ci, artifact-qualification]
     runs-on: ubuntu-latest
     environment:
       name: release
@@ -590,6 +599,27 @@ jobs:
           path: dist
           pattern: python-*
           merge-multiple: true
+
+      # `artifact-qualification`'s `inventory` job records the SHA-256 of
+      # every artifact it qualified, including these wheels and the source
+      # distribution, from the one build `python-wheels.yml` produced for
+      # this commit (issue #527).
+      - name: Download the qualified artifact inventory
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: artifact-inventory
+          path: qualification-inventory
+
+      # Issue #527's acceptance criterion: the published wheel's digest must
+      # equal the qualified wheel's digest, and this must fail loudly if they
+      # ever differ, independently of the build topology above -- so a future
+      # refactor that reintroduces a second build is caught here even if the
+      # topology change itself goes unnoticed.
+      - name: Verify published wheels match the qualified inventory
+        run: |
+          python3 -B scripts/verify-python-digest.py \
+            --inventory qualification-inventory/artifact-inventory.json \
+            dist/*
 
       # Reuses `scripts/qualify-python-wheel.py`'s own `workspace_version`
       # and `pep440_version` instead of restating the Cargo-to-PEP-440
