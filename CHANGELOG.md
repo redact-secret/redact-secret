@@ -37,6 +37,16 @@ evidence is linked from each published version.
   observation — so a contributor or agent can satisfy the check
   `redact-secret-benchmarks` enforces (`scripts/check-evidence-arrival.mjs`,
   issue #52 there) without reading the checker itself (#525).
+- Recorded the [0.1.0-beta.5 release retrospective](docs/audits/beta5-release-retrospective.md)
+  (#531, closing Epic #526): what published, the three release-engineering
+  failures (npm propagation false negatives, the forced recovery run, and the
+  non-byte-identical qualified/published Python wheel), how #527/#528/#529
+  resolved them, and what remains open (the Reconcile Release path has never
+  been deliberately exercised; the wheel build itself is not yet proven
+  reproducible). Added the [v0.1.0 release-readiness checklist](docs/release-readiness-v0.1.0.md),
+  referenced from [the release runbook](docs/releasing.md#review-and-approval),
+  stating six checkable criteria a future stable-release decision is made
+  against; this work approves no release itself.
 
 ## 0.1.0-beta.5 — 2026-09-20
 
