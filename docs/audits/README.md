@@ -49,3 +49,4 @@ and [qualification follow-up](release-qualification-follow-up.md) describe beta.
 | Vercel credential taxonomy audit (#516) | [Prefix provenance, TruffleHog/gitleaks/flare-redact corroboration, per-class disposition](evidence/516/README.md) |
 | Google credential-family audit beyond `google-api-key` (#519) | [OAuth client secret, service-account private key, Gemini API credentials, OAuth refresh/access; per-family disposition and evidence tier](evidence/519/README.md) |
 | Firebase secret-bearing credential detection with public-config discrimination (#520) | [New `firebase-server-key` detector, `google-api-key`/client-config discrimination mechanism, Realtime Database secret gap](evidence/520/README.md) |
+| Terraform Cloud/Enterprise token detection (#521) | [New `terraform-cloud-token` detector, provider-documented exact-width evidence, agent-pool/Enterprise shape reuse](evidence/521/README.md) |

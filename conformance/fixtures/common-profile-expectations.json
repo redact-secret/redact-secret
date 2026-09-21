@@ -3,7 +3,7 @@
   "corpus": "synchronous-corpus.json",
   "offsetUnit": "utf8-byte",
   "detectors": ["private-key","jwt","bearer-token","connection-string","otpauth-uri","generic-token"],
-  "fixtureCount": 1400,
+  "fixtureCount": 1419,
   "fixtures": [
     {"expected":[{"action":"warn","confidence":"medium","detector":"generic-token","end":48,"start":8,"type":"contextual_secret"}],"id":"host-dotenv-github"},
     {"expected":[{"action":"warn","confidence":"medium","detector":"generic-token","end":52,"start":12,"type":"contextual_secret"}],"id":"host-json-github"},
@@ -1404,6 +1404,25 @@
     {"expected":[],"id":"pulumi-access-token-negative-version-identifier"},
     {"expected":[],"id":"pulumi-access-token-negative-github-actions-secret-reference"},
     {"expected":[{"action":"redact","confidence":"high","detector":"generic-token","end":57,"start":13,"type":"contextual_secret"}],"id":"pulumi-access-token-overlap-context"},
-    {"expected":[],"id":"pulumi-access-token-adversarial-long-suffix"}
+    {"expected":[],"id":"pulumi-access-token-adversarial-long-suffix"},
+    {"expected":[],"id":"terraform-cloud-token-positive-bare"},
+    {"expected":[],"id":"terraform-cloud-token-positive-cli-credentials-hcl"},
+    {"expected":[],"id":"terraform-cloud-token-positive-cli-credentials-json"},
+    {"expected":[],"id":"terraform-cloud-token-positive-dotenv"},
+    {"expected":[],"id":"terraform-cloud-token-positive-github-actions"},
+    {"expected":[],"id":"terraform-cloud-token-positive-log"},
+    {"expected":[],"id":"terraform-cloud-token-overlap-generic-context"},
+    {"expected":[],"id":"terraform-cloud-token-boundary-prefix-short"},
+    {"expected":[],"id":"terraform-cloud-token-boundary-suffix-short"},
+    {"expected":[],"id":"terraform-cloud-token-boundary-wrong-marker"},
+    {"expected":[],"id":"terraform-cloud-token-negative-masked"},
+    {"expected":[],"id":"terraform-cloud-token-negative-env-var-reference"},
+    {"expected":[],"id":"terraform-cloud-token-negative-doc-placeholder"},
+    {"expected":[],"id":"terraform-cloud-token-negative-embedded-wider-identifier"},
+    {"expected":[],"id":"terraform-cloud-token-negative-workspace-and-org-ids"},
+    {"expected":[],"id":"terraform-cloud-token-negative-provider-version-constraint"},
+    {"expected":[],"id":"terraform-cloud-token-negative-state-file-identifier"},
+    {"expected":[],"id":"terraform-cloud-token-adversarial-near-miss-suffix"},
+    {"expected":[],"id":"terraform-cloud-token-positive-crlf-unicode-prefix"}
   ]
 }

@@ -5581,6 +5581,98 @@
     },
     {
       "behaviorClass": "provider",
+      "detector": "terraform-cloud-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "terraform-cloud-token-positive-bare",
+            "terraform-cloud-token-positive-cli-credentials-hcl",
+            "terraform-cloud-token-positive-cli-credentials-json",
+            "terraform-cloud-token-positive-crlf-unicode-prefix",
+            "terraform-cloud-token-positive-dotenv",
+            "terraform-cloud-token-positive-github-actions",
+            "terraform-cloud-token-positive-log"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "terraform-cloud-token-overlap-generic-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "terraform-cloud-token-adversarial-near-miss-suffix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "terraform-cloud-token-boundary-prefix-short",
+            "terraform-cloud-token-boundary-suffix-short",
+            "terraform-cloud-token-boundary-wrong-marker"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "terraform-cloud-token-negative-doc-placeholder",
+            "terraform-cloud-token-negative-embedded-wider-identifier",
+            "terraform-cloud-token-negative-env-var-reference",
+            "terraform-cloud-token-negative-masked",
+            "terraform-cloud-token-negative-provider-version-constraint",
+            "terraform-cloud-token-negative-state-file-identifier",
+            "terraform-cloud-token-negative-workspace-and-org-ids"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "terraform-cloud-token-boundary-prefix-short",
+            "terraform-cloud-token-boundary-suffix-short",
+            "terraform-cloud-token-boundary-wrong-marker"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for terraform_cloud_token (terraform-cloud-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "terraform_cloud_token"
+    },
+    {
+      "behaviorClass": "provider",
       "detector": "pulumi-access-token",
       "dimensions": [
         {
@@ -5856,6 +5948,7 @@
             "supabase-adversarial-long-suffix",
             "supabase-management-adversarial-long-suffix",
             "telegram-bot-token-adversarial-long-padding",
+            "terraform-cloud-token-adversarial-near-miss-suffix",
             "twilio-api-key-secret-adversarial-dense-findings",
             "twilio-auth-token-adversarial-dense-findings",
             "vault-adversarial-long-suffix",
@@ -6242,6 +6335,7 @@
             "supabase-adversarial-long-suffix",
             "supabase-management-adversarial-long-suffix",
             "telegram-bot-token-adversarial-long-padding",
+            "terraform-cloud-token-adversarial-near-miss-suffix",
             "twilio-api-key-secret-adversarial-dense-findings",
             "twilio-auth-token-adversarial-dense-findings",
             "vault-adversarial-long-suffix",

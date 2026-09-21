@@ -72,7 +72,7 @@ export const CANONICAL_IDS = [
   "telegram-bot-token", "discord-bot-token", "sentry-user-auth-token", "sentry-org-auth-token",
   "datadog-api-key", "datadog-application-key", "grafana-service-account-token",
   "grafana-cloud-access-policy-token", "new-relic-user-api-key", "new-relic-license-key",
-  "firebase-server-key", "pulumi-access-token",
+  "firebase-server-key", "terraform-cloud-token", "pulumi-access-token",
   "jwt", "bearer-token", "connection-string", "otpauth-uri", "generic-token",
 ];
 
@@ -91,7 +91,7 @@ export const GROUPS = {
     "aws-access-key", "vault-token", "cloudflare-token", "digitalocean-token", "supabase-token",
     "supabase-management-token", "vercel-token", "google-api-key", "microsoft-entra-client-secret", "datadog-api-key",
     "datadog-application-key", "grafana-service-account-token", "grafana-cloud-access-policy-token",
-    "new-relic-user-api-key", "new-relic-license-key", "firebase-server-key",
+    "new-relic-user-api-key", "new-relic-license-key", "firebase-server-key", "terraform-cloud-token",
     "pulumi-access-token",
   ],
   devtools: [
