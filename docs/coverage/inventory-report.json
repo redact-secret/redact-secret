@@ -1190,7 +1190,7 @@
     {
       "detector": "google-api-key",
       "evidence": {
-        "fixtureCount": 23,
+        "fixtureCount": 30,
         "hostContextsExercised": [
           "dotenv",
           "javascript",
@@ -1201,6 +1201,7 @@
         ],
         "kindsWithSupportedEvidence": [
           "adversarial",
+          "boundary",
           "negative",
           "overlap",
           "positive"
@@ -1211,6 +1212,7 @@
         ]
       },
       "evidenceFixtureIds": [
+        "firebase-positive-google-api-key-as-server-key-context",
         "google-positive-dotenv",
         "google-positive-javascript-firebase-config",
         "google-positive-json",
@@ -2243,12 +2245,44 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "new_relic_license_key"
+    },
+    {
+      "detector": "firebase-server-key",
+      "evidence": {
+        "fixtureCount": 11,
+        "hostContextsExercised": [
+          "dotenv",
+          "javascript",
+          "plain-text",
+          "shell"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "firebase-server-key-positive-bare",
+        "firebase-server-key-positive-crlf-unicode-prefix",
+        "firebase-server-key-positive-dotenv",
+        "firebase-server-key-positive-javascript"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "firebase_server_key"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 49,
+    "supported": 50,
     "unresolved": 0
   }
 }

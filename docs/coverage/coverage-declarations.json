@@ -2919,6 +2919,7 @@
         {
           "dimension": "positive",
           "evidenceFixtureIds": [
+            "firebase-positive-google-api-key-as-server-key-context",
             "google-positive-dotenv",
             "google-positive-javascript-firebase-config",
             "google-positive-json",
@@ -2945,6 +2946,7 @@
         {
           "dimension": "boundary",
           "evidenceFixtureIds": [
+            "firebase-negative-client-config-wide-gap-does-not-suppress",
             "google-boundary-below-min",
             "google-boundary-case-sensitivity",
             "google-boundary-crlf",
@@ -2958,6 +2960,10 @@
         {
           "dimension": "near-miss-negative",
           "evidenceFixtureIds": [
+            "firebase-negative-authdomain-bare",
+            "firebase-negative-client-config-javascript",
+            "firebase-negative-client-config-json",
+            "firebase-negative-messaging-sender-id-bare",
             "google-negative-key-id",
             "google-negative-masked",
             "google-negative-oauth-client-id",
@@ -5490,6 +5496,90 @@
       "type": "new_relic_license_key"
     },
     {
+      "behaviorClass": "provider",
+      "detector": "firebase-server-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "firebase-server-key-positive-bare",
+            "firebase-server-key-positive-crlf-unicode-prefix",
+            "firebase-server-key-positive-dotenv",
+            "firebase-server-key-positive-javascript"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "firebase-server-key-overlap-generic-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "firebase-server-key-adversarial-near-miss-body"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "firebase-server-key-boundary-body-short",
+            "firebase-server-key-boundary-separator-wrong",
+            "firebase-server-key-boundary-tail-short"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "firebase-server-key-negative-masked",
+            "firebase-server-key-negative-reference"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "firebase-server-key-boundary-body-short",
+            "firebase-server-key-boundary-separator-wrong",
+            "firebase-server-key-boundary-tail-short"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for firebase_server_key (firebase-server-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "firebase_server_key"
+    },
+    {
       "behaviorClass": "incremental",
       "detector": "unassigned",
       "dimensions": [
@@ -5626,6 +5716,7 @@
             "digitalocean-adversarial-long-suffix",
             "discord-bot-token-adversarial-long-padding",
             "docker-adversarial-long-suffix",
+            "firebase-server-key-adversarial-near-miss-body",
             "github-adversarial-long-suffix",
             "gitlab-adversarial-long-suffix",
             "google-adversarial-long-suffix",
@@ -6010,6 +6101,7 @@
             "digitalocean-adversarial-long-suffix",
             "discord-bot-token-adversarial-long-padding",
             "docker-adversarial-long-suffix",
+            "firebase-server-key-adversarial-near-miss-body",
             "github-adversarial-long-suffix",
             "gitlab-adversarial-long-suffix",
             "google-adversarial-long-suffix",
