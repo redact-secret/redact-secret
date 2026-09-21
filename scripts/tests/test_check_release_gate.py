@@ -29,12 +29,6 @@ jobs:
     permissions:
       contents: read
 
-  python-wheels:
-    name: Python wheels
-    uses: ./.github/workflows/python-wheels.yml
-    permissions:
-      contents: read
-
   artifact-qualification:
     name: Artifact qualification
     uses: ./.github/workflows/artifact-qualification.yml
@@ -44,7 +38,7 @@ jobs:
   publish-native-dependencies:
     name: Publish npm dependency
     runs-on: ubuntu-latest
-    needs: [ci, python-wheels, artifact-qualification]
+    needs: [ci, artifact-qualification]
     environment:
       name: release
     permissions:
@@ -57,7 +51,7 @@ jobs:
   publish-wasm-dependency:
     name: Publish npm dependency (wasm)
     runs-on: ubuntu-latest
-    needs: [ci, python-wheels, artifact-qualification]
+    needs: [ci, artifact-qualification]
     environment:
       name: release
     permissions:
@@ -88,7 +82,6 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - ci
-      - python-wheels
       - artifact-qualification
       - publish-native-dependencies
       - publish-wasm-dependency
@@ -103,7 +96,7 @@ jobs:
 
   publish-crates:
     name: Publish crates.io
-    needs: [ci, python-wheels, artifact-qualification]
+    needs: [ci, artifact-qualification]
     runs-on: ubuntu-latest
     environment:
       name: release
@@ -116,7 +109,7 @@ jobs:
 
   publish-pypi:
     name: Publish PyPI
-    needs: [ci, python-wheels, artifact-qualification]
+    needs: [ci, artifact-qualification]
     runs-on: ubuntu-latest
     environment:
       name: release
@@ -125,6 +118,12 @@ jobs:
 
     steps:
       - name: Check out repository
+        run: echo noop
+
+      - name: Verify published wheels match the qualified inventory
+        run: python3 -B scripts/verify-python-digest.py --inventory qualification-inventory/artifact-inventory.json dist/*
+
+      - name: Publish to PyPI
         run: echo noop
 """
 
@@ -140,19 +139,6 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo noop
-"""
-
-WHEELS_YML = """\
-name: Python wheels
-
-on:
-  workflow_call:
-
-jobs:
-  policy:
     runs-on: ubuntu-latest
     steps:
       - run: echo noop
@@ -181,7 +167,6 @@ class ReleaseGateTests(unittest.TestCase):
         self.root = Path(tmp.name)
         self._write("release.yml", RELEASE_YML)
         self._write("ci.yml", CI_YML)
-        self._write("python-wheels.yml", WHEELS_YML)
         self._write("artifact-qualification.yml", ARTIFACT_QUALIFICATION_YML)
 
     def _write(self, name: str, content: str) -> Path:
@@ -201,26 +186,17 @@ class ReleaseGateTests(unittest.TestCase):
 
     def test_publish_not_needing_ci_is_an_error(self) -> None:
         broken = RELEASE_YML.replace(
-            "    needs:\n      - ci\n      - python-wheels\n",
-            "    needs:\n      - python-wheels\n",
+            "    needs:\n      - ci\n      - artifact-qualification\n",
+            "    needs:\n      - artifact-qualification\n",
         )
         self._write("release.yml", broken)
         errors = CHECK.validate(self.root)
         self.assertTrue(any("does not need ci" in error for error in errors))
 
-    def test_publish_not_needing_python_wheels_is_an_error(self) -> None:
-        broken = RELEASE_YML.replace(
-            "    needs:\n      - ci\n      - python-wheels\n",
-            "    needs:\n      - ci\n",
-        )
-        self._write("release.yml", broken)
-        errors = CHECK.validate(self.root)
-        self.assertTrue(any("does not need python-wheels" in error for error in errors))
-
     def test_publish_not_needing_artifact_qualification_is_an_error(self) -> None:
         broken = RELEASE_YML.replace(
-            "    needs:\n      - ci\n      - python-wheels\n      - artifact-qualification\n",
-            "    needs:\n      - ci\n      - python-wheels\n",
+            "    needs:\n      - ci\n      - artifact-qualification\n",
+            "    needs:\n      - ci\n",
         )
         self._write("release.yml", broken)
         errors = CHECK.validate(self.root)
@@ -258,8 +234,8 @@ class ReleaseGateTests(unittest.TestCase):
 
     def test_publish_crates_not_needing_a_gate_is_an_error(self) -> None:
         broken = RELEASE_YML.replace(
-            "  publish-crates:\n    name: Publish crates.io\n    needs: [ci, python-wheels, artifact-qualification]\n",
-            "  publish-crates:\n    name: Publish crates.io\n    needs: [ci, python-wheels]\n",
+            "  publish-crates:\n    name: Publish crates.io\n    needs: [ci, artifact-qualification]\n",
+            "  publish-crates:\n    name: Publish crates.io\n    needs: [ci]\n",
         )
         self._write("release.yml", broken)
         errors = CHECK.validate(self.root)
@@ -269,14 +245,14 @@ class ReleaseGateTests(unittest.TestCase):
 
     def test_publish_pypi_not_needing_a_gate_is_an_error(self) -> None:
         broken = RELEASE_YML.replace(
-            "  publish-pypi:\n    name: Publish PyPI\n    needs: [ci, python-wheels, artifact-qualification]\n",
+            "  publish-pypi:\n    name: Publish PyPI\n    needs: [ci, artifact-qualification]\n",
             "  publish-pypi:\n    name: Publish PyPI\n    needs: [ci]\n",
         )
         self._write("release.yml", broken)
         errors = CHECK.validate(self.root)
         self.assertTrue(
             any(
-                "publish-pypi job does not need artifact-qualification, python-wheels" in error
+                "publish-pypi job does not need artifact-qualification" in error
                 for error in errors
             )
         )
@@ -427,6 +403,79 @@ class ReleaseGateTests(unittest.TestCase):
         self.assertTrue(
             any(
                 'does not assert the common artifact reports "common"' in error
+                for error in errors
+            )
+        )
+
+    def test_missing_publish_pypi_job_is_missing_error_for_digest_step(self) -> None:
+        broken = RELEASE_YML[: RELEASE_YML.index("  publish-pypi:")]
+        self._write("release.yml", broken)
+        errors = CHECK.validate(self.root)
+        # Already covered by test_missing_publish_pypi_job_is_an_error, but the
+        # digest-step checks must not also fire a confusing second error for a
+        # job that does not exist.
+        self.assertFalse(any("is missing the 'Verify published wheels" in error for error in errors))
+
+    def test_missing_pypi_digest_step_is_an_error(self) -> None:
+        broken = RELEASE_YML.replace(
+            "      - name: Verify published wheels match the qualified inventory\n"
+            "        run: python3 -B scripts/verify-python-digest.py --inventory qualification-inventory/artifact-inventory.json dist/*\n\n",
+            "",
+        )
+        self.assertNotEqual(broken, RELEASE_YML)
+        self._write("release.yml", broken)
+        errors = CHECK.validate(self.root)
+        self.assertTrue(
+            any(
+                "is missing the 'Verify published wheels match the qualified inventory' step" in error
+                for error in errors
+            )
+        )
+
+    def test_missing_pypi_publish_step_is_an_error(self) -> None:
+        broken = RELEASE_YML.replace(
+            "      - name: Publish to PyPI\n        run: echo noop\n",
+            "",
+        )
+        self.assertNotEqual(broken, RELEASE_YML)
+        self._write("release.yml", broken)
+        errors = CHECK.validate(self.root)
+        self.assertTrue(
+            any(
+                "is missing the 'Publish to PyPI' step" in error
+                for error in errors
+            )
+        )
+
+    def test_pypi_digest_step_after_publish_step_is_an_error(self) -> None:
+        digest_step = (
+            "      - name: Verify published wheels match the qualified inventory\n"
+            "        run: python3 -B scripts/verify-python-digest.py --inventory qualification-inventory/artifact-inventory.json dist/*\n\n"
+        )
+        publish_step = "      - name: Publish to PyPI\n        run: echo noop\n"
+        broken = RELEASE_YML.replace(digest_step + publish_step, publish_step + "\n" + digest_step)
+        self.assertNotEqual(broken, RELEASE_YML)
+        self._write("release.yml", broken)
+        errors = CHECK.validate(self.root)
+        self.assertTrue(
+            any(
+                "'Verify published wheels match the qualified inventory' must precede "
+                "'Publish to PyPI'" in error
+                for error in errors
+            )
+        )
+
+    def test_pypi_digest_step_not_running_the_script_is_an_error(self) -> None:
+        broken = RELEASE_YML.replace(
+            "python3 -B scripts/verify-python-digest.py --inventory qualification-inventory/artifact-inventory.json dist/*",
+            "echo noop",
+        )
+        self.assertNotEqual(broken, RELEASE_YML)
+        self._write("release.yml", broken)
+        errors = CHECK.validate(self.root)
+        self.assertTrue(
+            any(
+                "does not run scripts/verify-python-digest.py" in error
                 for error in errors
             )
         )
