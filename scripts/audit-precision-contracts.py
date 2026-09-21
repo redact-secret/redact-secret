@@ -155,7 +155,18 @@ def find_contract_matches(text: str, pattern: re.Pattern[str]) -> list[dict]:
 
 
 def family_patterns(contracts: dict) -> dict[str, re.Pattern[str]]:
-    return {family["detector"]: compile_family(family) for family in contracts["families"]}
+    """One compiled pattern per family that has adopted at least one variant.
+
+    A family with no `variants` (every class still `pending`, e.g.
+    `vercel-token` per issue #516) has no reviewed grammar to check corpus
+    fixtures against yet; it is omitted here rather than compiled into an
+    empty alternation, which would match everywhere with no named group.
+    """
+    return {
+        family["detector"]: compile_family(family)
+        for family in contracts["families"]
+        if family["variants"]
+    }
 
 
 # --- beta.4 twin baseline -----------------------------------------------------
