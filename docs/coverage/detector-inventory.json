@@ -379,6 +379,13 @@
       "policyClass": "always-redact",
       "reconciliationTrigger": "AAAASYNREV0:SYNTHETICREVOKEDFIREBASEFCMLEGACYSERVERKEYFIXTUREPADDING0123456789SYNTHETICREVOKEDFIREBASEFCMLEGACYSERVERKEYFIXTUREPADDING0123456789ABCDWXYZ",
       "schemes": null
+    },
+    {
+      "type": "pulumi_access_token",
+      "detector": "pulumi-access-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "pul-0123456789abcdef0123456789abcdef01234567",
+      "schemes": null
     }
   ],
   "consumers": [

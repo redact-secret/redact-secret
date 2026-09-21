@@ -1,5 +1,5 @@
 //! Stripe, `PyPI`, Hugging Face, Docker, `DigitalOcean`, Supabase, Vercel,
-//! npm, Google, and Grafana Cloud API key detection.
+//! npm, Google, Grafana Cloud, and Pulumi access token detection.
 //!
 //! Mirrors the retired `src/detectors/additional-providers.ts` oracle. Every
 //! one of these providers reduces to the same shape as [`super::gitlab`] or
@@ -466,6 +466,56 @@ pub(super) const GRAFANA_CLOUD: KnownFormatProviderDetector = KnownFormatProvide
     boundary: pattern::is_alnum_dash,
 };
 
+/// Pulumi Cloud access tokens (issue #522, B3c): personal, organization, and
+/// team credentials, all three sharing one literal prefix and body shape --
+/// Pulumi's own REST API reference documents no kind-specific prefix, so
+/// (the same "one documented shape, several issuance contexts" reading
+/// [`NPM`] above already applies) this is one [`PrefixShape`], not one per
+/// token kind.
+///
+/// **Prefix: provider-documented.** Pulumi's Cloud REST API reference
+/// (`pulumi.com/docs/reference/cloud-rest-api/access-tokens/`, observed
+/// 2026-09-21) states, of the token-creation response: "The response
+/// includes the token ID and the tokenValue (prefixed with 'pul-')." That
+/// page, and its `personal-access-tokens` sibling (identical prose, observed
+/// the same day), state no length or alphabet for the value that follows.
+///
+/// **Body: tool-corroborated, not provider-documented.** Two independently
+/// maintained tools, consulted only as external behavioral references per
+/// `AGENTS.md`, converge on the same shape:
+///
+/// ```text
+/// gitleaks 8.30.1's pulumi-api-token rule:
+///   \b(pul-[a-f0-9]{40})(?:[`'"\s;]|\\[nr]|$)
+/// pleno-dlp's Pulumi detector (github.com/plenoai/pleno-dlp):
+///   "pul- prefix + 40-hex"
+/// ```
+///
+/// Both pin exactly 40 lowercase hexadecimal bytes after the prefix; neither
+/// registers any other length or alphabet. A worked, explicitly
+/// non-working example (Nelson Figueroa, "How to Tell What Kind of Pulumi
+/// Access Token You Have", dev.to, observed 2026-09-21, itself citing
+/// gitleaks/trufflehog) shows one 40-lowercase-hex-byte example each for the
+/// personal, organization, and team kinds -- consistent with, but not
+/// treated as independent of, that tool agreement. A body shorter or longer
+/// than 40 bytes, in uppercase hex, or using any other undocumented
+/// character is an intentional false negative rather than a fuzzy match,
+/// the same exact-length precedent [`DIGITALOCEAN`] and [`NPM`] above
+/// already set.
+const PULUMI_SIGNALS: [&str; 2] = ["pulumi-documented-prefix", "tool-corroborated-length"];
+
+pub(super) const PULUMI: KnownFormatProviderDetector = KnownFormatProviderDetector {
+    id: "pulumi-access-token",
+    type_name: "pulumi_access_token",
+    shapes: &[PrefixShape::exact(
+        "pul-",
+        40,
+        pattern::is_lower_hex,
+        &PULUMI_SIGNALS,
+    )],
+    boundary: pattern::is_alnum_dash,
+};
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -515,6 +565,13 @@ mod tests {
     const _: () = assert!(SUPABASE_PAT_BODY.len() == 40);
     const DIGITALOCEAN_REFRESH_BODY: &str =
         "123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0";
+    /// Exactly 40 lowercase hex bytes: the tool-corroborated Pulumi access
+    /// token body length (issue #522). The hex-only alphabet admits no
+    /// `SYNTHETIC…` marker, so this is the same unmistakably patterned hex
+    /// run style [`DIGITALOCEAN_BODY`] uses for its own narrowed alphabet.
+    /// None was ever provider-issued.
+    const PULUMI_BODY: &str = "0123456789abcdef0123456789abcdef01234567";
+    const _: () = assert!(PULUMI_BODY.len() == 40);
 
     fn detect(detector: &KnownFormatProviderDetector, input: &str) -> Vec<Candidate> {
         detector
@@ -584,6 +641,7 @@ mod tests {
                 GRAFANA_CLOUD_BODY,
                 "glc_SYNTHETICSHORT",
             ),
+            family(PULUMI, "pul-", PULUMI_BODY, "pul-0123456789abcdef"),
         ]
     }
 
@@ -1364,6 +1422,125 @@ mod tests {
             format!("dop%5Fv1%5F{DIGITALOCEAN_BODY}"),
         ] {
             assert!(detect(&DIGITALOCEAN, &input).is_empty(), "{input}");
+        }
+    }
+
+    // Issue #522: the Pulumi access token contract. The `pul-` prefix is
+    // provider-documented (Pulumi's own Cloud REST API reference); the
+    // exact 40-lowercase-hex body is tool-corroborated (gitleaks and
+    // pleno-dlp independently agree). Every body below is a locally
+    // constructed synthetic value; none was ever provider-issued.
+
+    /// The documented shape, matched at `Confidence::High`,
+    /// `Specificity::Provider`, at exactly the token's own range. Personal,
+    /// organization, and team tokens share this one literal prefix and body
+    /// grammar, so one synthetic body stands in for all three kinds.
+    #[test]
+    fn pulumi_accepts_exactly_forty_lowercase_hex_bytes() {
+        let token = format!("pul-{PULUMI_BODY}");
+        assert_eq!(token.len(), 44);
+        let candidates = detect(&PULUMI, &token);
+        assert_eq!(candidates.len(), 1);
+        assert_eq!(candidates[0].type_name(), "pulumi_access_token");
+        assert_eq!(candidates[0].confidence(), Confidence::High);
+        assert_eq!(candidates[0].effective_specificity(), Specificity::Provider);
+        assert_eq!(candidates[0].range(), ByteRange::new(0, 44).unwrap());
+    }
+
+    /// Length negative twin: gitleaks and pleno-dlp both pin the body to
+    /// exactly 40 bytes, so a 39-byte or 41-byte body is an intentional
+    /// false negative, not a fuzzy match against a minimum or a truncation
+    /// to the documented width.
+    #[test]
+    fn pulumi_rejects_a_body_one_hex_byte_short_or_long_of_the_documented_length() {
+        for body in [
+            &PULUMI_BODY[..PULUMI_BODY.len() - 1],
+            &format!("{PULUMI_BODY}0"),
+        ] {
+            let value = format!("pul-{body}");
+            assert_eq!(detect(&PULUMI, &value).len(), 0, "{value}");
+        }
+    }
+
+    /// Alphabet negative twin: both corroborating tools pin the body to
+    /// lowercase hex only. An uppercase hex digit, a non-hex letter, or
+    /// whitespace inside an otherwise documented-length body is rejected
+    /// rather than truncated to its longest valid-alphabet prefix.
+    #[test]
+    fn pulumi_rejects_uppercase_hex_and_non_hex_bytes_inside_the_body() {
+        let token = format!("pul-{PULUMI_BODY}");
+        let body_at = |index: usize, replacement: &str| {
+            let at = "pul-".len() + index;
+            format!("{}{replacement}{}", &token[..at], &token[at + 1..])
+        };
+        for input in [
+            body_at(8, "D"),
+            body_at(8, "g"),
+            body_at(8, " "),
+            body_at(39, "A"),
+        ] {
+            assert!(detect(&PULUMI, &input).is_empty(), "{input}");
+        }
+    }
+
+    /// Prefix negative twin: an undocumented near-miss prefix (missing or
+    /// wrong separator, wrong case, one letter off, or the documented
+    /// prefix embedded in a wider identifier) is a false negative by
+    /// design, never a fuzzy match, the same rule this registry's other
+    /// documented-prefix families already apply.
+    #[test]
+    fn pulumi_rejects_undocumented_near_miss_prefixes() {
+        for input in [
+            format!("pu-{PULUMI_BODY}"),
+            format!("pull-{PULUMI_BODY}"),
+            format!("pul_{PULUMI_BODY}"),
+            format!("pul{PULUMI_BODY}"),
+            format!("PUL-{PULUMI_BODY}"),
+            format!("legacypul-{PULUMI_BODY}"),
+            format!("pul%2D{PULUMI_BODY}"),
+        ] {
+            assert!(detect(&PULUMI, &input).is_empty(), "{input}");
+        }
+    }
+
+    /// Benign controls (issue #522): a fully qualified Pulumi stack
+    /// reference, a bare project name, `pulumi up`/`pulumi version`-style
+    /// CLI output, and a documentation-style `x`-filled placeholder all
+    /// carry no `pul-`-prefixed hex run and must stay unclassified.
+    #[test]
+    fn pulumi_rejects_stack_project_and_version_identifiers_as_benign_controls() {
+        for input in [
+            "stack: myorg/my-infra-project/production",
+            "Updating (dev):\n    pulumi:pulumi:Stack my-infra-project-dev running\nResources: 3 unchanged\nUpdate succeeded in 8s",
+            "Previewing update (staging)\n    Type                 Name\n +   pulumi:providers:aws default",
+            "pulumi version\nv3.142.0",
+            "PULUMI_ACCESS_TOKEN=pul-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        ] {
+            assert!(detect(&PULUMI, input).is_empty(), "{input}");
+        }
+    }
+
+    /// Quotes, Markdown code spans, and a `KEY=` assignment all bound the
+    /// token without joining it, the same boundary behavior `DIGITALOCEAN`
+    /// already exercises.
+    #[test]
+    fn pulumi_bounds_the_token_against_quotes_code_spans_and_assignments() {
+        let token = format!("pul-{PULUMI_BODY}");
+        for (input, start) in [
+            (format!("\"{token}\""), 1),
+            (format!("`{token}`"), 1),
+            (
+                format!("PULUMI_ACCESS_TOKEN={token}"),
+                "PULUMI_ACCESS_TOKEN=".len(),
+            ),
+        ] {
+            let candidates = detect(&PULUMI, &input);
+            assert_eq!(candidates.len(), 1, "{input}");
+            assert_eq!(
+                candidates[0].range(),
+                ByteRange::new(start, start + token.len()).unwrap(),
+                "{input}"
+            );
         }
     }
 }

@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 1377,
+  "fixtureCount": 1400,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -30996,6 +30996,408 @@
       "input": "https://synthetic-revoked-default-rtdb.firebaseio.com/users.json?auth=aB3xQ9zK7mN2pR5sT8vW1yC4dF6gH0jL9nM3oP7qS1uV5wX8zA2bC4dE6fG8hJ0k",
       "expected": [],
       "note": "The legacy Firebase Realtime Database secret (firebase.google.com/docs/database/rest/auth, observed 2026-09-20: 'The Realtime Database REST API still supports authentication via legacy authentication tokens, including secrets'; no format, length, or character-set is documented for the value) is passed as a bare `?auth=<secret>` query parameter on a `*.firebaseio.com` URL -- an opaque value with zero lexical evidence, the same category issue #519's audit records as correctly left uncovered for Google's own OAuth access/refresh tokens. generic-token's AMBIGUOUS_NAMES list already includes `auth`, but its open-assignment boundary check requires whitespace or `{`/`,`/`;` immediately before the key name; the `?` that precedes a URL query parameter is not in that set, so this realistic form is not classified even incidentally (a bare `auth=<value>` assignment elsewhere in the corpus already is). Widening that boundary set is a generic_token.rs-wide change affecting every URL query string this crate scans, not a Firebase-specific one, and is out of this issue's scope; this fixture pins the current, deliberate silence as a documented gap rather than an unnoticed one, the same pattern issue #519 used for google-negative-oauth-client-secret."
+    },
+    {
+      "id": "pulumi-access-token-positive-bare",
+      "detector": "pulumi-access-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "pul-0123456789abcdef0123456789abcdef01234567",
+      "expected": [
+        {
+          "detector": "pulumi-access-token",
+          "type": "pulumi_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 44
+        }
+      ],
+      "note": "The documented pul- prefix plus exactly 40 lowercase hex bytes is sufficient on its own; no surrounding context is required."
+    },
+    {
+      "id": "pulumi-access-token-positive-dotenv",
+      "detector": "pulumi-access-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "PULUMI_ACCESS_TOKEN=pul-0123456789abcdef0123456789abcdef01234567",
+      "expected": [
+        {
+          "detector": "pulumi-access-token",
+          "type": "pulumi_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 20,
+          "end": 64
+        }
+      ],
+      "note": "A bare dotenv-style assignment (KEY=<token>, no quotes) is detected by format alone."
+    },
+    {
+      "id": "pulumi-access-token-positive-cli-credentials-file",
+      "detector": "pulumi-access-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\n  \"current\": \"https://api.pulumi.com\",\n  \"accessTokens\": {\n    \"https://api.pulumi.com\": \"pul-0123456789abcdef0123456789abcdef01234567\"\n  },\n  \"accounts\": {}\n}\n",
+      "expected": [
+        {
+          "detector": "pulumi-access-token",
+          "type": "pulumi_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 92,
+          "end": 136
+        }
+      ],
+      "note": "The Pulumi CLI's ~/.pulumi/credentials.json stores each backend's access token in plain text under accessTokens, keyed by backend URL; a leaked copy of that file is detected by format alone."
+    },
+    {
+      "id": "pulumi-access-token-positive-github-actions",
+      "detector": "pulumi-access-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "github-actions"
+      ],
+      "input": "env:\n  PULUMI_ACCESS_TOKEN: pul-0123456789abcdef0123456789abcdef01234567\n",
+      "expected": [
+        {
+          "detector": "pulumi-access-token",
+          "type": "pulumi_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 28,
+          "end": 72
+        }
+      ],
+      "note": "Host syntax is lexical context; a hardcoded token in CI configuration (rather than a secrets: reference) retains exact original-input offsets."
+    },
+    {
+      "id": "pulumi-access-token-positive-log",
+      "detector": "pulumi-access-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-21T12:00:00Z INFO  using pulumi access token pul-0123456789abcdef0123456789abcdef01234567 for deployment\n",
+      "expected": [
+        {
+          "detector": "pulumi-access-token",
+          "type": "pulumi_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 53,
+          "end": 97
+        }
+      ],
+      "note": "A token embedded in an ordinary log line is bounded by whitespace on both sides."
+    },
+    {
+      "id": "pulumi-access-token-positive-shell-quoted",
+      "detector": "pulumi-access-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export PULUMI_ACCESS_TOKEN=\"pul-0123456789abcdef0123456789abcdef01234567\"\n",
+      "expected": [
+        {
+          "detector": "pulumi-access-token",
+          "type": "pulumi_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 28,
+          "end": 72
+        }
+      ],
+      "note": "A quoted shell export still bounds the token to exactly its own 44 bytes."
+    },
+    {
+      "id": "pulumi-access-token-positive-punctuation-adjacent",
+      "detector": "pulumi-access-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "(pul-0123456789abcdef0123456789abcdef01234567).",
+      "expected": [
+        {
+          "detector": "pulumi-access-token",
+          "type": "pulumi_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1,
+          "end": 45
+        }
+      ],
+      "note": "Surrounding parenthesis and prose punctuation bound the match without joining it."
+    },
+    {
+      "id": "pulumi-access-token-positive-crlf-unicode-prefix",
+      "detector": "pulumi-access-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 reviewed format\r\npul-0123456789abcdef0123456789abcdef01234567\n\r\n",
+      "expected": [
+        {
+          "detector": "pulumi-access-token",
+          "type": "pulumi_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 24,
+          "end": 68
+        }
+      ],
+      "note": "A multi-byte Unicode prefix and CRLF line endings do not shift the reported UTF-8 byte offsets away from the token's own bytes."
+    },
+    {
+      "id": "pulumi-access-token-positive-repeated-value",
+      "detector": "pulumi-access-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "pul-0123456789abcdef0123456789abcdef01234567 pul-0123456789abcdef0123456789abcdef01234567",
+      "expected": [
+        {
+          "detector": "pulumi-access-token",
+          "type": "pulumi_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 44
+        },
+        {
+          "detector": "pulumi-access-token",
+          "type": "pulumi_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 45,
+          "end": 89
+        }
+      ],
+      "note": "An identical value repeated in the same input is reported once per independent occurrence, not deduplicated."
+    },
+    {
+      "id": "pulumi-access-token-boundary-one-short",
+      "detector": "pulumi-access-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "pul-0123456789abcdef0123456789abcdef0123456",
+      "expected": [],
+      "note": "A 39-byte body -- one byte short of the tool-corroborated 40-byte length -- is an intentional false negative, not a fuzzy match against a minimum."
+    },
+    {
+      "id": "pulumi-access-token-boundary-one-long",
+      "detector": "pulumi-access-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "pul-0123456789abcdef0123456789abcdef012345670",
+      "expected": [],
+      "note": "A 41-byte body -- one byte past the documented length -- is not misread as the exact shape followed by a trailing byte."
+    },
+    {
+      "id": "pulumi-access-token-boundary-invalid-alphabet",
+      "detector": "pulumi-access-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "pul-D123456789abcdef0123456789abcdef01234567",
+      "expected": [],
+      "note": "Both corroborating tools (gitleaks, pleno-dlp) pin the body to lowercase hex only; an uppercase hex digit inside an otherwise documented-length body is rejected."
+    },
+    {
+      "id": "pulumi-access-token-boundary-wrong-separator",
+      "detector": "pulumi-access-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "pul_0123456789abcdef0123456789abcdef01234567",
+      "expected": [],
+      "note": "An underscore in place of the documented hyphen separator is an undocumented near-miss prefix, a false negative by design."
+    },
+    {
+      "id": "pulumi-access-token-boundary-encoded-prefix",
+      "detector": "pulumi-access-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "pul%2D0123456789abcdef0123456789abcdef01234567",
+      "expected": [],
+      "note": "A percent-encoded delimiter lookalike (%2D for the literal hyphen) does not satisfy the documented literal prefix."
+    },
+    {
+      "id": "pulumi-access-token-negative-embedded-in-wider-identifier",
+      "detector": "pulumi-access-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "legacypul-0123456789abcdef0123456789abcdef01234567",
+      "expected": [],
+      "note": "The documented prefix embedded inside a wider identifier (a leading alnum/dash byte immediately before pul-) is a truncated slice of a longer identifier, not a boundary-delimited credential."
+    },
+    {
+      "id": "pulumi-access-token-negative-masked",
+      "detector": "pulumi-access-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "pul-****************************************",
+      "expected": [],
+      "note": "A masked placeholder of the correct length carries no valid-alphabet bytes and stays unclassified."
+    },
+    {
+      "id": "pulumi-access-token-negative-doc-style-placeholder",
+      "detector": "pulumi-access-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "PULUMI_ACCESS_TOKEN=pul-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "expected": [],
+      "note": "A documentation-style x-filled placeholder is not valid-alphabet hex and stays unclassified, the same benign-control treatment this registry's other exact-hex-body families already give a placeholder value."
+    },
+    {
+      "id": "pulumi-access-token-negative-stack-reference",
+      "detector": "pulumi-access-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "stack: myorg/my-infra-project/production\n",
+      "expected": [],
+      "note": "A fully qualified Pulumi stack reference (org/project/stack) carries no pul--prefixed hex run and stays unclassified."
+    },
+    {
+      "id": "pulumi-access-token-negative-cli-update-output",
+      "detector": "pulumi-access-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "log"
+      ],
+      "input": "Updating (dev):\n    pulumi:pulumi:Stack my-infra-project-dev running\nResources: 3 unchanged\nUpdate succeeded in 8s\n",
+      "expected": [],
+      "note": "Ordinary pulumi up CLI output (resource summary, update duration) carries no credential-shaped text."
+    },
+    {
+      "id": "pulumi-access-token-negative-version-identifier",
+      "detector": "pulumi-access-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "terminal"
+      ],
+      "input": "pulumi version\nv3.142.0\n",
+      "expected": [],
+      "note": "A pulumi version identifier is not pul--prefixed and stays unclassified."
+    },
+    {
+      "id": "pulumi-access-token-negative-github-actions-secret-reference",
+      "detector": "pulumi-access-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "github-actions"
+      ],
+      "input": "env:\n  PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}\n",
+      "expected": [],
+      "note": "Pulumi's own GitHub Actions guidance recommends an encrypted secrets: reference rather than a literal token; the reference syntax carries no pul--prefixed hex run."
+    },
+    {
+      "id": "pulumi-access-token-overlap-context",
+      "detector": "pulumi-access-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "access_token=pul-0123456789abcdef0123456789abcdef01234567",
+      "expected": [
+        {
+          "detector": "pulumi-access-token",
+          "type": "pulumi_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 57
+        }
+      ],
+      "note": "Qualified provider evidence wins over a contextual assignment."
+    },
+    {
+      "id": "pulumi-access-token-adversarial-long-suffix",
+      "detector": "pulumi-access-token",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 12004,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      },
+      "input": "pul-0123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef01234567",
+      "expected": [],
+      "note": "A single long lowercase-hex run after the documented prefix is a wider identifier, not a token: the exact 40-byte contract never carves a valid-looking substring out of it, and the scan stays linear and bounded."
     }
   ]
 }

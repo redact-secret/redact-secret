@@ -65,3 +65,4 @@ future planning and implementation but do not authorize Git or release actions.
 - [Map GitHub's six token families onto six independent finding types under one detector](2026-09-20-map-github-token-families-onto-independent-finding-types.md)
 - [Inventory the GitLab token-prefix table and contract the two undeclared prefixes](2026-09-20-inventory-gitlab-token-families.md)
 - [Project the generated support matrix into docs and release notes via a pinned copy](2026-09-21-project-the-support-matrix-into-docs-and-release-notes.md)
+- [Freeze the Pulumi access token grammar as a documented-prefix, tool-corroborated exact-length hex shape](2026-09-21-freeze-pulumi-access-token-grammar.md)

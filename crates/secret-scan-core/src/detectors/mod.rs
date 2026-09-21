@@ -92,6 +92,7 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(new_relic::NewRelicUserApiKeyDetector),
         Box::new(new_relic::NewRelicLicenseKeyDetector),
         Box::new(firebase::FirebaseServerKeyDetector),
+        Box::new(additional_providers::PULUMI),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
         Box::new(ConnectionStringDetector),
@@ -181,6 +182,7 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("new-relic-user-api-key", Pack::Provider),
     ("new-relic-license-key", Pack::Provider),
     ("firebase-server-key", Pack::Provider),
+    ("pulumi-access-token", Pack::Provider),
     ("jwt", Pack::Common),
     ("bearer-token", Pack::Common),
     ("connection-string", Pack::Common),
@@ -259,6 +261,7 @@ mod tests {
                 "new-relic-user-api-key",
                 "new-relic-license-key",
                 "firebase-server-key",
+                "pulumi-access-token",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -492,6 +495,8 @@ mod tests {
             "SYNREV0",
             "SYNTHETICREVOKEDFIREBASEFCMLEGACYSERVERKEYFIXTUREPADDING0123456789SYNTHETICREVOKEDFIREBASEFCMLEGACYSERVERKEYFIXTUREPADDING0123456789ABCDWXYZ"
         );
+        let pulumi_access_token_input =
+            format!("pul-{}", "0123456789abcdef0123456789abcdef01234567");
         let cases = [
             (
                 "sentry-user-auth-token",
@@ -508,6 +513,7 @@ mod tests {
             ("new-relic-user-api-key", new_relic_user_api_key_input),
             ("new-relic-license-key", new_relic_license_key_input),
             ("firebase-server-key", firebase_server_key_input.as_str()),
+            ("pulumi-access-token", pulumi_access_token_input.as_str()),
         ];
         assert_provider_candidates(&cases);
     }
