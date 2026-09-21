@@ -386,6 +386,13 @@
       "policyClass": "always-redact",
       "reconciliationTrigger": "SYNREV0REVOKED.atlasv1.SYNTHETICREVOKEDTERRAFORMCLOUDTOKENFIXTUREPADDING0123456789ABCDEFGH",
       "schemes": null
+    },
+    {
+      "type": "pulumi_access_token",
+      "detector": "pulumi-access-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "pul-0123456789abcdef0123456789abcdef01234567",
+      "schemes": null
     }
   ],
   "consumers": [

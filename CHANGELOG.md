@@ -5,6 +5,20 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+### Changed detection
+
+- Added a `pulumi-access-token` detector recognizing Pulumi Cloud personal,
+  organization, and team access tokens: the documented `pul-` prefix
+  (Pulumi's own Cloud REST API reference) followed by an exact 40-byte
+  lowercase hex suffix, corroborated by two independent external tools
+  rather than provider-documented (#522,
+  `decision-freeze-pulumi-access-token-grammar`). All three token kinds
+  share one shape, since Pulumi's reference documents no kind-specific
+  prefix. A body shorter or longer than 40 bytes, in uppercase hex, or using
+  any other undocumented character is a documented out-of-scope gap. The new
+  detector is always-redact, provider-specific, and wins any overlap with
+  the generic contextual detector.
+
 ### Internal, tooling, and qualification
 
 - README and a new [support matrix](docs/support-matrix.md) now render from a

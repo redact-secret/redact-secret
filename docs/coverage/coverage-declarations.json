@@ -5672,6 +5672,104 @@
       "type": "terraform_cloud_token"
     },
     {
+      "behaviorClass": "provider",
+      "detector": "pulumi-access-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "pulumi-access-token-positive-bare",
+            "pulumi-access-token-positive-cli-credentials-file",
+            "pulumi-access-token-positive-crlf-unicode-prefix",
+            "pulumi-access-token-positive-dotenv",
+            "pulumi-access-token-positive-github-actions",
+            "pulumi-access-token-positive-log",
+            "pulumi-access-token-positive-punctuation-adjacent",
+            "pulumi-access-token-positive-repeated-value",
+            "pulumi-access-token-positive-shell-quoted"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "pulumi-access-token-overlap-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "pulumi-access-token-adversarial-long-suffix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "pulumi-access-token-boundary-encoded-prefix",
+            "pulumi-access-token-boundary-invalid-alphabet",
+            "pulumi-access-token-boundary-one-long",
+            "pulumi-access-token-boundary-one-short",
+            "pulumi-access-token-boundary-wrong-separator"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "pulumi-access-token-negative-cli-update-output",
+            "pulumi-access-token-negative-doc-style-placeholder",
+            "pulumi-access-token-negative-embedded-in-wider-identifier",
+            "pulumi-access-token-negative-github-actions-secret-reference",
+            "pulumi-access-token-negative-masked",
+            "pulumi-access-token-negative-stack-reference",
+            "pulumi-access-token-negative-version-identifier"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "pulumi-access-token-boundary-encoded-prefix",
+            "pulumi-access-token-boundary-invalid-alphabet",
+            "pulumi-access-token-boundary-one-long",
+            "pulumi-access-token-boundary-one-short",
+            "pulumi-access-token-boundary-wrong-separator"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for pulumi_access_token (pulumi-access-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "pulumi_access_token"
+    },
+    {
       "behaviorClass": "incremental",
       "detector": "unassigned",
       "dimensions": [
@@ -5839,6 +5937,7 @@
             "private-key-adversarial-incomplete",
             "private-key-adversarial-mismatched",
             "private-key-adversarial-nested",
+            "pulumi-access-token-adversarial-long-suffix",
             "pypi-adversarial-long-suffix",
             "sendgrid-adversarial-incomplete-suffix",
             "sentry-org-auth-token-adversarial-long-run",
@@ -6225,6 +6324,7 @@
             "private-key-adversarial-incomplete",
             "private-key-adversarial-mismatched",
             "private-key-adversarial-nested",
+            "pulumi-access-token-adversarial-long-suffix",
             "pypi-adversarial-long-suffix",
             "sendgrid-adversarial-incomplete-suffix",
             "sentry-org-auth-token-adversarial-long-run",

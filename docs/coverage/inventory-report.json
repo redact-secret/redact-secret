@@ -2315,12 +2315,52 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "terraform_cloud_token"
+    },
+    {
+      "detector": "pulumi-access-token",
+      "evidence": {
+        "fixtureCount": 23,
+        "hostContextsExercised": [
+          "dotenv",
+          "github-actions",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "terminal"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "pulumi-access-token-positive-bare",
+        "pulumi-access-token-positive-cli-credentials-file",
+        "pulumi-access-token-positive-crlf-unicode-prefix",
+        "pulumi-access-token-positive-dotenv",
+        "pulumi-access-token-positive-github-actions",
+        "pulumi-access-token-positive-log",
+        "pulumi-access-token-positive-punctuation-adjacent",
+        "pulumi-access-token-positive-repeated-value",
+        "pulumi-access-token-positive-shell-quoted"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "pulumi_access_token"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 51,
+    "supported": 52,
     "unresolved": 0
   }
 }

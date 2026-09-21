@@ -94,6 +94,7 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(new_relic::NewRelicLicenseKeyDetector),
         Box::new(firebase::FirebaseServerKeyDetector),
         Box::new(terraform::TerraformCloudTokenDetector),
+        Box::new(additional_providers::PULUMI),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
         Box::new(ConnectionStringDetector),
@@ -184,6 +185,7 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("new-relic-license-key", Pack::Provider),
     ("firebase-server-key", Pack::Provider),
     ("terraform-cloud-token", Pack::Provider),
+    ("pulumi-access-token", Pack::Provider),
     ("jwt", Pack::Common),
     ("bearer-token", Pack::Common),
     ("connection-string", Pack::Common),
@@ -263,6 +265,7 @@ mod tests {
                 "new-relic-license-key",
                 "firebase-server-key",
                 "terraform-cloud-token",
+                "pulumi-access-token",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -500,6 +503,8 @@ mod tests {
             "SYNREV0REVOKED.atlasv1.{}",
             &"SYNTHETICREVOKEDTERRAFORMCLOUDTOKENFIXTUREPADDING0123456789ABCDEFGHIJKLMNOPQR"[..67]
         );
+        let pulumi_access_token_input =
+            format!("pul-{}", "0123456789abcdef0123456789abcdef01234567");
         let cases = [
             (
                 "sentry-user-auth-token",
@@ -520,6 +525,7 @@ mod tests {
                 "terraform-cloud-token",
                 terraform_cloud_token_input.as_str(),
             ),
+            ("pulumi-access-token", pulumi_access_token_input.as_str()),
         ];
         assert_provider_candidates(&cases);
     }
