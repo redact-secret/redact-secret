@@ -149,6 +149,15 @@ environment in [assessment](../assessment/README.md). The manually dispatched
 `complete-assessment.yml` is not wired as a Release dependency, and a threshold
 measured for one host does not establish acceptance on another host.
 
+`Artifact qualification` also runs the [support-matrix drift
+gate](support-matrix-drift.md) (issue #511): it fails the run on a family
+that regressed out of `stable` since the most recent prior release unless
+`benchmarks/support-matrix-drift-acknowledgements.json` already carries an
+explicit, rationale-bearing override for it. Refresh
+`benchmarks/support-matrix.json` from a `redact-secret-benchmarks` run
+measured against this candidate's published-artifact evidence path (issue
+#508's distinction) before qualification, not from a local build.
+
 ## Review and approval
 
 Before requesting final release approval, assemble a reviewable record of:
@@ -202,8 +211,10 @@ consumer installation separately before claiming that broader verification.
 
 `record-manifest` attempts to run even after failed publishers and uploads
 `release-manifest-<version>`. It records source revision, corpus identity,
-version, expected artifact identities, and observed registry states. Its success
-does not establish tag or registry-install success: those jobs are separate.
+version, expected artifact identities, observed registry states, and (issue
+#511) the [support-matrix drift](support-matrix-drift.md) record `Artifact
+qualification` computed for this candidate. Its success does not establish
+tag or registry-install success: those jobs are separate.
 
 ## Recover a partial publication
 
