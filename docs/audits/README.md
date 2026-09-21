@@ -46,3 +46,4 @@ and [qualification follow-up](release-qualification-follow-up.md) describe beta.
 | Declarative ruleset parser WebAssembly size increment (#441) | [Before/after artifact sizes, prototype parser, build evidence](evidence/441/README.md) |
 | Structural/contextual detector shape inventory (#475) | [Valid-but-non-secret shapes for generic-token, bearer-token, connection-string, jwt, cited fixtures](evidence/475/README.md) |
 | Google OAuth credential coverage evidence (#487) | [`GOCSPX-`/`1//`/`ya29.` tool-corroboration research; none adopted](evidence/487/README.md) |
+| Vercel credential taxonomy audit (#516) | [Prefix provenance, TruffleHog/gitleaks/flare-redact corroboration, per-class disposition](evidence/516/README.md) |

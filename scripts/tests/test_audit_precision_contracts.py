@@ -74,6 +74,16 @@ class ContractEvaluationTests(unittest.TestCase):
         self.assertEqual(review["disposition"], "review")
         self.assertEqual(review["contractOnlyMatches"], [{"start": 2, "end": 14, "variant": "exact"}])
 
+    def test_family_patterns_omits_a_family_with_no_adopted_variant(self) -> None:
+        contracts = {
+            "families": [
+                self.FAMILY,
+                {"detector": "gizmo-token", "variants": []},
+            ]
+        }
+        patterns = AUDIT.family_patterns(contracts)
+        self.assertEqual(set(patterns), {"widget-token"})
+
 
 class BaselineDerivationTests(unittest.TestCase):
     CONTRACTS = {"families": [{"detector": "widget-token", "variants": [{"id": "exact", "grammar": "wgt_[a-f0-9]{8}"}]}]}

@@ -188,7 +188,7 @@
       "kind": "corroboration",
       "revision": "page shows no version; observed 2026-09-17",
       "observedAt": "2026-09-17",
-      "establishes": ["which token types each provider registers with GitHub's partner program (existence of a type, not its grammar): OpenAI API Key; DigitalOcean OAuth Token, Personal Access Token, Refresh Token, System Token; Docker Organization Access Token, Personal Access Token; Slack API Token; Hugging Face User Access Token, Organization API Token; Cloudflare Account API Token, Global User API Key, User API Token; Linear API Key, OAuth Access Token; Google OAuth Client ID (also lists `google_oauth_client_secret`), Google OAuth Access Token, Google OAuth Refresh Token (reobserved 2026-09-20 for issue #487)"],
+      "establishes": ["which token types each provider registers with GitHub's partner program (existence of a type, not its grammar): OpenAI API Key; DigitalOcean OAuth Token, Personal Access Token, Refresh Token, System Token; Docker Organization Access Token, Personal Access Token; Slack API Token; Hugging Face User Access Token, Organization API Token; Cloudflare Account API Token, Global User API Key, User API Token; Linear API Key, OAuth Access Token; Google OAuth Client ID (also lists `google_oauth_client_secret`), Google OAuth Access Token, Google OAuth Refresh Token (reobserved 2026-09-20 for issue #487); Vercel API Key, Vercel App Refresh Token (no push protection), Vercel App User Access Token, Vercel Integration Access Token, Vercel Personal Access Token, Vercel Support Access Token (reobserved 2026-09-20 for issue #516)"],
       "doesNotEstablish": ["any prefix, length or alphabet"]
     },
     "benchmark-common-formats": {
@@ -259,6 +259,80 @@
       ],
       "doesNotEstablish": [
         "any `secret_`/`ntn_` integration-token detail; neither prefix appears on this page"
+      ]
+    },
+    "vercel-changelog-token-formats": {
+      "url": "https://vercel.com/changelog/new-token-formats-and-secret-scanning",
+      "kind": "provider",
+      "revision": "published 2026-02-09; page carries no separate version",
+      "observedAt": "2026-09-20",
+      "establishes": [
+        "\"Each credential type now includes a prefix: `vcp` for Vercel personal access tokens, `vci` for Vercel integration tokens, `vca` for Vercel app access tokens, `vcr` for Vercel app refresh tokens, `vck` for Vercel API keys.\"",
+        "detection for these prefixes \"is powered by GitHub secret scanning\""
+      ],
+      "doesNotEstablish": [
+        "any body length or alphabet for any of the five prefixes"
+      ]
+    },
+    "vercel-docs-access-tokens": {
+      "url": "https://vercel.com/docs/accounts/access-tokens",
+      "kind": "provider",
+      "revision": "last_updated 2026-09-08",
+      "observedAt": "2026-09-20",
+      "establishes": [
+        "\"Personal access tokens begin with the prefix `vcp_`\" (literal prose rule for the prefix)",
+        "a masked example in a curl snippet, `vcp_xxxxxxxxxxxxxxxxxxxxxxxx` (24 literal `x` filler characters)"
+      ],
+      "doesNotEstablish": [
+        "a real body length or alphabet: the masked example is a redaction placeholder in a code snippet, not a generated value, the same category this file already declines to treat as establishing a length (compare `families.slack-token`'s `xoxp-111-222-333-...` numeric placeholders)"
+      ]
+    },
+    "vercel-docs-sign-in-tokens": {
+      "url": "https://vercel.com/docs/sign-in-with-vercel/tokens",
+      "kind": "provider",
+      "revision": "last_updated 2026-03-30",
+      "observedAt": "2026-09-20",
+      "establishes": [
+        "an \"Access Token example\" (`vca_` prefix) and a \"Refresh Token example\" (`vcr_` prefix), both carrying the identical 56-byte mixed-case alphanumeric body `BQuu9ChDu3n6Pfh6YQnCshpoYkWDSFKogLqmBtQ0tC8NAA5rXt340sjz` (no `-`/`_` in this instance)"
+      ],
+      "doesNotEstablish": [
+        "a stated length or alphabet rule in prose; the two examples reuse the identical body string, so this is one documented instance, not two independent ones, for either prefix"
+      ]
+    },
+    "vercel-docs-ai-gateway-api-keys": {
+      "url": "https://vercel.com/docs/ai-gateway/authentication-and-byok/api-keys",
+      "kind": "provider",
+      "revision": "last_updated 2026-09-08",
+      "observedAt": "2026-09-20",
+      "establishes": [
+        "confirms the `vck_` prefix via a compromised-secret report request body: `{ \"secret\": { \"api_key\": \"vck_...\" } }`"
+      ],
+      "doesNotEstablish": [
+        "any body length or alphabet"
+      ]
+    },
+    "vercel-docs-api-integrations": {
+      "url": "https://vercel.com/docs/integrations/create-integration/vercel-api-integrations",
+      "kind": "provider",
+      "revision": "last_updated 2026-09-16 (five weeks after the 2026-02-09 prefix changelog)",
+      "observedAt": "2026-09-20",
+      "establishes": [
+        "the OAuth `code`-exchange endpoint (`POST /v2/oauth/access_token`) example shows a request `client_secret=EOBPvZuBYAtb3SbYo8H1iWFP` (24 bytes, alphanumeric, no prefix) and a JSON response `\"access_token\": \"xEbuzM1ZAJ46afITQlYqH605\"` (24 bytes, alphanumeric, no prefix) — a real, currently-documented, unprefixed credential surface distinct from the five `vc*_`-prefixed classes, updated after the prefix rollout and still unprefixed"
+      ],
+      "doesNotEstablish": [
+        "any prefix or shape for the dashboard-issued `vci_` \"Integration Access Token\" the changelog and GitHub's partner list separately name"
+      ]
+    },
+    "vercel-rest-api-reference": {
+      "url": "https://vercel.com/docs/rest-api",
+      "kind": "provider",
+      "revision": "last_updated 2026-09-21",
+      "observedAt": "2026-09-20",
+      "establishes": [
+        "the page is purely an endpoint index (method/path/description tables per resource group, including an `authentication` section listing only endpoint rows)"
+      ],
+      "doesNotEstablish": [
+        "any token prefix, length, or alphabet; no prose on the page discusses credential format at all"
       ]
     }
   },
@@ -644,6 +718,33 @@
           "resolution": "No single external tool corroborates both shapes with the same rule; flare-redact is the only source that registers both prefixes at all, and its `ntn_` branch is looser than gitleaks'. Each shape's own exact-length contract is unaffected by the other tools' silence on it."
         }
       ]
+    },
+    {
+      "detector": "vercel-token",
+      "findingType": "vercel_token",
+      "implementation": "crates/secret-scan-core/src/detectors/additional_providers.rs (VERCEL)",
+      "beta4Rule": "Not one of issue #367's seven frozen families. Unchanged since introduction: five `PrefixShape::at_least(_, 20, is_alnum_dash, ...)` shapes, one per prefix (`vcp_`, `vci_`, `vca_`, `vcr_`, `vck_`). Issue #516 (this entry) records the formal precision-contract evidence for that grammar; the grammar itself is unchanged.",
+      "toolRules": {
+        "gitleaks-8.30.1": "no Vercel rule of any kind; the full 3209-line pinned config was searched directly for `vercel` with zero matches.",
+        "trufflehog-3.97.4": "vercel: `PrefixRegex([\"vercel\"]) + \\b([a-zA-Z0-9]{24})\\b` — keyword-gated (the literal word `vercel` must appear nearby), matching a bare, exactly-24-character alphanumeric body with no fixed prefix. Registers no rule for any of the five `vc*_`-prefixed shapes. Fetched directly and diffed byte-for-byte against the latest tag `v3.97.5`: identical, unchanged.",
+        "flare-redact-1.6.1": "no Vercel-related detector entries of any kind."
+      },
+      "variants": [],
+      "pending": [
+        {"id": "personal-access-token", "prefix": "vcp_", "tier": "T0", "reason": "Issue #516. `vercel-docs-access-tokens` states the literal prefix rule in prose (\"Personal access tokens begin with the prefix `vcp_`\"), corroborated by `vercel-changelog-token-formats`. No source establishes a body length or alphabet: the only body evidence is a masked `xxxxxxxxxxxxxxxxxxxxxxxx` redaction placeholder in a curl snippet, not a generated example, and no pinned tool (gitleaks, trufflehog, flare-redact) registers any rule for this prefix. Stays on the existing `at_least(20, is_alnum_dash)` floor, which the placeholder's 24-character length already satisfies. Unblocking condition: a shipped gitleaks or TruffleHog rule for `vcp_`, or a Vercel documentation page stating one body length/alphabet rule in prose.", "sources": ["vercel-changelog-token-formats", "vercel-docs-access-tokens", "vercel-rest-api-reference", "gitleaks-8.30.1", "trufflehog-3.97.4", "flare-redact-1.6.1"]},
+        {"id": "integration-access-token", "prefix": "vci_", "tier": "T0", "reason": "Issue #516. `vercel-changelog-token-formats` and GitHub's partner-pattern listing (`github-secret-scanning-patterns`, \"Vercel Integration Access Token\") corroborate the prefix's existence and literal spelling. No source found by this audit shows an example value or a stated body length/alphabet for this specific prefix — the one integration-token example found (`vercel-docs-api-integrations`'s bare 24-character `access_token`) belongs to a different, unprefixed OAuth `code`-exchange credential (see `excluded.bare-oauth-access-token` below), not this one. No pinned tool registers any rule for `vci_`. Unblocking condition: as `personal-access-token` above, scoped to `vci_`.", "sources": ["vercel-changelog-token-formats", "github-secret-scanning-patterns", "vercel-docs-api-integrations", "gitleaks-8.30.1", "trufflehog-3.97.4", "flare-redact-1.6.1"]},
+        {"id": "app-access-token", "prefix": "vca_", "tier": "T0", "reason": "Issue #516. `vercel-changelog-token-formats` and `github-secret-scanning-patterns` (\"Vercel App User Access Token\") corroborate the prefix. `vercel-docs-sign-in-tokens` shows one real example body (56 bytes, mixed-case alphanumeric, no `-`/`_`) but states no length or alphabet rule in prose, and no pinned tool registers a rule for `vca_` — a single documented instance does not promote a shape past T0 in this file's framework on its own (compare `families.google-api-key.variants[0]`'s `AIza` body, which additionally has two-tool corroboration this instance lacks entirely). Unblocking condition: as `personal-access-token` above, scoped to `vca_`.", "sources": ["vercel-changelog-token-formats", "github-secret-scanning-patterns", "vercel-docs-sign-in-tokens", "gitleaks-8.30.1", "trufflehog-3.97.4", "flare-redact-1.6.1"]},
+        {"id": "app-refresh-token", "prefix": "vcr_", "tier": "T0", "reason": "Issue #516. `vercel-changelog-token-formats` and `github-secret-scanning-patterns` (\"Vercel App Refresh Token\", the one Vercel row without push protection) corroborate the prefix. `vercel-docs-sign-in-tokens`'s \"Refresh Token example\" reuses the identical 56-byte body shown for `vca_` above, so it is not independent evidence for this prefix's own body shape; no pinned tool registers a rule for `vcr_`. Unblocking condition: as `personal-access-token` above, scoped to `vcr_`.", "sources": ["vercel-changelog-token-formats", "github-secret-scanning-patterns", "vercel-docs-sign-in-tokens", "gitleaks-8.30.1", "trufflehog-3.97.4", "flare-redact-1.6.1"]},
+        {"id": "api-key", "prefix": "vck_", "tier": "T0", "reason": "Issue #516. `vercel-changelog-token-formats` and `github-secret-scanning-patterns` corroborate the prefix; `vercel-docs-ai-gateway-api-keys` independently confirms it via a compromised-secret-report example (`\"api_key\": \"vck_...\"`). No source found by this audit gives a body length or alphabet, and no pinned tool registers a rule for `vck_`. Unblocking condition: as `personal-access-token` above, scoped to `vck_`.", "sources": ["vercel-changelog-token-formats", "github-secret-scanning-patterns", "vercel-docs-ai-gateway-api-keys", "gitleaks-8.30.1", "trufflehog-3.97.4", "flare-redact-1.6.1"]}
+      ],
+      "excluded": [
+        {"id": "support-access-token", "basis": "existence-only", "reason": "GitHub's secret-scanning partner-pattern listing names a sixth Vercel type, \"Vercel Support Access Token\", with push protection enabled, alongside the five that map onto `vercel-changelog-token-formats`'s five prefixes. No Vercel documentation, changelog, or pinned tool consulted by this audit names a prefix or any shape for it. Not scored `pending` because there is no candidate grammar of any kind to revisit: this is opaque, existence-only corroboration, the same reading this file already gives Cloudflare's `cfk_` checksum shape (`families.cloudflare-token.pending[0]`) and Google's three OAuth formats (`families.google-api-key.pending`). Per issue #501's own instruction, an opaque credential with no lexical evidence is not forced into a detector shape."},
+        {"id": "bare-oauth-access-token", "basis": "provider", "reason": "`vercel-docs-api-integrations` (updated 2026-09-16, five weeks after the prefix changelog) still returns a bare, unprefixed, exactly-24-character alphanumeric `access_token` (and accepts a `client_secret` of the identical shape) from the OAuth `code`-exchange endpoint (`POST /v2/oauth/access_token`). This is the real credential TruffleHog's pinned `vercel` detector matches (`PrefixRegex([\"vercel\"]) + [a-zA-Z0-9]{24}`) — not a stale rule for a superseded format, but tool-agreement with a currently-documented, still-unprefixed Vercel credential surface distinct from the five `vc*_`-prefixed classes above. Excluded permanently, not pending: without a fixed prefix this value is indistinguishable from an arbitrary 24-character identifier, the same reasoning already applied to Linear's `unprefixed-oauth-access-token` (`families.linear-token.excluded`) and to Google's unprefixed OAuth candidates. It stays covered only incidentally by `generic-token`'s contextual rule when the keyword `vercel` or a high-signal key name triggers it — the same keyword gate TruffleHog's own rule requires."}
+      ],
+      "conflicts": [
+        {"property": "what the pinned TruffleHog `vercel` detector's bare 24-character rule corresponds to", "positions": {"issue-516-framing": "reads the rule as conflicting with the corpus's five documented prefixes, implying it is stale or wrong", "vercel-docs-api-integrations": "shows the OAuth `code`-exchange endpoint still issuing bare, unprefixed 24-character `access_token`/`client_secret` values as of 2026-09-16, five weeks after the prefix changelog shipped", "trufflehog-3.97.4": "the rule is unchanged at the latest tag `v3.97.5` and registers no rule for any `vc*_`-prefixed shape"}, "resolution": "Not a conflict between one right and one wrong source: two different Vercel credential surfaces exist side by side. TruffleHog's rule accurately covers the older, unprefixed OAuth-integration surface and says nothing about the five newer prefixed classes, which stay pending on their own lack of tool or documented-length evidence, unaffected by TruffleHog's rule one way or the other. The unprefixed surface itself is excluded regardless, since it carries no fixed prefix to build a provider rule on."}
+      ],
+      "mutations": []
     }
   ]
 }
