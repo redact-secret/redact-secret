@@ -22,24 +22,28 @@
 //! the same left-to-right, longest-prefix pass instead of two passes merged
 //! by position afterward.
 //!
-//! Issue #551: `lin_oauth_` used to keep beta.4's open floor
-//! (`RunLength::AtLeast`, no documented maximum), matched against
+//! Issue #551 diagnosed a real defect here: `lin_oauth_` kept beta.4's open
+//! floor (`RunLength::AtLeast`, no documented maximum), matched against
 //! `[A-Za-z0-9_-]` -- the identical alphabet [`BOUNDARY`] itself checks. A
 //! run computed that way is already maximal by construction, so the byte
 //! immediately past it can never belong to that same alphabet, and
-//! `pattern::boundary_ok`'s trailing check is structurally unable to fire: a
-//! directly-glued wider identifier (`..._backup`, `...-1`) was silently
+//! `pattern::boundary_ok`'s trailing check was structurally unable to fire:
+//! a directly-glued wider identifier (`..._backup`, `...-1`) was silently
 //! absorbed into the match as "more opaque secret" rather than tripping the
 //! boundary rule every other provider in this crate relies on. The same
 //! defect affected every other still-open-floor Slack prefix
-//! (`super::slack`). The shared fix is the one every reviewed-contract
-//! sibling in `additional_providers.rs` already uses: an exact length, so
-//! the boundary check has bytes left over to inspect. A body longer than
-//! the unchanged 20-byte floor is now an intentional false negative until a
-//! reviewed contract establishes a real maximum -- the same tradeoff
-//! `docker-token` (#370), `openai-token` (#368), `huggingface-token`
-//! (#372), and `cloudflare-token` (#373) each already accepted when they
-//! moved off this identical open-floor shape.
+//! (`super::slack`).
+//!
+//! #551's fix turned the floor into an exact length, the same move every
+//! reviewed-contract sibling in `additional_providers.rs` uses -- but those
+//! siblings have an evidence-backed maximum to promote to; this guard does
+//! not, and issue #570 found real oauth tokens no longer matching at all
+//! once "the floor" became "the whole body". [`pattern::RunLength::OpenFloor`]
+//! is the actual fix: the run is still open-ended (`{n,}`), but capped back
+//! to the floor exactly when a dash or underscore starts right there, which
+//! is what a directly-glued wider identifier always looks like at that
+//! position. A plain alphanumeric extension past the floor is read in full,
+//! as more opaque secret, same as beta.4.
 
 use crate::detectors::additional_providers::KnownFormatProviderDetector;
 use crate::detectors::pattern::{self, Alphabet, PrefixShape};
@@ -54,9 +58,8 @@ const API_SIGNALS: [&str; 2] = ["linear-documented-prefix", "base62-exact-length
 /// `lin_oauth_`: no consulted provider or tool source shows this prefix's
 /// grammar (the provider's own OAuth example is a bare hex string), so it
 /// stays a support-policy interim guard rather than an evidence-backed
-/// contract. Issue #551: the guard's beta.4 open floor is now an exact
-/// length (see the module doc), so this is the guard's whole body length,
-/// not merely its minimum.
+/// contract. Issue #570: beta.4's open floor, restored (see the module doc
+/// for why #551's exact-length fix was itself a regression).
 const OAUTH_PREFIX: &str = "lin_oauth_";
 const OAUTH_MIN_LEN: usize = 20;
 const OAUTH_ALPHABET: Alphabet = pattern::is_alnum_dash;
@@ -67,15 +70,15 @@ const OAUTH_SIGNALS: [&str; 2] = ["linear-scannable-prefix", "opaque-suffix"];
 const BOUNDARY: Alphabet = pattern::is_alnum_dash;
 
 /// Requires the `lin_api_` API key to carry its full reviewed 40-byte body;
-/// `lin_oauth_` keeps its interim guard, now at an exact 20-byte length
-/// (issue #551). An undocumented segment name in place of `api`/`oauth` is
-/// an intentional false negative.
+/// `lin_oauth_` keeps its interim guard's open 20-byte floor (issue #570).
+/// An undocumented segment name in place of `api`/`oauth` is an intentional
+/// false negative.
 pub(super) const LINEAR: KnownFormatProviderDetector = KnownFormatProviderDetector::new(
     "linear-token",
     "linear_token",
     &[
         PrefixShape::exact(API_PREFIX, API_BODY_LEN, API_ALPHABET, &API_SIGNALS),
-        PrefixShape::exact(OAUTH_PREFIX, OAUTH_MIN_LEN, OAUTH_ALPHABET, &OAUTH_SIGNALS),
+        PrefixShape::open_floor(OAUTH_PREFIX, OAUTH_MIN_LEN, OAUTH_ALPHABET, &OAUTH_SIGNALS),
     ],
     BOUNDARY,
 );
@@ -91,7 +94,7 @@ mod tests {
     const API_BODY: &str = "SYNTHETICREVOKEDLINEARAPITOKENVALUE01234";
     const _: () = assert!(API_BODY.len() == API_BODY_LEN);
     /// Exactly [`OAUTH_MIN_LEN`] bytes: the `lin_oauth_` interim guard's
-    /// whole body length since issue #551 (previously just its floor).
+    /// floor.
     const OAUTH_BODY: &str = "SYNTHETICREVOKED0001";
     const _: () = assert!(OAUTH_BODY.len() == OAUTH_MIN_LEN);
 
@@ -167,36 +170,43 @@ mod tests {
         }
     }
 
-    /// The `lin_oauth_` interim guard keeps beta.4's underscore/dash-inclusive
-    /// alphabet unchanged, but issue #551 turns its 20-byte floor into an
-    /// exact length: a 19-byte body stays a false negative as before, and a
-    /// body at exactly 20 bytes still matches in full.
+    /// The `lin_oauth_` interim guard keeps beta.4's minimum-length,
+    /// underscore/dash-inclusive rule unchanged (issue #570 restores it
+    /// after #551 mistakenly narrowed the floor into an exact length): a
+    /// 19-byte body is a false negative, and any body at or above 20 bytes
+    /// matches in full.
     #[test]
-    fn oauth_requires_exactly_the_beta4_twenty_byte_length() {
+    fn oauth_keeps_the_beta4_minimum_length_rule_unchanged() {
         assert!(detect(&format!("{OAUTH_PREFIX}{}", "x".repeat(19))).is_empty());
-        let value = format!("{OAUTH_PREFIX}{}", "x_y-z".repeat(4));
+        for body in [
+            "x".repeat(20),
+            "x".repeat(200),
+            "x_y-z".repeat(5),
+            API_BODY.to_string(),
+        ] {
+            let value = format!("{OAUTH_PREFIX}{body}");
+            let candidates = detect(&value);
+            assert_eq!(candidates.len(), 1, "{body}");
+            assert_eq!(
+                candidates[0].range(),
+                ByteRange::new(0, value.len()).unwrap(),
+                "{body}"
+            );
+        }
+    }
+
+    /// Issue #570: a body longer than the floor is still one whole match --
+    /// #551 turned this into a false negative by mistake, treating the
+    /// floor as if it were a reviewed maximum.
+    #[test]
+    fn oauth_matches_a_body_longer_than_the_twenty_byte_floor() {
+        let value = format!("{OAUTH_PREFIX}{}", "x".repeat(45));
         let candidates = detect(&value);
         assert_eq!(candidates.len(), 1);
         assert_eq!(
             candidates[0].range(),
             ByteRange::new(0, value.len()).unwrap()
         );
-    }
-
-    /// Issue #551: before this fix, `lin_oauth_`'s open floor (`RunLength::
-    /// AtLeast`) matched any run of 20 or more bytes in full, so a body
-    /// longer than the floor was indistinguishable from a directly-glued
-    /// wider identifier -- exactly the shared boundary defect this issue
-    /// closes. A body past the now-exact 20-byte length is an intentional
-    /// false negative until a reviewed contract establishes a real maximum.
-    #[test]
-    fn oauth_rejects_a_body_longer_than_the_exact_twenty_byte_length() {
-        for body in ["x".repeat(21), "x".repeat(200), "x_y-z".repeat(5)] {
-            assert!(
-                detect(&format!("{OAUTH_PREFIX}{body}")).is_empty(),
-                "{body}"
-            );
-        }
     }
 
     #[test]
@@ -228,13 +238,13 @@ mod tests {
         assert!(detect(&format!("legacy{}", oauth_token())).is_empty());
     }
 
-    /// Issue #551: the shared boundary/delimiter regression set, mirrored
-    /// from `digitalocean-token`'s existing leading/trailing/dash
+    /// Issue #551's shared boundary/delimiter regression set, mirrored from
+    /// `digitalocean-token`'s existing leading/trailing/dash
     /// identifier-embedding fixtures, for both `linear-token` shapes. The
     /// API key already passed every one of these (its exact 40-byte
     /// alphanumeric body always leaves the boundary check something to
-    /// inspect); `lin_oauth_` only passes now that its own floor is exact
-    /// too (see the module doc).
+    /// inspect); `lin_oauth_` passes via [`pattern::RunLength::OpenFloor`]
+    /// instead of #551's exact length (see the module doc).
     #[test]
     fn rejects_every_shape_embedded_in_a_wider_identifier_leading_trailing_or_dash_joined() {
         for value in [api_token(), oauth_token()] {

@@ -12,9 +12,9 @@
 //! ```text
 //! xoxb-<10-13 [0-9]>-<10-13 [0-9]>-<18+ [A-Za-z0-9]>              bot
 //! xoxp-<10-13 [0-9]>-<10-13 [0-9]>-<10-13 [0-9]>-<28+ [A-Za-z0-9]>  user
-//! xoxe-<1 [0-9]>-<20 [A-Za-z0-9_-]>                              refresh
-//! xoxe.xoxb-<1 [0-9]>-<20 [A-Za-z0-9_-]>                         rotating bot
-//! xoxe.xoxp-<1 [0-9]>-<20 [A-Za-z0-9_-]>                         rotating user
+//! xoxe-<1 [0-9]>-<20+ [A-Za-z0-9_-]>                              refresh
+//! xoxe.xoxb-<1 [0-9]>-<20+ [A-Za-z0-9_-]>                         rotating bot
+//! xoxe.xoxp-<1 [0-9]>-<20+ [A-Za-z0-9_-]>                         rotating user
 //! ```
 //!
 //! (`docs/decisions/2026-09-20-freeze-slack-user-and-rotation-token-grammar.md`).
@@ -32,44 +32,50 @@
 //! <https://docs.slack.dev/authentication/using-token-rotation/>, observed
 //! 2026-09-20) and gitleaks' config-access/-refresh-token rules encode the
 //! same single digit; the body that follows keeps beta.4's opaque
-//! `[A-Za-z0-9_-]` interim guard, since neither source constrains it
-//! (`xoxe.xoxp-`'s own extra `-1234-` section is a single uncorroborated
-//! example and is not decomposed further). Issue #551 turns its 20-byte
-//! floor into an exact length (see the module doc's boundary-defect
-//! paragraph below).
+//! `[A-Za-z0-9_-]` interim guard and 20-byte minimum unchanged, since
+//! neither source constrains it (`xoxe.xoxp-`'s own extra `-1234-` section
+//! is a single uncorroborated example and is not decomposed further).
 //!
-//! `xapp-` and `xwfp-` keep beta.4's alphabet unchanged as a plain interim
+//! `xapp-` and `xwfp-` keep beta.4's rule unchanged as a plain interim
 //! guard: `xapp-`'s only candidate structure is a single uncorroborated
 //! tool source (gitleaks, case-insensitive) and `xwfp-` has no tool source
 //! at all, so neither clears this project's two-source (or
 //! provider-plus-tool) bar for a structural contract
 //! (`docs/audits/evidence/367/precision-contracts.json`,
-//! `slack-token.variants[app-level|workflow]`). Issue #551 turns their own
-//! 20-byte floor into an exact length too, for the same reason. The `regex`
-//! crate cannot be
-//! used here — this crate is dependency-free — so [`scan_sectioned`] and the
-//! interim guard compose every shape from the shared `pattern` primitives,
-//! the same way [`super::openai`] does for its own segmented grammar.
+//! `slack-token.variants[app-level|workflow]`). Decision
+//! `decision-freeze-slack-user-and-rotation-token-grammar` (#512) froze
+//! both prefixes' shape as unchanged from beta.4. The `regex` crate cannot
+//! be used here — this crate is dependency-free — so [`scan_sectioned`] and
+//! the interim guard compose every shape from the shared `pattern`
+//! primitives, the same way [`super::openai`] does for its own segmented
+//! grammar.
 //!
-//! Issue #551: every prefix above whose tail kept beta.4's open floor
-//! (`RunLength::AtLeast`, no documented maximum) matched against
-//! `[A-Za-z0-9_-]` — the identical alphabet [`BOUNDARY`] itself checks. A
-//! run computed that way is already maximal by construction, so the byte
-//! immediately past it can never belong to that same alphabet, and
-//! `pattern::boundary_ok`'s trailing check is structurally unable to fire: a
-//! directly-glued wider identifier (`..._backup`, `...-1`) was silently
-//! absorbed into the match as "more opaque secret" rather than tripping the
-//! boundary rule the bot and user secret sections already enforce with
-//! their own narrower [`SECRET_ALPHABET`]. The same defect affected
-//! [`super::linear`]'s `lin_oauth_` guard. The shared fix, applied to the
-//! rotation tail and both remaining interim prefixes, is the one every
-//! reviewed-contract sibling in `additional_providers.rs` already uses: an
-//! exact length, so the boundary check has bytes left over to inspect. A
-//! body longer than the unchanged 20-byte floor is now an intentional false
-//! negative until a reviewed contract establishes a real maximum — the same
-//! tradeoff `docker-token` (#370), `openai-token` (#368), `huggingface-token`
-//! (#372), and `cloudflare-token` (#373) each already accepted when they
-//! moved off this identical open-floor shape.
+//! Issue #551 diagnosed a real defect: every prefix above whose tail kept
+//! beta.4's open floor (`RunLength::AtLeast`, no documented maximum)
+//! matched against `[A-Za-z0-9_-]` — the identical alphabet [`BOUNDARY`]
+//! itself checks. A run computed that way is already maximal by
+//! construction, so the byte immediately past it can never belong to that
+//! same alphabet, and `pattern::boundary_ok`'s trailing check was
+//! structurally unable to fire: a directly-glued wider identifier
+//! (`..._backup`, `...-1`) was silently absorbed into the match as "more
+//! opaque secret" rather than tripping the boundary rule the bot and user
+//! secret sections already enforce with their own narrower
+//! [`SECRET_ALPHABET`]. The same defect affected [`super::linear`]'s
+//! `lin_oauth_` guard.
+//!
+//! #551's fix turned each floor into an exact length, the move every
+//! reviewed-contract sibling in `additional_providers.rs` uses when it has
+//! an evidence-backed maximum to promote to — but these three prefixes do
+//! not, and #512 had explicitly frozen them "unchanged"; issue #570 found
+//! every real-length rotation, `xapp-`, and `xwfp-` token no longer
+//! matching at all once "the floor" silently became "the whole body"
+//! (0 of 7 documented shapes detected). [`pattern::RunLength::OpenFloor`]
+//! is the actual fix: the run stays open-ended (`{n,}`, restoring #512's
+//! frozen shape), but is capped back to the floor exactly when a dash or
+//! underscore starts right there, which is what a directly-glued wider
+//! identifier always looks like at that position. A plain alphanumeric
+//! extension past the floor is read in full, as more opaque secret, same
+//! as beta.4.
 
 use crate::detectors::pattern::{self, Alphabet, PrefixShape};
 use crate::error::DetectorFailure;
@@ -108,23 +114,23 @@ const USER_SIGNALS: [&str; 2] = ["slack-documented-prefix", "user-section-gramma
 
 /// The rotation family's documented version section (see the module doc).
 const ROTATION_DIGIT_WIDTH: usize = 1;
-/// Issue #551: beta.4's floor, now the tail's exact length (see the module
-/// doc's boundary-defect paragraph) rather than its minimum.
+/// Issue #512's frozen floor, restored as an open floor (issue #570; see the
+/// module doc's boundary-defect paragraph) rather than #551's exact length.
 const ROTATION_TAIL_MIN: usize = 20;
 const ROTATION_TAIL_ALPHABET: Alphabet = pattern::is_alnum_dash;
 const ROTATION_SIGNALS: [&str; 2] = ["slack-documented-prefix", "rotation-version-section"];
 const ROTATION_PREFIXES: [&str; 3] = [REFRESH_PREFIX, ROTATING_BOT_PREFIX, ROTATING_USER_PREFIX];
 
 /// `xapp-` and `xwfp-`, unchanged from beta.4 (see the module doc for why
-/// neither is promoted). Issue #551: beta.4's floor is now each guard's
-/// exact length rather than its minimum (see the module doc's
-/// boundary-defect paragraph).
+/// neither is promoted). Issue #570: an open floor (see the module doc's
+/// boundary-defect paragraph), restoring #512's frozen shape after #551
+/// mistakenly narrowed it to an exact length.
 const INTERIM_MIN_LEN: usize = 20;
 const INTERIM_ALPHABET: Alphabet = pattern::is_alnum_dash;
 const INTERIM_SIGNALS: [&str; 2] = ["slack-documented-prefix", "opaque-suffix"];
 const INTERIM_SHAPES: [PrefixShape<'static>; 2] = [
-    PrefixShape::exact("xapp-", INTERIM_MIN_LEN, INTERIM_ALPHABET, &INTERIM_SIGNALS),
-    PrefixShape::exact("xwfp-", INTERIM_MIN_LEN, INTERIM_ALPHABET, &INTERIM_SIGNALS),
+    PrefixShape::open_floor("xapp-", INTERIM_MIN_LEN, INTERIM_ALPHABET, &INTERIM_SIGNALS),
+    PrefixShape::open_floor("xwfp-", INTERIM_MIN_LEN, INTERIM_ALPHABET, &INTERIM_SIGNALS),
 ];
 
 /// A value is never a slice of a wider `[A-Za-z0-9_-]` identifier.
@@ -185,7 +191,6 @@ fn scan(input: &str) -> Vec<(usize, usize, &'static [&'static str])> {
         digit_max: ROTATION_DIGIT_WIDTH,
         tail_min: ROTATION_TAIL_MIN,
         tail_alphabet: ROTATION_TAIL_ALPHABET,
-        tail_exact: true,
     };
     for prefix in ROTATION_PREFIXES {
         matches.extend(
@@ -218,7 +223,6 @@ fn scan_bot(input: &str) -> Vec<(usize, usize)> {
             digit_max: SECTION_MAX,
             tail_min: BOT_SECRET_MIN,
             tail_alphabet: SECRET_ALPHABET,
-            tail_exact: false,
         },
     )
 }
@@ -236,22 +240,20 @@ fn scan_user(input: &str) -> Vec<(usize, usize)> {
             digit_max: SECTION_MAX,
             tail_min: USER_SECRET_MIN,
             tail_alphabet: SECRET_ALPHABET,
-            tail_exact: false,
         },
     )
 }
 
 /// `section_count` `-`-separated digit sections (each within `[digit_min,
-/// digit_max]` bytes) followed by a tail matching `tail_alphabet`: the shape
-/// every documented Slack token family reduces to once its own section count
-/// and widths are known. The tail is `tail_min`-or-more bytes when
-/// `tail_exact` is `false` (the bot and user secret sections, whose own
-/// alphabet is narrower than [`BOUNDARY`], so a trailing boundary byte
-/// already rejects a directly-glued wider identifier); when `tail_exact` is
-/// `true` (issue #551: the rotation tail, whose `[A-Za-z0-9_-]` alphabet
-/// equals `BOUNDARY`), the tail is exactly `tail_min` bytes, the only shape
-/// that leaves the boundary check something to inspect -- see the module
-/// doc's boundary-defect paragraph.
+/// digit_max]` bytes) followed by an open-floor tail of `tail_min`-or-more
+/// `tail_alphabet` bytes (`pattern::open_floor_run_end`): the shape every
+/// documented Slack token family reduces to once its own section count and
+/// widths are known. The bot and user secret sections' own alphabet is
+/// narrower than [`BOUNDARY`], so a trailing boundary byte already rejects a
+/// directly-glued wider identifier there regardless; the rotation tail's
+/// `[A-Za-z0-9_-]` alphabet equals `BOUNDARY`, so it is the one that
+/// actually depends on the open-floor cap -- see the module doc's
+/// boundary-defect paragraph.
 #[derive(Clone, Copy)]
 struct SectionedShape {
     section_count: usize,
@@ -259,7 +261,6 @@ struct SectionedShape {
     digit_max: usize,
     tail_min: usize,
     tail_alphabet: Alphabet,
-    tail_exact: bool,
 }
 
 /// Every boundary-delimited `prefix` value whose body matches `shape`, left
@@ -323,11 +324,12 @@ fn sectioned_end(
     if available < shape.tail_min {
         return None;
     }
-    Some(if shape.tail_exact {
-        cursor + shape.tail_min
-    } else {
-        cursor + available
-    })
+    Some(pattern::open_floor_run_end(
+        bytes,
+        cursor,
+        shape.tail_min,
+        available,
+    ))
 }
 
 /// The end of the maximal digit run starting at `start`, only when its
@@ -350,10 +352,8 @@ mod tests {
     /// `(benchmark id suffix, input, expected ranges)`.
     type Case = (&'static str, String, Vec<(usize, usize)>);
 
-    /// Exactly [`ROTATION_TAIL_MIN`] (== [`INTERIM_MIN_LEN`]) bytes: since
-    /// issue #551 turned both floors into exact lengths, every test below
-    /// that expects a full match needs a body of exactly this length rather
-    /// than merely at or above it.
+    /// Exactly [`ROTATION_TAIL_MIN`] (== [`INTERIM_MIN_LEN`]), the shared
+    /// open floor both tails require at minimum.
     const OPAQUE_TWENTY_BYTE_BODY: &str = "SYNTHETICROTATION001";
     const _: () = assert!(OPAQUE_TWENTY_BYTE_BODY.len() == ROTATION_TAIL_MIN);
     const _: () = assert!(OPAQUE_TWENTY_BYTE_BODY.len() == INTERIM_MIN_LEN);
@@ -593,25 +593,24 @@ mod tests {
         }
     }
 
-    /// Issue #551: before this fix, the rotation tail's open floor
-    /// (`RunLength::AtLeast`-equivalent) matched any run of 20 or more bytes
-    /// in full, so a body longer than the floor was indistinguishable from a
-    /// directly-glued wider identifier -- exactly the shared boundary defect
-    /// this issue closes. A body past the now-exact 20-byte length is an
-    /// intentional false negative until a reviewed contract establishes a
-    /// real maximum.
+    /// Issue #570: a tail longer than the floor, with no dash or underscore
+    /// right at the floor, is still one whole match -- #551 turned this into
+    /// a false negative by mistake, treating the floor as if it were a
+    /// reviewed maximum. Decision #512 froze this floor as open-ended.
     #[test]
-    fn rotation_prefixes_reject_a_tail_longer_than_the_exact_twenty_byte_length() {
+    fn rotation_prefixes_match_a_tail_longer_than_the_twenty_byte_floor() {
         let body = "SYNTHETICREVOKEDINTERIMVALUE0123456789";
         for prefix in ["xoxe-", "xoxe.xoxb-", "xoxe.xoxp-"] {
             let input = format!("{prefix}1-{}", &body[..=ROTATION_TAIL_MIN]);
-            assert!(ranges(&input).is_empty(), "{prefix}");
+            assert_eq!(ranges(&input), vec![(0, input.len())], "{prefix}");
         }
     }
 
-    /// Issue #551: the shared boundary/delimiter regression set, mirrored
-    /// from `digitalocean-token`'s existing leading/trailing/dash
-    /// identifier-embedding fixtures, for every rotation prefix.
+    /// Issue #551's shared boundary/delimiter regression set, mirrored from
+    /// `digitalocean-token`'s existing leading/trailing/dash
+    /// identifier-embedding fixtures, for every rotation prefix. Issue #570
+    /// keeps this passing via [`pattern::open_floor_run_end`] instead of
+    /// #551's exact length.
     #[test]
     fn rotation_prefixes_reject_every_value_embedded_in_a_wider_identifier() {
         for prefix in ["xoxe-", "xoxe.xoxb-", "xoxe.xoxp-"] {
@@ -688,23 +687,28 @@ mod tests {
         assert!(ranges(value).is_empty());
     }
 
-    /// Issue #551: before this fix, `xapp-`/`xwfp-`'s open floor matched any
-    /// run of 20 or more bytes in full, so a body longer than the floor was
-    /// indistinguishable from a directly-glued wider identifier -- the same
-    /// shared boundary defect fixed for `xoxe-`/`xoxe.xoxb-`/`xoxe.xoxp-` and
-    /// `lin_oauth_` (`super::linear`). A body past the now-exact 20-byte
-    /// length is an intentional false negative until a reviewed contract
-    /// establishes a real maximum. This is also the shared boundary/
-    /// delimiter regression set, mirrored from `digitalocean-token`'s
-    /// existing leading/trailing/dash identifier-embedding fixtures.
+    /// Issue #570: a plain alphanumeric extension past the floor is still
+    /// more opaque secret, matched in full -- #512 froze `xapp-`/`xwfp-`'s
+    /// floor as open-ended, and #551 mistakenly turned it into a reviewed
+    /// maximum instead of fixing the boundary defect a different way.
     #[test]
-    fn interim_prefixes_reject_a_body_longer_than_exact_or_embedded_in_a_wider_identifier() {
+    fn interim_prefixes_match_a_body_longer_than_the_twenty_byte_floor() {
+        for prefix in ["xapp-", "xwfp-"] {
+            let value = format!("{prefix}{OPAQUE_TWENTY_BYTE_BODY}0");
+            assert_eq!(ranges(&value), vec![(0, value.len())], "{value}");
+        }
+    }
+
+    /// Issue #551's shared boundary/delimiter regression set, mirrored from
+    /// `digitalocean-token`'s existing leading/trailing/dash
+    /// identifier-embedding fixtures. Issue #570 keeps this passing via
+    /// [`pattern::open_floor_run_end`] instead of #551's exact length: a
+    /// dash or underscore landing exactly at the floor is capped there
+    /// rather than absorbed, leaving it for the boundary check to reject.
+    #[test]
+    fn interim_prefixes_reject_a_value_embedded_in_a_wider_identifier() {
         for prefix in ["xapp-", "xwfp-"] {
             let value = format!("{prefix}{OPAQUE_TWENTY_BYTE_BODY}");
-            assert!(
-                ranges(&format!("{prefix}{OPAQUE_TWENTY_BYTE_BODY}0")).is_empty(),
-                "{value}"
-            );
             assert!(ranges(&format!("legacy{value}")).is_empty(), "{value}");
             assert!(ranges(&format!("{value}_backup")).is_empty(), "{value}");
             assert!(ranges(&format!("{value}-1")).is_empty(), "{value}");
@@ -732,8 +736,9 @@ mod tests {
         // `slack-token.variants[app-level|workflow]`), so a value shaped
         // like the bot/user digit-section grammar is still accepted by the
         // plain opaque-suffix guard rather than being required to have one.
-        // The dash-bearing body is exactly the 20-byte length issue #551
-        // requires (a longer one is now rejected, below).
+        // The dash-bearing body is exactly the floor's length, so it never
+        // reaches `open_floor_run_end`'s past-the-floor delimiter check at
+        // all -- the dash here is part of the value, not a suffix.
         for prefix in ["xapp-", "xwfp-"] {
             let input = format!("{prefix}1234567890123-321098");
             assert_eq!(ranges(&input), vec![(0, input.len())], "{prefix}");
