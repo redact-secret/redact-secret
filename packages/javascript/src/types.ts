@@ -111,6 +111,15 @@ export interface WholeInputLimits {
 export interface ScanOptions {
   readonly policy?: SecretPolicy;
   readonly limits?: WholeInputLimits;
+  /**
+   * A caller-supplied declarative ruleset
+   * (`decision-define-declarative-detector-ruleset-contract`), as raw bytes
+   * or a UTF-8 string of its text grammar. Its declared detectors register
+   * after every built-in, so a ruleset detector can add detections but
+   * never outrank a built-in's resolved finding. Throws
+   * `INVALID_RULESET` when it does not parse.
+   */
+  readonly ruleset?: Uint8Array | string;
 }
 
 export interface RedactOptions {

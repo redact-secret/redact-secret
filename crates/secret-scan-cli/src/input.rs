@@ -92,15 +92,42 @@ pub fn read_file_text(path: &Path) -> Result<String, Failure> {
     read_bounded_text(file, MAX_INPUT_BYTES)
 }
 
+/// Reads `path` whole as raw bytes, bounded by [`MAX_INPUT_BYTES`] — the
+/// same generous cap [`read_file_text`] applies, well above the core's own
+/// tighter ruleset size bound. Unlike [`read_file_text`], this never
+/// decodes: the core, not the CLI, validates a `--ruleset` file's UTF-8 and
+/// grammar (`redact_secret::load_ruleset`).
+///
+/// # Errors
+///
+/// The same failures as [`read_file_text`], minus [`Failure::NotUtf8`].
+pub fn read_file_bytes(path: &Path) -> Result<Vec<u8>, Failure> {
+    let file = File::open(path).map_err(|_| Failure::ReadFailed)?;
+    read_bounded_bytes(file, MAX_INPUT_BYTES)
+}
+
 /// Reads `reader` to the end, bounded by `max_bytes` and decoded as UTF-8.
+///
+/// # Errors
+///
+/// The same failures as [`read_file_text`], against `max_bytes`.
+fn read_bounded_text(reader: impl Read, max_bytes: usize) -> Result<String, Failure> {
+    let bytes = read_bounded_bytes(reader, max_bytes)?;
+    // The `FromUtf8Error` owns the undecodable bytes; discarding it here is
+    // what keeps them out of the diagnostic.
+    String::from_utf8(bytes).map_err(|_| Failure::NotUtf8)
+}
+
+/// Reads `reader` to the end, bounded by `max_bytes`.
 ///
 /// The reader is capped at one byte past the bound, so exceeding it is
 /// observable without ever holding more than the bound plus that byte.
 ///
 /// # Errors
 ///
-/// The same failures as [`read_file_text`], against `max_bytes`.
-fn read_bounded_text(reader: impl Read, max_bytes: usize) -> Result<String, Failure> {
+/// [`Failure::ReadFailed`] when the read itself fails, and
+/// `INPUT_LIMIT_EXCEEDED` when more than `max_bytes` were read.
+fn read_bounded_bytes(reader: impl Read, max_bytes: usize) -> Result<Vec<u8>, Failure> {
     let ceiling = u64::try_from(max_bytes).unwrap_or(u64::MAX);
     let mut reader = reader.take(ceiling.saturating_add(1));
 
@@ -111,10 +138,7 @@ fn read_bounded_text(reader: impl Read, max_bytes: usize) -> Result<String, Fail
     if bytes.len() > max_bytes {
         return Err(Failure::Core(SecretScanErrorCode::InputLimitExceeded));
     }
-
-    // The `FromUtf8Error` owns the undecodable bytes; discarding it here is
-    // what keeps them out of the diagnostic.
-    String::from_utf8(bytes).map_err(|_| Failure::NotUtf8)
+    Ok(bytes)
 }
 
 #[cfg(test)]

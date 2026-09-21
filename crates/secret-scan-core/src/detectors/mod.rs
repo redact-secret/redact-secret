@@ -32,6 +32,7 @@ mod openai;
 mod otpauth;
 mod pattern;
 mod private_key;
+mod ruleset_adapter;
 mod sendgrid;
 mod sentry;
 mod shopify;
@@ -49,6 +50,7 @@ use private_key::PrivateKeyDetector;
 pub(crate) use bearer_token::has_open_bearer_authorization;
 pub(crate) use generic_token::has_open_contextual_assignment;
 pub(crate) use private_key::PrivateKeyRetentionTracker;
+pub(crate) use ruleset_adapter::RulesetDetector;
 
 /// Every built-in detector, in canonical registration order.
 #[must_use]

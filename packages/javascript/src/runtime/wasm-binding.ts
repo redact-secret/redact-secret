@@ -129,6 +129,7 @@ export interface WasmModule {
     policy?: WasmPolicyCallback,
     maxInputBytes?: number,
     maxFindings?: number,
+    ruleset?: Uint8Array,
   ): readonly WasmFinding[];
   redact(
     input: string,
@@ -143,6 +144,7 @@ export interface WasmModule {
     formatter?: WasmFormatterCallback,
     maxInputBytes?: number,
     maxFindings?: number,
+    ruleset?: Uint8Array,
   ): { readonly text: string; readonly findings: readonly WasmFinding[] };
   createIncrementalSanitizer(
     maxInputCodeUnits: number,
@@ -296,13 +298,14 @@ export function createBindingFromWasmModule(wasm: WasmModule): NativeBinding {
     initialize: () => {
       wasm.initialize();
     },
-    scan: (input, policy, limits) =>
+    scan: (input, policy, limits, ruleset) =>
       wasm
         .scan(
           input,
           toWasmPolicyCallback(policy),
           limits?.maxInputBytes,
           limits?.maxFindings,
+          ruleset,
         )
         .map(toNativeFinding),
     redact: (input, findings, formatter, limits) =>
@@ -313,13 +316,14 @@ export function createBindingFromWasmModule(wasm: WasmModule): NativeBinding {
         limits?.maxInputBytes,
         limits?.maxFindings,
       ),
-    scanAndRedact: (input, policy, formatter, limits) => {
+    scanAndRedact: (input, policy, formatter, limits, ruleset) => {
       const result = wasm.scanAndRedact(
         input,
         toWasmPolicyCallback(policy),
         toWasmFormatterCallback(formatter),
         limits?.maxInputBytes,
         limits?.maxFindings,
+        ruleset,
       );
       return {
         text: result.text,

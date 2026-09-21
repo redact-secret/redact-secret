@@ -58,6 +58,7 @@
 //! | Result | [`ScanResult`], [`IncrementalResult`] |
 //! | Sanitized error | [`SecretScanError`], [`SecretScanErrorCode`], [`DetectorFailure`], [`PolicyFailure`], [`FormatterFailure`] |
 //! | Custom detectors | [`Detector`], [`Candidate`], [`DetectorContext`], [`DetectorRegistry`], [`RegisteredDetector`] |
+//! | Declarative rulesets | [`load_ruleset`], [`RulesetError`], [`RulesetErrorClass`] |
 //! | Profiles | [`Profile`] |
 //! | Identifiers and units | [`is_identifier`], [`MAX_IDENTIFIER_LENGTH`], [`RANGE_UNIT`], [`VERSION`] |
 //! | Detector building blocks | [`shannon_entropy`] |
@@ -124,11 +125,6 @@ mod pipeline;
 mod policy;
 mod redact;
 mod registry;
-// Issue #483 (`decision-define-declarative-detector-ruleset-contract`): the
-// parser and IR are entirely crate-internal, and nothing yet builds a
-// `Detector` from a parsed ruleset — that adapter is #495. Until then this
-// module's only callers are its own tests.
-#[allow(dead_code)]
 mod ruleset;
 mod types;
 
@@ -150,6 +146,7 @@ pub use redact::{
     typed_placeholder_formatter,
 };
 pub use registry::{DetectorRegistry, Profile, RegisteredDetector};
+pub use ruleset::{RulesetError, RulesetErrorClass, load_ruleset};
 pub use types::{
     Action, ByteRange, Candidate, Confidence, DetectedFinding, Detector, DetectorContext, Finding,
     MAX_IDENTIFIER_LENGTH, Obfuscation, PlaceholderContext, PlaceholderFormatter, Policy,

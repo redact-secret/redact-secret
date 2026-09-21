@@ -64,8 +64,9 @@
 //! specificity enum does not define at all — is the single fixed
 //! [`RulesetLoadError::SpecificityNotClaimable`].
 
-use crate::detectors::built_in_ids;
-use crate::types::{Specificity, is_identifier};
+use crate::detectors::{RulesetDetector, built_in_ids};
+use crate::error::SecretScanErrorCode;
+use crate::types::{Detector, Specificity, is_identifier};
 
 /// The one supported `ruleset-revision` value. Any other value is rejected
 /// with [`RulesetLoadError::UnknownRevision`] before any detector block is
@@ -284,6 +285,216 @@ pub(crate) enum RulesetLoadError {
     ReservedDetectorId,
     /// No detector blocks at all.
     EmptyRuleset,
+}
+
+/// The public, fixed rejection class of a rejected ruleset (issue #495,
+/// `decision-define-declarative-detector-ruleset-contract`'s "Closed
+/// validator enum" and "Fail-closed loading rule" sections).
+///
+/// This is `RulesetLoadError` translated one variant to one variant for
+/// bindings that need the class as data rather than as a private Rust enum.
+/// Like `RulesetLoadError`, every variant is a content-free unit variant:
+/// no byte from the rejected ruleset is ever carried by one.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+#[non_exhaustive]
+pub enum RulesetErrorClass {
+    /// See `RulesetLoadError::RulesetTooLarge`.
+    RulesetTooLarge,
+    /// See `RulesetLoadError::UnknownRevision`.
+    UnknownRevision,
+    /// See `RulesetLoadError::UnknownField`.
+    UnknownField,
+    /// See `RulesetLoadError::UnsupportedConstruct`.
+    UnsupportedConstruct,
+    /// See `RulesetLoadError::UnknownAlphabet`.
+    UnknownAlphabet,
+    /// See `RulesetLoadError::UnknownValidator`.
+    UnknownValidator,
+    /// See `RulesetLoadError::SpecificityNotClaimable`.
+    SpecificityNotClaimable,
+    /// See `RulesetLoadError::MissingField`.
+    MissingField,
+    /// See `RulesetLoadError::PrefixTooShort`.
+    PrefixTooShort,
+    /// See `RulesetLoadError::PrefixTooLong`.
+    PrefixTooLong,
+    /// See `RulesetLoadError::RunLengthOutOfBounds`.
+    RunLengthOutOfBounds,
+    /// See `RulesetLoadError::TooManyDetectors`.
+    TooManyDetectors,
+    /// See `RulesetLoadError::DuplicateDetectorId`.
+    DuplicateDetectorId,
+    /// See `RulesetLoadError::ReservedDetectorId`.
+    ReservedDetectorId,
+    /// See `RulesetLoadError::EmptyRuleset`.
+    EmptyRuleset,
+}
+
+impl RulesetErrorClass {
+    /// The stable `SCREAMING_SNAKE_CASE` class string, the same casing
+    /// convention [`SecretScanErrorCode::as_str`] uses.
+    #[must_use]
+    pub const fn as_str(self) -> &'static str {
+        match self {
+            Self::RulesetTooLarge => "RULESET_TOO_LARGE",
+            Self::UnknownRevision => "UNKNOWN_REVISION",
+            Self::UnknownField => "UNKNOWN_FIELD",
+            Self::UnsupportedConstruct => "UNSUPPORTED_CONSTRUCT",
+            Self::UnknownAlphabet => "UNKNOWN_ALPHABET",
+            Self::UnknownValidator => "UNKNOWN_VALIDATOR",
+            Self::SpecificityNotClaimable => "SPECIFICITY_NOT_CLAIMABLE",
+            Self::MissingField => "MISSING_FIELD",
+            Self::PrefixTooShort => "PREFIX_TOO_SHORT",
+            Self::PrefixTooLong => "PREFIX_TOO_LONG",
+            Self::RunLengthOutOfBounds => "RUN_LENGTH_OUT_OF_BOUNDS",
+            Self::TooManyDetectors => "TOO_MANY_DETECTORS",
+            Self::DuplicateDetectorId => "DUPLICATE_DETECTOR_ID",
+            Self::ReservedDetectorId => "RESERVED_DETECTOR_ID",
+            Self::EmptyRuleset => "EMPTY_RULESET",
+        }
+    }
+}
+
+impl std::fmt::Display for RulesetErrorClass {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.as_str())
+    }
+}
+
+impl From<RulesetLoadError> for RulesetErrorClass {
+    fn from(error: RulesetLoadError) -> Self {
+        match error {
+            RulesetLoadError::RulesetTooLarge => Self::RulesetTooLarge,
+            RulesetLoadError::UnknownRevision => Self::UnknownRevision,
+            RulesetLoadError::UnknownField => Self::UnknownField,
+            RulesetLoadError::UnsupportedConstruct => Self::UnsupportedConstruct,
+            RulesetLoadError::UnknownAlphabet => Self::UnknownAlphabet,
+            RulesetLoadError::UnknownValidator => Self::UnknownValidator,
+            RulesetLoadError::SpecificityNotClaimable => Self::SpecificityNotClaimable,
+            RulesetLoadError::MissingField => Self::MissingField,
+            RulesetLoadError::PrefixTooShort => Self::PrefixTooShort,
+            RulesetLoadError::PrefixTooLong => Self::PrefixTooLong,
+            RulesetLoadError::RunLengthOutOfBounds => Self::RunLengthOutOfBounds,
+            RulesetLoadError::TooManyDetectors => Self::TooManyDetectors,
+            RulesetLoadError::DuplicateDetectorId => Self::DuplicateDetectorId,
+            RulesetLoadError::ReservedDetectorId => Self::ReservedDetectorId,
+            RulesetLoadError::EmptyRuleset => Self::EmptyRuleset,
+        }
+    }
+}
+
+/// A rejected ruleset, returned by [`load_ruleset`].
+///
+/// Carries exactly two fixed, content-free facts — never a byte derived
+/// from the rejected ruleset (issue #495's "Bindings surface
+/// `INVALID_RULESET` plus the fixed class name, and no caller-supplied or
+/// input-derived byte appears in either"):
+///
+/// - [`Self::code`] is always [`SecretScanErrorCode::InvalidRuleset`], the
+///   one public error code every binding maps to its own exception type.
+/// - [`Self::class`] is the specific, fixed [`RulesetErrorClass`], so a
+///   ruleset author (or the CLI printing a diagnostic) can tell a
+///   `PrefixTooShort` rejection from an `UnknownAlphabet` one.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub struct RulesetError {
+    class: RulesetErrorClass,
+}
+
+impl RulesetError {
+    /// The one public error code every rejected ruleset carries.
+    #[must_use]
+    pub const fn code(self) -> SecretScanErrorCode {
+        SecretScanErrorCode::InvalidRuleset
+    }
+
+    /// The fixed rejection class.
+    #[must_use]
+    pub const fn class(self) -> RulesetErrorClass {
+        self.class
+    }
+
+    /// The fixed, input-free message for [`Self::code`]; identical to the
+    /// `Display` output.
+    #[must_use]
+    pub const fn message(self) -> &'static str {
+        self.code().message()
+    }
+}
+
+impl From<RulesetLoadError> for RulesetError {
+    fn from(error: RulesetLoadError) -> Self {
+        Self {
+            class: RulesetErrorClass::from(error),
+        }
+    }
+}
+
+impl std::fmt::Display for RulesetError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.message())
+    }
+}
+
+impl std::error::Error for RulesetError {}
+
+/// Parses `bytes` as a declarative ruleset and returns one registrable
+/// [`Detector`] per validated `detector:` block, in the ruleset's own
+/// declaration order (`decision-define-declarative-detector-ruleset-contract`).
+///
+/// This is the Rust core's whole ruleset surface: register the result the
+/// same way a native custom detector is registered —
+/// [`DetectorRegistry::with_built_in`](crate::DetectorRegistry::with_built_in),
+/// [`DetectorRegistry::with_common_built_in`](crate::DetectorRegistry::with_common_built_in),
+/// or [`DetectorRegistry::register`](crate::DetectorRegistry::register).
+/// Passing the result to `with_built_in`/`with_common_built_in` keeps the
+/// registry's [`Profile`](crate::Profile) identity, since a ruleset sits
+/// outside profile identity (the ADR's "Profile interaction"); `register`
+/// clears it, exactly as it does for any other custom detector.
+///
+/// Every returned detector claims [`Confidence::Medium`](crate::Confidence::Medium)
+/// and either [`Specificity::Entropy`] or [`Specificity::Contextual`] —
+/// never [`Specificity::Structural`], [`Specificity::Provider`], or
+/// [`Specificity::PrivateKey`], which `parse_ruleset` already refuses to
+/// parse. Combined with every custom detector registering after every
+/// built-in (`decision-define-detector-profile-and-pack-contract`), a
+/// ruleset detector can add detections but can never overturn a built-in's
+/// resolved finding through the specificity or registration-order tie-break
+/// keys (`crate::pipeline`'s `RankedCandidate::priority`).
+///
+/// # Errors
+///
+/// Returns a [`RulesetError`] describing the fixed rejection class; see
+/// `RulesetLoadError` for the full catalog. Loading never partially
+/// succeeds: either every detector block is returned or the whole ruleset
+/// is rejected.
+///
+/// # Examples
+///
+/// ```
+/// use redact_secret::{DetectorRegistry, load_ruleset};
+///
+/// let ruleset = b"ruleset-revision: 1\n\
+/// detector: acme-internal-token\n\
+/// specificity: contextual\n\
+/// prefix: \"ACME_\"\n\
+/// alphabet: alnum-dash\n\
+/// run: at-least 20\n\
+/// validator: none\n";
+///
+/// let detectors = load_ruleset(ruleset)?;
+/// assert_eq!(detectors.len(), 1);
+///
+/// let registry = DetectorRegistry::with_built_in(detectors)?;
+/// assert!(registry.contains("acme-internal-token"));
+/// assert_eq!(registry.profile(), Some(redact_secret::Profile::Full));
+/// # Ok::<(), Box<dyn std::error::Error>>(())
+/// ```
+pub fn load_ruleset(bytes: &[u8]) -> Result<Vec<Box<dyn Detector>>, RulesetError> {
+    let specs = parse_ruleset(bytes)?;
+    Ok(specs
+        .into_iter()
+        .map(|spec| Box::new(RulesetDetector::new(spec)) as Box<dyn Detector>)
+        .collect())
 }
 
 /// Trimmed, non-blank lines of `text`, in order.

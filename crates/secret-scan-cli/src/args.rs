@@ -7,7 +7,10 @@
 use std::ffi::OsString;
 use std::path::PathBuf;
 
-use crate::failure::{Failure, JSON_WITH_REDACT, REDACT_ONE_PATH, SOLE_OPTION, UNKNOWN_OPTION};
+use crate::failure::{
+    Failure, JSON_WITH_REDACT, REDACT_ONE_PATH, RULESET_MISSING_PATH, RULESET_REPEATED,
+    RULESET_REQUIRES_FILE, SOLE_OPTION, UNKNOWN_OPTION,
+};
 
 /// The identity standard input reports as in a check report.
 pub const STDIN_IDENTITY: &str = "<stdin>";
@@ -57,11 +60,15 @@ pub enum Command {
         sources: Vec<Source>,
         /// How to render the report.
         format: Format,
+        /// The path `--ruleset` named, if any.
+        ruleset: Option<PathBuf>,
     },
     /// Write the sanitized form of one source to standard output.
     Redact {
         /// The single source to sanitize.
         source: Source,
+        /// The path `--ruleset` named, if any.
+        ruleset: Option<PathBuf>,
     },
 }
 
@@ -70,8 +77,10 @@ pub enum Command {
 /// # Errors
 ///
 /// Returns [`Failure::Usage`] for an unrecognized option, for `--help` or
-/// `--version` alongside another argument, for `--json` with `--redact`, and
-/// for `--redact` with more than one path.
+/// `--version` alongside another argument, for `--json` with `--redact`, for
+/// `--redact` with more than one path, for `--ruleset` given more than once
+/// or with no path following it, and for `--ruleset` with no explicit file
+/// path (standard input's incremental session accepts no custom detector).
 pub fn parse<I>(args: I) -> Result<Command, Failure>
 where
     I: IntoIterator<Item = OsString>,
@@ -88,9 +97,11 @@ where
     let mut redact = false;
     let mut json = false;
     let mut paths_only = false;
+    let mut ruleset: Option<PathBuf> = None;
     let mut paths: Vec<PathBuf> = Vec::new();
 
-    for arg in args {
+    let mut args = args.into_iter();
+    while let Some(arg) = args.next() {
         if paths_only || arg.as_encoded_bytes().first() != Some(&b'-') {
             paths.push(PathBuf::from(arg));
             continue;
@@ -99,6 +110,12 @@ where
             Some("--") => paths_only = true,
             Some("--redact") => redact = true,
             Some("--json") => json = true,
+            Some("--ruleset") => {
+                let path = args.next().ok_or(Failure::Usage(RULESET_MISSING_PATH))?;
+                if ruleset.replace(PathBuf::from(path)).is_some() {
+                    return Err(Failure::Usage(RULESET_REPEATED));
+                }
+            }
             Some("--help" | "-h" | "--version" | "-V") => {
                 return Err(Failure::Usage(SOLE_OPTION));
             }
@@ -112,20 +129,28 @@ where
         }
         let mut paths = paths.into_iter();
         let source = match (paths.next(), paths.next()) {
+            (None, _) if ruleset.is_some() => return Err(Failure::Usage(RULESET_REQUIRES_FILE)),
             (None, _) => Source::Stdin,
             (Some(path), None) => Source::File(path),
             (Some(_), Some(_)) => return Err(Failure::Usage(REDACT_ONE_PATH)),
         };
-        return Ok(Command::Redact { source });
+        return Ok(Command::Redact { source, ruleset });
     }
 
     let sources = if paths.is_empty() {
+        if ruleset.is_some() {
+            return Err(Failure::Usage(RULESET_REQUIRES_FILE));
+        }
         vec![Source::Stdin]
     } else {
         paths.into_iter().map(Source::File).collect()
     };
     let format = if json { Format::Json } else { Format::Text };
-    Ok(Command::Check { sources, format })
+    Ok(Command::Check {
+        sources,
+        format,
+        ruleset,
+    })
 }
 
 #[cfg(test)]
@@ -147,6 +172,7 @@ mod tests {
             Command::Check {
                 sources: vec![Source::Stdin],
                 format: Format::Text,
+                ruleset: None,
             }
         );
     }
@@ -158,6 +184,7 @@ mod tests {
             Command::Check {
                 sources: vec![file("b.txt"), file("a.txt")],
                 format: Format::Text,
+                ruleset: None,
             }
         );
     }
@@ -169,6 +196,7 @@ mod tests {
             Command::Check {
                 sources: vec![file("a.txt")],
                 format: Format::Json,
+                ruleset: None,
             }
         );
     }
@@ -178,13 +206,15 @@ mod tests {
         assert_eq!(
             parse_args(&["--redact"]).unwrap(),
             Command::Redact {
-                source: Source::Stdin
+                source: Source::Stdin,
+                ruleset: None,
             }
         );
         assert_eq!(
             parse_args(&["--redact", "a.txt"]).unwrap(),
             Command::Redact {
-                source: file("a.txt")
+                source: file("a.txt"),
+                ruleset: None,
             }
         );
     }
@@ -196,7 +226,51 @@ mod tests {
             Command::Check {
                 sources: vec![file("--json")],
                 format: Format::Text,
+                ruleset: None,
             }
+        );
+    }
+
+    #[test]
+    fn ruleset_names_a_path_alongside_a_file_source_in_either_mode() {
+        assert_eq!(
+            parse_args(&["--ruleset", "rules.txt", "a.txt"]).unwrap(),
+            Command::Check {
+                sources: vec![file("a.txt")],
+                format: Format::Text,
+                ruleset: Some(PathBuf::from("rules.txt")),
+            }
+        );
+        assert_eq!(
+            parse_args(&["--redact", "--ruleset", "rules.txt", "a.txt"]).unwrap(),
+            Command::Redact {
+                source: file("a.txt"),
+                ruleset: Some(PathBuf::from("rules.txt")),
+            }
+        );
+    }
+
+    #[test]
+    fn ruleset_without_an_explicit_path_is_rejected_in_either_mode() {
+        assert_eq!(
+            parse_args(&["--ruleset", "rules.txt"]),
+            Err(Failure::Usage(RULESET_REQUIRES_FILE))
+        );
+        assert_eq!(
+            parse_args(&["--redact", "--ruleset", "rules.txt"]),
+            Err(Failure::Usage(RULESET_REQUIRES_FILE))
+        );
+    }
+
+    #[test]
+    fn ruleset_rejects_a_missing_value_and_a_repeated_flag() {
+        assert_eq!(
+            parse_args(&["--ruleset"]),
+            Err(Failure::Usage(RULESET_MISSING_PATH))
+        );
+        assert_eq!(
+            parse_args(&["--ruleset", "a.txt", "--ruleset", "b.txt", "c.txt"]),
+            Err(Failure::Usage(RULESET_REPEATED))
         );
     }
 

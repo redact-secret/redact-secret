@@ -435,9 +435,11 @@ Excluding a *callback* is not the same as excluding all extension:
 `decision-define-declarative-detector-ruleset-contract` fixes the contract
 for a caller-supplied **declarative ruleset** — data the core parses and
 matches itself through the existing `pattern.rs` engine, never host code
-run per candidate — as the accepted path for JavaScript, Python, and the
-CLI. See that decision for the matching vocabulary, cost bounds, ordering
-cap, and implementation status.
+run per candidate — implemented (issue #495) for the Rust core
+(`redact_secret::load_ruleset`), JavaScript (Node and browser WebAssembly),
+Python, and the CLI (`--ruleset <path>`). See that decision for the matching
+vocabulary, cost bounds, and ordering cap, and `README.md`'s "Declarative
+rulesets" section for the wire grammar and per-surface usage.
 
 Extensions are trusted in-process code, not a sandbox. Fixed library errors can
 sanitize an exception crossing a callback boundary, but cannot prevent trusted

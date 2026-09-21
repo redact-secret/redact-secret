@@ -27,9 +27,10 @@ use pyo3::{create_exception, wrap_pyfunction};
 use redact_secret::{
     Action, ByteRange, Confidence, DefaultPolicy, DetectedFinding, DetectorRegistry,
     Finding as CoreFinding, Obfuscation, PlaceholderContext, PlaceholderFormatter, Policy,
-    PolicyContext, SecretScanError as CoreError, SecretScanErrorCode, WholeInputLimits,
-    default_placeholder_formatter as core_default_formatter, redact_with_limits as core_redact,
-    run_detector_pipeline, typed_placeholder_formatter as core_typed_formatter,
+    PolicyContext, RulesetError, SecretScanError as CoreError, SecretScanErrorCode,
+    WholeInputLimits, default_placeholder_formatter as core_default_formatter, load_ruleset,
+    redact_with_limits as core_redact, run_detector_pipeline,
+    typed_placeholder_formatter as core_typed_formatter,
 };
 
 /// The Unicode string-index unit every range this module reports uses.
@@ -162,6 +163,12 @@ create_exception!(
     SecretScanError,
     "An incremental session received an operation after it left the accepting state."
 );
+create_exception!(
+    redact_secret._native,
+    InvalidRulesetError,
+    SecretScanError,
+    "A `ruleset` argument to `scan`/`scan_and_redact` was rejected while loading (issue #495). The fixed rejection class is folded into the message, in parentheses."
+);
 
 /// Maps a fixed core error code to its exception type and fixed message.
 pub(crate) fn map_error_code(code: SecretScanErrorCode) -> PyErr {
@@ -200,12 +207,29 @@ pub(crate) fn map_error_code(code: SecretScanErrorCode) -> PyErr {
             PyErr::new::<FindingLimitExceededError, _>(message)
         }
         SecretScanErrorCode::InvalidState => PyErr::new::<InvalidStateError, _>(message),
+        // Reached only if a `SecretScanError` ever carried this code
+        // directly; every real rejection instead goes through
+        // `map_ruleset_error`, which also folds in the fixed class.
+        SecretScanErrorCode::InvalidRuleset => PyErr::new::<InvalidRulesetError, _>(message),
     }
 }
 
 /// Maps a core error to its sanitized Python exception.
 pub(crate) fn map_core_error(error: CoreError) -> PyErr {
     map_error_code(error.code())
+}
+
+/// Maps a rejected `ruleset` argument to `InvalidRulesetError`. The code is
+/// always the core's fixed `INVALID_RULESET`; the fixed rejection class is
+/// appended to the message, in parentheses — never a byte from the rejected
+/// ruleset, only the fixed class name
+/// [`redact_secret::RulesetErrorClass::as_str`] already gives.
+pub(crate) fn map_ruleset_error(error: RulesetError) -> PyErr {
+    PyErr::new::<InvalidRulesetError, _>(format!(
+        "{} ({})",
+        error.message(),
+        error.class().as_str()
+    ))
 }
 
 /// Registers every exception type and sets its fixed `code` class attribute.
@@ -304,6 +328,11 @@ fn register_exceptions(module: &Bound<'_, PyModule>) -> PyResult<()> {
         "InvalidStateError",
         InvalidStateError,
         SecretScanErrorCode::InvalidState
+    );
+    register!(
+        "InvalidRulesetError",
+        InvalidRulesetError,
+        SecretScanErrorCode::InvalidRuleset
     );
 
     Ok(())
@@ -660,21 +689,55 @@ impl PyWholeInputLimits {
 // Detection and policy
 // ---------------------------------------------------------------------
 
-/// Builds a registry of every built-in detector. There is no custom
-/// detector callback surface (`decision-define-runtime-bindings`).
-fn registry() -> PyResult<DetectorRegistry> {
-    DetectorRegistry::with_built_in([]).map_err(map_core_error)
+/// Builds a registry of every built-in detector, plus every detector
+/// `ruleset` declares when given (issue #495,
+/// `decision-define-declarative-detector-ruleset-contract`). There is no
+/// custom detector *callback* surface (`decision-define-runtime-bindings`);
+/// a declarative ruleset is data the core parses and matches itself, never
+/// host code.
+///
+/// # Errors
+///
+/// `InvalidOptionsError` when `ruleset` is neither `bytes`/`bytearray` nor
+/// `str`, and `InvalidRulesetError` when it does not parse.
+fn registry_with_ruleset(ruleset: Option<&Bound<'_, PyAny>>) -> PyResult<DetectorRegistry> {
+    match ruleset {
+        None => DetectorRegistry::with_built_in([]).map_err(map_core_error),
+        Some(value) => {
+            let bytes = extract_ruleset_bytes(value)?;
+            let detectors = load_ruleset(&bytes).map_err(map_ruleset_error)?;
+            DetectorRegistry::with_built_in(detectors).map_err(map_core_error)
+        }
+    }
 }
 
-/// Runs every built-in detector over `text` and resolves overlaps.
+/// Extracts ruleset bytes from a `bytes`/`bytearray` or `str` argument
+/// (`decision-define-declarative-detector-ruleset-contract`'s "Surface
+/// exposure": "a `bytes`/`str` argument in the same position").
+fn extract_ruleset_bytes(value: &Bound<'_, PyAny>) -> PyResult<Vec<u8>> {
+    if let Ok(bytes) = value.extract::<Vec<u8>>() {
+        return Ok(bytes);
+    }
+    if let Ok(text) = value.extract::<String>() {
+        return Ok(text.into_bytes());
+    }
+    Err(map_error_code(SecretScanErrorCode::InvalidOptions))
+}
+
+/// Runs every built-in detector, plus `ruleset`'s when given, over `text`
+/// and resolves overlaps.
 ///
 /// Checks `limits` explicitly: this function calls `run_detector_pipeline`
 /// directly rather than a core function that already applies a limit set, so
 /// it does not inherit the default whole-input bound for free
 /// (`decision-bound-whole-input-operations-by-default`).
-fn detect(text: &str, limits: &WholeInputLimits) -> PyResult<Vec<DetectedFinding>> {
+fn detect(
+    text: &str,
+    limits: &WholeInputLimits,
+    ruleset: Option<&Bound<'_, PyAny>>,
+) -> PyResult<Vec<DetectedFinding>> {
     limits.check_input(text).map_err(map_core_error)?;
-    let registry = registry()?;
+    let registry = registry_with_ruleset(ruleset)?;
     let detected = run_detector_pipeline(text, &registry).map_err(map_core_error)?;
     limits
         .check_findings(detected.len())
@@ -849,10 +912,19 @@ fn redact_core(
 /// `limits.max_input_bytes` (or the default), `FindingLimitExceededError`
 /// when the accepted finding count exceeds `limits.max_findings` (or the
 /// default), `DetectorFailureError` or `InvalidCandidateError` for an
-/// internal detector fault, or `PolicyFailureError` /
-/// `InvalidPolicyActionError` for a failing or malformed `policy` callback.
+/// internal detector fault, `PolicyFailureError` /
+/// `InvalidPolicyActionError` for a failing or malformed `policy` callback,
+/// `InvalidOptionsError` when `ruleset` is neither `bytes`/`bytearray` nor
+/// `str`, or `InvalidRulesetError` when `ruleset` is given and does not
+/// parse.
+///
+/// `ruleset`, when given, is a caller-supplied declarative ruleset
+/// (`decision-define-declarative-detector-ruleset-contract`) as `bytes`,
+/// `bytearray`, or `str`; its declared detectors register after every
+/// built-in, so a ruleset detector can add detections but never outrank a
+/// built-in's resolved finding.
 #[pyfunction]
-#[pyo3(signature = (text, policy=None, limits=None))]
+#[pyo3(signature = (text, policy=None, limits=None, ruleset=None))]
 // pyo3 argument extraction produces owned `Bound`/`Option<Bound>` values;
 // there is no borrowed form to take instead.
 #[allow(clippy::needless_pass_by_value)]
@@ -860,10 +932,11 @@ fn scan<'py>(
     text: Bound<'py, PyAny>,
     policy: Option<Bound<'py, PyAny>>,
     limits: Option<PyRef<'py, PyWholeInputLimits>>,
+    ruleset: Option<Bound<'py, PyAny>>,
 ) -> PyResult<Vec<PyFinding>> {
     let text_owned = extract_text(&text)?;
     let limits = PyWholeInputLimits::resolve(limits.as_deref());
-    let detected = detect(&text_owned, &limits)?;
+    let detected = detect(&text_owned, &limits, ruleset.as_ref())?;
     let findings = apply_policy(&text_owned, detected, policy.as_ref())?;
     findings_to_py(&text_owned, findings)
 }
@@ -914,20 +987,21 @@ fn redact<'py>(
 /// `ScanResult.findings` are exactly the findings used to produce
 /// `ScanResult.text`.
 ///
-/// See `scan` and `redact` for the `policy`, `formatter`, and `limits`
-/// contracts and error conditions.
+/// See `scan` and `redact` for the `policy`, `formatter`, `limits`, and
+/// `ruleset` contracts and error conditions.
 #[pyfunction]
-#[pyo3(signature = (text, policy=None, formatter=None, limits=None))]
+#[pyo3(signature = (text, policy=None, formatter=None, limits=None, ruleset=None))]
 #[allow(clippy::needless_pass_by_value)]
 fn scan_and_redact<'py>(
     text: Bound<'py, PyAny>,
     policy: Option<Bound<'py, PyAny>>,
     formatter: Option<Bound<'py, PyAny>>,
     limits: Option<PyRef<'py, PyWholeInputLimits>>,
+    ruleset: Option<Bound<'py, PyAny>>,
 ) -> PyResult<PyScanResult> {
     let text_owned = extract_text(&text)?;
     let limits = PyWholeInputLimits::resolve(limits.as_deref());
-    let detected = detect(&text_owned, &limits)?;
+    let detected = detect(&text_owned, &limits, ruleset.as_ref())?;
     let findings = apply_policy(&text_owned, detected, policy.as_ref())?;
     let redacted_text = redact_core(&text_owned, &findings, formatter.as_ref(), &limits)?;
     let py_findings = findings_to_py(&text_owned, findings)?;

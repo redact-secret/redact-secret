@@ -149,14 +149,30 @@ fn run_redact(
 
 /// [`lifecycle::with_registry`] plus [`run_scan`], flattened into the one
 /// `JsValue` error every exported function reports.
+///
+/// When `ruleset` is given, this bypasses the cached registry entirely and
+/// builds a fresh one over [`lifecycle::registry_with_ruleset`] instead:
+/// ruleset content can differ on every call, where the built-in-only
+/// registry is the same value every time. `initialize()` is still required
+/// first either way, so every exported operation keeps the one documented
+/// rule ("every synchronous operation requires a prior successful
+/// `initialize()`") regardless of whether it carries a ruleset.
 fn scan_after_initialize(
     input: &str,
     policy: Option<&Function>,
     limits: &WholeInputLimits,
+    ruleset: Option<&[u8]>,
 ) -> Result<Vec<Finding>, JsValue> {
-    lifecycle::with_registry(|registry| run_scan(input, registry, policy, limits))
-        .map_err(to_js_error)?
-        .map_err(|error| to_js_error(error.into()))
+    match ruleset {
+        None => lifecycle::with_registry(|registry| run_scan(input, registry, policy, limits))
+            .map_err(to_js_error)?
+            .map_err(|error| to_js_error(error.into())),
+        Some(bytes) => {
+            lifecycle::ensure_initialized().map_err(to_js_error)?;
+            let registry = lifecycle::registry_with_ruleset(bytes).map_err(to_js_error)?;
+            run_scan(input, &registry, policy, limits).map_err(|error| to_js_error(error.into()))
+        }
+    }
 }
 
 /// Scans `input` for secrets, in registration order with the documented
@@ -174,7 +190,13 @@ fn scan_after_initialize(
 /// [`initialize`] has not yet succeeded. Otherwise returns the sanitized,
 /// input-free error the core pipeline or a failing `policy` call produces,
 /// including `INPUT_LIMIT_EXCEEDED`, `FINDING_LIMIT_EXCEEDED`, and
-/// `INVALID_LIMITS`.
+/// `INVALID_LIMITS`. Returns `INVALID_RULESET` when `ruleset` is given and
+/// does not parse.
+///
+/// `ruleset`, when given, is a caller-supplied declarative ruleset
+/// (`decision-define-declarative-detector-ruleset-contract`); its declared
+/// detectors register after every built-in, so a ruleset detector can add
+/// detections but never outrank a built-in's resolved finding.
 // `policy` cannot be `Option<&Function>`: wasm-bindgen only implements
 // `FromWasmAbi` for owned imported types across an exported function
 // boundary, so this crate takes ownership at every such boundary and
@@ -186,10 +208,11 @@ pub fn scan(
     policy: Option<Function>,
     max_input_bytes: Option<u32>,
     max_findings: Option<u32>,
+    ruleset: Option<Vec<u8>>,
 ) -> Result<Vec<FindingJs>, JsValue> {
     let limits = resolve_whole_input_limits(max_input_bytes, max_findings)
         .map_err(|error| to_js_error(error.into()))?;
-    let findings = scan_after_initialize(input, policy.as_ref(), &limits)?;
+    let findings = scan_after_initialize(input, policy.as_ref(), &limits, ruleset.as_deref())?;
     Ok(findings
         .into_iter()
         .map(|finding| FindingJs::new(input, finding))
@@ -245,10 +268,11 @@ pub fn scan_and_redact(
     formatter: Option<Function>,
     max_input_bytes: Option<u32>,
     max_findings: Option<u32>,
+    ruleset: Option<Vec<u8>>,
 ) -> Result<ScanAndRedactResultJs, JsValue> {
     let limits = resolve_whole_input_limits(max_input_bytes, max_findings)
         .map_err(|error| to_js_error(error.into()))?;
-    let findings = scan_after_initialize(input, policy.as_ref(), &limits)?;
+    let findings = scan_after_initialize(input, policy.as_ref(), &limits, ruleset.as_deref())?;
     let text = run_redact(input, &findings, formatter.as_ref(), &limits)
         .map_err(|error| to_js_error(error.into()))?;
     let findings = findings
@@ -409,7 +433,7 @@ mod tests {
         initialize().unwrap();
         let input = synthetic_input();
 
-        let findings = scan(&input, None, None, None).unwrap();
+        let findings = scan(&input, None, None, None, None).unwrap();
         assert_eq!(findings.len(), 1);
         assert_eq!(findings[0].type_name(), synthetic::secret().type_name);
         assert_eq!(findings[0].action(), "redact");
@@ -417,7 +441,7 @@ mod tests {
         let output = redact(&input, findings, None, None, None).unwrap();
         assert_eq!(output, redacted_input("<SECRET_1>"));
 
-        let combined = scan_and_redact(&input, None, None, None, None).unwrap();
+        let combined = scan_and_redact(&input, None, None, None, None, None).unwrap();
         assert_eq!(combined.text(), output);
         assert_eq!(combined.findings().len(), 1);
         assert_eq!(
@@ -435,7 +459,7 @@ mod tests {
     fn a_bare_provider_token_is_detected_only_by_the_full_profile() {
         initialize().unwrap();
         let input = format!("prefix \u{1F511} AKIA{} suffix", "SYNTHETICEXAMPLE");
-        let findings = scan(&input, None, None, None).unwrap();
+        let findings = scan(&input, None, None, None, None).unwrap();
         if cfg!(feature = "full") {
             assert_eq!(findings.len(), 1);
             assert_eq!(findings[0].detector(), "aws-access-key");
@@ -454,6 +478,75 @@ mod tests {
         assert_eq!(profile(), expected);
     }
 
+    /// A minimal, valid declarative ruleset (issue #495).
+    const RULESET_FIXTURE: &[u8] = b"ruleset-revision: 1\n\
+detector: acme-internal-token\n\
+specificity: contextual\n\
+prefix: \"ACME_\"\n\
+alphabet: alnum-dash\n\
+run: at-least 20\n\
+validator: none\n";
+
+    #[test]
+    fn scan_accepts_a_ruleset_and_registers_it_after_the_compiled_profiles_built_ins() {
+        initialize().unwrap();
+        let value = "a".repeat(20);
+        let input = format!("ACME_{value}");
+
+        let without_ruleset = scan(&input, None, None, None, None).unwrap();
+        assert!(
+            without_ruleset.is_empty(),
+            "no built-in detector claims ACME_"
+        );
+
+        let with_ruleset = scan(&input, None, None, None, Some(RULESET_FIXTURE.to_vec())).unwrap();
+        assert_eq!(with_ruleset.len(), 1);
+        assert_eq!(with_ruleset[0].detector(), "acme-internal-token");
+        assert_eq!(with_ruleset[0].confidence(), "medium");
+    }
+
+    #[test]
+    fn scan_and_redact_thread_the_ruleset_through_to_the_scan_step() {
+        initialize().unwrap();
+        let value = "a".repeat(20);
+        let input = format!("ACME_{value}");
+
+        let combined = scan_and_redact(
+            &input,
+            None,
+            None,
+            None,
+            None,
+            Some(RULESET_FIXTURE.to_vec()),
+        )
+        .unwrap();
+        assert_eq!(combined.findings().len(), 1);
+        assert_eq!(combined.findings()[0].detector(), "acme-internal-token");
+        // `Confidence::Medium` warns rather than redacts under the default
+        // policy, so the text passes through unchanged.
+        assert!(combined.text().contains(&value));
+    }
+
+    /// [`lifecycle::registry_with_ruleset`] itself, exercised natively:
+    /// [`scan`]'s own error path needs a real JavaScript engine (see this
+    /// module's other tests' note), but the registry construction it
+    /// delegates to does not.
+    #[test]
+    fn registry_with_ruleset_builds_a_registry_over_the_compiled_profile() {
+        let registry = lifecycle::registry_with_ruleset(RULESET_FIXTURE).unwrap();
+        assert!(registry.contains("acme-internal-token"));
+        assert_eq!(registry.profile(), Some(lifecycle::PROFILE));
+    }
+
+    #[test]
+    fn registry_with_ruleset_rejects_a_malformed_ruleset_with_the_fixed_code_and_class() {
+        let error = lifecycle::registry_with_ruleset(b"ruleset-revision: 2\n").unwrap_err();
+        assert_eq!(
+            error,
+            error::WasmErrorCode::Ruleset(redact_secret::RulesetErrorClass::UnknownRevision)
+        );
+    }
+
     /// The finding's range converts to UTF-16 code units without changing
     /// the selected span, even with the astral character positioned before
     /// the match.
@@ -461,7 +554,7 @@ mod tests {
     fn finding_range_uses_utf16_offsets_end_to_end() {
         initialize().unwrap();
         let input = synthetic_input();
-        let findings = scan(&input, None, None, None).unwrap();
+        let findings = scan(&input, None, None, None, None).unwrap();
         let range = findings[0].range();
 
         let utf16: Vec<u16> = input.encode_utf16().collect();
@@ -500,7 +593,7 @@ mod tests {
         let input = synthetic_input();
 
         let policy = Function::new_with_args("finding, context", "return 'block';");
-        let findings = scan(&input, Some(policy), None, None).unwrap();
+        let findings = scan(&input, Some(policy), None, None, None).unwrap();
         assert_eq!(findings.len(), 1);
         assert_eq!(findings[0].action(), "block");
 

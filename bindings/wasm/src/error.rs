@@ -8,7 +8,7 @@
 //! rather than the core, the same way the core documents that
 //! `INVALID_INPUT` and `INVALID_OPTIONS` are host-produced codes.
 
-use redact_secret::{SecretScanError, SecretScanErrorCode};
+use redact_secret::{RulesetError, RulesetErrorClass, SecretScanError, SecretScanErrorCode};
 use wasm_bindgen::JsValue;
 
 /// Every error code this binding can report to JavaScript: every
@@ -21,6 +21,10 @@ pub(crate) enum WasmErrorCode {
     InitializationFailed,
     /// A code produced by the core pipeline.
     Core(SecretScanErrorCode),
+    /// A `ruleset` argument was rejected while loading (issue #495). The
+    /// code is always the core's fixed `INVALID_RULESET`; the fixed class
+    /// is folded into [`Self::message`].
+    Ruleset(RulesetErrorClass),
 }
 
 impl WasmErrorCode {
@@ -31,17 +35,29 @@ impl WasmErrorCode {
             Self::NotInitialized => "NOT_INITIALIZED",
             Self::InitializationFailed => "INITIALIZATION_FAILED",
             Self::Core(code) => code.as_str(),
+            Self::Ruleset(_) => SecretScanErrorCode::InvalidRuleset.as_str(),
         }
     }
 
-    /// The fixed, input-free message for this code.
-    fn message(self) -> &'static str {
+    /// The fixed, input-free message for this code. A [`Self::Ruleset`]
+    /// message appends the fixed class name in parentheses — never a byte
+    /// from the rejected ruleset, only
+    /// [`RulesetErrorClass::as_str`](redact_secret::RulesetErrorClass::as_str)'s
+    /// fixed name.
+    fn message(self) -> String {
         match self {
             Self::NotInitialized => {
-                "redact-secret wasm module is not initialized; call initialize() first."
+                "redact-secret wasm module is not initialized; call initialize() first.".to_owned()
             }
-            Self::InitializationFailed => "redact-secret wasm module failed to initialize.",
-            Self::Core(code) => code.message(),
+            Self::InitializationFailed => {
+                "redact-secret wasm module failed to initialize.".to_owned()
+            }
+            Self::Core(code) => code.message().to_owned(),
+            Self::Ruleset(class) => format!(
+                "{} ({})",
+                SecretScanErrorCode::InvalidRuleset.message(),
+                class.as_str()
+            ),
         }
     }
 }
@@ -58,11 +74,17 @@ impl From<SecretScanError> for WasmErrorCode {
     }
 }
 
+impl From<RulesetError> for WasmErrorCode {
+    fn from(error: RulesetError) -> Self {
+        Self::Ruleset(error.class())
+    }
+}
+
 /// Builds the `Error` JavaScript sees for `code`, with a `code` property
 /// alongside the standard `message`. Never carries input, a matched value,
 /// or anything beyond `code`'s fixed strings.
 pub(crate) fn to_js_error(code: WasmErrorCode) -> JsValue {
-    let error = js_sys::Error::new(code.message());
+    let error = js_sys::Error::new(&code.message());
     error.set_name("SecretScanError");
     let _ = js_sys::Reflect::set(
         &error,
@@ -99,6 +121,16 @@ mod tests {
             WasmErrorCode::from(error).as_str(),
             SecretScanErrorCode::PolicyFailure.as_str()
         );
+    }
+
+    #[test]
+    fn ruleset_errors_carry_the_fixed_code_and_append_the_class() {
+        let rejection = redact_secret::load_ruleset(b"ruleset-revision: 2\n")
+            .err()
+            .expect("expected the unsupported revision to be rejected");
+        let wrapped = WasmErrorCode::from(rejection);
+        assert_eq!(wrapped.as_str(), "INVALID_RULESET");
+        assert!(wrapped.message().contains("UNKNOWN_REVISION"));
     }
 
     // `to_js_error` builds a real JavaScript `Error`, so this only runs

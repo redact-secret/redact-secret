@@ -94,7 +94,7 @@ describe("Node addon binding: scanAndRedact result shape", () => {
     });
 
     expect(
-      binding.scanAndRedact("input", undefined, undefined, undefined),
+      binding.scanAndRedact("input", undefined, undefined, undefined, undefined),
     ).toEqual({
       text: "<SECRET_1>",
       findings: [sampleFinding],
@@ -139,10 +139,10 @@ describe("Node addon binding: createBindingFromCommonAddon", () => {
     expect(binding.version()).toBe("0.0.0-test");
     expect(binding.profile()).toBe("common");
     binding.initialize();
-    expect(binding.scan("input", undefined, undefined)).toEqual([]);
+    expect(binding.scan("input", undefined, undefined, undefined)).toEqual([]);
     expect(binding.redact("input", [], undefined, undefined)).toBe("input");
     expect(
-      binding.scanAndRedact("input", undefined, undefined, undefined),
+      binding.scanAndRedact("input", undefined, undefined, undefined, undefined),
     ).toEqual({
       text: "input",
       findings: [sampleFinding],
@@ -178,7 +178,7 @@ describe("Node addon binding: createBindingFromCommonAddon", () => {
     });
 
     expect(
-      binding.scanAndRedact("input", undefined, undefined, undefined),
+      binding.scanAndRedact("input", undefined, undefined, undefined, undefined),
     ).toEqual({
       text: "<SECRET_1>",
       findings: [sampleFinding],

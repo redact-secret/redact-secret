@@ -17,25 +17,57 @@ use std::path::Path;
 
 use redact_secret::{
     DefaultPolicy, DetectorRegistry, Finding, IncrementalSanitizer, ScanResult,
-    default_placeholder_formatter, scan, scan_and_redact,
+    default_placeholder_formatter, load_ruleset, scan, scan_and_redact,
 };
 
 use crate::args::Source;
 use crate::failure::Failure;
-use crate::input::{Utf8Stream, read_file_text};
+use crate::input::{Utf8Stream, read_file_bytes, read_file_text};
 use crate::limits::{READ_CHUNK_BYTES, incremental_limits};
 use crate::report::{Report, SafeFinding};
+
+/// Reads `path` as raw ruleset bytes and validates that it parses, so a
+/// malformed `--ruleset` file fails the whole run before any source is
+/// touched rather than surfacing as a per-source failure.
+///
+/// The core, not the CLI, performs every grammar and cost-bound check
+/// (`redact_secret::load_ruleset`); this only reads the file and confirms
+/// the read bytes are loadable at all. Every source scan later re-parses
+/// the same bytes to get its own fresh detector set — parsing is cheap and
+/// stateless, and [`DetectorRegistry::with_built_in`] consumes its custom
+/// iterator, so a registry cannot be reused across sources anyway (the
+/// built-in-only path already rebuilds one per source).
+///
+/// # Errors
+///
+/// [`Failure::ReadFailed`] when the file cannot be read, and
+/// [`Failure::Ruleset`] when it does not parse.
+pub fn load_ruleset_file(path: &Path) -> Result<Vec<u8>, Failure> {
+    let bytes = read_file_bytes(path)?;
+    load_ruleset(&bytes).map_err(Failure::from)?;
+    Ok(bytes)
+}
+
+/// Builds a registry over the built-in detectors, plus every detector
+/// `ruleset` declares when given.
+fn registry_for(ruleset: Option<&[u8]>) -> Result<DetectorRegistry, Failure> {
+    let custom = match ruleset {
+        Some(bytes) => load_ruleset(bytes).map_err(Failure::from)?,
+        None => Vec::new(),
+    };
+    Ok(DetectorRegistry::with_built_in(custom)?)
+}
 
 /// Scans every source and returns the safe report for the whole run.
 ///
 /// A source that fails is recorded as a failure and the remaining sources are
 /// still scanned: a caller that passed a directory of files learns about all
 /// of them, and the run still exits as a failure.
-pub fn check(sources: &[Source], stdin: &mut dyn Read) -> Report {
+pub fn check(sources: &[Source], stdin: &mut dyn Read, ruleset: Option<&[u8]>) -> Report {
     let mut report = Report::new();
     for source in sources {
         let identity = source.identity();
-        match check_source(source, stdin) {
+        match check_source(source, stdin, ruleset) {
             Ok(findings) => report.push_source(identity, findings),
             Err(failure) => report.push_failure(identity, failure),
         }
@@ -43,20 +75,27 @@ pub fn check(sources: &[Source], stdin: &mut dyn Read) -> Report {
     report
 }
 
-fn check_source(source: &Source, stdin: &mut dyn Read) -> Result<Vec<SafeFinding>, Failure> {
+fn check_source(
+    source: &Source,
+    stdin: &mut dyn Read,
+    ruleset: Option<&[u8]>,
+) -> Result<Vec<SafeFinding>, Failure> {
     match source {
+        // `args::parse` refuses `--ruleset` combined with standard input
+        // (its incremental session accepts no custom detector), so `ruleset`
+        // is always `None` on this path; nothing here needs to branch on it.
         Source::Stdin => {
             let mut session = IncrementalSanitizer::new(incremental_limits()?)?;
             // Check mode never emits text. The sanitized text each closed
             // unit produces is dropped with the result that carried it.
             stream(stdin, &mut session, &mut |_sanitized| Ok(()))
         }
-        Source::File(path) => check_file(path),
+        Source::File(path) => check_file(path, ruleset),
     }
 }
 
-fn check_file(path: &Path) -> Result<Vec<SafeFinding>, Failure> {
-    let registry = DetectorRegistry::with_built_in([])?;
+fn check_file(path: &Path, ruleset: Option<&[u8]>) -> Result<Vec<SafeFinding>, Failure> {
+    let registry = registry_for(ruleset)?;
     let text = read_file_text(path)?;
     let findings = scan(&text, &registry, &DefaultPolicy)?;
     drop(text);
@@ -79,8 +118,15 @@ fn check_file(path: &Path) -> Result<Vec<SafeFinding>, Failure> {
 ///
 /// Returns the failure that stopped the run. Every one of them leaves the
 /// session holding nothing.
-pub fn redact(source: &Source, stdin: &mut dyn Read, out: &mut dyn Write) -> Result<(), Failure> {
+pub fn redact(
+    source: &Source,
+    stdin: &mut dyn Read,
+    out: &mut dyn Write,
+    ruleset: Option<&[u8]>,
+) -> Result<(), Failure> {
     match source {
+        // `args::parse` refuses `--ruleset` combined with standard input;
+        // see `check_source`'s identical note.
         Source::Stdin => {
             let mut session = IncrementalSanitizer::new(incremental_limits()?)?;
             stream(stdin, &mut session, &mut |sanitized| {
@@ -89,7 +135,7 @@ pub fn redact(source: &Source, stdin: &mut dyn Read, out: &mut dyn Write) -> Res
             Ok(())
         }
         Source::File(path) => {
-            let registry = DetectorRegistry::with_built_in([])?;
+            let registry = registry_for(ruleset)?;
             let text = read_file_text(path)?;
             let result: ScanResult = scan_and_redact(
                 &text,

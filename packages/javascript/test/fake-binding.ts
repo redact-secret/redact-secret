@@ -36,6 +36,12 @@ export interface FakeBinding extends NativeBinding {
    * first.
    */
   readonly lastLimits: NativeWholeInputLimits | undefined;
+  /**
+   * The `ruleset` argument the most recent `scan`/`scanAndRedact` call
+   * received, with the same "check `calls` first" caveat as
+   * {@link lastLimits}.
+   */
+  readonly lastRuleset: Uint8Array | undefined;
 }
 
 export function createFakeBinding(
@@ -45,6 +51,7 @@ export function createFakeBinding(
   const findings = options.findings ?? [];
   const redacted = options.redacted ?? "<SECRET_1>";
   let lastLimits: NativeWholeInputLimits | undefined;
+  let lastRuleset: Uint8Array | undefined;
 
   function session(): NativeIncrementalSanitizer {
     let state: IncrementalSanitizerState = "accepting";
@@ -89,8 +96,9 @@ export function createFakeBinding(
         throw options.throwOnInitialize;
       }
     },
-    scan: (input, policy, limits) => {
+    scan: (input, policy, limits, ruleset) => {
       lastLimits = limits;
+      lastRuleset = ruleset;
       calls.push(`scan:${input}:${policy === undefined ? "builtin" : "custom"}`);
       if (options.throwOnScan !== undefined) throw options.throwOnScan;
       return findings;
@@ -102,8 +110,9 @@ export function createFakeBinding(
       );
       return redacted;
     },
-    scanAndRedact: (input, policy, formatter, limits) => {
+    scanAndRedact: (input, policy, formatter, limits, ruleset) => {
       lastLimits = limits;
+      lastRuleset = ruleset;
       calls.push(
         `scanAndRedact:${input}:${policy === undefined ? "builtin" : "custom"}:${formatter === undefined ? "builtin" : "custom"}`,
       );
@@ -117,6 +126,9 @@ export function createFakeBinding(
     },
     get lastLimits() {
       return lastLimits;
+    },
+    get lastRuleset() {
+      return lastRuleset;
     },
   };
 }
