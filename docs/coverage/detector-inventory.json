@@ -379,6 +379,13 @@
       "policyClass": "always-redact",
       "reconciliationTrigger": "AAAASYNREV0:SYNTHETICREVOKEDFIREBASEFCMLEGACYSERVERKEYFIXTUREPADDING0123456789SYNTHETICREVOKEDFIREBASEFCMLEGACYSERVERKEYFIXTUREPADDING0123456789ABCDWXYZ",
       "schemes": null
+    },
+    {
+      "type": "terraform_cloud_token",
+      "detector": "terraform-cloud-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "SYNREV0REVOKED.atlasv1.SYNTHETICREVOKEDTERRAFORMCLOUDTOKENFIXTUREPADDING0123456789ABCDEFGH",
+      "schemes": null
     }
   ],
   "consumers": [

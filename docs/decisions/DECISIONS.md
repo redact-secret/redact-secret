@@ -65,3 +65,4 @@ future planning and implementation but do not authorize Git or release actions.
 - [Map GitHub's six token families onto six independent finding types under one detector](2026-09-20-map-github-token-families-onto-independent-finding-types.md)
 - [Inventory the GitLab token-prefix table and contract the two undeclared prefixes](2026-09-20-inventory-gitlab-token-families.md)
 - [Project the generated support matrix into docs and release notes via a pinned copy](2026-09-21-project-the-support-matrix-into-docs-and-release-notes.md)
+- [Add Terraform Cloud/Enterprise API token detection](2026-09-21-add-terraform-cloud-enterprise-token-detection.md)
