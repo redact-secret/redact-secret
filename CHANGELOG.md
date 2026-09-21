@@ -30,6 +30,13 @@ evidence is linked from each published version.
   generated status-distribution fragment
   (`generate-support-matrix-docs.py --release-note`); see
   [the release runbook](docs/releasing.md#close-out).
+- [CONTRIBUTION.md](CONTRIBUTION.md#new-detector-family-checklist) documents
+  the evidence arrival contract every new detector family must satisfy —
+  provider or tool evidence, canonical positives, negative twins, benign
+  controls, metamorphic cases, mutation cases, and differential
+  observation — so a contributor or agent can satisfy the check
+  `redact-secret-benchmarks` enforces (`scripts/check-evidence-arrival.mjs`,
+  issue #52 there) without reading the checker itself (#525).
 
 ## 0.1.0-beta.5 — 2026-09-20
 
