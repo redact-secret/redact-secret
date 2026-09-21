@@ -76,7 +76,10 @@ fi
 
 product_sha=$(git -C "$product_root" rev-parse HEAD)
 [ -n "$output_dir" ] || output_dir="$product_root/benchmark-evidence/candidate/$(date +%Y%m%d-%H%M%S)"
-case "$output_dir" in /*) ;; *) die "--output-dir must be absolute" ;; esac
+case "$output_dir" in
+  /*) ;;
+  *) die "--output-dir must be absolute" ;;
+esac
 
 printf '\nproduct    %s (clean)\nbenchmark  %s (clean)\noutput     %s\n\n' \
   "$product_sha" "$benchmark_ref" "$output_dir"
