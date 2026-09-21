@@ -51,6 +51,14 @@ pub(super) fn is_lower_hex(byte: u8) -> bool {
     byte.is_ascii_digit() || (b'a'..=b'f').contains(&byte)
 }
 
+/// `[a-z0-9]`: a lowercase-only alphanumeric body. Uppercase `A-Z` is
+/// deliberately outside the class, mirroring [`is_lower_hex`]'s reasoning,
+/// for a provider whose reviewed external-tool contract is this narrower
+/// alphabet rather than the mixed-case [`is_alnum`].
+pub(super) fn is_lower_alnum(byte: u8) -> bool {
+    byte.is_ascii_digit() || byte.is_ascii_lowercase()
+}
+
 /// `[A-Za-z0-9+/]`: the standard (non-URL-safe) base64 body alphabet,
 /// excluding the `=` padding character. A run matched against this alphabet
 /// stops before any trailing padding rather than trying to bound it to
@@ -301,6 +309,14 @@ mod tests {
         assert!(is_alnum_dash(b'-') && is_alnum_dash(b'_') && !is_alnum_dash(b'.'));
         assert!(is_alnum_dash_dot(b'.') && is_alnum_dash_dot(b'-'));
         assert!(is_digit(b'0') && is_digit(b'9') && !is_digit(b'a') && !is_digit(b'-'));
+        assert!(
+            is_lower_alnum(b'0')
+                && is_lower_alnum(b'a')
+                && is_lower_alnum(b'z')
+                && !is_lower_alnum(b'A')
+                && !is_lower_alnum(b'_')
+                && !is_lower_alnum(b'-')
+        );
         assert!(
             is_lower_hex(b'0')
                 && is_lower_hex(b'f')
