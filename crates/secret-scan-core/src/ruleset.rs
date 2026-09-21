@@ -46,12 +46,17 @@
 //! The first non-blank line must be `ruleset-revision: 1` — any other value
 //! is [`RulesetLoadError::UnknownRevision`], any other key in that position
 //! is [`RulesetLoadError::UnsupportedConstruct`]. Every following line
-//! either starts a new detector block (`detector: <id>`) or supplies one of
-//! that block's fields; a field line before the first `detector:` line is
-//! [`RulesetLoadError::UnsupportedConstruct`]. A block's five fields —
-//! `specificity`, `prefix`, `alphabet`, `run`, `validator` — are each
-//! required exactly once; a sixth, unrecognized field name (`confidence`,
-//! for example: revision 1 has none) is
+//! either starts a new block — a value-section `detector: <id>` block or a
+//! names-section `names: <bucket>` block — or supplies one of the current
+//! block's fields; a field line before the first block header is
+//! [`RulesetLoadError::UnsupportedConstruct`]. The two block kinds may
+//! interleave in any order and either may repeat.
+//!
+//! ## Value section: `detector:` blocks
+//!
+//! A block's five fields — `specificity`, `prefix`, `alphabet`, `run`,
+//! `validator` — are each required exactly once; a sixth, unrecognized field
+//! name (`confidence`, for example: revision 1 has none) is
 //! [`RulesetLoadError::UnknownField`], and one omitted is
 //! [`RulesetLoadError::MissingField`].
 //!
@@ -63,8 +68,51 @@
 //! including the three reserved to built-ins and any name the pipeline's
 //! specificity enum does not define at all — is the single fixed
 //! [`RulesetLoadError::SpecificityNotClaimable`].
+//!
+//! ## Names section: `names:` blocks (issue #484)
+//!
+//! `crate::detectors::generic_token`'s `HIGH_SIGNAL_NAMES`/`AMBIGUOUS_NAMES`
+//! constant lists and its `normalize_name` comparison key **are** the
+//! ruleset schema's names section
+//! (`decision-define-declarative-detector-ruleset-contract`); a names-only
+//! ruleset (no `detector:` blocks) is valid and does not trip
+//! [`RulesetLoadError::EmptyRuleset`].
+//!
+//! `names: ambiguous` opens a names block; `ambiguous` is the only claimable
+//! bucket in this revision — any other bucket name, including
+//! `high-signal`, is [`RulesetLoadError::NameBucketNotClaimable`]. Every
+//! following line until the next block header is `name: <value>`, repeated
+//! once per added name; any other field name is
+//! [`RulesetLoadError::UnknownField`]. A `name` value must match the same
+//! `[A-Za-z][A-Za-z0-9_.-]*` grammar `normalize_name` assumes (otherwise
+//! [`RulesetLoadError::UnsupportedConstruct`]) and be at most
+//! [`MAX_RULESET_NAME_BYTES`] bytes long
+//! ([`RulesetLoadError::NameTooLong`]).
+//!
+//! Loading normalizes every `name` value with `normalize_name` — the same
+//! function a scanned input's captured assignment name is normalized with —
+//! before doing anything else with it. A normalized value that already
+//! equals a built-in `HIGH_SIGNAL_NAMES`/`AMBIGUOUS_NAMES` entry, or that
+//! duplicates another name already added by this same ruleset, is a
+//! silent no-op: a caller cannot remove, override, or re-bucket a built-in
+//! name, and repeating one is not an error. Otherwise it is added to the
+//! ambiguous bucket; more than [`MAX_RULESET_NAMES`] additions (after that
+//! deduplication) is [`RulesetLoadError::TooManyNames`].
+//!
+//! A names section never mutates the built-in `generic-token` detector: it
+//! is matched by a separate internal detector
+//! ([`crate::detectors::RULESET_NAMES_DETECTOR_ID`]), registered after every
+//! built-in like a value-section ruleset detector, always claiming
+//! `Specificity::Contextual` and `Confidence::Medium` and only ever
+//! consulting the caller-supplied list — never the high-signal bucket or
+//! its lower entropy bar. This re-establishes, for the names section, the
+//! same containment property [`load_ruleset`]'s value-section detectors
+//! already have.
 
-use crate::detectors::{RulesetDetector, built_in_ids};
+use crate::detectors::{
+    RULESET_NAMES_DETECTOR_ID, RulesetDetector, built_in_ids, generic_token_ruleset_names_detector,
+    is_reserved_name, normalize_name,
+};
 use crate::error::SecretScanErrorCode;
 use crate::types::{Detector, Specificity, is_identifier};
 
@@ -107,6 +155,26 @@ const MIN_RULESET_DETECTORS: usize = 1;
 /// [`crate::DEFAULT_MAX_INPUT_BYTES`] plays for scan input; a legitimate
 /// ruleset (64 detectors x id + prefix + field names) is a few KB.
 pub(crate) const MAX_RULESET_BYTES: usize = 64 * 1024;
+
+/// Maximum length in bytes of one caller-supplied `name:` value in a
+/// `names: ambiguous` block, checked on the raw wire value before
+/// [`normalize_name`] runs. Matches [`crate::types::MAX_IDENTIFIER_LENGTH`]:
+/// a ruleset name is a human-chosen assignment keyword (`corp_token`), the
+/// same kind of caller-chosen string every other identifier bound in this
+/// crate already covers.
+const MAX_RULESET_NAME_BYTES: usize = crate::types::MAX_IDENTIFIER_LENGTH;
+
+/// Maximum number of ambiguous-bucket names one ruleset may add, counted
+/// after deduplicating against the built-in `HIGH_SIGNAL_NAMES`/
+/// `AMBIGUOUS_NAMES` sets and against each other (issue #484, point 3/4:
+/// the names section registers no `detector:` block, so
+/// [`MAX_RULESET_DETECTORS`] does not bound it, and needs its own cost
+/// bound instead). `generic_token.rs`'s own `AMBIGUOUS_NAMES` has 5
+/// entries; 32 is generous for a real organization's internal
+/// assignment-keyword inventory while keeping the per-candidate linear scan
+/// the names-section detector performs against the extension list a small,
+/// fixed cost.
+const MAX_RULESET_NAMES: usize = 32;
 
 /// The closed, seven-member alphabet-name vocabulary
 /// (`decision-define-declarative-detector-ruleset-contract`, "Matching
@@ -283,8 +351,17 @@ pub(crate) enum RulesetLoadError {
     DuplicateDetectorId,
     /// A detector id collides with a `full` built-in id.
     ReservedDetectorId,
-    /// No detector blocks at all.
+    /// No detector blocks and no names-section additions at all.
     EmptyRuleset,
+    /// A `names:` block names a bucket other than `ambiguous` — the only
+    /// bucket a caller may add to in this revision.
+    NameBucketNotClaimable,
+    /// A `name:` value inside a `names:` block exceeds
+    /// [`MAX_RULESET_NAME_BYTES`].
+    NameTooLong,
+    /// More than [`MAX_RULESET_NAMES`] ambiguous-bucket names, after
+    /// deduplication, were declared across the ruleset.
+    TooManyNames,
 }
 
 /// The public, fixed rejection class of a rejected ruleset (issue #495,
@@ -328,6 +405,12 @@ pub enum RulesetErrorClass {
     ReservedDetectorId,
     /// See `RulesetLoadError::EmptyRuleset`.
     EmptyRuleset,
+    /// See `RulesetLoadError::NameBucketNotClaimable`.
+    NameBucketNotClaimable,
+    /// See `RulesetLoadError::NameTooLong`.
+    NameTooLong,
+    /// See `RulesetLoadError::TooManyNames`.
+    TooManyNames,
 }
 
 impl RulesetErrorClass {
@@ -351,6 +434,9 @@ impl RulesetErrorClass {
             Self::DuplicateDetectorId => "DUPLICATE_DETECTOR_ID",
             Self::ReservedDetectorId => "RESERVED_DETECTOR_ID",
             Self::EmptyRuleset => "EMPTY_RULESET",
+            Self::NameBucketNotClaimable => "NAME_BUCKET_NOT_CLAIMABLE",
+            Self::NameTooLong => "NAME_TOO_LONG",
+            Self::TooManyNames => "TOO_MANY_NAMES",
         }
     }
 }
@@ -379,6 +465,9 @@ impl From<RulesetLoadError> for RulesetErrorClass {
             RulesetLoadError::DuplicateDetectorId => Self::DuplicateDetectorId,
             RulesetLoadError::ReservedDetectorId => Self::ReservedDetectorId,
             RulesetLoadError::EmptyRuleset => Self::EmptyRuleset,
+            RulesetLoadError::NameBucketNotClaimable => Self::NameBucketNotClaimable,
+            RulesetLoadError::NameTooLong => Self::NameTooLong,
+            RulesetLoadError::TooManyNames => Self::TooManyNames,
         }
     }
 }
@@ -490,11 +579,16 @@ impl std::error::Error for RulesetError {}
 /// # Ok::<(), Box<dyn std::error::Error>>(())
 /// ```
 pub fn load_ruleset(bytes: &[u8]) -> Result<Vec<Box<dyn Detector>>, RulesetError> {
-    let specs = parse_ruleset(bytes)?;
-    Ok(specs
+    let parsed = parse_ruleset(bytes)?;
+    let mut detectors: Vec<Box<dyn Detector>> = parsed
+        .detectors
         .into_iter()
         .map(|spec| Box::new(RulesetDetector::new(spec)) as Box<dyn Detector>)
-        .collect())
+        .collect();
+    if !parsed.ambiguous_names.is_empty() {
+        detectors.push(generic_token_ruleset_names_detector(parsed.ambiguous_names));
+    }
+    Ok(detectors)
 }
 
 /// Trimmed, non-blank lines of `text`, in order.
@@ -568,7 +662,7 @@ fn flush_block(
     if !is_identifier(id) {
         return Err(RulesetLoadError::UnsupportedConstruct);
     }
-    if built_in_ids().any(|reserved| reserved == id) {
+    if built_in_ids().any(|reserved| reserved == id) || id == RULESET_NAMES_DETECTOR_ID {
         return Err(RulesetLoadError::ReservedDetectorId);
     }
     if specs.iter().any(|existing| existing.id == id) {
@@ -613,6 +707,94 @@ fn flush_block(
     Ok(())
 }
 
+/// `true` for a raw `name:` value matching the exact capture-name grammar
+/// `normalize_name` assumes (`[A-Za-z][A-Za-z0-9_.-]*`, non-empty).
+fn is_raw_name_shape(value: &str) -> bool {
+    let bytes = value.as_bytes();
+    match bytes.split_first() {
+        Some((&first, rest)) => {
+            first.is_ascii_alphabetic()
+                && rest
+                    .iter()
+                    .all(|&byte| byte.is_ascii_alphanumeric() || matches!(byte, b'_' | b'.' | b'-'))
+        }
+        None => false,
+    }
+}
+
+/// Validates and folds one `names: ambiguous` block's raw `name:` values
+/// into `ambiguous_names`, applying the bounds, normalization, and
+/// built-in/duplicate no-op rules the module documentation's "Names
+/// section" describes. `names_declared` counts every raw value that passes
+/// shape and length validation, whether or not it turns out to be a no-op —
+/// this is what [`parse_ruleset`] checks instead of `ambiguous_names` being
+/// non-empty, so a names block that only re-declares built-in names is a
+/// real, accepted ruleset, not [`RulesetLoadError::EmptyRuleset`].
+fn flush_names(
+    raw_values: &[&str],
+    ambiguous_names: &mut Vec<String>,
+    names_declared: &mut usize,
+) -> Result<(), RulesetLoadError> {
+    for &raw in raw_values {
+        if !is_raw_name_shape(raw) {
+            return Err(RulesetLoadError::UnsupportedConstruct);
+        }
+        if raw.len() > MAX_RULESET_NAME_BYTES {
+            return Err(RulesetLoadError::NameTooLong);
+        }
+        *names_declared += 1;
+        let normalized = normalize_name(raw);
+        if is_reserved_name(&normalized) || ambiguous_names.contains(&normalized) {
+            continue;
+        }
+        if ambiguous_names.len() >= MAX_RULESET_NAMES {
+            return Err(RulesetLoadError::TooManyNames);
+        }
+        ambiguous_names.push(normalized);
+    }
+    Ok(())
+}
+
+/// One pending block while scanning a ruleset's lines: either a value-section
+/// `detector:` block accumulating its fields, or a names-section `names:`
+/// block accumulating its raw `name:` values.
+enum PendingBlock<'a> {
+    Detector {
+        id: &'a str,
+        fields: Vec<(&'a str, &'a str)>,
+    },
+    Names {
+        raw_values: Vec<&'a str>,
+    },
+}
+
+/// Validates and folds a completed pending block, if any, into `specs` /
+/// `ambiguous_names`.
+fn flush_pending(
+    pending: Option<PendingBlock<'_>>,
+    specs: &mut Vec<RulesetDetectorSpec>,
+    ambiguous_names: &mut Vec<String>,
+    names_declared: &mut usize,
+) -> Result<(), RulesetLoadError> {
+    match pending {
+        None => Ok(()),
+        Some(PendingBlock::Detector { id, fields }) => flush_block(id, &fields, specs),
+        Some(PendingBlock::Names { raw_values }) => {
+            flush_names(&raw_values, ambiguous_names, names_declared)
+        }
+    }
+}
+
+/// A fully parsed and validated declarative ruleset: the value section's
+/// [`RulesetDetectorSpec`] blocks and the names section's caller-supplied,
+/// already-normalized ambiguous-bucket names (issue #484; see the module
+/// documentation's "Names section").
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub(crate) struct ParsedRuleset {
+    pub(crate) detectors: Vec<RulesetDetectorSpec>,
+    pub(crate) ambiguous_names: Vec<String>,
+}
+
 /// Parses and validates a caller-supplied declarative ruleset.
 ///
 /// Never partially loads: the whole document is validated before any
@@ -623,7 +805,7 @@ fn flush_block(
 ///
 /// Returns the first applicable [`RulesetLoadError`]; see its variants for
 /// the full rejection catalog.
-pub(crate) fn parse_ruleset(bytes: &[u8]) -> Result<Vec<RulesetDetectorSpec>, RulesetLoadError> {
+pub(crate) fn parse_ruleset(bytes: &[u8]) -> Result<ParsedRuleset, RulesetLoadError> {
     if bytes.len() > MAX_RULESET_BYTES {
         return Err(RulesetLoadError::RulesetTooLarge);
     }
@@ -640,31 +822,65 @@ pub(crate) fn parse_ruleset(bytes: &[u8]) -> Result<Vec<RulesetDetectorSpec>, Ru
     }
 
     let mut specs: Vec<RulesetDetectorSpec> = Vec::new();
-    let mut current_id: Option<&str> = None;
-    let mut current_fields: Vec<(&str, &str)> = Vec::new();
+    let mut ambiguous_names: Vec<String> = Vec::new();
+    let mut names_declared: usize = 0;
+    let mut pending: Option<PendingBlock<'_>> = None;
 
     for line in lines {
         let (key, value) = split_field(line).ok_or(RulesetLoadError::UnsupportedConstruct)?;
-        if key == "detector" {
-            if let Some(previous_id) = current_id.replace(value) {
-                flush_block(previous_id, &current_fields, &mut specs)?;
-                current_fields.clear();
+        match key {
+            "detector" => {
+                flush_pending(
+                    pending.take(),
+                    &mut specs,
+                    &mut ambiguous_names,
+                    &mut names_declared,
+                )?;
+                pending = Some(PendingBlock::Detector {
+                    id: value,
+                    fields: Vec::new(),
+                });
             }
-        } else {
-            if current_id.is_none() {
-                return Err(RulesetLoadError::UnsupportedConstruct);
+            "names" => {
+                flush_pending(
+                    pending.take(),
+                    &mut specs,
+                    &mut ambiguous_names,
+                    &mut names_declared,
+                )?;
+                if value != "ambiguous" {
+                    return Err(RulesetLoadError::NameBucketNotClaimable);
+                }
+                pending = Some(PendingBlock::Names {
+                    raw_values: Vec::new(),
+                });
             }
-            current_fields.push((key, value));
+            _ => match &mut pending {
+                None => return Err(RulesetLoadError::UnsupportedConstruct),
+                Some(PendingBlock::Detector { fields, .. }) => fields.push((key, value)),
+                Some(PendingBlock::Names { raw_values }) => {
+                    if key != "name" {
+                        return Err(RulesetLoadError::UnknownField);
+                    }
+                    raw_values.push(value);
+                }
+            },
         }
     }
-    if let Some(id) = current_id {
-        flush_block(id, &current_fields, &mut specs)?;
-    }
+    flush_pending(
+        pending,
+        &mut specs,
+        &mut ambiguous_names,
+        &mut names_declared,
+    )?;
 
-    if specs.len() < MIN_RULESET_DETECTORS {
+    if specs.len() < MIN_RULESET_DETECTORS && names_declared == 0 {
         return Err(RulesetLoadError::EmptyRuleset);
     }
-    Ok(specs)
+    Ok(ParsedRuleset {
+        detectors: specs,
+        ambiguous_names,
+    })
 }
 
 #[cfg(test)]
@@ -686,9 +902,10 @@ validator: none\n";
 
     #[test]
     fn parses_a_valid_minimal_ruleset() {
-        let specs = parse_ruleset(VALID.as_bytes()).unwrap();
-        assert_eq!(specs.len(), 1);
-        let spec = &specs[0];
+        let parsed = parse_ruleset(VALID.as_bytes()).unwrap();
+        assert_eq!(parsed.detectors.len(), 1);
+        assert!(parsed.ambiguous_names.is_empty());
+        let spec = &parsed.detectors[0];
         assert_eq!(spec.id(), "acme-internal-token");
         assert_eq!(spec.specificity(), Specificity::Contextual);
         assert_eq!(spec.prefix(), "ACME_");
@@ -709,33 +926,33 @@ validator: none\n";
             ("base64-body", AlphabetName::Base64Body),
         ] {
             let text = replace_once(VALID, "alnum-dash", name);
-            let specs = parse_ruleset(text.as_bytes()).unwrap();
-            assert_eq!(specs[0].alphabet(), expected, "{name}");
+            let parsed = parse_ruleset(text.as_bytes()).unwrap();
+            assert_eq!(parsed.detectors[0].alphabet(), expected, "{name}");
         }
         for (name, expected) in [
             ("none", ValidatorName::None),
             ("trailing-lower-hex", ValidatorName::TrailingLowerHex),
         ] {
             let text = replace_once(VALID, "validator: none", &format!("validator: {name}"));
-            let specs = parse_ruleset(text.as_bytes()).unwrap();
-            assert_eq!(specs[0].validator(), expected, "{name}");
+            let parsed = parse_ruleset(text.as_bytes()).unwrap();
+            assert_eq!(parsed.detectors[0].validator(), expected, "{name}");
         }
     }
 
     #[test]
     fn parses_exact_and_at_least_run_forms() {
         let text = replace_once(VALID, "run: at-least 20", "run: exact 12");
-        let specs = parse_ruleset(text.as_bytes()).unwrap();
-        assert_eq!(specs[0].run(), RunSpec::Exact(12));
+        let parsed = parse_ruleset(text.as_bytes()).unwrap();
+        assert_eq!(parsed.detectors[0].run(), RunSpec::Exact(12));
     }
 
     #[test]
     fn owns_its_storage_independent_of_the_input_buffer() {
         let spec = {
             let bytes = VALID.as_bytes().to_vec();
-            let mut specs = parse_ruleset(&bytes).unwrap();
+            let mut parsed = parse_ruleset(&bytes).unwrap();
             drop(bytes);
-            specs.remove(0)
+            parsed.detectors.remove(0)
         };
         assert_eq!(spec.id(), "acme-internal-token");
         assert_eq!(spec.prefix(), "ACME_");
@@ -950,8 +1167,8 @@ validator: none\n";
         for index in 0..64 {
             text.push_str(&detector_block(&format!("acme-token-{index}")));
         }
-        let specs = parse_ruleset(text.as_bytes()).unwrap();
-        assert_eq!(specs.len(), 64);
+        let parsed = parse_ruleset(text.as_bytes()).unwrap();
+        assert_eq!(parsed.detectors.len(), 64);
     }
 
     #[test]
@@ -1005,6 +1222,164 @@ validator: none\n";
             replace_once(VALID, "validator: none", &format!("validator: {canary}")),
             replace_once(VALID, "acme-internal-token", canary),
             format!("ruleset-revision: {canary}\n"),
+        ];
+        for text in cases {
+            let error = parse_ruleset(text.as_bytes()).unwrap_err();
+            assert!(!format!("{error:?}").contains(canary), "{text}");
+        }
+    }
+
+    // --- issue #484: declarative ruleset names section ----------------------
+
+    #[test]
+    fn parses_a_names_only_ruleset_and_normalizes_its_names() {
+        let text =
+            "ruleset-revision: 1\nnames: ambiguous\nname: CorpToken\nname: internal-secret\n";
+        let parsed = parse_ruleset(text.as_bytes()).unwrap();
+        assert!(parsed.detectors.is_empty());
+        assert_eq!(
+            parsed.ambiguous_names,
+            vec!["corp_token".to_owned(), "internal_secret".to_owned()]
+        );
+    }
+
+    #[test]
+    fn a_names_only_ruleset_does_not_trip_empty_ruleset() {
+        let text = "ruleset-revision: 1\nnames: ambiguous\nname: corp_token\n";
+        assert!(parse_ruleset(text.as_bytes()).is_ok());
+    }
+
+    #[test]
+    fn a_names_block_may_interleave_with_detector_blocks_in_either_order() {
+        let text = format!("{VALID}names: ambiguous\nname: corp_token\n");
+        let parsed = parse_ruleset(text.as_bytes()).unwrap();
+        assert_eq!(parsed.detectors.len(), 1);
+        assert_eq!(parsed.ambiguous_names, vec!["corp_token".to_owned()]);
+
+        let text = format!(
+            "ruleset-revision: 1\nnames: ambiguous\nname: corp_token\n{}",
+            &VALID[VALID.find("detector:").unwrap()..]
+        );
+        let parsed = parse_ruleset(text.as_bytes()).unwrap();
+        assert_eq!(parsed.detectors.len(), 1);
+        assert_eq!(parsed.ambiguous_names, vec!["corp_token".to_owned()]);
+    }
+
+    #[test]
+    fn a_name_that_normalizes_to_a_built_in_name_is_a_silent_no_op() {
+        for raw in ["api_key", "ApiKey", "API-KEY", "auth", "Auth"] {
+            let text = format!("ruleset-revision: 1\nnames: ambiguous\nname: {raw}\n");
+            let parsed = parse_ruleset(text.as_bytes()).unwrap();
+            assert!(parsed.ambiguous_names.is_empty(), "{raw}");
+        }
+    }
+
+    #[test]
+    fn a_repeated_name_is_deduplicated_not_an_error() {
+        let text = "ruleset-revision: 1\nnames: ambiguous\nname: corp_token\nname: CorpToken\n";
+        let parsed = parse_ruleset(text.as_bytes()).unwrap();
+        assert_eq!(parsed.ambiguous_names, vec!["corp_token".to_owned()]);
+    }
+
+    #[test]
+    fn rejects_a_bucket_other_than_ambiguous() {
+        for bucket in ["high-signal", "bogus"] {
+            let text = format!("ruleset-revision: 1\nnames: {bucket}\nname: corp_token\n");
+            assert_eq!(
+                parse_ruleset(text.as_bytes()),
+                Err(RulesetLoadError::NameBucketNotClaimable),
+                "{bucket}"
+            );
+        }
+    }
+
+    #[test]
+    fn rejects_a_name_over_the_length_bound() {
+        let long = "a".repeat(MAX_RULESET_NAME_BYTES + 1);
+        let text = format!("ruleset-revision: 1\nnames: ambiguous\nname: {long}\n");
+        assert_eq!(
+            parse_ruleset(text.as_bytes()),
+            Err(RulesetLoadError::NameTooLong)
+        );
+    }
+
+    #[test]
+    fn rejects_a_malformed_name() {
+        for malformed in ["1corp", "corp token", "", "corp!token"] {
+            let text = format!("ruleset-revision: 1\nnames: ambiguous\nname: {malformed}\n");
+            assert_eq!(
+                parse_ruleset(text.as_bytes()),
+                Err(RulesetLoadError::UnsupportedConstruct),
+                "{malformed:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn rejects_an_unknown_field_inside_a_names_block() {
+        let text = "ruleset-revision: 1\nnames: ambiguous\nprefix: \"ACME_\"\n";
+        assert_eq!(
+            parse_ruleset(text.as_bytes()),
+            Err(RulesetLoadError::UnknownField)
+        );
+    }
+
+    #[test]
+    fn rejects_too_many_names() {
+        use std::fmt::Write;
+
+        let mut text = String::from("ruleset-revision: 1\nnames: ambiguous\n");
+        for index in 0..=MAX_RULESET_NAMES {
+            let _ = writeln!(text, "name: corp-token-{index}");
+        }
+        assert_eq!(
+            parse_ruleset(text.as_bytes()),
+            Err(RulesetLoadError::TooManyNames)
+        );
+    }
+
+    #[test]
+    fn accepts_exactly_the_maximum_name_count() {
+        use std::fmt::Write;
+
+        let mut text = String::from("ruleset-revision: 1\nnames: ambiguous\n");
+        for index in 0..MAX_RULESET_NAMES {
+            let _ = writeln!(text, "name: corp-token-{index}");
+        }
+        let parsed = parse_ruleset(text.as_bytes()).unwrap();
+        assert_eq!(parsed.ambiguous_names.len(), MAX_RULESET_NAMES);
+    }
+
+    #[test]
+    fn rejects_a_detector_id_colliding_with_the_reserved_names_detector_id() {
+        let text = replace_once(VALID, "acme-internal-token", RULESET_NAMES_DETECTOR_ID);
+        assert_eq!(
+            parse_ruleset(text.as_bytes()),
+            Err(RulesetLoadError::ReservedDetectorId)
+        );
+    }
+
+    #[test]
+    fn load_ruleset_registers_a_separate_detector_for_a_names_only_ruleset() {
+        let text = b"ruleset-revision: 1\nnames: ambiguous\nname: corp_token\n";
+        let detectors = load_ruleset(text).unwrap();
+        assert_eq!(detectors.len(), 1);
+        assert_eq!(detectors[0].id(), RULESET_NAMES_DETECTOR_ID);
+    }
+
+    #[test]
+    fn load_ruleset_adds_no_extra_detector_when_the_names_section_is_absent() {
+        let detectors = load_ruleset(VALID.as_bytes()).unwrap();
+        assert_eq!(detectors.len(), 1);
+        assert_ne!(detectors[0].id(), RULESET_NAMES_DETECTOR_ID);
+    }
+
+    #[test]
+    fn rejections_involving_names_never_carry_the_rejected_content() {
+        let canary = "S3CR3T_CANARY_MARKER";
+        let cases = [
+            format!("ruleset-revision: 1\nnames: {canary}\nname: corp_token\n"),
+            format!("ruleset-revision: 1\nnames: ambiguous\nname: {canary}!\n"),
         ];
         for text in cases {
             let error = parse_ruleset(text.as_bytes()).unwrap_err();

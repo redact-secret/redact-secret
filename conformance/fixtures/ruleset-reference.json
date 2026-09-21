@@ -95,6 +95,39 @@
       }
     ]
   },
+  "names": {
+    "id": "ruleset-names-section",
+    "description": "The declarative ruleset's names section (issue #484, decision-define-declarative-detector-ruleset-contract): a names-only ruleset (no detector: blocks) adding one ambiguous-bucket name, plus the built-in no-op and unrecognized-name cases. `corp_token` is not a built-in name; `api_key` and `Auth` are, so declaring them is a no-op that adds nothing.",
+    "ruleset": "ruleset-revision: 1\nnames: ambiguous\nname: corp_token\nname: api_key\nname: Auth\n",
+    "cases": [
+      {
+        "id": "ruleset-ambiguous-name-at-threshold",
+        "detector": "generic-token-ruleset-names",
+        "input": "corp_token=SYNTHETIC_REVOKED_RULESET_AMBIGUOUS_1234",
+        "type": "contextual_secret",
+        "confidence": "medium",
+        "specificity": "contextual",
+        "start": 11,
+        "end": 51
+      },
+      {
+        "id": "unlisted-name-produces-no-finding",
+        "input": "unrelated_field=SYNTHETIC_REVOKED_RULESET_AMBIGUOUS_1234",
+        "findingCount": 0
+      },
+      {
+        "id": "built-in-high-signal-name-still-resolves-through-the-built-in-detector",
+        "detector": "generic-token",
+        "input": "api_key=SYNTHETIC_REVOKED_CONTEXT_VALUE",
+        "type": "contextual_secret",
+        "confidence": "high",
+        "specificity": "contextual",
+        "start": 8,
+        "end": 39,
+        "note": "declaring the already-built-in api_key/auth names is a no-op; the built-in generic-token detector (not the names-only ruleset extension) still resolves them exactly as it does with no ruleset loaded"
+      }
+    ]
+  },
   "ordering": {
     "id": "ruleset-cannot-overturn-a-built-in",
     "description": "A ruleset detector claiming the identical range, specificity, and (fixed) confidence as a built-in's own candidate must still lose the tie: built-ins register before any ruleset detector (decision-define-declarative-detector-ruleset-contract, 'Ordering and the specificity cap').",
@@ -175,6 +208,21 @@
     {
       "class": "EMPTY_RULESET",
       "ruleset": "ruleset-revision: 1\n"
+    },
+    {
+      "class": "NAME_BUCKET_NOT_CLAIMABLE",
+      "ruleset": "ruleset-revision: 1\nnames: high-signal\nname: corp_token\n",
+      "note": "ambiguous is the only claimable bucket in this revision (issue #484)"
+    },
+    {
+      "class": "NAME_TOO_LONG",
+      "ruleset": "ruleset-revision: 1\nnames: ambiguous\nname: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n",
+      "note": "65 bytes, one over the 64-byte maximum"
+    },
+    {
+      "class": "TOO_MANY_NAMES",
+      "nameCount": 33,
+      "note": "33 unique ambiguous-bucket names, one over the 32-name maximum"
     }
   ]
 }

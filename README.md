@@ -177,9 +177,9 @@ built-in detectors run in Rust, and bindings must not create another detector
 implementation. A caller with an internal credential format is not left
 without a path: `decision-define-declarative-detector-ruleset-contract`
 fixes the contract for a caller-supplied **declarative ruleset** — data the
-core parses and matches itself, never a callback — and issue #495 implements
-it for the Rust core, JavaScript (Node and browser WebAssembly), Python, and
-the CLI. See [Declarative rulesets](#declarative-rulesets) below.
+core parses and matches itself, never a callback — and issues #495 and #484
+implement it for the Rust core, JavaScript (Node and browser WebAssembly),
+Python, and the CLI. See [Declarative rulesets](#declarative-rulesets) below.
 
 ## Declarative rulesets
 
@@ -234,6 +234,31 @@ ruleset still sees `Full`/`Common` from `DetectorRegistry::profile()`;
 ruleset presence is a separate fact the caller already has from the number
 of detectors `load_ruleset` returned.
 
+### Names section
+
+A ruleset can also add to `generic-token`'s contextual-assignment name
+vocabulary, without a `detector:` block at all:
+
+```text
+ruleset-revision: 1
+names: ambiguous
+name: corp_token
+```
+
+`names: ambiguous` is the only claimable bucket in this revision — a caller
+can add an in-house assignment keyword (`corp_token`) to the same **ambiguous**
+bucket `auth`/`credential`/`signing_key` already belong to, kept at that
+bucket's higher entropy bar and always `Confidence::Medium`; a ruleset cannot
+add to the high-signal bucket (`api_key`, `password`, …) in this revision.
+Every `name:` value is normalized the same way a scanned input's captured
+assignment name already is, so `CorpToken`, `corp-token`, and `corp_token` are
+the same addition. A name that normalizes to an existing built-in name is a
+silent no-op — a ruleset can never remove, override, or re-bucket a built-in
+name. A names-only ruleset (no `detector:` blocks) is valid; a names section
+registers its own separate detector rather than changing `generic-token`
+itself, so it inherits the same containment property as a value-section
+ruleset detector.
+
 A malformed ruleset is rejected as a whole — never partially loaded — with
 the fixed `INVALID_RULESET` code and one of a closed set of rejection
 classes (`RulesetErrorClass`: `RULESET_TOO_LARGE`, `UNKNOWN_REVISION`,
@@ -241,7 +266,8 @@ classes (`RulesetErrorClass`: `RULESET_TOO_LARGE`, `UNKNOWN_REVISION`,
 `UNKNOWN_VALIDATOR`, `SPECIFICITY_NOT_CLAIMABLE`, `MISSING_FIELD`,
 `PREFIX_TOO_SHORT`, `PREFIX_TOO_LONG`, `RUN_LENGTH_OUT_OF_BOUNDS`,
 `TOO_MANY_DETECTORS`, `DUPLICATE_DETECTOR_ID`, `RESERVED_DETECTOR_ID`,
-`EMPTY_RULESET`) — never a byte from the rejected ruleset.
+`EMPTY_RULESET`, `NAME_BUCKET_NOT_CLAIMABLE`, `NAME_TOO_LONG`,
+`TOO_MANY_NAMES`) — never a byte from the rejected ruleset.
 
 Per surface:
 

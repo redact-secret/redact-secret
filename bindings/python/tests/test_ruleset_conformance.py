@@ -41,11 +41,40 @@ def _too_many_detectors_ruleset(count: int) -> bytes:
     return ("\n".join(lines) + "\n").encode("utf-8")
 
 
+def _too_many_names_ruleset(count: int) -> bytes:
+    """The `TOO_MANY_NAMES` ruleset: `count` unique ambiguous-bucket `name:`
+    declarations in one `names: ambiguous` block (issue #484, mirrors the
+    Rust conformance consumer's generator)."""
+    lines = ["ruleset-revision: 1", "names: ambiguous"]
+    lines.extend(f"name: corp-token-{index}" for index in range(count))
+    return ("\n".join(lines) + "\n").encode("utf-8")
+
+
 def test_the_accepted_ruleset_matches_every_declared_case() -> None:
     accepted = _fixture()["accepted"]
     ruleset = accepted["ruleset"].encode("utf-8")
 
     for case in accepted["cases"]:
+        findings = redact_secret.scan(case["input"], ruleset=ruleset)
+        if case.get("findingCount") == 0:
+            assert findings == [], case["id"]
+            continue
+
+        assert len(findings) == 1, case["id"]
+        finding = findings[0]
+        assert finding.detector == case["detector"], case["id"]
+        assert finding.type == case["type"], case["id"]
+        assert finding.confidence == case["confidence"], case["id"]
+        start = byte_offset_to_char_offset_reference(case["input"], case["start"])
+        end = byte_offset_to_char_offset_reference(case["input"], case["end"])
+        assert (finding.start, finding.end) == (start, end), case["id"]
+
+
+def test_the_names_section_ruleset_matches_every_declared_case() -> None:
+    names = _fixture()["names"]
+    ruleset = names["ruleset"].encode("utf-8")
+
+    for case in names["cases"]:
         findings = redact_secret.scan(case["input"], ruleset=ruleset)
         if case.get("findingCount") == 0:
             assert findings == [], case["id"]
@@ -88,6 +117,8 @@ def test_every_declared_rejection_class_is_reproduced(rejection: dict) -> None:
         ruleset = b"x" * rejection["oversizedBytes"]
     elif "detectorCount" in rejection:
         ruleset = _too_many_detectors_ruleset(rejection["detectorCount"])
+    elif "nameCount" in rejection:
+        ruleset = _too_many_names_ruleset(rejection["nameCount"])
     else:
         ruleset = rejection["ruleset"].encode("utf-8")
 
@@ -115,5 +146,8 @@ def test_every_class_the_core_defines_is_covered_exactly_once() -> None:
         "DUPLICATE_DETECTOR_ID",
         "RESERVED_DETECTOR_ID",
         "EMPTY_RULESET",
+        "NAME_BUCKET_NOT_CLAIMABLE",
+        "NAME_TOO_LONG",
+        "TOO_MANY_NAMES",
     ]
     assert sorted(names) == sorted(all_classes)

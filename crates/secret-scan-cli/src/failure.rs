@@ -106,6 +106,11 @@ const fn ruleset_class_message(class: RulesetErrorClass) -> &'static str {
             "a detector block's id collides with a built-in detector."
         }
         RulesetErrorClass::EmptyRuleset => "the ruleset declares no detectors.",
+        RulesetErrorClass::NameBucketNotClaimable => {
+            "a names block declares a bucket other than ambiguous."
+        }
+        RulesetErrorClass::NameTooLong => "a names block's name is too long.",
+        RulesetErrorClass::TooManyNames => "the ruleset declares too many names.",
         _ => "the ruleset was rejected.",
     }
 }

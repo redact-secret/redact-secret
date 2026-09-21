@@ -160,8 +160,8 @@ mod tests {
     }
 
     fn detect_with(ruleset_text: &str, input: &str) -> Vec<Candidate> {
-        let mut specs = parse_ruleset(ruleset_text.as_bytes()).unwrap();
-        let detector = RulesetDetector::new(specs.remove(0));
+        let mut parsed = parse_ruleset(ruleset_text.as_bytes()).unwrap();
+        let detector = RulesetDetector::new(parsed.detectors.remove(0));
         detector
             .detect(input, &DetectorContext::new(input.len()))
             .unwrap()
@@ -177,8 +177,8 @@ mod tests {
              run: at-least 20\n\
              validator: none\n",
         );
-        let mut specs = parse_ruleset(text.as_bytes()).unwrap();
-        let detector = RulesetDetector::new(specs.remove(0));
+        let mut parsed = parse_ruleset(text.as_bytes()).unwrap();
+        let detector = RulesetDetector::new(parsed.detectors.remove(0));
         assert_eq!(detector.id(), "acme-internal-token");
     }
 
