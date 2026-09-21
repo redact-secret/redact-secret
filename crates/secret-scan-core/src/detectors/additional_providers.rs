@@ -412,9 +412,16 @@ pub(super) const NPM: KnownFormatProviderDetector = KnownFormatProviderDetector 
 /// also an intentional false negative rather than a fuzzy match. The same
 /// `AIza`-prefixed shape appears in public Firebase/browser configuration
 /// (referrer-restricted, not always a privileged secret) as well as in
-/// service-scoped Cloud/Gemini use, so this detector reports the shape at
-/// `Confidence::High` and leaves the redact/warn action call to policy, the
-/// same tradeoff npm and the other known-format providers above make.
+/// service-scoped Cloud/Gemini use, so this detector always reports the
+/// shape at `Confidence::High`, never suppressing a match itself. Issue
+/// #520 (B3a) discriminates the public Firebase Web SDK client config from
+/// everywhere else this shape appears, but does so at the pipeline level
+/// (`crate::pipeline::is_within_firebase_client_config_context`), not here:
+/// a candidate that survives this detector unchanged is dropped afterward,
+/// only when it also sits inside a recognized client-config object. Outside
+/// that narrow, evidenced exemption, the shape still leaves the redact/warn
+/// action call to policy, the same tradeoff npm and the other known-format
+/// providers above make.
 const GOOGLE_SIGNALS: [&str; 2] = ["google-documented-prefix", "exact-length-suffix"];
 
 pub(super) const GOOGLE: KnownFormatProviderDetector = KnownFormatProviderDetector {

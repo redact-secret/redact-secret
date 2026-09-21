@@ -18,6 +18,7 @@ mod cloudflare;
 mod connection_string;
 mod datadog;
 mod discord;
+mod firebase;
 mod generic_token;
 mod github;
 mod gitlab;
@@ -90,6 +91,7 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(additional_providers::GRAFANA_CLOUD),
         Box::new(new_relic::NewRelicUserApiKeyDetector),
         Box::new(new_relic::NewRelicLicenseKeyDetector),
+        Box::new(firebase::FirebaseServerKeyDetector),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
         Box::new(ConnectionStringDetector),
@@ -178,6 +180,7 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("grafana-cloud-access-policy-token", Pack::Provider),
     ("new-relic-user-api-key", Pack::Provider),
     ("new-relic-license-key", Pack::Provider),
+    ("firebase-server-key", Pack::Provider),
     ("jwt", Pack::Common),
     ("bearer-token", Pack::Common),
     ("connection-string", Pack::Common),
@@ -255,6 +258,7 @@ mod tests {
                 "grafana-cloud-access-policy-token",
                 "new-relic-user-api-key",
                 "new-relic-license-key",
+                "firebase-server-key",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -483,6 +487,11 @@ mod tests {
             "DD_APPLICATION_KEY=0123456789abcdef0123456789abcdef01234567";
         let new_relic_user_api_key_input = "NRAK-SYNTHETICREVOKEDNEWRELICUSA";
         let new_relic_license_key_input = "newrelic 0123456789abcdef0123456789abcdef01234567";
+        let firebase_server_key_input = format!(
+            "AAAA{}:{}",
+            "SYNREV0",
+            "SYNTHETICREVOKEDFIREBASEFCMLEGACYSERVERKEYFIXTUREPADDING0123456789SYNTHETICREVOKEDFIREBASEFCMLEGACYSERVERKEYFIXTUREPADDING0123456789ABCDWXYZ"
+        );
         let cases = [
             (
                 "sentry-user-auth-token",
@@ -498,6 +507,7 @@ mod tests {
             ("grafana-cloud-access-policy-token", grafana_cloud_input),
             ("new-relic-user-api-key", new_relic_user_api_key_input),
             ("new-relic-license-key", new_relic_license_key_input),
+            ("firebase-server-key", firebase_server_key_input.as_str()),
         ];
         assert_provider_candidates(&cases);
     }

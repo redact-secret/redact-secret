@@ -372,6 +372,13 @@
       "policyClass": "confidence-gated",
       "reconciliationTrigger": "newrelic 0123456789abcdef0123456789abcdef01234567",
       "schemes": null
+    },
+    {
+      "type": "firebase_server_key",
+      "detector": "firebase-server-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "AAAASYNREV0:SYNTHETICREVOKEDFIREBASEFCMLEGACYSERVERKEYFIXTUREPADDING0123456789SYNTHETICREVOKEDFIREBASEFCMLEGACYSERVERKEYFIXTUREPADDING0123456789ABCDWXYZ",
+      "schemes": null
     }
   ],
   "consumers": [
