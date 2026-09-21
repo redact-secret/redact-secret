@@ -9,10 +9,29 @@ name: Package Release Rehearsal
 # and content-checks -- never publishes -- every runtime dependency package
 # that plan resolved (`scripts/publish-dependency-package.mjs --dry-run`).
 #
+# Issue #530: beta.5 published a Python wheel that did not match the one
+# qualification exercised (issue #527). The fix -- build every artifact
+# exactly once and compare digests before it is ever handed to a registry
+# (`scripts/verify-python-digest.py`, issues #527 and #528) -- is a pure,
+# local, pre-publish check: it reads qualification's own recorded inventory
+# and the artifact about to be packed, and needs no registry. That means the
+# exact check `release.yml`'s `publish-native-dependencies`,
+# `publish-wasm-dependency`, and `publish-pypi` jobs run before their own real
+# `npm publish` / PyPI upload can also run here, against the same
+# qualification artifacts, before this workflow's own dry-run pack step --
+# rehearsing the property itself, not a description of it. `publish-crates`'s
+# digest check and every job's post-publish registry-state read cannot be
+# rehearsed this way: both compare against what a registry reports about a
+# file it actually received, which only exists after a real publish. See
+# `docs/audits/release-rehearsal-coverage.md` for the full breakdown of what
+# this workflow does and does not cover, and why.
+#
 # `NODE_AUTH_TOKEN` is never supplied to this workflow and no job requests
 # `registry-url` from `actions/setup-node`, so a `--dry-run` invocation that
 # somehow still attempted to publish would fail on authentication, not
-# succeed quietly.
+# succeed quietly. Nothing here requests PyPI trusted-publishing credentials
+# either, so the Python digest check below has no way to reach PyPI even by
+# accident.
 
 on:
   workflow_dispatch:
@@ -57,6 +76,18 @@ jobs:
         with:
           path: qualification-artifacts
 
+      # `release.yml`'s `publish-pypi` job runs this exact check, against
+      # these exact artifact names, before handing anything to PyPI (issue
+      # #527). Rehearsing it here means a wheel or sdist that diverged from
+      # what qualification recorded fails a `workflow_dispatch` run any
+      # maintainer can trigger on demand, not a live release.
+      - name: Verify the Python wheels and source distribution match the qualified inventory
+        run: |
+          python3 -B scripts/verify-python-digest.py \
+            --inventory qualification-artifacts/artifact-inventory/artifact-inventory.json \
+            qualification-artifacts/python-wheel-*/*.whl \
+            qualification-artifacts/python-sdist/*.tar.gz
+
       - name: Record the dependency cutover plan
         env:
           # On a pull request `github.sha` is the synthesized merge commit,
@@ -71,23 +102,33 @@ jobs:
             --summary "$GITHUB_STEP_SUMMARY"
 
       # Assembles each dependency package the plan resolved from the
-      # qualified artifact it names, then packs and content-checks it
-      # (`--dry-run`: no `npm publish`, no registry mutation). The platform
-      # and target names driving this loop come from the plan JSON itself,
-      # not a second hand-maintained list, so this cannot silently rehearse
-      # a different set of packages than `record-dependency-cutover-plan.py`
-      # just resolved.
+      # qualified artifact it names, verifies (issues #527/#528) that what
+      # was just assembled is byte-identical to what `artifact-qualification`
+      # qualified -- the same check `publish-native-dependencies` and
+      # `publish-wasm-dependency` run in `release.yml` before their own real
+      # `npm publish` -- then packs and content-checks it (`--dry-run`: no
+      # `npm publish`, no registry mutation). The platform and target names
+      # driving this loop come from the plan JSON itself, not a second
+      # hand-maintained list, so this cannot silently rehearse a different
+      # set of packages than `record-dependency-cutover-plan.py` just
+      # resolved.
       - name: Assemble and dry-run each dependency package
         shell: bash
         run: |
           set -eo pipefail
+          inventory="qualification-artifacts/artifact-inventory/artifact-inventory.json"
           while IFS= read -r entry; do
             kind=$(jq -r '.kind' <<<"$entry")
             artifact_dir="qualification-artifacts/$(jq -r '.expectedArtifact' <<<"$entry")"
             if [[ "$kind" == "native" ]]; then
               platform=$(jq -r '.platform' <<<"$entry")
+              target=$(jq -r '.target' <<<"$entry")
               package_dir="bindings/node/npm/$platform"
               cp "$artifact_dir/redact-secret.$platform.node" "$package_dir/"
+              python3 -B scripts/verify-python-digest.py \
+                --inventory "$inventory" \
+                --family node-addon --target "$target" \
+                "$package_dir/redact-secret.$platform.node"
             else
               package_dir="bindings/wasm/npm"
               cp "$artifact_dir"/redact_secret_wasm* "$package_dir/"
@@ -101,6 +142,11 @@ jobs:
               # hard-coded path that could drift from it.
               companion_dir="qualification-artifacts/$(jq -r '.companionArtifact' <<<"$entry")"
               cp "$companion_dir"/redact_secret_wasm_common* "$package_dir/"
+              python3 -B scripts/verify-python-digest.py \
+                --inventory "$inventory" \
+                --family browser --family browser-common \
+                "$package_dir"/redact_secret_wasm.js "$package_dir"/redact_secret_wasm_bg.wasm \
+                "$package_dir"/redact_secret_wasm_common.js "$package_dir"/redact_secret_wasm_common_bg.wasm
             fi
             node scripts/publish-dependency-package.mjs --package-dir "$package_dir" --dry-run
           done < <(jq -c '.dependencies[]' dependency-cutover-plan.json)
