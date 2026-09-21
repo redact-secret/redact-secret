@@ -39,6 +39,147 @@ fn is_known_vendor_placeholder_literal(matched: &str) -> bool {
     KNOWN_VENDOR_PLACEHOLDER_LITERALS.contains(&matched)
 }
 
+/// Field names Firebase's own console generates alongside `apiKey` in the
+/// Web SDK client config object (`firebase.google.com/docs/web/setup`,
+/// observed 2026-09-20). None of these is itself a secret; together with
+/// `apiKey` they identify the object as the config block Firebase's own
+/// documentation
+/// (`firebase.google.com/docs/projects/api-keys`, observed 2026-09-20)
+/// states plainly is safe to publish: "API keys restricted to Firebase
+/// services do not need to be treated as secrets, and it's safe to include
+/// them in your code or configuration files."
+///
+/// See [`is_within_firebase_client_config_context`] for how this list is
+/// used -- issue #520 (B3a)'s public-config discrimination.
+const FIREBASE_CLIENT_CONFIG_FIELD_NAMES: [&str; 7] = [
+    "authDomain",
+    "databaseURL",
+    "storageBucket",
+    "messagingSenderId",
+    "appId",
+    "measurementId",
+    "projectId",
+];
+
+/// Bytes of surrounding text, searched independently before and after a
+/// `google_api_key` match, for [`FIREBASE_CLIENT_CONFIG_FIELD_NAMES`].
+/// Generous above every realistic pretty-printed `firebaseConfig` object
+/// (well under 400 bytes for all eight fields; see the
+/// `firebase-negative-client-config-*` corpus fixtures) while staying far
+/// short of a whole source file, so an unrelated Google API key documented
+/// elsewhere in a large file cannot be suppressed by coincidence.
+const FIREBASE_CONTEXT_WINDOW_BYTES: usize = 512;
+
+/// At least this many *distinct* Firebase config field names must appear in
+/// the window for a match to count as a client-config object rather than a
+/// single coincidental field name (or a decoy) sitting near an unrelated
+/// key. Two is deliberately more than one: `google-positive-javascript-
+/// firebase-config` (the pre-existing corpus fixture) carries only
+/// `authDomain` alongside `apiKey` and is *not* suppressed by this
+/// threshold -- a minimal two-field snippet is weaker evidence of a real,
+/// complete client config than the `firebase-negative-client-config-*`
+/// fixtures' full eight-field blocks.
+const FIREBASE_CONTEXT_MIN_FIELDS: usize = 2;
+
+/// Whether `window` names `field` as an object key: `field` immediately
+/// followed (after an optional closing quote and whitespace) by `:`, and
+/// not itself the tail of a longer identifier (`xauthDomain` does not
+/// count). Matches both the JS (`authDomain: "..."`) and JSON
+/// (`"authDomain": "..."`) forms; the leading quote is not part of `field`
+/// so it needs no separate check.
+fn window_names_config_field(window: &str, field: &str) -> bool {
+    let bytes = window.as_bytes();
+    window.match_indices(field).any(|(start, _)| {
+        let boundary_ok = start == 0 || {
+            let previous = bytes[start - 1];
+            !(previous.is_ascii_alphanumeric() || previous == b'_' || previous == b'$')
+        };
+        if !boundary_ok {
+            return false;
+        }
+        let mut cursor = start + field.len();
+        if matches!(bytes.get(cursor), Some(b'"' | b'\'')) {
+            cursor += 1;
+        }
+        while matches!(bytes.get(cursor), Some(b' ' | b'\t')) {
+            cursor += 1;
+        }
+        bytes.get(cursor) == Some(&b':')
+    })
+}
+
+/// The nearest UTF-8 char boundary at or before `idx`.
+fn char_boundary_at_or_before(s: &str, mut idx: usize) -> usize {
+    while idx > 0 && !s.is_char_boundary(idx) {
+        idx -= 1;
+    }
+    idx
+}
+
+/// The nearest UTF-8 char boundary at or after `idx`.
+fn char_boundary_at_or_after(s: &str, mut idx: usize) -> usize {
+    while idx < s.len() && !s.is_char_boundary(idx) {
+        idx += 1;
+    }
+    idx
+}
+
+/// Whether `text` has `google-api-key`'s exact `AIza`-prefixed, 39-byte
+/// shape (`crate::detectors::additional_providers`'s `GOOGLE` entry): the
+/// literal `AIza`, then exactly 35 bytes of `[A-Za-z0-9_-]`.
+///
+/// [`is_within_firebase_client_config_context`] is applied to a candidate's
+/// matched *text* rather than gated on `type_name() == "google_api_key"`,
+/// because `apiKey` also normalizes to a `generic-token` high-signal name:
+/// without this, an `apiKey` value inside a suppressed firebase config would
+/// still surface as a `contextual_secret` finding for the same span from a
+/// second detector, defeating the exemption. This mirrors, rather than
+/// reuses, `GOOGLE`'s shape -- the two are kept independent so a change to
+/// either does not silently change the other's behavior.
+fn has_google_api_key_shape(text: &str) -> bool {
+    let bytes = text.as_bytes();
+    bytes.len() == 39
+        && bytes.starts_with(b"AIza")
+        && bytes[4..]
+            .iter()
+            .all(|&byte| byte.is_ascii_alphanumeric() || byte == b'_' || byte == b'-')
+}
+
+/// Whether `range` sits inside a recognized Firebase Web SDK client-config
+/// object: at least [`FIREBASE_CONTEXT_MIN_FIELDS`] of
+/// [`FIREBASE_CLIENT_CONFIG_FIELD_NAMES`] appear as object keys within
+/// [`FIREBASE_CONTEXT_WINDOW_BYTES`] of `range`, on either side.
+///
+/// This is the mechanism behind issue #520 (B3a)'s public-config
+/// discrimination for `google-api-key`'s `AIza` shape, which also matches
+/// Firebase's public, referrer-restricted client-config `apiKey` (see
+/// `crate::detectors::additional_providers`'s `GOOGLE` doc comment). It is
+/// applied at the pipeline level, the same way
+/// [`is_known_vendor_placeholder_literal`] is: a cross-cutting exemption
+/// over an existing detector's candidates, not a change to the detector's
+/// own shape-only matching (`google-api-key` keeps reporting the identical
+/// shape everywhere else -- a bare or ambiguously-contexted `AIza` value is
+/// unaffected, preserving existing leaked-span coverage).
+fn is_within_firebase_client_config_context(scanned: &str, range: ByteRange) -> bool {
+    let window_start = char_boundary_at_or_before(
+        scanned,
+        range.start().saturating_sub(FIREBASE_CONTEXT_WINDOW_BYTES),
+    );
+    let window_end = char_boundary_at_or_after(
+        scanned,
+        range
+            .end()
+            .saturating_add(FIREBASE_CONTEXT_WINDOW_BYTES)
+            .min(scanned.len()),
+    );
+    let window = &scanned[window_start..window_end];
+    FIREBASE_CLIENT_CONFIG_FIELD_NAMES
+        .iter()
+        .filter(|field| window_names_config_field(window, field))
+        .count()
+        >= FIREBASE_CONTEXT_MIN_FIELDS
+}
+
 /// A validated candidate with the keys overlap resolution sorts on.
 struct RankedCandidate<'a> {
     type_name: &'a str,
@@ -359,7 +500,11 @@ fn select_optimal_disjoint_set(mut ranked: Vec<RankedCandidate<'_>>) -> Vec<Rank
 ///
 /// A candidate whose full matched text exactly equals a documented
 /// vendor-placeholder literal (an internal, fixed exemption list) is
-/// dropped before validation, regardless of which detector proposed it.
+/// dropped before validation, regardless of which detector proposed it. A
+/// candidate whose matched text has `google-api-key`'s `AIza`-prefixed
+/// shape and sits inside a recognized Firebase Web SDK client-config object
+/// is dropped the same way, regardless of which detector proposed it
+/// (`is_within_firebase_client_config_context`).
 ///
 /// Identical input and registry always produce identical findings.
 ///
@@ -395,6 +540,12 @@ pub fn run_detector_pipeline(
             let range = candidate.range();
             if range.is_char_aligned_in(scanned)
                 && is_known_vendor_placeholder_literal(&scanned[range.start()..range.end()])
+            {
+                continue;
+            }
+            if range.is_char_aligned_in(scanned)
+                && has_google_api_key_shape(&scanned[range.start()..range.end()])
+                && is_within_firebase_client_config_context(scanned, range)
             {
                 continue;
             }
@@ -832,5 +983,89 @@ mod tests {
         let findings = run_detector_pipeline(input, &registry).unwrap();
         assert_eq!(findings.len(), 1);
         assert_eq!(findings[0].type_name(), "contextual_secret");
+    }
+
+    const GOOGLE_API_KEY: &str = "AIzaSYNTHETIC_REVOKED_GOOGLE_API_KEY012";
+
+    fn firebase_client_config_javascript() -> String {
+        format!(
+            "const firebaseConfig = {{\n  apiKey: \"{GOOGLE_API_KEY}\",\n  authDomain: \"synthetic-revoked.firebaseapp.com\",\n  databaseURL: \"https://synthetic-revoked-default-rtdb.firebaseio.com\",\n  projectId: \"synthetic-revoked\",\n  storageBucket: \"synthetic-revoked.firebasestorage.app\",\n  messagingSenderId: \"000000000000\",\n  appId: \"1:000000000000:web:synthetic0revoked1fixture2\",\n  measurementId: \"G-SYNTHETIC0\"\n}};"
+        )
+    }
+
+    fn firebase_client_config_json() -> String {
+        format!(
+            "{{\"apiKey\": \"{GOOGLE_API_KEY}\", \"authDomain\": \"synthetic-revoked.firebaseapp.com\", \"databaseURL\": \"https://synthetic-revoked-default-rtdb.firebaseio.com\", \"projectId\": \"synthetic-revoked\", \"storageBucket\": \"synthetic-revoked.firebasestorage.app\", \"messagingSenderId\": \"000000000000\", \"appId\": \"1:000000000000:web:synthetic0revoked1fixture2\", \"measurementId\": \"G-SYNTHETIC0\"}}"
+        )
+    }
+
+    #[test]
+    fn a_full_firebase_client_config_in_javascript_produces_no_findings() {
+        let registry = built_in_registry();
+        let input = firebase_client_config_javascript();
+        assert_eq!(
+            run_detector_pipeline(&input, &registry).unwrap(),
+            Vec::new()
+        );
+    }
+
+    #[test]
+    fn a_full_firebase_client_config_in_json_produces_no_findings() {
+        let registry = built_in_registry();
+        let input = firebase_client_config_json();
+        assert_eq!(
+            run_detector_pipeline(&input, &registry).unwrap(),
+            Vec::new()
+        );
+    }
+
+    #[test]
+    fn a_bare_google_api_key_with_only_one_firebase_sibling_field_is_still_detected() {
+        // Below `FIREBASE_CONTEXT_MIN_FIELDS`: one sibling field alone is not
+        // strong enough evidence of a real, complete client config.
+        let registry = built_in_registry();
+        let input = format!(
+            "const firebaseConfig = {{\n  apiKey: \"{GOOGLE_API_KEY}\",\n  authDomain: \"synthetic-revoked.firebaseapp.com\",\n}};"
+        );
+        let findings = run_detector_pipeline(&input, &registry).unwrap();
+        assert_eq!(findings.len(), 1);
+        assert_eq!(findings[0].type_name(), "google_api_key");
+    }
+
+    #[test]
+    fn a_google_api_key_used_as_a_privileged_server_key_variable_is_still_detected() {
+        // Grounded in a documented real-world FCM-takeover pattern: an
+        // `AIza`-shaped key stored under a privileged `server_key`-style
+        // variable name, not the public client config, carries none of the
+        // config's sibling fields and must not be suppressed.
+        let registry = built_in_registry();
+        let input = format!("const server_key = \"{GOOGLE_API_KEY}\";");
+        let findings = run_detector_pipeline(&input, &registry).unwrap();
+        assert_eq!(findings.len(), 1);
+        assert_eq!(findings[0].type_name(), "google_api_key");
+    }
+
+    #[test]
+    fn a_bare_google_api_key_far_from_any_firebase_config_is_still_detected() {
+        let registry = built_in_registry();
+        let input = format!("GEMINI_API_KEY={GOOGLE_API_KEY}");
+        let findings = run_detector_pipeline(&input, &registry).unwrap();
+        assert_eq!(findings.len(), 1);
+        assert_eq!(findings[0].type_name(), "google_api_key");
+    }
+
+    #[test]
+    fn firebase_config_field_names_are_not_recognized_across_an_unrelated_wide_gap() {
+        // Two sibling field names exist in the input, but far enough past
+        // `FIREBASE_CONTEXT_WINDOW_BYTES` that they must not suppress an
+        // unrelated key earlier in the same large input.
+        let registry = built_in_registry();
+        let padding = "x".repeat(FIREBASE_CONTEXT_WINDOW_BYTES + 200);
+        let input = format!(
+            "GEMINI_API_KEY={GOOGLE_API_KEY}\n{padding}\nauthDomain: \"a\"\nmessagingSenderId: \"b\"\n"
+        );
+        let findings = run_detector_pipeline(&input, &registry).unwrap();
+        assert_eq!(findings.len(), 1);
+        assert_eq!(findings[0].type_name(), "google_api_key");
     }
 }

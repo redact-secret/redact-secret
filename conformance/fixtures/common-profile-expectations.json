@@ -3,7 +3,7 @@
   "corpus": "synchronous-corpus.json",
   "offsetUnit": "utf8-byte",
   "detectors": ["private-key","jwt","bearer-token","connection-string","otpauth-uri","generic-token"],
-  "fixtureCount": 1359,
+  "fixtureCount": 1377,
   "fixtures": [
     {"expected":[{"action":"warn","confidence":"medium","detector":"generic-token","end":48,"start":8,"type":"contextual_secret"}],"id":"host-dotenv-github"},
     {"expected":[{"action":"warn","confidence":"medium","detector":"generic-token","end":52,"start":12,"type":"contextual_secret"}],"id":"host-json-github"},
@@ -1363,6 +1363,24 @@
     {"expected":[],"id":"notion-token-positive-yaml-secret"},
     {"expected":[],"id":"notion-token-positive-yaml-ntn"},
     {"expected":[],"id":"notion-token-positive-log-secret"},
-    {"expected":[],"id":"notion-token-positive-log-ntn"}
+    {"expected":[],"id":"notion-token-positive-log-ntn"},
+    {"expected":[],"id":"firebase-server-key-positive-bare"},
+    {"expected":[],"id":"firebase-server-key-positive-dotenv"},
+    {"expected":[],"id":"firebase-server-key-positive-javascript"},
+    {"expected":[],"id":"firebase-server-key-positive-crlf-unicode-prefix"},
+    {"expected":[],"id":"firebase-server-key-overlap-generic-context"},
+    {"expected":[],"id":"firebase-server-key-adversarial-near-miss-body"},
+    {"expected":[],"id":"firebase-server-key-boundary-body-short"},
+    {"expected":[],"id":"firebase-server-key-boundary-tail-short"},
+    {"expected":[],"id":"firebase-server-key-boundary-separator-wrong"},
+    {"expected":[],"id":"firebase-server-key-negative-masked"},
+    {"expected":[],"id":"firebase-server-key-negative-reference"},
+    {"expected":[],"id":"firebase-negative-client-config-javascript"},
+    {"expected":[],"id":"firebase-negative-client-config-json"},
+    {"expected":[],"id":"firebase-positive-google-api-key-as-server-key-context"},
+    {"expected":[],"id":"firebase-negative-authdomain-bare"},
+    {"expected":[],"id":"firebase-negative-messaging-sender-id-bare"},
+    {"expected":[],"id":"firebase-negative-client-config-wide-gap-does-not-suppress"},
+    {"expected":[],"id":"firebase-database-secret-query-param-negative-out-of-scope"}
   ]
 }
