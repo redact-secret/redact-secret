@@ -255,6 +255,16 @@ reviewed PR and retain the RC branch. A release is complete only when the
 intended artifact set, verification, tag, and evidence agree; partial success
 must remain visible as partial success.
 
+If `benchmarks/support-matrix.json` changed since the previous release (see
+[the support matrix](support-matrix.md) and issue #510), include its status
+distribution and what moved in the dated changelog entry, generated -- never
+hand-written -- with:
+
+```bash
+python3 -B scripts/generate-support-matrix-docs.py --release-note \
+  --previous <(git show "v$PREVIOUS_VERSION:benchmarks/support-matrix.json")
+```
+
 Run the deterministic, offline durable-record check before opening the
 closeout PR:
 
