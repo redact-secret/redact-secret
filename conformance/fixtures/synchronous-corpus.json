@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 1332,
+  "fixtureCount": 1349,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -9020,14 +9020,14 @@
       "expected": [
         {
           "detector": "github-token",
-          "type": "github_token",
+          "type": "github_app_installation_token",
           "confidence": "high",
           "specificity": "provider",
           "start": 0,
           "end": 84
         }
       ],
-      "note": "The complete rollout-safe stateless installation-token shape is supported."
+      "note": "The complete rollout-safe stateless installation-token shape is supported. Retyped from github_token to github_app_installation_token by issue #517 (B1f): installation tokens are their own credential family, distinct from a classic personal access token."
     },
     {
       "id": "github-boundary-short",
@@ -9101,14 +9101,14 @@
       "expected": [
         {
           "detector": "github-token",
-          "type": "github_token",
+          "type": "github_fine_grained_personal_access_token",
           "confidence": "high",
           "specificity": "provider",
           "start": 0,
           "end": 93
         }
       ],
-      "note": "GitHub's fine-grained personal access token format (github_pat_ + an exact 22-byte first segment + a literal underscore separator + an exact 59-byte second segment) is supported; the corpus previously had no fine-grained fixture at all, only the rust unit tests in detectors/github.rs."
+      "note": "GitHub's fine-grained personal access token format (github_pat_ + an exact 22-byte first segment + a literal underscore separator + an exact 59-byte second segment) is supported; the corpus previously had no fine-grained fixture at all, only the rust unit tests in detectors/github.rs. Retyped from github_token to github_fine_grained_personal_access_token by issue #517 (B1f)."
     },
     {
       "id": "github-positive-fine-grained-dotenv",
@@ -9123,14 +9123,14 @@
       "expected": [
         {
           "detector": "github-token",
-          "type": "github_token",
+          "type": "github_fine_grained_personal_access_token",
           "confidence": "high",
           "specificity": "provider",
           "start": 26,
           "end": 119
         }
       ],
-      "note": "A bare dotenv-style assignment carrying a fine-grained token is detected the same as a classic one."
+      "note": "A bare dotenv-style assignment carrying a fine-grained token is detected the same as a classic one. Retyped from github_token to github_fine_grained_personal_access_token by issue #517 (B1f)."
     },
     {
       "id": "github-boundary-fine-grained-wrong-separator",
@@ -9222,6 +9222,335 @@
       "input": "Authorize at https://github.com/login/oauth/authorize?client_id=ghp_client_identifier&scope=repo",
       "expected": [],
       "note": "A GitHub OAuth authorize URL's client_id query parameter happens to start with the classic-token prefix ghp_, but its value is a short underscore-delimited identifier: the classic-token alphabet excludes underscore, so the run breaks at client's first underscore, far short of the documented 36-byte body."
+    },
+    {
+      "id": "github-negative-gh-cli-masked-token",
+      "detector": "github-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "terminal"
+      ],
+      "input": "Token: ghp_************************************",
+      "expected": [],
+      "note": "issue #517 (B1f): a benign control for the gh CLI's own masked/redacted display -- `gh auth status` prints `Token: ghp_************************************`, replacing the body with asterisks -- rather than a real value. No documented GitHub prefix's alphabet includes `*`, so the run breaks immediately after the prefix for every family, not just the classic one shown here."
+    },
+    {
+      "id": "github-negative-undocumented-classic-family-prefix",
+      "detector": "github-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "ghq_SYNTHETICREVOKED00000000000000000000",
+      "expected": [],
+      "note": "issue #517 (B1f): ghq_ is not one of GitHub's five documented classic-family prefixes (gho_/ghp_/ghu_/ghr_ share this body grammar; ghs_ is the separate installation family); a near-miss on the literal prefix is rejected outright rather than matching some other family's type."
+    },
+    {
+      "id": "github-positive-oauth",
+      "detector": "github-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "gho_SYNTHETICREVOKED00000000000000000000",
+      "expected": [
+        {
+          "detector": "github-token",
+          "type": "github_oauth_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 40
+        }
+      ],
+      "note": "issue #517 (B1f): the OAuth access token family (gho_) is its own finding type, github_oauth_token, distinct from a classic personal access token even though both share the prefix + exact-36-byte body grammar GitHub's 2021-04 token-format rollout documents."
+    },
+    {
+      "id": "github-boundary-oauth-short",
+      "detector": "github-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "gho_SYNTHETICREVOKED0000000000000000000",
+      "expected": [],
+      "note": "issue #517 (B1f): the OAuth family's body is matched as an exact 36-byte length, not a minimum, the same rule github-boundary-classic-overlong pins from the other direction; one byte short of that length is rejected."
+    },
+    {
+      "id": "github-positive-oauth-dotenv",
+      "detector": "github-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "GITHUB_OAUTH_TOKEN=gho_SYNTHETICREVOKED00000000000000000000",
+      "expected": [
+        {
+          "detector": "github-token",
+          "type": "github_oauth_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 19,
+          "end": 59
+        }
+      ],
+      "note": "issue #517 (B1f): a bare dotenv-style assignment carrying an OAuth access token is detected the same as a classic one."
+    },
+    {
+      "id": "github-positive-user-to-server",
+      "detector": "github-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "ghu_SYNTHETICREVOKED00000000000000000000",
+      "expected": [
+        {
+          "detector": "github-token",
+          "type": "github_app_user_to_server_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 40
+        }
+      ],
+      "note": "issue #517 (B1f): a GitHub App user-to-server token (ghu_) is its own finding type, github_app_user_to_server_token, kept distinct from the app's own server-to-server (installation, ghs_) token even though both authenticate the same App, because they carry different grammars and different blast radii (user-to-server acts as the authorizing user; installation acts as the App itself)."
+    },
+    {
+      "id": "github-boundary-user-to-server-short",
+      "detector": "github-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "ghu_SYNTHETICREVOKED0000000000000000000",
+      "expected": [],
+      "note": "issue #517 (B1f): the user-to-server family's body is matched as an exact 36-byte length, not a minimum; one byte short of that length is rejected."
+    },
+    {
+      "id": "github-positive-user-to-server-dotenv",
+      "detector": "github-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "GITHUB_USER_TO_SERVER_TOKEN=ghu_SYNTHETICREVOKED00000000000000000000",
+      "expected": [
+        {
+          "detector": "github-token",
+          "type": "github_app_user_to_server_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 28,
+          "end": 68
+        }
+      ],
+      "note": "issue #517 (B1f): a bare dotenv-style assignment carrying a user-to-server token is detected the same as a classic one."
+    },
+    {
+      "id": "github-positive-refresh-token",
+      "detector": "github-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "ghr_SYNTHETICREVOKED00000000000000000000",
+      "expected": [
+        {
+          "detector": "github-token",
+          "type": "github_app_refresh_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 40
+        }
+      ],
+      "note": "issue #517 (B1f): a GitHub App refresh token (ghr_) is its own finding type, github_app_refresh_token, because unlike the other classic-shaped families it is never presented to an API as a bearer credential -- it is exchanged for a new user-to-server/refresh pair -- so a matrix consumer needs to be able to state its status independently of the access-token families it is exchanged alongside."
+    },
+    {
+      "id": "github-boundary-refresh-token-short",
+      "detector": "github-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "ghr_SYNTHETICREVOKED0000000000000000000",
+      "expected": [],
+      "note": "issue #517 (B1f): the refresh-token family's body is matched as an exact 36-byte length, not a minimum; one byte short of that length is rejected."
+    },
+    {
+      "id": "github-positive-refresh-token-dotenv",
+      "detector": "github-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "GITHUB_APP_REFRESH_TOKEN=ghr_SYNTHETICREVOKED00000000000000000000",
+      "expected": [
+        {
+          "detector": "github-token",
+          "type": "github_app_refresh_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 65
+        }
+      ],
+      "note": "issue #517 (B1f): a bare dotenv-style assignment carrying a refresh token is detected the same as a classic one."
+    },
+    {
+      "id": "github-positive-installation-stateful",
+      "detector": "github-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "ghs_SYNTHETICREVOKED00000000000000000000",
+      "expected": [
+        {
+          "detector": "github-token",
+          "type": "github_app_installation_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 40
+        }
+      ],
+      "note": "issue #517 (B1f): the opaque, fixed-length stateful shape of a server-to-server (installation) token was previously proven only by a Rust unit test (detects_a_stateful_installation_token in detectors/github.rs), not the canonical corpus; github-positive-installation-stateless already covers the newer stateless JWT-shaped variant this same type also accepts."
+    },
+    {
+      "id": "github-overlap-oauth-context",
+      "detector": "github-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "access_token=gho_SYNTHETICREVOKED00000000000000000000",
+      "expected": [
+        {
+          "detector": "github-token",
+          "type": "github_oauth_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 53
+        }
+      ],
+      "note": "issue #517 (B1f): overlap resolution is a type-identity claim (which family wins), so it is evidenced per type rather than borrowed from github-overlap-context's classic-token case (evidence-requirements.md's requirement matrix). Provider evidence wins over an access-token assignment."
+    },
+    {
+      "id": "github-overlap-user-to-server-context",
+      "detector": "github-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "access_token=ghu_SYNTHETICREVOKED00000000000000000000",
+      "expected": [
+        {
+          "detector": "github-token",
+          "type": "github_app_user_to_server_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 53
+        }
+      ],
+      "note": "issue #517 (B1f): overlap resolution is a type-identity claim, evidenced per type. Provider evidence wins over an access-token assignment."
+    },
+    {
+      "id": "github-overlap-refresh-token-context",
+      "detector": "github-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "access_token=ghr_SYNTHETICREVOKED00000000000000000000",
+      "expected": [
+        {
+          "detector": "github-token",
+          "type": "github_app_refresh_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 53
+        }
+      ],
+      "note": "issue #517 (B1f): overlap resolution is a type-identity claim, evidenced per type. Provider evidence wins over an access-token assignment."
+    },
+    {
+      "id": "github-overlap-installation-context",
+      "detector": "github-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "access_token=ghs_SYNTHETICREVOKED00000000000000000000",
+      "expected": [
+        {
+          "detector": "github-token",
+          "type": "github_app_installation_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 53
+        }
+      ],
+      "note": "issue #517 (B1f): overlap resolution is a type-identity claim, evidenced per type. Provider evidence wins over an access-token assignment."
+    },
+    {
+      "id": "github-overlap-fine-grained-context",
+      "detector": "github-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "access_token=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",
+      "expected": [
+        {
+          "detector": "github-token",
+          "type": "github_fine_grained_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 106
+        }
+      ],
+      "note": "issue #517 (B1f): overlap resolution is a type-identity claim, evidenced per type. Provider evidence wins over an access-token assignment."
     },
     {
       "id": "gitlab-positive-personal-access",

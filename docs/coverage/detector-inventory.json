@@ -34,6 +34,41 @@
       "schemes": null
     },
     {
+      "type": "github_oauth_token",
+      "detector": "github-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "gho_SYNTHETICREVOKED00000000000000000000",
+      "schemes": null
+    },
+    {
+      "type": "github_app_user_to_server_token",
+      "detector": "github-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "ghu_SYNTHETICREVOKED00000000000000000000",
+      "schemes": null
+    },
+    {
+      "type": "github_app_installation_token",
+      "detector": "github-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "ghs_SYNTHETICREVOKED00000000000000000000",
+      "schemes": null
+    },
+    {
+      "type": "github_app_refresh_token",
+      "detector": "github-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "ghr_SYNTHETICREVOKED00000000000000000000",
+      "schemes": null
+    },
+    {
+      "type": "github_fine_grained_personal_access_token",
+      "detector": "github-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "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",
+      "schemes": null
+    },
+    {
       "type": "gitlab_token",
       "detector": "gitlab-token",
       "policyClass": "always-redact",

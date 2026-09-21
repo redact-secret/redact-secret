@@ -15,11 +15,11 @@ These counts describe finding-type inventory rows with corpus evidence, not dete
 
 | Row state | Count |
 | --- | --- |
-| supported | 44 |
+| supported | 49 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 55.
+Coverage declarations: 60.
 
 ## Coverage by detector
 
@@ -38,7 +38,7 @@ Coverage declarations: 55.
 | discord-bot-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | docker-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | generic-token | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
-| github-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| github-token | 6 | supported: 6, intentionally-unsupported: 0, unresolved: 0 |
 | gitlab-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | google-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | grafana-cloud-access-policy-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -87,6 +87,11 @@ Coverage declarations: 55.
 | digitalocean_token | digitalocean-token | provider | supported | not-applicable | none |
 | discord_bot_token | discord-bot-token | provider | supported | not-applicable | none |
 | docker_token | docker-token | provider | supported | not-applicable | none |
+| github_app_installation_token | github-token | provider | supported | not-applicable | none |
+| github_app_refresh_token | github-token | provider | supported | not-applicable | none |
+| github_app_user_to_server_token | github-token | provider | supported | not-applicable | none |
+| github_fine_grained_personal_access_token | github-token | provider | supported | not-applicable | none |
+| github_oauth_token | github-token | provider | supported | not-applicable | none |
 | github_token | github-token | provider | supported | not-applicable | none |
 | gitlab_token | gitlab-token | provider | supported | not-applicable | none |
 | google_api_key | google-api-key | provider | supported | not-applicable | none |
@@ -142,15 +147,15 @@ Coverage declarations: 55.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 55 | 0 | 0 |
-| boundary | 44 | 0 | 0 |
-| host-context | 44 | 0 | 0 |
+| adversarial | 60 | 0 | 0 |
+| boundary | 49 | 0 | 0 |
+| host-context | 49 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 55 | 0 | 0 |
-| near-miss-negative | 44 | 0 | 0 |
-| overlap | 44 | 0 | 0 |
-| positive | 44 | 0 | 0 |
-| range | 55 | 0 | 0 |
+| malformed | 60 | 0 | 0 |
+| near-miss-negative | 49 | 0 | 0 |
+| overlap | 49 | 0 | 0 |
+| positive | 49 | 0 | 0 |
+| range | 60 | 0 | 0 |
 
 ## Unresolved and pending coverage
 
