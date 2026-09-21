@@ -1,0 +1,1809 @@
+{
+  "schemaVersion": 1,
+  "taxonomySchemaVersion": 1,
+  "sourceReport": {
+    "schemaVersion": 1,
+    "generatedAt": "2026-09-21T02:24:02.738Z",
+    "runId": "b162ec11-737e-4b10-a86f-f1487fad3afe",
+    "revision": "3e50f2cfd57c3c1363b2c3a2ca48b2ac8f8e2ce5",
+    "dirty": false,
+    "criteriaSchemaVersion": 1
+  },
+  "providerCount": 31,
+  "familyCount": 72,
+  "distribution": {
+    "stable": 0,
+    "provisional": 53,
+    "pending": 2,
+    "unsupported": 17
+  },
+  "families": [
+    {
+      "provider": "anthropic",
+      "family": "anthropic:secret-api-key",
+      "familyName": "Secret API key",
+      "status": "provisional",
+      "evidenceTier": "T2",
+      "providerSource": null,
+      "corroboratingScanners": [
+        "gitleaks 8.30.1",
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 2,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 12,
+        "differential": 0
+      },
+      "detectors": [
+        "anthropic-token"
+      ],
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 2 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 12 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+    },
+    {
+      "provider": "atlassian",
+      "family": "atlassian:access-token",
+      "familyName": "Access token",
+      "status": "unsupported",
+      "evidenceTier": null,
+      "providerSource": null,
+      "corroboratingScanners": [],
+      "twinCoverage": null,
+      "unresolvedCriticalItems": null,
+      "detectors": [],
+      "reason": "atlassian-api-token's contract review states the pinned TruffleHog detector targets the distinct ATCT access-token family, not the ATAT-prefixed API-token shape."
+    },
+    {
+      "provider": "atlassian",
+      "family": "atlassian:api-token",
+      "familyName": "API token",
+      "status": "provisional",
+      "evidenceTier": "T2",
+      "providerSource": null,
+      "corroboratingScanners": [
+        "gitleaks 8.30.1"
+      ],
+      "twinCoverage": {
+        "pairs": 3,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 12,
+        "differential": 0
+      },
+      "detectors": [
+        "atlassian-api-token"
+      ],
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 12 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+    },
+    {
+      "provider": "aws",
+      "family": "aws:context-specific-credential",
+      "familyName": "Context-specific credential",
+      "status": "unsupported",
+      "evidenceTier": null,
+      "providerSource": null,
+      "corroboratingScanners": [],
+      "twinCoverage": null,
+      "unresolvedCriticalItems": null,
+      "detectors": [],
+      "reason": "Documented in the same IAM unique-identifier prefix table as AKIA/ASIA; not matched by the AKIA-only pattern. Provider source: https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_identifiers.html#identifiers-prefixes."
+    },
+    {
+      "provider": "aws",
+      "family": "aws:iam-user-access-key",
+      "familyName": "IAM user access key",
+      "status": "provisional",
+      "evidenceTier": "T1",
+      "providerSource": {
+        "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_identifiers.html#identifiers-prefixes",
+        "observedAt": "2026-09-17",
+        "formatVersion": "IAM unique-ID prefix table",
+        "covers": "AKIA/ASIA/ABIA/ACCA prefixes, and AIDA as the IAM-user unique-ID prefix rather than an access key (re-checked 2026-09-20, #36); 16-character base32 body and 40-character secret are tool-corroborated"
+      },
+      "corroboratingScanners": [
+        "gitleaks 8.30.1",
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 6,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 0,
+        "differential": 0
+      },
+      "detectors": [
+        "aws-access-key"
+      ],
+      "reason": "benign.minimumCases: 4 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family."
+    },
+    {
+      "provider": "aws",
+      "family": "aws:iam-user-secret-access-key",
+      "familyName": "IAM user secret access key",
+      "status": "unsupported",
+      "evidenceTier": null,
+      "providerSource": null,
+      "corroboratingScanners": [],
+      "twinCoverage": null,
+      "unresolvedCriticalItems": null,
+      "detectors": [],
+      "reason": "The aws-access-key contract's companion field states a separate 40-character secret access key is required alongside the access key ID; this project has no dedicated detector for the secret half, which carries no stable prefix to anchor on."
+    },
+    {
+      "provider": "aws",
+      "family": "aws:sts-service-bearer-token",
+      "familyName": "STS service bearer token",
+      "status": "unsupported",
+      "evidenceTier": null,
+      "providerSource": null,
+      "corroboratingScanners": [],
+      "twinCoverage": null,
+      "unresolvedCriticalItems": null,
+      "detectors": [],
+      "reason": "Documented in the same IAM unique-identifier prefix table as AKIA/ASIA; not matched by the AKIA-only pattern. Provider source: https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_identifiers.html#identifiers-prefixes."
+    },
+    {
+      "provider": "aws",
+      "family": "aws:sts-temporary-access-key",
+      "familyName": "STS temporary access key",
+      "status": "unsupported",
+      "evidenceTier": null,
+      "providerSource": null,
+      "corroboratingScanners": [],
+      "twinCoverage": null,
+      "unresolvedCriticalItems": null,
+      "detectors": [],
+      "reason": "aws-access-key's pattern is anchored to AKIA only (benchmarks/lib/assessment.ts contract), so ASIA values are not matched. classifyFixture already special-cases a bare AWS positive as policy, not must-redact, because \"some legacy ASIA values also use digits outside the base32 alphabet\". Provider source: https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_identifiers.html#identifiers-prefixes."
+    },
+    {
+      "provider": "azure-devops",
+      "family": "azure-devops:personal-access-token",
+      "familyName": "Personal access token",
+      "status": "provisional",
+      "evidenceTier": "T3",
+      "providerSource": null,
+      "corroboratingScanners": [],
+      "twinCoverage": {
+        "pairs": 3,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 0,
+        "differential": 0
+      },
+      "detectors": [
+        "azure-devops-personal-access-token"
+      ],
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family."
+    },
+    {
+      "provider": "cloudflare",
+      "family": "cloudflare:api-token",
+      "familyName": "Scannable API token",
+      "status": "provisional",
+      "evidenceTier": "T1",
+      "providerSource": {
+        "url": "https://developers.cloudflare.com/fundamentals/api/get-started/create-token/",
+        "observedAt": "2026-09-17",
+        "formatVersion": "cfut_ scannable format",
+        "covers": "cfut_ prefix documented as the scannable token format; 40+8 body structure is tool-corroborated"
+      },
+      "corroboratingScanners": [
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 4,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 27,
+        "mutation": 15,
+        "differential": 0
+      },
+      "detectors": [
+        "cloudflare-token"
+      ],
+      "reason": "minimumTwinPairs: 4 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | metamorphic.criticalFailures: 27 > 0 — A metamorphic invariant violation (for example, detection lost after an envelope-preserving transform) shows the detector is not robust to construction, independent of how many cases were run. | mutation.unresolvedCritical: 15 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+    },
+    {
+      "provider": "datadog",
+      "family": "datadog:api-key",
+      "familyName": "API key",
+      "status": "provisional",
+      "evidenceTier": "T2",
+      "providerSource": null,
+      "corroboratingScanners": [
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 0,
+        "failures": 0,
+        "unprobeable": {
+          "reason": "docs.datadoghq.com/account_management/api-app-keys states no length, alphabet or prefix for API keys. The 32-character shape is tool-corroborated only.",
+          "observedAt": "2026-09-20"
+        }
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 0,
+        "differential": 0
+      },
+      "detectors": [
+        "datadog-api-key"
+      ],
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family."
+    },
+    {
+      "provider": "datadog",
+      "family": "datadog:application-key",
+      "familyName": "Application key",
+      "status": "provisional",
+      "evidenceTier": "T2",
+      "providerSource": null,
+      "corroboratingScanners": [
+        "gitleaks 8.30.1",
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 0,
+        "failures": 0,
+        "unprobeable": {
+          "reason": "docs.datadoghq.com/account_management/api-app-keys states no length, alphabet or prefix for application keys. The 40-character shape is tool-corroborated only.",
+          "observedAt": "2026-09-20"
+        }
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 0,
+        "differential": 0
+      },
+      "detectors": [
+        "datadog-application-key"
+      ],
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family."
+    },
+    {
+      "provider": "digitalocean",
+      "family": "digitalocean:oauth-token",
+      "familyName": "OAuth token",
+      "status": "provisional",
+      "evidenceTier": "T1",
+      "providerSource": {
+        "url": "https://docs.digitalocean.com/release-notes/api/",
+        "observedAt": "2026-09-17",
+        "formatVersion": "2022-03-29 token prefixes",
+        "covers": "dop_v1_/doo_v1_/dor_v1_ prefixes; 64-hex body is tool-corroborated"
+      },
+      "corroboratingScanners": [
+        "gitleaks 8.30.1",
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 8,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 102,
+        "differential": 0
+      },
+      "detectors": [
+        "digitalocean-token"
+      ],
+      "reason": "mutation.unresolvedCritical: 102 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+    },
+    {
+      "provider": "digitalocean",
+      "family": "digitalocean:personal-access-token",
+      "familyName": "Personal access token",
+      "status": "provisional",
+      "evidenceTier": "T1",
+      "providerSource": {
+        "url": "https://docs.digitalocean.com/release-notes/api/",
+        "observedAt": "2026-09-17",
+        "formatVersion": "2022-03-29 token prefixes",
+        "covers": "dop_v1_/doo_v1_/dor_v1_ prefixes; 64-hex body is tool-corroborated"
+      },
+      "corroboratingScanners": [
+        "gitleaks 8.30.1",
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 8,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 102,
+        "differential": 0
+      },
+      "detectors": [
+        "digitalocean-token"
+      ],
+      "reason": "mutation.unresolvedCritical: 102 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+    },
+    {
+      "provider": "digitalocean",
+      "family": "digitalocean:refresh-token",
+      "familyName": "Refresh token",
+      "status": "provisional",
+      "evidenceTier": "T1",
+      "providerSource": {
+        "url": "https://docs.digitalocean.com/release-notes/api/",
+        "observedAt": "2026-09-17",
+        "formatVersion": "2022-03-29 token prefixes",
+        "covers": "dop_v1_/doo_v1_/dor_v1_ prefixes; 64-hex body is tool-corroborated"
+      },
+      "corroboratingScanners": [
+        "gitleaks 8.30.1",
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 8,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 102,
+        "differential": 0
+      },
+      "detectors": [
+        "digitalocean-token"
+      ],
+      "reason": "mutation.unresolvedCritical: 102 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+    },
+    {
+      "provider": "discord",
+      "family": "discord:bot-token",
+      "familyName": "Bot token",
+      "status": "provisional",
+      "evidenceTier": "T2",
+      "providerSource": null,
+      "corroboratingScanners": [
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 0,
+        "failures": 0,
+        "unprobeable": {
+          "reason": "docs.discord.com/developers/reference shows one example token in an Authorization header and states no segment count, encoding, length or alphabet. An example is not a grammar.",
+          "observedAt": "2026-09-20"
+        }
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 18,
+        "differential": 0
+      },
+      "detectors": [
+        "discord-bot-token"
+      ],
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 18 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+    },
+    {
+      "provider": "docker",
+      "family": "docker:oauth-access-token",
+      "familyName": "OAuth access token",
+      "status": "provisional",
+      "evidenceTier": "T2",
+      "providerSource": null,
+      "corroboratingScanners": [
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 7,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 27,
+        "mutation": 38,
+        "differential": 0
+      },
+      "detectors": [
+        "docker-token"
+      ],
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | metamorphic.criticalFailures: 27 > 0 — A metamorphic invariant violation (for example, detection lost after an envelope-preserving transform) shows the detector is not robust to construction, independent of how many cases were run. | mutation.unresolvedCritical: 38 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+    },
+    {
+      "provider": "docker",
+      "family": "docker:personal-access-token",
+      "familyName": "Personal access token",
+      "status": "provisional",
+      "evidenceTier": "T2",
+      "providerSource": null,
+      "corroboratingScanners": [
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 7,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 27,
+        "mutation": 38,
+        "differential": 0
+      },
+      "detectors": [
+        "docker-token"
+      ],
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | metamorphic.criticalFailures: 27 > 0 — A metamorphic invariant violation (for example, detection lost after an envelope-preserving transform) shows the detector is not robust to construction, independent of how many cases were run. | mutation.unresolvedCritical: 38 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+    },
+    {
+      "provider": null,
+      "family": "generic:bearer-token",
+      "familyName": "Bearer credential",
+      "status": "provisional",
+      "evidenceTier": "T3",
+      "providerSource": null,
+      "corroboratingScanners": [],
+      "twinCoverage": {
+        "pairs": 3,
+        "failures": 3,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 26,
+        "differential": 6
+      },
+      "detectors": [
+        "bearer-token"
+      ],
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | twinFailures: 3 > 0 — A twin failure is a recorded false negative on the exact discrimination this project exists to make; stable tolerates none, however small the sample. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 26 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review. | differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+    },
+    {
+      "provider": null,
+      "family": "generic:connection-string-password",
+      "familyName": "Connection-string password",
+      "status": "provisional",
+      "evidenceTier": "T3",
+      "providerSource": null,
+      "corroboratingScanners": [],
+      "twinCoverage": {
+        "pairs": 15,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 0,
+        "differential": 0
+      },
+      "detectors": [
+        "connection-string"
+      ],
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts."
+    },
+    {
+      "provider": null,
+      "family": "generic:jwt",
+      "familyName": "JSON Web Token",
+      "status": "provisional",
+      "evidenceTier": "T1",
+      "providerSource": {
+        "url": "https://www.rfc-editor.org/rfc/rfc7519",
+        "observedAt": "2026-09-17",
+        "formatVersion": "RFC 7519 compact serialization",
+        "covers": "three base64url segments; the reviewed control is additionally signature-verified offline"
+      },
+      "corroboratingScanners": [
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 4,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 0,
+        "differential": 0
+      },
+      "detectors": [
+        "jwt"
+      ],
+      "reason": "minimumTwinPairs: 4 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family."
+    },
+    {
+      "provider": null,
+      "family": "generic:otp-seed",
+      "familyName": "OTP seed",
+      "status": "provisional",
+      "evidenceTier": "T3",
+      "providerSource": null,
+      "corroboratingScanners": [],
+      "twinCoverage": {
+        "pairs": 6,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 0,
+        "differential": 0
+      },
+      "detectors": [
+        "otpauth-uri"
+      ],
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family."
+    },
+    {
+      "provider": null,
+      "family": "generic:private-key",
+      "familyName": "PEM-encoded private key",
+      "status": "provisional",
+      "evidenceTier": "T1",
+      "providerSource": {
+        "url": "https://www.rfc-editor.org/rfc/rfc7468",
+        "observedAt": "2026-09-17",
+        "formatVersion": "RFC 7468 textual encodings",
+        "covers": "BEGIN/END PRIVATE KEY labels and base64 body; the reviewed control is additionally parsed as PKCS#8 offline"
+      },
+      "corroboratingScanners": [
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 2,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 0,
+        "differential": 0
+      },
+      "detectors": [
+        "private-key"
+      ],
+      "reason": "minimumTwinPairs: 2 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 3 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family."
+    },
+    {
+      "provider": null,
+      "family": "generic:unclassified-assignment-literal",
+      "familyName": "Unclassified assignment literal",
+      "status": "provisional",
+      "evidenceTier": "T3",
+      "providerSource": null,
+      "corroboratingScanners": [],
+      "twinCoverage": {
+        "pairs": 9,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 6,
+        "mutation": 20,
+        "differential": 0
+      },
+      "detectors": [
+        "generic-token"
+      ],
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | metamorphic.criticalFailures: 6 > 0 — A metamorphic invariant violation (for example, detection lost after an envelope-preserving transform) shows the detector is not robust to construction, independent of how many cases were run. | mutation.unresolvedCritical: 20 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+    },
+    {
+      "provider": "github",
+      "family": "github:app-server-to-server-token",
+      "familyName": "GitHub App server-to-server token",
+      "status": "provisional",
+      "evidenceTier": "T1",
+      "providerSource": {
+        "url": "https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/about-authentication-to-github#githubs-token-formats",
+        "observedAt": "2026-09-17",
+        "formatVersion": "2021-04 prefix scheme",
+        "covers": "ghp_/gho_/ghu_/ghs_/ghr_ prefixes and underscore separator; 36-character body is tool-corroborated (checksum in the last six characters per github.blog/2021-04-05)"
+      },
+      "corroboratingScanners": [
+        "gitleaks 8.30.1",
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 42,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 305,
+        "differential": 0
+      },
+      "detectors": [
+        "github-token"
+      ],
+      "reason": "benign.minimumCases: 4 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 305 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+    },
+    {
+      "provider": "github",
+      "family": "github:app-user-to-server-token",
+      "familyName": "GitHub App user-to-server token",
+      "status": "provisional",
+      "evidenceTier": "T1",
+      "providerSource": {
+        "url": "https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/about-authentication-to-github#githubs-token-formats",
+        "observedAt": "2026-09-17",
+        "formatVersion": "2021-04 prefix scheme",
+        "covers": "ghp_/gho_/ghu_/ghs_/ghr_ prefixes and underscore separator; 36-character body is tool-corroborated (checksum in the last six characters per github.blog/2021-04-05)"
+      },
+      "corroboratingScanners": [
+        "gitleaks 8.30.1",
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 42,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 305,
+        "differential": 0
+      },
+      "detectors": [
+        "github-token"
+      ],
+      "reason": "benign.minimumCases: 4 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 305 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+    },
+    {
+      "provider": "github",
+      "family": "github:classic-personal-access-token",
+      "familyName": "Classic personal access token",
+      "status": "provisional",
+      "evidenceTier": "T1",
+      "providerSource": {
+        "url": "https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/about-authentication-to-github#githubs-token-formats",
+        "observedAt": "2026-09-17",
+        "formatVersion": "2021-04 prefix scheme",
+        "covers": "ghp_/gho_/ghu_/ghs_/ghr_ prefixes and underscore separator; 36-character body is tool-corroborated (checksum in the last six characters per github.blog/2021-04-05)"
+      },
+      "corroboratingScanners": [
+        "gitleaks 8.30.1",
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 42,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 305,
+        "differential": 0
+      },
+      "detectors": [
+        "github-token"
+      ],
+      "reason": "benign.minimumCases: 4 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 305 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+    },
+    {
+      "provider": "github",
+      "family": "github:fine-grained-personal-access-token",
+      "familyName": "Fine-grained personal access token",
+      "status": "unsupported",
+      "evidenceTier": null,
+      "providerSource": null,
+      "corroboratingScanners": [],
+      "twinCoverage": null,
+      "unresolvedCriticalItems": null,
+      "detectors": [],
+      "reason": "Named explicitly in issue #502 as a family the github-token detector does not cover: its pattern only matches the ghp_/gho_/ghu_/ghs_/ghr_ underscore-plus-36-character-body shape, which github_pat_ does not fit. Provider source: https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/about-authentication-to-github#githubs-token-formats."
+    },
+    {
+      "provider": "github",
+      "family": "github:oauth-access-token",
+      "familyName": "OAuth access token",
+      "status": "provisional",
+      "evidenceTier": "T1",
+      "providerSource": {
+        "url": "https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/about-authentication-to-github#githubs-token-formats",
+        "observedAt": "2026-09-17",
+        "formatVersion": "2021-04 prefix scheme",
+        "covers": "ghp_/gho_/ghu_/ghs_/ghr_ prefixes and underscore separator; 36-character body is tool-corroborated (checksum in the last six characters per github.blog/2021-04-05)"
+      },
+      "corroboratingScanners": [
+        "gitleaks 8.30.1",
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 42,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 305,
+        "differential": 0
+      },
+      "detectors": [
+        "github-token"
+      ],
+      "reason": "benign.minimumCases: 4 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 305 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+    },
+    {
+      "provider": "github",
+      "family": "github:oauth-refresh-token",
+      "familyName": "OAuth refresh token",
+      "status": "provisional",
+      "evidenceTier": "T1",
+      "providerSource": {
+        "url": "https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/about-authentication-to-github#githubs-token-formats",
+        "observedAt": "2026-09-17",
+        "formatVersion": "2021-04 prefix scheme",
+        "covers": "ghp_/gho_/ghu_/ghs_/ghr_ prefixes and underscore separator; 36-character body is tool-corroborated (checksum in the last six characters per github.blog/2021-04-05)"
+      },
+      "corroboratingScanners": [
+        "gitleaks 8.30.1",
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 42,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 305,
+        "differential": 0
+      },
+      "detectors": [
+        "github-token"
+      ],
+      "reason": "benign.minimumCases: 4 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 305 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+    },
+    {
+      "provider": "gitlab",
+      "family": "gitlab:legacy-personal-access-token",
+      "familyName": "Legacy personal access token",
+      "status": "provisional",
+      "evidenceTier": "T1",
+      "providerSource": {
+        "url": "https://docs.gitlab.com/security/tokens/",
+        "observedAt": "2026-09-17",
+        "formatVersion": "token prefix table",
+        "covers": "glpat- prefix; 20-character legacy body is tool-corroborated, routable tokens are not covered"
+      },
+      "corroboratingScanners": [
+        "gitleaks 8.30.1",
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 7,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 40,
+        "differential": 0
+      },
+      "detectors": [
+        "gitlab-token"
+      ],
+      "reason": "benign.minimumCases: 4 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 40 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+    },
+    {
+      "provider": "gitlab",
+      "family": "gitlab:routable-personal-access-token",
+      "familyName": "Routable personal access token",
+      "status": "unsupported",
+      "evidenceTier": null,
+      "providerSource": null,
+      "corroboratingScanners": [],
+      "twinCoverage": null,
+      "unresolvedCriticalItems": null,
+      "detectors": [],
+      "reason": "gitlab-token's contract review states explicitly that routable tokens are not covered by the 20-character-body pattern. Provider source: https://docs.gitlab.com/security/tokens/."
+    },
+    {
+      "provider": "google",
+      "family": "google:generic-api-key",
+      "familyName": "Generic API key",
+      "status": "provisional",
+      "evidenceTier": "T2",
+      "providerSource": null,
+      "corroboratingScanners": [
+        "gitleaks 8.30.1"
+      ],
+      "twinCoverage": {
+        "pairs": 3,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 15,
+        "differential": 0
+      },
+      "detectors": [
+        "google-api-key"
+      ],
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 15 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+    },
+    {
+      "provider": "google",
+      "family": "google:oauth2-credential",
+      "familyName": "OAuth2 credential",
+      "status": "unsupported",
+      "evidenceTier": null,
+      "providerSource": null,
+      "corroboratingScanners": [],
+      "twinCoverage": null,
+      "unresolvedCriticalItems": null,
+      "detectors": [],
+      "reason": "google-api-key's contract review notes the pinned TruffleHog detectors separately cover Gemini and OAuth2 credentials, not this generic AIza API-key shape."
+    },
+    {
+      "provider": "grafana",
+      "family": "grafana:cloud-access-policy-token",
+      "familyName": "Cloud access policy token",
+      "status": "provisional",
+      "evidenceTier": "T2",
+      "providerSource": null,
+      "corroboratingScanners": [
+        "gitleaks 8.30.1"
+      ],
+      "twinCoverage": {
+        "pairs": 0,
+        "failures": 0,
+        "unprobeable": {
+          "reason": "The Grafana Cloud access-policies page states no token format at all, not even the glc_ prefix.",
+          "observedAt": "2026-09-20"
+        }
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 12,
+        "differential": 0
+      },
+      "detectors": [
+        "grafana-cloud-access-policy-token"
+      ],
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 12 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+    },
+    {
+      "provider": "grafana",
+      "family": "grafana:service-account-token",
+      "familyName": "Service account token",
+      "status": "provisional",
+      "evidenceTier": "T2",
+      "providerSource": null,
+      "corroboratingScanners": [
+        "gitleaks 8.30.1",
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 0,
+        "failures": 0,
+        "unprobeable": {
+          "reason": "grafana.com/docs/grafana/latest/administration/service-accounts shows one glsa_ example token in API requests and states no length, alphabet or checksum rule. An example is not a grammar.",
+          "observedAt": "2026-09-20"
+        }
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 15,
+        "differential": 0
+      },
+      "detectors": [
+        "grafana-service-account-token"
+      ],
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 15 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+    },
+    {
+      "provider": "hashicorp-vault",
+      "family": "hashicorp-vault:batch-token",
+      "familyName": "Batch token",
+      "status": "provisional",
+      "evidenceTier": "T1",
+      "providerSource": {
+        "url": "https://developer.hashicorp.com/vault/docs/concepts/tokens",
+        "observedAt": "2026-09-17",
+        "formatVersion": "hvs./hvb./hvr. prefixes, 24+ random characters",
+        "covers": "prefixes and minimum length; the provider states the structure is opaque, so the 90–120-character rule the pinned tools use is corroboration, not contract"
+      },
+      "corroboratingScanners": [
+        "gitleaks 8.30.1",
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 4,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 6,
+        "differential": 0
+      },
+      "detectors": [
+        "vault-token"
+      ],
+      "reason": "minimumTwinPairs: 4 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 6 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+    },
+    {
+      "provider": "hashicorp-vault",
+      "family": "hashicorp-vault:recovery-token",
+      "familyName": "Recovery token",
+      "status": "provisional",
+      "evidenceTier": "T1",
+      "providerSource": {
+        "url": "https://developer.hashicorp.com/vault/docs/concepts/tokens",
+        "observedAt": "2026-09-17",
+        "formatVersion": "hvs./hvb./hvr. prefixes, 24+ random characters",
+        "covers": "prefixes and minimum length; the provider states the structure is opaque, so the 90–120-character rule the pinned tools use is corroboration, not contract"
+      },
+      "corroboratingScanners": [
+        "gitleaks 8.30.1",
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 4,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 6,
+        "differential": 0
+      },
+      "detectors": [
+        "vault-token"
+      ],
+      "reason": "minimumTwinPairs: 4 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 6 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+    },
+    {
+      "provider": "hashicorp-vault",
+      "family": "hashicorp-vault:service-token",
+      "familyName": "Service token",
+      "status": "provisional",
+      "evidenceTier": "T1",
+      "providerSource": {
+        "url": "https://developer.hashicorp.com/vault/docs/concepts/tokens",
+        "observedAt": "2026-09-17",
+        "formatVersion": "hvs./hvb./hvr. prefixes, 24+ random characters",
+        "covers": "prefixes and minimum length; the provider states the structure is opaque, so the 90–120-character rule the pinned tools use is corroboration, not contract"
+      },
+      "corroboratingScanners": [
+        "gitleaks 8.30.1",
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 4,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 6,
+        "differential": 0
+      },
+      "detectors": [
+        "vault-token"
+      ],
+      "reason": "minimumTwinPairs: 4 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 6 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+    },
+    {
+      "provider": "huggingface",
+      "family": "huggingface:api-token",
+      "familyName": "API token",
+      "status": "provisional",
+      "evidenceTier": "T2",
+      "providerSource": null,
+      "corroboratingScanners": [
+        "gitleaks 8.30.1",
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 2,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 25,
+        "differential": 0
+      },
+      "detectors": [
+        "huggingface-token"
+      ],
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 2 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 25 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+    },
+    {
+      "provider": "linear",
+      "family": "linear:oauth-access-token",
+      "familyName": "OAuth access token",
+      "status": "unsupported",
+      "evidenceTier": null,
+      "providerSource": null,
+      "corroboratingScanners": [],
+      "twinCoverage": null,
+      "unresolvedCriticalItems": null,
+      "detectors": [],
+      "reason": "classifyFixture explicitly routes lin_oauth_ values to the \"needs a separate format contract; related detector support is not evidence of parity\" guard. Provider source: benchmarks/lib/assessment.ts (classifyFixture variant guard: \"Variant support must not be inferred from a related family name.\")."
+    },
+    {
+      "provider": "linear",
+      "family": "linear:personal-api-key",
+      "familyName": "Personal API key",
+      "status": "provisional",
+      "evidenceTier": "T2",
+      "providerSource": null,
+      "corroboratingScanners": [
+        "gitleaks 8.30.1",
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 5,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 25,
+        "differential": 0
+      },
+      "detectors": [
+        "linear-token"
+      ],
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 25 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+    },
+    {
+      "provider": "microsoft-entra",
+      "family": "microsoft-entra:application-client-secret",
+      "familyName": "Application client secret",
+      "status": "provisional",
+      "evidenceTier": "T2",
+      "providerSource": null,
+      "corroboratingScanners": [
+        "gitleaks 8.30.1"
+      ],
+      "twinCoverage": {
+        "pairs": 0,
+        "failures": 0,
+        "unprobeable": {
+          "reason": "learn.microsoft.com/entra/identity-platform/how-to-add-credentials says only to record the secret Value; it states no length, alphabet or marker.",
+          "observedAt": "2026-09-20"
+        }
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 3,
+        "differential": 0
+      },
+      "detectors": [
+        "microsoft-entra-client-secret"
+      ],
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 3 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+    },
+    {
+      "provider": "new-relic",
+      "family": "new-relic:license-key",
+      "familyName": "License key",
+      "status": "provisional",
+      "evidenceTier": "T3",
+      "providerSource": null,
+      "corroboratingScanners": [],
+      "twinCoverage": {
+        "pairs": 3,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 0,
+        "differential": 0
+      },
+      "detectors": [
+        "new-relic-license-key"
+      ],
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family."
+    },
+    {
+      "provider": "new-relic",
+      "family": "new-relic:user-api-key",
+      "familyName": "User API key",
+      "status": "provisional",
+      "evidenceTier": "T2",
+      "providerSource": null,
+      "corroboratingScanners": [
+        "gitleaks 8.30.1",
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 0,
+        "failures": 0,
+        "unprobeable": {
+          "reason": "docs.newrelic.com/docs/apis/intro-apis/new-relic-api-keys states no user-key prefix, length or alphabet. The NRAK- prefix is known only from a Terraform migration guide and the pinned tools.",
+          "observedAt": "2026-09-20"
+        }
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 15,
+        "differential": 0
+      },
+      "detectors": [
+        "new-relic-user-api-key"
+      ],
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 15 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+    },
+    {
+      "provider": "notion",
+      "family": "notion:integration-token",
+      "familyName": "Integration token",
+      "status": "unsupported",
+      "evidenceTier": null,
+      "providerSource": null,
+      "corroboratingScanners": [],
+      "twinCoverage": null,
+      "unresolvedCriticalItems": null,
+      "detectors": [],
+      "reason": "notion-token's contract review states this current ntn_-prefixed format has no contract here; the pinned gitleaks rule targets it instead of the legacy secret_ shape."
+    },
+    {
+      "provider": "notion",
+      "family": "notion:legacy-integration-token",
+      "familyName": "Legacy integration token",
+      "status": "provisional",
+      "evidenceTier": "T2",
+      "providerSource": null,
+      "corroboratingScanners": [
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 3,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 15,
+        "differential": 0
+      },
+      "detectors": [
+        "notion-token"
+      ],
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 15 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+    },
+    {
+      "provider": "npm",
+      "family": "npm:granular-access-token",
+      "familyName": "Granular access token",
+      "status": "provisional",
+      "evidenceTier": "T1",
+      "providerSource": {
+        "url": "https://github.blog/changelog/2021-09-23-npm-has-a-new-access-token-format/",
+        "observedAt": "2026-09-17",
+        "formatVersion": "2021-09 npm_ prefix scheme",
+        "covers": "npm_ prefix, underscore delimiter and six-character Base62 CRC32 checksum; 36-character body is tool-corroborated"
+      },
+      "corroboratingScanners": [
+        "gitleaks 8.30.1",
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 6,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 40,
+        "differential": 0
+      },
+      "detectors": [
+        "npm-token"
+      ],
+      "reason": "benign.minimumCases: 4 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 40 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+    },
+    {
+      "provider": "npm",
+      "family": "npm:legacy-token",
+      "familyName": "Legacy token",
+      "status": "unsupported",
+      "evidenceTier": null,
+      "providerSource": null,
+      "corroboratingScanners": [],
+      "twinCoverage": null,
+      "unresolvedCriticalItems": null,
+      "detectors": [],
+      "reason": "npm-token's own provider source is the changelog announcing the npm_ prefix scheme as a replacement, implying the prior UUID-format token predates it; that legacy shape is not matched by the npm_-prefixed pattern. Provider source: https://github.blog/changelog/2021-09-23-npm-has-a-new-access-token-format/."
+    },
+    {
+      "provider": "openai",
+      "family": "openai:secret-api-key",
+      "familyName": "Secret API key",
+      "status": "provisional",
+      "evidenceTier": "T2",
+      "providerSource": null,
+      "corroboratingScanners": [
+        "gitleaks 8.30.1",
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 6,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 81,
+        "mutation": 39,
+        "differential": 0
+      },
+      "detectors": [
+        "openai-token"
+      ],
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | metamorphic.criticalFailures: 81 > 0 — A metamorphic invariant violation (for example, detection lost after an envelope-preserving transform) shows the detector is not robust to construction, independent of how many cases were run. | mutation.unresolvedCritical: 39 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+    },
+    {
+      "provider": "pypi",
+      "family": "pypi:api-token",
+      "familyName": "API token",
+      "status": "provisional",
+      "evidenceTier": "T1",
+      "providerSource": {
+        "url": "https://pypi.org/help/#apitoken",
+        "observedAt": "2026-09-17",
+        "formatVersion": "pypi- prefixed base64 macaroon",
+        "covers": "pypi- prefix and base64 macaroon body; no lexical length contract"
+      },
+      "corroboratingScanners": [
+        "gitleaks 8.30.1",
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 3,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 0,
+        "differential": 0
+      },
+      "detectors": [
+        "pypi-token"
+      ],
+      "reason": "minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family."
+    },
+    {
+      "provider": "sendgrid",
+      "family": "sendgrid:api-key",
+      "familyName": "API key",
+      "status": "provisional",
+      "evidenceTier": "T1",
+      "providerSource": {
+        "url": "https://support.sendgrid.com/hc/en-us/articles/44146758703387-Can-I-Use-a-Reduced-Shorter-API-Key-Size-in-SendGrid",
+        "observedAt": "2026-09-20",
+        "formatVersion": "fixed 69-character key length",
+        "covers": "the total key is documented as always 69 characters and never shorter; the SG. prefix, the dot-separated id/secret segments, the 22/43 character split between them and the alphabet are tool-corroborated, not this citation"
+      },
+      "corroboratingScanners": [
+        "gitleaks 8.30.1",
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 18,
+        "failures": 2,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 232,
+        "differential": 3
+      },
+      "detectors": [
+        "sendgrid-token"
+      ],
+      "reason": "twinFailures: 2 > 0 — A twin failure is a recorded false negative on the exact discrimination this project exists to make; stable tolerates none, however small the sample. | mutation.unresolvedCritical: 232 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review. | differential.unresolvedContractDisagreements: 3 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+    },
+    {
+      "provider": "sentry",
+      "family": "sentry:organization-auth-token",
+      "familyName": "Organization auth token",
+      "status": "provisional",
+      "evidenceTier": "T2",
+      "providerSource": null,
+      "corroboratingScanners": [
+        "gitleaks 8.30.1",
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 0,
+        "failures": 0,
+        "unprobeable": {
+          "reason": "docs.sentry.io/account/auth-tokens states no prefix, length, alphabet or payload structure for organization auth tokens.",
+          "observedAt": "2026-09-20"
+        }
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 15,
+        "differential": 0
+      },
+      "detectors": [
+        "sentry-org-auth-token"
+      ],
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 15 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+    },
+    {
+      "provider": "sentry",
+      "family": "sentry:user-auth-token",
+      "familyName": "User auth token",
+      "status": "provisional",
+      "evidenceTier": "T2",
+      "providerSource": null,
+      "corroboratingScanners": [
+        "gitleaks 8.30.1"
+      ],
+      "twinCoverage": {
+        "pairs": 0,
+        "failures": 0,
+        "unprobeable": {
+          "reason": "docs.sentry.io/account/auth-tokens states no prefix, length, alphabet or payload structure for user auth tokens.",
+          "observedAt": "2026-09-20"
+        }
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 18,
+        "differential": 0
+      },
+      "detectors": [
+        "sentry-user-auth-token"
+      ],
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 18 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+    },
+    {
+      "provider": "shopify",
+      "family": "shopify:custom-app-access-token",
+      "familyName": "Custom app access token",
+      "status": "provisional",
+      "evidenceTier": "T1",
+      "providerSource": {
+        "url": "https://shopify.dev/docs/apps/build/authentication-authorization/access-tokens",
+        "observedAt": "2026-09-17",
+        "formatVersion": "shpat_/shppa_ opaque tokens",
+        "covers": "shpat_ and shppa_ prefixes; 32-hex body is tool-corroborated"
+      },
+      "corroboratingScanners": [
+        "gitleaks 8.30.1",
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 4,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 24,
+        "differential": 0
+      },
+      "detectors": [
+        "shopify-token"
+      ],
+      "reason": "minimumTwinPairs: 4 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 24 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+    },
+    {
+      "provider": "shopify",
+      "family": "shopify:public-app-access-token",
+      "familyName": "Public app access token",
+      "status": "provisional",
+      "evidenceTier": "T1",
+      "providerSource": {
+        "url": "https://shopify.dev/docs/apps/build/authentication-authorization/access-tokens",
+        "observedAt": "2026-09-17",
+        "formatVersion": "shpat_/shppa_ opaque tokens",
+        "covers": "shpat_ and shppa_ prefixes; 32-hex body is tool-corroborated"
+      },
+      "corroboratingScanners": [
+        "gitleaks 8.30.1",
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 4,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 24,
+        "differential": 0
+      },
+      "detectors": [
+        "shopify-token"
+      ],
+      "reason": "minimumTwinPairs: 4 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 24 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+    },
+    {
+      "provider": "slack",
+      "family": "slack:app-level-token",
+      "familyName": "App-level token",
+      "status": "unsupported",
+      "evidenceTier": null,
+      "providerSource": null,
+      "corroboratingScanners": [],
+      "twinCoverage": null,
+      "unresolvedCriticalItems": null,
+      "detectors": [],
+      "reason": "Documented alongside xoxb- in the same provider prefix table; not matched by the bot-token-only pattern. Provider source: https://docs.slack.dev/authentication/tokens."
+    },
+    {
+      "provider": "slack",
+      "family": "slack:bot-token",
+      "familyName": "Bot token",
+      "status": "provisional",
+      "evidenceTier": "T1",
+      "providerSource": {
+        "url": "https://docs.slack.dev/authentication/tokens",
+        "observedAt": "2026-09-17",
+        "formatVersion": "xoxb-/xoxp-/xapp-/xwfp- prefixes, dash-separated sections",
+        "covers": "prefixes and section structure with the secret last; numeric section widths and 24-character secret are tool-corroborated"
+      },
+      "corroboratingScanners": [
+        "gitleaks 8.30.1",
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 4,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 27,
+        "mutation": 33,
+        "differential": 0
+      },
+      "detectors": [
+        "slack-token"
+      ],
+      "reason": "minimumTwinPairs: 4 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 4 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | metamorphic.criticalFailures: 27 > 0 — A metamorphic invariant violation (for example, detection lost after an envelope-preserving transform) shows the detector is not robust to construction, independent of how many cases were run. | mutation.unresolvedCritical: 33 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+    },
+    {
+      "provider": "slack",
+      "family": "slack:user-token",
+      "familyName": "User token",
+      "status": "unsupported",
+      "evidenceTier": null,
+      "providerSource": null,
+      "corroboratingScanners": [],
+      "twinCoverage": null,
+      "unresolvedCriticalItems": null,
+      "detectors": [],
+      "reason": "slack-token's contract lists xoxp- among the provider-documented prefixes but its pattern only matches xoxb-. Provider source: https://docs.slack.dev/authentication/tokens."
+    },
+    {
+      "provider": "slack",
+      "family": "slack:workflow-webhook-token",
+      "familyName": "Workflow webhook token",
+      "status": "unsupported",
+      "evidenceTier": null,
+      "providerSource": null,
+      "corroboratingScanners": [],
+      "twinCoverage": null,
+      "unresolvedCriticalItems": null,
+      "detectors": [],
+      "reason": "classifyFixture explicitly routes xwfp- values to the \"needs a separate format contract\" guard. Provider source: benchmarks/lib/assessment.ts (classifyFixture variant guard: \"Variant support must not be inferred from a related family name.\")."
+    },
+    {
+      "provider": "stripe",
+      "family": "stripe:organization-api-key",
+      "familyName": "Organization API key",
+      "status": "unsupported",
+      "evidenceTier": null,
+      "providerSource": null,
+      "corroboratingScanners": [],
+      "twinCoverage": null,
+      "unresolvedCriticalItems": null,
+      "detectors": [],
+      "reason": "classifyFixture explicitly routes sk_org_ values to \"this variant needs a separate format contract; related detector support is not evidence of parity\", so it is not claimed by stripe-token's live/test secret-key pattern. Provider source: benchmarks/lib/assessment.ts (classifyFixture variant guard: \"Variant support must not be inferred from a related family name.\")."
+    },
+    {
+      "provider": "stripe",
+      "family": "stripe:restricted-key-live",
+      "familyName": "Live restricted key",
+      "status": "provisional",
+      "evidenceTier": "T1",
+      "providerSource": {
+        "url": "https://docs.stripe.com/keys",
+        "observedAt": "2026-09-17",
+        "formatVersion": "sk_/rk_/pk_ key types",
+        "covers": "sk_live_/sk_test_/rk_live_/rk_test_ secret and restricted keys, pk_ publishable keys documented as safe to expose, sk_org_ organization keys; 32-character body is tool-corroborated"
+      },
+      "corroboratingScanners": [
+        "gitleaks 8.30.1",
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 4,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 80,
+        "differential": 0
+      },
+      "detectors": [
+        "stripe-token"
+      ],
+      "reason": "minimumTwinPairs: 4 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 80 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+    },
+    {
+      "provider": "stripe",
+      "family": "stripe:restricted-key-test",
+      "familyName": "Test restricted key",
+      "status": "provisional",
+      "evidenceTier": "T1",
+      "providerSource": {
+        "url": "https://docs.stripe.com/keys",
+        "observedAt": "2026-09-17",
+        "formatVersion": "sk_/rk_/pk_ key types",
+        "covers": "sk_live_/sk_test_/rk_live_/rk_test_ secret and restricted keys, pk_ publishable keys documented as safe to expose, sk_org_ organization keys; 32-character body is tool-corroborated"
+      },
+      "corroboratingScanners": [
+        "gitleaks 8.30.1",
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 4,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 80,
+        "differential": 0
+      },
+      "detectors": [
+        "stripe-token"
+      ],
+      "reason": "minimumTwinPairs: 4 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 80 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+    },
+    {
+      "provider": "stripe",
+      "family": "stripe:secret-key-live",
+      "familyName": "Live secret key",
+      "status": "provisional",
+      "evidenceTier": "T1",
+      "providerSource": {
+        "url": "https://docs.stripe.com/keys",
+        "observedAt": "2026-09-17",
+        "formatVersion": "sk_/rk_/pk_ key types",
+        "covers": "sk_live_/sk_test_/rk_live_/rk_test_ secret and restricted keys, pk_ publishable keys documented as safe to expose, sk_org_ organization keys; 32-character body is tool-corroborated"
+      },
+      "corroboratingScanners": [
+        "gitleaks 8.30.1",
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 4,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 80,
+        "differential": 0
+      },
+      "detectors": [
+        "stripe-token"
+      ],
+      "reason": "minimumTwinPairs: 4 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 80 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+    },
+    {
+      "provider": "stripe",
+      "family": "stripe:secret-key-test",
+      "familyName": "Test secret key",
+      "status": "provisional",
+      "evidenceTier": "T1",
+      "providerSource": {
+        "url": "https://docs.stripe.com/keys",
+        "observedAt": "2026-09-17",
+        "formatVersion": "sk_/rk_/pk_ key types",
+        "covers": "sk_live_/sk_test_/rk_live_/rk_test_ secret and restricted keys, pk_ publishable keys documented as safe to expose, sk_org_ organization keys; 32-character body is tool-corroborated"
+      },
+      "corroboratingScanners": [
+        "gitleaks 8.30.1",
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 4,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 80,
+        "differential": 0
+      },
+      "detectors": [
+        "stripe-token"
+      ],
+      "reason": "minimumTwinPairs: 4 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 80 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+    },
+    {
+      "provider": "stripe",
+      "family": "stripe:webhook-signing-secret",
+      "familyName": "Webhook signing secret",
+      "status": "unsupported",
+      "evidenceTier": null,
+      "providerSource": null,
+      "corroboratingScanners": [],
+      "twinCoverage": null,
+      "unresolvedCriticalItems": null,
+      "detectors": [],
+      "reason": "Same classifyFixture guard as the organization API key covers whsec_ values; stripe-token's pattern does not match them. Provider source: benchmarks/lib/assessment.ts (classifyFixture variant guard: \"Variant support must not be inferred from a related family name.\")."
+    },
+    {
+      "provider": "supabase",
+      "family": "supabase:personal-access-token",
+      "familyName": "Personal access token",
+      "status": "unsupported",
+      "evidenceTier": null,
+      "providerSource": null,
+      "corroboratingScanners": [],
+      "twinCoverage": null,
+      "unresolvedCriticalItems": null,
+      "detectors": [],
+      "reason": "supabase-token's contract review notes the pinned TruffleHog detector instead covers sbp_ management tokens, a distinct family from the sb_secret_ project key this project's detector targets."
+    },
+    {
+      "provider": "supabase",
+      "family": "supabase:secret-key",
+      "familyName": "Project secret key",
+      "status": "pending",
+      "evidenceTier": "T0",
+      "providerSource": null,
+      "corroboratingScanners": [
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 0,
+        "failures": 0,
+        "unprobeable": {
+          "reason": "The positive is T0 pending, so no pair can be scored. The provider page documents sb_publishable_ as safe to expose, so a public-prefix twin is expressible; it is deferred until body evidence lifts the positive out of T0.",
+          "observedAt": "2026-09-20"
+        }
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 0,
+        "differential": 0
+      },
+      "detectors": [
+        "supabase-token"
+      ],
+      "reason": "positiveContractTier T0 — Tier T0 means no positive fixture has cleared review yet, so nothing about detection accuracy can be claimed for this family; pending is the only honest label."
+    },
+    {
+      "provider": "telegram",
+      "family": "telegram:bot-token",
+      "familyName": "Bot token",
+      "status": "provisional",
+      "evidenceTier": "T2",
+      "providerSource": null,
+      "corroboratingScanners": [
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 0,
+        "failures": 0,
+        "unprobeable": {
+          "reason": "core.telegram.org/bots/api says the token \"looks something like\" one example and states no digit count, separator rule, length or alphabet. An example is not a grammar.",
+          "observedAt": "2026-09-20"
+        }
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 9,
+        "differential": 0
+      },
+      "detectors": [
+        "telegram-bot-token"
+      ],
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 9 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+    },
+    {
+      "provider": "twilio",
+      "family": "twilio:api-key-secret",
+      "familyName": "API key secret",
+      "status": "provisional",
+      "evidenceTier": "T2",
+      "providerSource": null,
+      "corroboratingScanners": [
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 0,
+        "failures": 0,
+        "unprobeable": {
+          "reason": "twilio.com/docs/iam/api-keys states no length or alphabet for the API key secret or its SID. The 32-character shape is tool-corroborated only.",
+          "observedAt": "2026-09-20"
+        }
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 0,
+        "differential": 0
+      },
+      "detectors": [
+        "twilio-api-key-secret"
+      ],
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family."
+    },
+    {
+      "provider": "twilio",
+      "family": "twilio:auth-token",
+      "familyName": "Account auth token",
+      "status": "provisional",
+      "evidenceTier": "T2",
+      "providerSource": null,
+      "corroboratingScanners": [
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 0,
+        "failures": 0,
+        "unprobeable": {
+          "reason": "twilio.com/docs/iam/credentials/api states no length or alphabet for the Auth Token or the Account SID. The 32-hex shape is tool-corroborated only.",
+          "observedAt": "2026-09-20"
+        }
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 0,
+        "differential": 0
+      },
+      "detectors": [
+        "twilio-auth-token"
+      ],
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family."
+    },
+    {
+      "provider": "vercel",
+      "family": "vercel:access-token",
+      "familyName": "Access token",
+      "status": "pending",
+      "evidenceTier": "T0",
+      "providerSource": null,
+      "corroboratingScanners": [
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 0,
+        "failures": 0,
+        "unprobeable": {
+          "reason": "The positive is T0 pending. Vercel documents the prefixes as scanning markers but states the body is intentionally opaque, so no lexical grammar exists to mutate; deferred to redact-secret#516.",
+          "observedAt": "2026-09-20"
+        }
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 0,
+        "differential": 0
+      },
+      "detectors": [
+        "vercel-token"
+      ],
+      "reason": "positiveContractTier T0 — Tier T0 means no positive fixture has cleared review yet, so nothing about detection accuracy can be claimed for this family; pending is the only honest label."
+    }
+  ]
+}
