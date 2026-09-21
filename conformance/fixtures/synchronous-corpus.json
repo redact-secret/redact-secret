@@ -3670,26 +3670,26 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "xoxp-SYNTHETIC_REVOKED_SYNTHET\nxapp-SYNTHETIC_REVOKED_SYNTHET\nxwfp-SYNTHETIC_REVOKED_SYNTHET\nxoxe-SYNTHETIC_REVOKED_SYNTHET\nxoxe.xoxb-SYNTHETIC_REVOKED_SYNTHET\nxoxe.xoxp-SYNTHETIC_REVOKED_SYNTHET",
+      "input": "xoxp-SYNTHETIC_REVOKED_01\nxapp-SYNTHETIC_REVOKED_01\nxwfp-SYNTHETIC_REVOKED_01\nxoxe-SYNTHETIC_REVOKED_01\nxoxe.xoxb-SYNTHETIC_REVOKED_01\nxoxe.xoxp-SYNTHETIC_REVOKED_01",
       "expected": [
         {
           "detector": "slack-token",
           "type": "slack_token",
           "confidence": "high",
           "specificity": "provider",
-          "start": 31,
-          "end": 61
+          "start": 26,
+          "end": 51
         },
         {
           "detector": "slack-token",
           "type": "slack_token",
           "confidence": "high",
           "specificity": "provider",
-          "start": 62,
-          "end": 92
+          "start": 52,
+          "end": 77
         }
       ],
-      "note": "Reclassified by issue #512 (docs/decisions/2026-09-20-freeze-slack-user-and-rotation-token-grammar.md): `xoxp-`, `xoxe-`, `xoxe.xoxb-`, and `xoxe.xoxp-` now require their own documented digit section, which none of these opaque bodies carry, so slack-token no longer claims them; `xapp-` and `xwfp-` are not promoted and still match at their original ranges. Input unchanged; expectation corrected. `slack-positive-structural-prefixes` is the corrected counterpart demonstrating every promoted family's full grammar."
+      "note": "Reclassified by issue #512 (docs/decisions/2026-09-20-freeze-slack-user-and-rotation-token-grammar.md): `xoxp-`, `xoxe-`, `xoxe.xoxb-`, and `xoxe.xoxp-` now require their own documented digit section, which none of these opaque bodies carry, so slack-token no longer claims them; `xapp-` and `xwfp-` are not promoted and still match at their original ranges. Issue #551: every opaque body here is now exactly 20 bytes (previously 25) -- the interim guards it exercises stopped accepting an open-ended run past their floor, so a longer body would no longer match at all; the fixture keeps demonstrating the same reclassification at the guards' new exact length. `slack-positive-structural-prefixes` is the corrected counterpart demonstrating every promoted family's full grammar."
     },
     {
       "id": "slack-positive-structural-prefixes",
@@ -3700,7 +3700,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICUSERSECRETVALUEFIX1\nxoxe-1-SYNTHETICROTATIONVALUEFIXTUREPADDING00\nxoxe.xoxb-1-SYNTHETICROTATIONVALUEFIXTUREPADDING01\nxoxe.xoxp-1-SYNTHETICROTATIONVALUEFIXTUREPADDING02",
+      "input": "xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICUSERSECRETVALUEFIX1\nxoxe-1-SYNTHETICROTATION001\nxoxe.xoxb-1-SYNTHETICROTATION001\nxoxe.xoxp-1-SYNTHETICROTATION001",
       "expected": [
         {
           "detector": "slack-token",
@@ -3716,26 +3716,26 @@
           "confidence": "high",
           "specificity": "provider",
           "start": 76,
-          "end": 121
+          "end": 103
         },
         {
           "detector": "slack-token",
           "type": "slack_token",
           "confidence": "high",
           "specificity": "provider",
-          "start": 122,
-          "end": 172
+          "start": 104,
+          "end": 136
         },
         {
           "detector": "slack-token",
           "type": "slack_token",
           "confidence": "high",
           "specificity": "provider",
-          "start": 173,
-          "end": 223
+          "start": 137,
+          "end": 169
         }
       ],
-      "note": "Issue #512 (docs/decisions/2026-09-20-freeze-slack-user-and-rotation-token-grammar.md): each of the four newly-promoted families (user, refresh, rotating-bot, rotating-user) is independently detected at its own full documented section grammar, the corrected counterpart of `slack-positive-all-prefixes` for these four prefixes."
+      "note": "Issue #512 (docs/decisions/2026-09-20-freeze-slack-user-and-rotation-token-grammar.md): each of the four newly-promoted families (user, refresh, rotating-bot, rotating-user) is independently detected at its own full documented section grammar, the corrected counterpart of `slack-positive-all-prefixes` for these four prefixes. Issue #551: the rotation tail is now exactly 20 bytes (previously any run of 20 or more), so its three fixtures here use a 20-byte tail rather than the earlier longer one."
     },
     {
       "id": "slack-boundary-user-no-section-grammar",
@@ -6581,7 +6581,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "lin_oauth_SYNTHETIC_REVOKED_SYNTHET",
+      "input": "lin_oauth_SYNTHETIC_REVOKED_01",
       "expected": [
         {
           "detector": "linear-token",
@@ -6589,10 +6589,10 @@
           "confidence": "high",
           "specificity": "provider",
           "start": 0,
-          "end": 35
+          "end": 30
         }
       ],
-      "note": "Every remaining documented prefix variant is independently supported."
+      "note": "Every remaining documented prefix variant is independently supported. Issue #551: `lin_oauth_`'s body is now exactly 20 bytes (previously any run of 20 or more), so this fixture's body shrank to match."
     },
     {
       "id": "linear-adversarial-long-suffix",

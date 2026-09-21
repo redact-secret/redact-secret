@@ -930,6 +930,43 @@ mod tests {
         }
     }
 
+    /// Issue #551: the shared boundary/delimiter regression set, mirrored
+    /// from `digitalocean-token`'s existing leading/trailing/dash
+    /// identifier-embedding fixtures, for every `docker-token` and
+    /// `digitalocean-token` shape here. `vercel-token` is deliberately
+    /// excluded: it is not one of the seven families this issue covers, and
+    /// unlike these two it is still an open-floor `RunLength::AtLeast` shape
+    /// (opaque suffix, no documented maximum) matched against its own
+    /// boundary alphabet, so it carries the same live defect `lin_oauth_`
+    /// and Slack's remaining interim guards had (see `super::linear` and
+    /// `super::slack`) -- out of scope for a family this issue does not
+    /// name.
+    #[test]
+    fn infra_providers_reject_every_shape_embedded_in_a_wider_identifier_leading_trailing_or_dash_joined()
+     {
+        for variant in infra_provider_variants()
+            .into_iter()
+            .filter(|variant| variant.detector.id() != "vercel-token")
+        {
+            let value = format!("{}{}", variant.prefix, variant.body);
+            assert!(
+                detect(variant.detector, &format!("legacy{value}")).is_empty(),
+                "{} leading",
+                variant.detector.id()
+            );
+            assert!(
+                detect(variant.detector, &format!("{value}_backup")).is_empty(),
+                "{} trailing",
+                variant.detector.id()
+            );
+            assert!(
+                detect(variant.detector, &format!("{value}-1")).is_empty(),
+                "{} dash",
+                variant.detector.id()
+            );
+        }
+    }
+
     #[test]
     fn infra_providers_reject_case_changed_wrong_prefixes() {
         for variant in infra_provider_variants() {
@@ -1157,6 +1194,17 @@ mod tests {
         assert_eq!(detect(&HUGGING_FACE, &value).len(), 0);
     }
 
+    /// Issue #551: the shared boundary/delimiter regression set, mirrored
+    /// from `digitalocean-token`'s existing leading/trailing/dash
+    /// identifier-embedding fixtures, for `huggingface-token`'s `hf_` shape.
+    #[test]
+    fn hf_rejects_every_embedding_shape_leading_trailing_or_dash_joined() {
+        let value = format!("hf_{HUGGING_FACE_BODY}");
+        assert!(detect(&HUGGING_FACE, &format!("legacy{value}")).is_empty());
+        assert!(detect(&HUGGING_FACE, &format!("{value}_backup")).is_empty());
+        assert!(detect(&HUGGING_FACE, &format!("{value}-1")).is_empty());
+    }
+
     #[test]
     fn application_providers_reject_a_percent_encoded_delimiter_lookalike() {
         assert_eq!(
@@ -1301,6 +1349,19 @@ mod tests {
             let value = format!("api_org_{body}");
             assert_eq!(detect(&HUGGING_FACE, &value).len(), 0, "{value}");
         }
+    }
+
+    /// Issue #551: the shared boundary/delimiter regression set, mirrored
+    /// from `digitalocean-token`'s existing leading/trailing/dash
+    /// identifier-embedding fixtures, for `huggingface-token`'s `api_org_`
+    /// shape.
+    #[test]
+    fn huggingface_organization_token_rejects_every_embedding_shape_leading_trailing_or_dash_joined()
+     {
+        let value = format!("api_org_{HUGGING_FACE_BODY}");
+        assert!(detect(&HUGGING_FACE, &format!("legacy{value}")).is_empty());
+        assert!(detect(&HUGGING_FACE, &format!("{value}_backup")).is_empty());
+        assert!(detect(&HUGGING_FACE, &format!("{value}-1")).is_empty());
     }
 
     /// Issue #485: the `hf_`/`api_org_` alphabet conflict (gitleaks:
