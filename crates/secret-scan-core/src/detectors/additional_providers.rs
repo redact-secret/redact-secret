@@ -81,9 +81,55 @@ impl Detector for KnownFormatProviderDetector {
 /// credentials. The suffix alphabet is `[A-Za-z0-9]` — narrower than the
 /// `[A-Za-z0-9_-]` boundary — so a trailing `_` or `-` still rejects a
 /// truncated candidate. The publishable-key prefix (`pk_live_`,
-/// `pk_test_`) is deliberately excluded: it names a public identifier, not
-/// a secret, so treating it as a match would be a false positive. Newer or
-/// undocumented prefixes are false negatives until added.
+/// `pk_test_`) is deliberately excluded: Stripe's own key-types table
+/// (<https://docs.stripe.com/keys>, observed 2026-09-20) marks `pk_...` as
+/// "Safe to expose" — the only key type it does — so treating it as a match
+/// would be a false positive by the provider's own classification, not
+/// merely a naming convention this project inferred.
+///
+/// Issue #513 completes the family with `sk_org_` and `whsec_`, each on a
+/// narrower evidence bar than `sk_`/`rk_`'s: gitleaks' `stripe-access-token`
+/// rule (`(?:sk|rk)_(?:test|live|prod)_[a-zA-Z0-9]{10,99}`) and trufflehog's
+/// `stripe` detector (`[rs]k_live_[a-zA-Z0-9]{20,247}`) corroborate `sk_`
+/// and `rk_`'s `live`/`test` segments, but neither tool has a rule for
+/// `sk_org_` or `whsec_` — both are adopted on provider documentation alone
+/// (T1, prefix only; the 20-byte floor below is this family's existing
+/// support-policy choice, not independently evidenced for these two
+/// prefixes):
+///
+/// - `sk_org_` — the same key-types table documents an "Organization API
+///   key `sk_org_...`", "Safe to expose: No", same secret handling as an
+///   account-level secret or restricted key
+///   (<https://docs.stripe.com/keys>, observed 2026-09-20).
+///   `docs.stripe.com/keys/organization-api-keys` (observed 2026-09-20)
+///   states the prefix precisely — "Organization API keys are prefixed
+///   `sk_org`" — and, as a direct evidenced negative, that there is **no**
+///   `rk_org_` counterpart: "All organization API keys have the same
+///   `sk_org` prefix, regardless of their permission levels. (There's no
+///   `rk_org` prefix.)" That page also states organization keys "support
+///   sandboxes and live mode", but shows no literal example distinguishing
+///   the two the way `sk_live_`/`sk_test_` are shown elsewhere on
+///   `docs.stripe.com/keys`; without a documented literal for that segment,
+///   this shape stays flat (`sk_org_` plus one opaque run), the same
+///   evidence-bar reasoning `docs/decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md`
+///   applies elsewhere in this crate ("select the reviewed source ordering,
+///   never guess a literal"). A value with a `_`-delimited environment
+///   segment embedded after `sk_org_` (for example a hypothetical
+///   `sk_org_live_...`) is therefore an intentional false negative today:
+///   the embedded `_` ends the alnum run before this shape's 20-byte floor,
+///   the same way any other undocumented internal separator would.
+///   gitleaks' own environment enumeration additionally includes `prod`
+///   (`sk_prod_`/`rk_prod_`), which no Stripe page documents for any key
+///   type; adopting it is out of this issue's scope and is left unadded.
+/// - `whsec_` — `docs.stripe.com/webhooks` (observed 2026-09-20) states
+///   webhook signing secrets are "per-webhook secrets", separate from API
+///   keys, and shows the literal prefix directly: "a signing secret
+///   beginning with `whsec_` appears", "a `webhook_endpoint.signing_secret`
+///   value that starts with `whsec_`", and the verification-handler
+///   placeholder `endpoint_secret = 'whsec_...'`. No page states a length or
+///   alphabet for the value that follows, so this shape's 20-byte
+///   alnum-run floor is the same support-policy choice already applied to
+///   `sk_`/`rk_`, not an independent contract for `whsec_`.
 const STRIPE_SIGNALS: [&str; 2] = ["stripe-documented-prefix", "opaque-suffix"];
 
 pub(super) const STRIPE: KnownFormatProviderDetector = KnownFormatProviderDetector {
@@ -564,6 +610,10 @@ mod tests {
     fn does_not_classify_neighboring_public_or_identifier_only_formats() {
         for input in [
             format!("pk_live_{BODY}"),
+            // Issue #513: Stripe's sandbox-mode publishable key is
+            // documented exactly as safe to expose as its live-mode
+            // counterpart (docs.stripe.com/keys, observed 2026-09-20).
+            format!("pk_test_{BODY}"),
             format!("sb_publishable_{BODY}"),
             format!("SK{}", "0".repeat(32)),
             // An undocumented near-miss prefix (not one byte-for-byte equal to
@@ -574,6 +624,27 @@ mod tests {
         ] {
             assert_eq!(detect(&STRIPE, &input).len(), 0, "{input}");
             assert_eq!(detect(&SUPABASE, &input).len(), 0, "{input}");
+        }
+    }
+
+    /// Issue #513: `sk_org_`'s and `whsec_`'s own documented-absence and
+    /// separator near misses. `rk_org_` is a direct evidenced negative
+    /// (`docs.stripe.com/keys/organization-api-keys`, observed 2026-09-20:
+    /// "There's no `rk_org` prefix"), not merely an untested guess; the
+    /// remaining cases are missing- or wrong-separator variants of
+    /// `sk_org_`/`whsec_`, undocumented near-misses by the same
+    /// false-negative-by-design rule as `sk_liv_` above.
+    #[test]
+    fn rejects_organization_and_webhook_documented_absence_and_separator_near_misses() {
+        for input in [
+            format!("rk_org_{BODY}"),
+            format!("sk_org{BODY}"),
+            format!("sk_org-{BODY}"),
+            format!("whsec{BODY}"),
+            format!("whsec-{BODY}"),
+            format!("wh_sec_{BODY}"),
+        ] {
+            assert_eq!(detect(&STRIPE, &input).len(), 0, "{input}");
         }
     }
 
@@ -607,6 +678,23 @@ mod tests {
         let candidates = detect(&STRIPE, &input);
         assert_eq!(candidates.len(), 1);
         let expected_start = input.find("sk_live_").unwrap();
+        assert_eq!(
+            candidates[0].range(),
+            ByteRange::new(expected_start, input.len()).unwrap()
+        );
+    }
+
+    /// Issue #513: the same public/secret pairing in sandbox mode. Stripe
+    /// documents `pk_test_` as equally safe to expose as `pk_live_`
+    /// (docs.stripe.com/keys, observed 2026-09-20), so pairing it with a
+    /// real-shaped `sk_test_` secret in the same file must classify only
+    /// the secret half, the same as the live-mode pairing above.
+    #[test]
+    fn classifies_only_the_secret_half_of_a_mixed_public_and_secret_input_in_sandbox_mode() {
+        let input = format!("pk_test_SYNTHETICREVOKEDSYNT\nsk_test_{BODY}");
+        let candidates = detect(&STRIPE, &input);
+        assert_eq!(candidates.len(), 1);
+        let expected_start = input.find("sk_test_").unwrap();
         assert_eq!(
             candidates[0].range(),
             ByteRange::new(expected_start, input.len()).unwrap()
