@@ -1,0 +1,175 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:redact-secret-benchmarks:support-matrix-drift:1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "generatedAt", "taxonomySchemaVersion", "familyCount", "baseline", "candidate", "summary", "regressions", "improvements", "newAndUnclassified", "staleProviderProvenance"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "generatedAt": { "type": "string" },
+    "taxonomySchemaVersion": { "const": 1 },
+    "familyCount": { "type": "integer", "minimum": 0 },
+    "baseline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["generatedAt", "runId", "revision"],
+      "properties": {
+        "generatedAt": { "type": "string" },
+        "runId": { "type": "string" },
+        "revision": { "type": "string" }
+      }
+    },
+    "candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["generatedAt", "runId", "revision"],
+      "properties": {
+        "generatedAt": { "type": "string" },
+        "runId": { "type": "string" },
+        "revision": { "type": "string" }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["regressions", "improvements", "newAndUnclassified", "staleProviderProvenance"],
+      "properties": {
+        "regressions": { "type": "integer", "minimum": 0 },
+        "improvements": { "type": "integer", "minimum": 0 },
+        "newAndUnclassified": { "type": "integer", "minimum": 0 },
+        "staleProviderProvenance": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "regressions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["provider", "family", "familyName", "baselineStatus", "candidateStatus", "reason"],
+        "properties": {
+          "provider": { "type": ["string", "null"] },
+          "family": { "type": "string" },
+          "familyName": { "type": "string" },
+          "baselineStatus": { "const": "stable" },
+          "candidateStatus": { "enum": ["provisional", "pending", "unsupported"] },
+          "reason": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "improvements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["provider", "family", "familyName", "baselineStatus", "candidateStatus", "evidence"],
+        "properties": {
+          "provider": { "type": ["string", "null"] },
+          "family": { "type": "string" },
+          "familyName": { "type": "string" },
+          "baselineStatus": { "enum": ["provisional", "pending", "unsupported"] },
+          "candidateStatus": { "const": "stable" },
+          "evidence": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["evidenceTier", "providerSource", "corroboratingScanners", "twinCoverage", "unresolvedCriticalItems", "detectors"],
+            "properties": {
+              "evidenceTier": { "enum": ["T0", "T1", "T2", "T3", null] },
+              "providerSource": {
+                "type": ["object", "null"],
+                "additionalProperties": false,
+                "required": ["url", "observedAt", "formatVersion", "covers"],
+                "properties": {
+                  "url": { "type": "string" },
+                  "observedAt": { "type": "string" },
+                  "formatVersion": { "type": "string" },
+                  "covers": { "type": "string" }
+                }
+              },
+              "corroboratingScanners": { "type": "array", "items": { "type": "string" } },
+              "twinCoverage": {
+                "type": ["object", "null"],
+                "additionalProperties": false,
+                "required": ["pairs", "failures", "unprobeable"],
+                "properties": {
+                  "pairs": { "type": "integer", "minimum": 0 },
+                  "failures": { "type": "integer", "minimum": 0 },
+                  "unprobeable": {
+                    "type": ["object", "null"],
+                    "additionalProperties": false,
+                    "required": ["reason", "observedAt"],
+                    "properties": {
+                      "reason": { "type": "string", "minLength": 1 },
+                      "observedAt": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" }
+                    }
+                  }
+                }
+              },
+              "unresolvedCriticalItems": {
+                "type": ["object", "null"],
+                "additionalProperties": false,
+                "required": ["metamorphic", "mutation", "differential"],
+                "properties": {
+                  "metamorphic": { "type": "integer", "minimum": 0 },
+                  "mutation": { "type": "integer", "minimum": 0 },
+                  "differential": { "type": "integer", "minimum": 0 }
+                }
+              },
+              "detectors": { "type": "array", "items": { "type": "string" } }
+            }
+          }
+        }
+      }
+    },
+    "newAndUnclassified": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["provider", "family", "familyName", "status"],
+        "properties": {
+          "provider": { "type": ["string", "null"] },
+          "family": { "type": "string" },
+          "familyName": { "type": "string" },
+          "status": { "enum": ["stable", "provisional", "pending", "unsupported"] }
+        }
+      }
+    },
+    "staleProviderProvenance": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["provider", "family", "familyName", "baselineStatus", "candidateStatus", "baselineProviderSource", "candidateProviderSource"],
+        "properties": {
+          "provider": { "type": ["string", "null"] },
+          "family": { "type": "string" },
+          "familyName": { "type": "string" },
+          "baselineStatus": { "enum": ["stable", "provisional", "pending", "unsupported"] },
+          "candidateStatus": { "enum": ["stable", "provisional", "pending", "unsupported"] },
+          "baselineProviderSource": {
+            "type": ["object", "null"],
+            "additionalProperties": false,
+            "required": ["url", "observedAt", "formatVersion", "covers"],
+            "properties": {
+              "url": { "type": "string" },
+              "observedAt": { "type": "string" },
+              "formatVersion": { "type": "string" },
+              "covers": { "type": "string" }
+            }
+          },
+          "candidateProviderSource": {
+            "type": ["object", "null"],
+            "additionalProperties": false,
+            "required": ["url", "observedAt", "formatVersion", "covers"],
+            "properties": {
+              "url": { "type": "string" },
+              "observedAt": { "type": "string" },
+              "formatVersion": { "type": "string" },
+              "covers": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -33,6 +33,18 @@ this script fails loudly on, naming the artifact, the file, and both
 digests -- but the manifest is still written first, so `record-manifest`'s
 `if: always()` still leaves a durable record of a run that failed this
 check.
+
+Issue #511 adds a seventh, optional field: `support_matrix_drift`. The
+`support-matrix-drift` job in `artifact-qualification.yml` runs
+`scripts/check-support-matrix-drift.py` and already decided, at
+qualification time, whether an unacknowledged regression blocks this run --
+this script never re-derives that decision. It only carries the drift
+record that job wrote through to the durable manifest (acceptance criterion
+1), the same "record what a sibling job already decided" role
+`artifact_digests` plays for issue #528's digest comparisons, and validates
+that the value has the shape `check-support-matrix-drift.py` actually
+produces so a malformed value fails loudly rather than recording a manifest
+that looks complete but is not.
 """
 
 from __future__ import annotations
@@ -51,6 +63,8 @@ FIELDS = (
 )
 
 DIGEST_STAGES = ("built", "qualified", "published")
+
+DRIFT_SUMMARY_FIELDS = ("regressions", "improvements", "newAndUnclassified", "staleProviderProvenance")
 
 
 def normalize_artifact_digests(raw: dict) -> tuple[dict, list[str]]:
@@ -97,6 +111,31 @@ def normalize_artifact_digests(raw: dict) -> tuple[dict, list[str]]:
             )
         normalized[identity] = normalized_records
     return normalized, errors
+
+
+def normalize_support_matrix_drift(raw: dict) -> tuple[dict, list[str]]:
+    """Validate `support_matrix_drift`, returning `(normalized, errors)`.
+
+    An empty object means the job did not run for this candidate (e.g. no
+    prior release tag existed to diff against yet) and is recorded as-is,
+    not an error. A non-empty value must carry `summary`'s four counts --
+    the shape `check-support-matrix-drift.py`'s record always has -- so a
+    truncated or hand-edited value is caught here rather than silently
+    recorded. This never re-decides whether a regression was acceptable;
+    that decision already happened, at qualification time, in the job that
+    produced this value.
+    """
+    if not raw:
+        return {}, []
+    summary = raw.get("summary")
+    if not isinstance(summary, dict):
+        return {}, ["support_matrix_drift: missing or invalid 'summary'"]
+    errors = [
+        f"support_matrix_drift.summary.{field}: must be a non-negative integer"
+        for field in DRIFT_SUMMARY_FIELDS
+        if not isinstance(summary.get(field), int) or summary.get(field) < 0
+    ]
+    return (dict(raw), errors)
 
 
 def build_manifest(
@@ -163,6 +202,14 @@ def main(argv: list[str] | None = None) -> int:
             "{file, built, qualified, published, comparable, note} records (issue #528)"
         ),
     )
+    parser.add_argument(
+        "--support-matrix-drift",
+        default="{}",
+        help=(
+            "JSON object: the drift record `check-support-matrix-drift.py` wrote for this "
+            "candidate, or {} when the job did not run (issue #511)"
+        ),
+    )
     parser.add_argument("--out", required=True, type=Path)
     args = parser.parse_args(argv)
 
@@ -189,18 +236,31 @@ def main(argv: list[str] | None = None) -> int:
     artifact_digests, digest_errors = normalize_artifact_digests(raw_digests)
     manifest["artifact_digests"] = artifact_digests
 
-    # Written before the digest errors are evaluated: `record-manifest` runs
+    try:
+        raw_drift = json.loads(args.support_matrix_drift)
+    except json.JSONDecodeError as error:
+        print(f"ERROR --support-matrix-drift is not valid JSON: {error}", file=sys.stderr)
+        return 1
+    if not isinstance(raw_drift, dict):
+        print("ERROR --support-matrix-drift must be a JSON object", file=sys.stderr)
+        return 1
+    support_matrix_drift, drift_errors = normalize_support_matrix_drift(raw_drift)
+    manifest["support_matrix_drift"] = support_matrix_drift
+
+    all_errors = digest_errors + drift_errors
+
+    # Written before those errors are evaluated: `record-manifest` runs
     # `if: always()` specifically so a run that fails this new check still
     # leaves a durable record of what it observed, the same as any other
     # partial or failed release (issue #528 acceptance criterion 4).
     args.out.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
-    if digest_errors:
-        for error in digest_errors:
+    if all_errors:
+        for error in all_errors:
             print(f"ERROR {error}", file=sys.stderr)
         print(
             f"Recorded release manifest for {manifest['version']} at {args.out} "
-            f"({len(digest_errors)} artifact digest error(s))",
+            f"({len(all_errors)} error(s))",
             file=sys.stderr,
         )
         return 1
