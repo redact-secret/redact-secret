@@ -47,3 +47,4 @@ and [qualification follow-up](release-qualification-follow-up.md) describe beta.
 | Structural/contextual detector shape inventory (#475) | [Valid-but-non-secret shapes for generic-token, bearer-token, connection-string, jwt, cited fixtures](evidence/475/README.md) |
 | Google OAuth credential coverage evidence (#487) | [`GOCSPX-`/`1//`/`ya29.` tool-corroboration research; none adopted](evidence/487/README.md) |
 | Vercel credential taxonomy audit (#516) | [Prefix provenance, TruffleHog/gitleaks/flare-redact corroboration, per-class disposition](evidence/516/README.md) |
+| Google credential-family audit beyond `google-api-key` (#519) | [OAuth client secret, service-account private key, Gemini API credentials, OAuth refresh/access; per-family disposition and evidence tier](evidence/519/README.md) |

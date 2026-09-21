@@ -229,7 +229,13 @@ plaintext safety.
 
 ## Detection coverage
 
-Built-in Rust detection covers:
+<!-- support-matrix:start -->
+**Support status** (31 providers, 72 credential families; stable: 0, provisional: 53, pending: 2, unsupported: 17) -- generated from evaluation evidence, never hand-written. `provisional` means useful but evidence-incomplete, not "almost stable"; unsupported families are listed with their reason. See the full [support matrix](docs/support-matrix.md).
+<!-- support-matrix:end -->
+
+The list below states what a detector exists for, not how strong the
+evidence behind it is; see the support-status line above and the linked
+matrix for that. Built-in Rust detection covers:
 
 - PEM-style private-key blocks;
 - AWS access-key IDs;

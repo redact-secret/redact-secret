@@ -34,6 +34,9 @@ list is not proof that input contains no secrets.
 - [Rust workspace](rust-workspace.md), [Python packaging](python-packaging.md),
   and [artifact qualification](qualification.md)
 - [Detection coverage evidence](coverage/README.md)
+- [Support matrix](support-matrix.md): per-family status (`stable` /
+  `provisional` / `pending` / `unsupported`), generated from evaluation
+  evidence in [`redact-secret-benchmarks`](https://github.com/redact-secret/redact-secret-benchmarks)
 - [Detection reliability evidence](reference/detection-reliability.md)
 - [Review archive](audits/README.md) and [beta.2 final code review](audits/beta2-final-code-review.md)
 - [Changelog](../CHANGELOG.md), [security reporting](../SECURITY.md), and [MIT license](../LICENSE)

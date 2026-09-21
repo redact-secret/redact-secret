@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 1354,
+  "fixtureCount": 1359,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -8393,6 +8393,71 @@
         }
       ],
       "note": "A long delimited provider match remains deterministic and bounded."
+    },
+    {
+      "id": "google-negative-oauth-client-secret",
+      "detector": "google-api-key",
+      "kind": "negative",
+      "support": "intentionally-unsupported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "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ECRET0",
+      "expected": [],
+      "note": "Issue #519 (family audit): the OAuth client secret format Google issues since 2021-06 carries the literal `GOCSPX-` prefix, but no consulted source (Google's own OAuth 2.0 protocol page, gitleaks 8.30.1, trufflehog 3.97.4, flare-redact 1.6.1) corroborates a body length or alphabet for it -- see issue #487's evidence and docs/audits/evidence/367/precision-contracts.json's families.google-api-key.pending[oauth-client-secret] (T0). Recorded pending, not silently absent: this fixture pins the current, deliberate silence so a future grammar addition is a reviewed decision, not an accidental regression."
+    },
+    {
+      "id": "google-negative-oauth-refresh-token",
+      "detector": "google-api-key",
+      "kind": "negative",
+      "support": "intentionally-unsupported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "1//0eSYNTHETICREVOKEDGCLOUDREFRESHTOKEN0000000000000000000",
+      "expected": [],
+      "note": "Issue #519 (family audit): the `1//` OAuth refresh-token prefix has exactly one single-tool rule (flare-redact's `gcp_refresh_token`, an uncorroborated 20-160 byte open range) -- see issue #487's evidence and precision-contracts.json's families.google-api-key.pending[oauth-refresh-token] (T0). Not structurally meaningful enough to adopt: recorded pending, and this fixture pins the current silence deliberately."
+    },
+    {
+      "id": "google-negative-oauth-access-token",
+      "detector": "google-api-key",
+      "kind": "negative",
+      "support": "intentionally-unsupported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "ya29.SYNTHETICREVOKEDACCESSTOKEN00000000000000000000000000",
+      "expected": [],
+      "note": "Issue #519 (family audit): the `ya29.` OAuth access-token prefix has exactly one single-tool rule (trufflehog's `googleoauth2`, an open-ended minimum length with no ceiling) -- see issue #487's evidence and precision-contracts.json's families.google-api-key.pending[oauth-access-token] (T0). `ya29.` tokens are also short-lived by design, lowering detection value even if a grammar existed. Recorded pending, not silently absent; this fixture pins the current silence deliberately."
+    },
+    {
+      "id": "google-negative-oauth-client-id",
+      "detector": "google-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "000000000000-abc123def456ghi789jkl0mnopqrstu.apps.googleusercontent.com",
+      "expected": [],
+      "note": "Issue #519 (family audit): a Google OAuth 2.0 client ID identifies the calling application; Google's own OAuth documentation and its `apps.googleusercontent.com` issuance convention both treat it as a public identifier embedded in client-side code and redirect URIs, not a credential -- the accompanying client secret is the actual secret. It carries no `AIza`/`GOCSPX-`/`1//`/`ya29.` shape and is correctly never classified."
+    },
+    {
+      "id": "google-negative-service-account-email",
+      "detector": "google-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "synthetic-sa@synthetic-project.iam.gserviceaccount.com",
+      "expected": [],
+      "note": "Issue #519 (family audit): a service account's `client_email` identifies the account and is routinely logged, committed to IAM policy files, and shared for grant configuration; it carries no secret material of its own. The credential is the paired `private_key` PEM block, already covered by the private-key detector (see private-key-positive-json-service-account-export). A bare service-account email is correctly never classified by any detector."
     },
     {
       "id": "private-key-positive",
