@@ -68,7 +68,8 @@ pub(super) fn is_base64_body(byte: u8) -> bool {
     is_alnum(byte) || byte == b'+' || byte == b'/'
 }
 
-/// Whether a matched run must be an exact length or a documented minimum,
+/// Whether a matched run must be an exact length, a documented minimum, or
+/// an open-ended minimum guarded against the boundary defect below,
 /// mirroring a regex quantifier of `{n}` or `{n,}`.
 #[derive(Clone, Copy, Debug)]
 pub(super) enum RunLength {
@@ -78,8 +79,24 @@ pub(super) enum RunLength {
     /// short one.
     Exact(usize),
     /// `{n,}`: the run consumes the maximal available run, which must be at
-    /// least `n` bytes.
+    /// least `n` bytes. When this shape's `alphabet` is the same as the
+    /// scan's `boundary` (an interim guard with no narrower reviewed
+    /// alphabet), [`boundary_ok`]'s trailing half can never fire — a
+    /// maximal run is, by construction, never followed by another byte of
+    /// its own alphabet — so a directly-glued wider identifier
+    /// (`..._backup`, `...-1`) is silently absorbed as "more opaque
+    /// secret". [`RunLength::OpenFloor`] is the fix for that case; reach
+    /// for plain `AtLeast` only when `alphabet` is already narrower than
+    /// `boundary`, where the trailing check works unaided (see the bot and
+    /// user secret sections in `super::slack`).
     AtLeast(usize),
+    /// `{n,}`, but capped back to `n` when the byte immediately at the
+    /// floor is a dash or underscore: see [`open_floor_run_end`]. The fix
+    /// for the same-alphabet defect described on [`RunLength::AtLeast`],
+    /// used by the Slack and Linear interim guards that must accept an
+    /// unreviewed open-ended body without also swallowing a directly-glued
+    /// wider identifier.
+    OpenFloor(usize),
 }
 
 /// An extra structural check a matched run must pass, applied after the
@@ -143,6 +160,24 @@ impl<'a> PrefixShape<'a> {
         }
     }
 
+    /// `prefix` followed by an open floor of `len` alphabet bytes (see
+    /// [`RunLength::OpenFloor`]): at least `len`, capped back to `len` when
+    /// a directly-glued wider identifier starts right there.
+    pub(super) const fn open_floor(
+        prefix: &'a str,
+        len: usize,
+        alphabet: Alphabet,
+        signals: &'static [&'static str],
+    ) -> Self {
+        Self {
+            prefix,
+            run: RunLength::OpenFloor(len),
+            alphabet,
+            signals,
+            post_check: None,
+        }
+    }
+
     /// Attaches a [`PostCheck`] a match under this shape must also pass.
     pub(super) const fn with_post_check(mut self, post_check: PostCheck) -> Self {
         self.post_check = Some(post_check);
@@ -178,6 +213,35 @@ pub(super) fn boundary_ok(bytes: &[u8], start: usize, end: usize, boundary: Alph
     let before_ok = start == 0 || !boundary(bytes[start - 1]);
     let after_ok = end >= bytes.len() || !boundary(bytes[end]);
     before_ok && after_ok
+}
+
+/// The end of a [`RunLength::OpenFloor`] run: at least `floor` bytes
+/// starting at `cursor`, extended to the full `available` run unless the
+/// byte immediately at the floor is a dash or underscore, in which case the
+/// run is capped at the floor instead.
+///
+/// This is the fix for a shape whose alphabet is the same as its own
+/// trailing boundary check, where plain [`RunLength::AtLeast`] can never
+/// reject a directly-glued wider identifier: a maximal run is, by
+/// construction, never followed by another byte of its own alphabet, so
+/// [`boundary_ok`]'s trailing half is vacuously true at every such match. A
+/// directly-glued wider identifier (`..._backup`, `...-1`) always starts
+/// with a dash or underscore at that exact position, so capping the run
+/// there leaves that byte for the ordinary boundary check to reject on,
+/// while a plain alphanumeric extension — a longer opaque secret with no
+/// reviewed maximum — is still read in full.
+pub(super) fn open_floor_run_end(
+    bytes: &[u8],
+    cursor: usize,
+    floor: usize,
+    available: usize,
+) -> usize {
+    let floor_end = cursor + floor;
+    if available > floor && matches!(bytes.get(floor_end), Some(b'-' | b'_')) {
+        floor_end
+    } else {
+        cursor + available
+    }
 }
 
 /// Finds every non-overlapping `(prefix, run)` match, left to right, the way
@@ -278,6 +342,9 @@ pub(super) fn scan_prefixed_shapes(
         let matched_len = match shape.run {
             RunLength::Exact(len) if available >= len => len,
             RunLength::AtLeast(len) if available >= len => available,
+            RunLength::OpenFloor(len) if available >= len => {
+                open_floor_run_end(bytes, suffix_start, len, available) - suffix_start
+            }
             _ => {
                 start += 1;
                 continue;
@@ -355,6 +422,55 @@ mod tests {
             is_alnum_dash,
         );
         assert_eq!(matches, vec![(0, input.len())]);
+    }
+
+    /// A body past the floor with no dash or underscore right there is more
+    /// opaque secret, taken in full — the fix's whole point is that this no
+    /// longer requires an exact length.
+    #[test]
+    fn open_floor_run_extends_past_the_floor_when_not_delimited() {
+        let input = "hf_0123456789012345678901234";
+        let matches = scan_prefixed_runs(
+            input,
+            &["hf_"],
+            RunLength::OpenFloor(20),
+            is_alnum_dash,
+            is_alnum_dash,
+        );
+        assert_eq!(matches, vec![(0, input.len())]);
+    }
+
+    /// A dash or underscore landing exactly at the floor is a directly-glued
+    /// wider identifier (`..._backup`, `...-1`); the run is capped at the
+    /// floor instead of absorbing it, which then leaves that byte for
+    /// `boundary_ok` to reject the whole match on.
+    #[test]
+    fn open_floor_run_is_capped_and_rejected_when_delimited_at_the_floor() {
+        for suffix in ["_backup", "-1"] {
+            let input = format!("hf_{}{suffix}", "0".repeat(20));
+            let matches = scan_prefixed_runs(
+                &input,
+                &["hf_"],
+                RunLength::OpenFloor(20),
+                is_alnum_dash,
+                is_alnum_dash,
+            );
+            assert_eq!(matches, Vec::new(), "{suffix}");
+        }
+    }
+
+    #[test]
+    fn open_floor_run_end_extends_past_a_plain_alphanumeric_continuation() {
+        let bytes = b"01234567890123456789extra";
+        assert_eq!(open_floor_run_end(bytes, 0, 20, bytes.len()), bytes.len());
+    }
+
+    #[test]
+    fn open_floor_run_end_caps_at_the_floor_when_delimited() {
+        let bytes = b"01234567890123456789_backup";
+        assert_eq!(open_floor_run_end(bytes, 0, 20, bytes.len()), 20);
+        let bytes = b"01234567890123456789-1";
+        assert_eq!(open_floor_run_end(bytes, 0, 20, bytes.len()), 20);
     }
 
     #[test]
