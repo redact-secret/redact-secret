@@ -291,42 +291,42 @@ pub(crate) enum RulesetLoadError {
 /// `decision-define-declarative-detector-ruleset-contract`'s "Closed
 /// validator enum" and "Fail-closed loading rule" sections).
 ///
-/// This is [`RulesetLoadError`] translated one variant to one variant for
+/// This is `RulesetLoadError` translated one variant to one variant for
 /// bindings that need the class as data rather than as a private Rust enum.
-/// Like [`RulesetLoadError`], every variant is a content-free unit variant:
+/// Like `RulesetLoadError`, every variant is a content-free unit variant:
 /// no byte from the rejected ruleset is ever carried by one.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 #[non_exhaustive]
 pub enum RulesetErrorClass {
-    /// See [`RulesetLoadError::RulesetTooLarge`].
+    /// See `RulesetLoadError::RulesetTooLarge`.
     RulesetTooLarge,
-    /// See [`RulesetLoadError::UnknownRevision`].
+    /// See `RulesetLoadError::UnknownRevision`.
     UnknownRevision,
-    /// See [`RulesetLoadError::UnknownField`].
+    /// See `RulesetLoadError::UnknownField`.
     UnknownField,
-    /// See [`RulesetLoadError::UnsupportedConstruct`].
+    /// See `RulesetLoadError::UnsupportedConstruct`.
     UnsupportedConstruct,
-    /// See [`RulesetLoadError::UnknownAlphabet`].
+    /// See `RulesetLoadError::UnknownAlphabet`.
     UnknownAlphabet,
-    /// See [`RulesetLoadError::UnknownValidator`].
+    /// See `RulesetLoadError::UnknownValidator`.
     UnknownValidator,
-    /// See [`RulesetLoadError::SpecificityNotClaimable`].
+    /// See `RulesetLoadError::SpecificityNotClaimable`.
     SpecificityNotClaimable,
-    /// See [`RulesetLoadError::MissingField`].
+    /// See `RulesetLoadError::MissingField`.
     MissingField,
-    /// See [`RulesetLoadError::PrefixTooShort`].
+    /// See `RulesetLoadError::PrefixTooShort`.
     PrefixTooShort,
-    /// See [`RulesetLoadError::PrefixTooLong`].
+    /// See `RulesetLoadError::PrefixTooLong`.
     PrefixTooLong,
-    /// See [`RulesetLoadError::RunLengthOutOfBounds`].
+    /// See `RulesetLoadError::RunLengthOutOfBounds`.
     RunLengthOutOfBounds,
-    /// See [`RulesetLoadError::TooManyDetectors`].
+    /// See `RulesetLoadError::TooManyDetectors`.
     TooManyDetectors,
-    /// See [`RulesetLoadError::DuplicateDetectorId`].
+    /// See `RulesetLoadError::DuplicateDetectorId`.
     DuplicateDetectorId,
-    /// See [`RulesetLoadError::ReservedDetectorId`].
+    /// See `RulesetLoadError::ReservedDetectorId`.
     ReservedDetectorId,
-    /// See [`RulesetLoadError::EmptyRuleset`].
+    /// See `RulesetLoadError::EmptyRuleset`.
     EmptyRuleset,
 }
 
@@ -454,7 +454,7 @@ impl std::error::Error for RulesetError {}
 /// Every returned detector claims [`Confidence::Medium`](crate::Confidence::Medium)
 /// and either [`Specificity::Entropy`] or [`Specificity::Contextual`] —
 /// never [`Specificity::Structural`], [`Specificity::Provider`], or
-/// [`Specificity::PrivateKey`], which [`parse_ruleset`] already refuses to
+/// [`Specificity::PrivateKey`], which `parse_ruleset` already refuses to
 /// parse. Combined with every custom detector registering after every
 /// built-in (`decision-define-detector-profile-and-pack-contract`), a
 /// ruleset detector can add detections but can never overturn a built-in's
@@ -464,7 +464,7 @@ impl std::error::Error for RulesetError {}
 /// # Errors
 ///
 /// Returns a [`RulesetError`] describing the fixed rejection class; see
-/// [`RulesetLoadError`] for the full catalog. Loading never partially
+/// `RulesetLoadError` for the full catalog. Loading never partially
 /// succeeds: either every detector block is returned or the whole ruleset
 /// is rejected.
 ///
