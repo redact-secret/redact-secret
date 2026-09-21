@@ -52,3 +52,4 @@ and [qualification follow-up](release-qualification-follow-up.md) describe beta.
 | Terraform Cloud/Enterprise token detection (#521) | [New `terraform-cloud-token` detector, provider-documented exact-width evidence, agent-pool/Enterprise shape reuse](evidence/521/README.md) |
 | Release rehearsal coverage and the Reconcile Release exercise (#530) | [What the no-publication rehearsal covers, what it cannot, and the pending live Reconcile Release commands](release-rehearsal-coverage.md) |
 | Declarative ruleset implementation WebAssembly size re-measurement (#495) | [Real compiled artifact sizes vs. the #441 baseline, covering #483 and #495 together](evidence/495/README.md) |
+| Beta.5 release retrospective and v0.1.0 readiness criteria (#531) | [What failed, how each problem was resolved, what remains open](beta5-release-retrospective.md); checklist at [v0.1.0 release-readiness checklist](../release-readiness-v0.1.0.md) |

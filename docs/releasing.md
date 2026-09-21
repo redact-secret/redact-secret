@@ -160,6 +160,11 @@ measured against this candidate's published-artifact evidence path (issue
 
 ## Review and approval
 
+Before requesting final release approval for v0.1.0 stable, check the
+candidate against the [v0.1.0 release-readiness checklist](release-readiness-v0.1.0.md).
+It states, per criterion, what "release engineering is ready" means and how
+to check it against this run; it does not itself approve anything.
+
 Before requesting final release approval, assemble a reviewable record of:
 
 - Approved version, RC branch, full source SHA, public API review, compatibility
