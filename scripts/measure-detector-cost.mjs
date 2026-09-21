@@ -66,7 +66,7 @@ export const CANONICAL_IDS = [
   "private-key", "aws-access-key", "github-token", "gitlab-token", "openai-token",
   "anthropic-token", "shopify-token", "vault-token", "stripe-token", "slack-token",
   "pypi-token", "huggingface-token", "docker-token", "cloudflare-token", "digitalocean-token",
-  "linear-token", "supabase-token", "vercel-token", "npm-token", "google-api-key",
+  "linear-token", "supabase-token", "supabase-management-token", "vercel-token", "npm-token", "google-api-key",
   "sendgrid-token", "microsoft-entra-client-secret", "azure-devops-personal-access-token",
   "notion-token", "atlassian-api-token", "twilio-auth-token", "twilio-api-key-secret",
   "telegram-bot-token", "discord-bot-token", "sentry-user-auth-token", "sentry-org-auth-token",
@@ -88,7 +88,7 @@ export const GROUPS = {
   ai: ["openai-token", "anthropic-token", "huggingface-token"],
   cloud: [
     "aws-access-key", "vault-token", "cloudflare-token", "digitalocean-token", "supabase-token",
-    "vercel-token", "google-api-key", "microsoft-entra-client-secret", "datadog-api-key",
+    "supabase-management-token", "vercel-token", "google-api-key", "microsoft-entra-client-secret", "datadog-api-key",
     "datadog-application-key", "grafana-service-account-token", "grafana-cloud-access-policy-token",
     "new-relic-user-api-key", "new-relic-license-key",
   ],

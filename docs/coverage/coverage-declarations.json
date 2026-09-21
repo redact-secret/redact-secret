@@ -2076,6 +2076,99 @@
     },
     {
       "behaviorClass": "provider",
+      "detector": "supabase-management-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "supabase-management-positive-classic",
+            "supabase-management-positive-versioned"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "supabase-management-overlap-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "supabase-management-adversarial-long-suffix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "supabase-management-boundary-above-exact",
+            "supabase-management-boundary-below-min",
+            "supabase-management-boundary-case-sensitivity",
+            "supabase-management-boundary-delimiter",
+            "supabase-management-boundary-invalid-alphabet",
+            "supabase-management-boundary-uppercase-in-body",
+            "supabase-management-boundary-versioned-below-min"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "supabase-management-negative-interpolated-secret-prefix",
+            "supabase-management-negative-masked-secret-prefix",
+            "supabase-management-negative-ordinary-reference",
+            "supabase-management-negative-placeholder",
+            "supabase-management-negative-wrong-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "supabase-management-boundary-above-exact",
+            "supabase-management-boundary-below-min",
+            "supabase-management-boundary-case-sensitivity",
+            "supabase-management-boundary-delimiter",
+            "supabase-management-boundary-invalid-alphabet",
+            "supabase-management-boundary-uppercase-in-body",
+            "supabase-management-boundary-versioned-below-min"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for supabase_personal_access_token (supabase-management-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "supabase_personal_access_token"
+    },
+    {
+      "behaviorClass": "provider",
       "detector": "vercel-token",
       "dimensions": [
         {
@@ -5018,6 +5111,7 @@
             "slack-adversarial-long-suffix",
             "stripe-adversarial-long-suffix",
             "supabase-adversarial-long-suffix",
+            "supabase-management-adversarial-long-suffix",
             "telegram-bot-token-adversarial-long-padding",
             "twilio-api-key-secret-adversarial-dense-findings",
             "twilio-auth-token-adversarial-dense-findings",
@@ -5401,6 +5495,7 @@
             "slack-adversarial-long-suffix",
             "stripe-adversarial-long-suffix",
             "supabase-adversarial-long-suffix",
+            "supabase-management-adversarial-long-suffix",
             "telegram-bot-token-adversarial-long-padding",
             "twilio-api-key-secret-adversarial-dense-findings",
             "twilio-auth-token-adversarial-dense-findings",

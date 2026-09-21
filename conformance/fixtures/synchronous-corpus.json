@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 1316,
+  "fixtureCount": 1332,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -7042,6 +7042,246 @@
         }
       ],
       "note": "A match after a CRLF line ending and a Unicode-prefixed comment line is still found at the correct UTF-8 byte offset."
+    },
+    {
+      "id": "supabase-management-positive-classic",
+      "detector": "supabase-management-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sbp_synthetic0revoked1provider2value3padding",
+      "expected": [
+        {
+          "detector": "supabase-management-token",
+          "type": "supabase_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 44
+        }
+      ],
+      "note": "The documented classic sbp_ personal-access-token prefix with its tool-corroborated 40-byte body is supported."
+    },
+    {
+      "id": "supabase-management-positive-versioned",
+      "detector": "supabase-management-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sbp_v0_synthetic0revoked1provider2value3padding",
+      "expected": [
+        {
+          "detector": "supabase-management-token",
+          "type": "supabase_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 47
+        }
+      ],
+      "note": "The versioned sbp_v0_ prefix (issue #515) is matched over the same tool-corroborated 40-byte body as the classic sbp_ prefix; TruffleHog's own shipped regex cannot match this form since its character class excludes '_', a gap this detector closes without copying TruffleHog's implementation."
+    },
+    {
+      "id": "supabase-management-negative-ordinary-reference",
+      "detector": "supabase-management-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "supabase-management-token-identifier",
+      "expected": [],
+      "note": "An ordinary provider-related identifier has no credential shape."
+    },
+    {
+      "id": "supabase-management-negative-wrong-prefix",
+      "detector": "supabase-management-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sbpx_synthetic0revoked1provider2value3padding",
+      "expected": [],
+      "note": "An undocumented near-miss prefix ('sbpx_') that is not one byte-for-byte equal to either documented prefix is not classified, however long or well-formed the following run is."
+    },
+    {
+      "id": "supabase-management-negative-placeholder",
+      "detector": "supabase-management-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sbp_<YOUR_SUPABASE_ACCESS_TOKEN>",
+      "expected": [],
+      "note": "A documentation placeholder value is not classified as a credential."
+    },
+    {
+      "id": "supabase-management-negative-masked-secret-prefix",
+      "detector": "supabase-management-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sbp_****************************************",
+      "expected": [],
+      "note": "A masked value (redaction asterisks in place of the real body) carries no alphabet run and is not classified, so a UI's own masking is never mistaken for a live credential."
+    },
+    {
+      "id": "supabase-management-negative-interpolated-secret-prefix",
+      "detector": "supabase-management-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "shell"
+      ],
+      "input": "sbp_${SUPABASE_ACCESS_TOKEN}",
+      "expected": [],
+      "note": "A shell/template interpolation reference immediately after the documented prefix breaks the alphabet run before the minimum length, so a variable reference is not misread as a literal secret."
+    },
+    {
+      "id": "supabase-management-boundary-below-min",
+      "detector": "supabase-management-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sbp_synthetic0revoked1provider2value3paddin",
+      "expected": [],
+      "note": "A body exactly one byte short of the documented 40-byte exact length is rejected; this class has no minimum-length concept, only the exact length."
+    },
+    {
+      "id": "supabase-management-boundary-above-exact",
+      "detector": "supabase-management-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sbp_synthetic0revoked1provider2value3paddingx",
+      "expected": [],
+      "note": "A body exactly one byte past the documented 40-byte exact length is rejected as a truncated slice of a longer run, not misread as the exact shape plus a trailing byte, the same truncation-rejection rule dckr_pat_/dckr_oat_ and npm_ already enforce for their own exact-length bodies."
+    },
+    {
+      "id": "supabase-management-boundary-versioned-below-min",
+      "detector": "supabase-management-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sbp_v0_synthetic0revoked1provider2value3paddin",
+      "expected": [],
+      "note": "The two documented prefixes are validated independently: a body one byte short of the versioned sbp_v0_ prefix's own 40-byte exact length is rejected the same way the classic sbp_ prefix's short twin is, and is not rescued by falling back to the shorter classic prefix's grammar."
+    },
+    {
+      "id": "supabase-management-boundary-invalid-alphabet",
+      "detector": "supabase-management-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sbp_synt!hetic0revoked1provider2value3padding",
+      "expected": [],
+      "note": "An invalid character inside the body breaks the run before the documented 40-byte length is reached."
+    },
+    {
+      "id": "supabase-management-boundary-delimiter",
+      "detector": "supabase-management-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sbp_synt hetic0revoked1provider2value3padding",
+      "expected": [],
+      "note": "An inserted space inside the body breaks the run instead of being silently bridged."
+    },
+    {
+      "id": "supabase-management-boundary-uppercase-in-body",
+      "detector": "supabase-management-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sbp_syntAetic0revoked1provider2value3padding",
+      "expected": [],
+      "note": "TruffleHog's own shipped grammar for this class is lowercase-only ([a-z0-9]); a single uppercased byte inside an otherwise well-formed 40-byte body breaks the run before the documented length is reached, rejecting a case-mangled twin instead of matching it, the same tradeoff is_lower_hex already documents for DigitalOcean's hex bodies."
+    },
+    {
+      "id": "supabase-management-boundary-case-sensitivity",
+      "detector": "supabase-management-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "SBP_synthetic0revoked1provider2value3padding",
+      "expected": [],
+      "note": "Both documented prefixes are matched case-sensitively; an uppercased prefix is not classified."
+    },
+    {
+      "id": "supabase-management-overlap-context",
+      "detector": "supabase-management-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "access_token=sbp_synthetic0revoked1provider2value3padding",
+      "expected": [
+        {
+          "detector": "supabase-management-token",
+          "type": "supabase_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 57
+        }
+      ],
+      "note": "Qualified provider evidence wins over a contextual assignment."
+    },
+    {
+      "id": "supabase-management-adversarial-long-suffix",
+      "detector": "supabase-management-token",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 9000,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      },
+      "input": "sbp_synthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3padding",
+      "expected": [],
+      "note": "An 8000-byte homogeneous lowercase-alnum run after the documented prefix is neither documented exact length, so the exact-length-plus-truncation rule reports nothing; the scan still stays deterministic and bounded (a long same-alphabet run is not misread as the exact shape plus trailing bytes)."
     },
     {
       "id": "vercel-positive-qualified",

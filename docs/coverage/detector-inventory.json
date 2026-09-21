@@ -132,6 +132,13 @@
       "schemes": null
     },
     {
+      "type": "supabase_personal_access_token",
+      "detector": "supabase-management-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "sbp_synthetic0revoked1provider2value3padding",
+      "schemes": null
+    },
+    {
       "type": "vercel_token",
       "detector": "vercel-token",
       "policyClass": "always-redact",

@@ -15,11 +15,11 @@ These counts describe finding-type inventory rows with corpus evidence, not dete
 
 | Row state | Count |
 | --- | --- |
-| supported | 43 |
+| supported | 44 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 54.
+Coverage declarations: 55.
 
 ## Coverage by detector
 
@@ -61,6 +61,7 @@ Coverage declarations: 54.
 | shopify-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | slack-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | stripe-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| supabase-management-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | supabase-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | telegram-bot-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | twilio-api-key-secret | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -109,6 +110,7 @@ Coverage declarations: 54.
 | shopify_access_token | shopify-token | provider | supported | not-applicable | none |
 | slack_token | slack-token | provider | supported | not-applicable | none |
 | stripe_credential | stripe-token | provider | supported | not-applicable | none |
+| supabase_personal_access_token | supabase-management-token | provider | supported | not-applicable | none |
 | supabase_secret_key | supabase-token | provider | supported | not-applicable | none |
 | telegram_bot_token | telegram-bot-token | provider | supported | not-applicable | none |
 | twilio_api_key_secret | twilio-api-key-secret | provider | supported | not-applicable | none |
@@ -140,15 +142,15 @@ Coverage declarations: 54.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 54 | 0 | 0 |
-| boundary | 43 | 0 | 0 |
-| host-context | 43 | 0 | 0 |
+| adversarial | 55 | 0 | 0 |
+| boundary | 44 | 0 | 0 |
+| host-context | 44 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 54 | 0 | 0 |
-| near-miss-negative | 43 | 0 | 0 |
-| overlap | 43 | 0 | 0 |
-| positive | 43 | 0 | 0 |
-| range | 54 | 0 | 0 |
+| malformed | 55 | 0 | 0 |
+| near-miss-negative | 44 | 0 | 0 |
+| overlap | 44 | 0 | 0 |
+| positive | 44 | 0 | 0 |
+| range | 55 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

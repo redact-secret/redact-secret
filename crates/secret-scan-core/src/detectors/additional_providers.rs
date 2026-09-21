@@ -314,6 +314,52 @@ pub(super) const SUPABASE: KnownFormatProviderDetector = KnownFormatProviderDete
     boundary: pattern::is_alnum_dash,
 };
 
+/// Supabase personal access tokens (PATs): a credential class that
+/// authenticates the Management API and the tools built on it (the
+/// Supabase CLI and MCP server), issued from a project's account settings
+/// rather than from a project's own API-keys page.
+/// `docs.supabase.com/guides/platform/personal-access-tokens` documents the
+/// `sbp_` prefix (by example only, e.g. `sbp_fc...`) and the classic-vs-
+/// scoped distinction, but not an exact body grammar.
+///
+/// `decision-scope-supabase-management-token-and-secret-key-independence`
+/// (issue #515) is explicit that this class must never borrow or lend
+/// evidence to `SUPABASE` (`sb_secret_`/`sb_publishable_`, above) or to the
+/// legacy JWT anon/service-role carve-out in [`super::jwt`]: a PAT
+/// authenticates a Supabase *account*, a secret key authenticates one
+/// *project's* data API, and a legacy JWT is a third, structurally
+/// unrelated shape. The two-shape body grammar here (`sbp_`/`sbp_v0_`, each
+/// followed by exactly 40 [`pattern::is_lower_alnum`] bytes) is instead
+/// externally corroborated: it is the shape `TruffleHog`'s own shipped
+/// detector (the `supabase` reference this project's benchmark evidence has
+/// historically pinned, per issue #515) already matches for the classic
+/// `sbp_` prefix. That reference detector's regex is anchored to
+/// `[a-z0-9]{40}` and carries no `_` in its character class, so it cannot
+/// match the versioned `sbp_v0_` prefix the same docs page's scoped-token
+/// walkthrough names — an admitted gap this detector closes as a second
+/// [`PrefixShape`] over the identical body grammar, not new matching logic,
+/// the same "adopt the sibling prefix, keep the body shape" move
+/// `HUGGING_FACE`'s `api_org_` shape already makes above. No `TruffleHog`
+/// implementation code is used; only its published match shape is
+/// consulted, per `AGENTS.md`.
+const SUPABASE_PAT_SIGNALS: [&str; 2] =
+    ["supabase-pat-documented-prefix", "tool-corroborated-length"];
+
+pub(super) const SUPABASE_PAT: KnownFormatProviderDetector = KnownFormatProviderDetector {
+    id: "supabase-management-token",
+    type_name: "supabase_personal_access_token",
+    shapes: &[
+        PrefixShape::exact(
+            "sbp_v0_",
+            40,
+            pattern::is_lower_alnum,
+            &SUPABASE_PAT_SIGNALS,
+        ),
+        PrefixShape::exact("sbp_", 40, pattern::is_lower_alnum, &SUPABASE_PAT_SIGNALS),
+    ],
+    boundary: pattern::is_alnum_dash,
+};
+
 /// Vercel personal, integration, app, refresh, and API-key credentials. An
 /// undocumented prefix letter is an intentional false negative.
 const VERCEL_SIGNALS: [&str; 2] = ["vercel-documented-prefix", "opaque-suffix"];
@@ -452,6 +498,14 @@ mod tests {
         "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
     const DIGITALOCEAN_OAUTH_BODY: &str =
         "fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210";
+    /// Exactly 40 bytes from `[a-z0-9]` (no uppercase, no `_`/`-`): the
+    /// tool-corroborated `sbp_`/`sbp_v0_` personal-access-token body length
+    /// (issue #515). The lowercase-only alphabet admits no `SYNTHETIC…`
+    /// marker, so this is a lowercase, unmistakably patterned synthetic run
+    /// instead, the same style [`DIGITALOCEAN_BODY`] uses for its own
+    /// narrowed alphabet.
+    const SUPABASE_PAT_BODY: &str = "synthetic0revoked1provider2value3padding";
+    const _: () = assert!(SUPABASE_PAT_BODY.len() == 40);
     const DIGITALOCEAN_REFRESH_BODY: &str =
         "123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0";
 
@@ -508,6 +562,12 @@ mod tests {
                 "dop_v1_SYNTHETIC_SHORT",
             ),
             family(SUPABASE, "sb_secret_", BODY, "sb_secret_SYNTHETIC_SHORT"),
+            family(
+                SUPABASE_PAT,
+                "sbp_",
+                SUPABASE_PAT_BODY,
+                "sbp_synthetic0short",
+            ),
             family(VERCEL, "vcp_", BODY, "vcp_SYNTHETIC_SHORT"),
             family(NPM, "npm_", NPM_BODY, "npm_SYNTHETICSHORT"),
             family(GOOGLE, "AIza", GOOGLE_BODY, "AIzaSYNTHETICSHORT"),

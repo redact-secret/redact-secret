@@ -843,6 +843,34 @@
       "type": "supabase_secret_key"
     },
     {
+      "detector": "supabase-management-token",
+      "evidence": {
+        "fixtureCount": 16,
+        "hostContextsExercised": [
+          "plain-text",
+          "shell"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "supabase-management-positive-classic",
+        "supabase-management-positive-versioned"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "supabase_personal_access_token"
+    },
+    {
       "detector": "vercel-token",
       "evidence": {
         "fixtureCount": 25,
@@ -1981,7 +2009,7 @@
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 43,
+    "supported": 44,
     "unresolved": 0
   }
 }
