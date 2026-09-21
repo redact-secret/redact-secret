@@ -342,13 +342,19 @@ pub(super) const SUPABASE: KnownFormatProviderDetector = KnownFormatProviderDete
 /// `HUGGING_FACE`'s `api_org_` shape already makes above. No `TruffleHog`
 /// implementation code is used; only its published match shape is
 /// consulted, per `AGENTS.md`.
-const SUPABASE_PAT_SIGNALS: [&str; 2] = ["supabase-pat-documented-prefix", "tool-corroborated-length"];
+const SUPABASE_PAT_SIGNALS: [&str; 2] =
+    ["supabase-pat-documented-prefix", "tool-corroborated-length"];
 
 pub(super) const SUPABASE_PAT: KnownFormatProviderDetector = KnownFormatProviderDetector {
     id: "supabase-management-token",
     type_name: "supabase_personal_access_token",
     shapes: &[
-        PrefixShape::exact("sbp_v0_", 40, pattern::is_lower_alnum, &SUPABASE_PAT_SIGNALS),
+        PrefixShape::exact(
+            "sbp_v0_",
+            40,
+            pattern::is_lower_alnum,
+            &SUPABASE_PAT_SIGNALS,
+        ),
         PrefixShape::exact("sbp_", 40, pattern::is_lower_alnum, &SUPABASE_PAT_SIGNALS),
     ],
     boundary: pattern::is_alnum_dash,
