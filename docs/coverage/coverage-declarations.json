@@ -1105,17 +1105,13 @@
         {
           "dimension": "near-miss-negative",
           "evidenceFixtureIds": [
-            "openai-negative-368-legacy-plain-twin",
-            "openai-negative-368-legacy-unicode-crlf-twin",
             "openai-negative-368-proj-plain-twin",
             "openai-negative-368-proj-unicode-crlf-twin",
             "openai-negative-368-svcacct-plain-twin",
             "openai-negative-368-svcacct-unicode-crlf-twin",
             "openai-negative-embedded-in-wider-identifier",
-            "openai-negative-explicit-namespace-legacy-body",
             "openai-negative-legacy-underscore-segment",
             "openai-negative-lookalike",
-            "openai-negative-marker-dotenv",
             "openai-negative-marker-embedded-leading",
             "openai-negative-marker-embedded-trailing",
             "openai-negative-marker-log",
@@ -1123,7 +1119,6 @@
             "openai-negative-marker-markdown",
             "openai-negative-marker-near-prefix-underscore",
             "openai-negative-marker-shell-quoted",
-            "openai-negative-marker-toml",
             "openai-negative-model-name",
             "openai-negative-near-prefix-underscore",
             "openai-negative-placeholder"
@@ -4552,6 +4547,95 @@
       ],
       "note": "Coverage declaration for authorization_credential (generic-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
       "type": "authorization_credential"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "generic-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "generic-token-vendor-prefix-admin-bare",
+            "generic-token-vendor-prefix-legacy-bare",
+            "generic-token-vendor-prefix-legacy-quoted",
+            "generic-token-vendor-prefix-legacy-unicode-crlf",
+            "generic-token-vendor-prefix-proj-bare",
+            "generic-token-vendor-prefix-proj-quoted",
+            "generic-token-vendor-prefix-proj-unicode-crlf",
+            "generic-token-vendor-prefix-svcacct-bare",
+            "generic-token-vendor-prefix-svcacct-quoted",
+            "generic-token-vendor-prefix-svcacct-unicode-crlf"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "generic-token-vendor-prefix-overlap-namespace-body"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "single-detector-family",
+            "sharedWith": "contextual_secret"
+          },
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "generic-token-vendor-prefix-embedded-in-wider-identifier-control",
+            "generic-token-vendor-prefix-short-body-control"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "generic-token-vendor-prefix-low-entropy-control"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "generic-token-vendor-prefix-embedded-in-wider-identifier-control",
+            "generic-token-vendor-prefix-short-body-control"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for vendor_prefixed_credential (generic-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "vendor_prefixed_credential"
     },
     {
       "behaviorClass": "provider",

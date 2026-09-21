@@ -15,11 +15,11 @@ These counts describe finding-type inventory rows with corpus evidence, not dete
 
 | Row state | Count |
 | --- | --- |
-| supported | 52 |
+| supported | 53 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 63.
+Coverage declarations: 64.
 
 ## Coverage by detector
 
@@ -38,7 +38,7 @@ Coverage declarations: 63.
 | discord-bot-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | docker-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | firebase-server-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
-| generic-token | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
+| generic-token | 3 | supported: 3, intentionally-unsupported: 0, unresolved: 0 |
 | github-token | 6 | supported: 6, intentionally-unsupported: 0, unresolved: 0 |
 | gitlab-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | google-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -127,6 +127,7 @@ Coverage declarations: 63.
 | twilio_api_key_secret | twilio-api-key-secret | provider | supported | not-applicable | none |
 | twilio_auth_token | twilio-auth-token | provider | supported | not-applicable | none |
 | vault_token | vault-token | provider | supported | not-applicable | none |
+| vendor_prefixed_credential | generic-token | provider | supported | not-applicable | none |
 | vercel_token | vercel-token | provider | supported | not-applicable | none |
 
 ## Coverage by scheme
@@ -153,15 +154,15 @@ Coverage declarations: 63.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 63 | 0 | 0 |
-| boundary | 52 | 0 | 0 |
-| host-context | 52 | 0 | 0 |
+| adversarial | 64 | 0 | 0 |
+| boundary | 53 | 0 | 0 |
+| host-context | 53 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 63 | 0 | 0 |
-| near-miss-negative | 52 | 0 | 0 |
-| overlap | 52 | 0 | 0 |
-| positive | 52 | 0 | 0 |
-| range | 63 | 0 | 0 |
+| malformed | 64 | 0 | 0 |
+| near-miss-negative | 53 | 0 | 0 |
+| overlap | 53 | 0 | 0 |
+| positive | 53 | 0 | 0 |
+| range | 64 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

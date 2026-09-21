@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 1420,
+  "fixtureCount": 1434,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -10951,15 +10951,24 @@
     {
       "id": "openai-negative-368-legacy-plain-twin",
       "detector": "openai-token",
-      "kind": "negative",
+      "kind": "overlap",
       "support": "supported",
-      "tier": "negative",
+      "tier": "regression",
       "contexts": [
         "plain-text"
       ],
       "input": "sk-SYNTHETICREVOKED0001T3BlbkFKSYNTHETICREVOKED0002\n\n",
-      "expected": [],
-      "note": "Negative twin of the paired positive differing in exactly one structural property (internal marker `T3BlbkFK` vs contracted `T3BlbkFJ`); beta.4 flagged it at the same range as its positive. Issue #368 self-contained synthetic reproduction; independent benchmark fixture id `openai-token-legacy-plain-twin` (redact-secret-benchmarks common-formats, measurement protocol v4, T2). Never provider-issued."
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "vendor_prefixed_credential",
+          "confidence": "medium",
+          "specificity": "entropy",
+          "start": 0,
+          "end": 51
+        }
+      ],
+      "note": "Negative twin of the paired positive differing in exactly one structural property (internal marker `T3BlbkFK` vs contracted `T3BlbkFJ`); beta.4 flagged it at the same range as its positive. Issue #368 self-contained synthetic reproduction; independent benchmark fixture id `openai-token-legacy-plain-twin` (redact-secret-benchmarks common-formats, measurement protocol v4, T2). Never provider-issued. Silent for openai-token (the marker-less/mutated-marker shape never satisfies the reviewed contract), but issue #552's bare vendor-prefixed policy layer still claims the exact-48-byte `sk-` body at generic classification, below `openai-token`'s specificity."
     },
     {
       "id": "openai-positive-368-proj-plain",
@@ -11056,15 +11065,24 @@
     {
       "id": "openai-negative-368-legacy-unicode-crlf-twin",
       "detector": "openai-token",
-      "kind": "negative",
+      "kind": "overlap",
       "support": "supported",
-      "tier": "negative",
+      "tier": "regression",
       "contexts": [
         "plain-text"
       ],
       "input": "# 🔑 reviewed format\r\nsk-SYNTHETICREVOKED0001T3BlbkFKSYNTHETICREVOKED0002\n\r\n",
-      "expected": [],
-      "note": "Negative twin of the paired positive differing in exactly one structural property (internal marker `T3BlbkFK` vs contracted `T3BlbkFJ`); beta.4 flagged it at the same range as its positive. Issue #368 self-contained synthetic reproduction; independent benchmark fixture id `openai-token-legacy-unicode-crlf-twin` (redact-secret-benchmarks common-formats, measurement protocol v4, T2). Never provider-issued."
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "vendor_prefixed_credential",
+          "confidence": "medium",
+          "specificity": "entropy",
+          "start": 24,
+          "end": 75
+        }
+      ],
+      "note": "Negative twin of the paired positive differing in exactly one structural property (internal marker `T3BlbkFK` vs contracted `T3BlbkFJ`); beta.4 flagged it at the same range as its positive. Issue #368 self-contained synthetic reproduction; independent benchmark fixture id `openai-token-legacy-unicode-crlf-twin` (redact-secret-benchmarks common-formats, measurement protocol v4, T2). Never provider-issued. Silent for openai-token, but issue #552's bare vendor-prefixed policy layer still claims the exact-48-byte `sk-` body at generic classification, below `openai-token`'s specificity."
     },
     {
       "id": "openai-positive-368-proj-unicode-crlf",
@@ -11165,15 +11183,24 @@
     {
       "id": "openai-negative-explicit-namespace-legacy-body",
       "detector": "openai-token",
-      "kind": "negative",
+      "kind": "overlap",
       "support": "supported",
-      "tier": "negative",
+      "tier": "regression",
       "contexts": [
         "plain-text"
       ],
       "input": "sk-proj-SYNTHETICREVOKED0001T3BlbkFJSYNTHETICREVOKED0002",
-      "expected": [],
-      "note": "A legacy-shaped 20/20 body under an explicit `sk-proj-` namespace is malformed for that namespace and is never re-read as a bare legacy key: each variant is validated independently with no fallback."
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "vendor_prefixed_credential",
+          "confidence": "medium",
+          "specificity": "entropy",
+          "start": 0,
+          "end": 56
+        }
+      ],
+      "note": "A legacy-shaped 20/20 body under an explicit `sk-proj-` namespace is malformed for that namespace and is never re-read as a bare legacy key: each variant is validated independently with no fallback. Silent for openai-token, but issue #552's bare vendor-prefixed policy layer still claims the whole `sk-proj-`-plus-48-byte-body span at generic classification, below `openai-token`'s specificity."
     },
     {
       "id": "openai-negative-marker-embedded-leading",
@@ -28381,15 +28408,24 @@
     {
       "id": "openai-negative-marker-dotenv",
       "detector": "openai-token",
-      "kind": "negative",
+      "kind": "overlap",
       "support": "supported",
-      "tier": "negative",
+      "tier": "regression",
       "contexts": [
         "dotenv"
       ],
       "input": "OPENAI_API_KEY=sk-SYNTHETICREVOKED0001T3BlbkFKSYNTHETICREVOKED0002\n",
-      "expected": [],
-      "note": "Malformed twin of openai-positive-marker-dotenv in the same dotenv context: the internal marker is corrupted (`T3BlbkFK` vs the contracted `T3BlbkFJ`). Issue #375 context-pairing evidence."
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "vendor_prefixed_credential",
+          "confidence": "medium",
+          "specificity": "entropy",
+          "start": 15,
+          "end": 66
+        }
+      ],
+      "note": "Malformed twin of openai-positive-marker-dotenv in the same dotenv context: the internal marker is corrupted (`T3BlbkFK` vs the contracted `T3BlbkFJ`). Issue #375 context-pairing evidence. Silent for openai-token, but issue #552's bare vendor-prefixed policy layer still claims the exact-48-byte `sk-` body at generic classification, below `openai-token`'s specificity; the assignment name `OPENAI_API_KEY` is not itself a recognized contextual name, so this is the prefix-anchored match, not the name-anchored one."
     },
     {
       "id": "openai-overlap-marker-malformed-json-assignment",
@@ -28477,15 +28513,24 @@
     {
       "id": "openai-negative-marker-toml",
       "detector": "openai-token",
-      "kind": "negative",
+      "kind": "overlap",
       "support": "supported",
-      "tier": "negative",
+      "tier": "regression",
       "contexts": [
         "toml"
       ],
       "input": "[tool.example]\nopenai_api_key = \"sk-SYNTHETICREVOKED0001T3BlbkFKSYNTHETICREVOKED0002\"\n",
-      "expected": [],
-      "note": "Malformed twin of openai-positive-marker-toml in the same TOML context: the internal marker is corrupted (`T3BlbkFK`). Issue #375 context-pairing evidence."
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "vendor_prefixed_credential",
+          "confidence": "medium",
+          "specificity": "entropy",
+          "start": 33,
+          "end": 84
+        }
+      ],
+      "note": "Malformed twin of openai-positive-marker-toml in the same TOML context: the internal marker is corrupted (`T3BlbkFK`). Issue #375 context-pairing evidence. Silent for openai-token, but issue #552's bare vendor-prefixed policy layer still claims the exact-48-byte `sk-` body at generic classification, below `openai-token`'s specificity."
     },
     {
       "id": "openai-boundary-svcacct-right-57",
@@ -30531,6 +30576,287 @@
         }
       ],
       "note": "Permanent synthetic regression (issue #552): before this fix, a quoted contextual assignment (key=\"value\") whose whole span a Markdown inline-code pair of backticks wraps had no recognized boundary before the key name or after the value's closing quote, so the assignment went entirely undetected rather than merely mis-spanned. Reproduces the redact-secret-benchmarks detector-coverage--generic-token-{api-key,password,client-secret}-bare fixtures under that corpus's context.markdown metamorphic operator (a matching pair of backticks around the whole fixture, no other change)."
+    },
+    {
+      "id": "generic-token-vendor-prefix-legacy-bare",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk-SYNTHETICrevoked0001aaaaBBBBccccDDDD1234wxyzEFGH",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "vendor_prefixed_credential",
+          "confidence": "medium",
+          "specificity": "entropy",
+          "start": 0,
+          "end": 51
+        }
+      ],
+      "note": "Permanent synthetic regression (issue #552): a bare, marker-less legacy shaped `sk-` value on its own line was previously invisible to every default detector -- gitleaks and trufflehog are blind to it too, since both key on the `T3BlbkFJ` marker. Reproduces the redact-secret-benchmarks detector-coverage--openai-token-{shape}-bare family (bare context)."
+    },
+    {
+      "id": "generic-token-vendor-prefix-legacy-quoted",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"value\": \"sk-SYNTHETICrevoked0001aaaaBBBBccccDDDD1234wxyzEFGH\"}",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "vendor_prefixed_credential",
+          "confidence": "medium",
+          "specificity": "entropy",
+          "start": 11,
+          "end": 62
+        }
+      ],
+      "note": "Permanent synthetic regression (issue #552): the same marker-less legacy shaped `sk-` value, quoted inside a JSON string, is still caught at the exact-48-byte alphanumeric body -- quoting is not itself a discriminator. Reproduces the redact-secret-benchmarks detector-coverage--openai-token-{shape}-quoted family."
+    },
+    {
+      "id": "generic-token-vendor-prefix-legacy-unicode-crlf",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 reviewed format\r\nsk-SYNTHETICrevoked0001aaaaBBBBccccDDDD1234wxyzEFGH\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "vendor_prefixed_credential",
+          "confidence": "medium",
+          "specificity": "entropy",
+          "start": 24,
+          "end": 75
+        }
+      ],
+      "note": "Permanent synthetic regression (issue #552): an astral emoji and CRLF line ending ahead of the same marker-less legacy shaped `sk-` value shift only the byte offsets. Reproduces the redact-secret-benchmarks detector-coverage--openai-token-{shape}-unicode-crlf family."
+    },
+    {
+      "id": "generic-token-vendor-prefix-proj-bare",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk-proj-SYNTHETICrevoked0002bbbbCCCCddddEEEE5678uvwxIJKL",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "vendor_prefixed_credential",
+          "confidence": "medium",
+          "specificity": "entropy",
+          "start": 0,
+          "end": 56
+        }
+      ],
+      "note": "Permanent synthetic regression (issue #552): a bare, marker-less proj shaped `sk-proj-` value on its own line was previously invisible to every default detector -- gitleaks and trufflehog are blind to it too, since both key on the `T3BlbkFJ` marker. Reproduces the redact-secret-benchmarks detector-coverage--openai-token-{shape}-bare family (bare context)."
+    },
+    {
+      "id": "generic-token-vendor-prefix-proj-quoted",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"value\": \"sk-proj-SYNTHETICrevoked0002bbbbCCCCddddEEEE5678uvwxIJKL\"}",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "vendor_prefixed_credential",
+          "confidence": "medium",
+          "specificity": "entropy",
+          "start": 11,
+          "end": 67
+        }
+      ],
+      "note": "Permanent synthetic regression (issue #552): the same marker-less proj shaped `sk-proj-` value, quoted inside a JSON string, is still caught at the exact-48-byte alphanumeric body -- quoting is not itself a discriminator. Reproduces the redact-secret-benchmarks detector-coverage--openai-token-{shape}-quoted family."
+    },
+    {
+      "id": "generic-token-vendor-prefix-proj-unicode-crlf",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 reviewed format\r\nsk-proj-SYNTHETICrevoked0002bbbbCCCCddddEEEE5678uvwxIJKL\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "vendor_prefixed_credential",
+          "confidence": "medium",
+          "specificity": "entropy",
+          "start": 24,
+          "end": 80
+        }
+      ],
+      "note": "Permanent synthetic regression (issue #552): an astral emoji and CRLF line ending ahead of the same marker-less proj shaped `sk-proj-` value shift only the byte offsets. Reproduces the redact-secret-benchmarks detector-coverage--openai-token-{shape}-unicode-crlf family."
+    },
+    {
+      "id": "generic-token-vendor-prefix-svcacct-bare",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk-svcacct-SYNTHETICrevoked0003ccccDDDDeeeeFFFF9012rstuMNOP",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "vendor_prefixed_credential",
+          "confidence": "medium",
+          "specificity": "entropy",
+          "start": 0,
+          "end": 59
+        }
+      ],
+      "note": "Permanent synthetic regression (issue #552): a bare, marker-less svcacct shaped `sk-svcacct-` value on its own line was previously invisible to every default detector -- gitleaks and trufflehog are blind to it too, since both key on the `T3BlbkFJ` marker. Reproduces the redact-secret-benchmarks detector-coverage--openai-token-{shape}-bare family (bare context)."
+    },
+    {
+      "id": "generic-token-vendor-prefix-svcacct-quoted",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"value\": \"sk-svcacct-SYNTHETICrevoked0003ccccDDDDeeeeFFFF9012rstuMNOP\"}",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "vendor_prefixed_credential",
+          "confidence": "medium",
+          "specificity": "entropy",
+          "start": 11,
+          "end": 70
+        }
+      ],
+      "note": "Permanent synthetic regression (issue #552): the same marker-less svcacct shaped `sk-svcacct-` value, quoted inside a JSON string, is still caught at the exact-48-byte alphanumeric body -- quoting is not itself a discriminator. Reproduces the redact-secret-benchmarks detector-coverage--openai-token-{shape}-quoted family."
+    },
+    {
+      "id": "generic-token-vendor-prefix-svcacct-unicode-crlf",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 reviewed format\r\nsk-svcacct-SYNTHETICrevoked0003ccccDDDDeeeeFFFF9012rstuMNOP\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "vendor_prefixed_credential",
+          "confidence": "medium",
+          "specificity": "entropy",
+          "start": 24,
+          "end": 83
+        }
+      ],
+      "note": "Permanent synthetic regression (issue #552): an astral emoji and CRLF line ending ahead of the same marker-less svcacct shaped `sk-svcacct-` value shift only the byte offsets. Reproduces the redact-secret-benchmarks detector-coverage--openai-token-{shape}-unicode-crlf family."
+    },
+    {
+      "id": "generic-token-vendor-prefix-admin-bare",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk-admin-SYNTHETICrevoked0004ddddEEEEffffGGGG3456stuvOPQR",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "vendor_prefixed_credential",
+          "confidence": "medium",
+          "specificity": "entropy",
+          "start": 0,
+          "end": 57
+        }
+      ],
+      "note": "The `sk-admin-` namespace (#368's fourth documented namespace) is covered by the same exact-48-byte bare vendor-prefixed policy rule as `sk-`/`sk-proj-`/`sk-svcacct-`, though it was not one of issue #552's original nine fixed-corpus misses."
+    },
+    {
+      "id": "generic-token-vendor-prefix-low-entropy-control",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      "expected": [],
+      "note": "Benign control (issue #552): a `sk-`-prefixed, exactly-48-byte run of a single repeated character has the right prefix and length but not the entropy floor the policy layer also requires, so it is not classified as a candidate -- the third of the three constraints the ADR names."
+    },
+    {
+      "id": "generic-token-vendor-prefix-short-body-control",
+      "detector": "generic-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk-SYNTHETICrevoked0001aaaaBBBBccccDDDD1234wxyzEFG end",
+      "expected": [],
+      "note": "Benign control (issue #552): a `sk-`-prefixed body one byte short of the required 48 is not classified -- the vendor-prefixed policy layer's run length is exact, not a minimum."
+    },
+    {
+      "id": "generic-token-vendor-prefix-embedded-in-wider-identifier-control",
+      "detector": "generic-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk-SYNTHETICrevoked0001aaaaBBBBccccDDDD1234wxyzEFGH9",
+      "expected": [],
+      "note": "Benign control (issue #552): one more alphanumeric byte directly after the 48-byte body makes the value a slice of a wider identifier, and the boundary check -- the same `is_alnum_dash` boundary `openai-token` itself uses -- rejects it rather than reading a truncated 48-byte prefix out of a longer run."
+    },
+    {
+      "id": "generic-token-vendor-prefix-overlap-namespace-body",
+      "detector": "generic-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk-proj-SYNTHETICREVOKED0001T3BlbkFJSYNTHETICREVOKED0002",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "vendor_prefixed_credential",
+          "confidence": "medium",
+          "specificity": "entropy",
+          "start": 0,
+          "end": 56
+        }
+      ],
+      "note": "Overlap evidence (issue #552), generic-token side: `openai-token` never claims a legacy-shaped 20/20 body under the explicit `sk-proj-` namespace (`openai-negative-explicit-namespace-legacy-body` records that silence), but the bare vendor-prefixed policy layer still claims the whole span at generic classification. Same input and disposition as `openai-negative-explicit-namespace-legacy-body`, filed a second time under this detector's own evidence so `vendor_prefixed_credential` carries direct overlap evidence rather than borrowing it."
     },
     {
       "id": "notion-token-positive-dotenv-secret",

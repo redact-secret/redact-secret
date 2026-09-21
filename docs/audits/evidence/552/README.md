@@ -16,6 +16,26 @@
 Written 2026-09-21 against `main` at `a7d3fb82eddd5efd85741827f5ac7c4d9d869f0f`, on
 branch `workbench/552-metamorphic-robustness-root-cause`.
 
+## Update — 2026-09-21, `openai-token`'s disposition superseded
+
+The reopened issue #552 measured that 15 of the original 18 misses were
+still present on `main`, and further research (recorded in the issue
+thread) found that the `openai-token` family's nine misses are not fully
+explained by the "already-accepted contract narrowing" framing below: the
+fixed-corpus shapes are a **provider-documented** body width (exactly 48
+bytes for the legacy and early-project/service-account/admin formats) that
+merely lacks the marker, not an arbitrary long-enough value. This document's
+conclusion of "no product code change is warranted" is **superseded for
+`openai-token` specifically** by
+[`decision-govern-bare-vendor-prefixed-policy-layer`](../../../decisions/2026-09-21-govern-bare-vendor-prefixed-policy-layer.md),
+which adds a separate, lower-confidence `generic-token` policy layer beneath
+the frozen contract. The `docker-token`, `cloudflare-token`, and
+`slack-token` findings below are unaffected and stand as written (see also
+[`evidence/566`](../566/README.md) for the docker/cloudflare re-check).
+Per `decision-govern-benchmark-regression-promotion`'s historical-record
+rule, the rest of this document is left as originally written rather than
+rewritten in place.
+
 ## Summary
 
 Issue #552 asks whether the fixed corpus's 18 `MISS` rows and 168 metamorphic

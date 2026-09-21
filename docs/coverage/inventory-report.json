@@ -1725,7 +1725,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 133,
+        "fixtureCount": 147,
         "hostContextsExercised": [
           "chat",
           "dotenv",
@@ -1811,7 +1811,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 133,
+        "fixtureCount": 147,
         "hostContextsExercised": [
           "chat",
           "dotenv",
@@ -1868,6 +1868,55 @@
       ],
       "state": "supported",
       "type": "authorization_credential"
+    },
+    {
+      "detector": "generic-token",
+      "evidence": {
+        "fixtureCount": 147,
+        "hostContextsExercised": [
+          "chat",
+          "dotenv",
+          "http",
+          "javascript",
+          "json",
+          "kubernetes",
+          "log",
+          "markdown",
+          "plain-text",
+          "python",
+          "shell",
+          "terminal",
+          "terraform",
+          "typescript",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "generic-token-vendor-prefix-admin-bare",
+        "generic-token-vendor-prefix-legacy-bare",
+        "generic-token-vendor-prefix-legacy-quoted",
+        "generic-token-vendor-prefix-legacy-unicode-crlf",
+        "generic-token-vendor-prefix-proj-bare",
+        "generic-token-vendor-prefix-proj-quoted",
+        "generic-token-vendor-prefix-proj-unicode-crlf",
+        "generic-token-vendor-prefix-svcacct-bare",
+        "generic-token-vendor-prefix-svcacct-quoted",
+        "generic-token-vendor-prefix-svcacct-unicode-crlf"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "vendor_prefixed_credential"
     },
     {
       "detector": "discord-bot-token",
@@ -2361,7 +2410,7 @@
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 52,
+    "supported": 53,
     "unresolved": 0
   }
 }

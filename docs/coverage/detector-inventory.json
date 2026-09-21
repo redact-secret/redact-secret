@@ -297,6 +297,13 @@
       ]
     },
     {
+      "type": "vendor_prefixed_credential",
+      "detector": "generic-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "sk-SYNTHETICrevoked0001aaaaBBBBccccDDDD1234wxyzEFGH",
+      "schemes": null
+    },
+    {
       "type": "discord_bot_token",
       "detector": "discord-bot-token",
       "policyClass": "always-redact",

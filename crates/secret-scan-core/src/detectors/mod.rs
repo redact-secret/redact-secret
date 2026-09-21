@@ -384,6 +384,38 @@ mod tests {
         assert_eq!(contextual[0].type_name(), "authorization_credential");
     }
 
+    /// Issue #552: a genuine, marker-bearing legacy `sk-` key satisfies both
+    /// `openai-token`'s reviewed contract and `generic-token`'s new bare
+    /// vendor-prefixed policy layer at the identical range. The candidates
+    /// compete, but never the finding: `openai-token`'s
+    /// [`Specificity::Provider`] strictly dominates `generic-token`'s
+    /// [`Specificity::Entropy`] in overlap resolution
+    /// (`decision-resolve-overlap-precedence-by-resolved-action-severity`),
+    /// so the in-contract key always keeps its own `openai_api_key` finding.
+    #[test]
+    fn openai_token_and_generic_token_policy_candidates_compete_and_provider_specificity_dominates()
+    {
+        let input = "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";
+        let context = DetectorContext::new(input.len());
+        let provider = openai::OpenAiTokenDetector.detect(input, &context).unwrap();
+        let policy = generic_token::generic_token_detector()
+            .detect(input, &context)
+            .unwrap();
+
+        assert_eq!(provider.len(), 1);
+        assert_eq!(provider[0].type_name(), "openai_api_key");
+        assert_eq!(provider[0].confidence(), Confidence::High);
+        assert_eq!(provider[0].specificity(), Some(Specificity::Provider));
+
+        assert_eq!(policy.len(), 1);
+        assert_eq!(policy[0].type_name(), "vendor_prefixed_credential");
+        assert_eq!(policy[0].confidence(), Confidence::Medium);
+        assert_eq!(policy[0].specificity(), Some(Specificity::Entropy));
+
+        assert_eq!(provider[0].range(), policy[0].range());
+        assert!(Specificity::Provider > Specificity::Entropy);
+    }
+
     fn assert_provider_candidates(cases: &[(&str, &str)]) {
         let detectors = built_in_detectors();
         for (id, input) in cases {
