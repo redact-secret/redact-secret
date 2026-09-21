@@ -201,9 +201,6 @@
           "dimension": "positive",
           "evidenceFixtureIds": [
             "github-positive-classic",
-            "github-positive-fine-grained",
-            "github-positive-fine-grained-dotenv",
-            "github-positive-installation-stateless",
             "host-chat-github",
             "host-curl-github",
             "host-docker-compose-github",
@@ -261,7 +258,10 @@
             "github-boundary-fine-grained-overlong-first-segment",
             "github-boundary-fine-grained-short-second-segment",
             "github-boundary-fine-grained-wrong-separator",
+            "github-boundary-oauth-short",
+            "github-boundary-refresh-token-short",
             "github-boundary-short",
+            "github-boundary-user-to-server-short",
             "mutation-github-01-invalid-prefix",
             "mutation-github-02-short-length",
             "mutation-github-03-invalid-alphabet",
@@ -276,8 +276,10 @@
           "evidenceFixtureIds": [
             "github-negative-commit-hash",
             "github-negative-fine-grained-variable-identifier",
+            "github-negative-gh-cli-masked-token",
             "github-negative-oauth-url-query",
-            "github-negative-test-id"
+            "github-negative-test-id",
+            "github-negative-undocumented-classic-family-prefix"
           ],
           "state": "supported"
         },
@@ -288,7 +290,10 @@
             "github-boundary-fine-grained-overlong-first-segment",
             "github-boundary-fine-grained-short-second-segment",
             "github-boundary-fine-grained-wrong-separator",
+            "github-boundary-oauth-short",
+            "github-boundary-refresh-token-short",
             "github-boundary-short",
+            "github-boundary-user-to-server-short",
             "mutation-github-01-invalid-prefix",
             "mutation-github-02-short-length",
             "mutation-github-03-invalid-alphabet",
@@ -305,13 +310,12 @@
             "github-adversarial-long-suffix",
             "github-negative-commit-hash",
             "github-negative-fine-grained-variable-identifier",
+            "github-negative-gh-cli-masked-token",
             "github-negative-oauth-url-query",
             "github-negative-test-id",
+            "github-negative-undocumented-classic-family-prefix",
             "github-overlap-context",
             "github-positive-classic",
-            "github-positive-fine-grained",
-            "github-positive-fine-grained-dotenv",
-            "github-positive-installation-stateless",
             "host-chat-github",
             "host-curl-github",
             "host-docker-compose-github",
@@ -367,6 +371,546 @@
       ],
       "note": "Coverage declaration for github_token (github-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
       "type": "github_token"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "github-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "github-positive-oauth",
+            "github-positive-oauth-dotenv"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "github-overlap-oauth-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "github-adversarial-long-suffix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "github-boundary-classic-overlong",
+            "github-boundary-fine-grained-overlong-first-segment",
+            "github-boundary-fine-grained-short-second-segment",
+            "github-boundary-fine-grained-wrong-separator",
+            "github-boundary-oauth-short",
+            "github-boundary-refresh-token-short",
+            "github-boundary-short",
+            "github-boundary-user-to-server-short",
+            "mutation-github-01-invalid-prefix",
+            "mutation-github-02-short-length",
+            "mutation-github-03-invalid-alphabet",
+            "mutation-github-04-whitespace-insertion",
+            "mutation-github-05-truncation",
+            "mutation-github-08-encoded-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "github-negative-commit-hash",
+            "github-negative-fine-grained-variable-identifier",
+            "github-negative-gh-cli-masked-token",
+            "github-negative-oauth-url-query",
+            "github-negative-test-id",
+            "github-negative-undocumented-classic-family-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "github-boundary-classic-overlong",
+            "github-boundary-fine-grained-overlong-first-segment",
+            "github-boundary-fine-grained-short-second-segment",
+            "github-boundary-fine-grained-wrong-separator",
+            "github-boundary-oauth-short",
+            "github-boundary-refresh-token-short",
+            "github-boundary-short",
+            "github-boundary-user-to-server-short",
+            "mutation-github-01-invalid-prefix",
+            "mutation-github-02-short-length",
+            "mutation-github-03-invalid-alphabet",
+            "mutation-github-04-whitespace-insertion",
+            "mutation-github-05-truncation",
+            "mutation-github-08-encoded-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for github_oauth_token (github-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "github_oauth_token"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "github-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "github-positive-user-to-server",
+            "github-positive-user-to-server-dotenv"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "github-overlap-user-to-server-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "github-adversarial-long-suffix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "github-boundary-classic-overlong",
+            "github-boundary-fine-grained-overlong-first-segment",
+            "github-boundary-fine-grained-short-second-segment",
+            "github-boundary-fine-grained-wrong-separator",
+            "github-boundary-oauth-short",
+            "github-boundary-refresh-token-short",
+            "github-boundary-short",
+            "github-boundary-user-to-server-short",
+            "mutation-github-01-invalid-prefix",
+            "mutation-github-02-short-length",
+            "mutation-github-03-invalid-alphabet",
+            "mutation-github-04-whitespace-insertion",
+            "mutation-github-05-truncation",
+            "mutation-github-08-encoded-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "github-negative-commit-hash",
+            "github-negative-fine-grained-variable-identifier",
+            "github-negative-gh-cli-masked-token",
+            "github-negative-oauth-url-query",
+            "github-negative-test-id",
+            "github-negative-undocumented-classic-family-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "github-boundary-classic-overlong",
+            "github-boundary-fine-grained-overlong-first-segment",
+            "github-boundary-fine-grained-short-second-segment",
+            "github-boundary-fine-grained-wrong-separator",
+            "github-boundary-oauth-short",
+            "github-boundary-refresh-token-short",
+            "github-boundary-short",
+            "github-boundary-user-to-server-short",
+            "mutation-github-01-invalid-prefix",
+            "mutation-github-02-short-length",
+            "mutation-github-03-invalid-alphabet",
+            "mutation-github-04-whitespace-insertion",
+            "mutation-github-05-truncation",
+            "mutation-github-08-encoded-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for github_app_user_to_server_token (github-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "github_app_user_to_server_token"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "github-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "github-positive-installation-stateful",
+            "github-positive-installation-stateless"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "github-overlap-installation-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "github-adversarial-long-suffix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "github-boundary-classic-overlong",
+            "github-boundary-fine-grained-overlong-first-segment",
+            "github-boundary-fine-grained-short-second-segment",
+            "github-boundary-fine-grained-wrong-separator",
+            "github-boundary-oauth-short",
+            "github-boundary-refresh-token-short",
+            "github-boundary-short",
+            "github-boundary-user-to-server-short",
+            "mutation-github-01-invalid-prefix",
+            "mutation-github-02-short-length",
+            "mutation-github-03-invalid-alphabet",
+            "mutation-github-04-whitespace-insertion",
+            "mutation-github-05-truncation",
+            "mutation-github-08-encoded-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "github-negative-commit-hash",
+            "github-negative-fine-grained-variable-identifier",
+            "github-negative-gh-cli-masked-token",
+            "github-negative-oauth-url-query",
+            "github-negative-test-id",
+            "github-negative-undocumented-classic-family-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "github-boundary-classic-overlong",
+            "github-boundary-fine-grained-overlong-first-segment",
+            "github-boundary-fine-grained-short-second-segment",
+            "github-boundary-fine-grained-wrong-separator",
+            "github-boundary-oauth-short",
+            "github-boundary-refresh-token-short",
+            "github-boundary-short",
+            "github-boundary-user-to-server-short",
+            "mutation-github-01-invalid-prefix",
+            "mutation-github-02-short-length",
+            "mutation-github-03-invalid-alphabet",
+            "mutation-github-04-whitespace-insertion",
+            "mutation-github-05-truncation",
+            "mutation-github-08-encoded-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for github_app_installation_token (github-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "github_app_installation_token"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "github-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "github-positive-refresh-token",
+            "github-positive-refresh-token-dotenv"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "github-overlap-refresh-token-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "github-adversarial-long-suffix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "github-boundary-classic-overlong",
+            "github-boundary-fine-grained-overlong-first-segment",
+            "github-boundary-fine-grained-short-second-segment",
+            "github-boundary-fine-grained-wrong-separator",
+            "github-boundary-oauth-short",
+            "github-boundary-refresh-token-short",
+            "github-boundary-short",
+            "github-boundary-user-to-server-short",
+            "mutation-github-01-invalid-prefix",
+            "mutation-github-02-short-length",
+            "mutation-github-03-invalid-alphabet",
+            "mutation-github-04-whitespace-insertion",
+            "mutation-github-05-truncation",
+            "mutation-github-08-encoded-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "github-negative-commit-hash",
+            "github-negative-fine-grained-variable-identifier",
+            "github-negative-gh-cli-masked-token",
+            "github-negative-oauth-url-query",
+            "github-negative-test-id",
+            "github-negative-undocumented-classic-family-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "github-boundary-classic-overlong",
+            "github-boundary-fine-grained-overlong-first-segment",
+            "github-boundary-fine-grained-short-second-segment",
+            "github-boundary-fine-grained-wrong-separator",
+            "github-boundary-oauth-short",
+            "github-boundary-refresh-token-short",
+            "github-boundary-short",
+            "github-boundary-user-to-server-short",
+            "mutation-github-01-invalid-prefix",
+            "mutation-github-02-short-length",
+            "mutation-github-03-invalid-alphabet",
+            "mutation-github-04-whitespace-insertion",
+            "mutation-github-05-truncation",
+            "mutation-github-08-encoded-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for github_app_refresh_token (github-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "github_app_refresh_token"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "github-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "github-positive-fine-grained",
+            "github-positive-fine-grained-dotenv"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "github-overlap-fine-grained-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "github-adversarial-long-suffix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "github-boundary-classic-overlong",
+            "github-boundary-fine-grained-overlong-first-segment",
+            "github-boundary-fine-grained-short-second-segment",
+            "github-boundary-fine-grained-wrong-separator",
+            "github-boundary-oauth-short",
+            "github-boundary-refresh-token-short",
+            "github-boundary-short",
+            "github-boundary-user-to-server-short",
+            "mutation-github-01-invalid-prefix",
+            "mutation-github-02-short-length",
+            "mutation-github-03-invalid-alphabet",
+            "mutation-github-04-whitespace-insertion",
+            "mutation-github-05-truncation",
+            "mutation-github-08-encoded-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "github-negative-commit-hash",
+            "github-negative-fine-grained-variable-identifier",
+            "github-negative-gh-cli-masked-token",
+            "github-negative-oauth-url-query",
+            "github-negative-test-id",
+            "github-negative-undocumented-classic-family-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "github-boundary-classic-overlong",
+            "github-boundary-fine-grained-overlong-first-segment",
+            "github-boundary-fine-grained-short-second-segment",
+            "github-boundary-fine-grained-wrong-separator",
+            "github-boundary-oauth-short",
+            "github-boundary-refresh-token-short",
+            "github-boundary-short",
+            "github-boundary-user-to-server-short",
+            "mutation-github-01-invalid-prefix",
+            "mutation-github-02-short-length",
+            "mutation-github-03-invalid-alphabet",
+            "mutation-github-04-whitespace-insertion",
+            "mutation-github-05-truncation",
+            "mutation-github-08-encoded-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for github_fine_grained_personal_access_token (github-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "github_fine_grained_personal_access_token"
     },
     {
       "behaviorClass": "provider",

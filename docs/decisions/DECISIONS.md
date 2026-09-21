@@ -61,3 +61,4 @@ future planning and implementation but do not authorize Git or release actions.
 - [Adopt the Hugging Face organization-token prefix under hf_'s frozen body grammar, re-tiered to T2](2026-09-20-adopt-huggingface-organization-token-prefix.md)
 - [Complete the Slack credential family by freezing the user-token grammar and the rotation family's version section](2026-09-20-freeze-slack-user-and-rotation-token-grammar.md)
 - [Separate the Supabase management-token credential class from the secret-key class, and keep each class's evidence independent](2026-09-20-scope-supabase-management-token-and-secret-key-independence.md)
+- [Map GitHub's six token families onto six independent finding types under one detector](2026-09-20-map-github-token-families-onto-independent-finding-types.md)

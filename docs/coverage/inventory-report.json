@@ -138,7 +138,7 @@
     {
       "detector": "github-token",
       "evidence": {
-        "fixtureCount": 54,
+        "fixtureCount": 71,
         "hostContextsExercised": [
           "chat",
           "curl",
@@ -176,9 +176,6 @@
       },
       "evidenceFixtureIds": [
         "github-positive-classic",
-        "github-positive-fine-grained",
-        "github-positive-fine-grained-dotenv",
-        "github-positive-installation-stateless",
         "host-chat-github",
         "host-curl-github",
         "host-docker-compose-github",
@@ -210,6 +207,246 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "github_token"
+    },
+    {
+      "detector": "github-token",
+      "evidence": {
+        "fixtureCount": 71,
+        "hostContextsExercised": [
+          "chat",
+          "curl",
+          "docker-compose",
+          "dotenv",
+          "github-actions",
+          "http",
+          "javascript",
+          "json",
+          "kubernetes",
+          "log",
+          "markdown",
+          "plain-text",
+          "powershell",
+          "python",
+          "shell",
+          "stack-trace",
+          "terminal",
+          "terraform",
+          "toml",
+          "typescript",
+          "xml",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "github-positive-oauth",
+        "github-positive-oauth-dotenv"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "github_oauth_token"
+    },
+    {
+      "detector": "github-token",
+      "evidence": {
+        "fixtureCount": 71,
+        "hostContextsExercised": [
+          "chat",
+          "curl",
+          "docker-compose",
+          "dotenv",
+          "github-actions",
+          "http",
+          "javascript",
+          "json",
+          "kubernetes",
+          "log",
+          "markdown",
+          "plain-text",
+          "powershell",
+          "python",
+          "shell",
+          "stack-trace",
+          "terminal",
+          "terraform",
+          "toml",
+          "typescript",
+          "xml",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "github-positive-user-to-server",
+        "github-positive-user-to-server-dotenv"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "github_app_user_to_server_token"
+    },
+    {
+      "detector": "github-token",
+      "evidence": {
+        "fixtureCount": 71,
+        "hostContextsExercised": [
+          "chat",
+          "curl",
+          "docker-compose",
+          "dotenv",
+          "github-actions",
+          "http",
+          "javascript",
+          "json",
+          "kubernetes",
+          "log",
+          "markdown",
+          "plain-text",
+          "powershell",
+          "python",
+          "shell",
+          "stack-trace",
+          "terminal",
+          "terraform",
+          "toml",
+          "typescript",
+          "xml",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "github-positive-installation-stateful",
+        "github-positive-installation-stateless"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "github_app_installation_token"
+    },
+    {
+      "detector": "github-token",
+      "evidence": {
+        "fixtureCount": 71,
+        "hostContextsExercised": [
+          "chat",
+          "curl",
+          "docker-compose",
+          "dotenv",
+          "github-actions",
+          "http",
+          "javascript",
+          "json",
+          "kubernetes",
+          "log",
+          "markdown",
+          "plain-text",
+          "powershell",
+          "python",
+          "shell",
+          "stack-trace",
+          "terminal",
+          "terraform",
+          "toml",
+          "typescript",
+          "xml",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "github-positive-refresh-token",
+        "github-positive-refresh-token-dotenv"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "github_app_refresh_token"
+    },
+    {
+      "detector": "github-token",
+      "evidence": {
+        "fixtureCount": 71,
+        "hostContextsExercised": [
+          "chat",
+          "curl",
+          "docker-compose",
+          "dotenv",
+          "github-actions",
+          "http",
+          "javascript",
+          "json",
+          "kubernetes",
+          "log",
+          "markdown",
+          "plain-text",
+          "powershell",
+          "python",
+          "shell",
+          "stack-trace",
+          "terminal",
+          "terraform",
+          "toml",
+          "typescript",
+          "xml",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "github-positive-fine-grained",
+        "github-positive-fine-grained-dotenv"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "github_fine_grained_personal_access_token"
     },
     {
       "detector": "gitlab-token",
@@ -2009,7 +2246,7 @@
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 44,
+    "supported": 49,
     "unresolved": 0
   }
 }
