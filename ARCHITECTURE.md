@@ -590,6 +590,14 @@ file in a new tarball) a byte comparison against that repack is not
 meaningful; the manifest records that explicitly instead of silently omitting
 the published digest.
 
+Qualification also gates on [support-matrix drift](docs/support-matrix-drift.md):
+the candidate's pinned support matrix is compared, entirely offline, against
+the most recent prior release's, and a family that regressed out of `stable`
+fails the run unless a human has recorded an explicit, rationale-bearing
+acknowledgement of it. The manifest carries that drift record too, so a
+release's evidence always states what the support matrix looked like before
+and after, not only whether the gate passed.
+
 The `Artifact qualification` workflow is that candidate run. From one revision it
 calls the Rust and CPython workflows and additionally builds the N-API addon,
 the browser WebAssembly artifact, and the CLI binary for every declared target,
