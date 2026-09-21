@@ -41,6 +41,7 @@ list is not proof that input contains no secrets.
 - [Review archive](audits/README.md) and [beta.2 final code review](audits/beta2-final-code-review.md)
 - [Changelog](../CHANGELOG.md), [security reporting](../SECURITY.md), and [MIT license](../LICENSE)
 - [Documentation readiness and delivery follow-up](documentation-readiness.md)
+- [v0.1.0 release-readiness checklist](release-readiness-v0.1.0.md)
 
 These Markdown pages are the source documentation. Relative links and ordinary
 code fences keep them usable in the repository and portable to a future public
