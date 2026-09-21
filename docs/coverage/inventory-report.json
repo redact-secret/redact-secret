@@ -2277,12 +2277,50 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "firebase_server_key"
+    },
+    {
+      "detector": "terraform-cloud-token",
+      "evidence": {
+        "fixtureCount": 19,
+        "hostContextsExercised": [
+          "dotenv",
+          "github-actions",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "terraform"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "terraform-cloud-token-positive-bare",
+        "terraform-cloud-token-positive-cli-credentials-hcl",
+        "terraform-cloud-token-positive-cli-credentials-json",
+        "terraform-cloud-token-positive-crlf-unicode-prefix",
+        "terraform-cloud-token-positive-dotenv",
+        "terraform-cloud-token-positive-github-actions",
+        "terraform-cloud-token-positive-log"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "terraform_cloud_token"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 50,
+    "supported": 51,
     "unresolved": 0
   }
 }
