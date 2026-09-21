@@ -192,7 +192,10 @@ mod tests {
     #[test]
     fn oauth_rejects_a_body_longer_than_the_exact_twenty_byte_length() {
         for body in ["x".repeat(21), "x".repeat(200), "x_y-z".repeat(5)] {
-            assert!(detect(&format!("{OAUTH_PREFIX}{body}")).is_empty(), "{body}");
+            assert!(
+                detect(&format!("{OAUTH_PREFIX}{body}")).is_empty(),
+                "{body}"
+            );
         }
     }
 
