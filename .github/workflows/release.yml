@@ -552,18 +552,22 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
+      # `npm view` consults npm's aggregate package metadata, which can stay a
+      # cached 404 for a while after a fresh publish -- that is what produced
+      # a false-negative "publish failed" report on beta.5 even though the
+      # publish had actually succeeded. `npm-registry-metadata.mjs` reads the
+      # immutable per-version endpoint directly instead, with a bounded,
+      # documented wait for propagation, and it fails closed with a message
+      # naming what it waited on and for how long if the content genuinely
+      # never matches -- the same treatment every other registry-state read
+      # in this pipeline gets.
       - name: Verify npm publication
         shell: bash
         run: |
-          for attempt in 1 2 3 4 5; do
-            published=$(npm view "${{ steps.release.outputs.package_name }}@${{ steps.release.outputs.package_version }}" version 2>/dev/null || true)
-            if [[ "$published" == "${{ steps.release.outputs.package_version }}" ]]; then
-              exit 0
-            fi
-            sleep 5
-          done
-          echo "The published version could not be verified from npm." >&2
-          exit 1
+          node scripts/npm-registry-metadata.mjs \
+            "${{ steps.release.outputs.package_name }}" \
+            "${{ steps.release.outputs.package_version }}" \
+            "${{ steps.pack.outputs.shasum }}"
 
       # `if: always()` so a partial or failed release still reports what it
       # observed; `record-manifest` is what actually writes the manifest now

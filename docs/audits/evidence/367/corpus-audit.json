@@ -3984,6 +3984,152 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "google-api-key",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "firebase-database-secret-query-param-negative-out-of-scope",
+      "kind": "negative",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "negative"
+    },
+    {
+      "contexts": [
+        "javascript"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "google-api-key",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "firebase-negative-authdomain-bare",
+      "kind": "negative",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "negative"
+    },
+    {
+      "contexts": [
+        "javascript"
+      ],
+      "contractOnlyMatches": [
+        {
+          "end": 75,
+          "start": 36,
+          "variant": "api-key"
+        }
+      ],
+      "corpus": "conformance/synchronous",
+      "detector": "google-api-key",
+      "disposition": "review",
+      "expectedRanges": [],
+      "id": "firebase-negative-client-config-javascript",
+      "kind": "negative",
+      "lostRanges": [],
+      "policyOutcomes": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "negative"
+    },
+    {
+      "contexts": [
+        "json"
+      ],
+      "contractOnlyMatches": [
+        {
+          "end": 51,
+          "start": 12,
+          "variant": "api-key"
+        }
+      ],
+      "corpus": "conformance/synchronous",
+      "detector": "google-api-key",
+      "disposition": "review",
+      "expectedRanges": [],
+      "id": "firebase-negative-client-config-json",
+      "kind": "negative",
+      "lostRanges": [],
+      "policyOutcomes": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "negative"
+    },
+    {
+      "contexts": [
+        "javascript"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "google-api-key",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 54,
+          "start": 15
+        }
+      ],
+      "id": "firebase-negative-client-config-wide-gap-does-not-suppress",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 54,
+          "start": 15
+        }
+      ],
+      "support": "supported",
+      "tier": "contextual"
+    },
+    {
+      "contexts": [
+        "javascript"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "google-api-key",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "firebase-negative-messaging-sender-id-bare",
+      "kind": "negative",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "negative"
+    },
+    {
+      "contexts": [
+        "javascript"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "google-api-key",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 59,
+          "start": 20
+        }
+      ],
+      "id": "firebase-positive-google-api-key-as-server-key-context",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 59,
+          "start": 20
+        }
+      ],
+      "support": "supported",
+      "tier": "canonical"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "google-api-key",
       "disposition": "retained",
       "expectedRanges": [
         {
@@ -9895,9 +10041,9 @@
     },
     "google-api-key": {
       "broad-shape": 0,
-      "retained": 9,
-      "review": 0,
-      "silent": 15
+      "retained": 11,
+      "review": 2,
+      "silent": 18
     },
     "huggingface-token": {
       "broad-shape": 0,

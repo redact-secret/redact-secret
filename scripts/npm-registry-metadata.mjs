@@ -49,10 +49,36 @@ export async function waitForPublished(
   }
   throw new Error(
     metadata === undefined
-      ? `${name}@${version}: not visible on the registry after publishing`
-      : `${name}@${version}: registry checksum does not match qualified content ` +
-          `(saw ${metadata.dist.shasum}, expected ${expectedShasum})`,
+      ? `${name}@${version}: not visible on the registry after waiting ${maxWaitMs}ms for publish propagation`
+      : `${name}@${version}: registry checksum still does not match qualified content after waiting ` +
+          `${maxWaitMs}ms (saw ${metadata.dist.shasum}, expected ${expectedShasum})`,
   );
+}
+
+/**
+ * Poll until `name@version` is visible on the registry with *any* content,
+ * or `maxWaitMs` elapses -- for callers that need to know a version is
+ * installable (e.g. a registry-install verification lane) but, unlike
+ * `waitForPublished`'s callers, hold no local shasum to verify it against.
+ * A propagation delay within the timeout resolves silently; exceeding it is
+ * a real failure, not "not published" treated as safe to proceed.
+ */
+export async function waitForVisible(
+  name,
+  version,
+  { request = fetch, pollIntervalMs = POLL_INTERVAL_MS, maxWaitMs = MAX_WAIT_MS } = {},
+) {
+  const deadline = Date.now() + maxWaitMs;
+  for (;;) {
+    const metadata = await viewPublished(name, version, request);
+    if (metadata !== undefined) return metadata;
+    if (Date.now() >= deadline) {
+      throw new Error(
+        `${name}@${version}: not visible on the registry after waiting ${maxWaitMs}ms for publish propagation`,
+      );
+    }
+    await new Promise((resolve) => setTimeout(resolve, pollIntervalMs));
+  }
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

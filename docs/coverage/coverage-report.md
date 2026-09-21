@@ -15,11 +15,11 @@ These counts describe finding-type inventory rows with corpus evidence, not dete
 
 | Row state | Count |
 | --- | --- |
-| supported | 49 |
+| supported | 50 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 60.
+Coverage declarations: 61.
 
 ## Coverage by detector
 
@@ -37,6 +37,7 @@ Coverage declarations: 60.
 | digitalocean-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | discord-bot-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | docker-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| firebase-server-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | generic-token | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
 | github-token | 6 | supported: 6, intentionally-unsupported: 0, unresolved: 0 |
 | gitlab-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -87,6 +88,7 @@ Coverage declarations: 60.
 | digitalocean_token | digitalocean-token | provider | supported | not-applicable | none |
 | discord_bot_token | discord-bot-token | provider | supported | not-applicable | none |
 | docker_token | docker-token | provider | supported | not-applicable | none |
+| firebase_server_key | firebase-server-key | provider | supported | not-applicable | none |
 | github_app_installation_token | github-token | provider | supported | not-applicable | none |
 | github_app_refresh_token | github-token | provider | supported | not-applicable | none |
 | github_app_user_to_server_token | github-token | provider | supported | not-applicable | none |
@@ -147,15 +149,15 @@ Coverage declarations: 60.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 60 | 0 | 0 |
-| boundary | 49 | 0 | 0 |
-| host-context | 49 | 0 | 0 |
+| adversarial | 61 | 0 | 0 |
+| boundary | 50 | 0 | 0 |
+| host-context | 50 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 60 | 0 | 0 |
-| near-miss-negative | 49 | 0 | 0 |
-| overlap | 49 | 0 | 0 |
-| positive | 49 | 0 | 0 |
-| range | 60 | 0 | 0 |
+| malformed | 61 | 0 | 0 |
+| near-miss-negative | 50 | 0 | 0 |
+| overlap | 50 | 0 | 0 |
+| positive | 50 | 0 | 0 |
+| range | 61 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

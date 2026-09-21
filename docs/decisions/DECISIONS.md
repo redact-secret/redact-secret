@@ -54,6 +54,7 @@ future planning and implementation but do not authorize Git or release actions.
 - [Share generic-token's interpolation and environment-reference exclusions with connection-string's password check](2026-09-20-share-non-secret-reference-exclusions-with-connection-string.md)
 - [Scope a payload-trusting exclusion for the legacy Supabase anon JWT to iss+role together](2026-09-20-scope-supabase-legacy-anon-jwt-exclusion.md)
 - [Warn unconditionally on high-signal contextual-name assignments despite prose false positives](2026-09-20-warn-unconditionally-on-high-signal-contextual-names.md)
+- [Add Firebase FCM legacy server key detection, and discriminate the public Web SDK client config from google-api-key](2026-09-20-add-firebase-server-key-detection-and-client-config-discrimination.md)
 - [Exclude repeated-character filler and whole-value placeholder vocabulary from bearer-token](2026-09-20-exclude-filler-and-placeholder-bearer-values.md)
 - [connection-string and jwt need no incremental retention hint of their own](2026-09-20-connection-string-and-jwt-need-no-retention-hint.md)
 - [Defer encoded-input decoding out of scope, with reasoning](2026-09-20-defer-encoded-input-decoding.md)
