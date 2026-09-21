@@ -296,6 +296,18 @@ mod tests {
         }
     }
 
+    /// Issue #551: the shared boundary/delimiter regression set, mirrored
+    /// from `digitalocean-token`'s existing leading/trailing/dash
+    /// identifier-embedding fixtures, for both `cloudflare-token` shapes.
+    #[test]
+    fn rejects_every_shape_embedded_in_a_wider_identifier_leading_trailing_or_dash_joined() {
+        for value in [user_token(), account_token()] {
+            assert!(detect(&format!("legacy{value}")).is_empty(), "{value}");
+            assert!(detect(&format!("{value}_backup")).is_empty(), "{value}");
+            assert!(detect(&format!("{value}-1")).is_empty(), "{value}");
+        }
+    }
+
     #[test]
     fn rejects_a_masked_value() {
         for prefix in [USER_PREFIX, ACCOUNT_PREFIX] {

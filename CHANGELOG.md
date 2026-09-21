@@ -54,6 +54,14 @@ evidence is linked from each published version.
   any other undocumented character is a documented out-of-scope gap. The new
   detector is always-redact, provider-specific, and wins any overlap with
   the generic contextual detector.
+- `slack-token`'s `xoxe-`, `xoxe.xoxb-`, and `xoxe.xoxp-` rotation tails,
+  its `xapp-` and `xwfp-` interim guards, and `linear-token`'s `lin_oauth_`
+  interim guard now require an exact 20-byte `[A-Za-z0-9_-]` body instead
+  of 20 or more bytes (#551). Their match alphabet equals the boundary
+  alphabet, so an open-ended run absorbed a directly glued identifier
+  (`…_backup`, `…-1`) into the finding instead of rejecting it. A body
+  longer than 20 bytes on these prefixes is now an intentional false
+  negative until a reviewed contract documents a real maximum.
 
 ### Internal, tooling, and qualification
 
