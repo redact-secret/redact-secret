@@ -4156,7 +4156,87 @@
       "detector": "google-api-key",
       "disposition": "silent",
       "expectedRanges": [],
+      "id": "google-negative-oauth-access-token",
+      "kind": "negative",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "negative"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "google-api-key",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "google-negative-oauth-client-id",
+      "kind": "negative",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "negative"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "google-api-key",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "google-negative-oauth-client-secret",
+      "kind": "negative",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "negative"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "google-api-key",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "google-negative-oauth-refresh-token",
+      "kind": "negative",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "negative"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "google-api-key",
+      "disposition": "silent",
+      "expectedRanges": [],
       "id": "google-negative-placeholder",
+      "kind": "negative",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "supported",
+      "tier": "negative"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "google-api-key",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "google-negative-service-account-email",
       "kind": "negative",
       "lostRanges": [],
       "retainedRanges": [],
@@ -9817,7 +9897,7 @@
       "broad-shape": 0,
       "retained": 9,
       "review": 0,
-      "silent": 10
+      "silent": 15
     },
     "huggingface-token": {
       "broad-shape": 0,
