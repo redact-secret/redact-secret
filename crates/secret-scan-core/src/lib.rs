@@ -124,6 +124,12 @@ mod pipeline;
 mod policy;
 mod redact;
 mod registry;
+// Issue #483 (`decision-define-declarative-detector-ruleset-contract`): the
+// parser and IR are entirely crate-internal, and nothing yet builds a
+// `Detector` from a parsed ruleset — that adapter is #495. Until then this
+// module's only callers are its own tests.
+#[allow(dead_code)]
+mod ruleset;
 mod types;
 
 pub use entropy::shannon_entropy;
