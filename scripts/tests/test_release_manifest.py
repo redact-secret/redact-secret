@@ -169,6 +169,36 @@ class NormalizeArtifactDigestsTests(unittest.TestCase):
         self.assertIn("must be a list", errors[0])
 
 
+VALID_DRIFT_SUMMARY = {"regressions": 0, "improvements": 1, "newAndUnclassified": 0, "staleProviderProvenance": 2}
+
+
+class NormalizeSupportMatrixDriftTests(unittest.TestCase):
+    def test_empty_value_is_recorded_as_empty_with_no_errors(self) -> None:
+        normalized, errors = RELEASE_MANIFEST.normalize_support_matrix_drift({})
+        self.assertEqual(normalized, {})
+        self.assertEqual(errors, [])
+
+    def test_well_formed_drift_record_passes_through_unchanged(self) -> None:
+        drift = {"summary": VALID_DRIFT_SUMMARY, "regressions": []}
+        normalized, errors = RELEASE_MANIFEST.normalize_support_matrix_drift(drift)
+        self.assertEqual(normalized, drift)
+        self.assertEqual(errors, [])
+
+    def test_missing_summary_is_an_error(self) -> None:
+        _, errors = RELEASE_MANIFEST.normalize_support_matrix_drift({"regressions": []})
+        self.assertTrue(any("summary" in e for e in errors))
+
+    def test_negative_summary_count_is_an_error(self) -> None:
+        drift = {"summary": dict(VALID_DRIFT_SUMMARY, regressions=-1)}
+        _, errors = RELEASE_MANIFEST.normalize_support_matrix_drift(drift)
+        self.assertTrue(any("regressions" in e for e in errors))
+
+    def test_non_integer_summary_count_is_an_error(self) -> None:
+        drift = {"summary": dict(VALID_DRIFT_SUMMARY, improvements="1")}
+        _, errors = RELEASE_MANIFEST.normalize_support_matrix_drift(drift)
+        self.assertTrue(any("improvements" in e for e in errors))
+
+
 class CliTests(unittest.TestCase):
     def test_writes_the_manifest_json(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -298,6 +328,103 @@ class CliTests(unittest.TestCase):
                     "--registry-state",
                     "npm=published",
                     "--artifact-digests",
+                    "not json",
+                    "--out",
+                    str(out),
+                ]
+            )
+            self.assertEqual(status, 1)
+            self.assertFalse(out.exists())
+
+    def test_defaults_support_matrix_drift_to_empty_object(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp) / "manifest.json"
+            status = RELEASE_MANIFEST.main(
+                [
+                    "--source-revision",
+                    VALID_FIELDS["source_revision"],
+                    "--conformance-identity",
+                    VALID_FIELDS["conformance_identity"],
+                    "--version",
+                    VALID_FIELDS["version"],
+                    "--artifact",
+                    "npm:@redact-secret/core",
+                    "--registry-state",
+                    "npm=published",
+                    "--out",
+                    str(out),
+                ]
+            )
+            self.assertEqual(status, 0)
+            recorded = json.loads(out.read_text(encoding="utf-8"))
+            self.assertEqual(recorded["support_matrix_drift"], {})
+
+    def test_support_matrix_drift_is_recorded_alongside_the_existing_evidence(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp) / "manifest.json"
+            drift = json.dumps({"summary": {"regressions": 1, "improvements": 0, "newAndUnclassified": 0, "staleProviderProvenance": 0}})
+            status = RELEASE_MANIFEST.main(
+                [
+                    "--source-revision",
+                    VALID_FIELDS["source_revision"],
+                    "--conformance-identity",
+                    VALID_FIELDS["conformance_identity"],
+                    "--version",
+                    VALID_FIELDS["version"],
+                    "--artifact",
+                    "npm:@redact-secret/core",
+                    "--registry-state",
+                    "npm=published",
+                    "--support-matrix-drift",
+                    drift,
+                    "--out",
+                    str(out),
+                ]
+            )
+            self.assertEqual(status, 0)
+            recorded = json.loads(out.read_text(encoding="utf-8"))
+            self.assertEqual(recorded["support_matrix_drift"]["summary"]["regressions"], 1)
+
+    def test_malformed_support_matrix_drift_still_writes_the_manifest_but_fails(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp) / "manifest.json"
+            status = RELEASE_MANIFEST.main(
+                [
+                    "--source-revision",
+                    VALID_FIELDS["source_revision"],
+                    "--conformance-identity",
+                    VALID_FIELDS["conformance_identity"],
+                    "--version",
+                    VALID_FIELDS["version"],
+                    "--artifact",
+                    "npm:@redact-secret/core",
+                    "--registry-state",
+                    "npm=published",
+                    "--support-matrix-drift",
+                    '{"summary": {}}',
+                    "--out",
+                    str(out),
+                ]
+            )
+            self.assertEqual(status, 1)
+            self.assertTrue(out.exists())
+
+    def test_invalid_support_matrix_drift_json_fails_without_writing(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp) / "manifest.json"
+            status = RELEASE_MANIFEST.main(
+                [
+                    "--source-revision",
+                    VALID_FIELDS["source_revision"],
+                    "--conformance-identity",
+                    VALID_FIELDS["conformance_identity"],
+                    "--version",
+                    VALID_FIELDS["version"],
+                    "--artifact",
+                    "npm:@redact-secret/core",
+                    "--registry-state",
+                    "npm=published",
+                    "--support-matrix-drift",
                     "not json",
                     "--out",
                     str(out),
