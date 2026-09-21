@@ -236,6 +236,16 @@ class InventoryTests(unittest.TestCase):
             self.errors(configure), ["unrecognized artifact(s): something-else"]
         )
 
+    def test_the_support_matrix_drift_record_is_not_an_unrecognized_artifact(self) -> None:
+        def configure(artifacts: Artifacts) -> None:
+            artifacts.files["support-matrix-drift"] = ["support-matrix-drift.json"]
+
+        self.assertEqual(self.errors(configure), [])
+        self.assertNotIn(
+            "support-matrix-drift",
+            {entry["artifact"] for entry in self.collect(configure)},
+        )
+
     def test_installed_javascript_qualification_covers_declared_runtimes(self) -> None:
         self.assertEqual(self.qualification_errors(), [])
 
