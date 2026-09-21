@@ -67,3 +67,4 @@ future planning and implementation but do not authorize Git or release actions.
 - [Project the generated support matrix into docs and release notes via a pinned copy](2026-09-21-project-the-support-matrix-into-docs-and-release-notes.md)
 - [Gate release qualification on support-matrix drift, with recorded acknowledgement to override](2026-09-21-gate-releases-on-support-matrix-drift.md)
 - [Freeze the Pulumi access token grammar as a documented-prefix, tool-corroborated exact-length hex shape](2026-09-21-freeze-pulumi-access-token-grammar.md)
+
