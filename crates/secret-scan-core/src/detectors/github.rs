@@ -1,14 +1,37 @@
-//! GitHub token detection: classic, installation, and fine-grained tokens.
+//! GitHub token detection, one finding type per credential family
+//! (`decision-map-github-token-families-onto-independent-finding-types`):
+//! classic personal access token, OAuth access token, GitHub App
+//! user-to-server token, GitHub App server-to-server (installation) token,
+//! GitHub App refresh token, and fine-grained personal access token. All six
+//! share this one detector id, `github-token`, the same "one detector, many
+//! declared types" shape `generic-token` already uses.
 //!
-//! Mirrors `src/detectors/github.ts`.
+//! The four prefixes in [`CLASSIC_FAMILY_PREFIXES`] share one body grammar
+//! (GitHub's 2021-04 token-format rollout: prefix + exactly 36
+//! `[A-Za-z0-9]` bytes, unchanged since) and so share a single scan pass;
+//! which literal prefix matched at each candidate's start determines its
+//! finding type. Installation tokens keep their own, wider grammar because
+//! GitHub's stateless installation-token rollout (started 2026-04-27) can
+//! make a `ghs_` token far longer and JWT-shaped.
 
 use crate::detectors::pattern::{self, RunLength};
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
 
-const CLASSIC_PREFIXES: [&str; 4] = ["gho_", "ghp_", "ghu_", "ghr_"];
-const INSTALLATION_PREFIXES: [&str; 1] = ["ghs_"];
+/// `(prefix, finding type)`. `ghp_` keeps the pre-existing `github_token`
+/// type name: it is the only one of the four with prior, independently
+/// evidenced fixtures and generic-infrastructure test usage, and nothing
+/// about splitting the other three prefixes out requires renaming it too.
+const CLASSIC_FAMILY_PREFIXES: [(&str, &str); 4] = [
+    ("ghp_", "github_token"),
+    ("gho_", "github_oauth_token"),
+    ("ghu_", "github_app_user_to_server_token"),
+    ("ghr_", "github_app_refresh_token"),
+];
+const INSTALLATION_PREFIX: &str = "ghs_";
+const INSTALLATION_TYPE: &str = "github_app_installation_token";
 const FINE_GRAINED_PREFIX: &str = "github_pat_";
+const FINE_GRAINED_TYPE: &str = "github_fine_grained_personal_access_token";
 const FINE_GRAINED_FIRST_LEN: usize = 22;
 const FINE_GRAINED_SECOND_LEN: usize = 59;
 
@@ -27,43 +50,69 @@ impl Detector for GitHubTokenDetector {
         input: &str,
         _context: &DetectorContext,
     ) -> Result<Vec<Candidate>, DetectorFailure> {
-        // Emission order matches the TypeScript oracle: classic, then
-        // installation, then fine-grained, each in its own left-to-right
-        // pass. This order is a public contract for overlap tie breaking,
-        // not just cosmetic.
+        // Emission order matches the historical oracle: classic family,
+        // then installation, then fine-grained, each in its own
+        // left-to-right pass. This order is a public contract for overlap
+        // tie breaking, not just cosmetic.
         let mut candidates = Vec::new();
+        push_classic_family(&mut candidates, input);
         push(
             &mut candidates,
             pattern::scan_prefixed_runs(
                 input,
-                &CLASSIC_PREFIXES,
-                RunLength::Exact(36),
-                pattern::is_alnum,
-                pattern::is_alnum_underscore,
-            ),
-        );
-        push(
-            &mut candidates,
-            pattern::scan_prefixed_runs(
-                input,
-                &INSTALLATION_PREFIXES,
+                &[INSTALLATION_PREFIX],
                 RunLength::AtLeast(36),
                 pattern::is_alnum_dash_dot,
                 pattern::is_alnum_dash_dot,
             ),
+            INSTALLATION_TYPE,
         );
-        push(&mut candidates, scan_fine_grained(input));
+        push(&mut candidates, scan_fine_grained(input), FINE_GRAINED_TYPE);
         Ok(candidates)
     }
 }
 
-fn push(candidates: &mut Vec<Candidate>, ranges: Vec<(usize, usize)>) {
+/// Scans all four classic-family prefixes in one left-to-right pass (they
+/// share a body grammar, so [`pattern::scan_prefixed_runs`] applies), then
+/// assigns each matched range its finding type by which literal prefix it
+/// starts with.
+fn push_classic_family(candidates: &mut Vec<Candidate>, input: &str) {
+    let prefixes: Vec<&str> = CLASSIC_FAMILY_PREFIXES.iter().map(|(p, _)| *p).collect();
+    let ranges = pattern::scan_prefixed_runs(
+        input,
+        &prefixes,
+        RunLength::Exact(36),
+        pattern::is_alnum,
+        pattern::is_alnum_underscore,
+    );
+    let bytes = input.as_bytes();
+    for (start, end) in ranges {
+        let Some(range) = ByteRange::new(start, end) else {
+            continue;
+        };
+        // `scan_prefixed_runs` only ever returns a match starting with one of
+        // the prefixes it was given, so exactly one arm always applies; a
+        // range matching none falls through to the loop's next iteration
+        // rather than panicking on an assumption that should always hold.
+        for (prefix, type_name) in CLASSIC_FAMILY_PREFIXES {
+            if bytes[start..].starts_with(prefix.as_bytes()) {
+                candidates.push(
+                    Candidate::new(type_name, Confidence::High, range)
+                        .with_specificity(Specificity::Provider),
+                );
+                break;
+            }
+        }
+    }
+}
+
+fn push(candidates: &mut Vec<Candidate>, ranges: Vec<(usize, usize)>, type_name: &'static str) {
     for (start, end) in ranges {
         let Some(range) = ByteRange::new(start, end) else {
             continue;
         };
         candidates.push(
-            Candidate::new("github_token", Confidence::High, range)
+            Candidate::new(type_name, Confidence::High, range)
                 .with_specificity(Specificity::Provider),
         );
     }
@@ -147,6 +196,10 @@ mod tests {
         let candidates = detect(&input);
         assert_eq!(candidates.len(), 1);
         assert_eq!(
+            candidates[0].type_name(),
+            "github_fine_grained_personal_access_token"
+        );
+        assert_eq!(
             candidates[0].range(),
             ByteRange::new(0, input.len()).unwrap()
         );
@@ -155,7 +208,9 @@ mod tests {
     #[test]
     fn detects_a_stateful_installation_token() {
         let input = format!("ghs_{}", "S".repeat(36));
-        assert_eq!(detect(&input).len(), 1);
+        let candidates = detect(&input);
+        assert_eq!(candidates.len(), 1);
+        assert_eq!(candidates[0].type_name(), "github_app_installation_token");
     }
 
     #[test]
@@ -165,6 +220,7 @@ mod tests {
         let input = format!("before {token} after");
         let candidates = detect(&input);
         assert_eq!(candidates.len(), 1);
+        assert_eq!(candidates[0].type_name(), "github_app_installation_token");
         let start = input.find(token).unwrap();
         assert_eq!(
             candidates[0].range(),
@@ -173,8 +229,60 @@ mod tests {
     }
 
     #[test]
+    fn detects_an_oauth_access_token() {
+        let input = format!("gho_{}", "S".repeat(36));
+        let candidates = detect(&input);
+        assert_eq!(candidates.len(), 1);
+        assert_eq!(candidates[0].type_name(), "github_oauth_token");
+    }
+
+    #[test]
+    fn detects_a_user_to_server_token() {
+        let input = format!("ghu_{}", "S".repeat(36));
+        let candidates = detect(&input);
+        assert_eq!(candidates.len(), 1);
+        assert_eq!(candidates[0].type_name(), "github_app_user_to_server_token");
+    }
+
+    #[test]
+    fn detects_a_refresh_token() {
+        let input = format!("ghr_{}", "S".repeat(36));
+        let candidates = detect(&input);
+        assert_eq!(candidates.len(), 1);
+        assert_eq!(candidates[0].type_name(), "github_app_refresh_token");
+    }
+
+    #[test]
+    fn each_classic_family_prefix_keeps_its_own_type_at_a_shared_position() {
+        // All four prefixes share one body grammar and one scan pass; this
+        // pins that the shared pass still assigns each match its own,
+        // independent family type rather than collapsing them.
+        let input = format!(
+            "{} {} {} {}",
+            format_args!("ghp_{}", "S".repeat(36)),
+            format_args!("gho_{}", "S".repeat(36)),
+            format_args!("ghu_{}", "S".repeat(36)),
+            format_args!("ghr_{}", "S".repeat(36)),
+        );
+        let candidates = detect(&input);
+        let types: Vec<&str> = candidates.iter().map(Candidate::type_name).collect();
+        assert_eq!(
+            types,
+            vec![
+                "github_token",
+                "github_oauth_token",
+                "github_app_user_to_server_token",
+                "github_app_refresh_token",
+            ]
+        );
+    }
+
+    #[test]
     fn rejects_short_lookalikes() {
         assert_eq!(detect("ghp_SYNTHETICSHORT").len(), 0);
+        assert_eq!(detect("gho_SYNTHETICSHORT").len(), 0);
+        assert_eq!(detect("ghu_SYNTHETICSHORT").len(), 0);
+        assert_eq!(detect("ghr_SYNTHETICSHORT").len(), 0);
         assert_eq!(detect("ghs_SYNTHETICSHORT").len(), 0);
         let short_fine_grained = format!(
             "github_pat_{}_{}",
@@ -182,6 +290,14 @@ mod tests {
             "T".repeat(FINE_GRAINED_SECOND_LEN - 1)
         );
         assert_eq!(detect(&short_fine_grained).len(), 0);
+    }
+
+    #[test]
+    fn rejects_an_undocumented_prefix_that_only_resembles_the_classic_family() {
+        // "ghq_" is not one of GitHub's five documented classic-family
+        // prefixes; a near-miss on the literal is rejected outright rather
+        // than falling back to some other family's type.
+        assert_eq!(detect(&format!("ghq_{}", "S".repeat(36))).len(), 0);
     }
 
     #[test]

@@ -152,7 +152,7 @@
       "expected": [
         {
           "detector": "github-token",
-          "type": "github_token",
+          "type": "github_app_installation_token",
           "confidence": "high",
           "specificity": "provider",
           "start": 0,
