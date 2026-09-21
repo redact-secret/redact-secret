@@ -330,6 +330,43 @@ mod tests {
     }
 
     #[test]
+    fn a_mid_value_alphabet_break_or_an_embedded_narrower_provider_shape_still_clears_the_length_floor()
+     {
+        const SENDGRID_ID: &str = "SYNTHETIC_REVOKED_0000";
+        const SENDGRID_SECRET: &str = "SYNTHETIC_REVOKED_SENDGRID_SECRET_000000000";
+
+        // issue #553, docs/decisions/2026-09-21-accept-truncated-and-nested-
+        // shapes-under-bearer-token-length-grammar.md: a single
+        // alphabet-violating byte partway through a longer value only ends
+        // the token run early -- it does not defeat detection when the
+        // truncated prefix alone still clears `MIN_TOKEN_LEN`. Split at
+        // byte 20 of a 40-byte value: the 20-byte prefix (>= 16) is
+        // classified, and the 19-byte suffix is never independently
+        // considered because it is not preceded by a `Bearer` scheme.
+        let left = "SYNTHETIC_REVOKED_AB"; // 20 bytes
+        let right = "SYNTHETIC_TAIL_WXYZ"; // 19 bytes
+        assert_eq!(left.len(), 20);
+        assert_eq!(right.len(), 19);
+        let input = format!("Authorization: Bearer {left}!{right}");
+        let candidates = detect(&input);
+        let (start, end) = only_range(&candidates);
+        assert_eq!(&input[start..end], left);
+
+        // A one-byte-short SendGrid-shaped value (`sendgrid.rs`'s own
+        // exact-length grammar correctly declines it) is still a 68-byte
+        // run of `is_token_char` bytes, well over the floor, so
+        // `bearer-token` classifies it on its own, unrelated terms.
+        let sendgrid_shaped = format!(
+            "SG.{SENDGRID_ID}.{}",
+            &SENDGRID_SECRET[..SENDGRID_SECRET.len() - 1]
+        );
+        let input = format!("Authorization: Bearer {sendgrid_shaped}");
+        let candidates = detect(&input);
+        let (start, end) = only_range(&candidates);
+        assert_eq!(&input[start..end], sendgrid_shaped);
+    }
+
+    #[test]
     fn trailing_padding_equals_are_included() {
         let input = "Bearer SYNTHETIC_REVOKED_BEARER_VALUE==";
         let candidates = detect(input);
