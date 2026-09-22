@@ -159,7 +159,11 @@ intentional false negatives stay in the linked decision records and
   an environment segment after `sk_org_` (a hypothetical `sk_org_live_…`),
   or gitleaks' undocumented `sk_prod_`/`rk_prod_`. Publishable `pk_live_`
   and `pk_test_` keys, which Stripe marks safe to expose, stay unflagged.
-  Evidence: `docs/coverage/fp-fn-summary-513.json`.
+  Evidence: this issue's `stripe-token`-only view (11 positive / 13 negative
+  fixtures across 6 host contexts) was recorded at
+  [`fp-fn-summary-513.json`](https://github.com/redact-secret/redact-secret/blob/b00b96ed3f4cf0eac485f0f0d343cf65717e152d/docs/coverage/fp-fn-summary-513.json),
+  removed by issue #595 as a redundant snapshot of the live, all-detector
+  `docs/coverage/fp-fn-summary.json`.
 - `gitlab-token` now also detects SCIM tokens (`glsoat-`) and Feature Flags
   client tokens (`glffct-`). They were the only rows of GitLab's
   token-prefix table without a matching prefix. Both use the same 20-byte

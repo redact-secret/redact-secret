@@ -476,19 +476,15 @@
       },
       "falsePositiveGuards": {
         "actualFalsePositives": 0,
-        "count": 22,
+        "count": 17,
         "fixtureIds": [
-          "openai-negative-368-legacy-plain-twin",
-          "openai-negative-368-legacy-unicode-crlf-twin",
           "openai-negative-368-proj-plain-twin",
           "openai-negative-368-proj-unicode-crlf-twin",
           "openai-negative-368-svcacct-plain-twin",
           "openai-negative-368-svcacct-unicode-crlf-twin",
           "openai-negative-embedded-in-wider-identifier",
-          "openai-negative-explicit-namespace-legacy-body",
           "openai-negative-legacy-underscore-segment",
           "openai-negative-lookalike",
-          "openai-negative-marker-dotenv",
           "openai-negative-marker-embedded-leading",
           "openai-negative-marker-embedded-trailing",
           "openai-negative-marker-log",
@@ -496,7 +492,6 @@
           "openai-negative-marker-markdown",
           "openai-negative-marker-near-prefix-underscore",
           "openai-negative-marker-shell-quoted",
-          "openai-negative-marker-toml",
           "openai-negative-model-name",
           "openai-negative-near-prefix-underscore",
           "openai-negative-placeholder"

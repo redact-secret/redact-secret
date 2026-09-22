@@ -30,23 +30,22 @@ as safe metadata.
 Output is deterministic: sorted detector names, sorted fixture ids within
 each detector, no timestamps.
 
+The only committed output is the live, all-detector
+``docs/coverage/fp-fn-summary.json``, guarded by a regeneration-equality
+test (``scripts/tests/test_generate_fp_fn_summary.py``); add a newly
+requested detector or issue to that file's own command below rather than
+writing a second, per-issue snapshot under ``docs/coverage`` -- issue #595
+removed the eleven ``fp-fn-summary-NNN.json`` files that practice produced,
+none of which any code read. A one-off, single-detector run for local
+review during an issue's own investigation should be written outside
+``docs/coverage`` (for example ``/tmp``) and is never committed.
+
     python3 -B scripts/generate-fp-fn-summary.py --out docs/coverage/fp-fn-summary.json
     python3 -B scripts/generate-fp-fn-summary.py \\
         --issue https://github.com/redact-secret/redact-secret/issues/319 \\
         --detector github-token --detector gitlab-token \\
         --detector npm-token --detector pypi-token \\
-        --out docs/coverage/fp-fn-summary-319.json
-    python3 -B scripts/generate-fp-fn-summary.py \\
-        --issue https://github.com/redact-secret/redact-secret/issues/320 \\
-        --detector vault-token --detector cloudflare-token \\
-        --detector digitalocean-token --detector docker-token \\
-        --detector vercel-token \\
-        --out docs/coverage/fp-fn-summary-320.json
-    python3 -B scripts/generate-fp-fn-summary.py \\
-        --issue https://github.com/redact-secret/redact-secret/issues/321 \\
-        --detector huggingface-token --detector linear-token \\
-        --detector slack-token --detector sendgrid-token \\
-        --out docs/coverage/fp-fn-summary-321.json
+        --out /tmp/fp-fn-summary-319.json
 """
 
 from __future__ import annotations

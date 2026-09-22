@@ -7,7 +7,19 @@ each distinguished as `supported`, `intentionally-unsupported`,
 `not-applicable`, or `unresolved`, without treating a raw fixture count as
 sufficient coverage evidence.
 
+Every file below has exactly one kind, per
+[`decision-decide-artifact-taxonomy-spec-routing-and-evidence-placement`](../decisions/2026-09-22-decide-artifact-taxonomy-spec-routing-and-evidence-placement.md):
+a live input read by code, a spec, or a generated file committed only
+alongside a regeneration-equality test. No file in this directory is a
+frozen snapshot; issue [#595](https://github.com/redact-secret/redact-secret/issues/595)
+removed the eleven `fp-fn-summary-NNN.json` files that had drifted into that
+role (see [History](#history)) and closed the gap for the two generated
+files that had no freshness test (`fp-fn-summary.json`,
+`precision-context-matrix.json`).
+
 ## Files
+
+### Live input
 
 - [`detector-inventory.json`](./detector-inventory.json) — the hand-authored
   declared baseline: every finding type the built-in registry
@@ -55,8 +67,30 @@ sufficient coverage evidence.
 
 Tests: `python3 -B -m unittest discover -s scripts/tests -p 'test_generate_coverage_inventory.py'`.
 
+### Specs
+
+- [`evidence-requirements.md`](./evidence-requirements.md) — the minimum
+  evidence dimensions per behavior class and the bounded-rationale exception
+  rule (issue [#102](https://github.com/redact-secret/redact-secret/issues/102)),
+  applied against every row of `detector-inventory.json` and `consumers`.
+- [`host-context-classes.md`](./host-context-classes.md) — the lexical
+  classification `evidence-requirements.md` §3 relies on to avoid a
+  detector-by-context Cartesian product (issue
+  [#110](https://github.com/redact-secret/redact-secret/issues/110)): the five
+  representative classes, their justification against quoting, escaping,
+  comments, assignment separators, headers, URLs, prose, and structured-data
+  boundaries, each class's named representative context(s), and the
+  reconciliation of every declared `CanonicalHostContext` value and current
+  corpus fixture against it.
+
+### Generated and gated
+
+Every file below is produced by a script from a live input and is committed
+only because a test fails when it falls out of date with that input — see
+[Coverage drift is a CI failure](#coverage-drift-is-a-ci-failure).
+
 - [`coverage-declarations.json`](./coverage-declarations.json) — the
-  evidence-requirements model (below) encoded and machine-validated: one
+  evidence-requirements model (above) encoded and machine-validated: one
   `CanonicalCoverageDeclaration` row per declared finding type, the
   cross-cutting `incremental` surface, and each declared consumer, with every
   evidence dimension resolved to `supported`, `not-applicable`, or `pending`
@@ -131,7 +165,13 @@ Tests: `python3 -B -m unittest discover -s scripts/tests -p 'test_generate_cover
   value). Defaults to `stripe-token`, `shopify-token`, and `supabase-token`;
   pass `--detector <id>` (repeatable) and `--issue <url>` (repeatable) to
   report on others, as this file's current fifteen-detector, nine-issue
-  `provenance.issue` list already does:
+  `provenance.issue` list already does. This is the *only* committed
+  `fp-fn-summary*.json`: a request to report on one more detector or issue
+  extends this file's own command below rather than adding a second,
+  per-issue snapshot (issue #595; see [History](#history) for the eleven
+  that used to exist). A one-off, single-detector run for local review
+  during an issue's own investigation is written outside `docs/coverage`
+  and never committed.
 
   ```sh
   python3 -B scripts/generate-fp-fn-summary.py \
@@ -153,98 +193,8 @@ Tests: `python3 -B -m unittest discover -s scripts/tests -p 'test_generate_cover
     --out docs/coverage/fp-fn-summary.json
   ```
 
-- [`fp-fn-summary-319.json`](./fp-fn-summary-319.json) — the same report for
-  issue [#319](https://github.com/redact-secret/redact-secret/issues/319)'s
-  `github-token`, `gitlab-token`, `npm-token`, and `pypi-token` coverage:
-
-  ```sh
-  python3 -B scripts/generate-fp-fn-summary.py \
-    --detector github-token --detector gitlab-token \
-    --detector npm-token --detector pypi-token \
-    --issue https://github.com/redact-secret/redact-secret/issues/319 \
-    --out docs/coverage/fp-fn-summary-319.json
-  ```
-
-- [`fp-fn-summary-320.json`](./fp-fn-summary-320.json) — the same report for
-  issue [#320](https://github.com/redact-secret/redact-secret/issues/320)'s
-  `vault-token`, `cloudflare-token`, `digitalocean-token`, `docker-token`,
-  and `vercel-token` coverage:
-
-  ```sh
-  python3 -B scripts/generate-fp-fn-summary.py \
-    --detector vault-token --detector cloudflare-token \
-    --detector digitalocean-token --detector docker-token \
-    --detector vercel-token \
-    --issue https://github.com/redact-secret/redact-secret/issues/320 \
-    --out docs/coverage/fp-fn-summary-320.json
-  ```
-
-- [`fp-fn-summary-321.json`](./fp-fn-summary-321.json) — the same report for
-  issue [#321](https://github.com/redact-secret/redact-secret/issues/321)'s
-  `huggingface-token`, `linear-token`, `slack-token`, and `sendgrid-token`
-  coverage:
-
-  ```sh
-  python3 -B scripts/generate-fp-fn-summary.py \
-    --detector huggingface-token --detector linear-token \
-    --detector slack-token --detector sendgrid-token \
-    --issue https://github.com/redact-secret/redact-secret/issues/321 \
-    --out docs/coverage/fp-fn-summary-321.json
-  ```
-
-- [`fp-fn-summary-322.json`](./fp-fn-summary-322.json) — the same report for
-  issue [#322](https://github.com/redact-secret/redact-secret/issues/322)'s
-  `private-key` coverage:
-
-  ```sh
-  python3 -B scripts/generate-fp-fn-summary.py \
-    --detector private-key \
-    --issue https://github.com/redact-secret/redact-secret/issues/322 \
-    --out docs/coverage/fp-fn-summary-322.json
-  ```
-
-- [`fp-fn-summary-370.json`](./fp-fn-summary-370.json) — the same report for
-  issue [#370](https://github.com/redact-secret/redact-secret/issues/370)'s
-  `docker-token` exact-length coverage (the corpus view after the Docker
-  PAT/OAT contract was frozen; `fp-fn-summary-320.json` is the earlier,
-  pre-#370 snapshot of the same detector and is intentionally left as it
-  was recorded):
-
-  ```sh
-  python3 -B scripts/generate-fp-fn-summary.py \
-    --detector docker-token \
-    --issue https://github.com/redact-secret/redact-secret/issues/370 \
-    --out docs/coverage/fp-fn-summary-370.json
-  ```
-
-- [`fp-fn-summary-374.json`](./fp-fn-summary-374.json) — the same report for
-  issue [#374](https://github.com/redact-secret/redact-secret/issues/374)'s
-  `linear-token` exact-length coverage (the corpus view after the `lin_api_`
-  contract was frozen; `fp-fn-summary-321.json` is the earlier, pre-#374
-  snapshot of the same detector and is intentionally left as it was
-  recorded):
-
-  ```sh
-  python3 -B scripts/generate-fp-fn-summary.py \
-    --detector linear-token \
-    --issue https://github.com/redact-secret/redact-secret/issues/374 \
-    --out docs/coverage/fp-fn-summary-374.json
-  ```
-
-- [`fp-fn-summary-513.json`](./fp-fn-summary-513.json) — the same report for
-  issue [#513](https://github.com/redact-secret/redact-secret/issues/513)'s
-  `stripe-token` coverage (the corpus view after the `sk_org_`/`whsec_`
-  family completion; `fp-fn-summary.json`'s own `stripe-token` row is the
-  live, all-detector view and is kept current alongside it):
-
-  ```sh
-  python3 -B scripts/generate-fp-fn-summary.py \
-    --detector stripe-token \
-    --issue https://github.com/redact-secret/redact-secret/issues/513 \
-    --out docs/coverage/fp-fn-summary-513.json
-  ```
-
-  Tests: `python3 -B -m unittest discover -s scripts/tests -p 'test_generate_fp_fn_summary.py'`.
+  Tests: `python3 -B -m unittest discover -s scripts/tests -p 'test_generate_fp_fn_summary.py'`,
+  including a regeneration-equality test against the committed file.
 
 - [`precision-context-matrix.json`](./precision-context-matrix.json) — the
   paired precision-regression matrix issue
@@ -271,7 +221,44 @@ Tests: `python3 -B -m unittest discover -s scripts/tests -p 'test_generate_cover
     --out docs/coverage/precision-context-matrix.json
   ```
 
-  Tests: `python3 -B -m unittest discover -s scripts/tests -p 'test_generate_precision_context_matrix.py'`.
+  Tests: `python3 -B -m unittest discover -s scripts/tests -p 'test_generate_precision_context_matrix.py'`,
+  including a regeneration-equality test against the committed file
+  (`npm run precision-context-matrix:test`, part of `npm run ci`).
+
+### History
+
+Issues [#316](https://github.com/redact-secret/redact-secret/issues/316)
+through `#325` and `#370`/`#374`/`#513` each extended `fp-fn-summary.json`'s
+detector coverage; each also wrote a redundant `fp-fn-summary-NNN.json`
+snapshot, keyed by the requesting issue rather than by any decision, after
+the pattern spread from a docstring example written for #319
+(`scripts/generate-fp-fn-summary.py`). No code ever read a numbered
+snapshot, and six no longer matched the corpus by the time issue
+[#595](https://github.com/redact-secret/redact-secret/issues/595) removed
+all eleven. Each row below is a `git show`-able permalink to the file as it
+stood at removal, not a live path:
+
+| Snapshot | Issue | Detector(s) | Positive / negative fixtures |
+| --- | --- | --- | --- |
+| [`fp-fn-summary-319.json`](https://github.com/redact-secret/redact-secret/blob/b00b96ed3f4cf0eac485f0f0d343cf65717e152d/docs/coverage/fp-fn-summary-319.json) | [#319](https://github.com/redact-secret/redact-secret/issues/319) | `github-token`, `gitlab-token`, `npm-token`, `pypi-token` | 30/4, 8/4, 7/5, 8/4 |
+| [`fp-fn-summary-320.json`](https://github.com/redact-secret/redact-secret/blob/b00b96ed3f4cf0eac485f0f0d343cf65717e152d/docs/coverage/fp-fn-summary-320.json) | [#320](https://github.com/redact-secret/redact-secret/issues/320) | `cloudflare-token`, `digitalocean-token`, `docker-token`, `vault-token`, `vercel-token` | 9/7, 10/7, 10/7, 10/6, 10/7 |
+| [`fp-fn-summary-321.json`](https://github.com/redact-secret/redact-secret/blob/b00b96ed3f4cf0eac485f0f0d343cf65717e152d/docs/coverage/fp-fn-summary-321.json) | [#321](https://github.com/redact-secret/redact-secret/issues/321) | `huggingface-token`, `linear-token`, `sendgrid-token`, `slack-token` | 12/6, 13/6, 13/4, 13/6 |
+| [`fp-fn-summary-322.json`](https://github.com/redact-secret/redact-secret/blob/b00b96ed3f4cf0eac485f0f0d343cf65717e152d/docs/coverage/fp-fn-summary-322.json) | [#322](https://github.com/redact-secret/redact-secret/issues/322) | `private-key` | 12/5 |
+| [`fp-fn-summary-369.json`](https://github.com/redact-secret/redact-secret/blob/b00b96ed3f4cf0eac485f0f0d343cf65717e152d/docs/coverage/fp-fn-summary-369.json) | [#369](https://github.com/redact-secret/redact-secret/issues/369) | `digitalocean-token` | 25/18 |
+| [`fp-fn-summary-370.json`](https://github.com/redact-secret/redact-secret/blob/b00b96ed3f4cf0eac485f0f0d343cf65717e152d/docs/coverage/fp-fn-summary-370.json) | [#370](https://github.com/redact-secret/redact-secret/issues/370) | `docker-token` (post-freeze exact length) | 18/11 |
+| [`fp-fn-summary-371.json`](https://github.com/redact-secret/redact-secret/blob/b00b96ed3f4cf0eac485f0f0d343cf65717e152d/docs/coverage/fp-fn-summary-371.json) | [#371](https://github.com/redact-secret/redact-secret/issues/371) | `slack-token` (bot-grammar freeze) | 1/6 |
+| [`fp-fn-summary-374.json`](https://github.com/redact-secret/redact-secret/blob/b00b96ed3f4cf0eac485f0f0d343cf65717e152d/docs/coverage/fp-fn-summary-374.json) | [#374](https://github.com/redact-secret/redact-secret/issues/374) | `linear-token` (post-freeze exact length) | 12/6 |
+| [`fp-fn-summary-512.json`](https://github.com/redact-secret/redact-secret/blob/b00b96ed3f4cf0eac485f0f0d343cf65717e152d/docs/coverage/fp-fn-summary-512.json) | [#512](https://github.com/redact-secret/redact-secret/issues/512) | `slack-token` (user/rotation grammar freeze) | 14/10 |
+| [`fp-fn-summary-513.json`](https://github.com/redact-secret/redact-secret/blob/b00b96ed3f4cf0eac485f0f0d343cf65717e152d/docs/coverage/fp-fn-summary-513.json) | [#513](https://github.com/redact-secret/redact-secret/issues/513) | `stripe-token` (`sk_org_`/`whsec_` family) | 11/13 |
+| [`fp-fn-summary-514.json`](https://github.com/redact-secret/redact-secret/blob/b00b96ed3f4cf0eac485f0f0d343cf65717e152d/docs/coverage/fp-fn-summary-514.json) | [#514](https://github.com/redact-secret/redact-secret/issues/514) | `notion-token` | 10/4 |
+
+`fp-fn-summary-369.json` and `fp-fn-summary-514.json` were never linked from
+this README or any other committed document; every other row above is also
+permalinked, with a one-line summary, from the ADR or changelog entry that
+originally cited it (`docs/decisions/2026-09-17-freeze-docker-pat-oat-exact-length-grammar.md`,
+`docs/decisions/2026-09-17-freeze-slack-bot-token-segment-grammar.md`,
+`docs/decisions/2026-09-20-freeze-slack-user-and-rotation-token-grammar.md`,
+`CHANGELOG.md`).
 
 ## Coverage drift is a CI failure
 
@@ -288,33 +275,30 @@ Tests: `python3 -B -m unittest discover -s scripts/tests -p 'test_generate_cover
   (`coverage:check`'s freshness and reconciliation tests); or
 - `coverage-declarations.json` fails `conformance/schema.ts`'s
   `validateCanonicalCoverageDeclarations` (`vitest run
-  conformance/schema.test.ts`, also part of `coverage:check`).
+  conformance/schema.test.ts`, also part of `coverage:check`); or
+- `fp-fn-summary.json` is out of date with the corpus for its committed
+  detector/issue set (`coverage:check`'s own committed-baseline-freshness
+  test, above).
+
+`npm run ci` separately runs `npm run precision-context-matrix:test`, which
+fails the build if `precision-context-matrix.json` is out of date with
+either corpus file for its committed detector set.
 
 Adding or removing a built-in capability — a detector, a finding type, a
 scheme — without regenerating and committing the affected documents above
 fails one of these checks. See `scripts/generate-coverage-inventory.py`,
-`scripts/generate-coverage-declarations.py`, and
-`scripts/generate-coverage-report.py`'s regeneration commands, above, to
-reconcile.
+`scripts/generate-coverage-declarations.py`,
+`scripts/generate-coverage-report.py`, `scripts/generate-fp-fn-summary.py`,
+and `scripts/generate-precision-context-matrix.py`'s regeneration commands,
+above, to reconcile.
 
 ## Scope
 
-This is the baseline, the evidence model that defines what a row needs to
-resolve honestly, and that model encoded as data:
+This is the baseline, the evidence model the [Specs](#specs) files above
+define, and that model encoded as data:
 
-- [`evidence-requirements.md`](./evidence-requirements.md) — the minimum
-  evidence dimensions per behavior class and the bounded-rationale exception
-  rule (issue [#102](https://github.com/redact-secret/redact-secret/issues/102)),
-  applied against every row of `detector-inventory.json` and `consumers`.
-- [`host-context-classes.md`](./host-context-classes.md) — the lexical
-  classification `evidence-requirements.md` §3 relies on to avoid a
-  detector-by-context Cartesian product (issue
-  [#110](https://github.com/redact-secret/redact-secret/issues/110)): the five
-  representative classes, their justification against quoting, escaping,
-  comments, assignment separators, headers, URLs, prose, and structured-data
-  boundaries, each class's named representative context(s), and the
-  reconciliation of every declared `CanonicalHostContext` value and current
-  corpus fixture against it.
+- `evidence-requirements.md` and `host-context-classes.md` (above) — what a
+  row needs to resolve honestly.
 - `coverage-declarations.json` and `conformance/schema.ts`'s coverage-
   declaration types (above) — that model, machine-validated (issue #103).
 - `coverage-report.md` and "Coverage drift is a CI failure" (above) — that

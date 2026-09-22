@@ -155,9 +155,14 @@ primitive instead of four near-duplicate hand-rolled loops.
   from the corrected corpus and contract (every `slack-token` row is
   `retained` or `silent`; none is `broad-shape` or `review`).
   `docs/coverage/inventory-report.json` and `coverage-declarations.json`
-  are regenerated; `docs/coverage/fp-fn-summary-512.json` records this
-  issue's Slack-only view (0 actual false positives or negatives), alongside
-  the existing `fp-fn-summary-371.json` for the bot contract.
+  are regenerated. This issue's Slack-only view (0 actual false positives
+  or negatives; 14 positive / 10 negative fixtures across 9 host contexts)
+  was recorded at
+  [`fp-fn-summary-512.json`](https://github.com/redact-secret/redact-secret/blob/b00b96ed3f4cf0eac485f0f0d343cf65717e152d/docs/coverage/fp-fn-summary-512.json),
+  alongside the earlier
+  [`fp-fn-summary-371.json`](https://github.com/redact-secret/redact-secret/blob/b00b96ed3f4cf0eac485f0f0d343cf65717e152d/docs/coverage/fp-fn-summary-371.json)
+  for the bot contract; both were removed by issue #595 as redundant
+  snapshots of the live, all-detector `fp-fn-summary.json`.
 - A real Slack user token whose numeric sections fall outside `10-13`
   digits or whose secret is shorter than 28 bytes, or a real rotation-family
   token whose version section is not exactly one digit, would go undetected
