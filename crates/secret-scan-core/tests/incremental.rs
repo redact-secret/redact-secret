@@ -284,7 +284,7 @@ fn an_unrelated_open_line_does_not_block_flushing_a_prior_closed_line() {
 
 // ---------------------------------------------------------------------------
 // mid-exclusion-prefix (issue #480 part B; see
-// docs/decisions/2026-09-20-connection-string-and-jwt-need-no-retention-hint.md)
+// docs/specs/contextual-detection.md)
 //
 // None of these three constructs need a dedicated retention hint: the
 // incremental scanner only runs detection once a line closes

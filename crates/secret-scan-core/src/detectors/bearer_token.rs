@@ -9,7 +9,7 @@
 //! recognized placeholder vocabulary is excluded
 //! ([`is_non_secret_bearer_value`]), the same two exclusions
 //! `generic-token` applies to the `Basic`/`Token` schemes -- see issue #468
-//! and `docs/decisions/2026-09-20-exclude-filler-and-placeholder-bearer-values.md`.
+//! and `docs/specs/contextual-detection.md`.
 
 use super::text::{
     ascii_run_len, ends_with_ci, is_js_whitespace, is_repeated_character_filler,

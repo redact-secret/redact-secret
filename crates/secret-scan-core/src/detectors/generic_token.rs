@@ -233,7 +233,7 @@ fn ends_with_key_or_pem(value: &str) -> bool {
 // Each of these is, like `is_template_reference`, a syntax that is only a
 // bare reference when it delimits the *whole* value -- a value that merely
 // starts with the opener, or that carries the pair embedded inside a larger
-// string, stays detected. `docs/decisions/2026-09-16-exclude-interpolation-command-substitution-references.md`
+// string, stays detected. `docs/specs/contextual-detection.md`
 // records the supported syntaxes and the accompanying span-scanning fix
 // (`delimited_reference_value`) that lets the whole-value check see past a
 // closing `)`/`]`/backtick that a plain unquoted-value boundary scan would
@@ -273,7 +273,7 @@ fn is_interpolation_reference(value: &str) -> bool {
 // prefixed with it, so each function below requires the whole value to
 // satisfy that scheme's actual reference shape. A scheme-like prefix on a
 // value that does not otherwise satisfy its grammar stays detected.
-// `docs/decisions/2026-09-16-exclude-secret-manager-references.md` records
+// `docs/specs/contextual-detection.md` records
 // the supported schemes and grammars.
 
 /// `true` for a byte allowed inside a generic path/identifier segment:
@@ -301,7 +301,7 @@ fn is_path(value: &str) -> bool {
 // --- cmd-style Windows env reference and SQL bind parameter exclusions
 // (issue #292) ------------------------------------------------------------
 //
-// `docs/decisions/2026-09-16-exclude-interpolation-command-substitution-references.md`
+// Issue #279 (`decision-exclude-interpolation-command-substitution-references`)
 // deferred these two syntaxes so each got its own explicit fixture coverage.
 // Both share `is_env_var_identifier`'s identifier shape rather than
 // `is_template_reference`'s "anything between the delimiters" rule: `%` and
@@ -1192,7 +1192,7 @@ fn is_prefix_boundary_char(ch: char) -> bool {
 /// on the operator's own line, so a key with no value before end-of-line
 /// (`secret:\n  nested: ...`, an interactive `Password:\n` prompt) never
 /// walks onto the next line's first token as if it were the value. See
-/// `docs/decisions/2026-09-15-contextual-assignment-stops-at-the-line.md`.
+/// `docs/specs/contextual-detection.md`.
 fn parse_name_and_operator(input: &str, start: usize) -> Option<(usize, usize, usize)> {
     let mut cursor = start;
     if let Some(ch @ ('"' | '\'')) = char_at(input, cursor) {
@@ -2135,7 +2135,7 @@ mod tests {
     // --- issue #292: a cmd.exe/batch-style Windows environment-variable
     // reference (`%VAR%`) or a SQL named bind parameter (`:identifier`) is
     // excluded like the existing reference-syntax exclusions -- deferred
-    // out of issue #279 (`docs/decisions/2026-09-16-exclude-interpolation-command-substitution-references.md`)
+    // out of issue #279 (`docs/specs/contextual-detection.md`)
     // so each gets its own explicit fixture coverage. Only a value fully
     // shaped as the syntax, with an identifier as its content, is a bare
     // reference; a missing delimiter, or the pair embedded inside a larger

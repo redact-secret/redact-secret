@@ -239,7 +239,7 @@ fn a_multi_byte_partition_is_enumerated_inside_the_code_point() {
 /// exclusion-shape fixtures rather than the whole corpus: a corpus-wide
 /// version of this check would misfire on the deliberate, documented
 /// interpolation-fragment residual
-/// (`docs/decisions/2026-09-20-exclude-closed-call-code-expressions-as-contextual-values.md`'s
+/// (`decision-exclude-closed-call-code-expressions-as-contextual-values`'s
 /// "Known residual, out of scope" clause), which strands `}_CONTEXT_VALUE`
 /// by design and belongs to #266/#279, not to this issue.
 const EXCLUDED_LINE_FIXTURES: &[(&str, &[&str])] = &[

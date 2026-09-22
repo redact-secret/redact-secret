@@ -5,9 +5,23 @@ scope: workspace
 title: Pin OpenGrep and establish a reviewed SAST baseline
 decided_at: 2026-09-10
 spec: evidence-and-gates
+aliases: decision-enforce-opengrep-in-ci-as-a-required-gate
 ---
 
 # Pin OpenGrep and establish a reviewed SAST baseline
+
+This record is the representative ADR for the OpenGrep SAST cluster (issue
+[#599](https://github.com/redact-secret/redact-secret/issues/599), DS6c, under
+epic [#591](https://github.com/redact-secret/redact-secret/issues/591)): the
+one pinned, fail-closed scan command whose exit code is the only SAST signal
+this repository trusts. [Folded records](#folded-records) lists the decision
+merged into this one under
+[`decision-decide-artifact-taxonomy-spec-routing-and-evidence-placement`](2026-09-22-decide-artifact-taxonomy-spec-routing-and-evidence-placement.md)'s
+Merge grade; its `decision_id` is preserved in this record's `aliases:`
+field above, and its full original text stays reachable at its permalink.
+The current rules -- pinning, baseline dispositions, and the CI gate with
+its SARIF projection -- live in
+[`docs/specs/evidence-and-gates.md`](../specs/evidence-and-gates.md).
 
 ## Decision
 
@@ -74,3 +88,15 @@ license text.
   Actions as of the pinned rules revision. Extending coverage to another
   vendored path (or another platform's OpenGrep binary) is a re-pin, not a
   new mechanism.
+
+## Folded records
+
+Each row is a decision merged into this one (Merge grade). The `decision_id`
+column is preserved verbatim in this record's `aliases:` frontmatter field so
+an old reference still resolves; the permalink is the folded record's last
+text on `main` before this merge, at
+`ed80bc8aaa5058e11bf8b6fc43214b0194de886a`.
+
+| Original `decision_id` | Date | Issue | Decision | Full record |
+| --- | --- | --- | --- | --- |
+| `decision-enforce-opengrep-in-ci-as-a-required-gate` | 2026-09-10 | [#156](https://github.com/redact-secret/redact-secret/issues/156), [#172](https://github.com/redact-secret/redact-secret/issues/172) | Run the pinned `run-sast.py` command as `.github/workflows/sast.yml` on every PR and push to `main`, gated by its exit code alone; SARIF upload and main-only suppression sync are best-effort projections. | [full record](https://github.com/redact-secret/redact-secret/blob/ed80bc8aaa5058e11bf8b6fc43214b0194de886a/docs/decisions/2026-09-10-enforce-opengrep-in-ci-as-a-required-gate.md) |
