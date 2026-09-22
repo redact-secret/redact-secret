@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Ship the first release's full artifact set
 decided_at: 2026-09-10
+spec: distribution
 ---
 
 # Ship the first release's full artifact set

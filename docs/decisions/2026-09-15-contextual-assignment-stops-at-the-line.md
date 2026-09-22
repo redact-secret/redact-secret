@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: A contextual assignment's value never crosses a line terminator
 decided_at: 2026-09-15
+spec: contextual-detection
 ---
 
 # A contextual assignment's value never crosses a line terminator

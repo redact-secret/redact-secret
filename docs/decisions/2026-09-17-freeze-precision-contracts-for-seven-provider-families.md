@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Freeze reviewed precision contracts for seven provider families and refine their default rules in place
 decided_at: 2026-09-17
+spec: detector-families
 ---
 
 # Freeze reviewed precision contracts for seven provider families and refine their default rules in place

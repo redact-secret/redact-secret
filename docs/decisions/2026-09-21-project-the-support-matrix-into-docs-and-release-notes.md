@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Project the generated support matrix into docs and release notes via a pinned copy
 decided_at: 2026-09-21
+spec: distribution
 ---
 
 # Project the generated support matrix into docs and release notes via a pinned copy

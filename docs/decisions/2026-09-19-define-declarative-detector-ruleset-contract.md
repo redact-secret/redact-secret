@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Define the declarative detector ruleset contract
 decided_at: 2026-09-19
+spec: engine
 ---
 
 # Define the declarative detector ruleset contract

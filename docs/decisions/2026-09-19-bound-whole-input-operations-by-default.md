@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Bound whole-input operations by default
 decided_at: 2026-09-19
+spec: engine
 ---
 
 # Bound whole-input operations by default

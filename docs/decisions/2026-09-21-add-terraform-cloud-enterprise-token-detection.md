@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Add Terraform Cloud/Enterprise API token detection
 decided_at: 2026-09-21
+spec: detector-families
 ---
 
 # Add Terraform Cloud/Enterprise API token detection

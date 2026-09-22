@@ -22,6 +22,13 @@ stability.
   scanner measurement in `redact-secret-benchmarks`, never copied into this
   repository; and an iterative or exploratory log as an issue comment, cited
   by permalink from whichever final record needs it, not restated there.
+- Current rules are stated in the five spec files under `docs/specs/`
+  (`detector-families.md`, `contextual-detection.md`, `engine.md`,
+  `distribution.md`, `evidence-and-gates.md`); each links the ADR that
+  decided it. A decision that applies an existing policy to one more
+  provider family or one more instance is a spec-file row plus its
+  supporting evidence, not a new ADR — a new ADR is warranted only for new
+  policy, a new trade-off, or a precedent that spans families.
 
 Keep fixtures to the smallest synthetic input that measures one contract behavior.
 Never include active credentials or matched plaintext in diagnostics. Keep the

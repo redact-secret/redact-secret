@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Exclude cmd-style Windows environment references (`%VAR%`) and SQL named bind parameters (`:identifier`)
 decided_at: 2026-09-16
+spec: contextual-detection
 ---
 
 # Exclude cmd-style Windows environment references (`%VAR%`) and SQL named bind parameters (`:identifier`)

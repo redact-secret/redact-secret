@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Gate beta.5 on precision gains and positive preservation
 decided_at: 2026-09-18
+spec: evidence-and-gates
 ---
 
 # Gate beta.5 on precision gains and positive preservation

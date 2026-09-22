@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Pin OpenGrep and establish a reviewed SAST baseline
 decided_at: 2026-09-10
+spec: evidence-and-gates
 ---
 
 # Pin OpenGrep and establish a reviewed SAST baseline

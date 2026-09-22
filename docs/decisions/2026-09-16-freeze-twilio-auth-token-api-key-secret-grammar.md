@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Freeze the Twilio Auth Token and API Key Secret grammar as context-gated 32-byte values
 decided_at: 2026-09-16
+spec: detector-families
 ---
 
 # Freeze the Twilio Auth Token and API Key Secret grammar as context-gated 32-byte values

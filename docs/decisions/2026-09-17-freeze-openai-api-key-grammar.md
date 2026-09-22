@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Freeze the OpenAI API key grammar as a marker-gated shape with exact segment lengths
 decided_at: 2026-09-17
+spec: detector-families
 ---
 
 # Freeze the OpenAI API key grammar as a marker-gated shape with exact segment lengths

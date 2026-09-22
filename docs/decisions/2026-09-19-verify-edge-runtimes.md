@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Verify @redact-secret/core on Cloudflare Workers and Vercel Edge
 decided_at: 2026-09-19
+spec: distribution
 ---
 
 # Verify @redact-secret/core on Cloudflare Workers and Vercel Edge

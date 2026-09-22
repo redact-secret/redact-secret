@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Freeze the Pulumi access token grammar as a documented-prefix, tool-corroborated exact-length hex shape
 decided_at: 2026-09-21
+spec: detector-families
 ---
 
 # Freeze the Pulumi access token grammar as a documented-prefix, tool-corroborated exact-length hex shape

@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Govern cross-language conformance
 decided_at: 2026-09-09
+spec: engine
 ---
 
 # Govern cross-language conformance

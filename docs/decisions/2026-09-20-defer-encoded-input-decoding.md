@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Defer encoded-input decoding out of scope, with reasoning
 decided_at: 2026-09-20
+spec: engine
 ---
 
 # Defer encoded-input decoding out of scope, with reasoning

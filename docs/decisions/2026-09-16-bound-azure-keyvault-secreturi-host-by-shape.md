@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Bound the Azure Key Vault SecretUri reference by host shape, not domain identity
 decided_at: 2026-09-16
+spec: contextual-detection
 ---
 
 # Bound the Azure Key Vault SecretUri reference by host shape, not domain identity

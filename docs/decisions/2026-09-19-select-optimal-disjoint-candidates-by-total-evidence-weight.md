@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Select optimal disjoint candidates by total evidence weight
 decided_at: 2026-09-19
+spec: engine
 ---
 
 # Select optimal disjoint candidates by total evidence weight

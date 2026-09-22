@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Decide the artifact taxonomy, spec routing, and evidence placement
 decided_at: 2026-09-22
+spec: evidence-and-gates
 ---
 
 # Decide the artifact taxonomy, spec routing, and evidence placement

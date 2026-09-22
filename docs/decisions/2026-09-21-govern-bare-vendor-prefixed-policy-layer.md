@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Redact a bare, marker-less OpenAI-prefixed value under a generic policy layer, beneath the frozen contract
 decided_at: 2026-09-21
+spec: detector-families
 ---
 
 # Redact a bare, marker-less OpenAI-prefixed value under a generic policy layer, beneath the frozen contract

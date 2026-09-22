@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Exclude interpolation and command-substitution references beyond `${...}`, `$name`, and `{{...}}`
 decided_at: 2026-09-16
+spec: contextual-detection
 ---
 
 # Exclude interpolation and command-substitution references beyond `${...}`, `$name`, and `{{...}}`

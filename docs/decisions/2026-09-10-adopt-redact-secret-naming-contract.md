@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Adopt the Redact Secret naming contract
 decided_at: 2026-09-10
+spec: distribution
 ---
 # Adopt the Redact Secret naming contract
 

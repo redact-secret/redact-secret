@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Exclude closed-call source-code expressions from generic-token's contextual values
 decided_at: 2026-09-20
+spec: contextual-detection
 ---
 
 # Exclude closed-call source-code expressions from generic-token's contextual values

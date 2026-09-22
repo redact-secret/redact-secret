@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Exclude a value fully delimited by `{{` and `}}` as a template reference
 decided_at: 2026-09-15
+spec: contextual-detection
 ---
 
 # Exclude a value fully delimited by `{{` and `}}` as a template reference

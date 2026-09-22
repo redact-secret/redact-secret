@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Define the detector profile and pack contract
 decided_at: 2026-09-18
+spec: engine
 ---
 
 # Define the detector profile and pack contract

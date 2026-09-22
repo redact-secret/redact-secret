@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Govern benchmark-originated product regressions
 decided_at: 2026-09-18
+spec: evidence-and-gates
 ---
 
 # Govern benchmark-originated product regressions
