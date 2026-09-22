@@ -8,10 +8,9 @@ commit actually *exists* in this repository's history). That needs the full
 git history, not the single-commit checkout the main `npm run ci` job uses,
 so it runs as its own CI job with `fetch-depth: 0` (issue #597, DS6a).
 
-No ADR carries `full_record:` yet -- DS6b-d populates it when an ADR is
-summarized or merged (issue #591's disposition grades). Until then this
-script finds zero permalinks and passes: forward-looking infrastructure, not
-a currently-exercised check.
+Every ADR summarized in place under issue #591's disposition grades
+(DS6b-d) carries `full_record:`; a merged record's folded permalinks sit in
+its `Folded records` table, which this script does not parse.
 
     python3 -B scripts/check-decision-permalinks.py
 """

@@ -287,7 +287,7 @@ class SizeWarningTests(unittest.TestCase):
             self.assertTrue(any("exceeds the 12000-byte guideline" in warning for warning in warnings))
 
 
-# -- '## Current application' appendix rejection, with the grandfather allowlist --
+# -- '## Current application' appendix rejection ----------------------------
 
 
 class CurrentApplicationTests(unittest.TestCase):
@@ -303,11 +303,11 @@ class CurrentApplicationTests(unittest.TestCase):
             errors, _warnings = VALIDATOR.validate(root)
             self.assertTrue(any("Current application' appendices are rejected" in error for error in errors))
 
-    def test_grandfathered_current_application_appendix_is_allowed(self) -> None:
+    def test_formerly_grandfathered_path_is_rejected_too(self) -> None:
+        # #597 grandfathered this path's appendix; #600 summarized the ADR
+        # and removed the exception, so the rule now has none.
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
-            # The allowlist is keyed by the exact real repository-relative
-            # path, so the fixture must be named to match it.
             add_record(
                 root,
                 "2026-09-10-adopt-redact-secret-naming-contract.md",
@@ -315,11 +315,11 @@ class CurrentApplicationTests(unittest.TestCase):
             )
             ensure_all_specs_exist(root)
             errors, _warnings = VALIDATOR.validate(root)
-            self.assertFalse(any("appendices are rejected" in error for error in errors))
+            self.assertTrue(any("Current application' appendices are rejected" in error for error in errors))
 
-    def test_allowlist_entries_name_real_files_with_a_rationale(self) -> None:
-        errors = VALIDATOR.check_allowlist_shape(REPO_ROOT)
-        self.assertEqual(errors, [])
+    def test_repository_adrs_carry_no_current_application_appendix(self) -> None:
+        errors, _warnings = VALIDATOR.validate(REPO_ROOT)
+        self.assertFalse(any("appendices are rejected" in error for error in errors))
 
 
 # -- full_record permalink format -------------------------------------------
