@@ -87,9 +87,10 @@
         "detector-coverage--generic-token-client-secret-quoted"
       ],
       "corpusHashes": [
-        "1012bdbabc75ab6228091cddfe9a54bb283c7c37a254c7484650bf367cfeab17"
+        "0d5800251b19d7ee0d2cc2ad489d09a619d7626c578bf9b28a5c9fce791610eb"
       ],
       "fixingCommit": "49f41ea95958c87e6c132471b15cd4c50642f721",
+      "benchmarkCommit": "0fa424ae64b7c44967b146758bc035a92dd65ee8",
       "canonicalFixtures": {
         "synchronous": [
           "contextual-positive-nested-no-separator-api-key",
@@ -110,11 +111,13 @@
           ]
         },
         "benchmarkRevalidation": {
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            "https://github.com/redact-secret/redact-secret/blob/75fd4de5770d068b891d3826913291c5b636ae6a/docs/audits/evidence/429/candidate-evidence-summary.json"
+          ]
         }
       },
-      "note": "Whole-input and incremental cases were already recorded. Issue #429 closed productConformance, citing the Artifact qualification run at commit f6769c4 (Rust core, Python binding, N-API addon, browser WebAssembly x3, CLI, all through built artifacts), a descendant of this record's fixing commit. benchmarkRevalidation stays pending: a fixed-candidate rerun completed, and this record's three fixtures individually came back EXACT, but the rerun's detector-coverage corpus hash (0d5800251b19d7ee0d2cc2ad489d09a619d7626c578bf9b28a5c9fce791610eb, verified directly against the redact-secret-benchmarks tree at the pinned commit) does not match this record's corpusHashes -- this repository's committed benchmarks/pin-manifest.json is stale for that category despite its revision label (docs/audits/evidence/429/README.md). Needs a follow-up issue against #427's manifest-sync process before this gate can close."
+      "note": "Whole-input and incremental cases were already recorded. Issue #429 closed productConformance, citing the Artifact qualification run at commit f6769c4 (Rust core, Python binding, N-API addon, browser WebAssembly x3, CLI, all through built artifacts), a descendant of this record's fixing commit. benchmarkRevalidation stayed pending because the rerun's detector-coverage corpus hash (0d5800251b19d7ee0d2cc2ad489d09a619d7626c578bf9b28a5c9fce791610eb, verified directly against the redact-secret-benchmarks tree at the pinned commit) did not match this record's corpusHashes -- this repository's committed benchmarks/pin-manifest.json was stale for that category despite its revision label (docs/audits/evidence/429/README.md). Issue #605 (DS10) resynced benchmarks/pin-manifest.json to actually match its claimed revision (0fa424ae), whose real detector-coverage corpus hash is this same 0d580025... value already recorded by the #429 rerun; this record's corpusHashes now matches, and the three fixtures' already-recorded EXACT outcomes close benchmarkRevalidation without a new rerun."
     },
     {
       "id": "sendgrid-generic-key-full-span-promotion",
