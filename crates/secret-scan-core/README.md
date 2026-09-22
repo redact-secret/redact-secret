@@ -1,8 +1,21 @@
 # redact-secret (Rust core)
 
-Deterministic secret detection and redaction. This crate is the canonical
-implementation of the Redact Secret product; every language binding
-translates to it rather than reimplementing detector behavior.
+Deterministic secret detection and redaction for runtime data and AI context.
+This crate is the canonical implementation of the Redact Secret product; every
+language binding translates to it rather than reimplementing detector
+behavior.
+
+Scan text in your process before it reaches logs, persistence, telemetry,
+tool output, or model context. Detection is local and deterministic: no
+network calls, no telemetry, and the same input always gives the same result.
+Findings never include the matched secret.
+
+Redact Secret is not a DLP platform and does not detect every secret: it
+finds supported credential formats only, and an empty finding list does not
+prove text is secret-free. It complements repository and history scanners
+rather than replacing them. Per-family support is published in the generated
+[support matrix](https://github.com/redact-secret/redact-secret/blob/main/docs/support-matrix.md),
+not stated by hand here.
 
 Path: `crates/secret-scan-core`. Registry name: `redact-secret` (library
 `redact_secret`); see

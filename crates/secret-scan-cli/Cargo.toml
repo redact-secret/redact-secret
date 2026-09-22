@@ -1,6 +1,6 @@
 [package]
 name = "redact-secret-cli"
-description = "Command-line interface built on the redact-secret core."
+description = "Deterministic secret detection and redaction for runtime data and AI context: command-line checks and redaction pipelines built on the redact-secret core."
 readme = "README.md"
 version.workspace = true
 edition.workspace = true

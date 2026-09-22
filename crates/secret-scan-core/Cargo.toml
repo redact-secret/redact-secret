@@ -1,6 +1,6 @@
 [package]
 name = "redact-secret"
-description = "Deterministic secret detection and redaction core. Side-effect free: no runtime network, filesystem, environment, telemetry, secret storage, or UI."
+description = "Deterministic secret detection and redaction for runtime data and AI context: scans text locally before it reaches logs, storage, telemetry, tools, or model context. Side-effect free: no runtime network, filesystem, environment, telemetry, secret storage, or UI."
 keywords = ["secret-detection", "redaction", "security"]
 categories = ["text-processing"]
 readme = "README.md"
