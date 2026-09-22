@@ -23,9 +23,18 @@ the single compiled addon or WebAssembly build they are about to pack, before
 packing it -- the same "built once, compared at publish time" property,
 independently of which registry ends up repackaging the qualified bytes.
 
+`--suffix` (optional) narrows the qualified set to file names ending in it.
+A family records every file its qualification artifact uploaded, which is not
+always what one package ships: `node-addon-<target>` also carries napi's
+generated `index.js`/`index.d.ts` loader, but a platform package ships only
+the compiled `.node` library, so its caller passes `--suffix .node`. Every
+qualified file left after narrowing must still be present, so the check stays
+"everything this package ships, and nothing it does not".
+
     scripts/verify-python-digest.py --inventory artifact-inventory.json dist/*
     scripts/verify-python-digest.py --inventory artifact-inventory.json \\
-        --family node-addon --target aarch64-apple-darwin bindings/node/redact-secret.darwin-arm64.node
+        --family node-addon --target aarch64-apple-darwin --suffix .node \\
+        bindings/node/redact-secret.darwin-arm64.node
 """
 
 from __future__ import annotations
@@ -44,13 +53,18 @@ def digest(path: Path) -> str:
 
 
 def qualified_digests(
-    inventory_path: Path, families: tuple[str, ...] = QUALIFIED_FAMILIES, target: str | None = None
+    inventory_path: Path,
+    families: tuple[str, ...] = QUALIFIED_FAMILIES,
+    target: str | None = None,
+    suffix: str | None = None,
 ) -> dict[str, str]:
     inventory = json.loads(inventory_path.read_text(encoding="utf-8"))
     return {
         entry["file"]: entry["sha256"]
         for entry in inventory["artifacts"]
-        if entry["family"] in families and (target is None or entry["target"] == target)
+        if entry["family"] in families
+        and (target is None or entry["target"] == target)
+        and (suffix is None or entry["file"].endswith(suffix))
     }
 
 
@@ -105,6 +119,11 @@ def main() -> int:
         default=None,
         help="restrict the qualified inventory to entries with this target (e.g. a Rust triple)",
     )
+    parser.add_argument(
+        "--suffix",
+        default=None,
+        help="restrict the qualified inventory to file names ending in this suffix (e.g. .node)",
+    )
     args = parser.parse_args()
     families = tuple(args.families) if args.families else QUALIFIED_FAMILIES
 
@@ -113,7 +132,7 @@ def main() -> int:
         print("Artifact digest verification complete: 0 artifact(s) checked, 1 error(s)")
         return 1
 
-    qualified = qualified_digests(args.inventory, families, args.target)
+    qualified = qualified_digests(args.inventory, families, args.target, args.suffix)
     errors = verify(args.artifacts, qualified)
 
     for error in errors:

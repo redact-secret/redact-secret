@@ -127,7 +127,7 @@ jobs:
               cp "$artifact_dir/redact-secret.$platform.node" "$package_dir/"
               python3 -B scripts/verify-python-digest.py \
                 --inventory "$inventory" \
-                --family node-addon --target "$target" \
+                --family node-addon --target "$target" --suffix .node \
                 "$package_dir/redact-secret.$platform.node"
             else
               package_dir="bindings/wasm/npm"
@@ -145,8 +145,10 @@ jobs:
               python3 -B scripts/verify-python-digest.py \
                 --inventory "$inventory" \
                 --family browser --family browser-common \
-                "$package_dir"/redact_secret_wasm.js "$package_dir"/redact_secret_wasm_bg.wasm \
-                "$package_dir"/redact_secret_wasm_common.js "$package_dir"/redact_secret_wasm_common_bg.wasm
+                "$package_dir"/redact_secret_wasm.js "$package_dir"/redact_secret_wasm.d.ts \
+                "$package_dir"/redact_secret_wasm_bg.wasm "$package_dir"/redact_secret_wasm_bg.wasm.d.ts \
+                "$package_dir"/redact_secret_wasm_common.js "$package_dir"/redact_secret_wasm_common.d.ts \
+                "$package_dir"/redact_secret_wasm_common_bg.wasm "$package_dir"/redact_secret_wasm_common_bg.wasm.d.ts
             fi
             node scripts/publish-dependency-package.mjs --package-dir "$package_dir" --dry-run
           done < <(jq -c '.dependencies[]' dependency-cutover-plan.json)

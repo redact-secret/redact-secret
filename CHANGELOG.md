@@ -5,6 +5,39 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+## 0.1.0-beta.6 — 2026-09-22
+
+[Publication and qualification evidence](docs/releases/0.1.0-beta.6/README.md).
+
+Beta.6 adds declarative rulesets on every surface, four provider detectors
+(Pulumi, Supabase management, Firebase server key, Terraform Cloud), and
+extra prefixes for Stripe and GitLab. It narrows Slack's user and rotation
+grammars, exempts Firebase's public client-config `apiKey`, and splits
+GitHub findings into one type per token family. It also fixes three
+`generic-token` Markdown and bare-prefix gaps and a glued-suffix boundary
+defect shared by Slack and Linear. The support matrix is re-measured and
+re-pinned from clean mains. Grammar provenance, measurements, and
+intentional false negatives stay in the linked decision records and
+`docs/audits/evidence/`.
+
+### Breaking and compatibility changes
+
+- `github-token` now reports a separate finding type for each GitHub token
+  family instead of `github_token` for every prefix (#517,
+  `decision-map-github-token-families-onto-independent-finding-types`).
+  `ghp_` keeps `github_token`; `gho_` is now `github_oauth_token`, `ghu_`
+  `github_app_user_to_server_token`, `ghs_` `github_app_installation_token`,
+  `ghr_` `github_app_refresh_token`, and `github_pat_`
+  `github_fine_grained_personal_access_token`. Code that filters, allowlists,
+  or counts findings by `github_token` stops seeing the other five families.
+  The detector id, prefixes, body grammars, byte spans, and always-redact
+  action are unchanged for all six.
+- Rust: `SecretScanErrorCode` gains `InvalidRuleset` and is still not
+  `#[non_exhaustive]`, so an exhaustive `match` needs a new arm. The
+  TypeScript `SecretScanErrorCode` union gains `"INVALID_RULESET"`, which
+  breaks an exhaustive `switch`. Python adds `InvalidRulesetError`, a
+  subclass of `SecretScanError`.
+
 ### Added
 
 - Declarative rulesets (#441, #483, #495, #484,
@@ -76,23 +109,134 @@ evidence is linked from each published version.
   any other undocumented character is a documented out-of-scope gap. The new
   detector is always-redact, provider-specific, and wins any overlap with
   the generic contextual detector.
-- `slack-token`'s `xoxe-`, `xoxe.xoxb-`, and `xoxe.xoxp-` rotation tails,
-  its `xapp-` and `xwfp-` interim guards, and `linear-token`'s `lin_oauth_`
-  interim guard now require an exact 20-byte `[A-Za-z0-9_-]` body instead
-  of 20 or more bytes (#551). Their match alphabet equals the boundary
-  alphabet, so an open-ended run absorbed a directly glued identifier
-  (`…_backup`, `…-1`) into the finding instead of rejecting it. A body
-  longer than 20 bytes on these prefixes is now an intentional false
-  negative until a reviewed contract documents a real maximum.
+- Added a `supabase-management-token` detector (finding type
+  `supabase_personal_access_token`) for the Supabase personal access tokens
+  that authenticate the Management API, CLI, and MCP server: `sbp_` or the
+  versioned `sbp_v0_`, followed by exactly 40 lowercase `[a-z0-9]` bytes
+  (#515,
+  `decision-scope-supabase-management-token-and-secret-key-independence`).
+  Supabase documents the prefixes but no body grammar. The 40-byte body is
+  trufflehog's shipped `sbp_` rule, applied to `sbp_v0_` as well, which
+  trufflehog's own regex cannot reach. A body shorter or longer than 40
+  bytes, or one containing an uppercase byte, is an intentional false
+  negative. The detector is always-redact and in the provider pack only.
+  `supabase-token`'s `sb_secret_` shape is unchanged: its 20-byte-minimum
+  body stays open because the two available sources disagree on an exact
+  length.
+- Added a `firebase-server-key` detector (finding type `firebase_server_key`)
+  for the legacy Firebase Cloud Messaging server key: the literal `AAAA`,
+  exactly 7 `[A-Za-z0-9_-]` bytes, a literal `:`, then exactly 140
+  `[A-Za-z0-9_-]` bytes, 152 bytes in all (#520,
+  `decision-add-firebase-server-key-detection-and-client-config-discrimination`).
+  Two independent write-ups of exposed keys corroborate the prefix. The
+  exact widths come from a single tool source (a nuclei template); neither
+  gitleaks nor trufflehog ships a rule. Google retired the send APIs this
+  key authenticates in 2024, but a leaked key is still redacted. A tail
+  shorter or longer than 140 bytes, or a separator other than `:`, is an
+  intentional false negative. The detector is always-redact and in the
+  provider pack only. Evidence: `docs/audits/evidence/520/README.md`.
+- Added a `terraform-cloud-token` detector (finding type
+  `terraform_cloud_token`) for HCP Terraform and Terraform Enterprise user,
+  team, and organization API tokens: exactly 14 `[A-Za-z0-9]` bytes, the
+  literal `.atlasv1.`, then exactly 67 `[A-Za-z0-9]` bytes, 90 bytes in all,
+  with no alphanumeric byte directly before or after (#521,
+  `decision-add-terraform-cloud-enterprise-token-detection`). The widths
+  come from three of HashiCorp's own API-reference examples and match
+  trufflehog's rule. Gitleaks' looser 60-70-byte range over a wider
+  alphabet is not adopted. The three token kinds share one shape and are
+  not told apart. An intentional false negative: a segment one byte short
+  or long, a malformed marker (`.atlasv2.`, `.ATLASV1.`), a masked value, or
+  HashiCorp's short `xxxxxx.atlasv1.` documentation placeholder. The
+  detector is always-redact and in the provider pack only. Evidence:
+  `docs/audits/evidence/521/README.md`.
+- `stripe-token` now also detects organization API keys (`sk_org_`) and
+  webhook signing secrets (`whsec_`), each followed by 20 or more
+  `[A-Za-z0-9]` bytes, the same floor and alphabet `sk_`/`rk_` already use
+  (#513). Both prefixes rest on Stripe's documentation alone, because
+  neither gitleaks nor trufflehog has a rule for them. Stripe documents no
+  length, so the 20-byte floor is this family's support-policy choice. An
+  intentional false negative: `rk_org_` (Stripe states it does not exist),
+  an environment segment after `sk_org_` (a hypothetical `sk_org_live_…`),
+  or gitleaks' undocumented `sk_prod_`/`rk_prod_`. Publishable `pk_live_`
+  and `pk_test_` keys, which Stripe marks safe to expose, stay unflagged.
+  Evidence: `docs/coverage/fp-fn-summary-513.json`.
+- `gitlab-token` now also detects SCIM tokens (`glsoat-`) and Feature Flags
+  client tokens (`glffct-`). They were the only rows of GitLab's
+  token-prefix table without a matching prefix. Both use the same 20-byte
+  minimum over `[A-Za-z0-9_-]` as the other eleven prefixes (#518,
+  `decision-inventory-gitlab-token-families`), because GitLab documents no
+  length for any prefix. The finding type stays `gitlab_token`. These gaps
+  are recorded, with unchanged behavior: a routable runner token
+  (`glrt-`/`glrtr-` with a `.`-delimited payload) is redacted only up to
+  its first `.`, which leaves its version and checksum tail in the output,
+  and is missed when that payload is under 20 bytes. The unprefixed legacy
+  runner registration token and the `_gitlab_session` cookie are not
+  detected.
+- `generic-token` now detects a quoted assignment wrapped in Markdown inline
+  code, such as `` `api_key="…"` `` (#552, found by
+  `redact-secret-benchmarks`' `context.markdown` metamorphic sweep). A
+  backtick is now accepted as the boundary before the assignment name and
+  after the value's closing quote. Before, the whole assignment was missed
+  instead of merely mis-spanned. Evidence: `docs/audits/evidence/552/README.md`.
+- `slack-token` now requires Slack's documented section structure for the
+  user token and the three rotation-family prefixes (#512,
+  `decision-freeze-slack-user-and-rotation-token-grammar`). Beta.5 accepted
+  any body of 20 or more `[A-Za-z0-9_-]` bytes after these prefixes.
+  `xoxp-` now needs three `-`-separated sections of 10-13 digits, then a
+  secret of 28 or more `[A-Za-z0-9]` bytes, the same structure `xoxb-`
+  already requires. `xoxe-`, `xoxe.xoxb-`, and `xoxe.xoxp-` now need a
+  single-digit version section (`xoxe-1-…`) before their opaque body. This
+  narrows detection: a value that reached the old 20-byte minimum without
+  these sections is no longer a `slack-token` finding, although a
+  contextual assignment can still surface through `generic-token`. Also
+  intentional false negatives: a pre-2016 6- or 10-character user secret, a
+  numeric section outside 10-13 digits, a user secret containing `_` or
+  `-`, and a version section of zero or two or more digits. This entry
+  leaves `xoxb-`, `xapp-`, and `xwfp-` unchanged. The deprecated `xoxa-`,
+  `xoxr-`, `xoxs-`, and `xoxo-` tokens stay unsupported.
+- `slack-token`'s `xapp-` and `xwfp-` bodies, the opaque bodies of its
+  `xoxe-`, `xoxe.xoxb-`, and `xoxe.xoxp-` rotation prefixes, and
+  `linear-token`'s `lin_oauth_` body still accept 20 or more `[A-Za-z0-9_-]`
+  bytes. They now reject the value when the byte right after the 20th body
+  byte is `-` or `_` (#551, #570). The body alphabet equals the boundary
+  alphabet, so beta.5 read a directly glued identifier (`…_backup`, `…-1`)
+  into the finding as more secret. Now a suffix that starts at exactly the
+  21st byte ends the body, and the boundary check rejects the value. It no
+  longer gets a `slack-token` or `linear-token` finding at all, where beta.5
+  redacted it together with its suffix. A body that continues past 20 bytes
+  in `[A-Za-z0-9]` is still read in full, as in beta.5. Two tradeoffs
+  remain. A real token on these prefixes whose 21st body byte is `-` or `_`
+  is a false negative. A glued suffix after a longer alphanumeric body is
+  still absorbed. An unreleased interim fix that required exactly 20 bytes
+  (#551) missed every real-length token on these prefixes. It was replaced
+  before release.
+- An `AIza`-shaped value (`google-api-key`'s exact 39-byte shape) is no
+  longer reported when at least two Firebase Web SDK config keys
+  (`authDomain`, `databaseURL`, `storageBucket`, `messagingSenderId`,
+  `appId`, `measurementId`, `projectId`) appear as object keys within 512
+  bytes of it, on either side (#520,
+  `decision-add-firebase-server-key-detection-and-client-config-discrimination`).
+  Firebase documents that config's `apiKey` as safe to publish. This
+  narrows detection. The exemption runs in the pipeline on the matched
+  text, so it also drops `generic-token`'s `contextual_secret` finding for
+  `apiKey`, and any custom or ruleset candidate with that shape. An
+  unrestricted Google API key pasted into such an object is now missed. An
+  `AIza` value with one or no such neighbour, or outside that window, is
+  still reported as in beta.5.
 
 ### Internal, tooling, and qualification
 
 - README and a new [support matrix](docs/support-matrix.md) now render from a
   pinned copy of `redact-secret-benchmarks`' generated evidence
   (`benchmarks/support-matrix.json`) instead of stating detector support by
-  hand (#510, `decision-project-the-support-matrix-into-docs-and-release-notes`).
+  hand (#510, `decision-project-support-matrix-into-docs-and-release-notes`).
   `npm run support-matrix:check` (wired into `npm run ci`) fails the build if
-  either surface drifts from the pinned matrix. Release notes gain a
+  either surface drifts from the pinned matrix. Artifact qualification's
+  `support-matrix-drift` job fails a candidate on any unacknowledged
+  regression out of `stable` against the previous release's pin (#511,
+  `decision-gate-releases-on-support-matrix-drift`), and the pin itself was
+  re-measured from clean product and benchmarks mains for this release
+  (#573). Release notes gain a
   generated status-distribution fragment
   (`generate-support-matrix-docs.py --release-note`); see
   [the release runbook](docs/releasing.md#close-out).
@@ -113,6 +257,16 @@ evidence is linked from each published version.
   referenced from [the release runbook](docs/releasing.md#review-and-approval),
   stating six checkable criteria a future stable-release decision is made
   against; this work approves no release itself.
+- Recorded that `bearer-token` still redacts a `Bearer` value cut short by
+  a byte outside its token alphabet whenever the part before that byte
+  reaches its 16-byte minimum. It also still redacts a value shaped like
+  another provider's token that the other provider's detector rejects, such
+  as a SendGrid-shaped key one byte short (#553,
+  `decision-accept-truncated-and-nested-shapes-under-bearer-token-length-grammar`).
+  Detection is unchanged. The new pinned test also records that bytes after
+  the break fall outside the redacted span. The #553 benchmark twin
+  failures are fixture expectations, to be corrected in
+  `redact-secret-benchmarks#66`. Evidence: `docs/audits/evidence/553/README.md`.
 
 ## 0.1.0-beta.5 — 2026-09-20
 

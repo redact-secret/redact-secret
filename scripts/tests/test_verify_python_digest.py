@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import contextlib
 import hashlib
 import importlib.util
+import io
 import json
 import sys
 import tempfile
@@ -224,6 +226,81 @@ class VerifyPythonDigestTests(unittest.TestCase):
             self.assertEqual(CHECK.main(), 0)
         finally:
             sys.argv = old_argv
+
+    def _addon_leg_with_loader(self) -> tuple[Path, Path]:
+        # The shape `record-artifact-inventory.py` actually records for one
+        # `node-addon-<target>` upload: the compiled library plus napi's
+        # generated loader, of which the platform package ships only the
+        # library (rc/0.1.0-beta.6 rehearsal run 35742550228).
+        addon_bytes = b"compiled addon"
+        addon = self._write("redact-secret.linux-x64-gnu.node", addon_bytes)
+        inventory = self._inventory(
+            [
+                {
+                    "family": "node-addon",
+                    "target": "x86_64-unknown-linux-gnu",
+                    "file": addon.name,
+                    "sha256": digest(addon_bytes),
+                },
+                {
+                    "family": "node-addon",
+                    "target": "x86_64-unknown-linux-gnu",
+                    "file": "index.js",
+                    "sha256": "2" * 64,
+                },
+                {
+                    "family": "node-addon",
+                    "target": "x86_64-unknown-linux-gnu",
+                    "file": "index.d.ts",
+                    "sha256": "3" * 64,
+                },
+            ]
+        )
+        return addon, inventory
+
+    def _run_addon_check(self, addon: Path, inventory: Path, *extra: str) -> int:
+        old_argv = sys.argv
+        sys.argv = [
+            "verify-python-digest.py",
+            str(addon),
+            "--inventory",
+            str(inventory),
+            "--family",
+            "node-addon",
+            "--target",
+            "x86_64-unknown-linux-gnu",
+            *extra,
+        ]
+        try:
+            with contextlib.redirect_stdout(io.StringIO()):
+                return CHECK.main()
+        finally:
+            sys.argv = old_argv
+
+    def test_unshipped_loader_files_fail_the_addon_check_without_a_suffix(self) -> None:
+        addon, inventory = self._addon_leg_with_loader()
+
+        self.assertEqual(self._run_addon_check(addon, inventory), 1)
+
+    def test_suffix_narrows_the_addon_check_to_the_shipped_library(self) -> None:
+        addon, inventory = self._addon_leg_with_loader()
+
+        self.assertEqual(self._run_addon_check(addon, inventory, "--suffix", ".node"), 0)
+
+    def test_suffix_still_requires_every_matching_qualified_file(self) -> None:
+        _, inventory = self._addon_leg_with_loader()
+
+        qualified = CHECK.qualified_digests(
+            inventory, ("node-addon",), target="x86_64-unknown-linux-gnu", suffix=".node"
+        )
+
+        self.assertEqual(
+            CHECK.verify([], qualified),
+            [
+                "redact-secret.linux-x64-gnu.node: qualified by artifact-qualification.yml "
+                "but not present among the artifacts about to publish"
+            ],
+        )
 
     def test_default_family_is_unchanged_when_no_flag_is_given(self) -> None:
         wheel_bytes = b"wheel contents"

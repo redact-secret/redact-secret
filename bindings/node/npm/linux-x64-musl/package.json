@@ -1,7 +1,7 @@
 {
   "name": "@redact-secret/node-linux-x64-musl",
   "description": "N-API native addon for @redact-secret/core (linux-x64-musl). Not intended for direct use; installed as an optional dependency of @redact-secret/core.",
-  "version": "0.1.0-beta.5",
+  "version": "0.1.0-beta.6",
   "os": ["linux"],
   "cpu": ["x64"],
   "libc": ["musl"],
