@@ -476,7 +476,9 @@ jobs:
             npm publish --dry-run --access public --tag "$npm_tag" "$tarball"
           else
             npm publish --access public --tag "$npm_tag" "$tarball"
-            node "$registry_reader" "$name" "$version" "$expected"
+            # Issue #614: npm accepted `$expected`; lag past the window is
+            # not a failure, a visible mismatch still is.
+            node "$registry_reader" "$name" "$version" "$expected" --publish-accepted
           fi
 
   verify-registry-install:
@@ -519,7 +521,11 @@ jobs:
 
       - name: Use current registry verification tooling
         shell: bash
-        run: git show "$GITHUB_SHA:scripts/verify-registry-install.mjs" > scripts/verify-registry-install.mjs
+        # Issue #614: `verify-registry-install.mjs` imports
+        # `waitForInstallable`, so its registry helper must be current too.
+        run: |
+          git show "$GITHUB_SHA:scripts/verify-registry-install.mjs" > scripts/verify-registry-install.mjs
+          git show "$GITHUB_SHA:scripts/npm-registry-metadata.mjs" > scripts/npm-registry-metadata.mjs
 
       - name: Set up Node.js
         if: matrix.libc != 'musl'
@@ -568,7 +574,11 @@ jobs:
 
       - name: Use current registry verification tooling
         shell: bash
-        run: git show "$GITHUB_SHA:scripts/verify-registry-install.mjs" > scripts/verify-registry-install.mjs
+        # Issue #614: `verify-registry-install.mjs` imports
+        # `waitForInstallable`, so its registry helper must be current too.
+        run: |
+          git show "$GITHUB_SHA:scripts/verify-registry-install.mjs" > scripts/verify-registry-install.mjs
+          git show "$GITHUB_SHA:scripts/npm-registry-metadata.mjs" > scripts/npm-registry-metadata.mjs
 
       - name: Set up Node.js
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0

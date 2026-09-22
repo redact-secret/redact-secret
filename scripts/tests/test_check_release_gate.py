@@ -584,6 +584,60 @@ class ReleaseGateTests(unittest.TestCase):
 
         self.assertEqual(CHECK.validate(self.root), [])
 
+    def test_inline_needs_output_in_run_block_is_an_error(self) -> None:
+        # Issue #614: an apostrophe in a job output ended this quoted string.
+        broken = RELEASE_YML.replace(
+            "      - name: Publish to PyPI\n        run: echo noop\n",
+            "      - name: Publish to PyPI\n"
+            "        run: |\n"
+            "          echo start\n"
+            "\n"
+            "          wasm_json='${{ needs.publish-wasm-dependency.outputs.registry_state_json }}'\n",
+        )
+        self.assertNotEqual(broken, RELEASE_YML)
+        self._write("release.yml", broken)
+        errors = CHECK.validate(self.root)
+        self.assertEqual(len(errors), 1, errors)
+        self.assertIn("substitutes a `${{ needs.* }}` job output inline", errors[0])
+
+    def test_inline_needs_output_in_one_line_run_is_an_error(self) -> None:
+        self._write(
+            "reconcile-release.yml",
+            "name: Reconcile Release\n"
+            "jobs:\n"
+            "  reconcile:\n"
+            "    steps:\n"
+            "      - run: |\n"
+            '          chmod 0644 "$package_dir"/$asset_glob\n'
+            "      - run: echo \"${{ needs.reconcile.outputs.source_revision }}\"\n",
+        )
+        errors = CHECK.validate(self.root)
+        self.assertEqual(len(errors), 1, errors)
+        self.assertIn("reconcile-release.yml:7:", errors[0])
+
+    def test_needs_output_through_env_is_accepted(self) -> None:
+        passing = RELEASE_YML.replace(
+            "      - name: Publish to PyPI\n        run: echo noop\n",
+            "      - name: Publish to PyPI\n"
+            "        if: ${{ needs.publish-wasm-dependency.result == 'success' }}\n"
+            "        env:\n"
+            "          WASM_JSON: ${{ needs.publish-wasm-dependency.outputs.registry_state_json }}\n"
+            "        run: |\n"
+            '          wasm_json="$WASM_JSON"\n',
+        )
+        self.assertNotEqual(passing, RELEASE_YML)
+        self._write("release.yml", passing)
+        self.assertEqual(CHECK.validate(self.root), [])
+
+    def test_repository_release_workflows_have_no_inline_needs_outputs(self) -> None:
+        repo = Path(__file__).resolve().parents[2]
+        for workflow in CHECK.INLINE_NEEDS_WORKFLOWS:
+            self.assertEqual(
+                CHECK.inline_needs_in_run((repo / workflow).read_text(encoding="utf-8")),
+                [],
+                workflow,
+            )
+
 
 if __name__ == "__main__":
     unittest.main()

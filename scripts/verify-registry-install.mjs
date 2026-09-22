@@ -31,7 +31,7 @@ import {
   packageVersion,
 } from "./qualify-runtime-fixture.mjs";
 import { qualifyBrowser, qualifyNode } from "./consumer-harness.mjs";
-import { waitForVisible } from "./npm-registry-metadata.mjs";
+import { waitForInstallable } from "./npm-registry-metadata.mjs";
 
 const WRAPPER_PACKAGE_NAME = "@redact-secret/core";
 
@@ -85,6 +85,22 @@ async function buildConsumerProject(version) {
   return root;
 }
 
+/**
+ * The wrapper plus every runtime dependency it pins, at the exact versions
+ * this revision declares -- everything `npm install` below must resolve.
+ */
+async function registryPackages(version) {
+  const manifest = JSON.parse(
+    await readFile(join(REPO_ROOT_PATH, "packages/javascript/package.json"), "utf8"),
+  );
+  return [
+    { name: WRAPPER_PACKAGE_NAME, version },
+    ...Object.entries({ ...manifest.dependencies, ...manifest.optionalDependencies })
+      .filter(([name]) => name.startsWith("@redact-secret/"))
+      .map(([name, pinned]) => ({ name, version: pinned })),
+  ];
+}
+
 async function loadIncrementalCorpus() {
   return JSON.parse(await readFile(INCREMENTAL_CORPUS_PATH, "utf8"));
 }
@@ -105,10 +121,12 @@ async function main() {
 
   // `npm install` below reads the registry too, but its own error for "not
   // there yet" is indistinguishable from "never published" -- so name that
-  // read explicitly here first, with the same bounded wait and the same
-  // clear "still propagating" vs. "not visible" distinction every other
-  // registry-state read in the release pipeline gets.
-  await waitForVisible(WRAPPER_PACKAGE_NAME, expectedVersion);
+  // read explicitly here first. Issue #614: the publish legs now accept
+  // npm's own publish success as authoritative when the registry lags, so
+  // this is where "published but not yet visible" is waited out, for the
+  // wrapper and every dependency, on the packument `npm install` resolves
+  // through, with a window sized for npm's observed lag.
+  await waitForInstallable(await registryPackages(expectedVersion));
 
   let consumerRoot;
   try {
