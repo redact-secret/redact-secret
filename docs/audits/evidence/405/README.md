@@ -2,7 +2,7 @@
 
 [Audit archive](../../README.md) ·
 [Precision-contract freeze (#367)](../../../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) ·
-[OpenAI grammar freeze (#368)](../../../decisions/2026-09-17-freeze-openai-api-key-grammar.md) ·
+[OpenAI grammar freeze (#368)](../../../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) ·
 [Beta.5 precision gate (#376)](../../../decisions/2026-09-18-gate-beta5-on-precision-gains-and-positive-preservation.md) ·
 [Benchmark-regression governance](../../../decisions/2026-09-18-govern-benchmark-regression-promotion.md) ·
 [Issue #405](https://github.com/redact-secret/redact-secret/issues/405) ·
@@ -41,7 +41,8 @@ No code change is made under this issue.
 ## Why the miss is intended
 
 Issue #368's decision record
-([`docs/decisions/2026-09-17-freeze-openai-api-key-grammar.md`](../../../decisions/2026-09-17-freeze-openai-api-key-grammar.md))
+([`docs/decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md`](../../../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md#folded-records),
+OpenAI row)
 narrowed `openai-token` from "any `sk-` value at least 20 bytes long" to the
 documented `<segment>T3BlbkFJ<segment>` shape with segments at an exact
 length (20/20 legacy, 74/74, 74/58, or 58/74 namespaced). `evidence/367`
@@ -102,7 +103,7 @@ with the marker corrupted, or a segment one byte off, is rejected).
 Issue #405 does not warrant a `conformance/benchmark-regressions.json` entry:
 that manifest is for a promoted, fixed regression with a fixing commit, and
 no fix is needed here. The nine fixtures are the same accepted false-negative
-cost `docs/decisions/2026-09-17-freeze-openai-api-key-grammar.md` recorded
+cost `docs/decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md` recorded
 when the grammar was frozen. The recommended next step lives in
 `redact-secret-benchmarks`: mark the existing `openai-token-shape-1/2/3`
 known-gap record `reviewed`, citing #367, #402, and this document, rather

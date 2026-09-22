@@ -17,7 +17,8 @@
 //! xoxe.xoxp-<1 [0-9]>-<20+ [A-Za-z0-9_-]>                         rotating user
 //! ```
 //!
-//! (`docs/decisions/2026-09-20-freeze-slack-user-and-rotation-token-grammar.md`).
+//! (`docs/decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md`,
+//! Slack user/rotation row).
 //! Every numeric section width above is tool-corroborated (gitleaks and
 //! trufflehog both use `10-13` for every Slack `-`-separated numeric
 //! section they recognize); the provider establishes only that sections are
@@ -43,7 +44,8 @@
 //! provider-plus-tool) bar for a structural contract
 //! (`docs/contracts/precision/precision-contracts.json`,
 //! `slack-token.variants[app-level|workflow]`). Decision
-//! `decision-freeze-slack-user-and-rotation-token-grammar` (#512) froze
+//! `decision-freeze-precision-contracts-seven-provider-families` (Slack
+//! user/rotation row, #512) froze
 //! both prefixes' shape as unchanged from beta.4. The `regex` crate cannot
 //! be used here — this crate is dependency-free — so [`scan_sectioned`] and
 //! the interim guard compose every shape from the shared `pattern`

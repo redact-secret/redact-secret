@@ -161,9 +161,8 @@ release-facing record.
 - **`cfat_` and `api_org_` had no decision record**, breaking the pattern
   every other frozen or adopted grammar in this registry follows (only
   `docs/audits/evidence/367/precision-contracts.json` entries existed).
-  Fixed: `docs/decisions/2026-09-20-adopt-cloudflare-account-token-prefix.md`
-  and `docs/decisions/2026-09-20-adopt-huggingface-organization-token-prefix.md`,
-  indexed in `DECISIONS.md`.
+  Fixed: `docs/decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md`
+  (Cloudflare and Hugging Face rows), indexed in `DECISIONS.md`.
 
 Everything else checked clean: the new Rust tests run under the existing
 `cargo test --workspace` wiring with no separate registration step; the new

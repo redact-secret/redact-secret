@@ -12,7 +12,7 @@
  * reproduction against the committed fixtures.
  *
  * The distinguishing property under test is the reviewed Docker Hub contract
- * (`decision-freeze-docker-pat-oat-exact-length-grammar`): a personal access
+ * (`decision-freeze-precision-contracts-seven-provider-families`): a personal access
  * token is `dckr_pat_` + exactly 27 bytes of `[A-Za-z0-9_-]`, an organization
  * access token is `dckr_oat_` + exactly 32 bytes of the same alphabet, and the
  * two segment names do not share a length. Every mutation below changes

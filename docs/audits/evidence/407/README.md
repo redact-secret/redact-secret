@@ -2,7 +2,7 @@
 
 [Audit archive](../../README.md) ·
 [Governance decision](../../../decisions/2026-09-18-govern-benchmark-regression-promotion.md) ·
-[Docker Hub PAT/OAT exact-length grammar freeze (#370)](../../../decisions/2026-09-17-freeze-docker-pat-oat-exact-length-grammar.md) ·
+[Docker Hub PAT/OAT exact-length grammar freeze (#370)](../../../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) ·
 [Precision-contract freeze (#367)](../../../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) ·
 [Beta.5 precision gate (#376)](../../../decisions/2026-09-18-gate-beta5-on-precision-gains-and-positive-preservation.md) ·
 [Issue #407](https://github.com/redact-secret/redact-secret/issues/407) ·
@@ -37,7 +37,7 @@ this issue.
 
 ## Why this is not a regression
 
-`decision-freeze-docker-pat-oat-exact-length-grammar` (#370) narrowed the
+`decision-freeze-precision-contracts-seven-provider-families` (Docker row, #370) narrowed the
 `docker-token` detector from beta.4's "recognized prefix plus a shared
 20-byte minimum suffix" rule to two independently validated, per-prefix
 exact-length shapes:
@@ -62,8 +62,8 @@ dckr_pat_ZByg3TZMUmABS7UvAuqZ7UGqTnUvdlUs   (41 bytes total)
 reproduced deterministically from the generator's own `synthetic()` seed
 (`detector-coverage:docker-token:dckr_pat_`, 32 bytes) — independently
 computed here, not taken on citation alone. A 32-byte suffix under
-`dckr_pat_` is exactly the shape `decision-freeze-docker-pat-oat-exact-length-grammar`
-names as an intentional false negative: "Any `dckr_pat_`/`dckr_oat_` value
+`dckr_pat_` is exactly the shape `decision-freeze-precision-contracts-seven-provider-families`
+(Docker row) names as an intentional false negative: "Any `dckr_pat_`/`dckr_oat_` value
 whose suffix is not exactly the documented length for its own segment name"
 is out of scope by design, the same exact-length precedent `npm-token`,
 `google-api-key`, `notion-token`, and `new-relic-user-api-key` already set.

@@ -3147,7 +3147,7 @@
       "findingCount": 0,
       "fixtureId": "docker-embedded-identifier-discriminating-boundary",
       "kind": null,
-      "note": "issue #320: a wider benign identifier the docker-token prefix is embedded in (a leading alnum/dash byte immediately before the documented prefix means it is a truncated slice of a longer identifier, not a boundary-delimited credential) on one line, and a real boundary-delimited token on the next, stay correctly discriminated at every chunk split, including splits that fall inside either prefix's own bytes. Reclassified by issue #370 (decision-freeze-docker-pat-oat-exact-length-grammar): the boundary-delimited value on the second line carries a 36-byte suffix, which is not the 27-byte personal access token length, so both lines now stay as plain text at every partition; docker-pat-oat-exact-length-partitions repeats this discrimination with exact-length shapes. Input unchanged; expectation corrected.",
+      "note": "issue #320: a wider benign identifier the docker-token prefix is embedded in (a leading alnum/dash byte immediately before the documented prefix means it is a truncated slice of a longer identifier, not a boundary-delimited credential) on one line, and a real boundary-delimited token on the next, stay correctly discriminated at every chunk split, including splits that fall inside either prefix's own bytes. Reclassified by issue #370 (decision-freeze-precision-contracts-seven-provider-families): the boundary-delimited value on the second line carries a 36-byte suffix, which is not the 27-byte personal access token length, so both lines now stay as plain text at every partition; docker-pat-oat-exact-length-partitions repeats this discrimination with exact-length shapes. Input unchanged; expectation corrected.",
       "result": "silent",
       "runtimeConsumers": [
         "rust-core",
@@ -3183,7 +3183,7 @@
       "findingCount": 0,
       "fixtureId": "docker-adversarial-long-suffix",
       "kind": "adversarial",
-      "note": "Reclassified by issue #370 (decision-freeze-docker-pat-oat-exact-length-grammar): an 11250-byte suffix is neither documented length, so the corrected rule reports nothing; the scan still stays deterministic and bounded (a long same-alphabet run is not misread as the exact shape plus trailing bytes). Input unchanged; expectation corrected.",
+      "note": "Reclassified by issue #370 (decision-freeze-precision-contracts-seven-provider-families): an 11250-byte suffix is neither documented length, so the corrected rule reports nothing; the scan still stays deterministic and bounded (a long same-alphabet run is not misread as the exact shape plus trailing bytes). Input unchanged; expectation corrected.",
       "result": "silent",
       "runtimeConsumers": [
         "rust-core",
@@ -3658,7 +3658,7 @@
       "findingCount": 1,
       "fixtureId": "docker-overlap-context",
       "kind": "overlap",
-      "note": "Reclassified by issue #370 (decision-freeze-docker-pat-oat-exact-length-grammar): docker-token no longer claims the 36-byte suffix, so the same input is owned by generic-token's contextual assignment path instead (the value under access_token= is still redacted, at contextual specificity). A bare malformed provider shape and the same value under an assignment key legitimately have different outcomes; nothing is globally suppressed.",
+      "note": "Reclassified by issue #370 (decision-freeze-precision-contracts-seven-provider-families): docker-token no longer claims the 36-byte suffix, so the same input is owned by generic-token's contextual assignment path instead (the value under access_token= is still redacted, at contextual specificity). A bare malformed provider shape and the same value under an assignment key legitimately have different outcomes; nothing is globally suppressed.",
       "result": "flagged",
       "runtimeConsumers": [
         "rust-core",
@@ -3715,7 +3715,7 @@
       "findingCount": 0,
       "fixtureId": "docker-positive-all-prefixes",
       "kind": "boundary",
-      "note": "Reclassified by issue #370 (decision-freeze-docker-pat-oat-exact-length-grammar): a 25-byte suffix after dckr_oat_ is not the 32-byte organization access token shape and is an intentional false negative; every documented prefix variant is now asserted at its own exact length by docker-positive-oat-exact-length and the docker-token-exact-length mutation family. Input unchanged; expectation corrected.",
+      "note": "Reclassified by issue #370 (decision-freeze-precision-contracts-seven-provider-families): a 25-byte suffix after dckr_oat_ is not the 32-byte organization access token shape and is an intentional false negative; every documented prefix variant is now asserted at its own exact length by docker-positive-oat-exact-length and the docker-token-exact-length mutation family. Input unchanged; expectation corrected.",
       "result": "silent",
       "runtimeConsumers": [
         "rust-core",
@@ -3753,7 +3753,7 @@
       "findingCount": 0,
       "fixtureId": "docker-positive-doc-style-placeholder",
       "kind": "boundary",
-      "note": "Reclassified by issue #370 (decision-freeze-docker-pat-oat-exact-length-grammar): a 20-byte run of valid alphabet bytes is not a documented Docker Hub length; the corrected exact-length rule declines it. docker-positive-pat-doc-style-placeholder-exact-length carries the same placeholder at the documented 27-byte length. Input unchanged; expectation corrected.",
+      "note": "Reclassified by issue #370 (decision-freeze-precision-contracts-seven-provider-families): a 20-byte run of valid alphabet bytes is not a documented Docker Hub length; the corrected exact-length rule declines it. docker-positive-pat-doc-style-placeholder-exact-length carries the same placeholder at the documented 27-byte length. Input unchanged; expectation corrected.",
       "result": "silent",
       "runtimeConsumers": [
         "rust-core",
@@ -3848,7 +3848,7 @@
       "findingCount": 0,
       "fixtureId": "docker-positive-min-length",
       "kind": "boundary",
-      "note": "Reclassified by issue #370 (decision-freeze-docker-pat-oat-exact-length-grammar): the retired 20-byte shared minimum is not a documented Docker Hub length; a 20-byte suffix after dckr_pat_ is an intentional false negative. Input unchanged; expectation corrected.",
+      "note": "Reclassified by issue #370 (decision-freeze-precision-contracts-seven-provider-families): the retired 20-byte shared minimum is not a documented Docker Hub length; a 20-byte suffix after dckr_pat_ is an intentional false negative. Input unchanged; expectation corrected.",
       "result": "silent",
       "runtimeConsumers": [
         "rust-core",
@@ -4076,7 +4076,7 @@
       "findingCount": 0,
       "fixtureId": "docker-positive-qualified",
       "kind": "boundary",
-      "note": "Reclassified by issue #370 (decision-freeze-docker-pat-oat-exact-length-grammar): a 36-byte suffix after dckr_pat_ is neither the 27-byte personal access token nor the 32-byte organization access token shape, so the input is now an intentional false negative. The input is unchanged from its beta.4 form; only the expectation is corrected.",
+      "note": "Reclassified by issue #370 (decision-freeze-precision-contracts-seven-provider-families): a 36-byte suffix after dckr_pat_ is neither the 27-byte personal access token nor the 32-byte organization access token shape, so the input is now an intentional false negative. The input is unchanged from its beta.4 form; only the expectation is corrected.",
       "result": "silent",
       "runtimeConsumers": [
         "rust-core",
@@ -8526,7 +8526,7 @@
       "findingCount": 2,
       "fixtureId": "slack-positive-all-prefixes",
       "kind": "positive",
-      "note": "Reclassified by issue #512 (docs/decisions/2026-09-20-freeze-slack-user-and-rotation-token-grammar.md): `xoxp-`, `xoxe-`, `xoxe.xoxb-`, and `xoxe.xoxp-` now require their own documented digit section, which none of these opaque bodies carry, so slack-token no longer claims them; `xapp-` and `xwfp-` are not promoted and still match at their original ranges. Every opaque body here is 25 bytes, past the interim guards' 20-byte floor, exercising issue #570's open-floor fix (#551 briefly turned the floor into an exact length, which stopped matching this fixture entirely; restored). `slack-positive-structural-prefixes` is the corrected counterpart demonstrating every promoted family's full grammar.",
+      "note": "Reclassified by issue #512 (docs/decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md): `xoxp-`, `xoxe-`, `xoxe.xoxb-`, and `xoxe.xoxp-` now require their own documented digit section, which none of these opaque bodies carry, so slack-token no longer claims them; `xapp-` and `xwfp-` are not promoted and still match at their original ranges. Every opaque body here is 25 bytes, past the interim guards' 20-byte floor, exercising issue #570's open-floor fix (#551 briefly turned the floor into an exact length, which stopped matching this fixture entirely; restored). `slack-positive-structural-prefixes` is the corrected counterpart demonstrating every promoted family's full grammar.",
       "result": "flagged",
       "runtimeConsumers": [
         "rust-core",
@@ -8944,7 +8944,7 @@
       "findingCount": 4,
       "fixtureId": "slack-positive-structural-prefixes",
       "kind": "positive",
-      "note": "Issue #512 (docs/decisions/2026-09-20-freeze-slack-user-and-rotation-token-grammar.md): each of the four newly-promoted families (user, refresh, rotating-bot, rotating-user) is independently detected at its own full documented section grammar, the corrected counterpart of `slack-positive-all-prefixes` for these four prefixes. The rotation tail here is 38 bytes, past its 20-byte floor, exercising issue #570's open-floor fix (#551 briefly turned the floor into an exact length and shrank this fixture's tail to fit; restored).",
+      "note": "Issue #512 (docs/decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md): each of the four newly-promoted families (user, refresh, rotating-bot, rotating-user) is independently detected at its own full documented section grammar, the corrected counterpart of `slack-positive-all-prefixes` for these four prefixes. The rotation tail here is 38 bytes, past its 20-byte floor, exercising issue #570's open-floor fix (#551 briefly turned the floor into an exact length and shrank this fixture's tail to fit; restored).",
       "result": "flagged",
       "runtimeConsumers": [
         "rust-core",

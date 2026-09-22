@@ -9,8 +9,8 @@
 //!   `[A-Za-z0-9]`.
 //!
 //! Both total exactly 50 bytes including the prefix. See
-//! `docs/decisions/2026-09-16-freeze-notion-integration-token-grammar.md`
-//! for why these lengths are frozen and what is deliberately out of scope
+//! `docs/decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md`
+//! (Notion row) for why these lengths are frozen and what is deliberately out of scope
 //! (OAuth refresh/access tokens, page/database/block IDs, share URLs).
 
 use crate::detectors::pattern::{self, RunLength, is_alnum, is_alnum_underscore};
