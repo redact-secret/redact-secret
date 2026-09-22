@@ -13,7 +13,7 @@
  *
  * The distinguishing properties under test are the reviewed Cloudflare
  * scannable user-token contract frozen by issue #367
- * (`docs/audits/evidence/367/precision-contracts.json`,
+ * (`docs/contracts/precision/precision-contracts.json`,
  * `families.cloudflare-token`): `cfut_` followed by exactly 40 bytes of
  * `[A-Za-z0-9]` (the body) and then exactly 8 bytes of `[0-9a-f]` (the
  * checksum). The checksum's existence is provider evidence (a bare 40-byte

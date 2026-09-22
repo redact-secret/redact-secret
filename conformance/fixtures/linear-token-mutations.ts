@@ -14,7 +14,7 @@
  *
  * The distinguishing properties under test are the reviewed Linear API-key
  * contract frozen by issue #367
- * (`docs/audits/evidence/367/precision-contracts.json`,
+ * (`docs/contracts/precision/precision-contracts.json`,
  * `families.linear-token`): `lin_api_` followed by exactly 40 bytes of
  * `[A-Za-z0-9]`. gitleaks 8.30.1's `linear-api-key` and trufflehog 3.97.4's
  * `linearapi` rules independently pin the body to this exact length, and

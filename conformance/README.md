@@ -256,7 +256,7 @@ it — not by a raw fixture count, which hides how unevenly coverage is
 distributed across shapes (issue #475).
 [`docs/audits/evidence/475/shape-inventory.json`](../docs/audits/evidence/475/shape-inventory.json)
 is the reviewed inventory, comparable in form to the provider-grammar
-contracts in [`docs/audits/evidence/367/precision-contracts.json`](../docs/audits/evidence/367/precision-contracts.json).
+contracts in [`docs/contracts/precision/precision-contracts.json`](../docs/contracts/precision/precision-contracts.json).
 A new exclusion or accepted tradeoff for one of these four detectors should
 add its shape (and cited fixtures) there, not just its fixtures here.
 

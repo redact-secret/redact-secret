@@ -2,7 +2,7 @@
 
 [Audit archive](../../README.md) ·
 [Precision-contract freeze (#367)](../../../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) ·
-[Precision contracts: `vercel-token` family](../367/precision-contracts.json) ·
+[Precision contracts: `vercel-token` family](../../../contracts/precision/precision-contracts.json) ·
 [Issue #516](https://github.com/redact-secret/redact-secret/issues/516) ·
 [Issue #501 (parent epic, B1e)](https://github.com/redact-secret/redact-secret/issues/501) ·
 [Issue #487 (Google OAuth, audit-only precedent)](https://github.com/redact-secret/redact-secret/issues/487)

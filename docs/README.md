@@ -34,6 +34,7 @@ list is not proof that input contains no secrets.
 - [Rust workspace](rust-workspace.md), [Python packaging](python-packaging.md),
   and [artifact qualification](qualification.md)
 - [Detection coverage evidence](coverage/README.md)
+- [Live contracts](contracts/README.md): CI-read inputs, kept outside the frozen evidence archive
 - [Support matrix](support-matrix.md): per-family status (`stable` /
   `provisional` / `pending` / `unsupported`), generated from evaluation
   evidence in [`redact-secret-benchmarks`](https://github.com/redact-secret/redact-secret-benchmarks)
