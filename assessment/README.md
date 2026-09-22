@@ -192,9 +192,11 @@ five-repetition run at commit `944341903d5b85686a056d3218f4c33110d7d57b`
 `438df062ddde47dcb32ae0aefc4297ed8b8c9e2c3270778c2b1f8809e40bd0dd`),
 committed under [`results/complete-v4/`](./results/complete-v4/). The prior
 pin, at commit `9359f59596f03443254f662db60d553b0610809e` (accuracy corpus
-hash `cc4cb42028fd700bc98dd06dacebe421c5462dd59a46cf013154a4d185849979`),
-remains as historical evidence under
-[`results/complete-v3/`](./results/complete-v3/), byte-for-byte unchanged.
+hash `cc4cb42028fd700bc98dd06dacebe421c5462dd59a46cf013154a4d185849979`), was
+pruned by [#594](https://github.com/redact-secret/redact-secret/issues/594)
+and remains as historical evidence at
+[`results/complete-v3/`](https://github.com/redact-secret/redact-secret/tree/6cd5f2c58e527396563d86d8caba98104a93a17c/assessment/results/complete-v3)
+(the fixed 15-run macOS baseline that `complete-v4` re-pinned).
 `results/complete-v4/` re-pins the accuracy identity only, after the beta.5
 precision gate ([#376](https://github.com/redact-secret/redact-secret/issues/376))
 corrected four accuracy-corpus fixtures to the seven provider contracts
@@ -250,26 +252,23 @@ The manually triggered workflow runs the same command and uploads both the raw
 assessment and acceptance result. This readiness evidence does not select a
 version or authorize tagging, publication, deployment, or release.
 
-The first formal candidate evaluation is committed under
-[`results/acceptance/`](./results/acceptance/): the
-[`acceptance report`](./results/acceptance/acceptance.md) links its complete
-machine-readable summary, which in turn links all 15 per-surface raw results
-and reports. It used the already-fixed criteria from commit `054076f` and five
-repetitions; all 46 timing, throughput, and observable-memory checks passed.
+The first formal candidate evaluation used the already-fixed criteria from
+commit `054076f` and five repetitions, with all 46 timing, throughput, and
+observable-memory checks passing. It was committed under
+`results/acceptance/`, linking its complete machine-readable summary and all
+15 per-surface raw results and reports;
+[#594](https://github.com/redact-secret/redact-secret/issues/594) pruned that
+directory, which remains as historical evidence at
+[`results/acceptance/`](https://github.com/redact-secret/redact-secret/tree/6cd5f2c58e527396563d86d8caba98104a93a17c/assessment/results/acceptance).
 
-The first durable run of that command is committed as
-[`results/complete/baseline.md`](./results/complete/baseline.md), with its
-machine-readable rollup in
-[`results/complete/summary.json`](./results/complete/summary.json); it
-remains as historical evidence and stays byte-for-byte unchanged as the
-corpus moves forward. The criteria file's currently pinned baseline is the
-later five-repetition run committed as
-[`results/complete-v3/baseline.md`](./results/complete-v3/baseline.md) and
-[`results/complete-v3/summary.json`](./results/complete-v3/summary.json),
-evaluated as `accepted` in
-[`results/complete-v3/acceptance.md`](./results/complete-v3/acceptance.md).
-Use a new output directory when reproducing either so stale files cannot
-satisfy a run.
+The first durable run of that command was committed as
+`results/complete/baseline.md` and `results/complete/summary.json`; #594
+pruned it too, and it remains as historical evidence at
+[`results/complete/`](https://github.com/redact-secret/redact-secret/tree/6cd5f2c58e527396563d86d8caba98104a93a17c/assessment/results/complete).
+The criteria file's baseline was later re-pinned to the five-repetition run
+under `results/complete-v3/` (also pruned; see above), then to the current
+`results/complete-v4/` pin described above. Use a new output directory when
+reproducing so stale files cannot satisfy a run.
 
 To choose another bounded profile, repeat `--profile`; include at least one
 `whole` and one non-`whole` profile or the rollup is incomplete. Other useful
@@ -304,9 +303,11 @@ complete, five-repetition run captured by the
 [`Complete assessment`](../.github/workflows/complete-assessment.yml)
 workflow's `ubuntu-latest` runner at commit
 `9ff702001342ff84acdde8ad9acdec396572a15e`, committed under
-[`results/complete-linux-x64/`](./results/complete-linux-x64/); it remains as
-historical evidence and stays byte-for-byte unchanged as the corpus moves
-forward. Its performance and resource thresholds were derived once, from
+`results/complete-linux-x64/`;
+[#594](https://github.com/redact-secret/redact-secret/issues/594) pruned that
+directory, which remains as historical evidence at
+[`results/complete-linux-x64/`](https://github.com/redact-secret/redact-secret/tree/6cd5f2c58e527396563d86d8caba98104a93a17c/assessment/results/complete-linux-x64).
+Its performance and resource thresholds were derived once, from
 that run, and have not changed since. The criteria file's `baseline` pointer
 and pinned accuracy counts re-pin the same way as the macOS profile's above;
 they currently point at the later five-repetition `ubuntu-latest` run at
@@ -324,9 +325,10 @@ frozen by [#367](https://github.com/redact-secret/redact-secret/issues/367);
 see [`results/complete-linux-x64-v4/README.md`](./results/complete-linux-x64-v4/README.md).
 The prior pin, at commit `9359f59596f03443254f662db60d553b0610809e` (accuracy
 corpus hash `cc4cb42028fd700bc98dd06dacebe421c5462dd59a46cf013154a4d185849979`),
-remains as historical evidence under
-[`results/complete-linux-x64-v3/`](./results/complete-linux-x64-v3/),
-byte-for-byte unchanged. Both v3 and v4 pin the same workload-profiles
+was pruned by #594 and remains as historical evidence at
+[`results/complete-linux-x64-v3/`](https://github.com/redact-secret/redact-secret/tree/6cd5f2c58e527396563d86d8caba98104a93a17c/assessment/results/complete-linux-x64-v3)
+(the fixed 15-run Linux x86_64 baseline that `complete-linux-x64-v4` re-pinned).
+Both v3 and v4 pin the same workload-profiles
 identity as the macOS profile, since that corpus is unchanged, and unlike the
 macOS profile's `complete-v4`, this Linux x86_64 evidence is fully `accepted`
 — performance thresholds pass cleanly on the qualified `ubuntu-latest` host.
@@ -362,11 +364,11 @@ npm run assessment:acceptance -- \
   --markdown-out assessment-output-linux-x64/acceptance.md
 ```
 
-The committed [acceptance evaluation](./results/complete-linux-x64/acceptance.md)
-of that same baseline run against its own freshly fixed criteria reports
+The [acceptance evaluation](https://github.com/redact-secret/redact-secret/blob/6cd5f2c58e527396563d86d8caba98104a93a17c/assessment/results/complete-linux-x64/acceptance.md)
+of that same baseline run against its own freshly fixed criteria reported
 `accepted` with all 46 checks passing and no `environment-*-mismatch`
 failure, by construction: the thresholds were fixed from this run's own
-observations.
+observations. (`results/complete-linux-x64/` was pruned by #594; see above.)
 
 ## Node and browser accuracy runners
 
@@ -483,10 +485,13 @@ repository's `assessment:check` command also runs fake-host cases for Unicode
 normalization, whole/incremental disagreement, sanitized package failure, and
 incomplete evaluation handling.
 
-The first bounded installed-wheel baseline is recorded under
-[`results/python/`](./results/python/): accuracy against `accuracy-corpus`, plus
-`scale-logs-small-whole` with two runs. Its README records the exact build,
-no-index installation, and evaluation commands.
+The first bounded installed-wheel baseline — accuracy against
+`accuracy-corpus`, plus `scale-logs-small-whole` with two runs, with its
+README recording the exact build, no-index installation, and evaluation
+commands — was recorded under `results/python/`;
+[#594](https://github.com/redact-secret/redact-secret/issues/594) pruned it,
+and it remains as historical evidence at
+[`results/python/`](https://github.com/redact-secret/redact-secret/tree/3ca61a9085d074c102fa9b3e9f937c3d4cf76a9c/assessment/results/python).
 
 ## Rust library runner
 
@@ -511,10 +516,12 @@ surfaces. `npm run assessment:rust:self-test` runs tiny
 known-answer checks for UTF-8 Unicode ranges, incremental incomplete-run
 behavior, and sanitized failure handling.
 
-The first bounded Rust baseline is recorded under
-[`results/rust-core/`](./results/rust-core/): accuracy against
-`accuracy-corpus`, plus `scale-logs-small-whole` with two runs. These files
-are inspectable evidence for this surface, not a release gate.
+The first bounded Rust baseline — accuracy against `accuracy-corpus`, plus
+`scale-logs-small-whole` with two runs, inspectable evidence for this surface
+rather than a release gate — was recorded under `results/rust-core/`;
+[#594](https://github.com/redact-secret/redact-secret/issues/594) pruned it,
+and it remains as historical evidence at
+[`results/rust-core/`](https://github.com/redact-secret/redact-secret/tree/3ca61a9085d074c102fa9b3e9f937c3d4cf76a9c/assessment/results/rust-core).
 
 ## CLI runner
 
@@ -616,10 +623,15 @@ above and must not become a second discovery benchmark.
 
 ## Performance build correction
 
-The historical `complete`, `complete-v2`, and `complete-v3` Rust timings were
-collected without `--release`; their raw evidence is retained but does not
-support optimized cross-runtime comparisons. The corrected
-[release-profile run](results/release-profile/baseline.md) uses release builds.
+The historical Rust timings in
+[`complete`](https://github.com/redact-secret/redact-secret/tree/6cd5f2c58e527396563d86d8caba98104a93a17c/assessment/results/complete)
+and
+[`complete-v3`](https://github.com/redact-secret/redact-secret/tree/6cd5f2c58e527396563d86d8caba98104a93a17c/assessment/results/complete-v3)
+(pruned by [#594](https://github.com/redact-secret/redact-secret/issues/594))
+were collected without `--release`; their raw evidence is retained at those
+permalinks but does not support optimized cross-runtime comparisons. The
+corrected [release-profile run](results/release-profile/baseline.md) uses
+release builds.
 The Rust runner now rejects debug performance execution, records its actual
 executable argv and build profile, and aggregation requires release provenance.
 Build time is outside the measured processing interval. CLI check-mode timings

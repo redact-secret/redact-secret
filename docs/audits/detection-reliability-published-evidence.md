@@ -16,7 +16,11 @@ not authorize a version, tag, publication, deployment, or release.
 
 ## Assessment coverage and identity
 
-The committed complete assessment is `complete` with no validation failures.
+The committed complete assessment is
+[`complete`](https://github.com/redact-secret/redact-secret/tree/6cd5f2c58e527396563d86d8caba98104a93a17c/assessment/results/complete)
+(pruned from the working tree by
+[#594](https://github.com/redact-secret/redact-secret/issues/594); the
+linked commit preserves it byte-for-byte) with no validation failures.
 Its 15 runs cover one accuracy profile and two repeated performance profiles on
 each of Rust, installed Python, Node, browser WebAssembly, and CLI. The scale
 profiles exercise one whole-input and one incremental path; the CLI's
