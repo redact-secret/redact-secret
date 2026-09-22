@@ -56,3 +56,30 @@ def test_no_custom_detector_callback_surface() -> None:
             "DetectorFailureError",
             "InvalidDetectorError",
         }
+
+
+def test_unloadable_extension_fails_with_fixed_actionable_message() -> None:
+    """Issue #586: a missing or foreign-platform extension module must fail
+    the import with one fixed message that names no host path and points to
+    the packaging guide, not the loader's own traceback."""
+    import subprocess
+    import sys
+
+    probe = (
+        "import importlib.abc, sys\n"
+        "class Block(importlib.abc.MetaPathFinder):\n"
+        "    def find_spec(self, name, path, target=None):\n"
+        "        if name == 'redact_secret._native':\n"
+        "            raise ImportError('synthetic loader failure at /nonexistent/_native.so')\n"
+        "sys.meta_path.insert(0, Block())\n"
+        "import redact_secret\n"
+    )
+    first = subprocess.run([sys.executable, "-c", probe], capture_output=True, text=True)
+    second = subprocess.run([sys.executable, "-c", probe], capture_output=True, text=True)
+    assert first.returncode != 0
+    message = first.stderr.strip().splitlines()[-1]
+    assert message == second.stderr.strip().splitlines()[-1]
+    assert message.startswith("ImportError: redact-secret could not load its native extension")
+    assert "docs/python-packaging.md" in message
+    assert "/nonexistent" not in first.stderr
+    assert "synthetic loader failure" not in first.stderr

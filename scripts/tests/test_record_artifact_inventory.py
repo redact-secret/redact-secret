@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import importlib.util
 import json
 import os
@@ -77,6 +78,42 @@ def installed_report(lane: str, target: str) -> dict:
     }
 
 
+QUICKSTART_SHA256 = "q" * 64
+
+
+def _built(name: str) -> dict:
+    # `Artifacts.build` writes each artifact file's own name as its bytes.
+    return {"file": name, "sha256": hashlib.sha256(name.encode("utf-8")).hexdigest()}
+
+
+def clean_install_report(lane: str) -> dict:
+    checks = {check: "passed" for check in RECORD.CLEAN_INSTALL_CHECKS[lane]}
+    binaries = (
+        [_built("package-cp310-abi3-macosx.whl")]
+        if lane == "python"
+        else [
+            _built("redact-secret.darwin-arm64.node"),
+            _built("redact_secret_wasm_bg.wasm"),
+            _built("redact_secret_wasm_common_bg.wasm"),
+        ]
+    )
+    return {
+        "schemaVersion": 1,
+        "lane": lane,
+        "sourceCommit": SOURCE_COMMIT,
+        "published": False,
+        "productVersion": PRODUCT_VERSION,
+        "document": {"path": "docs/quickstart.md", "sha256": QUICKSTART_SHA256},
+        "commands": ["npm install @redact-secret/core@0.1.0-beta.1"],
+        "runtime": {"name": lane, "version": "1.0"},
+        "loadedArtifact": RECORD.CLEAN_INSTALL_ARTIFACT[lane],
+        "budgetSeconds": 300,
+        "elapsedSeconds": 42.0,
+        "binaries": binaries,
+        "results": checks,
+    }
+
+
 class Artifacts:
     """Builds a downloaded-artifact tree that satisfies `require_matrix`, so
     each test can remove or add exactly one thing."""
@@ -109,6 +146,12 @@ class Artifacts:
             "installed-javascript-browser-webkit": [
                 "installed-javascript-browser-webkit.json"
             ],
+            "clean-install-node": ["clean-install-node.json"],
+            "clean-install-python": ["clean-install-python.json"],
+            "clean-install-browser": ["clean-install-browser.json"],
+        }
+        self.clean_install = {
+            lane: clean_install_report(lane) for lane in RECORD.CLEAN_INSTALL_CHECKS
         }
 
     def build(self) -> Path:
@@ -125,6 +168,9 @@ class Artifacts:
                         lane = "browser"
                         target = artifact.removeprefix("installed-javascript-browser-")
                     path.write_text(json.dumps(installed_report(lane, target)), encoding="utf-8")
+                elif artifact.startswith("clean-install-"):
+                    lane = artifact.removeprefix("clean-install-")
+                    path.write_text(json.dumps(self.clean_install[lane]), encoding="utf-8")
                 else:
                     path.write_bytes(name.encode("utf-8"))
         return self.root
@@ -303,6 +349,67 @@ class InventoryTests(unittest.TestCase):
                 "installed JavaScript node 20: incremental corpus fixture count does not match the inventory",
             ],
         )
+
+    def clean_install_errors(self, configure=None) -> list[str]:
+        with tempfile.TemporaryDirectory() as directory:
+            artifacts = Artifacts(Path(directory))
+            if configure is not None:
+                configure(artifacts)
+            root = artifacts.build()
+            results, errors = RECORD.collect_clean_install_qualification(root)
+            return errors + RECORD.require_clean_install_qualification(
+                results, RECORD.collect(root), SOURCE_COMMIT, PRODUCT_VERSION, QUICKSTART_SHA256
+            )
+
+    def test_clean_install_evidence_is_not_an_unrecognized_artifact(self) -> None:
+        self.assertFalse(any(entry["artifact"].startswith("clean-install-") for entry in self.collect()))
+
+    def test_clean_install_qualification_covers_every_lane(self) -> None:
+        self.assertEqual(self.clean_install_errors(), [])
+
+    def test_a_missing_clean_install_lane_fails(self) -> None:
+        def drop(artifacts: Artifacts) -> None:
+            del artifacts.files["clean-install-python"]
+
+        self.assertIn("clean install python: no qualification", self.clean_install_errors(drop))
+
+    def test_a_clean_install_binary_this_run_did_not_build_fails(self) -> None:
+        def swap(artifacts: Artifacts) -> None:
+            artifacts.clean_install["node"]["binaries"][0]["sha256"] = "0" * 64
+
+        self.assertIn(
+            "clean install node: redact-secret.darwin-arm64.node is not an artifact this run qualified",
+            self.clean_install_errors(swap),
+        )
+
+    def test_a_clean_install_from_another_quickstart_revision_fails(self) -> None:
+        def stale(artifacts: Artifacts) -> None:
+            artifacts.clean_install["browser"]["document"]["sha256"] = "0" * 64
+
+        self.assertIn(
+            "clean install browser: did not run this revision's docs/quickstart.md",
+            self.clean_install_errors(stale),
+        )
+
+    def test_a_clean_install_over_budget_or_failed_check_fails(self) -> None:
+        def slow(artifacts: Artifacts) -> None:
+            artifacts.clean_install["node"]["elapsedSeconds"] = 301
+            artifacts.clean_install["python"]["results"]["failure"] = "failed"
+
+        errors = self.clean_install_errors(slow)
+        self.assertIn("clean install node: documented path did not finish within 300s", errors)
+        self.assertIn("clean install python: failure did not pass", errors)
+
+    def test_a_published_or_wrong_artifact_clean_install_fails(self) -> None:
+        def registry(artifacts: Artifacts) -> None:
+            artifacts.clean_install["browser"]["published"] = True
+            artifacts.clean_install["node"]["loadedArtifact"] = "wasm"
+
+        errors = self.clean_install_errors(registry)
+        self.assertIn(
+            "clean install browser: must qualify candidate artifacts (published=false)", errors
+        )
+        self.assertIn("clean install node: did not load the addon artifact", errors)
 
     def test_an_addon_without_a_compiled_library_fails(self) -> None:
         def configure(artifacts: Artifacts) -> None:

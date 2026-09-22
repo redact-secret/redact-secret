@@ -54,46 +54,60 @@ propagates its own error: it becomes one of the fixed exceptions below.
 
 from __future__ import annotations
 
-from redact_secret._native import (
-    RANGE_UNIT,
-    VERSION,
-    BufferLimitExceededError,
-    DetectedFinding,
-    DetectorFailureError,
-    Finding,
-    FindingLimitExceededError,
-    IncrementalLimits,
-    IncrementalPolicyContext,
-    IncrementalResult,
-    IncrementalSanitizer,
-    InputLimitExceededError,
-    InvalidCandidateError,
-    InvalidDetectorError,
-    InvalidFindingsError,
-    InvalidInputError,
-    InvalidLimitsError,
-    InvalidOptionsError,
-    InvalidPlaceholderError,
-    InvalidPolicyActionError,
-    InvalidRulesetError,
-    InvalidStateError,
-    MultilineLimitExceededError,
-    PlaceholderContext,
-    PlaceholderFailureError,
-    PolicyContext,
-    PolicyFailureError,
-    ScanResult,
-    SecretScanError,
-    TokenLimitExceededError,
-    WholeInputLimits,
-    default_incremental_policy,
-    default_placeholder_formatter,
-    default_policy,
-    redact,
-    scan,
-    scan_and_redact,
-    typed_placeholder_formatter,
+# Fixed, input-free, and actionable (issue #586): an extension module that is
+# missing, built for another platform, or otherwise unloadable fails the
+# import with this message alone. The loader's own error names host paths and
+# ABI details, so it is suppressed rather than chained.
+_NATIVE_UNAVAILABLE = (
+    "redact-secret could not load its native extension: this platform or Python "
+    "build has no supported wheel, or the installation is incomplete. Reinstall "
+    "with `python -m pip install --only-binary=:all: redact-secret` on a supported "
+    "platform; see https://github.com/redact-secret/redact-secret/blob/main/docs/python-packaging.md"
 )
+
+try:
+    from redact_secret._native import (
+        RANGE_UNIT,
+        VERSION,
+        BufferLimitExceededError,
+        DetectedFinding,
+        DetectorFailureError,
+        Finding,
+        FindingLimitExceededError,
+        IncrementalLimits,
+        IncrementalPolicyContext,
+        IncrementalResult,
+        IncrementalSanitizer,
+        InputLimitExceededError,
+        InvalidCandidateError,
+        InvalidDetectorError,
+        InvalidFindingsError,
+        InvalidInputError,
+        InvalidLimitsError,
+        InvalidOptionsError,
+        InvalidPlaceholderError,
+        InvalidPolicyActionError,
+        InvalidRulesetError,
+        InvalidStateError,
+        MultilineLimitExceededError,
+        PlaceholderContext,
+        PlaceholderFailureError,
+        PolicyContext,
+        PolicyFailureError,
+        ScanResult,
+        SecretScanError,
+        TokenLimitExceededError,
+        WholeInputLimits,
+        default_incremental_policy,
+        default_placeholder_formatter,
+        default_policy,
+        redact,
+        scan,
+        scan_and_redact,
+        typed_placeholder_formatter,
+    )
+except ImportError:
+    raise ImportError(_NATIVE_UNAVAILABLE) from None
 
 __version__ = VERSION
 
