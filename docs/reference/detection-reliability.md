@@ -52,7 +52,12 @@ incremental output equivalence. Neither detects a secret the scanner missed.
 The [canonical conformance review](../audits/public-contract-cross-runtime-conformance.md)
 owns redaction correctness for supported behavior.
 
-Historical Rust timing in `complete`, `complete-v2`, and `complete-v3` used a
+Historical Rust timing in
+[`complete`](https://github.com/redact-secret/redact-secret/tree/6cd5f2c58e527396563d86d8caba98104a93a17c/assessment/results/complete)
+and
+[`complete-v3`](https://github.com/redact-secret/redact-secret/tree/6cd5f2c58e527396563d86d8caba98104a93a17c/assessment/results/complete-v3)
+(pruned from the working tree by
+[#594](https://github.com/redact-secret/redact-secret/issues/594)) used a
 debug build and is unsuitable for optimized cross-runtime comparison. The
 [corrected release-build run](../../assessment/results/release-profile/baseline.md)
 records a separate current-checkout measurement; see its source and artifact

@@ -100,11 +100,13 @@ All four qualification lanes passed.
 | `@redact-secret/node-darwin-arm64` | `0.1.0-beta.1` | `47e536a1b12a1717212253fea6c1aa305e796f1d55673666e3dd88ac71b40f34` |
 | `@redact-secret/wasm` | `0.1.0-beta.1` | `3f8527292987296a6bc7a159ff4c755131d24bf125388ce62a5a872ac225f77b` |
 
-The exact qualification records are
-[`package-node-qualification.json`](./package-node-qualification.json),
-[`package-browser-chromium-qualification.json`](./package-browser-chromium-qualification.json),
-[`package-browser-firefox-qualification.json`](./package-browser-firefox-qualification.json),
-and [`package-browser-webkit-qualification.json`](./package-browser-webkit-qualification.json).
+The exact qualification records were pruned by
+[#594](https://github.com/redact-secret/redact-secret/issues/594) and remain
+as historical evidence at
+[`package-node-qualification.json`](https://github.com/redact-secret/redact-secret/blob/77eb43a122ce4c3f5683019bd77cc4c7fc57894c/assessment/results/beta.2/package-node-qualification.json),
+[`package-browser-chromium-qualification.json`](https://github.com/redact-secret/redact-secret/blob/77eb43a122ce4c3f5683019bd77cc4c7fc57894c/assessment/results/beta.2/package-browser-chromium-qualification.json),
+[`package-browser-firefox-qualification.json`](https://github.com/redact-secret/redact-secret/blob/77eb43a122ce4c3f5683019bd77cc4c7fc57894c/assessment/results/beta.2/package-browser-firefox-qualification.json),
+and [`package-browser-webkit-qualification.json`](https://github.com/redact-secret/redact-secret/blob/77eb43a122ce4c3f5683019bd77cc4c7fc57894c/assessment/results/beta.2/package-browser-webkit-qualification.json).
 
 ## Reproduction
 

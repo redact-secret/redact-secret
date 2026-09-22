@@ -88,7 +88,7 @@ describe("complete assessment aggregation", () => {
     expect(renderCompleteAssessmentMarkdown(aggregate)).toContain("Status: **COMPLETE**");
   });
 
-  test.each(["complete-v3", "complete-v4"])("the committed %s baseline is complete, schema-valid, and fully linked", (dir) => {
+  test.each(["complete-v4"])("the committed %s baseline is complete, schema-valid, and fully linked", (dir) => {
     const baselinePath = join(HERE, "results", dir, "summary.json");
     const baseline = JSON.parse(readFileSync(baselinePath, "utf8")) as {
       status: string;
