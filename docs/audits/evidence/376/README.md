@@ -81,8 +81,8 @@ at zero flags, unaffected by the seven contract fixes.
 benchmark) had four fixtures whose OpenAI/DigitalOcean/Docker/Cloudflare/
 Hugging Face/Linear/Slack values predated the seven frozen contracts,
 explicitly deferred to this gate by the
-[OpenAI](../../../decisions/2026-09-17-freeze-openai-api-key-grammar.md) and
-[Docker](../../../decisions/2026-09-17-freeze-docker-pat-oat-exact-length-grammar.md)
+[OpenAI](../../../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) and
+[Docker](../../../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md)
 decision records. This gate corrects `code-openai-api-key`,
 `logs-additional-provider-tokens-one`, `code-additional-provider-tokens-one`,
 and `chat-additional-provider-tokens-one` to their contracted grammars and

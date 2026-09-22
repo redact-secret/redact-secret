@@ -53,9 +53,9 @@ four rows in its own audit of the benchmark's policy/T3 samples, one day
 earlier, with the same "provider finding removed; intended policy change"
 disposition. Each family's own frozen-grammar decision record states the
 narrowing and its accepted false-negative cost:
-[OpenAI](../../../decisions/2026-09-17-freeze-openai-api-key-grammar.md),
-[Slack](../../../decisions/2026-09-17-freeze-slack-bot-token-segment-grammar.md),
-[Docker](../../../decisions/2026-09-17-freeze-docker-pat-oat-exact-length-grammar.md),
+[OpenAI](../../../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md),
+[Slack](../../../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md),
+[Docker](../../../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md),
 and Cloudflare's own module doc
 (`crates/secret-scan-core/src/detectors/cloudflare.rs:1-41`, issue #373 under
 #367).

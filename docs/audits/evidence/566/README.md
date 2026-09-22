@@ -1,9 +1,9 @@
 # Issue #566 — `docker-token`/`cloudflare-token` shape-1 provider-evidence review
 
 [Audit archive](../../README.md) ·
-[Docker exact-length freeze (#370)](../../../decisions/2026-09-17-freeze-docker-pat-oat-exact-length-grammar.md) ·
+[Docker exact-length freeze (#370)](../../../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) ·
 [Precision-contract freeze (#367)](../../../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) ·
-[Cloudflare account-token prefix (#481)](../../../decisions/2026-09-20-adopt-cloudflare-account-token-prefix.md) ·
+[Cloudflare account-token prefix (#481)](../../../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) ·
 [Issue #566](https://github.com/redact-secret/redact-secret/issues/566) ·
 [Epic #548](https://github.com/redact-secret/redact-secret/issues/548) ·
 [Split from #552](https://github.com/redact-secret/redact-secret/issues/552) ·
@@ -165,8 +165,8 @@ cargo test -p redact-secret detectors::
   these shapes — only that no source available to this review, checked live
   on 2026-09-21, documents either shape today. Should either provider publish
   a grammar that includes it, the contract is re-reviewable, the same accepted
-  cost both `decision-freeze-docker-pat-oat-exact-length-grammar` and
-  `decision-adopt-cloudflare-account-token-prefix` already record.
+  cost `decision-freeze-precision-contracts-seven-provider-families` (Docker
+  and Cloudflare rows) already records.
 - It does not perform the benchmarks-side fixture-generator correction:
   `detector-coverage.mjs`'s per-family flat-length formula needs a per-prefix
   width (27/32 for `docker-token`, 48-with-checksum for `cloudflare-token`)

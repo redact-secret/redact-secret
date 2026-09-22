@@ -222,7 +222,7 @@ pub(super) const HUGGING_FACE: KnownFormatProviderDetector = KnownFormatProvider
 
 /// Docker Hub personal (`dckr_pat_`) and organization (`dckr_oat_`) access
 /// tokens, validated as two separately-sized exact-length shapes (issue
-/// #370, `decision-freeze-docker-pat-oat-exact-length-grammar`):
+/// #370, `decision-freeze-precision-contracts-seven-provider-families`, Docker row):
 ///
 /// ```text
 /// dckr_pat_<27 bytes from [A-Za-z0-9_-]>   (36 bytes total)
@@ -322,8 +322,8 @@ pub(super) const SUPABASE: KnownFormatProviderDetector = KnownFormatProviderDete
 /// `sbp_` prefix (by example only, e.g. `sbp_fc...`) and the classic-vs-
 /// scoped distinction, but not an exact body grammar.
 ///
-/// `decision-scope-supabase-management-token-and-secret-key-independence`
-/// (issue #515) is explicit that this class must never borrow or lend
+/// `decision-freeze-precision-contracts-seven-provider-families` (Supabase
+/// management-token row, issue #515) is explicit that this class must never borrow or lend
 /// evidence to `SUPABASE` (`sb_secret_`/`sb_publishable_`, above) or to the
 /// legacy JWT anon/service-role carve-out in [`super::jwt`]: a PAT
 /// authenticates a Supabase *account*, a secret key authenticates one

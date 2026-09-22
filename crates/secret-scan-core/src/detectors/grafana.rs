@@ -34,7 +34,8 @@
 //! crate's [`super::jwt`] and [`super::generic_token`] detectors already
 //! carry for opaque base64/JSON-shaped values, without a documented grammar
 //! to bound it. This is a deliberate scope exclusion, not an oversight; see
-//! `docs/decisions/2026-09-16-freeze-grafana-service-account-and-cloud-access-policy-token-grammar.md`.
+//! `docs/decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md`
+//! (Grafana row).
 //!
 //! ## Action
 //!

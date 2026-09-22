@@ -2,7 +2,7 @@
 
 [Audit archive](../../README.md) ·
 [Governance decision](../../../decisions/2026-09-18-govern-benchmark-regression-promotion.md) ·
-[Slack bot grammar freeze (#371)](../../../decisions/2026-09-17-freeze-slack-bot-token-segment-grammar.md) ·
+[Slack bot grammar freeze (#371)](../../../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) ·
 [Precision-contract freeze (#367)](../../../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) ·
 [Beta.5 precision gate (#376)](../../../decisions/2026-09-18-gate-beta5-on-precision-gains-and-positive-preservation.md) ·
 [Issue #406](https://github.com/redact-secret/redact-secret/issues/406) ·
@@ -34,7 +34,7 @@ is made under this issue.
 
 ## Why this is not a regression
 
-`decision-freeze-slack-bot-token-segment-grammar` (#371) narrowed the
+`decision-freeze-precision-contracts-seven-provider-families` (Slack bot row, #371) narrowed the
 `xoxb-` bot shape from beta.4's "recognized prefix plus a 20-byte minimum
 suffix" rule to the provider-documented three-section grammar:
 

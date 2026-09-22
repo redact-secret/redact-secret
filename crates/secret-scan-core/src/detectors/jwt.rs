@@ -14,8 +14,8 @@
 //! already gives the new-format `sb_publishable_` key. Every other claim
 //! (`alg`, `exp`, an absent or fabricated signature, a `service_role` or any
 //! other `role`) is still ignored; see
-//! `docs/decisions/2026-09-20-scope-supabase-legacy-anon-jwt-exclusion.md`
-//! for the full rationale, including the accepted false-negative risk of
+//! `docs/decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md`
+//! (Supabase legacy-anon-JWT row) for the full rationale, including the accepted false-negative risk of
 //! trusting an unverified payload claim.
 
 use crate::error::DetectorFailure;

@@ -3,10 +3,10 @@
 [Audit archive](../../README.md) ·
 [Governance decision](../../../decisions/2026-09-18-govern-benchmark-regression-promotion.md) ·
 [Precision-contract freeze (#367)](../../../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) ·
-[OpenAI grammar freeze (#368)](../../../decisions/2026-09-17-freeze-openai-api-key-grammar.md) ·
-[Docker exact-length freeze (#370)](../../../decisions/2026-09-17-freeze-docker-pat-oat-exact-length-grammar.md) ·
-[Slack bot grammar freeze (#371)](../../../decisions/2026-09-17-freeze-slack-bot-token-segment-grammar.md) ·
-[Slack user/rotation grammar freeze (#512)](../../../decisions/2026-09-20-freeze-slack-user-and-rotation-token-grammar.md) ·
+[OpenAI grammar freeze (#368)](../../../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) ·
+[Docker exact-length freeze (#370)](../../../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) ·
+[Slack bot grammar freeze (#371)](../../../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) ·
+[Slack user/rotation grammar freeze (#512)](../../../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) ·
 [Beta.5 precision gate (#376)](../../../decisions/2026-09-18-gate-beta5-on-precision-gains-and-positive-preservation.md) ·
 [Issue #552](https://github.com/redact-secret/redact-secret/issues/552) ·
 [Prior evidence: #367](../367/README.md) · [Prior evidence: #405](../405/README.md) ·

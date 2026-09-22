@@ -38,8 +38,7 @@ Four `assessment/fixtures/accuracy-corpus.json` fixtures
 (`code-openai-api-key`, `logs-additional-provider-tokens-one`,
 `code-additional-provider-tokens-one`, `chat-additional-provider-tokens-one`)
 predated the seven frozen contracts, as explicitly deferred to this gate by
-the [OpenAI](2026-09-17-freeze-openai-api-key-grammar.md) and
-[Docker](2026-09-17-freeze-docker-pat-oat-exact-length-grammar.md) decision
+the [OpenAI and Docker](2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) decision
 records. This gate corrects them to their contracted grammars and re-pins
 both `assessment/acceptance-criteria.json` and
 `assessment/acceptance-criteria-linux-x64.json`'s `baseline` pointer and
