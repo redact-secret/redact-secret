@@ -54,7 +54,8 @@ interval, or exhaustive provider-format inventory behind this 9-fixture set.
 ## Range and redaction interpretation
 
 The only range disagreement is the Bearer assessment case documented in the
-[beta.2 disposition](../../assessment/results/beta.2/README.md). Every surface
+[beta.2 disposition](https://github.com/redact-secret/redact-secret/blob/de6add470321f40d7b1cb36808d9f4559e6c2e99/assessment/results/beta.2/README.md)
+(removed by [#603](https://github.com/redact-secret/redact-secret/issues/603)). Every surface
 selects the credential value while the assessment label includes the scheme.
 The selected value is redacted, but the unchanged label correctly keeps the
 case outside the exact-match numerator.
@@ -78,7 +79,8 @@ conformance pass as an accuracy result or presenting it as one formal RC run.
 
 ## Limitation and defect disposition
 
-The [beta.2 assessment](../../assessment/results/beta.2/README.md) disposes all
+The [beta.2 assessment](https://github.com/redact-secret/redact-secret/blob/de6add470321f40d7b1cb36808d9f4559e6c2e99/assessment/results/beta.2/README.md)
+disposes all
 six mismatch records without changing their reviewed labels: shortened GitHub
 and AWS shapes remain outside fixed provider grammars; `seed` remains outside
 the contextual-name allowlist; and the Bearer mismatch is a disagreement

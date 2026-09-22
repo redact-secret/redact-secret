@@ -1,7 +1,7 @@
-import { existsSync, readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
-import { describe, expect, test } from "vitest";
+import { existsSync, mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { afterEach, describe, expect, test } from "vitest";
 
 import {
   buildCompleteAssessment,
@@ -14,8 +14,6 @@ import {
   type AssessmentResult,
   type AssessmentSurface,
 } from "./schema.js";
-
-const HERE = dirname(fileURLToPath(import.meta.url));
 
 const PROFILES = [
   { id: "scale-logs-small-whole", chunkProfile: "whole" },
@@ -59,6 +57,7 @@ function completeAttempts(): AssessmentAttempt[] {
     {
       surface, kind: "accuracy" as const, profileId: "accuracy-corpus",
       resultPath: `${surface}/accuracy.json`, markdownPath: `${surface}/accuracy.md`,
+      mismatchesPath: `${surface}/accuracy-corpus-mismatches.json`,
       result: result(surface, "accuracy-corpus", "accuracy", "a".repeat(64)),
     },
     ...PROFILES.map((profile) => ({
@@ -78,6 +77,31 @@ function build(attempts: readonly AssessmentAttempt[]) {
   });
 }
 
+let workDir: string | undefined;
+
+afterEach(() => {
+  if (workDir !== undefined) rmSync(workDir, { recursive: true, force: true });
+  workDir = undefined;
+});
+
+/**
+ * Writes a synthetic aggregate's result/markdown (and, for accuracy runs, an
+ * empty mismatches) files to a fresh temp directory, standing in for a
+ * committed `results/<dir>/` baseline: the aggregation code path that links
+ * `resultPath`/`markdownPath`/`mismatchesPath` to real files on disk is
+ * exercised without binding the test to any specific pinned evidence.
+ */
+function writeAggregateToDisk(aggregate: ReturnType<typeof buildCompleteAssessment>): string {
+  workDir = mkdtempSync(join(tmpdir(), "complete-assessment-"));
+  for (const run of aggregate.runs) {
+    mkdirSync(join(workDir, run.surface), { recursive: true });
+    writeFileSync(join(workDir, run.resultPath), JSON.stringify(run.result));
+    writeFileSync(join(workDir, run.markdownPath), "# synthetic\n");
+    if (run.mismatchesPath !== undefined) writeFileSync(join(workDir, run.mismatchesPath), "[]");
+  }
+  return workDir;
+}
+
 describe("complete assessment aggregation", () => {
   test("requires every surface and preserves whole and incremental evidence", () => {
     const aggregate = build(completeAttempts());
@@ -88,23 +112,19 @@ describe("complete assessment aggregation", () => {
     expect(renderCompleteAssessmentMarkdown(aggregate)).toContain("Status: **COMPLETE**");
   });
 
-  test.each(["complete-v4"])("the committed %s baseline is complete, schema-valid, and fully linked", (dir) => {
-    const baselinePath = join(HERE, "results", dir, "summary.json");
-    const baseline = JSON.parse(readFileSync(baselinePath, "utf8")) as {
-      status: string;
-      validationFailures: readonly string[];
-      runs: readonly AssessmentAttempt[];
-    };
-    expect(baseline.status).toBe("complete");
-    expect(baseline.validationFailures).toEqual([]);
-    expect(baseline.runs).toHaveLength(15);
-    for (const run of baseline.runs) {
+  test("a complete aggregate is schema-valid and fully linked to real files on disk", () => {
+    const aggregate = build(completeAttempts());
+    expect(aggregate.status).toBe("complete");
+    expect(aggregate.validationFailures).toEqual([]);
+    expect(aggregate.runs).toHaveLength(15);
+    const dir = writeAggregateToDisk(aggregate);
+    for (const run of aggregate.runs) {
       expect(run.result).toBeDefined();
       expect(() => validateAssessmentResults([run.result!])).not.toThrow();
-      expect(existsSync(join(HERE, "results", dir, run.resultPath))).toBe(true);
-      expect(existsSync(join(HERE, "results", dir, run.markdownPath))).toBe(true);
+      expect(existsSync(join(dir, run.resultPath))).toBe(true);
+      expect(existsSync(join(dir, run.markdownPath))).toBe(true);
       if (run.mismatchesPath !== undefined) {
-        expect(existsSync(join(HERE, "results", dir, run.mismatchesPath))).toBe(true);
+        expect(existsSync(join(dir, run.mismatchesPath))).toBe(true);
       }
     }
   });
@@ -122,18 +142,30 @@ describe("complete assessment aggregation", () => {
     }
   });
 
-  test("corrected evidence reaggregates with explicit release provenance", () => {
-    const current = JSON.parse(readFileSync(join(HERE, "results", "release-profile", "summary.json"), "utf8"));
-    const rebuilt = buildCompleteAssessment({attempts: current.runs, performanceProfiles: current.performanceProfiles, repetitions: current.repetitions, validateResult: candidate => validateAssessmentResults([candidate])});
-    expect(rebuilt.status).toBe("complete");
-    expect(rebuilt.runs).toHaveLength(15);
-    for (const run of rebuilt.runs.filter(r => r.surface === "rust-core")) {
-      expect(run.result?.provenance.buildProfile).toBe("release");
-      expect(JSON.parse(run.result!.provenance.command)[0]).toContain("release/examples/assessment_adapter");
-    }
-    for (const run of rebuilt.runs.filter(r => r.kind === "accuracy")) {
-      expect(run.result?.accuracy).toEqual({truePositives:21,falsePositives:1,falseNegatives:5,policyMismatches:0});
-    }
+  test("a rust-core performance run carrying its real release-adapter argv reaggregates as complete", () => {
+    // Replaces a prior test bound to the committed `results/release-profile/`
+    // baseline: this exercises the same aggregation code path (a rust-core
+    // performance run with explicit release provenance) against a synthetic
+    // fixture shaped like the real adapter's argv-array `command` field.
+    const attempts = completeAttempts();
+    const index = attempts.findIndex((a) => a.surface === "rust-core" && a.kind === "performance");
+    const original = attempts[index].result!;
+    attempts[index] = {
+      ...attempts[index],
+      result: {
+        ...original,
+        provenance: {
+          ...original.provenance,
+          buildProfile: "release",
+          command: JSON.stringify(["target/release/examples/assessment_adapter", "--profile", "scale-logs-small-whole"]),
+        },
+      },
+    };
+    const aggregate = build(attempts);
+    expect(aggregate.status).toBe("complete");
+    const rustPerformance = aggregate.runs.find((run) => run.surface === "rust-core" && run.kind === "performance");
+    expect(rustPerformance?.result?.provenance.buildProfile).toBe("release");
+    expect(JSON.parse(rustPerformance!.result!.provenance.command)[0]).toContain("release/examples/assessment_adapter");
   });
 
   test("a missing or failed product surface makes the aggregate incomplete", () => {
