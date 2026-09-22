@@ -11,7 +11,7 @@ function fail(message) {
 }
 
 function parseArguments(argv) {
-  const options = { criteria: "assessment/acceptance-criteria.json", summary: undefined, jsonOut: undefined, markdownOut: undefined };
+  const options = { criteria: undefined, summary: undefined, jsonOut: undefined, markdownOut: undefined };
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index];
     const value = argv[index + 1];
@@ -22,6 +22,10 @@ function parseArguments(argv) {
     else options.markdownOut = value;
     index += 1;
   }
+  // Core no longer ships a bundled acceptance-criteria document (issue #603;
+  // DS11): redact-secret-benchmarks owns criteria and judgement, and passes
+  // its own criteria path explicitly.
+  if (options.criteria === undefined) fail("--criteria requires a value");
   if (options.summary === undefined) fail("--summary requires a value");
   return options;
 }

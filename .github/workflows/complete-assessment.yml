@@ -1,10 +1,12 @@
 name: Complete assessment
 
-# Manually builds one Linux host's real product artifacts and records a bounded,
-# complete cross-language accuracy/performance assessment and evaluates it
-# against assessment/acceptance-criteria-linux-x64.json, the fixed RC
-# acceptance criteria for this ubuntu-latest host. This publishes nothing and
-# is not a release gate.
+# Manually builds one Linux host's real product artifacts and records a
+# bounded, complete cross-language accuracy/performance assessment as a core
+# smoke run. It performs no acceptance judgement: performance results,
+# criteria, and pass/fail judgement are owned by redact-secret-benchmarks
+# (issue #603; DS11), which runs this same measurement suite against a
+# pinned core revision and evaluates it against criteria it holds. This
+# publishes nothing and is not a release gate.
 on:
   workflow_dispatch:
 
@@ -75,18 +77,11 @@ jobs:
       - name: Run the complete bounded assessment
         run: npm run assessment:all -- --python .venv/bin/python --runs 5 --output-dir assessment-output
 
-      - name: Evaluate the fixed RC acceptance criteria
-        run: npm run assessment:acceptance -- --criteria assessment/acceptance-criteria-linux-x64.json --summary assessment-output/summary.json --json-out assessment-output/acceptance.json --markdown-out assessment-output/acceptance.md
-
       - name: Add the consolidated baseline to the workflow summary
         if: always() && hashFiles('assessment-output/baseline.md') != ''
         run: sed -n '1,$p' assessment-output/baseline.md >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Add acceptance results to the workflow summary
-        if: always() && hashFiles('assessment-output/acceptance.md') != ''
-        run: sed -n '1,$p' assessment-output/acceptance.md >> "$GITHUB_STEP_SUMMARY"
-
-      - name: Upload raw samples, results, and consolidated reports
+      - name: Upload raw samples and consolidated reports
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:

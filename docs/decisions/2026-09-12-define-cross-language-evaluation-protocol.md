@@ -94,3 +94,11 @@ instead of an anecdote.
 - A future scale workload profile whose generation would take a meaningfully
   long time must be inspected before it is proposed, per `AGENTS.md`'s rule
   for any command expected to exceed five minutes.
+
+**Amended 2026-09-22 by `decision-move-performance-results-criteria-and-judgement-to-benchmarks`:**
+this protocol's committed corpus, profiles, and result contract stay in
+`assessment/`. The RC acceptance criteria and pinned baselines this
+repository committed on top of that contract, and the pass/fail judgement
+against them, were never part of this protocol and are now explicitly owned
+by `redact-secret-benchmarks`, not committed here as `assessment/results/` or
+`assessment/acceptance-criteria*.json`.
