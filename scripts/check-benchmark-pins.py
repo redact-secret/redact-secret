@@ -44,6 +44,23 @@ fast, network-free `npm run ci` path (see the `benchmark-pin-drift` job in
    red until an unrelated repository catches up. Tracked in #427 pending a
    cross-repo fix; promote it to a build-blocking error once
    redact-secret-benchmarks can be refreshed as part of the same change.
+5. `benchmarks/support-matrix-schema.json` -- the other file this repository
+   vendors from redact-secret-benchmarks, read by
+   `check-support-matrix-drift.py` and `generate-support-matrix-docs.py` --
+   must stay byte-identical to that repository's own current copy
+   (`schemas/support-matrix-v1.json` there; moved from
+   `benchmarks/support-matrix-schema.json` by
+   redact-secret-benchmarks#133). Unlike pin-manifest.json, this schema
+   describes a format rather than a detector-registry snapshot, so it is
+   compared against BENCHMARKS_BRANCH rather than the manifest's pinned
+   `revision` -- a historical revision may predate the #133 path move or
+   simply be missing later schema changes that carry no detector-snapshot
+   implications. Unlike checks 1-4, this is a copy of a whole file rather
+   than a set of ids, so it can only be verified by fetching that file's
+   content live -- it runs alongside checks 3 and 4, not in the offline
+   path. (`benchmarks/support-matrix-drift-schema.json` was a third vendored
+   file; issue #605 (DS10) removed it instead of adding a check, since
+   nothing in this repository ever read it.)
 
 Like `reconcile-guard.py`'s `is_ancestor` and the counterpart
 redact-secret-benchmarks#15 check (`benchmarks/lib/pin-drift.ts`), the
@@ -57,6 +74,7 @@ for check 3 (the other repository, where only a live query can answer it).
 from __future__ import annotations
 
 import argparse
+import base64
 import json
 import subprocess
 import sys
@@ -65,9 +83,14 @@ from pathlib import Path
 
 MANIFEST_PATH = Path("benchmarks") / "pin-manifest.json"
 LEDGER_PATH = Path("conformance") / "benchmark-regressions.json"
+SUPPORT_MATRIX_SCHEMA_PATH = Path("benchmarks") / "support-matrix-schema.json"
 DETECTORS_PATH = "crates/secret-scan-core/src/detectors"
 BENCHMARKS_REPO = "redact-secret/redact-secret-benchmarks"
 BENCHMARKS_BRANCH = "main"
+# Where the vendored copy at SUPPORT_MATRIX_SCHEMA_PATH lives in
+# redact-secret-benchmarks itself (redact-secret-benchmarks#133 moved it out
+# of that repository's own `benchmarks/`).
+BENCHMARKS_SUPPORT_MATRIX_SCHEMA_PATH = "schemas/support-matrix-v1.json"
 PRODUCT_BRANCH = "main"
 # actions/checkout (fetch-depth: 0, pull_request trigger) fetches every
 # branch into refs/remotes/origin/* and checks out a detached PR merge ref --
@@ -200,6 +223,29 @@ def gh_compare_is_ancestor(repo_slug: str, base: str, head: str) -> bool:
     return status in ("identical", "ahead")
 
 
+def gh_fetch_file(repo_slug: str, ref: str, path: str) -> str:
+    """The text content of `path` in `repo_slug` at `ref`, via the GitHub contents API."""
+    result = subprocess.run(
+        ["gh", "api", f"repos/{repo_slug}/contents/{path}?ref={ref}", "--jq", ".content"],
+        capture_output=True,
+        text=True,
+        check=True,
+        timeout=30,
+    )
+    return base64.b64decode(result.stdout.strip()).decode("utf-8")
+
+
+def check_schema_drift(local_content: str, live_content: str, *, live_source: str) -> list[str]:
+    """Check 5: the vendored support-matrix schema must be byte-identical to
+    redact-secret-benchmarks' own current copy."""
+    if local_content != live_content:
+        return [
+            f"{SUPPORT_MATRIX_SCHEMA_PATH} has drifted from {live_source}; "
+            "regenerate the vendored copy from that file"
+        ]
+    return []
+
+
 def resolve_ancestry_facts(root: Path, manifest: dict, ledger: dict) -> dict:
     source_revision = manifest["pins"]["sourceRevision"]
     source_is_ancestor = local_is_ancestor(root, source_revision, PRODUCT_LOCAL_REF)
@@ -226,8 +272,8 @@ def main(argv: list[str] | None = None) -> int:
         "--check-ancestry",
         action="store_true",
         help=(
-            "also run checks 3 and 4 (commit ancestry); needs full git history and, for "
-            f"check 3, `gh api` access to {BENCHMARKS_REPO}"
+            "also run checks 3, 4, and 5 (commit ancestry and vendored-schema drift); needs "
+            f"full git history and `gh api` access to {BENCHMARKS_REPO}"
         ),
     )
     args = parser.parse_args(argv)
@@ -243,6 +289,11 @@ def main(argv: list[str] | None = None) -> int:
         findings = check_ancestry(manifest, ledger, **facts)
         errors += findings.errors
         warnings += findings.warnings
+
+        live_source = f"{BENCHMARKS_REPO}@{BENCHMARKS_BRANCH}:{BENCHMARKS_SUPPORT_MATRIX_SCHEMA_PATH}"
+        local_schema = (root / SUPPORT_MATRIX_SCHEMA_PATH).read_text(encoding="utf-8")
+        live_schema = gh_fetch_file(BENCHMARKS_REPO, BENCHMARKS_BRANCH, BENCHMARKS_SUPPORT_MATRIX_SCHEMA_PATH)
+        errors += check_schema_drift(local_schema, live_schema, live_source=live_source)
 
     for warning in warnings:
         print(f"WARNING {warning}")
