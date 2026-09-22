@@ -141,6 +141,9 @@ and must use the qualified binaries and recorded digests.
    derives its version dynamically from Cargo. Use the
    [lockstep policy](rust-workspace.md#version-lockstep) for the complete set.
    Preserve historical release records and examples intentionally pinned to them.
+   Update the version pins and expected output in
+   [`docs/quickstart.md`](quickstart.md) too; the `clean-install` job fails on
+   a page that does not pin the candidate version.
 4. Run the local checks below, then freeze the candidate commit. Any further
    source commit requires fresh qualification. Retain the RC branch after release.
 

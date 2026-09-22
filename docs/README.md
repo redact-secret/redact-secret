@@ -14,7 +14,9 @@ the generated [support matrix](support-matrix.md).
 
 ## Get started
 
-1. [Installation and source setup](getting-started.md): choose your runtime.
+1. [Five-minute quickstart](quickstart.md): install the published package in an
+   empty project and redact one value with Node.js, Python, or a browser bundler.
+   [Installation and source setup](getting-started.md) covers every runtime.
 2. Follow a guide: [JavaScript](guides/javascript.md), [Python](guides/python.md),
    [Rust](guides/rust.md), or [CLI](guides/cli.md).
 3. Read [policy and safe integration](guides/safe-integration.md) before sending

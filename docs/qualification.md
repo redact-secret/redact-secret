@@ -111,6 +111,7 @@ pull request does not trigger it.
 | `package-consumer-node` | Installs packed candidate packages in a clean directory and exercises public scan, incremental, and Node stream APIs on Node.js 20, 22, and 24 |
 | `package-consumer-browser` | Installs the same candidates and exercises public scan, incremental, and Web stream APIs in Chromium, Firefox, and WebKit |
 | `package-consumer-wasm-runtimes` | Qualifies the Node WebAssembly fallback and the Cloudflare Workers path against the `browser` job's builds, for both detector profiles |
+| `clean-install` | Runs the [five-minute quickstart](quickstart.md) for Node, Python, and a Vite browser bundle from an empty directory against this run's addon, wasm builds, and wheel; see [clean-install qualification](#clean-install-qualification) |
 | `inventory` | Requires the whole declared matrix and records what was built |
 
 Because `rust` and `python` are called workflows rather than copies, their
@@ -427,6 +428,77 @@ a whole-input pass of the same real session, not a hardcoded expectation),
 frozen absolute findings, backpressure, `destroy()`/cancellation/abort, and
 that a downstream failure or malformed/truncated UTF-8 keeps already-finalized
 output while discarding everything still retained.
+
+## Clean-install qualification
+
+Issue #586. The `clean-install` job answers a different question from the
+`package-consumer-*` jobs: not "does the installed API behave", but "does
+the path a new user reads actually work". It runs each lane of
+[`docs/quickstart.md`](quickstart.md) with
+`scripts/qualify-clean-install.mjs`, which reads the page's `qualify=` code
+blocks at run time and executes them verbatim. The page and CI cannot
+disagree because there is only one copy of each command and file.
+
+Each lane starts in an empty directory under the OS temp root, outside the
+checkout, with `npm_*`, `PYTHONPATH`, and virtualenv variables removed.
+Commands are not rewritten. Only the package source changes, through
+configuration the same commands already honor: the npm lanes resolve the
+`@redact-secret` scope from a local registry that serves only the candidate
+tarballs (Vite and everything else come from the public registry), and the
+Python lane installs with `PIP_NO_INDEX` and `PIP_FIND_LINKS` pointing at
+the candidate wheels. `scripts/pack-npm-candidate.mjs` builds those tarballs
+from the `node-addon`, `wasm-web`, and `wasm-web-common` artifacts the same
+way `release.yml` stages them for publication. No toolchain runs.
+
+Beyond the documented output, each lane verifies:
+
+- the installed `@redact-secret` packages are exactly the wrapper, the
+  WebAssembly package, and the host addon package. Each resolves from the
+  candidate registry at the candidate tarball's integrity, and its files
+  match the tarball byte for byte. The Python distribution's files match the
+  candidate wheel;
+- the transitive runtime assets are present: the addon, both `.wasm`
+  profiles, and in the browser lane a Vite bundle carrying exactly the
+  installed full-profile `.wasm`, served as `application/wasm`;
+- the loaded runtime is the documented one: `artifact()` reports `addon` on
+  Node and `wasm` in the browser, and the Python extension loads from the
+  clean virtual environment. With the addon removed, the Node program still
+  succeeds on `wasm`, as the page states;
+- initialization failure is fixed, input-free, and actionable. With the addon
+  and WebAssembly package removed on Node, the `.wasm` request failing in the
+  browser, or the extension module removed in Python, the program fails with
+  the one fixed message. That message contains no input and no host path, and
+  names `docs/troubleshooting.md` (JavaScript) or `docs/python-packaging.md`
+  (Python);
+- the documented path, from the first setup command to the expected output,
+  finishes within `--budget-seconds` (300 by default). The page's version
+  pins must equal the product version, so a release bump that skips the page
+  fails here.
+
+Each lane uploads a `clean-install-<lane>` report that records outcomes,
+versions, digests, commands, and elapsed time, never command output. The
+`inventory` job requires all three. It rejects a report produced from a
+different revision of the page. It also rejects any report whose `.node`,
+`.wasm`, or `.whl` binaries do not match, by file name and SHA-256, artifacts
+it recorded from the same run. Because `release.yml` calls this workflow for
+the release candidate, that ties the evidence to the exact candidate #584
+qualifies.
+
+To reproduce a lane locally, pack the host candidate from built artifacts and
+run the same command CI runs:
+
+```bash
+npm run js:build
+node scripts/pack-npm-candidate.mjs --addon-dir bindings/node \
+  --wasm-dir bindings/wasm/pkg --wasm-common-dir bindings/wasm/pkg-common --out-dir candidate
+maturin build --release --manifest-path bindings/python/Cargo.toml --out candidate
+node scripts/qualify-clean-install.mjs --lane <node|python|browser> --candidate-dir <dir>
+```
+
+Without `--candidate-dir`, the driver installs the published packages from
+the public registries. That is the post-publication check of the same page.
+Only versions whose failure messages meet the actionable requirement (from
+0.1.0-beta.7) pass it.
 
 ## Running it locally
 

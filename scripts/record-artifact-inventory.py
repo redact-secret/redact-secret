@@ -23,6 +23,10 @@ Four things are recorded, all tied to one source commit:
 4. **Installed JavaScript qualification** - one safe result for every declared
    Node major and browser engine, naming the candidate package digests,
    commands, runtime, and public incremental/stream outcomes.
+5. **Clean-install qualification** (issue #586) - one result per
+   ``docs/quickstart.md`` lane (Node, Python, browser bundler), each tied to
+   that page's digest and to binaries that must be byte-identical to
+   artifacts recorded in (1).
 
     python3 -B scripts/record-artifact-inventory.py \\
         --artifacts qualification-artifacts --out artifact-inventory.json
@@ -111,7 +115,7 @@ def collect(artifacts: Path) -> list[dict]:
     collected: list[dict] = []
     for directory in sorted(p for p in artifacts.iterdir() if p.is_dir()):
         name = directory.name
-        if name.startswith("installed-javascript-"):
+        if name.startswith("installed-javascript-") or name.startswith("clean-install-"):
             continue
         if name == "support-matrix-drift":
             # Issue #511: a release-decision record consumed by release.yml's
@@ -250,6 +254,107 @@ def require_installed_javascript_qualification(
             errors.append(
                 f"installed JavaScript {lane}: qualified {extra}, which Cargo.toml does not declare"
             )
+    return errors
+
+
+QUICKSTART = Path("docs") / "quickstart.md"
+CLEAN_INSTALL_CHECKS = {
+    "node": ("install", "contents", "output", "artifact", "fallback", "failure"),
+    "python": ("install", "contents", "output", "artifact", "failure"),
+    "browser": ("install", "contents", "bundle", "output", "artifact", "failure"),
+}
+CLEAN_INSTALL_ARTIFACT = {"node": "addon", "python": "native", "browser": "wasm"}
+# The issue's own bound: the documented path completes in about five minutes.
+CLEAN_INSTALL_MAX_BUDGET_SECONDS = 300
+
+
+def collect_clean_install_qualification(artifacts: Path) -> tuple[list[dict], list[str]]:
+    """Read the one JSON report each `clean-install-<lane>` job uploaded."""
+    results: list[dict] = []
+    errors: list[str] = []
+    for directory in sorted(artifacts.glob("clean-install-*")):
+        files = sorted(path for path in directory.rglob("*") if path.is_file())
+        if len(files) != 1 or files[0].suffix != ".json":
+            errors.append(f"{directory.name}: expected exactly one JSON report")
+            continue
+        try:
+            report = json.loads(files[0].read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            errors.append(f"{directory.name}: invalid JSON report")
+            continue
+        if not isinstance(report, dict):
+            errors.append(f"{directory.name}: report must be a JSON object")
+            continue
+        report["artifact"] = directory.name
+        report["reportSha256"] = digest(files[0])
+        results.append(report)
+    return results, errors
+
+
+def require_clean_install_qualification(
+    results: list[dict],
+    collected: list[dict],
+    expected_commit: str,
+    expected_version: str,
+    quickstart_sha256: str,
+) -> list[str]:
+    """Every quickstart lane passed, from this revision's page, on binaries
+    this run built: each reported binary must match a recorded artifact's file
+    name and SHA-256, which is what makes it the exact candidate."""
+    errors: list[str] = []
+    built = {(Path(entry["file"]).name, entry["sha256"]) for entry in collected}
+    lanes = [result.get("lane") for result in results]
+    for result in results:
+        lane = result.get("lane")
+        label = f"clean install {lane}"
+        if lane not in CLEAN_INSTALL_CHECKS:
+            errors.append(f"{result.get('artifact', 'clean install')}: invalid lane")
+            continue
+        if result.get("artifact") != f"clean-install-{lane}":
+            errors.append(f"{label}: artifact directory does not match its lane")
+        if result.get("schemaVersion") != 1:
+            errors.append(f"{label}: unsupported evidence schema")
+        if result.get("sourceCommit") != expected_commit:
+            errors.append(f"{label}: source revision does not match the inventory")
+        if result.get("published") is not False:
+            errors.append(f"{label}: must qualify candidate artifacts (published=false)")
+        if result.get("productVersion") != expected_version:
+            errors.append(f"{label}: product version does not match the inventory")
+        document = result.get("document") or {}
+        if document.get("path") != QUICKSTART.as_posix() or document.get("sha256") != quickstart_sha256:
+            errors.append(f"{label}: did not run this revision's {QUICKSTART.as_posix()}")
+        if not result.get("commands"):
+            errors.append(f"{label}: records no commands")
+        if result.get("loadedArtifact") != CLEAN_INSTALL_ARTIFACT[lane]:
+            errors.append(f"{label}: did not load the {CLEAN_INSTALL_ARTIFACT[lane]} artifact")
+        checks = result.get("results") or {}
+        for check in CLEAN_INSTALL_CHECKS[lane]:
+            if checks.get(check) != "passed":
+                errors.append(f"{label}: {check} did not pass")
+        budget = result.get("budgetSeconds")
+        elapsed = result.get("elapsedSeconds")
+        if (
+            not isinstance(budget, (int, float))
+            or not isinstance(elapsed, (int, float))
+            or budget > CLEAN_INSTALL_MAX_BUDGET_SECONDS
+            or elapsed > budget
+        ):
+            errors.append(
+                f"{label}: documented path did not finish within {CLEAN_INSTALL_MAX_BUDGET_SECONDS}s"
+            )
+        binaries = result.get("binaries") or []
+        suffixes = sorted(Path(str(binary.get("file", ""))).suffix for binary in binaries)
+        expected_suffixes = [".whl"] if lane == "python" else [".node", ".wasm", ".wasm"]
+        if suffixes != expected_suffixes:
+            errors.append(f"{label}: expected binaries {expected_suffixes}, reported {suffixes}")
+        for binary in binaries:
+            key = (Path(str(binary.get("file", ""))).name, binary.get("sha256"))
+            if key not in built:
+                errors.append(f"{label}: {key[0]} is not an artifact this run qualified")
+    for lane in sorted(set(CLEAN_INSTALL_CHECKS) - set(lanes)):
+        errors.append(f"clean install {lane}: no qualification")
+    for lane in sorted({lane for lane in lanes if lanes.count(lane) > 1}):
+        errors.append(f"clean install {lane}: duplicate qualification")
     return errors
 
 
@@ -448,6 +553,22 @@ def render_summary(inventory: dict) -> str:
             f"{result['results']['stream']} | "
             f"`{result['reportSha256'][:16]}…` |"
         )
+    lines.extend(
+        [
+            "",
+            "### Clean-install qualification",
+            "",
+            "| Lane | Runtime | Loaded | Elapsed | Evidence SHA-256 |",
+            "| --- | --- | --- | ---: | --- |",
+        ]
+    )
+    for result in inventory.get("cleanInstallQualification", []):
+        runtime = result.get("runtime") or {}
+        lines.append(
+            f"| {result.get('lane')} | {runtime.get('name')} {runtime.get('version')} | "
+            f"{result.get('loadedArtifact')} | {result.get('elapsedSeconds')}s | "
+            f"`{result['reportSha256'][:16]}…` |"
+        )
     readiness = inventory.get("releaseReadiness", {})
     review = readiness.get("publicApiAndChangelogReview", {})
     registry = readiness.get("registryInstallVerification", {})
@@ -505,6 +626,13 @@ def main() -> int:
             matrix, qualification, revision, product_version
         )
     )
+    clean_install, clean_install_errors = collect_clean_install_qualification(arguments.artifacts)
+    errors.extend(clean_install_errors)
+    errors.extend(
+        require_clean_install_qualification(
+            clean_install, collected, revision, product_version, digest(ROOT / QUICKSTART)
+        )
+    )
 
     inventory = {
         "sourceCommit": revision,
@@ -528,6 +656,7 @@ def main() -> int:
         },
         "artifacts": collected,
         "installedJavaScriptQualification": qualification,
+        "cleanInstallQualification": clean_install,
         "releaseReadiness": release_readiness_record(),
     }
 

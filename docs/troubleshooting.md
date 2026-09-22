@@ -6,6 +6,7 @@
 | --- | --- |
 | `NOT_INITIALIZED` in JavaScript | Await `initialize()` before synchronous work |
 | `INITIALIZATION_FAILED` on Node | Supported Node major and target, installed optional addon, matching package versions, and an addon whose profile matches the entry point (`@redact-secret/core` or `/common`); a missing or unloadable addon falls back to `@redact-secret/wasm` instead, so check that it is installed and matches the package version too |
+| `ImportError: redact-secret could not load its native extension` in Python | No wheel for this platform or Python build, or an incomplete install; reinstall with `--only-binary=:all:` on a platform in the [wheel matrix](python-packaging.md) |
 | Node runs on WebAssembly, not the addon | `artifact()` returns `"wasm"` after `initialize()`: the host has no matching `@redact-secret/node-<platform>` package, its optional-dependency install failed, or the addon could not load |
 | `INITIALIZATION_FAILED` in browser | Browser import conditions, Wasm asset URL, HTTP response, MIME type, and an artifact whose version and profile match the entry point (`@redact-secret/core` or `/common`) |
 | `UNPAIRED_SURROGATE` | JavaScript text contains an invalid standalone UTF-16 surrogate; correct input handling before scanning |
