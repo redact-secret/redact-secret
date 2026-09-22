@@ -56,6 +56,7 @@
     "support-matrix:generate": "python3 -B scripts/generate-support-matrix-docs.py",
     "support-matrix-drift:test": "python3 -B -m unittest discover -s scripts/tests -p 'test_check_support_matrix_drift.py'",
     "benchmark-pins:check:ancestry": "python3 -B scripts/check-benchmark-pins.py --check-ancestry",
+    "benchmark-pins:sync": "python3 -B scripts/check-benchmark-pins.py --sync",
     "benchmark:candidate": "node scripts/benchmark-candidate.mjs",
     "benchmark:candidate:test": "node --test scripts/tests/benchmark-candidate.test.mjs",
     "detector-cost:test": "node --test scripts/tests/measure-detector-cost.test.mjs",
