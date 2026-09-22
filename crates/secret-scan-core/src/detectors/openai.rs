@@ -4,7 +4,7 @@
 //! base64 encoding of the ASCII text `OpenAI`) between two opaque segments
 //! of a source-documented length. Issue #368 froze that shape as the default
 //! contract (`docs/decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md`,
-//! OpenAI row),
+//! `OpenAI` row),
 //! replacing the earlier "recognized prefix plus a 20-byte minimum suffix"
 //! rule that accepted any long enough `sk-` value:
 //!
