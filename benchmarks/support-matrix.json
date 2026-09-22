@@ -3,19 +3,19 @@
   "taxonomySchemaVersion": 1,
   "sourceReport": {
     "schemaVersion": 1,
-    "generatedAt": "2026-09-21T02:24:02.738Z",
-    "runId": "b162ec11-737e-4b10-a86f-f1487fad3afe",
-    "revision": "3e50f2cfd57c3c1363b2c3a2ca48b2ac8f8e2ce5",
+    "generatedAt": "2026-09-22T00:26:30.496Z",
+    "runId": "d0e99d6b-a252-4e30-8b24-a1195c94ee99",
+    "revision": "a502fdd715c5a5882430e951d5493de32fe8621c",
     "dirty": false,
     "criteriaSchemaVersion": 1
   },
-  "providerCount": 31,
-  "familyCount": 72,
+  "providerCount": 34,
+  "familyCount": 79,
   "distribution": {
-    "stable": 0,
-    "provisional": 53,
+    "stable": 3,
+    "provisional": 58,
     "pending": 2,
-    "unsupported": 17
+    "unsupported": 16
   },
   "families": [
     {
@@ -36,13 +36,13 @@
       },
       "unresolvedCriticalItems": {
         "metamorphic": 0,
-        "mutation": 12,
-        "differential": 0
+        "mutation": 0,
+        "differential": 6
       },
       "detectors": [
         "anthropic-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 2 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 12 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 2 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": "atlassian",
@@ -74,13 +74,13 @@
       },
       "unresolvedCriticalItems": {
         "metamorphic": 0,
-        "mutation": 12,
-        "differential": 0
+        "mutation": 0,
+        "differential": 6
       },
       "detectors": [
         "atlassian-api-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 12 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": "aws",
@@ -119,12 +119,12 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 0
+        "differential": 9
       },
       "detectors": [
         "aws-access-key"
       ],
-      "reason": "benign.minimumCases: 4 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family."
+      "reason": "benign.minimumAxes: 2 < 3 (axes present: near-miss, placeholder) — A bare case count is satisfied by five copies of the same near-miss and proves nothing about diversity. Staged at 2 immediately after #91 merged (the minimum then met by every family reading stable: gitlab-token, npm-token), per docs/decisions/2026-09-21-measure-benign-axis-diversity.md's ratchet plan. Raised to 3 once #93 (#90's part A3) authored the missing placeholder/reference axes for the 23 families that previously carried only a same-axis near-miss pair, plus one reference control each for gitlab-token and npm-token so the ratchet lands with zero regressions; measured via `npm run eval:classify` immediately before this value changed. | differential.unresolvedContractDisagreements: 9 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": "aws",
@@ -181,12 +181,12 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 0
+        "differential": 6
       },
       "detectors": [
         "azure-devops-personal-access-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": "cloudflare",
@@ -204,19 +204,19 @@
         "trufflehog 3.97.4"
       ],
       "twinCoverage": {
-        "pairs": 4,
+        "pairs": 6,
         "failures": 0,
         "unprobeable": null
       },
       "unresolvedCriticalItems": {
-        "metamorphic": 27,
-        "mutation": 15,
-        "differential": 0
+        "metamorphic": 0,
+        "mutation": 0,
+        "differential": 3
       },
       "detectors": [
         "cloudflare-token"
       ],
-      "reason": "minimumTwinPairs: 4 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | metamorphic.criticalFailures: 27 > 0 — A metamorphic invariant violation (for example, detection lost after an envelope-preserving transform) shows the detector is not robust to construction, independent of how many cases were run. | mutation.unresolvedCritical: 15 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+      "reason": "differential.unresolvedContractDisagreements: 3 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": "datadog",
@@ -239,12 +239,12 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 0
+        "differential": 3
       },
       "detectors": [
         "datadog-api-key"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | differential.unresolvedContractDisagreements: 3 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": "datadog",
@@ -268,12 +268,12 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 0
+        "differential": 3
       },
       "detectors": [
         "datadog-application-key"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | differential.unresolvedContractDisagreements: 3 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": "digitalocean",
@@ -298,13 +298,13 @@
       },
       "unresolvedCriticalItems": {
         "metamorphic": 0,
-        "mutation": 102,
-        "differential": 0
+        "mutation": 0,
+        "differential": 4
       },
       "detectors": [
         "digitalocean-token"
       ],
-      "reason": "mutation.unresolvedCritical: 102 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+      "reason": "differential.unresolvedContractDisagreements: 4 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": "digitalocean",
@@ -329,13 +329,13 @@
       },
       "unresolvedCriticalItems": {
         "metamorphic": 0,
-        "mutation": 102,
-        "differential": 0
+        "mutation": 0,
+        "differential": 4
       },
       "detectors": [
         "digitalocean-token"
       ],
-      "reason": "mutation.unresolvedCritical: 102 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+      "reason": "differential.unresolvedContractDisagreements: 4 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": "digitalocean",
@@ -360,13 +360,13 @@
       },
       "unresolvedCriticalItems": {
         "metamorphic": 0,
-        "mutation": 102,
-        "differential": 0
+        "mutation": 0,
+        "differential": 4
       },
       "detectors": [
         "digitalocean-token"
       ],
-      "reason": "mutation.unresolvedCritical: 102 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+      "reason": "differential.unresolvedContractDisagreements: 4 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": "discord",
@@ -388,13 +388,13 @@
       },
       "unresolvedCriticalItems": {
         "metamorphic": 0,
-        "mutation": 18,
-        "differential": 0
+        "mutation": 6,
+        "differential": 6
       },
       "detectors": [
         "discord-bot-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 18 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | mutation.unresolvedCritical: 6 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review. | differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": "docker",
@@ -413,13 +413,13 @@
       },
       "unresolvedCriticalItems": {
         "metamorphic": 27,
-        "mutation": 38,
-        "differential": 0
+        "mutation": 3,
+        "differential": 3
       },
       "detectors": [
         "docker-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | metamorphic.criticalFailures: 27 > 0 — A metamorphic invariant violation (for example, detection lost after an envelope-preserving transform) shows the detector is not robust to construction, independent of how many cases were run. | mutation.unresolvedCritical: 38 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | benign.minimumAxes: 1 < 3 (axes present: near-miss) — A bare case count is satisfied by five copies of the same near-miss and proves nothing about diversity. Staged at 2 immediately after #91 merged (the minimum then met by every family reading stable: gitlab-token, npm-token), per docs/decisions/2026-09-21-measure-benign-axis-diversity.md's ratchet plan. Raised to 3 once #93 (#90's part A3) authored the missing placeholder/reference axes for the 23 families that previously carried only a same-axis near-miss pair, plus one reference control each for gitlab-token and npm-token so the ratchet lands with zero regressions; measured via `npm run eval:classify` immediately before this value changed. | metamorphic.criticalFailures: 27 > 0 — A metamorphic invariant violation (for example, detection lost after an envelope-preserving transform) shows the detector is not robust to construction, independent of how many cases were run. | mutation.unresolvedCritical: 3 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review. | differential.unresolvedContractDisagreements: 3 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": "docker",
@@ -438,13 +438,38 @@
       },
       "unresolvedCriticalItems": {
         "metamorphic": 27,
-        "mutation": 38,
-        "differential": 0
+        "mutation": 3,
+        "differential": 3
       },
       "detectors": [
         "docker-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | metamorphic.criticalFailures: 27 > 0 — A metamorphic invariant violation (for example, detection lost after an envelope-preserving transform) shows the detector is not robust to construction, independent of how many cases were run. | mutation.unresolvedCritical: 38 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | benign.minimumAxes: 1 < 3 (axes present: near-miss) — A bare case count is satisfied by five copies of the same near-miss and proves nothing about diversity. Staged at 2 immediately after #91 merged (the minimum then met by every family reading stable: gitlab-token, npm-token), per docs/decisions/2026-09-21-measure-benign-axis-diversity.md's ratchet plan. Raised to 3 once #93 (#90's part A3) authored the missing placeholder/reference axes for the 23 families that previously carried only a same-axis near-miss pair, plus one reference control each for gitlab-token and npm-token so the ratchet lands with zero regressions; measured via `npm run eval:classify` immediately before this value changed. | metamorphic.criticalFailures: 27 > 0 — A metamorphic invariant violation (for example, detection lost after an envelope-preserving transform) shows the detector is not robust to construction, independent of how many cases were run. | mutation.unresolvedCritical: 3 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review. | differential.unresolvedContractDisagreements: 3 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+    },
+    {
+      "provider": "firebase",
+      "family": "firebase:server-key",
+      "familyName": "Legacy FCM server key",
+      "status": "provisional",
+      "evidenceTier": "T2",
+      "providerSource": null,
+      "corroboratingScanners": [
+        "nuclei-templates (projectdiscovery)"
+      ],
+      "twinCoverage": {
+        "pairs": 3,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 0,
+        "differential": 6
+      },
+      "detectors": [
+        "firebase-server-key"
+      ],
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": null,
@@ -456,18 +481,18 @@
       "corroboratingScanners": [],
       "twinCoverage": {
         "pairs": 3,
-        "failures": 3,
+        "failures": 0,
         "unprobeable": null
       },
       "unresolvedCriticalItems": {
         "metamorphic": 0,
-        "mutation": 26,
+        "mutation": 0,
         "differential": 6
       },
       "detectors": [
         "bearer-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | twinFailures: 3 > 0 — A twin failure is a recorded false negative on the exact discrimination this project exists to make; stable tolerates none, however small the sample. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 26 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review. | differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": null,
@@ -485,12 +510,12 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 0
+        "differential": 30
       },
       "detectors": [
         "connection-string"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | differential.unresolvedContractDisagreements: 30 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": null,
@@ -508,19 +533,19 @@
         "trufflehog 3.97.4"
       ],
       "twinCoverage": {
-        "pairs": 4,
+        "pairs": 7,
         "failures": 0,
         "unprobeable": null
       },
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 0
+        "differential": 4
       },
       "detectors": [
         "jwt"
       ],
-      "reason": "minimumTwinPairs: 4 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family."
+      "reason": "differential.unresolvedContractDisagreements: 4 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": null,
@@ -538,12 +563,12 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 0
+        "differential": 12
       },
       "detectors": [
         "otpauth-uri"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | differential.unresolvedContractDisagreements: 12 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": null,
@@ -561,19 +586,19 @@
         "trufflehog 3.97.4"
       ],
       "twinCoverage": {
-        "pairs": 2,
+        "pairs": 5,
         "failures": 0,
         "unprobeable": null
       },
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 0
+        "differential": 18
       },
       "detectors": [
         "private-key"
       ],
-      "reason": "minimumTwinPairs: 2 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 3 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family."
+      "reason": "differential.unresolvedContractDisagreements: 18 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": null,
@@ -589,14 +614,14 @@
         "unprobeable": null
       },
       "unresolvedCriticalItems": {
-        "metamorphic": 6,
-        "mutation": 20,
-        "differential": 0
+        "metamorphic": 2,
+        "mutation": 0,
+        "differential": 12
       },
       "detectors": [
         "generic-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | metamorphic.criticalFailures: 6 > 0 — A metamorphic invariant violation (for example, detection lost after an envelope-preserving transform) shows the detector is not robust to construction, independent of how many cases were run. | mutation.unresolvedCritical: 20 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | metamorphic.criticalFailures: 2 > 0 — A metamorphic invariant violation (for example, detection lost after an envelope-preserving transform) shows the detector is not robust to construction, independent of how many cases were run. | differential.unresolvedContractDisagreements: 12 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": "github",
@@ -621,13 +646,13 @@
       },
       "unresolvedCriticalItems": {
         "metamorphic": 0,
-        "mutation": 305,
+        "mutation": 0,
         "differential": 0
       },
       "detectors": [
         "github-token"
       ],
-      "reason": "benign.minimumCases: 4 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 305 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+      "reason": "benign.minimumAxes: 2 < 3 (axes present: near-miss, placeholder) — A bare case count is satisfied by five copies of the same near-miss and proves nothing about diversity. Staged at 2 immediately after #91 merged (the minimum then met by every family reading stable: gitlab-token, npm-token), per docs/decisions/2026-09-21-measure-benign-axis-diversity.md's ratchet plan. Raised to 3 once #93 (#90's part A3) authored the missing placeholder/reference axes for the 23 families that previously carried only a same-axis near-miss pair, plus one reference control each for gitlab-token and npm-token so the ratchet lands with zero regressions; measured via `npm run eval:classify` immediately before this value changed."
     },
     {
       "provider": "github",
@@ -652,13 +677,13 @@
       },
       "unresolvedCriticalItems": {
         "metamorphic": 0,
-        "mutation": 305,
+        "mutation": 0,
         "differential": 0
       },
       "detectors": [
         "github-token"
       ],
-      "reason": "benign.minimumCases: 4 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 305 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+      "reason": "benign.minimumAxes: 2 < 3 (axes present: near-miss, placeholder) — A bare case count is satisfied by five copies of the same near-miss and proves nothing about diversity. Staged at 2 immediately after #91 merged (the minimum then met by every family reading stable: gitlab-token, npm-token), per docs/decisions/2026-09-21-measure-benign-axis-diversity.md's ratchet plan. Raised to 3 once #93 (#90's part A3) authored the missing placeholder/reference axes for the 23 families that previously carried only a same-axis near-miss pair, plus one reference control each for gitlab-token and npm-token so the ratchet lands with zero regressions; measured via `npm run eval:classify` immediately before this value changed."
     },
     {
       "provider": "github",
@@ -683,13 +708,13 @@
       },
       "unresolvedCriticalItems": {
         "metamorphic": 0,
-        "mutation": 305,
+        "mutation": 0,
         "differential": 0
       },
       "detectors": [
         "github-token"
       ],
-      "reason": "benign.minimumCases: 4 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 305 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+      "reason": "benign.minimumAxes: 2 < 3 (axes present: near-miss, placeholder) — A bare case count is satisfied by five copies of the same near-miss and proves nothing about diversity. Staged at 2 immediately after #91 merged (the minimum then met by every family reading stable: gitlab-token, npm-token), per docs/decisions/2026-09-21-measure-benign-axis-diversity.md's ratchet plan. Raised to 3 once #93 (#90's part A3) authored the missing placeholder/reference axes for the 23 families that previously carried only a same-axis near-miss pair, plus one reference control each for gitlab-token and npm-token so the ratchet lands with zero regressions; measured via `npm run eval:classify` immediately before this value changed."
     },
     {
       "provider": "github",
@@ -727,13 +752,13 @@
       },
       "unresolvedCriticalItems": {
         "metamorphic": 0,
-        "mutation": 305,
+        "mutation": 0,
         "differential": 0
       },
       "detectors": [
         "github-token"
       ],
-      "reason": "benign.minimumCases: 4 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 305 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+      "reason": "benign.minimumAxes: 2 < 3 (axes present: near-miss, placeholder) — A bare case count is satisfied by five copies of the same near-miss and proves nothing about diversity. Staged at 2 immediately after #91 merged (the minimum then met by every family reading stable: gitlab-token, npm-token), per docs/decisions/2026-09-21-measure-benign-axis-diversity.md's ratchet plan. Raised to 3 once #93 (#90's part A3) authored the missing placeholder/reference axes for the 23 families that previously carried only a same-axis near-miss pair, plus one reference control each for gitlab-token and npm-token so the ratchet lands with zero regressions; measured via `npm run eval:classify` immediately before this value changed."
     },
     {
       "provider": "github",
@@ -758,19 +783,19 @@
       },
       "unresolvedCriticalItems": {
         "metamorphic": 0,
-        "mutation": 305,
+        "mutation": 0,
         "differential": 0
       },
       "detectors": [
         "github-token"
       ],
-      "reason": "benign.minimumCases: 4 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 305 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+      "reason": "benign.minimumAxes: 2 < 3 (axes present: near-miss, placeholder) — A bare case count is satisfied by five copies of the same near-miss and proves nothing about diversity. Staged at 2 immediately after #91 merged (the minimum then met by every family reading stable: gitlab-token, npm-token), per docs/decisions/2026-09-21-measure-benign-axis-diversity.md's ratchet plan. Raised to 3 once #93 (#90's part A3) authored the missing placeholder/reference axes for the 23 families that previously carried only a same-axis near-miss pair, plus one reference control each for gitlab-token and npm-token so the ratchet lands with zero regressions; measured via `npm run eval:classify` immediately before this value changed."
     },
     {
       "provider": "gitlab",
       "family": "gitlab:legacy-personal-access-token",
       "familyName": "Legacy personal access token",
-      "status": "provisional",
+      "status": "stable",
       "evidenceTier": "T1",
       "providerSource": {
         "url": "https://docs.gitlab.com/security/tokens/",
@@ -789,13 +814,13 @@
       },
       "unresolvedCriticalItems": {
         "metamorphic": 0,
-        "mutation": 40,
+        "mutation": 0,
         "differential": 0
       },
       "detectors": [
         "gitlab-token"
       ],
-      "reason": "benign.minimumCases: 4 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 40 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+      "reason": null
     },
     {
       "provider": "gitlab",
@@ -827,13 +852,13 @@
       },
       "unresolvedCriticalItems": {
         "metamorphic": 0,
-        "mutation": 15,
-        "differential": 0
+        "mutation": 0,
+        "differential": 3
       },
       "detectors": [
         "google-api-key"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 15 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | differential.unresolvedContractDisagreements: 3 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": "google",
@@ -868,13 +893,13 @@
       },
       "unresolvedCriticalItems": {
         "metamorphic": 0,
-        "mutation": 12,
-        "differential": 0
+        "mutation": 0,
+        "differential": 3
       },
       "detectors": [
         "grafana-cloud-access-policy-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 12 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | differential.unresolvedContractDisagreements: 3 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": "grafana",
@@ -897,13 +922,106 @@
       },
       "unresolvedCriticalItems": {
         "metamorphic": 0,
-        "mutation": 15,
-        "differential": 0
+        "mutation": 0,
+        "differential": 3
       },
       "detectors": [
         "grafana-service-account-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 15 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | differential.unresolvedContractDisagreements: 3 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+    },
+    {
+      "provider": "hashicorp-terraform",
+      "family": "hashicorp-terraform:organization-token",
+      "familyName": "Organization token",
+      "status": "provisional",
+      "evidenceTier": "T1",
+      "providerSource": {
+        "url": "https://developer.hashicorp.com/terraform/cloud-docs/api-docs/user-tokens",
+        "observedAt": "2026-09-21",
+        "formatVersion": "HCP Terraform/Enterprise 14+67-byte API token",
+        "covers": "three independent HCP Terraform API-reference pages (user-tokens, organization-tokens, team-tokens) each publish a full example token; every one of the three is exactly 14 bytes before the literal .atlasv1. marker and exactly 67 bytes after it, and the mirrored Terraform Enterprise organization-tokens page publishes the identical shape and example, confirming Cloud and Enterprise are one grammar rather than two. Neither page documents a checksum or any marker beyond the literal .atlasv1. tag"
+      },
+      "corroboratingScanners": [
+        "gitleaks 8.30.1",
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 6,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 0,
+        "differential": 6
+      },
+      "detectors": [
+        "terraform-cloud-token"
+      ],
+      "reason": "differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+    },
+    {
+      "provider": "hashicorp-terraform",
+      "family": "hashicorp-terraform:team-token",
+      "familyName": "Team token",
+      "status": "provisional",
+      "evidenceTier": "T1",
+      "providerSource": {
+        "url": "https://developer.hashicorp.com/terraform/cloud-docs/api-docs/user-tokens",
+        "observedAt": "2026-09-21",
+        "formatVersion": "HCP Terraform/Enterprise 14+67-byte API token",
+        "covers": "three independent HCP Terraform API-reference pages (user-tokens, organization-tokens, team-tokens) each publish a full example token; every one of the three is exactly 14 bytes before the literal .atlasv1. marker and exactly 67 bytes after it, and the mirrored Terraform Enterprise organization-tokens page publishes the identical shape and example, confirming Cloud and Enterprise are one grammar rather than two. Neither page documents a checksum or any marker beyond the literal .atlasv1. tag"
+      },
+      "corroboratingScanners": [
+        "gitleaks 8.30.1",
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 6,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 0,
+        "differential": 6
+      },
+      "detectors": [
+        "terraform-cloud-token"
+      ],
+      "reason": "differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+    },
+    {
+      "provider": "hashicorp-terraform",
+      "family": "hashicorp-terraform:user-token",
+      "familyName": "User token",
+      "status": "provisional",
+      "evidenceTier": "T1",
+      "providerSource": {
+        "url": "https://developer.hashicorp.com/terraform/cloud-docs/api-docs/user-tokens",
+        "observedAt": "2026-09-21",
+        "formatVersion": "HCP Terraform/Enterprise 14+67-byte API token",
+        "covers": "three independent HCP Terraform API-reference pages (user-tokens, organization-tokens, team-tokens) each publish a full example token; every one of the three is exactly 14 bytes before the literal .atlasv1. marker and exactly 67 bytes after it, and the mirrored Terraform Enterprise organization-tokens page publishes the identical shape and example, confirming Cloud and Enterprise are one grammar rather than two. Neither page documents a checksum or any marker beyond the literal .atlasv1. tag"
+      },
+      "corroboratingScanners": [
+        "gitleaks 8.30.1",
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 6,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 0,
+        "differential": 6
+      },
+      "detectors": [
+        "terraform-cloud-token"
+      ],
+      "reason": "differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": "hashicorp-vault",
@@ -922,19 +1040,19 @@
         "trufflehog 3.97.4"
       ],
       "twinCoverage": {
-        "pairs": 4,
+        "pairs": 6,
         "failures": 0,
         "unprobeable": null
       },
       "unresolvedCriticalItems": {
         "metamorphic": 0,
-        "mutation": 6,
-        "differential": 0
+        "mutation": 0,
+        "differential": 18
       },
       "detectors": [
         "vault-token"
       ],
-      "reason": "minimumTwinPairs: 4 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 6 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+      "reason": "differential.unresolvedContractDisagreements: 18 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": "hashicorp-vault",
@@ -953,19 +1071,19 @@
         "trufflehog 3.97.4"
       ],
       "twinCoverage": {
-        "pairs": 4,
+        "pairs": 6,
         "failures": 0,
         "unprobeable": null
       },
       "unresolvedCriticalItems": {
         "metamorphic": 0,
-        "mutation": 6,
-        "differential": 0
+        "mutation": 0,
+        "differential": 18
       },
       "detectors": [
         "vault-token"
       ],
-      "reason": "minimumTwinPairs: 4 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 6 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+      "reason": "differential.unresolvedContractDisagreements: 18 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": "hashicorp-vault",
@@ -984,19 +1102,19 @@
         "trufflehog 3.97.4"
       ],
       "twinCoverage": {
-        "pairs": 4,
+        "pairs": 6,
         "failures": 0,
         "unprobeable": null
       },
       "unresolvedCriticalItems": {
         "metamorphic": 0,
-        "mutation": 6,
-        "differential": 0
+        "mutation": 0,
+        "differential": 18
       },
       "detectors": [
         "vault-token"
       ],
-      "reason": "minimumTwinPairs: 4 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 6 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+      "reason": "differential.unresolvedContractDisagreements: 18 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": "huggingface",
@@ -1016,13 +1134,13 @@
       },
       "unresolvedCriticalItems": {
         "metamorphic": 0,
-        "mutation": 25,
-        "differential": 0
+        "mutation": 0,
+        "differential": 4
       },
       "detectors": [
         "huggingface-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 2 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 25 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 2 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumAxes: 1 < 3 (axes present: near-miss) — A bare case count is satisfied by five copies of the same near-miss and proves nothing about diversity. Staged at 2 immediately after #91 merged (the minimum then met by every family reading stable: gitlab-token, npm-token), per docs/decisions/2026-09-21-measure-benign-axis-diversity.md's ratchet plan. Raised to 3 once #93 (#90's part A3) authored the missing placeholder/reference axes for the 23 families that previously carried only a same-axis near-miss pair, plus one reference control each for gitlab-token and npm-token so the ratchet lands with zero regressions; measured via `npm run eval:classify` immediately before this value changed. | differential.unresolvedContractDisagreements: 4 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": "linear",
@@ -1055,13 +1173,13 @@
       },
       "unresolvedCriticalItems": {
         "metamorphic": 0,
-        "mutation": 25,
-        "differential": 0
+        "mutation": 0,
+        "differential": 10
       },
       "detectors": [
         "linear-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 25 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | benign.minimumAxes: 1 < 3 (axes present: near-miss) — A bare case count is satisfied by five copies of the same near-miss and proves nothing about diversity. Staged at 2 immediately after #91 merged (the minimum then met by every family reading stable: gitlab-token, npm-token), per docs/decisions/2026-09-21-measure-benign-axis-diversity.md's ratchet plan. Raised to 3 once #93 (#90's part A3) authored the missing placeholder/reference axes for the 23 families that previously carried only a same-axis near-miss pair, plus one reference control each for gitlab-token and npm-token so the ratchet lands with zero regressions; measured via `npm run eval:classify` immediately before this value changed. | differential.unresolvedContractDisagreements: 10 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": "microsoft-entra",
@@ -1083,13 +1201,13 @@
       },
       "unresolvedCriticalItems": {
         "metamorphic": 0,
-        "mutation": 3,
+        "mutation": 0,
         "differential": 0
       },
       "detectors": [
         "microsoft-entra-client-secret"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 3 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret."
     },
     {
       "provider": "new-relic",
@@ -1107,12 +1225,12 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 0
+        "differential": 6
       },
       "detectors": [
         "new-relic-license-key"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": "new-relic",
@@ -1135,13 +1253,13 @@
       },
       "unresolvedCriticalItems": {
         "metamorphic": 0,
-        "mutation": 15,
-        "differential": 0
+        "mutation": 0,
+        "differential": 3
       },
       "detectors": [
         "new-relic-user-api-key"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 15 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | differential.unresolvedContractDisagreements: 3 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": "notion",
@@ -1173,19 +1291,19 @@
       },
       "unresolvedCriticalItems": {
         "metamorphic": 0,
-        "mutation": 15,
-        "differential": 0
+        "mutation": 0,
+        "differential": 6
       },
       "detectors": [
         "notion-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 15 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": "npm",
       "family": "npm:granular-access-token",
       "familyName": "Granular access token",
-      "status": "provisional",
+      "status": "stable",
       "evidenceTier": "T1",
       "providerSource": {
         "url": "https://github.blog/changelog/2021-09-23-npm-has-a-new-access-token-format/",
@@ -1204,13 +1322,13 @@
       },
       "unresolvedCriticalItems": {
         "metamorphic": 0,
-        "mutation": 40,
+        "mutation": 0,
         "differential": 0
       },
       "detectors": [
         "npm-token"
       ],
-      "reason": "benign.minimumCases: 4 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 40 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+      "reason": null
     },
     {
       "provider": "npm",
@@ -1242,14 +1360,107 @@
         "unprobeable": null
       },
       "unresolvedCriticalItems": {
-        "metamorphic": 81,
-        "mutation": 39,
-        "differential": 0
+        "metamorphic": 0,
+        "mutation": 0,
+        "differential": 18
       },
       "detectors": [
         "openai-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | metamorphic.criticalFailures: 81 > 0 — A metamorphic invariant violation (for example, detection lost after an envelope-preserving transform) shows the detector is not robust to construction, independent of how many cases were run. | mutation.unresolvedCritical: 39 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | benign.minimumAxes: 1 < 3 (axes present: near-miss) — A bare case count is satisfied by five copies of the same near-miss and proves nothing about diversity. Staged at 2 immediately after #91 merged (the minimum then met by every family reading stable: gitlab-token, npm-token), per docs/decisions/2026-09-21-measure-benign-axis-diversity.md's ratchet plan. Raised to 3 once #93 (#90's part A3) authored the missing placeholder/reference axes for the 23 families that previously carried only a same-axis near-miss pair, plus one reference control each for gitlab-token and npm-token so the ratchet lands with zero regressions; measured via `npm run eval:classify` immediately before this value changed. | differential.unresolvedContractDisagreements: 18 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+    },
+    {
+      "provider": "pulumi",
+      "family": "pulumi:organization-access-token",
+      "familyName": "Organization access token",
+      "status": "provisional",
+      "evidenceTier": "T1",
+      "providerSource": {
+        "url": "https://www.pulumi.com/docs/reference/cloud-rest-api/access-tokens/",
+        "observedAt": "2026-09-21",
+        "formatVersion": "pul- prefixed opaque token",
+        "covers": "Pulumi's own Cloud REST API reference states, of the token-creation response: \"The response includes the token ID and the tokenValue (prefixed with 'pul-').\" Its personal-access-tokens sibling page carries the identical sentence. Neither page states a length or alphabet for the value that follows the prefix"
+      },
+      "corroboratingScanners": [
+        "gitleaks 8.30.1",
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 6,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 0,
+        "differential": 1
+      },
+      "detectors": [
+        "pulumi-access-token"
+      ],
+      "reason": "differential.unresolvedContractDisagreements: 1 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+    },
+    {
+      "provider": "pulumi",
+      "family": "pulumi:personal-access-token",
+      "familyName": "Personal access token",
+      "status": "provisional",
+      "evidenceTier": "T1",
+      "providerSource": {
+        "url": "https://www.pulumi.com/docs/reference/cloud-rest-api/access-tokens/",
+        "observedAt": "2026-09-21",
+        "formatVersion": "pul- prefixed opaque token",
+        "covers": "Pulumi's own Cloud REST API reference states, of the token-creation response: \"The response includes the token ID and the tokenValue (prefixed with 'pul-').\" Its personal-access-tokens sibling page carries the identical sentence. Neither page states a length or alphabet for the value that follows the prefix"
+      },
+      "corroboratingScanners": [
+        "gitleaks 8.30.1",
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 6,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 0,
+        "differential": 1
+      },
+      "detectors": [
+        "pulumi-access-token"
+      ],
+      "reason": "differential.unresolvedContractDisagreements: 1 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+    },
+    {
+      "provider": "pulumi",
+      "family": "pulumi:team-access-token",
+      "familyName": "Team access token",
+      "status": "provisional",
+      "evidenceTier": "T1",
+      "providerSource": {
+        "url": "https://www.pulumi.com/docs/reference/cloud-rest-api/access-tokens/",
+        "observedAt": "2026-09-21",
+        "formatVersion": "pul- prefixed opaque token",
+        "covers": "Pulumi's own Cloud REST API reference states, of the token-creation response: \"The response includes the token ID and the tokenValue (prefixed with 'pul-').\" Its personal-access-tokens sibling page carries the identical sentence. Neither page states a length or alphabet for the value that follows the prefix"
+      },
+      "corroboratingScanners": [
+        "gitleaks 8.30.1",
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 6,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 0,
+        "differential": 1
+      },
+      "detectors": [
+        "pulumi-access-token"
+      ],
+      "reason": "differential.unresolvedContractDisagreements: 1 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": "pypi",
@@ -1258,35 +1469,35 @@
       "status": "provisional",
       "evidenceTier": "T1",
       "providerSource": {
-        "url": "https://pypi.org/help/#apitoken",
-        "observedAt": "2026-09-17",
-        "formatVersion": "pypi- prefixed base64 macaroon",
-        "covers": "pypi- prefix and base64 macaroon body; no lexical length contract"
+        "url": "https://docs.pypi.org/api/secrets/",
+        "observedAt": "2026-09-21",
+        "formatVersion": "pypi- prefix, base64-serialized PyMacaroon, {85,} length floor",
+        "covers": "docs.pypi.org's own detection-format page publishes this contract's exact regex, pypi-[A-Za-z0-9-_]{85,}: the pypi- prefix, a \"-\" separator, a base64 PyMacaroon serialization, an 85-character floor and no ceiling"
       },
       "corroboratingScanners": [
         "gitleaks 8.30.1",
         "trufflehog 3.97.4"
       ],
       "twinCoverage": {
-        "pairs": 3,
+        "pairs": 9,
         "failures": 0,
         "unprobeable": null
       },
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 0
+        "differential": 4
       },
       "detectors": [
         "pypi-token"
       ],
-      "reason": "minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family."
+      "reason": "differential.unresolvedContractDisagreements: 4 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": "sendgrid",
       "family": "sendgrid:api-key",
       "familyName": "API key",
-      "status": "provisional",
+      "status": "stable",
       "evidenceTier": "T1",
       "providerSource": {
         "url": "https://support.sendgrid.com/hc/en-us/articles/44146758703387-Can-I-Use-a-Reduced-Shorter-API-Key-Size-in-SendGrid",
@@ -1300,18 +1511,18 @@
       ],
       "twinCoverage": {
         "pairs": 18,
-        "failures": 2,
+        "failures": 0,
         "unprobeable": null
       },
       "unresolvedCriticalItems": {
         "metamorphic": 0,
-        "mutation": 232,
-        "differential": 3
+        "mutation": 0,
+        "differential": 0
       },
       "detectors": [
         "sendgrid-token"
       ],
-      "reason": "twinFailures: 2 > 0 — A twin failure is a recorded false negative on the exact discrimination this project exists to make; stable tolerates none, however small the sample. | mutation.unresolvedCritical: 232 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review. | differential.unresolvedContractDisagreements: 3 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": null
     },
     {
       "provider": "sentry",
@@ -1334,13 +1545,13 @@
       },
       "unresolvedCriticalItems": {
         "metamorphic": 0,
-        "mutation": 15,
-        "differential": 0
+        "mutation": 0,
+        "differential": 6
       },
       "detectors": [
         "sentry-org-auth-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 15 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": "sentry",
@@ -1362,13 +1573,13 @@
       },
       "unresolvedCriticalItems": {
         "metamorphic": 0,
-        "mutation": 18,
+        "mutation": 0,
         "differential": 0
       },
       "detectors": [
         "sentry-user-auth-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 18 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret."
     },
     {
       "provider": "shopify",
@@ -1387,19 +1598,19 @@
         "trufflehog 3.97.4"
       ],
       "twinCoverage": {
-        "pairs": 4,
+        "pairs": 6,
         "failures": 0,
         "unprobeable": null
       },
       "unresolvedCriticalItems": {
         "metamorphic": 0,
-        "mutation": 24,
-        "differential": 0
+        "mutation": 0,
+        "differential": 6
       },
       "detectors": [
         "shopify-token"
       ],
-      "reason": "minimumTwinPairs: 4 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 24 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+      "reason": "differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": "shopify",
@@ -1418,19 +1629,19 @@
         "trufflehog 3.97.4"
       ],
       "twinCoverage": {
-        "pairs": 4,
+        "pairs": 6,
         "failures": 0,
         "unprobeable": null
       },
       "unresolvedCriticalItems": {
         "metamorphic": 0,
-        "mutation": 24,
-        "differential": 0
+        "mutation": 0,
+        "differential": 6
       },
       "detectors": [
         "shopify-token"
       ],
-      "reason": "minimumTwinPairs: 4 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 24 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+      "reason": "differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": "slack",
@@ -1462,19 +1673,19 @@
         "trufflehog 3.97.4"
       ],
       "twinCoverage": {
-        "pairs": 4,
+        "pairs": 6,
         "failures": 0,
         "unprobeable": null
       },
       "unresolvedCriticalItems": {
-        "metamorphic": 27,
-        "mutation": 33,
-        "differential": 0
+        "metamorphic": 0,
+        "mutation": 0,
+        "differential": 30
       },
       "detectors": [
         "slack-token"
       ],
-      "reason": "minimumTwinPairs: 4 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 4 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | metamorphic.criticalFailures: 27 > 0 — A metamorphic invariant violation (for example, detection lost after an envelope-preserving transform) shows the detector is not robust to construction, independent of how many cases were run. | mutation.unresolvedCritical: 33 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+      "reason": "benign.minimumAxes: 2 < 3 (axes present: near-miss, placeholder) — A bare case count is satisfied by five copies of the same near-miss and proves nothing about diversity. Staged at 2 immediately after #91 merged (the minimum then met by every family reading stable: gitlab-token, npm-token), per docs/decisions/2026-09-21-measure-benign-axis-diversity.md's ratchet plan. Raised to 3 once #93 (#90's part A3) authored the missing placeholder/reference axes for the 23 families that previously carried only a same-axis near-miss pair, plus one reference control each for gitlab-token and npm-token so the ratchet lands with zero regressions; measured via `npm run eval:classify` immediately before this value changed. | differential.unresolvedContractDisagreements: 30 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": "slack",
@@ -1532,19 +1743,19 @@
         "trufflehog 3.97.4"
       ],
       "twinCoverage": {
-        "pairs": 4,
+        "pairs": 6,
         "failures": 0,
         "unprobeable": null
       },
       "unresolvedCriticalItems": {
         "metamorphic": 0,
-        "mutation": 80,
-        "differential": 0
+        "mutation": 0,
+        "differential": 18
       },
       "detectors": [
         "stripe-token"
       ],
-      "reason": "minimumTwinPairs: 4 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 80 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+      "reason": "differential.unresolvedContractDisagreements: 18 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": "stripe",
@@ -1563,19 +1774,19 @@
         "trufflehog 3.97.4"
       ],
       "twinCoverage": {
-        "pairs": 4,
+        "pairs": 6,
         "failures": 0,
         "unprobeable": null
       },
       "unresolvedCriticalItems": {
         "metamorphic": 0,
-        "mutation": 80,
-        "differential": 0
+        "mutation": 0,
+        "differential": 18
       },
       "detectors": [
         "stripe-token"
       ],
-      "reason": "minimumTwinPairs: 4 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 80 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+      "reason": "differential.unresolvedContractDisagreements: 18 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": "stripe",
@@ -1594,19 +1805,19 @@
         "trufflehog 3.97.4"
       ],
       "twinCoverage": {
-        "pairs": 4,
+        "pairs": 6,
         "failures": 0,
         "unprobeable": null
       },
       "unresolvedCriticalItems": {
         "metamorphic": 0,
-        "mutation": 80,
-        "differential": 0
+        "mutation": 0,
+        "differential": 18
       },
       "detectors": [
         "stripe-token"
       ],
-      "reason": "minimumTwinPairs: 4 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 80 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+      "reason": "differential.unresolvedContractDisagreements: 18 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": "stripe",
@@ -1625,19 +1836,19 @@
         "trufflehog 3.97.4"
       ],
       "twinCoverage": {
-        "pairs": 4,
+        "pairs": 6,
         "failures": 0,
         "unprobeable": null
       },
       "unresolvedCriticalItems": {
         "metamorphic": 0,
-        "mutation": 80,
-        "differential": 0
+        "mutation": 0,
+        "differential": 18
       },
       "detectors": [
         "stripe-token"
       ],
-      "reason": "minimumTwinPairs: 4 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 80 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+      "reason": "differential.unresolvedContractDisagreements: 18 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": "stripe",
@@ -1656,14 +1867,31 @@
       "provider": "supabase",
       "family": "supabase:personal-access-token",
       "familyName": "Personal access token",
-      "status": "unsupported",
-      "evidenceTier": null,
-      "providerSource": null,
-      "corroboratingScanners": [],
-      "twinCoverage": null,
-      "unresolvedCriticalItems": null,
-      "detectors": [],
-      "reason": "supabase-token's contract review notes the pinned TruffleHog detector instead covers sbp_ management tokens, a distinct family from the sb_secret_ project key this project's detector targets."
+      "status": "provisional",
+      "evidenceTier": "T1",
+      "providerSource": {
+        "url": "https://supabase.com/docs/guides/platform/personal-access-tokens",
+        "observedAt": "2026-09-20",
+        "formatVersion": "sbp_/sbp_v0_ personal access tokens",
+        "covers": "documents the sbp_ prefix by example (sbp_fc...) and the classic-vs-scoped distinction; states no exact body grammar"
+      },
+      "corroboratingScanners": [
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 6,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 0,
+        "differential": 9
+      },
+      "detectors": [
+        "supabase-management-token"
+      ],
+      "reason": "differential.unresolvedContractDisagreements: 9 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": "supabase",
@@ -1686,7 +1914,7 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 0
+        "differential": 6
       },
       "detectors": [
         "supabase-token"
@@ -1713,13 +1941,13 @@
       },
       "unresolvedCriticalItems": {
         "metamorphic": 0,
-        "mutation": 9,
-        "differential": 0
+        "mutation": 0,
+        "differential": 6
       },
       "detectors": [
         "telegram-bot-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | mutation.unresolvedCritical: 9 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": "twilio",
@@ -1742,12 +1970,12 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 0
+        "differential": 6
       },
       "detectors": [
         "twilio-api-key-secret"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": "twilio",
@@ -1770,12 +1998,12 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 0
+        "differential": 6
       },
       "detectors": [
         "twilio-auth-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 2 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": "vercel",
@@ -1798,7 +2026,7 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 0
+        "differential": 30
       },
       "detectors": [
         "vercel-token"
