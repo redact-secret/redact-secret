@@ -1,8 +1,16 @@
 # Redact Secret documentation
 
-Redact Secret finds supported credential patterns in text and replaces them
-before the text reaches logs, storage, tools, or model context. JavaScript,
-Python, Rust, and the CLI share one deterministic Rust implementation.
+Redact Secret is deterministic secret detection and redaction for runtime
+data and AI context. It finds supported credential patterns in text and
+replaces them before the text reaches logs, persistence, telemetry, tool
+output, or model context. JavaScript, Python, Rust, and the CLI share one
+deterministic Rust implementation that runs locally, with no network access.
+
+Client-side scanning is preventive; server-side scanning is the authoritative
+enforcement boundary. Redact Secret is not a DLP platform, does not detect
+every secret, and complements repository and history scanners rather than
+replacing them. See the [README](../README.md#what-it-does-not-replace) and
+the generated [support matrix](support-matrix.md).
 
 ## Get started
 

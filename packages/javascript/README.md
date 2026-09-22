@@ -1,7 +1,21 @@
 # @redact-secret/core
 
-Deterministic secret detection and redaction for browser and server
-JavaScript/TypeScript applications.
+Deterministic secret detection and redaction for runtime data and AI context,
+for browser and server JavaScript/TypeScript applications.
+
+Scan text in your process before it reaches logs, persistence, telemetry,
+tool output, or model context. Detection is local and deterministic: no
+network calls, no telemetry, and the same input always gives the same result.
+Findings never include the matched secret. Browser scanning is preventive;
+the server must scan again as the authoritative enforcement boundary (see
+[safe integration](https://github.com/redact-secret/redact-secret/blob/main/docs/guides/safe-integration.md)).
+
+Redact Secret is not a DLP platform and does not detect every secret: it
+finds supported credential formats only, and an empty finding list does not
+prove text is secret-free. It complements repository and history scanners
+rather than replacing them. Per-family support is published in the generated
+[support matrix](https://github.com/redact-secret/redact-secret/blob/main/docs/support-matrix.md),
+not stated by hand here.
 
 One typed API, two artifacts: the package's `imports` map selects the Node
 N-API addon on Node.js and the browser WebAssembly build everywhere else

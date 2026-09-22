@@ -1,10 +1,22 @@
 # Redact Secret for Python
 
-Deterministic secret detection and redaction for CPython, over the same Rust
-core that backs the JavaScript, Rust, and CLI surfaces of
-[Redact Secret](https://github.com/redact-secret/redact-secret). Every built-in
-detector runs in Rust; there is no pure-Python fallback implementation to drift
-from it.
+Deterministic secret detection and redaction for runtime data and AI context,
+for CPython, over the same Rust core that backs the JavaScript, Rust, and CLI
+surfaces of [Redact Secret](https://github.com/redact-secret/redact-secret).
+Every built-in detector runs in Rust; there is no pure-Python fallback
+implementation to drift from it.
+
+Scan text in your process before it reaches logs, persistence, telemetry,
+tool output, or model context. Detection is local and deterministic: no
+network calls, no telemetry, and the same input always gives the same result.
+Findings never include the matched secret.
+
+Redact Secret is not a DLP platform and does not detect every secret: it
+finds supported credential formats only, and an empty finding list does not
+prove text is secret-free. It complements repository and history scanners
+rather than replacing them. Per-family support is published in the generated
+[support matrix](https://github.com/redact-secret/redact-secret/blob/main/docs/support-matrix.md),
+not stated by hand here.
 
 The distribution is `redact-secret` and the import name is
 `redact_secret`. The product name is `Redact Secret` everywhere; per PEP 503,

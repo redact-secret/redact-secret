@@ -1,6 +1,6 @@
 {
   "name": "@redact-secret/core",
-  "description": "Deterministic secret detection and redaction for browser and server JavaScript/TypeScript applications.",
+  "description": "Deterministic secret detection and redaction for runtime data and AI context: scans text locally before it reaches logs, storage, telemetry, tools, or model context. One API for Node.js and browsers.",
   "license": "MIT",
   "repository": {
     "type": "git",

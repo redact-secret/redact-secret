@@ -18,7 +18,7 @@ build-backend = "maturin"
 # so no registry-fallback name is needed. Recheck availability before
 # publication with `python3 scripts/check-python-package.py --recheck-pypi-name`.
 name = "redact-secret"
-description = "Deterministic secret detection and redaction (CPython binding for the redact-secret core)."
+description = "Deterministic secret detection and redaction for runtime data and AI context: scans text locally before it reaches logs, storage, telemetry, tools, or model context. CPython binding for the redact-secret core."
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"

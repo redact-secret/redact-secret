@@ -5,6 +5,20 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+### Documentation
+
+- The README, documentation home, and every registry-facing README and
+  manifest description (npm, PyPI, crates.io, CLI) now share one product
+  position: deterministic secret detection and redaction for runtime data and
+  AI context (#585). The README opens with the runtime boundary, names logs,
+  persistence, telemetry, tool output, and model context as use cases, keeps
+  client-side prevention and server-side enforcement distinct, and states
+  what the library does not replace: DLP platforms, complete secret coverage,
+  and repository/history scanners. Installation and a first working example
+  now precede the architecture, and the README's hand-maintained provider
+  list gives way to the generated support matrix. `npm run
+  product-positioning:check` keeps those surfaces from drifting apart.
+
 ## 0.1.0-beta.6 — 2026-09-22
 
 [Publication and qualification evidence](docs/releases/0.1.0-beta.6/README.md).
