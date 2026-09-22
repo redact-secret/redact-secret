@@ -173,73 +173,38 @@ stale evidence.
 
 The manually triggered
 [`Complete assessment`](../.github/workflows/complete-assessment.yml) workflow
-builds and installs the real artifacts, runs this command, places the Markdown
-baseline in the workflow summary, and uploads the complete output directory.
-It publishes nothing and is not a release gate.
+builds and installs the real artifacts, runs this command as a smoke check,
+places the Markdown baseline in the workflow summary, and uploads the output
+directory. It publishes nothing, performs no acceptance judgement, and is not
+a release gate.
 
-## Fixed RC performance and resource acceptance
+## Performance results, criteria, and judgement moved to redact-secret-benchmarks
 
-[`acceptance-criteria.json`](./acceptance-criteria.json) fixes the RC
-criteria before candidate measurement. Its performance and resource
-thresholds were derived once, from the first complete baseline at commit
-`a356e702e59b03cf297e0af15ba0423bc8466d48`, and have not changed since. Its
-`baseline` pointer and pinned accuracy counts are re-pinned whenever the
-accuracy corpus moves to a new reviewed revision, so a candidate built from
-the current corpus is not rejected on a stale identity mismatch before any
-timing threshold is even checked; the criteria currently point at the
-five-repetition run at commit `944341903d5b85686a056d3218f4c33110d7d57b`
-(accuracy corpus version `3`, hash
-`438df062ddde47dcb32ae0aefc4297ed8b8c9e2c3270778c2b1f8809e40bd0dd`),
-committed under [`results/complete-v4/`](./results/complete-v4/). The prior
-pin, at commit `9359f59596f03443254f662db60d553b0610809e` (accuracy corpus
-hash `cc4cb42028fd700bc98dd06dacebe421c5462dd59a46cf013154a4d185849979`), was
-pruned by [#594](https://github.com/redact-secret/redact-secret/issues/594)
-and remains as historical evidence at
-[`results/complete-v3/`](https://github.com/redact-secret/redact-secret/tree/6cd5f2c58e527396563d86d8caba98104a93a17c/assessment/results/complete-v3)
-(the fixed 15-run macOS baseline that `complete-v4` re-pinned).
-`results/complete-v4/` re-pins the accuracy identity only, after the beta.5
-precision gate ([#376](https://github.com/redact-secret/redact-secret/issues/376))
-corrected four accuracy-corpus fixtures to the seven provider contracts
-frozen by [#367](https://github.com/redact-secret/redact-secret/issues/367);
-see [`results/complete-v4/README.md`](./results/complete-v4/README.md) for
-why its own performance/resource acceptance intentionally still reports
-`rejected` in that directory's committed evidence, and why the performance
-thresholds below are unchanged by that gate. They cover the two
-representative log-processing profiles: 64 KiB whole-input and 256 KiB
-fixed-4096 incremental input (standard input for the CLI). Five repetitions
-are required so a two-sample exploratory baseline cannot be mistaken for
-formal acceptance evidence.
+Per
+[`decision-move-performance-results-criteria-and-judgement-to-benchmarks`](../docs/decisions/2026-09-22-move-performance-results-criteria-and-judgement-to-benchmarks.md)
+(issue [#603](https://github.com/redact-secret/redact-secret/issues/603);
+DS11), this directory keeps only measurement tooling: the five runners above,
+the result schema, the workload generator and profiles, and the accuracy
+corpus. `git ls-files assessment/results` is intentionally empty.
+[`redact-secret-benchmarks`](https://github.com/redact-secret/redact-secret-benchmarks)
+now owns performance results, RC acceptance criteria, threshold recalibration,
+judgement, and publication, via
+[benchmarks issue #136](https://github.com/redact-secret/redact-secret-benchmarks/issues/136),
+which runs this repository's `npm run assessment:all` at a pinned core
+revision and evaluates the result against criteria it holds. **Linux x86_64
+is the only official performance profile going forward; the macOS arm64
+profile this section previously fixed is retired.**
 
-The environment profile is deliberately narrow: macOS on arm64/aarch64, Node
-22, Chromium, CPython 3, and the host Rust toolchain. This is the environment
-the first measurements characterize. Evidence from another OS, architecture,
-Node major, or browser engine remains useful assessment evidence, but it cannot
-silently claim these host-qualified thresholds. Add and baseline a separately
-reviewed environment profile before accepting one.
-
-Timing ceilings are approximately twice the first observed p95, rounded upward
-to stable operational values; throughput floors are approximately half the
-first observed minimum, rounded downward. The margin accommodates ordinary
-host jitter while still detecting a material regression. Memory caps likewise
-round upward from observed maxima with category-specific headroom. Only a
-category the surface can observe is capped: Rust and CLI process RSS, Python
-allocator plus process RSS, Node heap/RSS/external memory, and Chromium's
-coarsened JavaScript heap observation. These categories can overlap and must
-not be summed. WebAssembly linear memory and retained streaming buffers remain
-unobservable without widening the product contract, so their explicit
-unavailability is preserved rather than converted to a zero or an invented
-limit.
-
-The accuracy counts are pinned to the first baseline only as a no-drift check
-across all five artifacts. This performance/resource decision does not convert
-the assessment corpus into a conformance gate or approve its known accuracy
-mismatches.
-
-After producing a fresh five-repetition complete assessment from one candidate
-revision, evaluate it with:
+`acceptance.ts`'s `evaluateAcceptance` and `validateAcceptanceCriteria` stay
+in core as reusable evaluation tooling — see
+[`acceptance.test.ts`](./acceptance.test.ts) for its synthetic-fixture
+coverage — but core no longer ships or commits a criteria document of its
+own. Evaluate a complete assessment against an externally supplied criteria
+document with:
 
 ```bash
 npm run assessment:acceptance -- \
+  --criteria <path-to-a-criteria-document> \
   --summary assessment-output/summary.json \
   --json-out assessment-output/acceptance.json \
   --markdown-out assessment-output/acceptance.md
@@ -248,27 +213,20 @@ npm run assessment:acceptance -- \
 The command validates completeness, repetitions, corpus identities, the host
 profile, accuracy parity, timing, throughput, and observable memory. It writes
 machine-readable and Markdown evidence before exiting non-zero on rejection.
-The manually triggered workflow runs the same command and uploads both the raw
-assessment and acceptance result. This readiness evidence does not select a
-version or authorize tagging, publication, deployment, or release.
+This readiness evidence does not select a version or authorize tagging,
+publication, deployment, or release.
 
-The first formal candidate evaluation used the already-fixed criteria from
-commit `054076f` and five repetitions, with all 46 timing, throughput, and
-observable-memory checks passing. It was committed under
-`results/acceptance/`, linking its complete machine-readable summary and all
-15 per-surface raw results and reports;
-[#594](https://github.com/redact-secret/redact-secret/issues/594) pruned that
-directory, which remains as historical evidence at
-[`results/acceptance/`](https://github.com/redact-secret/redact-secret/tree/6cd5f2c58e527396563d86d8caba98104a93a17c/assessment/results/acceptance).
-
-The first durable run of that command was committed as
-`results/complete/baseline.md` and `results/complete/summary.json`; #594
-pruned it too, and it remains as historical evidence at
-[`results/complete/`](https://github.com/redact-secret/redact-secret/tree/6cd5f2c58e527396563d86d8caba98104a93a17c/assessment/results/complete).
-The criteria file's baseline was later re-pinned to the five-repetition run
-under `results/complete-v3/` (also pruned; see above), then to the current
-`results/complete-v4/` pin described above. Use a new output directory when
-reproducing so stale files cannot satisfy a run.
+The historical macOS RC criteria and their pinned baselines
+(`results/complete-v4/`, `results/complete-v3/`, `results/complete/`,
+`results/acceptance/`) and the historical Linux x86_64 criteria and baselines
+(`results/complete-linux-x64-v4/`, `results/complete-linux-x64-v3/`,
+`results/complete-linux-x64/`) were removed by
+[#603](https://github.com/redact-secret/redact-secret/issues/603) and remain
+as historical evidence at the pre-removal commit:
+[`assessment/`](https://github.com/redact-secret/redact-secret/tree/de6add470321f40d7b1cb36808d9f4559e6c2e99/assessment)
+(`acceptance-criteria.json`, `acceptance-criteria-linux-x64.json`, and
+`results/`). Use a new output directory when reproducing a fresh run so stale
+files cannot satisfy it.
 
 To choose another bounded profile, repeat `--profile`; include at least one
 `whole` and one non-`whole` profile or the rollup is incomplete. Other useful
@@ -286,89 +244,6 @@ npm run assessment:rust:performance -- --profile scale-logs-medium-fixed4096 --r
 npm run assessment:python:performance -- --python .venv/bin/python --profile scale-logs-medium-fixed4096 --runs 2
 npm run assessment:cli:performance -- --binary target/release/redact-secret --profile scale-logs-medium-fixed4096 --runs 2
 ```
-
-### A second environment profile: Linux x86_64
-
-`AcceptanceCriteria.environment` is a single, criteria-file-scoped block, so a
-second host is added as a second, independently loaded criteria document
-rather than by widening that type into a multi-profile lookup: this can never
-silently overwrite or ambiguate the macOS profile's already-fixed values, and
-`assessment-acceptance.mjs` already accepted `--criteria <path>` before this
-profile existed.
-
-[`acceptance-criteria-linux-x64.json`](./acceptance-criteria-linux-x64.json)
-fixes RC criteria for Linux x86_64 — the other host the release actually
-ships (npm and the CLI target Linux glibc, macOS, and Windows) — from a
-complete, five-repetition run captured by the
-[`Complete assessment`](../.github/workflows/complete-assessment.yml)
-workflow's `ubuntu-latest` runner at commit
-`9ff702001342ff84acdde8ad9acdec396572a15e`, committed under
-`results/complete-linux-x64/`;
-[#594](https://github.com/redact-secret/redact-secret/issues/594) pruned that
-directory, which remains as historical evidence at
-[`results/complete-linux-x64/`](https://github.com/redact-secret/redact-secret/tree/6cd5f2c58e527396563d86d8caba98104a93a17c/assessment/results/complete-linux-x64).
-Its performance and resource thresholds were derived once, from
-that run, and have not changed since. The criteria file's `baseline` pointer
-and pinned accuracy counts re-pin the same way as the macOS profile's above;
-they currently point at the later five-repetition `ubuntu-latest` run at
-commit
-`944341903d5b85686a056d3218f4c33110d7d57b` (accuracy corpus version `3`,
-hash `438df062ddde47dcb32ae0aefc4297ed8b8c9e2c3270778c2b1f8809e40bd0dd`),
-committed under
-[`results/complete-linux-x64-v4/`](./results/complete-linux-x64-v4/) and
-evaluated as `accepted` in
-[`results/complete-linux-x64-v4/acceptance.md`](./results/complete-linux-x64-v4/acceptance.md),
-dispatched from the beta.5 precision gate
-([#376](https://github.com/redact-secret/redact-secret/issues/376)) after it
-corrected four accuracy-corpus fixtures to the seven provider contracts
-frozen by [#367](https://github.com/redact-secret/redact-secret/issues/367);
-see [`results/complete-linux-x64-v4/README.md`](./results/complete-linux-x64-v4/README.md).
-The prior pin, at commit `9359f59596f03443254f662db60d553b0610809e` (accuracy
-corpus hash `cc4cb42028fd700bc98dd06dacebe421c5462dd59a46cf013154a4d185849979`),
-was pruned by #594 and remains as historical evidence at
-[`results/complete-linux-x64-v3/`](https://github.com/redact-secret/redact-secret/tree/6cd5f2c58e527396563d86d8caba98104a93a17c/assessment/results/complete-linux-x64-v3)
-(the fixed 15-run Linux x86_64 baseline that `complete-linux-x64-v4` re-pinned).
-Both v3 and v4 pin the same workload-profiles
-identity as the macOS profile, since that corpus is unchanged, and unlike the
-macOS profile's `complete-v4`, this Linux x86_64 evidence is fully `accepted`
-— performance thresholds pass cleanly on the qualified `ubuntu-latest` host.
-
-The environment profile is `linux-x64-node22-chromium`: Linux on x86_64, Node
-22, Chromium, CPython 3, and the host Rust toolchain — otherwise the same
-scope as the macOS profile, just the other shipped host. Timing ceilings are
-twice the observed p95, rounded up to the nearest whole millisecond below 10
-and to the nearest 5/50/100 above that; throughput floors are half the
-observed minimum, rounded down to the nearest 10,000 (or 100,000 above 1
-million) bytes per second; memory caps are 2.5x the observed maximum, rounded
-up to the nearest mebibyte — the same "generous, stable, rounded" intent as
-the macOS profile's hand-fixed values, applied as an explicit rule since this
-is a fresh profile rather than a reproduction of the first one. As with the
-macOS profile, Rust, Python, and CLI share one memory cap across both
-performance profiles per category; Node and browser WebAssembly fix a cap per
-profile (Node's external-memory category is shared, since the two profiles'
-observations were nearly identical).
-
-The [`Complete assessment`](../.github/workflows/complete-assessment.yml)
-workflow runs on `ubuntu-latest`, so its "Evaluate the fixed RC acceptance
-criteria" step passes `--criteria assessment/acceptance-criteria-linux-x64.json`
-and is evaluated against this profile, not the macOS one.
-
-Evaluate a Linux x86_64 candidate the same way as the macOS profile, pointing
-`--criteria` at the Linux document:
-
-```bash
-npm run assessment:acceptance -- \
-  --criteria assessment/acceptance-criteria-linux-x64.json \
-  --summary assessment-output-linux-x64/summary.json \
-  --json-out assessment-output-linux-x64/acceptance.json \
-  --markdown-out assessment-output-linux-x64/acceptance.md
-```
-
-The [acceptance evaluation](https://github.com/redact-secret/redact-secret/blob/6cd5f2c58e527396563d86d8caba98104a93a17c/assessment/results/complete-linux-x64/acceptance.md)
-of that same baseline run against its own freshly fixed criteria reported
-`accepted` with all 46 checks passing and no `environment-*-mismatch`
-failure, by construction: the thresholds were fixed from this run's own
-observations. (`results/complete-linux-x64/` was pruned by #594; see above.)
 
 ## Node and browser accuracy runners
 
@@ -587,13 +462,16 @@ the Rust library runner above.
 
 ## Beta.2 detection assessment
 
-[`results/beta.2/`](./results/beta.2/) records the fixed-corpus assessment for
-issue #191 against locally built, digest-identified Node and browser WebAssembly
-candidate artifacts. Its JSON rollup and Markdown report state dataset scope
-and denominators, distinguish a range mismatch from ordinary-negative false
-positives, preserve the reviewed labels, and link every mismatch to its
-detector-contract disposition. The result is readiness evidence, not a
-conformance gate or release authorization.
+`results/beta.2/` recorded the fixed-corpus assessment for issue #191 against
+locally built, digest-identified Node and browser WebAssembly candidate
+artifacts: dataset scope and denominators, a range mismatch distinguished from
+ordinary-negative false positives, the reviewed labels, and every mismatch
+linked to its detector-contract disposition. [#603](https://github.com/redact-secret/redact-secret/issues/603)
+removed it along with the rest of `results/`; it remains as historical
+evidence at
+[`results/beta.2/`](https://github.com/redact-secret/redact-secret/tree/de6add470321f40d7b1cb36808d9f4559e6c2e99/assessment/results/beta.2).
+The result was readiness evidence, not a conformance gate or release
+authorization.
 
 ## What this directory is not (yet)
 
@@ -624,14 +502,16 @@ above and must not become a second discovery benchmark.
 ## Performance build correction
 
 The historical Rust timings in
-[`complete`](https://github.com/redact-secret/redact-secret/tree/6cd5f2c58e527396563d86d8caba98104a93a17c/assessment/results/complete)
+[`complete`](https://github.com/redact-secret/redact-secret/tree/6cd5f2c58e527396563d86d8caba98104a93a17c/assessment/results/complete),
+[`complete-v3`](https://github.com/redact-secret/redact-secret/tree/6cd5f2c58e527396563d86d8caba98104a93a17c/assessment/results/complete-v3),
 and
-[`complete-v3`](https://github.com/redact-secret/redact-secret/tree/6cd5f2c58e527396563d86d8caba98104a93a17c/assessment/results/complete-v3)
-(pruned by [#594](https://github.com/redact-secret/redact-secret/issues/594))
-were collected without `--release`; their raw evidence is retained at those
-permalinks but does not support optimized cross-runtime comparisons. The
-corrected [release-profile run](results/release-profile/baseline.md) uses
-release builds.
+[`release-profile`](https://github.com/redact-secret/redact-secret/tree/de6add470321f40d7b1cb36808d9f4559e6c2e99/assessment/results/release-profile)
+(the last removed by [#603](https://github.com/redact-secret/redact-secret/issues/603);
+the first two pruned earlier by
+[#594](https://github.com/redact-secret/redact-secret/issues/594)) are
+retained at those permalinks. `complete` and `complete-v3` were collected
+without `--release` and do not support optimized cross-runtime comparisons;
+`release-profile` is the corrected run using release builds.
 The Rust runner now rejects debug performance execution, records its actual
 executable argv and build profile, and aggregation requires release provenance.
 Build time is outside the measured processing interval. CLI check-mode timings

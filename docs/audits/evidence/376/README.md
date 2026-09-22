@@ -26,6 +26,9 @@ policy-change table, and anomalies in that repository's
 This repository's own release-qualification accuracy-corpus re-pin, which
 the same gate also performed, is not benchmark measurement and is
 unaffected by this move — see
-[`assessment/results/complete-v4/README.md`](../../../../assessment/results/complete-v4/README.md)
+[`assessment/results/complete-v4/README.md`](https://github.com/redact-secret/redact-secret/blob/de6add470321f40d7b1cb36808d9f4559e6c2e99/assessment/results/complete-v4/README.md)
 and
-[`assessment/results/complete-linux-x64-v4/README.md`](../../../../assessment/results/complete-linux-x64-v4/README.md).
+[`assessment/results/complete-linux-x64-v4/README.md`](https://github.com/redact-secret/redact-secret/blob/de6add470321f40d7b1cb36808d9f4559e6c2e99/assessment/results/complete-linux-x64-v4/README.md)
+(both removed by [#603](https://github.com/redact-secret/redact-secret/issues/603);
+performance results, criteria, and judgement now belong to
+`redact-secret-benchmarks`).

@@ -16,8 +16,10 @@
 /benchmark-evidence/
 
 # Scratch output of the assessment runners (npm run assessment:all, etc.);
-# committed baselines live under assessment/results/ instead.
+# performance results, criteria, and baselines live in
+# redact-secret-benchmarks instead (issue #603).
 /assessment-output/
+/assessment-output-*/
 
 # Rust build output
 /target/

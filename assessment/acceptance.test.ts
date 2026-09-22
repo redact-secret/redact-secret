@@ -1,126 +1,151 @@
-import { createHash } from "node:crypto";
-import { existsSync, readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
 import { describe, expect, test } from "vitest";
 
 import { evaluateAcceptance, validateAcceptanceCriteria, type AcceptanceCriteria } from "./acceptance.js";
-import type { CompleteAssessment } from "./complete.js";
+import { REQUIRED_ASSESSMENT_SURFACES, type CompleteAssessment, type CompleteAssessmentRun } from "./complete.js";
+import type { AssessmentMemoryMetrics, AssessmentResult, AssessmentSurface } from "./schema.js";
 
-const HERE = dirname(fileURLToPath(import.meta.url));
-const criteria = validateAcceptanceCriteria(JSON.parse(readFileSync(join(HERE, "acceptance-criteria.json"), "utf8")) as AcceptanceCriteria);
-const baseline = JSON.parse(readFileSync(join(HERE, "results", "complete-v4", "summary.json"), "utf8")) as CompleteAssessment;
+// This file no longer reads a committed `assessment/results/` baseline or a
+// committed `assessment/acceptance-criteria*.json` document: ownership of
+// performance results, RC acceptance criteria, and judgement moved to
+// `redact-secret-benchmarks` (issue #603; DS11). `evaluateAcceptance` and
+// `validateAcceptanceCriteria` stay in core as reusable tooling, so this
+// suite exercises their code paths against synthetic criteria and a
+// synthetic candidate instead of a pinned historical evidence directory.
 
-function candidate(): CompleteAssessment {
+const PROFILES = [
+  { id: "scale-logs-small-whole" },
+  { id: "scale-logs-medium-fixed4096" },
+] as const;
+
+const ACCURACY_CORPUS = { version: "1", hash: "a".repeat(64) };
+const WORKLOAD_PROFILES = { version: "1", hash: "b".repeat(64) };
+const ACCURACY = { truePositives: 1, falsePositives: 0, falseNegatives: 0, policyMismatches: 0 };
+
+function memory(overrides: Partial<Record<keyof AssessmentMemoryMetrics, readonly { baselineBytes: number; maximumObservedBytes: number }[]>> = {}): AssessmentMemoryMetrics {
+  const unavailable = { unit: "bytes" as const, samples: [], unavailableReason: "not available", samplingLimit: "no samples" };
+  const categories: (keyof AssessmentMemoryMetrics)[] = [
+    "nodeHeap", "nodeRss", "nodeExternal", "browserJsHeap",
+    "wasmLinearMemory", "pythonHeap", "processRss", "streamingBuffer",
+  ];
+  return Object.fromEntries(categories.map((category) => {
+    const samples = overrides[category];
+    return [category, samples === undefined ? unavailable : {
+      unit: "bytes" as const, samples, samplingLimit: "sampled at process boundaries",
+    }];
+  })) as unknown as AssessmentMemoryMetrics;
+}
+
+function environment(id: string, os: string, cpu: string, runtime: string) {
   return {
-    ...baseline,
-    repetitions: criteria.minimumRepetitions,
-    runs: baseline.runs.map((run) => ({
-      ...run,
-      result: run.result === undefined ? undefined : {
-        ...run.result,
-        provenance: {
-          ...run.result.provenance,
-          buildProfile: "release",
-          os: "darwin-25.5.0",
-          cpu: run.surface === "rust-core" ? "aarch64" : "arm64",
-          runtime: run.surface === "rust-core" ? "rustc-1.98.1" : run.surface === "python" ? "cpython-3.14.7" : run.surface === "node" ? "node-22.16.0" : run.surface === "browser-wasm" ? "chromium-153" : "rustc 1.98.1",
-        },
-        performance: run.result.performance === undefined ? undefined : {
-          ...run.result.performance,
-          initialization: { ...run.result.performance.initialization, samples: Array(criteria.minimumRepetitions).fill(run.result.performance.initialization.median) },
-          processing: { ...run.result.performance.processing, samples: Array(criteria.minimumRepetitions).fill(run.result.performance.processing.median) },
-          throughput: { ...run.result.performance.throughput, samples: Array(criteria.minimumRepetitions).fill(run.result.performance.throughput.median) },
-          memory: Object.fromEntries(Object.entries(run.result.performance.memory).map(([name, metric]) => [name, {
-            ...metric,
-            samples: metric.samples.length === 0 ? [] : Array(criteria.minimumRepetitions).fill(metric.samples[0]),
-          }])) as typeof run.result.performance.memory,
-        },
-      },
-    })),
+    id, osPrefixes: [os], cpus: [cpu],
+    runtimePrefixes: Object.fromEntries(REQUIRED_ASSESSMENT_SURFACES.map((surface) => [surface, [runtime]])) as Record<AssessmentSurface, readonly string[]>,
   };
 }
 
-// Dated waiver (2026-09-18, issue #415): the pinned macOS baseline
-// (results/complete-v4/) fails these exact 46-check evaluation's checks --
-// every non-Rust surface's processing-p95-ms and
-// throughput-minimum-bytes-per-second, plus two initialization-p95-ms misses
-// -- for reasons documented in results/complete-v4/README.md and
-// assessment/README.md#fixed-rc-performance-and-resource-acceptance:
-// reproduced on real hardware outside any sandbox, uniformly across five
-// independently implemented runtimes, and unrelated to the accuracy-corpus
-// re-pin that baseline otherwise supports. Listing the exact keys (rather
-// than accepting any failure whose key merely contains ":performance:") is
-// what makes "accept the representative baseline-shaped candidate" below
-// able to fail again: a further regression -- a new check going red, or the
-// checked count drifting from 46 -- changes this list and the test catches
-// it. Narrowing this list requires either the separate, deliberate
-// threshold review assessment/README.md calls for (options (a)/(b) on issue
-// #415) or, for a check that stops failing, updating this waiver to match.
-const MACOS_PERFORMANCE_WAIVER_2026_09_18: readonly string[] = [
-  "browser-wasm:performance:scale-logs-medium-fixed4096:processing-p95-ms",
-  "browser-wasm:performance:scale-logs-medium-fixed4096:throughput-minimum-bytes-per-second",
-  "browser-wasm:performance:scale-logs-small-whole:processing-p95-ms",
-  "browser-wasm:performance:scale-logs-small-whole:throughput-minimum-bytes-per-second",
-  "cli:performance:scale-logs-medium-fixed4096:initialization-p95-ms",
-  "cli:performance:scale-logs-medium-fixed4096:processing-p95-ms",
-  "cli:performance:scale-logs-medium-fixed4096:throughput-minimum-bytes-per-second",
-  "cli:performance:scale-logs-small-whole:initialization-p95-ms",
-  "cli:performance:scale-logs-small-whole:processing-p95-ms",
-  "cli:performance:scale-logs-small-whole:throughput-minimum-bytes-per-second",
-  "node:performance:scale-logs-medium-fixed4096:initialization-p95-ms",
-  "node:performance:scale-logs-medium-fixed4096:processing-p95-ms",
-  "node:performance:scale-logs-medium-fixed4096:throughput-minimum-bytes-per-second",
-  "node:performance:scale-logs-small-whole:processing-p95-ms",
-  "node:performance:scale-logs-small-whole:throughput-minimum-bytes-per-second",
-  "python:performance:scale-logs-medium-fixed4096:initialization-p95-ms",
-  "python:performance:scale-logs-medium-fixed4096:processing-p95-ms",
-  "python:performance:scale-logs-medium-fixed4096:throughput-minimum-bytes-per-second",
-  "python:performance:scale-logs-small-whole:processing-p95-ms",
-  "python:performance:scale-logs-small-whole:throughput-minimum-bytes-per-second",
-];
+function accuracyResult(surface: AssessmentSurface, os: string, cpu: string, runtime: string): AssessmentResult {
+  return {
+    schemaVersion: "3", surface, profileId: "accuracy-corpus",
+    accuracy: { ...ACCURACY },
+    provenance: {
+      commit: "2".repeat(40), artifactIdentity: `${surface}@synthetic`,
+      corpusVersion: ACCURACY_CORPUS.version, corpusHash: ACCURACY_CORPUS.hash,
+      os, cpu, runtime, command: `synthetic-${surface}-accuracy`, buildProfile: "release",
+    },
+  };
+}
 
-describe("fixed RC acceptance criteria", () => {
-  test("criteria are bound to the reviewed baseline", () => {
-    expect(criteria.baseline.sourceCommit).toBe(baseline.sourceCommit);
-    expect(criteria.baseline.accuracyCorpusVersion).toBe(baseline.accuracyCorpus?.version);
-    expect(criteria.baseline.accuracyCorpusHash).toBe(baseline.accuracyCorpus?.hash);
-    expect(criteria.baseline.workloadProfilesVersion).toBe(baseline.workloadProfiles?.version);
-    expect(criteria.baseline.workloadProfilesHash).toBe(baseline.workloadProfiles?.hash);
+function performanceResult(surface: AssessmentSurface, profileId: string, os: string, cpu: string, runtime: string, repetitions: number): AssessmentResult {
+  const fill = (value: number) => Array(repetitions).fill(value) as number[];
+  return {
+    schemaVersion: "3", surface, profileId,
+    performance: {
+      initialization: { unit: "milliseconds", samples: fill(1), minimum: 1, median: 1, p95: 2, maximum: 2, mean: 1, standardDeviation: 0.5 },
+      processing: { unit: "milliseconds", samples: fill(3), minimum: 3, median: 3, p95: 4, maximum: 4, mean: 3, standardDeviation: 0.5 },
+      throughput: { unit: "bytes-per-second", samples: fill(6), minimum: 6, median: 6, p95: 7, maximum: 7, mean: 6, standardDeviation: 0.5 },
+      memory: memory({ processRss: fill(0).map(() => ({ baselineBytes: 500, maximumObservedBytes: 1000 })) }),
+    },
+    provenance: {
+      commit: "2".repeat(40), artifactIdentity: `${surface}@synthetic`,
+      corpusVersion: WORKLOAD_PROFILES.version, corpusHash: WORKLOAD_PROFILES.hash,
+      os, cpu, runtime, command: `synthetic-${surface}-${profileId}`,
+      buildProfile: "release",
+    },
+  };
+}
+
+function candidate(os: string, cpu: string, runtime: string, repetitions = 2): CompleteAssessment {
+  const runs: CompleteAssessmentRun[] = REQUIRED_ASSESSMENT_SURFACES.flatMap((surface) => [
+    {
+      surface, kind: "accuracy" as const, profileId: "accuracy-corpus", path: "whole-input" as const, status: "complete" as const,
+      resultPath: `${surface}/accuracy.json`, markdownPath: `${surface}/accuracy.md`,
+      result: accuracyResult(surface, os, cpu, runtime),
+    },
+    ...PROFILES.map((profile) => ({
+      surface, kind: "performance" as const, profileId: profile.id, path: "whole-input" as const, status: "complete" as const,
+      resultPath: `${surface}/${profile.id}.json`, markdownPath: `${surface}/${profile.id}.md`,
+      result: performanceResult(surface, profile.id, os, cpu, runtime, repetitions),
+    })),
+  ]);
+  return {
+    schemaVersion: "1", status: "complete", sourceCommit: "2".repeat(40),
+    accuracyCorpus: ACCURACY_CORPUS, workloadProfiles: WORKLOAD_PROFILES,
+    repetitions, performanceProfiles: PROFILES.map((profile) => ({ id: profile.id, chunkProfile: "whole" })),
+    requiredSurfaces: REQUIRED_ASSESSMENT_SURFACES, runs, validationFailures: [],
+  };
+}
+
+function criteria(id: string, os: string, cpu: string, runtime: string): AcceptanceCriteria {
+  return validateAcceptanceCriteria({
+    schemaVersion: "1", criteriaId: id, fixedAt: "2026-09-22",
+    baseline: {
+      summaryPath: "assessment-output/summary.json", sourceCommit: "2".repeat(40),
+      accuracyCorpusVersion: ACCURACY_CORPUS.version, accuracyCorpusHash: ACCURACY_CORPUS.hash,
+      workloadProfilesVersion: WORKLOAD_PROFILES.version, workloadProfilesHash: WORKLOAD_PROFILES.hash,
+    },
+    minimumRepetitions: 2,
+    environment: environment(id, os, cpu, runtime),
+    accuracy: { ...ACCURACY },
+    performance: REQUIRED_ASSESSMENT_SURFACES.flatMap((surface) => PROFILES.map((profile) => ({
+      surface, profileId: profile.id,
+      maxInitializationP95Ms: 10, maxProcessingP95Ms: 10, minThroughputBytesPerSecond: 1,
+      memoryCapsBytes: { processRss: 10_000 },
+    }))),
+  });
+}
+
+const PROFILE_A = criteria("env-a", "test-os-a", "test-cpu-a", "test-runtime-a");
+const PROFILE_B = criteria("env-b", "test-os-b", "test-cpu-b", "test-runtime-b");
+const CANDIDATE_A = candidate("test-os-a", "test-cpu-a", "test-runtime-a");
+const CANDIDATE_B = candidate("test-os-b", "test-cpu-b", "test-runtime-b");
+
+describe("acceptance criteria", () => {
+  test("is a separately identified, separately loaded profile that does not touch a second one", () => {
+    expect(PROFILE_A.criteriaId).not.toBe(PROFILE_B.criteriaId);
+    expect(PROFILE_A.environment.id).not.toBe(PROFILE_B.environment.id);
   });
 
-  test("accept the representative baseline-shaped candidate's accuracy and identity against the dated macOS performance waiver", () => {
-    // This asserts the pinned baseline is a correct accuracy-and-identity
-    // reference -- the thing a corpus re-pin actually changes -- while still
-    // holding every performance check to account, via
-    // MACOS_PERFORMANCE_WAIVER_2026_09_18 above, rather than waving through
-    // any failure merely because its key contains ":performance:".
-    const evaluation = evaluateAcceptance(candidate(), criteria);
-    const nonPerformanceFailures = evaluation.failures.filter((failure) => !failure.includes(":performance:"));
-    expect(nonPerformanceFailures).toEqual([]);
-    expect(evaluation.checks).toHaveLength(46);
-    const failingCheckKeys = evaluation.checks.filter((item) => !item.passed).map((item) => item.key).sort();
-    expect(failingCheckKeys).toEqual(MACOS_PERFORMANCE_WAIVER_2026_09_18);
+  test("an in-spec candidate is accepted", () => {
+    const evaluation = evaluateAcceptance(CANDIDATE_A, PROFILE_A);
+    expect(evaluation.status).toBe("accepted");
+    expect(evaluation.failures).toEqual([]);
+    expect(evaluation.checks).toHaveLength(REQUIRED_ASSESSMENT_SURFACES.length * PROFILES.length * 4);
+    expect(evaluation.checks.every((item) => item.passed)).toBe(true);
   });
 
   test("a rust-core performance run built without --release cannot bypass release-build evidence", () => {
-    // Deliberately constructed, not read from whichever baseline directory
-    // happens to be pinned: this must hold regardless of whether that
-    // directory's own historical rust-core provenance happens to predate
-    // this check.
-    const input = candidate();
-    const index = input.runs.findIndex((run) => run.surface === "rust-core" && run.kind === "performance" && run.profileId === "scale-logs-small-whole");
+    const input = candidate("test-os-a", "test-cpu-a", "test-runtime-a");
     const runs = [...input.runs];
+    const index = runs.findIndex((run) => run.surface === "rust-core" && run.kind === "performance" && run.profileId === "scale-logs-small-whole");
     const result = runs[index].result!;
     runs[index] = { ...runs[index], result: { ...result, provenance: { ...result.provenance, buildProfile: undefined } } };
-    const evaluation = evaluateAcceptance({ ...input, runs }, criteria);
+    const evaluation = evaluateAcceptance({ ...input, runs }, PROFILE_A);
     expect(evaluation.status).toBe("rejected");
     expect(evaluation.failures).toContain("rust-core:performance:scale-logs-small-whole:release-build-required");
-    expect(evaluation.checks.some(c => c.key.startsWith("rust-core:performance:scale-logs-small-whole"))).toBe(false);
+    expect(evaluation.checks.some((item) => item.key.startsWith("rust-core:performance:scale-logs-small-whole"))).toBe(false);
   });
 
   test("rejects performance, resource, environment, and accuracy regressions", () => {
-    const input = candidate();
+    const input = candidate("test-os-a", "test-cpu-a", "test-runtime-a");
     const runs = [...input.runs];
     const index = runs.findIndex((run) => run.surface === "node" && run.profileId === "scale-logs-small-whole");
     const result = runs[index].result!;
@@ -128,14 +153,11 @@ describe("fixed RC acceptance criteria", () => {
       ...runs[index],
       result: {
         ...result,
-        provenance: { ...result.provenance, cpu: "x64" },
+        provenance: { ...result.provenance, cpu: "unexpected-cpu" },
         performance: {
           ...result.performance!,
           processing: { ...result.performance!.processing, p95: 999 },
-          memory: {
-            ...result.performance!.memory,
-            nodeRss: { ...result.performance!.memory.nodeRss, samples: [] },
-          },
+          memory: { ...result.performance!.memory, processRss: { ...result.performance!.memory.processRss, samples: [] } },
         },
       },
     };
@@ -144,91 +166,34 @@ describe("fixed RC acceptance criteria", () => {
       ...runs[accuracyIndex],
       result: { ...runs[accuracyIndex].result!, accuracy: { ...runs[accuracyIndex].result!.accuracy!, policyMismatches: 1 } },
     };
-    const evaluation = evaluateAcceptance({ ...input, runs }, criteria);
+    const evaluation = evaluateAcceptance({ ...input, runs }, PROFILE_A);
     expect(evaluation.status).toBe("rejected");
     expect(evaluation.failures).toContain("node:performance:scale-logs-small-whole:environment-cpu-mismatch");
     expect(evaluation.failures).toContain("node:performance:scale-logs-small-whole:processing-p95-ms:threshold-not-met");
-    expect(evaluation.failures).toContain("node:performance:scale-logs-small-whole:memory-nodeRss:insufficient-samples");
+    expect(evaluation.failures).toContain("node:performance:scale-logs-small-whole:memory-processRss:insufficient-samples");
     expect(evaluation.failures).toContain("python:accuracy:accuracy-corpus:policyMismatches-mismatch");
   });
 
   test("rejects incomplete, under-repeated, or identity-drifted evidence", () => {
-    const input = candidate();
+    const input = candidate("test-os-a", "test-cpu-a", "test-runtime-a");
     const evaluation = evaluateAcceptance({
       ...input,
       status: "incomplete",
-      repetitions: 2,
+      repetitions: 1,
       workloadProfiles: { version: "1", hash: "f".repeat(64) },
-    }, criteria);
+    }, PROFILE_A);
     expect(evaluation.failures).toContain("suite:assessment-incomplete");
     expect(evaluation.failures).toContain("suite:insufficient-repetitions");
     expect(evaluation.failures).toContain("suite:workload-profile-identity-mismatch");
   });
-});
 
-const linuxCriteria = validateAcceptanceCriteria(JSON.parse(readFileSync(join(HERE, "acceptance-criteria-linux-x64.json"), "utf8")) as AcceptanceCriteria);
-const linuxBaseline = JSON.parse(readFileSync(join(HERE, "results", "complete-linux-x64-v4", "summary.json"), "utf8")) as CompleteAssessment;
+  test("a candidate shaped for one environment profile cannot silently satisfy another", () => {
+    const crossedToB = evaluateAcceptance(CANDIDATE_A, PROFILE_B);
+    expect(crossedToB.status).toBe("rejected");
+    expect(crossedToB.failures.some((failure) => failure.endsWith(":environment-os-mismatch"))).toBe(true);
 
-describe("fixed RC acceptance criteria — Linux x86_64", () => {
-  test("is a separately identified, separately loaded profile that leaves the macOS criteria untouched", () => {
-    expect(linuxCriteria.criteriaId).not.toBe(criteria.criteriaId);
-    expect(linuxCriteria.environment.id).not.toBe(criteria.environment.id);
-    expect(criteria.environment.id).toBe("macos-arm64-node22-chromium");
-    expect(linuxCriteria.environment.id).toBe("linux-x64-node22-chromium");
-    expect(linuxCriteria.environment.osPrefixes).toEqual(["linux-"]);
-    expect(linuxCriteria.environment.cpus).toEqual(["x86_64", "x64"]);
-  });
-
-  test("criteria are bound to the committed Linux x86_64 baseline run", () => {
-    expect(linuxCriteria.baseline.sourceCommit).toBe(linuxBaseline.sourceCommit);
-    expect(linuxCriteria.baseline.accuracyCorpusVersion).toBe(linuxBaseline.accuracyCorpus?.version);
-    expect(linuxCriteria.baseline.accuracyCorpusHash).toBe(linuxBaseline.accuracyCorpus?.hash);
-    expect(linuxCriteria.baseline.workloadProfilesVersion).toBe(linuxBaseline.workloadProfiles?.version);
-    expect(linuxCriteria.baseline.workloadProfilesHash).toBe(linuxBaseline.workloadProfiles?.hash);
-    expect(linuxBaseline.status).toBe("complete");
-    expect(linuxBaseline.repetitions).toBe(linuxCriteria.minimumRepetitions);
-    expect(linuxBaseline.runs).toHaveLength(15);
-
-    const evidenceRoot = join(HERE, "results", "complete-linux-x64-v4");
-    const evaluation = JSON.parse(readFileSync(join(evidenceRoot, "acceptance.json"), "utf8")) as { status: string; environmentId: string; checks: readonly { passed: boolean }[]; failures: readonly string[] };
-    expect(evaluation.status).toBe("accepted");
-    expect(evaluation.environmentId).toBe("linux-x64-node22-chromium");
-    expect(evaluation.checks).toHaveLength(46);
-    expect(evaluation.checks.every((item) => item.passed)).toBe(true);
-    expect(evaluation.failures).toEqual([]);
-    for (const run of linuxBaseline.runs) {
-      expect(join(evidenceRoot, run.resultPath)).toSatisfy(existsSync);
-      expect(join(evidenceRoot, run.markdownPath)).toSatisfy(existsSync);
-      if (run.mismatchesPath !== undefined) expect(join(evidenceRoot, run.mismatchesPath)).toSatisfy(existsSync);
-    }
-  });
-
-  test("the macOS-shaped candidate cannot silently satisfy the Linux profile", () => {
-    const evaluation = evaluateAcceptance(candidate(), linuxCriteria);
-    expect(evaluation.status).toBe("rejected");
-    expect(evaluation.failures.some((failure) => failure.endsWith(":environment-os-mismatch"))).toBe(true);
-  });
-
-  test("the Linux-shaped baseline cannot silently satisfy the macOS profile", () => {
-    const evaluation = evaluateAcceptance({ ...linuxBaseline, repetitions: criteria.minimumRepetitions }, criteria);
-    expect(evaluation.status).toBe("rejected");
-    expect(evaluation.failures.some((failure) => failure.endsWith(":environment-os-mismatch"))).toBe(true);
-  });
-
-  test("the Complete assessment workflow names the criteria file matching its runs-on host", () => {
-    const workflow = readFileSync(join(HERE, "..", ".github", "workflows", "complete-assessment.yml"), "utf8");
-    expect(workflow).toMatch(/^\s*runs-on:\s*ubuntu-latest\s*$/m);
-    expect(workflow).toContain("--criteria assessment/acceptance-criteria-linux-x64.json");
-    expect(linuxCriteria.environment.osPrefixes).toContain("linux-");
-  });
-});
-
-describe("accuracy corpus identity pin does not drift from the live corpus", () => {
-  test("both criteria files pin the current accuracy-corpus.json hash", () => {
-    const liveCorpusHash = createHash("sha256")
-      .update(readFileSync(join(HERE, "fixtures", "accuracy-corpus.json")))
-      .digest("hex");
-    expect(criteria.baseline.accuracyCorpusHash).toBe(liveCorpusHash);
-    expect(linuxCriteria.baseline.accuracyCorpusHash).toBe(liveCorpusHash);
+    const crossedToA = evaluateAcceptance(CANDIDATE_B, PROFILE_A);
+    expect(crossedToA.status).toBe("rejected");
+    expect(crossedToA.failures.some((failure) => failure.endsWith(":environment-os-mismatch"))).toBe(true);
   });
 });

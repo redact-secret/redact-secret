@@ -10,11 +10,14 @@ precision, recall, or detector-count claim.
 
 ## Measured corpus and artifact identity
 
-The committed [v4 assessment](../../assessment/results/complete-v4/summary.json)
-contains 18 hand-reviewed synthetic whole-input fixtures, 26 expected findings,
-and 3 expected-empty fixtures. All five surfaces (Rust, Python, Node, browser
-WebAssembly, CLI) produced the same accuracy result. This is evidence from
-source `944341903d5b85686a056d3218f4c33110d7d57b`, not a measurement of any
+The [v4 assessment](https://github.com/redact-secret/redact-secret/blob/de6add470321f40d7b1cb36808d9f4559e6c2e99/assessment/results/complete-v4/summary.json)
+(removed from the working tree by [#603](https://github.com/redact-secret/redact-secret/issues/603);
+performance results, criteria, and judgement now belong to
+`redact-secret-benchmarks`) contains 18 hand-reviewed synthetic whole-input
+fixtures, 26 expected findings, and 3 expected-empty fixtures. All five
+surfaces (Rust, Python, Node, browser WebAssembly, CLI) produced the same
+accuracy result. This is evidence from source
+`944341903d5b85686a056d3218f4c33110d7d57b`, not a measurement of any
 published package. Accuracy corpus version `3` has SHA-256
 `438df062ddde47dcb32ae0aefc4297ed8b8c9e2c3270778c2b1f8809e40bd0dd`.
 
@@ -29,13 +32,14 @@ published package. Accuracy corpus version `3` has SHA-256
 The one extra Bearer finding covers the credential value, while the expected
 range includes the `Bearer` scheme. This single range disagreement contributes
 both one FP and one FN; it is not a false alarm in an ordinary-negative file.
-The [safe mismatch records](../../assessment/results/complete-v4/rust-core/accuracy-corpus-mismatches.json)
+The [safe mismatch records](https://github.com/redact-secret/redact-secret/blob/de6add470321f40d7b1cb36808d9f4559e6c2e99/assessment/results/complete-v4/rust-core/accuracy-corpus-mismatches.json)
 contain only metadata and offsets.
 
 The remaining misses are two shortened GitHub tokens, a shortened AWS access
 key, and the unsupported contextual setting name `seed`. Their
-[dispositions](../../assessment/results/beta.2/README.md) remain documented
-scope and contract choices. Labels were not changed to improve the score.
+[dispositions](https://github.com/redact-secret/redact-secret/blob/de6add470321f40d7b1cb36808d9f4559e6c2e99/assessment/results/beta.2/README.md)
+remain documented scope and contract choices. Labels were not changed to
+improve the score.
 
 These fractions are not precision, recall, or accuracy estimates for production
 traffic or arbitrary secrets. The fixtures were selected for reviewable boundary
@@ -59,11 +63,14 @@ and
 (pruned from the working tree by
 [#594](https://github.com/redact-secret/redact-secret/issues/594)) used a
 debug build and is unsuitable for optimized cross-runtime comparison. The
-[corrected release-build run](../../assessment/results/release-profile/baseline.md)
+[corrected release-build run](https://github.com/redact-secret/redact-secret/blob/de6add470321f40d7b1cb36808d9f4559e6c2e99/assessment/results/release-profile/baseline.md)
+(removed by [#603](https://github.com/redact-secret/redact-secret/issues/603))
 records a separate current-checkout measurement; see its source and artifact
 provenance before comparing it with historical accuracy. CLI performance is
 check mode; the other surfaces scan and redact. Timing is environment-bound
-and is not detection reliability.
+and is not detection reliability. Performance results, criteria, and
+judgement now belong to
+[`redact-secret-benchmarks`](https://github.com/redact-secret/redact-secret-benchmarks).
 
 ## Historical evidence and reproduction
 
