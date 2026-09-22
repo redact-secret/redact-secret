@@ -1,7 +1,7 @@
 //! Cloudflare scannable API token detection.
 //!
 //! The reviewed grammar (issue #373, following the frozen precision
-//! contract from issue #367, `docs/audits/evidence/367/precision-contracts.json`,
+//! contract from issue #367, `docs/contracts/precision/precision-contracts.json`,
 //! `families.cloudflare-token`) is `cfut_[A-Za-z0-9]{40}[0-9a-f]{8}`:
 //! Cloudflare's token documentation and creation flow establish the `cfut_`
 //! prefix and a 40-character alphanumeric body; trufflehog 3.97.4's
@@ -33,7 +33,7 @@
 //! Cloudflare's `cfat_` (account token) namespace shares this exact
 //! `[40 characters][checksum]` shape (issue #481, following the frozen
 //! precision contract from issue #367,
-//! `docs/audits/evidence/367/precision-contracts.json`,
+//! `docs/contracts/precision/precision-contracts.json`,
 //! `families.cloudflare-token`): the provider's token-formats page
 //! documents `cfat_` with the identical `cfat_[40 characters][checksum]`
 //! format cell as `cfut_`, and trufflehog 3.97.4's `cloudflareapitoken` v2
@@ -50,7 +50,7 @@
 //! 37-45-character hex key, not the new scannable format. Freezing a
 //! grammar for `cfk_` without that corroboration would be a guess rather
 //! than a reviewed contract, so it stays excluded here, split into issue
-//! #486 (see `docs/audits/evidence/367/precision-contracts.json`,
+//! #486 (see `docs/contracts/precision/precision-contracts.json`,
 //! `families.cloudflare-token.pending`).
 //!
 //! The legacy unprefixed 40-character alphanumeric token and 37-45-character

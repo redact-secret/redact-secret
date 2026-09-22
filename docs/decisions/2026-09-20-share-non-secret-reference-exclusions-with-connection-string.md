@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Share generic-token's interpolation and environment-reference exclusions with connection-string's password check
 decided_at: 2026-09-20
+spec: contextual-detection
 ---
 
 # Share generic-token's interpolation and environment-reference exclusions with connection-string's password check

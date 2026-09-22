@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Exclude unquoted source-code expressions from generic-token's contextual values
 decided_at: 2026-09-16
+spec: contextual-detection
 ---
 
 # Exclude unquoted source-code expressions from generic-token's contextual values

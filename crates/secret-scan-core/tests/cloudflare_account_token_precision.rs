@@ -2,7 +2,7 @@
 //! through the public API exactly as the issue's own measurement did.
 //!
 //! `cfat_` is adopted into the reviewed `cloudflare-token` contract (issue
-//! #367/#373, `docs/audits/evidence/367/precision-contracts.json`,
+//! #367/#373, `docs/contracts/precision/precision-contracts.json`,
 //! `families.cloudflare-token`) at the same shape as `cfut_`: the
 //! provider's token-formats page documents both prefixes with the identical
 //! `[40 characters][checksum]` format cell, and trufflehog 3.97.4's

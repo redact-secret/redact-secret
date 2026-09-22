@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Resolve overlap precedence by resolved-action severity
 decided_at: 2026-09-19
+spec: engine
 ---
 
 # Resolve overlap precedence by resolved-action severity

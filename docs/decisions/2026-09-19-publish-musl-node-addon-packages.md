@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Publish the musl Node addon packages
 decided_at: 2026-09-19
+spec: distribution
 ---
 
 # Publish the musl Node addon packages

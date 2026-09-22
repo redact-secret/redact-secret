@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Exclude repeated-character filler and whole-value placeholder vocabulary from bearer-token
 decided_at: 2026-09-20
+spec: detector-families
 ---
 
 # Exclude repeated-character filler and whole-value placeholder vocabulary from bearer-token

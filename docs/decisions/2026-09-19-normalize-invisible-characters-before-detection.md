@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Normalize invisible characters before detection
 decided_at: 2026-09-19
+spec: engine
 ---
 
 # Normalize invisible characters before detection

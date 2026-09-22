@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: connection-string and jwt need no incremental retention hint of their own
 decided_at: 2026-09-20
+spec: detector-families
 ---
 
 # connection-string and jwt need no incremental retention hint of their own

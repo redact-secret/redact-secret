@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Define the cross-language evaluation protocol
 decided_at: 2026-09-12
+spec: evidence-and-gates
 ---
 
 # Define the cross-language evaluation protocol

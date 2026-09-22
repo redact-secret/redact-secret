@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Enforce OpenGrep in CI as a required, SARIF-integrated gate
 decided_at: 2026-09-10
+spec: evidence-and-gates
 ---
 
 # Enforce OpenGrep in CI as a required, SARIF-integrated gate

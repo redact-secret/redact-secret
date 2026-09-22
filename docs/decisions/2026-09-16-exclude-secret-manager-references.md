@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Exclude secret-manager reference strings resolved at runtime
 decided_at: 2026-09-16
+spec: contextual-detection
 ---
 
 # Exclude secret-manager reference strings resolved at runtime

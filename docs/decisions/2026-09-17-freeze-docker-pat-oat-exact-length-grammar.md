@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Freeze the Docker Hub access token grammar as two separately-sized exact-length prefixed shapes
 decided_at: 2026-09-17
+spec: detector-families
 ---
 
 # Freeze the Docker Hub access token grammar as two separately-sized exact-length prefixed shapes

@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Detect a nested contextual assignment with no separator inside an enclosing quote
 decided_at: 2026-09-16
+spec: contextual-detection
 ---
 
 # Detect a nested contextual assignment with no separator inside an enclosing quote

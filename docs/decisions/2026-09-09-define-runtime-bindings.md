@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Define runtime bindings
 decided_at: 2026-09-09
+spec: engine
 ---
 
 # Define runtime bindings

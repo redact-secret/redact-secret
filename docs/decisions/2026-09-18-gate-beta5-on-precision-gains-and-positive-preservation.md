@@ -5,6 +5,7 @@ scope: workspace
 title: Gate beta.5 on precision gains and positive preservation
 decided_at: 2026-09-18
 full_record: https://github.com/redact-secret/redact-secret/blob/de6add470321f40d7b1cb36808d9f4559e6c2e99/docs/decisions/2026-09-18-gate-beta5-on-precision-gains-and-positive-preservation.md
+spec: evidence-and-gates
 ---
 
 # Gate beta.5 on precision gains and positive preservation

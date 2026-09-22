@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Freeze the New Relic User API Key and License Key grammar as an exact-length prefixed shape and a keyword-gated bare hex shape
 decided_at: 2026-09-16
+spec: detector-families
 ---
 
 # Freeze the New Relic User API Key and License Key grammar as an exact-length prefixed shape and a keyword-gated bare hex shape

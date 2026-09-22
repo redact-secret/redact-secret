@@ -2,7 +2,7 @@
 
 [Audit archive](../../README.md) ·
 [Precision-contract freeze (#367)](../../../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) ·
-[Precision contracts: `google-api-key` family](../367/precision-contracts.json) ·
+[Precision contracts: `google-api-key` family](../../../contracts/precision/precision-contracts.json) ·
 [Issue #519](https://github.com/redact-secret/redact-secret/issues/519) ·
 [Issue #501 (epic)](https://github.com/redact-secret/redact-secret/issues/501) ·
 [Issue #487 (Google OAuth credential coverage evidence, adopted here by reference)](../487/README.md) ·

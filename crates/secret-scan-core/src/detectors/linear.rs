@@ -1,7 +1,7 @@
 //! Linear API key and OAuth access token detection.
 //!
 //! The reviewed API-key grammar (issue #374, following the frozen precision
-//! contract from issue #367, `docs/audits/evidence/367/precision-contracts.json`,
+//! contract from issue #367, `docs/contracts/precision/precision-contracts.json`,
 //! `families.linear-token`) is `lin_api_[A-Za-z0-9]{40}`: gitleaks 8.30.1's
 //! `linear-api-key` and trufflehog 3.97.4's `linearapi` rules independently
 //! pin the body to an exact 40-byte alphanumeric run, with no `_`/`-`. A

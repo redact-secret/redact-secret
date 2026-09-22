@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Freeze the Slack bot token grammar as a three-section dash-separated shape
 decided_at: 2026-09-17
+spec: detector-families
 ---
 
 # Freeze the Slack bot token grammar as a three-section dash-separated shape

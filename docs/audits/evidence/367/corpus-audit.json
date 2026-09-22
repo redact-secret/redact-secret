@@ -1,5 +1,5 @@
 {
-  "contracts": "docs/audits/evidence/367/precision-contracts.json",
+  "contracts": "docs/contracts/precision/precision-contracts.json",
   "dispositions": {
     "broad-shape": "a positive expectation the frozen contract no longer matches; the child fix must re-author the value to the contract and keep the old input as an intentionally-unsupported boundary fixture rather than delete it",
     "retained": "every expected range for this detector is matched by the frozen contract at exactly the same bytes; the fixture survives the child fix unchanged",

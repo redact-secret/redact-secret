@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Accept a truncated or nested-provider Bearer value under bearer-token's length-and-alphabet grammar
 decided_at: 2026-09-21
+spec: detector-families
 ---
 
 # Accept a truncated or nested-provider Bearer value under bearer-token's length-and-alphabet grammar
