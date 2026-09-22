@@ -4329,7 +4329,7 @@
       ],
       "input": "hf_SYNTHETIC_REVOKED_SY",
       "expected": [],
-      "note": "Reclassified by issue #372 (frozen precision contract in docs/audits/evidence/367/precision-contracts.json, families.huggingface-token): the retired 20-byte shared minimum is not the documented 34-byte Hugging Face user-token length; a 20-byte body is an intentional false negative. Input unchanged; expectation corrected."
+      "note": "Reclassified by issue #372 (frozen precision contract in docs/contracts/precision/precision-contracts.json, families.huggingface-token): the retired 20-byte shared minimum is not the documented 34-byte Hugging Face user-token length; a 20-byte body is an intentional false negative. Input unchanged; expectation corrected."
     },
     {
       "id": "huggingface-boundary-below-min",
@@ -4909,7 +4909,7 @@
       ],
       "input": "cfut_SYNTHETIC_REVOKED_SY",
       "expected": [],
-      "note": "Reclassified by issue #373 (frozen precision contract in docs/audits/evidence/367/precision-contracts.json, families.cloudflare-token): the retired 20-byte shared minimum is not the documented 40-byte body plus 8-byte lowercase-hex checksum; a bare 20-byte alphanumeric run is an intentional false negative. Input unchanged; expectation corrected."
+      "note": "Reclassified by issue #373 (frozen precision contract in docs/contracts/precision/precision-contracts.json, families.cloudflare-token): the retired 20-byte shared minimum is not the documented 40-byte body plus 8-byte lowercase-hex checksum; a bare 20-byte alphanumeric run is an intentional false negative. Input unchanged; expectation corrected."
     },
     {
       "id": "cloudflare-boundary-below-min",
@@ -5027,7 +5027,7 @@
       ],
       "input": "cfut_xxxxxxxxxxxxxxxxxxxx",
       "expected": [],
-      "note": "Reclassified by issue #373 (frozen precision contract in docs/audits/evidence/367/precision-contracts.json, families.cloudflare-token): a 20-byte run of valid alphabet bytes is not the documented 40-byte body plus 8-byte lowercase-hex checksum; the corrected exact-length rule declines it. Input unchanged; expectation corrected."
+      "note": "Reclassified by issue #373 (frozen precision contract in docs/contracts/precision/precision-contracts.json, families.cloudflare-token): a 20-byte run of valid alphabet bytes is not the documented 40-byte body plus 8-byte lowercase-hex checksum; the corrected exact-length rule declines it. Input unchanged; expectation corrected."
     },
     {
       "id": "cloudflare-negative-embedded-in-wider-identifier",
@@ -6365,7 +6365,7 @@
           "end": 48
         }
       ],
-      "note": "Issue #374 (frozen precision contract in docs/audits/evidence/367/precision-contracts.json, families.linear-token): the reviewed grammar's exact 40-byte, alphanumeric identity case is the family's paired positive."
+      "note": "Issue #374 (frozen precision contract in docs/contracts/precision/precision-contracts.json, families.linear-token): the reviewed grammar's exact 40-byte, alphanumeric identity case is the family's paired positive."
     },
     {
       "id": "linear-boundary-one-short-exact-length",
@@ -6527,7 +6527,7 @@
       ],
       "input": "lin_api_SYNTHETIC_REVOKED_SY",
       "expected": [],
-      "note": "Reclassified by issue #374 (frozen precision contract in docs/audits/evidence/367/precision-contracts.json, families.linear-token): the retired 20-byte shared minimum is not the documented 40-byte Linear API-key length; a 21-byte body is an intentional false negative. Input unchanged; expectation corrected."
+      "note": "Reclassified by issue #374 (frozen precision contract in docs/contracts/precision/precision-contracts.json, families.linear-token): the retired 20-byte shared minimum is not the documented 40-byte Linear API-key length; a 21-byte body is an intentional false negative. Input unchanged; expectation corrected."
     },
     {
       "id": "linear-boundary-below-min",
@@ -8440,7 +8440,7 @@
       ],
       "input": "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ECRET0",
       "expected": [],
-      "note": "Issue #519 (family audit): the OAuth client secret format Google issues since 2021-06 carries the literal `GOCSPX-` prefix, but no consulted source (Google's own OAuth 2.0 protocol page, gitleaks 8.30.1, trufflehog 3.97.4, flare-redact 1.6.1) corroborates a body length or alphabet for it -- see issue #487's evidence and docs/audits/evidence/367/precision-contracts.json's families.google-api-key.pending[oauth-client-secret] (T0). Recorded pending, not silently absent: this fixture pins the current, deliberate silence so a future grammar addition is a reviewed decision, not an accidental regression."
+      "note": "Issue #519 (family audit): the OAuth client secret format Google issues since 2021-06 carries the literal `GOCSPX-` prefix, but no consulted source (Google's own OAuth 2.0 protocol page, gitleaks 8.30.1, trufflehog 3.97.4, flare-redact 1.6.1) corroborates a body length or alphabet for it -- see issue #487's evidence and docs/contracts/precision/precision-contracts.json's families.google-api-key.pending[oauth-client-secret] (T0). Recorded pending, not silently absent: this fixture pins the current, deliberate silence so a future grammar addition is a reviewed decision, not an accidental regression."
     },
     {
       "id": "google-negative-oauth-refresh-token",
@@ -25172,7 +25172,7 @@
       ],
       "input": "hf_xxxxxxxxxxxxxxxxxxxx",
       "expected": [],
-      "note": "Reclassified by issue #372 (frozen precision contract in docs/audits/evidence/367/precision-contracts.json, families.huggingface-token): a 20-byte run of valid alphabet bytes is not the documented 34-byte Hugging Face user-token length; the corrected exact-length rule declines it. huggingface-positive-exact-length carries a documentation-style placeholder shape at the documented 34-byte length. Input unchanged; expectation corrected."
+      "note": "Reclassified by issue #372 (frozen precision contract in docs/contracts/precision/precision-contracts.json, families.huggingface-token): a 20-byte run of valid alphabet bytes is not the documented 34-byte Hugging Face user-token length; the corrected exact-length rule declines it. huggingface-positive-exact-length carries a documentation-style placeholder shape at the documented 34-byte length. Input unchanged; expectation corrected."
     },
     {
       "id": "huggingface-negative-embedded-in-wider-identifier",
@@ -25430,7 +25430,7 @@
       ],
       "input": "lin_api_xxxxxxxxxxxxxxxxxxxx",
       "expected": [],
-      "note": "Reclassified by issue #374 (frozen precision contract in docs/audits/evidence/367/precision-contracts.json, families.linear-token): a 20-byte run of valid alphabet bytes is not the documented 40-byte Linear API-key length; the corrected exact-length rule declines it. linear-positive-exact-length carries a documentation-style placeholder shape at the documented 40-byte length. Input unchanged; expectation corrected."
+      "note": "Reclassified by issue #374 (frozen precision contract in docs/contracts/precision/precision-contracts.json, families.linear-token): a 20-byte run of valid alphabet bytes is not the documented 40-byte Linear API-key length; the corrected exact-length rule declines it. linear-positive-exact-length carries a documentation-style placeholder shape at the documented 40-byte length. Input unchanged; expectation corrected."
     },
     {
       "id": "linear-negative-embedded-in-wider-identifier",
@@ -28016,7 +28016,7 @@
           "end": 37
         }
       ],
-      "note": "Issue #372 (frozen precision contract in docs/audits/evidence/367/precision-contracts.json, families.huggingface-token): the reviewed grammar's exact 34-byte, letters-only identity case is the family's paired positive."
+      "note": "Issue #372 (frozen precision contract in docs/contracts/precision/precision-contracts.json, families.huggingface-token): the reviewed grammar's exact 34-byte, letters-only identity case is the family's paired positive."
     },
     {
       "id": "huggingface-boundary-one-short-exact-length",
@@ -28139,7 +28139,7 @@
           "end": 37
         }
       ],
-      "note": "Issue #372: gitleaks 8.30.1 (letters only) and trufflehog 3.97.4 (letters and digits) disagree on the body alphabet; that conflict is resolved as a support-policy choice for the union `[A-Za-z0-9]` rather than guessed into the letters-only intersection, so a digit-bearing documented-length body is still accepted. This composition stays unscored (T0-pending) in the benchmark corpus in docs/audits/evidence/367/precision-contracts.json pending independent review, even though the default rule accepts it here."
+      "note": "Issue #372: gitleaks 8.30.1 (letters only) and trufflehog 3.97.4 (letters and digits) disagree on the body alphabet; that conflict is resolved as a support-policy choice for the union `[A-Za-z0-9]` rather than guessed into the letters-only intersection, so a digit-bearing documented-length body is still accepted. This composition stays unscored (T0-pending) in the benchmark corpus in docs/contracts/precision/precision-contracts.json pending independent review, even though the default rule accepts it here."
     },
     {
       "id": "huggingface-positive-organization-token",
@@ -28167,7 +28167,7 @@
           "end": 42
         }
       ],
-      "note": "Issue #485 (re-tiered from T0 to T2 in docs/audits/evidence/367/precision-contracts.json, families.huggingface-token): `api_org_` shares the exact `hf_` body shape -- gitleaks 8.30.1 registers `api_org_` as its own letters-only rule and trufflehog 3.97.4 matches it under the same `(?:hf_|api_org_)[a-zA-Z0-9]{34}` rule it uses for `hf_`. This is the family's paired positive for the organization-token prefix."
+      "note": "Issue #485 (re-tiered from T0 to T2 in docs/contracts/precision/precision-contracts.json, families.huggingface-token): `api_org_` shares the exact `hf_` body shape -- gitleaks 8.30.1 registers `api_org_` as its own letters-only rule and trufflehog 3.97.4 matches it under the same `(?:hf_|api_org_)[a-zA-Z0-9]{34}` rule it uses for `hf_`. This is the family's paired positive for the organization-token prefix."
     },
     {
       "id": "huggingface-boundary-organization-token-one-short",
@@ -28258,7 +28258,7 @@
           "end": 53
         }
       ],
-      "note": "Issue #373 (frozen precision contract in docs/audits/evidence/367/precision-contracts.json, families.cloudflare-token): the reviewed grammar's exact 40-byte alphanumeric body plus 8-byte lowercase-hex checksum identity case is the family's paired positive."
+      "note": "Issue #373 (frozen precision contract in docs/contracts/precision/precision-contracts.json, families.cloudflare-token): the reviewed grammar's exact 40-byte alphanumeric body plus 8-byte lowercase-hex checksum identity case is the family's paired positive."
     },
     {
       "id": "cloudflare-boundary-one-short-checksum-suffix",
@@ -28277,7 +28277,7 @@
       },
       "input": "cfut_SYNTHETICREVOKEDCLOUDFLAREAPITOKENVALUEdeadbeef",
       "expected": [],
-      "note": "Issue #373 (frozen precision contract in docs/audits/evidence/367/precision-contracts.json, families.cloudflare-token): a 39-byte body -- one byte short of the documented 40-byte length -- is the beta.4 cloudflare-token-user-plain-twin regression's sibling boundary; silence follows from construction."
+      "note": "Issue #373 (frozen precision contract in docs/contracts/precision/precision-contracts.json, families.cloudflare-token): a 39-byte body -- one byte short of the documented 40-byte length -- is the beta.4 cloudflare-token-user-plain-twin regression's sibling boundary; silence follows from construction."
     },
     {
       "id": "cloudflare-boundary-one-long-checksum-suffix",
@@ -28296,7 +28296,7 @@
       },
       "input": "cfut_SYNTHETICREVOKEDCLOUDFLAREAPITOKENVALUE1Adeadbeef",
       "expected": [],
-      "note": "Issue #373 (frozen precision contract in docs/audits/evidence/367/precision-contracts.json, families.cloudflare-token): a 41-byte run before the checksum is not read as the exact 40-byte body followed by an 8-byte checksum at a shifted offset; the run's last 8 bytes at the documented combined length are no longer all lowercase hex, so no candidate is emitted."
+      "note": "Issue #373 (frozen precision contract in docs/contracts/precision/precision-contracts.json, families.cloudflare-token): a 41-byte run before the checksum is not read as the exact 40-byte body followed by an 8-byte checksum at a shifted offset; the run's last 8 bytes at the documented combined length are no longer all lowercase hex, so no candidate is emitted."
     },
     {
       "id": "cloudflare-boundary-invalid-alphabet-checksum-suffix",
@@ -28315,7 +28315,7 @@
       },
       "input": "cfut_SYNTHETICREVOKEDC_OUDFLAREAPITOKENVALUE1deadbeef",
       "expected": [],
-      "note": "Issue #373 (frozen precision contract in docs/audits/evidence/367/precision-contracts.json, families.cloudflare-token): both consulted sources describe the body as `[A-Za-z0-9]`; an underscore inside it breaks the alphanumeric run before the documented combined length is reached, rather than being tolerated as it would under the retired `[A-Za-z0-9_-]` shared shape."
+      "note": "Issue #373 (frozen precision contract in docs/contracts/precision/precision-contracts.json, families.cloudflare-token): both consulted sources describe the body as `[A-Za-z0-9]`; an underscore inside it breaks the alphanumeric run before the documented combined length is reached, rather than being tolerated as it would under the retired `[A-Za-z0-9_-]` shared shape."
     },
     {
       "id": "cloudflare-boundary-checksum-one-short",
@@ -28334,7 +28334,7 @@
       },
       "input": "cfut_SYNTHETICREVOKEDCLOUDFLAREAPITOKENVALUE1deadbee",
       "expected": [],
-      "note": "Issue #373 (frozen precision contract in docs/audits/evidence/367/precision-contracts.json, families.cloudflare-token): a 7-byte checksum -- one byte short of the documented 8-byte length -- leaves the combined alphanumeric run one byte short of the documented 48-byte total, so no candidate is emitted."
+      "note": "Issue #373 (frozen precision contract in docs/contracts/precision/precision-contracts.json, families.cloudflare-token): a 7-byte checksum -- one byte short of the documented 8-byte length -- leaves the combined alphanumeric run one byte short of the documented 48-byte total, so no candidate is emitted."
     },
     {
       "id": "cloudflare-boundary-checksum-one-long",
@@ -28353,7 +28353,7 @@
       },
       "input": "cfut_SYNTHETICREVOKEDCLOUDFLAREAPITOKENVALUE1deadbeef0",
       "expected": [],
-      "note": "Issue #373 (frozen precision contract in docs/audits/evidence/367/precision-contracts.json, families.cloudflare-token): a run one byte longer than the documented combined length is rejected via the boundary check rather than truncated to the documented shape, the same precedent digitalocean-token and npm-token already set for their own exact-length grammars."
+      "note": "Issue #373 (frozen precision contract in docs/contracts/precision/precision-contracts.json, families.cloudflare-token): a run one byte longer than the documented combined length is rejected via the boundary check rather than truncated to the documented shape, the same precedent digitalocean-token and npm-token already set for their own exact-length grammars."
     },
     {
       "id": "cloudflare-boundary-checksum-non-hex",
@@ -28372,7 +28372,7 @@
       },
       "input": "cfut_SYNTHETICREVOKEDCLOUDFLAREAPITOKENVALUE1ghijklmn",
       "expected": [],
-      "note": "Issue #373 (frozen precision contract in docs/audits/evidence/367/precision-contracts.json, families.cloudflare-token): this is the reproduced beta.4 cloudflare-token-user-plain-twin regression -- an alphanumeric but non-hexadecimal eight-byte tail. Retained as must-not-flag: the value carries no checksum segment of any shape a consulted source describes."
+      "note": "Issue #373 (frozen precision contract in docs/contracts/precision/precision-contracts.json, families.cloudflare-token): this is the reproduced beta.4 cloudflare-token-user-plain-twin regression -- an alphanumeric but non-hexadecimal eight-byte tail. Retained as must-not-flag: the value carries no checksum segment of any shape a consulted source describes."
     },
     {
       "id": "cloudflare-boundary-checksum-uppercase-hex",
@@ -28391,7 +28391,7 @@
       },
       "input": "cfut_SYNTHETICREVOKEDCLOUDFLAREAPITOKENVALUE1DEADBEEF",
       "expected": [],
-      "note": "Issue #373 (frozen precision contract in docs/audits/evidence/367/precision-contracts.json, families.cloudflare-token): the checksum alphabet is `[0-9a-f]`, not `[0-9A-Fa-f]` -- the single tool corroborating its shape states lowercase hex, so an uppercase-hex checksum is an intentional false negative rather than a case-insensitive match."
+      "note": "Issue #373 (frozen precision contract in docs/contracts/precision/precision-contracts.json, families.cloudflare-token): the checksum alphabet is `[0-9a-f]`, not `[0-9A-Fa-f]` -- the single tool corroborating its shape states lowercase hex, so an uppercase-hex checksum is an intentional false negative rather than a case-insensitive match."
     },
     {
       "id": "cloudflare-positive-account-checksum-suffix",
@@ -28419,7 +28419,7 @@
           "end": 53
         }
       ],
-      "note": "Issue #481 (docs/audits/evidence/367/precision-contracts.json, families.cloudflare-token, adopted from `pending`): `cfat_` shares the exact `cfut_` body/checksum shape -- the provider's token-formats page documents both prefixes with the identical `[40 characters][checksum]` format cell, and trufflehog 3.97.4's `cf[ua]t_` alternation corroborates both. This is the family's paired positive for the account-token prefix."
+      "note": "Issue #481 (docs/contracts/precision/precision-contracts.json, families.cloudflare-token, adopted from `pending`): `cfat_` shares the exact `cfut_` body/checksum shape -- the provider's token-formats page documents both prefixes with the identical `[40 characters][checksum]` format cell, and trufflehog 3.97.4's `cf[ua]t_` alternation corroborates both. This is the family's paired positive for the account-token prefix."
     },
     {
       "id": "cloudflare-boundary-account-checksum-non-hex",
