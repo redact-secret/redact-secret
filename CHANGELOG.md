@@ -5,6 +5,24 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+### Changed
+
+- `INITIALIZATION_FAILED`'s fixed message now names what failed to load and
+  links the troubleshooting guide, instead of only
+  `redact-secret failed to initialize.` (#586). The code is unchanged; match
+  on `error.code`, not the message.
+- Python raises one fixed, actionable `ImportError` when its native extension
+  cannot load, instead of the loader's own error with host paths and ABI
+  details (#586).
+
+### Added
+
+- A [five-minute quickstart](docs/quickstart.md) for Node.js, Python, and a
+  Vite browser bundle, starting from an empty directory. The
+  `clean-install` qualification job runs its commands and files verbatim
+  against each candidate's exact artifacts and records the result in the
+  artifact inventory (#586).
+
 ### Documentation
 
 - The README, documentation home, and every registry-facing README and
@@ -18,6 +36,7 @@ evidence is linked from each published version.
   now precede the architecture, and the README's hand-maintained provider
   list gives way to the generated support matrix. `npm run
   product-positioning:check` keeps those surfaces from drifting apart.
+
 
 ## 0.1.0-beta.6 — 2026-09-22
 

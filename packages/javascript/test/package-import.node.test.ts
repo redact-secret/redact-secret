@@ -238,7 +238,10 @@ describe("Node package import", () => {
     // it could not find.
     expect(JSON.parse(output)).toEqual({
       code: "INITIALIZATION_FAILED",
-      message: "redact-secret failed to initialize.",
+      message:
+        "redact-secret failed to initialize: no usable native addon or WebAssembly " +
+        "artifact matching this package's version and profile could be loaded. " +
+        "See https://github.com/redact-secret/redact-secret/blob/main/docs/troubleshooting.md",
     });
   });
 

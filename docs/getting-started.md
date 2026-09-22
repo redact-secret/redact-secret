@@ -42,7 +42,9 @@ cargo add redact-secret@0.1.0-beta.6
 cargo install redact-secret-cli --version 0.1.0-beta.6 --locked
 ```
 
-Run only the command for your runtime. Rust library and CLI source installs
+Run only the command for your runtime. For a complete, tested path from an
+empty directory to one redacted value, follow the
+[five-minute quickstart](quickstart.md). Rust library and CLI source installs
 need a Rust toolchain; supported Python wheels and Node prebuilt addons do not.
 Continue with [JavaScript](guides/javascript.md), [Python](guides/python.md),
 [Rust](guides/rust.md), or [CLI](guides/cli.md).

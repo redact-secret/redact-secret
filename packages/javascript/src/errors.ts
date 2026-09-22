@@ -78,7 +78,13 @@ const ERROR_MESSAGES: Readonly<Record<SecretScanErrorCode, string>> = {
   INVALID_RULESET: "The supplied ruleset is invalid.",
   NOT_INITIALIZED:
     "redact-secret is not initialized; await initialize() before this call.",
-  INITIALIZATION_FAILED: "redact-secret failed to initialize.",
+  // Fixed and input-free like every other message, but also actionable
+  // (issue #586): it names the failure classes and the guide that separates
+  // them, since the loader's own diagnostic is deliberately withheld.
+  INITIALIZATION_FAILED:
+    "redact-secret failed to initialize: no usable native addon or WebAssembly " +
+    "artifact matching this package's version and profile could be loaded. " +
+    "See https://github.com/redact-secret/redact-secret/blob/main/docs/troubleshooting.md",
   INVALID_CHUNK: "Stream sanitizer input must contain bytes.",
   INVALID_UTF8: "Stream sanitizer input is not valid UTF-8.",
   UNPAIRED_SURROGATE: "Secret scan input contains an unpaired UTF-16 surrogate.",
