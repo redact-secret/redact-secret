@@ -9,6 +9,14 @@
 Project-wide ADRs live under `docs/decisions` with `scope: workspace`; do not
 also create `_notes/decisions`. Validate them with `npm run decisions:validate`.
 
+New evidence goes where
+[`decision-decide-artifact-taxonomy-spec-routing-and-evidence-placement`](docs/decisions/2026-09-22-decide-artifact-taxonomy-spec-routing-and-evidence-placement.md)
+places its kind: final evidence for a product judgement lands frozen under
+`docs/audits/evidence/<issue>/`; final evidence from a benchmark or scanner
+run belongs in `redact-secret-benchmarks`, never copied here; and an
+iterative or exploratory log stays in an issue comment, linked by permalink
+from whichever final record cites it, not duplicated into a repository file.
+
 ## Security boundary
 
 - Never place real credentials in source, fixtures, logs, errors, snapshots, documentation, or agent context. Use unmistakably synthetic or revoked examples.

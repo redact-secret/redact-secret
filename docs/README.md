@@ -39,9 +39,27 @@ list is not proof that input contains no secrets.
   evidence in [`redact-secret-benchmarks`](https://github.com/redact-secret/redact-secret-benchmarks)
 - [Detection reliability evidence](reference/detection-reliability.md)
 - [Review archive](audits/README.md) and [beta.2 final code review](audits/beta2-final-code-review.md)
+- [Release records](releases/status.md): every published version and its durable record
 - [Changelog](../CHANGELOG.md), [security reporting](../SECURITY.md), and [MIT license](../LICENSE)
 - [Documentation readiness and delivery follow-up](documentation-readiness.md)
 - [v0.1.0 release-readiness checklist](release-readiness-v0.1.0.md)
+
+## Where a document or generated file belongs
+
+[`decision-decide-artifact-taxonomy-spec-routing-and-evidence-placement`](decisions/2026-09-22-decide-artifact-taxonomy-spec-routing-and-evidence-placement.md)
+gives every committed document or generated file under `docs/`, `assessment/`,
+and `benchmarks/` exactly one kind, found by what reads or produces it, not by
+its current path:
+
+| Kind | Test | Location |
+| --- | --- | --- |
+| Live contract / input | CI, a script, or code reads it | a non-archive path (for example `docs/contracts/`) |
+| Generated | a script produces it | committed only with a regeneration-equality test; otherwise gitignored |
+| Final evidence, product judgement | an ADR or release relies on it | `docs/audits/evidence/<issue>/`, frozen |
+| Final evidence, benchmark measurement | a benchmark or scanner run produced it | `redact-secret-benchmarks`, per [`decision-govern-benchmark-regression-promotion`](decisions/2026-09-18-govern-benchmark-regression-promotion.md) |
+| Iterative / exploratory log | only people read it, not a final record | an issue comment; final records keep a permalink to it, not a copy |
+| Detail of a settled record | nothing reads the full text any more | a commit-pinned permalink plus a summary |
+| Release record | one per version | `docs/releases/<version>/` |
 
 These Markdown pages are the source documentation. Relative links and ordinary
 code fences keep them usable in the repository and portable to a future public

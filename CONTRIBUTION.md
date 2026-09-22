@@ -15,6 +15,13 @@ stability.
 - Read [ARCHITECTURE.md](ARCHITECTURE.md), [CONVENTIONS.md](CONVENTIONS.md), and the
   [decision router](docs/decisions/DECISIONS.md). A material boundary change needs
   an ADR rather than an undocumented convention.
+- New evidence goes where
+  [`decision-decide-artifact-taxonomy-spec-routing-and-evidence-placement`](docs/decisions/2026-09-22-decide-artifact-taxonomy-spec-routing-and-evidence-placement.md)
+  places its kind, not wherever is convenient: a product-judgement record
+  under `docs/audits/evidence/<issue>/`, frozen once written; a benchmark or
+  scanner measurement in `redact-secret-benchmarks`, never copied into this
+  repository; and an iterative or exploratory log as an issue comment, cited
+  by permalink from whichever final record needs it, not restated there.
 
 Keep fixtures to the smallest synthetic input that measures one contract behavior.
 Never include active credentials or matched plaintext in diagnostics. Keep the

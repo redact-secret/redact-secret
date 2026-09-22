@@ -70,4 +70,5 @@ future planning and implementation but do not authorize Git or release actions.
 - [Freeze the Pulumi access token grammar as a documented-prefix, tool-corroborated exact-length hex shape](2026-09-21-freeze-pulumi-access-token-grammar.md)
 - [Accept a truncated or nested-provider Bearer value under bearer-token's length-and-alphabet grammar](2026-09-21-accept-truncated-and-nested-shapes-under-bearer-token-length-grammar.md)
 - [Redact a bare, marker-less OpenAI-prefixed value under a generic policy layer, beneath the frozen contract](2026-09-21-govern-bare-vendor-prefixed-policy-layer.md)
+- [Decide the artifact taxonomy, spec routing, and evidence placement](2026-09-22-decide-artifact-taxonomy-spec-routing-and-evidence-placement.md)
 
