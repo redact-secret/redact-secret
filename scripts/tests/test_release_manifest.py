@@ -582,6 +582,37 @@ class WorkflowOutputTests(unittest.TestCase):
             self.assertIn("pypi:redact-secret", manifest["artifact_set"])
             self.assertIn("crate:redact-secret-cli", manifest["artifact_set"])
 
+    def test_manifest_step_survives_an_apostrophe_in_a_job_output(self) -> None:
+        # Issue #614: beta.6's wasm digest note ("the registry tarball's own
+        # shasum") ended an inline single-quoted string and failed this step.
+        root = SCRIPT.parents[1]
+        workflow = (root / ".github/workflows/release.yml").read_text()
+        step = workflow.split("      - name: Build and record the manifest\n", 1)[1]
+        shell = step.split("        run: |\n", 1)[1].split("      - name:", 1)[0]
+        shell = textwrap.dedent(shell)
+        self.assertNotRegex(shell, r"\$\{\{")
+        note = "npm repacks it; \"published\" is the registry tarball's own shasum $(exit 1)."
+        wasm_digest = json.dumps({"npm:@redact-secret/wasm": [{
+            "file": "redact_secret_wasm_bg.wasm", "built": "b" * 64, "qualified": "b" * 64,
+            "published": "c" * 40, "comparable": False, "note": note,
+        }]})
+        wasm_state = json.dumps({"npm:@redact-secret/wasm": "published"})
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp)
+            (directory / "packages").symlink_to(root / "packages", target_is_directory=True)
+            (directory / "scripts").symlink_to(root / "scripts", target_is_directory=True)
+            subprocess.run(["bash", "-e", "-o", "pipefail", "-c", shell], cwd=directory,
+                           env={**os.environ, "GITHUB_SHA": "a" * 40,
+                                "GITHUB_OUTPUT": str(directory / "output"),
+                                "WASM_ARTIFACT_DIGEST_JSON": wasm_digest,
+                                "WASM_REGISTRY_STATE_JSON": wasm_state},
+                           check=True, capture_output=True)
+            manifest = json.loads((directory / "manifest.json").read_text())
+            self.assertEqual(manifest["registry_state"]["npm:@redact-secret/wasm"], "published")
+            self.assertEqual(
+                manifest["artifact_digests"]["npm:@redact-secret/wasm"][0]["note"], note
+            )
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -43,7 +43,7 @@
 import { execFileSync } from "node:child_process";
 import { readFileSync, rmSync } from "node:fs";
 import { join, resolve } from "node:path";
-import { viewPublished, waitForPublished } from "./npm-registry-metadata.mjs";
+import { describePublication, viewPublished, waitForPublished } from "./npm-registry-metadata.mjs";
 
 const NPM = process.platform === "win32" ? "npm.cmd" : "npm";
 
@@ -154,10 +154,15 @@ async function main() {
     execFileSync(NPM, ["publish", "--access", "public", "--tag", tag, tarball], {
       stdio: "inherit",
     });
-    const verified = await waitForPublished(name, version, { expectedShasum: packResult.shasum });
-    console.log(
-      `${name}@${version} published and verified (shasum ${verified.dist.shasum}).`,
-    );
+    // `npm publish` exited 0 for exactly this tarball, so npm has accepted
+    // this shasum: a registry still serving 404 after the window is
+    // propagation lag, not a failure (issue #614). A visible, different
+    // checksum still fails.
+    const verified = await waitForPublished(name, version, {
+      expectedShasum: packResult.shasum,
+      publishAccepted: true,
+    });
+    console.log(describePublication(name, version, verified));
   } finally {
     rmSync(tarball, { force: true });
   }

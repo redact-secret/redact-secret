@@ -55,6 +55,14 @@ crates.io only reports the published checksum once the crate is live, so
 "verify, then publish" is not available here the way it is for an artifact
 already sitting in a local `dist/` directory.
 
+Issue #614 adds a quoting rule for both release workflows: a `run:` block
+must not splice a `${{ needs.* }}` job output into shell source. Expression
+substitution happens before the shell parses the script, so one apostrophe
+in a job output (the wasm digest note) ended a single-quoted string and
+failed the beta.6 manifest step. Job outputs must reach the script through
+`env:` and be read as "$VAR" -- also the standard script-injection
+mitigation.
+
 This intentionally parses the workflow YAML with plain text and regular
 expressions rather than a YAML library, matching
 `check-python-package.py`'s wheel-matrix check: no third-party dependency is
@@ -121,6 +129,15 @@ CRATE_DIGEST_STEPS = (
     ("Publish redact-secret", "Verify redact-secret publication matches the qualified crate"),
     ("Publish redact-secret-cli", "Verify redact-secret-cli publication matches the qualified crate"),
 )
+
+# Issue #614: workflows whose `run:` blocks must read `needs.*` job outputs
+# through `env:` rather than inline `${{ }}` substitution.
+INLINE_NEEDS_WORKFLOWS = (
+    RELEASE_WORKFLOW,
+    Path(".github") / "workflows" / "reconcile-release.yml",
+)
+INLINE_NEEDS_PATTERN = re.compile(r"\$\{\{\s*needs\.")
+RUN_BLOCK_HEADER = re.compile(r"^(?P<indent>\s*)(?:- )?run:\s*(?P<rest>.*)$")
 
 JOB_HEADER_PREFIX = "  "
 ATTRIBUTE_PREFIX = "    "
@@ -211,6 +228,37 @@ def extract_step_blocks(job_body: str) -> list[tuple[int, str, str]]:
         end = headers[index + 1][0] if index + 1 < len(headers) else len(job_body)
         blocks.append((offset, name, job_body[offset:end]))
     return blocks
+
+
+def inline_needs_in_run(text: str) -> list[int]:
+    """Return 1-based line numbers of `${{ needs.` inside a `run:` script.
+
+    Covers both a one-line `run: ...` and a block scalar (`run: |` / `>`),
+    whose body is every following line indented deeper than the `run:` key
+    (blank lines included). `env:`, `with:`, `if:`, and every other key may
+    still use `needs.*` expressions -- only shell source is rejected.
+    """
+    offending: list[int] = []
+    lines = text.splitlines()
+    block_indent: int | None = None
+    for number, line in enumerate(lines, start=1):
+        if block_indent is not None:
+            if not line.strip() or len(line) - len(line.lstrip()) > block_indent:
+                if INLINE_NEEDS_PATTERN.search(line):
+                    offending.append(number)
+                continue
+            block_indent = None
+        match = RUN_BLOCK_HEADER.match(line)
+        if match is None:
+            continue
+        rest = match.group("rest").strip()
+        if rest[:1] in ("|", ">"):
+            # The key's own column: a `- run:` list item's key sits two
+            # columns past the dash.
+            block_indent = len(match.group("indent")) + (2 if line.lstrip().startswith("- ") else 0)
+        elif INLINE_NEEDS_PATTERN.search(rest):
+            offending.append(number)
+    return offending
 
 
 def validate(root: Path) -> list[str]:
@@ -361,6 +409,16 @@ def validate(root: Path) -> list[str]:
                     f"{RELEASE_WORKFLOW.as_posix()}: '{digest_step_name}' does not run "
                     f"{CRATE_DIGEST_SCRIPT}"
                 )
+
+    for workflow in INLINE_NEEDS_WORKFLOWS:
+        path = root / workflow
+        if not path.is_file():
+            continue
+        for number in inline_needs_in_run(path.read_text(encoding="utf-8")):
+            errors.append(
+                f"{workflow.as_posix()}:{number}: a `run:` script substitutes a "
+                "`${{ needs.* }}` job output inline -- pass it through `env:` and read it as \"$VAR\""
+            )
 
     reconcile_path = root / ".github/workflows/reconcile-release.yml"
     if reconcile_path.is_file():
