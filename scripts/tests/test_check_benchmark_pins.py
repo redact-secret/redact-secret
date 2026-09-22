@@ -175,6 +175,20 @@ class AncestryTests(unittest.TestCase):
         self.assertEqual(findings.errors, [])
 
 
+# -- check 5: vendored support-matrix-schema.json drift (pure) -------------
+
+
+class SchemaDriftTests(unittest.TestCase):
+    def test_passes_when_identical(self) -> None:
+        self.assertEqual(CHECK.check_schema_drift("{}\n", "{}\n", live_source="x@y:z"), [])
+
+    def test_flags_a_drifted_copy(self) -> None:
+        errors = CHECK.check_schema_drift('{"a": 1}\n', '{"a": 2}\n', live_source="redact-secret-benchmarks@r:schemas/support-matrix-v1.json")
+        self.assertEqual(len(errors), 1)
+        self.assertIn(str(CHECK.SUPPORT_MATRIX_SCHEMA_PATH), errors[0])
+        self.assertIn("redact-secret-benchmarks@r:schemas/support-matrix-v1.json", errors[0])
+
+
 # -- local git ancestry helpers, against a real, deterministic history -----
 
 
