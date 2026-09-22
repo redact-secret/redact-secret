@@ -167,58 +167,14 @@ qualified.
 
 ## JavaScript quick start
 
-The JavaScript package presents one typed API across Node.js and
-modern browsers. Its explicit initialization contract makes native or
-WebAssembly loading failures observable without making every scan asynchronous.
-
-On Node.js, `@redact-secret/core` installs a prebuilt N-API addon for
-glibc and musl Linux, macOS, and Windows (x64 and arm64 each: eight platform
-packages, `engines.node` `20.x || 22.x || 24.x`) as an optional dependency.
-On a host with no matching addon at all — an unsupported platform or
-architecture, a matching optional dependency that failed to install, or a
-corrupt addon — `initialize()` falls back to the same WebAssembly artifact
-browsers use instead of failing outright. Call `artifact()` after
-`initialize()` to see which one actually loaded: `"addon"` or `"wasm"`. Bun
-and Deno get this fallback for free. **Cloudflare Workers is a verified,
-supported runtime**: it resolves its own `workerd` package condition to a
-loader that instantiates the WebAssembly artifact from a bundler-compiled
-`WebAssembly.Module` instead of the generated glue's `import.meta.url`-based
-`fetch`, which does not work under a real `workerd` sandbox
-(`decision-verify-edge-runtimes`). **Vercel Edge is not yet supported**: it
-resolves the plain browser entry point, whose `fetch`-based initialization
-fails there for a related but distinct reason, verified against Vercel's own
-reference Edge Runtime engine; see
-[docs/qualification.md](./docs/qualification.md) for the verified root cause
-and why the Cloudflare Workers fix does not carry over. See that document
-also for the full target matrix, exactly which failures engage the Node
-fallback, and how CI keeps both from drifting.
-
-```ts
-import { artifact, initialize, scanAndRedact } from "@redact-secret/core";
-
-await initialize();
-console.log(artifact()); // "addon" on a supported host, "wasm" on the fallback
-```
-
-All examples use unmistakably synthetic, revoked values. Findings contain
-classification, action, and original-input offsets, never the matched plaintext
-value. For the [first example](#install-and-first-example) above:
-
-```ts
-result.findings[0];
-// {
-//   id: "finding-1",
-//   type: "contextual_secret",
-//   detector: "generic-token",
-//   confidence: "high",
-//   action: "redact",
-//   start: 8,
-//   end: 39
-// }
-```
-
-JavaScript offsets are half-open UTF-16 code-unit ranges into the original
-input, even when the sanitized output has a different length.
+`@redact-secret/core` presents one typed API across Node.js and modern
+browsers. On Node.js it loads a prebuilt N-API addon and falls back to the
+browser WebAssembly artifact where no addon loads; `artifact()` reports which
+one did. Cloudflare Workers is supported; Vercel Edge is not yet. Findings
+carry classification, action, and original-input offsets (UTF-16 code units
+in JavaScript), never the matched plaintext. The
+[JavaScript guide](docs/guides/javascript.md) covers runtime selection,
+policies, limits, profiles, and browser loading.
 
 ## Core operations
 
@@ -250,168 +206,27 @@ The default policy is:
 The first stable cross-language extension surface includes custom policy and
 placeholder formatter callbacks. Custom detector callbacks are excluded: all
 built-in detectors run in Rust, and bindings must not create another detector
-implementation. A caller with an internal credential format is not left
-without a path: `decision-define-declarative-detector-ruleset-contract`
-fixes the contract for a caller-supplied **declarative ruleset** — data the
-core parses and matches itself, never a callback — and issues #495 and #484
-implement it for the Rust core, JavaScript (Node and browser WebAssembly),
-Python, and the CLI. See [Declarative rulesets](#declarative-rulesets) below.
+implementation. A caller with an internal credential format uses a
+[declarative ruleset](#declarative-rulesets) instead.
 
 ## Declarative rulesets
 
-An organization with an internal credential format — an in-house service
-token, a partner API key, a legacy prefix — can declare it without writing
-code. A ruleset is UTF-8 text, at most 64 KiB, matched by the same
-linear-time, ReDoS-free engine every built-in detector already runs through
-(`crates/secret-scan-core/src/detectors/pattern.rs`): no regex, no new
-matching vocabulary.
-
-```text
-ruleset-revision: 1
-detector: acme-internal-token
-specificity: contextual
-prefix: "ACME_"
-alphabet: alnum-dash
-run: at-least 20
-validator: none
-```
-
-The first line is always `ruleset-revision: 1`. Every following `detector:
-<id>` line starts a block of exactly five fields:
-
-| Field | Values |
-| --- | --- |
-| `specificity` | `entropy` or `contextual` only — `structural`, `provider`, and `private-key` are reserved to built-in detectors and rejected |
-| `prefix` | a double-quoted literal, 3–64 bytes, matched byte-exact and case-sensitive (no escape sequences) |
-| `alphabet` | one of `alnum`, `alnum-dash`, `alnum-dash-dot`, `upper-alnum`, `digit`, `lower-hex`, `base64-body` |
-| `run` | `exact <n>` or `at-least <n>`, `1 ≤ n ≤ 4096` |
-| `validator` | `none`, or `trailing-lower-hex` (the matched run's final `n` alphabet bytes — `n` from the block's own `run` count — must be lowercase hex) |
-
-A ruleset detector's matching semantics are exactly a built-in prefixed
-detector's:
-
-- **Case-sensitive, byte-exact prefix matching.** No case folding, no NFKC,
-  no decoding, no unescaping.
-- **Matching runs on the normalized scan copy; reported ranges use original
-  input coordinates.** Every detector matches after invisible and format
-  code points are stripped
-  (`decision-normalize-invisible-characters-before-detection`); every
-  reported range is translated back to the caller's original text before it
-  becomes a public result. A ruleset detector is not a special case.
-- **Boundary behavior is fixed, not caller-configurable.** A match that is a
-  truncated slice of a longer run of the same alphabet is rejected, not
-  truncated — a ruleset has no way to loosen or tighten this.
-
-Every ruleset candidate carries `Confidence::Medium`, fixed regardless of the
-ruleset's own content, and registers after every built-in detector. Combined
-with the specificity restriction above, a ruleset can add detections but can
-never silently outrank a built-in's resolved finding. A caller with a loaded
-ruleset still sees `Full`/`Common` from `DetectorRegistry::profile()`;
-ruleset presence is a separate fact the caller already has from the number
-of detectors `load_ruleset` returned.
-
-### Names section
-
-A ruleset can also add to `generic-token`'s contextual-assignment name
-vocabulary, without a `detector:` block at all:
-
-```text
-ruleset-revision: 1
-names: ambiguous
-name: corp_token
-```
-
-`names: ambiguous` is the only claimable bucket in this revision — a caller
-can add an in-house assignment keyword (`corp_token`) to the same **ambiguous**
-bucket `auth`/`credential`/`signing_key` already belong to, kept at that
-bucket's higher entropy bar and always `Confidence::Medium`; a ruleset cannot
-add to the high-signal bucket (`api_key`, `password`, …) in this revision.
-Every `name:` value is normalized the same way a scanned input's captured
-assignment name already is, so `CorpToken`, `corp-token`, and `corp_token` are
-the same addition. A name that normalizes to an existing built-in name is a
-silent no-op — a ruleset can never remove, override, or re-bucket a built-in
-name. A names-only ruleset (no `detector:` blocks) is valid; a names section
-registers its own separate detector rather than changing `generic-token`
-itself, so it inherits the same containment property as a value-section
-ruleset detector.
-
-A malformed ruleset is rejected as a whole — never partially loaded — with
-the fixed `INVALID_RULESET` code and one of a closed set of rejection
-classes (`RulesetErrorClass`: `RULESET_TOO_LARGE`, `UNKNOWN_REVISION`,
-`UNKNOWN_FIELD`, `UNSUPPORTED_CONSTRUCT`, `UNKNOWN_ALPHABET`,
-`UNKNOWN_VALIDATOR`, `SPECIFICITY_NOT_CLAIMABLE`, `MISSING_FIELD`,
-`PREFIX_TOO_SHORT`, `PREFIX_TOO_LONG`, `RUN_LENGTH_OUT_OF_BOUNDS`,
-`TOO_MANY_DETECTORS`, `DUPLICATE_DETECTOR_ID`, `RESERVED_DETECTOR_ID`,
-`EMPTY_RULESET`, `NAME_BUCKET_NOT_CLAIMABLE`, `NAME_TOO_LONG`,
-`TOO_MANY_NAMES`) — never a byte from the rejected ruleset.
-
-Per surface:
-
-- **Rust:** `redact_secret::load_ruleset(bytes) -> Result<Vec<Box<dyn Detector>>, RulesetError>`,
-  registered the same way a native custom detector is:
-  `DetectorRegistry::with_built_in(detectors)`.
-- **JavaScript (Node and browser WebAssembly):** a `ruleset` option on `scan`/
-  `scanAndRedact`, taking a `Uint8Array` or a UTF-8 `string`.
-- **Python:** a `ruleset` keyword argument on `scan`/`scan_and_redact`, taking
-  `bytes`, `bytearray`, or `str`.
-- **CLI:** `--ruleset <path>`, requiring an explicit file source — standard
-  input's streaming session accepts no custom detector, ruleset or
-  otherwise, because none declares the retention bound a streaming session
-  must enforce.
-
-Deliberately out of scope for this revision: `AND`/`OR`/`NOT`, nesting,
-rule-to-rule reference, context keyword/companion fields, caller-set
-confidence or entropy threshold, regex or any pattern beyond the alphabets
-above, and migrating built-in detectors onto this format. See
-`decision-define-declarative-detector-ruleset-contract` for the full
-rationale.
+An organization with an internal credential format can declare it as a
+**declarative ruleset**: UTF-8 data (at most 64 KiB) the core parses and
+matches itself with the same linear-time engine as every built-in detector,
+never a callback. Ruleset detections always carry medium confidence and can
+never outrank a built-in finding. Rust, JavaScript, Python, and the CLI
+(`--ruleset <path>`) all accept one. See the
+[rulesets guide](docs/guides/rulesets.md) for the format, matching semantics,
+and rejection classes.
 
 ## Incremental sanitization
 
 Independently scanning chunks is unsafe because a credential can cross any
-chunk boundary. The bounded incremental API retains unresolved plaintext until
-a detector window closes, finalization supplies the end-of-input boundary, or a
-declared limit fails.
-
-**Current support:** Rust, Python, CLI standard input, and both JavaScript
-artifacts (Node and browser WebAssembly) support incremental sanitization.
-See [streaming](./docs/guides/streaming.md).
-
-Python limits count UTF-8 bytes, while findings carry absolute Unicode code
-point offsets into the joined input:
-
-```python
-import redact_secret
-
-limits = redact_secret.IncrementalLimits(
-    max_input_bytes=1_000_000,
-    max_buffered_bytes=32_896,
-    max_token_bytes=8_192,
-    max_multiline_bytes=32_768,
-)
-
-with redact_secret.IncrementalSanitizer(limits) as session:
-    first = session.append("api_key=SYNTHETIC_REVOKED_")
-    second = session.append("INCREMENTAL_VALUE\nordinary text")
-    final = session.finalize()
-
-safe_text = first.text + second.text + final.text
-# api_key=<SECRET_1>\nordinary text
-```
-
-Leaving the `with` block aborts a session that was not finalized, so whatever it
-still retained is discarded.
-
-Every session requires explicit total-input, retained-plaintext, token, and
-multiline limits. Abort, lifecycle misuse, callback failure, and limit failure
-drop retained plaintext and return only fixed, input-free errors. For accepted
-input, concatenated incremental results must equal one whole-input operation
-regardless of chunk partitioning.
-
-Byte-stream adapters use one fatal, stateful UTF-8 decoder so multibyte
-characters may safely cross chunks. Host adapters own backpressure,
-cancellation, and destruction; the Rust core owns scan semantics and retained
-plaintext safety.
+chunk boundary. Rust, Python, CLI standard input, and both JavaScript
+artifacts provide a bounded incremental API whose concatenated output equals
+one whole-input operation, under explicit limits that fail closed. See
+[streaming](docs/guides/streaming.md).
 
 ## Detection coverage
 
@@ -419,39 +234,13 @@ plaintext safety.
 **Support status** (34 providers, 79 credential families; stable: 3, provisional: 58, pending: 2, unsupported: 16) -- generated from evaluation evidence, never hand-written. `provisional` means useful but evidence-incomplete, not "almost stable"; unsupported families are listed with their reason. See the full [support matrix](docs/support-matrix.md).
 <!-- support-matrix:end -->
 
-The support-status line above and the linked matrix are the only place
-per-family support is stated; this README does not repeat provider lists or
-counts. Built-in Rust detection covers these kinds of structure — the
-[detection reference](docs/reference/detection.md) names the provider formats
-behind each:
-
-- PEM-style private-key blocks;
-- provider-issued API keys and tokens with a recognizable format;
-- JWTs and bearer, Basic, and Token authorization credentials;
-- contextual credential assignments, such as an `api_key` or `password`
-  setting;
-- credential-bearing database and message-broker connection URLs; and
-- `otpauth://` URIs carrying a shared secret.
-
-Entropy is only a supporting signal. Random-looking text is not classified
-without structural or contextual evidence, and the generic name `token` alone
-is deliberately ignored.
-
-Strict prefixes, supported URI schemes, minimum lengths, bounded values, and
-placeholder exclusions favor precision. The tradeoff is that truncated, short,
-new, or unsupported credential formats can be missed. The core never performs
-runtime provider lookups, and Redact Secret is not a complete DLP system.
-
-Whole-input `scan`, `redact`, and `scan_and_redact` default to a 64 MiB input
-bound and a 50,000 finding-count bound
-(`decision-bound-whole-input-operations-by-default`). Exceeding either fails
-closed with a fixed `INPUT_LIMIT_EXCEEDED`/`FINDING_LIMIT_EXCEEDED` error
-rather than a truncated result; a caller that genuinely needs a wider bound
-raises it explicitly (`scan_with_limits` and its siblings in Rust, a `limits`
-option in every binding). This is a library-level backstop, not a substitute
-for host-side bounding: authoritative servers must still bound transport
-bytes, decoded input, sanitized output, concurrency, and memory before
-downstream use.
+Built-in detection covers private keys, provider-issued tokens, JWT and
+authorization headers, contextual credential assignments, credential-bearing
+connection URLs, and `otpauth://` URIs. Entropy is only a supporting signal,
+and whole-input operations are bounded by default. The
+[detection reference](docs/reference/detection.md) lists every built-in
+detector (generated from the inventory), the false-positive and
+false-negative tradeoffs, and the limits.
 
 ## Browser and server boundaries
 
@@ -486,52 +275,12 @@ Never log raw request or tool bodies before authoritative scanning.
 
 ## Opt-in detector profiles
 
-Everything above uses `full`, the default on every surface: every officially
-supported built-in detector, and the compatibility baseline. Keep the
-authoritative server boundary above on `full`.
-
-For size- or latency-sensitive **preventive** consumers — browser UX and
-small agent or tool processes — `common` is a smaller, opt-in built-in
-detector set: only the structural and contextual detectors (a PEM/OpenSSH
-private key, an RFC 7519 JWT, an `otpauth://` URI, a credential-bearing
-connection URI, an HTTP `Bearer` header, and a contextual assignment), not
-any one issuer's token format. Switch by changing the import, or the Rust
-constructor:
-
-```ts
-import { initialize, scanAndRedact } from "@redact-secret/core/common";
-```
-
-```rust
-let registry = DetectorRegistry::with_common_built_in(std::iter::empty())?;
-```
-
-`common`'s false-negative tradeoff: a bare provider token (for example a raw
-GitHub or AWS credential, with no surrounding `Bearer` header or contextual
-assignment) is not detected at all, and a provider token that *is* caught by
-a `common` detector's context is reported under that detector's type and
-confidence instead of the provider-specific one — for example `warn` where
-`full` would `redact`. It adds no false positive: it only drops candidates
-`full` would have reported. Measured against `full` over the whole canonical
-corpus, `common` saves about 16% transfer size and processes 3–6× faster in
-the browser, with zero new false positives and identical findings wherever
-no provider detector would have competed
-([evidence](./docs/audits/evidence/382/README.md)).
-
-`@redact-secret/core/web-stream` and `@redact-secret/core/node-stream`'s
-convenience `createWebStreamSanitizer`/`createNodeStreamSanitizer` always
-open a `full` session. For a `common` byte stream, use the same factories
-from `@redact-secret/core/common/web-stream`/`@redact-secret/core/common/node-stream`
-instead — resolving one of those two subpaths never reaches the `full`
-runtime or the root `@redact-secret/wasm` artifact in a browser bundle. The
-`WebStreamSanitizer`/`NodeStreamSanitizer` classes are profile-agnostic and
-shared across both pairs of subpaths, so constructing one directly with a
-session from `@redact-secret/core/common`'s own `createIncrementalSanitizer`
-still works too. See the
-[streaming guide](./docs/guides/streaming.md#streaming-under-the-common-profile).
-
-Python and the CLI stay `full` only — the CLI is a pre-commit/CI enforcement
-tool, where a smaller profile would only weaken enforcement.
+Everything above uses `full`, the default on every surface. `common`
+(`@redact-secret/core/common`, or `DetectorRegistry::with_common_built_in` in
+Rust) is a smaller, opt-in set for preventive browser and agent consumers
+that drops provider-specific detectors. Keep the authoritative server
+boundary on `full`. See [detector profiles](docs/reference/detection.md#detector-profiles)
+for its false-negative tradeoff and measured savings.
 
 ## Mask secrets in traces
 
@@ -587,22 +336,10 @@ pre-commit hooks, and safe redaction pipelines.
 ```bash
 redact-secret src/config.ts src/client.ts   # check files; exit 1 on a finding
 git diff --cached | redact-secret           # check a staged diff
-redact-secret --json .env.example           # machine-consumable safe report
 redact-secret --redact log.txt > safe.txt   # sanitize; the input is untouched
 ```
 
-Check output carries safe file identity and finding metadata only — a range
-names a span in the input, never the bytes in that span. Check exit codes are
-the enforcement contract: `0` when nothing was found, `1` when anything was, and
-`2` for a usage, decoding, or processing failure. A failure outranks a finding,
-and input that is not valid UTF-8 fails closed. Redaction reports `0` or `2`
-only: finding something is what it is for, not a failure.
-
-Standard input is streamed through the incremental core under explicit limits,
-because a credential may straddle any chunk boundary; a path is read whole under
-the same total-input bound. See
-[`crates/secret-scan-cli/README.md`](./crates/secret-scan-cli/README.md) for
-the full surface and `redact-secret --help` for the limits in force.
+See the [CLI guide](docs/guides/cli.md) for exit codes, reports, and limits.
 
 ## Conformance
 
@@ -635,67 +372,14 @@ byte spans before common scoring.
 
 ## Development
 
-Install JavaScript tooling and run the main repository checks:
-
 ```bash
 npm ci
 npm run ci
 ```
 
-Validate workspace policy and the Rust surfaces:
-
-```bash
-npm run rust:check
-cargo fmt --all --check
-cargo clippy --workspace --all-targets --locked -- -D warnings
-cargo test --workspace --locked
-RUSTDOCFLAGS="-D warnings" cargo doc --workspace --no-deps --locked
-cargo package -p redact-secret --locked
-```
-
-Build and qualify the CPython artifacts (see
-[docs/python-packaging.md](./docs/python-packaging.md)):
-
-```bash
-npm run python:check
-uvx maturin build --release -m bindings/python/Cargo.toml -o dist
-uvx maturin sdist -m bindings/python/Cargo.toml -o dist
-python3 scripts/qualify-python-wheel.py --conformance dist/*.whl
-python3 scripts/qualify-python-wheel.py --build-sdist dist/*.tar.gz
-```
-
-Build and qualify the Node addon, the browser artifact, and the CLI for this
-host (see [docs/qualification.md](./docs/qualification.md)):
-
-```bash
-npm run artifacts:check
-npm --prefix bindings/node ci && npm --prefix bindings/node run build
-npm run js:build && npm run addon:qualify -- --target <triple>
-npm run wasm:build && npm run browser:qualify
-cargo build --release --locked -p redact-secret-cli
-npm run cli:qualify -- --binary target/release/redact-secret
-```
-
-The repository layout is:
-
-```text
-conformance/             shared cross-language contract
-assessment/              cross-language evaluation protocol (corpus, profiles, result contract)
-crates/secret-scan-core canonical Rust implementation
-crates/secret-scan-cli  CLI host adapter
-bindings/node           Node N-API binding
-bindings/wasm           browser WebAssembly binding
-bindings/python         Python PyO3 binding and package
-packages/javascript     unified JavaScript package, published as @redact-secret/core
-```
-
-Release qualification builds, tests, and smoke-tests the Rust crate, npm
-package, Python package, and CLI from the same commit without publishing,
-across every declared target and browser engine, and records an artifact
-inventory tied to the source commit. See
-[Versioning, qualification, and release](./ARCHITECTURE.md#versioning-qualification-and-release)
-in ARCHITECTURE.md for the full workflow and
-[docs/qualification.md](./docs/qualification.md) for how to run it locally.
+[Developer onboarding](docs/onboarding.md) lists the Rust, Python, and
+artifact qualification commands and the repository layout; the
+[contribution guide](CONTRIBUTION.md) covers pull requests and review.
 
 ## Security and release process
 
@@ -703,21 +387,11 @@ See [SECURITY.md](./SECURITY.md) for private vulnerability reporting and the
 security model. Never submit active credentials in a report, issue, fixture,
 snapshot, log, or diagnostic.
 
-A release requires explicit approval after tests pass and the public API and
-changelog have been reviewed. Readiness checks do not authorize selecting a
-version, creating a tag, publishing a package, deploying, or archiving another
-repository. See the [changelog](./CHANGELOG.md).
-
-The accepted architectural decisions are indexed in
-[docs/decisions/DECISIONS.md](./docs/decisions/DECISIONS.md).
-
-Acceptance evidence and independent reviews — the closed-issue migration
-ledger, the core/conformance/CLI boundary review, the JavaScript and Python
-binding review, the CI and supply-chain review, and their release-gap
-disposition and deferred-quality backlog — are indexed in
-[docs/audits/README.md](./docs/audits/README.md). These documents record
-evidence and classify work only; none of them authorizes any release
-operation.
+Releases follow the [release authority](AGENTS.md#release-authority) and the
+[release runbook](docs/releasing.md); see the [changelog](./CHANGELOG.md).
+Accepted architectural decisions are indexed in
+[docs/decisions/DECISIONS.md](./docs/decisions/DECISIONS.md), and review
+evidence in [docs/audits/README.md](./docs/audits/README.md).
 
 ## License
 

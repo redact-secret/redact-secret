@@ -213,8 +213,8 @@ npm run assessment:acceptance -- \
 The command validates completeness, repetitions, corpus identities, the host
 profile, accuracy parity, timing, throughput, and observable memory. It writes
 machine-readable and Markdown evidence before exiting non-zero on rejection.
-This readiness evidence does not select a version or authorize tagging,
-publication, deployment, or release.
+This is readiness evidence, not release approval; see the
+[release authority](../AGENTS.md#release-authority).
 
 The historical macOS RC criteria and their pinned baselines
 (`results/complete-v4/`, `results/complete-v3/`, `results/complete/`,
@@ -488,8 +488,7 @@ runtime instrumentation, telemetry, or public API to any product surface;
 Per the governing decision: a web UI for browsing results, comparisons
 against competing products, new language bindings, and any release,
 versioning, or publication action. Producing or reporting a result is not a
-release gate and does not by itself authorize any release action; see
-`AGENTS.md`'s release authority section.
+release gate; see the [release authority](../AGENTS.md#release-authority).
 
 Discovery fixtures, generated variants, differential and holdout evaluation,
 known-gap lifecycle, raw evidence, and fixed-candidate revalidation belong to

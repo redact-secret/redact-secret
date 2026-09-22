@@ -152,65 +152,24 @@ complete the delivery checks after a platform has been chosen.
 
 ## Branching strategy
 
-`rc` stands for release candidate. `main` is the integration branch. Merge normal
-development from working branches through pull requests. When a release is ready
-for stabilization, create `rc/<version>` from the reviewed main commit, for
-example `rc/0.1.0-beta.1`.
-
-```mermaid
-flowchart TD
-    work["Working branch"] -->|Pull request| main["main"]
-    main -->|Create release candidate branch| candidate["rc/0.1.0-beta.1"]
-    fix["Release-fix branch"] -->|Pull request targeting RC branch| candidate
-    candidate --> checks["Freeze commit; pass CI and release dry-runs"]
-    checks --> publish["Manually dispatch publication from RC branch"]
-    publish --> verify["Verify published packages with clean installs"]
-    verify --> tag["Tag the qualified commit: v0.1.0-beta.1"]
-    tag --> backport["Open a PR to merge release changes back into main"]
-    backport --> main
-```
-
-- Keep version preparation, release notes, and candidate fixes on `rc/<version>`.
-  Target release-fix PRs at that branch; keep unrelated development on `main`.
-- There is no intermediate `release/v*` branch. Each release uses its own RC
-  branch, whose version must exactly match the product manifests.
-- PR merges do not publish packages or create tags. After qualification and
-  explicit release approval, manually dispatch [Release](.github/workflows/release.yml)
-  from the RC branch. The protected `release` environment permits RC branches.
-- Freeze the candidate commit during qualification and publication. Any source
-  change requires fresh qualification. The workflow creates the immutable,
-  annotated version tag on the qualified commit only after publication and
-  registry-install verification succeed.
-- After publication, merge release changes back into `main` through a reviewed
-  PR and retain the RC branch as the preparation and recovery record.
-- [Reconcile Release](.github/workflows/reconcile-release.yml) requires separate
-  authorization and runs from the matching RC branch. Its source must remain
-  in that branch's history; merging into `main` is not a repair prerequisite.
-- When PyPI already has a matching proper subset of the qualified wheels and
-  source distribution, `Reconcile Release` verifies every existing file by
-  SHA-256, downloads the original qualified artifacts, stages only the missing
-  files, and publishes those files on an authorized non-dry-run. Conflicting
-  files, unreadable registry state, or expired original artifacts block
-  recovery. A dry run prints the missing PyPI filenames without publishing.
+`main` is the integration branch. Merge normal development from working
+branches through pull requests. Release candidates live on `rc/<version>`
+branches; the [release runbook's branching model](docs/releasing.md#branching-model)
+defines how they are cut, fixed, published, reconciled, and merged back.
 
 ## Releases
 
-Follow the [release runbook](docs/releasing.md) for candidate preparation,
+Follow the [release authority](AGENTS.md#release-authority) and the
+[release runbook](docs/releasing.md) for candidate preparation,
 non-publishing qualification, approval, publication, recovery, and closeout.
-
 The Rust crates, npm packages, Python distribution, and CLI share one SemVer
-version, source revision, and eventual `v{version}` tag. Follow the
-[release authority](AGENTS.md#release-authority),
-[lockstep decision](docs/decisions/2026-09-09-release-bindings-in-lockstep.md), and
-[artifact qualification guide](docs/qualification.md). Publishing one artifact
-does not establish that the whole product has been released. Partial publication
-requires separately authorized [Reconcile Release](.github/workflows/reconcile-release.yml)
-using the durable release manifest and matching qualified artifacts.
+version, source revision, and eventual `v{version}` tag
+([lockstep decision](docs/decisions/2026-09-09-release-bindings-in-lockstep.md),
+[artifact qualification guide](docs/qualification.md)).
 
 ### Release evidence
 
 [Release status](docs/releases/status.md) lists every published version and
 its durable record. Subsequent development is recorded under `Unreleased` in
 the [changelog](CHANGELOG.md). Candidate reviews live under
-[docs/audits](docs/audits/README.md); their verification is not approval to
-publish.
+[docs/audits](docs/audits/README.md).

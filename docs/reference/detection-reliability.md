@@ -76,8 +76,7 @@ judgement now belong to
 
 The earlier [9-fixture audit](../audits/evidence/200/verification-summary.json)
 is preserved for its original revision. It does not describe the current v3
-corpus. That audit does not claim that those artifacts were published and does
-not authorize a release.
+corpus. That audit does not claim that those artifacts were published.
 
 Build all real artifacts from one checkout, then run:
 

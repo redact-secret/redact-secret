@@ -11,8 +11,9 @@ revision before any registry publication begins.
 corpus the single behavioral contract each of those artifacts is measured
 against. This document describes the workflow that carries both out.
 
-Nothing here publishes anything. Publication requires the separate release
-approval `AGENTS.md` defines.
+Nothing here publishes anything. Publication follows the
+[release authority](../AGENTS.md#release-authority) and the
+[release runbook](releasing.md).
 
 ## Candidate security evidence
 

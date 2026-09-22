@@ -11,8 +11,14 @@
 | JavaScript browser (WebAssembly) artifact | `createIncrementalSanitizer` |
 
 A secret may cross any chunk boundary. Scanning each chunk independently can
-leak it. A session retains unresolved text until its detection window closes,
-then emits text and findings. An append may legitimately return empty text.
+leak it. A session retains unresolved plaintext until a detector window
+closes, finalization supplies the end-of-input boundary, or a declared limit
+fails, then emits text and findings. An append may legitimately return empty
+text.
+
+Every session requires explicit total-input, retained-plaintext, token, and
+multiline limits. Host adapters own backpressure, cancellation, and
+destruction; the Rust core owns scan semantics and retained-plaintext safety.
 
 `createIncrementalSanitizer` and `IncrementalSanitizer::with_common_built_in`
 support the opt-in `common` detector profile on every surface that exposes

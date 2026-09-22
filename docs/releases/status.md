@@ -48,8 +48,8 @@ limited to that original manifest and inventory, workflow evidence, registry
 checksums, and tag identity; it must not be described as a new qualification run.
 
 The prepared GitHub Release bodies target the existing annotated tags and are
-prereleases. Creating those pages requires the explicit release approval in
-`AGENTS.md`; no package republish, new tag, or workflow dispatch is needed.
+prereleases. Creating those pages follows the
+[release authority](../../AGENTS.md#release-authority); no package republish, new tag, or workflow dispatch is needed.
 Qualified CLI binaries remain Actions artifacts; these bodies do not promise
 new binary attachments. Security fixes target the latest beta under
 [SECURITY.md](../../SECURITY.md).

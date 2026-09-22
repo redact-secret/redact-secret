@@ -18,12 +18,59 @@ npm run rust:check
 cargo fmt --all --check
 cargo clippy --workspace --all-targets --locked -- -D warnings
 cargo test --workspace --locked
+RUSTDOCFLAGS="-D warnings" cargo doc --workspace --no-deps --locked
+cargo package -p redact-secret --locked
 ```
 
 `npm run ci` checks declarations, release guards, conformance schema, JavaScript
 types, and wrapper tests. It does not run the full native platform matrix or
 substitute for the real artifact qualifiers. [Qualification](qualification.md)
 and [Python packaging](python-packaging.md) give those commands and inputs.
+
+Build and qualify the CPython artifacts (see
+[Python packaging](python-packaging.md)):
+
+```bash
+npm run python:check
+uvx maturin build --release -m bindings/python/Cargo.toml -o dist
+uvx maturin sdist -m bindings/python/Cargo.toml -o dist
+python3 scripts/qualify-python-wheel.py --conformance dist/*.whl
+python3 scripts/qualify-python-wheel.py --build-sdist dist/*.tar.gz
+```
+
+Build and qualify the Node addon, the browser artifact, and the CLI for this
+host (see [qualification](qualification.md)):
+
+```bash
+npm run artifacts:check
+npm --prefix bindings/node ci && npm --prefix bindings/node run build
+npm run js:build && npm run addon:qualify -- --target <triple>
+npm run wasm:build && npm run browser:qualify
+cargo build --release --locked -p redact-secret-cli
+npm run cli:qualify -- --binary target/release/redact-secret
+```
+
+Release qualification builds, tests, and smoke-tests the Rust crate, npm
+package, Python package, and CLI from the same commit without publishing,
+across every declared target and browser engine, and records an artifact
+inventory tied to the source commit. See
+[Versioning, qualification, and release](../ARCHITECTURE.md#versioning-qualification-and-release)
+for the design and [qualification](qualification.md) for how to run it locally.
+
+## Repository layout
+
+```text
+conformance/             shared cross-language contract
+assessment/              cross-language evaluation protocol (corpus, profiles, result contract)
+crates/secret-scan-core canonical Rust implementation
+crates/secret-scan-cli  CLI host adapter
+bindings/node           Node N-API binding
+bindings/wasm           browser WebAssembly binding
+bindings/python         Python PyO3 binding and package
+packages/javascript     unified JavaScript package, published as @redact-secret/core
+```
+
+## Behavior changes
 
 Detector, redaction, overlap, or policy changes need deterministic regressions.
 Prefer the shared [conformance corpus](../conformance/README.md) for behavior
@@ -43,6 +90,5 @@ Existing audit and decision URLs are preserved for traceability.
 
 Review changes to the public API and [changelog](../CHANGELOG.md).
 Local green tests are not cross-platform qualification or registry verification.
-Release approval, version selection, tagging, publication, and deployment follow
-[the repository's release authority](../AGENTS.md); editing or reviewing the
-repository does not itself authorize them.
+Releases follow the [release authority](../AGENTS.md#release-authority) and the
+[release runbook](releasing.md).

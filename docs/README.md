@@ -28,6 +28,7 @@ the generated [support matrix](support-matrix.md).
 | What credentials can be detected, and what can be missed? | [Detection and limits](reference/detection.md) |
 | What did the bounded reliability assessment observe? | [Detection reliability](reference/detection-reliability.md) |
 | Can I process a stream? | [Streaming](guides/streaming.md) |
+| How do I detect an in-house credential format? | [Declarative rulesets](guides/rulesets.md) |
 | Why did initialization or sanitization fail? | [Troubleshooting](troubleshooting.md) |
 | How do I contribute or run checks? | [Developer onboarding](onboarding.md) · [Contribution guide](../CONTRIBUTION.md) |
 | How do I benchmark an unreleased local candidate? | [Local candidate benchmark](benchmark-candidate.md) |
