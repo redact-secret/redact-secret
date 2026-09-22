@@ -12,6 +12,25 @@
 Written 2026-09-21 against `main` at `86577d8e5b7db7a5a6c4ecfd6fc6ee8ab215909a`,
 on branch `workbench/553-bearer-sendgrid-twin-decision`.
 
+## Update — 2026-09-21, the fixture-correction tracking issue was wrong
+
+Every disposition below routes the `redact-secret-benchmarks` fixture
+correction through `redact-secret-benchmarks#66`. That issue's actual scope
+was the `known-gaps.json` promotion lifecycle, never touched these fixtures,
+and closed without doing this work — all five still fired on `main` as of
+this update. The corrected tracking issue was
+[`redact-secret-benchmarks#78`](https://github.com/redact-secret/redact-secret-benchmarks/issues/78),
+now closed; the fixtures are corrected. The re-measurement and the process
+finding are recorded in the issue thread, not restated here — see
+[the correction](https://github.com/redact-secret/redact-secret/issues/553#issuecomment-5764683940).
+Per `decision-govern-benchmark-regression-promotion`'s historical-record
+rule, the rest of this document (including its `#66` references) is left as
+originally written rather than rewritten in place.
+
+**Kind (per [DS0](../../../decisions/2026-09-22-decide-artifact-taxonomy-spec-routing-and-evidence-placement.md)):**
+final evidence, product judgement — the governing decision above relies on
+it. Stays in this repository.
+
 ## Summary
 
 Issue #553 asks for a per-family classification, before any fix, of the five
