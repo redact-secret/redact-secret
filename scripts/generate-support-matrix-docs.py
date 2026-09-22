@@ -9,7 +9,8 @@ from benchmark evidence (that repository's #509/A8). Nothing here re-derives
 or hand-adjusts a status. Because that artifact is a gitignored build output
 in the benchmark repository, this repository keeps its own pinned, committed
 copy -- `benchmarks/support-matrix.json` -- the same pattern already used for
-`benchmarks/pin-manifest.json` (`scripts/check-benchmark-pins.py`). Refresh it
+`benchmarks/pin-manifest.json` (`scripts/check-benchmark-pins.py`; every
+vendored file is listed in `benchmarks/README.md`). Refresh it
 by regenerating `support-matrix.json` in a `redact-secret-benchmarks` checkout
 (`npm run eval:classify && npm run eval:matrix`) and copying the result here,
 then re-running this script.

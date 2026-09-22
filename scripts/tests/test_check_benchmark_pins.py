@@ -33,6 +33,13 @@ def ledger_with(*records: dict) -> dict:
     return {"schemaVersion": 1, "lifecycleAuthority": "https://example.invalid", "records": list(records)}
 
 
+def gates(*, productConformance: str = "pending", benchmarkRevalidation: str = "pending") -> dict:
+    return {
+        "productConformance": {"status": productConformance, "evidence": []},
+        "benchmarkRevalidation": {"status": benchmarkRevalidation, "evidence": []},
+    }
+
+
 def record(**overrides) -> dict:
     base = {
         "id": "benchmark-gap-1",
@@ -74,6 +81,29 @@ class ReconciliationTests(unittest.TestCase):
         self.assertEqual(len(errors), 2)
         self.assertTrue(any("benchmark-gap-1" in e for e in errors))
         self.assertTrue(any("benchmark-gap-2" in e for e in errors))
+
+    def test_freezes_corpus_hashes_once_benchmark_revalidation_passed(self) -> None:
+        """A closed record's corpusHashes are the identity of the corpus that
+        was measured; the upstream digest changes on every corpus edit, so
+        re-checking it against the current pin would fail forever (#637).
+        The record is anchored by its benchmarkCommit (check 3) instead."""
+        ledger = ledger_with(record(corpusHashes=["9" * 64], gates=gates(benchmarkRevalidation="passed")))
+        self.assertEqual(CHECK.check_reconciliation(MANIFEST, ledger), [])
+
+    def test_still_flags_a_stale_corpus_hash_while_benchmark_revalidation_is_pending(self) -> None:
+        ledger = ledger_with(record(corpusHashes=["9" * 64], gates=gates(benchmarkRevalidation="pending")))
+        errors = CHECK.check_reconciliation(MANIFEST, ledger)
+        self.assertEqual(len(errors), 1)
+        self.assertIn("re-pin", errors[0])
+
+    def test_still_flags_a_dangling_fixture_id_for_a_closed_record(self) -> None:
+        """Fixture ids are stable identities, not content digests: they stay checked."""
+        ledger = ledger_with(
+            record(benchmarkFixtureIds=["gone--fixture"], gates=gates(benchmarkRevalidation="passed"))
+        )
+        errors = CHECK.check_reconciliation(MANIFEST, ledger)
+        self.assertEqual(len(errors), 1)
+        self.assertIn("gone--fixture", errors[0])
 
 
 class CollectBenchmarkCommitsTests(unittest.TestCase):
@@ -175,6 +205,59 @@ class AncestryTests(unittest.TestCase):
         self.assertEqual(findings.errors, [])
 
 
+# -- check 7: pinned version vs this repository's product version (pure) ---
+
+
+class SemverTests(unittest.TestCase):
+    def test_orders_pre_releases_numerically_not_lexically(self) -> None:
+        self.assertEqual(CHECK.compare_semver("0.1.0-beta.10", "0.1.0-beta.9"), 1)
+        self.assertEqual(CHECK.compare_semver("0.1.0-beta.6", "0.1.0-beta.6"), 0)
+        self.assertEqual(CHECK.compare_semver("0.1.0-beta.3", "0.1.0-beta.6"), -1)
+
+    def test_a_release_sorts_after_its_pre_releases_and_before_the_next_core(self) -> None:
+        self.assertEqual(CHECK.compare_semver("0.1.0", "0.1.0-rc.1"), 1)
+        self.assertEqual(CHECK.compare_semver("0.1.0-rc.1", "0.1.0"), -1)
+        self.assertEqual(CHECK.compare_semver("0.1.0", "0.1.1-beta.1"), -1)
+
+    def test_alphanumeric_identifiers_sort_after_numeric_and_prefixes_sort_first(self) -> None:
+        self.assertEqual(CHECK.compare_semver("1.0.0-alpha", "1.0.0-alpha.1"), -1)
+        self.assertEqual(CHECK.compare_semver("1.0.0-1", "1.0.0-alpha"), -1)
+        self.assertEqual(CHECK.compare_semver("1.0.0-alpha.beta", "1.0.0-beta"), -1)
+
+    def test_rejects_a_non_semver_string(self) -> None:
+        with self.assertRaises(ValueError):
+            CHECK.parse_semver("v0.1.0")
+
+
+class PinnedVersionTests(unittest.TestCase):
+    def test_silent_when_the_pin_matches_the_product_version(self) -> None:
+        self.assertEqual(CHECK.check_pinned_version(MANIFEST, "0.1.0-beta.5"), [])
+
+    def test_silent_when_the_pin_is_newer_than_this_checkout(self) -> None:
+        self.assertEqual(CHECK.check_pinned_version(MANIFEST, "0.1.0-beta.4"), [])
+
+    def test_warns_when_the_pin_is_older_than_the_product_version(self) -> None:
+        """#637: the vendored manifest carried 0.1.0-beta.3 while main was at
+        0.1.0-beta.6 and nothing said so. A warning, not an error: an rc
+        branch bumps package.json before the benchmarks repo can pin it."""
+        warnings = CHECK.check_pinned_version(MANIFEST, "0.1.0-beta.6")
+        self.assertEqual(len(warnings), 1)
+        self.assertIn("0.1.0-beta.5", warnings[0])
+        self.assertIn("0.1.0-beta.6", warnings[0])
+        self.assertIn("benchmark-pins:sync", warnings[0])
+
+    def test_warns_instead_of_crashing_on_an_unparseable_version(self) -> None:
+        manifest = {**MANIFEST, "pins": {**MANIFEST["pins"], "redactSecretVersion": "beta"}}
+        warnings = CHECK.check_pinned_version(manifest, "0.1.0-beta.6")
+        self.assertEqual(len(warnings), 1)
+        self.assertIn("cannot compare", warnings[0])
+
+    def test_warns_when_the_pin_has_no_version(self) -> None:
+        manifest = {**MANIFEST, "pins": {}}
+        warnings = CHECK.check_pinned_version(manifest, "0.1.0-beta.6")
+        self.assertEqual(len(warnings), 1)
+
+
 # -- check 5: vendored support-matrix-schema.json drift (pure) -------------
 
 
@@ -187,6 +270,100 @@ class SchemaDriftTests(unittest.TestCase):
         self.assertEqual(len(errors), 1)
         self.assertIn(str(CHECK.SUPPORT_MATRIX_SCHEMA_PATH), errors[0])
         self.assertIn("redact-secret-benchmarks@r:schemas/support-matrix-v1.json", errors[0])
+
+
+# -- check 6: vendored pin-manifest.json provenance, given facts (pure) ----
+
+
+def provenance(**overrides) -> dict:
+    facts = {
+        "revision_is_ancestor": True,
+        "revision_has_manifest": True,
+        "local_content": '{"revision": "r"}\n',
+        "live_content": '{"revision": "r"}\n',
+        "live_source": "redact-secret-benchmarks@main:benchmarks/pin-manifest.json",
+    }
+    facts.update(overrides)
+    return facts
+
+
+class ManifestProvenanceTests(unittest.TestCase):
+    def test_passes_when_the_revision_is_real_carries_the_manifest_and_content_matches(self) -> None:
+        self.assertEqual(CHECK.check_manifest_provenance(MANIFEST, **provenance()), [])
+
+    def test_flags_a_revision_that_is_not_in_the_benchmarks_history(self) -> None:
+        errors = CHECK.check_manifest_provenance(MANIFEST, **provenance(revision_is_ancestor=False))
+        self.assertEqual(len(errors), 1)
+        self.assertIn("r" * 40, errors[0])
+        self.assertIn("not a recorded ancestor", errors[0])
+
+    def test_does_not_also_report_a_missing_file_for_a_revision_outside_the_history(self) -> None:
+        """A commit outside main has no tree to look in; one error, not two."""
+        errors = CHECK.check_manifest_provenance(
+            MANIFEST, **provenance(revision_is_ancestor=False, revision_has_manifest=False)
+        )
+        self.assertEqual(len(errors), 1)
+        self.assertIn("not a recorded ancestor", errors[0])
+
+    def test_flags_a_revision_that_predates_the_manifest(self) -> None:
+        """#637's `f1d4fac`: a real benchmarks commit at which
+        benchmarks/pin-manifest.json did not exist yet."""
+        errors = CHECK.check_manifest_provenance(MANIFEST, **provenance(revision_has_manifest=False))
+        self.assertEqual(len(errors), 1)
+        self.assertIn("does not contain benchmarks/pin-manifest.json", errors[0])
+
+    def test_flags_vendored_content_that_drifted_from_the_benchmarks_copy(self) -> None:
+        errors = CHECK.check_manifest_provenance(MANIFEST, **provenance(live_content='{"revision": "s"}\n'))
+        self.assertEqual(len(errors), 1)
+        self.assertIn(str(CHECK.MANIFEST_PATH), errors[0])
+        self.assertIn("redact-secret-benchmarks@main:benchmarks/pin-manifest.json", errors[0])
+        self.assertIn("benchmark-pins:sync", errors[0])
+
+    def test_reports_provenance_and_drift_independently(self) -> None:
+        errors = CHECK.check_manifest_provenance(
+            MANIFEST, **provenance(revision_has_manifest=False, live_content="different\n")
+        )
+        self.assertEqual(len(errors), 2)
+
+    def test_both_vendored_files_are_under_the_same_byte_identity_rule(self) -> None:
+        """#637 acceptance: the schema (check 5) and the manifest (check 6c)
+        share one drift rule, and `--sync` rewrites exactly those files."""
+        self.assertEqual(
+            [str(local) for local, _ in CHECK.VENDORED_FILES],
+            [str(CHECK.MANIFEST_PATH), str(CHECK.SUPPORT_MATRIX_SCHEMA_PATH)],
+        )
+        drift = CHECK.check_vendored_file_drift(CHECK.MANIFEST_PATH, "a", "b", live_source="x")
+        self.assertEqual(len(drift), 1)
+        self.assertEqual(CHECK.check_schema_drift("a", "b", live_source="x")[0].split(" has drifted")[0], str(CHECK.SUPPORT_MATRIX_SCHEMA_PATH))
+
+
+class SyncVendoredFilesTests(unittest.TestCase):
+    def test_rewrites_every_vendored_copy_from_the_benchmarks_branch(self) -> None:
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        root = Path(tmp.name)
+        (root / "benchmarks").mkdir()
+        (root / CHECK.MANIFEST_PATH).write_text("stale\n", encoding="utf-8")
+        requested: list[tuple[str, str, str]] = []
+
+        def fetch(repo: str, ref: str, path: str) -> str:
+            requested.append((repo, ref, path))
+            return f"fresh {path}\n"
+
+        written = CHECK.sync_vendored_files(root, fetch)
+        self.assertEqual(written, [CHECK.MANIFEST_PATH, CHECK.SUPPORT_MATRIX_SCHEMA_PATH])
+        self.assertEqual(
+            requested,
+            [
+                (CHECK.BENCHMARKS_REPO, CHECK.BENCHMARKS_BRANCH, CHECK.BENCHMARKS_MANIFEST_PATH),
+                (CHECK.BENCHMARKS_REPO, CHECK.BENCHMARKS_BRANCH, CHECK.BENCHMARKS_SUPPORT_MATRIX_SCHEMA_PATH),
+            ],
+        )
+        self.assertEqual((root / CHECK.MANIFEST_PATH).read_text(encoding="utf-8"), "fresh benchmarks/pin-manifest.json\n")
+        self.assertEqual(
+            (root / CHECK.SUPPORT_MATRIX_SCHEMA_PATH).read_text(encoding="utf-8"),
+            "fresh schemas/support-matrix-v1.json\n",
+        )
 
 
 # -- local git ancestry helpers, against a real, deterministic history -----

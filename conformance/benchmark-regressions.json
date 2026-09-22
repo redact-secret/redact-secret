@@ -129,7 +129,7 @@
         "sendgrid-regressions--url-safe-generic-key"
       ],
       "corpusHashes": [
-        "8f1962b1eb77dec0862bc07a9ba1052f198b30899aaa93cb42fad309a3287778"
+        "bb556d9d91dda1a394c83be1cd3763e75ebf9230d5fbdb6ad5abd91368ab459d"
       ],
       "canonicalFixtures": {
         "synchronous": [
@@ -148,7 +148,7 @@
           "evidence": []
         }
       },
-      "note": "Promotes 'SendGrid generic-key control detects the entire token, including a trailing dash' out of redact-secret-benchmarks' regressions.test.mjs (benchmarks issue #16), which pins two properties across the corpus's three '-generic-key' fixtures: a secret segment ending in '-' and an id/secret pair carrying an embedded '_'. Each property got its own canonical fixture per the split-by-property rule so a failure names which one broke. Both were confirmed to already pass against the current detector before being added, so this closes an uncovered contract rather than a live regression; gates stay pending until supported-surface evidence and a fixed-candidate benchmark rerun are recorded. No benchmark fixture input or discovery-matrix material was copied -- both canonical inputs are freshly constructed synthetic values."
+      "note": "Promotes 'SendGrid generic-key control detects the entire token, including a trailing dash' out of redact-secret-benchmarks' regressions.test.mjs (benchmarks issue #16), which pins two properties across the corpus's three '-generic-key' fixtures: a secret segment ending in '-' and an id/secret pair carrying an embedded '_'. Each property got its own canonical fixture per the split-by-property rule so a failure names which one broke. Both were confirmed to already pass against the current detector before being added, so this closes an uncovered contract rather than a live regression; gates stay pending until supported-surface evidence and a fixed-candidate benchmark rerun are recorded. No benchmark fixture input or discovery-matrix material was copied -- both canonical inputs are freshly constructed synthetic values. Issue #637 re-pinned corpusHashes from 8f1962b1... to the sendgrid-regressions corpus hash at the resynced benchmarks/pin-manifest.json (benchmarks revision feadf545, published 0.1.0-beta.6): both gates were still pending with no evidence recorded, so no measurement was invalidated -- a pending record must reference the corpus it will actually be revalidated against, and redact-secret-benchmarks regenerated that corpus after this record was promoted. Both benchmarkFixtureIds still exist at the resynced revision."
     },
     {
       "id": "reference-syntax-literal-secret-controls-promotion",
