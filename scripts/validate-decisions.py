@@ -25,24 +25,6 @@ SPEC_NAMES = {
 }
 SIZE_WARNING_BYTES = 12_000
 
-# Exact repository-relative path -> why this ADR's `## Current application`
-# appendix is a reviewed, grandfathered exception rather than a new one.
-# Mirrors scripts/check-legacy-identifiers.py's LEGACY_IDENTIFIER_ALLOWLIST
-# pattern: keyed by exact path, mandatory non-empty rationale. Issue #597
-# (DS6a) adds this rule going forward without rewriting existing ADR bodies;
-# the epic's later disposition work (DS6b-d, tracked under #591) removes
-# each appendix -- and this allowlist entry with it -- when it rewrites that
-# ADR's body under a summarize/merge grade.
-CURRENT_APPLICATION_ALLOWLIST: dict[str, str] = {
-    "docs/decisions/2026-09-10-adopt-redact-secret-naming-contract.md": (
-        "pre-existing appendix from before #597's rule; DS6b-d removes it "
-        "when this ADR's body is summarized or merged"
-    ),
-    "docs/decisions/2026-09-10-ship-first-release-artifact-set.md": (
-        "pre-existing appendix from before #597's rule; DS6b-d removes it "
-        "when this ADR's body is summarized or merged"
-    ),
-}
 
 
 def parse_frontmatter(path: Path) -> tuple[dict[str, str], str, list[str]]:
@@ -69,23 +51,6 @@ def parse_frontmatter(path: Path) -> tuple[dict[str, str], str, list[str]]:
             errors.append(f"{path}:{number}: duplicate field {key}")
         fields[key] = value.strip().strip('"\'')
     return fields, "\n".join(lines[end + 1 :]), errors
-
-
-def check_allowlist_shape(root: Path) -> list[str]:
-    """Every Current-application allowlist entry names a real file and carries a rationale.
-
-    Not called from `validate()` itself -- a caller testing the appendix
-    rule against a synthetic record set has no reason to also carry every
-    real allowlisted file into that fixture (mirrors
-    `check-legacy-identifiers.py`'s `check_allowlist_shape`/`validate` split).
-    """
-    errors: list[str] = []
-    for relative, rationale in CURRENT_APPLICATION_ALLOWLIST.items():
-        if not rationale.strip():
-            errors.append(f"{relative}: Current-application allowlist entry has no rationale")
-        if not (root / relative).is_file():
-            errors.append(f"{relative}: Current-application allowlisted but the file does not exist")
-    return errors
 
 
 def parse_spec_routing(root: Path) -> tuple[dict[str, set[Path]], list[str]]:
@@ -258,8 +223,7 @@ def validate(root: Path) -> tuple[list[str], list[str]]:
         if full_record is not None and not FULL_RECORD.fullmatch(full_record):
             errors.append(f"{record}: full_record is not a main-commit blob permalink")
 
-        relative = str(record.relative_to(root)) if record.is_relative_to(root) else str(record)
-        if CURRENT_APPLICATION_HEADING.search(body) and relative not in CURRENT_APPLICATION_ALLOWLIST:
+        if CURRENT_APPLICATION_HEADING.search(body):
             errors.append(
                 f"{record}: '## Current application' appendices are rejected; "
                 "use supersession or a spec-file row instead"
@@ -296,7 +260,6 @@ def validate(root: Path) -> tuple[list[str], list[str]]:
 def main() -> int:
     root = Path(sys.argv[1]) if len(sys.argv) > 1 else Path.cwd()
     errors, warnings = validate(root)
-    errors = check_allowlist_shape(root) + errors
     for warning in warnings:
         print(f"WARNING {warning}")
     for error in errors:
