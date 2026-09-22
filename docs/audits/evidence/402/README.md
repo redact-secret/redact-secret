@@ -13,6 +13,9 @@ Triaged 2026-09-18 against candidate commit `ec1f86b0c07efc10ecbbd9fa22d7083f898
 discovery evidence, not a detector change: it adds no fixture, corrects no
 grammar, and closes no gate. It changes no code.
 
+**Kind (per [DS0](../../../decisions/2026-09-22-decide-artifact-taxonomy-spec-routing-and-evidence-placement.md)):**
+final evidence, product judgement. Stays in this repository.
+
 ## Summary
 
 `release-regression-check` reported 19 fixtures regressing against the
@@ -29,16 +32,19 @@ confirmed for any of the 19, and no code change is made under this issue.
 
 | Group | Count | Disposition | Prior evidence |
 | --- | ---: | --- | --- |
-| `openai-token-shape-1/2/3-{bare,quoted,unicode-crlf}` | 9 | intended, reviewed policy change | [#367](../367/README.md), [#376](../376/README.md#policy-changes-never-hidden-by-deleting-cases) |
-| `slack-token-shape-1-{bare,quoted,unicode-crlf}` | 3 | intended, reviewed policy change | [#367](../367/README.md), [#376](../376/README.md#policy-changes-never-hidden-by-deleting-cases) |
-| `docker-token-shape-1-{bare,quoted,unicode-crlf}` | 3 | intended, reviewed policy change | [#367](../367/README.md), [#376](../376/README.md#policy-changes-never-hidden-by-deleting-cases) |
-| `cloudflare-token-shape-1-{bare,quoted,unicode-crlf}` | 3 | intended, reviewed policy change | [#367](../367/README.md), [#376](../376/README.md#policy-changes-never-hidden-by-deleting-cases) |
-| `common-formats--sendgrid-token-segmented-unicode-crlf` | 1 | known benchmark-harness fixture-ID collision; byte-perfect detection confirmed | [#376, "Benchmark fixture-ID collision"](../376/README.md#what-this-evidence-does-not-claim-and-remaining-limitations) |
+| `openai-token-shape-1/2/3-{bare,quoted,unicode-crlf}` | 9 | intended, reviewed policy change | [#367](../367/README.md), [#376](https://github.com/redact-secret/redact-secret-benchmarks/blob/695500611224a434ce89392b97d4107275587079/docs/reports/beta-5/results.md#policy-changes) |
+| `slack-token-shape-1-{bare,quoted,unicode-crlf}` | 3 | intended, reviewed policy change | [#367](../367/README.md), [#376](https://github.com/redact-secret/redact-secret-benchmarks/blob/695500611224a434ce89392b97d4107275587079/docs/reports/beta-5/results.md#policy-changes) |
+| `docker-token-shape-1-{bare,quoted,unicode-crlf}` | 3 | intended, reviewed policy change | [#367](../367/README.md), [#376](https://github.com/redact-secret/redact-secret-benchmarks/blob/695500611224a434ce89392b97d4107275587079/docs/reports/beta-5/results.md#policy-changes) |
+| `cloudflare-token-shape-1-{bare,quoted,unicode-crlf}` | 3 | intended, reviewed policy change | [#367](../367/README.md), [#376](https://github.com/redact-secret/redact-secret-benchmarks/blob/695500611224a434ce89392b97d4107275587079/docs/reports/beta-5/results.md#policy-changes) |
+| `common-formats--sendgrid-token-segmented-unicode-crlf` | 1 | known benchmark-harness fixture-ID collision; byte-perfect detection confirmed | [#376, "Benchmark fixture-ID collision"](https://github.com/redact-secret/redact-secret-benchmarks/blob/695500611224a434ce89392b97d4107275587079/docs/reports/beta-5/results.md#anomalies-not-product-regressions) |
 
 ## The 18 detector-coverage misses
 
-`docs/audits/evidence/376/README.md` ("Policy changes") already names these
-four families and this exact fixture-ID shape verbatim:
+This repository's own gate evidence for #376 already named these four
+families and this exact fixture-ID shape verbatim (quoted here from that
+record; the full measurement has since moved to
+[`redact-secret-benchmarks`'s beta.5 results, "Policy changes"](https://github.com/redact-secret/redact-secret-benchmarks/blob/695500611224a434ce89392b97d4107275587079/docs/reports/beta-5/results.md#policy-changes),
+per [`evidence/376`](../376/README.md)):
 
 > Eighteen `detector-coverage` policy/T3 rows for four of the seven frozen
 > families move from a provider finding to silent, matching the reviewed
@@ -85,8 +91,11 @@ the same disposition applies to all three contexts per family.
 
 ## The one fixed-corpus partial match
 
-`docs/audits/evidence/376/README.md`'s limitations section already documents
-this exact symptom:
+This repository's own gate evidence for #376 already documented this exact
+symptom (quoted here from that record; the full measurement has since moved
+to
+[`redact-secret-benchmarks`'s beta.5 results, "Anomalies"](https://github.com/redact-secret/redact-secret-benchmarks/blob/695500611224a434ce89392b97d4107275587079/docs/reports/beta-5/results.md#anomalies-not-product-regressions),
+per [`evidence/376`](../376/README.md)):
 
 > **Benchmark fixture-ID collision, not fixed here.** A materialization-path
 > collision between `common-formats` and `detector-coverage` fixtures
