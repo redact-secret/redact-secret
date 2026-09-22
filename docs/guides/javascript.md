@@ -2,10 +2,12 @@
 
 [Documentation home](../README.md) · [Installation](../getting-started.md)
 
-The package is ESM and exposes the same whole-input API on Node and browsers.
-Initialize once before synchronous operations. Initialization is idempotent;
-a failed attempt may be retried. It also checks that the binding version
-matches the wrapper version.
+The package is ESM and exposes one typed whole-input API on Node and modern
+browsers. Initialize once before synchronous operations: the explicit
+initialization contract makes native or WebAssembly loading failures
+observable without making every scan asynchronous. Initialization is
+idempotent; a failed attempt may be retried. It also checks that the binding
+version matches the wrapper version.
 
 ```ts
 import { initialize, scanAndRedact } from "@redact-secret/core";
@@ -20,7 +22,52 @@ console.log(result.findings.length); // 1
 that same original input. Prefer `scanAndRedact` when you need both. Findings
 and result metadata are frozen and contain no matched plaintext. Their
 half-open `start`/`end` offsets count UTF-16 code units in the original input.
-Never log `input.slice(finding.start, finding.end)`.
+Never log `input.slice(finding.start, finding.end)`. Offsets point into the
+original input even when the sanitized output has a different length:
+
+```ts
+result.findings[0];
+// {
+//   id: "finding-1",
+//   type: "contextual_secret",
+//   detector: "generic-token",
+//   confidence: "high",
+//   action: "redact",
+//   start: 8,
+//   end: 39
+// }
+```
+
+## Runtime selection
+
+On Node.js, `@redact-secret/core` installs a prebuilt N-API addon for glibc
+and musl Linux, macOS, and Windows (x64 and arm64 each: eight platform
+packages, `engines.node` `20.x || 22.x || 24.x`) as an optional dependency.
+On a host with no matching addon at all — an unsupported platform or
+architecture, a matching optional dependency that failed to install, or a
+corrupt addon — `initialize()` falls back to the same WebAssembly artifact
+browsers use instead of failing outright. Call `artifact()` after
+`initialize()` to see which one actually loaded: `"addon"` or `"wasm"`. Bun
+and Deno get this fallback for free.
+
+```ts
+import { artifact, initialize } from "@redact-secret/core";
+
+await initialize();
+console.log(artifact()); // "addon" on a supported host, "wasm" on the fallback
+```
+
+**Cloudflare Workers is a verified, supported runtime**: it resolves its own
+`workerd` package condition to a loader that instantiates the WebAssembly
+artifact from a bundler-compiled `WebAssembly.Module` instead of the generated
+glue's `import.meta.url`-based `fetch`, which does not work under a real
+`workerd` sandbox (`decision-verify-edge-runtimes`). **Vercel Edge is not yet
+supported**: it resolves the plain browser entry point, whose `fetch`-based
+initialization fails there for a related but distinct reason, verified
+against Vercel's own reference Edge Runtime engine. See
+[qualification](../qualification.md) for the verified root cause, why the
+Cloudflare Workers fix does not carry over, the full target matrix, exactly
+which failures engage the Node fallback, and how CI keeps both from drifting.
 
 ## Choose a policy
 
@@ -87,9 +134,7 @@ versa) fails closed rather than silently running the wrong detector set.
 a JWT, an `otpauth://` URI, a credential-bearing connection URI, a `Bearer`
 header, and a contextual assignment); it never detects a bare, unadorned
 provider token. See [detection coverage](../reference/detection.md#detector-profiles)
-for the false-negative tradeoff and the
-[README's profile section](../../README.md#opt-in-detector-profiles) for
-measured savings. Python and the CLI stay `full` only.
+for the false-negative tradeoff and the measured savings. Python and the CLI stay `full` only.
 
 ## Browser loading
 

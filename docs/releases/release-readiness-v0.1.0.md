@@ -12,9 +12,8 @@ went well enough. The beta.5 failures and fixes that motivate each line are
 recorded in the
 [beta.5 release retrospective](../audits/beta5-release-retrospective.md).
 
-**This checklist does not select a version, create a tag, authorize
-publication, or deploy.** It does not itself constitute release approval.
-Follow [release authority](../../AGENTS.md#release-authority) and the
+**This checklist is evidence, not release approval.** Follow the
+[release authority](../../AGENTS.md#release-authority) and the
 [release runbook](../releasing.md) for those decisions; this page only states
 what "release engineering is ready for v0.1.0 stable" means, evaluated
 against a real run.

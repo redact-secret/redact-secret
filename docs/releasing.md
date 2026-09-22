@@ -7,6 +7,13 @@ qualification, publication, recovery, and closeout. It describes the workflows
 in this repository; [AGENTS.md](../AGENTS.md#release-authority) remains the
 release authority. A completed issue or successful build is not release approval.
 
+Nothing but that explicit approval authorizes a release. Readiness checks,
+qualification runs, assessment results, audits, checklists, a manifest
+version value, and completed issues are evidence only: none of them selects a
+version, creates a tag or a GitHub Release page, publishes a package,
+deploys, or archives another repository. Documents elsewhere in this
+repository link here rather than restating this rule.
+
 Published versions and their evidence are listed in
 [release status](releases/status.md). Use the candidate's own source revision
 and review evidence when preparing the next release.
@@ -40,6 +47,51 @@ interchangeable with re-running `Release`: re-running `Release` can fail hard
 on packages that already published successfully, since most registries reject
 publishing over an existing version. Details on why to prefer each workflow,
 and what evidence each requires, are in the sections below.
+
+## Branching model
+
+`rc` stands for release candidate. `main` is the integration branch; normal
+development merges into it from working branches through pull requests. When
+a release is ready for stabilization, create `rc/<version>` from the reviewed
+main commit, for example `rc/0.1.0-beta.1`.
+
+```mermaid
+flowchart TD
+    work["Working branch"] -->|Pull request| main["main"]
+    main -->|Create release candidate branch| candidate["rc/0.1.0-beta.1"]
+    fix["Release-fix branch"] -->|Pull request targeting RC branch| candidate
+    candidate --> checks["Freeze commit; pass CI and release dry-runs"]
+    checks --> publish["Manually dispatch publication from RC branch"]
+    publish --> verify["Verify published packages with clean installs"]
+    verify --> tag["Tag the qualified commit: v0.1.0-beta.1"]
+    tag --> backport["Open a PR to merge release changes back into main"]
+    backport --> main
+```
+
+- Keep version preparation, release notes, and candidate fixes on `rc/<version>`.
+  Target release-fix PRs at that branch; keep unrelated development on `main`.
+- There is no intermediate `release/v*` branch. Each release uses its own RC
+  branch, whose version must exactly match the product manifests.
+- PR merges do not publish packages or create tags. After qualification and
+  explicit release approval, manually dispatch
+  [Release](../.github/workflows/release.yml) from the RC branch. The
+  protected `release` environment permits RC branches.
+- Freeze the candidate commit during qualification and publication. Any source
+  change requires fresh qualification. The workflow creates the immutable,
+  annotated version tag on the qualified commit only after publication and
+  registry-install verification succeed.
+- After publication, merge release changes back into `main` through a reviewed
+  PR and retain the RC branch as the preparation and recovery record.
+- [Reconcile Release](../.github/workflows/reconcile-release.yml) requires
+  separate authorization and runs from the matching RC branch. Its source must
+  remain in that branch's history; merging into `main` is not a repair
+  prerequisite.
+- When PyPI already has a matching proper subset of the qualified wheels and
+  source distribution, `Reconcile Release` verifies every existing file by
+  SHA-256, downloads the original qualified artifacts, stages only the missing
+  files, and publishes those files on an authorized non-dry-run. Conflicting
+  files, unreadable registry state, or expired original artifacts block
+  recovery. A dry run prints the missing PyPI filenames without publishing.
 
 ## Product and artifact identity
 

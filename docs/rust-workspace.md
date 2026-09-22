@@ -72,8 +72,8 @@ idempotent by registry state rather than by a cutover-vs-routine switch: when
 a package for the requested version is absent it publishes the qualified
 artifact; when the same version is already published it verifies matching
 registry content and skips republishing it (npm versions are immutable). One
-dispatch of `Release`, gated on the release approval `AGENTS.md` mandates,
-handles both initial publication and routine releases -- there is no separate
+dispatch of `Release`, gated on the
+[release authority](../AGENTS.md#release-authority), handles both initial publication and routine releases -- there is no separate
 "publish only the wrapper" path.
 
 ## Policies
@@ -249,7 +249,8 @@ version drift, including drift in the private root and native/Wasm packages.
 `npm run rust:check` runs the enforcement. First and subsequent publications
 use the same approved release graph, including all nine npm dependencies
 before the wrapper; there is no separate first-cutover dispatch. A manifest
-value alone neither selects nor authorizes a release.
+value alone is not release approval; see the
+[release runbook](releasing.md).
 
 ### MSRV
 

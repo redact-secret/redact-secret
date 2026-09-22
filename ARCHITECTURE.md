@@ -524,8 +524,8 @@ in the [detection reference](./docs/reference/detection.md#detector-profiles),
 [API concepts](./docs/reference/api-contract.md#detector-profiles), and the
 [JavaScript](./docs/guides/javascript.md#detector-profiles) and
 [Rust](./docs/guides/rust.md#detector-profiles) guides. Publishing a released
-version with these exports still requires the explicit release approval
-`AGENTS.md` describes.
+version with these exports follows the
+[release authority](./AGENTS.md#release-authority).
 
 ## Error and telemetry constraints
 
@@ -626,9 +626,9 @@ while npm now ships musl N-API addons alongside glibc
 all falls back to the WebAssembly artifact browsers use
 (`decision-add-node-wasm-fallback`).
 
-Release readiness does not authorize selecting a version, tagging, publishing,
-deploying, or archiving another repository. Those actions require the separate
-release approval defined by repository governance.
+Release readiness is evidence, not approval; see the
+[release authority](./AGENTS.md#release-authority) and the
+[release runbook](./docs/releasing.md).
 
 ## Deliberate exclusions
 

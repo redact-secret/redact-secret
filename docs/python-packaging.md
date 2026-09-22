@@ -241,5 +241,5 @@ protection, the workflow runs on every pull request without path filtering, as
 well as every push to `main`. It also exposes `workflow_call`, so release
 qualification can reuse it without restating the matrix.
 
-No release is authorized by any of this. Publishing requires the separate
-approval defined by repository governance.
+Publishing follows the [release authority](../AGENTS.md#release-authority)
+and the [release runbook](releasing.md).

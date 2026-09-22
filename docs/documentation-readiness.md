@@ -75,6 +75,7 @@ revision for candidate documentation; a development manifest version is not
 proof of registry publication. Final delivery must label the approved version
 and distinguish it from ongoing beta/development documentation.
 
-This checklist does not select a version, create a repository, authorize a tag,
-publication, deployment, or release. Follow [release authority](../AGENTS.md#release-authority)
-and the [release process](../CONTRIBUTION.md#releases) for those actions.
+This checklist is evidence, not approval. It does not create a repository;
+versions, tags, publication, and deployment follow the
+[release authority](../AGENTS.md#release-authority) and the
+[release runbook](releasing.md).
