@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Freeze the Grafana service account and Cloud access policy token grammar, and exclude the legacy API key
 decided_at: 2026-09-16
+spec: detector-families
 ---
 
 # Freeze the Grafana service account and Cloud access policy token grammar, and exclude the legacy API key

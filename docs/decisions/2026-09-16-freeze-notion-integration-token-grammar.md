@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Freeze the Notion integration token grammar as two exact-length prefixed shapes
 decided_at: 2026-09-16
+spec: detector-families
 ---
 
 # Freeze the Notion integration token grammar as two exact-length prefixed shapes

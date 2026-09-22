@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Freeze the Sentry user and organization auth token grammar as two unambiguous prefixed shapes
 decided_at: 2026-09-16
+spec: detector-families
 ---
 
 # Freeze the Sentry user and organization auth token grammar as two unambiguous prefixed shapes

@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Adopt the Hugging Face organization-token prefix under hf_'s frozen body grammar, re-tiered to T2
 decided_at: 2026-09-20
+spec: detector-families
 ---
 
 # Adopt the Hugging Face organization-token prefix under hf_'s frozen body grammar, re-tiered to T2

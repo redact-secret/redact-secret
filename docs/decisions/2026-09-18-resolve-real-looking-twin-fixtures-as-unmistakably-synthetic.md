@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Resolve real-looking twin fixtures as unmistakably synthetic
 decided_at: 2026-09-18
+spec: evidence-and-gates
 ---
 
 # Resolve real-looking twin fixtures as unmistakably synthetic

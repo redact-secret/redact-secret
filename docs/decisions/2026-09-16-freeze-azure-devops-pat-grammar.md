@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Freeze the Azure DevOps personal access token grammar as the documented 84-byte AZDO-signature shape
 decided_at: 2026-09-16
+spec: detector-families
 ---
 
 # Freeze the Azure DevOps personal access token grammar as the documented 84-byte AZDO-signature shape

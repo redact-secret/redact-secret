@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Adopt the Cloudflare account-token prefix under the frozen cfut_ contract
 decided_at: 2026-09-20
+spec: detector-families
 ---
 
 # Adopt the Cloudflare account-token prefix under the frozen cfut_ contract

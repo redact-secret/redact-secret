@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Freeze the Atlassian Cloud API token grammar as a minimum-length ATAT-prefixed body
 decided_at: 2026-09-16
+spec: detector-families
 ---
 
 # Freeze the Atlassian Cloud API token grammar as a minimum-length ATAT-prefixed body

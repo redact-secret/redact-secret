@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Match placeholder words on token boundaries, not exact-string equality
 decided_at: 2026-09-15
+spec: contextual-detection
 ---
 
 # Match placeholder words on token boundaries, not exact-string equality

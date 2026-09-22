@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Release bindings in lockstep
 decided_at: 2026-09-09
+spec: distribution
 ---
 # Release bindings in lockstep
 

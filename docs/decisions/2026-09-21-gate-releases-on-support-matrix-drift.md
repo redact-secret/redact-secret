@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Gate release qualification on support-matrix drift, with recorded acknowledgement to override
 decided_at: 2026-09-21
+spec: evidence-and-gates
 ---
 
 # Gate release qualification on support-matrix drift, with recorded acknowledgement to override

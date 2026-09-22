@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Graduate logging and tracing adapters to a separate repository
 decided_at: 2026-09-19
+spec: distribution
 ---
 # Graduate logging and tracing adapters to a separate repository
 

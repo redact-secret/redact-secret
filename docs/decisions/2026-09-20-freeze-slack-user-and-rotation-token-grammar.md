@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Complete the Slack credential family by freezing the user-token grammar and the rotation family's version section
 decided_at: 2026-09-20
+spec: detector-families
 ---
 
 # Complete the Slack credential family by freezing the user-token grammar and the rotation family's version section

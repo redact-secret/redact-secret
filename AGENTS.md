@@ -17,6 +17,14 @@ run belongs in `redact-secret-benchmarks`, never copied here; and an
 iterative or exploratory log stays in an issue comment, linked by permalink
 from whichever final record cites it, not duplicated into a repository file.
 
+Current rules are stated in the five spec files under `docs/specs/`
+(`detector-families.md`, `contextual-detection.md`, `engine.md`,
+`distribution.md`, `evidence-and-gates.md`); each links the ADR that decided
+it. A decision that applies an existing policy to one more provider family or
+one more instance is a spec-file row plus its supporting evidence, not a new
+ADR — a new ADR is warranted only for new policy, a new trade-off, or a
+precedent that spans families.
+
 ## Security boundary
 
 - Never place real credentials in source, fixtures, logs, errors, snapshots, documentation, or agent context. Use unmistakably synthetic or revoked examples.

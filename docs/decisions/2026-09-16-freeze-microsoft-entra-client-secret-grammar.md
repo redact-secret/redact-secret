@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Freeze the Microsoft Entra application client-secret grammar as an unprefixed digit-Q-tilde marker
 decided_at: 2026-09-16
+spec: detector-families
 ---
 
 # Freeze the Microsoft Entra application client-secret grammar as an unprefixed digit-Q-tilde marker

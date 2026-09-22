@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Scope a payload-trusting exclusion for the legacy Supabase anon JWT to iss+role together
 decided_at: 2026-09-20
+spec: detector-families
 ---
 
 # Scope a payload-trusting exclusion for the legacy Supabase anon JWT to `iss`+`role` together

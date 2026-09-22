@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Measure JavaScript performance externally
 decided_at: 2026-09-12
+spec: evidence-and-gates
 ---
 
 # Measure JavaScript performance externally

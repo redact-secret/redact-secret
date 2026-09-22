@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Adopt a Rust-core monorepo
 decided_at: 2026-09-09
+spec: engine
 ---
 
 # Adopt a Rust-core monorepo

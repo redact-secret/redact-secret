@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Add a Node WebAssembly fallback when the native addon is unusable
 decided_at: 2026-09-19
+spec: distribution
 ---
 
 # Add a Node WebAssembly fallback when the native addon is unusable

@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Freeze the Telegram Bot API token grammar as a minimum-length digit-colon-secret shape
 decided_at: 2026-09-16
+spec: detector-families
 ---
 
 # Freeze the Telegram Bot API token grammar as a minimum-length digit-colon-secret shape

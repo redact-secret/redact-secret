@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Freeze the Datadog API Key and Application Key grammar as marker-gated lowercase-hex values
 decided_at: 2026-09-16
+spec: detector-families
 ---
 
 # Freeze the Datadog API Key and Application Key grammar as marker-gated lowercase-hex values

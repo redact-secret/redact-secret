@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Warn unconditionally on high-signal contextual-name assignments despite prose false positives
 decided_at: 2026-09-20
+spec: contextual-detection
 ---
 
 # Warn unconditionally on high-signal contextual-name assignments despite prose false positives

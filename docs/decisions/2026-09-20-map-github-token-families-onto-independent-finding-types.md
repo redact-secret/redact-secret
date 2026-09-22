@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Map GitHub's six token families onto six independent finding types under one detector
 decided_at: 2026-09-20
+spec: detector-families
 ---
 
 # Map GitHub's six token families onto six independent finding types under one detector

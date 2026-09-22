@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Add Firebase FCM legacy server key detection, and discriminate the public Web SDK client config from google-api-key
 decided_at: 2026-09-20
+spec: detector-families
 ---
 
 # Add Firebase FCM legacy server key detection, and discriminate the public Web SDK client config from `google-api-key`

@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Inventory the GitLab token-prefix table and contract the two undeclared prefixes; record routable tokens and the legacy runner-registration token as explicit, tracked gaps
 decided_at: 2026-09-20
+spec: detector-families
 ---
 
 # Inventory the GitLab token-prefix table and contract the two undeclared prefixes

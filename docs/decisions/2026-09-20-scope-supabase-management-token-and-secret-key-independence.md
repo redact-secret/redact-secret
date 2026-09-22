@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Separate the Supabase management-token credential class from the secret-key class, and keep each class's evidence independent
 decided_at: 2026-09-20
+spec: detector-families
 ---
 
 # Separate the Supabase management-token credential class from the secret-key class, and keep each class's evidence independent

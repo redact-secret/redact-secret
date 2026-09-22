@@ -4,6 +4,7 @@ status: accepted
 scope: workspace
 title: Freeze the Discord bot token grammar as a three-segment digit-decoding snowflake token
 decided_at: 2026-09-16
+spec: detector-families
 ---
 
 # Freeze the Discord bot token grammar as a three-segment digit-decoding snowflake token
