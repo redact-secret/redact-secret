@@ -145,7 +145,7 @@
         {
           "id": "supabase-legacy-anon-public-key",
           "description": "A legacy-format Supabase JWT whose payload decodes to \"iss\":\"supabase\" together with \"role\":\"anon\" is a public identifier by Supabase's own design (the same treatment the new-format sb_publishable_ key already receives) and produces no finding. Invalid UTF-8, a non-Supabase iss, or any role other than anon (including service_role) all stay detected.",
-          "basis": {"kind": "decision", "ref": "docs/decisions/2026-09-20-scope-supabase-legacy-anon-jwt-exclusion.md (issue #472)"},
+          "basis": {"kind": "decision", "ref": "docs/decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md (Supabase legacy-anon-JWT row, issue #472)"},
           "fixtures": {
             "negative": ["jwt-negative-legacy-supabase-anon-claim", "jwt-negative-legacy-supabase-anon-dotenv", "jwt-negative-legacy-supabase-anon-yaml", "jwt-negative-legacy-supabase-anon-markdown"],
             "positive": ["jwt-positive-legacy-supabase-service-role-claim", "jwt-positive-legacy-supabase-service-role-dotenv", "jwt-positive-legacy-supabase-service-role-yaml", "jwt-positive-legacy-supabase-service-role-markdown", "jwt-positive-anon-role-non-supabase-issuer"],

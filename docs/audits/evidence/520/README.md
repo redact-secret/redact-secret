@@ -1,7 +1,7 @@
 # Issue #520 — Firebase secret-bearing credential detection with public-config discrimination
 
 [Audit archive](../../README.md) ·
-[Decision: Firebase server key detection and client-config discrimination](../../../decisions/2026-09-20-add-firebase-server-key-detection-and-client-config-discrimination.md) ·
+[Decision: Firebase server key detection and client-config discrimination](../../../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) ·
 [Issue #520](https://github.com/redact-secret/redact-secret/issues/520) ·
 [Issue #501 (epic)](https://github.com/redact-secret/redact-secret/issues/501) ·
 [Issue #519 (Google credential-family audit, adopted here by reference)](../519/README.md)

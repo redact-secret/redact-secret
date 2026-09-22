@@ -71,8 +71,8 @@ passes without anyone having to read the checker script itself:
    Anything not directly backed by provider documentation is a T2
    (tool-corroborated) contract, not T1, and must say so rather than assert
    provider grounding it doesn't have --
-   [`decision-freeze-pulumi-access-token-grammar`](docs/decisions/2026-09-21-freeze-pulumi-access-token-grammar.md)
-   shows a T1-prefix/T2-body contract written up this way.
+   [`decision-freeze-precision-contracts-seven-provider-families`](docs/decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md#folded-records)
+   (Pulumi row) shows a T1-prefix/T2-body contract written up this way.
 2. **Canonical positives.** At least one fixture carrying the family's
    documented shape in a realistic context, run through the differential
    method against the pinned scanners.

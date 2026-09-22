@@ -619,7 +619,7 @@
       "detector": "notion-token",
       "findingType": "notion_integration_token",
       "implementation": "crates/secret-scan-core/src/detectors/notion.rs",
-      "beta4Rule": "Not one of issue #367's seven frozen families and not present in beta.4. Issue #300 (2026-09-16) introduced the detector with both shapes already frozen at introduction (docs/decisions/2026-09-16-freeze-notion-integration-token-grammar.md). Issue #514 (this entry) records the formal precision-contract evidence for that grammar; the grammar itself is unchanged.",
+      "beta4Rule": "Not one of issue #367's seven frozen families and not present in beta.4. Issue #300 (2026-09-16) introduced the detector with both shapes already frozen at introduction (docs/decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md, Notion row). Issue #514 (this entry) records the formal precision-contract evidence for that grammar; the grammar itself is unchanged.",
       "toolRules": {
         "gitleaks-8.30.1": "notion-api-token: `\\b(ntn_[0-9]{11}[A-Za-z0-9]{32}[A-Za-z0-9]{3})(?:[\\x60'\"\\s;]|\\\\[nr]|$)` \u2014 `ntn_` only; no rule for `secret_`.",
         "trufflehog-3.97.4": "notion: `\\b(secret_[A-Za-z0-9]{43})\\b` \u2014 `secret_` only; no rule for `ntn_`.",

@@ -1,7 +1,7 @@
 # Issue #553 — settling the `bearer-token` and `sendgrid-token` twin failures
 
 [Audit archive](../../README.md) ·
-[Governing decision](../../../decisions/2026-09-21-accept-truncated-and-nested-shapes-under-bearer-token-length-grammar.md) ·
+[Governing decision](../../../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) ·
 [Standing decision cited](../../../decisions/2026-09-20-warn-unconditionally-on-high-signal-contextual-names.md) ·
 [Related decision](../../../decisions/2026-09-20-exclude-filler-and-placeholder-bearer-values.md) ·
 [Issue #553](https://github.com/redact-secret/redact-secret/issues/553) ·
@@ -11,6 +11,25 @@
 
 Written 2026-09-21 against `main` at `86577d8e5b7db7a5a6c4ecfd6fc6ee8ab215909a`,
 on branch `workbench/553-bearer-sendgrid-twin-decision`.
+
+## Update — 2026-09-21, the fixture-correction tracking issue was wrong
+
+Every disposition below routes the `redact-secret-benchmarks` fixture
+correction through `redact-secret-benchmarks#66`. That issue's actual scope
+was the `known-gaps.json` promotion lifecycle, never touched these fixtures,
+and closed without doing this work — all five still fired on `main` as of
+this update. The corrected tracking issue was
+[`redact-secret-benchmarks#78`](https://github.com/redact-secret/redact-secret-benchmarks/issues/78),
+now closed; the fixtures are corrected. The re-measurement and the process
+finding are recorded in the issue thread, not restated here — see
+[the correction](https://github.com/redact-secret/redact-secret/issues/553#issuecomment-5764683940).
+Per `decision-govern-benchmark-regression-promotion`'s historical-record
+rule, the rest of this document (including its `#66` references) is left as
+originally written rather than rewritten in place.
+
+**Kind (per [DS0](../../../decisions/2026-09-22-decide-artifact-taxonomy-spec-routing-and-evidence-placement.md)):**
+final evidence, product judgement — the governing decision above relies on
+it. Stays in this repository.
 
 ## Summary
 
@@ -32,7 +51,7 @@ already-established, already-shipped design decisions:
 | `sendgrid-regressions--base62-generic-key-twin` | `sendgrid-token` | `generic-token` | `api_key=` is a `HIGH_SIGNAL_NAMES` match, warned on unconditionally by standing decision |
 
 No code change is warranted. This document, plus the newly recorded decision
-[`2026-09-21-accept-truncated-and-nested-shapes-under-bearer-token-length-grammar.md`](../../../decisions/2026-09-21-accept-truncated-and-nested-shapes-under-bearer-token-length-grammar.md),
+[the merged precision-contracts decision (Bearer-token row)](../../../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md#folded-records),
 is the finding issue #553 requires before any fix — and the finding is that
 no fix belongs in this repository.
 
@@ -85,7 +104,7 @@ explicit `Bearer` scheme and a token of at least 16 characters... this keeps
 arbitrary identifiers out of scope but intentionally misses short development
 tokens" (`bearer_token.rs:1-6`). The twin's premise does not hold given that
 contract. See the quoted and CRLF variants reproduced identically in
-`docs/decisions/2026-09-21-accept-truncated-and-nested-shapes-under-bearer-token-length-grammar.md`.
+`docs/decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md` (Folded records: Bearer-token row).
 
 **Disposition: fixture encodes an untenable expectation.** The fixture cannot
 produce a negative from this detector at the chosen mutation index, given the
@@ -222,7 +241,7 @@ above.
 - **Every outcome is recorded as a finding; no detector behaviour is changed
   against a standing ADR without a superseding ADR** — done: this document
   plus
-  [`2026-09-21-accept-truncated-and-nested-shapes-under-bearer-token-length-grammar.md`](../../../decisions/2026-09-21-accept-truncated-and-nested-shapes-under-bearer-token-length-grammar.md)
+  [the merged precision-contracts decision (Bearer-token row)](../../../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md#folded-records)
   (new, for the four `bearer-token`-firing cases) and the standing
   `2026-09-20-warn-unconditionally-on-high-signal-contextual-names.md`
   (cited, for the fifth). No detector behavior changes at all, so no ADR is

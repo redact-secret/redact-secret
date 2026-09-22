@@ -2,7 +2,7 @@
 
 [Audit archive](../../README.md) ·
 [Governance decision](../../../decisions/2026-09-18-govern-benchmark-regression-promotion.md) ·
-[Docker Hub PAT/OAT exact-length grammar freeze (#370)](../../../decisions/2026-09-17-freeze-docker-pat-oat-exact-length-grammar.md) ·
+[Docker Hub PAT/OAT exact-length grammar freeze (#370)](../../../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) ·
 [Precision-contract freeze (#367)](../../../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) ·
 [Beta.5 precision gate (#376)](../../../decisions/2026-09-18-gate-beta5-on-precision-gains-and-positive-preservation.md) ·
 [Issue #407](https://github.com/redact-secret/redact-secret/issues/407) ·
@@ -14,6 +14,9 @@ Triaged 2026-09-18 against candidate commit `fe4f1d1688450baee402472b1a7f2cc802e
 (this repository's `main` at the time #407 was filed). This is a review of
 discovery evidence, not a detector change: it adds no fixture, corrects no
 grammar, and closes no gate. It changes no code.
+
+**Kind (per [DS0](../../../decisions/2026-09-22-decide-artifact-taxonomy-spec-routing-and-evidence-placement.md)):**
+final evidence, product judgement. Stays in this repository.
 
 ## Summary
 
@@ -30,11 +33,11 @@ this issue.
 
 | Group | Count | Disposition | Prior evidence |
 | --- | ---: | --- | --- |
-| `docker-token-shape-1-{bare,quoted,unicode-crlf}` | 3 | intended, reviewed policy change | [#367](../367/README.md), [#376](../376/README.md#policy-changes-never-hidden-by-deleting-cases), [#402](../402/README.md) |
+| `docker-token-shape-1-{bare,quoted,unicode-crlf}` | 3 | intended, reviewed policy change | [#367](../367/README.md), [#376](https://github.com/redact-secret/redact-secret-benchmarks/blob/695500611224a434ce89392b97d4107275587079/docs/reports/beta-5/results.md#policy-changes), [#402](../402/README.md) |
 
 ## Why this is not a regression
 
-`decision-freeze-docker-pat-oat-exact-length-grammar` (#370) narrowed the
+`decision-freeze-precision-contracts-seven-provider-families` (Docker row, #370) narrowed the
 `docker-token` detector from beta.4's "recognized prefix plus a shared
 20-byte minimum suffix" rule to two independently validated, per-prefix
 exact-length shapes:
@@ -59,8 +62,8 @@ dckr_pat_ZByg3TZMUmABS7UvAuqZ7UGqTnUvdlUs   (41 bytes total)
 reproduced deterministically from the generator's own `synthetic()` seed
 (`detector-coverage:docker-token:dckr_pat_`, 32 bytes) — independently
 computed here, not taken on citation alone. A 32-byte suffix under
-`dckr_pat_` is exactly the shape `decision-freeze-docker-pat-oat-exact-length-grammar`
-names as an intentional false negative: "Any `dckr_pat_`/`dckr_oat_` value
+`dckr_pat_` is exactly the shape `decision-freeze-precision-contracts-seven-provider-families`
+(Docker row) names as an intentional false negative: "Any `dckr_pat_`/`dckr_oat_` value
 whose suffix is not exactly the documented length for its own segment name"
 is out of scope by design, the same exact-length precedent `npm-token`,
 `google-api-key`, `notion-token`, and `new-relic-user-api-key` already set.

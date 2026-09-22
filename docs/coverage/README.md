@@ -255,10 +255,8 @@ stood at removal, not a live path:
 `fp-fn-summary-369.json` and `fp-fn-summary-514.json` were never linked from
 this README or any other committed document; every other row above is also
 permalinked, with a one-line summary, from the ADR or changelog entry that
-originally cited it (`docs/decisions/2026-09-17-freeze-docker-pat-oat-exact-length-grammar.md`,
-`docs/decisions/2026-09-17-freeze-slack-bot-token-segment-grammar.md`,
-`docs/decisions/2026-09-20-freeze-slack-user-and-rotation-token-grammar.md`,
-`CHANGELOG.md`).
+originally cited it (`docs/decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md`
+(Docker, Slack bot, and Slack user/rotation rows), `CHANGELOG.md`).
 
 ## Coverage drift is a CI failure
 

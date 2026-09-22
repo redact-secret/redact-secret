@@ -3,10 +3,10 @@
 [Audit archive](../../README.md) ·
 [Governance decision](../../../decisions/2026-09-18-govern-benchmark-regression-promotion.md) ·
 [Precision-contract freeze (#367)](../../../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) ·
-[OpenAI grammar freeze (#368)](../../../decisions/2026-09-17-freeze-openai-api-key-grammar.md) ·
-[Docker exact-length freeze (#370)](../../../decisions/2026-09-17-freeze-docker-pat-oat-exact-length-grammar.md) ·
-[Slack bot grammar freeze (#371)](../../../decisions/2026-09-17-freeze-slack-bot-token-segment-grammar.md) ·
-[Slack user/rotation grammar freeze (#512)](../../../decisions/2026-09-20-freeze-slack-user-and-rotation-token-grammar.md) ·
+[OpenAI grammar freeze (#368)](../../../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) ·
+[Docker exact-length freeze (#370)](../../../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) ·
+[Slack bot grammar freeze (#371)](../../../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) ·
+[Slack user/rotation grammar freeze (#512)](../../../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) ·
 [Beta.5 precision gate (#376)](../../../decisions/2026-09-18-gate-beta5-on-precision-gains-and-positive-preservation.md) ·
 [Issue #552](https://github.com/redact-secret/redact-secret/issues/552) ·
 [Prior evidence: #367](../367/README.md) · [Prior evidence: #405](../405/README.md) ·
@@ -18,23 +18,26 @@ branch `workbench/552-metamorphic-robustness-root-cause`.
 
 ## Update — 2026-09-21, `openai-token`'s disposition superseded
 
-The reopened issue #552 measured that 15 of the original 18 misses were
-still present on `main`, and further research (recorded in the issue
-thread) found that the `openai-token` family's nine misses are not fully
-explained by the "already-accepted contract narrowing" framing below: the
-fixed-corpus shapes are a **provider-documented** body width (exactly 48
-bytes for the legacy and early-project/service-account/admin formats) that
-merely lacks the marker, not an arbitrary long-enough value. This document's
-conclusion of "no product code change is warranted" is **superseded for
-`openai-token` specifically** by
+This document's conclusion of "no product code change is warranted" is
+**superseded for `openai-token` specifically** by
 [`decision-govern-bare-vendor-prefixed-policy-layer`](../../../decisions/2026-09-21-govern-bare-vendor-prefixed-policy-layer.md),
 which adds a separate, lower-confidence `generic-token` policy layer beneath
 the frozen contract. The `docker-token`, `cloudflare-token`, and
 `slack-token` findings below are unaffected and stand as written (see also
-[`evidence/566`](../566/README.md) for the docker/cloudflare re-check).
+[`evidence/566`](../566/README.md) for the docker/cloudflare re-check). The
+reopening measurement and the `openai-token` research that produced the
+superseding decision are the iterative record behind this update and are
+not restated here — see
+[the reopening (15 of 18 misses still present)](https://github.com/redact-secret/redact-secret/issues/552#issuecomment-5764673516)
+and
+[the 48-byte provider research](https://github.com/redact-secret/redact-secret/issues/552#issuecomment-5765700218).
 Per `decision-govern-benchmark-regression-promotion`'s historical-record
 rule, the rest of this document is left as originally written rather than
 rewritten in place.
+
+**Kind (per [DS0](../../../decisions/2026-09-22-decide-artifact-taxonomy-spec-routing-and-evidence-placement.md)):**
+final evidence, product judgement — the frozen contract decisions above rely
+on it. Stays in this repository.
 
 ## Summary
 

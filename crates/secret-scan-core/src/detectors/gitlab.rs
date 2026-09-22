@@ -16,8 +16,9 @@ const PREFIXES: [&str; 13] = [
 /// prefixes" table, observed 2026-09-20; issue #518's inventory). `glpat-`
 /// also covers impersonation, project-access, and group-access tokens, which
 /// the same table gives no separate prefix for. Three gaps are intentional
-/// and tracked, not silent, per `docs/decisions/2026-09-20-inventory-gitlab-
-/// token-families.md`:
+/// and tracked, not silent, per
+/// `docs/decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md`
+/// (GitLab row):
 ///
 /// - Personal-access-token prefixes can be customized by an administrator.
 /// - `glrt-`/`glrtr-`'s "routable" variant embeds a `.`-delimited version and
@@ -127,7 +128,8 @@ mod tests {
     /// The same routable format with a short payload (under the 20-byte
     /// floor) is missed entirely rather than partially matched. This is the
     /// documented, intentional gap (see the struct-level doc comment and
-    /// `docs/decisions/2026-09-20-inventory-gitlab-token-families.md`): no
+    /// `docs/decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md`,
+    /// GitLab row): no
     /// source corroborates the payload's own length, so this scan cannot
     /// tighten to the `.`-delimited shape without guessing a contract.
     #[test]

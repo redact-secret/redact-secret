@@ -1,7 +1,7 @@
 # Issue #521 — Terraform Cloud/Enterprise token detection
 
 [Audit archive](../../README.md) ·
-[Decision: Add Terraform Cloud/Enterprise API token detection](../../../decisions/2026-09-21-add-terraform-cloud-enterprise-token-detection.md) ·
+[Decision: Add Terraform Cloud/Enterprise API token detection](../../../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) ·
 [Issue #521](https://github.com/redact-secret/redact-secret/issues/521) ·
 [Issue #501 (epic)](https://github.com/redact-secret/redact-secret/issues/501)
 

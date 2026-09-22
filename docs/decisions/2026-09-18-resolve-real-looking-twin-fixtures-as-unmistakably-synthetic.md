@@ -30,9 +30,7 @@ seeded generator and were never issued, but read as plausible random hex.
 Regenerate every listed value in place with a visible, unmistakably
 constructed marker, rather than record a provenance-only exception. The
 detector contracts described in
-[`2026-09-17-freeze-openai-api-key-grammar.md`](2026-09-17-freeze-openai-api-key-grammar.md)
-and
-[`2026-09-17-freeze-slack-bot-token-segment-grammar.md`](2026-09-17-freeze-slack-bot-token-segment-grammar.md)
+[`2026-09-17-freeze-precision-contracts-for-seven-provider-families.md`](2026-09-17-freeze-precision-contracts-for-seven-provider-families.md)
 are unchanged; only fixture bytes moved, following the corpus's textual-splice
 procedure and keeping every value's byte length exactly as reviewed, so every
 existing byte-range assertion stays correct by construction:

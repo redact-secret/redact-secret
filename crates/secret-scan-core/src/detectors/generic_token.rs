@@ -1392,8 +1392,8 @@ fn authorization_candidates(input: &str) -> Vec<Candidate> {
 
 /// `OpenAI` `sk-` namespaces whose legacy and early-project/service-account/
 /// admin body width is documented as exactly 48 `[A-Za-z0-9]` bytes
-/// (`docs/decisions/2026-09-17-freeze-openai-api-key-grammar.md`, issue
-/// #368). That decision requires the `T3BlbkFJ` marker for `openai-token`'s
+/// (`docs/decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md`,
+/// `OpenAI` row, issue #368). That decision requires the `T3BlbkFJ` marker for `openai-token`'s
 /// own `openai_api_key` classification; a value in this exact shape that
 /// lacks the marker — an unrotated pre-2024 legacy key, or a near-miss that
 /// merely mutated the marker — is not reclassified as one here. It is still

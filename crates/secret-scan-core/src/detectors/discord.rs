@@ -15,8 +15,8 @@
 //! first segment decodes to JSON (`{"..."`), never to an all-digit string,
 //! so this requirement anchors the detector to Discord's specific token
 //! shape without overlapping the JWT detector's grammar. See
-//! `docs/decisions/2026-09-16-freeze-discord-bot-token-grammar.md` for the
-//! full rationale and what is deliberately out of scope (webhook URL
+//! `docs/decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md`
+//! (Discord row) for the full rationale and what is deliberately out of scope (webhook URL
 //! tokens, `OAuth2` client secrets, `mfa.`-prefixed user/self-bot tokens).
 
 use crate::detectors::pattern::{self, is_alnum_dash};
