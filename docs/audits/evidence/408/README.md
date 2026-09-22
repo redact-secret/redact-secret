@@ -14,6 +14,9 @@ Triaged 2026-09-18 against candidate commit `fe4f1d1688450baee402472b1a7f2cc802e
 detector change: it adds no fixture, corrects no grammar, and closes no gate.
 It changes no code.
 
+**Kind (per [DS0](../../../decisions/2026-09-22-decide-artifact-taxonomy-spec-routing-and-evidence-placement.md)):**
+final evidence, product judgement. Stays in this repository.
+
 ## Summary
 
 Issue #408 reports that the `detector-coverage` corpus's Cloudflare shape-1
@@ -29,7 +32,7 @@ product defect is confirmed, and no code change is made under this issue.
 
 | Group | Count | Disposition | Prior evidence |
 | --- | ---: | --- | --- |
-| `cloudflare-token-shape-1-{bare,quoted,unicode-crlf}` | 3 | intended, reviewed policy change | [#367](../367/README.md), [#376](../376/README.md#policy-changes-never-hidden-by-deleting-cases), [#402](../402/README.md) |
+| `cloudflare-token-shape-1-{bare,quoted,unicode-crlf}` | 3 | intended, reviewed policy change | [#367](../367/README.md), [#376](https://github.com/redact-secret/redact-secret-benchmarks/blob/695500611224a434ce89392b97d4107275587079/docs/reports/beta-5/results.md#policy-changes), [#402](../402/README.md) |
 
 ## Why this is not a regression
 
@@ -49,8 +52,10 @@ false negative:
 > regression shape) and a non-hex or uppercase-hex checksum ... are now
 > intentional false negatives instead of matches.
 
-`docs/audits/evidence/376/README.md` ("Policy changes") and
-`docs/audits/evidence/367/README.md` both independently name this exact
+This repository's own gate evidence for [#376](../376/README.md) (quoted
+here; the full measurement has since moved to
+[`redact-secret-benchmarks`'s beta.5 results, "Policy changes"](https://github.com/redact-secret/redact-secret-benchmarks/blob/695500611224a434ce89392b97d4107275587079/docs/reports/beta-5/results.md#policy-changes))
+and `docs/audits/evidence/367/README.md` both independently name this exact
 fixture-ID family verbatim, one and two days before #408 was filed:
 
 > Eighteen `detector-coverage` policy/T3 rows for four of the seven frozen

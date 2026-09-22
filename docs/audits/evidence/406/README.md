@@ -15,6 +15,9 @@ Triaged 2026-09-18 against candidate commit `fe4f1d1688450baee402472b1a7f2cc802e
 detector change: it adds no fixture, corrects no grammar, and closes no gate.
 It changes no code.
 
+**Kind (per [DS0](../../../decisions/2026-09-22-decide-artifact-taxonomy-spec-routing-and-evidence-placement.md)):**
+final evidence, product judgement. Stays in this repository.
+
 ## Summary
 
 Issue #406 reports that the `detector-coverage` corpus's Slack shape-1
@@ -30,7 +33,7 @@ is made under this issue.
 
 | Group | Count | Disposition | Prior evidence |
 | --- | ---: | --- | --- |
-| `slack-token-shape-1-{bare,quoted,unicode-crlf}` | 3 | intended, reviewed policy change | [#367](../367/README.md), [#376](../376/README.md#policy-changes-never-hidden-by-deleting-cases), [#402](../402/README.md) |
+| `slack-token-shape-1-{bare,quoted,unicode-crlf}` | 3 | intended, reviewed policy change | [#367](../367/README.md), [#376](https://github.com/redact-secret/redact-secret-benchmarks/blob/695500611224a434ce89392b97d4107275587079/docs/reports/beta-5/results.md#policy-changes), [#402](../402/README.md) |
 
 ## Why this is not a regression
 
@@ -43,10 +46,11 @@ xoxb-<10-13 [0-9]>-<10-13 [0-9]>-<18+ [A-Za-z0-9]>
 ```
 
 `slack-token-shape-1` is exactly the pre-freeze shape the decision retired:
-an `xoxb-`-prefixed value with no `-`-sectioned body (`docs/audits/evidence/376/README.md`,
-"Policy changes", names `slack-token-shape-1` — "no dash-sectioning" —
-verbatim as one of eighteen `detector-coverage` policy/T3 rows moving from a
-provider finding to silent, an intended, reviewed change with cases kept, not
+an `xoxb-`-prefixed value with no `-`-sectioned body (this repository's own
+gate evidence for [#376](../376/README.md) named `slack-token-shape-1` — "no
+dash-sectioning" — verbatim as one of eighteen `detector-coverage` policy/T3
+rows moving from a provider finding to silent, an intended, reviewed change
+with cases kept, not
 deleted). `docs/audits/evidence/402/README.md` independently re-triaged the
 same row at candidate `ec1f86b0c07e` with the identical disposition. The
 `bare`, `quoted`, and `unicode-crlf` contexts fail for the same structural
