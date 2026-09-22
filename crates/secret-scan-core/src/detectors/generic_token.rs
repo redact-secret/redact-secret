@@ -907,12 +907,32 @@ fn is_quoted_value_boundary(ch: Option<char>) -> bool {
     }
 }
 
+/// A backtick terminates an unquoted value for the same reason it opens
+/// one in [`is_prefix_boundary_char`] (issue #552): a Markdown inline-code
+/// span wraps the whole assignment. Without it, `` `password=********` ``
+/// read the closing backtick into the value, which slipped a masked filler
+/// past its repeated-character exclusion and mis-scoped every unquoted
+/// value's range by one byte under that envelope (issue #548, the
+/// `context.markdown` metamorphic failure on `generic-token`). A real
+/// secret containing a literal backtick, unquoted, is the accepted false
+/// negative.
 fn is_unquoted_value_boundary(ch: Option<char>) -> bool {
     match ch {
         None => true,
         Some(c) => matches!(
             c,
-            ' ' | '\t' | '\u{0B}' | '\u{0C}' | '\r' | '\n' | ',' | ';' | '}' | ']' | '"' | '\''
+            ' ' | '\t'
+                | '\u{0B}'
+                | '\u{0C}'
+                | '\r'
+                | '\n'
+                | ','
+                | ';'
+                | '}'
+                | ']'
+                | '"'
+                | '\''
+                | '`'
         ),
     }
 }
@@ -1109,7 +1129,11 @@ fn unquoted_assignment_value(input: &str, start: usize) -> Option<(usize, usize)
     }
     let mut cursor = start;
     while let Some(ch) = char_at(input, cursor) {
-        if is_unquoted_value_boundary(Some(ch)) {
+        // A backtick closes an inline-code span around the value, but one
+        // *opening* the value with no closing partner (`delimited_reference_value`
+        // has already declined it) is an unterminated template literal or
+        // command substitution whose interior must still be reported.
+        if is_unquoted_value_boundary(Some(ch)) && !(ch == '`' && cursor == start) {
             break;
         }
         cursor += ch.len_utf8();
@@ -1541,6 +1565,31 @@ mod tests {
         assert_eq!(candidates.len(), 1);
         assert_eq!(candidates[0].confidence(), Confidence::High);
         let value_start = "`api_key=\"".len();
+        let value_end = value_start + "SYNTHETIC_REVOKED_CONTEXT_VALUE".len();
+        assert_eq!(
+            candidates[0].range(),
+            ByteRange::new(value_start, value_end).unwrap()
+        );
+    }
+
+    // issue #548: the same `context.markdown` envelope over an *unquoted*
+    // value. `is_unquoted_value_boundary` did not know the backtick, so the
+    // closing delimiter was read into the value: a masked filler became
+    // `********`` and escaped the #264 repeated-character exclusion, and a
+    // real value's range ran one byte long.
+    #[test]
+    fn a_masked_value_wrapped_in_markdown_inline_code_stays_excluded() {
+        assert!(detect("`password=********`").is_empty());
+    }
+
+    #[test]
+    fn an_unquoted_assignment_in_markdown_inline_code_excludes_the_closing_backtick() {
+        let input = "`api_key=SYNTHETIC_REVOKED_CONTEXT_VALUE`";
+        let candidates = detect(input);
+
+        assert_eq!(candidates.len(), 1);
+        assert_eq!(candidates[0].confidence(), Confidence::High);
+        let value_start = "`api_key=".len();
         let value_end = value_start + "SYNTHETIC_REVOKED_CONTEXT_VALUE".len();
         assert_eq!(
             candidates[0].range(),

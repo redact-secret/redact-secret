@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 1434,
+  "fixtureCount": 1436,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -476,6 +476,41 @@
       "input": "sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
       "expected": [],
       "note": "A common high-entropy or identifier-like value remains unchanged under default scanning."
+    },
+    {
+      "id": "generic-token-negative-masked-value-markdown-inline-code",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "markdown"
+      ],
+      "input": "`password=********`",
+      "expected": [],
+      "note": "A masked filler value stays excluded inside a Markdown inline-code span: the closing backtick terminates the unquoted value instead of being read into it, so the repeated-character exclusion (issue #264) still applies. Epic #548, the context.markdown metamorphic failure on generic-token."
+    },
+    {
+      "id": "generic-token-positive-unquoted-markdown-inline-code",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "markdown"
+      ],
+      "input": "`api_key=SYNTHETIC_REVOKED_CONTEXT_VALUE`",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 9,
+          "end": 40
+        }
+      ],
+      "note": "An unquoted high-signal assignment wrapped in a Markdown inline-code span is detected with the closing backtick excluded from the range; the quoted form is covered by the issue #552 unit test. Epic #548."
     },
     {
       "id": "negative-checksum",
