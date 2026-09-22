@@ -9,11 +9,18 @@ Reviewed 2026-09-17 against published `@redact-secret/core@0.1.0-beta.4`
 the seven provider fixes (#368–#374), the shared context/streaming matrix
 (#375) and the beta.5 precision gate (#376) build on. It changes no detector.
 
+The reviewed contract text itself is a live input CI reads on every run, so
+per `decision-decide-artifact-taxonomy-spec-routing-and-evidence-placement`
+it lives outside this frozen archive, at
+[`docs/contracts/precision/precision-contracts.json`](../../../contracts/precision/precision-contracts.json)
+(moved by #596). The two files below stay here: they are derived, frozen
+evidence the script below verifies for staleness, not a live contract a
+detector or policy reads.
+
 ## Files
 
 | File | Contents | Maintained by |
 | --- | --- | --- |
-| [`precision-contracts.json`](precision-contracts.json) | One reviewed contract per supported variant: prefix, segment grammar, lengths, alphabets, markers, boundary rule, evidence tier, and for every property whether it rests on provider documentation, tool agreement, a single tool, or this project's support policy. Every source with URL, revision or page date, observation date, what it establishes and what it does not. Resolved conflicts, pending (T0) forms, excluded forms, and the audit of the twelve beta.4 mutations. | hand-authored review |
 | [`beta4-twin-baseline.json`](beta4-twin-baseline.json) | The 24 must-not-flag twins and their 24 paired positives from the beta.4 `common-formats` snapshot, frozen by construction recipe, content SHA-256, byte length, assessment, expected ranges and the ranges beta.4 actually produced. The corrected-contract view is derived separately under `contractView`. | `scripts/audit-precision-contracts.py --write` (derived fields) |
 | [`corpus-audit.json`](corpus-audit.json) | Every fixture in this repository that names one of the seven detectors, evaluated against its frozen contract, with a disposition and the exact ranges retained or lost. Never contains inputs. | `scripts/audit-precision-contracts.py --write` |
 

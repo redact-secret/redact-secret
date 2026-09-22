@@ -2,7 +2,7 @@
 
 [Audit archive](../../README.md) ·
 [Precision-contract freeze (#367)](../../../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) ·
-[Precision contracts: `google-api-key` family](../367/precision-contracts.json) ·
+[Precision contracts: `google-api-key` family](../../../contracts/precision/precision-contracts.json) ·
 [Issue #487](https://github.com/redact-secret/redact-secret/issues/487) ·
 [Issue #481 (Cloudflare `cfat_`, adopted)](https://github.com/redact-secret/redact-secret/issues/481) ·
 [Issue #486 (Cloudflare `cfk_`, not adopted precedent)](https://github.com/redact-secret/redact-secret/issues/486)

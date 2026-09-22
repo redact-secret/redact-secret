@@ -4,7 +4,7 @@
 //! sections, the final section being the secret. Issue #371 froze the
 //! `xoxb-` bot form's section grammar as the default contract
 //! (`docs/decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md`,
-//! `docs/audits/evidence/367/precision-contracts.json`), replacing the
+//! `docs/contracts/precision/precision-contracts.json`), replacing the
 //! earlier "recognized prefix plus a 20-byte minimum suffix" rule that
 //! accepted any long enough `xoxb-` value regardless of its internal
 //! structure. Issue #512 completes the family on the same evidentiary bar:
@@ -41,7 +41,7 @@
 //! tool source (gitleaks, case-insensitive) and `xwfp-` has no tool source
 //! at all, so neither clears this project's two-source (or
 //! provider-plus-tool) bar for a structural contract
-//! (`docs/audits/evidence/367/precision-contracts.json`,
+//! (`docs/contracts/precision/precision-contracts.json`,
 //! `slack-token.variants[app-level|workflow]`). Decision
 //! `decision-freeze-slack-user-and-rotation-token-grammar` (#512) froze
 //! both prefixes' shape as unchanged from beta.4. The `regex` crate cannot
@@ -732,7 +732,7 @@ mod tests {
     fn xapp_and_xwfp_are_not_promoted_to_a_digit_section_grammar() {
         // Issue #512: `xapp-`'s only candidate structure is a single
         // uncorroborated tool source and `xwfp-` has no tool source at all
-        // (docs/audits/evidence/367/precision-contracts.json,
+        // (docs/contracts/precision/precision-contracts.json,
         // `slack-token.variants[app-level|workflow]`), so a value shaped
         // like the bot/user digit-section grammar is still accepted by the
         // plain opaque-suffix guard rather than being required to have one.
