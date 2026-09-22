@@ -24,7 +24,6 @@ future planning and implementation but do not authorize Git or release actions.
 - [Select optimal disjoint candidates by total evidence weight](2026-09-19-select-optimal-disjoint-candidates-by-total-evidence-weight.md)
 - [Define the declarative detector ruleset contract](2026-09-19-define-declarative-detector-ruleset-contract.md)
 - [Graduate logging and tracing adapters to a separate repository](2026-09-19-graduate-adapters-to-a-separate-repository.md)
-- [Publish the musl Node addon packages](2026-09-19-publish-musl-node-addon-packages.md)
 - [Add a Node WebAssembly fallback when the native addon is unusable](2026-09-19-add-node-webassembly-fallback.md)
 - [Verify @redact-secret/core on Cloudflare Workers and Vercel Edge](2026-09-19-verify-edge-runtimes.md)
 - [Warn unconditionally on high-signal contextual-name assignments despite prose false positives](2026-09-20-warn-unconditionally-on-high-signal-contextual-names.md)

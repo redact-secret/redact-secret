@@ -1,0 +1,8 @@
+# Issue #614: MSVC's link.exe stamps each PE/COFF image with the link time
+# and embeds the absolute PDB path, so two builds of the same source
+# produced different `win32-*-msvc` `.node` bytes (beta.6). `/Brepro`
+# replaces the timestamp and PDB signature with a hash of the output, and
+# `/PDBALTPATH:%_PDB%` embeds only the PDB file name. The Windows addon legs
+# of `artifact-qualification.yml` rebuild the addon and fail on divergence.
+[target.'cfg(all(windows, target_env = "msvc"))']
+rustflags = ["-C", "link-arg=/Brepro", "-C", "link-arg=/PDBALTPATH:%_PDB%"]

@@ -62,10 +62,6 @@ LEGACY_IDENTIFIER_ALLOWLIST: dict[str, str] = {
         "repository; the old name is the redirect's entire point and must "
         "not be rewritten"
     ),
-    "docs/decisions/2026-09-10-ship-first-release-artifact-set.md": (
-        "an accepted ADR describing what was decided on 2026-09-10 under "
-        "the names then in force; a historical record, not current identity"
-    ),
     "docs/decisions/2026-09-09-adopt-rust-core-monorepo.md": (
         "the accepted architecture ADR identifies the repository name in force when adopted"
     ),

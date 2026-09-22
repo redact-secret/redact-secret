@@ -331,6 +331,33 @@ jobs:
         shell: bash
         run: npx napi build --platform --release --target "${{ matrix.target }}"
 
+      # Issue #614: beta.6's rehearsal and release qualified different
+      # Windows `.node` bytes for the same source. `.cargo/config.toml`
+      # links MSVC targets deterministically; this relinks the addon crate
+      # (a fresh link is where a timestamp or PDB signature would differ)
+      # and fails if the rebuilt bytes diverge from the first build's.
+      - name: Verify the Windows addon build is reproducible
+        if: contains(matrix.target, 'windows-msvc')
+        working-directory: bindings/node
+        shell: bash
+        env:
+          TARGET: ${{ matrix.target }}
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          addons=(*.node)
+          [[ ${#addons[@]} -eq 1 ]] || { echo "expected exactly one built addon, found: ${addons[*]}" >&2; exit 1; }
+          addon=${addons[0]}
+          first=$(sha256sum "$addon" | cut -d' ' -f1)
+          cargo clean --release --target "$TARGET" -p redact-secret-node
+          npx napi build --platform --release --target "$TARGET"
+          second=$(sha256sum "$addon" | cut -d' ' -f1)
+          if [[ "$first" != "$second" ]]; then
+            echo "::error::$TARGET addon is not reproducible: first build $first, rebuild $second" >&2
+            exit 1
+          fi
+          echo "$TARGET addon rebuilt byte-identically (sha256 $first)."
+
       # The addon is a cdylib, and `musl-tools` cannot link one: its gcc
       # wrapper ships no musl `libgcc_s.so.1`, and routing rustc's
       # self-contained objects through the glibc driver instead produces a

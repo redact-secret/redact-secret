@@ -561,17 +561,19 @@ jobs:
       # a false-negative "publish failed" report on beta.5 even though the
       # publish had actually succeeded. `npm-registry-metadata.mjs` reads the
       # immutable per-version endpoint directly instead, with a bounded,
-      # documented wait for propagation, and it fails closed with a message
-      # naming what it waited on and for how long if the content genuinely
-      # never matches -- the same treatment every other registry-state read
-      # in this pipeline gets.
+      # documented wait for propagation. Issue #614: that window still
+      # expired on beta.6, so `--publish-accepted` treats the successful
+      # `npm publish` above as authoritative when the endpoint is still 404
+      # at the deadline; a visible checksum that does not match the packed
+      # tarball still fails. `verify-registry-install` waits out the lag.
       - name: Verify npm publication
         shell: bash
         run: |
           node scripts/npm-registry-metadata.mjs \
             "${{ steps.release.outputs.package_name }}" \
             "${{ steps.release.outputs.package_version }}" \
-            "${{ steps.pack.outputs.shasum }}"
+            "${{ steps.pack.outputs.shasum }}" \
+            --publish-accepted
 
       # `if: always()` so a partial or failed release still reports what it
       # observed; `record-manifest` is what actually writes the manifest now
@@ -1164,9 +1166,24 @@ jobs:
           path: support-matrix-drift
           if-no-artifact-found: warn
 
+      # Issue #614: every `needs.*.outputs.*` value reaches this script
+      # through `env:` and is read as "$VAR". Inline `${{ }}` substitution
+      # splices the value into shell source before bash parses it, so an
+      # apostrophe in a job output (the wasm digest note) ended a quoted
+      # string and failed the step. `check-release-gate.py` rejects the
+      # inline form in `run:` blocks.
       - name: Build and record the manifest
         id: manifest
         shell: bash
+        env:
+          NPM_REGISTRY_STATE_JSON: ${{ needs.publish.outputs.registry_state_json }}
+          WASM_REGISTRY_STATE_JSON: ${{ needs.publish-wasm-dependency.outputs.registry_state_json }}
+          CRATES_REGISTRY_STATE_JSON: ${{ needs.publish-crates.outputs.registry_state_json }}
+          PYPI_REGISTRY_STATE_JSON: ${{ needs.publish-pypi.outputs.registry_state_json }}
+          WASM_ARTIFACT_DIGEST_JSON: ${{ needs.publish-wasm-dependency.outputs.artifact_digest_json }}
+          WRAPPER_ARTIFACT_DIGEST_JSON: ${{ needs.publish.outputs.artifact_digest_json }}
+          CRATES_ARTIFACT_DIGEST_JSON: ${{ needs.publish-crates.outputs.artifact_digest_json }}
+          PYPI_ARTIFACT_DIGEST_JSON: ${{ needs.publish-pypi.outputs.artifact_digest_json }}
         run: |
           version=$(node -p "require('./packages/javascript/package.json').version" 2>/dev/null || true)
           conformance_identity=$(git rev-parse "$GITHUB_SHA:conformance" 2>/dev/null || true)
@@ -1180,14 +1197,14 @@ jobs:
           # A job that was skipped or failed before its own "report state"
           # step ran leaves its output empty, not `{}` -- default it here so
           # a partial release still yields a manifest instead of a jq error.
-          npm_json='${{ needs.publish.outputs.registry_state_json }}'
+          npm_json="$NPM_REGISTRY_STATE_JSON"
           [[ -z "$npm_json" ]] && npm_json='{}'
           native_json=$(jq -s 'add // {}' dependency-registry-states/*/registry-state.json 2>/dev/null) || native_json='{}'
-          wasm_json='${{ needs.publish-wasm-dependency.outputs.registry_state_json }}'
+          wasm_json="$WASM_REGISTRY_STATE_JSON"
           [[ -z "$wasm_json" ]] && wasm_json='{}'
-          crates_json='${{ needs.publish-crates.outputs.registry_state_json }}'
+          crates_json="$CRATES_REGISTRY_STATE_JSON"
           [[ -z "$crates_json" ]] && crates_json='{}'
-          pypi_json='${{ needs.publish-pypi.outputs.registry_state_json }}'
+          pypi_json="$PYPI_REGISTRY_STATE_JSON"
           [[ -z "$pypi_json" ]] && pypi_json='{}'
 
           # Declare the whole product even when no publisher produced output.
@@ -1219,13 +1236,13 @@ jobs:
           # step leaves its output empty, so that contributes nothing rather
           # than breaking the merge.
           native_digest_json=$(jq -s 'add // {}' dependency-artifact-digests/*/artifact-digest.json 2>/dev/null) || native_digest_json='{}'
-          wasm_digest_json='${{ needs.publish-wasm-dependency.outputs.artifact_digest_json }}'
+          wasm_digest_json="$WASM_ARTIFACT_DIGEST_JSON"
           [[ -z "$wasm_digest_json" ]] && wasm_digest_json='{}'
-          wrapper_digest_json='${{ needs.publish.outputs.artifact_digest_json }}'
+          wrapper_digest_json="$WRAPPER_ARTIFACT_DIGEST_JSON"
           [[ -z "$wrapper_digest_json" ]] && wrapper_digest_json='{}'
-          crates_digest_json='${{ needs.publish-crates.outputs.artifact_digest_json }}'
+          crates_digest_json="$CRATES_ARTIFACT_DIGEST_JSON"
           [[ -z "$crates_digest_json" ]] && crates_digest_json='{}'
-          pypi_digest_json='${{ needs.publish-pypi.outputs.artifact_digest_json }}'
+          pypi_digest_json="$PYPI_ARTIFACT_DIGEST_JSON"
           [[ -z "$pypi_digest_json" ]] && pypi_digest_json='{}'
           artifact_digests=$(jq -cn \
             --argjson native "$native_digest_json" \
