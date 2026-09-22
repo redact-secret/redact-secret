@@ -41,6 +41,7 @@ and [qualification follow-up](release-qualification-follow-up.md) describe beta.
 | Independent repeat audit (#145, top-level review) | [Revision-bound verdict and residual findings](repeated-release-readiness-audit.md) |
 | Release rehearsal coverage and the Reconcile Release exercise (#530) | [What the no-publication rehearsal covers, what it cannot, and the pending live Reconcile Release commands](release-rehearsal-coverage.md) |
 | Beta.5 release retrospective and v0.1.0 readiness criteria (#531) | [What failed, how each problem was resolved, what remains open](beta5-release-retrospective.md); checklist at [v0.1.0 release-readiness checklist](../releases/release-readiness-v0.1.0.md) |
+| Beta.6 release retrospective (#615) | [What went well, what went wrong, what #614 fixed, what remains open](beta6-release-retrospective.md); release record at [0.1.0-beta.6](../releases/0.1.0-beta.6/README.md) |
 
 ## Epic close-outs
 
