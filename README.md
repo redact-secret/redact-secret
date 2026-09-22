@@ -1,28 +1,116 @@
 # Redact Secret
 
-Deterministic secret detection and redaction for JavaScript, Python, Rust, and
-command-line applications.
+Deterministic secret detection and redaction for runtime data and AI context.
 
-Redact Secret inspects untrusted text before it is logged, persisted, indexed,
-sent to a tool, or added to model context. One side-effect-free Rust core owns
-built-in detection, overlap resolution, policy, redaction, and bounded
-incremental sanitization. Runtime bindings adapt that behavior without
-reimplementing it.
+Your application handles text it does not fully control: user input, pasted
+configuration, error messages, HTTP bodies, and tool results. Before that text
+leaves the request and lands somewhere that keeps or repeats it, pass it
+through Redact Secret. It finds supported credential formats and returns the
+text with those credentials replaced, plus findings that describe what was
+found and where without ever including the secret itself. It runs in your
+process. It makes no network calls and sends no telemetry, and the same input
+always gives the same result.
+
+## What it is for
+
+Scan text at the runtime boundary, just before it reaches one of these
+destinations:
+
+- **Logs**: log messages, structured fields, and error text
+  ([logging example](examples/logging-redaction/)).
+- **Persistence**: databases, caches, search indexes, and conversation
+  history.
+- **Telemetry**: traces, spans, and LLM observability records
+  ([tracing example](examples/tracing-masking/)).
+- **Tool output**: results returned by tools, agents, and MCP servers
+  ([MCP example](examples/mcp-redact/)).
+- **Model context**: prompts, retrieved documents, and anything else added to
+  a model's context window.
+
+One side-effect-free Rust core owns built-in detection, overlap resolution,
+policy, redaction, and bounded incremental sanitization. JavaScript (Node.js
+and browsers), Python, Rust, and a command-line tool all use that core
+instead of reimplementing it.
+
+## Where scanning belongs
 
 > Client-side scanning is preventive UX. Server-side scanning is the
 > authoritative enforcement boundary.
 
-## Start here
+Scanning in a browser or desktop client catches a pasted credential before it
+leaves the device. That is useful, but clients can be modified or skipped, so
+it is never enforcement. The server scans again, independently, before
+logging, storage, context construction, or model and tool invocation, and
+that server scan is the one your security decisions rely on. Redact Secret
+reports a `block` action, but your application is what rejects the request.
+See [browser and server boundaries](#browser-and-server-boundaries) and
+[policy and safe integration](docs/guides/safe-integration.md).
 
-Read the [documentation](./docs/README.md) for installation, language guides,
-policy, detection limits, and troubleshooting. The current checkout uses one
-Rust core through runtime-specific bindings; its executable behavior contract
-lives in [conformance](./conformance/README.md).
+## What it does not replace
 
-Public beta packages are available; see [release status](./docs/releases/status.md)
-for verified versions and artifacts. Development manifest versions alone do not
-establish availability. To build this checkout, use the
-[source setup](./docs/getting-started.md).
+- **It is not a DLP platform.** It finds credentials, not personal data, and
+  it has no policy console, quarantine, or hosted service.
+- **It does not detect every secret.** Detection is limited to supported
+  formats and deliberately favors precision. Truncated, new, or unsupported
+  credential formats can be missed, and an empty finding list does not prove
+  the text is secret-free.
+- **It does not replace repository and history scanners.** Tools that scan Git
+  history, pull requests, and registries for leaked credentials (for example
+  Gitleaks, TruffleHog, or GitHub secret scanning) do a different job and are
+  complementary. Redact Secret works on live data at runtime. Its CLI can
+  check files and staged diffs, but it does not walk commit history.
+- **It does not verify, rotate, or revoke credentials.** It never contacts a
+  provider, so it cannot tell whether a detected credential is active. If a
+  secret has leaked, rotate it.
+
+## Supported formats and limitations
+
+Which credential families are supported, and how strong the evidence is for
+each, is published in the generated [support matrix](docs/support-matrix.md).
+That matrix is built from evaluation evidence, not written by hand. The
+[detection and limits reference](docs/reference/detection.md) explains what
+can be missed and why. Published versions and their artifacts are listed in
+[release status](docs/releases/status.md).
+
+## Install and first example
+
+Public beta packages exist for npm, PyPI, crates.io, and the CLI. The exact
+install command for the current published version of each is in
+[getting started](docs/getting-started.md#install-a-published-release).
+Select a version explicitly rather than relying on an unqualified install.
+
+```ts
+import { initialize, scanAndRedact } from "@redact-secret/core";
+
+await initialize();
+
+const result = scanAndRedact("API_KEY=SYNTHETIC_REVOKED_CONTEXT_VALUE");
+console.log(result.text);
+// API_KEY=<SECRET_1>
+```
+
+```python
+import redact_secret
+
+result = redact_secret.scan_and_redact("API_KEY=SYNTHETIC_REVOKED_CONTEXT_VALUE")
+print(result.text)
+# API_KEY=<SECRET_1>
+```
+
+```bash
+printf '%s\n' 'API_KEY=SYNTHETIC_REVOKED_CONTEXT_VALUE' | redact-secret --redact
+# API_KEY=<SECRET_1>
+```
+
+Then continue with the [JavaScript](docs/guides/javascript.md),
+[Python](docs/guides/python.md), [Rust](docs/guides/rust.md), or
+[CLI](docs/guides/cli.md) guide, or the [documentation home](docs/README.md).
+To build this checkout instead, see the
+[source setup](docs/getting-started.md#build-this-checkout). The executable
+behavior contract that every surface passes lives in
+[conformance](conformance/README.md).
+
+## Integrations
 
 Pino, Python `logging`, and OpenTelemetry `SpanProcessor` integrations are
 being graduated to a separate repository,
@@ -112,21 +200,9 @@ await initialize();
 console.log(artifact()); // "addon" on a supported host, "wasm" on the fallback
 ```
 
-```ts
-import { initialize, scanAndRedact } from "@redact-secret/core";
-
-await initialize();
-
-const input = "API_KEY=SYNTHETIC_REVOKED_CONTEXT_VALUE";
-const result = scanAndRedact(input);
-
-console.log(result.text);
-// API_KEY=<SECRET_1>
-```
-
 All examples use unmistakably synthetic, revoked values. Findings contain
 classification, action, and original-input offsets, never the matched plaintext
-value.
+value. For the [first example](#install-and-first-example) above:
 
 ```ts
 result.findings[0];
@@ -343,27 +419,19 @@ plaintext safety.
 **Support status** (34 providers, 79 credential families; stable: 3, provisional: 58, pending: 2, unsupported: 16) -- generated from evaluation evidence, never hand-written. `provisional` means useful but evidence-incomplete, not "almost stable"; unsupported families are listed with their reason. See the full [support matrix](docs/support-matrix.md).
 <!-- support-matrix:end -->
 
-The list below states what a detector exists for, not how strong the
-evidence behind it is; see the support-status line above and the linked
-matrix for that. Built-in Rust detection covers:
+The support-status line above and the linked matrix are the only place
+per-family support is stated; this README does not repeat provider lists or
+counts. Built-in Rust detection covers these kinds of structure — the
+[detection reference](docs/reference/detection.md) names the provider formats
+behind each:
 
 - PEM-style private-key blocks;
-- AWS access-key IDs;
-- GitHub and GitLab token families;
+- provider-issued API keys and tokens with a recognizable format;
 - JWTs and bearer, Basic, and Token authorization credentials;
-- OpenAI, Anthropic, Shopify, and modern HashiCorp Vault credentials;
-- qualified Stripe, Slack, PyPI, Hugging Face, Docker Hub, Cloudflare,
-  DigitalOcean, Linear, Supabase, Vercel, npm, SendGrid, Google Cloud/Gemini,
-  Microsoft Entra client secret, Azure DevOps personal access token, Notion, Atlassian Cloud (Jira / Confluence), Twilio Auth Token/API Key
-  Secret, Telegram Bot API, Discord bot, Sentry user/organization auth token,
-  Datadog API/Application Key, Grafana service account, and Grafana Cloud access
-  policy, and New Relic User API Key/License Key credentials;
-- contextual credential assignments, including AWS secret-access-key and
-  session-token setting names;
-- credential-bearing PostgreSQL, MySQL, MariaDB, MongoDB, Redis, and AMQP URLs;
-  and
-- `otpauth://totp` and `otpauth://hotp` URIs carrying a base32-encoded shared
-  secret.
+- contextual credential assignments, such as an `api_key` or `password`
+  setting;
+- credential-bearing database and message-broker connection URLs; and
+- `otpauth://` URIs carrying a shared secret.
 
 Entropy is only a supporting signal. Random-looking text is not classified
 without structural or contextual evidence, and the generic name `token` alone

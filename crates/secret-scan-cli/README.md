@@ -2,10 +2,20 @@
 
 Binary name: `redact-secret`. Path: `crates/secret-scan-cli`.
 
+Deterministic secret detection and redaction for runtime data and AI context,
+from the command line: check files, staged diffs, and standard input in CI and
+pre-commit hooks, or sanitize text in a redaction pipeline.
+
 The CLI is a host adapter over the `redact-secret` core crate. It may use the
 process environment, standard streams, and the filesystem; the core may not.
 Every detection, policy, and redaction decision comes from the core, so a given
 input produces the same findings here, in the library, and in every binding.
+
+It checks the files and streams it is given; it does not walk Git history, so
+it complements repository and history scanners rather than replacing them. It
+is not a DLP platform and does not detect every secret: per-family support is
+published in the generated
+[support matrix](https://github.com/redact-secret/redact-secret/blob/main/docs/support-matrix.md).
 
 ```text
 usage: redact-secret [--json] [--] [<path>...]
