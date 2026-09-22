@@ -2,6 +2,7 @@
 decision_id: decision-move-performance-results-criteria-and-judgement-to-benchmarks
 status: accepted
 scope: workspace
+spec: evidence-and-gates
 title: Move performance results, criteria, and judgement to redact-secret-benchmarks
 decided_at: 2026-09-22
 ---
