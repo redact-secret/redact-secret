@@ -180,7 +180,7 @@ jobs:
         run: |
           python3 -B scripts/verify-python-digest.py \
             --inventory qualification-inventory/artifact-inventory.json \
-            --family node-addon --target "${{ matrix.target }}" \
+            --family node-addon --target "${{ matrix.target }}" --suffix .node \
             "bindings/node/npm/${{ matrix.platform }}/redact-secret.${{ matrix.platform }}.node"
 
       - name: Pack, content-check, publish, and verify
@@ -374,9 +374,13 @@ jobs:
             --inventory qualification-inventory/artifact-inventory.json \
             --family browser --family browser-common \
             bindings/wasm/npm/redact_secret_wasm.js \
+            bindings/wasm/npm/redact_secret_wasm.d.ts \
             bindings/wasm/npm/redact_secret_wasm_bg.wasm \
+            bindings/wasm/npm/redact_secret_wasm_bg.wasm.d.ts \
             bindings/wasm/npm/redact_secret_wasm_common.js \
-            bindings/wasm/npm/redact_secret_wasm_common_bg.wasm
+            bindings/wasm/npm/redact_secret_wasm_common.d.ts \
+            bindings/wasm/npm/redact_secret_wasm_common_bg.wasm \
+            bindings/wasm/npm/redact_secret_wasm_common_bg.wasm.d.ts
 
       - name: Pack, content-check, publish, and verify
         run: node scripts/publish-dependency-package.mjs --package-dir bindings/wasm/npm --tag "${{ steps.tag.outputs.tag }}"
