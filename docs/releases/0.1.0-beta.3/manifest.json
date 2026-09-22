@@ -1,0 +1,182 @@
+{
+  "record_schema_version": 1,
+  "record_kind": "reconstructed",
+  "source_revision": "34ea9b92ed8879082e99f56f8f4715ee4e4f1f35",
+  "conformance_identity": "23793bcd94af737ceb21ad1b04b485eed479a95d",
+  "version": "0.1.0-beta.3",
+  "artifact_inventory_sha256": "1f4c387dbae142bca251316019ca933c48b8d91957d2e91126ee645f911dc5b4",
+  "artifact_set": [
+    "crate:redact-secret",
+    "crate:redact-secret-cli",
+    "npm:@redact-secret/core",
+    "npm:@redact-secret/node-darwin-arm64",
+    "npm:@redact-secret/node-darwin-x64",
+    "npm:@redact-secret/node-linux-arm64-gnu",
+    "npm:@redact-secret/node-linux-x64-gnu",
+    "npm:@redact-secret/node-win32-arm64-msvc",
+    "npm:@redact-secret/node-win32-x64-msvc",
+    "npm:@redact-secret/wasm",
+    "pypi:redact-secret"
+  ],
+  "registry_state": {
+    "crate:redact-secret": "published",
+    "crate:redact-secret-cli": "published",
+    "npm:@redact-secret/core": "published",
+    "npm:@redact-secret/node-darwin-arm64": "published",
+    "npm:@redact-secret/node-darwin-x64": "published",
+    "npm:@redact-secret/node-linux-arm64-gnu": "published",
+    "npm:@redact-secret/node-linux-x64-gnu": "published",
+    "npm:@redact-secret/node-win32-arm64-msvc": "published",
+    "npm:@redact-secret/node-win32-x64-msvc": "published",
+    "npm:@redact-secret/wasm": "published",
+    "pypi:redact-secret": "published"
+  },
+  "release_evidence": {
+    "manifest_reconstructed": true,
+    "reason": "The Release workflow manifest captured partial registry state before reconciliation. Reconcile Release intentionally emits no replacement manifest, so final immutable registry metadata, successful clean-install jobs, and the annotated Git tag were combined with the preserved original manifest and inventory.",
+    "observed_at": "2026-09-16",
+    "original_run": 35127722228,
+    "original_manifest": {
+      "artifact_set": [
+        "crate:redact-secret",
+        "crate:redact-secret-cli",
+        "npm:@redact-secret/core",
+        "npm:@redact-secret/node-darwin-arm64",
+        "npm:@redact-secret/node-darwin-x64",
+        "npm:@redact-secret/node-linux-arm64-gnu",
+        "npm:@redact-secret/node-linux-x64-gnu",
+        "npm:@redact-secret/node-win32-arm64-msvc",
+        "npm:@redact-secret/node-win32-x64-msvc",
+        "npm:@redact-secret/wasm",
+        "pypi:redact-secret"
+      ],
+      "conformance_identity": "23793bcd94af737ceb21ad1b04b485eed479a95d",
+      "registry_state": {
+        "crate:redact-secret": "published",
+        "crate:redact-secret-cli": "published",
+        "npm:@redact-secret/core": "unknown",
+        "npm:@redact-secret/node-darwin-arm64": "published",
+        "npm:@redact-secret/node-darwin-x64": "published",
+        "npm:@redact-secret/node-linux-arm64-gnu": "published",
+        "npm:@redact-secret/node-linux-x64-gnu": "unpublished",
+        "npm:@redact-secret/node-win32-arm64-msvc": "unpublished",
+        "npm:@redact-secret/node-win32-x64-msvc": "published",
+        "npm:@redact-secret/wasm": "published",
+        "pypi:redact-secret": "published"
+      },
+      "source_revision": "34ea9b92ed8879082e99f56f8f4715ee4e4f1f35",
+      "version": "0.1.0-beta.3"
+    },
+    "registries": {
+      "crate:redact-secret": {
+        "checksum": "7fa953867f6a6af797122a4d08fdd3ce692345ea98619a12a243071f4c0dcc51"
+      },
+      "crate:redact-secret-cli": {
+        "checksum": "cdc2801f2d2aad325dab138a036281e0d8966cb1ec20c4a4c76b2bb24bed2d2e"
+      },
+      "npm:@redact-secret/core": {
+        "shasum": "d6382fab336f9a2590a3ed558b7b1462856be716",
+        "integrity": "sha512-Znxedugve2tfPcu1Ed3DShnPf73t1ofjtjUNd1O3yU12JoeHhTXm4njONeXrXlTmjLtZyPiBsiUlGaOk8PSH0A=="
+      },
+      "npm:@redact-secret/wasm": {
+        "shasum": "71fa8e2388e0137e3352c0c86fae8de693aa4738",
+        "integrity": "sha512-r3pF61QjnbcL4ewU9LMYEgeKAswSk6+0PUfD/zi7u8hfWaqeqzCkulEqdg9wGGGXwJj8xYXjTJw10jRjo7h2fw=="
+      },
+      "npm:@redact-secret/node-darwin-arm64": {
+        "shasum": "66ba7ba136cdb2a5b52ecd2fcb872ccca23e764e",
+        "integrity": "sha512-ZgqptgVXRLYAHZeEcV5CWacC40L8QMSHrXq8qLuIIXJigH5MU0i3hrzxNLPjhOwehmT+0KhD5CqMdzUzZAWJWg=="
+      },
+      "npm:@redact-secret/node-darwin-x64": {
+        "shasum": "7589ca581786913051f9bf0602ed2efd04417a67",
+        "integrity": "sha512-++i1jkwEU+R61yvZoRzQHuVuNTdeJ5ItEefN+RS6gFEpd8cta0cTicM50+E3URIyEzl+COxQdBJ/hQOw6h60gQ=="
+      },
+      "npm:@redact-secret/node-linux-arm64-gnu": {
+        "shasum": "1991142fcc069627c27cfb04e7334cc2a6ae3c22",
+        "integrity": "sha512-86+IR8cj7VUDC3NSMRyrvhHOnbMm9+iA3aY8RuoCxtXL8vh1THPBjInuFfMDOyfV33zsaWJbgj+1pSl64l35Nw=="
+      },
+      "npm:@redact-secret/node-linux-x64-gnu": {
+        "shasum": "0bc97e087c302b160dbcce3d7039ffdbc95faf7c",
+        "integrity": "sha512-fWpsBe3lE8eJTeAbTNT2HpK0OTt9Jaw5EaLt3DB4cuAtkCld0zZclJbZAv7BpeH/M8lqjU6Owp5LluU12nvGZA=="
+      },
+      "npm:@redact-secret/node-win32-arm64-msvc": {
+        "shasum": "d3892e87fb9d46c61e0439a10686738d5228859f",
+        "integrity": "sha512-H8POqgWoJa72e4NI/1NIzaK+bv/+mOp6gyR7VzDLmkg1owXLuaqC5RYMA/OS6Qmz+hB3kxi7Q6wFB+mhcSHU1g=="
+      },
+      "npm:@redact-secret/node-win32-x64-msvc": {
+        "shasum": "36f948e5a2eb93bb7e2edb607f1e30aad67039f0",
+        "integrity": "sha512-O/zt0Vm0L63GuKl4rIbh32VfsDkWDnTgDJZb0TW063kkOf1byTp0WrtVvl1/OTPK33yL4hBop721E8ZyM6lGZA=="
+      },
+      "pypi:redact-secret": {
+        "files": [
+          {
+            "filename": "redact_secret-0.1.0b3-cp310-abi3-macosx_10_12_x86_64.whl",
+            "sha256": "2b5c20e1f08ce1779cf824285ea4d5abe51b6457de6cf1f0307b21b380e6671f"
+          },
+          {
+            "filename": "redact_secret-0.1.0b3-cp310-abi3-macosx_11_0_arm64.whl",
+            "sha256": "f9c0b0ba690fa94362418a161ca8584f6885767562c8e292269bc5dee658474c"
+          },
+          {
+            "filename": "redact_secret-0.1.0b3-cp310-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl",
+            "sha256": "705ce70337561307a9c276e5216d7577fecf21f1ef312cc6d818d65e356293ce"
+          },
+          {
+            "filename": "redact_secret-0.1.0b3-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+            "sha256": "baa873b8171989be64c09fac2a5ecfa95e0ca44fcaa2c4edd93213f209678ef1"
+          },
+          {
+            "filename": "redact_secret-0.1.0b3-cp310-abi3-musllinux_1_2_aarch64.whl",
+            "sha256": "8dee14da44278da64010f6ba59e2dabe6f012cfc8d26c4b8b5f98ca15a08ed01"
+          },
+          {
+            "filename": "redact_secret-0.1.0b3-cp310-abi3-musllinux_1_2_x86_64.whl",
+            "sha256": "6493cc2379fed98d0f57ca2f982d3319f134ced65ce2700ca00e870860c3b249"
+          },
+          {
+            "filename": "redact_secret-0.1.0b3-cp310-abi3-win_amd64.whl",
+            "sha256": "19d6d35264ee1f9c66cb4773077eb34f94e5a7ab4b0b1c988592555345338856"
+          },
+          {
+            "filename": "redact_secret-0.1.0b3-cp310-abi3-win_arm64.whl",
+            "sha256": "545afdb4e563a3062984bfb465396d192d804faf8bc98790c1317685d789a253"
+          },
+          {
+            "filename": "redact_secret-0.1.0b3.tar.gz",
+            "sha256": "aef48507d6b58618a4133d02526a7346bf3c9dd0d4101c3c16ca4444b5dc1961"
+          }
+        ]
+      }
+    },
+    "runs": [
+      {
+        "id": 35127722228,
+        "result": "Release published every artifact except the npm facade, but the Linux x64 GNU and Windows ARM64 npm packages could not be verified on the registry immediately after publishing, so the manifest recorded them as unpublished; the facade publish, install, and tag jobs were then skipped, leaving the facade state unknown."
+      },
+      {
+        "id": 35129171906,
+        "result": "Authorized reconciliation found all seven npm dependency packages already published with matching content and published the npm facade, then failed its immediate post-publish checksum read; install and tag jobs were skipped."
+      },
+      {
+        "id": 35129831469,
+        "result": "Authorized reconciliation found every artifact, including the facade, already published with content matching the original source, completed six Node clean installs and Chromium verification, and created annotated tag v0.1.0-beta.3."
+      }
+    ],
+    "verification": {
+      "run": 35129831469,
+      "node": [
+        "aarch64-apple-darwin",
+        "x86_64-apple-darwin",
+        "aarch64-unknown-linux-gnu",
+        "x86_64-unknown-linux-gnu",
+        "aarch64-pc-windows-msvc",
+        "x86_64-pc-windows-msvc"
+      ],
+      "browser": "chromium"
+    },
+    "tag": {
+      "name": "v0.1.0-beta.3",
+      "object": "ce4da72755ea64197adb26c615084a015662eee5",
+      "target": "34ea9b92ed8879082e99f56f8f4715ee4e4f1f35"
+    }
+  }
+}

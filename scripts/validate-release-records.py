@@ -40,6 +40,12 @@ SHA64 = re.compile(r"^[0-9a-f]{64}$")
 VERSION = re.compile(r"^(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-[0-9A-Za-z.-]+)?$")
 
 
+# A file whose name carries a published prerelease version (`beta.3-...`,
+# `0.1.0-beta.3...`) is part of that version's record, so it belongs inside
+# `docs/releases/<version>/`, never loose at a docs root.
+LOOSE_RELEASE_FILE = re.compile(r"(?:^|[^0-9A-Za-z])(?:alpha|beta|rc)\.\d+|\d+\.\d+\.\d+-")
+
+
 class InvalidRecord(ValueError):
     """A durable release record is incomplete or inconsistent."""
 
@@ -142,6 +148,16 @@ def validate_evidence(manifest: dict, inventory: dict, label: str) -> None:
     require(verification.get("browser") == "chromium", f"{label}: Chromium verification required")
 
 
+def validate_no_loose_records(root: Path) -> None:
+    for directory in (root / "docs", root / "docs/releases"):
+        if not directory.is_dir():
+            continue
+        loose = sorted(path.name for path in directory.iterdir()
+                       if path.is_file() and LOOSE_RELEASE_FILE.search(path.name))
+        require(not loose, f"{directory.relative_to(root)}: release record files outside a version "
+                           f"directory: {', '.join(loose)}")
+
+
 def validate_record(root: Path, directory: Path, changelog: str) -> None:
     version, label = directory.name, str(directory.relative_to(root))
     require(VERSION.fullmatch(version) is not None, f"{label}: invalid version directory")
@@ -200,6 +216,7 @@ def main(argv: list[str] | None = None) -> int:
         changelog = (root / "CHANGELOG.md").read_text(encoding="utf-8")
         versions = args.version or sorted(path.name for path in releases.iterdir() if path.is_dir())
         require(bool(versions), "no release records found")
+        validate_no_loose_records(root)
         for version in versions:
             directory = releases / version
             require(directory.is_dir(), f"missing release record directory for {version}")

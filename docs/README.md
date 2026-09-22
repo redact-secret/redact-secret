@@ -52,7 +52,7 @@ list is not proof that input contains no secrets.
 - [Repository conventions](../CONVENTIONS.md)
 - [Changelog](../CHANGELOG.md), [security reporting](../SECURITY.md), and [MIT license](../LICENSE)
 - [Documentation readiness and delivery follow-up](documentation-readiness.md)
-- [v0.1.0 release-readiness checklist](release-readiness-v0.1.0.md)
+- [v0.1.0 release-readiness checklist](releases/release-readiness-v0.1.0.md)
 
 ## Where a document or generated file belongs
 

@@ -257,7 +257,7 @@ intentional false negatives stay in the linked decision records and
   non-byte-identical qualified/published Python wheel), how #527/#528/#529
   resolved them, and what remains open (the Reconcile Release path has never
   been deliberately exercised; the wheel build itself is not yet proven
-  reproducible). Added the [v0.1.0 release-readiness checklist](docs/release-readiness-v0.1.0.md),
+  reproducible). Added the [v0.1.0 release-readiness checklist](docs/releases/release-readiness-v0.1.0.md),
   referenced from [the release runbook](docs/releasing.md#review-and-approval),
   stating six checkable criteria a future stable-release decision is made
   against; this work approves no release itself.
@@ -671,7 +671,7 @@ intentional false negatives stay in the linked decision records and
 
 ## 0.1.0-beta.3 — 2026-09-16
 
-[Publication status and recovery evidence](docs/releases/status.md).
+[Publication and recovery evidence](docs/releases/0.1.0-beta.3/README.md).
 
 - Added a `sendgrid-token` detector recognizing SendGrid's documented
   `SG.<22-byte id>.<43-byte secret>` API key shape, both segments drawn from
@@ -772,7 +772,7 @@ intentional false negatives stay in the linked decision records and
   missing delimiter, a non-12-digit account id, and similar) is unaffected
   and continues to be reported.
 
-## 0.1.0-beta.2 — 2026-09-13
+## 0.1.0-beta.2 — 2026-09-14
 
 [Publication evidence](docs/releases/0.1.0-beta.2/README.md).
 

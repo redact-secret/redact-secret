@@ -146,6 +146,21 @@ class ValidateReleaseRecordsTests(unittest.TestCase):
         with self.assertRaisesRegex(MODULE.InvalidRecord, "CHANGELOG"):
             self.validate(self.fixture(), changelog="")
 
+    def test_rejects_version_files_loose_at_a_docs_root(self) -> None:
+        for loose in ("docs/releases/beta.3-release-notes.md",
+                      "docs/releases/1.2.3-beta.4-manifest.json",
+                      "docs/rc.1-notes.md"):
+            root = self.fixture()
+            (root / loose).write_text("loose\n")
+            with self.assertRaisesRegex(MODULE.InvalidRecord, "outside a version directory"):
+                MODULE.validate_no_loose_records(root)
+
+    def test_accepts_cross_version_files_at_the_releases_root(self) -> None:
+        root = self.fixture()
+        for name in ("status.md", "registry-observation.json", "release-readiness-v0.1.0.md"):
+            (root / "docs/releases" / name).write_text("index\n")
+        MODULE.validate_no_loose_records(root)
+
     def test_manifest_without_artifact_digests_is_accepted(self) -> None:
         # Frozen historical records (beta.1 through beta.5) predate this
         # field entirely (issue #528).

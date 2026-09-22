@@ -10,7 +10,7 @@ the exact artifact."
 and what has since been fixed. It does not itself select a version, create a
 tag, publish a package, or deploy, and it does not approve v0.1.0 or any
 other release. The companion
-[v0.1.0 release-readiness checklist](../release-readiness-v0.1.0.md) states
+[v0.1.0 release-readiness checklist](../releases/release-readiness-v0.1.0.md) states
 the criteria a later, explicitly approved release decision is made against.
 
 ## What was published
@@ -145,7 +145,7 @@ not actually happened, is exactly the outcome Epic #526 was opened to close.
   `Reconcile Release` dispatch requires under
   [`AGENTS.md`'s release authority section](../../AGENTS.md#release-authority),
   and that authorization has not been given. This is tracked as item 5 of the
-  [v0.1.0 release-readiness checklist](../release-readiness-v0.1.0.md).
+  [v0.1.0 release-readiness checklist](../releases/release-readiness-v0.1.0.md).
 - **The Python wheel build itself is not proven reproducible.** #527 removed
   the second build that let beta.5's mismatch occur, but nothing yet asserts
   that building the same wheel twice, independently, produces identical
