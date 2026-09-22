@@ -13,7 +13,7 @@
  *
  * The distinguishing properties under test are the reviewed Hugging Face
  * user-access-token contract frozen by issue #367
- * (`docs/audits/evidence/367/precision-contracts.json`,
+ * (`docs/contracts/precision/precision-contracts.json`,
  * `families.huggingface-token`): `hf_` followed by exactly 34 bytes, and a
  * body alphabet resolved from the two tools' disagreement as the support-
  * policy union `[A-Za-z0-9]` rather than either tool's narrower reading —
@@ -29,7 +29,7 @@
  *
  * Issue #485 adopts the `api_org_` (organization-token) prefix into the same
  * family, re-tiering it from T0 to T2
- * (`docs/audits/evidence/367/precision-contracts.json`,
+ * (`docs/contracts/precision/precision-contracts.json`,
  * `families.huggingface-token`): gitleaks 8.30.1 registers `api_org_` as its
  * own letters-only rule and trufflehog 3.97.4 matches it under the same
  * `(?:hf_|api_org_)[a-zA-Z0-9]{34}` rule it uses for `hf_` — the identical

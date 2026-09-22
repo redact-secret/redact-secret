@@ -5,9 +5,12 @@ Issue #367 freezes, for seven provider families (OpenAI, DigitalOcean, Docker,
 Slack, Hugging Face, Cloudflare, Linear), the reviewed lexical contract each
 default detector must enforce, the beta.4 negative-twin baseline those
 contracts were measured against, and an audit of every fixture this
-repository already ships for those families. The contract text lives in
-``docs/audits/evidence/367/precision-contracts.json``; this script derives the
-two evidence files next to it and keeps them honest:
+repository already ships for those families. The contract text is a live
+input CI reads on every run, so it lives outside the frozen-evidence archive
+at ``docs/contracts/precision/precision-contracts.json``
+(``decision-decide-artifact-taxonomy-spec-routing-and-evidence-placement``);
+this script derives the two evidence files still frozen under
+``docs/audits/evidence/367/`` and keeps them honest:
 
 ``beta4-twin-baseline.json``
     The 24 must-not-flag twins and their 24 paired positives from the beta.4
@@ -54,8 +57,9 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+CONTRACTS_DIR = ROOT / "docs" / "contracts" / "precision"
+CONTRACTS_PATH = CONTRACTS_DIR / "precision-contracts.json"
 EVIDENCE_DIR = ROOT / "docs" / "audits" / "evidence" / "367"
-CONTRACTS_PATH = EVIDENCE_DIR / "precision-contracts.json"
 BASELINE_PATH = EVIDENCE_DIR / "beta4-twin-baseline.json"
 CORPUS_AUDIT_PATH = EVIDENCE_DIR / "corpus-audit.json"
 

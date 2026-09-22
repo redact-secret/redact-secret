@@ -167,7 +167,7 @@ pub(super) const PYPI: KnownFormatProviderDetector = KnownFormatProviderDetector
 
 /// Hugging Face user access tokens in the provider's `hf_` namespace: the
 /// reviewed grammar (issue #372, following the frozen precision contract
-/// from issue #367, `docs/audits/evidence/367/precision-contracts.json`) is
+/// from issue #367, `docs/contracts/precision/precision-contracts.json`) is
 /// `hf_` plus an exact 34-byte body, matched to the union alphabet
 /// `[A-Za-z0-9]`. gitleaks 8.30.1 and trufflehog 3.97.4 independently agree
 /// on the 34-byte exact length, so a body one byte short is an intentional
@@ -181,7 +181,7 @@ pub(super) const PYPI: KnownFormatProviderDetector = KnownFormatProviderDetector
 /// any other undocumented prefix, is an intentional false negative.
 ///
 /// Hugging Face organization API tokens in the `api_org_` namespace (issue
-/// #485, re-tiering `docs/audits/evidence/367/precision-contracts.json`,
+/// #485, re-tiering `docs/contracts/precision/precision-contracts.json`,
 /// `families.huggingface-token.pending.organization-token` from T0 to T2):
 /// the #367 audit deferred `api_org_` not for an evidence gap but as a scope
 /// boundary ("adding a variant is a coverage change, not a precision fix"),
@@ -1221,7 +1221,7 @@ mod tests {
     }
 
     /// Issue #372: the frozen precision contract
-    /// (`docs/audits/evidence/367/precision-contracts.json`, `families.
+    /// (`docs/contracts/precision/precision-contracts.json`, `families.
     /// huggingface-token`) narrows the body to exactly 34 bytes. A 33-byte
     /// body — one byte short, the beta.4
     /// `huggingface-token-user-plain-twin` regression fixture — is an

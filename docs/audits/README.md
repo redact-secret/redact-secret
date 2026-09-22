@@ -29,7 +29,7 @@ and [qualification follow-up](release-qualification-follow-up.md) describe beta.
 | Remediation classification | [Release gaps](release-gap-disposition.md), [deferred quality](deferred-quality-backlog.md) |
 | Earlier release readiness | [Readiness audit](release-readiness-audit.md) |
 | Independent repeat audit (#145) | [Revision-bound verdict and residual findings](repeated-release-readiness-audit.md) |
-| Precision contracts (#367) | [Frozen contracts, beta.4 twin baseline and corpus audit](evidence/367/README.md) |
+| Precision contracts (#367) | [Beta.4 twin baseline and corpus audit; the live contract itself moved to `docs/contracts/precision/`](evidence/367/README.md) |
 | Beta.5 precision gate (#376) | [Candidate comparison, policy changes, and accuracy-corpus re-pin](evidence/376/README.md) |
 | Per-detector artifact/runtime cost baseline (#378) | [Compositions, artifact sizes, runtime cost](evidence/378/README.md) |
 | Full and common WebAssembly artifacts (#381) | [Real-artifact sizes, build evidence, performance, browser qualification, decision gate](evidence/381/README.md) |
