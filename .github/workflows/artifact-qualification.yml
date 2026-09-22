@@ -940,11 +940,20 @@ jobs:
       # packaged bytes are correct. Skipping it does not change the `.crate`
       # tarball `cargo package` writes to `target/package/`, only whether it
       # also compiles the extracted copy.
+      #
+      # Both crates are packaged in one invocation. `--no-verify` still has
+      # to resolve the CLI's dependencies to write the `Cargo.lock` it ships,
+      # and on a freshly bumped RC the exact `=<version>` core requirement is
+      # not on crates.io yet, so a separate `-p redact-secret-cli` run fails
+      # there (it only passed on `main`, whose version was already
+      # published). Packaged together, Cargo resolves the CLI against the
+      # core `.crate` it just wrote, recorded as a crates.io source whose
+      # checksum is that file's SHA-256 -- the same bytes `release.yml`'s
+      # `publish-crates` job verifies crates.io received before it publishes
+      # the CLI, so the CLI tarball recorded here is the one it reproduces.
       - name: Package the crates
         if: needs.plan.outputs.full == 'true'
-        run: |
-          cargo package --no-verify --locked -p redact-secret
-          cargo package --no-verify --locked -p redact-secret-cli
+        run: cargo package --no-verify --locked -p redact-secret -p redact-secret-cli
 
       # Requires the whole declared matrix, records every artifact's size and
       # SHA-256 against the source commit, and lists the contents of each
