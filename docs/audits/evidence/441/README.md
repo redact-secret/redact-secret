@@ -1,6 +1,6 @@
 # Issue #441 — declarative ruleset parser WebAssembly size increment
 
-[Audit archive](../README.md) · [Issue #441](https://github.com/redact-secret/redact-secret/issues/441)
+[Audit archive](../../README.md) · [Issue #441](https://github.com/redact-secret/redact-secret/issues/441)
 
 Measured 2026-09-19 at commit `341c34413d7246bec4037c9969368f2478dd1bbf`
 (`workbench/441-declarative-rulesets`, branched from `main`), working tree

@@ -1,7 +1,7 @@
 # Issue #495 — declarative ruleset implementation WebAssembly size re-measurement
 
-[Audit archive](../README.md) · [Issue #495](https://github.com/redact-secret/redact-secret/issues/495) ·
-[decision-define-declarative-detector-ruleset-contract](../../decisions/2026-09-19-define-declarative-detector-ruleset-contract.md)
+[Audit archive](../../README.md) · [Issue #495](https://github.com/redact-secret/redact-secret/issues/495) ·
+[decision-define-declarative-detector-ruleset-contract](../../../decisions/2026-09-19-define-declarative-detector-ruleset-contract.md)
 
 Measured at commit `f67e1e5bf10cda086f734ac356c8cbb4f581e8cd`
 (`milocosmopolitan/expose-the-declarative-ruleset-detector-adapter`), the
@@ -22,11 +22,11 @@ call for re-measurement with `scripts/measure-detector-cost.mjs`."
 
 Unlike [#441](../441/README.md)'s prototype measurement (a representative
 scaffold, reverted immediately after), this measures the real shipped
-implementation: [`crates/secret-scan-core/src/ruleset.rs`](../../../crates/secret-scan-core/src/ruleset.rs)'s
-parser (#483), [`crates/secret-scan-core/src/detectors/ruleset_adapter.rs`](../../../crates/secret-scan-core/src/detectors/ruleset_adapter.rs)'s
+implementation: [`crates/secret-scan-core/src/ruleset.rs`](../../../../crates/secret-scan-core/src/ruleset.rs)'s
+parser (#483), [`crates/secret-scan-core/src/detectors/ruleset_adapter.rs`](../../../../crates/secret-scan-core/src/detectors/ruleset_adapter.rs)'s
 `Detector` adapter (#495), the public `load_ruleset`/`RulesetError`/
 `RulesetErrorClass` API, the new `INVALID_RULESET` error code, and the
-`ruleset` argument [`bindings/wasm/src/lib.rs`](../../../bindings/wasm/src/lib.rs)'s
+`ruleset` argument [`bindings/wasm/src/lib.rs`](../../../../bindings/wasm/src/lib.rs)'s
 `scan`/`scanAndRedact` now accept — all reachable in the shipped build, no
 `std::hint::black_box` scaffolding needed.
 
