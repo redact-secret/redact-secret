@@ -127,8 +127,12 @@ reopen #367 itself.
   (`issue_371_twins_are_rejected_and_their_paired_positives_preserved`).
 - `docs/coverage/detector-inventory.json`'s `slack_token` reconciliation
   trigger is now a full bot-grammar value; `inventory-report.json`,
-  `coverage-declarations.json`, and `coverage-report.md` are regenerated,
-  and `fp-fn-summary-371.json` records this issue's Slack-only view.
+  `coverage-declarations.json`, and `coverage-report.md` are regenerated.
+  This issue's Slack-only view (1 positive / 6 negative fixtures across 7
+  host contexts) was recorded at
+  [`fp-fn-summary-371.json`](https://github.com/redact-secret/redact-secret/blob/b00b96ed3f4cf0eac485f0f0d343cf65717e152d/docs/coverage/fp-fn-summary-371.json),
+  removed by issue #595 as a redundant snapshot of the live, all-detector
+  `fp-fn-summary.json`.
   `docs/audits/evidence/367/corpus-audit.json` is regenerated from the
   corrected corpus; `beta4-twin-baseline.json` and
   `precision-contracts.json` are frozen historical/decision evidence and are

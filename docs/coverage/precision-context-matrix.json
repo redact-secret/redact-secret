@@ -5749,7 +5749,7 @@
       "findingCount": 1,
       "fixtureId": "linear-positive-all-prefixes",
       "kind": "positive",
-      "note": "Every remaining documented prefix variant is independently supported.",
+      "note": "Every remaining documented prefix variant is independently supported. This body is 25 bytes, past `lin_oauth_`'s 20-byte floor, exercising issue #570's open-floor fix (#551 briefly turned the floor into an exact length and shrank this fixture's body to fit; restored).",
       "result": "flagged",
       "runtimeConsumers": [
         "rust-core",
@@ -6048,10 +6048,10 @@
       "contractTier": null,
       "detector": "openai-token",
       "enforcedBy": "crates/secret-scan-core/tests/incremental_partitions.rs::every_fixture_reproduces_the_canonical_whole_input_reference",
-      "findingCount": 3,
+      "findingCount": 4,
       "fixtureId": "openai-368-unicode-crlf-pairs",
       "kind": null,
-      "note": "issue #368: the three Unicode/CRLF positives and their twins from the issue's self-contained reproduction, concatenated; each astral emoji and CRLF shifts the byte offsets and every partition must still resolve exactly the three positives.",
+      "note": "issue #368: the three Unicode/CRLF positives and their twins from the issue's self-contained reproduction, concatenated; each astral emoji and CRLF shifts the byte offsets and every partition must still resolve exactly the three positives. Issue #552: the legacy twin's body is still an exact-48-byte `sk-` run (the proj/svcacct twins' underscored bodies are not), so the bare vendor-prefixed policy layer now also claims it at generic classification, shifting every later placeholder number by one.",
       "result": "flagged",
       "runtimeConsumers": [
         "rust-core",
@@ -6082,10 +6082,10 @@
       "contractTier": null,
       "detector": "openai-token",
       "enforcedBy": "crates/secret-scan-core/tests/incremental_partitions.rs::every_fixture_reproduces_the_canonical_whole_input_reference",
-      "findingCount": 1,
+      "findingCount": 2,
       "fixtureId": "openai-legacy-marker-twin-discriminating-boundary",
       "kind": null,
-      "note": "issue #368: the positive and its twin differ in one structural property, so every UTF-8 byte and char partition must resolve the same single finding as the whole-input scan, including splits inside the `T3BlbkFJ` marker and at the 73/74-byte segment boundary. Here the twin mutates the marker's last byte.",
+      "note": "issue #368: the positive and its twin differ in one structural property, so every UTF-8 byte and char partition must resolve the same single finding as the whole-input scan, including splits inside the `T3BlbkFJ` marker and at the 73/74-byte segment boundary. Here the twin mutates the marker's last byte. Issue #552: the twin's marker-less-to-openai-token body is still an exact-48-byte `sk-` run, so the bare vendor-prefixed policy layer now claims it at generic classification, and every partition must resolve that second finding identically too.",
       "result": "flagged",
       "runtimeConsumers": [
         "rust-core",
@@ -6588,14 +6588,14 @@
       "contexts": [
         "plain-text"
       ],
-      "contractTier": "negative",
+      "contractTier": "regression",
       "detector": "openai-token",
       "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
-      "findingCount": 0,
+      "findingCount": 1,
       "fixtureId": "openai-negative-368-legacy-plain-twin",
-      "kind": "negative",
-      "note": "Negative twin of the paired positive differing in exactly one structural property (internal marker `T3BlbkFK` vs contracted `T3BlbkFJ`); beta.4 flagged it at the same range as its positive. Issue #368 self-contained synthetic reproduction; independent benchmark fixture id `openai-token-legacy-plain-twin` (redact-secret-benchmarks common-formats, measurement protocol v4, T2). Never provider-issued.",
-      "result": "silent",
+      "kind": "overlap",
+      "note": "Negative twin of the paired positive differing in exactly one structural property (internal marker `T3BlbkFK` vs contracted `T3BlbkFJ`); beta.4 flagged it at the same range as its positive. Issue #368 self-contained synthetic reproduction; independent benchmark fixture id `openai-token-legacy-plain-twin` (redact-secret-benchmarks common-formats, measurement protocol v4, T2). Never provider-issued. Silent for openai-token (the marker-less/mutated-marker shape never satisfies the reviewed contract), but issue #552's bare vendor-prefixed policy layer still claims the exact-48-byte `sk-` body at generic classification, below `openai-token`'s specificity.",
+      "result": "flagged",
       "runtimeConsumers": [
         "rust-core",
         "python-binding"
@@ -6607,14 +6607,14 @@
       "contexts": [
         "plain-text"
       ],
-      "contractTier": "negative",
+      "contractTier": "regression",
       "detector": "openai-token",
       "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
-      "findingCount": 0,
+      "findingCount": 1,
       "fixtureId": "openai-negative-368-legacy-unicode-crlf-twin",
-      "kind": "negative",
-      "note": "Negative twin of the paired positive differing in exactly one structural property (internal marker `T3BlbkFK` vs contracted `T3BlbkFJ`); beta.4 flagged it at the same range as its positive. Issue #368 self-contained synthetic reproduction; independent benchmark fixture id `openai-token-legacy-unicode-crlf-twin` (redact-secret-benchmarks common-formats, measurement protocol v4, T2). Never provider-issued.",
-      "result": "silent",
+      "kind": "overlap",
+      "note": "Negative twin of the paired positive differing in exactly one structural property (internal marker `T3BlbkFK` vs contracted `T3BlbkFJ`); beta.4 flagged it at the same range as its positive. Issue #368 self-contained synthetic reproduction; independent benchmark fixture id `openai-token-legacy-unicode-crlf-twin` (redact-secret-benchmarks common-formats, measurement protocol v4, T2). Never provider-issued. Silent for openai-token, but issue #552's bare vendor-prefixed policy layer still claims the exact-48-byte `sk-` body at generic classification, below `openai-token`'s specificity.",
+      "result": "flagged",
       "runtimeConsumers": [
         "rust-core",
         "python-binding"
@@ -6721,14 +6721,14 @@
       "contexts": [
         "plain-text"
       ],
-      "contractTier": "negative",
+      "contractTier": "regression",
       "detector": "openai-token",
       "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
-      "findingCount": 0,
+      "findingCount": 1,
       "fixtureId": "openai-negative-explicit-namespace-legacy-body",
-      "kind": "negative",
-      "note": "A legacy-shaped 20/20 body under an explicit `sk-proj-` namespace is malformed for that namespace and is never re-read as a bare legacy key: each variant is validated independently with no fallback.",
-      "result": "silent",
+      "kind": "overlap",
+      "note": "A legacy-shaped 20/20 body under an explicit `sk-proj-` namespace is malformed for that namespace and is never re-read as a bare legacy key: each variant is validated independently with no fallback. Silent for openai-token, but issue #552's bare vendor-prefixed policy layer still claims the whole `sk-proj-`-plus-48-byte-body span at generic classification, below `openai-token`'s specificity.",
+      "result": "flagged",
       "runtimeConsumers": [
         "rust-core",
         "python-binding"
@@ -6778,14 +6778,14 @@
       "contexts": [
         "dotenv"
       ],
-      "contractTier": "negative",
+      "contractTier": "regression",
       "detector": "openai-token",
       "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
-      "findingCount": 0,
+      "findingCount": 1,
       "fixtureId": "openai-negative-marker-dotenv",
-      "kind": "negative",
-      "note": "Malformed twin of openai-positive-marker-dotenv in the same dotenv context: the internal marker is corrupted (`T3BlbkFK` vs the contracted `T3BlbkFJ`). Issue #375 context-pairing evidence.",
-      "result": "silent",
+      "kind": "overlap",
+      "note": "Malformed twin of openai-positive-marker-dotenv in the same dotenv context: the internal marker is corrupted (`T3BlbkFK` vs the contracted `T3BlbkFJ`). Issue #375 context-pairing evidence. Silent for openai-token, but issue #552's bare vendor-prefixed policy layer still claims the exact-48-byte `sk-` body at generic classification, below `openai-token`'s specificity; the assignment name `OPENAI_API_KEY` is not itself a recognized contextual name, so this is the prefix-anchored match, not the name-anchored one.",
+      "result": "flagged",
       "runtimeConsumers": [
         "rust-core",
         "python-binding"
@@ -6930,14 +6930,14 @@
       "contexts": [
         "toml"
       ],
-      "contractTier": "negative",
+      "contractTier": "regression",
       "detector": "openai-token",
       "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
-      "findingCount": 0,
+      "findingCount": 1,
       "fixtureId": "openai-negative-marker-toml",
-      "kind": "negative",
-      "note": "Malformed twin of openai-positive-marker-toml in the same TOML context: the internal marker is corrupted (`T3BlbkFK`). Issue #375 context-pairing evidence.",
-      "result": "silent",
+      "kind": "overlap",
+      "note": "Malformed twin of openai-positive-marker-toml in the same TOML context: the internal marker is corrupted (`T3BlbkFK`). Issue #375 context-pairing evidence. Silent for openai-token, but issue #552's bare vendor-prefixed policy layer still claims the exact-48-byte `sk-` body at generic classification, below `openai-token`'s specificity.",
+      "result": "flagged",
       "runtimeConsumers": [
         "rust-core",
         "python-binding"
@@ -8526,7 +8526,7 @@
       "findingCount": 2,
       "fixtureId": "slack-positive-all-prefixes",
       "kind": "positive",
-      "note": "Reclassified by issue #512 (docs/decisions/2026-09-20-freeze-slack-user-and-rotation-token-grammar.md): `xoxp-`, `xoxe-`, `xoxe.xoxb-`, and `xoxe.xoxp-` now require their own documented digit section, which none of these opaque bodies carry, so slack-token no longer claims them; `xapp-` and `xwfp-` are not promoted and still match at their original ranges. Input unchanged; expectation corrected. `slack-positive-structural-prefixes` is the corrected counterpart demonstrating every promoted family's full grammar.",
+      "note": "Reclassified by issue #512 (docs/decisions/2026-09-20-freeze-slack-user-and-rotation-token-grammar.md): `xoxp-`, `xoxe-`, `xoxe.xoxb-`, and `xoxe.xoxp-` now require their own documented digit section, which none of these opaque bodies carry, so slack-token no longer claims them; `xapp-` and `xwfp-` are not promoted and still match at their original ranges. Every opaque body here is 25 bytes, past the interim guards' 20-byte floor, exercising issue #570's open-floor fix (#551 briefly turned the floor into an exact length, which stopped matching this fixture entirely; restored). `slack-positive-structural-prefixes` is the corrected counterpart demonstrating every promoted family's full grammar.",
       "result": "flagged",
       "runtimeConsumers": [
         "rust-core",
@@ -8944,7 +8944,7 @@
       "findingCount": 4,
       "fixtureId": "slack-positive-structural-prefixes",
       "kind": "positive",
-      "note": "Issue #512 (docs/decisions/2026-09-20-freeze-slack-user-and-rotation-token-grammar.md): each of the four newly-promoted families (user, refresh, rotating-bot, rotating-user) is independently detected at its own full documented section grammar, the corrected counterpart of `slack-positive-all-prefixes` for these four prefixes.",
+      "note": "Issue #512 (docs/decisions/2026-09-20-freeze-slack-user-and-rotation-token-grammar.md): each of the four newly-promoted families (user, refresh, rotating-bot, rotating-user) is independently detected at its own full documented section grammar, the corrected counterpart of `slack-positive-all-prefixes` for these four prefixes. The rotation tail here is 38 bytes, past its 20-byte floor, exercising issue #570's open-floor fix (#551 briefly turned the floor into an exact length and shrank this fixture's tail to fit; restored).",
       "result": "flagged",
       "runtimeConsumers": [
         "rust-core",

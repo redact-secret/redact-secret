@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 import sys
 import unittest
 from pathlib import Path
@@ -11,6 +12,34 @@ assert SPEC and SPEC.loader
 GEN = importlib.util.module_from_spec(SPEC)
 sys.modules[SPEC.name] = GEN
 SPEC.loader.exec_module(GEN)
+
+ROOT = SCRIPT.resolve().parents[1]
+
+# The exact detector/issue set docs/coverage/README.md documents as the
+# live, all-detector command -- the only fp-fn-summary output this repo
+# commits (issue #595 removed the per-issue `fp-fn-summary-NNN.json`
+# snapshots that used to duplicate slices of it).
+COMMITTED_DETECTORS = [
+    "anthropic-token",
+    "aws-access-key",
+    "bearer-token",
+    "cloudflare-token",
+    "connection-string",
+    "digitalocean-token",
+    "docker-token",
+    "jwt",
+    "openai-token",
+    "otpauth-uri",
+    "shopify-token",
+    "stripe-token",
+    "supabase-token",
+    "vault-token",
+    "vercel-token",
+]
+COMMITTED_ISSUES = [
+    f"https://github.com/redact-secret/redact-secret/issues/{n}"
+    for n in (316, 317, 318, 320, 323, 324, 325, 370, 513)
+]
 
 
 def fixture(id_: str, detector: str, *, kind: str, contexts: list[str] | None = None) -> dict:
@@ -110,6 +139,25 @@ class BuildReportTests(unittest.TestCase):
         other_issue = "https://github.com/redact-secret/redact-secret/issues/319"
         report = GEN.build_report(corpus, ["widget"], issues=[other_issue])
         self.assertEqual(report["provenance"]["issue"], other_issue)
+
+
+class RealRepoReconciliationTests(unittest.TestCase):
+    """Exercises the committed report against the real corpus, so a corpus
+    change that drops or renames a fixture without regenerating
+    ``docs/coverage/fp-fn-summary.json`` is caught the same way
+    ``python3 -B scripts/generate-fp-fn-summary.py`` would catch it."""
+
+    def test_committed_fp_fn_summary_is_up_to_date(self) -> None:
+        corpus = GEN.load_json(GEN.CORPUS_PATH)
+        report = GEN.build_report(corpus, COMMITTED_DETECTORS, COMMITTED_ISSUES)
+        fresh = json.dumps(report, indent=2, sort_keys=True) + "\n"
+        committed = (ROOT / "docs" / "coverage" / "fp-fn-summary.json").read_text(encoding="utf-8")
+        self.assertEqual(
+            fresh,
+            committed,
+            "docs/coverage/fp-fn-summary.json is out of date; regenerate it with the "
+            "command in docs/coverage/README.md",
+        )
 
 
 if __name__ == "__main__":

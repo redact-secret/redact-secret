@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 import sys
 import unittest
 from pathlib import Path
@@ -11,6 +12,8 @@ assert SPEC and SPEC.loader
 GEN = importlib.util.module_from_spec(SPEC)
 sys.modules[SPEC.name] = GEN
 SPEC.loader.exec_module(GEN)
+
+ROOT = SCRIPT.resolve().parents[1]
 
 
 def sync_fixture(
@@ -173,6 +176,31 @@ class Beta4TwinBaselineRowsTests(unittest.TestCase):
         }
         rows = GEN.beta4_twin_baseline_rows(baseline, ["widget-token"])
         self.assertEqual(rows, [])
+
+
+class RealRepoReconciliationTests(unittest.TestCase):
+    """Exercises the committed matrix against the real corpus files, so a
+    corpus change without regenerating
+    ``docs/coverage/precision-context-matrix.json`` is caught the same way
+    ``python3 -B scripts/generate-precision-context-matrix.py`` would catch
+    it."""
+
+    def test_committed_precision_context_matrix_is_up_to_date(self) -> None:
+        matrix = GEN.build_matrix(
+            GEN.load_json(GEN.SYNC_PATH),
+            GEN.load_json(GEN.INCREMENTAL_PATH),
+            GEN.load_json(GEN.BASELINE_PATH),
+            list(GEN.DEFAULT_DETECTORS),
+        )
+        fresh = json.dumps(matrix, indent=2, sort_keys=True) + "\n"
+        committed = (ROOT / "docs" / "coverage" / "precision-context-matrix.json").read_text(encoding="utf-8")
+        self.assertEqual(
+            fresh,
+            committed,
+            "docs/coverage/precision-context-matrix.json is out of date; regenerate it with "
+            "`python3 -B scripts/generate-precision-context-matrix.py "
+            "--out docs/coverage/precision-context-matrix.json`",
+        )
 
 
 if __name__ == "__main__":

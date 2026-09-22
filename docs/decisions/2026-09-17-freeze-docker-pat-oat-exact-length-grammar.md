@@ -135,8 +135,11 @@ provider family.
 - `docs/coverage/detector-inventory.json`'s `docker_token` reconciliation
   trigger is now a 27-byte-suffix value; `inventory-report.json`,
   `coverage-declarations.json`, `coverage-report.md`, and
-  `fp-fn-summary.json` are regenerated, and `fp-fn-summary-370.json`
-  records this issue's Docker-only view.
+  `fp-fn-summary.json` are regenerated. This issue's Docker-only view (18
+  positive / 11 negative fixtures across 7 host contexts) was recorded at
+  [`fp-fn-summary-370.json`](https://github.com/redact-secret/redact-secret/blob/b00b96ed3f4cf0eac485f0f0d343cf65717e152d/docs/coverage/fp-fn-summary-370.json),
+  removed by issue #595 as a redundant snapshot of the live, all-detector
+  `fp-fn-summary.json`.
 - A value that is a real Docker Hub token of a length other than 27 or 32
   bytes, should Docker ever issue one, would go undetected by this detector
   until the contract is re-reviewed; that is the accepted cost of rejecting
