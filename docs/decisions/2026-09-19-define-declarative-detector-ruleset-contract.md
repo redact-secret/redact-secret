@@ -139,7 +139,7 @@ value grammar is exactly one [`PrefixShape`](../../crates/secret-scan-core/src/d
 - `run`: `exact <n>` or `at-least <n>`, mirroring `RunLength::{Exact,
   AtLeast}`.
 - `validator`: `none`, or one name from the closed enum in
-  [Closed validator enum](#closed-validator-enum-post-check).
+  [Closed validator enum](#closed-validator-enum-postcheck).
 
 Loading a ruleset materializes a `Vec<PrefixShape>` and feeds it to the
 existing `scan_prefixed_shapes` — the same left-to-right, longest-prefix-wins,

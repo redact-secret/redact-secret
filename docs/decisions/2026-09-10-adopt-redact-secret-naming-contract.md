@@ -42,7 +42,7 @@ candidate. `SecretScanError`/`SecretScanErrorCode` and internal crate-directory
 paths remain unchanged as decided.
 
 The original body is retained as historical rationale. The current artifact
-mapping is recorded in the [first-release decision's current application](2026-09-10-ship-first-release-artifact-set.md#current-application--2026-09-11-144).
+mapping is recorded in the [first-release decision's current application](2026-09-10-ship-first-release-artifact-set.md#current-application--2026-09-12-181-182).
 The candidate changelog is current product documentation and is no longer on
 the historical-name allowlist. No version or release operation is authorized
 by this update.

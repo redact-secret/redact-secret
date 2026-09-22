@@ -39,7 +39,16 @@ list is not proof that input contains no secrets.
   evidence in [`redact-secret-benchmarks`](https://github.com/redact-secret/redact-secret-benchmarks)
 - [Detection reliability evidence](reference/detection-reliability.md)
 - [Review archive](audits/README.md) and [beta.2 final code review](audits/beta2-final-code-review.md)
-- [Release records](releases/status.md): every published version and its durable record
+- [Release records](releases/status.md): every published version and its durable record,
+  stored per version under [`docs/releases/`](releases/)
+- [Support-matrix drift gate](support-matrix-drift.md): the pre-release regression
+  check between a baseline and candidate support matrix
+- [Python repository redirect](python-repository-redirect.md) and
+  [repository transfer runbook](repository-transfer-runbook.md)
+- [Conformance fixture schema](../conformance/README.md),
+  [cross-language evaluation protocol](../assessment/README.md), and
+  [OpenGrep SAST baseline](../sast/README.md)
+- [Repository conventions](../CONVENTIONS.md)
 - [Changelog](../CHANGELOG.md), [security reporting](../SECURITY.md), and [MIT license](../LICENSE)
 - [Documentation readiness and delivery follow-up](documentation-readiness.md)
 - [v0.1.0 release-readiness checklist](release-readiness-v0.1.0.md)
