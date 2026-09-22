@@ -3,7 +3,7 @@
 [Audit archive](../../README.md) ·
 [Governing decision](../../../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) ·
 [Standing decision cited](../../../decisions/2026-09-20-warn-unconditionally-on-high-signal-contextual-names.md) ·
-[Related decision](../../../decisions/2026-09-20-exclude-filler-and-placeholder-bearer-values.md) ·
+[Related decision](../../../decisions/2026-09-15-exclude-fully-delimited-template-references.md#folded-records) ·
 [Issue #553](https://github.com/redact-secret/redact-secret/issues/553) ·
 [Epic #548](https://github.com/redact-secret/redact-secret/issues/548) ·
 [Prior evidence: #552](../552/README.md) ·

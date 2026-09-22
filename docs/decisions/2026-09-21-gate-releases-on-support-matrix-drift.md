@@ -5,9 +5,24 @@ scope: workspace
 title: Gate release qualification on support-matrix drift, with recorded acknowledgement to override
 decided_at: 2026-09-21
 spec: evidence-and-gates
+aliases: decision-project-support-matrix-into-docs-and-release-notes
 ---
 
 # Gate release qualification on support-matrix drift, with recorded acknowledgement to override
+
+This record is the representative ADR for the support-matrix cluster (issue
+[#599](https://github.com/redact-secret/redact-secret/issues/599), DS6c, under
+epic [#591](https://github.com/redact-secret/redact-secret/issues/591)): the
+generated support matrix reaches this repository only as a pinned, committed
+copy, and every surface that consumes it -- docs, release notes, and release
+qualification -- is checked offline against that one pin.
+[Folded records](#folded-records) lists the decision merged into this one
+under
+[`decision-decide-artifact-taxonomy-spec-routing-and-evidence-placement`](2026-09-22-decide-artifact-taxonomy-spec-routing-and-evidence-placement.md)'s
+Merge grade; its `decision_id` is preserved in this record's `aliases:`
+field above, and its full original text stays reachable at its permalink.
+The current rules live in
+[`docs/specs/evidence-and-gates.md`](../specs/evidence-and-gates.md).
 
 ## Decision
 
@@ -103,3 +118,15 @@ acknowledgement stops covering the family the moment its regression reason
 changes. Release authority is unchanged (acceptance criterion 5): this gate
 informs `release.yml`'s qualification step; it does not itself grant
 authority to tag, publish, or release.
+
+## Folded records
+
+Each row is a decision merged into this one (Merge grade). The `decision_id`
+column is preserved verbatim in this record's `aliases:` frontmatter field so
+an old reference still resolves; the permalink is the folded record's last
+text on `main` before this merge, at
+`ed80bc8aaa5058e11bf8b6fc43214b0194de886a`.
+
+| Original `decision_id` | Date | Issue | Decision | Full record |
+| --- | --- | --- | --- | --- |
+| `decision-project-support-matrix-into-docs-and-release-notes` | 2026-09-21 | [#510](https://github.com/redact-secret/redact-secret/issues/510) | Keep a pinned copy of the benchmarks-generated `support-matrix.json` and its schema, render `docs/support-matrix.md`, the README section, and a release-note fragment from it, and fail `npm run ci` on drift; never fetch it live. | [full record](https://github.com/redact-secret/redact-secret/blob/ed80bc8aaa5058e11bf8b6fc43214b0194de886a/docs/decisions/2026-09-21-project-the-support-matrix-into-docs-and-release-notes.md) |

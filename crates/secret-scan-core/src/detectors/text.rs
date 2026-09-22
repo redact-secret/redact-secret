@@ -25,7 +25,7 @@ pub(super) fn is_js_line_terminator(ch: char) -> bool {
 /// elsewhere, a contextual assignment's name-operator-value grammar must not
 /// treat a line terminator as ordinary filler, or an operator with no value
 /// on its own line reads the next physical line's first token as the value
-/// (see `docs/decisions/2026-09-15-contextual-assignment-stops-at-the-line.md`).
+/// (see `docs/specs/contextual-detection.md`).
 pub(super) fn is_horizontal_js_whitespace(ch: char) -> bool {
     is_js_whitespace(ch) && !is_js_line_terminator(ch)
 }
@@ -108,7 +108,7 @@ pub(super) fn ends_with_ci(value: &str, suffix: &str) -> bool {
 /// already-excluded word — a leading/trailing separator, an appended digit
 /// to a word on `digit_suffix_words`, or two listed words joined with
 /// `-`/`_` — without falling back to raw substring containment (see
-/// `docs/decisions/2026-09-15-match-placeholder-words-on-token-boundaries.md`).
+/// `docs/specs/contextual-detection.md`).
 ///
 /// `value` is split into maximal runs of ASCII alphanumeric characters
 /// (every other byte is a separator). Two independent checks then apply:

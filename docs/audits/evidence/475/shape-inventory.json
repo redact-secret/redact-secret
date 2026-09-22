@@ -77,7 +77,7 @@
         {
           "id": "repeated-character-filler",
           "description": "A Bearer value made of the same character repeated three or more times (xxxxxxxxxxxxxxxxxxxx, 00000000000000000000, --------------------) is classic redaction-style filler, not a credential.",
-          "basis": {"kind": "decision", "ref": "docs/decisions/2026-09-20-exclude-filler-and-placeholder-bearer-values.md (issue #468)"},
+          "basis": {"kind": "decision", "ref": "docs/decisions/2026-09-15-exclude-fully-delimited-template-references.md (folded decision-exclude-filler-and-placeholder-bearer-values, issue #468)"},
           "fixtures": {
             "negative": ["bearer-negative-repeated-character-filler-run-of-x", "bearer-negative-repeated-character-filler-run-of-zero", "bearer-negative-repeated-character-filler-run-of-dash", "bearer-negative-repeated-character-filler-yaml", "bearer-negative-repeated-character-filler-dotenv"],
             "positive": ["bearer-positive-near-miss-repeated-character-filler", "bearer-positive-yaml-real-token-still-detected", "bearer-positive-dotenv-real-token-still-detected"]
@@ -86,7 +86,7 @@
         {
           "id": "whole-value-placeholder-vocabulary",
           "description": "A Bearer value built entirely from recognized placeholder words on token boundaries (PASSWORD_SECRET_EXAMPLE). A compound value mixing a listed word with an unlisted one (EXAMPLE_TOKEN_VALUE) is a documented, out-of-scope false negative, same as generic-token's equivalent exclusion.",
-          "basis": {"kind": "decision", "ref": "docs/decisions/2026-09-20-exclude-filler-and-placeholder-bearer-values.md (issue #468)"},
+          "basis": {"kind": "decision", "ref": "docs/decisions/2026-09-15-exclude-fully-delimited-template-references.md (folded decision-exclude-filler-and-placeholder-bearer-values, issue #468)"},
           "fixtures": {
             "negative": ["bearer-negative-placeholder-whole-value", "bearer-negative-placeholder-markdown"],
             "positive": ["bearer-positive-compound-placeholder-not-excluded", "bearer-positive-markdown-real-token-still-detected"]
@@ -111,7 +111,7 @@
         {
           "id": "interpolation-and-environment-references",
           "description": "A password that is an interpolation, command-substitution, or environment-variable reference rather than a literal secret: ${VAR} (pre-existing), bare $VAR / PowerShell $env:VAR, $(cmd) command substitution, {{tmpl}} template, #{ruby} interpolation, {env:VAR} opencode reference, %VAR% Windows reference. Each is a whole-value shape; a value that merely starts with an opener, or that contains '$' without matching one of these forms, stays detected.",
-          "basis": {"kind": "decision", "ref": "docs/decisions/2026-09-20-share-non-secret-reference-exclusions-with-connection-string.md (issue #469)"},
+          "basis": {"kind": "decision", "ref": "docs/decisions/2026-09-15-exclude-fully-delimited-template-references.md (folded decision-share-non-secret-reference-exclusions-with-connection-string, issue #469)"},
           "fixtures": {
             "negative": ["connection-negative-postgres-braced-env-reference", "connection-negative-postgres-bare-dollar-env-reference", "connection-negative-postgres-powershell-env-reference", "connection-negative-postgres-command-substitution-reference", "connection-negative-postgres-template-reference", "connection-negative-postgres-ruby-interpolation-reference", "connection-negative-postgres-opencode-env-reference", "connection-negative-postgres-windows-env-reference", "connection-negative-docker-compose-env-var-password", "connection-negative-json-config-env-var-password", "connection-negative-dotenv-example-braced-reference"],
             "positive": ["connection-positive-dollar-not-identifier-still-detected", "connection-positive-embedded-dollar-still-detected", "connection-positive-unclosed-command-substitution-still-detected", "connection-positive-docker-compose-real-password-still-detected", "connection-positive-json-config-real-password-still-detected", "connection-positive-dotenv-real-password-still-detected"]
