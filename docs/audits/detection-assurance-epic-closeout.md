@@ -22,7 +22,7 @@ current-state claims.
 | Contextual-secret overlap resolution | [#188](https://github.com/redact-secret/redact-secret/issues/188) | The independent nested-assignment fixture pins `contextual_secret` overlap without borrowing a sibling finding type. |
 | Authorization-credential overlap resolution | [#189](https://github.com/redact-secret/redact-secret/issues/189) | The dedicated Token authorization fixture pins the `authorization_credential` overlap outcome. |
 | Authorization-credential host-context breadth | [#190](https://github.com/redact-secret/redact-secret/issues/190) | `authorization_credential` supplies direct positive evidence across the five representative lexical classes. |
-| Separate beta.2 detection assessment | [#191](https://github.com/redact-secret/redact-secret/issues/191) | [Beta.2 detection assessment](../../assessment/results/beta.2/README.md) reports the fixed non-conformance corpus, artifact identities, metrics, and mismatch dispositions. |
+| Separate beta.2 detection assessment | [#191](https://github.com/redact-secret/redact-secret/issues/191) | [Beta.2 detection assessment](https://github.com/redact-secret/redact-secret/blob/de6add470321f40d7b1cb36808d9f4559e6c2e99/assessment/results/beta.2/README.md) (removed by [#603](https://github.com/redact-secret/redact-secret/issues/603)) reports the fixed non-conformance corpus, artifact identities, metrics, and mismatch dispositions. |
 
 The generated coverage state has no remaining unresolved rows, unsupported
 rows, or pending evidence dimensions: [coverage-report.md](../coverage/coverage-report.md)

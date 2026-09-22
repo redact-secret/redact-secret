@@ -47,4 +47,5 @@ future planning and implementation but do not authorize Git or release actions.
 - [Gate release qualification on support-matrix drift, with recorded acknowledgement to override](2026-09-21-gate-releases-on-support-matrix-drift.md)
 - [Redact a bare, marker-less OpenAI-prefixed value under a generic policy layer, beneath the frozen contract](2026-09-21-govern-bare-vendor-prefixed-policy-layer.md)
 - [Decide the artifact taxonomy, spec routing, and evidence placement](2026-09-22-decide-artifact-taxonomy-spec-routing-and-evidence-placement.md)
+- [Move performance results, criteria, and judgement to redact-secret-benchmarks](2026-09-22-move-performance-results-criteria-and-judgement-to-benchmarks.md)
 

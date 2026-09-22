@@ -95,11 +95,13 @@ content and hash moved. The five false negatives are pre-existing and
 unrelated to the seven provider families (`github-token` ×2, `generic-token`,
 `aws-access-key`, `bearer-token`); confirmed present, unchanged, against the
 original unrewritten fixtures before this fix was committed. See
-[`assessment/results/complete-v4/README.md`](../../../../assessment/results/complete-v4/README.md)
+[`assessment/results/complete-v4/README.md`](https://github.com/redact-secret/redact-secret/blob/de6add470321f40d7b1cb36808d9f4559e6c2e99/assessment/results/complete-v4/README.md)
 and
-[`assessment/results/complete-linux-x64-v4/README.md`](../../../../assessment/results/complete-linux-x64-v4/README.md)
-for the full re-pin evidence, including a discovered, out-of-scope
-performance-threshold gap (below).
+[`assessment/results/complete-linux-x64-v4/README.md`](https://github.com/redact-secret/redact-secret/blob/de6add470321f40d7b1cb36808d9f4559e6c2e99/assessment/results/complete-linux-x64-v4/README.md)
+(both removed by [#603](https://github.com/redact-secret/redact-secret/issues/603);
+performance results, criteria, and judgement now belong to
+`redact-secret-benchmarks`) for the full re-pin evidence, including a
+discovered, out-of-scope performance-threshold gap (below).
 
 ## Required checks
 

@@ -146,8 +146,12 @@ Also require passing SAST evidence for the frozen revision. An acknowledged
 baseline is not zero findings or complete parser coverage. Assessment results
 remain separate from conformance: use the prepared profiles and applicable
 environment in [assessment](../assessment/README.md). The manually dispatched
-`complete-assessment.yml` is not wired as a Release dependency, and a threshold
-measured for one host does not establish acceptance on another host.
+`complete-assessment.yml` runs the measurement suite as a smoke check only; it
+performs no acceptance judgement and is not wired as a Release dependency.
+Performance results, RC acceptance criteria, and judgement are owned by
+[`redact-secret-benchmarks`](https://github.com/redact-secret/redact-secret-benchmarks),
+not this repository (issue #603), and a threshold measured for one host does
+not establish acceptance on another host.
 
 `Artifact qualification` also runs the [support-matrix drift
 gate](support-matrix-drift.md) (issue #511): it fails the run on a family
