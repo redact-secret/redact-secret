@@ -400,6 +400,13 @@
       "policyClass": "always-redact",
       "reconciliationTrigger": "pul-0123456789abcdef0123456789abcdef01234567",
       "schemes": null
+    },
+    {
+      "type": "databricks_personal_access_token",
+      "detector": "databricks-personal-access-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "dapi0123456789abcdef0123456789abcdef",
+      "schemes": null
     }
   ],
   "consumers": [

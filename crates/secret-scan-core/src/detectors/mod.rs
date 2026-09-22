@@ -16,6 +16,7 @@ mod azure_devops;
 mod bearer_token;
 mod cloudflare;
 mod connection_string;
+mod databricks;
 mod datadog;
 mod discord;
 mod firebase;
@@ -100,6 +101,7 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(firebase::FirebaseServerKeyDetector),
         Box::new(terraform::TerraformCloudTokenDetector),
         Box::new(additional_providers::PULUMI),
+        Box::new(databricks::DATABRICKS),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
         Box::new(ConnectionStringDetector),
@@ -191,6 +193,7 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("firebase-server-key", Pack::Provider),
     ("terraform-cloud-token", Pack::Provider),
     ("pulumi-access-token", Pack::Provider),
+    ("databricks-personal-access-token", Pack::Provider),
     ("jwt", Pack::Common),
     ("bearer-token", Pack::Common),
     ("connection-string", Pack::Common),
@@ -271,6 +274,7 @@ mod tests {
                 "firebase-server-key",
                 "terraform-cloud-token",
                 "pulumi-access-token",
+                "databricks-personal-access-token",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -542,6 +546,8 @@ mod tests {
         );
         let pulumi_access_token_input =
             format!("pul-{}", "0123456789abcdef0123456789abcdef01234567");
+        let databricks_personal_access_token_input =
+            format!("dapi{}", "0123456789abcdef0123456789abcdef");
         let cases = [
             (
                 "sentry-user-auth-token",
@@ -563,6 +569,10 @@ mod tests {
                 terraform_cloud_token_input.as_str(),
             ),
             ("pulumi-access-token", pulumi_access_token_input.as_str()),
+            (
+                "databricks-personal-access-token",
+                databricks_personal_access_token_input.as_str(),
+            ),
         ];
         assert_provider_candidates(&cases);
     }
