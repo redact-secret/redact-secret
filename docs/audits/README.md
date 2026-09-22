@@ -60,3 +60,12 @@ and [qualification follow-up](release-qualification-follow-up.md) describe beta.
 | Declarative ruleset names section false-positive/containment evidence (#484) | [Design rationale, corpus regression evidence, conformance coverage, and the open external benchmark gap](evidence/484/README.md) |
 | `docker-token`/`cloudflare-token` shape-1 provider-evidence review (#566) | [Live re-check of Docker and Cloudflare provider docs; neither shape is provider-documented; both misses stay a benchmarks-side fixture artifact, no grammar widened](evidence/566/README.md) |
 | Epic D close-out measurement (#548) | [`stable` 2 of 46 on a candidate of clean `main` under the pinned scanners; all 17 T1 families clear every product-quality gate; ledger re-keying and the trufflehog pin/ledger mismatch attributed; `generic-token` Markdown inline-code fix](evidence/548/README.md) |
+| Beta.4 release readiness (#362) | [Release readiness review](beta4-release-readiness-review.md) |
+| CI workflow inspection | [Maintenance review](ci-maintenance-review.md) |
+| Candidate identity and public-contract verification (#144) | [Checks, opengrep report, and package manifests](evidence/144/README.md) |
+| Independent release-readiness audit (#145) | [CI/local check log, dependency-cutover rehearsal, SAST/registry evidence](evidence/145/README.md) |
+| Release-qualification rehearsal (#174) | [Registry/governance checks, SAST, qualification matrix, download verification](evidence/174/README.md) |
+| Public contract and cross-runtime conformance evidence (#199) | [Per-host artifact checks and pinned fixture corpora](evidence/199/README.md) |
+| Detection reliability published-evidence run (#200) | [Cross-language testbed run and per-surface detection tallies](evidence/200/README.md) |
+| Cloudflare Workers and Vercel Edge verification (#462) | [Real-runtime reproduction, root cause, and fix status per platform](evidence/462/README.md) |
+| Beta.2 final review reproduction probes | [Offline synthetic-input probes for issues #234–#238](evidence/beta2-final-review/README.md) |

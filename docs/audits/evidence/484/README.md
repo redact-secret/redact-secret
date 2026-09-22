@@ -1,7 +1,7 @@
 # Issue #484 — declarative ruleset names section: false-positive and containment evidence
 
-[Audit archive](../README.md) · [Issue #484](https://github.com/redact-secret/redact-secret/issues/484) ·
-[decision-define-declarative-detector-ruleset-contract](../../decisions/2026-09-19-define-declarative-detector-ruleset-contract.md)
+[Audit archive](../../README.md) · [Issue #484](https://github.com/redact-secret/redact-secret/issues/484) ·
+[decision-define-declarative-detector-ruleset-contract](../../../decisions/2026-09-19-define-declarative-detector-ruleset-contract.md)
 
 Measured at commit `75f758d945c19a2b370cf6c90aca5c55b667e499` on
 `milocosmopolitan/add-the-declarative-ruleset-names-section-on-top`, the
