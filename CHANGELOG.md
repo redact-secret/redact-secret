@@ -43,6 +43,15 @@ evidence is linked from each published version.
 
 ### Changed detection
 
+- `generic-token` no longer reads the closing backtick of a Markdown
+  inline-code span into an unquoted assignment value (#548, found by
+  `redact-secret-benchmarks`' `context.markdown` metamorphic sweep). A masked
+  filler such as `` `password=********` `` stays excluded as it already did
+  bare, and an unquoted value inside backticks is redacted at its exact bytes
+  instead of one byte long. A value whose own first byte is an unmatched
+  backtick (an unterminated template literal or command substitution) is still
+  reported; a real secret containing a literal backtick, unquoted, is the
+  accepted false negative. Evidence: `docs/audits/evidence/548/README.md`.
 - `generic-token` now also redacts a bare, marker-less `sk-`/`sk-proj-`/
   `sk-svcacct-`/`sk-admin-` value at OpenAI's documented legacy/early-project
   body width (exactly 48 `[A-Za-z0-9]` bytes) with no surrounding context at
