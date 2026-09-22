@@ -30,16 +30,16 @@ Python, Rust, and the CLI expose. See
 
 ## Install a published release
 
-The following versions were published on 2026-09-20; see
+The following versions were published on 2026-09-22; see
 [release status](releases/status.md). npm `latest` still points to beta.1, so
-select beta.5 explicitly rather than relying on an unqualified install.
+select beta.6 explicitly rather than relying on an unqualified install.
 Keep the selected version in your application's dependency lockfile.
 
 ```bash
-npm install @redact-secret/core@0.1.0-beta.5
-python -m pip install redact-secret==0.1.0b5
-cargo add redact-secret@0.1.0-beta.5
-cargo install redact-secret-cli --version 0.1.0-beta.5 --locked
+npm install @redact-secret/core@0.1.0-beta.6
+python -m pip install redact-secret==0.1.0b6
+cargo add redact-secret@0.1.0-beta.6
+cargo install redact-secret-cli --version 0.1.0-beta.6 --locked
 ```
 
 Run only the command for your runtime. Rust library and CLI source installs

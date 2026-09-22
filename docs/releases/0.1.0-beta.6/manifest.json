@@ -1,0 +1,244 @@
+{
+  "record_schema_version": 1,
+  "record_kind": "reconstructed",
+  "source_revision": "079095e766e4a71e2b7e29413ed17be37bb3315d",
+  "conformance_identity": "f0b80c1639369198e2ab85066240ced12730fbe5",
+  "version": "0.1.0-beta.6",
+  "artifact_inventory_sha256": "eb26f4277604618d6dbfd7f510d5655633ea7a917f2b54043307af6825225d31",
+  "artifact_set": [
+    "crate:redact-secret",
+    "crate:redact-secret-cli",
+    "npm:@redact-secret/core",
+    "npm:@redact-secret/node-darwin-arm64",
+    "npm:@redact-secret/node-darwin-x64",
+    "npm:@redact-secret/node-linux-arm64-gnu",
+    "npm:@redact-secret/node-linux-arm64-musl",
+    "npm:@redact-secret/node-linux-x64-gnu",
+    "npm:@redact-secret/node-linux-x64-musl",
+    "npm:@redact-secret/node-win32-arm64-msvc",
+    "npm:@redact-secret/node-win32-x64-msvc",
+    "npm:@redact-secret/wasm",
+    "pypi:redact-secret"
+  ],
+  "registry_state": {
+    "crate:redact-secret": "published",
+    "crate:redact-secret-cli": "published",
+    "npm:@redact-secret/core": "published",
+    "npm:@redact-secret/node-darwin-arm64": "published",
+    "npm:@redact-secret/node-darwin-x64": "published",
+    "npm:@redact-secret/node-linux-arm64-gnu": "published",
+    "npm:@redact-secret/node-linux-arm64-musl": "published",
+    "npm:@redact-secret/node-linux-x64-gnu": "published",
+    "npm:@redact-secret/node-linux-x64-musl": "published",
+    "npm:@redact-secret/node-win32-arm64-msvc": "published",
+    "npm:@redact-secret/node-win32-x64-msvc": "published",
+    "npm:@redact-secret/wasm": "published",
+    "pypi:redact-secret": "published"
+  },
+  "release_evidence": {
+    "manifest_reconstructed": true,
+    "reason": "Release run 35747931840 recorded no release-manifest artifact: its 'Build and record the manifest' step interpolates each publish job's artifact_digest_json output inside a single-quoted shell string, and the wasm job's digest note contains an apostrophe (\"tarball's own shasum\"), which ended the quoted string and failed the step with 'own: command not found' (exit 127). Separately, npm registry propagation exceeded the workflow's 180-second verification window for @redact-secret/node-darwin-arm64 (and later for the facade during recovery), so the facade publish, registry-install matrix, and tag were left to Reconcile Release, which intentionally emits no replacement manifest. Final immutable registry metadata, the successful clean-install jobs, and the annotated Git tag are combined here with the preserved inventory.",
+    "observed_at": "2026-09-22",
+    "original_run": 35747931840,
+    "original_manifest": {
+      "provenance": "Reconstructed from run 35747931840, since that run uploaded no manifest. The eight native npm states are copied verbatim from the per-leg registry-state-native-* artifacts the run did upload. The wasm, crate, and PyPI states were passed only as job outputs to the failed manifest step and are not preserved; they are recorded as published because each of those jobs, including its own post-publish verification, concluded success. The facade is unknown because its publish job was skipped.",
+      "artifact_set": [
+        "crate:redact-secret",
+        "crate:redact-secret-cli",
+        "npm:@redact-secret/core",
+        "npm:@redact-secret/node-darwin-arm64",
+        "npm:@redact-secret/node-darwin-x64",
+        "npm:@redact-secret/node-linux-arm64-gnu",
+        "npm:@redact-secret/node-linux-arm64-musl",
+        "npm:@redact-secret/node-linux-x64-gnu",
+        "npm:@redact-secret/node-linux-x64-musl",
+        "npm:@redact-secret/node-win32-arm64-msvc",
+        "npm:@redact-secret/node-win32-x64-msvc",
+        "npm:@redact-secret/wasm",
+        "pypi:redact-secret"
+      ],
+      "conformance_identity": "f0b80c1639369198e2ab85066240ced12730fbe5",
+      "registry_state": {
+        "crate:redact-secret": "published",
+        "crate:redact-secret-cli": "published",
+        "npm:@redact-secret/core": "unknown",
+        "npm:@redact-secret/node-darwin-arm64": "unpublished",
+        "npm:@redact-secret/node-darwin-x64": "published",
+        "npm:@redact-secret/node-linux-arm64-gnu": "published",
+        "npm:@redact-secret/node-linux-arm64-musl": "published",
+        "npm:@redact-secret/node-linux-x64-gnu": "published",
+        "npm:@redact-secret/node-linux-x64-musl": "published",
+        "npm:@redact-secret/node-win32-arm64-msvc": "published",
+        "npm:@redact-secret/node-win32-x64-msvc": "published",
+        "npm:@redact-secret/wasm": "published",
+        "pypi:redact-secret": "published"
+      },
+      "source_revision": "079095e766e4a71e2b7e29413ed17be37bb3315d",
+      "version": "0.1.0-beta.6"
+    },
+    "registries": {
+      "crate:redact-secret": {
+        "checksum": "13343afd31cba282d4929efc4d0f57cafd40b5fcccc687e0790aeee1dcf35ad7"
+      },
+      "crate:redact-secret-cli": {
+        "checksum": "bf1c88dd130acb13f6d798cdc4819b3a366d550270dc2cb151cb5102064cda4f"
+      },
+      "npm:@redact-secret/core": {
+        "shasum": "a1527577141fed632861367a12890de8b1708b55",
+        "integrity": "sha512-AhD2iN+dcr6DpFlIC6yetQSFGqIonOzNSWf4I0x0EIJ6UmC5+VEzrBkWZngnbZkR4WSbdcBcuoY8RR3oPDPv/Q=="
+      },
+      "npm:@redact-secret/wasm": {
+        "shasum": "45b6ae3d3e03796f4dce57a72411a0b56345c1fc",
+        "integrity": "sha512-LHjcykEkM9k/vWrG85jqOtY8L+ZZpLsgD1rfbkRCLJaspfK1MlJ5mQOMM6YQ0gVzPftHr5W8ioH/N301EdJ5pQ=="
+      },
+      "npm:@redact-secret/node-darwin-arm64": {
+        "shasum": "f13493dd82e4ae7b3c007034c1945b16d93a47d3",
+        "integrity": "sha512-hVZJPQ4isPoLxBpGrOnJcVpNiRRRZT649fs/9WGiJBkdOz8IEDMGVDbm3F6OP7bQToM01iWD8BFc54kac2jSaQ=="
+      },
+      "npm:@redact-secret/node-darwin-x64": {
+        "shasum": "3ee98506017d4a755c268b7a81f312785de8b0c5",
+        "integrity": "sha512-XZnYKk2kVdZHdwceCZKDLDQmAe0k8PK+yqh+3KWl97/PoPNUcFRzQVBdlrdNK3KMc5aEhyGBJbx5ENtS1G+oFw=="
+      },
+      "npm:@redact-secret/node-linux-arm64-gnu": {
+        "shasum": "2dba5f045aff8e9e7d56abb1f46c563f82918d3e",
+        "integrity": "sha512-bOnTDvVlZYm+Ah5bFWTT1P6/57625tAFsLosOOQ1UN59/TM0XvgIFblvp6ecAr+cPTKhxtjT8qaoDI0wko79Kw=="
+      },
+      "npm:@redact-secret/node-linux-x64-gnu": {
+        "shasum": "a50434b36eda1e00f1014f1c7bdb9e555e89db4e",
+        "integrity": "sha512-QiLua7dV3oAaJeYyNUyI/E5C+ZaQXgl7hHNcJIxwcLv5sXkdKGvduKqaYc39P8xvQuHKZX42tyh2z7gORqOkCw=="
+      },
+      "npm:@redact-secret/node-linux-arm64-musl": {
+        "shasum": "95159980c3146741527199c800c6d6c69c82c390",
+        "integrity": "sha512-puPt9dUn/TtDLg5Ny6GVXQ2y1+pR5ghi4EjJb4oek5tcAhjq/Cg8HVgWtzFrF8ATrxxEAQCk0xPGUXsRZE/ROw=="
+      },
+      "npm:@redact-secret/node-linux-x64-musl": {
+        "shasum": "4df98662db87d063c280f406e10319c746cc34c9",
+        "integrity": "sha512-WosSm4SSyTGUZjQdxIt+Ldos1m55oeGwBvqT56jHLKF9YKka75rpkSYmJGNdZ6ecPKDUSFIz5hHeVuggMfy2ew=="
+      },
+      "npm:@redact-secret/node-win32-x64-msvc": {
+        "shasum": "cbb08ff42e9342247b0aae8a83b00af9184cba2c",
+        "integrity": "sha512-uUoVJqXJ4+Ntj3OYCMh50ZoOcTl9hDA2jzv4frW1U4n0rvJTDdHwa9W2vPclz2dGmVAFotGFPhMQut5tK3t0Jw=="
+      },
+      "npm:@redact-secret/node-win32-arm64-msvc": {
+        "shasum": "41e1e0445f5189c24398168d598466da94e7c61c",
+        "integrity": "sha512-jgWA05/FAU0fc7bs0kuKVlptfBKdX9MMDkEPKYySDmX7k6qp20yLvZZCwVqBbRQT2GtksfHx2I/n7RTA8X3uiQ=="
+      },
+      "pypi:redact-secret": {
+        "files": [
+          {
+            "filename": "redact_secret-0.1.0b6-cp310-abi3-macosx_10_12_x86_64.whl",
+            "sha256": "26fb588a43463c0167a27571bd8380f8c0ea150cad2eea786739a8341ad90d64"
+          },
+          {
+            "filename": "redact_secret-0.1.0b6-cp310-abi3-macosx_11_0_arm64.whl",
+            "sha256": "6e2b2f774f37bb097535841136957ca57153c1e9282d5f51edfd2f3694f0f6db"
+          },
+          {
+            "filename": "redact_secret-0.1.0b6-cp310-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl",
+            "sha256": "15191ec5b181579f30889328692fe9159b424297a0bb01e33bfd5b7f3535e779"
+          },
+          {
+            "filename": "redact_secret-0.1.0b6-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+            "sha256": "f4083a3af582bf681cb1a7bc046ae994d41cf293771265039180710ee96b260f"
+          },
+          {
+            "filename": "redact_secret-0.1.0b6-cp310-abi3-musllinux_1_2_aarch64.whl",
+            "sha256": "abc7dedccfee4e8d8de86e5ea89c1583531929ecf62bdeba9a8941471b058394"
+          },
+          {
+            "filename": "redact_secret-0.1.0b6-cp310-abi3-musllinux_1_2_x86_64.whl",
+            "sha256": "37c269a65ea8d24b884f83e8c975f3300aa0a9dc91a09af5a22541ab1c97873d"
+          },
+          {
+            "filename": "redact_secret-0.1.0b6-cp310-abi3-win_amd64.whl",
+            "sha256": "8e69ea58012c4cf45cac211e5c43b7cabc227ca7c75bc9e837079089b6d8e8fc"
+          },
+          {
+            "filename": "redact_secret-0.1.0b6-cp310-abi3-win_arm64.whl",
+            "sha256": "d06dcca1577b35bfd3036c1ccfac0c033ddcf41c8641da9af382584db9c5b072"
+          },
+          {
+            "filename": "redact_secret-0.1.0b6.tar.gz",
+            "sha256": "ea3eb958e054db5916ea8b397699639292f0cdab6e54b8e7c94cd39cb37563c5"
+          }
+        ]
+      }
+    },
+    "runs": [
+      {
+        "id": 35746762806,
+        "result": "CI passed at the frozen source revision."
+      },
+      {
+        "id": 35746762866,
+        "result": "SAST passed at the frozen source revision."
+      },
+      {
+        "id": 35746763631,
+        "result": "Artifact qualification passed at the frozen source revision."
+      },
+      {
+        "id": 35745354042,
+        "result": "Package Release Rehearsal passed at 0abdb7f, the head of PR #608, whose only difference from the frozen source is the sast/baseline.json re-key merged with it; it digest-checked and dry-run packed all nine npm dependency packages."
+      },
+      {
+        "id": 35747931840,
+        "result": "Release re-ran qualification (producing the preserved inventory), then published both crates, all nine PyPI files, and all nine npm dependency packages. @redact-secret/node-darwin-arm64's post-publish verification timed out on npm propagation although publication succeeded, so the facade, registry-install matrix, and tag were skipped; the manifest step failed on the quoting defect described above."
+      },
+      {
+        "id": 35749700163,
+        "result": "Authorized dry-run reconciliation (source_run 35747931840, source_commit 079095e) confirmed the source revision is an ancestor of rc/0.1.0-beta.6, content-matched all nine npm dependency packages, both crates, and all nine PyPI files, and planned publication only of the facade."
+      },
+      {
+        "id": 35749941626,
+        "result": "Authorized recovery published @redact-secret/core (shasum a1527577141fed632861367a12890de8b1708b55), but npm processing again exceeded the 180-second verification window."
+      },
+      {
+        "id": 35750575837,
+        "result": "Idempotent authorized recovery verified every registry artifact (nothing republished), passed clean installs on all eight published Node targets and Chromium, and created annotated tag v0.1.0-beta.6 at the frozen source revision."
+      }
+    ],
+    "verification": {
+      "run": 35750575837,
+      "node": [
+        "aarch64-apple-darwin",
+        "x86_64-apple-darwin",
+        "aarch64-unknown-linux-gnu",
+        "x86_64-unknown-linux-gnu",
+        "aarch64-unknown-linux-musl",
+        "x86_64-unknown-linux-musl",
+        "aarch64-pc-windows-msvc",
+        "x86_64-pc-windows-msvc"
+      ],
+      "browser": "chromium",
+      "rust": {
+        "observed_at": "2026-09-22",
+        "platform": "aarch64-apple-darwin",
+        "version": "0.1.0-beta.6",
+        "install": "cargo install redact-secret-cli --version 0.1.0-beta.6 --locked --root <empty-temporary-root>",
+        "checks": [
+          "redact-secret --version",
+          "clean standard-input scan"
+        ],
+        "result": "passed"
+      },
+      "python": {
+        "observed_at": "2026-09-22",
+        "platform": "macosx_11_0_arm64",
+        "version": "0.1.0b6",
+        "install": "python -m pip install redact-secret==0.1.0b6 in a new virtual environment",
+        "checks": [
+          "importlib.metadata exact-version assertion",
+          "clean scan_and_redact call"
+        ],
+        "files": 9,
+        "result": "passed"
+      }
+    },
+    "tag": {
+      "name": "v0.1.0-beta.6",
+      "object": "ba4882dbfd28a164fb835d4c0b87b0f832337313",
+      "target": "079095e766e4a71e2b7e29413ed17be37bb3315d"
+    }
+  }
+}
