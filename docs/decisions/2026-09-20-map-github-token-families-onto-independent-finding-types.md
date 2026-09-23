@@ -151,7 +151,7 @@ inventory, and one this decision leaves as a **concrete unblocking
 condition** for a future issue: add the `PostCheck` once that issue can also
 add negative-twin fixtures proving a shape-valid-but-checksum-invalid string
 is rejected, the same "adopt tool-corroborated exact contract" bar
-`decision-scope-supabase-management-token-and-secret-key-independence.md`
+`decision-scope-supabase-management-token-and-secret-key-independence`
 applies to `sbp_`.
 
 ## Consequences

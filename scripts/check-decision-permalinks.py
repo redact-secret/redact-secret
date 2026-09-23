@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
-"""Verify every ADR `full_record:` permalink names a commit reachable in local history.
+"""Verify every ADR blob permalink names a real commit *and* a real path at it.
 
 `decision-decide-artifact-taxonomy-spec-routing-and-evidence-placement`'s
-permalink rule requires `full_record:` to name a 40-hex `main` commit
+permalink rule requires a permalink to name a 40-hex `main` commit
 (`scripts/validate-decisions.py` checks the *shape*; this script checks the
-commit actually *exists* in this repository's history). That needs the full
-git history, not the single-commit checkout the main `npm run ci` job uses,
-so it runs as its own CI job with `fetch-depth: 0` (issue #597, DS6a).
+commit exists in this repository's history and that the cited path exists at
+that commit). That needs the full git history, not the single-commit checkout
+the main `npm run ci` job uses, so it runs as its own CI job with
+`fetch-depth: 0` (issue #597, DS6a).
 
-Every ADR summarized in place under issue #591's disposition grades
-(DS6b-d) carries `full_record:`; a merged record's folded permalinks sit in
-its `Folded records` table, which this script does not parse.
+Every blob permalink in a record is checked wherever it sits: the frontmatter
+`full_record:` line and each row of a `Folded records` table alike (issue
+#640, item 1).
 
     python3 -B scripts/check-decision-permalinks.py
 """
@@ -23,30 +24,29 @@ import sys
 from pathlib import Path
 
 
-FULL_RECORD_SHA = re.compile(
-    r"^full_record:\s*https://github\.com/redact-secret/redact-secret/blob/([0-9a-f]{40})/"
+PERMALINK = re.compile(
+    r"https://github\.com/redact-secret/redact-secret/blob/([0-9a-f]{40})/([^\s)>\]`\"']+)"
 )
 
 
-def collect_permalink_commits(decision_dir: Path) -> dict[str, list[Path]]:
-    """Map each unique 40-hex commit SHA to the ADR file(s) whose `full_record:` names it."""
-    commits: dict[str, list[Path]] = {}
+def collect_permalinks(decision_dir: Path) -> dict[tuple[str, str], list[Path]]:
+    """Map each unique (commit SHA, path) permalink to the ADR file(s) citing it."""
+    links: dict[tuple[str, str], list[Path]] = {}
     if not decision_dir.is_dir():
-        return commits
+        return links
     for record in sorted(decision_dir.glob("*.md")):
         if record.name == "DECISIONS.md":
             continue
-        for line in record.read_text(encoding="utf-8").splitlines():
-            match = FULL_RECORD_SHA.match(line.strip())
-            if match is not None:
-                commits.setdefault(match.group(1), []).append(record)
-    return commits
+        for sha, path in PERMALINK.findall(record.read_text(encoding="utf-8")):
+            cited_by = links.setdefault((sha, path.split("#", 1)[0]), [])
+            if record not in cited_by:
+                cited_by.append(record)
+    return links
 
 
-def commit_exists(root: Path, sha: str) -> bool:
-    """True when `sha` names a commit reachable in `root`'s local git history."""
+def _git_ok(root: Path, *args: str) -> bool:
     result = subprocess.run(
-        ["git", "-C", str(root), "cat-file", "-e", f"{sha}^{{commit}}"],
+        ["git", "-C", str(root), *args],
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
         check=False,
@@ -54,15 +54,27 @@ def commit_exists(root: Path, sha: str) -> bool:
     return result.returncode == 0
 
 
+def commit_exists(root: Path, sha: str) -> bool:
+    """True when `sha` names a commit reachable in `root`'s local git history."""
+    return _git_ok(root, "cat-file", "-e", f"{sha}^{{commit}}")
+
+
+def path_exists_at(root: Path, sha: str, path: str) -> bool:
+    """True when `path` is a file in the tree of commit `sha`."""
+    return _git_ok(root, "cat-file", "-e", f"{sha}:{path}")
+
+
 def validate(root: Path) -> list[str]:
     root = root.resolve()
     decision_dir = root / "docs" / "decisions"
     errors: list[str] = []
-    for sha, records in sorted(collect_permalink_commits(decision_dir).items()):
-        if commit_exists(root, sha):
-            continue
-        for record in records:
-            errors.append(f"{record}: full_record commit {sha} is not reachable in local history")
+    for (sha, path), records in sorted(collect_permalinks(decision_dir).items()):
+        if not commit_exists(root, sha):
+            for record in records:
+                errors.append(f"{record}: permalink commit {sha} is not reachable in local history")
+        elif not path_exists_at(root, sha, path):
+            for record in records:
+                errors.append(f"{record}: permalink path {path} does not exist at commit {sha}")
     return errors
 
 

@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -15,6 +16,8 @@ LINK = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
 FULL_RECORD = re.compile(
     r"^https://github\.com/redact-secret/redact-secret/blob/[0-9a-f]{40}/.+$"
 )
+BLOB_PERMALINK = re.compile(r"https://github\.com/redact-secret/redact-secret/blob/[0-9a-f]{40}/\S+")
+ID_WITH_MD_SUFFIX = re.compile(r"(?<![\w./-])(decision-[a-z0-9]+(?:-[a-z0-9]+)*)\.md\b")
 VALID_STATUSES = {"proposed", "accepted", "rejected", "superseded"}
 SPEC_NAMES = {
     "detector-families",
@@ -171,6 +174,64 @@ def check_aliases(records: list[Path], fields_by_record: dict[Path, dict[str, st
     return errors
 
 
+def alias_list(fields: dict[str, str]) -> list[str]:
+    return [value.strip() for value in fields.get("aliases", "").split(",") if value.strip()]
+
+
+def alias_permalinks(body: str) -> dict[str, str]:
+    """Map each `decision_id` in a `Folded records` table row to that row's blob permalink."""
+    permalinks: dict[str, str] = {}
+    for line in body.splitlines():
+        row = re.match(r"^\|\s*`(decision-[a-z0-9-]+)`\s*\|", line)
+        link = BLOB_PERMALINK.search(line)
+        if row is not None and link is not None:
+            permalinks[row.group(1)] = link.group(0).rstrip(")")
+    return permalinks
+
+
+def check_folded_permalinks(
+    records: list[Path], fields_by_record: dict[Path, dict[str, str]], bodies: dict[Path, str]
+) -> list[str]:
+    """A record that folds others must carry a permalink to each folded record's last text."""
+    errors: list[str] = []
+    for record in records:
+        aliases = alias_list(fields_by_record[record])
+        if not aliases:
+            continue
+        permalinks = alias_permalinks(bodies[record])
+        for alias in aliases:
+            if alias not in permalinks:
+                errors.append(
+                    f"{record}: folded alias {alias} has no `Folded records` row with a full-record permalink"
+                )
+    return errors
+
+
+def markdown_files(root: Path) -> list[Path]:
+    result = subprocess.run(
+        ["git", "-C", str(root), "ls-files", "-z", "--", "*.md"], capture_output=True, check=False
+    )
+    if result.returncode == 0 and result.stdout:
+        return [root / name for name in result.stdout.decode("utf-8").split("\0") if name]
+    return sorted((root / "docs").rglob("*.md"))
+
+
+def check_id_md_citations(root: Path, known_ids: set[str]) -> list[str]:
+    """A decision id cited with a `.md` suffix names no file; cite the id or the record's path."""
+    errors: list[str] = []
+    for path in markdown_files(root):
+        if not path.is_file():
+            continue
+        for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+            for match in ID_WITH_MD_SUFFIX.finditer(line):
+                if match.group(1) in known_ids:
+                    errors.append(
+                        f"{path}:{number}: {match.group(1)}.md cites a decision id with a .md suffix, "
+                        "which resolves to no file"
+                    )
+    return errors
+
+
 def validate(root: Path) -> tuple[list[str], list[str]]:
     root = root.resolve()
     decision_dir = root / "docs" / "decisions"
@@ -195,8 +256,10 @@ def validate(root: Path) -> tuple[list[str], list[str]]:
 
     identities: dict[str, Path] = {}
     fields_by_record: dict[Path, dict[str, str]] = {}
+    bodies: dict[Path, str] = {}
     for record in records:
         fields, body, record_errors = parse_frontmatter(record)
+        bodies[record] = body
         errors.extend(record_errors)
         fields_by_record[record] = fields
         for required in ("decision_id", "status", "scope", "spec"):
@@ -235,6 +298,9 @@ def validate(root: Path) -> tuple[list[str], list[str]]:
 
     errors.extend(check_supersession(records, fields_by_record, identities))
     errors.extend(check_aliases(records, fields_by_record, identities))
+    errors.extend(check_folded_permalinks(records, fields_by_record, bodies))
+    known_ids = set(identities) | {alias for record in records for alias in alias_list(fields_by_record[record])}
+    errors.extend(check_id_md_citations(root, known_ids))
     errors.extend(check_spec_routing(root, records, fields_by_record))
 
     if not index.is_file():

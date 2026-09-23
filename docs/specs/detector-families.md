@@ -13,7 +13,8 @@ Rules governing individual provider/credential family grammars: what a detector 
 
 ## Finding types
 
-Generated (best-effort join by detector name) from [`docs/coverage/detector-inventory.json`](../coverage/detector-inventory.json); not machine-checked against this table.
+<!-- detector-families:start -->
+Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-families-table.py`; the rows and the first three columns are checked against the inventory. Only the Governing ADR column is edited by hand.
 
 | Type | Detector | Policy class | Governing ADR |
 | --- | --- | --- | --- |
@@ -81,6 +82,7 @@ Generated (best-effort join by detector name) from [`docs/coverage/detector-inve
 | `vault_token` | `vault-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `vendor_prefixed_credential` | `generic-token` | `always-redact` | [Redact a bare, marker-less OpenAI-prefixed value under a generic policy layer, beneath the frozen contract](../decisions/2026-09-21-govern-bare-vendor-prefixed-policy-layer.md) |
 | `vercel_token` | `vercel-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
+<!-- detector-families:end -->
 
 ## Rules
 

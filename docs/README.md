@@ -42,7 +42,13 @@ list is not proof that input contains no secrets.
 
 ## Project internals and release evidence
 
-- [Architecture](../ARCHITECTURE.md) and [architecture decisions](decisions/DECISIONS.md)
+- [Architecture](../ARCHITECTURE.md) and [architecture decisions](decisions/DECISIONS.md);
+  [folded decision ids](decision-aliases.md) map a removed id to the record that carries it
+- Current rules, one spec per area, each linking the decision that set it:
+  [detector families](specs/detector-families.md),
+  [contextual detection](specs/contextual-detection.md),
+  [engine](specs/engine.md), [distribution](specs/distribution.md), and
+  [evidence and gates](specs/evidence-and-gates.md)
 - [Rust workspace](rust-workspace.md), [Python packaging](python-packaging.md),
   and [artifact qualification](qualification.md)
 - [Detection coverage evidence](coverage/README.md)
