@@ -400,6 +400,13 @@
       "policyClass": "always-redact",
       "reconciliationTrigger": "pul-0123456789abcdef0123456789abcdef01234567",
       "schemes": null
+    },
+    {
+      "type": "netlify_personal_access_token",
+      "detector": "netlify-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "nfp_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01",
+      "schemes": null
     }
   ],
   "consumers": [

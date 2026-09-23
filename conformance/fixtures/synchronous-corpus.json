@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 1436,
+  "fixtureCount": 1462,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -32115,6 +32115,465 @@
         }
       ],
       "note": "CRLF line endings and a multi-byte Unicode prefix shift only the byte offsets; the match itself is unaffected."
+    },
+    {
+      "id": "netlify-positive-qualified",
+      "detector": "netlify-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "nfp_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01",
+      "expected": [
+        {
+          "detector": "netlify-token",
+          "type": "netlify_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 40
+        }
+      ],
+      "note": "A provider-published prefix with the documented-length synthetic body is supported."
+    },
+    {
+      "id": "netlify-boundary-one-short",
+      "detector": "netlify-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "nfp_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY0",
+      "expected": [],
+      "note": "Issue #311: a 35-byte body — one byte short of the documented 36-byte length — is silent by construction."
+    },
+    {
+      "id": "netlify-boundary-one-long",
+      "detector": "netlify-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "nfp_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01a",
+      "expected": [],
+      "note": "A 37-byte body — one byte past the documented length — is not misread as the exact shape followed by a trailing byte; the boundary check, widened past the match alphabet to include `-`, rejects the whole run rather than truncating it."
+    },
+    {
+      "id": "netlify-boundary-invalid-alphabet",
+      "detector": "netlify-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "nfp_SYNTHETIC_!EVOKED_NETLIFY_PAT_BODY01",
+      "expected": [],
+      "note": "An invalid character inside the body breaks the run before the documented 36-byte length is reached."
+    },
+    {
+      "id": "netlify-boundary-dash-in-body",
+      "detector": "netlify-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "nfp_SYNTHETIC_-EVOKED_NETLIFY_PAT_BODY01",
+      "expected": [],
+      "note": "gitleaks 8.30.1 and trufflehog 3.97.4 both converge on `[A-Za-z0-9_]` for the documented body; a dash inside an otherwise documented-length body is rejected rather than truncated to its longest valid-alphabet prefix."
+    },
+    {
+      "id": "netlify-negative-ordinary-reference",
+      "detector": "netlify-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "netlify-documentation-identifier",
+      "expected": [],
+      "note": "An ordinary provider-related identifier has no credential shape."
+    },
+    {
+      "id": "netlify-negative-lookalike",
+      "detector": "netlify-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "netlify_pat_SYNTHETIC_REVOKED_CONFORMANCE_KEY",
+      "expected": [],
+      "note": "A human-readable variable name that merely mentions the credential class is not the documented `nfp_` prefix; no candidate is emitted."
+    },
+    {
+      "id": "netlify-boundary-case-sensitivity",
+      "detector": "netlify-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "NFP_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01",
+      "expected": [],
+      "note": "The documented prefix is matched byte-for-byte; an uppercase rendering ('NFP_') is not a case-insensitive equivalent — issue #311 froze the lowercase-only prefix per both tools' independent convergence."
+    },
+    {
+      "id": "netlify-adversarial-long-suffix",
+      "detector": "netlify-token",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 9041,
+        "maxFindings": 1,
+        "maxRuntimeMs": 250
+      },
+      "input": "nfp_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01!SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_",
+      "expected": [
+        {
+          "detector": "netlify-token",
+          "type": "netlify_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 40
+        }
+      ],
+      "note": "A long delimited provider match remains deterministic and bounded; the documented 40-byte token is followed by a delimiter and a long non-matching tail that is never scanned into the finding."
+    },
+    {
+      "id": "netlify-negative-embedded-in-wider-identifier",
+      "detector": "netlify-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "legacynfp_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01",
+      "expected": [],
+      "note": "The `nfp_` prefix immediately preceded by an alphanumeric character ('legacynfp_...') is a truncated slice of a wider benign identifier, not a boundary-delimited credential, so no candidate is emitted; a real secret substring is never carved out of a longer surrounding token."
+    },
+    {
+      "id": "netlify-positive-json",
+      "detector": "netlify-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"personalAccessToken\": \"nfp_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01\"}",
+      "expected": [
+        {
+          "detector": "netlify-token",
+          "type": "netlify_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 65
+        }
+      ],
+      "note": "A quoted JSON string value is detected the same as a bare one; the enclosing quotes are not part of the match."
+    },
+    {
+      "id": "netlify-positive-yaml",
+      "detector": "netlify-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "netlify_pat: nfp_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01\n",
+      "expected": [
+        {
+          "detector": "netlify-token",
+          "type": "netlify_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 53
+        }
+      ],
+      "note": "A YAML mapping value is detected the same as a bare one."
+    },
+    {
+      "id": "netlify-positive-log",
+      "detector": "netlify-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-16T00:00:00Z INFO deploying to netlify token=nfp_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01 status=200",
+      "expected": [
+        {
+          "detector": "netlify-token",
+          "type": "netlify_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 53,
+          "end": 93
+        }
+      ],
+      "note": "A provider token embedded in a structured log line is still detected."
+    },
+    {
+      "id": "netlify-positive-shell-quoted",
+      "detector": "netlify-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export NETLIFY_AUTH_TOKEN=\"nfp_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01\"\n",
+      "expected": [
+        {
+          "detector": "netlify-token",
+          "type": "netlify_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 27,
+          "end": 67
+        }
+      ],
+      "note": "A double-quoted shell export value is detected the same as a bare one; the enclosing quotes are not part of the match."
+    },
+    {
+      "id": "netlify-positive-dotenv",
+      "detector": "netlify-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "NETLIFY_AUTH_TOKEN=nfp_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01\n",
+      "expected": [
+        {
+          "detector": "netlify-token",
+          "type": "netlify_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 19,
+          "end": 59
+        }
+      ],
+      "note": "The exact-length token is still classified as a dotenv assignment value."
+    },
+    {
+      "id": "netlify-negative-dotenv",
+      "detector": "netlify-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "NETLIFY_AUTH_TOKEN=nfp_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY0\n",
+      "expected": [],
+      "note": "Malformed twin (35-byte body) of netlify-positive-dotenv in the same dotenv context."
+    },
+    {
+      "id": "netlify-positive-markdown-delimiter",
+      "detector": "netlify-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "markdown"
+      ],
+      "input": "`nfp_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01` must be rotated before reuse.",
+      "expected": [
+        {
+          "detector": "netlify-token",
+          "type": "netlify_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1,
+          "end": 41
+        }
+      ],
+      "note": "A Markdown inline-code span wrapping the value in backticks does not defeat detection: the backtick is outside the boundary alphabet, so the match is found at its correct offsets with the delimiters excluded."
+    },
+    {
+      "id": "netlify-positive-repeated-value",
+      "detector": "netlify-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "nfp_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01 nfp_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01",
+      "expected": [
+        {
+          "detector": "netlify-token",
+          "type": "netlify_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 40
+        },
+        {
+          "detector": "netlify-token",
+          "type": "netlify_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 41,
+          "end": 81
+        }
+      ],
+      "note": "An identical value repeated in the same input is reported once per independent occurrence, not deduplicated."
+    },
+    {
+      "id": "netlify-positive-unicode-crlf",
+      "detector": "netlify-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 café\r\nnfp_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01\r\n",
+      "expected": [
+        {
+          "detector": "netlify-token",
+          "type": "netlify_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 54
+        }
+      ],
+      "note": "CRLF line endings and a multi-byte Unicode prefix shift only the byte offsets; the match itself is unaffected."
+    },
+    {
+      "id": "netlify-negative-percent-encoded-lookalike",
+      "detector": "netlify-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "nfp%5FSYNTHETIC_REVOKED_NETLIFY_PAT_BODY01",
+      "expected": [],
+      "note": "A percent-encoded rendering of the documented delimiter ('nfp%5F' in place of 'nfp_') does not literally match the prefix's own bytes, so no candidate is emitted; a URL-decoded lookalike is an intentional false negative rather than a fuzzy match."
+    },
+    {
+      "id": "netlify-negative-other-nf-prefixes",
+      "detector": "netlify-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "nfc_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01 nfo_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01 nfu_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01 nfb_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01",
+      "expected": [],
+      "note": "Netlify's own token-format announcement documents four other `nf` + identifying-character prefixes (`nfc_` CLI, `nfo_` OAuth, `nfu_` app.netlify.com, `nfb_` build) sharing this scheme; none is a personal access token, and none is in this issue's scope, so no candidate is emitted for any of them."
+    },
+    {
+      "id": "netlify-negative-legacy-unprefixed",
+      "detector": "netlify-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "netlify aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": [],
+      "note": "The pre-2023-11-07 unprefixed Netlify token shape (trufflehog's legacy `netlify/v1`: `[A-Za-z0-9_-]{43,45}`, keyword-gated) is a documented gap, not implemented here: that shape is common to every legacy Netlify token class, not specific to a personal access token, so emitting a `netlify_personal_access_token` finding for it would mislabel the finding (see the module doc's \"Known unsupported variants\")."
+    },
+    {
+      "id": "netlify-negative-site-id",
+      "detector": "netlify-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "site_id: 12345678-90ab-cdef-1234-567890abcdef",
+      "expected": [],
+      "note": "A Netlify Site ID / Project ID is an opaque UUID-shaped public identifier with no `nfp_`-prefixed shape (docs.netlify.com/api-and-cli-guides/api-guides/get-started-with-api/); excluded per the issue's own scope, and not matched by construction."
+    },
+    {
+      "id": "netlify-boundary-masked-placeholder",
+      "detector": "netlify-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "nfp_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+      "expected": [],
+      "note": "A repeated-character placeholder ('nfp_XXXX...') otherwise satisfies the documented shape but is excluded as a masked value, matching super::twilio's and super::new_relic's own precedent."
+    },
+    {
+      "id": "netlify-positive-punctuation-adjacent",
+      "detector": "netlify-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "(nfp_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01).",
+      "expected": [
+        {
+          "detector": "netlify-token",
+          "type": "netlify_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1,
+          "end": 41
+        }
+      ],
+      "note": "Punctuation immediately surrounding the value does not defeat detection; the match excludes the parentheses and trailing period."
+    },
+    {
+      "id": "netlify-overlap-context",
+      "detector": "netlify-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "access_token=nfp_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01",
+      "expected": [
+        {
+          "detector": "netlify-token",
+          "type": "netlify_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 53
+        }
+      ],
+      "note": "Qualified provider evidence wins over a contextual assignment."
     }
   ]
 }

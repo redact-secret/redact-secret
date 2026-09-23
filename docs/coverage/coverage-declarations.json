@@ -5858,6 +5858,108 @@
       "type": "pulumi_access_token"
     },
     {
+      "behaviorClass": "provider",
+      "detector": "netlify-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "netlify-positive-dotenv",
+            "netlify-positive-json",
+            "netlify-positive-log",
+            "netlify-positive-markdown-delimiter",
+            "netlify-positive-punctuation-adjacent",
+            "netlify-positive-qualified",
+            "netlify-positive-repeated-value",
+            "netlify-positive-shell-quoted",
+            "netlify-positive-unicode-crlf",
+            "netlify-positive-yaml"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "netlify-overlap-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "netlify-adversarial-long-suffix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "netlify-boundary-case-sensitivity",
+            "netlify-boundary-dash-in-body",
+            "netlify-boundary-invalid-alphabet",
+            "netlify-boundary-masked-placeholder",
+            "netlify-boundary-one-long",
+            "netlify-boundary-one-short"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "netlify-negative-dotenv",
+            "netlify-negative-embedded-in-wider-identifier",
+            "netlify-negative-legacy-unprefixed",
+            "netlify-negative-lookalike",
+            "netlify-negative-ordinary-reference",
+            "netlify-negative-other-nf-prefixes",
+            "netlify-negative-percent-encoded-lookalike",
+            "netlify-negative-site-id"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "netlify-boundary-case-sensitivity",
+            "netlify-boundary-dash-in-body",
+            "netlify-boundary-invalid-alphabet",
+            "netlify-boundary-masked-placeholder",
+            "netlify-boundary-one-long",
+            "netlify-boundary-one-short"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for netlify_personal_access_token (netlify-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "netlify_personal_access_token"
+    },
+    {
       "behaviorClass": "incremental",
       "detector": "unassigned",
       "dimensions": [
@@ -6015,6 +6117,7 @@
             "jwt-adversarial-incomplete",
             "linear-adversarial-long-suffix",
             "microsoft-entra-client-secret-adversarial-long-padding",
+            "netlify-adversarial-long-suffix",
             "new-relic-license-key-adversarial-dense-findings",
             "new-relic-user-api-key-adversarial-long-padding",
             "notion-token-adversarial-long-padding",
@@ -6402,6 +6505,7 @@
             "jwt-adversarial-incomplete",
             "linear-adversarial-long-suffix",
             "microsoft-entra-client-secret-adversarial-long-padding",
+            "netlify-adversarial-long-suffix",
             "new-relic-license-key-adversarial-dense-findings",
             "new-relic-user-api-key-adversarial-long-padding",
             "notion-token-adversarial-long-padding",

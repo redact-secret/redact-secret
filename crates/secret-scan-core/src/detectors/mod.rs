@@ -26,6 +26,7 @@ mod grafana;
 mod jwt;
 mod linear;
 mod microsoft_entra;
+mod netlify;
 mod new_relic;
 mod notion;
 mod openai;
@@ -100,6 +101,7 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(firebase::FirebaseServerKeyDetector),
         Box::new(terraform::TerraformCloudTokenDetector),
         Box::new(additional_providers::PULUMI),
+        Box::new(netlify::NetlifyPersonalAccessTokenDetector),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
         Box::new(ConnectionStringDetector),
@@ -191,6 +193,7 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("firebase-server-key", Pack::Provider),
     ("terraform-cloud-token", Pack::Provider),
     ("pulumi-access-token", Pack::Provider),
+    ("netlify-token", Pack::Provider),
     ("jwt", Pack::Common),
     ("bearer-token", Pack::Common),
     ("connection-string", Pack::Common),
@@ -271,6 +274,7 @@ mod tests {
                 "firebase-server-key",
                 "terraform-cloud-token",
                 "pulumi-access-token",
+                "netlify-token",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -542,6 +546,7 @@ mod tests {
         );
         let pulumi_access_token_input =
             format!("pul-{}", "0123456789abcdef0123456789abcdef01234567");
+        let netlify_token_input = "nfp_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01";
         let cases = [
             (
                 "sentry-user-auth-token",
@@ -563,6 +568,7 @@ mod tests {
                 terraform_cloud_token_input.as_str(),
             ),
             ("pulumi-access-token", pulumi_access_token_input.as_str()),
+            ("netlify-token", netlify_token_input),
         ];
         assert_provider_candidates(&cases);
     }
