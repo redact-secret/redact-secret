@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 1597,
+  "fixtureCount": 1600,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -19460,6 +19460,63 @@
       "input": "discord application id (not a secret): 198622483471925248",
       "expected": [],
       "note": "A bare public Discord application/client ID (a snowflake) shares no shape with the three-segment token grammar and is not classified."
+    },
+    {
+      "id": "discord-bot-token-positive-current-new-bot-bare",
+      "detector": "discord-bot-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "MDAwMDAwMDAwMDAwMDAwMDAwMA.REVOKE.SYNTHETICREVOKEDBOTTOKENCURRENTSHAPE38",
+      "expected": [
+        {
+          "detector": "discord-bot-token",
+          "type": "discord_bot_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 72
+        }
+      ],
+      "note": "A currently-issued new-bot shape (issue #670): a 19-decimal-digit snowflake (26-byte first segment, the shape every bot ID created on or after 2022-07-22 takes) paired with the 38-byte third segment every token has carried since Discord widened it (~May 2022)."
+    },
+    {
+      "id": "discord-bot-token-positive-current-reset-bot-bare",
+      "detector": "discord-bot-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "MDAwMDAwMDAwMDAwMDAwMDAw.REVOKE.SYNTHETICREVOKEDBOTTOKENCURRENTSHAPE38",
+      "expected": [
+        {
+          "detector": "discord-bot-token",
+          "type": "discord_bot_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 70
+        }
+      ],
+      "note": "A currently-issued reset-bot shape (issue #670): an 18-decimal-digit-ID bot (24-byte first segment) whose token was reset after Discord widened the third segment to 38 bytes (~May 2022), without its ID gaining a digit."
+    },
+    {
+      "id": "discord-bot-token-negative-19-digit-id-legacy-shape",
+      "detector": "discord-bot-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "MDAwMDAwMDAwMDAwMDAwMDAwMA.REVOKE.SYNTHETICREVOKEDBOTTOKENFIX",
+      "expected": [],
+      "note": "A 26-byte (19-decimal-digit-snowflake) first segment never pairs with the legacy 27-byte third segment: by the time a bot ID reaches 19 digits (2022-07-22 onward), the third segment had already widened to 38 bytes (~May 2022)."
     },
     {
       "id": "twilio-auth-token-positive-bare-with-account-sid",

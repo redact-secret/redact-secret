@@ -1922,7 +1922,7 @@
     {
       "detector": "discord-bot-token",
       "evidence": {
-        "fixtureCount": 18,
+        "fixtureCount": 21,
         "hostContextsExercised": [
           "dotenv",
           "json",
@@ -1944,6 +1944,8 @@
       "evidenceFixtureIds": [
         "discord-bot-token-positive-bare",
         "discord-bot-token-positive-crlf-unicode-prefix",
+        "discord-bot-token-positive-current-new-bot-bare",
+        "discord-bot-token-positive-current-reset-bot-bare",
         "discord-bot-token-positive-dotenv",
         "discord-bot-token-positive-json",
         "discord-bot-token-positive-log",

@@ -4648,6 +4648,8 @@
           "evidenceFixtureIds": [
             "discord-bot-token-positive-bare",
             "discord-bot-token-positive-crlf-unicode-prefix",
+            "discord-bot-token-positive-current-new-bot-bare",
+            "discord-bot-token-positive-current-reset-bot-bare",
             "discord-bot-token-positive-dotenv",
             "discord-bot-token-positive-json",
             "discord-bot-token-positive-log",
@@ -4682,6 +4684,7 @@
         {
           "dimension": "near-miss-negative",
           "evidenceFixtureIds": [
+            "discord-bot-token-negative-19-digit-id-legacy-shape",
             "discord-bot-token-negative-masked",
             "discord-bot-token-negative-placeholder",
             "discord-bot-token-negative-public-application-id",

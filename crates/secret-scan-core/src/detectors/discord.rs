@@ -1,12 +1,19 @@
 //! Discord bot token detection.
 //!
 //! Three dot-separated segments, each an exact-length run of
-//! `[A-Za-z0-9_-]` (unpadded base64url): 24 bytes, then 6, then 27 --
+//! `[A-Za-z0-9_-]` (unpadded base64url). The first segment is 24 bytes (an
+//! 18-decimal-digit snowflake) or 26 bytes (a 19-decimal-digit snowflake,
+//! the shape every bot ID takes once it passes 2^63/10^18 -- in practice
+//! IDs created on or after 2022-07-22). The third segment is 27 bytes,
 //! matching Discord's own single documented example in
-//! `https://docs.discord.com/developers/reference` and corroborated,
-//! consulted only as an external behavioral reference per `AGENTS.md` (no
-//! code copied from either project), by gitleaks's and trufflehog's
-//! independent Discord bot-token rules.
+//! `https://docs.discord.com/developers/reference`, or 38 bytes, the shape
+//! every token has taken since Discord widened it (~May 2022), whichever
+//! bot's token it is. A 26-byte first segment never pairs with a 27-byte
+//! third segment: by the time an ID reaches 19 digits, the third segment had
+//! already widened. These lengths are corroborated, consulted only as an
+//! external behavioral reference per `AGENTS.md` (no code copied from either
+//! project), by gitleaks's and trufflehog's independent Discord bot-token
+//! rules, and by issue #670's evidence run.
 //!
 //! A three-dot-segment base64url shape alone is indistinguishable from a
 //! JWT (see [`super::jwt`]), so this detector requires the first segment to
@@ -23,9 +30,11 @@ use crate::detectors::pattern::{self, is_alnum_dash};
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
 
-const SEGMENT_ONE_LEN: usize = 24;
+const SEGMENT_ONE_LEN_LEGACY: usize = 24;
+const SEGMENT_ONE_LEN_CURRENT: usize = 26;
 const SEGMENT_TWO_LEN: usize = 6;
-const SEGMENT_THREE_LEN: usize = 27;
+const SEGMENT_THREE_LEN_LEGACY: usize = 27;
+const SEGMENT_THREE_LEN_CURRENT: usize = 38;
 
 /// Recognizes a Discord bot token by its documented three-segment shape and
 /// a digit-decoding first segment. No surrounding context (`DISCORD_TOKEN=`,
@@ -71,17 +80,19 @@ fn base64_url_sextet(byte: u8) -> Option<u8> {
     }
 }
 
-/// `true` when `segment` (whose length is always a multiple of 4 -- every
-/// caller passes exactly [`SEGMENT_ONE_LEN`]) decodes, as unpadded
-/// base64url, to a byte sequence containing only ASCII digits. No
-/// intermediate buffer is allocated: each 4-byte group decodes directly to
-/// its 3 raw bytes.
+/// `true` when `segment` (every caller passes exactly
+/// [`SEGMENT_ONE_LEN_LEGACY`] or [`SEGMENT_ONE_LEN_CURRENT`] bytes, so the
+/// length is always a multiple of 4 or leaves a 2-byte remainder) decodes,
+/// as unpadded base64url, to a byte sequence containing only ASCII digits.
+/// No intermediate buffer is allocated: each 4-byte group decodes directly
+/// to its 3 raw bytes, and a trailing 2-byte group (the shape an unpadded
+/// base64url encoding of a length-not-divisible-by-3 byte string leaves,
+/// which the 19-decimal-digit snowflake case is) decodes to its 1 raw byte.
 fn decodes_to_ascii_digits(segment: &[u8]) -> bool {
-    debug_assert_eq!(segment.len() % 4, 0);
+    debug_assert!(segment.len().is_multiple_of(4) || segment.len() % 4 == 2);
     let (chunks, remainder) = segment.as_chunks::<4>();
-    debug_assert!(remainder.is_empty());
     let low_byte = |value: u32| u8::try_from(value & 0xFF).unwrap_or(0);
-    chunks.iter().all(|chunk| {
+    let chunks_are_digits = chunks.iter().all(|chunk| {
         let mut sextets = [0u8; 4];
         for (slot, &byte) in sextets.iter_mut().zip(chunk) {
             match base64_url_sextet(byte) {
@@ -100,7 +111,21 @@ fn decodes_to_ascii_digits(segment: &[u8]) -> bool {
         ]
         .into_iter()
         .all(|byte| byte.is_ascii_digit())
-    })
+    });
+    if !chunks_are_digits {
+        return false;
+    }
+    match remainder {
+        [] => true,
+        [first, second] => {
+            let (Some(a), Some(b)) = (base64_url_sextet(*first), base64_url_sextet(*second)) else {
+                return false;
+            };
+            let combined = (u32::from(a) << 6) | u32::from(b);
+            low_byte(combined >> 4).is_ascii_digit()
+        }
+        _ => false,
+    }
 }
 
 /// The exclusive end of an exact-length alphabet run starting at `start`,
@@ -113,23 +138,49 @@ fn segment_end(ends: &[usize], start: usize, len: usize) -> Option<usize> {
 
 /// Attempts a three-segment match anchored exactly at `start`. Returns the
 /// exclusive end offset on success.
+///
+/// Tries each documented first-segment length; a 26-byte (19-digit
+/// snowflake) first segment only pairs with a 38-byte third segment, while a
+/// 24-byte (18-digit snowflake) first segment pairs with either third-segment
+/// length, since a legacy bot's token grows its third segment on reset
+/// without its ID gaining a digit.
 fn match_at(bytes: &[u8], ends: &[usize], start: usize) -> Option<usize> {
-    let seg1_end = segment_end(ends, start, SEGMENT_ONE_LEN)?;
-    if !decodes_to_ascii_digits(&bytes[start..seg1_end]) {
-        return None;
-    }
-    if bytes.get(seg1_end) != Some(&b'.') {
-        return None;
-    }
+    for (seg1_len, seg3_lens) in [
+        (
+            SEGMENT_ONE_LEN_CURRENT,
+            [SEGMENT_THREE_LEN_CURRENT].as_slice(),
+        ),
+        (
+            SEGMENT_ONE_LEN_LEGACY,
+            [SEGMENT_THREE_LEN_CURRENT, SEGMENT_THREE_LEN_LEGACY].as_slice(),
+        ),
+    ] {
+        let Some(seg1_end) = segment_end(ends, start, seg1_len) else {
+            continue;
+        };
+        if bytes.get(seg1_end) != Some(&b'.') {
+            continue;
+        }
+        if !decodes_to_ascii_digits(&bytes[start..seg1_end]) {
+            continue;
+        }
 
-    let seg2_start = seg1_end + 1;
-    let seg2_end = segment_end(ends, seg2_start, SEGMENT_TWO_LEN)?;
-    if bytes.get(seg2_end) != Some(&b'.') {
-        return None;
-    }
+        let seg2_start = seg1_end + 1;
+        let Some(seg2_end) = segment_end(ends, seg2_start, SEGMENT_TWO_LEN) else {
+            continue;
+        };
+        if bytes.get(seg2_end) != Some(&b'.') {
+            continue;
+        }
 
-    let seg3_start = seg2_end + 1;
-    segment_end(ends, seg3_start, SEGMENT_THREE_LEN)
+        let seg3_start = seg2_end + 1;
+        for &seg3_len in seg3_lens {
+            if let Some(seg3_end) = segment_end(ends, seg3_start, seg3_len) {
+                return Some(seg3_end);
+            }
+        }
+    }
+    None
 }
 
 /// Finds every non-overlapping match, left to right, the way a global regex
@@ -166,11 +217,37 @@ mod tests {
     const SEGMENT_TWO: &str = "REVOKE";
     const SEGMENT_THREE: &str = "SYNTHETICREVOKEDBOTTOKENFIX";
 
+    // The base64url encoding of nineteen ASCII '0' bytes: a synthetic
+    // 19-decimal-digit snowflake, the shape every bot ID takes once it
+    // passes 2^63/10^18 (IDs created on or after 2022-07-22).
+    const SEGMENT_ONE_CURRENT: &str = "MDAwMDAwMDAwMDAwMDAwMDAwMA";
+    // The 38-byte third-segment shape every Discord bot token has taken
+    // since Discord widened it (~May 2022), regardless of ID length.
+    const SEGMENT_THREE_CURRENT: &str = "SYNTHETICREVOKEDBOTTOKENCURRENTSHAPE38";
+
     fn token() -> String {
-        assert_eq!(SEGMENT_ONE.len(), SEGMENT_ONE_LEN);
+        assert_eq!(SEGMENT_ONE.len(), SEGMENT_ONE_LEN_LEGACY);
         assert_eq!(SEGMENT_TWO.len(), SEGMENT_TWO_LEN);
-        assert_eq!(SEGMENT_THREE.len(), SEGMENT_THREE_LEN);
+        assert_eq!(SEGMENT_THREE.len(), SEGMENT_THREE_LEN_LEGACY);
         format!("{SEGMENT_ONE}.{SEGMENT_TWO}.{SEGMENT_THREE}")
+    }
+
+    /// A currently-issued reset-bot token: an 18-digit-ID bot (24-byte first
+    /// segment) whose token was reset after Discord widened the third
+    /// segment (~May 2022), so it carries the 38-byte third segment.
+    fn token_current_reset_bot() -> String {
+        assert_eq!(SEGMENT_ONE.len(), SEGMENT_ONE_LEN_LEGACY);
+        assert_eq!(SEGMENT_THREE_CURRENT.len(), SEGMENT_THREE_LEN_CURRENT);
+        format!("{SEGMENT_ONE}.{SEGMENT_TWO}.{SEGMENT_THREE_CURRENT}")
+    }
+
+    /// A currently-issued new-bot token: a 19-digit-ID bot (26-byte first
+    /// segment, created on or after 2022-07-22) paired with the 38-byte
+    /// third segment every token has carried since it widened.
+    fn token_current_new_bot() -> String {
+        assert_eq!(SEGMENT_ONE_CURRENT.len(), SEGMENT_ONE_LEN_CURRENT);
+        assert_eq!(SEGMENT_THREE_CURRENT.len(), SEGMENT_THREE_LEN_CURRENT);
+        format!("{SEGMENT_ONE_CURRENT}.{SEGMENT_TWO}.{SEGMENT_THREE_CURRENT}")
     }
 
     fn detect(input: &str) -> Vec<Candidate> {
@@ -213,6 +290,59 @@ mod tests {
             candidates[0].range(),
             ByteRange::new(0, value.len()).unwrap()
         );
+    }
+
+    #[test]
+    fn detects_the_current_reset_bot_shape_24_6_38() {
+        let value = token_current_reset_bot();
+        let candidates = detect(&value);
+        assert_eq!(candidates.len(), 1);
+        assert_eq!(candidates[0].type_name(), "discord_bot_token");
+        assert_eq!(candidates[0].confidence(), Confidence::High);
+        assert_eq!(candidates[0].effective_specificity(), Specificity::Provider);
+        assert_eq!(
+            candidates[0].range(),
+            ByteRange::new(0, value.len()).unwrap()
+        );
+    }
+
+    #[test]
+    fn detects_the_current_new_bot_shape_26_6_38() {
+        let value = token_current_new_bot();
+        let candidates = detect(&value);
+        assert_eq!(candidates.len(), 1);
+        assert_eq!(candidates[0].type_name(), "discord_bot_token");
+        assert_eq!(candidates[0].confidence(), Confidence::High);
+        assert_eq!(candidates[0].effective_specificity(), Specificity::Provider);
+        assert_eq!(
+            candidates[0].range(),
+            ByteRange::new(0, value.len()).unwrap()
+        );
+    }
+
+    #[test]
+    fn detects_the_current_shapes_bare_in_env_and_json_contexts() {
+        for value in [token_current_reset_bot(), token_current_new_bot()] {
+            for input in [
+                value.clone(),
+                format!("DISCORD_TOKEN={value}"),
+                format!("{{\"token\": \"{value}\"}}"),
+            ] {
+                let candidates = detect(&input);
+                assert_eq!(candidates.len(), 1, "{input}");
+                let (start, end) = (candidates[0].range().start(), candidates[0].range().end());
+                assert_eq!(&input[start..end], value, "{input}");
+            }
+        }
+    }
+
+    #[test]
+    fn rejects_a_19_digit_snowflake_paired_with_the_legacy_27_byte_third_segment() {
+        // By the time a bot ID reaches 19 digits (2022-07-22 onward), the
+        // third segment had already widened to 38 bytes (~May 2022), so
+        // this combination never occurs for a real token.
+        let input = format!("{SEGMENT_ONE_CURRENT}.{SEGMENT_TWO}.{SEGMENT_THREE}");
+        assert!(detect(&input).is_empty());
     }
 
     #[test]
@@ -281,7 +411,7 @@ mod tests {
 
     #[test]
     fn rejects_a_segment_one_one_byte_short() {
-        let short = &SEGMENT_ONE[..SEGMENT_ONE_LEN - 4];
+        let short = &SEGMENT_ONE[..SEGMENT_ONE_LEN_LEGACY - 4];
         assert!(detect(&format!("{short}.{SEGMENT_TWO}.{SEGMENT_THREE}")).is_empty());
     }
 
@@ -293,8 +423,15 @@ mod tests {
 
     #[test]
     fn rejects_a_segment_three_one_byte_short() {
-        let short = &SEGMENT_THREE[..SEGMENT_THREE_LEN - 1];
+        let short = &SEGMENT_THREE[..SEGMENT_THREE_LEN_LEGACY - 1];
         assert!(detect(&format!("{SEGMENT_ONE}.{SEGMENT_TWO}.{short}")).is_empty());
+    }
+
+    #[test]
+    fn rejects_a_current_third_segment_one_byte_short() {
+        let short = &SEGMENT_THREE_CURRENT[..SEGMENT_THREE_LEN_CURRENT - 1];
+        assert!(detect(&format!("{SEGMENT_ONE}.{SEGMENT_TWO}.{short}")).is_empty());
+        assert!(detect(&format!("{SEGMENT_ONE_CURRENT}.{SEGMENT_TWO}.{short}")).is_empty());
     }
 
     #[test]
@@ -303,7 +440,7 @@ mod tests {
         // to JSON, not an all-digit snowflake.
         let jwt_like = "eyJhbGciOiJIUzI1NiJ9";
         let padded = format!("{jwt_like}AAAA"); // pad to exactly 24 bytes
-        assert_eq!(padded.len(), SEGMENT_ONE_LEN);
+        assert_eq!(padded.len(), SEGMENT_ONE_LEN_LEGACY);
         assert!(!decodes_to_ascii_digits(padded.as_bytes()));
         assert!(detect(&format!("{padded}.{SEGMENT_TWO}.{SEGMENT_THREE}")).is_empty());
     }
@@ -336,11 +473,18 @@ mod tests {
     fn rejects_a_masked_value() {
         let masked = format!(
             "{}.{}.{}",
-            "*".repeat(SEGMENT_ONE_LEN),
+            "*".repeat(SEGMENT_ONE_LEN_LEGACY),
             "*".repeat(SEGMENT_TWO_LEN),
-            "*".repeat(SEGMENT_THREE_LEN)
+            "*".repeat(SEGMENT_THREE_LEN_LEGACY)
         );
         assert!(detect(&masked).is_empty());
+        let masked_current = format!(
+            "{}.{}.{}",
+            "*".repeat(SEGMENT_ONE_LEN_CURRENT),
+            "*".repeat(SEGMENT_TWO_LEN),
+            "*".repeat(SEGMENT_THREE_LEN_CURRENT)
+        );
+        assert!(detect(&masked_current).is_empty());
     }
 
     #[test]
