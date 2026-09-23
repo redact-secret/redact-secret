@@ -2373,6 +2373,43 @@
       "type": "mailchimp_api_key"
     },
     {
+      "detector": "mailgun-api-key",
+      "evidence": {
+        "fixtureCount": 18,
+        "hostContextsExercised": [
+          "dotenv",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "mailgun-api-key-positive-dotenv-keyword",
+        "mailgun-api-key-positive-json-keyword",
+        "mailgun-api-key-positive-log-keyword",
+        "mailgun-api-key-positive-shell-quoted",
+        "mailgun-api-key-positive-signing-key-field-name",
+        "mailgun-api-key-positive-yaml-keyword",
+        "mailgun-api-key-regression-crlf-and-unicode-prefix"
+      ],
+      "policyClass": "confidence-gated",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "mailgun_api_key"
+    },
+    {
       "detector": "firebase-server-key",
       "evidence": {
         "fixtureCount": 11,

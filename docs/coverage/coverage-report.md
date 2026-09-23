@@ -54,6 +54,7 @@ Coverage declarations: 73.
 | jwt | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | linear-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | mailchimp-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| mailgun-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | microsoft-entra-client-secret | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | netlify-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | new-relic-license-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -120,6 +121,7 @@ Coverage declarations: 73.
 | jwt | jwt | structural | supported | not-applicable | none |
 | linear_token | linear-token | provider | supported | not-applicable | none |
 | mailchimp_api_key | mailchimp-api-key | provider | supported | not-applicable | none |
+| mailgun_api_key | mailgun-api-key | provider | supported | not-applicable | none |
 | microsoft_entra_client_secret | microsoft-entra-client-secret | provider | supported | not-applicable | none |
 | netlify_personal_access_token | netlify-token | provider | supported | not-applicable | none |
 | new_relic_license_key | new-relic-license-key | provider | supported | not-applicable | none |

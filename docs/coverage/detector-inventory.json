@@ -395,6 +395,13 @@
       "schemes": null
     },
     {
+      "type": "mailgun_api_key",
+      "detector": "mailgun-api-key",
+      "policyClass": "confidence-gated",
+      "reconciliationTrigger": "mailgun key-abcdefghijklmnopqrstuvwxyz012345",
+      "schemes": null
+    },
+    {
       "type": "firebase_server_key",
       "detector": "firebase-server-key",
       "policyClass": "always-redact",

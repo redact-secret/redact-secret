@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 1616,
+  "fixtureCount": 1634,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -27121,6 +27121,1118 @@
         }
       ],
       "note": "A single mailchimp-context-bearing line densely packed with 100 candidate-shaped runs stays linear and bounded: per-line (not per-candidate) context checks and a greedy suffix scan keep cost proportional to input size."
+    },
+    {
+      "id": "mailgun-api-key-positive-dotenv-keyword",
+      "detector": "mailgun-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "MAILGUN_API_KEY=key-abcdefghijklmnopqrstuvwxyz012345",
+      "expected": [
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 16,
+          "end": 52
+        }
+      ],
+      "note": "The key-<32-byte-body> shape has no vendor marker of its own; the mailgun-named dotenv key is the only context present, so confidence is medium rather than high."
+    },
+    {
+      "id": "mailgun-api-key-positive-json-keyword",
+      "detector": "mailgun-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"mailgunApiKey\": \"key-abcdefghijklmnopqrstuvwxyz012345\"}",
+      "expected": [
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 19,
+          "end": 55
+        }
+      ],
+      "note": "A quoted JSON string value is detected the same as a bare one; the mailgun-named field is a keyword-only context, so confidence is medium."
+    },
+    {
+      "id": "mailgun-api-key-positive-yaml-keyword",
+      "detector": "mailgun-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "mailgun_api_key: key-abcdefghijklmnopqrstuvwxyz012345",
+      "expected": [
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 17,
+          "end": 53
+        }
+      ],
+      "note": "A YAML mapping value on the same line as the mailgun-named key is detected at medium confidence."
+    },
+    {
+      "id": "mailgun-api-key-positive-log-keyword",
+      "detector": "mailgun-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "log"
+      ],
+      "input": "# Mailgun private API key: key-abcdefghijklmnopqrstuvwxyz012345",
+      "expected": [
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 27,
+          "end": 63
+        }
+      ],
+      "note": "The provider's own product name in ordinary prose, not just a snake_case identifier, satisfies the same-line keyword requirement."
+    },
+    {
+      "id": "mailgun-api-key-positive-shell-quoted",
+      "detector": "mailgun-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export MAILGUN_API_KEY=\"key-abcdefghijklmnopqrstuvwxyz012345\"\n",
+      "expected": [
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 24,
+          "end": 60
+        }
+      ],
+      "note": "A quoted shell export still bounds the token to exactly its own bytes; the keyword-bearing variable name on the same line satisfies the context requirement."
+    },
+    {
+      "id": "mailgun-api-key-positive-signing-key-field-name",
+      "detector": "mailgun-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "mailgun http_signing_key: key-abcdefghijklmnopqrstuvwxyz012345",
+      "expected": [
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 26,
+          "end": 62
+        }
+      ],
+      "note": "Mailgun's current account-management API reference documents the HTTP webhook signing key with the identical key-<32-byte-body> shape as the private API key, so the same grammar and finding type cover the field Mailgun's own API calls http_signing_key; the mailgun keyword on this line still satisfies the context requirement."
+    },
+    {
+      "id": "mailgun-api-key-regression-crlf-and-unicode-prefix",
+      "detector": "mailgun-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 café\r\nmailgun key-abcdefghijklmnopqrstuvwxyz012345\r\n",
+      "expected": [
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 22,
+          "end": 58
+        }
+      ],
+      "note": "A CRLF-delimited line and a preceding Unicode-bearing comment line do not shift the byte offsets of a later plain-ASCII match."
+    },
+    {
+      "id": "mailgun-api-key-negative-bare-value-with-no-context",
+      "detector": "mailgun-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "key-abcdefghijklmnopqrstuvwxyz012345",
+      "expected": [],
+      "note": "The key-<32-byte-body> shape alone, with no mailgun keyword anywhere on the line, is not classified."
+    },
+    {
+      "id": "mailgun-api-key-negative-context-on-a-different-line",
+      "detector": "mailgun-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# mailgun\nkey-abcdefghijklmnopqrstuvwxyz012345\n",
+      "expected": [],
+      "note": "The keyword requirement is scoped to the same line the incremental sanitizer processes as one unit; a keyword on the preceding line does not satisfy it."
+    },
+    {
+      "id": "mailgun-api-key-negative-environment-variable-reference",
+      "detector": "mailgun-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "shell"
+      ],
+      "input": "mailgun MAILGUN_API_KEY=${MAILGUN_API_KEY}",
+      "expected": [],
+      "note": "An environment-variable reference is not a literal secret value; the ${...} interpolation breaks the required contiguous alphanumeric body run."
+    },
+    {
+      "id": "mailgun-api-key-negative-repeated-character-filler",
+      "detector": "mailgun-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "mailgun key-00000000000000000000000000000000",
+      "expected": [],
+      "note": "A masked placeholder value of a single repeated character, though within the documented alphabet, length, and prefix, is excluded as classic redaction-style filler rather than a real key."
+    },
+    {
+      "id": "mailgun-api-key-negative-public-validation-key-reference",
+      "detector": "mailgun-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "mailgun pubkey-abcdefghijklmnopqrstuvwxyz012345",
+      "expected": [],
+      "note": "gitleaks' own mailgun-pub-key rule documents a distinct pubkey-<32 bytes> public validation key shape, explicitly out of scope per the issue; the b immediately preceding key- is alphanumeric, so the left-boundary check rejects it structurally."
+    },
+    {
+      "id": "mailgun-api-key-boundary-one-short",
+      "detector": "mailgun-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "mailgun key-abcdefghijklmnopqrstuvwxyz01234",
+      "expected": [],
+      "note": "A body one byte short of the required 32-byte length is rejected rather than matched against a shorter run."
+    },
+    {
+      "id": "mailgun-api-key-boundary-one-long",
+      "detector": "mailgun-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "mailgun key-abcdefghijklmnopqrstuvwxyz0123450",
+      "expected": [],
+      "note": "A body one byte longer than the required 32-byte length is rejected rather than truncated, because the boundary check requires a non-alphanumeric byte immediately after the 32nd body byte."
+    },
+    {
+      "id": "mailgun-api-key-boundary-uppercase-body",
+      "detector": "mailgun-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "mailgun key-ABCDEFGHIJKLMNOPQRSTUVWXYZ012345",
+      "expected": [],
+      "note": "The reviewed grammar's body alphabet is lowercase-only; an uppercase-mangled body is a structurally different value, not a case variant, per super::mailgun's own module doc."
+    },
+    {
+      "id": "mailgun-api-key-boundary-uppercase-literal",
+      "detector": "mailgun-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "mailgun KEY-abcdefghijklmnopqrstuvwxyz012345",
+      "expected": [],
+      "note": "The literal key- prefix is matched byte-for-byte in lowercase, per both external tools' own lowercase-only rules; an uppercase KEY- is not recognized."
+    },
+    {
+      "id": "mailgun-api-key-overlap-generic-context",
+      "detector": "mailgun-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "api_key=key-a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0 mailgun",
+      "expected": [
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 8,
+          "end": 44
+        }
+      ],
+      "note": "api_key is a recognized generic-token field name, so this assignment also proposes a contextual-secret candidate at the same medium confidence (this value's low-entropy alternating pattern is below generic-token's high-confidence threshold) as this keyword-gated format. Same resolved-action severity (both warn under DefaultPolicy), so the provider-specific candidate's higher specificity decides the overlap."
+    },
+    {
+      "id": "mailgun-api-key-adversarial-dense-findings",
+      "detector": "mailgun-api-key",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 3908,
+        "maxFindings": 100,
+        "maxRuntimeMs": 250
+      },
+      "input": "mailgun key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 key-abcdefghijklmnopqrstuvwxyz012345 ",
+      "expected": [
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 8,
+          "end": 44
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 45,
+          "end": 81
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 82,
+          "end": 118
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 119,
+          "end": 155
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 156,
+          "end": 192
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 193,
+          "end": 229
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 230,
+          "end": 266
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 267,
+          "end": 303
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 304,
+          "end": 340
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 341,
+          "end": 377
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 378,
+          "end": 414
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 415,
+          "end": 451
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 452,
+          "end": 488
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 489,
+          "end": 525
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 526,
+          "end": 562
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 563,
+          "end": 599
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 600,
+          "end": 636
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 637,
+          "end": 673
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 674,
+          "end": 710
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 711,
+          "end": 747
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 748,
+          "end": 784
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 785,
+          "end": 821
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 822,
+          "end": 858
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 859,
+          "end": 895
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 896,
+          "end": 932
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 933,
+          "end": 969
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 970,
+          "end": 1006
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1007,
+          "end": 1043
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1044,
+          "end": 1080
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1081,
+          "end": 1117
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1118,
+          "end": 1154
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1155,
+          "end": 1191
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1192,
+          "end": 1228
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1229,
+          "end": 1265
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1266,
+          "end": 1302
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1303,
+          "end": 1339
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1340,
+          "end": 1376
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1377,
+          "end": 1413
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1414,
+          "end": 1450
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1451,
+          "end": 1487
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1488,
+          "end": 1524
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1525,
+          "end": 1561
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1562,
+          "end": 1598
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1599,
+          "end": 1635
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1636,
+          "end": 1672
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1673,
+          "end": 1709
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1710,
+          "end": 1746
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1747,
+          "end": 1783
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1784,
+          "end": 1820
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1821,
+          "end": 1857
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1858,
+          "end": 1894
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1895,
+          "end": 1931
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1932,
+          "end": 1968
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1969,
+          "end": 2005
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2006,
+          "end": 2042
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2043,
+          "end": 2079
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2080,
+          "end": 2116
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2117,
+          "end": 2153
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2154,
+          "end": 2190
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2191,
+          "end": 2227
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2228,
+          "end": 2264
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2265,
+          "end": 2301
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2302,
+          "end": 2338
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2339,
+          "end": 2375
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2376,
+          "end": 2412
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2413,
+          "end": 2449
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2450,
+          "end": 2486
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2487,
+          "end": 2523
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2524,
+          "end": 2560
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2561,
+          "end": 2597
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2598,
+          "end": 2634
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2635,
+          "end": 2671
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2672,
+          "end": 2708
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2709,
+          "end": 2745
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2746,
+          "end": 2782
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2783,
+          "end": 2819
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2820,
+          "end": 2856
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2857,
+          "end": 2893
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2894,
+          "end": 2930
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2931,
+          "end": 2967
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2968,
+          "end": 3004
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3005,
+          "end": 3041
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3042,
+          "end": 3078
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3079,
+          "end": 3115
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3116,
+          "end": 3152
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3153,
+          "end": 3189
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3190,
+          "end": 3226
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3227,
+          "end": 3263
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3264,
+          "end": 3300
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3301,
+          "end": 3337
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3338,
+          "end": 3374
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3375,
+          "end": 3411
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3412,
+          "end": 3448
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3449,
+          "end": 3485
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3486,
+          "end": 3522
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3523,
+          "end": 3559
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3560,
+          "end": 3596
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3597,
+          "end": 3633
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3634,
+          "end": 3670
+        },
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3671,
+          "end": 3707
+        }
+      ],
+      "note": "A single mailgun-context-bearing line densely packed with 100 candidate-shaped runs stays linear and bounded: per-line (not per-candidate) context checks and a bounded literal scan keep cost proportional to input size."
     },
     {
       "id": "huggingface-positive-doc-style-placeholder",

@@ -93,6 +93,7 @@ as a [declarative ruleset](../guides/rulesets.md).
 | `new-relic-user-api-key` | `new_relic_user_api_key` | `always-redact` | — |
 | `new-relic-license-key` | `new_relic_license_key` | `confidence-gated` | — |
 | `mailchimp-api-key` | `mailchimp_api_key` | `confidence-gated` | — |
+| `mailgun-api-key` | `mailgun_api_key` | `confidence-gated` | — |
 | `firebase-server-key` | `firebase_server_key` | `always-redact` | — |
 | `terraform-cloud-token` | `terraform_cloud_token` | `always-redact` | — |
 | `pulumi-access-token` | `pulumi_access_token` | `always-redact` | — |
