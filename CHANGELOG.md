@@ -34,6 +34,51 @@ evidence is linked from each published version.
 
 ### Added
 
+- Added an `okta-api-token` detector (finding type `okta_api_token`)
+  recognizing Okta management API tokens: the literal `00` followed by
+  exactly 40 bytes of `[A-Za-z0-9_-]`, 42 bytes in total, reported only with
+  a same-line `okta` signal (confidence-gated, so the default policy warns
+  rather than redacts) (#315,
+  [`docs/specs/detector-families.md`](docs/specs/detector-families.md)).
+  Okta's own guide states neither a length nor a complete alphabet, so the
+  body grammar rests on two independently maintained external tools that
+  agree on the `00` prefix and the 40-byte length.
+- Added a `mailgun-api-key` detector (finding type `mailgun_api_key`)
+  recognizing Mailgun private API keys and HTTP webhook signing keys: the
+  literal `key-` followed by exactly 32 lowercase-alphanumeric bytes,
+  confidence-gated on a same-line `mailgun` signal (#314,
+  [`docs/specs/detector-families.md`](docs/specs/detector-families.md)). The
+  two shapes are structurally identical, so they report under one type.
+- Added a `mailchimp-api-key` detector (finding type `mailchimp_api_key`)
+  recognizing Mailchimp Marketing API keys: 32 lowercase-hex bytes, the
+  literal `-us`, then one or two digits naming the data-center subdomain,
+  confidence-gated on a same-line `mailchimp` signal (#313,
+  [`docs/specs/detector-families.md`](docs/specs/detector-families.md)). The
+  one-digit form is accepted because Mailchimp's own worked example uses it.
+- Added a `netlify-token` detector (finding type
+  `netlify_personal_access_token`) recognizing Netlify personal access
+  tokens: the literal `nfp_` followed by exactly 36 bytes of `[A-Za-z0-9_]`,
+  40 bytes in total, matching the capacity Netlify's own token-format
+  announcement states. It is reported unconditionally (always redacted),
+  since the prefix is self-identifying (#311,
+  [`docs/specs/detector-families.md`](docs/specs/detector-families.md)).
+- Added a `postman-api-key` detector (finding type `postman_api_key`)
+  recognizing Postman API keys: the literal `PMAK-`, 24 lowercase-hex bytes,
+  a literal `-`, then 34 lowercase-hex bytes — a 59-byte body whose dash is
+  pinned to its documented offset. A body missing that dash, or carrying it
+  elsewhere, is an intentional false negative. Reported unconditionally
+  (always redacted) (#310,
+  [`docs/specs/detector-families.md`](docs/specs/detector-families.md)).
+- Added `heroku-api-key` and `heroku-api-key-legacy` detectors (finding types
+  `heroku_api_key`, `heroku_api_key_legacy`) (#312,
+  [`docs/specs/detector-families.md`](docs/specs/detector-families.md)):
+  - the current shape is the literal `HRKU-AA` followed by exactly 58 bytes
+    of `[A-Za-z0-9_-]`, 65 bytes in total as Heroku's own changelog states,
+    reported unconditionally (always redacted);
+  - the legacy shape is a bare `8-4-4-4-12` lowercase-hex UUID, which carries
+    no marker of its own and is therefore reported only with a same-line,
+    case-insensitive `heroku` signal, confidence-gated so the default policy
+    warns rather than redacts.
 - `new_relic_license_key` now also detects the currently issued New Relic
   license key generation: 32 lowercase-hex bytes followed by the literal
   `FFFFNRAL`, and its EU-region form (`eu01xx`, 26 lowercase-hex bytes,

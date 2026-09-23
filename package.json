@@ -31,6 +31,7 @@
     "decision-permalinks:check": "python3 -B -m unittest discover -s scripts/tests -p 'test_check_decision_permalinks.py' && python3 -B scripts/check-decision-permalinks.py",
     "legacy-identifiers:check": "python3 -B -m unittest discover -s scripts/tests -p 'test_check_legacy_identifiers.py' && python3 -B scripts/check-legacy-identifiers.py",
     "doc-links:check": "python3 -B -m unittest discover -s scripts/tests -p 'test_check_doc_links.py' && python3 -B scripts/check-doc-links.py",
+    "changelog-coverage:check": "python3 -B -m unittest discover -s scripts/tests -p 'test_check_changelog_coverage.py' && python3 -B scripts/check-changelog-coverage.py",
     "json-path-citations:check": "python3 -B -m unittest discover -s scripts/tests -p 'test_check_json_path_citations.py' && python3 -B scripts/check-json-path-citations.py",
     "audits-index:check": "python3 -B -m unittest discover -s scripts/tests -p 'test_check_audits_index.py' && python3 -B scripts/check-audits-index.py",
     "product-positioning:check": "python3 -B -m unittest discover -s scripts/tests -p 'test_check_product_positioning.py' && python3 -B scripts/check-product-positioning.py",

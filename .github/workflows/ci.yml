@@ -248,6 +248,39 @@ jobs:
       - name: Every benchmarkCommit, pins.sourceRevision, and the manifest revision must trace to a real ancestor; vendored manifest and schema must match benchmarks main
         run: npm run benchmark-pins:check:ancestry
 
+  changelog-coverage:
+    name: Changelog coverage (pull requests)
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      # scripts/check-changelog-coverage.py compares this pull request's
+      # CHANGELOG.md against its merge base, so it needs both sides, not the
+      # default single-commit checkout the other jobs use.
+      - name: Check out repository with full history
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      # Every GitHub Actions expression is read through the environment, never
+      # interpolated into the shell snippet: the SAST rules re-parse a `run:`
+      # block as Bash, and `${{ ... }}` is not valid Bash (see the
+      # `curl-eval` partial-parsing entries in sast/baseline.json).
+      - name: A detector or binding change must carry an Unreleased changelog entry
+        run: |
+          python3 -B -m unittest discover -s scripts/tests -p 'test_check_changelog_coverage.py'
+          python3 -B scripts/check-changelog-coverage.py \
+            --base "${PR_BASE_SHA}" \
+            --head "${PR_HEAD_SHA}" \
+            --labels "${PR_LABELS}"
+        env:
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
+
   decision-permalinks:
     name: ADR permalink existence (full history)
     runs-on: ubuntu-latest

@@ -52,7 +52,21 @@ package you change. Changes to packaging, compatibility, or release behavior als
 require artifact inspection and clean-install smoke tests.
 
 Pull requests should explain the observable change, its verification, and any
-compatibility impact. By contributing, you agree that your contribution is licensed
+compatibility impact.
+
+### Changelog coverage
+
+A pull request that changes the detector registry, the policy that classifies
+its findings, the CLI, or a binding's own source must also change
+`CHANGELOG.md`'s `## Unreleased` section. The `Changelog coverage` CI job
+enforces it (`scripts/check-changelog-coverage.py`, issue #633), and the
+guarded path list lives in that script's `GUARDED_PATHS`.
+
+Write the entry for someone consuming the published package: what they can now
+observe, what changed about an existing finding type, and what they must do if
+a type or its default action changed. When the change alters no observable
+behavior -- a refactor, a test, a comment -- apply the `no-changelog` label to
+the pull request instead, so the waiver is visible to the reviewer. By contributing, you agree that your contribution is licensed
 under the repository's [MIT License](LICENSE).
 
 ### New detector family checklist
