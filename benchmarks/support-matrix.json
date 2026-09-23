@@ -3,17 +3,17 @@
   "taxonomySchemaVersion": 1,
   "sourceReport": {
     "schemaVersion": 1,
-    "generatedAt": "2026-09-23T17:27:11.072Z",
-    "runId": "3b84b58d-6b14-4bae-bed6-f432a3754b84",
-    "revision": "be5f8e6b96c362d90aba95d605acf1742a0f4dab",
+    "generatedAt": "2026-09-23T19:20:59.962Z",
+    "runId": "e9f8400e-db67-4fbc-ac2b-fe8657f769e4",
+    "revision": "f57e89556890e89a2ee19cb913a5a75745ed3230",
     "dirty": false,
     "criteriaSchemaVersion": 1
   },
   "providerCount": 42,
   "familyCount": 93,
   "distribution": {
-    "stable": 34,
-    "provisional": 38,
+    "stable": 36,
+    "provisional": 36,
     "pending": 2,
     "unsupported": 19
   },
@@ -222,7 +222,7 @@
       "provider": "confluent",
       "family": "confluent:cloud-api-secret",
       "familyName": "Cloud API secret (cflt-prefixed)",
-      "status": "provisional",
+      "status": "stable",
       "evidenceTier": "T1",
       "providerSource": {
         "url": "https://docs.confluent.io/cloud/current/security/authenticate/workload-identities/service-accounts/api-keys/overview.html",
@@ -242,12 +242,12 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 6
+        "differential": 0
       },
       "detectors": [
         "confluent-cloud-api-secret"
       ],
-      "reason": "differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": null
     },
     {
       "provider": "confluent",
@@ -268,12 +268,12 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 6
+        "differential": 0
       },
       "detectors": [
         "confluent-cloud-api-secret-legacy"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret."
     },
     {
       "provider": "databricks",
@@ -294,12 +294,12 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 6
+        "differential": 0
       },
       "detectors": [
         "databricks-personal-access-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts."
     },
     {
       "provider": "datadog",
@@ -355,12 +355,12 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 6
+        "differential": 0
       },
       "detectors": [
         "datadog-application-key"
       ],
-      "reason": "minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 4 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": "minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 4 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family."
     },
     {
       "provider": "datadog",
@@ -502,12 +502,12 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 12
+        "differential": 0
       },
       "detectors": [
         "discord-bot-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | differential.unresolvedContractDisagreements: 12 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret."
     },
     {
       "provider": "docker",
@@ -1466,7 +1466,7 @@
       "provider": "netlify",
       "family": "netlify:personal-access-token",
       "familyName": "Personal access token",
-      "status": "provisional",
+      "status": "stable",
       "evidenceTier": "T1",
       "providerSource": {
         "url": "https://answers.netlify.com/t/change-to-the-netlify-authentication-token-format/106146",
@@ -1486,12 +1486,12 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 6
+        "differential": 0
       },
       "detectors": [
         "netlify-token"
       ],
-      "reason": "differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": null
     },
     {
       "provider": "new-relic",
@@ -1511,12 +1511,12 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 3
+        "differential": 0
       },
       "detectors": [
         "new-relic-license-key"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | differential.unresolvedContractDisagreements: 3 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts."
     },
     {
       "provider": "new-relic",
@@ -1645,12 +1645,12 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 9
+        "differential": 0
       },
       "detectors": [
         "okta-api-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | differential.unresolvedContractDisagreements: 9 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts."
     },
     {
       "provider": "openai",

@@ -18,6 +18,13 @@ evidence is linked from each published version.
 
 ### Changed
 
+- The pinned [support matrix](docs/support-matrix.md) was re-measured after
+  the beta.7 committed families' differential ledger sweep
+  (redact-secret-benchmarks#175, #176): `netlify:personal-access-token` and
+  `confluent:cloud-api-secret` move from `provisional` to `stable` (36 stable
+  of 93). Postman, Databricks and Okta stay `provisional` at T2, with no
+  unresolved differential items; no provider source states their grammar
+  (#574).
 - `Package Release Rehearsal` now qualifies a throwaway, never-published
   `<X.Y.Z>-beta.<run id>` version instead of the branch's already-published
   one, moved onto its own uncommitted checkout after proving npm, crates.io,
