@@ -335,11 +335,27 @@ pub(super) fn scan_prefixed_shapes(
             }
         })
         .collect();
-    let tables: Vec<Vec<usize>> = alphabets.iter().map(|&a| run_ends(bytes, a)).collect();
+    // Run-end tables are built on first use: most inputs contain no prefix
+    // at all, and an eager table costs a pass and an allocation per alphabet.
+    let mut tables: Vec<Option<Vec<usize>>> = vec![None; alphabets.len()];
+    // Bytes that can begin some prefix. A position outside this set cannot
+    // match any shape, so it skips the per-shape comparison entirely. An
+    // empty prefix matches everywhere and disables the filter.
+    let mut first_bytes = [false; 256];
+    for shape in shapes {
+        match shape.prefix.as_bytes().first() {
+            Some(&byte) => first_bytes[usize::from(byte)] = true,
+            None => first_bytes = [true; 256],
+        }
+    }
 
     let mut matches = Vec::new();
     let mut start = 0;
     while start < bytes.len() {
+        if !first_bytes[usize::from(bytes[start])] {
+            start += 1;
+            continue;
+        }
         let Some((shape_index, shape)) = shapes
             .iter()
             .enumerate()
@@ -350,7 +366,9 @@ pub(super) fn scan_prefixed_shapes(
             continue;
         };
 
-        let ends = &tables[shape_table[shape_index]];
+        let table_index = shape_table[shape_index];
+        let ends =
+            tables[table_index].get_or_insert_with(|| run_ends(bytes, alphabets[table_index]));
         let suffix_start = start + shape.prefix.len();
         let available = ends[suffix_start] - suffix_start;
         let matched_len = match shape.run {
