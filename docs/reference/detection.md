@@ -44,7 +44,7 @@ for your host. An organization-specific format that is not listed here can be ad
 as a [declarative ruleset](../guides/rulesets.md).
 
 <!-- detector-inventory:start -->
-54 built-in detectors emit 61 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
+55 built-in detectors emit 62 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
 
 | Detector | Finding types | Default policy class | Schemes |
 | --- | --- | --- | --- |
@@ -92,6 +92,7 @@ as a [declarative ruleset](../guides/rulesets.md).
 | `new-relic-user-api-key` | `new_relic_user_api_key` | `always-redact` | — |
 | `new-relic-license-key` | `new_relic_license_key` | `confidence-gated` | — |
 | `mailchimp-api-key` | `mailchimp_api_key` | `confidence-gated` | — |
+| `mailgun-api-key` | `mailgun_api_key` | `confidence-gated` | — |
 | `firebase-server-key` | `firebase_server_key` | `always-redact` | — |
 | `terraform-cloud-token` | `terraform_cloud_token` | `always-redact` | — |
 | `pulumi-access-token` | `pulumi_access_token` | `always-redact` | — |
