@@ -3,19 +3,19 @@
   "taxonomySchemaVersion": 1,
   "sourceReport": {
     "schemaVersion": 1,
-    "generatedAt": "2026-09-22T00:26:30.496Z",
-    "runId": "d0e99d6b-a252-4e30-8b24-a1195c94ee99",
-    "revision": "a502fdd715c5a5882430e951d5493de32fe8621c",
+    "generatedAt": "2026-09-23T17:27:11.072Z",
+    "runId": "3b84b58d-6b14-4bae-bed6-f432a3754b84",
+    "revision": "be5f8e6b96c362d90aba95d605acf1742a0f4dab",
     "dirty": false,
     "criteriaSchemaVersion": 1
   },
-  "providerCount": 34,
-  "familyCount": 79,
+  "providerCount": 42,
+  "familyCount": 93,
   "distribution": {
-    "stable": 3,
-    "provisional": 58,
+    "stable": 34,
+    "provisional": 38,
     "pending": 2,
-    "unsupported": 16
+    "unsupported": 19
   },
   "families": [
     {
@@ -37,12 +37,12 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 6
+        "differential": 0
       },
       "detectors": [
         "anthropic-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 2 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 2 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret."
     },
     {
       "provider": "atlassian",
@@ -75,12 +75,12 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 6
+        "differential": 0
       },
       "detectors": [
         "atlassian-api-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret."
     },
     {
       "provider": "aws",
@@ -99,7 +99,7 @@
       "provider": "aws",
       "family": "aws:iam-user-access-key",
       "familyName": "IAM user access key",
-      "status": "provisional",
+      "status": "stable",
       "evidenceTier": "T1",
       "providerSource": {
         "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_identifiers.html#identifiers-prefixes",
@@ -119,12 +119,12 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 9
+        "differential": 0
       },
       "detectors": [
         "aws-access-key"
       ],
-      "reason": "benign.minimumAxes: 2 < 3 (axes present: near-miss, placeholder) — A bare case count is satisfied by five copies of the same near-miss and proves nothing about diversity. Staged at 2 immediately after #91 merged (the minimum then met by every family reading stable: gitlab-token, npm-token), per docs/decisions/2026-09-21-measure-benign-axis-diversity.md's ratchet plan. Raised to 3 once #93 (#90's part A3) authored the missing placeholder/reference axes for the 23 families that previously carried only a same-axis near-miss pair, plus one reference control each for gitlab-token and npm-token so the ratchet lands with zero regressions; measured via `npm run eval:classify` immediately before this value changed. | differential.unresolvedContractDisagreements: 9 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": null
     },
     {
       "provider": "aws",
@@ -181,18 +181,18 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 6
+        "differential": 0
       },
       "detectors": [
         "azure-devops-personal-access-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret."
     },
     {
       "provider": "cloudflare",
       "family": "cloudflare:api-token",
       "familyName": "Scannable API token",
-      "status": "provisional",
+      "status": "stable",
       "evidenceTier": "T1",
       "providerSource": {
         "url": "https://developers.cloudflare.com/fundamentals/api/get-started/create-token/",
@@ -211,12 +211,95 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 3
+        "differential": 0
       },
       "detectors": [
         "cloudflare-token"
       ],
-      "reason": "differential.unresolvedContractDisagreements: 3 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": null
+    },
+    {
+      "provider": "confluent",
+      "family": "confluent:cloud-api-secret",
+      "familyName": "Cloud API secret (cflt-prefixed)",
+      "status": "provisional",
+      "evidenceTier": "T1",
+      "providerSource": {
+        "url": "https://docs.confluent.io/cloud/current/security/authenticate/workload-identities/service-accounts/api-keys/overview.html",
+        "observedAt": "2026-09-23",
+        "formatVersion": "cflt-prefixed API secret (created after 2025-07-30)",
+        "covers": "the page states \"API secrets created after July 30, 2025 have a cflt prefix followed by 60 characters consisting of A-Z, a-z, 0-9, + or /\" and that \"the final 6 characters contain a Base64-encoded CRC32 checksum of the prior 54 characters\"; the checksum is documented but not part of this contract's lexical pattern (it shares the body's alphabet, per the cloudflare-token precedent)"
+      },
+      "corroboratingScanners": [
+        "gitleaks 8.30.1",
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 6,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 0,
+        "differential": 6
+      },
+      "detectors": [
+        "confluent-cloud-api-secret"
+      ],
+      "reason": "differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+    },
+    {
+      "provider": "confluent",
+      "family": "confluent:cloud-api-secret-legacy",
+      "familyName": "Cloud API secret (unprefixed, pre-2025-07-30)",
+      "status": "provisional",
+      "evidenceTier": "T2",
+      "providerSource": null,
+      "corroboratingScanners": [
+        "gitleaks 8.30.1",
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 3,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 0,
+        "differential": 6
+      },
+      "detectors": [
+        "confluent-cloud-api-secret-legacy"
+      ],
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+    },
+    {
+      "provider": "databricks",
+      "family": "databricks:personal-access-token",
+      "familyName": "Personal access token",
+      "status": "provisional",
+      "evidenceTier": "T2",
+      "providerSource": null,
+      "corroboratingScanners": [
+        "gitleaks 8.30.1",
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 9,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 0,
+        "differential": 6
+      },
+      "detectors": [
+        "databricks-personal-access-token"
+      ],
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": "datadog",
@@ -229,27 +312,60 @@
         "trufflehog 3.97.4"
       ],
       "twinCoverage": {
-        "pairs": 0,
+        "pairs": 11,
         "failures": 0,
-        "unprobeable": {
-          "reason": "docs.datadoghq.com/account_management/api-app-keys states no length, alphabet or prefix for API keys. The 32-character shape is tool-corroborated only.",
-          "observedAt": "2026-09-20"
-        }
+        "unprobeable": null
       },
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 3
+        "differential": 0
       },
       "detectors": [
         "datadog-api-key"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | differential.unresolvedContractDisagreements: 3 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts."
     },
     {
       "provider": "datadog",
       "family": "datadog:application-key",
-      "familyName": "Application key",
+      "familyName": "Application key (ddapp_-prefixed)",
+      "status": "provisional",
+      "evidenceTier": "T1",
+      "providerSource": {
+        "url": "https://docs.datadoghq.com/account_management/personal-access-tokens/",
+        "observedAt": "2026-09-22",
+        "formatVersion": "Access-token comparison table (mirrored at /account_management/service-access-tokens/)",
+        "covers": "Application keys column: \"Identifiable prefix … ddapp_ (new)\" establishes ddapp_ as the identifying prefix of current-format application keys. Body length (34 characters) and alphabet are not stated on this page; both are corroborated only by Datadog-owned code and a third-party partner doc, never by a provider-domain page"
+      },
+      "corroboratingScanners": [
+        "AWS Secrets Manager partner doc",
+        "DataDog/cloudformation-template",
+        "DataDog/datadog-agent (Agent app-key validator)",
+        "DataDog/datadog-agent (Agent log/config scrubber)",
+        "DataDog/terraform-module-datadog-agentless-scanner",
+        "gitleaks 8.30.1",
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 3,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 0,
+        "differential": 6
+      },
+      "detectors": [
+        "datadog-application-key"
+      ],
+      "reason": "minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 4 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family. | differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+    },
+    {
+      "provider": "datadog",
+      "family": "datadog:application-key-legacy",
+      "familyName": "Application key (legacy 40-hex)",
       "status": "provisional",
       "evidenceTier": "T2",
       "providerSource": null,
@@ -258,28 +374,25 @@
         "trufflehog 3.97.4"
       ],
       "twinCoverage": {
-        "pairs": 0,
+        "pairs": 3,
         "failures": 0,
-        "unprobeable": {
-          "reason": "docs.datadoghq.com/account_management/api-app-keys states no length, alphabet or prefix for application keys. The 40-character shape is tool-corroborated only.",
-          "observedAt": "2026-09-20"
-        }
+        "unprobeable": null
       },
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 3
+        "differential": 0
       },
       "detectors": [
-        "datadog-application-key"
+        "datadog-application-key-legacy"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | differential.unresolvedContractDisagreements: 3 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret."
     },
     {
       "provider": "digitalocean",
       "family": "digitalocean:oauth-token",
       "familyName": "OAuth token",
-      "status": "provisional",
+      "status": "stable",
       "evidenceTier": "T1",
       "providerSource": {
         "url": "https://docs.digitalocean.com/release-notes/api/",
@@ -299,18 +412,18 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 4
+        "differential": 0
       },
       "detectors": [
         "digitalocean-token"
       ],
-      "reason": "differential.unresolvedContractDisagreements: 4 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": null
     },
     {
       "provider": "digitalocean",
       "family": "digitalocean:personal-access-token",
       "familyName": "Personal access token",
-      "status": "provisional",
+      "status": "stable",
       "evidenceTier": "T1",
       "providerSource": {
         "url": "https://docs.digitalocean.com/release-notes/api/",
@@ -330,18 +443,18 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 4
+        "differential": 0
       },
       "detectors": [
         "digitalocean-token"
       ],
-      "reason": "differential.unresolvedContractDisagreements: 4 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": null
     },
     {
       "provider": "digitalocean",
       "family": "digitalocean:refresh-token",
       "familyName": "Refresh token",
-      "status": "provisional",
+      "status": "stable",
       "evidenceTier": "T1",
       "providerSource": {
         "url": "https://docs.digitalocean.com/release-notes/api/",
@@ -361,12 +474,12 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 4
+        "differential": 0
       },
       "detectors": [
         "digitalocean-token"
       ],
-      "reason": "differential.unresolvedContractDisagreements: 4 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": null
     },
     {
       "provider": "discord",
@@ -382,19 +495,19 @@
         "pairs": 0,
         "failures": 0,
         "unprobeable": {
-          "reason": "docs.discord.com/developers/reference shows one example token in an Authorization header and states no segment count, encoding, length or alphabet. An example is not a grammar.",
-          "observedAt": "2026-09-20"
+          "reason": "Re-checked 2026-09-22 (redact-secret#646, exhaustive, including the current-shape passes for redact-secret-benchmarks#159): no Discord-owned page or OpenAPI spec states a segment count, encoding, length or alphabet for any issued shape; the reference shows one legacy-shape example header. An example is not a grammar.",
+          "observedAt": "2026-09-22"
         }
       },
       "unresolvedCriticalItems": {
         "metamorphic": 0,
-        "mutation": 6,
-        "differential": 6
+        "mutation": 0,
+        "differential": 12
       },
       "detectors": [
         "discord-bot-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | mutation.unresolvedCritical: 6 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review. | differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | differential.unresolvedContractDisagreements: 12 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": "docker",
@@ -412,14 +525,14 @@
         "unprobeable": null
       },
       "unresolvedCriticalItems": {
-        "metamorphic": 27,
-        "mutation": 3,
-        "differential": 3
+        "metamorphic": 0,
+        "mutation": 0,
+        "differential": 0
       },
       "detectors": [
         "docker-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | benign.minimumAxes: 1 < 3 (axes present: near-miss) — A bare case count is satisfied by five copies of the same near-miss and proves nothing about diversity. Staged at 2 immediately after #91 merged (the minimum then met by every family reading stable: gitlab-token, npm-token), per docs/decisions/2026-09-21-measure-benign-axis-diversity.md's ratchet plan. Raised to 3 once #93 (#90's part A3) authored the missing placeholder/reference axes for the 23 families that previously carried only a same-axis near-miss pair, plus one reference control each for gitlab-token and npm-token so the ratchet lands with zero regressions; measured via `npm run eval:classify` immediately before this value changed. | metamorphic.criticalFailures: 27 > 0 — A metamorphic invariant violation (for example, detection lost after an envelope-preserving transform) shows the detector is not robust to construction, independent of how many cases were run. | mutation.unresolvedCritical: 3 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review. | differential.unresolvedContractDisagreements: 3 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts."
     },
     {
       "provider": "docker",
@@ -437,14 +550,14 @@
         "unprobeable": null
       },
       "unresolvedCriticalItems": {
-        "metamorphic": 27,
-        "mutation": 3,
-        "differential": 3
+        "metamorphic": 0,
+        "mutation": 0,
+        "differential": 0
       },
       "detectors": [
         "docker-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | benign.minimumAxes: 1 < 3 (axes present: near-miss) — A bare case count is satisfied by five copies of the same near-miss and proves nothing about diversity. Staged at 2 immediately after #91 merged (the minimum then met by every family reading stable: gitlab-token, npm-token), per docs/decisions/2026-09-21-measure-benign-axis-diversity.md's ratchet plan. Raised to 3 once #93 (#90's part A3) authored the missing placeholder/reference axes for the 23 families that previously carried only a same-axis near-miss pair, plus one reference control each for gitlab-token and npm-token so the ratchet lands with zero regressions; measured via `npm run eval:classify` immediately before this value changed. | metamorphic.criticalFailures: 27 > 0 — A metamorphic invariant violation (for example, detection lost after an envelope-preserving transform) shows the detector is not robust to construction, independent of how many cases were run. | mutation.unresolvedCritical: 3 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review. | differential.unresolvedContractDisagreements: 3 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts."
     },
     {
       "provider": "firebase",
@@ -464,12 +577,12 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 6
+        "differential": 0
       },
       "detectors": [
         "firebase-server-key"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret."
     },
     {
       "provider": null,
@@ -487,12 +600,12 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 6
+        "differential": 0
       },
       "detectors": [
         "bearer-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret."
     },
     {
       "provider": null,
@@ -510,18 +623,18 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 30
+        "differential": 0
       },
       "detectors": [
         "connection-string"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | differential.unresolvedContractDisagreements: 30 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts."
     },
     {
       "provider": null,
       "family": "generic:jwt",
       "familyName": "JSON Web Token",
-      "status": "provisional",
+      "status": "stable",
       "evidenceTier": "T1",
       "providerSource": {
         "url": "https://www.rfc-editor.org/rfc/rfc7519",
@@ -540,12 +653,12 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 4
+        "differential": 0
       },
       "detectors": [
         "jwt"
       ],
-      "reason": "differential.unresolvedContractDisagreements: 4 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": null
     },
     {
       "provider": null,
@@ -563,18 +676,18 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 12
+        "differential": 0
       },
       "detectors": [
         "otpauth-uri"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | differential.unresolvedContractDisagreements: 12 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts."
     },
     {
       "provider": null,
       "family": "generic:private-key",
       "familyName": "PEM-encoded private key",
-      "status": "provisional",
+      "status": "stable",
       "evidenceTier": "T1",
       "providerSource": {
         "url": "https://www.rfc-editor.org/rfc/rfc7468",
@@ -593,12 +706,12 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 18
+        "differential": 0
       },
       "detectors": [
         "private-key"
       ],
-      "reason": "differential.unresolvedContractDisagreements: 18 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": null
     },
     {
       "provider": null,
@@ -614,20 +727,20 @@
         "unprobeable": null
       },
       "unresolvedCriticalItems": {
-        "metamorphic": 2,
+        "metamorphic": 0,
         "mutation": 0,
-        "differential": 12
+        "differential": 0
       },
       "detectors": [
         "generic-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | metamorphic.criticalFailures: 2 > 0 — A metamorphic invariant violation (for example, detection lost after an envelope-preserving transform) shows the detector is not robust to construction, independent of how many cases were run. | differential.unresolvedContractDisagreements: 12 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts."
     },
     {
       "provider": "github",
       "family": "github:app-server-to-server-token",
       "familyName": "GitHub App server-to-server token",
-      "status": "provisional",
+      "status": "stable",
       "evidenceTier": "T1",
       "providerSource": {
         "url": "https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/about-authentication-to-github#githubs-token-formats",
@@ -652,13 +765,13 @@
       "detectors": [
         "github-token"
       ],
-      "reason": "benign.minimumAxes: 2 < 3 (axes present: near-miss, placeholder) — A bare case count is satisfied by five copies of the same near-miss and proves nothing about diversity. Staged at 2 immediately after #91 merged (the minimum then met by every family reading stable: gitlab-token, npm-token), per docs/decisions/2026-09-21-measure-benign-axis-diversity.md's ratchet plan. Raised to 3 once #93 (#90's part A3) authored the missing placeholder/reference axes for the 23 families that previously carried only a same-axis near-miss pair, plus one reference control each for gitlab-token and npm-token so the ratchet lands with zero regressions; measured via `npm run eval:classify` immediately before this value changed."
+      "reason": null
     },
     {
       "provider": "github",
       "family": "github:app-user-to-server-token",
       "familyName": "GitHub App user-to-server token",
-      "status": "provisional",
+      "status": "stable",
       "evidenceTier": "T1",
       "providerSource": {
         "url": "https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/about-authentication-to-github#githubs-token-formats",
@@ -683,13 +796,13 @@
       "detectors": [
         "github-token"
       ],
-      "reason": "benign.minimumAxes: 2 < 3 (axes present: near-miss, placeholder) — A bare case count is satisfied by five copies of the same near-miss and proves nothing about diversity. Staged at 2 immediately after #91 merged (the minimum then met by every family reading stable: gitlab-token, npm-token), per docs/decisions/2026-09-21-measure-benign-axis-diversity.md's ratchet plan. Raised to 3 once #93 (#90's part A3) authored the missing placeholder/reference axes for the 23 families that previously carried only a same-axis near-miss pair, plus one reference control each for gitlab-token and npm-token so the ratchet lands with zero regressions; measured via `npm run eval:classify` immediately before this value changed."
+      "reason": null
     },
     {
       "provider": "github",
       "family": "github:classic-personal-access-token",
       "familyName": "Classic personal access token",
-      "status": "provisional",
+      "status": "stable",
       "evidenceTier": "T1",
       "providerSource": {
         "url": "https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/about-authentication-to-github#githubs-token-formats",
@@ -714,7 +827,7 @@
       "detectors": [
         "github-token"
       ],
-      "reason": "benign.minimumAxes: 2 < 3 (axes present: near-miss, placeholder) — A bare case count is satisfied by five copies of the same near-miss and proves nothing about diversity. Staged at 2 immediately after #91 merged (the minimum then met by every family reading stable: gitlab-token, npm-token), per docs/decisions/2026-09-21-measure-benign-axis-diversity.md's ratchet plan. Raised to 3 once #93 (#90's part A3) authored the missing placeholder/reference axes for the 23 families that previously carried only a same-axis near-miss pair, plus one reference control each for gitlab-token and npm-token so the ratchet lands with zero regressions; measured via `npm run eval:classify` immediately before this value changed."
+      "reason": null
     },
     {
       "provider": "github",
@@ -733,7 +846,7 @@
       "provider": "github",
       "family": "github:oauth-access-token",
       "familyName": "OAuth access token",
-      "status": "provisional",
+      "status": "stable",
       "evidenceTier": "T1",
       "providerSource": {
         "url": "https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/about-authentication-to-github#githubs-token-formats",
@@ -758,13 +871,13 @@
       "detectors": [
         "github-token"
       ],
-      "reason": "benign.minimumAxes: 2 < 3 (axes present: near-miss, placeholder) — A bare case count is satisfied by five copies of the same near-miss and proves nothing about diversity. Staged at 2 immediately after #91 merged (the minimum then met by every family reading stable: gitlab-token, npm-token), per docs/decisions/2026-09-21-measure-benign-axis-diversity.md's ratchet plan. Raised to 3 once #93 (#90's part A3) authored the missing placeholder/reference axes for the 23 families that previously carried only a same-axis near-miss pair, plus one reference control each for gitlab-token and npm-token so the ratchet lands with zero regressions; measured via `npm run eval:classify` immediately before this value changed."
+      "reason": null
     },
     {
       "provider": "github",
       "family": "github:oauth-refresh-token",
       "familyName": "OAuth refresh token",
-      "status": "provisional",
+      "status": "stable",
       "evidenceTier": "T1",
       "providerSource": {
         "url": "https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/about-authentication-to-github#githubs-token-formats",
@@ -789,7 +902,7 @@
       "detectors": [
         "github-token"
       ],
-      "reason": "benign.minimumAxes: 2 < 3 (axes present: near-miss, placeholder) — A bare case count is satisfied by five copies of the same near-miss and proves nothing about diversity. Staged at 2 immediately after #91 merged (the minimum then met by every family reading stable: gitlab-token, npm-token), per docs/decisions/2026-09-21-measure-benign-axis-diversity.md's ratchet plan. Raised to 3 once #93 (#90's part A3) authored the missing placeholder/reference axes for the 23 families that previously carried only a same-axis near-miss pair, plus one reference control each for gitlab-token and npm-token so the ratchet lands with zero regressions; measured via `npm run eval:classify` immediately before this value changed."
+      "reason": null
     },
     {
       "provider": "gitlab",
@@ -853,12 +966,12 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 3
+        "differential": 0
       },
       "detectors": [
         "google-api-key"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | differential.unresolvedContractDisagreements: 3 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret."
     },
     {
       "provider": "google",
@@ -884,22 +997,19 @@
         "gitleaks 8.30.1"
       ],
       "twinCoverage": {
-        "pairs": 0,
+        "pairs": 11,
         "failures": 0,
-        "unprobeable": {
-          "reason": "The Grafana Cloud access-policies page states no token format at all, not even the glc_ prefix.",
-          "observedAt": "2026-09-20"
-        }
+        "unprobeable": null
       },
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 3
+        "differential": 0
       },
       "detectors": [
         "grafana-cloud-access-policy-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | differential.unresolvedContractDisagreements: 3 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts."
     },
     {
       "provider": "grafana",
@@ -913,28 +1023,25 @@
         "trufflehog 3.97.4"
       ],
       "twinCoverage": {
-        "pairs": 0,
+        "pairs": 11,
         "failures": 0,
-        "unprobeable": {
-          "reason": "grafana.com/docs/grafana/latest/administration/service-accounts shows one glsa_ example token in API requests and states no length, alphabet or checksum rule. An example is not a grammar.",
-          "observedAt": "2026-09-20"
-        }
+        "unprobeable": null
       },
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 3
+        "differential": 0
       },
       "detectors": [
         "grafana-service-account-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | differential.unresolvedContractDisagreements: 3 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts."
     },
     {
       "provider": "hashicorp-terraform",
       "family": "hashicorp-terraform:organization-token",
       "familyName": "Organization token",
-      "status": "provisional",
+      "status": "stable",
       "evidenceTier": "T1",
       "providerSource": {
         "url": "https://developer.hashicorp.com/terraform/cloud-docs/api-docs/user-tokens",
@@ -954,18 +1061,18 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 6
+        "differential": 0
       },
       "detectors": [
         "terraform-cloud-token"
       ],
-      "reason": "differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": null
     },
     {
       "provider": "hashicorp-terraform",
       "family": "hashicorp-terraform:team-token",
       "familyName": "Team token",
-      "status": "provisional",
+      "status": "stable",
       "evidenceTier": "T1",
       "providerSource": {
         "url": "https://developer.hashicorp.com/terraform/cloud-docs/api-docs/user-tokens",
@@ -985,18 +1092,18 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 6
+        "differential": 0
       },
       "detectors": [
         "terraform-cloud-token"
       ],
-      "reason": "differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": null
     },
     {
       "provider": "hashicorp-terraform",
       "family": "hashicorp-terraform:user-token",
       "familyName": "User token",
-      "status": "provisional",
+      "status": "stable",
       "evidenceTier": "T1",
       "providerSource": {
         "url": "https://developer.hashicorp.com/terraform/cloud-docs/api-docs/user-tokens",
@@ -1016,18 +1123,18 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 6
+        "differential": 0
       },
       "detectors": [
         "terraform-cloud-token"
       ],
-      "reason": "differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": null
     },
     {
       "provider": "hashicorp-vault",
       "family": "hashicorp-vault:batch-token",
       "familyName": "Batch token",
-      "status": "provisional",
+      "status": "stable",
       "evidenceTier": "T1",
       "providerSource": {
         "url": "https://developer.hashicorp.com/vault/docs/concepts/tokens",
@@ -1047,18 +1154,18 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 18
+        "differential": 0
       },
       "detectors": [
         "vault-token"
       ],
-      "reason": "differential.unresolvedContractDisagreements: 18 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": null
     },
     {
       "provider": "hashicorp-vault",
       "family": "hashicorp-vault:recovery-token",
       "familyName": "Recovery token",
-      "status": "provisional",
+      "status": "stable",
       "evidenceTier": "T1",
       "providerSource": {
         "url": "https://developer.hashicorp.com/vault/docs/concepts/tokens",
@@ -1078,18 +1185,18 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 18
+        "differential": 0
       },
       "detectors": [
         "vault-token"
       ],
-      "reason": "differential.unresolvedContractDisagreements: 18 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": null
     },
     {
       "provider": "hashicorp-vault",
       "family": "hashicorp-vault:service-token",
       "familyName": "Service token",
-      "status": "provisional",
+      "status": "stable",
       "evidenceTier": "T1",
       "providerSource": {
         "url": "https://developer.hashicorp.com/vault/docs/concepts/tokens",
@@ -1109,12 +1216,69 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 18
+        "differential": 0
       },
       "detectors": [
         "vault-token"
       ],
-      "reason": "differential.unresolvedContractDisagreements: 18 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": null
+    },
+    {
+      "provider": "heroku",
+      "family": "heroku:legacy-api-key",
+      "familyName": "Legacy API key (bare UUID)",
+      "status": "provisional",
+      "evidenceTier": "T2",
+      "providerSource": null,
+      "corroboratingScanners": [
+        "gitleaks 8.30.1",
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 3,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 7,
+        "mutation": 1,
+        "differential": 0
+      },
+      "detectors": [
+        "heroku-api-key-legacy"
+      ],
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.falseAlarms: 1 > 0 — A false alarm on a benign control is a recorded false positive; stable tolerates none. | metamorphic.criticalFailures: 7 > 0 — A metamorphic invariant violation (for example, detection lost after an envelope-preserving transform) shows the detector is not robust to construction, independent of how many cases were run. | mutation.unresolvedCritical: 1 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+    },
+    {
+      "provider": "heroku",
+      "family": "heroku:oauth-access-token",
+      "familyName": "OAuth access token (HRKU-prefixed)",
+      "status": "stable",
+      "evidenceTier": "T1",
+      "providerSource": {
+        "url": "https://devcenter.heroku.com/articles/oauth",
+        "observedAt": "2026-09-23",
+        "formatVersion": "HRKU- prefixed 65-character OAuth access token",
+        "covers": "the page states \"Heroku OAuth access tokens are 65 characters long and prefixed with HRKU-\" and shows a 65-character worked example beginning HRKU-AA (not reproduced here, since secret scanners classify it as a live token); the literal AA after the dash and the [A-Za-z0-9_-] body alphabet are tool-corroborated and consistent with that example, not stated in prose"
+      },
+      "corroboratingScanners": [
+        "gitleaks 8.30.1",
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 6,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 0,
+        "differential": 0
+      },
+      "detectors": [
+        "heroku-api-key"
+      ],
+      "reason": null
     },
     {
       "provider": "huggingface",
@@ -1135,12 +1299,12 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 4
+        "differential": 0
       },
       "detectors": [
         "huggingface-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 2 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumAxes: 1 < 3 (axes present: near-miss) — A bare case count is satisfied by five copies of the same near-miss and proves nothing about diversity. Staged at 2 immediately after #91 merged (the minimum then met by every family reading stable: gitlab-token, npm-token), per docs/decisions/2026-09-21-measure-benign-axis-diversity.md's ratchet plan. Raised to 3 once #93 (#90's part A3) authored the missing placeholder/reference axes for the 23 families that previously carried only a same-axis near-miss pair, plus one reference control each for gitlab-token and npm-token so the ratchet lands with zero regressions; measured via `npm run eval:classify` immediately before this value changed. | differential.unresolvedContractDisagreements: 4 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 2 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret."
     },
     {
       "provider": "linear",
@@ -1174,12 +1338,90 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 10
+        "differential": 0
       },
       "detectors": [
         "linear-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | benign.minimumAxes: 1 < 3 (axes present: near-miss) — A bare case count is satisfied by five copies of the same near-miss and proves nothing about diversity. Staged at 2 immediately after #91 merged (the minimum then met by every family reading stable: gitlab-token, npm-token), per docs/decisions/2026-09-21-measure-benign-axis-diversity.md's ratchet plan. Raised to 3 once #93 (#90's part A3) authored the missing placeholder/reference axes for the 23 families that previously carried only a same-axis near-miss pair, plus one reference control each for gitlab-token and npm-token so the ratchet lands with zero regressions; measured via `npm run eval:classify` immediately before this value changed. | differential.unresolvedContractDisagreements: 10 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts."
+    },
+    {
+      "provider": "mailchimp",
+      "family": "mailchimp:marketing-api-key",
+      "familyName": "Marketing API key",
+      "status": "provisional",
+      "evidenceTier": "T2",
+      "providerSource": null,
+      "corroboratingScanners": [
+        "gitleaks 8.30.1",
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 6,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 0,
+        "differential": 0
+      },
+      "detectors": [
+        "mailchimp-api-key"
+      ],
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts."
+    },
+    {
+      "provider": "mailgun",
+      "family": "mailgun:legacy-signing-key-triplet",
+      "familyName": "Legacy 32-8-8 hex signing key",
+      "status": "unsupported",
+      "evidenceTier": null,
+      "providerSource": null,
+      "corroboratingScanners": [],
+      "twinCoverage": null,
+      "unresolvedCriticalItems": null,
+      "detectors": [],
+      "reason": "Known unsupported legacy variant per redact-secret#314 (product PR #680); not fixtured because the provider no longer documents it. Provider source: https://github.com/gitleaks/gitleaks/blob/v8.30.1/config/gitleaks.toml."
+    },
+    {
+      "provider": "mailgun",
+      "family": "mailgun:private-api-key",
+      "familyName": "Private API key and HTTP webhook signing key",
+      "status": "provisional",
+      "evidenceTier": "T2",
+      "providerSource": null,
+      "corroboratingScanners": [
+        "gitleaks 8.30.1",
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 9,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 0,
+        "differential": 0
+      },
+      "detectors": [
+        "mailgun-api-key"
+      ],
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts."
+    },
+    {
+      "provider": "mailgun",
+      "family": "mailgun:public-validation-key",
+      "familyName": "Public validation key (pubkey-)",
+      "status": "unsupported",
+      "evidenceTier": null,
+      "providerSource": null,
+      "corroboratingScanners": [],
+      "twinCoverage": null,
+      "unresolvedCriticalItems": null,
+      "detectors": [],
+      "reason": "Documented public per redact-secret#314's scope; gitleaks 8.30.1's mailgun-pub-key rule still flags it, which the mailgun-api-key public-id control records. Provider source: https://github.com/gitleaks/gitleaks/blob/v8.30.1/config/gitleaks.toml."
     },
     {
       "provider": "microsoft-entra",
@@ -1189,36 +1431,55 @@
       "evidenceTier": "T2",
       "providerSource": null,
       "corroboratingScanners": [
-        "gitleaks 8.30.1"
+        "gitleaks 8.30.1",
+        "trufflehog 3.97.4"
       ],
       "twinCoverage": {
-        "pairs": 0,
-        "failures": 0,
-        "unprobeable": {
-          "reason": "learn.microsoft.com/entra/identity-platform/how-to-add-credentials says only to record the secret Value; it states no length, alphabet or marker.",
-          "observedAt": "2026-09-20"
-        }
+        "pairs": 14,
+        "failures": 3,
+        "unprobeable": null
       },
       "unresolvedCriticalItems": {
-        "metamorphic": 0,
-        "mutation": 0,
-        "differential": 0
+        "metamorphic": 27,
+        "mutation": 31,
+        "differential": 3
       },
       "detectors": [
         "microsoft-entra-client-secret"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | twinFailures: 3 > 0 — A twin failure is a recorded false negative on the exact discrimination this project exists to make; stable tolerates none, however small the sample. | metamorphic.criticalFailures: 27 > 0 — A metamorphic invariant violation (for example, detection lost after an envelope-preserving transform) shows the detector is not robust to construction, independent of how many cases were run. | mutation.unresolvedCritical: 31 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review. | differential.unresolvedContractDisagreements: 3 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
-      "provider": "new-relic",
-      "family": "new-relic:license-key",
-      "familyName": "License key",
-      "status": "provisional",
-      "evidenceTier": "T3",
+      "provider": "netlify",
+      "family": "netlify:other-prefixed-tokens",
+      "familyName": "CLI, OAuth, app and build tokens (nfc_/nfo_/nfu_/nfb_)",
+      "status": "unsupported",
+      "evidenceTier": null,
       "providerSource": null,
       "corroboratingScanners": [],
+      "twinCoverage": null,
+      "unresolvedCriticalItems": null,
+      "detectors": [],
+      "reason": "Out of redact-secret#311's explicit scope; each is a distinct credential, so none is a control or positive for netlify:personal-access-token. Provider source: https://answers.netlify.com/t/change-to-the-netlify-authentication-token-format/106146."
+    },
+    {
+      "provider": "netlify",
+      "family": "netlify:personal-access-token",
+      "familyName": "Personal access token",
+      "status": "provisional",
+      "evidenceTier": "T1",
+      "providerSource": {
+        "url": "https://answers.netlify.com/t/change-to-the-netlify-authentication-token-format/106146",
+        "observedAt": "2026-09-23",
+        "formatVersion": "2023-11-07 nf-prefixed token format",
+        "covers": "Netlify's staff-authored announcement states \"All Netlify authentication tokens will start with a nf prefix followed by a single identifying character\" — nfp for personal access tokens (nfc/nfo/nfu/nfb for CLI, OAuth, app and build tokens) — and that token storage capacity must grow \"to 40 characters\"; the \"_\" delimiter and the [A-Za-z0-9_] body alphabet are tool-corroborated, not stated on the page"
+      },
+      "corroboratingScanners": [
+        "gitleaks 8.30.1",
+        "trufflehog 3.97.4"
+      ],
       "twinCoverage": {
-        "pairs": 3,
+        "pairs": 6,
         "failures": 0,
         "unprobeable": null
       },
@@ -1228,9 +1489,34 @@
         "differential": 6
       },
       "detectors": [
+        "netlify-token"
+      ],
+      "reason": "differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+    },
+    {
+      "provider": "new-relic",
+      "family": "new-relic:license-key",
+      "familyName": "License key",
+      "status": "provisional",
+      "evidenceTier": "T2",
+      "providerSource": null,
+      "corroboratingScanners": [
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 9,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 0,
+        "differential": 3
+      },
+      "detectors": [
         "new-relic-license-key"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | differential.unresolvedContractDisagreements: 3 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": "new-relic",
@@ -1244,22 +1530,19 @@
         "trufflehog 3.97.4"
       ],
       "twinCoverage": {
-        "pairs": 0,
+        "pairs": 11,
         "failures": 0,
-        "unprobeable": {
-          "reason": "docs.newrelic.com/docs/apis/intro-apis/new-relic-api-keys states no user-key prefix, length or alphabet. The NRAK- prefix is known only from a Terraform migration guide and the pinned tools.",
-          "observedAt": "2026-09-20"
-        }
+        "unprobeable": null
       },
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 3
+        "differential": 0
       },
       "detectors": [
         "new-relic-user-api-key"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | differential.unresolvedContractDisagreements: 3 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts."
     },
     {
       "provider": "notion",
@@ -1292,12 +1575,12 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 6
+        "differential": 0
       },
       "detectors": [
         "notion-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret."
     },
     {
       "provider": "npm",
@@ -1344,6 +1627,32 @@
       "reason": "npm-token's own provider source is the changelog announcing the npm_ prefix scheme as a replacement, implying the prior UUID-format token predates it; that legacy shape is not matched by the npm_-prefixed pattern. Provider source: https://github.blog/changelog/2021-09-23-npm-has-a-new-access-token-format/."
     },
     {
+      "provider": "okta",
+      "family": "okta:api-token",
+      "familyName": "Management API token (SSWS)",
+      "status": "provisional",
+      "evidenceTier": "T2",
+      "providerSource": null,
+      "corroboratingScanners": [
+        "gitleaks 8.30.1",
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 9,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 0,
+        "differential": 9
+      },
+      "detectors": [
+        "okta-api-token"
+      ],
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | differential.unresolvedContractDisagreements: 9 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+    },
+    {
       "provider": "openai",
       "family": "openai:secret-api-key",
       "familyName": "Secret API key",
@@ -1362,18 +1671,44 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 18
+        "differential": 0
       },
       "detectors": [
         "openai-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | benign.minimumAxes: 1 < 3 (axes present: near-miss) — A bare case count is satisfied by five copies of the same near-miss and proves nothing about diversity. Staged at 2 immediately after #91 merged (the minimum then met by every family reading stable: gitlab-token, npm-token), per docs/decisions/2026-09-21-measure-benign-axis-diversity.md's ratchet plan. Raised to 3 once #93 (#90's part A3) authored the missing placeholder/reference axes for the 23 families that previously carried only a same-axis near-miss pair, plus one reference control each for gitlab-token and npm-token so the ratchet lands with zero regressions; measured via `npm run eval:classify` immediately before this value changed. | differential.unresolvedContractDisagreements: 18 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts."
+    },
+    {
+      "provider": "postman",
+      "family": "postman:api-key",
+      "familyName": "API key",
+      "status": "provisional",
+      "evidenceTier": "T2",
+      "providerSource": null,
+      "corroboratingScanners": [
+        "gitleaks 8.30.1",
+        "trufflehog 3.97.4"
+      ],
+      "twinCoverage": {
+        "pairs": 9,
+        "failures": 0,
+        "unprobeable": null
+      },
+      "unresolvedCriticalItems": {
+        "metamorphic": 0,
+        "mutation": 0,
+        "differential": 0
+      },
+      "detectors": [
+        "postman-api-key"
+      ],
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts."
     },
     {
       "provider": "pulumi",
       "family": "pulumi:organization-access-token",
       "familyName": "Organization access token",
-      "status": "provisional",
+      "status": "stable",
       "evidenceTier": "T1",
       "providerSource": {
         "url": "https://www.pulumi.com/docs/reference/cloud-rest-api/access-tokens/",
@@ -1393,18 +1728,18 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 1
+        "differential": 0
       },
       "detectors": [
         "pulumi-access-token"
       ],
-      "reason": "differential.unresolvedContractDisagreements: 1 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": null
     },
     {
       "provider": "pulumi",
       "family": "pulumi:personal-access-token",
       "familyName": "Personal access token",
-      "status": "provisional",
+      "status": "stable",
       "evidenceTier": "T1",
       "providerSource": {
         "url": "https://www.pulumi.com/docs/reference/cloud-rest-api/access-tokens/",
@@ -1424,18 +1759,18 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 1
+        "differential": 0
       },
       "detectors": [
         "pulumi-access-token"
       ],
-      "reason": "differential.unresolvedContractDisagreements: 1 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": null
     },
     {
       "provider": "pulumi",
       "family": "pulumi:team-access-token",
       "familyName": "Team access token",
-      "status": "provisional",
+      "status": "stable",
       "evidenceTier": "T1",
       "providerSource": {
         "url": "https://www.pulumi.com/docs/reference/cloud-rest-api/access-tokens/",
@@ -1455,18 +1790,18 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 1
+        "differential": 0
       },
       "detectors": [
         "pulumi-access-token"
       ],
-      "reason": "differential.unresolvedContractDisagreements: 1 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": null
     },
     {
       "provider": "pypi",
       "family": "pypi:api-token",
       "familyName": "API token",
-      "status": "provisional",
+      "status": "stable",
       "evidenceTier": "T1",
       "providerSource": {
         "url": "https://docs.pypi.org/api/secrets/",
@@ -1486,12 +1821,12 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 4
+        "differential": 0
       },
       "detectors": [
         "pypi-token"
       ],
-      "reason": "differential.unresolvedContractDisagreements: 4 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": null
     },
     {
       "provider": "sendgrid",
@@ -1539,19 +1874,19 @@
         "pairs": 0,
         "failures": 0,
         "unprobeable": {
-          "reason": "docs.sentry.io/account/auth-tokens states no prefix, length, alphabet or payload structure for organization auth tokens.",
-          "observedAt": "2026-09-20"
+          "reason": "Re-checked 2026-09-22 (redact-secret#658): no Sentry domain states the format. Sentry's merged RFC 0091 (getsentry/rfcs) documents the sntrys_ prefix and PREFIX_FACTS_SECRET structure, but is hosted on github.com; whether that meets the provider-source bar is an open maintainer decision.",
+          "observedAt": "2026-09-22"
         }
       },
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 6
+        "differential": 0
       },
       "detectors": [
         "sentry-org-auth-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret."
     },
     {
       "provider": "sentry",
@@ -1567,8 +1902,8 @@
         "pairs": 0,
         "failures": 0,
         "unprobeable": {
-          "reason": "docs.sentry.io/account/auth-tokens states no prefix, length, alphabet or payload structure for user auth tokens.",
-          "observedAt": "2026-09-20"
+          "reason": "Re-checked 2026-09-22 (redact-secret#659): no Sentry domain states the format. The sntryu_ prefix appears in sentry-cli's CHANGELOG and Sentry's source on github.com; whether that meets the provider-source bar is an open maintainer decision.",
+          "observedAt": "2026-09-22"
         }
       },
       "unresolvedCriticalItems": {
@@ -1585,7 +1920,7 @@
       "provider": "shopify",
       "family": "shopify:custom-app-access-token",
       "familyName": "Custom app access token",
-      "status": "provisional",
+      "status": "stable",
       "evidenceTier": "T1",
       "providerSource": {
         "url": "https://shopify.dev/docs/apps/build/authentication-authorization/access-tokens",
@@ -1605,18 +1940,18 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 6
+        "differential": 0
       },
       "detectors": [
         "shopify-token"
       ],
-      "reason": "differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": null
     },
     {
       "provider": "shopify",
       "family": "shopify:public-app-access-token",
       "familyName": "Public app access token",
-      "status": "provisional",
+      "status": "stable",
       "evidenceTier": "T1",
       "providerSource": {
         "url": "https://shopify.dev/docs/apps/build/authentication-authorization/access-tokens",
@@ -1636,12 +1971,12 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 6
+        "differential": 0
       },
       "detectors": [
         "shopify-token"
       ],
-      "reason": "differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": null
     },
     {
       "provider": "slack",
@@ -1660,7 +1995,7 @@
       "provider": "slack",
       "family": "slack:bot-token",
       "familyName": "Bot token",
-      "status": "provisional",
+      "status": "stable",
       "evidenceTier": "T1",
       "providerSource": {
         "url": "https://docs.slack.dev/authentication/tokens",
@@ -1680,12 +2015,12 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 30
+        "differential": 0
       },
       "detectors": [
         "slack-token"
       ],
-      "reason": "benign.minimumAxes: 2 < 3 (axes present: near-miss, placeholder) — A bare case count is satisfied by five copies of the same near-miss and proves nothing about diversity. Staged at 2 immediately after #91 merged (the minimum then met by every family reading stable: gitlab-token, npm-token), per docs/decisions/2026-09-21-measure-benign-axis-diversity.md's ratchet plan. Raised to 3 once #93 (#90's part A3) authored the missing placeholder/reference axes for the 23 families that previously carried only a same-axis near-miss pair, plus one reference control each for gitlab-token and npm-token so the ratchet lands with zero regressions; measured via `npm run eval:classify` immediately before this value changed. | differential.unresolvedContractDisagreements: 30 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": null
     },
     {
       "provider": "slack",
@@ -1730,7 +2065,7 @@
       "provider": "stripe",
       "family": "stripe:restricted-key-live",
       "familyName": "Live restricted key",
-      "status": "provisional",
+      "status": "stable",
       "evidenceTier": "T1",
       "providerSource": {
         "url": "https://docs.stripe.com/keys",
@@ -1750,18 +2085,18 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 18
+        "differential": 0
       },
       "detectors": [
         "stripe-token"
       ],
-      "reason": "differential.unresolvedContractDisagreements: 18 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": null
     },
     {
       "provider": "stripe",
       "family": "stripe:restricted-key-test",
       "familyName": "Test restricted key",
-      "status": "provisional",
+      "status": "stable",
       "evidenceTier": "T1",
       "providerSource": {
         "url": "https://docs.stripe.com/keys",
@@ -1781,18 +2116,18 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 18
+        "differential": 0
       },
       "detectors": [
         "stripe-token"
       ],
-      "reason": "differential.unresolvedContractDisagreements: 18 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": null
     },
     {
       "provider": "stripe",
       "family": "stripe:secret-key-live",
       "familyName": "Live secret key",
-      "status": "provisional",
+      "status": "stable",
       "evidenceTier": "T1",
       "providerSource": {
         "url": "https://docs.stripe.com/keys",
@@ -1812,18 +2147,18 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 18
+        "differential": 0
       },
       "detectors": [
         "stripe-token"
       ],
-      "reason": "differential.unresolvedContractDisagreements: 18 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": null
     },
     {
       "provider": "stripe",
       "family": "stripe:secret-key-test",
       "familyName": "Test secret key",
-      "status": "provisional",
+      "status": "stable",
       "evidenceTier": "T1",
       "providerSource": {
         "url": "https://docs.stripe.com/keys",
@@ -1843,12 +2178,12 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 18
+        "differential": 0
       },
       "detectors": [
         "stripe-token"
       ],
-      "reason": "differential.unresolvedContractDisagreements: 18 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": null
     },
     {
       "provider": "stripe",
@@ -1867,7 +2202,7 @@
       "provider": "supabase",
       "family": "supabase:personal-access-token",
       "familyName": "Personal access token",
-      "status": "provisional",
+      "status": "stable",
       "evidenceTier": "T1",
       "providerSource": {
         "url": "https://supabase.com/docs/guides/platform/personal-access-tokens",
@@ -1886,12 +2221,12 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 9
+        "differential": 0
       },
       "detectors": [
         "supabase-management-token"
       ],
-      "reason": "differential.unresolvedContractDisagreements: 9 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": null
     },
     {
       "provider": "supabase",
@@ -1914,7 +2249,7 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 6
+        "differential": 0
       },
       "detectors": [
         "supabase-token"
@@ -1935,19 +2270,19 @@
         "pairs": 0,
         "failures": 0,
         "unprobeable": {
-          "reason": "core.telegram.org/bots/api says the token \"looks something like\" one example and states no digit count, separator rule, length or alphabet. An example is not a grammar.",
-          "observedAt": "2026-09-20"
+          "reason": "Re-checked 2026-09-22 (redact-secret#660, exhaustive): core.telegram.org gives example tokens only. The Bot API server's acceptance check (tdlib/telegram-bot-api) is code on github.com, not documentation.",
+          "observedAt": "2026-09-22"
         }
       },
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 6
+        "differential": 0
       },
       "detectors": [
         "telegram-bot-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret."
     },
     {
       "provider": "twilio",
@@ -1963,19 +2298,19 @@
         "pairs": 0,
         "failures": 0,
         "unprobeable": {
-          "reason": "twilio.com/docs/iam/api-keys states no length or alphabet for the API key secret or its SID. The 32-character shape is tool-corroborated only.",
-          "observedAt": "2026-09-20"
+          "reason": "Re-checked 2026-09-22 (redact-secret#661, exhaustive): Twilio types the secret as a bare string everywhere; only the companion SK SID has a documented pattern, and a companion is not the secret.",
+          "observedAt": "2026-09-22"
         }
       },
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 6
+        "differential": 0
       },
       "detectors": [
         "twilio-api-key-secret"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret."
     },
     {
       "provider": "twilio",
@@ -1991,19 +2326,19 @@
         "pairs": 0,
         "failures": 0,
         "unprobeable": {
-          "reason": "twilio.com/docs/iam/credentials/api states no length or alphabet for the Auth Token or the Account SID. The 32-hex shape is tool-corroborated only.",
-          "observedAt": "2026-09-20"
+          "reason": "Re-checked 2026-09-22 (redact-secret#662): no twilio.com page states a length or alphabet. twilio-cli's \"must be 32 characters\" check is provider code on github.com, which this project has not yet accepted as documentation.",
+          "observedAt": "2026-09-22"
         }
       },
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 6
+        "differential": 0
       },
       "detectors": [
         "twilio-auth-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret."
     },
     {
       "provider": "vercel",
@@ -2019,14 +2354,14 @@
         "pairs": 0,
         "failures": 0,
         "unprobeable": {
-          "reason": "The positive is T0 pending. Vercel documents the prefixes as scanning markers but states the body is intentionally opaque, so no lexical grammar exists to mutate; deferred to redact-secret#516.",
+          "reason": "The positive is T0 pending. Vercel documents the prefixes as scanning markers but states the body is intentionally opaque, so no lexical grammar exists to mutate; deferred until a shipped scanner rule or Vercel's own documentation states one body length/alphabet rule in prose.",
           "observedAt": "2026-09-20"
         }
       },
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 30
+        "differential": 0
       },
       "detectors": [
         "vercel-token"

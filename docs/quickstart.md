@@ -20,7 +20,7 @@ Requires Node.js 20, 22, or 24. In an empty directory:
 ```sh qualify=node:setup
 npm init -y
 npm pkg set type=module
-npm install @redact-secret/core@0.1.0-beta.6
+npm install @redact-secret/core@0.1.0-beta.7
 ```
 
 Save this as `quickstart.mjs`:
@@ -44,7 +44,7 @@ node quickstart.mjs
 Expected output:
 
 ```text qualify=node:expect
-redact-secret 0.1.0-beta.6 loaded addon
+redact-secret 0.1.0-beta.7 loaded addon
 API_KEY=<SECRET_1>
 findings: 1
 ```
@@ -62,7 +62,7 @@ Requires CPython 3.10 or newer on a platform with a published wheel (see
 
 ```sh qualify=python:setup
 python3 -m venv .venv
-.venv/bin/python -m pip install --only-binary=:all: redact-secret==0.1.0b6
+.venv/bin/python -m pip install --only-binary=:all: redact-secret==0.1.0b7
 ```
 
 `--only-binary=:all:` makes an unsupported platform fail during install
@@ -86,7 +86,7 @@ Run it:
 Expected output:
 
 ```text qualify=python:expect
-redact-secret 0.1.0-beta.6
+redact-secret 0.1.0-beta.7
 API_KEY=<SECRET_1>
 findings: 1
 ```
@@ -99,7 +99,7 @@ conditions and emits the WebAssembly asset. In an empty directory:
 ```sh qualify=browser:setup
 npm init -y
 npm pkg set type=module
-npm install @redact-secret/core@0.1.0-beta.6 vite@7.3.6
+npm install @redact-secret/core@0.1.0-beta.7 vite@7.3.6
 ```
 
 Save this as `index.html`:
@@ -146,7 +146,7 @@ npx vite preview --port 4173 --strictPort
 Expected page text:
 
 ```text qualify=browser:expect
-redact-secret 0.1.0-beta.6 loaded wasm
+redact-secret 0.1.0-beta.7 loaded wasm
 API_KEY=<SECRET_1>
 findings: 1
 ```
