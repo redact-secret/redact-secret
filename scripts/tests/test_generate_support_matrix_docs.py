@@ -22,14 +22,14 @@ SCHEMA = {
 }
 
 
-def family(provider, family_id, name, status, *, reason=None, tier="T1", detectors=("widget-token",)):
+def family(provider, family_id, name, status, *, reason=None, tier="T1", detectors=("widget-token",), provider_source=None):
     return {
         "provider": provider,
         "family": family_id,
         "familyName": name,
         "status": status,
         "evidenceTier": tier if status != "unsupported" else None,
-        "providerSource": None,
+        "providerSource": provider_source,
         "corroboratingScanners": [],
         "twinCoverage": None,
         "unresolvedCriticalItems": None,
@@ -148,6 +148,56 @@ class RenderMatrixMarkdownTests(unittest.TestCase):
         m = matrix([family("widget", "widget:token", "Widget token", "stable")])
         self.assertEqual(GEN.render_matrix_markdown(m), GEN.render_matrix_markdown(m))
 
+    def test_stable_copy_states_it_is_not_exhaustive(self) -> None:
+        # Issue #589 acceptance criterion: stable must not read as "every
+        # variant, forever" -- historical and future variants are explicitly
+        # out of scope for the claim.
+        m = matrix([family("widget", "widget:token", "Widget token", "stable")])
+        text = GEN.render_matrix_markdown(m)
+        self.assertIn("does not mean every historical or future variant", text)
+
+    def test_links_to_the_measurement_protocol_without_requiring_it_first(self) -> None:
+        # Issue #589 acceptance criterion: the guide links to the detailed
+        # protocol but says a reader need not read it first.
+        m = matrix([family("widget", "widget:token", "Widget token", "stable")])
+        text = GEN.render_matrix_markdown(m)
+        self.assertIn(
+            "https://github.com/redact-secret/redact-secret-benchmarks/blob/"
+            f"{m['sourceReport']['revision']}/docs/support-status.md",
+            text,
+        )
+        self.assertIn("You do not need to read it", text)
+
+    def test_stable_family_exposes_supported_contexts_and_limitations(self) -> None:
+        # Issue #589 acceptance criterion: a stable family's supported
+        # contexts and known limitations are shown where evidence provides
+        # them, drawn from its providerSource.covers rather than `reason`
+        # (which is always null for `stable`).
+        m = matrix(
+            [
+                family(
+                    "widget",
+                    "widget:token",
+                    "Widget token",
+                    "stable",
+                    provider_source={
+                        "url": "https://example.invalid/docs",
+                        "observedAt": "2026-09-01",
+                        "formatVersion": "1",
+                        "covers": "wgt_ prefix; the 8-character suffix variant is not covered",
+                    },
+                )
+            ]
+        )
+        text = GEN.render_matrix_markdown(m)
+        self.assertIn("Supported contexts & known limitations", text)
+        self.assertIn("wgt_ prefix; the 8-character suffix variant is not covered", text)
+
+    def test_stable_family_with_no_provider_source_falls_back(self) -> None:
+        m = matrix([family("widget", "widget:token", "Widget token", "stable", provider_source=None)])
+        text = GEN.render_matrix_markdown(m)
+        self.assertIn("not recorded in the pinned evidence", text)
+
 
 class ReadmeFragmentTests(unittest.TestCase):
     def test_injects_between_markers(self) -> None:
@@ -175,6 +225,37 @@ class ReleaseNoteTests(unittest.TestCase):
         previous = matrix([family("widget", "widget:token", "Widget token", "stable")])
         text = GEN.render_release_note(current, previous)
         self.assertIn("`widget:token`: stable -> provisional", text)
+
+    def test_reports_the_stable_delta(self) -> None:
+        # Issue #589 acceptance criterion: release notes show a measured
+        # stable delta, not just the raw counts.
+        current = matrix(
+            [
+                family("widget", "widget:token", "Widget token", "stable"),
+                family("gadget", "gadget:token", "Gadget token", "stable"),
+            ]
+        )
+        previous = matrix([family("widget", "widget:token", "Widget token", "stable")])
+        text = GEN.render_release_note(current, previous)
+        self.assertIn("Stable: 2 (+1 from 1).", text)
+
+    def test_a_family_leaving_stable_is_tagged_a_regression(self) -> None:
+        current = matrix([family("widget", "widget:token", "Widget token", "provisional", reason="tool-corroborated only")])
+        previous = matrix([family("widget", "widget:token", "Widget token", "stable")])
+        text = GEN.render_release_note(current, previous)
+        self.assertIn("`widget:token`: stable -> provisional (regression)", text)
+
+    def test_a_family_reaching_stable_is_tagged_an_improvement(self) -> None:
+        current = matrix([family("widget", "widget:token", "Widget token", "stable")])
+        previous = matrix([family("widget", "widget:token", "Widget token", "provisional", reason="tool-corroborated only")])
+        text = GEN.render_release_note(current, previous)
+        self.assertIn("`widget:token`: provisional -> stable (improvement)", text)
+
+    def test_a_move_between_non_stable_statuses_is_untagged(self) -> None:
+        current = matrix([family("widget", "widget:token", "Widget token", "pending", reason="no positive contract yet")])
+        previous = matrix([family("widget", "widget:token", "Widget token", "provisional", reason="tool-corroborated only")])
+        text = GEN.render_release_note(current, previous)
+        self.assertIn("`widget:token`: provisional -> pending\n", text)
 
     def test_reports_no_movement(self) -> None:
         current = matrix([family("widget", "widget:token", "Widget token", "stable")])

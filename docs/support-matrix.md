@@ -11,11 +11,13 @@ python3 -B scripts/generate-support-matrix-docs.py
 
 34 providers, 79 credential families.
 
+For the detailed measurement protocol behind these statuses -- evidence tiers, and the twin, benign, metamorphic, mutation, and differential criteria a family must clear -- see `redact-secret-benchmarks`'s [support-status specification](https://github.com/redact-secret/redact-secret-benchmarks/blob/a502fdd715c5a5882430e951d5493de32fe8621c/docs/support-status.md). You do not need to read it to use this table.
+
 ## What each status means
 
 ### `stable` (3)
 
-Officially supported. Provider-documented (T1) contract, negative twins, benign controls, metamorphic and mutation evidence, with no unresolved critical disagreement. You can rely on this family's detection and its precision behavior.
+Officially supported. Provider-documented (T1) contract, negative twins, benign controls, metamorphic and mutation evidence, with no unresolved critical disagreement. You can rely on this family's detection and its precision behavior. Stable does not mean every historical or future variant of this credential is detected -- see each family's supported contexts and known limitations below.
 
 ### `provisional` (58)
 
@@ -33,11 +35,11 @@ This project explicitly does not detect this credential family. The reason is st
 
 ### Stable
 
-| Provider | Family | Evidence tier | Detector(s) | Reason |
+| Provider | Family | Evidence tier | Detector(s) | Supported contexts & known limitations |
 | --- | --- | --- | --- | --- |
-| gitlab | Legacy personal access token | T1 | gitlab-token | — |
-| npm | Granular access token | T1 | npm-token | — |
-| sendgrid | API key | T1 | sendgrid-token | — |
+| gitlab | Legacy personal access token | T1 | gitlab-token | glpat- prefix; 20-character legacy body is tool-corroborated, routable tokens are not covered |
+| npm | Granular access token | T1 | npm-token | npm_ prefix, underscore delimiter and six-character Base62 CRC32 checksum; 36-character body is tool-corroborated |
+| sendgrid | API key | T1 | sendgrid-token | the total key is documented as always 69 characters and never shorter; the SG. prefix, the dot-separated id/secret segments, the 22/43 character split between them and the alphabet are tool-corroborated, not this citation |
 
 ### Provisional
 
