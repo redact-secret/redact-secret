@@ -37,5 +37,6 @@ paths have different construct limits. See [coverage](reference/detection.md)
 and [streaming](guides/streaming.md) before treating these as inconsistencies.
 
 Report a minimal synthetic or revoked reproducer with runtime/version and safe
-expected metadata. Use the [private security process](../SECURITY.md) for
-vulnerabilities. Never paste an active secret into a public issue.
+expected metadata, following the [reporting guide](guides/reporting-detection-issues.md).
+Use the [private security process](../SECURITY.md) for vulnerabilities. Never
+paste an active secret into a public issue.

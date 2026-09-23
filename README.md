@@ -385,7 +385,8 @@ artifact qualification commands and the repository layout; the
 
 See [SECURITY.md](./SECURITY.md) for private vulnerability reporting and the
 security model. Never submit active credentials in a report, issue, fixture,
-snapshot, log, or diagnostic.
+snapshot, log, or diagnostic. For a false positive or missed detection, use
+the [reporting guide](docs/guides/reporting-detection-issues.md) instead.
 
 Releases follow the [release authority](AGENTS.md#release-authority) and the
 [release runbook](docs/releasing.md); see the [changelog](./CHANGELOG.md).
