@@ -42,7 +42,12 @@
 
 import { buildBlockedResult, redactArguments, redactToolResult } from "./redact-tool-call.mjs";
 
-function emitFindings(findings, onFinding, scope) {
+/** Reported for every finding, including on a blocked outcome, as exactly
+ * the safe metadata `scanAndRedact` already returns — never the input or a
+ * matched value. A throwing `onFinding` is swallowed and never influences
+ * the redaction outcome. Exported so `agent-context.mjs` shares this one
+ * implementation instead of a second copy in the same directory. */
+export function emitFindings(findings, onFinding, scope) {
   if (typeof onFinding !== "function") return;
   for (const finding of findings) {
     try {

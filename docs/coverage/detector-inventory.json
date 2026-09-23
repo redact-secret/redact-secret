@@ -402,6 +402,13 @@
       "schemes": null
     },
     {
+      "type": "databricks_personal_access_token",
+      "detector": "databricks-personal-access-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "dapi0123456789abcdef0123456789abcdef",
+      "schemes": null
+    },
+    {
       "type": "netlify_personal_access_token",
       "detector": "netlify-token",
       "policyClass": "always-redact",

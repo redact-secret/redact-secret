@@ -15,11 +15,11 @@ These counts describe finding-type inventory rows with corpus evidence, not dete
 
 | Row state | Count |
 | --- | --- |
-| supported | 54 |
+| supported | 55 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 65.
+Coverage declarations: 66.
 
 ## Coverage by detector
 
@@ -32,6 +32,7 @@ Coverage declarations: 65.
 | bearer-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | cloudflare-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | connection-string | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| databricks-personal-access-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | datadog-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | datadog-application-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | digitalocean-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -86,6 +87,7 @@ Coverage declarations: 65.
 | cloudflare_api_token | cloudflare-token | provider | supported | not-applicable | none |
 | connection_string_password | connection-string | structural | supported | supported | none |
 | contextual_secret | generic-token | contextual | supported | not-applicable | none |
+| databricks_personal_access_token | databricks-personal-access-token | provider | supported | not-applicable | none |
 | datadog_api_key | datadog-api-key | provider | supported | not-applicable | none |
 | datadog_application_key | datadog-application-key | provider | supported | not-applicable | none |
 | digitalocean_token | digitalocean-token | provider | supported | not-applicable | none |
@@ -156,15 +158,15 @@ Coverage declarations: 65.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 65 | 0 | 0 |
-| boundary | 54 | 0 | 0 |
-| host-context | 54 | 0 | 0 |
+| adversarial | 66 | 0 | 0 |
+| boundary | 55 | 0 | 0 |
+| host-context | 55 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 65 | 0 | 0 |
-| near-miss-negative | 54 | 0 | 0 |
-| overlap | 54 | 0 | 0 |
-| positive | 54 | 0 | 0 |
-| range | 65 | 0 | 0 |
+| malformed | 66 | 0 | 0 |
+| near-miss-negative | 55 | 0 | 0 |
+| overlap | 55 | 0 | 0 |
+| positive | 55 | 0 | 0 |
+| range | 66 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

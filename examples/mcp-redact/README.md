@@ -1,7 +1,19 @@
 # Redact secrets in MCP tool calls
 
-Middleware, in JavaScript and Python, that **redacts** secrets in MCP tool
-call arguments and results instead of rejecting the whole call (issue #327).
+A tested recipe, in JavaScript and Python — not a published or official
+adapter (see [Support level](#support-level)) — that **redacts** secrets in
+MCP tool call arguments and results instead of rejecting the whole call
+(issue #327), and composes that into the AI-context golden path a whole
+agent turn needs (issue #587):
+
+```
+user input -> scan -> application policy
+tool result -> scan -> context construction
+safe context -> model
+```
+
+[`agent-context.mjs`](./agent-context.mjs) / [`python/agent_context.py`](./python/agent_context.py)
+is this flow, end to end — see [The AI-context golden path](#the-ai-context-golden-path).
 Existing MCP protections block outright — Docker MCP Gateway's default
 `--block-secrets` rejects the whole tool call when any of its 88 regexes
 match (`pkg/interceptors/block_secrets.go`), and the ggshield AI hook blocks
@@ -37,7 +49,68 @@ version.
 | [`redact-tool-call.mjs`](./redact-tool-call.mjs) / [`python/redact_tool_call.py`](./python/redact_tool_call.py) | The shared primitive: redact a `CallToolResult`'s content blocks / `structuredContent`, or a tool call's argument object, mapping findings onto the issue's `redact`/`warn`/`block` policy contract. No `@modelcontextprotocol/sdk`/`mcp` import — `CallToolResult` is a plain, duck-typed shape, the same choice `examples/tracing-masking/redact-span-attributes.mjs` makes for OpenTelemetry's `SpanProcessor`. |
 | [`wrap-tool-call.mjs`](./wrap-tool-call.mjs) / [`python/wrap_tool_call.py`](./python/wrap_tool_call.py) | Server-side (`wrapServerToolHandler`/`wrap_server_tool_handler`) and client-side (`wrapClientCallTool`/`wrap_client_call_tool`) wrappers built on the primitive above, shaped to drop into a real `ToolCallback` / `on_call_tool` handler / `callTool`/`call_tool`. |
 | [`streaming-tool-result.mjs`](./streaming-tool-result.mjs) / [`python/streaming_tool_result.py`](./python/streaming_tool_result.py) | Redaction for a tool result assembled progressively (a handler piping a subprocess/file/HTTP response in chunks), built on `createIncrementalSanitizer`/`IncrementalSanitizer`. See [Streamed results](#streamed-or-progressive-results). |
+| [`agent-context.mjs`](./agent-context.mjs) / [`python/agent_context.py`](./python/agent_context.py) | The AI-context golden path (`buildSafeContext`/`build_safe_context`): composes the primitives above into the full turn — user input, then an optional tool call, then the assembled safe context. See [below](#the-ai-context-golden-path). |
 | [`demo.mjs`](./demo.mjs) / [`python/demo.py`](./python/demo.py) | Runnable, side-by-side: the same synthetic tool result through block-all vs. this middleware's redact behavior. |
+
+## The AI-context golden path
+
+```
+user input -> scan -> application policy
+tool result -> scan -> context construction
+safe context -> model
+```
+
+`buildSafeContext`/`build_safe_context` runs one whole agent turn through
+this flow and returns either the safe `context` to hand to the model, or a
+`blocked`/`aborted` outcome with no `context` field at all — there is no
+path that returns both a blocked reason and usable context:
+
+1. **User input → scan → application policy.** `userInput` is passed to
+   `redactUserInput`/`redact_user_input` (this file's own boundary helper,
+   built the same way `redactToolResult` is) before anything else happens.
+   A `block` finding ends the call immediately: no tool is dispatched, no
+   `context` is built, and `userInput` itself is never present in the
+   return value on any path — nothing in this module ever logs it either
+   (issue #587's "no example logs raw input before authoritative
+   scanning").
+2. **Tool result → scan → context construction.** When `callTool` is
+   supplied, it is dispatched from `buildToolRequest(safeInputText)` — the
+   *sanitized* input text, never the raw one, so a tool argument derived
+   from what the user typed only ever carries already-scanned text. The
+   result is scanned exactly like `wrapClientCallTool` scans it, before
+   being appended to `context.messages`.
+3. **Safe context → model.** The returned `context.messages` array is the
+   only value this function produces that is safe to forward to a model
+   call, a log line, or persistence; every other field to that point stays
+   local to the function.
+
+**All four policy actions**, demonstrated by `agent-context.test.mjs` /
+`test_agent_context.py`: `allow` (clean input, no findings), `redact` (a
+finding's span is replaced and the turn continues), `warn` (the finding is
+reported but the text is untouched), and `block` (the whole turn ends, at
+either the input or the tool stage, with no context built).
+
+**Edge cases, each with its own test**, per issue #587's requirement that
+none of them retain plaintext:
+
+- **Oversized input** is rejected by length alone — `redactUserInput`
+  checks `userInput.length` against `limits.maxInputLength` *before*
+  calling `scanAndRedact` at all, so an oversized message is never passed
+  to the scanner in the first place.
+- **Initialization failure** (calling this before `initialize()`) surfaces
+  as `scanAndRedact` throwing, which is caught the same way any other core
+  failure is — there is no separate "not initialized" branch to fall out
+  of sync with the core's own error.
+- **Callback failure**: a throwing `onFinding`/`on_finding` is swallowed
+  by the same `emitFindings`/`emit_findings` helper `wrap-tool-call.mjs`
+  uses, and never influences the outcome.
+- **Cancellation**: an already-aborted `signal`/already-set `cancel_event`
+  short-circuits before `scanAndRedact` is ever called.
+- **Abort**: `signal`/`cancel_event` is checked again before the tool is
+  dispatched and again before its (already-sanitized) result is folded
+  into context, so a signal firing mid-flight still discards everything —
+  including text that was already safe — the same fail-closed property
+  `streaming-tool-result.mjs` documents for a declared-limit failure.
 
 ## Policy mapping
 

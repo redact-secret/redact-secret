@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 1462,
+  "fixtureCount": 1493,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -32115,6 +32115,548 @@
         }
       ],
       "note": "CRLF line endings and a multi-byte Unicode prefix shift only the byte offsets; the match itself is unaffected."
+    },
+    {
+      "id": "databricks-personal-access-token-positive-bare",
+      "detector": "databricks-personal-access-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "dapi0123456789abcdef0123456789abcdef",
+      "expected": [
+        {
+          "detector": "databricks-personal-access-token",
+          "type": "databricks_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 36
+        }
+      ],
+      "note": "The documented dapi prefix plus exactly 32 lowercase hex bytes is sufficient on its own; no surrounding context is required."
+    },
+    {
+      "id": "databricks-personal-access-token-positive-dotenv",
+      "detector": "databricks-personal-access-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "DATABRICKS_TOKEN=dapi0123456789abcdef0123456789abcdef",
+      "expected": [
+        {
+          "detector": "databricks-personal-access-token",
+          "type": "databricks_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 17,
+          "end": 53
+        }
+      ],
+      "note": "A bare dotenv-style assignment (KEY=<token>, no quotes) is detected by format alone."
+    },
+    {
+      "id": "databricks-personal-access-token-positive-json",
+      "detector": "databricks-personal-access-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\n  \"host\": \"https://my-workspace.cloud.databricks.com\",\n  \"token\": \"dapi0123456789abcdef0123456789abcdef\"\n}\n",
+      "expected": [
+        {
+          "detector": "databricks-personal-access-token",
+          "type": "databricks_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 69,
+          "end": 105
+        }
+      ],
+      "note": "A leaked CI secrets-style JSON blob storing a Databricks host and token in plain text is detected by format alone."
+    },
+    {
+      "id": "databricks-personal-access-token-positive-yaml",
+      "detector": "databricks-personal-access-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "databricks:\n  host: https://my-workspace.cloud.databricks.com\n  token: dapi0123456789abcdef0123456789abcdef\n",
+      "expected": [
+        {
+          "detector": "databricks-personal-access-token",
+          "type": "databricks_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 71,
+          "end": 107
+        }
+      ],
+      "note": "A YAML-style configuration mapping a host to a literal token is detected by format alone."
+    },
+    {
+      "id": "databricks-personal-access-token-positive-python-source",
+      "detector": "databricks-personal-access-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "python"
+      ],
+      "input": "DATABRICKS_TOKEN = \"dapi0123456789abcdef0123456789abcdef\"  # noqa: hardcoded for local testing only\n",
+      "expected": [
+        {
+          "detector": "databricks-personal-access-token",
+          "type": "databricks_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 20,
+          "end": 56
+        }
+      ],
+      "note": "A hardcoded token assigned to a Python source-level constant retains exact original-input offsets."
+    },
+    {
+      "id": "databricks-personal-access-token-positive-github-actions",
+      "detector": "databricks-personal-access-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "github-actions"
+      ],
+      "input": "env:\n  DATABRICKS_TOKEN: dapi0123456789abcdef0123456789abcdef\n",
+      "expected": [
+        {
+          "detector": "databricks-personal-access-token",
+          "type": "databricks_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 61
+        }
+      ],
+      "note": "Host syntax is lexical context; a hardcoded token in CI configuration (rather than a secrets: reference) retains exact original-input offsets."
+    },
+    {
+      "id": "databricks-personal-access-token-positive-log",
+      "detector": "databricks-personal-access-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-22T12:00:00Z INFO  using databricks personal access token dapi0123456789abcdef0123456789abcdef for job submission\n",
+      "expected": [
+        {
+          "detector": "databricks-personal-access-token",
+          "type": "databricks_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 66,
+          "end": 102
+        }
+      ],
+      "note": "A token embedded in an ordinary log line is bounded by whitespace on both sides."
+    },
+    {
+      "id": "databricks-personal-access-token-positive-shell-quoted",
+      "detector": "databricks-personal-access-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export DATABRICKS_TOKEN=\"dapi0123456789abcdef0123456789abcdef\"\n",
+      "expected": [
+        {
+          "detector": "databricks-personal-access-token",
+          "type": "databricks_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 61
+        }
+      ],
+      "note": "A quoted shell export still bounds the token to exactly its own bytes."
+    },
+    {
+      "id": "databricks-personal-access-token-positive-punctuation-adjacent",
+      "detector": "databricks-personal-access-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "(dapi0123456789abcdef0123456789abcdef).",
+      "expected": [
+        {
+          "detector": "databricks-personal-access-token",
+          "type": "databricks_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1,
+          "end": 37
+        }
+      ],
+      "note": "Surrounding parenthesis and prose punctuation bound the match without joining it."
+    },
+    {
+      "id": "databricks-personal-access-token-positive-crlf-unicode-prefix",
+      "detector": "databricks-personal-access-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 reviewed format\r\ndapi0123456789abcdef0123456789abcdef\n\r\n",
+      "expected": [
+        {
+          "detector": "databricks-personal-access-token",
+          "type": "databricks_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 24,
+          "end": 60
+        }
+      ],
+      "note": "A multi-byte Unicode prefix and CRLF line endings do not shift the reported UTF-8 byte offsets away from the token's own bytes."
+    },
+    {
+      "id": "databricks-personal-access-token-positive-repeated-value",
+      "detector": "databricks-personal-access-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "dapi0123456789abcdef0123456789abcdef dapi0123456789abcdef0123456789abcdef",
+      "expected": [
+        {
+          "detector": "databricks-personal-access-token",
+          "type": "databricks_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 36
+        },
+        {
+          "detector": "databricks-personal-access-token",
+          "type": "databricks_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 37,
+          "end": 73
+        }
+      ],
+      "note": "An identical value repeated in the same input is reported once per independent occurrence, not deduplicated. Tiered contextual, not canonical, since the CLI's canonical-redact conformance test requires exactly one expectation per canonical-tier fixture (the same fix issue #522's own repeated-value fixture needed)."
+    },
+    {
+      "id": "databricks-personal-access-token-positive-rotated-suffix",
+      "detector": "databricks-personal-access-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "dapi0123456789abcdef0123456789abcdef-2",
+      "expected": [
+        {
+          "detector": "databricks-personal-access-token",
+          "type": "databricks_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 38
+        }
+      ],
+      "note": "A token-rotation suffix (a literal dash and a single digit, corroborated by both gitleaks and trufflehog) is matched as part of the same token."
+    },
+    {
+      "id": "databricks-personal-access-token-positive-rotated-dotenv",
+      "detector": "databricks-personal-access-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "DATABRICKS_TOKEN=dapi0123456789abcdef0123456789abcdef-2",
+      "expected": [
+        {
+          "detector": "databricks-personal-access-token",
+          "type": "databricks_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 17,
+          "end": 55
+        }
+      ],
+      "note": "A rotated token in a dotenv-style assignment is matched in full, including its rotation suffix."
+    },
+    {
+      "id": "databricks-personal-access-token-boundary-one-short",
+      "detector": "databricks-personal-access-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "dapi0123456789abcdef0123456789abcde",
+      "expected": [],
+      "note": "A 31-byte body -- one byte short of the tool-corroborated 32-byte length -- is an intentional false negative, not a fuzzy match against a minimum."
+    },
+    {
+      "id": "databricks-personal-access-token-boundary-one-long",
+      "detector": "databricks-personal-access-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "dapi0123456789abcdef0123456789abcdef0",
+      "expected": [],
+      "note": "A 33-byte body with no rotation dash -- one byte past the documented length -- is not misread as the exact shape followed by a trailing byte."
+    },
+    {
+      "id": "databricks-personal-access-token-boundary-invalid-alphabet",
+      "detector": "databricks-personal-access-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "dapiD123456789abcdef0123456789abcdef",
+      "expected": [],
+      "note": "Both corroborating tools (gitleaks, trufflehog) pin the body to lowercase hex only; an uppercase hex digit inside an otherwise documented-length body is rejected."
+    },
+    {
+      "id": "databricks-personal-access-token-boundary-rotation-separator",
+      "detector": "databricks-personal-access-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "dapi0123456789abcdef0123456789abcdef_2",
+      "expected": [],
+      "note": "An underscore in place of the documented rotation-suffix hyphen is an undocumented near-miss shape, a false negative by design."
+    },
+    {
+      "id": "databricks-personal-access-token-boundary-rotation-multi-digit",
+      "detector": "databricks-personal-access-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "dapi0123456789abcdef0123456789abcdef-22",
+      "expected": [],
+      "note": "Both tools model the rotation suffix as exactly one digit; a two-digit suffix is an intentional false negative rather than a match on the first digit alone."
+    },
+    {
+      "id": "databricks-personal-access-token-boundary-rotation-non-digit",
+      "detector": "databricks-personal-access-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "dapi0123456789abcdef0123456789abcdef-a",
+      "expected": [],
+      "note": "A hex letter after the rotation dash is not an ASCII digit; both tools require a digit specifically, so this is rejected."
+    },
+    {
+      "id": "databricks-personal-access-token-boundary-encoded-prefix",
+      "detector": "databricks-personal-access-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "dap%690123456789abcdef0123456789abcdef",
+      "expected": [],
+      "note": "A percent-encoded delimiter lookalike (%69 for the literal i) does not satisfy the documented literal prefix."
+    },
+    {
+      "id": "databricks-personal-access-token-negative-wrong-prefix-case",
+      "detector": "databricks-personal-access-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "DAPI0123456789abcdef0123456789abcdef",
+      "expected": [],
+      "note": "An uppercase-cased prefix is an undocumented near-miss, a false negative by design rather than a case-insensitive match."
+    },
+    {
+      "id": "databricks-personal-access-token-negative-embedded-identifier",
+      "detector": "databricks-personal-access-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "legacydapi0123456789abcdef0123456789abcdef",
+      "expected": [],
+      "note": "The documented prefix embedded inside a wider identifier (a leading alnum/dash byte immediately before dapi) is a truncated slice of a longer identifier, not a boundary-delimited credential."
+    },
+    {
+      "id": "databricks-personal-access-token-negative-masked",
+      "detector": "databricks-personal-access-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "dapi********************************",
+      "expected": [],
+      "note": "A masked placeholder of the correct length carries no valid-alphabet bytes and stays unclassified."
+    },
+    {
+      "id": "databricks-personal-access-token-negative-doc-style-placeholder",
+      "detector": "databricks-personal-access-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "DATABRICKS_TOKEN=dapixxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "expected": [],
+      "note": "A documentation-style x-filled placeholder is not valid-alphabet hex and stays unclassified, the same benign-control treatment this registry's other exact-hex-body families already give a placeholder value."
+    },
+    {
+      "id": "databricks-personal-access-token-negative-workspace-host-url",
+      "detector": "databricks-personal-access-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "adb-1234567890123456.7.azuredatabricks.net",
+      "expected": [],
+      "note": "A Databricks workspace host URL carries no dapi-prefixed run and stays unclassified; workspace/host identifiers are explicitly out of scope (issue #308)."
+    },
+    {
+      "id": "databricks-personal-access-token-negative-config-file-no-token",
+      "detector": "databricks-personal-access-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "host = https://my-workspace.cloud.databricks.com\n",
+      "expected": [],
+      "note": "A .databrickscfg-style host line with no token value present carries no dapi-prefixed run."
+    },
+    {
+      "id": "databricks-personal-access-token-negative-cluster-and-job-ids",
+      "detector": "databricks-personal-access-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "cluster_id: 0921-150000-abcd1234\njob_id: 123456789012345\n",
+      "expected": [],
+      "note": "Cluster and job identifiers are explicitly out of scope (issue #308) and carry no dapi-prefixed run."
+    },
+    {
+      "id": "databricks-personal-access-token-negative-notebook-path",
+      "detector": "databricks-personal-access-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "/Workspace/Users/user@example.com/notebooks/etl_pipeline\n",
+      "expected": [],
+      "note": "A notebook path is explicitly out of scope (issue #308) and carries no dapi-prefixed run."
+    },
+    {
+      "id": "databricks-personal-access-token-negative-actions-secret-ref",
+      "detector": "databricks-personal-access-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "github-actions"
+      ],
+      "input": "env:\n  DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}\n",
+      "expected": [],
+      "note": "An encrypted secrets: reference (GitHub Actions' own recommended pattern) carries no dapi-prefixed run."
+    },
+    {
+      "id": "databricks-personal-access-token-overlap-context",
+      "detector": "databricks-personal-access-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "access_token=dapi0123456789abcdef0123456789abcdef",
+      "expected": [
+        {
+          "detector": "databricks-personal-access-token",
+          "type": "databricks_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 49
+        }
+      ],
+      "note": "Qualified provider evidence wins over a contextual assignment."
+    },
+    {
+      "id": "databricks-personal-access-token-adversarial-long-suffix",
+      "detector": "databricks-personal-access-token",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 10900,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      },
+      "input": "dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde dapi0123456789abcdef0123456789abcde ",
+      "expected": [],
+      "note": "A long run of near-miss dapi-prefixed bodies (each one byte short of the documented length) must not make the scan quadratic, and none matches."
     },
     {
       "id": "netlify-positive-qualified",

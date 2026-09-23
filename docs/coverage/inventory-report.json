@@ -2408,6 +2408,51 @@
       "type": "pulumi_access_token"
     },
     {
+      "detector": "databricks-personal-access-token",
+      "evidence": {
+        "fixtureCount": 31,
+        "hostContextsExercised": [
+          "dotenv",
+          "github-actions",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "databricks-personal-access-token-positive-bare",
+        "databricks-personal-access-token-positive-crlf-unicode-prefix",
+        "databricks-personal-access-token-positive-dotenv",
+        "databricks-personal-access-token-positive-github-actions",
+        "databricks-personal-access-token-positive-json",
+        "databricks-personal-access-token-positive-log",
+        "databricks-personal-access-token-positive-punctuation-adjacent",
+        "databricks-personal-access-token-positive-python-source",
+        "databricks-personal-access-token-positive-repeated-value",
+        "databricks-personal-access-token-positive-rotated-dotenv",
+        "databricks-personal-access-token-positive-rotated-suffix",
+        "databricks-personal-access-token-positive-shell-quoted",
+        "databricks-personal-access-token-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "databricks_personal_access_token"
+    },
+    {
       "detector": "netlify-token",
       "evidence": {
         "fixtureCount": 26,
@@ -2452,7 +2497,7 @@
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 54,
+    "supported": 55,
     "unresolved": 0
   }
 }
