@@ -15,6 +15,10 @@ export const DEFAULT_SERVER_LIMITS = Object.freeze({
   maxConcurrentRequests: 8,
 });
 
+// Declared independently of the browser side's default policy (browser.mjs
+// calls `scanAndRedact` with no `policy` option). It happens to mirror that
+// default today, but the server owns this declaration and can change it
+// without any client release — see README.md#client-and-server-policy-differences.
 export const serverPolicy = Object.freeze({
   evaluate(finding) {
     if (finding.type === "private_key") return "block";

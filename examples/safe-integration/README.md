@@ -47,7 +47,40 @@ limit names, and counts—never raw input, output, matched text, or an exception
 message. Warning metadata is safe to render, but warning text remains
 unredacted, so the example does not forward it. Transport bytes are bounded
 before decoding; decoded input, sanitized output, finding count, and concurrent
-requests are bounded before downstream use.
+requests are bounded before downstream use. `handle` never logs the raw
+`bodyBytes` it receives, and reaches `JSON.parse` before any logging call
+exists in this file—there is nothing here that could log a raw request body
+ahead of scanning.
+
+## Client and server policy differences
+
+`prepareBrowserSubmission` calls `scanAndRedact(content)` with no `policy`
+option, so it uses the library default. `createServerHandler` instead passes
+the explicit `serverPolicy` declared in [`integration.mjs`](./integration.mjs).
+The two happen to agree today—`serverPolicy` mirrors the default so that a
+`ready` browser submission and an `OK` server response usually describe the
+same decision, which keeps the UX predictable—but they are declared
+independently. The server owns its policy outright: it can change thresholds,
+add a stricter rule, or diverge from whatever the installed client bundle
+does, without coordinating a client release, because the server always
+recomputes its own decision from `request.content` rather than reading
+anything the client sent about its own findings.
+
+That independence is why the server never treats a client's decision as proof
+of enforcement. The request body carries only `content`—never the client's
+`findings`, `state`, or any other sanitized metadata—so `createServerHandler`
+has nothing from the client it could trust even if it wanted to. A client
+running stale code, a modified bundle, or no scanning at all changes nothing
+about what the server does: it scans the bytes it actually received under its
+own policy every time.
+
+Findings from both entry points carry `start`/`end` offsets into the original
+input the scan call was given—`content` for the browser, `request.content`
+for the server—never into the sanitized `text`. A UI or log line that slices
+the *sanitized* output with those offsets will read the wrong span; the
+qualification harness (`scripts/consumer-harness.mjs`) asserts this by
+slicing the original fixture with a returned finding's offsets and confirming
+that substring never appears in the forwarded or submitted sanitized output.
 
 The examples use the public `@redact-secret/core` API and do not implement a
 detector. [`integration.test.mjs`](./integration.test.mjs) deterministically
