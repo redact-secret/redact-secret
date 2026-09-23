@@ -504,10 +504,10 @@
       "rule_id": "sast.rules.javascript.lang.security.audit.prototype-pollution.prototype-pollution-assignment",
       "rationale": "`scenario[role] = ...` writes to a scenario object this file creates itself, and `role` is checked against the literal allowlist `setup`/`run`/`serve`/`expect` a few lines above, so the key can never be `__proto__`, `constructor`, or `prototype`. The input is this repository's own `docs/quickstart.md`, read by a local qualification script. It is not a network-facing service."
     },
-    "76fca179975e0b63": {
+    "8b8fd1cd3925ff77": {
       "classification": "false_positive",
       "path": "scripts/qualify-clean-install.mjs",
-      "line": 617,
+      "line": 586,
       "rule_id": "sast.rules.javascript.lang.security.audit.unsafe-dynamic-method",
       "rationale": "The dynamic lookup selects a lane function from a literal three-entry object (`node`/`python`/`browser`); `options.lane` is validated against the fixed `LANES` list during argument parsing, before this call, so the invoked function is always one of the three lane functions defined in this file, never externally controlled. This is a local qualification script, not a network-facing service."
     }
