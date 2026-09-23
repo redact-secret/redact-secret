@@ -44,7 +44,7 @@ from typing import Any, Callable, Optional
 
 from redact_tool_call import build_blocked_result, redact_arguments, redact_tool_result
 
-__all__ = ["wrap_server_tool_handler", "wrap_client_call_tool"]
+__all__ = ["emit_findings", "wrap_server_tool_handler", "wrap_client_call_tool"]
 
 
 def _get_arguments(params: Any) -> dict[str, Any]:
@@ -69,7 +69,13 @@ def _as_dict(value: Any) -> dict[str, Any]:
     return value.model_dump(by_alias=True)
 
 
-def _emit_findings(findings: list[Any], on_finding: Optional[Callable[..., None]], scope: str) -> None:
+def emit_findings(findings: list[Any], on_finding: Optional[Callable[..., None]], scope: str) -> None:
+    """Reported for every finding, including on a blocked outcome, as
+    exactly the safe metadata ``scan_and_redact`` already returns -- never
+    the input or a matched value. A raising ``on_finding`` is swallowed and
+    never influences the redaction outcome. Not underscore-prefixed:
+    ``agent_context.py`` imports it rather than keeping a second copy in
+    this same directory."""
     if on_finding is None:
         return
     for finding in findings:
@@ -111,14 +117,14 @@ def wrap_server_tool_handler(
         if redact_arguments_before_forwarding:
             args = _get_arguments(params)
             arg_outcome = redact_arguments(scan_and_redact, args, policy=policy, limits=limits)
-            _emit_findings(arg_outcome["findings"], on_finding, "argument")
+            emit_findings(arg_outcome["findings"], on_finding, "argument")
             if arg_outcome["outcome"] == "blocked":
                 return build_blocked_result()
             effective_params = _with_arguments(params, arg_outcome["arguments"])
 
         raw = await handler(ctx, effective_params)
         result_outcome = redact_tool_result(scan_and_redact, _as_dict(raw), policy=policy, limits=limits)
-        _emit_findings(result_outcome["findings"], on_finding, "result")
+        emit_findings(result_outcome["findings"], on_finding, "result")
         if result_outcome["outcome"] == "blocked":
             return build_blocked_result()
         return result_outcome["result"]
@@ -144,7 +150,7 @@ def wrap_client_call_tool(
     async def redacting_call_tool(*args: Any, **kwargs: Any) -> Any:
         raw = await call_tool(*args, **kwargs)
         result_outcome = redact_tool_result(scan_and_redact, _as_dict(raw), policy=policy, limits=limits)
-        _emit_findings(result_outcome["findings"], on_finding, "result")
+        emit_findings(result_outcome["findings"], on_finding, "result")
         if result_outcome["outcome"] == "blocked":
             return build_blocked_result()
         return result_outcome["result"]

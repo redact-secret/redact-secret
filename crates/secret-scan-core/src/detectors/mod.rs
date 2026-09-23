@@ -16,6 +16,7 @@ mod azure_devops;
 mod bearer_token;
 mod cloudflare;
 mod connection_string;
+mod databricks;
 mod datadog;
 mod discord;
 mod firebase;
@@ -101,6 +102,7 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(firebase::FirebaseServerKeyDetector),
         Box::new(terraform::TerraformCloudTokenDetector),
         Box::new(additional_providers::PULUMI),
+        Box::new(databricks::DATABRICKS),
         Box::new(postman::POSTMAN),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
@@ -193,6 +195,7 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("firebase-server-key", Pack::Provider),
     ("terraform-cloud-token", Pack::Provider),
     ("pulumi-access-token", Pack::Provider),
+    ("databricks-personal-access-token", Pack::Provider),
     ("postman-api-key", Pack::Provider),
     ("jwt", Pack::Common),
     ("bearer-token", Pack::Common),
@@ -274,6 +277,7 @@ mod tests {
                 "firebase-server-key",
                 "terraform-cloud-token",
                 "pulumi-access-token",
+                "databricks-personal-access-token",
                 "postman-api-key",
                 "jwt",
                 "bearer-token",
@@ -546,6 +550,8 @@ mod tests {
         );
         let pulumi_access_token_input =
             format!("pul-{}", "0123456789abcdef0123456789abcdef01234567");
+        let databricks_personal_access_token_input =
+            format!("dapi{}", "0123456789abcdef0123456789abcdef");
         let postman_api_key_input = format!(
             "PMAK-{}-{}",
             "0123456789abcdef01234567", "0123456789abcdef0123456789abcdef01"
@@ -571,6 +577,10 @@ mod tests {
                 terraform_cloud_token_input.as_str(),
             ),
             ("pulumi-access-token", pulumi_access_token_input.as_str()),
+            (
+                "databricks-personal-access-token",
+                databricks_personal_access_token_input.as_str(),
+            ),
             ("postman-api-key", postman_api_key_input.as_str()),
         ];
         assert_provider_candidates(&cases);
