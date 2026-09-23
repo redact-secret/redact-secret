@@ -51,6 +51,7 @@ Prepare an approved version on `rc/{version}` (for example, `rc/0.1.0-beta.1`) f
 - 시험/검증 작업에서는 "무엇을 측정하는가"와 "무엇이 입력으로 필요한가"를 분리한다. 입력은 측정 대상을 만족하는 최소 크기여야 한다. 
 - 기존 자산(이슈, 브랜치, 파일)에서 고르는 것이 유일한 선택지라고 가정하지 않는다. 새로 만드는 쪽이 더 싸면 그쪽을 먼저 제안한다. 
 - 반론이 들어오면, 내가 답하기 쉬운 반론이 아니라 실제로 제기된 반론에 답한다.
+- benchmarks 측정(`eval:classify`, `eval:matrix`, `benchmark:candidate`) 전에 `trufflehog --version`이 핀(3.97.4)과 같은지 확인한다. 자동 업데이트로 patch만 올라가도 stable 수가 43에서 5로 바뀐다(redact-secret-benchmarks#180). 다르면 수치를 보고하지 말고 핀 버전 바이너리를 PATH 앞에 두고 다시 돌린다. stable 수에는 항상 모드(published/candidate)를 함께 적는다.
 
 <!-- graft:start -->
 ## Graft — repo context graph
