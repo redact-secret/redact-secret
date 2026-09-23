@@ -395,6 +395,13 @@
       "schemes": null
     },
     {
+      "type": "okta_api_token",
+      "detector": "okta-api-token",
+      "policyClass": "confidence-gated",
+      "reconciliationTrigger": "Authorization: SSWS 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh",
+      "schemes": null
+    },
+    {
       "type": "firebase_server_key",
       "detector": "firebase-server-key",
       "policyClass": "always-redact",

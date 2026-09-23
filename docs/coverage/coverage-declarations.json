@@ -5773,6 +5773,98 @@
     },
     {
       "behaviorClass": "provider",
+      "detector": "okta-api-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "okta-api-token-positive-dotenv-keyword",
+            "okta-api-token-positive-json-keyword",
+            "okta-api-token-positive-log-keyword",
+            "okta-api-token-positive-shell-quoted",
+            "okta-api-token-positive-ssws-authorization-header",
+            "okta-api-token-positive-yaml-keyword",
+            "okta-api-token-regression-crlf-and-unicode-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "okta-api-token-overlap-generic-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "okta-api-token-adversarial-dense-findings"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "okta-api-token-boundary-one-long",
+            "okta-api-token-boundary-one-short",
+            "okta-api-token-boundary-ssws-glued-without-space",
+            "okta-api-token-boundary-wrong-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "okta-api-token-negative-bare-value-with-no-context",
+            "okta-api-token-negative-context-on-a-different-line",
+            "okta-api-token-negative-environment-variable-reference",
+            "okta-api-token-negative-repeated-character-filler",
+            "okta-api-token-negative-tenant-domain-reference"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "okta-api-token-boundary-one-long",
+            "okta-api-token-boundary-one-short",
+            "okta-api-token-boundary-ssws-glued-without-space",
+            "okta-api-token-boundary-wrong-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for okta_api_token (okta-api-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "okta_api_token"
+    },
+    {
+      "behaviorClass": "provider",
       "detector": "firebase-server-key",
       "dimensions": [
         {
@@ -6875,6 +6967,7 @@
             "new-relic-user-api-key-adversarial-long-padding",
             "notion-token-adversarial-long-padding",
             "npm-adversarial-long-suffix",
+            "okta-api-token-adversarial-dense-findings",
             "openai-adversarial-long-suffix",
             "openai-adversarial-marker-prefix-flood",
             "otpauth-adversarial-overlong-query",
@@ -7271,6 +7364,7 @@
             "new-relic-user-api-key-adversarial-long-padding",
             "notion-token-adversarial-long-padding",
             "npm-adversarial-long-suffix",
+            "okta-api-token-adversarial-dense-findings",
             "openai-adversarial-long-suffix",
             "openai-adversarial-marker-prefix-flood",
             "otpauth-adversarial-overlong-query",

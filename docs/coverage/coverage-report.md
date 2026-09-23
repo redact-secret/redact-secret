@@ -15,11 +15,11 @@ These counts describe finding-type inventory rows with corpus evidence, not dete
 
 | Row state | Count |
 | --- | --- |
-| supported | 62 |
+| supported | 63 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 73.
+Coverage declarations: 74.
 
 ## Coverage by detector
 
@@ -60,6 +60,7 @@ Coverage declarations: 73.
 | new-relic-user-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | notion-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | npm-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| okta-api-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | openai-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | otpauth-uri | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | postman-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -126,6 +127,7 @@ Coverage declarations: 73.
 | new_relic_user_api_key | new-relic-user-api-key | provider | supported | not-applicable | none |
 | notion_integration_token | notion-token | provider | supported | not-applicable | none |
 | npm_access_token | npm-token | provider | supported | not-applicable | none |
+| okta_api_token | okta-api-token | provider | supported | not-applicable | none |
 | openai_api_key | openai-token | provider | supported | not-applicable | none |
 | otpauth_secret | otpauth-uri | structural | supported | supported | none |
 | postman_api_key | postman-api-key | provider | supported | not-applicable | none |
@@ -172,15 +174,15 @@ Coverage declarations: 73.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 73 | 0 | 0 |
-| boundary | 62 | 0 | 0 |
-| host-context | 62 | 0 | 0 |
+| adversarial | 74 | 0 | 0 |
+| boundary | 63 | 0 | 0 |
+| host-context | 63 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 73 | 0 | 0 |
-| near-miss-negative | 62 | 0 | 0 |
-| overlap | 62 | 0 | 0 |
-| positive | 62 | 0 | 0 |
-| range | 73 | 0 | 0 |
+| malformed | 74 | 0 | 0 |
+| near-miss-negative | 63 | 0 | 0 |
+| overlap | 63 | 0 | 0 |
+| positive | 63 | 0 | 0 |
+| range | 74 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

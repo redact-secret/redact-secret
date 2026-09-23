@@ -10,19 +10,21 @@ use crate::types::{Action, Confidence, DetectedFinding, Policy, PolicyContext};
 /// Not every [`Specificity::Provider`](crate::types::Specificity) type is
 /// here: `twilio_auth_token`, `twilio_api_key_secret`, `datadog_api_key`,
 /// `datadog_application_key`, `new_relic_license_key`, `mailchimp_api_key`,
-/// `mailgun_api_key`, `confluent_cloud_api_secret_legacy`, and
-/// `heroku_api_key_legacy` are deliberately left confidence-gated (redact at
-/// [`Confidence::High`], warn otherwise) even though that is a weaker action
-/// than their specificity alone would suggest — each has a documented
-/// `decision-freeze-*` grammar record (or, for
+/// `mailgun_api_key`, `okta_api_token`, `confluent_cloud_api_secret_legacy`,
+/// and `heroku_api_key_legacy` are deliberately left confidence-gated
+/// (redact at [`Confidence::High`], warn otherwise) even though that is a
+/// weaker action than their specificity alone would suggest — each has a
+/// documented `decision-freeze-*` grammar record (or, for
 /// `confluent_cloud_api_secret_legacy`, `heroku_api_key_legacy`,
-/// `mailchimp_api_key`, and `mailgun_api_key`, its own module doc in
-/// `detectors::confluent`, `detectors::heroku`, `detectors::mailchimp`, or
-/// `detectors::mailgun`) explaining why a bare keyword-cooccurrence match at
-/// medium confidence is too weak (an opaque bare value sharing a line with a
-/// vendor keyword) to redact by default; each of those legacy types only
-/// ever reports [`Confidence::Medium`], so it always warns rather than
-/// redacts under this default policy. Overlap resolution's resolved-action
+/// `mailchimp_api_key`, `mailgun_api_key`, and `okta_api_token`, its own
+/// module doc in `detectors::confluent`, `detectors::heroku`,
+/// `detectors::mailchimp`, `detectors::mailgun`, or `detectors::okta`)
+/// explaining why a bare keyword-cooccurrence match at medium confidence is
+/// too weak (an opaque bare value sharing a line with a vendor keyword) to
+/// redact by default; `okta_api_token` also reports
+/// [`Confidence::High`] when a stronger same-line `SSWS` scheme signal is
+/// present, which this default policy already redacts without needing a
+/// carve-out here. Overlap resolution's resolved-action
 /// severity ranking
 /// (`decision-resolve-overlap-precedence-by-resolved-action-severity`)
 /// exists precisely so this list does not have to be exhaustive over every
