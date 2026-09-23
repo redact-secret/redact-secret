@@ -15,11 +15,11 @@ These counts describe finding-type inventory rows with corpus evidence, not dete
 
 | Row state | Count |
 | --- | --- |
-| supported | 63 |
+| supported | 64 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 74.
+Coverage declarations: 75.
 
 ## Coverage by detector
 
@@ -176,15 +176,15 @@ Coverage declarations: 74.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 74 | 0 | 0 |
-| boundary | 63 | 0 | 0 |
-| host-context | 63 | 0 | 0 |
+| adversarial | 75 | 0 | 0 |
+| boundary | 64 | 0 | 0 |
+| host-context | 64 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 74 | 0 | 0 |
-| near-miss-negative | 63 | 0 | 0 |
-| overlap | 63 | 0 | 0 |
-| positive | 63 | 0 | 0 |
-| range | 74 | 0 | 0 |
+| malformed | 75 | 0 | 0 |
+| near-miss-negative | 64 | 0 | 0 |
+| overlap | 64 | 0 | 0 |
+| positive | 64 | 0 | 0 |
+| range | 75 | 0 | 0 |
 
 ## Unresolved and pending coverage
 
