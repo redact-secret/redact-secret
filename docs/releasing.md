@@ -194,7 +194,11 @@ workflow declarations is not full candidate qualification.
 
 `Package Release Rehearsal` packs and checks npm runtime dependencies and
 records `dependency-cutover-plan`. It publishes nothing. It is an npm dependency
-rehearsal, not a simulated publication to all registries. `Release` has no
+rehearsal, not a simulated publication to all registries. It qualifies a
+throwaway `<X.Y.Z>-beta.<run id>` version that no registry carries, moved onto
+its own uncommitted checkout, so unpublished-version defects surface before an
+RC exists (what that covers:
+[release rehearsal coverage](audits/release-rehearsal-coverage.md#rehearsing-at-a-throwaway-unpublished-version)). `Release` has no
 `publish=false` or `dry_run` input; never dispatch it as a rehearsal.
 
 Also require passing SAST evidence for the frozen revision. An acknowledged

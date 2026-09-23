@@ -43,6 +43,15 @@ name: Artifact qualification
 on:
   workflow_dispatch:
   workflow_call:
+    inputs:
+      # Issue #632: `package-release-rehearsal.yml` passes a throwaway,
+      # never-published version so every job below qualifies the release path
+      # at a version no registry carries. Empty for every other caller.
+      rehearsal-version:
+        description: Throwaway product version to qualify (X.Y.Z-beta.<run id>); empty for none.
+        type: string
+        required: false
+        default: ""
   push:
     branches:
       - main
@@ -254,6 +263,8 @@ jobs:
     permissions:
       contents: read
     uses: ./.github/workflows/python-wheels.yml
+    with:
+      rehearsal-version: ${{ inputs.rehearsal-version }}
 
   node-addon:
     name: Addon ${{ matrix.target }}
@@ -301,6 +312,11 @@ jobs:
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           persist-credentials: false
+
+      - name: Apply the rehearsal version (no-op outside a rehearsal)
+        uses: ./.github/actions/apply-rehearsal-version
+        with:
+          version: ${{ inputs.rehearsal-version }}
 
       - name: Set up the floor Node.js
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
@@ -479,6 +495,11 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Apply the rehearsal version (no-op outside a rehearsal)
+        uses: ./.github/actions/apply-rehearsal-version
+        with:
+          version: ${{ inputs.rehearsal-version }}
+
       - name: Set up Node.js
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
@@ -574,6 +595,11 @@ jobs:
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           persist-credentials: false
+
+      - name: Apply the rehearsal version (no-op outside a rehearsal)
+        uses: ./.github/actions/apply-rehearsal-version
+        with:
+          version: ${{ inputs.rehearsal-version }}
 
       - name: Set up Node.js
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
@@ -682,6 +708,11 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Apply the rehearsal version (no-op outside a rehearsal)
+        uses: ./.github/actions/apply-rehearsal-version
+        with:
+          version: ${{ inputs.rehearsal-version }}
+
       - name: Set up Node.js
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
@@ -749,6 +780,11 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Apply the rehearsal version (no-op outside a rehearsal)
+        uses: ./.github/actions/apply-rehearsal-version
+        with:
+          version: ${{ inputs.rehearsal-version }}
+
       - name: Set up Node.js
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
@@ -811,6 +847,11 @@ jobs:
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           persist-credentials: false
+
+      - name: Apply the rehearsal version (no-op outside a rehearsal)
+        uses: ./.github/actions/apply-rehearsal-version
+        with:
+          version: ${{ inputs.rehearsal-version }}
 
       - name: Set up Node.js
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
@@ -876,6 +917,11 @@ jobs:
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           persist-credentials: false
+
+      - name: Apply the rehearsal version (no-op outside a rehearsal)
+        uses: ./.github/actions/apply-rehearsal-version
+        with:
+          version: ${{ inputs.rehearsal-version }}
 
       - name: Set up Node.js
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
@@ -1029,6 +1075,12 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Apply the rehearsal version (no-op outside a rehearsal)
+        if: needs.plan.outputs.full == 'true'
+        uses: ./.github/actions/apply-rehearsal-version
+        with:
+          version: ${{ inputs.rehearsal-version }}
+
       - name: Set up Node.js
         if: needs.plan.outputs.full == 'true'
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
@@ -1084,7 +1136,15 @@ jobs:
       # the CLI, so the CLI tarball recorded here is the one it reproduces.
       - name: Package the crates
         if: needs.plan.outputs.full == 'true'
-        run: cargo package --no-verify --locked -p redact-secret -p redact-secret-cli
+        env:
+          REHEARSAL_VERSION: ${{ inputs.rehearsal-version }}
+        shell: bash
+        # A rehearsal's version bump is deliberately uncommitted, and `cargo
+        # package` refuses a dirty tree; the bump is the only thing dirty.
+        run: |
+          allow_dirty=()
+          if [[ -n "$REHEARSAL_VERSION" ]]; then allow_dirty=(--allow-dirty); fi
+          cargo package --no-verify --locked "${allow_dirty[@]}" -p redact-secret -p redact-secret-cli
 
       # Requires the whole declared matrix, records every artifact's size and
       # SHA-256 against the source commit, and lists the contents of each

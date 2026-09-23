@@ -26,6 +26,15 @@ name: Package Release Rehearsal
 # `docs/audits/release-rehearsal-coverage.md` for the full breakdown of what
 # this workflow does and does not cover, and why.
 #
+# Issue #632: every job here first moves its own checkout to a throwaway,
+# never-published version (`<X.Y.Z>-beta.<run id>`, `scripts/rehearsal-version.py`),
+# so the paths that only misbehave for a version no registry carries -- the
+# exact-version `cargo package` resolution and the qualified-inventory digest
+# scope of beta.6's #607 and #608 -- run on `main`, not first on an RC. The
+# bump is never committed or pushed; `version` proves npm, crates.io, and PyPI
+# all answer 404 for it before anything is built. What that covers, and what
+# it still cannot, is in `docs/audits/release-rehearsal-coverage.md`.
+#
 # `NODE_AUTH_TOKEN` is never supplied to this workflow and no job requests
 # `registry-url` from `actions/setup-node`, so a `--dry-run` invocation that
 # somehow still attempted to publish would fail on authentication, not
@@ -39,15 +48,53 @@ on:
 permissions: {}
 
 jobs:
+  # Issue #632: on `main` the branch version is always already published, so
+  # release-path steps that only misbehave for a version no registry carries
+  # (beta.6's #607 and #608) never ran until an RC was cut. This job derives a
+  # throwaway `<X.Y.Z>-beta.<run id>` version and proves npm, crates.io, and
+  # PyPI all answer 404 for it; every job below moves its own checkout to that
+  # version (`scripts/rehearsal-version.py apply`) before building or
+  # qualifying. The bump is never committed or pushed and nothing is
+  # published. Only a 404 counts as absent: a registry that answers anything
+  # else fails the run rather than being assumed empty.
+  version:
+    name: Choose an unpublished rehearsal version
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    outputs:
+      version: ${{ steps.derive.outputs.version }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+
+      - name: Derive the throwaway version
+        id: derive
+        env:
+          RUN_ID: ${{ github.run_id }}
+        run: echo "version=$(python3 -B scripts/rehearsal-version.py derive --run-id "$RUN_ID")" >> "$GITHUB_OUTPUT"
+
+      - name: Prove no registry carries it
+        env:
+          REHEARSAL_VERSION: ${{ steps.derive.outputs.version }}
+        run: python3 -B scripts/rehearsal-version.py check-unpublished --version "$REHEARSAL_VERSION"
+
   artifact-qualification:
     name: Artifact qualification
+    needs: version
     uses: ./.github/workflows/artifact-qualification.yml
     permissions:
       contents: read
+    with:
+      rehearsal-version: ${{ needs.version.outputs.version }}
 
   rehearse:
     name: Rehearse the npm dependency cutover
-    needs: artifact-qualification
+    needs: [version, artifact-qualification]
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
@@ -58,6 +105,11 @@ jobs:
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           persist-credentials: false
+
+      - name: Apply the rehearsal version
+        uses: ./.github/actions/apply-rehearsal-version
+        with:
+          version: ${{ needs.version.outputs.version }}
 
       - name: Set up Node.js
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0

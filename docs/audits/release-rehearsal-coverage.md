@@ -58,6 +58,87 @@ closing the "fixes from #527 and #528 validated on the rehearsal path" half
 of this issue's first acceptance criterion for every artifact class where
 that is possible without a real publish.
 
+## Rehearsing at a throwaway unpublished version
+
+Added for issue [#632](https://github.com/redact-secret/redact-secret/issues/632),
+from item 1 of the [beta.6 release retrospective](beta6-release-retrospective.md).
+Until then the rehearsal qualified whatever version its branch carried, and on
+`main` that version is always already on every registry. Two beta.6 defects
+therefore surfaced only on the freshly bumped RC and cost two extra
+qualification cycles: [#607](https://github.com/redact-secret/redact-secret/pull/607)
+(`cargo package` of `redact-secret-cli` alone cannot resolve its exact
+`redact-secret` requirement before that version is on crates.io) and
+[#608](https://github.com/redact-secret/redact-secret/pull/608) (npm dependency
+digest checks passed fewer files than the inventory records).
+
+**How it works.** `package-release-rehearsal.yml` starts with a `version` job.
+It derives `<X.Y.Z>-beta.<run id>` from the branch version
+(`scripts/rehearsal-version.py derive`) and proves npm (all eleven scoped
+packages), crates.io (both crates), and PyPI answer **404** for it
+(`check-unpublished`); any other answer, including a rate limit, fails the run.
+Every job that builds, packs, or qualifies a version-bearing artifact then runs
+`.github/actions/apply-rehearsal-version` right after its checkout, which
+rewrites the lockstep set in that job's own working tree: the workspace
+`Cargo.toml` (version and exact core requirement), `Cargo.lock`'s workspace
+members, every lockstep JSON manifest and exact `@redact-secret/*` pin, both
+npm lockfiles, the TypeScript `VERSION`, and the quickstart pins. Nothing is
+committed or pushed, and nothing is published. `artifact-qualification.yml` and
+`python-wheels.yml` take the version as an optional `rehearsal-version` input,
+empty for `release.yml` and every push or pull request run, so those paths are
+unchanged. The bump is uncommitted, so the inventory job's `cargo package`
+passes `--allow-dirty` when (and only when) a rehearsal version is set.
+
+**Why `-beta.<run id>` and not `-rehearsal.<run id>`.** The Python wheel
+qualification (`scripts/qualify-python-wheel.py`) and the quickstart pin check
+(`scripts/clean-install-doc.mjs`) accept only `X.Y.Z-beta.N`, and PEP 440 has no
+spelling for a `-rehearsal` segment, so maturin could not build the wheel. A
+run id is a number far above any published beta, and the registry probe checks
+the claim instead of assuming it.
+
+**What it covers now, before an RC exists:**
+
+| Path | Runs at the unpublished version |
+| --- | --- |
+| Inventory crate packaging | `cargo package` of both crates against a core version crates.io does not have (#607) |
+| Lockstep and `--locked` resolution | every manifest, exact pin, and lockfile agrees on the new version |
+| Digest checks | node-addon, browser, Python, and the npm dependency packages are verified against an inventory recorded at that version (#527/#528/#608) |
+| Wheel and quickstart | the PEP 440 spelling of the version in the wheel, and the pinned quickstart install lines |
+| Unpublished-state probe | that no registry carries the version, so a probe that assumed absence is checked, not trusted |
+
+It still cannot cover anything that needs a real publish (see the next
+section), and it does not rehearse the RC-branch preparation itself
+(changelog, release notes, `docs/releases/<version>/`).
+
+**Evidence that it would have caught #607.** Run on 2026-09-23 against
+`main` at `42d1fb0`, after `scripts/rehearsal-version.py apply --version
+0.1.0-beta.12345678901` (a throwaway checkout, not committed):
+
+```
+$ cargo package --no-verify --locked --allow-dirty -p redact-secret-cli      # pre-#607 form
+  failed to select a version for the requirement `redact-secret = "=0.1.0-beta.12345678901"`
+  candidate versions found which didn't match: 0.1.0-beta.6, 0.1.0-beta.5, ...
+  location searched: crates.io index
+$ cargo package --no-verify --locked --allow-dirty -p redact-secret -p redact-secret-cli   # #607's fix
+  Packaged 61 files ... Packaged 13 files ...
+```
+
+The same run passed `scripts/check-rust-workspace.py` and `cargo metadata
+--locked` at the bumped version, so the bump itself is consistent. The pre-#607
+form passes on `main` as it stands, which is the gap this closes.
+`scripts/tests/test_rehearsal_version.py` guards the wiring: every building job
+applies the version, `release.yml` never passes one, and the inventory packages
+both crates together.
+
+**#608 is a different case.** Its defect was the digest scope the qualified
+inventory records against the files a package ships (`--suffix .node`, the
+wasm `.d.ts` files). That scope does not depend on whether the version is
+published, and the existing `scripts/tests/test_verify_python_digest.py`
+cases from that fix already fail against the pre-#608 script. What the
+throwaway version adds is that these checks now run against an inventory
+recorded at a version that has never existed, which is the state `release.yml`
+sees. This document does not claim a rehearsal at the throwaway version would
+fail on pre-#608 code for a reason the version introduced.
+
 ## What the rehearsal cannot cover, and why
 
 These are genuine gaps, not omissions to be silently worked around:

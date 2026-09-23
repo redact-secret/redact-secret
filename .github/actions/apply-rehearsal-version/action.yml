@@ -1,0 +1,22 @@
+name: Apply the rehearsal version
+description: >-
+  Moves this checkout's lockstep product version to a throwaway, never-published
+  one (issue #632) so a rehearsal exercises the unpublished-version release path.
+  Nothing is committed or pushed. A no-op when `version` is empty, which is how
+  every ordinary run and `release.yml` call it.
+
+inputs:
+  version:
+    description: The throwaway version (X.Y.Z-beta.<run id>), or empty for none.
+    required: false
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    - name: Move the lockstep version set
+      if: inputs.version != ''
+      shell: bash
+      env:
+        REHEARSAL_VERSION: ${{ inputs.version }}
+      run: python3 -B scripts/rehearsal-version.py apply --version "$REHEARSAL_VERSION"
