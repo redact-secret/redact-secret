@@ -3,17 +3,17 @@
   "taxonomySchemaVersion": 1,
   "sourceReport": {
     "schemaVersion": 1,
-    "generatedAt": "2026-09-23T22:23:15.167Z",
-    "runId": "8a2e90a9-e7f9-4731-ae87-ae8c41d018ce",
-    "revision": "43b2d615a0d9fd4a2d49dbaeb1e36c86ea6c856e",
+    "generatedAt": "2026-09-23T22:14:55.709Z",
+    "runId": "715d2d8e-0862-4ba8-9ef2-18b90091030c",
+    "revision": "186e6e7053195ad14ebecf823c1cb269d3496654",
     "dirty": false,
     "criteriaSchemaVersion": 1
   },
   "providerCount": 42,
   "familyCount": 93,
   "distribution": {
-    "stable": 51,
-    "provisional": 21,
+    "stable": 49,
+    "provisional": 23,
     "pending": 2,
     "unsupported": 19
   },
@@ -232,7 +232,7 @@
       "provider": "confluent",
       "family": "confluent:cloud-api-secret",
       "familyName": "Cloud API secret (cflt-prefixed)",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
       "providerSource": {
         "url": "https://docs.confluent.io/cloud/current/security/authenticate/workload-identities/service-accounts/api-keys/overview.html",
@@ -252,12 +252,12 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 0
+        "differential": 6
       },
       "detectors": [
         "confluent-cloud-api-secret"
       ],
-      "reason": null
+      "reason": "differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": "confluent",
@@ -1521,7 +1521,7 @@
       "provider": "netlify",
       "family": "netlify:personal-access-token",
       "familyName": "Personal access token",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
       "providerSource": {
         "url": "https://answers.netlify.com/t/change-to-the-netlify-authentication-token-format/106146",
@@ -1541,12 +1541,12 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 0
+        "differential": 6
       },
       "detectors": [
         "netlify-token"
       ],
-      "reason": null
+      "reason": "differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": "new-relic",

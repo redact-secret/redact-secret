@@ -152,11 +152,13 @@ Follow-ups closed:
   broke this repository's `Benchmark pin drift` job on main. The benchmark
   follow-up re-points it to `186e6e7`, and this repository vendors that copy.
 - The evidence links are re-pinned to benchmarks `main`.
-- The benchmark follow-up settles 12 candidate-mode ledger rows for
-  netlify and confluent. The vendored `benchmarks/support-matrix.json` is
-  now run `8a2e90a9` (benchmarks `43b2d61`): 51 `stable`, i.e. 36 + 15.
-  `docs/support-matrix.md`, the README summary and CHANGELOG are regenerated
-  from it.
+- The vendored `benchmarks/support-matrix.json` is now clean-main run
+  `715d2d8e` (benchmarks `186e6e7`): 49 `stable`. `docs/support-matrix.md`,
+  the README summary and CHANGELOG are regenerated from it. In this run,
+  netlify and confluent read `provisional` only because their candidate-mode
+  ledger rows are not on benchmarks `main` yet. The benchmark follow-up adds
+  those 12 rows, and the same candidate then reports 51 `stable` (run
+  `8a2e90a9`). Re-vendor after that branch merges.
 
 Still open, and not closable before a release:
 
