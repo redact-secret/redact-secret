@@ -269,7 +269,8 @@ pub(super) const DOCKER_PAT_SUFFIX_LEN: usize = 27;
 pub(super) const DOCKER_OAT_SUFFIX_LEN: usize = 32;
 /// Every exact suffix length accepted after `dckr_oat_`: the provider's own
 /// 27-byte example width (issue #708) and the 32-byte width.
-pub(super) const DOCKER_OAT_SUFFIX_LENS: [usize; 2] = [DOCKER_PAT_SUFFIX_LEN, DOCKER_OAT_SUFFIX_LEN];
+pub(super) const DOCKER_OAT_SUFFIX_LENS: [usize; 2] =
+    [DOCKER_PAT_SUFFIX_LEN, DOCKER_OAT_SUFFIX_LEN];
 
 /// `DigitalOcean` personal (`dop_v1_`), `OAuth` access (`doo_v1_`), and
 /// `OAuth` refresh (`dor_v1_`) token families.

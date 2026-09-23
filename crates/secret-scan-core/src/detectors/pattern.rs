@@ -402,16 +402,16 @@ pub(super) fn scan_prefixed_shapes(
                 let accepted = |len: usize| {
                     let end = suffix_start + len;
                     available >= len
-                        && shape.post_check.is_none_or(|check| check(bytes, start, end))
+                        && shape
+                            .post_check
+                            .is_none_or(|check| check(bytes, start, end))
                         && boundary_ok(bytes, start, end, boundary)
                 };
-                match lens.iter().copied().filter(|&len| accepted(len)).max() {
-                    Some(len) => len,
-                    None => {
-                        start += 1;
-                        continue;
-                    }
-                }
+                let Some(len) = lens.iter().copied().filter(|&len| accepted(len)).max() else {
+                    start += 1;
+                    continue;
+                };
+                len
             }
             RunLength::AtLeast(len) if available >= len => available,
             RunLength::OpenFloor(len) if available >= len => {
