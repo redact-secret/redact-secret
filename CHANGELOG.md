@@ -18,6 +18,15 @@ evidence is linked from each published version.
 
 ### Changed
 
+- The pinned [support matrix](docs/support-matrix.md) was re-measured at
+  clean product `main` (`44bb3d6`, candidate mode) and benchmarks
+  `workbench/575-post-merge-follow-ups` (`43b2d61`, run `8a2e90a9`), with
+  gitleaks 8.30.1 and trufflehog 3.97.4. Epic A's 15 existing families move
+  from `provisional` to `stable`: anthropic, linear, notion, New Relic user
+  and license, both Grafana families, Azure DevOps, Google, both Datadog
+  families, Hugging Face, Microsoft Entra, and both Docker families.
+  51 of 93 families are now `stable`, and none regressed (#575,
+  [evidence](docs/audits/evidence/575/README.md)).
 - `microsoft-entra-client-secret` now detects a client secret whose first
   three characters include `-`, including one that starts with `-`. The
   three bytes before the `<digit>Q~` marker now accept the same

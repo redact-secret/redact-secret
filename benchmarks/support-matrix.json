@@ -3,17 +3,17 @@
   "taxonomySchemaVersion": 1,
   "sourceReport": {
     "schemaVersion": 1,
-    "generatedAt": "2026-09-23T19:20:59.962Z",
-    "runId": "e9f8400e-db67-4fbc-ac2b-fe8657f769e4",
-    "revision": "f57e89556890e89a2ee19cb913a5a75745ed3230",
+    "generatedAt": "2026-09-23T22:23:15.167Z",
+    "runId": "8a2e90a9-e7f9-4731-ae87-ae8c41d018ce",
+    "revision": "43b2d615a0d9fd4a2d49dbaeb1e36c86ea6c856e",
     "dirty": false,
     "criteriaSchemaVersion": 1
   },
   "providerCount": 42,
   "familyCount": 93,
   "distribution": {
-    "stable": 36,
-    "provisional": 36,
+    "stable": 51,
+    "provisional": 21,
     "pending": 2,
     "unsupported": 19
   },
@@ -22,15 +22,20 @@
       "provider": "anthropic",
       "family": "anthropic:secret-api-key",
       "familyName": "Secret API key",
-      "status": "provisional",
-      "evidenceTier": "T2",
-      "providerSource": null,
+      "status": "stable",
+      "evidenceTier": "T1",
+      "providerSource": {
+        "url": "https://platform.claude.com/docs/en/manage-claude/compliance-api-access",
+        "observedAt": "2026-09-23",
+        "formatVersion": "Claude API key prefix table",
+        "covers": "the provider identifies sk-ant-api03- as the Claude API key prefix; the 93-character body, alphabet and AA suffix remain tool-corroborated"
+      },
       "corroboratingScanners": [
         "gitleaks 8.30.1",
         "trufflehog 3.97.4"
       ],
       "twinCoverage": {
-        "pairs": 2,
+        "pairs": 6,
         "failures": 0,
         "unprobeable": null
       },
@@ -42,7 +47,7 @@
       "detectors": [
         "anthropic-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 2 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret."
+      "reason": null
     },
     {
       "provider": "atlassian",
@@ -169,12 +174,17 @@
       "provider": "azure-devops",
       "family": "azure-devops:personal-access-token",
       "familyName": "Personal access token",
-      "status": "provisional",
-      "evidenceTier": "T3",
-      "providerSource": null,
+      "status": "stable",
+      "evidenceTier": "T1",
+      "providerSource": {
+        "url": "https://learn.microsoft.com/en-us/azure/devops/organizations/accounts/use-personal-access-tokens-to-authenticate#pat-format",
+        "observedAt": "2026-09-23",
+        "formatVersion": "84-character PAT with AZDO signature",
+        "covers": "tokens are 84 characters long with a fixed AZDO signature at positions 76-80; Microsoft Purview separately supplies the alphanumeric detail used by the pattern"
+      },
       "corroboratingScanners": [],
       "twinCoverage": {
-        "pairs": 3,
+        "pairs": 6,
         "failures": 0,
         "unprobeable": null
       },
@@ -186,7 +196,7 @@
       "detectors": [
         "azure-devops-personal-access-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret."
+      "reason": null
     },
     {
       "provider": "cloudflare",
@@ -268,12 +278,12 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 0
+        "differential": 6
       },
       "detectors": [
         "confluent-cloud-api-secret-legacy"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": "databricks",
@@ -294,20 +304,25 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 0
+        "differential": 6
       },
       "detectors": [
         "databricks-personal-access-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": "datadog",
       "family": "datadog:api-key",
       "familyName": "API key",
-      "status": "provisional",
-      "evidenceTier": "T2",
-      "providerSource": null,
+      "status": "stable",
+      "evidenceTier": "T1",
+      "providerSource": {
+        "url": "https://docs.datadoghq.com/resources/json/full_spec_v1.json",
+        "observedAt": "2026-09-23",
+        "formatVersion": "OpenAPI v1 ApiKey.key minLength/maxLength 32 and apiKeyAuth scheme",
+        "covers": "Datadog's own API reference spec (docs.datadoghq.com /resources/json/full_spec_v1.json, v1 ApiKey schema, generated from DataDog/documentation hugo/data/api/v1/full_spec.yaml) fixes the API key value at exactly 32 characters (minLength 32, maxLength 32) and names the DD-API-KEY header and DD_API_KEY environment variable. The constraint is stated on the v1 key model; the v2 schema states no length. The lowercase-hex alphabet is not provider-stated: the spec's example fits it, and it is corroborated by Datadog-owned code and tools only"
+      },
       "corroboratingScanners": [
         "trufflehog 3.97.4"
       ],
@@ -324,13 +339,13 @@
       "detectors": [
         "datadog-api-key"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts."
+      "reason": null
     },
     {
       "provider": "datadog",
       "family": "datadog:application-key",
       "familyName": "Application key (ddapp_-prefixed)",
-      "status": "provisional",
+      "status": "stable",
       "evidenceTier": "T1",
       "providerSource": {
         "url": "https://docs.datadoghq.com/account_management/personal-access-tokens/",
@@ -348,7 +363,7 @@
         "trufflehog 3.97.4"
       ],
       "twinCoverage": {
-        "pairs": 3,
+        "pairs": 6,
         "failures": 0,
         "unprobeable": null
       },
@@ -360,7 +375,7 @@
       "detectors": [
         "datadog-application-key"
       ],
-      "reason": "minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.minimumCases: 4 < 5 — Five benign controls is the minimum sample to claim the detector stays quiet on adjacent, non-secret shapes for this family."
+      "reason": null
     },
     {
       "provider": "datadog",
@@ -502,25 +517,30 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 0
+        "differential": 12
       },
       "detectors": [
         "discord-bot-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | differential.unresolvedContractDisagreements: 12 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": "docker",
       "family": "docker:oauth-access-token",
       "familyName": "OAuth access token",
-      "status": "provisional",
-      "evidenceTier": "T2",
-      "providerSource": null,
+      "status": "stable",
+      "evidenceTier": "T1",
+      "providerSource": {
+        "url": "https://docs.docker.com/reference/api/ai-governance/api.yaml",
+        "observedAt": "2026-09-23",
+        "formatVersion": "AI Governance API bearerAuth credential table (Format column: dckr_pat_*, dckr_oat_*)",
+        "covers": "Docker's own API reference (docs.docker.com AI Governance API spec, bearerAuth credential table) states the Personal Access Token format as dckr_pat_* and the Organization Access Token format as dckr_oat_*, establishing both prefixes (the * is a glob, not a grammar). Body lengths and alphabet are not provider-stated, except that Docker's Hub API spec (createOrgAccessTokenResponse.token) shows an example OAT with a 27-character alphanumeric body, on example strength only. The 27-character dckr_pat_ body, the 32-character dckr_oat_ width and the [A-Za-z0-9_-] alphabet remain tool-corroborated"
+      },
       "corroboratingScanners": [
         "trufflehog 3.97.4"
       ],
       "twinCoverage": {
-        "pairs": 7,
+        "pairs": 16,
         "failures": 0,
         "unprobeable": null
       },
@@ -532,20 +552,25 @@
       "detectors": [
         "docker-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts."
+      "reason": null
     },
     {
       "provider": "docker",
       "family": "docker:personal-access-token",
       "familyName": "Personal access token",
-      "status": "provisional",
-      "evidenceTier": "T2",
-      "providerSource": null,
+      "status": "stable",
+      "evidenceTier": "T1",
+      "providerSource": {
+        "url": "https://docs.docker.com/reference/api/ai-governance/api.yaml",
+        "observedAt": "2026-09-23",
+        "formatVersion": "AI Governance API bearerAuth credential table (Format column: dckr_pat_*, dckr_oat_*)",
+        "covers": "Docker's own API reference (docs.docker.com AI Governance API spec, bearerAuth credential table) states the Personal Access Token format as dckr_pat_* and the Organization Access Token format as dckr_oat_*, establishing both prefixes (the * is a glob, not a grammar). Body lengths and alphabet are not provider-stated, except that Docker's Hub API spec (createOrgAccessTokenResponse.token) shows an example OAT with a 27-character alphanumeric body, on example strength only. The 27-character dckr_pat_ body, the 32-character dckr_oat_ width and the [A-Za-z0-9_-] alphabet remain tool-corroborated"
+      },
       "corroboratingScanners": [
         "trufflehog 3.97.4"
       ],
       "twinCoverage": {
-        "pairs": 7,
+        "pairs": 16,
         "failures": 0,
         "unprobeable": null
       },
@@ -557,7 +582,7 @@
       "detectors": [
         "docker-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts."
+      "reason": null
     },
     {
       "provider": "firebase",
@@ -952,14 +977,19 @@
       "provider": "google",
       "family": "google:generic-api-key",
       "familyName": "Generic API key",
-      "status": "provisional",
-      "evidenceTier": "T2",
-      "providerSource": null,
+      "status": "stable",
+      "evidenceTier": "T1",
+      "providerSource": {
+        "url": "https://docs.cloud.google.com/docs/authentication/api-keys",
+        "observedAt": "2026-09-23",
+        "formatVersion": "Google Cloud API key example",
+        "covers": "the provider page identifies the exposed key_string as an API key and shows an AIza-prefixed example; the 35-character suffix and alphabet remain gitleaks-corroborated"
+      },
       "corroboratingScanners": [
         "gitleaks 8.30.1"
       ],
       "twinCoverage": {
-        "pairs": 3,
+        "pairs": 6,
         "failures": 0,
         "unprobeable": null
       },
@@ -971,7 +1001,7 @@
       "detectors": [
         "google-api-key"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret."
+      "reason": null
     },
     {
       "provider": "google",
@@ -990,9 +1020,14 @@
       "provider": "grafana",
       "family": "grafana:cloud-access-policy-token",
       "familyName": "Cloud access policy token",
-      "status": "provisional",
-      "evidenceTier": "T2",
-      "providerSource": null,
+      "status": "stable",
+      "evidenceTier": "T1",
+      "providerSource": {
+        "url": "https://grafana.com/docs/grafana-cloud/observe-and-act/agent-observability/get-started/grafana-cloud/",
+        "observedAt": "2026-09-23",
+        "formatVersion": "glc_ access-policy token prefix",
+        "covers": "Grafana states that Cloud access policy tokens start with glc_; body length and alphabet remain tool-corroborated"
+      },
       "corroboratingScanners": [
         "gitleaks 8.30.1"
       ],
@@ -1009,15 +1044,20 @@
       "detectors": [
         "grafana-cloud-access-policy-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts."
+      "reason": null
     },
     {
       "provider": "grafana",
       "family": "grafana:service-account-token",
       "familyName": "Service account token",
-      "status": "provisional",
-      "evidenceTier": "T2",
-      "providerSource": null,
+      "status": "stable",
+      "evidenceTier": "T1",
+      "providerSource": {
+        "url": "https://grafana.com/blog/new-in-grafana-9-1-service-accounts-are-now-ga/",
+        "observedAt": "2026-09-23",
+        "formatVersion": "glsa service-account token prefix",
+        "covers": "Grafana states that service account tokens carry a glsa prefix; the delimiter, segment lengths, alphabet and checksum placement remain tool-corroborated"
+      },
       "corroboratingScanners": [
         "gitleaks 8.30.1",
         "trufflehog 3.97.4"
@@ -1035,7 +1075,7 @@
       "detectors": [
         "grafana-service-account-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts."
+      "reason": null
     },
     {
       "provider": "hashicorp-terraform",
@@ -1284,15 +1324,20 @@
       "provider": "huggingface",
       "family": "huggingface:api-token",
       "familyName": "API token",
-      "status": "provisional",
-      "evidenceTier": "T2",
-      "providerSource": null,
+      "status": "stable",
+      "evidenceTier": "T1",
+      "providerSource": {
+        "url": "https://huggingface.co/docs/huggingface.js/hub/modules",
+        "observedAt": "2026-09-23",
+        "formatVersion": "@huggingface/hub SDK reference AccessToken type (hf_${string})",
+        "covers": "Hugging Face's SDK reference on huggingface.co types the user access token as hf_${string}, establishing the hf_ prefix; the provider's Hub OpenAPI spec (/.well-known/openapi.json, POST /api/credentials/revoke) gives a raw access-token example of hf_ followed by 34 placeholder characters, which establishes the 34-character body length on example strength only. The [A-Za-z0-9] body alphabet is not provider-stated and remains a support-policy union of the tool alphabets (gitleaks letters only, TruffleHog alphanumeric); the api_org_ variant is not covered by this provider source"
+      },
       "corroboratingScanners": [
         "gitleaks 8.30.1",
         "trufflehog 3.97.4"
       ],
       "twinCoverage": {
-        "pairs": 2,
+        "pairs": 7,
         "failures": 0,
         "unprobeable": null
       },
@@ -1304,7 +1349,7 @@
       "detectors": [
         "huggingface-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 2 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret."
+      "reason": null
     },
     {
       "provider": "linear",
@@ -1323,9 +1368,14 @@
       "provider": "linear",
       "family": "linear:personal-api-key",
       "familyName": "Personal API key",
-      "status": "provisional",
-      "evidenceTier": "T2",
-      "providerSource": null,
+      "status": "stable",
+      "evidenceTier": "T1",
+      "providerSource": {
+        "url": "https://linear.app/changelog/2021-08-19-github-secret-scanning",
+        "observedAt": "2026-09-23",
+        "formatVersion": "Linear-specific API and OAuth prefixes",
+        "covers": "the provider documents lin_api_ for API keys and lin_oauth_ for OAuth access tokens; the 40-character body and alphabet remain tool-corroborated"
+      },
       "corroboratingScanners": [
         "gitleaks 8.30.1",
         "trufflehog 3.97.4"
@@ -1343,7 +1393,7 @@
       "detectors": [
         "linear-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts."
+      "reason": null
     },
     {
       "provider": "mailchimp",
@@ -1427,27 +1477,32 @@
       "provider": "microsoft-entra",
       "family": "microsoft-entra:application-client-secret",
       "familyName": "Application client secret",
-      "status": "provisional",
-      "evidenceTier": "T2",
-      "providerSource": null,
+      "status": "stable",
+      "evidenceTier": "T1",
+      "providerSource": {
+        "url": "https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.applications/add-mgapplicationpassword?view=graph-powershell-1.0",
+        "observedAt": "2026-09-23",
+        "formatVersion": "Graph PowerShell Add-MgApplicationPassword SecretText examples (3 + 8Q~ + 34)",
+        "covers": "Microsoft Graph PowerShell's Add-MgApplicationPassword reference (learn.microsoft.com) prints two example SecretText values, each 3 characters (equal to the printed 3-character Hint), the digit 8, the literal Q~, and 34 characters, 40 in total. The Q~ marker at offset 4 and the 8-variant's 40-character width come from these examples, not from a stated grammar. The 7Q~ 37-character previous format, the digit-to-length coupling and the body alphabet are corroborated only by Microsoft's security-utilities code (SEC101/156) and third-party tools"
+      },
       "corroboratingScanners": [
         "gitleaks 8.30.1",
         "trufflehog 3.97.4"
       ],
       "twinCoverage": {
-        "pairs": 14,
-        "failures": 3,
+        "pairs": 17,
+        "failures": 0,
         "unprobeable": null
       },
       "unresolvedCriticalItems": {
-        "metamorphic": 27,
-        "mutation": 31,
-        "differential": 3
+        "metamorphic": 0,
+        "mutation": 0,
+        "differential": 0
       },
       "detectors": [
         "microsoft-entra-client-secret"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | twinFailures: 3 > 0 — A twin failure is a recorded false negative on the exact discrimination this project exists to make; stable tolerates none, however small the sample. | metamorphic.criticalFailures: 27 > 0 — A metamorphic invariant violation (for example, detection lost after an envelope-preserving transform) shows the detector is not robust to construction, independent of how many cases were run. | mutation.unresolvedCritical: 31 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review. | differential.unresolvedContractDisagreements: 3 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": null
     },
     {
       "provider": "netlify",
@@ -1497,9 +1552,14 @@
       "provider": "new-relic",
       "family": "new-relic:license-key",
       "familyName": "License key",
-      "status": "provisional",
-      "evidenceTier": "T2",
-      "providerSource": null,
+      "status": "stable",
+      "evidenceTier": "T1",
+      "providerSource": {
+        "url": "https://docs.newrelic.com/docs/opentelemetry/integrations/ibm-mq/host/",
+        "observedAt": "2026-09-23",
+        "formatVersion": "ingest license key length and NRAL suffix",
+        "covers": "New Relic's own documentation (docs.newrelic.com, IBM MQ host-integration page) states the ingest license key as 40 characters with the literal suffix NRAL, establishing the suffix and total length; its eBPF install pages show elided examples ending FFFFNRAL. The body alphabet, the FFFF segment and the EU eu01xx prefix are not provider-stated: they rest on New Relic-authored code (newrelic-cli IsValidLicenseKeyFormat, docs-website check-for-keys.sh) and trufflehog 3.97.4"
+      },
       "corroboratingScanners": [
         "trufflehog 3.97.4"
       ],
@@ -1516,15 +1576,20 @@
       "detectors": [
         "new-relic-license-key"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts."
+      "reason": null
     },
     {
       "provider": "new-relic",
       "family": "new-relic:user-api-key",
       "familyName": "User API key",
-      "status": "provisional",
-      "evidenceTier": "T2",
-      "providerSource": null,
+      "status": "stable",
+      "evidenceTier": "T1",
+      "providerSource": {
+        "url": "https://docs.newrelic.com/docs/infrastructure-as-code/terraform/terraform-intro/",
+        "observedAt": "2026-09-23",
+        "formatVersion": "NRAK- user-key prefix",
+        "covers": "New Relic says most user keys begin with NRAK-; body length and alphabet remain tool-corroborated"
+      },
       "corroboratingScanners": [
         "gitleaks 8.30.1",
         "trufflehog 3.97.4"
@@ -1542,7 +1607,7 @@
       "detectors": [
         "new-relic-user-api-key"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts."
+      "reason": null
     },
     {
       "provider": "notion",
@@ -1561,14 +1626,19 @@
       "provider": "notion",
       "family": "notion:legacy-integration-token",
       "familyName": "Legacy integration token",
-      "status": "provisional",
-      "evidenceTier": "T2",
-      "providerSource": null,
+      "status": "stable",
+      "evidenceTier": "T1",
+      "providerSource": {
+        "url": "https://developers.notion.com/page/changelog",
+        "observedAt": "2026-09-23",
+        "formatVersion": "2024-09 Public API token prefix migration",
+        "covers": "the provider documents secret_ as the still-working legacy Public API token prefix and ntn_ as the prefix for newly generated tokens; the 43-character body and alphabet remain tool-corroborated"
+      },
       "corroboratingScanners": [
         "trufflehog 3.97.4"
       ],
       "twinCoverage": {
-        "pairs": 3,
+        "pairs": 6,
         "failures": 0,
         "unprobeable": null
       },
@@ -1580,7 +1650,7 @@
       "detectors": [
         "notion-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret."
+      "reason": null
     },
     {
       "provider": "npm",
@@ -1645,12 +1715,12 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 0
+        "differential": 9
       },
       "detectors": [
         "okta-api-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | differential.unresolvedContractDisagreements: 9 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
     },
     {
       "provider": "openai",

@@ -196,8 +196,10 @@
         "detector-coverage--microsoft-entra-client-secret-leading-dash-unicode-crlf"
       ],
       "corpusHashes": [
-        "47600c267336c2e7fc0f60f201fd59ff18d3d712d22cac2cb9873ff581a54850"
+        "45ff102e8437d6218cd9f67423a744addd984d45338e3586e75b6fa359d0ca5d"
       ],
+      "fixingCommit": "dc855b6222928252a661945828f88a3022e768fd",
+      "benchmarkCommit": "186e6e7053195ad14ebecf823c1cb269d3496654",
       "canonicalFixtures": {
         "synchronous": [
           "microsoft-entra-client-secret-leading-dash-bare",
@@ -209,15 +211,66 @@
       },
       "gates": {
         "productConformance": {
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            "https://github.com/redact-secret/redact-secret/actions/runs/35926288803/job/107402141655",
+            "https://github.com/redact-secret/redact-secret/actions/runs/35926288803/job/107402141444",
+            "https://github.com/redact-secret/redact-secret/actions/runs/35926288803/job/107402140671",
+            "https://github.com/redact-secret/redact-secret/actions/runs/35926288803/job/107402140681"
+          ]
         },
         "benchmarkRevalidation": {
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            "https://github.com/redact-secret/redact-secret-benchmarks/blob/186e6e7053195ad14ebecf823c1cb269d3496654/evidence/575/README.md"
+          ]
         }
       },
-      "note": "microsoft-entra-client-secret rejected a secret whose three-byte leading run contains '-', including a first character of '-'. The benchmark contract already admits it (redact-secret-benchmarks#161, following #655's research), so the three leading-dash detector-coverage fixtures were T2 leaked spans. The fix gives the leading run the same [A-Za-z0-9_.~-] alphabet as the suffix; the outer boundary is unchanged, which the joined-identifier control pins. No incremental case: the change is inside a single bounded match, and no chunk or retention state is involved. Canonical inputs are freshly constructed synthetic values; no benchmark fixture input was copied. The corpus hash is the detector-coverage hash in the vendored pin manifest."
+      "note": "microsoft-entra-client-secret rejected a secret whose three-byte leading run contains '-', including a first character of '-'. The benchmark contract already admits it (redact-secret-benchmarks#161, following #655's research), so the three leading-dash detector-coverage fixtures were T2 leaked spans. The fix gives the leading run the same [A-Za-z0-9_.~-] alphabet as the suffix; the outer boundary is unchanged, which the joined-identifier control pins. No incremental case: the change is inside a single bounded match, and no chunk or retention state is involved. Canonical inputs are freshly constructed synthetic values; no benchmark fixture input was copied. The corpus hash is the detector-coverage hash in the vendored pin manifest. Fixed in dc855b6 (PR #709). The canonical fixtures pass in main CI run 35926288803 (Rust native host, Node, browser wasm and CLI jobs). The benchmark reran the fixed detector (candidate 0233674, identical detector code) and all three fixtures report exact spans; the clean-main rerun (candidate 44bb3d6, run a9862a93) reproduced this. The corpus hash was re-pinned to the detector-coverage hash at the pinned revision after #708's fixtures were added."
+    },
+    {
+      "id": "benchmark-gap-708",
+      "benchmarkRecordId": "product-708",
+      "benchmarkIssue": "https://github.com/redact-secret/redact-secret-benchmarks/issues/10",
+      "productIssue": "https://github.com/redact-secret/redact-secret/issues/708",
+      "benchmarkFixtureIds": [
+        "detector-coverage--docker-token-oat-27-bare",
+        "detector-coverage--docker-token-oat-27-quoted",
+        "detector-coverage--docker-token-oat-27-unicode-crlf"
+      ],
+      "corpusHashes": [
+        "45ff102e8437d6218cd9f67423a744addd984d45338e3586e75b6fa359d0ca5d"
+      ],
+      "fixingCommit": "dc855b6222928252a661945828f88a3022e768fd",
+      "benchmarkCommit": "186e6e7053195ad14ebecf823c1cb269d3496654",
+      "canonicalFixtures": {
+        "synchronous": [
+          "docker-boundary-pat-length-under-oat-prefix",
+          "docker-oat-27-byte-body-dotenv",
+          "docker-oat-27-byte-body-crlf-unicode",
+          "docker-oat-26-byte-body-rejected",
+          "docker-oat-28-byte-body-rejected"
+        ],
+        "incremental": []
+      },
+      "gates": {
+        "productConformance": {
+          "status": "passed",
+          "evidence": [
+            "https://github.com/redact-secret/redact-secret/actions/runs/35926288803/job/107402141655",
+            "https://github.com/redact-secret/redact-secret/actions/runs/35926288803/job/107402141444",
+            "https://github.com/redact-secret/redact-secret/actions/runs/35926288803/job/107402140671",
+            "https://github.com/redact-secret/redact-secret/actions/runs/35926288803/job/107402140681"
+          ]
+        },
+        "benchmarkRevalidation": {
+          "status": "passed",
+          "evidence": [
+            "https://github.com/redact-secret/redact-secret-benchmarks/blob/186e6e7053195ad14ebecf823c1cb269d3496654/evidence/575/README.md"
+          ]
+        }
+      },
+      "note": "docker-token rejected a dckr_oat_ organization access token with a 27-byte body, the width Docker's own Hub API reference example shows (#647). The fix (dc855b6, PR #709) adds RunLength::OneOf, so dckr_oat_ accepts exactly 27 or 32 bytes of [A-Za-z0-9_-]. The 26- and 28-byte controls pin both exact edges, and the former docker-boundary-pat-length-under-oat-prefix rejection is now a supported positive. No incremental case: the change is inside one bounded match, with no chunk or retention state. Canonical inputs are freshly built synthetic values. The benchmark reran the fixed detector (candidate 0233674, identical detector code) and got exact spans; the clean-main rerun (candidate 44bb3d6, run a9862a93) reproduced them."
     }
   ]
 }
