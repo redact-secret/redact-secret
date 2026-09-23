@@ -13,10 +13,34 @@
 
 mod support;
 
+use std::sync::{RwLock, RwLockReadGuard, RwLockWriteGuard};
 use std::time::Instant;
 
 use redact_secret::{IncrementalLimits, IncrementalSanitizer, SecretScanErrorCode, SessionState};
 use support::{CanonicalFixture, run_session, synchronous_corpus, whole_input};
+
+/// Keeps the wall-clock assertions from measuring their sibling tests.
+///
+/// The tests in this binary run concurrently and most of them walk the whole
+/// adversarial corpus, so a per-fixture `Instant` measurement would also count
+/// the CPU the other tests are spending. Timed tests take the write side and
+/// run alone; every other test takes the read side and still runs alongside
+/// its peers.
+static TIMING_ISOLATION: RwLock<()> = RwLock::new(());
+
+/// Held by a test whose assertions depend on wall-clock time.
+fn timed() -> RwLockWriteGuard<'static, ()> {
+    TIMING_ISOLATION
+        .write()
+        .unwrap_or_else(std::sync::PoisonError::into_inner)
+}
+
+/// Held by a test that does not measure time, so a timed test can exclude it.
+fn untimed() -> RwLockReadGuard<'static, ()> {
+    TIMING_ISOLATION
+        .read()
+        .unwrap_or_else(std::sync::PoisonError::into_inner)
+}
 
 /// The adversarial tier of the canonical synchronous corpus.
 fn adversarial_fixtures() -> Vec<CanonicalFixture> {
@@ -71,6 +95,7 @@ fn limits_for(fixture: &CanonicalFixture) -> IncrementalLimits {
 
 #[test]
 fn the_adversarial_tier_is_present_and_fully_declared() {
+    let _isolation = untimed();
     let fixtures = adversarial_fixtures();
     assert!(
         fixtures.len() >= 26,
@@ -94,6 +119,7 @@ fn the_adversarial_tier_is_present_and_fully_declared() {
 
 #[test]
 fn every_adversarial_fixture_stays_within_its_declared_input_and_finding_caps() {
+    let _isolation = untimed();
     for fixture in adversarial_fixtures() {
         let resource = fixture.resource.unwrap();
         assert!(
@@ -137,6 +163,7 @@ fn every_adversarial_fixture_stays_within_its_declared_input_and_finding_caps() 
 
 #[test]
 fn every_adversarial_fixture_is_deterministic() {
+    let _isolation = untimed();
     for fixture in adversarial_fixtures() {
         let (first_text, first_findings) = whole_input(&fixture.input);
         let (second_text, second_findings) = whole_input(&fixture.input);
@@ -147,6 +174,7 @@ fn every_adversarial_fixture_is_deterministic() {
 
 #[test]
 fn the_whole_input_adversarial_corpus_stays_within_its_declared_runtime_cap() {
+    let _isolation = timed();
     for fixture in adversarial_fixtures() {
         let resource = fixture.resource.unwrap();
         let started_at = Instant::now();
@@ -165,6 +193,7 @@ fn the_whole_input_adversarial_corpus_stays_within_its_declared_runtime_cap() {
 
 #[test]
 fn the_incremental_adversarial_corpus_agrees_and_stays_within_its_runtime_cap() {
+    let _isolation = timed();
     for fixture in adversarial_fixtures() {
         let resource = fixture.resource.unwrap();
         let (expected_text, expected_findings) = whole_input(&fixture.input);
@@ -205,6 +234,7 @@ fn a_fragmented_adversarial_partition_stays_within_the_same_runtime_cap() {
     // inputs into fixed-size chunks and assert the declared runtime cap
     // still holds and the result is unchanged.
     const CHUNK_BYTES: usize = 1_024;
+    let _isolation = timed();
 
     for fixture in adversarial_fixtures() {
         let resource = fixture.resource.unwrap();
@@ -245,6 +275,7 @@ fn a_fragmented_adversarial_partition_stays_within_the_same_runtime_cap() {
 
 #[test]
 fn an_adversarial_input_above_a_session_limit_fails_safely_without_output() {
+    let _isolation = untimed();
     // The caps above are the corpus's declaration of bounded behavior; this
     // is the complementary guarantee, that an input beyond a session's own
     // limits is refused rather than absorbed. The fixture is the corpus's
