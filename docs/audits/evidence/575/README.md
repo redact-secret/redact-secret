@@ -13,10 +13,9 @@ record contains no credential value.
 ## Result
 
 PASS. The benchmark measurement is frozen at
-[redact-secret-benchmarks evidence/575](https://github.com/redact-secret/redact-secret-benchmarks/blob/2849733f66479441a812891f2a32b69fcca3b697/evidence/575/README.md).
-It is linked at the benchmark branch commit; re-pin the link to the `main`
-merge commit once `workbench/112-retier-provider-families` merges. Its
-one-line result:
+[redact-secret-benchmarks evidence/575](https://github.com/redact-secret/redact-secret-benchmarks/blob/186e6e7053195ad14ebecf823c1cb269d3496654/evidence/575/README.md).
+It is pinned to benchmarks `main` at the PR #178 merge commit. Its one-line
+result:
 
 > All seven selected taxonomy families are `stable`, so 15 existing families
 > have now moved from `provisional` to `stable` against the beta.6 baseline
@@ -126,28 +125,50 @@ pass.
 | #574 committed families at `provisional` or better | Yes; `heroku:oauth-access-token` is `stable` |
 | No plaintext or real-derived credential material | None in this record, the benchmark evidence or the ledger notes |
 
-## Not done yet
+## Update 2026-09-23: clean-main qualification and follow-ups
 
-- **Clean-main measurement.** The run above is candidate mode, on branches.
-  The epic's final measurement must be repeated after this branch and
-  benchmarks `workbench/112-retier-provider-families` merge. The published
-  matrix also needs the release, because #707 and #708 are unreleased.
-- **Published-mode ledger ids.** `queue:check` in the benchmark repo still
-  lists 3 `new-relic-license-key` and 3 `microsoft-entra-client-secret` ids
-  that exist only in published mode. Settle them before the published matrix
-  is regenerated.
-- **`benchmark-gap-708` in `conformance/benchmark-regressions.json`.** The
-  benchmark fixture ids for #708 are not yet in the vendored pin manifest, so
-  the record can only be added after benchmarks main includes them and
-  `npm run benchmark-pins:sync` runs. The product-conformance and
-  benchmark-revalidation gates for `benchmark-gap-707` stay `pending` until
-  evidence is linked from merged commits.
-- **Contract review text.** The benchmark contracts' `review` text still
-  describes the #707 and #708 misses as current. Update it when the known
-  gaps move to `fixed`.
-- **Support matrix docs.** `docs/support-matrix.md`, README and CHANGELOG
-  support counts follow the published matrix. Update them at the pin sync
-  after release, not from this candidate run.
+Both branches merged: this repository's PR #709 as main `44bb3d6` (fix commit
+`dc855b6`), and redact-secret-benchmarks PR #178 as main `186e6e7`. Both merges
+rewrote the branch commits named above. The measurement was repeated at the two
+clean mains with the same pinned scanners:
+
+- **Candidate run** `a9862a93-f185-4abf-94fd-a71d17504fd8`: 1,466 of 1,466
+  fixtures, corpus hash unchanged, 0 `MISS`.
+- **Pinned candidate-mode classification** `715d2d8e-0862-4ba8-9ef2-18b90091030c`:
+  49 `stable`, identical family for family to the branch run, 0 regressions.
+
+The raw records are in the benchmark evidence's `clean-main/` addendum (benchmark
+follow-up branch `workbench/575-post-merge-follow-ups`).
+
+Follow-ups closed:
+
+- `benchmark-gap-707` and the new `benchmark-gap-708` in
+  `conformance/benchmark-regressions.json` record the fix commit, and both gates
+  are `passed`: main CI job links for product conformance, and the benchmark
+  evidence for revalidation. Known gaps `product-707` and `product-708` are
+  `fixed` in the benchmark repository, and the contract `review` text no longer
+  describes them as current misses.
+- The benchmark pin manifest named a pre-merge branch revision (`d22fd86`), which
+  broke this repository's `Benchmark pin drift` job on main. The benchmark
+  follow-up re-points it to `186e6e7`, and this repository vendors that copy.
+- The evidence links are re-pinned to benchmarks `main`.
+- The vendored `benchmarks/support-matrix.json` is now clean-main run
+  `715d2d8e` (benchmarks `186e6e7`): 49 `stable`. `docs/support-matrix.md`,
+  the README summary and CHANGELOG are regenerated from it. In this run,
+  netlify and confluent read `provisional` only because their candidate-mode
+  ledger rows are not on benchmarks `main` yet. The benchmark follow-up adds
+  those 12 rows, and the same candidate then reports 51 `stable` (run
+  `8a2e90a9`). Re-vendor after that branch merges.
+
+Still open, and not closable before a release:
+
+- **Published-mode status.** A published-mode classification at benchmarks
+  main (`3797613a`, default product = published 0.1.0-beta.6) reports 43
+  `stable`. Entra, Docker, New Relic license and Datadog application key stay
+  `provisional` there, because beta.6 does not contain their detector changes.
+  Their open ledger rows (including the six New Relic license and Entra ids
+  noted earlier) are real beta.6 misses. They can only be settled against a
+  published beta.7.
 
 ## Authority
 

@@ -186,7 +186,7 @@ twins and ledger rows landed in redact-secret-benchmarks#112, and one pinned
 run shows all eight families `stable` with no regression among the 33
 baseline families. That run is benchmark `eceaf0a`, product `63d3367`, and
 support run `070a23b2-4952-4860-acb1-6ef6c46c3016`; the frozen record is
-[redact-secret-benchmarks evidence/642](https://github.com/redact-secret/redact-secret-benchmarks/blob/d22fd86364bf243ca6994fbc5bc486d600bd5a22/evidence/642/README.md).
+[redact-secret-benchmarks evidence/642](https://github.com/redact-secret/redact-secret-benchmarks/blob/186e6e7053195ad14ebecf823c1cb269d3496654/evidence/642/README.md).
 That run's only T1/T2 leaked spans were the three Entra leading-dash
 fixtures. They were fixed by #707 and re-measured in the Epic A
 qualification, [#575 evidence](../575/README.md).

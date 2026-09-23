@@ -18,6 +18,19 @@ evidence is linked from each published version.
 
 ### Changed
 
+- The pinned [support matrix](docs/support-matrix.md) was re-measured at
+  clean product `main` (`44bb3d6`, candidate mode) and benchmarks `main`
+  (`186e6e7`, run `715d2d8e`), with gitleaks 8.30.1 and trufflehog 3.97.4.
+  Epic A's 15 existing families move from `provisional` to `stable`:
+  anthropic, linear, notion, New Relic user and license, both Grafana
+  families, Azure DevOps, Google, both Datadog families, Hugging Face,
+  Microsoft Entra, and both Docker families. 49 of 93 families are now
+  `stable` (#575, [evidence](docs/audits/evidence/575/README.md)).
+  `netlify:personal-access-token` and `confluent:cloud-api-secret` read
+  `provisional` in this run. Detection has not regressed: their
+  candidate-mode differential review rows are not yet on benchmarks `main`.
+  With those rows (benchmarks `workbench/575-post-merge-follow-ups`), the
+  same candidate reports 51 `stable`.
 - `microsoft-entra-client-secret` now detects a client secret whose first
   three characters include `-`, including one that starts with `-`. The
   three bytes before the `<digit>Q~` marker now accept the same
