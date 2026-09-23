@@ -5858,6 +5858,114 @@
       "type": "pulumi_access_token"
     },
     {
+      "behaviorClass": "provider",
+      "detector": "databricks-personal-access-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "databricks-personal-access-token-positive-bare",
+            "databricks-personal-access-token-positive-crlf-unicode-prefix",
+            "databricks-personal-access-token-positive-dotenv",
+            "databricks-personal-access-token-positive-github-actions",
+            "databricks-personal-access-token-positive-json",
+            "databricks-personal-access-token-positive-log",
+            "databricks-personal-access-token-positive-punctuation-adjacent",
+            "databricks-personal-access-token-positive-python-source",
+            "databricks-personal-access-token-positive-repeated-value",
+            "databricks-personal-access-token-positive-rotated-dotenv",
+            "databricks-personal-access-token-positive-rotated-suffix",
+            "databricks-personal-access-token-positive-shell-quoted",
+            "databricks-personal-access-token-positive-yaml"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "databricks-personal-access-token-overlap-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "databricks-personal-access-token-adversarial-long-suffix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "databricks-personal-access-token-boundary-encoded-prefix",
+            "databricks-personal-access-token-boundary-invalid-alphabet",
+            "databricks-personal-access-token-boundary-one-long",
+            "databricks-personal-access-token-boundary-one-short",
+            "databricks-personal-access-token-boundary-rotation-multi-digit",
+            "databricks-personal-access-token-boundary-rotation-non-digit",
+            "databricks-personal-access-token-boundary-rotation-separator"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "databricks-personal-access-token-negative-actions-secret-ref",
+            "databricks-personal-access-token-negative-cluster-and-job-ids",
+            "databricks-personal-access-token-negative-config-file-no-token",
+            "databricks-personal-access-token-negative-doc-style-placeholder",
+            "databricks-personal-access-token-negative-embedded-identifier",
+            "databricks-personal-access-token-negative-masked",
+            "databricks-personal-access-token-negative-notebook-path",
+            "databricks-personal-access-token-negative-workspace-host-url",
+            "databricks-personal-access-token-negative-wrong-prefix-case"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "databricks-personal-access-token-boundary-encoded-prefix",
+            "databricks-personal-access-token-boundary-invalid-alphabet",
+            "databricks-personal-access-token-boundary-one-long",
+            "databricks-personal-access-token-boundary-one-short",
+            "databricks-personal-access-token-boundary-rotation-multi-digit",
+            "databricks-personal-access-token-boundary-rotation-non-digit",
+            "databricks-personal-access-token-boundary-rotation-separator"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for databricks_personal_access_token (databricks-personal-access-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "databricks_personal_access_token"
+    },
+    {
       "behaviorClass": "incremental",
       "detector": "unassigned",
       "dimensions": [
@@ -5989,6 +6097,7 @@
             "connection-adversarial-malformed-authority",
             "connection-adversarial-overlong",
             "contextual-adversarial-overlong",
+            "databricks-personal-access-token-adversarial-long-suffix",
             "datadog-api-key-adversarial-dense-findings",
             "datadog-application-key-adversarial-dense-findings",
             "digitalocean-adversarial-long-suffix",
@@ -6376,6 +6485,7 @@
             "connection-adversarial-malformed-authority",
             "connection-adversarial-overlong",
             "contextual-adversarial-overlong",
+            "databricks-personal-access-token-adversarial-long-suffix",
             "datadog-api-key-adversarial-dense-findings",
             "datadog-application-key-adversarial-dense-findings",
             "digitalocean-adversarial-long-suffix",
