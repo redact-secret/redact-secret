@@ -60,7 +60,9 @@ STATUS_COPY = {
         "Officially supported. Provider-documented (T1) contract, negative "
         "twins, benign controls, metamorphic and mutation evidence, with no "
         "unresolved critical disagreement. You can rely on this family's "
-        "detection and its precision behavior."
+        "detection and its precision behavior. Stable does not mean every "
+        "historical or future variant of this credential is detected -- see "
+        "each family's supported contexts and known limitations below."
     ),
     "provisional": (
         "Useful today, but the evidence behind it is incomplete -- typically "
@@ -148,6 +150,7 @@ def _escape_cell(value: str) -> str:
 
 def render_matrix_markdown(matrix: dict) -> str:
     families = matrix["families"]
+    revision = matrix["sourceReport"]["revision"]
     lines = [
         "# Support matrix",
         "",
@@ -163,9 +166,15 @@ def render_matrix_markdown(matrix: dict) -> str:
         "with `benchmarks/support-matrix.json`. That file is itself a pinned copy of "
         "`redact-secret-benchmarks`'s generated evidence "
         "([source revision](https://github.com/redact-secret/redact-secret-benchmarks/commit/"
-        f"{matrix['sourceReport']['revision']})); see the module docstring for how to refresh it.",
+        f"{revision})); see the module docstring for how to refresh it.",
         "",
         f"{matrix['providerCount']} providers, {matrix['familyCount']} credential families.",
+        "",
+        "For the detailed measurement protocol behind these statuses -- evidence tiers, and "
+        "the twin, benign, metamorphic, mutation, and differential criteria a family must clear "
+        "-- see `redact-secret-benchmarks`'s "
+        f"[support-status specification](https://github.com/redact-secret/redact-secret-benchmarks/blob/{revision}/docs/support-status.md). "
+        "You do not need to read it to use this table.",
         "",
         "## What each status means",
         "",
@@ -199,13 +208,28 @@ def render_matrix_markdown(matrix: dict) -> str:
                     _escape_cell(family["familyName"]),
                     _escape_cell(family["evidenceTier"] or "—"),
                     _escape_cell(", ".join(family["detectors"]) or "—"),
-                    _escape_cell(family["reason"] or "—"),
+                    _escape_cell(_last_column(family, status)),
                 ]
             )
-        lines.append(_markdown_table(["Provider", "Family", "Evidence tier", "Detector(s)", "Reason"], rows))
+        last_header = "Supported contexts & known limitations" if status == "stable" else "Reason"
+        lines.append(_markdown_table(["Provider", "Family", "Evidence tier", "Detector(s)", last_header], rows))
         lines.append("")
 
     return "\n".join(lines).rstrip("\n") + "\n"
+
+
+def _last_column(family: dict, status: str) -> str:
+    """For `stable` families, the table's fifth column names supported
+    contexts and known limitations instead of a reason (`stable` carries no
+    `reason` -- see `validate_matrix`), drawn from the T1 `providerSource`
+    evidence required to reach `stable` at all. Every other status keeps its
+    recorded `reason` there, as before."""
+    if status != "stable":
+        return family["reason"] or "—"
+    provider_source = family.get("providerSource")
+    if provider_source and provider_source.get("covers"):
+        return provider_source["covers"]
+    return "not recorded in the pinned evidence"
 
 
 def render_readme_fragment(matrix: dict) -> str:
@@ -235,6 +259,18 @@ def inject_readme_fragment(readme_text: str, fragment: str) -> str:
     return readme_text[:start] + fragment + readme_text[end:]
 
 
+def _move_tag(old_status: str, new_status: str) -> str:
+    """Labels a status move as a regression or improvement exactly when it
+    crosses the `stable` boundary, matching `check-support-matrix-drift.py`'s
+    own regression/improvement vocabulary so a reader sees the same word for
+    the same kind of change in both places."""
+    if old_status == "stable" and new_status != "stable":
+        return " (regression)"
+    if new_status == "stable" and old_status != "stable":
+        return " (improvement)"
+    return ""
+
+
 def render_release_note(matrix: dict, previous: dict | None) -> str:
     """A fragment meant for the dated `CHANGELOG.md` entry (this repository's
     release notes; see docs/releasing.md), not `docs/releases/<version>/README.md`,
@@ -262,10 +298,17 @@ def render_release_note(matrix: dict, previous: dict | None) -> str:
     added = sorted(set(current_by_family) - set(previous_by_family))
     removed = sorted(set(previous_by_family) - set(current_by_family))
 
+    previous_stable = previous["distribution"].get("stable", 0)
+    current_stable = distribution.get("stable", 0)
+    lines.append("")
+    lines.append(
+        f"Stable: {current_stable} ({current_stable - previous_stable:+d} from {previous_stable})."
+    )
+
     lines.append("")
     if moved:
         lines.append("Moved since the previous release:")
-        lines.extend(f"- `{family}`: {old} -> {new}" for family, old, new in moved)
+        lines.extend(f"- `{family}`: {old} -> {new}{_move_tag(old, new)}" for family, old, new in moved)
     else:
         lines.append("No family's status moved since the previous release.")
     if added:
