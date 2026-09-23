@@ -44,7 +44,7 @@ for your host. An organization-specific format that is not listed here can be ad
 as a [declarative ruleset](../guides/rulesets.md).
 
 <!-- detector-inventory:start -->
-49 built-in detectors emit 56 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
+50 built-in detectors emit 57 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
 
 | Detector | Finding types | Default policy class | Schemes |
 | --- | --- | --- | --- |
@@ -97,6 +97,7 @@ as a [declarative ruleset](../guides/rulesets.md).
 | `databricks-personal-access-token` | `databricks_personal_access_token` | `always-redact` | — |
 | `confluent-cloud-api-secret` | `confluent_cloud_api_secret` | `always-redact` | — |
 | `confluent-cloud-api-secret-legacy` | `confluent_cloud_api_secret_legacy` | `confidence-gated` | — |
+| `netlify-token` | `netlify_personal_access_token` | `always-redact` | — |
 <!-- detector-inventory:end -->
 
 ## Detector profiles

@@ -28,6 +28,7 @@ mod grafana;
 mod jwt;
 mod linear;
 mod microsoft_entra;
+mod netlify;
 mod new_relic;
 mod notion;
 mod openai;
@@ -105,6 +106,7 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(databricks::DATABRICKS),
         Box::new(confluent::CONFLUENT_CLOUD_API_SECRET),
         Box::new(confluent::ConfluentLegacyApiSecretDetector),
+        Box::new(netlify::NetlifyPersonalAccessTokenDetector),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
         Box::new(ConnectionStringDetector),
@@ -199,6 +201,7 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("databricks-personal-access-token", Pack::Provider),
     ("confluent-cloud-api-secret", Pack::Provider),
     ("confluent-cloud-api-secret-legacy", Pack::Provider),
+    ("netlify-token", Pack::Provider),
     ("jwt", Pack::Common),
     ("bearer-token", Pack::Common),
     ("connection-string", Pack::Common),
@@ -282,6 +285,7 @@ mod tests {
                 "databricks-personal-access-token",
                 "confluent-cloud-api-secret",
                 "confluent-cloud-api-secret-legacy",
+                "netlify-token",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -560,6 +564,7 @@ mod tests {
             format!("dapi{}", "0123456789abcdef0123456789abcdef");
         let confluent_cloud_api_secret_input =
             "cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPQRSTUV";
+        let netlify_token_input = "nfp_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01";
         let cases = [
             (
                 "sentry-user-auth-token",
@@ -589,6 +594,7 @@ mod tests {
                 "confluent-cloud-api-secret",
                 confluent_cloud_api_secret_input,
             ),
+            ("netlify-token", netlify_token_input),
         ];
         assert_provider_candidates(&cases);
     }

@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 1496,
+  "fixtureCount": 1522,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -3245,7 +3245,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 密钥 café\r\npk_live_SYNTHETICREVOKEDSYNT\r\n",
+      "input": "# \ud83d\udd11 \u5bc6\u94a5 caf\u00e9\r\npk_live_SYNTHETICREVOKEDSYNT\r\n",
       "expected": [],
       "note": "A preceding Unicode comment line and CRLF line endings do not turn the public identifier prefix into a classified credential."
     },
@@ -3416,7 +3416,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\nsk_live_SYNTHETICREVOKEDSYNTHETICREVOKED\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\nsk_live_SYNTHETICREVOKEDSYNTHETICREVOKED\r\n",
       "expected": [
         {
           "detector": "stripe-token",
@@ -4194,7 +4194,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\npypi-SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\npypi-SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\r\n",
       "expected": [
         {
           "detector": "pypi-token",
@@ -4796,7 +4796,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\ndckr_pat_SYNTHETIC_REVOKED_KEY_VALUE\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\ndckr_pat_SYNTHETIC_REVOKED_KEY_VALUE\r\n",
       "expected": [
         {
           "detector": "docker-token",
@@ -5187,7 +5187,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\ncfut_SYNTHETICREVOKEDCLOUDFLAREAPITOKENVALUE1deadbeef\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\ncfut_SYNTHETICREVOKEDCLOUDFLAREAPITOKENVALUE1deadbeef\r\n",
       "expected": [
         {
           "detector": "cloudflare-token",
@@ -5616,7 +5616,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\ndop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\ndop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\r\n",
       "expected": [
         {
           "detector": "digitalocean-token",
@@ -6151,7 +6151,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 reviewed format\r\ndop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcde\n\r\n",
+      "input": "# \ud83d\udd11 reviewed format\r\ndop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcde\n\r\n",
       "expected": [],
       "note": "Regression frozen from issue #369's self-contained synthetic snapshot (benchmark fixture digitalocean-token-dop-unicode-crlf-twin; published @redact-secret/core@0.1.0-beta.4, default detectors, measurement protocol v4, local benchmark run 2026-09-17T21:26:02.204Z-3390af, corpus SHA-256 19ca47f5dbf21acc94c6712a51d6586c9fd1653b3da132172622c0e7c4b08fb8). Negative twin (length 63 vs contracted 64) after a Unicode comment and CRLF that beta.4 flagged at bytes [24,94); silence follows from construction. The value is locally constructed and was never provider-issued."
     },
@@ -6164,7 +6164,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 reviewed format\r\ndop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\n\r\n",
+      "input": "# \ud83d\udd11 reviewed format\r\ndop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\n\r\n",
       "expected": [
         {
           "detector": "digitalocean-token",
@@ -6221,7 +6221,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 reviewed format\r\ndoo_v1_fedcba9876543210fedcba9876543210fedcba9876543210fedcba987654321\n\r\n",
+      "input": "# \ud83d\udd11 reviewed format\r\ndoo_v1_fedcba9876543210fedcba9876543210fedcba9876543210fedcba987654321\n\r\n",
       "expected": [],
       "note": "Regression frozen from issue #369's self-contained synthetic snapshot (benchmark fixture digitalocean-token-doo-unicode-crlf-twin; published @redact-secret/core@0.1.0-beta.4, default detectors, measurement protocol v4, local benchmark run 2026-09-17T21:26:02.204Z-3390af, corpus SHA-256 19ca47f5dbf21acc94c6712a51d6586c9fd1653b3da132172622c0e7c4b08fb8). Negative twin (length 63 vs contracted 64) after a Unicode comment and CRLF that beta.4 flagged at bytes [24,94); silence follows from construction. The value is locally constructed and was never provider-issued."
     },
@@ -6234,7 +6234,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 reviewed format\r\ndoo_v1_fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210\n\r\n",
+      "input": "# \ud83d\udd11 reviewed format\r\ndoo_v1_fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210\n\r\n",
       "expected": [
         {
           "detector": "digitalocean-token",
@@ -6291,7 +6291,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 reviewed format\r\ndor_v1_123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\n\r\n",
+      "input": "# \ud83d\udd11 reviewed format\r\ndor_v1_123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\n\r\n",
       "expected": [],
       "note": "Regression frozen from issue #369's self-contained synthetic snapshot (benchmark fixture digitalocean-token-dor-unicode-crlf-twin; published @redact-secret/core@0.1.0-beta.4, default detectors, measurement protocol v4, local benchmark run 2026-09-17T21:26:02.204Z-3390af, corpus SHA-256 19ca47f5dbf21acc94c6712a51d6586c9fd1653b3da132172622c0e7c4b08fb8). Negative twin (length 63 vs contracted 64) after a Unicode comment and CRLF that beta.4 flagged at bytes [24,94); silence follows from construction. The value is locally constructed and was never provider-issued."
     },
@@ -6304,7 +6304,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 reviewed format\r\ndor_v1_123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0\n\r\n",
+      "input": "# \ud83d\udd11 reviewed format\r\ndor_v1_123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0\n\r\n",
       "expected": [
         {
           "detector": "digitalocean-token",
@@ -6384,7 +6384,7 @@
       },
       "input": "lin_api_SyntheticRevokedLinearApiTokenABCDEF012",
       "expected": [],
-      "note": "Issue #374: a 39-byte body — one byte short of the documented 40-byte length — is the beta.4 linear-token-api-plain-twin regression shape; silence follows from construction."
+      "note": "Issue #374: a 39-byte body \u2014 one byte short of the documented 40-byte length \u2014 is the beta.4 linear-token-api-plain-twin regression shape; silence follows from construction."
     },
     {
       "id": "linear-boundary-one-long-exact-length",
@@ -6403,7 +6403,7 @@
       },
       "input": "lin_api_SyntheticRevokedLinearApiTokenABCDEF01239",
       "expected": [],
-      "note": "Issue #374: a 41-byte body — one byte past the documented 40-byte length — is not misread as the exact shape followed by a trailing byte."
+      "note": "Issue #374: a 41-byte body \u2014 one byte past the documented 40-byte length \u2014 is not misread as the exact shape followed by a trailing byte."
     },
     {
       "id": "linear-boundary-invalid-alphabet-exact-length",
@@ -6894,7 +6894,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 密钥 café\r\nsb_publishable_SYNTHETICREVOKEDSYNT\r\n",
+      "input": "# \ud83d\udd11 \u5bc6\u94a5 caf\u00e9\r\nsb_publishable_SYNTHETICREVOKEDSYNT\r\n",
       "expected": [],
       "note": "A preceding Unicode comment line and CRLF line endings do not turn the public identifier prefix into a classified credential."
     },
@@ -7065,7 +7065,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\nsb_secret_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\nsb_secret_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\r\n",
       "expected": [
         {
           "detector": "supabase-token",
@@ -7747,7 +7747,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\nvcp_SYNTHETIC_REVOKED_KEY_VALUE\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\nvcp_SYNTHETIC_REVOKED_KEY_VALUE\r\n",
       "expected": [
         {
           "detector": "vercel-token",
@@ -8051,7 +8051,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\nnpm_SYNTHETICREVOKEDSYNTHETICREVOKEDSYNT\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\nnpm_SYNTHETICREVOKEDSYNTHETICREVOKEDSYNT\r\n",
       "expected": [
         {
           "detector": "npm-token",
@@ -8359,7 +8359,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "АІzaSYNTHETIC_REVOKED_GOOGLE_API_KEY012",
+      "input": "\u0410\u0406zaSYNTHETIC_REVOKED_GOOGLE_API_KEY012",
       "expected": [],
       "note": "A Cyrillic-lookalike prefix (U+0410, U+0406 in place of ASCII A, I) is not the documented ASCII AIza prefix and is not classified."
     },
@@ -8964,7 +8964,7 @@
       },
       "input": "XAKIASYNTHETICEXAMPLEY",
       "expected": [],
-      "note": "Accepted tradeoff, not a shape-based allowance: a key-shaped run merged into a longer alphanumeric identifier (alnum on both sides) is indistinguishable at the grammar level from an ordinary wider identifier that happens to contain the same 20 characters, so it is excluded. This can suppress a genuine AKIA/ASIA key if it were ever concatenated directly against other alphanumeric text (for example inside a base64 blob or a compound token) with no separator; that residual false-negative risk is accepted because is_alnum boundary checking cannot resolve it without a wider identifier grammar. It does not apply merely because punctuation, whitespace, or a line boundary sits on either side of the value — see the paired surviving positive, aws-positive-punctuation-boundary."
+      "note": "Accepted tradeoff, not a shape-based allowance: a key-shaped run merged into a longer alphanumeric identifier (alnum on both sides) is indistinguishable at the grammar level from an ordinary wider identifier that happens to contain the same 20 characters, so it is excluded. This can suppress a genuine AKIA/ASIA key if it were ever concatenated directly against other alphanumeric text (for example inside a base64 blob or a compound token) with no separator; that residual false-negative risk is accepted because is_alnum boundary checking cannot resolve it without a wider identifier grammar. It does not apply merely because punctuation, whitespace, or a line boundary sits on either side of the value \u2014 see the paired surviving positive, aws-positive-punctuation-boundary."
     },
     {
       "id": "aws-positive-punctuation-boundary",
@@ -9030,7 +9030,7 @@
           "end": 32
         }
       ],
-      "note": "A key-shaped value inside a comment naming the field 'example' is not suppressed merely by that context — only the exact vendor-documented literal is excluded (see the regression-aws-example-* fixtures). This is a genuine credential shape and must still be detected."
+      "note": "A key-shaped value inside a comment naming the field 'example' is not suppressed merely by that context \u2014 only the exact vendor-documented literal is excluded (see the regression-aws-example-* fixtures). This is a genuine credential shape and must still be detected."
     },
     {
       "id": "aws-positive-unicode-adjacent-multibyte-before",
@@ -9041,7 +9041,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "caféAKIASYNTHETICEXAMPLE",
+      "input": "caf\u00e9AKIASYNTHETICEXAMPLE",
       "expected": [
         {
           "detector": "aws-access-key",
@@ -9052,7 +9052,7 @@
           "end": 25
         }
       ],
-      "note": "A multi-byte UTF-8 character (é, 2 bytes) immediately before the run is correctly treated as a non-alnum boundary byte, and the UTF-8 byte offset lands past both of its bytes rather than splitting them."
+      "note": "A multi-byte UTF-8 character (\u00e9, 2 bytes) immediately before the run is correctly treated as a non-alnum boundary byte, and the UTF-8 byte offset lands past both of its bytes rather than splitting them."
     },
     {
       "id": "aws-adversarial-long-suffix",
@@ -10049,7 +10049,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\nglpat-SYNTHETIC_REVOKED_GITLAB_TOKEN\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\nglpat-SYNTHETIC_REVOKED_GITLAB_TOKEN\r\n",
       "expected": [
         {
           "detector": "gitlab-token",
@@ -10112,7 +10112,7 @@
       ],
       "input": "Cookie: _gitlab_session=abcdef0123456789abcdef0123456789abcdef01",
       "expected": [],
-      "note": "Issue #518 inventory: the GitLab session cookie (`_gitlab_session=`) is a documented row in GitLab's token-prefix table but is recorded unsupported here — its name=value cookie shape, not a `glXXX-`-prefixed bearer credential, is outside this detector's grammar, and a dedicated cookie-value rule would risk matching arbitrary opaque session identifiers generally."
+      "note": "Issue #518 inventory: the GitLab session cookie (`_gitlab_session=`) is a documented row in GitLab's token-prefix table but is recorded unsupported here \u2014 its name=value cookie shape, not a `glXXX-`-prefixed bearer credential, is outside this detector's grammar, and a dedicated cookie-value rule would risk matching arbitrary opaque session identifiers generally."
     },
     {
       "id": "gitlab-negative-legacy-runner-registration-token",
@@ -10160,7 +10160,7 @@
           "end": 26
         }
       ],
-      "note": "Issue #518 inventory: when a routable runner authentication token's base64 payload alone reaches the 20-byte floor, the existing grammar still matches — truncated at the first `.`, missing the version/checksum tail, but still flagging and redacting the credential. This is the existing, deliberate maximal-run behavior, not a bug; the precise end offset is not corroborated to the routable format's real segment boundary, which is why the family stays pending rather than scored."
+      "note": "Issue #518 inventory: when a routable runner authentication token's base64 payload alone reaches the 20-byte floor, the existing grammar still matches \u2014 truncated at the first `.`, missing the version/checksum tail, but still flagging and redacting the credential. This is the existing, deliberate maximal-run behavior, not a bug; the precise end offset is not corroborated to the routable format's real segment boundary, which is why the family stays pending rather than scored."
     },
     {
       "id": "openai-positive-project",
@@ -10512,7 +10512,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "🔑 Authorization: Bearer sk-proj-SYNTHETIC_REVOKED_CONFORMANCE_KEY",
+      "input": "\ud83d\udd11 Authorization: Bearer sk-proj-SYNTHETIC_REVOKED_CONFORMANCE_KEY",
       "expected": [
         {
           "detector": "bearer-token",
@@ -10948,7 +10948,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "🔑 Authorization: Bearer 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",
+      "input": "\ud83d\udd11 Authorization: Bearer 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",
       "expected": [
         {
           "detector": "openai-token",
@@ -11084,7 +11084,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 reviewed format\r\n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\n\r\n",
+      "input": "# \ud83d\udd11 reviewed format\r\n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\n\r\n",
       "expected": [
         {
           "detector": "openai-token",
@@ -11106,7 +11106,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 reviewed format\r\nsk-SYNTHETICREVOKED0001T3BlbkFKSYNTHETICREVOKED0002\n\r\n",
+      "input": "# \ud83d\udd11 reviewed format\r\nsk-SYNTHETICREVOKED0001T3BlbkFKSYNTHETICREVOKED0002\n\r\n",
       "expected": [
         {
           "detector": "generic-token",
@@ -11128,7 +11128,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 reviewed format\r\n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\n\r\n",
+      "input": "# \ud83d\udd11 reviewed format\r\n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\n\r\n",
       "expected": [
         {
           "detector": "openai-token",
@@ -11150,7 +11150,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 reviewed format\r\nsk-proj-SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTT3BlbkFJSYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SY\n\r\n",
+      "input": "# \ud83d\udd11 reviewed format\r\nsk-proj-SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTT3BlbkFJSYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SY\n\r\n",
       "expected": [],
       "note": "Negative twin of the paired positive differing in exactly one structural property (73-byte left segment vs contracted 74); beta.4 flagged it at the same range as its positive. Issue #368 self-contained synthetic reproduction; independent benchmark fixture id `openai-token-proj-unicode-crlf-twin` (redact-secret-benchmarks common-formats, measurement protocol v4, T2). Never provider-issued."
     },
@@ -11163,7 +11163,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 reviewed format\r\n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\n\r\n",
+      "input": "# \ud83d\udd11 reviewed format\r\n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\n\r\n",
       "expected": [
         {
           "detector": "openai-token",
@@ -11185,7 +11185,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 reviewed format\r\nsk-svcacct-SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTT3BlbkFJSYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SY\n\r\n",
+      "input": "# \ud83d\udd11 reviewed format\r\nsk-svcacct-SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTT3BlbkFJSYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SY\n\r\n",
       "expected": [],
       "note": "Negative twin of the paired positive differing in exactly one structural property (73-byte left segment vs contracted 74); beta.4 flagged it at the same range as its positive. Issue #368 self-contained synthetic reproduction; independent benchmark fixture id `openai-token-svcacct-unicode-crlf-twin` (redact-secret-benchmarks common-formats, measurement protocol v4, T2). Never provider-issued."
     },
@@ -11973,7 +11973,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "🔑 Authorization: Bearer sk-ant-api03-SYNTHETIC_REVOKED_CONFORMANCE_KEY",
+      "input": "\ud83d\udd11 Authorization: Bearer sk-ant-api03-SYNTHETIC_REVOKED_CONFORMANCE_KEY",
       "expected": [
         {
           "detector": "anthropic-token",
@@ -12246,7 +12246,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 密钥 café\r\nshpca_SYNTHETICREVOKEDSYNT\r\n",
+      "input": "# \ud83d\udd11 \u5bc6\u94a5 caf\u00e9\r\nshpca_SYNTHETICREVOKEDSYNT\r\n",
       "expected": [],
       "note": "A preceding Unicode comment line and CRLF line endings do not turn the public identifier prefix into a classified credential."
     },
@@ -12417,7 +12417,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\nshpat_SYNTHETIC_REVOKED_SHOPIFY_TOKEN\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\nshpat_SYNTHETIC_REVOKED_SHOPIFY_TOKEN\r\n",
       "expected": [
         {
           "detector": "shopify-token",
@@ -12830,7 +12830,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\nhvs.SYNTHETIC_REVOKED_VAULT_TOKEN\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\nhvs.SYNTHETIC_REVOKED_VAULT_TOKEN\r\n",
       "expected": [
         {
           "detector": "vault-token",
@@ -13369,7 +13369,7 @@
           "end": 49
         }
       ],
-      "note": "HTTP Basic authorization is excluded from bearer-token specifically: the grammar requires the literal 'bearer' keyword, so a Basic-scheme header never reaches its scheme check. The value is not left unguarded, though — generic-token's broader authorization_credential rule still claims it, the same scheme-agnostic pattern authorization-positive-basic already documents for a bare (non-bearer-token-adjacent) Basic header. This is the Basic-versus-Bearer scheme separation: bearer-token owns only the 'bearer' literal, and a sibling contextual detector covers the rest."
+      "note": "HTTP Basic authorization is excluded from bearer-token specifically: the grammar requires the literal 'bearer' keyword, so a Basic-scheme header never reaches its scheme check. The value is not left unguarded, though \u2014 generic-token's broader authorization_credential rule still claims it, the same scheme-agnostic pattern authorization-positive-basic already documents for a bare (non-bearer-token-adjacent) Basic header. This is the Basic-versus-Bearer scheme separation: bearer-token owns only the 'bearer' literal, and a sibling contextual detector covers the rest."
     },
     {
       "id": "bearer-negative-missing-value",
@@ -13781,7 +13781,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "😀 mongodb://fixture%3Auser:SYNTHETIC%40REVOKED%3ADB%2FVALUE@[2001:db8::1]:27017/db",
+      "input": "\ud83d\ude00 mongodb://fixture%3Auser:SYNTHETIC%40REVOKED%3ADB%2FVALUE@[2001:db8::1]:27017/db",
       "expected": [
         {
           "detector": "connection-string",
@@ -14224,7 +14224,7 @@
         "operation": "declared-boundary",
         "ordinal": 0
       },
-      "input": "mongodb://fixture:SYNTHETIC_REVOKED_DB_VALUE@café.example.test:27017/db",
+      "input": "mongodb://fixture:SYNTHETIC_REVOKED_DB_VALUE@caf\u00e9.example.test:27017/db",
       "expected": [],
       "note": "A Unicode host label is not an ASCII reg-name and is rejected; an internationalized mongodb host needs punycode encoding, which this parser does not resolve."
     },
@@ -14981,7 +14981,7 @@
           "end": 39
         }
       ],
-      "note": "A bare dotenv KEY=value line supplies contextual_secret's structured-data-kv representative positive evidence (host-context-classes.md §4)."
+      "note": "A bare dotenv KEY=value line supplies contextual_secret's structured-data-kv representative positive evidence (host-context-classes.md \u00a74)."
     },
     {
       "id": "contextual-host-shell",
@@ -15406,7 +15406,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "note: café — password=\"@Microsoft.KeyVault(VaultName=myvault;SecretName=mysecret)\"",
+      "input": "note: caf\u00e9 \u2014 password=\"@Microsoft.KeyVault(VaultName=myvault;SecretName=mysecret)\"",
       "expected": [],
       "note": "issue #293: a multi-byte Unicode character preceding the assignment does not defeat the Azure Key Vault VaultName/SecretName exclusion; the exclusion's byte-offset handling advances by real UTF-8 byte width, not char count."
     },
@@ -15940,7 +15940,7 @@
       "contexts": [
         "terminal"
       ],
-      "input": "Password: ••••••••",
+      "input": "Password: \u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022",
       "expected": [],
       "note": "Repeated-character filler is recognized for a multi-byte Unicode mask character (U+2022 BULLET), not only single-byte ASCII ones like '*'."
     },
@@ -16356,7 +16356,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "🔑 café\r\notpauth://totp/Example:alice@example.com?secret=SYNTHETICOTPAUTHSEEDVALUEQPWKYV",
+      "input": "\ud83d\udd11 caf\u00e9\r\notpauth://totp/Example:alice@example.com?secret=SYNTHETICOTPAUTHSEEDVALUEQPWKYV",
       "expected": [
         {
           "detector": "otpauth-uri",
@@ -16951,7 +16951,7 @@
           "end": 20
         }
       ],
-      "note": "A one-character mutation of AWS's documented example access key ID (last byte E to F) no longer matches the exact-literal carve-out and is correctly detected — pairing that exclusion with a surviving positive proves it is exact-match only, not a shape-based allowance that could hide a real secret."
+      "note": "A one-character mutation of AWS's documented example access key ID (last byte E to F) no longer matches the exact-literal carve-out and is correctly detected \u2014 pairing that exclusion with a surviving positive proves it is exact-match only, not a shape-based allowance that could hide a real secret."
     },
     {
       "id": "regression-aws-example-secret-access-key",
@@ -17613,7 +17613,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "🔑 SENDGRID_TOKEN=SG.SYNTHETIC_REVOKED_0000.SYNTHETIC_REVOKED_SENDGRID_SECRET_000000000",
+      "input": "\ud83d\udd11 SENDGRID_TOKEN=SG.SYNTHETIC_REVOKED_0000.SYNTHETIC_REVOKED_SENDGRID_SECRET_000000000",
       "expected": [
         {
           "detector": "sendgrid-token",
@@ -17635,7 +17635,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\nSG.SYNTHETIC_REVOKED_0000.SYNTHETIC_REVOKED_SENDGRID_SECRET_000000000\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\nSG.SYNTHETIC_REVOKED_0000.SYNTHETIC_REVOKED_SENDGRID_SECRET_000000000\r\n",
       "expected": [
         {
           "detector": "sendgrid-token",
@@ -18497,7 +18497,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\nATATSYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY_SYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY_SYNTHETIC_REVO\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\nATATSYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY_SYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY_SYNTHETIC_REVO\r\n",
       "expected": [
         {
           "detector": "atlassian-api-token",
@@ -18821,7 +18821,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "note: café — value=\"api_key=\"SYNTHETIC_REVOKED_NESTED_QUOTE_UNICODE_1234\"\"\n",
+      "input": "note: caf\u00e9 \u2014 value=\"api_key=\"SYNTHETIC_REVOKED_NESTED_QUOTE_UNICODE_1234\"\"\n",
       "expected": [
         {
           "detector": "generic-token",
@@ -18975,7 +18975,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\n123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\n123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11\r\n",
       "expected": [
         {
           "detector": "telegram-bot-token",
@@ -19260,7 +19260,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\nMDAwMDAwMDAwMDAwMDAwMDAw.REVOKE.SYNTHETICREVOKEDBOTTOKENFIX\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\nMDAwMDAwMDAwMDAwMDAwMDAw.REVOKE.SYNTHETICREVOKEDBOTTOKENFIX\r\n",
       "expected": [
         {
           "detector": "discord-bot-token",
@@ -19623,7 +19623,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\ntwilio fedcba9876543210fedcba9876543210\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\ntwilio fedcba9876543210fedcba9876543210\r\n",
       "expected": [
         {
           "detector": "twilio-auth-token",
@@ -21703,7 +21703,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\nDD_API_KEY=0123456789abcdef0123456789abcdef\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\nDD_API_KEY=0123456789abcdef0123456789abcdef\r\n",
       "expected": [
         {
           "detector": "datadog-api-key",
@@ -22745,7 +22745,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\nDD_APPLICATION_KEY=0123456789abcdef0123456789abcdef01234567\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\nDD_APPLICATION_KEY=0123456789abcdef0123456789abcdef01234567\r\n",
       "expected": [
         {
           "detector": "datadog-application-key",
@@ -23731,7 +23731,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\nglsa_SYNTHETICREVOKEDGRAFANASATOKEN01_deadbeef\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\nglsa_SYNTHETICREVOKEDGRAFANASATOKEN01_deadbeef\r\n",
       "expected": [
         {
           "detector": "grafana-service-account-token",
@@ -24068,7 +24068,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\nglc_SYNTHETICREVOKEDGRAFANACLOUDACCESSPOLICYTOKEN\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\nglc_SYNTHETICREVOKEDGRAFANACLOUDACCESSPOLICYTOKEN\r\n",
       "expected": [
         {
           "detector": "grafana-cloud-access-policy-token",
@@ -24227,7 +24227,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\nsntryu_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\nsntryu_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\r\n",
       "expected": [
         {
           "detector": "sentry-user-auth-token",
@@ -24517,7 +24517,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\nsntrys_eyJSYNTHETICREVOKEDSENTRYO_SigFixSYNTHETICREVOKED0123456789SigFixSYNTH\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\nsntrys_eyJSYNTHETICREVOKEDSENTRYO_SigFixSYNTHETICREVOKED0123456789SigFixSYNTH\r\n",
       "expected": [
         {
           "detector": "sentry-org-auth-token",
@@ -24828,7 +24828,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\nNRAK-SYNTHETICREVOKEDNEWRELICUSA\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\nNRAK-SYNTHETICREVOKEDNEWRELICUSA\r\n",
       "expected": [
         {
           "detector": "new-relic-user-api-key",
@@ -25039,7 +25039,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\nnewrelic 0123456789abcdef0123456789abcdef01234567\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\nnewrelic 0123456789abcdef0123456789abcdef01234567\r\n",
       "expected": [
         {
           "detector": "new-relic-license-key",
@@ -25358,7 +25358,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "🔑 Authorization: Bearer hf_SYNTHETICREVOKEDHUGGINGFACETOKEN01",
+      "input": "\ud83d\udd11 Authorization: Bearer hf_SYNTHETICREVOKEDHUGGINGFACETOKEN01",
       "expected": [
         {
           "detector": "huggingface-token",
@@ -25616,7 +25616,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "🔑 Authorization: Bearer lin_api_SYNTHETICREVOKEDLINEARAPITOKENVALUE01234",
+      "input": "\ud83d\udd11 Authorization: Bearer lin_api_SYNTHETICREVOKEDLINEARAPITOKENVALUE01234",
       "expected": [
         {
           "detector": "linear-token",
@@ -25812,7 +25812,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "🔑 Authorization: Bearer xoxb-SYNTHETIC_REVOKED_CONFORMANCE_KEY",
+      "input": "\ud83d\udd11 Authorization: Bearer xoxb-SYNTHETIC_REVOKED_CONFORMANCE_KEY",
       "expected": [
         {
           "detector": "bearer-token",
@@ -26257,7 +26257,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\n-----BEGIN PRIVATE KEY-----\r\nU1lOVEhFVElDX0NSTEZfVU5JQ09ERV9QUkVGSVg=\r\n-----END PRIVATE KEY-----\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\n-----BEGIN PRIVATE KEY-----\r\nU1lOVEhFVElDX0NSTEZfVU5JQ09ERV9QUkVGSVg=\r\n-----END PRIVATE KEY-----\r\n",
       "expected": [
         {
           "detector": "private-key",
@@ -27651,7 +27651,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\ndckr_pat_SYNTHETIC_REVOKED_KEY_VALU\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\ndckr_pat_SYNTHETIC_REVOKED_KEY_VALU\r\n",
       "expected": [],
       "note": "Issue #370: the 26-byte personal access token twin after a CRLF line ending and a Unicode-prefixed comment line stays silent; mirrors benchmark fixture docker-token-pat-unicode-crlf-twin, which beta.4 flagged."
     },
@@ -27664,7 +27664,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\ndckr_oat_SYNTHETIC_REVOKED_OAT_KEY_VALUE\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\ndckr_oat_SYNTHETIC_REVOKED_OAT_KEY_VALUE\r\n",
       "expected": [],
       "note": "Issue #370: the 31-byte organization access token twin after a CRLF line ending and a Unicode-prefixed comment line stays silent; mirrors benchmark fixture docker-token-oat-unicode-crlf-twin, which beta.4 flagged."
     },
@@ -27677,7 +27677,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\ndckr_oat_SYNTHETIC_REVOKED_OAT_KEY_VALUE3\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\ndckr_oat_SYNTHETIC_REVOKED_OAT_KEY_VALUE3\r\n",
       "expected": [
         {
           "detector": "docker-token",
@@ -28035,7 +28035,7 @@
       },
       "input": "hf_SyntheticRevokedHuggingFaceTokenA",
       "expected": [],
-      "note": "Issue #372: a 33-byte body — one byte short of the documented 34-byte length — is the beta.4 huggingface-token-user-plain-twin regression shape; silence follows from construction."
+      "note": "Issue #372: a 33-byte body \u2014 one byte short of the documented 34-byte length \u2014 is the beta.4 huggingface-token-user-plain-twin regression shape; silence follows from construction."
     },
     {
       "id": "huggingface-boundary-one-long-exact-length",
@@ -28054,7 +28054,7 @@
       },
       "input": "hf_SyntheticRevokedHuggingFaceTokenABC",
       "expected": [],
-      "note": "Issue #372: a 35-byte body — one byte past the documented 34-byte length — is not misread as the exact shape followed by a trailing byte."
+      "note": "Issue #372: a 35-byte body \u2014 one byte past the documented 34-byte length \u2014 is not misread as the exact shape followed by a trailing byte."
     },
     {
       "id": "huggingface-boundary-invalid-alphabet-exact-length",
@@ -28219,7 +28219,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\napi_org_SYNTHETICREVOKEDHUGGINGFACETOKEN01\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\napi_org_SYNTHETICREVOKEDHUGGINGFACETOKEN01\r\n",
       "expected": [
         {
           "detector": "huggingface-token",
@@ -29767,7 +29767,7 @@
         "maxFindings": 1,
         "maxRuntimeMs": 250
       },
-      "input": "token: ghp_SYNTHETIC‌REVOKED00000000000000000000\n",
+      "input": "token: ghp_SYNTHETIC\u200cREVOKED00000000000000000000\n",
       "expected": [
         {
           "detector": "github-token",
@@ -29795,7 +29795,7 @@
         "maxFindings": 1,
         "maxRuntimeMs": 250
       },
-      "input": "Authorization: Bearer SYNTHETIC​REVOKED_BEARER_VALUE_1234\n",
+      "input": "Authorization: Bearer SYNTHETIC\u200bREVOKED_BEARER_VALUE_1234\n",
       "expected": [
         {
           "detector": "bearer-token",
@@ -29823,7 +29823,7 @@
         "maxFindings": 1,
         "maxRuntimeMs": 250
       },
-      "input": "api​_key = SYNTHETIC_REVOKED_VALUE_1234\n",
+      "input": "api\u200b_key = SYNTHETIC_REVOKED_VALUE_1234\n",
       "expected": [
         {
           "detector": "generic-token",
@@ -29851,7 +29851,7 @@
         "maxFindings": 1,
         "maxRuntimeMs": 250
       },
-      "input": "api_key = SYNTHETIC_REVOKED​_VALUE_1234\n",
+      "input": "api_key = SYNTHETIC_REVOKED\u200b_VALUE_1234\n",
       "expected": [
         {
           "detector": "generic-token",
@@ -29879,7 +29879,7 @@
         "maxFindings": 1,
         "maxRuntimeMs": 250
       },
-      "input": "postgres://svc:SYNTHETIC​REVOKEDPW@db:5432/app\n",
+      "input": "postgres://svc:SYNTHETIC\u200bREVOKEDPW@db:5432/app\n",
       "expected": [
         {
           "detector": "connection-string",
@@ -29907,7 +29907,7 @@
         "maxFindings": 1,
         "maxRuntimeMs": 250
       },
-      "input": "token: ghp_SYNTHETIC‮REVOKED00000000000000000000\n",
+      "input": "token: ghp_SYNTHETIC\u202eREVOKED00000000000000000000\n",
       "expected": [
         {
           "detector": "github-token",
@@ -29935,7 +29935,7 @@
         "maxFindings": 1,
         "maxRuntimeMs": 250
       },
-      "input": "token: ghp_󠁁SYNTHETIC󠁁REVOKED00000000000000000000\n",
+      "input": "token: ghp_\udb40\udc41SYNTHETIC\udb40\udc41REVOKED00000000000000000000\n",
       "expected": [
         {
           "detector": "github-token",
@@ -29963,7 +29963,7 @@
         "maxFindings": 1,
         "maxRuntimeMs": 250
       },
-      "input": "token: ghp_SYNTHETICREVOKED0000000000000000000️0\n",
+      "input": "token: ghp_SYNTHETICREVOKED0000000000000000000\ufe0f0\n",
       "expected": [
         {
           "detector": "github-token",
@@ -29991,7 +29991,7 @@
         "maxFindings": 1,
         "maxRuntimeMs": 250
       },
-      "input": "token: gㅤhp_SYNTHETICREVOKED00000000000000000000\n",
+      "input": "token: g\u3164hp_SYNTHETICREVOKED00000000000000000000\n",
       "expected": [
         {
           "detector": "github-token",
@@ -30019,7 +30019,7 @@
         "maxFindings": 1,
         "maxRuntimeMs": 250
       },
-      "input": "token: ghp_SYNTHETIC­­⁠REVOKED00000000000000000000\n",
+      "input": "token: ghp_SYNTHETIC\u00ad\u00ad\u2060REVOKED00000000000000000000\n",
       "expected": [
         {
           "detector": "github-token",
@@ -30047,7 +30047,7 @@
         "maxFindings": 1,
         "maxRuntimeMs": 250
       },
-      "input": "x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­\ntoken: ghp_SYNTHETIC‌REVOKED00000000000000000000\n",
+      "input": "x\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00ad\ntoken: ghp_SYNTHETIC\u200cREVOKED00000000000000000000\n",
       "expected": [
         {
           "detector": "github-token",
@@ -30665,7 +30665,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 reviewed format\r\nsk-SYNTHETICrevoked0001aaaaBBBBccccDDDD1234wxyzEFGH\n",
+      "input": "# \ud83d\udd11 reviewed format\r\nsk-SYNTHETICrevoked0001aaaaBBBBccccDDDD1234wxyzEFGH\n",
       "expected": [
         {
           "detector": "generic-token",
@@ -30731,7 +30731,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 reviewed format\r\nsk-proj-SYNTHETICrevoked0002bbbbCCCCddddEEEE5678uvwxIJKL\n",
+      "input": "# \ud83d\udd11 reviewed format\r\nsk-proj-SYNTHETICrevoked0002bbbbCCCCddddEEEE5678uvwxIJKL\n",
       "expected": [
         {
           "detector": "generic-token",
@@ -30797,7 +30797,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 reviewed format\r\nsk-svcacct-SYNTHETICrevoked0003ccccDDDDeeeeFFFF9012rstuMNOP\n",
+      "input": "# \ud83d\udd11 reviewed format\r\nsk-svcacct-SYNTHETICrevoked0003ccccDDDDeeeeFFFF9012rstuMNOP\n",
       "expected": [
         {
           "detector": "generic-token",
@@ -31144,7 +31144,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\nAAAASYNREV0:SYNTHETICREVOKEDFIREBASEFCMLEGACYSERVERKEYFIXTUREPADDING0123456789SYNTHETICREVOKEDFIREBASEFCMLEGACYSERVERKEYFIXTUREPADDING0123456789ABCDWXYZ\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\nAAAASYNREV0:SYNTHETICREVOKEDFIREBASEFCMLEGACYSERVERKEYFIXTUREPADDING0123456789SYNTHETICREVOKEDFIREBASEFCMLEGACYSERVERKEYFIXTUREPADDING0123456789ABCDWXYZ\r\n",
       "expected": [
         {
           "detector": "firebase-server-key",
@@ -31543,7 +31543,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 reviewed format\r\npul-0123456789abcdef0123456789abcdef01234567\n\r\n",
+      "input": "# \ud83d\udd11 reviewed format\r\npul-0123456789abcdef0123456789abcdef01234567\n\r\n",
       "expected": [
         {
           "detector": "pulumi-access-token",
@@ -32102,7 +32102,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\nSYNREV0REVOKED.atlasv1.SYNTHETICREVOKEDTERRAFORMCLOUDTOKENFIXTUREPADDING0123456789ABCDEFGH\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\nSYNREV0REVOKED.atlasv1.SYNTHETICREVOKEDTERRAFORMCLOUDTOKENFIXTUREPADDING0123456789ABCDEFGH\r\n",
       "expected": [
         {
           "detector": "terraform-cloud-token",
@@ -32322,7 +32322,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 reviewed format\r\ndapi0123456789abcdef0123456789abcdef\n\r\n",
+      "input": "# \ud83d\udd11 reviewed format\r\ndapi0123456789abcdef0123456789abcdef\n\r\n",
       "expected": [
         {
           "detector": "databricks-personal-access-token",
@@ -32842,7 +32842,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\ncfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPQRSTUV\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\ncfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPQRSTUV\r\n",
       "expected": [
         {
           "detector": "confluent-cloud-api-secret",
@@ -33987,6 +33987,465 @@
         }
       ],
       "note": "A single confluent-context-bearing line densely packed with candidate-shaped runs stays linear: per-line (not per-candidate) context checks keep this bounded."
+    },
+    {
+      "id": "netlify-positive-qualified",
+      "detector": "netlify-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "nfp_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01",
+      "expected": [
+        {
+          "detector": "netlify-token",
+          "type": "netlify_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 40
+        }
+      ],
+      "note": "A provider-published prefix with the documented-length synthetic body is supported."
+    },
+    {
+      "id": "netlify-boundary-one-short",
+      "detector": "netlify-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "nfp_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY0",
+      "expected": [],
+      "note": "Issue #311: a 35-byte body \u2014 one byte short of the documented 36-byte length \u2014 is silent by construction."
+    },
+    {
+      "id": "netlify-boundary-one-long",
+      "detector": "netlify-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "nfp_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01a",
+      "expected": [],
+      "note": "A 37-byte body \u2014 one byte past the documented length \u2014 is not misread as the exact shape followed by a trailing byte; the boundary check, widened past the match alphabet to include `-`, rejects the whole run rather than truncating it."
+    },
+    {
+      "id": "netlify-boundary-invalid-alphabet",
+      "detector": "netlify-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "nfp_SYNTHETIC_!EVOKED_NETLIFY_PAT_BODY01",
+      "expected": [],
+      "note": "An invalid character inside the body breaks the run before the documented 36-byte length is reached."
+    },
+    {
+      "id": "netlify-boundary-dash-in-body",
+      "detector": "netlify-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "nfp_SYNTHETIC_-EVOKED_NETLIFY_PAT_BODY01",
+      "expected": [],
+      "note": "gitleaks 8.30.1 and trufflehog 3.97.4 both converge on `[A-Za-z0-9_]` for the documented body; a dash inside an otherwise documented-length body is rejected rather than truncated to its longest valid-alphabet prefix."
+    },
+    {
+      "id": "netlify-negative-ordinary-reference",
+      "detector": "netlify-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "netlify-documentation-identifier",
+      "expected": [],
+      "note": "An ordinary provider-related identifier has no credential shape."
+    },
+    {
+      "id": "netlify-negative-lookalike",
+      "detector": "netlify-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "netlify_pat_SYNTHETIC_REVOKED_CONFORMANCE_KEY",
+      "expected": [],
+      "note": "A human-readable variable name that merely mentions the credential class is not the documented `nfp_` prefix; no candidate is emitted."
+    },
+    {
+      "id": "netlify-boundary-case-sensitivity",
+      "detector": "netlify-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "NFP_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01",
+      "expected": [],
+      "note": "The documented prefix is matched byte-for-byte; an uppercase rendering ('NFP_') is not a case-insensitive equivalent \u2014 issue #311 froze the lowercase-only prefix per both tools' independent convergence."
+    },
+    {
+      "id": "netlify-adversarial-long-suffix",
+      "detector": "netlify-token",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 9041,
+        "maxFindings": 1,
+        "maxRuntimeMs": 250
+      },
+      "input": "nfp_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01!SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_",
+      "expected": [
+        {
+          "detector": "netlify-token",
+          "type": "netlify_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 40
+        }
+      ],
+      "note": "A long delimited provider match remains deterministic and bounded; the documented 40-byte token is followed by a delimiter and a long non-matching tail that is never scanned into the finding."
+    },
+    {
+      "id": "netlify-negative-embedded-in-wider-identifier",
+      "detector": "netlify-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "legacynfp_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01",
+      "expected": [],
+      "note": "The `nfp_` prefix immediately preceded by an alphanumeric character ('legacynfp_...') is a truncated slice of a wider benign identifier, not a boundary-delimited credential, so no candidate is emitted; a real secret substring is never carved out of a longer surrounding token."
+    },
+    {
+      "id": "netlify-positive-json",
+      "detector": "netlify-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"personalAccessToken\": \"nfp_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01\"}",
+      "expected": [
+        {
+          "detector": "netlify-token",
+          "type": "netlify_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 65
+        }
+      ],
+      "note": "A quoted JSON string value is detected the same as a bare one; the enclosing quotes are not part of the match."
+    },
+    {
+      "id": "netlify-positive-yaml",
+      "detector": "netlify-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "netlify_pat: nfp_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01\n",
+      "expected": [
+        {
+          "detector": "netlify-token",
+          "type": "netlify_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 53
+        }
+      ],
+      "note": "A YAML mapping value is detected the same as a bare one."
+    },
+    {
+      "id": "netlify-positive-log",
+      "detector": "netlify-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-16T00:00:00Z INFO deploying to netlify token=nfp_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01 status=200",
+      "expected": [
+        {
+          "detector": "netlify-token",
+          "type": "netlify_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 53,
+          "end": 93
+        }
+      ],
+      "note": "A provider token embedded in a structured log line is still detected."
+    },
+    {
+      "id": "netlify-positive-shell-quoted",
+      "detector": "netlify-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export NETLIFY_AUTH_TOKEN=\"nfp_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01\"\n",
+      "expected": [
+        {
+          "detector": "netlify-token",
+          "type": "netlify_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 27,
+          "end": 67
+        }
+      ],
+      "note": "A double-quoted shell export value is detected the same as a bare one; the enclosing quotes are not part of the match."
+    },
+    {
+      "id": "netlify-positive-dotenv",
+      "detector": "netlify-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "NETLIFY_AUTH_TOKEN=nfp_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01\n",
+      "expected": [
+        {
+          "detector": "netlify-token",
+          "type": "netlify_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 19,
+          "end": 59
+        }
+      ],
+      "note": "The exact-length token is still classified as a dotenv assignment value."
+    },
+    {
+      "id": "netlify-negative-dotenv",
+      "detector": "netlify-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "NETLIFY_AUTH_TOKEN=nfp_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY0\n",
+      "expected": [],
+      "note": "Malformed twin (35-byte body) of netlify-positive-dotenv in the same dotenv context."
+    },
+    {
+      "id": "netlify-positive-markdown-delimiter",
+      "detector": "netlify-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "markdown"
+      ],
+      "input": "`nfp_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01` must be rotated before reuse.",
+      "expected": [
+        {
+          "detector": "netlify-token",
+          "type": "netlify_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1,
+          "end": 41
+        }
+      ],
+      "note": "A Markdown inline-code span wrapping the value in backticks does not defeat detection: the backtick is outside the boundary alphabet, so the match is found at its correct offsets with the delimiters excluded."
+    },
+    {
+      "id": "netlify-positive-repeated-value",
+      "detector": "netlify-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "nfp_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01 nfp_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01",
+      "expected": [
+        {
+          "detector": "netlify-token",
+          "type": "netlify_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 40
+        },
+        {
+          "detector": "netlify-token",
+          "type": "netlify_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 41,
+          "end": 81
+        }
+      ],
+      "note": "An identical value repeated in the same input is reported once per independent occurrence, not deduplicated."
+    },
+    {
+      "id": "netlify-positive-unicode-crlf",
+      "detector": "netlify-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# \ud83d\udd11 caf\u00e9\r\nnfp_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01\r\n",
+      "expected": [
+        {
+          "detector": "netlify-token",
+          "type": "netlify_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 54
+        }
+      ],
+      "note": "CRLF line endings and a multi-byte Unicode prefix shift only the byte offsets; the match itself is unaffected."
+    },
+    {
+      "id": "netlify-negative-percent-encoded-lookalike",
+      "detector": "netlify-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "nfp%5FSYNTHETIC_REVOKED_NETLIFY_PAT_BODY01",
+      "expected": [],
+      "note": "A percent-encoded rendering of the documented delimiter ('nfp%5F' in place of 'nfp_') does not literally match the prefix's own bytes, so no candidate is emitted; a URL-decoded lookalike is an intentional false negative rather than a fuzzy match."
+    },
+    {
+      "id": "netlify-negative-other-nf-prefixes",
+      "detector": "netlify-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "nfc_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01 nfo_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01 nfu_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01 nfb_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01",
+      "expected": [],
+      "note": "Netlify's own token-format announcement documents four other `nf` + identifying-character prefixes (`nfc_` CLI, `nfo_` OAuth, `nfu_` app.netlify.com, `nfb_` build) sharing this scheme; none is a personal access token, and none is in this issue's scope, so no candidate is emitted for any of them."
+    },
+    {
+      "id": "netlify-negative-legacy-unprefixed",
+      "detector": "netlify-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "netlify aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": [],
+      "note": "The pre-2023-11-07 unprefixed Netlify token shape (trufflehog's legacy `netlify/v1`: `[A-Za-z0-9_-]{43,45}`, keyword-gated) is a documented gap, not implemented here: that shape is common to every legacy Netlify token class, not specific to a personal access token, so emitting a `netlify_personal_access_token` finding for it would mislabel the finding (see the module doc's \"Known unsupported variants\")."
+    },
+    {
+      "id": "netlify-negative-site-id",
+      "detector": "netlify-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "site_id: 12345678-90ab-cdef-1234-567890abcdef",
+      "expected": [],
+      "note": "A Netlify Site ID / Project ID is an opaque UUID-shaped public identifier with no `nfp_`-prefixed shape (docs.netlify.com/api-and-cli-guides/api-guides/get-started-with-api/); excluded per the issue's own scope, and not matched by construction."
+    },
+    {
+      "id": "netlify-boundary-masked-placeholder",
+      "detector": "netlify-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "nfp_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+      "expected": [],
+      "note": "A repeated-character placeholder ('nfp_XXXX...') otherwise satisfies the documented shape but is excluded as a masked value, matching super::twilio's and super::new_relic's own precedent."
+    },
+    {
+      "id": "netlify-positive-punctuation-adjacent",
+      "detector": "netlify-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "(nfp_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01).",
+      "expected": [
+        {
+          "detector": "netlify-token",
+          "type": "netlify_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1,
+          "end": 41
+        }
+      ],
+      "note": "Punctuation immediately surrounding the value does not defeat detection; the match excludes the parentheses and trailing period."
+    },
+    {
+      "id": "netlify-overlap-context",
+      "detector": "netlify-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "access_token=nfp_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01",
+      "expected": [
+        {
+          "detector": "netlify-token",
+          "type": "netlify_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 53
+        }
+      ],
+      "note": "Qualified provider evidence wins over a contextual assignment."
     }
   ]
 }

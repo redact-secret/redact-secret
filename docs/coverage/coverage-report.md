@@ -15,11 +15,11 @@ These counts describe finding-type inventory rows with corpus evidence, not dete
 
 | Row state | Count |
 | --- | --- |
-| supported | 56 |
+| supported | 57 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 67.
+Coverage declarations: 68.
 
 ## Coverage by detector
 
@@ -51,6 +51,7 @@ Coverage declarations: 67.
 | jwt | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | linear-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | microsoft-entra-client-secret | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| netlify-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | new-relic-license-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | new-relic-user-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | notion-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -111,6 +112,7 @@ Coverage declarations: 67.
 | jwt | jwt | structural | supported | not-applicable | none |
 | linear_token | linear-token | provider | supported | not-applicable | none |
 | microsoft_entra_client_secret | microsoft-entra-client-secret | provider | supported | not-applicable | none |
+| netlify_personal_access_token | netlify-token | provider | supported | not-applicable | none |
 | new_relic_license_key | new-relic-license-key | provider | supported | not-applicable | none |
 | new_relic_user_api_key | new-relic-user-api-key | provider | supported | not-applicable | none |
 | notion_integration_token | notion-token | provider | supported | not-applicable | none |
@@ -160,15 +162,15 @@ Coverage declarations: 67.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 67 | 0 | 0 |
-| boundary | 56 | 0 | 0 |
-| host-context | 56 | 0 | 0 |
+| adversarial | 68 | 0 | 0 |
+| boundary | 57 | 0 | 0 |
+| host-context | 57 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 67 | 0 | 0 |
-| near-miss-negative | 56 | 0 | 0 |
-| overlap | 56 | 0 | 0 |
-| positive | 56 | 0 | 0 |
-| range | 67 | 0 | 0 |
+| malformed | 68 | 0 | 0 |
+| near-miss-negative | 57 | 0 | 0 |
+| overlap | 57 | 0 | 0 |
+| positive | 57 | 0 | 0 |
+| range | 68 | 0 | 0 |
 
 ## Unresolved and pending coverage
 
