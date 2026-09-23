@@ -24,6 +24,14 @@ on:
       - "rc/*"
   workflow_dispatch:
   workflow_call:
+    inputs:
+      # Issue #632: a throwaway version for the release rehearsal; see
+      # `artifact-qualification.yml`. Empty for every other caller.
+      rehearsal-version:
+        description: Throwaway product version to build (X.Y.Z-beta.<run id>); empty for none.
+        type: string
+        required: false
+        default: ""
 
 permissions: {}
 
@@ -122,6 +130,11 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Apply the rehearsal version (no-op outside a rehearsal)
+        uses: ./.github/actions/apply-rehearsal-version
+        with:
+          version: ${{ inputs.rehearsal-version }}
+
       - name: Build the source distribution
         uses: PyO3/maturin-action@e83996d129638aa358a18fbd1dfb82f0b0fb5d3b # v1.51.0
         with:
@@ -218,6 +231,11 @@ jobs:
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           persist-credentials: false
+
+      - name: Apply the rehearsal version (no-op outside a rehearsal)
+        uses: ./.github/actions/apply-rehearsal-version
+        with:
+          version: ${{ inputs.rehearsal-version }}
 
       - name: Build the wheel
         uses: PyO3/maturin-action@e83996d129638aa358a18fbd1dfb82f0b0fb5d3b # v1.51.0
@@ -380,6 +398,11 @@ jobs:
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           persist-credentials: false
+
+      - name: Apply the rehearsal version (no-op outside a rehearsal)
+        uses: ./.github/actions/apply-rehearsal-version
+        with:
+          version: ${{ inputs.rehearsal-version }}
 
       - name: Download every artifact
         if: needs.plan.outputs.full == 'true'

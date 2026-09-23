@@ -18,6 +18,12 @@ evidence is linked from each published version.
 
 ### Changed
 
+- `Package Release Rehearsal` now qualifies a throwaway, never-published
+  `<X.Y.Z>-beta.<run id>` version instead of the branch's already-published
+  one, moved onto its own uncommitted checkout after proving npm, crates.io,
+  and PyPI carry no such version, so unpublished-version release-path defects
+  (beta.6's #607 and #608) surface before an RC exists (#632,
+  [`docs/audits/release-rehearsal-coverage.md`](docs/audits/release-rehearsal-coverage.md)).
 - The [safe browser/server integration example](examples/safe-integration/README.md)
   now documents why the browser's default policy and the server's explicit
   `serverPolicy` are declared independently, states that the server never
