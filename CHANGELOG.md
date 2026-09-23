@@ -22,6 +22,16 @@ evidence is linked from each published version.
   `clean-install` qualification job runs its commands and files verbatim
   against each candidate's exact artifacts and records the result in the
   artifact inventory (#586).
+- Two `confluent-cloud-api-secret` detectors covering Confluent Cloud API
+  secrets across both documented generations (#309,
+  [`docs/specs/detector-families.md`](docs/specs/detector-families.md)):
+  `confluent_cloud_api_secret` recognizes the current, documented `cflt`
+  prefix plus an exact 60-byte base64-body shape and is always-redact; the
+  legacy pre-2025-07-30 unprefixed 64-byte form is only ever ambiguous by
+  shape alone, so `confluent_cloud_api_secret_legacy` requires a
+  case-insensitive `confluent` substring on the same line and stays
+  confidence-gated (warn unless corroborated at high confidence). The API
+  Key ID (the non-secret half of the pair) is never itself a finding.
 
 ### Documentation
 
