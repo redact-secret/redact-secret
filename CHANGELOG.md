@@ -32,6 +32,16 @@ evidence is linked from each published version.
   body shorter or longer than 32 bytes, in uppercase hex, or a rotation
   suffix with more than one digit is a documented out-of-scope gap. The new
   detector is always-redact and provider-specific.
+- Two `confluent-cloud-api-secret` detectors covering Confluent Cloud API
+  secrets across both documented generations (#309,
+  [`docs/specs/detector-families.md`](docs/specs/detector-families.md)):
+  `confluent_cloud_api_secret` recognizes the current, documented `cflt`
+  prefix plus an exact 60-byte base64-body shape and is always-redact; the
+  legacy pre-2025-07-30 unprefixed 64-byte form is only ever ambiguous by
+  shape alone, so `confluent_cloud_api_secret_legacy` requires a
+  case-insensitive `confluent` substring on the same line and stays
+  confidence-gated (warn unless corroborated at high confidence). The API
+  Key ID (the non-secret half of the pair) is never itself a finding.
 
 ### Documentation
 

@@ -409,6 +409,20 @@
       "schemes": null
     },
     {
+      "type": "confluent_cloud_api_secret",
+      "detector": "confluent-cloud-api-secret",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPQRSTUV",
+      "schemes": null
+    },
+    {
+      "type": "confluent_cloud_api_secret_legacy",
+      "detector": "confluent-cloud-api-secret-legacy",
+      "policyClass": "confidence-gated",
+      "reconciliationTrigger": "confluent SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO",
+      "schemes": null
+    },
+    {
       "type": "postman_api_key",
       "detector": "postman-api-key",
       "policyClass": "always-redact",
