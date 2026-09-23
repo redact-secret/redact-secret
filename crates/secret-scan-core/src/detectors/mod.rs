@@ -17,6 +17,7 @@ mod bearer_token;
 mod cloudflare;
 mod confluent;
 mod connection_string;
+mod databricks;
 mod datadog;
 mod discord;
 mod firebase;
@@ -101,6 +102,7 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(firebase::FirebaseServerKeyDetector),
         Box::new(terraform::TerraformCloudTokenDetector),
         Box::new(additional_providers::PULUMI),
+        Box::new(databricks::DATABRICKS),
         Box::new(confluent::CONFLUENT_CLOUD_API_SECRET),
         Box::new(confluent::ConfluentLegacyApiSecretDetector),
         jwt::jwt_detector(),
@@ -194,6 +196,7 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("firebase-server-key", Pack::Provider),
     ("terraform-cloud-token", Pack::Provider),
     ("pulumi-access-token", Pack::Provider),
+    ("databricks-personal-access-token", Pack::Provider),
     ("confluent-cloud-api-secret", Pack::Provider),
     ("confluent-cloud-api-secret-legacy", Pack::Provider),
     ("jwt", Pack::Common),
@@ -276,6 +279,7 @@ mod tests {
                 "firebase-server-key",
                 "terraform-cloud-token",
                 "pulumi-access-token",
+                "databricks-personal-access-token",
                 "confluent-cloud-api-secret",
                 "confluent-cloud-api-secret-legacy",
                 "jwt",
@@ -552,6 +556,8 @@ mod tests {
         );
         let pulumi_access_token_input =
             format!("pul-{}", "0123456789abcdef0123456789abcdef01234567");
+        let databricks_personal_access_token_input =
+            format!("dapi{}", "0123456789abcdef0123456789abcdef");
         let confluent_cloud_api_secret_input =
             "cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPQRSTUV";
         let cases = [
@@ -575,6 +581,10 @@ mod tests {
                 terraform_cloud_token_input.as_str(),
             ),
             ("pulumi-access-token", pulumi_access_token_input.as_str()),
+            (
+                "databricks-personal-access-token",
+                databricks_personal_access_token_input.as_str(),
+            ),
             (
                 "confluent-cloud-api-secret",
                 confluent_cloud_api_secret_input,

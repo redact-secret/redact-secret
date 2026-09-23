@@ -72,7 +72,7 @@ export const CANONICAL_IDS = [
   "telegram-bot-token", "discord-bot-token", "sentry-user-auth-token", "sentry-org-auth-token",
   "datadog-api-key", "datadog-application-key", "grafana-service-account-token",
   "grafana-cloud-access-policy-token", "new-relic-user-api-key", "new-relic-license-key",
-  "firebase-server-key", "terraform-cloud-token", "pulumi-access-token",
+  "firebase-server-key", "terraform-cloud-token", "pulumi-access-token", "databricks-personal-access-token",
   "confluent-cloud-api-secret", "confluent-cloud-api-secret-legacy",
   "jwt", "bearer-token", "connection-string", "otpauth-uri", "generic-token",
 ];
@@ -93,7 +93,8 @@ export const GROUPS = {
     "supabase-management-token", "vercel-token", "google-api-key", "microsoft-entra-client-secret", "datadog-api-key",
     "datadog-application-key", "grafana-service-account-token", "grafana-cloud-access-policy-token",
     "new-relic-user-api-key", "new-relic-license-key", "firebase-server-key", "terraform-cloud-token",
-    "pulumi-access-token", "confluent-cloud-api-secret", "confluent-cloud-api-secret-legacy",
+    "pulumi-access-token", "databricks-personal-access-token",
+    "confluent-cloud-api-secret", "confluent-cloud-api-secret-legacy",
   ],
   devtools: [
     "github-token", "gitlab-token", "azure-devops-personal-access-token", "notion-token",

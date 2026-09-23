@@ -22,6 +22,16 @@ evidence is linked from each published version.
   `clean-install` qualification job runs its commands and files verbatim
   against each candidate's exact artifacts and records the result in the
   artifact inventory (#586).
+- Added a `databricks-personal-access-token` detector (finding type
+  `databricks_personal_access_token`) recognizing Databricks personal access
+  tokens: the documented `dapi` prefix followed by an exact 32-byte
+  lowercase hex body, optionally followed by a token-rotation suffix (a
+  literal `-` and a single digit), corroborated by two independent external
+  tools rather than provider-documented (#308,
+  [`docs/specs/detector-families.md`](docs/specs/detector-families.md)). A
+  body shorter or longer than 32 bytes, in uppercase hex, or a rotation
+  suffix with more than one digit is a documented out-of-scope gap. The new
+  detector is always-redact and provider-specific.
 - Two `confluent-cloud-api-secret` detectors covering Confluent Cloud API
   secrets across both documented generations (#309,
   [`docs/specs/detector-families.md`](docs/specs/detector-families.md)):
