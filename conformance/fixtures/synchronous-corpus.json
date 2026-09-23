@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 1493,
+  "fixtureCount": 1522,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -3245,7 +3245,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 密钥 café\r\npk_live_SYNTHETICREVOKEDSYNT\r\n",
+      "input": "# \ud83d\udd11 \u5bc6\u94a5 caf\u00e9\r\npk_live_SYNTHETICREVOKEDSYNT\r\n",
       "expected": [],
       "note": "A preceding Unicode comment line and CRLF line endings do not turn the public identifier prefix into a classified credential."
     },
@@ -3416,7 +3416,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\nsk_live_SYNTHETICREVOKEDSYNTHETICREVOKED\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\nsk_live_SYNTHETICREVOKEDSYNTHETICREVOKED\r\n",
       "expected": [
         {
           "detector": "stripe-token",
@@ -4194,7 +4194,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\npypi-SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\npypi-SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\r\n",
       "expected": [
         {
           "detector": "pypi-token",
@@ -4796,7 +4796,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\ndckr_pat_SYNTHETIC_REVOKED_KEY_VALUE\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\ndckr_pat_SYNTHETIC_REVOKED_KEY_VALUE\r\n",
       "expected": [
         {
           "detector": "docker-token",
@@ -5187,7 +5187,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\ncfut_SYNTHETICREVOKEDCLOUDFLAREAPITOKENVALUE1deadbeef\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\ncfut_SYNTHETICREVOKEDCLOUDFLAREAPITOKENVALUE1deadbeef\r\n",
       "expected": [
         {
           "detector": "cloudflare-token",
@@ -5616,7 +5616,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\ndop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\ndop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\r\n",
       "expected": [
         {
           "detector": "digitalocean-token",
@@ -6151,7 +6151,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 reviewed format\r\ndop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcde\n\r\n",
+      "input": "# \ud83d\udd11 reviewed format\r\ndop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcde\n\r\n",
       "expected": [],
       "note": "Regression frozen from issue #369's self-contained synthetic snapshot (benchmark fixture digitalocean-token-dop-unicode-crlf-twin; published @redact-secret/core@0.1.0-beta.4, default detectors, measurement protocol v4, local benchmark run 2026-09-17T21:26:02.204Z-3390af, corpus SHA-256 19ca47f5dbf21acc94c6712a51d6586c9fd1653b3da132172622c0e7c4b08fb8). Negative twin (length 63 vs contracted 64) after a Unicode comment and CRLF that beta.4 flagged at bytes [24,94); silence follows from construction. The value is locally constructed and was never provider-issued."
     },
@@ -6164,7 +6164,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 reviewed format\r\ndop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\n\r\n",
+      "input": "# \ud83d\udd11 reviewed format\r\ndop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\n\r\n",
       "expected": [
         {
           "detector": "digitalocean-token",
@@ -6221,7 +6221,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 reviewed format\r\ndoo_v1_fedcba9876543210fedcba9876543210fedcba9876543210fedcba987654321\n\r\n",
+      "input": "# \ud83d\udd11 reviewed format\r\ndoo_v1_fedcba9876543210fedcba9876543210fedcba9876543210fedcba987654321\n\r\n",
       "expected": [],
       "note": "Regression frozen from issue #369's self-contained synthetic snapshot (benchmark fixture digitalocean-token-doo-unicode-crlf-twin; published @redact-secret/core@0.1.0-beta.4, default detectors, measurement protocol v4, local benchmark run 2026-09-17T21:26:02.204Z-3390af, corpus SHA-256 19ca47f5dbf21acc94c6712a51d6586c9fd1653b3da132172622c0e7c4b08fb8). Negative twin (length 63 vs contracted 64) after a Unicode comment and CRLF that beta.4 flagged at bytes [24,94); silence follows from construction. The value is locally constructed and was never provider-issued."
     },
@@ -6234,7 +6234,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 reviewed format\r\ndoo_v1_fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210\n\r\n",
+      "input": "# \ud83d\udd11 reviewed format\r\ndoo_v1_fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210\n\r\n",
       "expected": [
         {
           "detector": "digitalocean-token",
@@ -6291,7 +6291,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 reviewed format\r\ndor_v1_123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\n\r\n",
+      "input": "# \ud83d\udd11 reviewed format\r\ndor_v1_123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\n\r\n",
       "expected": [],
       "note": "Regression frozen from issue #369's self-contained synthetic snapshot (benchmark fixture digitalocean-token-dor-unicode-crlf-twin; published @redact-secret/core@0.1.0-beta.4, default detectors, measurement protocol v4, local benchmark run 2026-09-17T21:26:02.204Z-3390af, corpus SHA-256 19ca47f5dbf21acc94c6712a51d6586c9fd1653b3da132172622c0e7c4b08fb8). Negative twin (length 63 vs contracted 64) after a Unicode comment and CRLF that beta.4 flagged at bytes [24,94); silence follows from construction. The value is locally constructed and was never provider-issued."
     },
@@ -6304,7 +6304,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 reviewed format\r\ndor_v1_123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0\n\r\n",
+      "input": "# \ud83d\udd11 reviewed format\r\ndor_v1_123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0\n\r\n",
       "expected": [
         {
           "detector": "digitalocean-token",
@@ -6384,7 +6384,7 @@
       },
       "input": "lin_api_SyntheticRevokedLinearApiTokenABCDEF012",
       "expected": [],
-      "note": "Issue #374: a 39-byte body — one byte short of the documented 40-byte length — is the beta.4 linear-token-api-plain-twin regression shape; silence follows from construction."
+      "note": "Issue #374: a 39-byte body \u2014 one byte short of the documented 40-byte length \u2014 is the beta.4 linear-token-api-plain-twin regression shape; silence follows from construction."
     },
     {
       "id": "linear-boundary-one-long-exact-length",
@@ -6403,7 +6403,7 @@
       },
       "input": "lin_api_SyntheticRevokedLinearApiTokenABCDEF01239",
       "expected": [],
-      "note": "Issue #374: a 41-byte body — one byte past the documented 40-byte length — is not misread as the exact shape followed by a trailing byte."
+      "note": "Issue #374: a 41-byte body \u2014 one byte past the documented 40-byte length \u2014 is not misread as the exact shape followed by a trailing byte."
     },
     {
       "id": "linear-boundary-invalid-alphabet-exact-length",
@@ -6894,7 +6894,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 密钥 café\r\nsb_publishable_SYNTHETICREVOKEDSYNT\r\n",
+      "input": "# \ud83d\udd11 \u5bc6\u94a5 caf\u00e9\r\nsb_publishable_SYNTHETICREVOKEDSYNT\r\n",
       "expected": [],
       "note": "A preceding Unicode comment line and CRLF line endings do not turn the public identifier prefix into a classified credential."
     },
@@ -7065,7 +7065,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\nsb_secret_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\nsb_secret_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\r\n",
       "expected": [
         {
           "detector": "supabase-token",
@@ -7747,7 +7747,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\nvcp_SYNTHETIC_REVOKED_KEY_VALUE\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\nvcp_SYNTHETIC_REVOKED_KEY_VALUE\r\n",
       "expected": [
         {
           "detector": "vercel-token",
@@ -8051,7 +8051,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\nnpm_SYNTHETICREVOKEDSYNTHETICREVOKEDSYNT\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\nnpm_SYNTHETICREVOKEDSYNTHETICREVOKEDSYNT\r\n",
       "expected": [
         {
           "detector": "npm-token",
@@ -8359,7 +8359,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "АІzaSYNTHETIC_REVOKED_GOOGLE_API_KEY012",
+      "input": "\u0410\u0406zaSYNTHETIC_REVOKED_GOOGLE_API_KEY012",
       "expected": [],
       "note": "A Cyrillic-lookalike prefix (U+0410, U+0406 in place of ASCII A, I) is not the documented ASCII AIza prefix and is not classified."
     },
@@ -8964,7 +8964,7 @@
       },
       "input": "XAKIASYNTHETICEXAMPLEY",
       "expected": [],
-      "note": "Accepted tradeoff, not a shape-based allowance: a key-shaped run merged into a longer alphanumeric identifier (alnum on both sides) is indistinguishable at the grammar level from an ordinary wider identifier that happens to contain the same 20 characters, so it is excluded. This can suppress a genuine AKIA/ASIA key if it were ever concatenated directly against other alphanumeric text (for example inside a base64 blob or a compound token) with no separator; that residual false-negative risk is accepted because is_alnum boundary checking cannot resolve it without a wider identifier grammar. It does not apply merely because punctuation, whitespace, or a line boundary sits on either side of the value — see the paired surviving positive, aws-positive-punctuation-boundary."
+      "note": "Accepted tradeoff, not a shape-based allowance: a key-shaped run merged into a longer alphanumeric identifier (alnum on both sides) is indistinguishable at the grammar level from an ordinary wider identifier that happens to contain the same 20 characters, so it is excluded. This can suppress a genuine AKIA/ASIA key if it were ever concatenated directly against other alphanumeric text (for example inside a base64 blob or a compound token) with no separator; that residual false-negative risk is accepted because is_alnum boundary checking cannot resolve it without a wider identifier grammar. It does not apply merely because punctuation, whitespace, or a line boundary sits on either side of the value \u2014 see the paired surviving positive, aws-positive-punctuation-boundary."
     },
     {
       "id": "aws-positive-punctuation-boundary",
@@ -9030,7 +9030,7 @@
           "end": 32
         }
       ],
-      "note": "A key-shaped value inside a comment naming the field 'example' is not suppressed merely by that context — only the exact vendor-documented literal is excluded (see the regression-aws-example-* fixtures). This is a genuine credential shape and must still be detected."
+      "note": "A key-shaped value inside a comment naming the field 'example' is not suppressed merely by that context \u2014 only the exact vendor-documented literal is excluded (see the regression-aws-example-* fixtures). This is a genuine credential shape and must still be detected."
     },
     {
       "id": "aws-positive-unicode-adjacent-multibyte-before",
@@ -9041,7 +9041,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "caféAKIASYNTHETICEXAMPLE",
+      "input": "caf\u00e9AKIASYNTHETICEXAMPLE",
       "expected": [
         {
           "detector": "aws-access-key",
@@ -9052,7 +9052,7 @@
           "end": 25
         }
       ],
-      "note": "A multi-byte UTF-8 character (é, 2 bytes) immediately before the run is correctly treated as a non-alnum boundary byte, and the UTF-8 byte offset lands past both of its bytes rather than splitting them."
+      "note": "A multi-byte UTF-8 character (\u00e9, 2 bytes) immediately before the run is correctly treated as a non-alnum boundary byte, and the UTF-8 byte offset lands past both of its bytes rather than splitting them."
     },
     {
       "id": "aws-adversarial-long-suffix",
@@ -10049,7 +10049,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\nglpat-SYNTHETIC_REVOKED_GITLAB_TOKEN\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\nglpat-SYNTHETIC_REVOKED_GITLAB_TOKEN\r\n",
       "expected": [
         {
           "detector": "gitlab-token",
@@ -10112,7 +10112,7 @@
       ],
       "input": "Cookie: _gitlab_session=abcdef0123456789abcdef0123456789abcdef01",
       "expected": [],
-      "note": "Issue #518 inventory: the GitLab session cookie (`_gitlab_session=`) is a documented row in GitLab's token-prefix table but is recorded unsupported here — its name=value cookie shape, not a `glXXX-`-prefixed bearer credential, is outside this detector's grammar, and a dedicated cookie-value rule would risk matching arbitrary opaque session identifiers generally."
+      "note": "Issue #518 inventory: the GitLab session cookie (`_gitlab_session=`) is a documented row in GitLab's token-prefix table but is recorded unsupported here \u2014 its name=value cookie shape, not a `glXXX-`-prefixed bearer credential, is outside this detector's grammar, and a dedicated cookie-value rule would risk matching arbitrary opaque session identifiers generally."
     },
     {
       "id": "gitlab-negative-legacy-runner-registration-token",
@@ -10160,7 +10160,7 @@
           "end": 26
         }
       ],
-      "note": "Issue #518 inventory: when a routable runner authentication token's base64 payload alone reaches the 20-byte floor, the existing grammar still matches — truncated at the first `.`, missing the version/checksum tail, but still flagging and redacting the credential. This is the existing, deliberate maximal-run behavior, not a bug; the precise end offset is not corroborated to the routable format's real segment boundary, which is why the family stays pending rather than scored."
+      "note": "Issue #518 inventory: when a routable runner authentication token's base64 payload alone reaches the 20-byte floor, the existing grammar still matches \u2014 truncated at the first `.`, missing the version/checksum tail, but still flagging and redacting the credential. This is the existing, deliberate maximal-run behavior, not a bug; the precise end offset is not corroborated to the routable format's real segment boundary, which is why the family stays pending rather than scored."
     },
     {
       "id": "openai-positive-project",
@@ -10512,7 +10512,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "🔑 Authorization: Bearer sk-proj-SYNTHETIC_REVOKED_CONFORMANCE_KEY",
+      "input": "\ud83d\udd11 Authorization: Bearer sk-proj-SYNTHETIC_REVOKED_CONFORMANCE_KEY",
       "expected": [
         {
           "detector": "bearer-token",
@@ -10948,7 +10948,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "🔑 Authorization: Bearer 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",
+      "input": "\ud83d\udd11 Authorization: Bearer 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",
       "expected": [
         {
           "detector": "openai-token",
@@ -11084,7 +11084,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 reviewed format\r\n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\n\r\n",
+      "input": "# \ud83d\udd11 reviewed format\r\n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\n\r\n",
       "expected": [
         {
           "detector": "openai-token",
@@ -11106,7 +11106,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 reviewed format\r\nsk-SYNTHETICREVOKED0001T3BlbkFKSYNTHETICREVOKED0002\n\r\n",
+      "input": "# \ud83d\udd11 reviewed format\r\nsk-SYNTHETICREVOKED0001T3BlbkFKSYNTHETICREVOKED0002\n\r\n",
       "expected": [
         {
           "detector": "generic-token",
@@ -11128,7 +11128,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 reviewed format\r\n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\n\r\n",
+      "input": "# \ud83d\udd11 reviewed format\r\n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\n\r\n",
       "expected": [
         {
           "detector": "openai-token",
@@ -11150,7 +11150,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 reviewed format\r\nsk-proj-SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTT3BlbkFJSYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SY\n\r\n",
+      "input": "# \ud83d\udd11 reviewed format\r\nsk-proj-SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTT3BlbkFJSYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SY\n\r\n",
       "expected": [],
       "note": "Negative twin of the paired positive differing in exactly one structural property (73-byte left segment vs contracted 74); beta.4 flagged it at the same range as its positive. Issue #368 self-contained synthetic reproduction; independent benchmark fixture id `openai-token-proj-unicode-crlf-twin` (redact-secret-benchmarks common-formats, measurement protocol v4, T2). Never provider-issued."
     },
@@ -11163,7 +11163,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 reviewed format\r\n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\n\r\n",
+      "input": "# \ud83d\udd11 reviewed format\r\n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\n\r\n",
       "expected": [
         {
           "detector": "openai-token",
@@ -11185,7 +11185,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 reviewed format\r\nsk-svcacct-SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTT3BlbkFJSYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SY\n\r\n",
+      "input": "# \ud83d\udd11 reviewed format\r\nsk-svcacct-SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTHETIC_REVOKED_LEFT_SYNTT3BlbkFJSYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SYNTHETIC_REVOKED_RIGHT_SY\n\r\n",
       "expected": [],
       "note": "Negative twin of the paired positive differing in exactly one structural property (73-byte left segment vs contracted 74); beta.4 flagged it at the same range as its positive. Issue #368 self-contained synthetic reproduction; independent benchmark fixture id `openai-token-svcacct-unicode-crlf-twin` (redact-secret-benchmarks common-formats, measurement protocol v4, T2). Never provider-issued."
     },
@@ -11973,7 +11973,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "🔑 Authorization: Bearer sk-ant-api03-SYNTHETIC_REVOKED_CONFORMANCE_KEY",
+      "input": "\ud83d\udd11 Authorization: Bearer sk-ant-api03-SYNTHETIC_REVOKED_CONFORMANCE_KEY",
       "expected": [
         {
           "detector": "anthropic-token",
@@ -12246,7 +12246,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 密钥 café\r\nshpca_SYNTHETICREVOKEDSYNT\r\n",
+      "input": "# \ud83d\udd11 \u5bc6\u94a5 caf\u00e9\r\nshpca_SYNTHETICREVOKEDSYNT\r\n",
       "expected": [],
       "note": "A preceding Unicode comment line and CRLF line endings do not turn the public identifier prefix into a classified credential."
     },
@@ -12417,7 +12417,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\nshpat_SYNTHETIC_REVOKED_SHOPIFY_TOKEN\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\nshpat_SYNTHETIC_REVOKED_SHOPIFY_TOKEN\r\n",
       "expected": [
         {
           "detector": "shopify-token",
@@ -12830,7 +12830,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\nhvs.SYNTHETIC_REVOKED_VAULT_TOKEN\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\nhvs.SYNTHETIC_REVOKED_VAULT_TOKEN\r\n",
       "expected": [
         {
           "detector": "vault-token",
@@ -13369,7 +13369,7 @@
           "end": 49
         }
       ],
-      "note": "HTTP Basic authorization is excluded from bearer-token specifically: the grammar requires the literal 'bearer' keyword, so a Basic-scheme header never reaches its scheme check. The value is not left unguarded, though — generic-token's broader authorization_credential rule still claims it, the same scheme-agnostic pattern authorization-positive-basic already documents for a bare (non-bearer-token-adjacent) Basic header. This is the Basic-versus-Bearer scheme separation: bearer-token owns only the 'bearer' literal, and a sibling contextual detector covers the rest."
+      "note": "HTTP Basic authorization is excluded from bearer-token specifically: the grammar requires the literal 'bearer' keyword, so a Basic-scheme header never reaches its scheme check. The value is not left unguarded, though \u2014 generic-token's broader authorization_credential rule still claims it, the same scheme-agnostic pattern authorization-positive-basic already documents for a bare (non-bearer-token-adjacent) Basic header. This is the Basic-versus-Bearer scheme separation: bearer-token owns only the 'bearer' literal, and a sibling contextual detector covers the rest."
     },
     {
       "id": "bearer-negative-missing-value",
@@ -13781,7 +13781,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "😀 mongodb://fixture%3Auser:SYNTHETIC%40REVOKED%3ADB%2FVALUE@[2001:db8::1]:27017/db",
+      "input": "\ud83d\ude00 mongodb://fixture%3Auser:SYNTHETIC%40REVOKED%3ADB%2FVALUE@[2001:db8::1]:27017/db",
       "expected": [
         {
           "detector": "connection-string",
@@ -14224,7 +14224,7 @@
         "operation": "declared-boundary",
         "ordinal": 0
       },
-      "input": "mongodb://fixture:SYNTHETIC_REVOKED_DB_VALUE@café.example.test:27017/db",
+      "input": "mongodb://fixture:SYNTHETIC_REVOKED_DB_VALUE@caf\u00e9.example.test:27017/db",
       "expected": [],
       "note": "A Unicode host label is not an ASCII reg-name and is rejected; an internationalized mongodb host needs punycode encoding, which this parser does not resolve."
     },
@@ -14981,7 +14981,7 @@
           "end": 39
         }
       ],
-      "note": "A bare dotenv KEY=value line supplies contextual_secret's structured-data-kv representative positive evidence (host-context-classes.md §4)."
+      "note": "A bare dotenv KEY=value line supplies contextual_secret's structured-data-kv representative positive evidence (host-context-classes.md \u00a74)."
     },
     {
       "id": "contextual-host-shell",
@@ -15406,7 +15406,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "note: café — password=\"@Microsoft.KeyVault(VaultName=myvault;SecretName=mysecret)\"",
+      "input": "note: caf\u00e9 \u2014 password=\"@Microsoft.KeyVault(VaultName=myvault;SecretName=mysecret)\"",
       "expected": [],
       "note": "issue #293: a multi-byte Unicode character preceding the assignment does not defeat the Azure Key Vault VaultName/SecretName exclusion; the exclusion's byte-offset handling advances by real UTF-8 byte width, not char count."
     },
@@ -15940,7 +15940,7 @@
       "contexts": [
         "terminal"
       ],
-      "input": "Password: ••••••••",
+      "input": "Password: \u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022",
       "expected": [],
       "note": "Repeated-character filler is recognized for a multi-byte Unicode mask character (U+2022 BULLET), not only single-byte ASCII ones like '*'."
     },
@@ -16356,7 +16356,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "🔑 café\r\notpauth://totp/Example:alice@example.com?secret=SYNTHETICOTPAUTHSEEDVALUEQPWKYV",
+      "input": "\ud83d\udd11 caf\u00e9\r\notpauth://totp/Example:alice@example.com?secret=SYNTHETICOTPAUTHSEEDVALUEQPWKYV",
       "expected": [
         {
           "detector": "otpauth-uri",
@@ -16951,7 +16951,7 @@
           "end": 20
         }
       ],
-      "note": "A one-character mutation of AWS's documented example access key ID (last byte E to F) no longer matches the exact-literal carve-out and is correctly detected — pairing that exclusion with a surviving positive proves it is exact-match only, not a shape-based allowance that could hide a real secret."
+      "note": "A one-character mutation of AWS's documented example access key ID (last byte E to F) no longer matches the exact-literal carve-out and is correctly detected \u2014 pairing that exclusion with a surviving positive proves it is exact-match only, not a shape-based allowance that could hide a real secret."
     },
     {
       "id": "regression-aws-example-secret-access-key",
@@ -17613,7 +17613,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "🔑 SENDGRID_TOKEN=SG.SYNTHETIC_REVOKED_0000.SYNTHETIC_REVOKED_SENDGRID_SECRET_000000000",
+      "input": "\ud83d\udd11 SENDGRID_TOKEN=SG.SYNTHETIC_REVOKED_0000.SYNTHETIC_REVOKED_SENDGRID_SECRET_000000000",
       "expected": [
         {
           "detector": "sendgrid-token",
@@ -17635,7 +17635,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\nSG.SYNTHETIC_REVOKED_0000.SYNTHETIC_REVOKED_SENDGRID_SECRET_000000000\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\nSG.SYNTHETIC_REVOKED_0000.SYNTHETIC_REVOKED_SENDGRID_SECRET_000000000\r\n",
       "expected": [
         {
           "detector": "sendgrid-token",
@@ -18497,7 +18497,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\nATATSYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY_SYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY_SYNTHETIC_REVO\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\nATATSYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY_SYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY_SYNTHETIC_REVO\r\n",
       "expected": [
         {
           "detector": "atlassian-api-token",
@@ -18821,7 +18821,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "note: café — value=\"api_key=\"SYNTHETIC_REVOKED_NESTED_QUOTE_UNICODE_1234\"\"\n",
+      "input": "note: caf\u00e9 \u2014 value=\"api_key=\"SYNTHETIC_REVOKED_NESTED_QUOTE_UNICODE_1234\"\"\n",
       "expected": [
         {
           "detector": "generic-token",
@@ -18975,7 +18975,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\n123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\n123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11\r\n",
       "expected": [
         {
           "detector": "telegram-bot-token",
@@ -19260,7 +19260,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\nMDAwMDAwMDAwMDAwMDAwMDAw.REVOKE.SYNTHETICREVOKEDBOTTOKENFIX\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\nMDAwMDAwMDAwMDAwMDAwMDAw.REVOKE.SYNTHETICREVOKEDBOTTOKENFIX\r\n",
       "expected": [
         {
           "detector": "discord-bot-token",
@@ -19623,7 +19623,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\ntwilio fedcba9876543210fedcba9876543210\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\ntwilio fedcba9876543210fedcba9876543210\r\n",
       "expected": [
         {
           "detector": "twilio-auth-token",
@@ -21703,7 +21703,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\nDD_API_KEY=0123456789abcdef0123456789abcdef\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\nDD_API_KEY=0123456789abcdef0123456789abcdef\r\n",
       "expected": [
         {
           "detector": "datadog-api-key",
@@ -22745,7 +22745,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\nDD_APPLICATION_KEY=0123456789abcdef0123456789abcdef01234567\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\nDD_APPLICATION_KEY=0123456789abcdef0123456789abcdef01234567\r\n",
       "expected": [
         {
           "detector": "datadog-application-key",
@@ -23731,7 +23731,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\nglsa_SYNTHETICREVOKEDGRAFANASATOKEN01_deadbeef\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\nglsa_SYNTHETICREVOKEDGRAFANASATOKEN01_deadbeef\r\n",
       "expected": [
         {
           "detector": "grafana-service-account-token",
@@ -24068,7 +24068,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\nglc_SYNTHETICREVOKEDGRAFANACLOUDACCESSPOLICYTOKEN\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\nglc_SYNTHETICREVOKEDGRAFANACLOUDACCESSPOLICYTOKEN\r\n",
       "expected": [
         {
           "detector": "grafana-cloud-access-policy-token",
@@ -24227,7 +24227,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\nsntryu_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\nsntryu_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\r\n",
       "expected": [
         {
           "detector": "sentry-user-auth-token",
@@ -24517,7 +24517,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\nsntrys_eyJSYNTHETICREVOKEDSENTRYO_SigFixSYNTHETICREVOKED0123456789SigFixSYNTH\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\nsntrys_eyJSYNTHETICREVOKEDSENTRYO_SigFixSYNTHETICREVOKED0123456789SigFixSYNTH\r\n",
       "expected": [
         {
           "detector": "sentry-org-auth-token",
@@ -24828,7 +24828,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\nNRAK-SYNTHETICREVOKEDNEWRELICUSA\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\nNRAK-SYNTHETICREVOKEDNEWRELICUSA\r\n",
       "expected": [
         {
           "detector": "new-relic-user-api-key",
@@ -25039,7 +25039,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\nnewrelic 0123456789abcdef0123456789abcdef01234567\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\nnewrelic 0123456789abcdef0123456789abcdef01234567\r\n",
       "expected": [
         {
           "detector": "new-relic-license-key",
@@ -25358,7 +25358,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "🔑 Authorization: Bearer hf_SYNTHETICREVOKEDHUGGINGFACETOKEN01",
+      "input": "\ud83d\udd11 Authorization: Bearer hf_SYNTHETICREVOKEDHUGGINGFACETOKEN01",
       "expected": [
         {
           "detector": "huggingface-token",
@@ -25616,7 +25616,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "🔑 Authorization: Bearer lin_api_SYNTHETICREVOKEDLINEARAPITOKENVALUE01234",
+      "input": "\ud83d\udd11 Authorization: Bearer lin_api_SYNTHETICREVOKEDLINEARAPITOKENVALUE01234",
       "expected": [
         {
           "detector": "linear-token",
@@ -25812,7 +25812,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "🔑 Authorization: Bearer xoxb-SYNTHETIC_REVOKED_CONFORMANCE_KEY",
+      "input": "\ud83d\udd11 Authorization: Bearer xoxb-SYNTHETIC_REVOKED_CONFORMANCE_KEY",
       "expected": [
         {
           "detector": "bearer-token",
@@ -26257,7 +26257,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\n-----BEGIN PRIVATE KEY-----\r\nU1lOVEhFVElDX0NSTEZfVU5JQ09ERV9QUkVGSVg=\r\n-----END PRIVATE KEY-----\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\n-----BEGIN PRIVATE KEY-----\r\nU1lOVEhFVElDX0NSTEZfVU5JQ09ERV9QUkVGSVg=\r\n-----END PRIVATE KEY-----\r\n",
       "expected": [
         {
           "detector": "private-key",
@@ -27651,7 +27651,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\ndckr_pat_SYNTHETIC_REVOKED_KEY_VALU\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\ndckr_pat_SYNTHETIC_REVOKED_KEY_VALU\r\n",
       "expected": [],
       "note": "Issue #370: the 26-byte personal access token twin after a CRLF line ending and a Unicode-prefixed comment line stays silent; mirrors benchmark fixture docker-token-pat-unicode-crlf-twin, which beta.4 flagged."
     },
@@ -27664,7 +27664,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\ndckr_oat_SYNTHETIC_REVOKED_OAT_KEY_VALUE\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\ndckr_oat_SYNTHETIC_REVOKED_OAT_KEY_VALUE\r\n",
       "expected": [],
       "note": "Issue #370: the 31-byte organization access token twin after a CRLF line ending and a Unicode-prefixed comment line stays silent; mirrors benchmark fixture docker-token-oat-unicode-crlf-twin, which beta.4 flagged."
     },
@@ -27677,7 +27677,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\ndckr_oat_SYNTHETIC_REVOKED_OAT_KEY_VALUE3\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\ndckr_oat_SYNTHETIC_REVOKED_OAT_KEY_VALUE3\r\n",
       "expected": [
         {
           "detector": "docker-token",
@@ -28035,7 +28035,7 @@
       },
       "input": "hf_SyntheticRevokedHuggingFaceTokenA",
       "expected": [],
-      "note": "Issue #372: a 33-byte body — one byte short of the documented 34-byte length — is the beta.4 huggingface-token-user-plain-twin regression shape; silence follows from construction."
+      "note": "Issue #372: a 33-byte body \u2014 one byte short of the documented 34-byte length \u2014 is the beta.4 huggingface-token-user-plain-twin regression shape; silence follows from construction."
     },
     {
       "id": "huggingface-boundary-one-long-exact-length",
@@ -28054,7 +28054,7 @@
       },
       "input": "hf_SyntheticRevokedHuggingFaceTokenABC",
       "expected": [],
-      "note": "Issue #372: a 35-byte body — one byte past the documented 34-byte length — is not misread as the exact shape followed by a trailing byte."
+      "note": "Issue #372: a 35-byte body \u2014 one byte past the documented 34-byte length \u2014 is not misread as the exact shape followed by a trailing byte."
     },
     {
       "id": "huggingface-boundary-invalid-alphabet-exact-length",
@@ -28219,7 +28219,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\napi_org_SYNTHETICREVOKEDHUGGINGFACETOKEN01\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\napi_org_SYNTHETICREVOKEDHUGGINGFACETOKEN01\r\n",
       "expected": [
         {
           "detector": "huggingface-token",
@@ -29767,7 +29767,7 @@
         "maxFindings": 1,
         "maxRuntimeMs": 250
       },
-      "input": "token: ghp_SYNTHETIC‌REVOKED00000000000000000000\n",
+      "input": "token: ghp_SYNTHETIC\u200cREVOKED00000000000000000000\n",
       "expected": [
         {
           "detector": "github-token",
@@ -29795,7 +29795,7 @@
         "maxFindings": 1,
         "maxRuntimeMs": 250
       },
-      "input": "Authorization: Bearer SYNTHETIC​REVOKED_BEARER_VALUE_1234\n",
+      "input": "Authorization: Bearer SYNTHETIC\u200bREVOKED_BEARER_VALUE_1234\n",
       "expected": [
         {
           "detector": "bearer-token",
@@ -29823,7 +29823,7 @@
         "maxFindings": 1,
         "maxRuntimeMs": 250
       },
-      "input": "api​_key = SYNTHETIC_REVOKED_VALUE_1234\n",
+      "input": "api\u200b_key = SYNTHETIC_REVOKED_VALUE_1234\n",
       "expected": [
         {
           "detector": "generic-token",
@@ -29851,7 +29851,7 @@
         "maxFindings": 1,
         "maxRuntimeMs": 250
       },
-      "input": "api_key = SYNTHETIC_REVOKED​_VALUE_1234\n",
+      "input": "api_key = SYNTHETIC_REVOKED\u200b_VALUE_1234\n",
       "expected": [
         {
           "detector": "generic-token",
@@ -29879,7 +29879,7 @@
         "maxFindings": 1,
         "maxRuntimeMs": 250
       },
-      "input": "postgres://svc:SYNTHETIC​REVOKEDPW@db:5432/app\n",
+      "input": "postgres://svc:SYNTHETIC\u200bREVOKEDPW@db:5432/app\n",
       "expected": [
         {
           "detector": "connection-string",
@@ -29907,7 +29907,7 @@
         "maxFindings": 1,
         "maxRuntimeMs": 250
       },
-      "input": "token: ghp_SYNTHETIC‮REVOKED00000000000000000000\n",
+      "input": "token: ghp_SYNTHETIC\u202eREVOKED00000000000000000000\n",
       "expected": [
         {
           "detector": "github-token",
@@ -29935,7 +29935,7 @@
         "maxFindings": 1,
         "maxRuntimeMs": 250
       },
-      "input": "token: ghp_󠁁SYNTHETIC󠁁REVOKED00000000000000000000\n",
+      "input": "token: ghp_\udb40\udc41SYNTHETIC\udb40\udc41REVOKED00000000000000000000\n",
       "expected": [
         {
           "detector": "github-token",
@@ -29963,7 +29963,7 @@
         "maxFindings": 1,
         "maxRuntimeMs": 250
       },
-      "input": "token: ghp_SYNTHETICREVOKED0000000000000000000️0\n",
+      "input": "token: ghp_SYNTHETICREVOKED0000000000000000000\ufe0f0\n",
       "expected": [
         {
           "detector": "github-token",
@@ -29991,7 +29991,7 @@
         "maxFindings": 1,
         "maxRuntimeMs": 250
       },
-      "input": "token: gㅤhp_SYNTHETICREVOKED00000000000000000000\n",
+      "input": "token: g\u3164hp_SYNTHETICREVOKED00000000000000000000\n",
       "expected": [
         {
           "detector": "github-token",
@@ -30019,7 +30019,7 @@
         "maxFindings": 1,
         "maxRuntimeMs": 250
       },
-      "input": "token: ghp_SYNTHETIC­­⁠REVOKED00000000000000000000\n",
+      "input": "token: ghp_SYNTHETIC\u00ad\u00ad\u2060REVOKED00000000000000000000\n",
       "expected": [
         {
           "detector": "github-token",
@@ -30047,7 +30047,7 @@
         "maxFindings": 1,
         "maxRuntimeMs": 250
       },
-      "input": "x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­x­\ntoken: ghp_SYNTHETIC‌REVOKED00000000000000000000\n",
+      "input": "x\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00adx\u00ad\ntoken: ghp_SYNTHETIC\u200cREVOKED00000000000000000000\n",
       "expected": [
         {
           "detector": "github-token",
@@ -30665,7 +30665,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 reviewed format\r\nsk-SYNTHETICrevoked0001aaaaBBBBccccDDDD1234wxyzEFGH\n",
+      "input": "# \ud83d\udd11 reviewed format\r\nsk-SYNTHETICrevoked0001aaaaBBBBccccDDDD1234wxyzEFGH\n",
       "expected": [
         {
           "detector": "generic-token",
@@ -30731,7 +30731,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 reviewed format\r\nsk-proj-SYNTHETICrevoked0002bbbbCCCCddddEEEE5678uvwxIJKL\n",
+      "input": "# \ud83d\udd11 reviewed format\r\nsk-proj-SYNTHETICrevoked0002bbbbCCCCddddEEEE5678uvwxIJKL\n",
       "expected": [
         {
           "detector": "generic-token",
@@ -30797,7 +30797,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 reviewed format\r\nsk-svcacct-SYNTHETICrevoked0003ccccDDDDeeeeFFFF9012rstuMNOP\n",
+      "input": "# \ud83d\udd11 reviewed format\r\nsk-svcacct-SYNTHETICrevoked0003ccccDDDDeeeeFFFF9012rstuMNOP\n",
       "expected": [
         {
           "detector": "generic-token",
@@ -31144,7 +31144,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\nAAAASYNREV0:SYNTHETICREVOKEDFIREBASEFCMLEGACYSERVERKEYFIXTUREPADDING0123456789SYNTHETICREVOKEDFIREBASEFCMLEGACYSERVERKEYFIXTUREPADDING0123456789ABCDWXYZ\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\nAAAASYNREV0:SYNTHETICREVOKEDFIREBASEFCMLEGACYSERVERKEYFIXTUREPADDING0123456789SYNTHETICREVOKEDFIREBASEFCMLEGACYSERVERKEYFIXTUREPADDING0123456789ABCDWXYZ\r\n",
       "expected": [
         {
           "detector": "firebase-server-key",
@@ -31543,7 +31543,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 reviewed format\r\npul-0123456789abcdef0123456789abcdef01234567\n\r\n",
+      "input": "# \ud83d\udd11 reviewed format\r\npul-0123456789abcdef0123456789abcdef01234567\n\r\n",
       "expected": [
         {
           "detector": "pulumi-access-token",
@@ -31781,8 +31781,7 @@
       "input": "pul-0123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef01234567",
       "expected": [],
       "note": "A single long lowercase-hex run after the documented prefix is a wider identifier, not a token: the exact 40-byte contract never carves a valid-looking substring out of it, and the scan stays linear and bounded."
-    }
-,
+    },
     {
       "id": "terraform-cloud-token-positive-bare",
       "detector": "terraform-cloud-token",
@@ -32323,7 +32322,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 reviewed format\r\ndapi0123456789abcdef0123456789abcdef\n\r\n",
+      "input": "# \ud83d\udd11 reviewed format\r\ndapi0123456789abcdef0123456789abcdef\n\r\n",
       "expected": [
         {
           "detector": "databricks-personal-access-token",
@@ -32659,6 +32658,1337 @@
       "note": "A long run of near-miss dapi-prefixed bodies (each one byte short of the documented length) must not make the scan quadratic, and none matches."
     },
     {
+      "id": "confluent-cloud-api-secret-positive-bare",
+      "detector": "confluent-cloud-api-secret",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPQRSTUV",
+      "expected": [
+        {
+          "detector": "confluent-cloud-api-secret",
+          "type": "confluent_cloud_api_secret",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 64
+        }
+      ],
+      "note": "The documented cflt prefix plus exactly 60 base64-body bytes is sufficient on its own; no surrounding context is required."
+    },
+    {
+      "id": "confluent-cloud-api-secret-positive-dotenv",
+      "detector": "confluent-cloud-api-secret",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "CONFLUENT_CLOUD_API_SECRET=cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPQRSTUV",
+      "expected": [
+        {
+          "detector": "confluent-cloud-api-secret",
+          "type": "confluent_cloud_api_secret",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 27,
+          "end": 91
+        }
+      ],
+      "note": "A bare dotenv-style assignment (KEY=<secret>, no quotes) is detected by format alone."
+    },
+    {
+      "id": "confluent-cloud-api-secret-positive-json",
+      "detector": "confluent-cloud-api-secret",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"apiSecret\": \"cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPQRSTUV\"}",
+      "expected": [
+        {
+          "detector": "confluent-cloud-api-secret",
+          "type": "confluent_cloud_api_secret",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 15,
+          "end": 79
+        }
+      ],
+      "note": "A JSON string value is detected by format alone."
+    },
+    {
+      "id": "confluent-cloud-api-secret-positive-yaml",
+      "detector": "confluent-cloud-api-secret",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "sasl.password: cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPQRSTUV",
+      "expected": [
+        {
+          "detector": "confluent-cloud-api-secret",
+          "type": "confluent_cloud_api_secret",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 15,
+          "end": 79
+        }
+      ],
+      "note": "A Kafka client SASL/PLAIN password field in YAML is detected by format alone."
+    },
+    {
+      "id": "confluent-cloud-api-secret-positive-github-actions",
+      "detector": "confluent-cloud-api-secret",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "github-actions"
+      ],
+      "input": "env:\n  CONFLUENT_CLOUD_API_SECRET: cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPQRSTUV\n",
+      "expected": [
+        {
+          "detector": "confluent-cloud-api-secret",
+          "type": "confluent_cloud_api_secret",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 35,
+          "end": 99
+        }
+      ],
+      "note": "Host syntax is lexical context; a hardcoded secret in CI configuration retains exact original-input offsets."
+    },
+    {
+      "id": "confluent-cloud-api-secret-positive-log",
+      "detector": "confluent-cloud-api-secret",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-22T12:00:00Z INFO  connecting with confluent api secret cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPQRSTUV to cluster\n",
+      "expected": [
+        {
+          "detector": "confluent-cloud-api-secret",
+          "type": "confluent_cloud_api_secret",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 64,
+          "end": 128
+        }
+      ],
+      "note": "A secret embedded in an ordinary log line is bounded by whitespace on both sides."
+    },
+    {
+      "id": "confluent-cloud-api-secret-positive-shell-quoted",
+      "detector": "confluent-cloud-api-secret",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export CONFLUENT_CLOUD_API_SECRET=\"cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPQRSTUV\"\n",
+      "expected": [
+        {
+          "detector": "confluent-cloud-api-secret",
+          "type": "confluent_cloud_api_secret",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 35,
+          "end": 99
+        }
+      ],
+      "note": "A quoted shell export still bounds the secret to exactly its own 64 bytes."
+    },
+    {
+      "id": "confluent-cloud-api-secret-positive-punctuation-adjacent",
+      "detector": "confluent-cloud-api-secret",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "(cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPQRSTUV).",
+      "expected": [
+        {
+          "detector": "confluent-cloud-api-secret",
+          "type": "confluent_cloud_api_secret",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1,
+          "end": 65
+        }
+      ],
+      "note": "Enclosing punctuation with no whitespace still bounds the secret to exactly its own 64 bytes."
+    },
+    {
+      "id": "confluent-cloud-api-secret-positive-crlf-unicode-prefix",
+      "detector": "confluent-cloud-api-secret",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# \ud83d\udd11 caf\u00e9\r\ncfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPQRSTUV\r\n",
+      "expected": [
+        {
+          "detector": "confluent-cloud-api-secret",
+          "type": "confluent_cloud_api_secret",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 78
+        }
+      ],
+      "note": "CRLF line endings and a multi-byte Unicode prefix shift only the byte offsets; the match itself is unaffected."
+    },
+    {
+      "id": "confluent-cloud-api-secret-positive-repeated-value",
+      "detector": "confluent-cloud-api-secret",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPQRSTUV cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPQRSTUV",
+      "expected": [
+        {
+          "detector": "confluent-cloud-api-secret",
+          "type": "confluent_cloud_api_secret",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 64
+        },
+        {
+          "detector": "confluent-cloud-api-secret",
+          "type": "confluent_cloud_api_secret",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 65,
+          "end": 129
+        }
+      ],
+      "note": "The same secret value appearing twice is reported once per occurrence, at its own byte range each time."
+    },
+    {
+      "id": "confluent-cloud-api-secret-boundary-one-short",
+      "detector": "confluent-cloud-api-secret",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPQRSTU",
+      "expected": [],
+      "note": "A body one byte short of the documented 60-byte length is rejected rather than truncated."
+    },
+    {
+      "id": "confluent-cloud-api-secret-boundary-one-long",
+      "detector": "confluent-cloud-api-secret",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPQRSTUVa",
+      "expected": [],
+      "note": "A body one byte longer than the documented length is rejected rather than matched up to the documented length."
+    },
+    {
+      "id": "confluent-cloud-api-secret-negative-wrong-prefix-case",
+      "detector": "confluent-cloud-api-secret",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "CfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPQRSTUV",
+      "expected": [],
+      "note": "The documented prefix is the literal lowercase cflt; a case-mangled twin is rejected rather than matched."
+    },
+    {
+      "id": "confluent-cloud-api-secret-negative-embedded-identifier",
+      "detector": "confluent-cloud-api-secret",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "legacy_cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPQRSTUV_backup",
+      "expected": [],
+      "note": "A cflt-prefixed run directly glued to a wider identifier on either side is rejected rather than matched as a substring."
+    },
+    {
+      "id": "confluent-cloud-api-secret-negative-doc-style-placeholder",
+      "detector": "confluent-cloud-api-secret",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "cflt${CONFLUENT_API_SECRET}",
+      "expected": [],
+      "note": "A documentation-style environment variable reference is outside the base64-body alphabet and is rejected."
+    },
+    {
+      "id": "confluent-cloud-api-secret-negative-key-id-alone",
+      "detector": "confluent-cloud-api-secret",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "SYNTHETICKEYID01",
+      "expected": [],
+      "note": "The API Key ID (the non-secret half of the pair) is never itself a finding; it carries no cflt-prefixed run."
+    },
+    {
+      "id": "confluent-cloud-api-secret-negative-cluster-and-host-context",
+      "detector": "confluent-cloud-api-secret",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "bootstrap.servers=pkc-abc123.us-east-1.aws.confluent.cloud:9092\ncluster_id: lkc-abc123\n",
+      "expected": [],
+      "note": "A bootstrap host string and a cluster identifier carry no cflt-prefixed run and are excluded automatically, matching the issue's explicit scope."
+    },
+    {
+      "id": "confluent-cloud-api-secret-overlap-context",
+      "detector": "confluent-cloud-api-secret",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "secret_key=cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPQRSTUV",
+      "expected": [
+        {
+          "detector": "confluent-cloud-api-secret",
+          "type": "confluent_cloud_api_secret",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 75
+        }
+      ],
+      "note": "secret_key is a recognized generic-token field name, so this assignment also proposes a contextual_secret candidate at the same resolved action (both redact); the provider-specific candidate's higher specificity still decides the overlap, exactly as decision-resolve-overlap-precedence-by-resolved-action-severity intends."
+    },
+    {
+      "id": "confluent-cloud-api-secret-adversarial-long-suffix",
+      "detector": "confluent-cloud-api-secret",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 8256,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      },
+      "input": "cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPQRSTUVAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      "expected": [],
+      "note": "A single documented-length secret immediately followed by a very long run of the same alphabet is rejected outright as one wider, non-matching run rather than truncated back down to the documented shape; this stays linear in input length."
+    },
+    {
+      "id": "confluent-cloud-api-secret-legacy-positive-dotenv-keyword",
+      "detector": "confluent-cloud-api-secret-legacy",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "CONFLUENT_API_SECRET=SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO",
+      "expected": [
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 21,
+          "end": 85
+        }
+      ],
+      "note": "The bare 64-byte base64-body value has no marker of its own; the confluent-named dotenv key is the only context present, so this classifies at medium confidence."
+    },
+    {
+      "id": "confluent-cloud-api-secret-legacy-positive-yaml-keyword",
+      "detector": "confluent-cloud-api-secret-legacy",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "confluent_api_secret: SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO",
+      "expected": [
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 22,
+          "end": 86
+        }
+      ],
+      "note": "YAML key syntax is lexical context only; the confluent-named key is a keyword-only signal, so confidence is medium."
+    },
+    {
+      "id": "confluent-cloud-api-secret-legacy-positive-bare-with-keyword",
+      "detector": "confluent-cloud-api-secret-legacy",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "confluent SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO",
+      "expected": [
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 10,
+          "end": 74
+        }
+      ],
+      "note": "A bare confluent keyword sharing the same line as the value is sufficient context, at medium confidence, matching both consulted tools' own keyword-gated behavior."
+    },
+    {
+      "id": "confluent-cloud-api-secret-legacy-negative-bare-no-context",
+      "detector": "confluent-cloud-api-secret-legacy",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO",
+      "expected": [],
+      "note": "A bare 64-byte base64-body run is indistinguishable from countless unrelated opaque blobs without reliable Confluent context."
+    },
+    {
+      "id": "confluent-cloud-api-secret-legacy-negative-different-line",
+      "detector": "confluent-cloud-api-secret-legacy",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# confluent cluster credentials\nSYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO\n",
+      "expected": [],
+      "note": "Context is scoped to the same line as the candidate so whole-input and incremental (line-at-a-time) scanning agree; a confluent keyword one line above the value is a documented, known false negative, not a match."
+    },
+    {
+      "id": "confluent-cloud-api-secret-legacy-negative-repeated-filler",
+      "detector": "confluent-cloud-api-secret-legacy",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "confluent aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": [],
+      "note": "A value made of one character repeated is classic documentation/redaction filler, excluded even when confluent context matches."
+    },
+    {
+      "id": "confluent-cloud-api-secret-legacy-negative-key-id-alone",
+      "detector": "confluent-cloud-api-secret-legacy",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "confluent SYNTHETICKEYID01",
+      "expected": [],
+      "note": "The API Key ID is a public identifier, not a secret; it is never emitted as a finding even alongside confluent context, since it carries no 64-byte base64-body run."
+    },
+    {
+      "id": "confluent-cloud-api-secret-legacy-boundary-wrong-length",
+      "detector": "confluent-cloud-api-secret-legacy",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "confluent SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMN",
+      "expected": [],
+      "note": "A value one byte short of the required 64-byte length is rejected rather than truncated, even with confluent context present."
+    },
+    {
+      "id": "confluent-cloud-api-secret-legacy-overlap-generic-context",
+      "detector": "confluent-cloud-api-secret-legacy",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "secret_key=aA0aA0aA0aA0aA0aA0aA0aA0aA0aA0aA0aA0aA0aA0aA0aA0aA0aA0aA0aA0aA0a # confluent",
+      "expected": [
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 11,
+          "end": 75
+        }
+      ],
+      "note": "secret_key is a recognized generic-token field name, so this low-entropy assignment also proposes a contextual_secret candidate; generic-token's own entropy heuristic keeps that candidate at the same medium confidence (action warn) as this keyword-gated legacy candidate, so the same resolved-action severity leaves specificity to decide, and the provider-specific candidate wins, exactly as decision-resolve-overlap-precedence-by-resolved-action-severity intends."
+    },
+    {
+      "id": "confluent-cloud-api-secret-legacy-adversarial-dense-findings",
+      "detector": "confluent-cloud-api-secret-legacy",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 6509,
+        "maxFindings": 100,
+        "maxRuntimeMs": 250
+      },
+      "input": "confluent SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO",
+      "expected": [
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 10,
+          "end": 74
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 75,
+          "end": 139
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 140,
+          "end": 204
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 205,
+          "end": 269
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 270,
+          "end": 334
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 335,
+          "end": 399
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 400,
+          "end": 464
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 465,
+          "end": 529
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 530,
+          "end": 594
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 595,
+          "end": 659
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 660,
+          "end": 724
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 725,
+          "end": 789
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 790,
+          "end": 854
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 855,
+          "end": 919
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 920,
+          "end": 984
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 985,
+          "end": 1049
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1050,
+          "end": 1114
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1115,
+          "end": 1179
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1180,
+          "end": 1244
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1245,
+          "end": 1309
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1310,
+          "end": 1374
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1375,
+          "end": 1439
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1440,
+          "end": 1504
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1505,
+          "end": 1569
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1570,
+          "end": 1634
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1635,
+          "end": 1699
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1700,
+          "end": 1764
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1765,
+          "end": 1829
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1830,
+          "end": 1894
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1895,
+          "end": 1959
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1960,
+          "end": 2024
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2025,
+          "end": 2089
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2090,
+          "end": 2154
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2155,
+          "end": 2219
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2220,
+          "end": 2284
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2285,
+          "end": 2349
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2350,
+          "end": 2414
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2415,
+          "end": 2479
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2480,
+          "end": 2544
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2545,
+          "end": 2609
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2610,
+          "end": 2674
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2675,
+          "end": 2739
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2740,
+          "end": 2804
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2805,
+          "end": 2869
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2870,
+          "end": 2934
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2935,
+          "end": 2999
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3000,
+          "end": 3064
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3065,
+          "end": 3129
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3130,
+          "end": 3194
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3195,
+          "end": 3259
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3260,
+          "end": 3324
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3325,
+          "end": 3389
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3390,
+          "end": 3454
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3455,
+          "end": 3519
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3520,
+          "end": 3584
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3585,
+          "end": 3649
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3650,
+          "end": 3714
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3715,
+          "end": 3779
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3780,
+          "end": 3844
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3845,
+          "end": 3909
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3910,
+          "end": 3974
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3975,
+          "end": 4039
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 4040,
+          "end": 4104
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 4105,
+          "end": 4169
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 4170,
+          "end": 4234
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 4235,
+          "end": 4299
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 4300,
+          "end": 4364
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 4365,
+          "end": 4429
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 4430,
+          "end": 4494
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 4495,
+          "end": 4559
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 4560,
+          "end": 4624
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 4625,
+          "end": 4689
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 4690,
+          "end": 4754
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 4755,
+          "end": 4819
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 4820,
+          "end": 4884
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 4885,
+          "end": 4949
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 4950,
+          "end": 5014
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 5015,
+          "end": 5079
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 5080,
+          "end": 5144
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 5145,
+          "end": 5209
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 5210,
+          "end": 5274
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 5275,
+          "end": 5339
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 5340,
+          "end": 5404
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 5405,
+          "end": 5469
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 5470,
+          "end": 5534
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 5535,
+          "end": 5599
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 5600,
+          "end": 5664
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 5665,
+          "end": 5729
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 5730,
+          "end": 5794
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 5795,
+          "end": 5859
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 5860,
+          "end": 5924
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 5925,
+          "end": 5989
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 5990,
+          "end": 6054
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 6055,
+          "end": 6119
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 6120,
+          "end": 6184
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 6185,
+          "end": 6249
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 6250,
+          "end": 6314
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 6315,
+          "end": 6379
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 6380,
+          "end": 6444
+        },
+        {
+          "detector": "confluent-cloud-api-secret-legacy",
+          "type": "confluent_cloud_api_secret_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 6445,
+          "end": 6509
+        }
+      ],
+      "note": "A single confluent-context-bearing line densely packed with candidate-shaped runs stays linear: per-line (not per-candidate) context checks keep this bounded."
+    },
+    {
       "id": "netlify-positive-qualified",
       "detector": "netlify-token",
       "kind": "positive",
@@ -32691,7 +34021,7 @@
       ],
       "input": "nfp_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY0",
       "expected": [],
-      "note": "Issue #311: a 35-byte body — one byte short of the documented 36-byte length — is silent by construction."
+      "note": "Issue #311: a 35-byte body \u2014 one byte short of the documented 36-byte length \u2014 is silent by construction."
     },
     {
       "id": "netlify-boundary-one-long",
@@ -32704,7 +34034,7 @@
       ],
       "input": "nfp_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01a",
       "expected": [],
-      "note": "A 37-byte body — one byte past the documented length — is not misread as the exact shape followed by a trailing byte; the boundary check, widened past the match alphabet to include `-`, rejects the whole run rather than truncating it."
+      "note": "A 37-byte body \u2014 one byte past the documented length \u2014 is not misread as the exact shape followed by a trailing byte; the boundary check, widened past the match alphabet to include `-`, rejects the whole run rather than truncating it."
     },
     {
       "id": "netlify-boundary-invalid-alphabet",
@@ -32769,7 +34099,7 @@
       ],
       "input": "NFP_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01",
       "expected": [],
-      "note": "The documented prefix is matched byte-for-byte; an uppercase rendering ('NFP_') is not a case-insensitive equivalent — issue #311 froze the lowercase-only prefix per both tools' independent convergence."
+      "note": "The documented prefix is matched byte-for-byte; an uppercase rendering ('NFP_') is not a case-insensitive equivalent \u2014 issue #311 froze the lowercase-only prefix per both tools' independent convergence."
     },
     {
       "id": "netlify-adversarial-long-suffix",
@@ -32995,7 +34325,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\nnfp_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01\r\n",
+      "input": "# \ud83d\udd11 caf\u00e9\r\nnfp_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01\r\n",
       "expected": [
         {
           "detector": "netlify-token",

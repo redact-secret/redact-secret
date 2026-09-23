@@ -2453,6 +2453,77 @@
       "type": "databricks_personal_access_token"
     },
     {
+      "detector": "confluent-cloud-api-secret",
+      "evidence": {
+        "fixtureCount": 19,
+        "hostContextsExercised": [
+          "dotenv",
+          "github-actions",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "confluent-cloud-api-secret-positive-bare",
+        "confluent-cloud-api-secret-positive-crlf-unicode-prefix",
+        "confluent-cloud-api-secret-positive-dotenv",
+        "confluent-cloud-api-secret-positive-github-actions",
+        "confluent-cloud-api-secret-positive-json",
+        "confluent-cloud-api-secret-positive-log",
+        "confluent-cloud-api-secret-positive-punctuation-adjacent",
+        "confluent-cloud-api-secret-positive-repeated-value",
+        "confluent-cloud-api-secret-positive-shell-quoted",
+        "confluent-cloud-api-secret-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "confluent_cloud_api_secret"
+    },
+    {
+      "detector": "confluent-cloud-api-secret-legacy",
+      "evidence": {
+        "fixtureCount": 10,
+        "hostContextsExercised": [
+          "dotenv",
+          "plain-text",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "confluent-cloud-api-secret-legacy-positive-bare-with-keyword",
+        "confluent-cloud-api-secret-legacy-positive-dotenv-keyword",
+        "confluent-cloud-api-secret-legacy-positive-yaml-keyword"
+      ],
+      "policyClass": "confidence-gated",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "confluent_cloud_api_secret_legacy"
+    },
+    {
       "detector": "netlify-token",
       "evidence": {
         "fixtureCount": 26,
@@ -2497,7 +2568,7 @@
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 55,
+    "supported": 57,
     "unresolved": 0
   }
 }

@@ -9,20 +9,25 @@ use crate::types::{Action, Confidence, DetectedFinding, Policy, PolicyContext};
 ///
 /// Not every [`Specificity::Provider`](crate::types::Specificity) type is
 /// here: `twilio_auth_token`, `twilio_api_key_secret`, `datadog_api_key`,
-/// `datadog_application_key`, and `new_relic_license_key` are deliberately
-/// left confidence-gated (redact at [`Confidence::High`], warn otherwise)
-/// even though that is a weaker action than their specificity alone would
-/// suggest — each has a documented `decision-freeze-*` grammar record
-/// explaining why a bare keyword-cooccurrence match at medium confidence is
-/// too weak (an opaque hex blob sharing a line with a vendor keyword) to
-/// redact by default. Overlap resolution's resolved-action severity ranking
+/// `datadog_application_key`, `new_relic_license_key`, and
+/// `confluent_cloud_api_secret_legacy` are deliberately left
+/// confidence-gated (redact at [`Confidence::High`], warn otherwise) even
+/// though that is a weaker action than their specificity alone would
+/// suggest — each has a documented `decision-freeze-*` grammar record (or,
+/// for `confluent_cloud_api_secret_legacy`, its own module doc in
+/// `detectors::confluent`) explaining why a bare keyword-cooccurrence match
+/// at medium confidence is too weak (an opaque base64 blob sharing a line
+/// with a vendor keyword) to redact by default; the legacy Confluent type
+/// only ever reports [`Confidence::Medium`], so it always warns rather than
+/// redacts under this default policy. Overlap resolution's resolved-action
+/// severity ranking
 /// (`decision-resolve-overlap-precedence-by-resolved-action-severity`)
 /// exists precisely so this list does not have to be exhaustive over every
 /// `Provider`/`Structural`/`PrivateKey` type for overlap resolution to stay
 /// correct: a confidence-gated type here can still lose an overlap to a
 /// stricter-resolving lower-specificity candidate, without needing to be
 /// added to this list.
-const ALWAYS_REDACT_TYPES: [&str; 48] = [
+const ALWAYS_REDACT_TYPES: [&str; 49] = [
     "anthropic_api_key",
     "atlassian_api_token",
     "authorization_credential",
@@ -30,6 +35,7 @@ const ALWAYS_REDACT_TYPES: [&str; 48] = [
     "azure_devops_personal_access_token",
     "bearer_token",
     "cloudflare_api_token",
+    "confluent_cloud_api_secret",
     "connection_string_password",
     "databricks_personal_access_token",
     "digitalocean_token",
