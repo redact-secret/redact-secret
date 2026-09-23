@@ -34,6 +34,17 @@ evidence is linked from each published version.
 
 ### Added
 
+- `new_relic_license_key` now also detects the currently issued New Relic
+  license key generation: 32 lowercase-hex bytes followed by the literal
+  `FFFFNRAL`, and its EU-region form (`eu01xx`, 26 lowercase-hex bytes,
+  `FFFFNRAL`), 40 bytes each. Previously only the legacy 40-byte all-hex
+  shape was recognized and current keys produced no finding. Both new shapes
+  keep the same-line `newrelic`/`new_relic`/`new-relic`/`new relic` keyword
+  gate and `Medium` confidence (warn, not redact), so existing behavior of the
+  legacy shape is unchanged. The first `NRAL` generation (36 hex bytes then
+  `NRAL`) and region prefixes other than `eu01xx` remain documented gaps
+  (#672, evidence in #656,
+  [`docs/specs/detector-families.md`](docs/specs/detector-families.md)).
 - A [five-minute quickstart](docs/quickstart.md) for Node.js, Python, and a
   Vite browser bundle, starting from an empty directory. The
   `clean-install` qualification job runs its commands and files verbatim

@@ -36,7 +36,12 @@
 //!   are specific enough to be actionable on their own, the same class every
 //!   other exact-length prefixed detector in this registry gets.
 //! - **License Key**: a bare run of exactly 40 [`is_lower_hex`] (`[0-9a-f]`)
-//!   bytes, bounded by a byte outside [`pattern::is_alnum`]. Unlike the User
+//!   bytes (the legacy all-hex generation), exactly 32 [`is_lower_hex`]
+//!   bytes followed by the literal `FFFFNRAL`, or the literal `eu01xx`, then
+//!   exactly 26 [`is_lower_hex`] bytes, then `FFFFNRAL` (the current
+//!   generation and its EU-region form, 40 bytes each; see "Current-generation
+//!   suffix" below), bounded by a byte
+//!   outside [`pattern::is_alnum`]. Unlike the User
 //!   Key, this format carries no marker of its own -- a 40-character hex
 //!   string is indistinguishable by shape alone from a `git` commit hash, a
 //!   SHA-1 digest, or countless other opaque hex blobs, and neither
@@ -87,19 +92,35 @@
 //!   explicit scope sentence above and not implemented here; they remain
 //!   documented gaps for a future issue, not silently dropped.
 //!
-//! ### Rejected: an unofficial license-key suffix
+//! ### Current-generation suffix (`FFFFNRAL`)
 //!
-//! trufflehog's `newreliclicensekey` detector additionally requires the
-//! matched 40 bytes to end in a literal `FFFFNRAL` (or, for an EU-region
-//! variant, begin with `eu01xx`) -- a stronger structural marker that, if
-//! real, would let a License Key be recognized at `High` confidence with no
-//! context needed at all. This module does not adopt it: neither New Relic's
-//! own documentation nor gitleaks (which has no License Key rule at all)
-//! corroborates it, so treating a single, uncorroborated external tool's
-//! reverse-engineered suffix as ground truth risks a worse outcome than the
-//! keyword-gated fallback below -- a documented false negative for every
-//! License Key that does not happen to carry it, for a confidence bump this
-//! module cannot independently verify.
+//! The currently issued License Key is 32 lowercase-hex bytes followed by the
+//! literal `FFFFNRAL`; its EU-region form is `eu01xx`, 26 lowercase-hex bytes,
+//! then `FFFFNRAL`. This was previously rejected as uncorroborated; it is now
+//! adopted (issue #672, on the research recorded in issue #656) because:
+//!
+//! - New Relic's own documentation (the IBM MQ host-integration guide)
+//!   describes the ingest license key as "40 chars, suffix NRAL", and its
+//!   eBPF install pages show `licenseKey` examples ending `FFFFNRAL`;
+//! - New Relic-authored code (`newrelic-cli`'s `IsValidLicenseKeyFormat`,
+//!   which also names the `eu01xx` prefix, and `docs-website`'s
+//!   `check-for-keys.sh`) and New Relic staff on its support forum agree on
+//!   the suffix and on EU keys always starting `eu01xx`;
+//! - trufflehog 3.97.4's `newreliclicensekey` independently matches
+//!   `([0-9a-f]{32}|eu01xx[0-9a-f]{26})FFFFNRAL`.
+//!
+//! The provider's own sources leave the body alphabet and the `FFFF` segment
+//! tool-corroborated only. Both new shapes share the legacy shape's keyword
+//! gate, `Medium` confidence and finding type: the suffix makes a false
+//! positive far less likely, but promoting confidence is a separate policy
+//! decision this change does not make. The hex body must be a maximal run of
+//! exactly the stated length, so a longer hex run before the marker is
+//! rejected rather than truncated.
+//!
+//! Not adopted, and left as documented gaps: the first `NRAL` generation (36
+//! hex bytes then `NRAL`, labelled `_OLD` in New Relic's own scanner), and
+//! region prefixes other than `eu01xx` (`us01`, `gov01`, `jp`, one-`x`
+//! padding), none of which the issue evidence covers.
 //!
 //! ## Consequences and known gaps
 //!
@@ -108,6 +129,8 @@
 //!   this dedicated path; a qualified `name=value` assignment of one still
 //!   gets a lower-confidence, lower-specificity contextual finding through
 //!   the existing generic-token path regardless of format.
+//! - A first-generation `NRAL` License Key (36 hex bytes then `NRAL`) or a
+//!   region-aware key with a prefix other than `eu01xx` goes undetected.
 //! - A License Key with no `newrelic`/`new_relic`/`new-relic`/`new relic`
 //!   keyword anywhere on its own line goes undetected -- the same accepted
 //!   tradeoff [`super::twilio`]'s own bare hex formats already carry.
@@ -124,6 +147,14 @@ use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, 
 const USER_API_KEY_PREFIX: &str = "NRAK-";
 const USER_API_KEY_BODY_LEN: usize = 27;
 const LICENSE_KEY_LEN: usize = 40;
+/// The current-generation License Key: a 32-byte lowercase-hex body followed
+/// by this literal marker, 40 bytes total.
+const LICENSE_KEY_MARKER: &str = "FFFFNRAL";
+const LICENSE_KEY_MARKED_BODY_LEN: usize = LICENSE_KEY_LEN - LICENSE_KEY_MARKER.len();
+/// The EU-region current-generation License Key: this literal, then 26
+/// lowercase-hex bytes, then [`LICENSE_KEY_MARKER`] (40 bytes total).
+const LICENSE_KEY_EU_PREFIX: &str = "eu01xx";
+const LICENSE_KEY_EU_BODY_LEN: usize = LICENSE_KEY_MARKED_BODY_LEN - LICENSE_KEY_EU_PREFIX.len();
 
 /// New Relic's own documented naming for the License Key credential,
 /// case-insensitively, in every spelling gitleaks's independent
@@ -246,20 +277,60 @@ impl Detector for NewRelicLicenseKeyDetector {
                     continue;
                 }
                 let run_end = ends[start];
-                if run_end - start == LICENSE_KEY_LEN
-                    && pattern::boundary_ok(bytes, start, run_end, pattern::is_alnum)
-                    && !text::is_repeated_character_filler(&line[start..run_end])
-                    && let Some(range) = ByteRange::new(line_start + start, line_start + run_end)
+                let key_end = if run_end - start == LICENSE_KEY_LEN {
+                    Some(run_end)
+                } else if run_end - start == LICENSE_KEY_MARKED_BODY_LEN
+                    && line[run_end..].starts_with(LICENSE_KEY_MARKER)
                 {
+                    Some(run_end + LICENSE_KEY_MARKER.len())
+                } else {
+                    None
+                };
+                if let Some(key_end) = key_end
+                    && pattern::boundary_ok(bytes, start, key_end, pattern::is_alnum)
+                    && !text::is_repeated_character_filler(&line[start..run_end])
+                    && let Some(range) = ByteRange::new(line_start + start, line_start + key_end)
+                {
+                    let signals: &[&str] = if key_end == run_end {
+                        &["new-relic-keyword-cooccurrence"]
+                    } else {
+                        &[
+                            "new-relic-keyword-cooccurrence",
+                            "new-relic-license-key-suffix-marker",
+                        ]
+                    };
                     candidates.push(
                         Candidate::new("new_relic_license_key", Confidence::Medium, range)
                             .with_specificity(Specificity::Provider)
-                            .with_signals(["new-relic-keyword-cooccurrence"]),
+                            .with_signals(signals.iter().copied()),
                     );
                 }
                 start = run_end;
             }
+
+            for (prefix_at, _) in line.match_indices(LICENSE_KEY_EU_PREFIX) {
+                let body_start = prefix_at + LICENSE_KEY_EU_PREFIX.len();
+                let body_end = ends[body_start];
+                let key_end = body_end + LICENSE_KEY_MARKER.len();
+                if body_end - body_start == LICENSE_KEY_EU_BODY_LEN
+                    && line[body_end..].starts_with(LICENSE_KEY_MARKER)
+                    && pattern::boundary_ok(bytes, prefix_at, key_end, pattern::is_alnum)
+                    && !text::is_repeated_character_filler(&line[body_start..body_end])
+                    && let Some(range) =
+                        ByteRange::new(line_start + prefix_at, line_start + key_end)
+                {
+                    candidates.push(
+                        Candidate::new("new_relic_license_key", Confidence::Medium, range)
+                            .with_specificity(Specificity::Provider)
+                            .with_signals([
+                                "new-relic-keyword-cooccurrence",
+                                "new-relic-license-key-suffix-marker",
+                            ]),
+                    );
+                }
+            }
         }
+        candidates.sort_by_key(|candidate| candidate.range().start());
         Ok(candidates)
     }
 }
@@ -422,6 +493,119 @@ mod tests {
                 ByteRange::new(start, start + LICENSE_KEY.len()).unwrap()
             );
         }
+    }
+
+    const CURRENT_KEY: &str = "0123456789abcdef0123456789abcdefFFFFNRAL";
+    const EU_KEY: &str = "eu01xx0123456789abcdef0123456789FFFFNRAL";
+
+    #[test]
+    fn current_generation_fixtures_are_exactly_forty_bytes() {
+        assert_eq!(CURRENT_KEY.len(), LICENSE_KEY_LEN);
+        assert_eq!(EU_KEY.len(), LICENSE_KEY_LEN);
+    }
+
+    #[test]
+    fn detects_the_current_generation_license_key_named_by_a_keyword() {
+        for key in [CURRENT_KEY, EU_KEY] {
+            for input in [
+                format!("newrelic {key}"),
+                format!("NEW_RELIC_LICENSE_KEY={key}"),
+                format!("{{\"new-relic-license-key\": \"{key}\"}}"),
+                format!("newrelic '{key}'"),
+                format!("# \u{1F511} caf\u{e9}\r\nnewrelic {key}\r\n"),
+            ] {
+                let candidates = detect_license_key(&input);
+                assert_eq!(candidates.len(), 1, "{input}");
+                assert_eq!(candidates[0].type_name(), "new_relic_license_key");
+                assert_eq!(candidates[0].confidence(), Confidence::Medium);
+                assert_eq!(candidates[0].effective_specificity(), Specificity::Provider);
+                let start = input.rfind(key).unwrap();
+                assert_eq!(
+                    candidates[0].range(),
+                    ByteRange::new(start, start + key.len()).unwrap()
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn rejects_a_current_generation_license_key_with_no_context() {
+        assert!(detect_license_key(CURRENT_KEY).is_empty());
+        assert!(detect_license_key(EU_KEY).is_empty());
+    }
+
+    #[test]
+    fn rejects_current_generation_keys_with_the_wrong_body_length() {
+        let long = format!("0{CURRENT_KEY}");
+        let short = &CURRENT_KEY[1..];
+        let eu_long = format!("eu01xx0{}", &EU_KEY[6..]);
+        let eu_short = format!("eu01xx{}", &EU_KEY[7..]);
+        for key in [long, short.to_owned(), eu_long, eu_short] {
+            assert!(
+                detect_license_key(&format!("newrelic {key}")).is_empty(),
+                "{key}"
+            );
+        }
+    }
+
+    #[test]
+    fn rejects_a_current_generation_key_with_a_wrong_marker_or_case() {
+        for key in [
+            CURRENT_KEY.replace("FFFFNRAL", "FFFFNRAK"),
+            CURRENT_KEY.replace("FFFFNRAL", "ffffnral"),
+            CURRENT_KEY.replace("FFFFNRAL", "NRAL"),
+            CURRENT_KEY.replace(
+                "0123456789abcdef0123456789abcdef",
+                "0123456789ABCDEF0123456789ABCDEF",
+            ),
+            EU_KEY.replace("eu01xx", "EU01XX"),
+            EU_KEY.replace("eu01xx", "us01xx"),
+        ] {
+            assert!(
+                detect_license_key(&format!("newrelic {key}")).is_empty(),
+                "{key}"
+            );
+        }
+    }
+
+    #[test]
+    fn rejects_a_current_generation_key_embedded_in_a_wider_identifier() {
+        for key in [CURRENT_KEY, EU_KEY] {
+            assert!(detect_license_key(&format!("newrelic x{key}")).is_empty());
+            assert!(detect_license_key(&format!("newrelic {key}x")).is_empty());
+            assert!(detect_license_key(&format!("newrelic {key}0")).is_empty());
+        }
+    }
+
+    #[test]
+    fn rejects_a_masked_current_generation_key() {
+        let masked = format!("{}FFFFNRAL", "0".repeat(32));
+        let masked_eu = format!("eu01xx{}FFFFNRAL", "0".repeat(26));
+        assert!(detect_license_key(&format!("newrelic {masked}")).is_empty());
+        assert!(detect_license_key(&format!("newrelic {masked_eu}")).is_empty());
+        // New Relic's own documentation placeholder is asterisks, not hex.
+        let placeholder = format!("{}FFFFNRAL", "*".repeat(32));
+        assert!(detect_license_key(&format!("newrelic {placeholder}")).is_empty());
+    }
+
+    #[test]
+    fn reports_every_license_key_generation_on_one_line_in_order() {
+        let input = format!("newrelic {EU_KEY} {LICENSE_KEY} {CURRENT_KEY}");
+        let candidates = detect_license_key(&input);
+        assert_eq!(candidates.len(), 3);
+        let starts: Vec<usize> = candidates.iter().map(|c| c.range().start()).collect();
+        assert!(starts.windows(2).all(|pair| pair[0] < pair[1]));
+    }
+
+    #[test]
+    fn stays_bounded_over_a_long_line_of_rejected_current_generation_candidates() {
+        let input = format!(
+            "newrelic {}",
+            format!("{} ", &CURRENT_KEY[1..]).repeat(10_000)
+        );
+        assert!(detect_license_key(&input).is_empty());
+        let eu = format!("newrelic {}", "eu01xx".repeat(10_000));
+        assert!(detect_license_key(&eu).is_empty());
     }
 
     #[test]
