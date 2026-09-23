@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 1634,
+  "fixtureCount": 1652,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -34141,6 +34141,1118 @@
         }
       ],
       "note": "Issue #514 host-context evidence: log was previously unexercised for the current ntn_ shape."
+    },
+    {
+      "id": "okta-api-token-positive-dotenv-keyword",
+      "detector": "okta-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "OKTA_API_TOKEN=00SYNTHETICREVOKEDTOKENA0123456789abcdefgh",
+      "expected": [
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 15,
+          "end": 57
+        }
+      ],
+      "note": "The 00-prefixed 42-byte shape has no vendor marker of its own; the okta-named dotenv key is the only context present, so confidence is medium rather than high."
+    },
+    {
+      "id": "okta-api-token-positive-json-keyword",
+      "detector": "okta-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"oktaApiToken\": \"00SYNTHETICREVOKEDTOKENA0123456789abcdefgh\"}",
+      "expected": [
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 18,
+          "end": 60
+        }
+      ],
+      "note": "A quoted JSON string value is detected the same as a bare one; the okta-named field is a keyword-only context, so confidence is medium."
+    },
+    {
+      "id": "okta-api-token-positive-yaml-keyword",
+      "detector": "okta-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "okta_api_token: 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh",
+      "expected": [
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 16,
+          "end": 58
+        }
+      ],
+      "note": "A YAML mapping value on the same line as the okta-named key is detected at medium confidence."
+    },
+    {
+      "id": "okta-api-token-positive-log-keyword",
+      "detector": "okta-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "log"
+      ],
+      "input": "# Okta management API token: 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh",
+      "expected": [
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 29,
+          "end": 71
+        }
+      ],
+      "note": "The provider's own product name in ordinary prose, not just a snake_case identifier, satisfies the same-line keyword requirement."
+    },
+    {
+      "id": "okta-api-token-positive-shell-quoted",
+      "detector": "okta-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export OKTA_API_TOKEN=\"00SYNTHETICREVOKEDTOKENA0123456789abcdefgh\"\n",
+      "expected": [
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 23,
+          "end": 65
+        }
+      ],
+      "note": "A quoted shell export still bounds the token to exactly its own bytes; the keyword-bearing variable name on the same line satisfies the context requirement."
+    },
+    {
+      "id": "okta-api-token-positive-ssws-authorization-header",
+      "detector": "okta-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "log"
+      ],
+      "input": "Authorization: SSWS 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh",
+      "expected": [
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 20,
+          "end": 62
+        }
+      ],
+      "note": "Okta's own documented SSWS authorization scheme immediately preceding the token, separated only by a space, is a provider-unique signal strong enough for high confidence without any okta keyword on the line."
+    },
+    {
+      "id": "okta-api-token-regression-crlf-and-unicode-prefix",
+      "detector": "okta-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 café\r\nAuthorization: SSWS 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh\r\n",
+      "expected": [
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 34,
+          "end": 76
+        }
+      ],
+      "note": "A CRLF-delimited line and a preceding Unicode-bearing comment line do not shift the byte offsets of a later plain-ASCII match."
+    },
+    {
+      "id": "okta-api-token-negative-bare-value-with-no-context",
+      "detector": "okta-api-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "00SYNTHETICREVOKEDTOKENA0123456789abcdefgh",
+      "expected": [],
+      "note": "The 00-prefixed 42-byte shape alone, with no SSWS scheme and no okta keyword anywhere on the line, is not classified."
+    },
+    {
+      "id": "okta-api-token-negative-context-on-a-different-line",
+      "detector": "okta-api-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# okta\n00SYNTHETICREVOKEDTOKENA0123456789abcdefgh\n",
+      "expected": [],
+      "note": "The keyword requirement is scoped to the same line the incremental sanitizer processes as one unit; a keyword on the preceding line does not satisfy it."
+    },
+    {
+      "id": "okta-api-token-negative-environment-variable-reference",
+      "detector": "okta-api-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "shell"
+      ],
+      "input": "okta OKTA_API_TOKEN=${OKTA_API_TOKEN}",
+      "expected": [],
+      "note": "An environment-variable reference is not a literal secret value; the ${...} interpolation breaks the required contiguous body run."
+    },
+    {
+      "id": "okta-api-token-negative-repeated-character-filler",
+      "detector": "okta-api-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "okta 00aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expected": [],
+      "note": "A masked placeholder value of a single repeated character, though within the documented alphabet, length, and prefix, is excluded as classic redaction-style filler rather than a real token."
+    },
+    {
+      "id": "okta-api-token-negative-tenant-domain-reference",
+      "detector": "okta-api-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "okta https://dev-12345.okta.com/oauth2/default",
+      "expected": [],
+      "note": "An Okta tenant domain is out of scope per the issue and never satisfies this grammar: it is not 00-prefixed and contains a . outside the token-body alphabet."
+    },
+    {
+      "id": "okta-api-token-boundary-one-short",
+      "detector": "okta-api-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "okta 00SYNTHETICREVOKEDTOKENA0123456789abcdefg",
+      "expected": [],
+      "note": "A body one byte short of the required 40-byte length is rejected rather than matched against a shorter run."
+    },
+    {
+      "id": "okta-api-token-boundary-one-long",
+      "detector": "okta-api-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "okta 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh0",
+      "expected": [],
+      "note": "A body one byte longer than the required 40-byte length is rejected rather than truncated, because the boundary check requires a byte outside the token-body alphabet immediately after the 40th body byte."
+    },
+    {
+      "id": "okta-api-token-boundary-wrong-prefix",
+      "detector": "okta-api-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "okta 01SYNTHETICREVOKEDTOKENA0123456789abcdefgh",
+      "expected": [],
+      "note": "The literal prefix is matched byte-for-byte as 00, per both external tools' own rules and the provider's own documented example; a 01 prefix is not recognized."
+    },
+    {
+      "id": "okta-api-token-boundary-ssws-glued-without-space",
+      "detector": "okta-api-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "okta SSWS00SYNTHETICREVOKEDTOKENA0123456789abcdefgh",
+      "expected": [],
+      "note": "Okta's own documented header syntax separates the SSWS scheme from the token with a space; a scheme glued directly to the token is rejected outright, since S is itself a token-body-alphabet byte and so violates the left-boundary check."
+    },
+    {
+      "id": "okta-api-token-overlap-generic-context",
+      "detector": "okta-api-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "api_key=00a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0 okta",
+      "expected": [
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 8,
+          "end": 50
+        }
+      ],
+      "note": "api_key is a recognized generic-token field name, so this assignment also proposes a contextual-secret candidate at the same medium confidence (this value's low-entropy alternating pattern is below generic-token's high-confidence threshold) as this keyword-gated format. Same resolved-action severity (both warn under DefaultPolicy), so the provider-specific candidate's higher specificity decides the overlap."
+    },
+    {
+      "id": "okta-api-token-adversarial-dense-findings",
+      "detector": "okta-api-token",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "okta 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh 00SYNTHETICREVOKEDTOKENA0123456789abcdefgh ",
+      "resource": {
+        "maxInputBytes": 4505,
+        "maxFindings": 100,
+        "maxRuntimeMs": 250
+      },
+      "expected": [
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 5,
+          "end": 47
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 48,
+          "end": 90
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 91,
+          "end": 133
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 134,
+          "end": 176
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 177,
+          "end": 219
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 220,
+          "end": 262
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 263,
+          "end": 305
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 306,
+          "end": 348
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 349,
+          "end": 391
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 392,
+          "end": 434
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 435,
+          "end": 477
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 478,
+          "end": 520
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 521,
+          "end": 563
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 564,
+          "end": 606
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 607,
+          "end": 649
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 650,
+          "end": 692
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 693,
+          "end": 735
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 736,
+          "end": 778
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 779,
+          "end": 821
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 822,
+          "end": 864
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 865,
+          "end": 907
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 908,
+          "end": 950
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 951,
+          "end": 993
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 994,
+          "end": 1036
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1037,
+          "end": 1079
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1080,
+          "end": 1122
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1123,
+          "end": 1165
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1166,
+          "end": 1208
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1209,
+          "end": 1251
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1252,
+          "end": 1294
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1295,
+          "end": 1337
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1338,
+          "end": 1380
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1381,
+          "end": 1423
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1424,
+          "end": 1466
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1467,
+          "end": 1509
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1510,
+          "end": 1552
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1553,
+          "end": 1595
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1596,
+          "end": 1638
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1639,
+          "end": 1681
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1682,
+          "end": 1724
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1725,
+          "end": 1767
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1768,
+          "end": 1810
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1811,
+          "end": 1853
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1854,
+          "end": 1896
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1897,
+          "end": 1939
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1940,
+          "end": 1982
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1983,
+          "end": 2025
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2026,
+          "end": 2068
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2069,
+          "end": 2111
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2112,
+          "end": 2154
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2155,
+          "end": 2197
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2198,
+          "end": 2240
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2241,
+          "end": 2283
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2284,
+          "end": 2326
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2327,
+          "end": 2369
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2370,
+          "end": 2412
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2413,
+          "end": 2455
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2456,
+          "end": 2498
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2499,
+          "end": 2541
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2542,
+          "end": 2584
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2585,
+          "end": 2627
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2628,
+          "end": 2670
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2671,
+          "end": 2713
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2714,
+          "end": 2756
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2757,
+          "end": 2799
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2800,
+          "end": 2842
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2843,
+          "end": 2885
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2886,
+          "end": 2928
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2929,
+          "end": 2971
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2972,
+          "end": 3014
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3015,
+          "end": 3057
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3058,
+          "end": 3100
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3101,
+          "end": 3143
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3144,
+          "end": 3186
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3187,
+          "end": 3229
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3230,
+          "end": 3272
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3273,
+          "end": 3315
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3316,
+          "end": 3358
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3359,
+          "end": 3401
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3402,
+          "end": 3444
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3445,
+          "end": 3487
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3488,
+          "end": 3530
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3531,
+          "end": 3573
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3574,
+          "end": 3616
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3617,
+          "end": 3659
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3660,
+          "end": 3702
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3703,
+          "end": 3745
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3746,
+          "end": 3788
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3789,
+          "end": 3831
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3832,
+          "end": 3874
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3875,
+          "end": 3917
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3918,
+          "end": 3960
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3961,
+          "end": 4003
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 4004,
+          "end": 4046
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 4047,
+          "end": 4089
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 4090,
+          "end": 4132
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 4133,
+          "end": 4175
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 4176,
+          "end": 4218
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 4219,
+          "end": 4261
+        },
+        {
+          "detector": "okta-api-token",
+          "type": "okta_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 4262,
+          "end": 4304
+        }
+      ],
+      "note": "A single okta-context-bearing line densely packed with 100 candidate-shaped runs stays linear and bounded: per-line (not per-candidate) context checks keep cost proportional to input size."
     },
     {
       "id": "firebase-server-key-positive-bare",

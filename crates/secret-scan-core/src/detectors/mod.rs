@@ -34,6 +34,7 @@ mod microsoft_entra;
 mod netlify;
 mod new_relic;
 mod notion;
+mod okta;
 mod openai;
 mod otpauth;
 mod pattern;
@@ -107,6 +108,7 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(new_relic::NewRelicLicenseKeyDetector),
         Box::new(mailchimp::MailchimpMarketingApiKeyDetector),
         Box::new(mailgun::MailgunApiKeyDetector),
+        Box::new(okta::OktaApiTokenDetector),
         Box::new(firebase::FirebaseServerKeyDetector),
         Box::new(terraform::TerraformCloudTokenDetector),
         Box::new(additional_providers::PULUMI),
@@ -208,6 +210,7 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("new-relic-license-key", Pack::Provider),
     ("mailchimp-api-key", Pack::Provider),
     ("mailgun-api-key", Pack::Provider),
+    ("okta-api-token", Pack::Provider),
     ("firebase-server-key", Pack::Provider),
     ("terraform-cloud-token", Pack::Provider),
     ("pulumi-access-token", Pack::Provider),
@@ -298,6 +301,7 @@ mod tests {
                 "new-relic-license-key",
                 "mailchimp-api-key",
                 "mailgun-api-key",
+                "okta-api-token",
                 "firebase-server-key",
                 "terraform-cloud-token",
                 "pulumi-access-token",
@@ -574,6 +578,10 @@ mod tests {
         let new_relic_license_key_input = "newrelic 0123456789abcdef0123456789abcdef01234567";
         let mailchimp_api_key_input = "mailchimp 0123456789abcdef0123456789abcdef-us6";
         let mailgun_api_key_input = "mailgun key-abcdefghijklmnopqrstuvwxyz012345";
+        let okta_api_token_input = format!(
+            "Authorization: SSWS 00{}",
+            &"SYNTHETICREVOKEDOKTAAPITOKENFIXTUREPADDING0123456789"[..40]
+        );
         let firebase_server_key_input = format!(
             "AAAA{}:{}",
             "SYNREV0",
@@ -620,6 +628,7 @@ mod tests {
             ("new-relic-license-key", new_relic_license_key_input),
             ("mailchimp-api-key", mailchimp_api_key_input),
             ("mailgun-api-key", mailgun_api_key_input),
+            ("okta-api-token", okta_api_token_input.as_str()),
             ("firebase-server-key", firebase_server_key_input.as_str()),
             (
                 "terraform-cloud-token",

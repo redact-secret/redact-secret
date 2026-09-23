@@ -2410,6 +2410,43 @@
       "type": "mailgun_api_key"
     },
     {
+      "detector": "okta-api-token",
+      "evidence": {
+        "fixtureCount": 18,
+        "hostContextsExercised": [
+          "dotenv",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "okta-api-token-positive-dotenv-keyword",
+        "okta-api-token-positive-json-keyword",
+        "okta-api-token-positive-log-keyword",
+        "okta-api-token-positive-shell-quoted",
+        "okta-api-token-positive-ssws-authorization-header",
+        "okta-api-token-positive-yaml-keyword",
+        "okta-api-token-regression-crlf-and-unicode-prefix"
+      ],
+      "policyClass": "confidence-gated",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "okta_api_token"
+    },
+    {
       "detector": "firebase-server-key",
       "evidence": {
         "fixtureCount": 11,
@@ -2795,7 +2832,7 @@
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 63,
+    "supported": 64,
     "unresolved": 0
   }
 }
