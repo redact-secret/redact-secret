@@ -2058,6 +2058,43 @@
     {
       "detector": "datadog-application-key",
       "evidence": {
+        "fixtureCount": 16,
+        "hostContextsExercised": [
+          "dotenv",
+          "http",
+          "json",
+          "plain-text",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "datadog-application-key-positive-bare",
+        "datadog-application-key-positive-crlf-unicode-prefix",
+        "datadog-application-key-positive-doc-style-placeholder",
+        "datadog-application-key-positive-dotenv",
+        "datadog-application-key-positive-header-marker",
+        "datadog-application-key-positive-json",
+        "datadog-application-key-positive-repeated-value",
+        "datadog-application-key-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "datadog_application_key"
+    },
+    {
+      "detector": "datadog-application-key-legacy",
+      "evidence": {
         "fixtureCount": 13,
         "hostContextsExercised": [
           "dotenv",
@@ -2077,16 +2114,16 @@
         ]
       },
       "evidenceFixtureIds": [
-        "datadog-application-key-positive-app-key-shorthand-marker",
-        "datadog-application-key-positive-bare-with-header-marker",
-        "datadog-application-key-positive-dotenv-marker",
-        "datadog-application-key-positive-json-vendor-keyword",
-        "datadog-application-key-regression-crlf-and-unicode-prefix"
+        "datadog-application-key-legacy-positive-app-key-shorthand-marker",
+        "datadog-application-key-legacy-positive-bare-with-header-marker",
+        "datadog-application-key-legacy-positive-dotenv-marker",
+        "datadog-application-key-legacy-positive-json-vendor-keyword",
+        "datadog-application-key-legacy-regression-crlf-unicode-prefix"
       ],
       "policyClass": "confidence-gated",
       "schemeRows": "not-applicable",
       "state": "supported",
-      "type": "datadog_application_key"
+      "type": "datadog_application_key_legacy"
     },
     {
       "detector": "grafana-service-account-token",
@@ -2721,7 +2758,7 @@
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 61,
+    "supported": 62,
     "unresolved": 0
   }
 }
