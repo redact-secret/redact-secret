@@ -216,17 +216,24 @@ machine-readable and Markdown evidence before exiting non-zero on rejection.
 This is readiness evidence, not release approval; see the
 [release authority](../AGENTS.md#release-authority).
 
-The historical macOS RC criteria and their pinned baselines
-(`results/complete-v4/`, `results/complete-v3/`, `results/complete/`,
-`results/acceptance/`) and the historical Linux x86_64 criteria and baselines
-(`results/complete-linux-x64-v4/`, `results/complete-linux-x64-v3/`,
-`results/complete-linux-x64/`) were removed by
+The historical macOS RC baselines
+(`results/complete/`, `results/acceptance/`) and the historical Linux x86_64
+baseline (`results/complete-linux-x64/`), plus the superseded revisions
+(`results/complete-v3/`, `results/complete-linux-x64-v3/`), were removed by
+[#594](https://github.com/redact-secret/redact-secret/issues/594) and remain
+as historical evidence at the pre-removal commit:
+[`assessment/results/`](https://github.com/redact-secret/redact-secret/tree/6cd5f2c58e527396563d86d8caba98104a93a17c/assessment/results)
+(`complete/`, `complete-v3/`, `acceptance/`, `complete-linux-x64/`,
+`complete-linux-x64-v3/`). The last macOS and Linux x86_64 baselines
+(`results/complete-v4/`, `results/complete-linux-x64-v4/`) and the RC criteria
+documents were removed by
 [#603](https://github.com/redact-secret/redact-secret/issues/603) and remain
 as historical evidence at the pre-removal commit:
 [`assessment/`](https://github.com/redact-secret/redact-secret/tree/de6add470321f40d7b1cb36808d9f4559e6c2e99/assessment)
-(`acceptance-criteria.json`, `acceptance-criteria-linux-x64.json`, and
-`results/`). Use a new output directory when reproducing a fresh run so stale
-files cannot satisfy it.
+(`acceptance-criteria.json`, `acceptance-criteria-linux-x64.json`,
+`results/complete-v4/`, and `results/complete-linux-x64-v4/`). Use a new
+output directory when reproducing a fresh run so stale files cannot satisfy
+it.
 
 To choose another bounded profile, repeat `--profile`; include at least one
 `whole` and one non-`whole` profile or the rollup is incomplete. Other useful
@@ -459,6 +466,12 @@ and the entire scan, and cannot isolate steady-state or Rust-only memory.
 Node, browser, Wasm, and Python heap categories, and the retained incremental
 buffer, are unavailable on this surface for the same reasons documented for
 the Rust library runner above.
+
+The first bounded CLI baseline — accuracy against `accuracy-corpus`, plus
+`scale-logs-small-whole` with two runs — was recorded under `results/cli/`;
+[#594](https://github.com/redact-secret/redact-secret/issues/594) pruned it,
+and it remains as historical evidence at
+[`results/cli/`](https://github.com/redact-secret/redact-secret/tree/6cd5f2c58e527396563d86d8caba98104a93a17c/assessment/results/cli).
 
 ## Beta.2 detection assessment
 
