@@ -2300,6 +2300,42 @@
       "type": "new_relic_license_key"
     },
     {
+      "detector": "mailchimp-api-key",
+      "evidence": {
+        "fixtureCount": 19,
+        "hostContextsExercised": [
+          "dotenv",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "mailchimp-api-key-positive-dotenv-keyword",
+        "mailchimp-api-key-positive-json-keyword",
+        "mailchimp-api-key-positive-log-keyword",
+        "mailchimp-api-key-positive-shell-quoted",
+        "mailchimp-api-key-positive-yaml-keyword",
+        "mailchimp-api-key-regression-crlf-and-unicode-prefix"
+      ],
+      "policyClass": "confidence-gated",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "mailchimp_api_key"
+    },
+    {
       "detector": "firebase-server-key",
       "evidence": {
         "fixtureCount": 11,
@@ -2685,7 +2721,7 @@
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 60,
+    "supported": 61,
     "unresolved": 0
   }
 }

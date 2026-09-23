@@ -381,6 +381,13 @@
       "schemes": null
     },
     {
+      "type": "mailchimp_api_key",
+      "detector": "mailchimp-api-key",
+      "policyClass": "confidence-gated",
+      "reconciliationTrigger": "mailchimp 0123456789abcdef0123456789abcdef-us6",
+      "schemes": null
+    },
+    {
       "type": "firebase_server_key",
       "detector": "firebase-server-key",
       "policyClass": "always-redact",
