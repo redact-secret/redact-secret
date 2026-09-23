@@ -37,7 +37,7 @@ class CollectPermalinkCommitsTests(unittest.TestCase):
             decision_dir = Path(temp) / "docs" / "decisions"
             decision_dir.mkdir(parents=True)
             (decision_dir / "2026-09-09-example.md").write_text(record(None), encoding="utf-8")
-            self.assertEqual(CHECK.collect_permalink_commits(decision_dir), {})
+            self.assertEqual(CHECK.collect_permalinks(decision_dir), {})
 
     def test_full_record_field_is_collected(self) -> None:
         sha = "a" * 40
@@ -49,11 +49,11 @@ class CollectPermalinkCommitsTests(unittest.TestCase):
                 record(f"https://github.com/redact-secret/redact-secret/blob/{sha}/docs/decisions/x.md"),
                 encoding="utf-8",
             )
-            self.assertEqual(CHECK.collect_permalink_commits(decision_dir), {sha: [record_path]})
+            self.assertEqual(CHECK.collect_permalinks(decision_dir), {(sha, "docs/decisions/x.md"): [record_path]})
 
     def test_missing_decisions_directory_yields_nothing(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
-            self.assertEqual(CHECK.collect_permalink_commits(Path(temp) / "docs" / "decisions"), {})
+            self.assertEqual(CHECK.collect_permalinks(Path(temp) / "docs" / "decisions"), {})
 
 
 class GitHistoryTests(unittest.TestCase):
@@ -67,11 +67,13 @@ class GitHistoryTests(unittest.TestCase):
         self._git("config", "user.email", "check-decision-permalinks-tests@example.invalid")
         self._git("config", "user.name", "check-decision-permalinks-tests")
         self.commit = self._commit("seed.txt")
+        self.commit = self._commit("docs/decisions/x.md")
 
     def _git(self, *args: str) -> None:
         subprocess.run(["git", "-C", str(self.repo), *args], check=True, capture_output=True)
 
     def _commit(self, filename: str) -> str:
+        (self.repo / filename).parent.mkdir(parents=True, exist_ok=True)
         (self.repo / filename).write_text("seed\n", encoding="utf-8")
         self._git("add", filename)
         self._git("commit", "-q", "-m", filename)
@@ -102,6 +104,39 @@ class GitHistoryTests(unittest.TestCase):
         self.assertEqual(len(errors), 1)
         self.assertIn(missing, errors[0])
         self.assertIn("not reachable in local history", errors[0])
+
+    def test_a_missing_path_at_a_real_commit_is_rejected(self) -> None:
+        self.add_record(
+            "2026-09-09-example.md",
+            f"https://github.com/redact-secret/redact-secret/blob/{self.commit}/docs/decisions/gone.md",
+        )
+        errors = CHECK.validate(self.repo)
+        self.assertEqual(len(errors), 1)
+        self.assertIn("does not exist at commit", errors[0])
+
+    def test_a_folded_records_table_permalink_is_checked(self) -> None:
+        missing = "e" * 40
+        self.add_record("2026-09-09-example.md", None)  # type: ignore[arg-type]
+        path = self.repo / "docs" / "decisions" / "2026-09-09-example.md"
+        path.write_text(
+            path.read_text(encoding="utf-8")
+            + "\n## Folded records\n\n| id | Full record |\n| --- | --- |\n"
+            + f"| `decision-old` | [full record](https://github.com/redact-secret/redact-secret/blob/{missing}/docs/decisions/old.md) |\n",
+            encoding="utf-8",
+        )
+        errors = CHECK.validate(self.repo)
+        self.assertEqual(len(errors), 1)
+        self.assertIn(missing, errors[0])
+
+    def test_a_table_permalink_to_a_real_commit_and_path_passes(self) -> None:
+        self.add_record("2026-09-09-example.md", None)  # type: ignore[arg-type]
+        path = self.repo / "docs" / "decisions" / "2026-09-09-example.md"
+        path.write_text(
+            path.read_text(encoding="utf-8")
+            + f"\n| `decision-old` | [full record](https://github.com/redact-secret/redact-secret/blob/{self.commit}/docs/decisions/x.md) |\n",
+            encoding="utf-8",
+        )
+        self.assertEqual(CHECK.validate(self.repo), [])
 
     def test_no_permalinks_is_a_clean_no_op(self) -> None:
         self.add_record("2026-09-09-example.md", None)  # type: ignore[arg-type]

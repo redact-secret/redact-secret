@@ -40,6 +40,14 @@ Use a Rust core.
 """
 
 
+def folded_row(alias: str) -> str:
+    sha = "a" * 40
+    return (
+        "\n## Folded records\n\n| Original `decision_id` | Full record |\n| --- | --- |\n"
+        f"| `{alias}` | [full record](https://github.com/redact-secret/redact-secret/blob/{sha}/docs/decisions/old.md) |\n"
+    )
+
+
 def add_record(root: Path, name: str, content: str, spec: str | None = "engine") -> None:
     decision_dir = root / "docs" / "decisions"
     decision_dir.mkdir(parents=True, exist_ok=True)
@@ -219,8 +227,54 @@ class AliasTests(unittest.TestCase):
             add_record(
                 root,
                 "2026-09-09-use-rust.md",
-                record(extra_frontmatter="aliases: decision-old-merged-in\n"),
+                record(extra_frontmatter="aliases: decision-old-merged-in\n", body_extra=folded_row("decision-old-merged-in")),
             )
+            ensure_all_specs_exist(root)
+            errors, _warnings = VALIDATOR.validate(root)
+            self.assertEqual(errors, [])
+
+    def test_alias_without_a_folded_permalink_row_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            add_record(root, "2026-09-09-use-rust.md", record(extra_frontmatter="aliases: decision-old\n"))
+            ensure_all_specs_exist(root)
+            errors, _warnings = VALIDATOR.validate(root)
+            self.assertTrue(any("folded alias decision-old has no" in error for error in errors))
+
+    def test_row_with_a_permalink_for_only_one_of_two_aliases_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            add_record(
+                root,
+                "2026-09-09-use-rust.md",
+                record(extra_frontmatter="aliases: decision-old, decision-older\n", body_extra=folded_row("decision-old")),
+            )
+            ensure_all_specs_exist(root)
+            errors, _warnings = VALIDATOR.validate(root)
+            self.assertEqual(sum("folded alias" in error for error in errors), 1)
+            self.assertTrue(any("decision-older" in error for error in errors))
+
+
+class IdWithMdSuffixTests(unittest.TestCase):
+    def test_citing_an_alias_with_a_md_suffix_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            add_record(
+                root,
+                "2026-09-09-use-rust.md",
+                record(
+                    extra_frontmatter="aliases: decision-old\n",
+                    body_extra=folded_row("decision-old") + "\nSee `decision-old.md` for detail.\n",
+                ),
+            )
+            ensure_all_specs_exist(root)
+            errors, _warnings = VALIDATOR.validate(root)
+            self.assertTrue(any("decision-old.md cites a decision id with a .md suffix" in error for error in errors))
+
+    def test_a_real_dated_filename_is_not_flagged(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            add_record(root, "2026-09-09-use-rust.md", record(body_extra="\nSee 2026-09-09-decision-use-rust.md.\n"))
             ensure_all_specs_exist(root)
             errors, _warnings = VALIDATOR.validate(root)
             self.assertEqual(errors, [])
