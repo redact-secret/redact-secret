@@ -817,10 +817,11 @@
     "docker-boundary-oat-one-short",
     "docker-boundary-oat-whitespace-insertion-exact-length",
     "docker-boundary-pat-invalid-alphabet-exact-length",
-    "docker-boundary-pat-length-under-oat-prefix",
     "docker-boundary-pat-one-long",
     "docker-boundary-pat-one-short",
     "docker-boundary-short",
+    "docker-oat-26-byte-body-rejected",
+    "docker-oat-28-byte-body-rejected",
     "docker-positive-all-prefixes",
     "docker-positive-doc-style-placeholder",
     "docker-positive-min-length",
@@ -924,7 +925,7 @@
     "issue": "https://github.com/redact-secret/redact-secret/issues/375",
     "synchronousCorpus": "conformance/fixtures/synchronous-corpus.json"
   },
-  "rowCount": 428,
+  "rowCount": 432,
   "rows": [
     {
       "contexts": [],
@@ -3367,20 +3368,20 @@
       "contexts": [
         "plain-text"
       ],
-      "contractTier": "malformed",
+      "contractTier": "regression",
       "detector": "docker-token",
       "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
-      "findingCount": 0,
+      "findingCount": 1,
       "fixtureId": "docker-boundary-pat-length-under-oat-prefix",
-      "kind": "boundary",
-      "note": "Issue #370: the two segment names are validated separately; the 27-byte personal access token length under the dckr_oat_ prefix is an intentional false negative.",
-      "result": "silent",
+      "kind": "positive",
+      "note": "Issue #708: Docker's Hub API reference shows a dckr_oat_ organization access token with a 27-byte body, so the PAT width under the OAT prefix is a supported OAT width, detected over its full span. Until #708 this fixture asserted rejection.",
+      "result": "flagged",
       "runtimeConsumers": [
         "rust-core",
         "python-binding"
       ],
       "scanMode": "synchronous",
-      "support": "intentionally-unsupported"
+      "support": "supported"
     },
     {
       "contexts": [
@@ -3647,6 +3648,82 @@
       ],
       "scanMode": "synchronous",
       "support": "supported"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractTier": "regression",
+      "detector": "docker-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 0,
+      "fixtureId": "docker-oat-26-byte-body-rejected",
+      "kind": "boundary",
+      "note": "Issue #708 control: the OAT widths are exact; a 26-byte body is rejected rather than read as a short 27.",
+      "result": "silent",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "intentionally-unsupported"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractTier": "regression",
+      "detector": "docker-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 1,
+      "fixtureId": "docker-oat-27-byte-body-crlf-unicode",
+      "kind": "positive",
+      "note": "Issue #708: CRLF line endings and a multi-byte Unicode prefix shift only the byte offsets of a 27-byte-body OAT.",
+      "result": "flagged",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "supported"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractTier": "regression",
+      "detector": "docker-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 1,
+      "fixtureId": "docker-oat-27-byte-body-dotenv",
+      "kind": "positive",
+      "note": "Issue #708: a dckr_oat_ token with the provider-documented 27-byte body is detected in a dotenv assignment; the key name is not part of the span.",
+      "result": "flagged",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "supported"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractTier": "regression",
+      "detector": "docker-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 0,
+      "fixtureId": "docker-oat-28-byte-body-rejected",
+      "kind": "boundary",
+      "note": "Issue #708 control: a 28-byte body is neither the 27- nor the 32-byte width and is rejected, not truncated to 27.",
+      "result": "silent",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "intentionally-unsupported"
     },
     {
       "contexts": [

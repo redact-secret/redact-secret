@@ -1988,6 +1988,9 @@
         {
           "dimension": "positive",
           "evidenceFixtureIds": [
+            "docker-boundary-pat-length-under-oat-prefix",
+            "docker-oat-27-byte-body-crlf-unicode",
+            "docker-oat-27-byte-body-dotenv",
             "docker-positive-crlf-unicode-prefix",
             "docker-positive-dotenv",
             "docker-positive-json",
@@ -2036,10 +2039,11 @@
             "docker-boundary-oat-one-short",
             "docker-boundary-oat-whitespace-insertion-exact-length",
             "docker-boundary-pat-invalid-alphabet-exact-length",
-            "docker-boundary-pat-length-under-oat-prefix",
             "docker-boundary-pat-one-long",
             "docker-boundary-pat-one-short",
             "docker-boundary-short",
+            "docker-oat-26-byte-body-rejected",
+            "docker-oat-28-byte-body-rejected",
             "docker-positive-all-prefixes",
             "docker-positive-doc-style-placeholder",
             "docker-positive-min-length",
@@ -2076,7 +2080,6 @@
             "docker-boundary-oat-one-short",
             "docker-boundary-oat-whitespace-insertion-exact-length",
             "docker-boundary-pat-invalid-alphabet-exact-length",
-            "docker-boundary-pat-length-under-oat-prefix",
             "docker-boundary-pat-one-long",
             "docker-boundary-pat-one-short",
             "docker-boundary-short",
@@ -3119,6 +3122,9 @@
         {
           "dimension": "positive",
           "evidenceFixtureIds": [
+            "microsoft-entra-client-secret-leading-dash-assignment",
+            "microsoft-entra-client-secret-leading-dash-bare",
+            "microsoft-entra-client-secret-leading-dash-crlf-unicode",
             "microsoft-entra-client-secret-positive-bare"
           ],
           "state": "supported"
@@ -3144,7 +3150,8 @@
             "microsoft-entra-client-secret-boundary-below-min",
             "microsoft-entra-client-secret-boundary-invalid-alphabet",
             "microsoft-entra-client-secret-boundary-missing-digit",
-            "microsoft-entra-client-secret-boundary-short-prefix"
+            "microsoft-entra-client-secret-boundary-short-prefix",
+            "microsoft-entra-client-secret-leading-dash-joined-identifier"
           ],
           "state": "supported"
         },

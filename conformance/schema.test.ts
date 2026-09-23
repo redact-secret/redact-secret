@@ -365,7 +365,11 @@ const GRAMMAR_MUTATION_FAMILIES: readonly GrammarMutationFamily[] = [
     issue: "#370",
     seedId: DOCKER_TOKEN_EXACT_LENGTH_SEED_ID,
     generate: generateDockerTokenMutations,
-    isFullPartitionPositive: (operation) => operation.endsWith("-identity"),
+    // Issue #708: Docker's Hub API reference shows a 27-byte OAT body, so the
+    // PAT width under `dckr_oat_` is a supported OAT width, not a mutation
+    // away from one.
+    isFullPartitionPositive: (operation) =>
+      operation.endsWith("-identity") || operation === "pat-length-under-oat-prefix",
   },
   {
     grammar: "digitalocean-v1",

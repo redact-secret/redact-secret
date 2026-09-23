@@ -18,6 +18,15 @@ evidence is linked from each published version.
 
 ### Changed
 
+- `microsoft-entra-client-secret` now detects a client secret whose first
+  three characters include `-`, including one that starts with `-`. The
+  three bytes before the `<digit>Q~` marker now accept the same
+  `[A-Za-z0-9_.~-]` alphabet as the rest of the secret. The outer boundary is
+  unchanged, so a run joined to a wider token is still rejected (#707).
+- `docker-token` now accepts a `dckr_oat_` organization access token with
+  exactly 27 body bytes, the width shown in Docker's own Hub API reference, as
+  well as exactly 32. Other widths are still rejected, and `dckr_pat_` still
+  takes exactly 27 (#708).
 - The pinned [support matrix](docs/support-matrix.md) was re-measured after
   the beta.7 committed families' differential ledger sweep
   (redact-secret-benchmarks#175, #176): `netlify:personal-access-token` and

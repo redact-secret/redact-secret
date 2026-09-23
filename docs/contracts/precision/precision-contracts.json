@@ -143,6 +143,22 @@
       "establishes": ["organization access tokens exist and are distinct from personal access tokens"],
       "doesNotEstablish": ["any prefix, length or alphabet"]
     },
+    "docker-ai-governance-api": {
+      "url": "https://docs.docker.com/reference/api/ai-governance/api.yaml",
+      "kind": "provider",
+      "revision": "docker/docs content/reference/api/ai-governance/api.yaml, present since 553c69e1b7 (2026-06-02)",
+      "observedAt": "2026-09-23",
+      "establishes": ["the `bearerAuth` credential table's Format column states `dckr_pat_*` for a Personal Access Token and `dckr_oat_*` for an Organization Access Token (issues #647, #648)"],
+      "doesNotEstablish": ["body length or alphabet: `*` is a glob, not a grammar"]
+    },
+    "docker-hub-api-spec": {
+      "url": "https://docs.docker.com/reference/api/hub/latest.yaml",
+      "kind": "provider",
+      "revision": "page shows no version; two occurrences re-counted 2026-09-23",
+      "observedAt": "2026-09-23",
+      "establishes": ["an example `createOrgAccessTokenResponse.token` value of `dckr_oat_` followed by a 27-character `[A-Za-z0-9]` body (example strength only; issue #708)"],
+      "doesNotEstablish": ["that 27 is the only issued OAT width, or the body alphabet as a rule"]
+    },
     "openai-help-api-key": {
       "url": "https://help.openai.com/en/articles/4936850-where-do-i-find-my-openai-api-key",
       "kind": "provider",
@@ -444,7 +460,8 @@
       },
       "variants": [
         {"id": "pat", "support": "supported", "tier": "T2", "grammar": "dckr_pat_[A-Za-z0-9_-]{27}", "segments": [{"name": "prefix", "literal": "dckr_pat_", "basis": "single-tool; existence of the type corroborated by github-secret-scanning-patterns"}, {"name": "body", "alphabet": "[A-Za-z0-9_-]", "length": 27, "basis": "single-tool; adopted as support-policy"}], "sources": ["trufflehog-3.97.4", "github-secret-scanning-patterns", "docker-docs-pat"]},
-        {"id": "oat", "support": "supported", "tier": "T2", "grammar": "dckr_oat_[A-Za-z0-9_-]{32}", "segments": [{"name": "prefix", "literal": "dckr_oat_", "basis": "single-tool; existence of the type corroborated by github-secret-scanning-patterns"}, {"name": "body", "alphabet": "[A-Za-z0-9_-]", "length": 32, "basis": "single-tool; adopted as support-policy"}], "sources": ["trufflehog-3.97.4", "github-secret-scanning-patterns", "docker-docs-oat"]}
+        {"id": "oat", "support": "supported", "tier": "T2", "grammar": "dckr_oat_[A-Za-z0-9_-]{32}", "segments": [{"name": "prefix", "literal": "dckr_oat_", "basis": "single-tool; existence of the type corroborated by github-secret-scanning-patterns"}, {"name": "body", "alphabet": "[A-Za-z0-9_-]", "length": 32, "basis": "single-tool; adopted as support-policy"}], "sources": ["trufflehog-3.97.4", "github-secret-scanning-patterns", "docker-docs-oat", "docker-ai-governance-api"]},
+        {"id": "oat-provider-example-width", "support": "supported", "tier": "T2", "grammar": "dckr_oat_[A-Za-z0-9_-]{27}", "segments": [{"name": "prefix", "literal": "dckr_oat_", "basis": "provider (docs.docker.com AI Governance API `bearerAuth` Format column; issue #647)"}, {"name": "body", "alphabet": "[A-Za-z0-9_-]", "length": 27, "basis": "provider example (docs.docker.com Hub API spec); alphabet kept at the OAT support-policy alphabet"}], "sources": ["docker-hub-api-spec", "docker-ai-governance-api"]}
       ],
       "pending": [],
       "excluded": [
@@ -452,7 +469,7 @@
         {"id": "shared-minimum", "basis": "support-policy", "reason": "PAT and OAT are validated separately at their own exact lengths; the beta.4 shared 20-byte minimum is withdrawn."}
       ],
       "conflicts": [
-        {"property": "exact lengths 27 and 32", "positions": {"trufflehog-3.97.4": "exact 27 (PAT) and 32 (OAT)", "gitleaks-8.30.1": "no rule", "docker-docs-pat, docker-docs-oat": "no grammar published"}, "resolution": "No disagreement exists, but only one source states a length. The contract adopts it as a support-policy choice and records that a provider-issued token of another length would be an intentionally unsupported form until a second source establishes the width. The measured twins (26 and 31) are retained because they differ from the only stated width, not because the width is provider-proven. Issue #566 (2026-09-21) re-checked both docs.docker.com PAT and OAT pages plus GitHub's supported-secret-scanning-patterns page and the Docker blog for a documented `dckr_pat_` body width; none publish one, so the question 'is a 32-byte `dckr_pat_` body issued' (the `detector-coverage--docker-token-shape-1-*` fixtures' shape) remains unresolved by any source and is not adopted -- the 27-byte contract is unchanged and the fixtures are dispositioned as a benchmarks-side generator artifact, not a coverage gap (see `docs/audits/evidence/566/README.md`)."}
+        {"property": "exact lengths 27 and 32", "positions": {"trufflehog-3.97.4": "exact 27 (PAT) and 32 (OAT)", "gitleaks-8.30.1": "no rule", "docker-docs-pat, docker-docs-oat": "no grammar published", "docker-hub-api-spec": "one OAT example with a 27-character body"}, "resolution": "No disagreement exists, but only one source states a length. The contract adopts it as a support-policy choice and records that a provider-issued token of another length would be an intentionally unsupported form until a second source establishes the width. The measured twins (26 and 31) are retained because they differ from the only stated width, not because the width is provider-proven. Issue #566 (2026-09-21) re-checked both docs.docker.com PAT and OAT pages plus GitHub's supported-secret-scanning-patterns page and the Docker blog for a documented `dckr_pat_` body width; none publish one, so the question 'is a 32-byte `dckr_pat_` body issued' (the `detector-coverage--docker-token-shape-1-*` fixtures' shape) remains unresolved by any source and is not adopted -- the 27-byte contract is unchanged and the fixtures are dispositioned as a benchmarks-side generator artifact, not a coverage gap (see `docs/audits/evidence/566/README.md`). Issue #708 (2026-09-23): Docker's own Hub API spec shows an Organization Access Token example with a 27-character body, which contradicts the trufflehog-only 32, and every other Docker-authored artefact that shows a width shows 27. The OAT branch now accepts exactly 27 (`oat-provider-example-width`) or exactly 32 (`oat`), and every other width is still rejected. Only a fresh OAT measurement (#647) could retire either width."}
       ],
       "mutations": [
         {"mutationKind": "length", "mutation": "length: 26 vs contracted 27", "fixtureIds": ["docker-token-pat-plain-twin", "docker-token-pat-unicode-crlf-twin"], "distinguishingProperty": "PAT body length exactly 27", "basis": "single-tool; adopted as support-policy", "disposition": "retained", "reason": "Retained as must-not-flag/T2; the tier already records that the property is tool-corroborated, not provider-documented."},

@@ -13,9 +13,9 @@
 //! project is reproduced, and this module's matching logic is authored
 //! independently against the shared shape they both describe.
 //!
-//! Grammar: 3 [`is_prefix_byte`] bytes, one ASCII digit, the literal `Q~`,
-//! then 31-34 [`is_suffix_byte`] bytes (37-40 bytes total), bounded on both
-//! sides by a byte outside the suffix alphabet (or the edge of input). There
+//! Grammar: 3 [`is_secret_byte`] bytes, one ASCII digit, the literal `Q~`,
+//! then 31-34 [`is_secret_byte`] bytes (37-40 bytes total), bounded on both
+//! sides by a byte outside that alphabet (or the edge of input). There
 //! is no leading literal to anchor on, unlike every other provider detector
 //! in this module; the `digit` + `Q~` marker itself is specific enough that
 //! no surrounding context (`client_secret=`, `clientSecret:`, ...) is
@@ -36,19 +36,15 @@ const PREFIX_LEN: usize = 3;
 const MIN_SUFFIX_LEN: usize = 31;
 const MAX_SUFFIX_LEN: usize = 34;
 
-/// `[A-Za-z0-9_.~]`: the 3 bytes before the digit, and every suffix byte
-/// except `-`. Matches gitleaks's `azure-ad-client-secret` charset for that
-/// leading run; trufflehog's `spv2.go` additionally allows `-` there, which
-/// this detector does not, favoring precision over recall in an already
-/// undocumented, community-inferred grammar.
-fn is_prefix_byte(byte: u8) -> bool {
-    byte.is_ascii_alphanumeric() || matches!(byte, b'_' | b'.' | b'~')
-}
-
-/// `[A-Za-z0-9_.~-]`: the suffix run, which both reference sources agree
-/// also accepts `-`.
-fn is_suffix_byte(byte: u8) -> bool {
-    is_prefix_byte(byte) || byte == b'-'
+/// `[A-Za-z0-9_.~-]`: every byte of the secret outside the `<digit>Q~`
+/// marker, including the 3 bytes before the digit. Issued secrets can start
+/// with `-` (issue #707): trufflehog's `spv2.go` and Microsoft's own
+/// `microsoft/security-utilities` SEC101/156 rule both accept it in the
+/// leading run. gitleaks's `azure-ad-client-secret` rule still excludes it
+/// there and would miss such a secret. The outer boundary is unchanged:
+/// a `-` just before the leading run still rejects the match.
+fn is_secret_byte(byte: u8) -> bool {
+    byte.is_ascii_alphanumeric() || matches!(byte, b'_' | b'.' | b'~' | b'-')
 }
 
 /// Detects a Microsoft Entra application client secret by its undocumented
@@ -89,7 +85,7 @@ impl Detector for MicrosoftEntraClientSecretDetector {
 /// namespace.
 fn scan(input: &str) -> Vec<(usize, usize)> {
     let bytes = input.as_bytes();
-    let ends = pattern::run_ends(bytes, is_suffix_byte);
+    let ends = pattern::run_ends(bytes, is_secret_byte);
     let mut matches = Vec::new();
     let mut anchor = 0;
     while anchor < bytes.len() {
@@ -122,7 +118,7 @@ fn match_at(bytes: &[u8], ends: &[usize], anchor: usize) -> Option<(usize, usize
     if !bytes[digit_at].is_ascii_digit() {
         return None;
     }
-    if !bytes[start..digit_at].iter().copied().all(is_prefix_byte) {
+    if !bytes[start..digit_at].iter().copied().all(is_secret_byte) {
         return None;
     }
 
@@ -133,7 +129,7 @@ fn match_at(bytes: &[u8], ends: &[usize], anchor: usize) -> Option<(usize, usize
     }
 
     let end = suffix_start + available;
-    pattern::boundary_ok(bytes, start, end, is_suffix_byte).then_some((start, end))
+    pattern::boundary_ok(bytes, start, end, is_secret_byte).then_some((start, end))
 }
 
 #[cfg(test)]
@@ -196,6 +192,45 @@ mod tests {
             .collect::<String>();
         assert_eq!(suffix.len(), 35);
         assert_eq!(detect(&format!("abc8Q~{suffix}")).len(), 0);
+    }
+
+    #[test]
+    fn detects_a_secret_whose_leading_run_starts_or_contains_a_dash() {
+        for lead in ["-bc", "a-c", "--c"] {
+            let input = format!("{lead}8Q~{SUFFIX_32}");
+            let candidates = detect(&input);
+            assert_eq!(candidates.len(), 1, "lead={lead}");
+            assert_eq!(
+                candidates[0].range(),
+                ByteRange::new(0, input.len()).unwrap(),
+                "lead={lead}"
+            );
+        }
+    }
+
+    #[test]
+    fn finds_a_leading_dash_secret_after_an_assignment_or_quote() {
+        for prefix in ["AZURE_CLIENT_SECRET=", "secret: \"", "secret '"] {
+            let input = format!("{prefix}-bc8Q~{SUFFIX_32}");
+            let candidates = detect(&input);
+            assert_eq!(candidates.len(), 1, "prefix={prefix}");
+            assert_eq!(
+                candidates[0].range(),
+                ByteRange::new(prefix.len(), input.len()).unwrap(),
+                "prefix={prefix}"
+            );
+        }
+    }
+
+    #[test]
+    fn rejects_a_leading_run_joined_to_a_wider_dash_or_alphanumeric_token() {
+        for joined in ["x-bc8Q~", "--bc8Q~", "xabc8Q~"] {
+            assert_eq!(
+                detect(&format!("{joined}{SUFFIX_32}")).len(),
+                0,
+                "joined={joined}"
+            );
+        }
     }
 
     #[test]

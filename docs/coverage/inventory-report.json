@@ -845,7 +845,7 @@
     {
       "detector": "docker-token",
       "evidence": {
-        "fixtureCount": 50,
+        "fixtureCount": 54,
         "hostContextsExercised": [
           "dotenv",
           "json",
@@ -867,6 +867,9 @@
         ]
       },
       "evidenceFixtureIds": [
+        "docker-boundary-pat-length-under-oat-prefix",
+        "docker-oat-27-byte-body-crlf-unicode",
+        "docker-oat-27-byte-body-dotenv",
         "docker-positive-crlf-unicode-prefix",
         "docker-positive-dotenv",
         "docker-positive-json",
@@ -1276,7 +1279,7 @@
     {
       "detector": "microsoft-entra-client-secret",
       "evidence": {
-        "fixtureCount": 11,
+        "fixtureCount": 15,
         "hostContextsExercised": [
           "plain-text"
         ],
@@ -1292,6 +1295,9 @@
         ]
       },
       "evidenceFixtureIds": [
+        "microsoft-entra-client-secret-leading-dash-assignment",
+        "microsoft-entra-client-secret-leading-dash-bare",
+        "microsoft-entra-client-secret-leading-dash-crlf-unicode",
         "microsoft-entra-client-secret-positive-bare"
       ],
       "policyClass": "always-redact",

@@ -184,6 +184,40 @@
         }
       },
       "note": "Promotes 'positive reference controls remain detectable by the public npm surface' out of redact-secret-benchmarks' regressions.test.mjs (benchmarks issue #16). The negative direction (reference/pointer syntax excluded) is already canonical via issues #292 and #293; this record supplies the missing positive direction -- that generic-token's reference-syntax exclusions do not also swallow literal credentials. The two canonical fixtures sit on the issue #292 boundary directly (is_env_var_identifier in generic_token.rs): a %...%- or :-delimited value whose interior contains '-' is not a bare identifier, so it fails the Windows-env/SQL-bind reference grammar and stays detected. Both were confirmed to already pass against the current detector before being added, so this closes an uncovered contract rather than a live regression; gates stay pending until supported-surface evidence and a fixed-candidate benchmark rerun are recorded. No benchmark fixture input or discovery-matrix material was copied -- both canonical inputs are freshly constructed synthetic values."
+    },
+    {
+      "id": "benchmark-gap-707",
+      "benchmarkRecordId": "product-707",
+      "benchmarkIssue": "https://github.com/redact-secret/redact-secret-benchmarks/issues/10",
+      "productIssue": "https://github.com/redact-secret/redact-secret/issues/707",
+      "benchmarkFixtureIds": [
+        "detector-coverage--microsoft-entra-client-secret-leading-dash-bare",
+        "detector-coverage--microsoft-entra-client-secret-leading-dash-quoted",
+        "detector-coverage--microsoft-entra-client-secret-leading-dash-unicode-crlf"
+      ],
+      "corpusHashes": [
+        "47600c267336c2e7fc0f60f201fd59ff18d3d712d22cac2cb9873ff581a54850"
+      ],
+      "canonicalFixtures": {
+        "synchronous": [
+          "microsoft-entra-client-secret-leading-dash-bare",
+          "microsoft-entra-client-secret-leading-dash-assignment",
+          "microsoft-entra-client-secret-leading-dash-crlf-unicode",
+          "microsoft-entra-client-secret-leading-dash-joined-identifier"
+        ],
+        "incremental": []
+      },
+      "gates": {
+        "productConformance": {
+          "status": "pending",
+          "evidence": []
+        },
+        "benchmarkRevalidation": {
+          "status": "pending",
+          "evidence": []
+        }
+      },
+      "note": "microsoft-entra-client-secret rejected a secret whose three-byte leading run contains '-', including a first character of '-'. The benchmark contract already admits it (redact-secret-benchmarks#161, following #655's research), so the three leading-dash detector-coverage fixtures were T2 leaked spans. The fix gives the leading run the same [A-Za-z0-9_.~-] alphabet as the suffix; the outer boundary is unchanged, which the joined-identifier control pins. No incremental case: the change is inside a single bounded match, and no chunk or retention state is involved. Canonical inputs are freshly constructed synthetic values; no benchmark fixture input was copied. The corpus hash is the detector-coverage hash in the vendored pin manifest."
     }
   ]
 }

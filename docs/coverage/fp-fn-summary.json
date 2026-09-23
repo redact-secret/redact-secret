@@ -351,8 +351,11 @@
       "detector": "docker-token",
       "falseNegativeGuards": {
         "actualFalseNegatives": 0,
-        "count": 18,
+        "count": 21,
         "fixtureIds": [
+          "docker-boundary-pat-length-under-oat-prefix",
+          "docker-oat-27-byte-body-crlf-unicode",
+          "docker-oat-27-byte-body-dotenv",
           "docker-positive-crlf-unicode-prefix",
           "docker-positive-dotenv",
           "docker-positive-json",

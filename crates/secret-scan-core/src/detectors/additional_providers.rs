@@ -221,19 +221,23 @@ pub(super) const HUGGING_FACE: KnownFormatProviderDetector = KnownFormatProvider
 };
 
 /// Docker Hub personal (`dckr_pat_`) and organization (`dckr_oat_`) access
-/// tokens, validated as two separately-sized exact-length shapes (issue
-/// #370, `decision-freeze-precision-contracts-seven-provider-families`, Docker row):
+/// tokens, validated as separately-sized exact-length shapes (issue #370,
+/// `decision-freeze-precision-contracts-seven-provider-families`, Docker row;
+/// the second OAT width is issue #708):
 ///
 /// ```text
-/// dckr_pat_<27 bytes from [A-Za-z0-9_-]>   (36 bytes total)
-/// dckr_oat_<32 bytes from [A-Za-z0-9_-]>   (41 bytes total)
+/// dckr_pat_<27 bytes from [A-Za-z0-9_-]>        (36 bytes total)
+/// dckr_oat_<27 or 32 bytes from [A-Za-z0-9_-]>  (36 or 41 bytes total)
 /// ```
 ///
-/// Each segment name carries its own length, so a 26- or 28-byte suffix
-/// after `dckr_pat_`, a 31- or 33-byte suffix after `dckr_oat_`, or the
-/// PAT length under the OAT prefix (and vice versa) is an intentional false
-/// negative rather than a fuzzy match, the same exact-length precedent
-/// `npm-token` and `google-api-key` below already set. Only the two
+/// Docker's own Hub API reference shows an organization access token with a
+/// 27-byte body. The 32-byte width comes from trufflehog only, so both
+/// widths are accepted under `dckr_oat_` (#708). Every other length is an
+/// intentional false negative rather than a fuzzy match: a 26- or 28-byte
+/// suffix after `dckr_pat_`, anything other than 27 or 32 bytes after
+/// `dckr_oat_`, or the 32-byte OAT width under the PAT prefix. This follows
+/// the same exact-length precedent `npm-token` and `google-api-key` below
+/// already set. Only the two
 /// documented segment names are matched; an undocumented segment name is an
 /// intentional false negative, and legacy Docker Hub passwords (which carry
 /// no distinguishing prefix at all) are out of scope for this detector.
@@ -249,9 +253,9 @@ pub(super) const DOCKER: KnownFormatProviderDetector = KnownFormatProviderDetect
             pattern::is_alnum_dash,
             &DOCKER_SIGNALS,
         ),
-        PrefixShape::exact(
+        PrefixShape::one_of(
             "dckr_oat_",
-            DOCKER_OAT_SUFFIX_LEN,
+            &DOCKER_OAT_SUFFIX_LENS,
             pattern::is_alnum_dash,
             &DOCKER_SIGNALS,
         ),
@@ -261,8 +265,11 @@ pub(super) const DOCKER: KnownFormatProviderDetector = KnownFormatProviderDetect
 
 /// The exact suffix length after `dckr_pat_`.
 pub(super) const DOCKER_PAT_SUFFIX_LEN: usize = 27;
-/// The exact suffix length after `dckr_oat_`.
+/// The longer exact suffix length after `dckr_oat_` (trufflehog-corroborated).
 pub(super) const DOCKER_OAT_SUFFIX_LEN: usize = 32;
+/// Every exact suffix length accepted after `dckr_oat_`: the provider's own
+/// 27-byte example width (issue #708) and the 32-byte width.
+pub(super) const DOCKER_OAT_SUFFIX_LENS: [usize; 2] = [DOCKER_PAT_SUFFIX_LEN, DOCKER_OAT_SUFFIX_LEN];
 
 /// `DigitalOcean` personal (`dop_v1_`), `OAuth` access (`doo_v1_`), and
 /// `OAuth` refresh (`dor_v1_`) token families.
@@ -1070,12 +1077,32 @@ mod tests {
     /// length under the OAT prefix and the OAT length under the PAT prefix
     /// are both rejected.
     #[test]
-    fn docker_does_not_share_a_length_between_segment_names() {
-        for input in [
-            format!("dckr_oat_{DOCKER_PAT_BODY}"),
-            format!("dckr_pat_{DOCKER_OAT_BODY}"),
-        ] {
-            assert_eq!(detect(&DOCKER, &input).len(), 0, "{input}");
+    fn docker_does_not_accept_the_oat_width_under_the_pat_prefix() {
+        let input = format!("dckr_pat_{DOCKER_OAT_BODY}");
+        assert_eq!(detect(&DOCKER, &input).len(), 0, "{input}");
+    }
+
+    /// Issue #708: Docker's Hub API reference shows an organization access
+    /// token with a 27-byte body, so `dckr_oat_` accepts exactly 27 or
+    /// exactly 32 bytes. Each width is matched over the full span, and every
+    /// width in between, or just outside, is rejected rather than truncated.
+    #[test]
+    fn docker_oat_accepts_exactly_the_27_and_32_byte_widths() {
+        for body in [DOCKER_PAT_BODY, DOCKER_OAT_BODY] {
+            let input = format!("DOCKER_TOKEN=dckr_oat_{body}");
+            let candidates = detect(&DOCKER, &input);
+            assert_eq!(candidates.len(), 1, "len={}", body.len());
+            assert_eq!(
+                candidates[0].range(),
+                ByteRange::new("DOCKER_TOKEN=".len(), input.len()).unwrap(),
+                "len={}",
+                body.len()
+            );
+        }
+        let padding = "SYNTHETICREVOKEDDOCKERORGTOKEN0000";
+        for len in [26usize, 28, 29, 30, 31, 33] {
+            let input = format!("dckr_oat_{}", &padding[..len]);
+            assert_eq!(detect(&DOCKER, &input).len(), 0, "len={len}");
         }
     }
 
