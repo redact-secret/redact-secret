@@ -73,6 +73,7 @@ export const CANONICAL_IDS = [
   "datadog-api-key", "datadog-application-key", "grafana-service-account-token",
   "grafana-cloud-access-policy-token", "new-relic-user-api-key", "new-relic-license-key",
   "firebase-server-key", "terraform-cloud-token", "pulumi-access-token", "databricks-personal-access-token",
+  "confluent-cloud-api-secret", "confluent-cloud-api-secret-legacy",
   "jwt", "bearer-token", "connection-string", "otpauth-uri", "generic-token",
 ];
 
@@ -93,6 +94,7 @@ export const GROUPS = {
     "datadog-application-key", "grafana-service-account-token", "grafana-cloud-access-policy-token",
     "new-relic-user-api-key", "new-relic-license-key", "firebase-server-key", "terraform-cloud-token",
     "pulumi-access-token", "databricks-personal-access-token",
+    "confluent-cloud-api-secret", "confluent-cloud-api-secret-legacy",
   ],
   devtools: [
     "github-token", "gitlab-token", "azure-devops-personal-access-token", "notion-token",

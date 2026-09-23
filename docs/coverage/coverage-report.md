@@ -15,11 +15,11 @@ These counts describe finding-type inventory rows with corpus evidence, not dete
 
 | Row state | Count |
 | --- | --- |
-| supported | 54 |
+| supported | 56 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 65.
+Coverage declarations: 67.
 
 ## Coverage by detector
 
@@ -31,6 +31,8 @@ Coverage declarations: 65.
 | azure-devops-personal-access-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | bearer-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | cloudflare-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| confluent-cloud-api-secret | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| confluent-cloud-api-secret-legacy | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | connection-string | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | databricks-personal-access-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | datadog-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -84,6 +86,8 @@ Coverage declarations: 65.
 | azure_devops_personal_access_token | azure-devops-personal-access-token | provider | supported | not-applicable | none |
 | bearer_token | bearer-token | structural | supported | not-applicable | none |
 | cloudflare_api_token | cloudflare-token | provider | supported | not-applicable | none |
+| confluent_cloud_api_secret | confluent-cloud-api-secret | provider | supported | not-applicable | none |
+| confluent_cloud_api_secret_legacy | confluent-cloud-api-secret-legacy | provider | supported | not-applicable | none |
 | connection_string_password | connection-string | structural | supported | supported | none |
 | contextual_secret | generic-token | contextual | supported | not-applicable | none |
 | databricks_personal_access_token | databricks-personal-access-token | provider | supported | not-applicable | none |
@@ -156,15 +160,15 @@ Coverage declarations: 65.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 65 | 0 | 0 |
-| boundary | 54 | 0 | 0 |
-| host-context | 54 | 0 | 0 |
+| adversarial | 67 | 0 | 0 |
+| boundary | 56 | 0 | 0 |
+| host-context | 56 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 65 | 0 | 0 |
-| near-miss-negative | 54 | 0 | 0 |
-| overlap | 54 | 0 | 0 |
-| positive | 54 | 0 | 0 |
-| range | 65 | 0 | 0 |
+| malformed | 67 | 0 | 0 |
+| near-miss-negative | 56 | 0 | 0 |
+| overlap | 56 | 0 | 0 |
+| positive | 56 | 0 | 0 |
+| range | 67 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

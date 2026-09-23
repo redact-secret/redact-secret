@@ -5966,6 +5966,178 @@
       "type": "databricks_personal_access_token"
     },
     {
+      "behaviorClass": "provider",
+      "detector": "confluent-cloud-api-secret",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "confluent-cloud-api-secret-positive-bare",
+            "confluent-cloud-api-secret-positive-crlf-unicode-prefix",
+            "confluent-cloud-api-secret-positive-dotenv",
+            "confluent-cloud-api-secret-positive-github-actions",
+            "confluent-cloud-api-secret-positive-json",
+            "confluent-cloud-api-secret-positive-log",
+            "confluent-cloud-api-secret-positive-punctuation-adjacent",
+            "confluent-cloud-api-secret-positive-repeated-value",
+            "confluent-cloud-api-secret-positive-shell-quoted",
+            "confluent-cloud-api-secret-positive-yaml"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "confluent-cloud-api-secret-overlap-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "confluent-cloud-api-secret-adversarial-long-suffix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "confluent-cloud-api-secret-boundary-one-long",
+            "confluent-cloud-api-secret-boundary-one-short"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "confluent-cloud-api-secret-negative-cluster-and-host-context",
+            "confluent-cloud-api-secret-negative-doc-style-placeholder",
+            "confluent-cloud-api-secret-negative-embedded-identifier",
+            "confluent-cloud-api-secret-negative-key-id-alone",
+            "confluent-cloud-api-secret-negative-wrong-prefix-case"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "confluent-cloud-api-secret-boundary-one-long",
+            "confluent-cloud-api-secret-boundary-one-short"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for confluent_cloud_api_secret (confluent-cloud-api-secret), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "confluent_cloud_api_secret"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "confluent-cloud-api-secret-legacy",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "confluent-cloud-api-secret-legacy-positive-bare-with-keyword",
+            "confluent-cloud-api-secret-legacy-positive-dotenv-keyword",
+            "confluent-cloud-api-secret-legacy-positive-yaml-keyword"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "confluent-cloud-api-secret-legacy-overlap-generic-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "confluent-cloud-api-secret-legacy-adversarial-dense-findings"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "confluent-cloud-api-secret-legacy-boundary-wrong-length"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "confluent-cloud-api-secret-legacy-negative-bare-no-context",
+            "confluent-cloud-api-secret-legacy-negative-different-line",
+            "confluent-cloud-api-secret-legacy-negative-key-id-alone",
+            "confluent-cloud-api-secret-legacy-negative-repeated-filler"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "confluent-cloud-api-secret-legacy-boundary-wrong-length"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for confluent_cloud_api_secret_legacy (confluent-cloud-api-secret-legacy), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "confluent_cloud_api_secret_legacy"
+    },
+    {
       "behaviorClass": "incremental",
       "detector": "unassigned",
       "dimensions": [
@@ -6093,6 +6265,8 @@
             "azdo-pat-adversarial-long-padding",
             "bearer-adversarial-punctuation",
             "cloudflare-adversarial-long-suffix",
+            "confluent-cloud-api-secret-adversarial-long-suffix",
+            "confluent-cloud-api-secret-legacy-adversarial-dense-findings",
             "connection-adversarial-azure-overlong",
             "connection-adversarial-malformed-authority",
             "connection-adversarial-overlong",
@@ -6481,6 +6655,8 @@
             "azdo-pat-adversarial-long-padding",
             "bearer-adversarial-punctuation",
             "cloudflare-adversarial-long-suffix",
+            "confluent-cloud-api-secret-adversarial-long-suffix",
+            "confluent-cloud-api-secret-legacy-adversarial-dense-findings",
             "connection-adversarial-azure-overlong",
             "connection-adversarial-malformed-authority",
             "connection-adversarial-overlong",

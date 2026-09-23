@@ -15,6 +15,7 @@ mod aws;
 mod azure_devops;
 mod bearer_token;
 mod cloudflare;
+mod confluent;
 mod connection_string;
 mod databricks;
 mod datadog;
@@ -102,6 +103,8 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(terraform::TerraformCloudTokenDetector),
         Box::new(additional_providers::PULUMI),
         Box::new(databricks::DATABRICKS),
+        Box::new(confluent::CONFLUENT_CLOUD_API_SECRET),
+        Box::new(confluent::ConfluentLegacyApiSecretDetector),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
         Box::new(ConnectionStringDetector),
@@ -194,6 +197,8 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("terraform-cloud-token", Pack::Provider),
     ("pulumi-access-token", Pack::Provider),
     ("databricks-personal-access-token", Pack::Provider),
+    ("confluent-cloud-api-secret", Pack::Provider),
+    ("confluent-cloud-api-secret-legacy", Pack::Provider),
     ("jwt", Pack::Common),
     ("bearer-token", Pack::Common),
     ("connection-string", Pack::Common),
@@ -275,6 +280,8 @@ mod tests {
                 "terraform-cloud-token",
                 "pulumi-access-token",
                 "databricks-personal-access-token",
+                "confluent-cloud-api-secret",
+                "confluent-cloud-api-secret-legacy",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -453,6 +460,8 @@ mod tests {
             "twilio SKaB3dE5gH7jK9mN1pQ3sT5vW7yZ9AbC3d zY9xW7vU5tS3rQ1pO9nM7lK5jI3hG1fE";
         let telegram_input = "123456:SYNTHETIC_REVOKED_TELEGRAM_BOT_TOKEN_SECRET";
         let discord_input = "MDAwMDAwMDAwMDAwMDAwMDAw.REVOKE.SYNTHETICREVOKEDBOTTOKENFIX";
+        let confluent_legacy_input =
+            "confluent SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO";
         let cases = [
             ("aws-access-key", "AKIASYNTHETICEXAMPLE"),
             (
@@ -516,6 +525,7 @@ mod tests {
             ("twilio-api-key-secret", twilio_api_key_secret_input),
             ("discord-bot-token", discord_input),
             ("telegram-bot-token", telegram_input),
+            ("confluent-cloud-api-secret-legacy", confluent_legacy_input),
         ];
         assert_provider_candidates(&cases);
     }
@@ -548,6 +558,8 @@ mod tests {
             format!("pul-{}", "0123456789abcdef0123456789abcdef01234567");
         let databricks_personal_access_token_input =
             format!("dapi{}", "0123456789abcdef0123456789abcdef");
+        let confluent_cloud_api_secret_input =
+            "cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPQRSTUV";
         let cases = [
             (
                 "sentry-user-auth-token",
@@ -572,6 +584,10 @@ mod tests {
             (
                 "databricks-personal-access-token",
                 databricks_personal_access_token_input.as_str(),
+            ),
+            (
+                "confluent-cloud-api-secret",
+                confluent_cloud_api_secret_input,
             ),
         ];
         assert_provider_candidates(&cases);
