@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 1652,
+  "fixtureCount": 1660,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -17977,6 +17977,85 @@
       "note": "A digit followed by Q but not the literal Q~ marker is not a credential."
     },
     {
+      "id": "microsoft-entra-client-secret-leading-dash-bare",
+      "detector": "microsoft-entra-client-secret",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "-bc8Q~SYNTHETIC_REVOKED_ENTRA_SECRET_V",
+      "expected": [
+        {
+          "detector": "microsoft-entra-client-secret",
+          "type": "microsoft_entra_client_secret",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 38
+        }
+      ],
+      "note": "Issue #707: a client secret whose first character is '-' is detected over its full span; the three-byte leading run shares the suffix alphabet."
+    },
+    {
+      "id": "microsoft-entra-client-secret-leading-dash-assignment",
+      "detector": "microsoft-entra-client-secret",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "AZURE_CLIENT_SECRET=-bc8Q~SYNTHETIC_REVOKED_ENTRA_SECRET_V",
+      "expected": [
+        {
+          "detector": "microsoft-entra-client-secret",
+          "type": "microsoft_entra_client_secret",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 20,
+          "end": 58
+        }
+      ],
+      "note": "Issue #707: after an '=' assignment the leading '-' starts the finding; the key name is not part of the span."
+    },
+    {
+      "id": "microsoft-entra-client-secret-leading-dash-crlf-unicode",
+      "detector": "microsoft-entra-client-secret",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 café\r\n-bc8Q~SYNTHETIC_REVOKED_ENTRA_SECRET_V\r\n",
+      "expected": [
+        {
+          "detector": "microsoft-entra-client-secret",
+          "type": "microsoft_entra_client_secret",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 52
+        }
+      ],
+      "note": "Issue #707: CRLF line endings and a multi-byte Unicode prefix shift only the byte offsets of a leading-dash secret."
+    },
+    {
+      "id": "microsoft-entra-client-secret-leading-dash-joined-identifier",
+      "detector": "microsoft-entra-client-secret",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "x-bc8Q~SYNTHETIC_REVOKED_ENTRA_SECRET_V",
+      "expected": [],
+      "note": "Issue #707 control: widening the leading run to '-' does not relax the outer boundary; a run joined to a wider token on its left is still rejected."
+    },
+    {
       "id": "azdo-pat-positive-bare",
       "detector": "azure-devops-personal-access-token",
       "kind": "positive",
@@ -30642,9 +30721,9 @@
     {
       "id": "docker-boundary-pat-length-under-oat-prefix",
       "detector": "docker-token",
-      "kind": "boundary",
-      "support": "intentionally-unsupported",
-      "tier": "malformed",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
       "contexts": [
         "plain-text"
       ],
@@ -30655,8 +30734,87 @@
         "ordinal": 6
       },
       "input": "dckr_oat_SYNTHETIC_REVOKED_KEY_VALUE",
+      "expected": [
+        {
+          "detector": "docker-token",
+          "type": "docker_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 36
+        }
+      ],
+      "note": "Issue #708: Docker's Hub API reference shows a dckr_oat_ organization access token with a 27-byte body, so the PAT width under the OAT prefix is a supported OAT width, detected over its full span. Until #708 this fixture asserted rejection."
+    },
+    {
+      "id": "docker-oat-27-byte-body-dotenv",
+      "detector": "docker-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "DOCKER_ORG_TOKEN=dckr_oat_SYNTHETIC_REVOKED_KEY_VALUE",
+      "expected": [
+        {
+          "detector": "docker-token",
+          "type": "docker_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 17,
+          "end": 53
+        }
+      ],
+      "note": "Issue #708: a dckr_oat_ token with the provider-documented 27-byte body is detected in a dotenv assignment; the key name is not part of the span."
+    },
+    {
+      "id": "docker-oat-27-byte-body-crlf-unicode",
+      "detector": "docker-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 café\r\ndckr_oat_SYNTHETIC_REVOKED_KEY_VALUE\r\n",
+      "expected": [
+        {
+          "detector": "docker-token",
+          "type": "docker_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 50
+        }
+      ],
+      "note": "Issue #708: CRLF line endings and a multi-byte Unicode prefix shift only the byte offsets of a 27-byte-body OAT."
+    },
+    {
+      "id": "docker-oat-26-byte-body-rejected",
+      "detector": "docker-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "dckr_oat_SYNTHETIC_REVOKED_KEY_VALU",
       "expected": [],
-      "note": "Issue #370: the two segment names are validated separately; the 27-byte personal access token length under the dckr_oat_ prefix is an intentional false negative."
+      "note": "Issue #708 control: the OAT widths are exact; a 26-byte body is rejected rather than read as a short 27."
+    },
+    {
+      "id": "docker-oat-28-byte-body-rejected",
+      "detector": "docker-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "dckr_oat_SYNTHETIC_REVOKED_KEY_VALUE0",
+      "expected": [],
+      "note": "Issue #708 control: a 28-byte body is neither the 27- nor the 32-byte width and is rejected, not truncated to 27."
     },
     {
       "id": "docker-boundary-oat-length-under-pat-prefix",

@@ -13,11 +13,14 @@
  *
  * The distinguishing property under test is the reviewed Docker Hub contract
  * (`decision-freeze-precision-contracts-seven-provider-families`): a personal access
- * token is `dckr_pat_` + exactly 27 bytes of `[A-Za-z0-9_-]`, an organization
- * access token is `dckr_oat_` + exactly 32 bytes of the same alphabet, and the
- * two segment names do not share a length. Every mutation below changes
- * exactly one structural property of its identity case, so silence (or the
- * identity match) follows from construction.
+ * token is `dckr_pat_` + exactly 27 bytes of `[A-Za-z0-9_-]`, and an
+ * organization access token is `dckr_oat_` + exactly 27 or exactly 32 bytes of
+ * the same alphabet (the 27-byte OAT width is issue #708, from Docker's own Hub
+ * API reference example). The 32-byte OAT width is not accepted under
+ * `dckr_pat_`. Every mutation below changes exactly one structural property of
+ * its identity case. The expected result follows from construction: silence,
+ * the identity match, or, for `pat-length-under-oat-prefix` since #708, a
+ * supported 27-byte OAT.
  *
  * Both base literals are unmistakably synthetic, revoked-shaped values: never
  * real or real-looking credentials.
@@ -29,7 +32,7 @@ const PAT_PREFIX = "dckr_pat_";
 const OAT_PREFIX = "dckr_oat_";
 /** Exactly the 27-byte suffix a Docker Hub personal access token carries. */
 const PAT_BODY = "SYNTHETIC_REVOKED_KEY_VALUE";
-/** Exactly the 32-byte suffix a Docker Hub organization access token carries. */
+/** Exactly the 32-byte (longer) suffix a Docker Hub organization access token can carry. */
 const OAT_BODY = "SYNTHETIC_REVOKED_OAT_KEY_VALUE3";
 /** The fixed byte (the `C` closing `SYNTHETIC`) the `invalid-alphabet` and
  * `whitespace-insertion` operations mutate. */

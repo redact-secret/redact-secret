@@ -84,6 +84,21 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `vercel_token` | `vercel-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 <!-- detector-families:end -->
 
+## Evidence-backed family applications
+
+These rows apply the existing evidence-tier policy to individual provider
+families. They add no new cross-family policy and do not replace the
+generated finding-type inventory above.
+
+| Family | Applied rule | Evidence |
+| --- | --- | --- |
+| `datadog:api-key` | T1 on the provider-stated exact length 32 and the `DD-API-KEY` / `DD_API_KEY` marker; the alphabet stays tool-corroborated, and the key stays marker-gated. | [#644](../audits/evidence/644/README.md), [#575](../audits/evidence/575/README.md) |
+| `datadog:application-key` | T1 on the provider-stated `ddapp_` prefix; the body stays tool-corroborated. | [#645](../audits/evidence/645/README.md), [#575](../audits/evidence/575/README.md) |
+| `new-relic:license-key` | T1 on the provider-stated `NRAL` suffix and total length 40; `FFFF`, the hex body and `eu01xx` stay tool/provider-code corroborated. | [#656](../audits/evidence/656/README.md), [#575](../audits/evidence/575/README.md) |
+| `huggingface:api-token` | T1 on the `hf_` prefix (SDK-reference type) and a length of 34 (OpenAPI example), by maintainer ruling; `api_org_` stays outside the T1 contract. | [#654](../audits/evidence/654/README.md), [#575](../audits/evidence/575/README.md) |
+| `microsoft-entra:application-client-secret` | T1 on the provider-domain SDK example: 3 characters, then `8Q~`, then 34, for 40 in total, by maintainer ruling. The leading run accepts `-` (#707). | [#655](../audits/evidence/655/README.md), [#575](../audits/evidence/575/README.md) |
+| `docker:personal-access-token`, `docker:oauth-access-token` | T1 on the provider-stated `dckr_pat_` / `dckr_oat_` prefixes; the OAT body is exactly 27 (the provider example) or 32 bytes (#708). | [#647](../audits/evidence/647/README.md), [#648](../audits/evidence/648/README.md), [#575](../audits/evidence/575/README.md) |
+
 ## Rules
 
 | Rule | Governing ADR |
@@ -93,13 +108,13 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | The Datadog API Key and Application Key grammar is frozen as marker-gated lowercase-hex values. | [Freeze the Datadog API Key and Application Key grammar as marker-gated lowercase-hex values](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | The Discord bot token grammar is frozen as a three-segment digit-decoding snowflake token. | [Freeze the Discord bot token grammar as a three-segment digit-decoding snowflake token](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | The Grafana service account and Cloud access policy token grammar is frozen; the legacy API key is excluded. | [Freeze the Grafana service account and Cloud access policy token grammar, and exclude the legacy API key](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
-| The Microsoft Entra application client-secret grammar is frozen as an unprefixed digit-`Q`-tilde marker shape. | [Freeze the Microsoft Entra application client-secret grammar as an unprefixed digit-Q-tilde marker](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
+| The Microsoft Entra application client-secret grammar is frozen as an unprefixed digit-`Q`-tilde marker shape. The three bytes before the digit share the suffix alphabet `[A-Za-z0-9_.~-]`, so a secret that starts with `-` is detected, and the outer boundary is unchanged ([#707](https://github.com/redact-secret/redact-secret/issues/707)). | [Freeze the Microsoft Entra application client-secret grammar as an unprefixed digit-Q-tilde marker](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | The New Relic User API Key grammar is frozen as an exact-length prefixed shape; the License Key grammar is a keyword-gated bare hex shape. | [Freeze the New Relic User API Key and License Key grammar as an exact-length prefixed shape and a keyword-gated bare hex shape](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | The Notion integration token grammar is frozen as two exact-length prefixed shapes. | [Freeze the Notion integration token grammar as two exact-length prefixed shapes](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | The Sentry user and organization auth token grammar is frozen as two unambiguous prefixed shapes. | [Freeze the Sentry user and organization auth token grammar as two unambiguous prefixed shapes](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | The Telegram Bot API token grammar is frozen as a minimum-length digit-colon-secret shape. | [Freeze the Telegram Bot API token grammar as a minimum-length digit-colon-secret shape](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | The Twilio Auth Token and API Key Secret grammar is frozen as context-gated 32-byte values. | [Freeze the Twilio Auth Token and API Key Secret grammar as context-gated 32-byte values](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
-| The Docker Hub access token grammar is frozen as two separately-sized exact-length prefixed shapes. | [Freeze the Docker Hub access token grammar as two separately-sized exact-length prefixed shapes](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
+| The Docker Hub access token grammar is frozen as separately-sized exact-length prefixed shapes: `dckr_pat_` takes exactly 27 bytes, and `dckr_oat_` takes exactly 27 bytes (the width in Docker's own API reference example) or exactly 32 ([#708](https://github.com/redact-secret/redact-secret/issues/708)). | [Freeze the Docker Hub access token grammar as two separately-sized exact-length prefixed shapes](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | The OpenAI API key grammar is frozen as a marker-gated shape with exact segment lengths. | [Freeze the OpenAI API key grammar as a marker-gated shape with exact segment lengths](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | Reviewed precision contracts are frozen for seven provider families, refining their default rules in place; a value matching a supported prefix but not the contracted shape stops producing a provider finding. | [Freeze reviewed precision contracts for seven provider families and refine their default rules in place](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | The Slack bot token grammar is frozen as a three-section dash-separated shape. | [Freeze the Slack bot token grammar as a three-section dash-separated shape](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |

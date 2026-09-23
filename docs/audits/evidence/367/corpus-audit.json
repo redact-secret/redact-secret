@@ -3112,14 +3112,24 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "docker-token",
-      "disposition": "silent",
-      "expectedRanges": [],
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 36,
+          "start": 0
+        }
+      ],
       "id": "docker-boundary-pat-length-under-oat-prefix",
-      "kind": "boundary",
+      "kind": "positive",
       "lostRanges": [],
-      "retainedRanges": [],
-      "support": "intentionally-unsupported",
-      "tier": "malformed"
+      "retainedRanges": [
+        {
+          "end": 36,
+          "start": 0
+        }
+      ],
+      "support": "supported",
+      "tier": "regression"
     },
     {
       "contexts": [
@@ -3344,6 +3354,90 @@
       "retainedRanges": [],
       "support": "supported",
       "tier": "negative"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "docker-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "docker-oat-26-byte-body-rejected",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "regression"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "docker-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 50,
+          "start": 14
+        }
+      ],
+      "id": "docker-oat-27-byte-body-crlf-unicode",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 50,
+          "start": 14
+        }
+      ],
+      "support": "supported",
+      "tier": "regression"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "docker-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 53,
+          "start": 17
+        }
+      ],
+      "id": "docker-oat-27-byte-body-dotenv",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 53,
+          "start": 17
+        }
+      ],
+      "support": "supported",
+      "tier": "regression"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "docker-token",
+      "disposition": "silent",
+      "expectedRanges": [],
+      "id": "docker-oat-28-byte-body-rejected",
+      "kind": "boundary",
+      "lostRanges": [],
+      "retainedRanges": [],
+      "support": "intentionally-unsupported",
+      "tier": "regression"
     },
     {
       "contexts": [
@@ -10035,9 +10129,9 @@
     },
     "docker-token": {
       "broad-shape": 0,
-      "retained": 23,
+      "retained": 26,
       "review": 0,
-      "silent": 30
+      "silent": 31
     },
     "google-api-key": {
       "broad-shape": 0,

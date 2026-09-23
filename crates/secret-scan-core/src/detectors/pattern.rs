@@ -82,9 +82,10 @@ pub(super) fn is_base64_body(byte: u8) -> bool {
     is_alnum(byte) || byte == b'+' || byte == b'/'
 }
 
-/// Whether a matched run must be an exact length, a documented minimum, or
-/// an open-ended minimum guarded against the boundary defect below,
-/// mirroring a regex quantifier of `{n}` or `{n,}`.
+/// Whether a matched run must be an exact length, one of a few exact
+/// lengths, a documented minimum, or an open-ended minimum guarded against
+/// the boundary defect below, mirroring a regex quantifier of `{n}`,
+/// `(?:{a}|{b})` or `{n,}`.
 #[derive(Clone, Copy, Debug)]
 pub(super) enum RunLength {
     /// `{n}`: the run consumes exactly `n` alphabet bytes, however many more
@@ -92,6 +93,13 @@ pub(super) enum RunLength {
     /// byte follows, so a longer run of the same shape is not misread as a
     /// short one.
     Exact(usize),
+    /// `(?:{a}|{b}|...)`: each listed length is tried as [`RunLength::Exact`],
+    /// longest first, and the first one that also passes the shape's post
+    /// check and the scan's boundary wins. Used when a provider documents
+    /// one prefix with more than one exact body width (Docker's `dckr_oat_`,
+    /// issue #708); a width between the listed ones is still rejected, never
+    /// truncated.
+    OneOf(&'static [usize]),
     /// `{n,}`: the run consumes the maximal available run, which must be at
     /// least `n` bytes. When this shape's `alphabet` is the same as the
     /// scan's `boundary` (an interim guard with no narrower reviewed
@@ -152,6 +160,23 @@ impl<'a> PrefixShape<'a> {
         Self {
             prefix,
             run: RunLength::Exact(len),
+            alphabet,
+            signals,
+            post_check: None,
+        }
+    }
+
+    /// `prefix` followed by exactly one of `lens` alphabet bytes
+    /// (`(?:{a}|{b})`, see [`RunLength::OneOf`]).
+    pub(super) const fn one_of(
+        prefix: &'a str,
+        lens: &'static [usize],
+        alphabet: Alphabet,
+        signals: &'static [&'static str],
+    ) -> Self {
+        Self {
+            prefix,
+            run: RunLength::OneOf(lens),
             alphabet,
             signals,
             post_check: None,
@@ -373,6 +398,21 @@ pub(super) fn scan_prefixed_shapes(
         let available = ends[suffix_start] - suffix_start;
         let matched_len = match shape.run {
             RunLength::Exact(len) if available >= len => len,
+            RunLength::OneOf(lens) => {
+                let accepted = |len: usize| {
+                    let end = suffix_start + len;
+                    available >= len
+                        && shape
+                            .post_check
+                            .is_none_or(|check| check(bytes, start, end))
+                        && boundary_ok(bytes, start, end, boundary)
+                };
+                let Some(len) = lens.iter().copied().filter(|&len| accepted(len)).max() else {
+                    start += 1;
+                    continue;
+                };
+                len
+            }
             RunLength::AtLeast(len) if available >= len => available,
             RunLength::OpenFloor(len) if available >= len => {
                 open_floor_run_end(bytes, suffix_start, len, available) - suffix_start
