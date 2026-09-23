@@ -15,11 +15,11 @@ These counts describe finding-type inventory rows with corpus evidence, not dete
 
 | Row state | Count |
 | --- | --- |
-| supported | 57 |
+| supported | 58 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 68.
+Coverage declarations: 69.
 
 ## Coverage by detector
 
@@ -58,6 +58,7 @@ Coverage declarations: 68.
 | npm-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | openai-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | otpauth-uri | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| postman-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | private-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | pulumi-access-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | pypi-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -119,6 +120,7 @@ Coverage declarations: 68.
 | npm_access_token | npm-token | provider | supported | not-applicable | none |
 | openai_api_key | openai-token | provider | supported | not-applicable | none |
 | otpauth_secret | otpauth-uri | structural | supported | supported | none |
+| postman_api_key | postman-api-key | provider | supported | not-applicable | none |
 | private_key | private-key | structural | supported | not-applicable | none |
 | pulumi_access_token | pulumi-access-token | provider | supported | not-applicable | none |
 | pypi_api_token | pypi-token | provider | supported | not-applicable | none |
@@ -162,15 +164,15 @@ Coverage declarations: 68.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 68 | 0 | 0 |
-| boundary | 57 | 0 | 0 |
-| host-context | 57 | 0 | 0 |
+| adversarial | 69 | 0 | 0 |
+| boundary | 58 | 0 | 0 |
+| host-context | 58 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 68 | 0 | 0 |
-| near-miss-negative | 57 | 0 | 0 |
-| overlap | 57 | 0 | 0 |
-| positive | 57 | 0 | 0 |
-| range | 68 | 0 | 0 |
+| malformed | 69 | 0 | 0 |
+| near-miss-negative | 58 | 0 | 0 |
+| overlap | 58 | 0 | 0 |
+| positive | 58 | 0 | 0 |
+| range | 69 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

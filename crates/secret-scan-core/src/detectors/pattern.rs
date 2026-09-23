@@ -51,6 +51,20 @@ pub(super) fn is_lower_hex(byte: u8) -> bool {
     byte.is_ascii_digit() || (b'a'..=b'f').contains(&byte)
 }
 
+/// `[0-9a-fA-F]`: a case-insensitive hexadecimal body, for a provider whose
+/// reviewed contract explicitly allows both cases (e.g. `super::postman`'s
+/// gitleaks-corroborated `PMAK-` shape).
+pub(super) fn is_hex(byte: u8) -> bool {
+    byte.is_ascii_hexdigit()
+}
+
+/// `[0-9a-fA-F-]`: [`is_hex`] plus a literal dash, for a run that carries one
+/// internal dash-delimited hex-hex structure a [`PostCheck`] validates the
+/// exact position of (`super::postman`).
+pub(super) fn is_hex_or_dash(byte: u8) -> bool {
+    is_hex(byte) || byte == b'-'
+}
+
 /// `[a-z0-9]`: a lowercase-only alphanumeric body. Uppercase `A-Z` is
 /// deliberately outside the class, mirroring [`is_lower_hex`]'s reasoning,
 /// for a provider whose reviewed external-tool contract is this narrower
@@ -391,6 +405,15 @@ mod tests {
                 && !is_lower_hex(b'F')
                 && !is_lower_hex(b'_')
         );
+        assert!(
+            is_hex(b'0')
+                && is_hex(b'f')
+                && is_hex(b'F')
+                && !is_hex(b'g')
+                && !is_hex(b'G')
+                && !is_hex(b'-')
+        );
+        assert!(is_hex_or_dash(b'-') && is_hex_or_dash(b'a') && !is_hex_or_dash(b'g'));
         assert!(
             is_base64_body(b'+')
                 && is_base64_body(b'/')
