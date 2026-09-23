@@ -15,11 +15,11 @@ These counts describe finding-type inventory rows with corpus evidence, not dete
 
 | Row state | Count |
 | --- | --- |
-| supported | 58 |
+| supported | 60 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 69.
+Coverage declarations: 71.
 
 ## Coverage by detector
 
@@ -47,6 +47,8 @@ Coverage declarations: 69.
 | google-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | grafana-cloud-access-policy-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | grafana-service-account-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| heroku-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| heroku-api-key-legacy | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | huggingface-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | jwt | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | linear-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -109,6 +111,8 @@ Coverage declarations: 69.
 | google_api_key | google-api-key | provider | supported | not-applicable | none |
 | grafana_cloud_access_policy_token | grafana-cloud-access-policy-token | provider | supported | not-applicable | none |
 | grafana_service_account_token | grafana-service-account-token | provider | supported | not-applicable | none |
+| heroku_api_key | heroku-api-key | provider | supported | not-applicable | none |
+| heroku_api_key_legacy | heroku-api-key-legacy | provider | supported | not-applicable | none |
 | huggingface_token | huggingface-token | provider | supported | not-applicable | none |
 | jwt | jwt | structural | supported | not-applicable | none |
 | linear_token | linear-token | provider | supported | not-applicable | none |
@@ -164,15 +168,15 @@ Coverage declarations: 69.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 69 | 0 | 0 |
-| boundary | 58 | 0 | 0 |
-| host-context | 58 | 0 | 0 |
+| adversarial | 71 | 0 | 0 |
+| boundary | 60 | 0 | 0 |
+| host-context | 60 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 69 | 0 | 0 |
-| near-miss-negative | 58 | 0 | 0 |
-| overlap | 58 | 0 | 0 |
-| positive | 58 | 0 | 0 |
-| range | 69 | 0 | 0 |
+| malformed | 71 | 0 | 0 |
+| near-miss-negative | 60 | 0 | 0 |
+| overlap | 60 | 0 | 0 |
+| positive | 60 | 0 | 0 |
+| range | 71 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

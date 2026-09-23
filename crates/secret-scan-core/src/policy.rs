@@ -9,16 +9,17 @@ use crate::types::{Action, Confidence, DetectedFinding, Policy, PolicyContext};
 ///
 /// Not every [`Specificity::Provider`](crate::types::Specificity) type is
 /// here: `twilio_auth_token`, `twilio_api_key_secret`, `datadog_api_key`,
-/// `datadog_application_key`, `new_relic_license_key`, and
-/// `confluent_cloud_api_secret_legacy` are deliberately left
-/// confidence-gated (redact at [`Confidence::High`], warn otherwise) even
-/// though that is a weaker action than their specificity alone would
-/// suggest — each has a documented `decision-freeze-*` grammar record (or,
-/// for `confluent_cloud_api_secret_legacy`, its own module doc in
-/// `detectors::confluent`) explaining why a bare keyword-cooccurrence match
-/// at medium confidence is too weak (an opaque base64 blob sharing a line
-/// with a vendor keyword) to redact by default; the legacy Confluent type
-/// only ever reports [`Confidence::Medium`], so it always warns rather than
+/// `datadog_application_key`, `new_relic_license_key`,
+/// `confluent_cloud_api_secret_legacy`, and `heroku_api_key_legacy` are
+/// deliberately left confidence-gated (redact at [`Confidence::High`], warn
+/// otherwise) even though that is a weaker action than their specificity
+/// alone would suggest — each has a documented `decision-freeze-*` grammar
+/// record (or, for `confluent_cloud_api_secret_legacy` and
+/// `heroku_api_key_legacy`, its own module doc in `detectors::confluent` or
+/// `detectors::heroku`) explaining why a bare keyword-cooccurrence match at
+/// medium confidence is too weak (an opaque bare value sharing a line with a
+/// vendor keyword) to redact by default; each of those legacy types only
+/// ever reports [`Confidence::Medium`], so it always warns rather than
 /// redacts under this default policy. Overlap resolution's resolved-action
 /// severity ranking
 /// (`decision-resolve-overlap-precedence-by-resolved-action-severity`)
@@ -27,7 +28,7 @@ use crate::types::{Action, Confidence, DetectedFinding, Policy, PolicyContext};
 /// correct: a confidence-gated type here can still lose an overlap to a
 /// stricter-resolving lower-specificity candidate, without needing to be
 /// added to this list.
-const ALWAYS_REDACT_TYPES: [&str; 50] = [
+const ALWAYS_REDACT_TYPES: [&str; 51] = [
     "anthropic_api_key",
     "atlassian_api_token",
     "authorization_credential",
@@ -52,6 +53,7 @@ const ALWAYS_REDACT_TYPES: [&str; 50] = [
     "google_api_key",
     "grafana_cloud_access_policy_token",
     "grafana_service_account_token",
+    "heroku_api_key",
     "huggingface_token",
     "jwt",
     "linear_token",

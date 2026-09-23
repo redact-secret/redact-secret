@@ -74,6 +74,7 @@ export const CANONICAL_IDS = [
   "grafana-cloud-access-policy-token", "new-relic-user-api-key", "new-relic-license-key",
   "firebase-server-key", "terraform-cloud-token", "pulumi-access-token", "databricks-personal-access-token",
   "confluent-cloud-api-secret", "confluent-cloud-api-secret-legacy", "netlify-token", "postman-api-key",
+  "heroku-api-key", "heroku-api-key-legacy",
   "jwt", "bearer-token", "connection-string", "otpauth-uri", "generic-token",
 ];
 
@@ -95,6 +96,7 @@ export const GROUPS = {
     "new-relic-user-api-key", "new-relic-license-key", "firebase-server-key", "terraform-cloud-token",
     "pulumi-access-token", "databricks-personal-access-token",
     "confluent-cloud-api-secret", "confluent-cloud-api-secret-legacy", "netlify-token", "postman-api-key",
+    "heroku-api-key", "heroku-api-key-legacy",
   ],
   devtools: [
     "github-token", "gitlab-token", "azure-devops-personal-access-token", "notion-token",
