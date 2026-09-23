@@ -9,7 +9,9 @@ stability.
 
 - Use GitHub Issues for reproducible bugs, compatibility evidence, and focused
   proposals. Public support is best-effort; the project makes no response-time or
-  long-term-support commitment.
+  long-term-support commitment. For a false positive or missed detection, use
+  the [reporting guide](docs/guides/reporting-detection-issues.md) and its
+  issue forms instead of a freeform issue.
 - Report suspected vulnerabilities privately as described in
   [SECURITY.md](SECURITY.md), not in a public issue.
 - Read [ARCHITECTURE.md](ARCHITECTURE.md), [CONVENTIONS.md](CONVENTIONS.md), and the
