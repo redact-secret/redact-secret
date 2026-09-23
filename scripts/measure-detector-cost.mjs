@@ -70,7 +70,7 @@ export const CANONICAL_IDS = [
   "sendgrid-token", "microsoft-entra-client-secret", "azure-devops-personal-access-token",
   "notion-token", "atlassian-api-token", "twilio-auth-token", "twilio-api-key-secret",
   "telegram-bot-token", "discord-bot-token", "sentry-user-auth-token", "sentry-org-auth-token",
-  "datadog-api-key", "datadog-application-key", "grafana-service-account-token",
+  "datadog-api-key", "datadog-application-key", "datadog-application-key-legacy", "grafana-service-account-token",
   "grafana-cloud-access-policy-token", "new-relic-user-api-key", "new-relic-license-key",
   "mailchimp-api-key", "mailgun-api-key", "okta-api-token",
   "firebase-server-key", "terraform-cloud-token", "pulumi-access-token", "databricks-personal-access-token",
@@ -93,7 +93,7 @@ export const GROUPS = {
   cloud: [
     "aws-access-key", "vault-token", "cloudflare-token", "digitalocean-token", "supabase-token",
     "supabase-management-token", "vercel-token", "google-api-key", "microsoft-entra-client-secret", "datadog-api-key",
-    "datadog-application-key", "grafana-service-account-token", "grafana-cloud-access-policy-token",
+    "datadog-application-key", "datadog-application-key-legacy", "grafana-service-account-token", "grafana-cloud-access-policy-token",
     "new-relic-user-api-key", "new-relic-license-key", "firebase-server-key", "terraform-cloud-token",
     "pulumi-access-token", "databricks-personal-access-token",
     "confluent-cloud-api-secret", "confluent-cloud-api-secret-legacy", "netlify-token", "postman-api-key",

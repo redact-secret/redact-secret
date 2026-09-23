@@ -84,7 +84,8 @@ as a [declarative ruleset](../guides/rulesets.md).
 | `twilio-auth-token` | `twilio_auth_token` | `confidence-gated` | — |
 | `twilio-api-key-secret` | `twilio_api_key_secret` | `confidence-gated` | — |
 | `datadog-api-key` | `datadog_api_key` | `confidence-gated` | — |
-| `datadog-application-key` | `datadog_application_key` | `confidence-gated` | — |
+| `datadog-application-key` | `datadog_application_key` | `always-redact` | — |
+| `datadog-application-key-legacy` | `datadog_application_key_legacy` | `confidence-gated` | — |
 | `grafana-service-account-token` | `grafana_service_account_token` | `always-redact` | — |
 | `grafana-cloud-access-policy-token` | `grafana_cloud_access_policy_token` | `always-redact` | — |
 | `sentry-user-auth-token` | `sentry_user_auth_token` | `always-redact` | — |

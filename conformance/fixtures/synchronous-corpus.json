@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 1636,
+  "fixtureCount": 1652,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -22641,7 +22641,7 @@
       "note": "A single datadog-context-bearing line densely packed with candidate-shaped runs stays linear: per-line (not per-candidate) context checks keep this bounded."
     },
     {
-      "id": "datadog-application-key-positive-bare-with-header-marker",
+      "id": "datadog-application-key-positive-bare",
       "detector": "datadog-application-key",
       "kind": "positive",
       "support": "supported",
@@ -22649,29 +22649,29 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "DD-APPLICATION-KEY: 0123456789abcdef0123456789abcdef01234567",
+      "input": "ddapp_SYNTHETIC0REVOKED0AppKeyBody012345",
       "expected": [
         {
           "detector": "datadog-application-key",
           "type": "datadog_application_key",
           "confidence": "high",
           "specificity": "provider",
-          "start": 20,
-          "end": 60
+          "start": 0,
+          "end": 40
         }
       ],
-      "note": "The documented DD-APPLICATION-KEY header name on the same line as the 40-byte lowercase-hex value is a specific type marker, so this classifies at high confidence."
+      "note": "The literal ddapp_ prefix plus the exact documented 34-byte body is sufficient on its own; no surrounding context is required."
     },
     {
-      "id": "datadog-application-key-positive-dotenv-marker",
+      "id": "datadog-application-key-positive-dotenv",
       "detector": "datadog-application-key",
       "kind": "positive",
       "support": "supported",
-      "tier": "contextual",
+      "tier": "canonical",
       "contexts": [
         "dotenv"
       ],
-      "input": "DD_APPLICATION_KEY=0123456789abcdef0123456789abcdef01234567",
+      "input": "DD_APPLICATION_KEY=ddapp_SYNTHETIC0REVOKED0AppKeyBody012345",
       "expected": [
         {
           "detector": "datadog-application-key",
@@ -22682,32 +22682,10 @@
           "end": 59
         }
       ],
-      "note": "The documented DD_APPLICATION_KEY environment variable name is a specific type marker, so this classifies at high confidence."
+      "note": "A bare dotenv-style assignment (KEY=<token>, no quotes) is detected by format alone; no marker or keyword is needed for the current shape."
     },
     {
-      "id": "datadog-application-key-positive-app-key-shorthand-marker",
-      "detector": "datadog-application-key",
-      "kind": "positive",
-      "support": "supported",
-      "tier": "contextual",
-      "contexts": [
-        "shell"
-      ],
-      "input": "export DD_APP_KEY=0123456789abcdef0123456789abcdef01234567",
-      "expected": [
-        {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
-          "confidence": "high",
-          "specificity": "provider",
-          "start": 18,
-          "end": 58
-        }
-      ],
-      "note": "The shorter DD_APP_KEY spelling some client libraries accept is also a specific type marker, distinct from the documented DD_APPLICATION_KEY name."
-    },
-    {
-      "id": "datadog-application-key-positive-json-vendor-keyword",
+      "id": "datadog-application-key-positive-json",
       "detector": "datadog-application-key",
       "kind": "positive",
       "support": "supported",
@@ -22715,86 +22693,65 @@
       "contexts": [
         "json"
       ],
-      "input": "{\"note\": \"datadog\", \"value\": \"0123456789abcdef0123456789abcdef01234567\"}",
+      "input": "{\n  \"applicationKey\": \"ddapp_SYNTHETIC0REVOKED0AppKeyBody012345\"\n}\n",
       "expected": [
         {
           "detector": "datadog-application-key",
           "type": "datadog_application_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
-          "start": 30,
-          "end": 70
+          "start": 23,
+          "end": 63
         }
       ],
-      "note": "The bare datadog vendor word is the only context present -- no specific application_key-shaped marker appears on this line -- so this classifies at medium confidence."
+      "note": "A JSON config value stores the key in plain text; a leaked copy of the file is detected by format alone."
     },
     {
-      "id": "datadog-application-key-negative-bare-value-with-no-context",
+      "id": "datadog-application-key-positive-yaml",
       "detector": "datadog-application-key",
-      "kind": "negative",
+      "kind": "positive",
       "support": "supported",
-      "tier": "negative",
+      "tier": "contextual",
       "contexts": [
-        "plain-text"
+        "yaml"
       ],
-      "input": "0123456789abcdef0123456789abcdef01234567",
-      "expected": [],
-      "note": "A bare 40-byte lowercase-hex run is indistinguishable from a SHA-1 digest without reliable Datadog context; this grammar carries no format marker of its own."
+      "input": "application_key: ddapp_SYNTHETIC0REVOKED0AppKeyBody012345\n",
+      "expected": [
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 17,
+          "end": 57
+        }
+      ],
+      "note": "A YAML mapping value is detected by format alone, with no vendor keyword required on the line."
     },
     {
-      "id": "datadog-application-key-negative-context-on-a-different-line",
+      "id": "datadog-application-key-positive-header-marker",
       "detector": "datadog-application-key",
-      "kind": "negative",
+      "kind": "positive",
       "support": "supported",
-      "tier": "negative",
+      "tier": "contextual",
       "contexts": [
-        "plain-text"
+        "http"
       ],
-      "input": "DD_APPLICATION_KEY=\n0123456789abcdef0123456789abcdef01234567\n",
-      "expected": [],
-      "note": "Context is scoped to a single line; the DD_APPLICATION_KEY marker on one line does not reach the value on the next."
+      "input": "DD-APPLICATION-KEY: ddapp_SYNTHETIC0REVOKED0AppKeyBody012345",
+      "expected": [
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 20,
+          "end": 60
+        }
+      ],
+      "note": "The documented DD-APPLICATION-KEY header still carries the value; the current shape needs no marker, but a marker present alongside it does not suppress or alter the match."
     },
     {
-      "id": "datadog-application-key-boundary-wrong-length-is-api-key-shaped",
-      "detector": "datadog-application-key",
-      "kind": "boundary",
-      "support": "intentionally-unsupported",
-      "tier": "malformed",
-      "contexts": [
-        "plain-text"
-      ],
-      "input": "DD_APPLICATION_KEY=0123456789abcdef0123456789abcdef",
-      "expected": [],
-      "note": "A 32-byte value on a line naming the application key specifically is not itself a 40-byte run; the exact-length gate, not the marker, is what distinguishes the two Datadog key types."
-    },
-    {
-      "id": "datadog-application-key-negative-environment-variable-reference",
-      "detector": "datadog-application-key",
-      "kind": "negative",
-      "support": "supported",
-      "tier": "negative",
-      "contexts": [
-        "shell"
-      ],
-      "input": "datadog DD_APPLICATION_KEY=${DD_APPLICATION_KEY}",
-      "expected": [],
-      "note": "An environment-variable interpolation reference is not hex-alphabet-shaped at the value position and is not classified, even with datadog context present."
-    },
-    {
-      "id": "datadog-application-key-negative-repeated-character-filler",
-      "detector": "datadog-application-key",
-      "kind": "negative",
-      "support": "supported",
-      "tier": "negative",
-      "contexts": [
-        "plain-text"
-      ],
-      "input": "datadog ffffffffffffffffffffffffffffffffffffffff",
-      "expected": [],
-      "note": "A value made of one character repeated is classic redaction-style filler; excluded even when datadog context matches, since this grammar has no structural marker of its own."
-    },
-    {
-      "id": "datadog-application-key-regression-crlf-and-unicode-prefix",
+      "id": "datadog-application-key-positive-crlf-unicode-prefix",
       "detector": "datadog-application-key",
       "kind": "positive",
       "support": "supported",
@@ -22802,21 +22759,73 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\nDD_APPLICATION_KEY=0123456789abcdef0123456789abcdef01234567\r\n",
+      "input": "# 🔑 café\r\nddapp_SYNTHETIC0REVOKED0AppKeyBody012345\r\n",
       "expected": [
         {
           "detector": "datadog-application-key",
           "type": "datadog_application_key",
           "confidence": "high",
           "specificity": "provider",
-          "start": 33,
-          "end": 73
+          "start": 14,
+          "end": 54
         }
       ],
-      "note": "An astral character and CRLF line endings ahead of the qualified line do not shift the match's UTF-8 byte offsets."
+      "note": "An astral character and CRLF line endings ahead of the value do not shift the match's UTF-8 byte offsets."
     },
     {
-      "id": "datadog-application-key-boundary-wrong-length",
+      "id": "datadog-application-key-positive-repeated-value",
+      "detector": "datadog-application-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345",
+      "expected": [
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 40
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 41,
+          "end": 81
+        }
+      ],
+      "note": "The same key value appearing twice is reported once per occurrence, at its own byte range each time."
+    },
+    {
+      "id": "datadog-application-key-positive-doc-style-placeholder",
+      "detector": "datadog-application-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "ddapp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "expected": [
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 40
+        }
+      ],
+      "note": "The body alphabet is [A-Za-z0-9], the same wide alnum class every other infra-provider exact-length shape in this crate uses; an x-filled documentation-style placeholder is built entirely from valid alphabet characters, so it is indistinguishable from a genuine key and is classified, not excluded -- the literal prefix is its own marker, unlike the legacy bare-hex shape."
+    },
+    {
+      "id": "datadog-application-key-boundary-one-short",
       "detector": "datadog-application-key",
       "kind": "boundary",
       "support": "intentionally-unsupported",
@@ -22824,9 +22833,61 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "DD_APPLICATION_KEY=0123456789abcdef0123456789abcdef0123456",
+      "input": "ddapp_SYNTHETIC0REVOKED0AppKeyBody01234",
       "expected": [],
-      "note": "A value one byte short of the required 40-byte length is rejected rather than truncated, even with a specific marker present."
+      "note": "A body one byte short of the documented 34-byte length is rejected rather than truncated."
+    },
+    {
+      "id": "datadog-application-key-boundary-one-long",
+      "detector": "datadog-application-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "ddapp_SYNTHETIC0REVOKED0AppKeyBody012345a",
+      "expected": [],
+      "note": "A body one byte longer than the documented length is rejected rather than matched up to the documented length."
+    },
+    {
+      "id": "datadog-application-key-negative-wrong-prefix-case",
+      "detector": "datadog-application-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "DDAPP_SYNTHETIC0REVOKED0AppKeyBody012345",
+      "expected": [],
+      "note": "The documented prefix is the literal lowercase ddapp_; a case-mangled twin is rejected rather than matched."
+    },
+    {
+      "id": "datadog-application-key-negative-embedded-identifier",
+      "detector": "datadog-application-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "legacy_ddapp_SYNTHETIC0REVOKED0AppKeyBody012345_backup",
+      "expected": [],
+      "note": "A ddapp_-prefixed run directly glued to a wider identifier on either side is rejected rather than matched as a substring."
+    },
+    {
+      "id": "datadog-application-key-negative-underscore-in-body",
+      "detector": "datadog-application-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "ddapp_SYNTHETIC0REVOKED0AppKeyBody01234_",
+      "expected": [],
+      "note": "Datadog's own Agent app-key validator, the CloudFormation and ARM templates, and AWS's independent documentation all require a strict [A-Za-z0-9] body; only the Agent's own log-scrubbing replacer is lenient enough to admit an underscore. This module follows the stricter, authentication-facing grammar, so a body byte outside [A-Za-z0-9] is rejected."
     },
     {
       "id": "datadog-application-key-overlap-beats-bearer-token",
@@ -22837,7 +22898,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "DD_APPLICATION_KEY Authorization: Bearer 0123456789abcdef0123456789abcdef01234567",
+      "input": "DD_APPLICATION_KEY Authorization: Bearer ddapp_SYNTHETIC0REVOKED0AppKeyBody012345",
       "expected": [
         {
           "detector": "datadog-application-key",
@@ -22861,806 +22922,1533 @@
       ],
       "resource": {
         "maxInputBytes": 8192,
+        "maxFindings": 60,
+        "maxRuntimeMs": 250
+      },
+      "input": "ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345 ddapp_SYNTHETIC0REVOKED0AppKeyBody012345",
+      "expected": [
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 40
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 41,
+          "end": 81
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 82,
+          "end": 122
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 123,
+          "end": 163
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 164,
+          "end": 204
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 205,
+          "end": 245
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 246,
+          "end": 286
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 287,
+          "end": 327
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 328,
+          "end": 368
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 369,
+          "end": 409
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 410,
+          "end": 450
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 451,
+          "end": 491
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 492,
+          "end": 532
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 533,
+          "end": 573
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 574,
+          "end": 614
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 615,
+          "end": 655
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 656,
+          "end": 696
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 697,
+          "end": 737
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 738,
+          "end": 778
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 779,
+          "end": 819
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 820,
+          "end": 860
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 861,
+          "end": 901
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 902,
+          "end": 942
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 943,
+          "end": 983
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 984,
+          "end": 1024
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1025,
+          "end": 1065
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1066,
+          "end": 1106
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1107,
+          "end": 1147
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1148,
+          "end": 1188
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1189,
+          "end": 1229
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1230,
+          "end": 1270
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1271,
+          "end": 1311
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1312,
+          "end": 1352
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1353,
+          "end": 1393
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1394,
+          "end": 1434
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1435,
+          "end": 1475
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1476,
+          "end": 1516
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1517,
+          "end": 1557
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1558,
+          "end": 1598
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1599,
+          "end": 1639
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1640,
+          "end": 1680
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1681,
+          "end": 1721
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1722,
+          "end": 1762
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1763,
+          "end": 1803
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1804,
+          "end": 1844
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1845,
+          "end": 1885
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1886,
+          "end": 1926
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1927,
+          "end": 1967
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1968,
+          "end": 2008
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2009,
+          "end": 2049
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2050,
+          "end": 2090
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2091,
+          "end": 2131
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2132,
+          "end": 2172
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2173,
+          "end": 2213
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2214,
+          "end": 2254
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2255,
+          "end": 2295
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2296,
+          "end": 2336
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2337,
+          "end": 2377
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2378,
+          "end": 2418
+        },
+        {
+          "detector": "datadog-application-key",
+          "type": "datadog_application_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2419,
+          "end": 2459
+        }
+      ],
+      "note": "Many valid ddapp_-prefixed keys packed onto one line each still classify independently, within the declared resource caps."
+    },
+    {
+      "id": "datadog-application-key-adversarial-long-suffix",
+      "detector": "datadog-application-key",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 8192,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      },
+      "input": "ddapp_SYNTHETIC0REVOKED0AppKeyBody012345AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      "expected": [],
+      "note": "A documented-length body directly followed by thousands more alnum bytes is one long run, not a valid match plus an embedded wider identifier: the boundary check rejects the whole run as truncated, and the scan stays within its declared resource caps."
+    },
+    {
+      "id": "datadog-application-key-legacy-positive-bare-with-header-marker",
+      "detector": "datadog-application-key-legacy",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "DD-APPLICATION-KEY: 0123456789abcdef0123456789abcdef01234567",
+      "expected": [
+        {
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 20,
+          "end": 60
+        }
+      ],
+      "note": "The documented DD-APPLICATION-KEY header name on the same line as the 40-byte lowercase-hex value is a specific type marker, so this classifies at high confidence."
+    },
+    {
+      "id": "datadog-application-key-legacy-positive-dotenv-marker",
+      "detector": "datadog-application-key-legacy",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "DD_APPLICATION_KEY=0123456789abcdef0123456789abcdef01234567",
+      "expected": [
+        {
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 19,
+          "end": 59
+        }
+      ],
+      "note": "The documented DD_APPLICATION_KEY environment variable name is a specific type marker, so this classifies at high confidence."
+    },
+    {
+      "id": "datadog-application-key-legacy-positive-app-key-shorthand-marker",
+      "detector": "datadog-application-key-legacy",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export DD_APP_KEY=0123456789abcdef0123456789abcdef01234567",
+      "expected": [
+        {
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 18,
+          "end": 58
+        }
+      ],
+      "note": "The shorter DD_APP_KEY spelling some client libraries accept is also a specific type marker, distinct from the documented DD_APPLICATION_KEY name."
+    },
+    {
+      "id": "datadog-application-key-legacy-positive-json-vendor-keyword",
+      "detector": "datadog-application-key-legacy",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"note\": \"datadog\", \"value\": \"0123456789abcdef0123456789abcdef01234567\"}",
+      "expected": [
+        {
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 30,
+          "end": 70
+        }
+      ],
+      "note": "The bare datadog vendor word is the only context present -- no specific application_key-shaped marker appears on this line -- so this classifies at medium confidence."
+    },
+    {
+      "id": "datadog-application-key-legacy-negative-bare-no-context",
+      "detector": "datadog-application-key-legacy",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "0123456789abcdef0123456789abcdef01234567",
+      "expected": [],
+      "note": "A bare 40-byte lowercase-hex run is indistinguishable from a SHA-1 digest without reliable Datadog context; this grammar carries no format marker of its own."
+    },
+    {
+      "id": "datadog-application-key-legacy-negative-different-line",
+      "detector": "datadog-application-key-legacy",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "DD_APPLICATION_KEY=\n0123456789abcdef0123456789abcdef01234567\n",
+      "expected": [],
+      "note": "Context is scoped to a single line; the DD_APPLICATION_KEY marker on one line does not reach the value on the next."
+    },
+    {
+      "id": "datadog-application-key-legacy-boundary-wrong-length-api-shaped",
+      "detector": "datadog-application-key-legacy",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "DD_APPLICATION_KEY=0123456789abcdef0123456789abcdef",
+      "expected": [],
+      "note": "A 32-byte value on a line naming the application key specifically is not itself a 40-byte run; the exact-length gate, not the marker, is what distinguishes the two Datadog key types."
+    },
+    {
+      "id": "datadog-application-key-legacy-negative-env-var-reference",
+      "detector": "datadog-application-key-legacy",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "shell"
+      ],
+      "input": "datadog DD_APPLICATION_KEY=${DD_APPLICATION_KEY}",
+      "expected": [],
+      "note": "An environment-variable interpolation reference is not hex-alphabet-shaped at the value position and is not classified, even with datadog context present."
+    },
+    {
+      "id": "datadog-application-key-legacy-negative-repeated-filler",
+      "detector": "datadog-application-key-legacy",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "datadog ffffffffffffffffffffffffffffffffffffffff",
+      "expected": [],
+      "note": "A value made of one character repeated is classic redaction-style filler; excluded even when datadog context matches, since this grammar has no structural marker of its own."
+    },
+    {
+      "id": "datadog-application-key-legacy-regression-crlf-unicode-prefix",
+      "detector": "datadog-application-key-legacy",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 café\r\nDD_APPLICATION_KEY=0123456789abcdef0123456789abcdef01234567\r\n",
+      "expected": [
+        {
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 33,
+          "end": 73
+        }
+      ],
+      "note": "An astral character and CRLF line endings ahead of the qualified line do not shift the match's UTF-8 byte offsets."
+    },
+    {
+      "id": "datadog-application-key-legacy-boundary-wrong-length",
+      "detector": "datadog-application-key-legacy",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "DD_APPLICATION_KEY=0123456789abcdef0123456789abcdef0123456",
+      "expected": [],
+      "note": "A value one byte short of the required 40-byte length is rejected rather than truncated, even with a specific marker present."
+    },
+    {
+      "id": "datadog-application-key-legacy-overlap-beats-bearer-token",
+      "detector": "datadog-application-key-legacy",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "DD_APPLICATION_KEY Authorization: Bearer 0123456789abcdef0123456789abcdef01234567",
+      "expected": [
+        {
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 41,
+          "end": 81
+        }
+      ],
+      "note": "Provider specificity outranks bearer-token's structural specificity for the same span, even though the bearer-token detector's own confidence is also high."
+    },
+    {
+      "id": "datadog-application-key-legacy-adversarial-dense-findings",
+      "detector": "datadog-application-key-legacy",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 8192,
         "maxFindings": 100,
         "maxRuntimeMs": 250
       },
       "input": "datadog 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567",
       "expected": [
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 8,
           "end": 48
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 49,
           "end": 89
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 90,
           "end": 130
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 131,
           "end": 171
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 172,
           "end": 212
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 213,
           "end": 253
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 254,
           "end": 294
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 295,
           "end": 335
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 336,
           "end": 376
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 377,
           "end": 417
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 418,
           "end": 458
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 459,
           "end": 499
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 500,
           "end": 540
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 541,
           "end": 581
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 582,
           "end": 622
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 623,
           "end": 663
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 664,
           "end": 704
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 705,
           "end": 745
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 746,
           "end": 786
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 787,
           "end": 827
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 828,
           "end": 868
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 869,
           "end": 909
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 910,
           "end": 950
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 951,
           "end": 991
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 992,
           "end": 1032
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 1033,
           "end": 1073
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 1074,
           "end": 1114
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 1115,
           "end": 1155
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 1156,
           "end": 1196
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 1197,
           "end": 1237
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 1238,
           "end": 1278
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 1279,
           "end": 1319
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 1320,
           "end": 1360
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 1361,
           "end": 1401
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 1402,
           "end": 1442
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 1443,
           "end": 1483
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 1484,
           "end": 1524
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 1525,
           "end": 1565
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 1566,
           "end": 1606
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 1607,
           "end": 1647
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 1648,
           "end": 1688
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 1689,
           "end": 1729
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 1730,
           "end": 1770
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 1771,
           "end": 1811
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 1812,
           "end": 1852
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 1853,
           "end": 1893
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 1894,
           "end": 1934
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 1935,
           "end": 1975
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 1976,
           "end": 2016
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 2017,
           "end": 2057
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 2058,
           "end": 2098
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 2099,
           "end": 2139
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 2140,
           "end": 2180
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 2181,
           "end": 2221
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 2222,
           "end": 2262
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 2263,
           "end": 2303
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 2304,
           "end": 2344
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 2345,
           "end": 2385
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 2386,
           "end": 2426
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 2427,
           "end": 2467
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 2468,
           "end": 2508
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 2509,
           "end": 2549
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 2550,
           "end": 2590
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 2591,
           "end": 2631
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 2632,
           "end": 2672
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 2673,
           "end": 2713
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 2714,
           "end": 2754
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 2755,
           "end": 2795
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 2796,
           "end": 2836
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 2837,
           "end": 2877
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 2878,
           "end": 2918
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 2919,
           "end": 2959
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 2960,
           "end": 3000
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 3001,
           "end": 3041
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 3042,
           "end": 3082
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 3083,
           "end": 3123
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 3124,
           "end": 3164
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 3165,
           "end": 3205
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 3206,
           "end": 3246
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 3247,
           "end": 3287
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 3288,
           "end": 3328
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 3329,
           "end": 3369
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 3370,
           "end": 3410
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 3411,
           "end": 3451
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 3452,
           "end": 3492
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 3493,
           "end": 3533
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 3534,
           "end": 3574
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 3575,
           "end": 3615
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 3616,
           "end": 3656
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 3657,
           "end": 3697
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 3698,
           "end": 3738
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 3739,
           "end": 3779
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 3780,
           "end": 3820
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 3821,
           "end": 3861
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 3862,
           "end": 3902
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 3903,
           "end": 3943
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 3944,
           "end": 3984
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 3985,
           "end": 4025
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 4026,
           "end": 4066
         },
         {
-          "detector": "datadog-application-key",
-          "type": "datadog_application_key",
+          "detector": "datadog-application-key-legacy",
+          "type": "datadog_application_key_legacy",
           "confidence": "medium",
           "specificity": "provider",
           "start": 4067,
@@ -37829,7 +38617,7 @@
       ],
       "input": "nfp_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY0",
       "expected": [],
-      "note": "Issue #311: a 35-byte body \u2014 one byte short of the documented 36-byte length \u2014 is silent by construction."
+      "note": "Issue #311: a 35-byte body — one byte short of the documented 36-byte length — is silent by construction."
     },
     {
       "id": "netlify-boundary-one-long",
@@ -37842,7 +38630,7 @@
       ],
       "input": "nfp_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01a",
       "expected": [],
-      "note": "A 37-byte body \u2014 one byte past the documented length \u2014 is not misread as the exact shape followed by a trailing byte; the boundary check, widened past the match alphabet to include `-`, rejects the whole run rather than truncating it."
+      "note": "A 37-byte body — one byte past the documented length — is not misread as the exact shape followed by a trailing byte; the boundary check, widened past the match alphabet to include `-`, rejects the whole run rather than truncating it."
     },
     {
       "id": "netlify-boundary-invalid-alphabet",
@@ -37907,7 +38695,7 @@
       ],
       "input": "NFP_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01",
       "expected": [],
-      "note": "The documented prefix is matched byte-for-byte; an uppercase rendering ('NFP_') is not a case-insensitive equivalent \u2014 issue #311 froze the lowercase-only prefix per both tools' independent convergence."
+      "note": "The documented prefix is matched byte-for-byte; an uppercase rendering ('NFP_') is not a case-insensitive equivalent — issue #311 froze the lowercase-only prefix per both tools' independent convergence."
     },
     {
       "id": "netlify-adversarial-long-suffix",
@@ -38133,7 +38921,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# \ud83d\udd11 caf\u00e9\r\nnfp_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01\r\n",
+      "input": "# 🔑 café\r\nnfp_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01\r\n",
       "expected": [
         {
           "detector": "netlify-token",

@@ -4993,11 +4993,14 @@
         {
           "dimension": "positive",
           "evidenceFixtureIds": [
-            "datadog-application-key-positive-app-key-shorthand-marker",
-            "datadog-application-key-positive-bare-with-header-marker",
-            "datadog-application-key-positive-dotenv-marker",
-            "datadog-application-key-positive-json-vendor-keyword",
-            "datadog-application-key-regression-crlf-and-unicode-prefix"
+            "datadog-application-key-positive-bare",
+            "datadog-application-key-positive-crlf-unicode-prefix",
+            "datadog-application-key-positive-doc-style-placeholder",
+            "datadog-application-key-positive-dotenv",
+            "datadog-application-key-positive-header-marker",
+            "datadog-application-key-positive-json",
+            "datadog-application-key-positive-repeated-value",
+            "datadog-application-key-positive-yaml"
           ],
           "state": "supported"
         },
@@ -5011,33 +5014,33 @@
         {
           "dimension": "adversarial",
           "evidenceFixtureIds": [
-            "datadog-application-key-adversarial-dense-findings"
+            "datadog-application-key-adversarial-dense-findings",
+            "datadog-application-key-adversarial-long-suffix"
           ],
           "state": "supported"
         },
         {
           "dimension": "boundary",
           "evidenceFixtureIds": [
-            "datadog-application-key-boundary-wrong-length",
-            "datadog-application-key-boundary-wrong-length-is-api-key-shaped"
+            "datadog-application-key-boundary-one-long",
+            "datadog-application-key-boundary-one-short"
           ],
           "state": "supported"
         },
         {
           "dimension": "near-miss-negative",
           "evidenceFixtureIds": [
-            "datadog-application-key-negative-bare-value-with-no-context",
-            "datadog-application-key-negative-context-on-a-different-line",
-            "datadog-application-key-negative-environment-variable-reference",
-            "datadog-application-key-negative-repeated-character-filler"
+            "datadog-application-key-negative-embedded-identifier",
+            "datadog-application-key-negative-underscore-in-body",
+            "datadog-application-key-negative-wrong-prefix-case"
           ],
           "state": "supported"
         },
         {
           "dimension": "malformed",
           "evidenceFixtureIds": [
-            "datadog-application-key-boundary-wrong-length",
-            "datadog-application-key-boundary-wrong-length-is-api-key-shaped"
+            "datadog-application-key-boundary-one-long",
+            "datadog-application-key-boundary-one-short"
           ],
           "state": "supported"
         },
@@ -5070,6 +5073,91 @@
       ],
       "note": "Coverage declaration for datadog_application_key (datadog-application-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
       "type": "datadog_application_key"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "datadog-application-key-legacy",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "datadog-application-key-legacy-positive-app-key-shorthand-marker",
+            "datadog-application-key-legacy-positive-bare-with-header-marker",
+            "datadog-application-key-legacy-positive-dotenv-marker",
+            "datadog-application-key-legacy-positive-json-vendor-keyword",
+            "datadog-application-key-legacy-regression-crlf-unicode-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "datadog-application-key-legacy-overlap-beats-bearer-token"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "datadog-application-key-legacy-adversarial-dense-findings"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "datadog-application-key-legacy-boundary-wrong-length",
+            "datadog-application-key-legacy-boundary-wrong-length-api-shaped"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "datadog-application-key-legacy-negative-bare-no-context",
+            "datadog-application-key-legacy-negative-different-line",
+            "datadog-application-key-legacy-negative-env-var-reference",
+            "datadog-application-key-legacy-negative-repeated-filler"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "datadog-application-key-legacy-boundary-wrong-length",
+            "datadog-application-key-legacy-boundary-wrong-length-api-shaped"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for datadog_application_key_legacy (datadog-application-key-legacy), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "datadog_application_key_legacy"
     },
     {
       "behaviorClass": "provider",
@@ -6934,6 +7022,8 @@
             "databricks-personal-access-token-adversarial-long-suffix",
             "datadog-api-key-adversarial-dense-findings",
             "datadog-application-key-adversarial-dense-findings",
+            "datadog-application-key-adversarial-long-suffix",
+            "datadog-application-key-legacy-adversarial-dense-findings",
             "digitalocean-adversarial-long-suffix",
             "discord-bot-token-adversarial-long-padding",
             "docker-adversarial-long-suffix",
@@ -7331,6 +7421,8 @@
             "databricks-personal-access-token-adversarial-long-suffix",
             "datadog-api-key-adversarial-dense-findings",
             "datadog-application-key-adversarial-dense-findings",
+            "datadog-application-key-adversarial-long-suffix",
+            "datadog-application-key-legacy-adversarial-dense-findings",
             "digitalocean-adversarial-long-suffix",
             "discord-bot-token-adversarial-long-padding",
             "docker-adversarial-long-suffix",

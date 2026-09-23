@@ -334,6 +334,13 @@
     {
       "type": "datadog_application_key",
       "detector": "datadog-application-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "ddapp_SYNTHETIC0REVOKED0AppKeyBody012345",
+      "schemes": null
+    },
+    {
+      "type": "datadog_application_key_legacy",
+      "detector": "datadog-application-key-legacy",
       "policyClass": "confidence-gated",
       "reconciliationTrigger": "DD_APPLICATION_KEY=0123456789abcdef0123456789abcdef01234567",
       "schemes": null
