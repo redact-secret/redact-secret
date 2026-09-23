@@ -7,7 +7,7 @@
 [Broad-discovery pass](https://github.com/redact-secret/redact-secret/issues/660#issuecomment-5785519823) ·
 [Telegram contract freeze](../../../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md)
 
-Written 2026-09-23 on branch `milocosmopolitan/beta7-research`. The two
+Written 2026-09-23 on branch `chore/beta7-research`. The two
 iterative passes stay in the linked issue comments and are not restated here.
 
 ## Verdict: NOT FOUND — EXHAUSTIVE as of 2026-09-23

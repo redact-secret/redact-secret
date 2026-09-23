@@ -9,7 +9,7 @@
 [Firebase contract decision](../../../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) ·
 [Prior evidence: #520](../520/README.md)
 
-Written 2026-09-23 on branch `milocosmopolitan/beta7-research`. The three
+Written 2026-09-23 on branch `chore/beta7-research`. The three
 iterative passes stay in the linked issue comments and are not restated here.
 
 ## Verdict: NOT FOUND — EXHAUSTIVE as of 2026-09-23

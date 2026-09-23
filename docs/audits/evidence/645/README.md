@@ -9,7 +9,7 @@
 [`ddapp_` coverage (#671)](https://github.com/redact-secret/redact-secret/issues/671) ·
 [Datadog contract freeze (#370)](../../../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md)
 
-Written 2026-09-23 on branch `milocosmopolitan/beta7-research`. The iterative
+Written 2026-09-23 on branch `chore/beta7-research`. The iterative
 passes stay in the linked issue comments and are not restated here.
 
 ## Verdict: FOUND, for the identifying element of the current `ddapp_` generation only

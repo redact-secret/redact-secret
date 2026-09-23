@@ -9,7 +9,7 @@
 [False-negative note](https://github.com/redact-secret/redact-secret/issues/656#issuecomment-5786154351) ·
 [Detector fix #672 / PR #682](https://github.com/redact-secret/redact-secret/pull/682)
 
-Written 2026-09-23 on branch `milocosmopolitan/beta7-research`. The three
+Written 2026-09-23 on branch `chore/beta7-research`. The three
 iterative passes stay in the linked issue comments and are not restated here.
 
 ## Verdict: FOUND, for the suffix and total length only

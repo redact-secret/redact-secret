@@ -8,7 +8,7 @@
 [Web-search pass](https://github.com/redact-secret/redact-secret/issues/658#issuecomment-5785992810) ·
 [Sentry contract freeze](../../../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md)
 
-Written 2026-09-23 on branch `milocosmopolitan/beta7-research`. The three
+Written 2026-09-23 on branch `chore/beta7-research`. The three
 iterative passes stay in the linked issue comments and are not restated here.
 
 ## Verdict: NOT FOUND on a provider domain — EXHAUSTIVE as of 2026-09-23; one provider-authored candidate awaits a maintainer ruling

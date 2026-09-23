@@ -8,7 +8,7 @@
 [Hugging Face contract freeze](../../../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) ·
 [Benchmarks counterpart redact-secret-benchmarks#112](https://github.com/redact-secret/redact-secret-benchmarks/issues/112)
 
-Written 2026-09-23 on branch `milocosmopolitan/beta7-research`. The two
+Written 2026-09-23 on branch `chore/beta7-research`. The two
 iterative passes stay in the linked issue comments and are not restated here.
 
 ## Verdict: FOUND, for the `hf_` user variant (prefix; length on example strength)
