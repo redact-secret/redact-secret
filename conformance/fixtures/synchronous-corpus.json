@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 1436,
+  "fixtureCount": 1459,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -31781,8 +31781,7 @@
       "input": "pul-0123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef012345670123456789abcdef0123456789abcdef01234567",
       "expected": [],
       "note": "A single long lowercase-hex run after the documented prefix is a wider identifier, not a token: the exact 40-byte contract never carves a valid-looking substring out of it, and the scan stays linear and bounded."
-    }
-,
+    },
     {
       "id": "terraform-cloud-token-positive-bare",
       "detector": "terraform-cloud-token",
@@ -32103,7 +32102,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# \ud83d\udd11 caf\u00e9\r\nSYNREV0REVOKED.atlasv1.SYNTHETICREVOKEDTERRAFORMCLOUDTOKENFIXTUREPADDING0123456789ABCDEFGH\r\n",
+      "input": "# 🔑 café\r\nSYNREV0REVOKED.atlasv1.SYNTHETICREVOKEDTERRAFORMCLOUDTOKENFIXTUREPADDING0123456789ABCDEFGH\r\n",
       "expected": [
         {
           "detector": "terraform-cloud-token",
@@ -32115,6 +32114,417 @@
         }
       ],
       "note": "CRLF line endings and a multi-byte Unicode prefix shift only the byte offsets; the match itself is unaffected."
+    },
+    {
+      "id": "postman-api-key-positive-bare",
+      "detector": "postman-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "PMAK-0123456789abcdef01234567-0123456789abcdef0123456789abcdef01",
+      "expected": [
+        {
+          "detector": "postman-api-key",
+          "type": "postman_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 64
+        }
+      ],
+      "note": "The documented PMAK- prefix plus the exact gitleaks-corroborated 59-byte hex-hex body is sufficient on its own; no surrounding context is required."
+    },
+    {
+      "id": "postman-api-key-positive-dotenv",
+      "detector": "postman-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "POSTMAN_API_KEY=PMAK-0123456789abcdef01234567-0123456789abcdef0123456789abcdef01",
+      "expected": [
+        {
+          "detector": "postman-api-key",
+          "type": "postman_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 16,
+          "end": 80
+        }
+      ],
+      "note": "A bare dotenv-style assignment (KEY=<token>, no quotes) is detected by format alone."
+    },
+    {
+      "id": "postman-api-key-positive-http-header",
+      "detector": "postman-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "X-API-Key: PMAK-0123456789abcdef01234567-0123456789abcdef0123456789abcdef01\r\nContent-Type: application/json\r\n",
+      "expected": [
+        {
+          "detector": "postman-api-key",
+          "type": "postman_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 75
+        }
+      ],
+      "note": "Postman's documented authentication mechanism sends the key in the X-API-Key request header; a captured or logged request retains the value in plain text."
+    },
+    {
+      "id": "postman-api-key-positive-environment-export",
+      "detector": "postman-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\n  \"id\": \"3f5b7e2a-2c1e-4a2e-9c7b-1a2b3c4d5e6f\",\n  \"name\": \"Production\",\n  \"values\": [\n    {\n      \"key\": \"postman_api_key\",\n      \"value\": \"PMAK-0123456789abcdef01234567-0123456789abcdef0123456789abcdef01\",\n      \"type\": \"secret\",\n      \"enabled\": true\n    }\n  ]\n}\n",
+      "expected": [
+        {
+          "detector": "postman-api-key",
+          "type": "postman_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 142,
+          "end": 206
+        }
+      ],
+      "note": "An exported Postman environment stores each variable's value in plain text; a leaked copy of the export is detected by format alone."
+    },
+    {
+      "id": "postman-api-key-positive-github-actions",
+      "detector": "postman-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "github-actions"
+      ],
+      "input": "env:\n  POSTMAN_API_KEY: PMAK-0123456789abcdef01234567-0123456789abcdef0123456789abcdef01\n",
+      "expected": [
+        {
+          "detector": "postman-api-key",
+          "type": "postman_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 24,
+          "end": 88
+        }
+      ],
+      "note": "Host syntax is lexical context; a hardcoded token in CI configuration (rather than a secrets: reference) retains exact original-input offsets."
+    },
+    {
+      "id": "postman-api-key-positive-log",
+      "detector": "postman-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-22T12:00:00Z INFO  running newman with api key PMAK-0123456789abcdef01234567-0123456789abcdef0123456789abcdef01 for collection sync\n",
+      "expected": [
+        {
+          "detector": "postman-api-key",
+          "type": "postman_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 55,
+          "end": 119
+        }
+      ],
+      "note": "A token embedded in an ordinary log line is bounded by whitespace on both sides."
+    },
+    {
+      "id": "postman-api-key-positive-shell-quoted",
+      "detector": "postman-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export POSTMAN_API_KEY=\"PMAK-0123456789abcdef01234567-0123456789abcdef0123456789abcdef01\"\n",
+      "expected": [
+        {
+          "detector": "postman-api-key",
+          "type": "postman_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 24,
+          "end": 88
+        }
+      ],
+      "note": "A quoted shell export still bounds the token to exactly its own 64 bytes."
+    },
+    {
+      "id": "postman-api-key-positive-punctuation-adjacent",
+      "detector": "postman-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "(PMAK-0123456789abcdef01234567-0123456789abcdef0123456789abcdef01).",
+      "expected": [
+        {
+          "detector": "postman-api-key",
+          "type": "postman_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1,
+          "end": 65
+        }
+      ],
+      "note": "Surrounding parenthesis and prose punctuation bound the match without joining it."
+    },
+    {
+      "id": "postman-api-key-positive-crlf-unicode-prefix",
+      "detector": "postman-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 reviewed format\r\nPMAK-0123456789abcdef01234567-0123456789abcdef0123456789abcdef01\n\r\n",
+      "expected": [
+        {
+          "detector": "postman-api-key",
+          "type": "postman_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 24,
+          "end": 88
+        }
+      ],
+      "note": "A multi-byte Unicode prefix and CRLF line endings do not shift the reported UTF-8 byte offsets away from the token's own bytes."
+    },
+    {
+      "id": "postman-api-key-positive-repeated-value",
+      "detector": "postman-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "PMAK-0123456789abcdef01234567-0123456789abcdef0123456789abcdef01 PMAK-0123456789abcdef01234567-0123456789abcdef0123456789abcdef01",
+      "expected": [
+        {
+          "detector": "postman-api-key",
+          "type": "postman_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 64
+        },
+        {
+          "detector": "postman-api-key",
+          "type": "postman_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 65,
+          "end": 129
+        }
+      ],
+      "note": "An identical value repeated in the same input is reported once per independent occurrence, not deduplicated."
+    },
+    {
+      "id": "postman-api-key-boundary-one-short",
+      "detector": "postman-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "PMAK-0123456789abcdef01234567-0123456789abcdef0123456789abcdef0",
+      "expected": [],
+      "note": "A 58-byte body -- one byte short of the tool-corroborated 59-byte length -- is an intentional false negative, not a fuzzy match against a minimum."
+    },
+    {
+      "id": "postman-api-key-boundary-one-long",
+      "detector": "postman-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "PMAK-0123456789abcdef01234567-0123456789abcdef0123456789abcdef010",
+      "expected": [],
+      "note": "A 60-byte body -- one byte past the documented length -- is not misread as the exact shape followed by a trailing byte."
+    },
+    {
+      "id": "postman-api-key-boundary-invalid-alphabet",
+      "detector": "postman-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "PMAK-g123456789abcdef01234567-0123456789abcdef0123456789abcdef01",
+      "expected": [],
+      "note": "Both corroborating tools pin the hex segments to [0-9a-fA-F]; a non-hex letter inside an otherwise documented-length segment is rejected."
+    },
+    {
+      "id": "postman-api-key-boundary-missing-separator",
+      "detector": "postman-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "PMAK-0123456789abcdef0123456700123456789abcdef0123456789abcdef01",
+      "expected": [],
+      "note": "gitleaks' reviewed contract pins the dash to byte 24 of the body; a bare 59-hex-byte run with no separator satisfies only trufflehog's looser superset shape, not this family's contract."
+    },
+    {
+      "id": "postman-api-key-boundary-wrong-separator-offset",
+      "detector": "postman-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "PMAK-0123456789abcdef0123456-0123456789abcdef0123456789abcdef010",
+      "expected": [],
+      "note": "The body is still exactly 59 bytes with exactly one dash, but the dash sits one byte early; the structural post-check still rejects a dash at an undocumented offset."
+    },
+    {
+      "id": "postman-api-key-boundary-encoded-prefix",
+      "detector": "postman-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "PMAK%2D0123456789abcdef01234567-0123456789abcdef0123456789abcdef01",
+      "expected": [],
+      "note": "A percent-encoded delimiter lookalike (%2D for the literal trailing hyphen) does not satisfy the documented literal PMAK- prefix."
+    },
+    {
+      "id": "postman-api-key-negative-embedded-in-wider-identifier",
+      "detector": "postman-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "legacyPMAK-0123456789abcdef01234567-0123456789abcdef0123456789abcdef01",
+      "expected": [],
+      "note": "The documented prefix embedded inside a wider identifier (a leading alnum/dash byte immediately before PMAK-) is a truncated slice of a longer identifier, not a boundary-delimited credential."
+    },
+    {
+      "id": "postman-api-key-negative-masked",
+      "detector": "postman-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "PMAK-***********************************************************",
+      "expected": [],
+      "note": "A masked placeholder of the correct length carries no valid-alphabet bytes and stays unclassified."
+    },
+    {
+      "id": "postman-api-key-negative-doc-style-placeholder",
+      "detector": "postman-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "POSTMAN_API_KEY=PMAK-xxxxxxxxxxxxxxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "expected": [],
+      "note": "A documentation-style x-filled placeholder is not valid-alphabet hex and stays unclassified, the same benign-control treatment this registry's other exact-hex-body families already give a placeholder value."
+    },
+    {
+      "id": "postman-api-key-negative-collection-id-reference",
+      "detector": "postman-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "collection: 3f5b7e2a-2c1e-4a2e-9c7b-1a2b3c4d5e6f\n",
+      "expected": [],
+      "note": "A Postman collection or workspace id is an unprefixed UUID with no documented PMAK- relationship; it carries no PMAK--prefixed hex-hex run and stays unclassified, the issue's stated exclusion boundary."
+    },
+    {
+      "id": "postman-api-key-negative-github-actions-secret-reference",
+      "detector": "postman-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "github-actions"
+      ],
+      "input": "env:\n  POSTMAN_API_KEY: ${{ secrets.POSTMAN_API_KEY }}\n",
+      "expected": [],
+      "note": "A GitHub Actions encrypted secrets: reference rather than a literal token carries no PMAK--prefixed hex-hex run."
+    },
+    {
+      "id": "postman-api-key-overlap-context",
+      "detector": "postman-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "postman_api_key=PMAK-0123456789abcdef01234567-0123456789abcdef0123456789abcdef01",
+      "expected": [
+        {
+          "detector": "postman-api-key",
+          "type": "postman_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 16,
+          "end": 80
+        }
+      ],
+      "note": "Qualified provider evidence wins over a contextual assignment."
+    },
+    {
+      "id": "postman-api-key-adversarial-long-suffix",
+      "detector": "postman-api-key",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 12305,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      },
+      "input": "PMAK-0123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef010123456789abcdef0123456700123456789abcdef0123456789abcdef01",
+      "expected": [],
+      "note": "A single long hex run after the documented prefix (with no internal dash at the documented offset) is a wider identifier, not a token: the exact 59-byte contract never carves a valid-looking substring out of it, and the scan stays linear and bounded."
     }
   ]
 }

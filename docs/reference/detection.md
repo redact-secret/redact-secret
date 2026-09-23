@@ -44,7 +44,7 @@ for your host. An organization-specific format that is not listed here can be ad
 as a [declarative ruleset](../guides/rulesets.md).
 
 <!-- detector-inventory:start -->
-46 built-in detectors emit 53 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
+47 built-in detectors emit 54 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
 
 | Detector | Finding types | Default policy class | Schemes |
 | --- | --- | --- | --- |
@@ -94,6 +94,7 @@ as a [declarative ruleset](../guides/rulesets.md).
 | `firebase-server-key` | `firebase_server_key` | `always-redact` | — |
 | `terraform-cloud-token` | `terraform_cloud_token` | `always-redact` | — |
 | `pulumi-access-token` | `pulumi_access_token` | `always-redact` | — |
+| `postman-api-key` | `postman_api_key` | `always-redact` | — |
 <!-- detector-inventory:end -->
 
 ## Detector profiles
