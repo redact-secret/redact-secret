@@ -1076,6 +1076,7 @@ jobs:
           persist-credentials: false
 
       - name: Apply the rehearsal version (no-op outside a rehearsal)
+        if: needs.plan.outputs.full == 'true'
         uses: ./.github/actions/apply-rehearsal-version
         with:
           version: ${{ inputs.rehearsal-version }}
