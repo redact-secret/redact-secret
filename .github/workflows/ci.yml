@@ -265,14 +265,20 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
 
+      # Every GitHub Actions expression is read through the environment, never
+      # interpolated into the shell snippet: the SAST rules re-parse a `run:`
+      # block as Bash, and `${{ ... }}` is not valid Bash (see the
+      # `curl-eval` partial-parsing entries in sast/baseline.json).
       - name: A detector or binding change must carry an Unreleased changelog entry
         run: |
           python3 -B -m unittest discover -s scripts/tests -p 'test_check_changelog_coverage.py'
           python3 -B scripts/check-changelog-coverage.py \
-            --base "${{ github.event.pull_request.base.sha }}" \
-            --head "${{ github.event.pull_request.head.sha }}" \
+            --base "${PR_BASE_SHA}" \
+            --head "${PR_HEAD_SHA}" \
             --labels "${PR_LABELS}"
         env:
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           PR_LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
 
   decision-permalinks:
