@@ -7,6 +7,12 @@ evidence is linked from each published version.
 
 ### Changed
 
+- The [safe browser/server integration example](examples/safe-integration/README.md)
+  now documents why the browser's default policy and the server's explicit
+  `serverPolicy` are declared independently, states that the server never
+  treats a client decision as proof of enforcement, and clarifies that
+  finding offsets index the original scanned input, not the sanitized output
+  (#588).
 - `INITIALIZATION_FAILED`'s fixed message now names what failed to load and
   links the troubleshooting guide, instead of only
   `redact-secret failed to initialize.` (#586). The code is unchanged; match
