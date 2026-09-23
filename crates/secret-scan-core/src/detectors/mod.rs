@@ -29,6 +29,7 @@ mod heroku;
 mod jwt;
 mod linear;
 mod mailchimp;
+mod mailgun;
 mod microsoft_entra;
 mod netlify;
 mod new_relic;
@@ -104,6 +105,7 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(new_relic::NewRelicUserApiKeyDetector),
         Box::new(new_relic::NewRelicLicenseKeyDetector),
         Box::new(mailchimp::MailchimpMarketingApiKeyDetector),
+        Box::new(mailgun::MailgunApiKeyDetector),
         Box::new(firebase::FirebaseServerKeyDetector),
         Box::new(terraform::TerraformCloudTokenDetector),
         Box::new(additional_providers::PULUMI),
@@ -203,6 +205,7 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("new-relic-user-api-key", Pack::Provider),
     ("new-relic-license-key", Pack::Provider),
     ("mailchimp-api-key", Pack::Provider),
+    ("mailgun-api-key", Pack::Provider),
     ("firebase-server-key", Pack::Provider),
     ("terraform-cloud-token", Pack::Provider),
     ("pulumi-access-token", Pack::Provider),
@@ -291,6 +294,7 @@ mod tests {
                 "new-relic-user-api-key",
                 "new-relic-license-key",
                 "mailchimp-api-key",
+                "mailgun-api-key",
                 "firebase-server-key",
                 "terraform-cloud-token",
                 "pulumi-access-token",
@@ -565,6 +569,7 @@ mod tests {
         let new_relic_user_api_key_input = "NRAK-SYNTHETICREVOKEDNEWRELICUSA";
         let new_relic_license_key_input = "newrelic 0123456789abcdef0123456789abcdef01234567";
         let mailchimp_api_key_input = "mailchimp 0123456789abcdef0123456789abcdef-us6";
+        let mailgun_api_key_input = "mailgun key-abcdefghijklmnopqrstuvwxyz012345";
         let firebase_server_key_input = format!(
             "AAAA{}:{}",
             "SYNREV0",
@@ -606,6 +611,7 @@ mod tests {
             ("new-relic-user-api-key", new_relic_user_api_key_input),
             ("new-relic-license-key", new_relic_license_key_input),
             ("mailchimp-api-key", mailchimp_api_key_input),
+            ("mailgun-api-key", mailgun_api_key_input),
             ("firebase-server-key", firebase_server_key_input.as_str()),
             (
                 "terraform-cloud-token",

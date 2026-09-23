@@ -5681,6 +5681,98 @@
     },
     {
       "behaviorClass": "provider",
+      "detector": "mailgun-api-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "mailgun-api-key-positive-dotenv-keyword",
+            "mailgun-api-key-positive-json-keyword",
+            "mailgun-api-key-positive-log-keyword",
+            "mailgun-api-key-positive-shell-quoted",
+            "mailgun-api-key-positive-signing-key-field-name",
+            "mailgun-api-key-positive-yaml-keyword",
+            "mailgun-api-key-regression-crlf-and-unicode-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "mailgun-api-key-overlap-generic-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "mailgun-api-key-adversarial-dense-findings"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "mailgun-api-key-boundary-one-long",
+            "mailgun-api-key-boundary-one-short",
+            "mailgun-api-key-boundary-uppercase-body",
+            "mailgun-api-key-boundary-uppercase-literal"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "mailgun-api-key-negative-bare-value-with-no-context",
+            "mailgun-api-key-negative-context-on-a-different-line",
+            "mailgun-api-key-negative-environment-variable-reference",
+            "mailgun-api-key-negative-public-validation-key-reference",
+            "mailgun-api-key-negative-repeated-character-filler"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "mailgun-api-key-boundary-one-long",
+            "mailgun-api-key-boundary-one-short",
+            "mailgun-api-key-boundary-uppercase-body",
+            "mailgun-api-key-boundary-uppercase-literal"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for mailgun_api_key (mailgun-api-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "mailgun_api_key"
+    },
+    {
+      "behaviorClass": "provider",
       "detector": "firebase-server-key",
       "dimensions": [
         {
@@ -6776,6 +6868,7 @@
             "jwt-adversarial-incomplete",
             "linear-adversarial-long-suffix",
             "mailchimp-api-key-adversarial-dense-findings",
+            "mailgun-api-key-adversarial-dense-findings",
             "microsoft-entra-client-secret-adversarial-long-padding",
             "netlify-adversarial-long-suffix",
             "new-relic-license-key-adversarial-dense-findings",
@@ -7171,6 +7264,7 @@
             "jwt-adversarial-incomplete",
             "linear-adversarial-long-suffix",
             "mailchimp-api-key-adversarial-dense-findings",
+            "mailgun-api-key-adversarial-dense-findings",
             "microsoft-entra-client-secret-adversarial-long-padding",
             "netlify-adversarial-long-suffix",
             "new-relic-license-key-adversarial-dense-findings",
