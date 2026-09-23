@@ -9,17 +9,18 @@ use crate::types::{Action, Confidence, DetectedFinding, Policy, PolicyContext};
 ///
 /// Not every [`Specificity::Provider`](crate::types::Specificity) type is
 /// here: `twilio_auth_token`, `twilio_api_key_secret`, `datadog_api_key`,
-/// `datadog_application_key`, `new_relic_license_key`, `mailchimp_api_key`,
-/// `mailgun_api_key`, `confluent_cloud_api_secret_legacy`, and
-/// `heroku_api_key_legacy` are deliberately left confidence-gated (redact at
-/// [`Confidence::High`], warn otherwise) even though that is a weaker action
-/// than their specificity alone would suggest — each has a documented
-/// `decision-freeze-*` grammar record (or, for
-/// `confluent_cloud_api_secret_legacy`, `heroku_api_key_legacy`,
-/// `mailchimp_api_key`, and `mailgun_api_key`, its own module doc in
-/// `detectors::confluent`, `detectors::heroku`, `detectors::mailchimp`, or
-/// `detectors::mailgun`) explaining why a bare keyword-cooccurrence match at
-/// medium confidence is too weak (an opaque bare value sharing a line with a
+/// `datadog_application_key_legacy`, `new_relic_license_key`,
+/// `mailchimp_api_key`, `mailgun_api_key`, `confluent_cloud_api_secret_legacy`,
+/// and `heroku_api_key_legacy` are deliberately left confidence-gated
+/// (redact at [`Confidence::High`], warn otherwise) even though that is a
+/// weaker action than their specificity alone would suggest — each has a
+/// documented `decision-freeze-*` grammar record (or, for
+/// `datadog_application_key_legacy`, `confluent_cloud_api_secret_legacy`,
+/// `heroku_api_key_legacy`, `mailchimp_api_key`, and `mailgun_api_key`, its
+/// own module doc in `detectors::datadog`, `detectors::confluent`,
+/// `detectors::heroku`, `detectors::mailchimp`, or `detectors::mailgun`)
+/// explaining why a bare keyword-cooccurrence match at medium confidence is
+/// too weak (an opaque bare value sharing a line with a
 /// vendor keyword) to redact by default; each of those legacy types only
 /// ever reports [`Confidence::Medium`], so it always warns rather than
 /// redacts under this default policy. Overlap resolution's resolved-action
@@ -30,7 +31,7 @@ use crate::types::{Action, Confidence, DetectedFinding, Policy, PolicyContext};
 /// correct: a confidence-gated type here can still lose an overlap to a
 /// stricter-resolving lower-specificity candidate, without needing to be
 /// added to this list.
-const ALWAYS_REDACT_TYPES: [&str; 51] = [
+const ALWAYS_REDACT_TYPES: [&str; 52] = [
     "anthropic_api_key",
     "atlassian_api_token",
     "authorization_credential",
@@ -41,6 +42,7 @@ const ALWAYS_REDACT_TYPES: [&str; 51] = [
     "confluent_cloud_api_secret",
     "connection_string_password",
     "databricks_personal_access_token",
+    "datadog_application_key",
     "digitalocean_token",
     "discord_bot_token",
     "docker_token",

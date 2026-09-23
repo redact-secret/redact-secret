@@ -44,7 +44,7 @@ for your host. An organization-specific format that is not listed here can be ad
 as a [declarative ruleset](../guides/rulesets.md).
 
 <!-- detector-inventory:start -->
-55 built-in detectors emit 62 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
+56 built-in detectors emit 63 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
 
 | Detector | Finding types | Default policy class | Schemes |
 | --- | --- | --- | --- |
@@ -84,7 +84,8 @@ as a [declarative ruleset](../guides/rulesets.md).
 | `twilio-auth-token` | `twilio_auth_token` | `confidence-gated` | — |
 | `twilio-api-key-secret` | `twilio_api_key_secret` | `confidence-gated` | — |
 | `datadog-api-key` | `datadog_api_key` | `confidence-gated` | — |
-| `datadog-application-key` | `datadog_application_key` | `confidence-gated` | — |
+| `datadog-application-key` | `datadog_application_key` | `always-redact` | — |
+| `datadog-application-key-legacy` | `datadog_application_key_legacy` | `confidence-gated` | — |
 | `grafana-service-account-token` | `grafana_service_account_token` | `always-redact` | — |
 | `grafana-cloud-access-policy-token` | `grafana_cloud_access_policy_token` | `always-redact` | — |
 | `sentry-user-auth-token` | `sentry_user_auth_token` | `always-redact` | — |

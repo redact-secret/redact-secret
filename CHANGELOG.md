@@ -5,6 +5,17 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+### Breaking and compatibility changes
+
+- `datadog_application_key` no longer covers the legacy, bare 40-byte
+  lowercase-hex Datadog Application Key shape; that shape now reports under
+  its own `datadog_application_key_legacy` type (detector id
+  `datadog-application-key-legacy`), unchanged in every other respect
+  (still confidence-gated on the same-line marker/keyword signals it always
+  required) (#671, [`docs/specs/detector-families.md`](docs/specs/detector-families.md)).
+  Code that filters findings by `type === "datadog_application_key"` for the
+  legacy shape must match `datadog_application_key_legacy` as well.
+
 ### Changed
 
 - The [safe browser/server integration example](examples/safe-integration/README.md)
@@ -48,6 +59,14 @@ evidence is linked from each published version.
   case-insensitive `confluent` substring on the same line and stays
   confidence-gated (warn unless corroborated at high confidence). The API
   Key ID (the non-secret half of the pair) is never itself a finding.
+- `datadog-application-key` now recognizes the current, provider-documented
+  `ddapp_`-prefixed Datadog Application Key shape (`ddapp_` plus an exact
+  34-byte alphanumeric body, 40 bytes total) unconditionally at
+  always-redact, corroborated by Datadog's own Agent validator, CloudFormation
+  and ARM templates, and AWS's Secrets Manager partner documentation (#671,
+  [`docs/specs/detector-families.md`](docs/specs/detector-families.md)). See
+  "Breaking and compatibility changes" above for the legacy shape's new type
+  name.
 
 ### Documentation
 

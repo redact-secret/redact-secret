@@ -99,7 +99,8 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(sentry::SentryUserAuthTokenDetector),
         Box::new(sentry::SentryOrgAuthTokenDetector),
         Box::new(datadog::DatadogApiKeyDetector),
-        Box::new(datadog::DatadogApplicationKeyDetector),
+        Box::new(datadog::DATADOG_APPLICATION_KEY),
+        Box::new(datadog::DatadogApplicationKeyLegacyDetector),
         Box::new(grafana::GrafanaServiceAccountTokenDetector),
         Box::new(additional_providers::GRAFANA_CLOUD),
         Box::new(new_relic::NewRelicUserApiKeyDetector),
@@ -200,6 +201,7 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("sentry-org-auth-token", Pack::Provider),
     ("datadog-api-key", Pack::Provider),
     ("datadog-application-key", Pack::Provider),
+    ("datadog-application-key-legacy", Pack::Provider),
     ("grafana-service-account-token", Pack::Provider),
     ("grafana-cloud-access-policy-token", Pack::Provider),
     ("new-relic-user-api-key", Pack::Provider),
@@ -289,6 +291,7 @@ mod tests {
                 "sentry-org-auth-token",
                 "datadog-api-key",
                 "datadog-application-key",
+                "datadog-application-key-legacy",
                 "grafana-service-account-token",
                 "grafana-cloud-access-policy-token",
                 "new-relic-user-api-key",
@@ -564,7 +567,8 @@ mod tests {
         let grafana_sa_input = "glsa_SYNTHETICREVOKEDGRAFANASATOKEN01_deadbeef";
         let grafana_cloud_input = "glc_SYNTHETICREVOKEDGRAFANACLOUDACCESSPOLICYTOKEN";
         let datadog_api_key_input = "DD_API_KEY=0123456789abcdef0123456789abcdef";
-        let datadog_application_key_input =
+        let datadog_application_key_input = "ddapp_SYNTHETIC0REVOKED0AppKeyBody012345";
+        let datadog_application_key_legacy_input =
             "DD_APPLICATION_KEY=0123456789abcdef0123456789abcdef01234567";
         let new_relic_user_api_key_input = "NRAK-SYNTHETICREVOKEDNEWRELICUSA";
         let new_relic_license_key_input = "newrelic 0123456789abcdef0123456789abcdef01234567";
@@ -606,6 +610,10 @@ mod tests {
             ),
             ("datadog-api-key", datadog_api_key_input),
             ("datadog-application-key", datadog_application_key_input),
+            (
+                "datadog-application-key-legacy",
+                datadog_application_key_legacy_input,
+            ),
             ("grafana-service-account-token", grafana_sa_input),
             ("grafana-cloud-access-policy-token", grafana_cloud_input),
             ("new-relic-user-api-key", new_relic_user_api_key_input),

@@ -15,11 +15,11 @@ These counts describe finding-type inventory rows with corpus evidence, not dete
 
 | Row state | Count |
 | --- | --- |
-| supported | 62 |
+| supported | 63 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 73.
+Coverage declarations: 74.
 
 ## Coverage by detector
 
@@ -37,6 +37,7 @@ Coverage declarations: 73.
 | databricks-personal-access-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | datadog-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | datadog-application-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| datadog-application-key-legacy | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | digitalocean-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | discord-bot-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | docker-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -99,6 +100,7 @@ Coverage declarations: 73.
 | databricks_personal_access_token | databricks-personal-access-token | provider | supported | not-applicable | none |
 | datadog_api_key | datadog-api-key | provider | supported | not-applicable | none |
 | datadog_application_key | datadog-application-key | provider | supported | not-applicable | none |
+| datadog_application_key_legacy | datadog-application-key-legacy | provider | supported | not-applicable | none |
 | digitalocean_token | digitalocean-token | provider | supported | not-applicable | none |
 | discord_bot_token | discord-bot-token | provider | supported | not-applicable | none |
 | docker_token | docker-token | provider | supported | not-applicable | none |
@@ -172,15 +174,15 @@ Coverage declarations: 73.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 73 | 0 | 0 |
-| boundary | 62 | 0 | 0 |
-| host-context | 62 | 0 | 0 |
+| adversarial | 74 | 0 | 0 |
+| boundary | 63 | 0 | 0 |
+| host-context | 63 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 73 | 0 | 0 |
-| near-miss-negative | 62 | 0 | 0 |
-| overlap | 62 | 0 | 0 |
-| positive | 62 | 0 | 0 |
-| range | 73 | 0 | 0 |
+| malformed | 74 | 0 | 0 |
+| near-miss-negative | 63 | 0 | 0 |
+| overlap | 63 | 0 | 0 |
+| positive | 63 | 0 | 0 |
+| range | 74 | 0 | 0 |
 
 ## Unresolved and pending coverage
 
