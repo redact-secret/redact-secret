@@ -375,45 +375,14 @@ async function nodeLane(context) {
   };
 }
 
-const WHEEL_CHECK = String.raw`
-import hashlib, json, pathlib, sys, sysconfig, zipfile
-import importlib.metadata as metadata
-dist = metadata.distribution("redact-secret")
-site = pathlib.Path(sysconfig.get_paths()["purelib"]).resolve()
-tags = [line.split(": ", 1)[1] for line in (dist.read_text("WHEEL") or "").splitlines() if line.startswith("Tag: ")]
-wheels = [pathlib.Path(p) for p in sys.argv[1:]]
-wheel = next((w for w in wheels if any(w.name.endswith(f"-{tag}.whl") for tag in tags)), None)
-mismatched = []
-count = 0
-if wheel is not None:
-    with zipfile.ZipFile(wheel) as archive:
-        for member in archive.namelist():
-            if member.endswith("/") or member.endswith(".dist-info/RECORD"):
-                continue
-            count += 1
-            installed = site / member
-            if not installed.is_file() or hashlib.sha256(installed.read_bytes()).hexdigest() != hashlib.sha256(archive.read(member)).hexdigest():
-                mismatched.append(member)
-else:
-    for entry in dist.files or []:
-        if entry.hash is None:
-            continue
-        count += 1
-        import base64
-        digest = base64.urlsafe_b64encode(hashlib.new(entry.hash.mode, entry.locate().read_bytes()).digest()).rstrip(b"=").decode()
-        if digest != entry.hash.value:
-            mismatched.append(str(entry))
-import redact_secret, redact_secret._native as native
-print(json.dumps({
-    "version": dist.version,
-    "wheel": wheel.name if wheel else None,
-    "files": count,
-    "mismatched": mismatched,
-    "module": str(pathlib.Path(redact_secret.__file__).resolve()),
-    "native": str(pathlib.Path(native.__file__).resolve()),
-    "python": sys.version.split()[0],
-}))
-`;
+/**
+ * The probe that describes the installed distribution and matches it to a
+ * candidate wheel lives in `scripts/lib/installed_wheel_probe.py`, so its
+ * wheel-selection rule can be unit tested without a built wheel (issue #687).
+ * Its source is passed to the candidate environment's interpreter with
+ * `python -c`, which needs no file inside the throwaway project.
+ */
+const wheelProbeSource = () => readFile(join(REPO_ROOT, "scripts", "lib", "installed_wheel_probe.py"), "utf8");
 
 async function pythonLane(context) {
   const { scenario, project, parent, env, timer, candidateDir } = context;
@@ -430,7 +399,7 @@ async function pythonLane(context) {
   const probe = await runShell(
     `.venv/bin/python -c "$WHEEL_CHECK" ${wheels.map((wheel) => `'${wheel}'`).join(" ")}`,
     project,
-    { ...env, WHEEL_CHECK },
+    { ...env, WHEEL_CHECK: await wheelProbeSource() },
   );
   assert(probe.code === 0, `cannot inspect the installed distribution: ${probe.stderr.split("\n").at(-2) ?? ""}`);
   const installed = JSON.parse(probe.stdout);
