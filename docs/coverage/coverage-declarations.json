@@ -5585,6 +5585,99 @@
     },
     {
       "behaviorClass": "provider",
+      "detector": "mailchimp-api-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "mailchimp-api-key-positive-dotenv-keyword",
+            "mailchimp-api-key-positive-json-keyword",
+            "mailchimp-api-key-positive-log-keyword",
+            "mailchimp-api-key-positive-shell-quoted",
+            "mailchimp-api-key-positive-yaml-keyword",
+            "mailchimp-api-key-regression-crlf-and-unicode-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "mailchimp-api-key-overlap-generic-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "mailchimp-api-key-adversarial-dense-findings"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "mailchimp-api-key-boundary-datacenter-digit-count-too-long",
+            "mailchimp-api-key-boundary-missing-datacenter-suffix",
+            "mailchimp-api-key-boundary-one-long",
+            "mailchimp-api-key-boundary-one-short",
+            "mailchimp-api-key-boundary-uppercase-hex",
+            "mailchimp-api-key-boundary-wrong-datacenter-literal"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "mailchimp-api-key-negative-audience-id-reference",
+            "mailchimp-api-key-negative-environment-variable-reference",
+            "mailchimp-api-key-negative-repeated-character-filler"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "mailchimp-api-key-boundary-datacenter-digit-count-too-long",
+            "mailchimp-api-key-boundary-missing-datacenter-suffix",
+            "mailchimp-api-key-boundary-one-long",
+            "mailchimp-api-key-boundary-one-short",
+            "mailchimp-api-key-boundary-uppercase-hex",
+            "mailchimp-api-key-boundary-wrong-datacenter-literal"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for mailchimp_api_key (mailchimp-api-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "mailchimp_api_key"
+    },
+    {
+      "behaviorClass": "provider",
       "detector": "firebase-server-key",
       "dimensions": [
         {
@@ -6679,6 +6772,7 @@
             "invisible-structural-authorization-zwsp",
             "jwt-adversarial-incomplete",
             "linear-adversarial-long-suffix",
+            "mailchimp-api-key-adversarial-dense-findings",
             "microsoft-entra-client-secret-adversarial-long-padding",
             "netlify-adversarial-long-suffix",
             "new-relic-license-key-adversarial-dense-findings",
@@ -7073,6 +7167,7 @@
             "invisible-structural-authorization-zwsp",
             "jwt-adversarial-incomplete",
             "linear-adversarial-long-suffix",
+            "mailchimp-api-key-adversarial-dense-findings",
             "microsoft-entra-client-secret-adversarial-long-padding",
             "netlify-adversarial-long-suffix",
             "new-relic-license-key-adversarial-dense-findings",

@@ -15,11 +15,11 @@ These counts describe finding-type inventory rows with corpus evidence, not dete
 
 | Row state | Count |
 | --- | --- |
-| supported | 60 |
+| supported | 61 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 71.
+Coverage declarations: 72.
 
 ## Coverage by detector
 
@@ -52,6 +52,7 @@ Coverage declarations: 71.
 | huggingface-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | jwt | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | linear-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| mailchimp-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | microsoft-entra-client-secret | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | netlify-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | new-relic-license-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -116,6 +117,7 @@ Coverage declarations: 71.
 | huggingface_token | huggingface-token | provider | supported | not-applicable | none |
 | jwt | jwt | structural | supported | not-applicable | none |
 | linear_token | linear-token | provider | supported | not-applicable | none |
+| mailchimp_api_key | mailchimp-api-key | provider | supported | not-applicable | none |
 | microsoft_entra_client_secret | microsoft-entra-client-secret | provider | supported | not-applicable | none |
 | netlify_personal_access_token | netlify-token | provider | supported | not-applicable | none |
 | new_relic_license_key | new-relic-license-key | provider | supported | not-applicable | none |
@@ -168,15 +170,15 @@ Coverage declarations: 71.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 71 | 0 | 0 |
-| boundary | 60 | 0 | 0 |
-| host-context | 60 | 0 | 0 |
+| adversarial | 72 | 0 | 0 |
+| boundary | 61 | 0 | 0 |
+| host-context | 61 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 71 | 0 | 0 |
-| near-miss-negative | 60 | 0 | 0 |
-| overlap | 60 | 0 | 0 |
-| positive | 60 | 0 | 0 |
-| range | 71 | 0 | 0 |
+| malformed | 72 | 0 | 0 |
+| near-miss-negative | 61 | 0 | 0 |
+| overlap | 61 | 0 | 0 |
+| positive | 61 | 0 | 0 |
+| range | 72 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

@@ -72,6 +72,7 @@ export const CANONICAL_IDS = [
   "telegram-bot-token", "discord-bot-token", "sentry-user-auth-token", "sentry-org-auth-token",
   "datadog-api-key", "datadog-application-key", "grafana-service-account-token",
   "grafana-cloud-access-policy-token", "new-relic-user-api-key", "new-relic-license-key",
+  "mailchimp-api-key",
   "firebase-server-key", "terraform-cloud-token", "pulumi-access-token", "databricks-personal-access-token",
   "confluent-cloud-api-secret", "confluent-cloud-api-secret-legacy", "netlify-token", "postman-api-key",
   "heroku-api-key", "heroku-api-key-legacy",
@@ -106,7 +107,7 @@ export const GROUPS = {
   saas: [
     "shopify-token", "stripe-token", "slack-token", "sendgrid-token", "twilio-auth-token",
     "twilio-api-key-secret", "telegram-bot-token", "discord-bot-token", "sentry-user-auth-token",
-    "sentry-org-auth-token",
+    "sentry-org-auth-token", "mailchimp-api-key",
   ],
 };
 

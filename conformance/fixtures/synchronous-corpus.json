@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 1578,
+  "fixtureCount": 1597,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -25160,6 +25160,1122 @@
       "input": "newrelic 0123456789abcdef0123456789abcdef0123456",
       "expected": [],
       "note": "A value one byte short of the required 40-byte length is rejected rather than truncated, even with new-relic context present."
+    },
+    {
+      "id": "mailchimp-api-key-positive-dotenv-keyword",
+      "detector": "mailchimp-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "MAILCHIMP_API_KEY=0123456789abcdef0123456789abcdef-us6",
+      "expected": [
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 18,
+          "end": 54
+        }
+      ],
+      "note": "The bare 32-byte lowercase-hex body plus its -us<N> datacenter suffix has no vendor marker of its own; the mailchimp-named dotenv key is the only context present, so confidence is medium rather than high."
+    },
+    {
+      "id": "mailchimp-api-key-positive-json-keyword",
+      "detector": "mailchimp-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"mailchimpApiKey\": \"0123456789abcdef0123456789abcdef-us6\"}",
+      "expected": [
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 21,
+          "end": 57
+        }
+      ],
+      "note": "A quoted JSON string value is detected the same as a bare one; the mailchimp-named field is a keyword-only context, so confidence is medium."
+    },
+    {
+      "id": "mailchimp-api-key-positive-yaml-keyword",
+      "detector": "mailchimp-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "mailchimp_api_key: 0123456789abcdef0123456789abcdef-us21",
+      "expected": [
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 19,
+          "end": 56
+        }
+      ],
+      "note": "A YAML mapping value on the same line as the mailchimp-named key is detected at medium confidence; this fixture also covers the two-digit datacenter suffix (-us21)."
+    },
+    {
+      "id": "mailchimp-api-key-positive-log-keyword",
+      "detector": "mailchimp-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "log"
+      ],
+      "input": "# Mailchimp API key: 0123456789abcdef0123456789abcdef-us6",
+      "expected": [
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 21,
+          "end": 57
+        }
+      ],
+      "note": "The provider's own product name in ordinary prose, not just a snake_case identifier, satisfies the same-line keyword requirement."
+    },
+    {
+      "id": "mailchimp-api-key-positive-shell-quoted",
+      "detector": "mailchimp-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export MAILCHIMP_API_KEY=\"0123456789abcdef0123456789abcdef-us6\"\n",
+      "expected": [
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 26,
+          "end": 62
+        }
+      ],
+      "note": "A quoted shell export still bounds the token to exactly its own bytes; the keyword-bearing variable name on the same line satisfies the context requirement."
+    },
+    {
+      "id": "mailchimp-api-key-regression-crlf-and-unicode-prefix",
+      "detector": "mailchimp-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 café\r\nmailchimp 0123456789abcdef0123456789abcdef-us6\r\n",
+      "expected": [
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 24,
+          "end": 60
+        }
+      ],
+      "note": "A multi-byte Unicode prefix and CRLF line ending on the line before the keyword and key do not defeat detection."
+    },
+    {
+      "id": "mailchimp-api-key-negative-bare-value-with-no-context",
+      "detector": "mailchimp-api-key",
+      "kind": "negative",
+      "support": "intentionally-unsupported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "0123456789abcdef0123456789abcdef-us6",
+      "expected": [],
+      "note": "A bare key with no mailchimp keyword anywhere on its line is indistinguishable from an opaque hex blob followed by a coincidental region-style suffix and is not classified; this is an accepted, documented gap."
+    },
+    {
+      "id": "mailchimp-api-key-negative-context-on-a-different-line",
+      "detector": "mailchimp-api-key",
+      "kind": "negative",
+      "support": "intentionally-unsupported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# mailchimp\n0123456789abcdef0123456789abcdef-us6\n",
+      "expected": [],
+      "note": "The mailchimp keyword on a different line than the candidate value is a documented gap, the same line-scoped tradeoff new-relic-license-key already accepts."
+    },
+    {
+      "id": "mailchimp-api-key-negative-environment-variable-reference",
+      "detector": "mailchimp-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "shell"
+      ],
+      "input": "mailchimp MAILCHIMP_API_KEY=${MAILCHIMP_API_KEY}",
+      "expected": [],
+      "note": "An environment-variable interpolation reference is never a 32-byte lowercase-hex run and is not classified, even with keyword context present."
+    },
+    {
+      "id": "mailchimp-api-key-negative-repeated-character-filler",
+      "detector": "mailchimp-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "mailchimp 00000000000000000000000000000000-us1",
+      "expected": [],
+      "note": "A masked placeholder value of a single repeated hex digit, though within the documented alphabet, length, and suffix, is excluded as classic redaction-style filler rather than a real key."
+    },
+    {
+      "id": "mailchimp-api-key-negative-audience-id-reference",
+      "detector": "mailchimp-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "mailchimp list_id: a1b2c3d4e5",
+      "expected": [],
+      "note": "A Mailchimp audience/list id is documented as a short alphanumeric id, far shorter than the 32-byte key body; it carries no exact-length hex run and stays unclassified, the issue's stated exclusion boundary."
+    },
+    {
+      "id": "mailchimp-api-key-boundary-one-short",
+      "detector": "mailchimp-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "mailchimp 0123456789abcdef0123456789abcde-us6",
+      "expected": [],
+      "note": "A 31-byte hex body -- one byte short of the tool-corroborated 32-byte length -- is an intentional false negative, not a fuzzy match against a minimum."
+    },
+    {
+      "id": "mailchimp-api-key-boundary-one-long",
+      "detector": "mailchimp-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "mailchimp 0123456789abcdef0123456789abcdef0-us6",
+      "expected": [],
+      "note": "A 33-byte hex run -- one byte past the documented length -- is not misread as the exact shape preceded by a stray byte; the run's own length check rejects it before the suffix is even considered."
+    },
+    {
+      "id": "mailchimp-api-key-boundary-missing-datacenter-suffix",
+      "detector": "mailchimp-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "mailchimp 0123456789abcdef0123456789abcdef",
+      "expected": [],
+      "note": "The -us<N> datacenter suffix is part of the documented shape itself, not an optional decoration; a bare 32-byte hex value with no suffix is rejected even with mailchimp context present."
+    },
+    {
+      "id": "mailchimp-api-key-boundary-wrong-datacenter-literal",
+      "detector": "mailchimp-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "mailchimp 0123456789abcdef0123456789abcdef-eu6",
+      "expected": [],
+      "note": "Both corroborating tools pin the datacenter literal to the ASCII bytes -us; a differently-lettered regional-looking suffix does not satisfy the documented literal."
+    },
+    {
+      "id": "mailchimp-api-key-boundary-datacenter-digit-count-too-long",
+      "detector": "mailchimp-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "mailchimp 0123456789abcdef0123456789abcdef-us123",
+      "expected": [],
+      "note": "The datacenter digit run is consumed greedily; a three-digit run is outside the documented one-or-two-digit range and the whole candidate is rejected rather than matched as a two-digit suffix followed by a stray digit."
+    },
+    {
+      "id": "mailchimp-api-key-boundary-uppercase-hex",
+      "detector": "mailchimp-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "mailchimp 0123456789ABCDEF0123456789ABCDEF-us6",
+      "expected": [],
+      "note": "The documented worked example's alphabet is lowercase hex only; an uppercase-hex run is a structurally different value, not a coincidental case variant."
+    },
+    {
+      "id": "mailchimp-api-key-overlap-generic-context",
+      "detector": "mailchimp-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "api_key=a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0-us6 mailchimp",
+      "expected": [
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 8,
+          "end": 44
+        }
+      ],
+      "note": "api_key is a recognized generic-token field name, so this assignment also proposes a contextual-secret candidate at the same medium confidence (this value's low-entropy alternating pattern is below generic-token's high-confidence threshold) as this keyword-gated format. Same resolved-action severity (both warn under DefaultPolicy), so the provider-specific candidate's higher specificity decides the overlap."
+    },
+    {
+      "id": "mailchimp-api-key-adversarial-dense-findings",
+      "detector": "mailchimp-api-key",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 3910,
+        "maxFindings": 100,
+        "maxRuntimeMs": 250
+      },
+      "input": "mailchimp 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 0123456789abcdef0123456789abcdef-us6 ",
+      "expected": [
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 10,
+          "end": 46
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 47,
+          "end": 83
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 84,
+          "end": 120
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 121,
+          "end": 157
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 158,
+          "end": 194
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 195,
+          "end": 231
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 232,
+          "end": 268
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 269,
+          "end": 305
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 306,
+          "end": 342
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 343,
+          "end": 379
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 380,
+          "end": 416
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 417,
+          "end": 453
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 454,
+          "end": 490
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 491,
+          "end": 527
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 528,
+          "end": 564
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 565,
+          "end": 601
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 602,
+          "end": 638
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 639,
+          "end": 675
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 676,
+          "end": 712
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 713,
+          "end": 749
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 750,
+          "end": 786
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 787,
+          "end": 823
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 824,
+          "end": 860
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 861,
+          "end": 897
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 898,
+          "end": 934
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 935,
+          "end": 971
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 972,
+          "end": 1008
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1009,
+          "end": 1045
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1046,
+          "end": 1082
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1083,
+          "end": 1119
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1120,
+          "end": 1156
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1157,
+          "end": 1193
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1194,
+          "end": 1230
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1231,
+          "end": 1267
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1268,
+          "end": 1304
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1305,
+          "end": 1341
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1342,
+          "end": 1378
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1379,
+          "end": 1415
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1416,
+          "end": 1452
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1453,
+          "end": 1489
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1490,
+          "end": 1526
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1527,
+          "end": 1563
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1564,
+          "end": 1600
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1601,
+          "end": 1637
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1638,
+          "end": 1674
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1675,
+          "end": 1711
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1712,
+          "end": 1748
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1749,
+          "end": 1785
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1786,
+          "end": 1822
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1823,
+          "end": 1859
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1860,
+          "end": 1896
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1897,
+          "end": 1933
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1934,
+          "end": 1970
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1971,
+          "end": 2007
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2008,
+          "end": 2044
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2045,
+          "end": 2081
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2082,
+          "end": 2118
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2119,
+          "end": 2155
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2156,
+          "end": 2192
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2193,
+          "end": 2229
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2230,
+          "end": 2266
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2267,
+          "end": 2303
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2304,
+          "end": 2340
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2341,
+          "end": 2377
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2378,
+          "end": 2414
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2415,
+          "end": 2451
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2452,
+          "end": 2488
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2489,
+          "end": 2525
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2526,
+          "end": 2562
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2563,
+          "end": 2599
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2600,
+          "end": 2636
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2637,
+          "end": 2673
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2674,
+          "end": 2710
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2711,
+          "end": 2747
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2748,
+          "end": 2784
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2785,
+          "end": 2821
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2822,
+          "end": 2858
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2859,
+          "end": 2895
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2896,
+          "end": 2932
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2933,
+          "end": 2969
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2970,
+          "end": 3006
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3007,
+          "end": 3043
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3044,
+          "end": 3080
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3081,
+          "end": 3117
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3118,
+          "end": 3154
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3155,
+          "end": 3191
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3192,
+          "end": 3228
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3229,
+          "end": 3265
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3266,
+          "end": 3302
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3303,
+          "end": 3339
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3340,
+          "end": 3376
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3377,
+          "end": 3413
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3414,
+          "end": 3450
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3451,
+          "end": 3487
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3488,
+          "end": 3524
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3525,
+          "end": 3561
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3562,
+          "end": 3598
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3599,
+          "end": 3635
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3636,
+          "end": 3672
+        },
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 3673,
+          "end": 3709
+        }
+      ],
+      "note": "A single mailchimp-context-bearing line densely packed with 100 candidate-shaped runs stays linear and bounded: per-line (not per-candidate) context checks and a greedy suffix scan keep cost proportional to input size."
     },
     {
       "id": "huggingface-positive-doc-style-placeholder",
