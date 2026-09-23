@@ -2524,6 +2524,47 @@
       "type": "confluent_cloud_api_secret_legacy"
     },
     {
+      "detector": "netlify-token",
+      "evidence": {
+        "fixtureCount": 26,
+        "hostContextsExercised": [
+          "dotenv",
+          "json",
+          "log",
+          "markdown",
+          "plain-text",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "netlify-positive-dotenv",
+        "netlify-positive-json",
+        "netlify-positive-log",
+        "netlify-positive-markdown-delimiter",
+        "netlify-positive-punctuation-adjacent",
+        "netlify-positive-qualified",
+        "netlify-positive-repeated-value",
+        "netlify-positive-shell-quoted",
+        "netlify-positive-unicode-crlf",
+        "netlify-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "netlify_personal_access_token"
+    },
+    {
       "detector": "postman-api-key",
       "evidence": {
         "fixtureCount": 23,
@@ -2568,7 +2609,7 @@
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 57,
+    "supported": 58,
     "unresolved": 0
   }
 }

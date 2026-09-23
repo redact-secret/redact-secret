@@ -423,6 +423,13 @@
       "schemes": null
     },
     {
+      "type": "netlify_personal_access_token",
+      "detector": "netlify-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "nfp_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01",
+      "schemes": null
+    },
+    {
       "type": "postman_api_key",
       "detector": "postman-api-key",
       "policyClass": "always-redact",

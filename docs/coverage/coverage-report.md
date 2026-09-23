@@ -51,6 +51,7 @@ Coverage declarations: 68.
 | jwt | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | linear-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | microsoft-entra-client-secret | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| netlify-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | new-relic-license-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | new-relic-user-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | notion-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -112,6 +113,7 @@ Coverage declarations: 68.
 | jwt | jwt | structural | supported | not-applicable | none |
 | linear_token | linear-token | provider | supported | not-applicable | none |
 | microsoft_entra_client_secret | microsoft-entra-client-secret | provider | supported | not-applicable | none |
+| netlify_personal_access_token | netlify-token | provider | supported | not-applicable | none |
 | new_relic_license_key | new-relic-license-key | provider | supported | not-applicable | none |
 | new_relic_user_api_key | new-relic-user-api-key | provider | supported | not-applicable | none |
 | notion_integration_token | notion-token | provider | supported | not-applicable | none |
