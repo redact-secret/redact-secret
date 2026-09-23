@@ -6240,6 +6240,105 @@
       "type": "netlify_personal_access_token"
     },
     {
+      "behaviorClass": "provider",
+      "detector": "postman-api-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "postman-api-key-positive-bare",
+            "postman-api-key-positive-crlf-unicode-prefix",
+            "postman-api-key-positive-dotenv",
+            "postman-api-key-positive-environment-export",
+            "postman-api-key-positive-github-actions",
+            "postman-api-key-positive-http-header",
+            "postman-api-key-positive-log",
+            "postman-api-key-positive-punctuation-adjacent",
+            "postman-api-key-positive-repeated-value",
+            "postman-api-key-positive-shell-quoted"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "postman-api-key-overlap-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "postman-api-key-adversarial-long-suffix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "postman-api-key-boundary-encoded-prefix",
+            "postman-api-key-boundary-invalid-alphabet",
+            "postman-api-key-boundary-missing-separator",
+            "postman-api-key-boundary-one-long",
+            "postman-api-key-boundary-one-short",
+            "postman-api-key-boundary-wrong-separator-offset"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "postman-api-key-negative-collection-id-reference",
+            "postman-api-key-negative-doc-style-placeholder",
+            "postman-api-key-negative-embedded-in-wider-identifier",
+            "postman-api-key-negative-github-actions-secret-reference",
+            "postman-api-key-negative-masked"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "postman-api-key-boundary-encoded-prefix",
+            "postman-api-key-boundary-invalid-alphabet",
+            "postman-api-key-boundary-missing-separator",
+            "postman-api-key-boundary-one-long",
+            "postman-api-key-boundary-one-short",
+            "postman-api-key-boundary-wrong-separator-offset"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for postman_api_key (postman-api-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "postman_api_key"
+    },
+    {
       "behaviorClass": "incremental",
       "detector": "unassigned",
       "dimensions": [
@@ -6408,6 +6507,7 @@
             "openai-adversarial-long-suffix",
             "openai-adversarial-marker-prefix-flood",
             "otpauth-adversarial-overlong-query",
+            "postman-api-key-adversarial-long-suffix",
             "private-key-adversarial-incomplete",
             "private-key-adversarial-mismatched",
             "private-key-adversarial-nested",
@@ -6799,6 +6899,7 @@
             "openai-adversarial-long-suffix",
             "openai-adversarial-marker-prefix-flood",
             "otpauth-adversarial-overlong-query",
+            "postman-api-key-adversarial-long-suffix",
             "private-key-adversarial-incomplete",
             "private-key-adversarial-mismatched",
             "private-key-adversarial-nested",

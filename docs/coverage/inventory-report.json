@@ -2563,12 +2563,53 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "netlify_personal_access_token"
+    },
+    {
+      "detector": "postman-api-key",
+      "evidence": {
+        "fixtureCount": 23,
+        "hostContextsExercised": [
+          "dotenv",
+          "github-actions",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "shell"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "postman-api-key-positive-bare",
+        "postman-api-key-positive-crlf-unicode-prefix",
+        "postman-api-key-positive-dotenv",
+        "postman-api-key-positive-environment-export",
+        "postman-api-key-positive-github-actions",
+        "postman-api-key-positive-http-header",
+        "postman-api-key-positive-log",
+        "postman-api-key-positive-punctuation-adjacent",
+        "postman-api-key-positive-repeated-value",
+        "postman-api-key-positive-shell-quoted"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "postman_api_key"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 57,
+    "supported": 58,
     "unresolved": 0
   }
 }
