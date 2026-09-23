@@ -6339,6 +6339,185 @@
       "type": "postman_api_key"
     },
     {
+      "behaviorClass": "provider",
+      "detector": "heroku-api-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "heroku-api-key-positive-bare",
+            "heroku-api-key-positive-crlf-unicode-prefix",
+            "heroku-api-key-positive-dotenv",
+            "heroku-api-key-positive-github-actions",
+            "heroku-api-key-positive-http-header",
+            "heroku-api-key-positive-json",
+            "heroku-api-key-positive-log",
+            "heroku-api-key-positive-punctuation-adjacent",
+            "heroku-api-key-positive-repeated-value",
+            "heroku-api-key-positive-shell-quoted",
+            "heroku-api-key-positive-yaml"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "heroku-api-key-overlap-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "heroku-api-key-adversarial-long-suffix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "heroku-api-key-boundary-missing-prefix-dash",
+            "heroku-api-key-boundary-one-long",
+            "heroku-api-key-boundary-one-short",
+            "heroku-api-key-boundary-wrong-marker"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "heroku-api-key-negative-app-id-reference",
+            "heroku-api-key-negative-embedded-in-wider-identifier",
+            "heroku-api-key-negative-env-var-reference",
+            "heroku-api-key-negative-github-actions-secret-reference",
+            "heroku-api-key-negative-masked"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "heroku-api-key-boundary-missing-prefix-dash",
+            "heroku-api-key-boundary-one-long",
+            "heroku-api-key-boundary-one-short",
+            "heroku-api-key-boundary-wrong-marker"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for heroku_api_key (heroku-api-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "heroku_api_key"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "heroku-api-key-legacy",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "heroku-api-key-legacy-positive-bare-with-keyword",
+            "heroku-api-key-legacy-positive-dotenv-keyword",
+            "heroku-api-key-legacy-positive-netrc-style",
+            "heroku-api-key-legacy-positive-yaml-keyword"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "heroku-api-key-legacy-overlap-generic-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "heroku-api-key-legacy-adversarial-dense-findings"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "heroku-api-key-legacy-boundary-wrong-dash-offset",
+            "heroku-api-key-legacy-boundary-wrong-length"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "heroku-api-key-legacy-negative-app-and-release-id",
+            "heroku-api-key-legacy-negative-bare-no-context",
+            "heroku-api-key-legacy-negative-different-line"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "heroku-api-key-legacy-boundary-wrong-dash-offset",
+            "heroku-api-key-legacy-boundary-wrong-length"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for heroku_api_key_legacy (heroku-api-key-legacy), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "heroku_api_key_legacy"
+    },
+    {
       "behaviorClass": "incremental",
       "detector": "unassigned",
       "dimensions": [
@@ -6484,6 +6663,8 @@
             "google-adversarial-long-suffix",
             "grafana-cloud-access-policy-token-adversarial-long-suffix",
             "grafana-service-account-token-adversarial-near-miss-body",
+            "heroku-api-key-adversarial-long-suffix",
+            "heroku-api-key-legacy-adversarial-dense-findings",
             "huggingface-adversarial-long-suffix",
             "invisible-adversarial-dense-seams",
             "invisible-class-bidi-override",
@@ -6876,6 +7057,8 @@
             "google-adversarial-long-suffix",
             "grafana-cloud-access-policy-token-adversarial-long-suffix",
             "grafana-service-account-token-adversarial-near-miss-body",
+            "heroku-api-key-adversarial-long-suffix",
+            "heroku-api-key-legacy-adversarial-dense-findings",
             "huggingface-adversarial-long-suffix",
             "invisible-adversarial-dense-seams",
             "invisible-class-bidi-override",

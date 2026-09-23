@@ -25,6 +25,7 @@ mod generic_token;
 mod github;
 mod gitlab;
 mod grafana;
+mod heroku;
 mod jwt;
 mod linear;
 mod microsoft_entra;
@@ -109,6 +110,8 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(confluent::ConfluentLegacyApiSecretDetector),
         Box::new(netlify::NetlifyPersonalAccessTokenDetector),
         Box::new(postman::POSTMAN),
+        Box::new(heroku::HEROKU_API_KEY),
+        Box::new(heroku::HerokuApiKeyLegacyDetector),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
         Box::new(ConnectionStringDetector),
@@ -205,6 +208,8 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("confluent-cloud-api-secret-legacy", Pack::Provider),
     ("netlify-token", Pack::Provider),
     ("postman-api-key", Pack::Provider),
+    ("heroku-api-key", Pack::Provider),
+    ("heroku-api-key-legacy", Pack::Provider),
     ("jwt", Pack::Common),
     ("bearer-token", Pack::Common),
     ("connection-string", Pack::Common),
@@ -290,6 +295,8 @@ mod tests {
                 "confluent-cloud-api-secret-legacy",
                 "netlify-token",
                 "postman-api-key",
+                "heroku-api-key",
+                "heroku-api-key-legacy",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -573,6 +580,11 @@ mod tests {
             "PMAK-{}-{}",
             "0123456789abcdef01234567", "0123456789abcdef0123456789abcdef01"
         );
+        let heroku_api_key_input = format!(
+            "HRKU-AA{}",
+            "SYNTHETIC0REVOKED0HerokuOAuthAccessTokenBodyFixture0123456"
+        );
+        let heroku_api_key_legacy_input = "heroku 01234567-89ab-cdef-0123-456789abcdef";
         let cases = [
             (
                 "sentry-user-auth-token",
@@ -604,6 +616,8 @@ mod tests {
             ),
             ("netlify-token", netlify_token_input),
             ("postman-api-key", postman_api_key_input.as_str()),
+            ("heroku-api-key", heroku_api_key_input.as_str()),
+            ("heroku-api-key-legacy", heroku_api_key_legacy_input),
         ];
         assert_provider_candidates(&cases);
     }

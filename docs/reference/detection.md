@@ -44,7 +44,7 @@ for your host. An organization-specific format that is not listed here can be ad
 as a [declarative ruleset](../guides/rulesets.md).
 
 <!-- detector-inventory:start -->
-51 built-in detectors emit 58 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
+53 built-in detectors emit 60 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
 
 | Detector | Finding types | Default policy class | Schemes |
 | --- | --- | --- | --- |
@@ -99,6 +99,8 @@ as a [declarative ruleset](../guides/rulesets.md).
 | `confluent-cloud-api-secret-legacy` | `confluent_cloud_api_secret_legacy` | `confidence-gated` | — |
 | `netlify-token` | `netlify_personal_access_token` | `always-redact` | — |
 | `postman-api-key` | `postman_api_key` | `always-redact` | — |
+| `heroku-api-key` | `heroku_api_key` | `always-redact` | — |
+| `heroku-api-key-legacy` | `heroku_api_key_legacy` | `confidence-gated` | — |
 <!-- detector-inventory:end -->
 
 ## Detector profiles

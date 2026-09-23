@@ -2604,12 +2604,86 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "postman_api_key"
+    },
+    {
+      "detector": "heroku-api-key",
+      "evidence": {
+        "fixtureCount": 22,
+        "hostContextsExercised": [
+          "dotenv",
+          "github-actions",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "heroku-api-key-positive-bare",
+        "heroku-api-key-positive-crlf-unicode-prefix",
+        "heroku-api-key-positive-dotenv",
+        "heroku-api-key-positive-github-actions",
+        "heroku-api-key-positive-http-header",
+        "heroku-api-key-positive-json",
+        "heroku-api-key-positive-log",
+        "heroku-api-key-positive-punctuation-adjacent",
+        "heroku-api-key-positive-repeated-value",
+        "heroku-api-key-positive-shell-quoted",
+        "heroku-api-key-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "heroku_api_key"
+    },
+    {
+      "detector": "heroku-api-key-legacy",
+      "evidence": {
+        "fixtureCount": 11,
+        "hostContextsExercised": [
+          "dotenv",
+          "plain-text",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "heroku-api-key-legacy-positive-bare-with-keyword",
+        "heroku-api-key-legacy-positive-dotenv-keyword",
+        "heroku-api-key-legacy-positive-netrc-style",
+        "heroku-api-key-legacy-positive-yaml-keyword"
+      ],
+      "policyClass": "confidence-gated",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "heroku_api_key_legacy"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 58,
+    "supported": 60,
     "unresolved": 0
   }
 }
