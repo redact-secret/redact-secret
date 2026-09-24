@@ -113,7 +113,11 @@ evidence is linked from each published version.
   - the legacy shape is a bare `8-4-4-4-12` lowercase-hex UUID, which carries
     no marker of its own and is therefore reported only with a same-line,
     case-insensitive `heroku` signal, confidence-gated so the default policy
-    warns rather than redacts.
+    warns rather than redacts. A UUID assigned to an identifier-shaped key
+    (one whose last word is `id` or `uuid`, such as `HEROKU_APP_ID`,
+    `app_id` or `herokuAppId`) is a public app or release id and is not
+    reported, even on a line that names heroku; a legacy token stored under
+    such a key name is an accepted false negative (#714).
 - `new_relic_license_key` now also detects the currently issued New Relic
   license key generation: 32 lowercase-hex bytes followed by the literal
   `FFFFNRAL`, and its EU-region form (`eu01xx`, 26 lowercase-hex bytes,

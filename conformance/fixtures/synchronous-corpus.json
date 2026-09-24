@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 1660,
+  "fixtureCount": 1661,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -39734,6 +39734,20 @@
       "input": "app_id: 01234567-89ab-cdef-0123-456789abcdef\nrelease: 01234567-89ab-cdef-0123-456789abcdef\n",
       "expected": [],
       "note": "An app id and a release id are both ordinary UUIDs; with no heroku keyword on either line, the issue's stated exclusion boundary keeps them clean."
+    },
+    {
+      "id": "heroku-api-key-legacy-negative-heroku-app-id",
+      "detector": "heroku-api-key-legacy",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv",
+        "json"
+      ],
+      "input": "HEROKU_APP_ID=01234567-89ab-cdef-0123-456789abcdef\n{\"herokuAppId\": \"01234567-89ab-cdef-0123-456789abcdef\"}\n",
+      "expected": [],
+      "note": "Issue #714: each line names heroku, but the UUID is assigned to an identifier-shaped key (last word id), so it is a public app id, not a legacy token, and stays clean."
     },
     {
       "id": "heroku-api-key-legacy-boundary-wrong-length",

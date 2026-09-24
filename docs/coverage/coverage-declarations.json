@@ -6850,7 +6850,8 @@
           "evidenceFixtureIds": [
             "heroku-api-key-legacy-negative-app-and-release-id",
             "heroku-api-key-legacy-negative-bare-no-context",
-            "heroku-api-key-legacy-negative-different-line"
+            "heroku-api-key-legacy-negative-different-line",
+            "heroku-api-key-legacy-negative-heroku-app-id"
           ],
           "state": "supported"
         },
