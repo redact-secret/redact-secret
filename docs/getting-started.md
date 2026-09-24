@@ -32,7 +32,7 @@ Python, Rust, and the CLI expose. See
 
 The commands below install the version this documentation describes; check
 [release status](releases/status.md) for what the registries currently carry.
-npm `latest` still points to beta.1, so select the version explicitly rather
+npm `latest` can lag the newest beta, so select the version explicitly rather
 than relying on an unqualified install.
 Keep the selected version in your application's dependency lockfile.
 
