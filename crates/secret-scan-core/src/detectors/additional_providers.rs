@@ -121,15 +121,12 @@ impl Detector for KnownFormatProviderDetector {
 ///   gitleaks' own environment enumeration additionally includes `prod`
 ///   (`sk_prod_`/`rk_prod_`), which no Stripe page documents for any key
 ///   type; adopting it is out of this issue's scope and is left unadded.
-/// - `whsec_` — `docs.stripe.com/webhooks` (observed 2026-09-20) states
-///   webhook signing secrets are "per-webhook secrets", separate from API
-///   keys, and shows the literal prefix directly: "a signing secret
-///   beginning with `whsec_` appears", "a `webhook_endpoint.signing_secret`
-///   value that starts with `whsec_`", and the verification-handler
-///   placeholder `endpoint_secret = 'whsec_...'`. No page states a length or
-///   alphabet for the value that follows, so this shape's 20-byte
-///   alnum-run floor is the same support-policy choice already applied to
-///   `sk_`/`rk_`, not an independent contract for `whsec_`.
+/// - `whsec_` — moved out of this table by issue #729 into its own
+///   `stripe_webhook_signing_secret` grammar in [`super::stripe`], because
+///   Stripe states webhook signing secrets are "per-webhook secrets",
+///   separate from API keys (<https://docs.stripe.com/webhooks>, observed
+///   2026-09-20). The 20-byte alnum floor recorded here for #513 no longer
+///   applies to it.
 const STRIPE_SIGNALS: [&str; 2] = ["stripe-documented-prefix", "opaque-suffix"];
 
 pub(super) const STRIPE: KnownFormatProviderDetector = KnownFormatProviderDetector {
@@ -141,7 +138,6 @@ pub(super) const STRIPE: KnownFormatProviderDetector = KnownFormatProviderDetect
         PrefixShape::at_least("rk_test_", 20, pattern::is_alnum, &STRIPE_SIGNALS),
         PrefixShape::at_least("rk_live_", 20, pattern::is_alnum, &STRIPE_SIGNALS),
         PrefixShape::at_least("sk_org_", 20, pattern::is_alnum, &STRIPE_SIGNALS),
-        PrefixShape::at_least("whsec_", 20, pattern::is_alnum, &STRIPE_SIGNALS),
     ],
     boundary: pattern::is_alnum_dash,
 };
@@ -752,13 +748,12 @@ mod tests {
         // instead of against the shared minimum-length `BODY`. Slack moved
         // out to `super::slack` (issue #371) and Linear to `super::linear`
         // (issue #374); each is covered by its own tests there.
-        let cases: [(&KnownFormatProviderDetector, &str); 14] = [
+        let cases: [(&KnownFormatProviderDetector, &str); 13] = [
             (&STRIPE, "sk_test_"),
             (&STRIPE, "sk_live_"),
             (&STRIPE, "rk_test_"),
             (&STRIPE, "rk_live_"),
             (&STRIPE, "sk_org_"),
-            (&STRIPE, "whsec_"),
             (&DIGITALOCEAN, "dop_v1_"),
             (&DIGITALOCEAN, "doo_v1_"),
             (&DIGITALOCEAN, "dor_v1_"),

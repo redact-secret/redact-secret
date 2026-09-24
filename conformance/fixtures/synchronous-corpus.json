@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 1857,
+  "fixtureCount": 1879,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -3138,7 +3138,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "sk_test_SYNTHETICREVOKEDSYNTHETIC\nrk_test_SYNTHETICREVOKEDSYNTHETIC\nrk_live_SYNTHETICREVOKEDSYNTHETIC\nsk_org_SYNTHETICREVOKEDSYNTHETIC\nwhsec_SYNTHETICREVOKEDSYNTHETIC",
+      "input": "sk_test_SYNTHETICREVOKEDSYNTHETIC\nrk_test_SYNTHETICREVOKEDSYNTHETIC\nrk_live_SYNTHETICREVOKEDSYNTHETIC\nsk_org_SYNTHETICREVOKEDSYNTHETIC\nwhsec_SYNTHETICREVOKEDWEBHOOKSECRET012",
       "expected": [
         {
           "detector": "stripe-token",
@@ -3174,14 +3174,14 @@
         },
         {
           "detector": "stripe-token",
-          "type": "stripe_credential",
+          "type": "stripe_webhook_signing_secret",
           "confidence": "high",
           "specificity": "provider",
           "start": 135,
-          "end": 166
+          "end": 173
         }
       ],
-      "note": "Every remaining documented prefix variant is independently supported."
+      "note": "Every remaining documented prefix variant is independently supported; the `whsec_` webhook signing secret carries its own finding type (issue #729)."
     },
     {
       "id": "stripe-adversarial-long-suffix",
@@ -3517,6 +3517,207 @@
       "note": "Issue #513: the sandbox-mode counterpart of stripe-positive-mixed-public-and-secret. A public identifier and a secret credential on adjacent lines: the public prefix never generates a candidate, while the paired secret is still classified with the correct range."
     },
     {
+      "id": "stripe-positive-webhook-secret-plain",
+      "detector": "stripe-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "whsec_SYNTHETICREVOKEDWEBHOOKSECRET012",
+      "expected": [
+        {
+          "detector": "stripe-token",
+          "type": "stripe_webhook_signing_secret",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 38
+        }
+      ],
+      "note": "A bare `whsec_` webhook signing secret at the 32-byte floor classifies as its own finding type (issue #729). Detection is not context-gated: Svix and Standard Webhooks values are secrets too."
+    },
+    {
+      "id": "stripe-positive-webhook-secret-dotenv",
+      "detector": "stripe-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "STRIPE_WEBHOOK_SECRET=whsec_SYNTHETICREVOKEDWEBHOOKSECRET012",
+      "expected": [
+        {
+          "detector": "stripe-token",
+          "type": "stripe_webhook_signing_secret",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 60
+        }
+      ],
+      "note": "The named-assignment context resolves to the provider finding on the value alone."
+    },
+    {
+      "id": "stripe-positive-webhook-secret-base64-symbols",
+      "detector": "stripe-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "whsec_SYNTHETICREVOKED+WEBHOOKSECRET012/",
+      "expected": [
+        {
+          "detector": "stripe-token",
+          "type": "stripe_webhook_signing_secret",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 40
+        }
+      ],
+      "note": "`+` and `/` are admitted in the body: Stripe's own CLI scrubber admits them while its canary sanitizer does not, so silence on them is not asserted (issue #729)."
+    },
+    {
+      "id": "stripe-positive-webhook-secret-padding",
+      "detector": "stripe-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "whsec_SYNTHETICREVOKEDWEBHOOKSECRET012==",
+      "expected": [
+        {
+          "detector": "stripe-token",
+          "type": "stripe_webhook_signing_secret",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 40
+        }
+      ],
+      "note": "Up to two terminal `=` padding bytes are part of the value and its span."
+    },
+    {
+      "id": "stripe-positive-webhook-secret-rolling-pair",
+      "detector": "stripe-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "STRIPE_WEBHOOK_SECRET=whsec_SYNTHETICREVOKEDWEBHOOKSECRET012\nSTRIPE_WEBHOOK_SECRET_PREVIOUS=whsec_210TERCESKOOHBEWDEKOVERCITEHTNYS",
+      "expected": [
+        {
+          "detector": "stripe-token",
+          "type": "stripe_webhook_signing_secret",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 60
+        },
+        {
+          "detector": "stripe-token",
+          "type": "stripe_webhook_signing_secret",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 92,
+          "end": 130
+        }
+      ],
+      "note": "A rolling-secret pair yields one finding per secret."
+    },
+    {
+      "id": "stripe-boundary-webhook-secret-below-32-floor",
+      "detector": "stripe-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "whsec_SYNTHETICREVOKEDWEBHOOKSECRET01",
+      "expected": [],
+      "note": "One byte below the 32-byte body floor (issue #729); the beta.4 20-byte floor no longer applies to `whsec_`."
+    },
+    {
+      "id": "stripe-negative-webhook-secret-embedded-in-wider-identifier",
+      "detector": "stripe-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "legacywhsec_SYNTHETICREVOKEDWEBHOOKSECRET012_backup",
+      "expected": [],
+      "note": "A value embedded in a wider identifier on either side is not classified."
+    },
+    {
+      "id": "stripe-negative-webhook-public-identifiers",
+      "detector": "stripe-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "we_1SYNTHETICENDPOINTID evt_1SYNTHETICEVENTIDENTIFIER t=1700000000,v1=5257a869e7ecebeda32affa62cdca3fa51cad7e77a0e56ff536d0ce8e108d8bd",
+      "expected": [],
+      "note": "Webhook endpoint and event ids and a Stripe-Signature digest are public identifiers, not signing secrets."
+    },
+    {
+      "id": "stripe-overlap-context-webhook-secret",
+      "detector": "stripe-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "access_token=whsec_SYNTHETICREVOKEDWEBHOOKSECRET012",
+      "expected": [
+        {
+          "detector": "stripe-token",
+          "type": "stripe_webhook_signing_secret",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 51
+        }
+      ],
+      "note": "Issue #729: a webhook signing secret under a generic contextual assignment key is owned by stripe-token (provider specificity) over generic-token's contextual candidate for the same span."
+    },
+    {
+      "id": "stripe-overlap-bearer-webhook-secret",
+      "detector": "stripe-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Authorization: Bearer whsec_SYNTHETICREVOKEDWEBHOOKSECRET012",
+      "expected": [
+        {
+          "detector": "stripe-token",
+          "type": "stripe_webhook_signing_secret",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 60
+        }
+      ],
+      "note": "Issue #729: a webhook signing secret in a Bearer header is owned by stripe-token over bearer-token's structural candidate for the same span."
+    },
+    {
       "id": "slack-positive-qualified",
       "detector": "slack-token",
       "kind": "boundary",
@@ -3712,19 +3913,11 @@
           "type": "slack_token",
           "confidence": "high",
           "specificity": "provider",
-          "start": 31,
-          "end": 61
-        },
-        {
-          "detector": "slack-token",
-          "type": "slack_token",
-          "confidence": "high",
-          "specificity": "provider",
           "start": 62,
           "end": 92
         }
       ],
-      "note": "Reclassified by issue #512 (docs/decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md): `xoxp-`, `xoxe-`, `xoxe.xoxb-`, and `xoxe.xoxp-` now require their own documented digit section, which none of these opaque bodies carry, so slack-token no longer claims them; `xapp-` and `xwfp-` are not promoted and still match at their original ranges. Every opaque body here is 25 bytes, past the interim guards' 20-byte floor, exercising issue #570's open-floor fix (#551 briefly turned the floor into an exact length, which stopped matching this fixture entirely; restored). `slack-positive-structural-prefixes` is the corrected counterpart demonstrating every promoted family's full grammar."
+      "note": "Reclassified by issue #512 (docs/decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md): `xoxp-`, `xoxe-`, `xoxe.xoxb-`, and `xoxe.xoxp-` now require their own documented digit section, which none of these opaque bodies carry, so slack-token no longer claims them; `xwfp-` is not promoted and still matches at its original range; issue #729 moved `xapp-` to its own section grammar (see slack-positive-app-level-plain), so this opaque `xapp-` body is no longer claimed. Every opaque body here is 25 bytes, past the interim guards' 20-byte floor, exercising issue #570's open-floor fix (#551 briefly turned the floor into an exact length, which stopped matching this fixture entirely; restored). `slack-positive-structural-prefixes` is the corrected counterpart demonstrating every promoted family's full grammar."
     },
     {
       "id": "slack-positive-structural-prefixes",
@@ -33321,9 +33514,219 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "xapp-SSSSSSSSSSSSSSSSSSS",
+      "input": "xwfp-SSSSSSSSSSSSSSSSSSS",
       "expected": [],
-      "note": "The retained interim `xapp-` guard keeps beta.4's 20-byte minimum unchanged; a 19-byte body is one below that floor. Issue #375 checkbox 6: explicit boundary evidence for the still-interim-guarded prefixes alongside slack-positive-all-prefixes. Issue #512 promoted `xoxp-` to a structural contract, so this fixture was retargeted to `xapp-`, one of the two prefixes (with `xwfp-`) that remain interim-guarded."
+      "note": "The retained interim `xwfp-` guard keeps beta.4's 20-byte minimum unchanged; a 19-byte body is one below that floor. Issue #375 checkbox 6: explicit boundary evidence for the still-interim-guarded prefixes alongside slack-positive-all-prefixes. Issue #512 promoted `xoxp-` to a structural contract, so this fixture was retargeted to `xapp-`, one of the two prefixes (with `xwfp-`) that remain interim-guarded."
+    },
+    {
+      "id": "slack-positive-app-level-plain",
+      "detector": "slack-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xapp-1-A0SYNTHETIC-1234567890123-SYNTHETICREVOKEDAPPSECRET00",
+      "expected": [
+        {
+          "detector": "slack-token",
+          "type": "slack_app_level_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 60
+        }
+      ],
+      "note": "The frozen app-level anatomy `xapp-<digits>-<alnum>-<digits>-<alnum>` classified bare, as its own finding type (issue #729). Section widths are open."
+    },
+    {
+      "id": "slack-positive-app-level-open-widths",
+      "detector": "slack-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xapp-1-A-2-b",
+      "expected": [
+        {
+          "detector": "slack-token",
+          "type": "slack_app_level_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 12
+        }
+      ],
+      "note": "Every app-level section is a non-empty run and no width is a negative rule (issue #729: tool sources disagree on widths)."
+    },
+    {
+      "id": "slack-positive-app-level-json",
+      "detector": "slack-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"app_token\": \"xapp-1-A0SYNTHETIC-1234567890123-SYNTHETICREVOKEDAPPSECRET00\"}",
+      "expected": [
+        {
+          "detector": "slack-token",
+          "type": "slack_app_level_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 15,
+          "end": 75
+        }
+      ],
+      "note": "A quoted JSON string value is detected the same as a bare one; the enclosing quotes are not part of the match."
+    },
+    {
+      "id": "slack-positive-app-level-dotenv",
+      "detector": "slack-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "SLACK_APP_TOKEN=xapp-1-A0SYNTHETIC-1234567890123-SYNTHETICREVOKEDAPPSECRET00",
+      "expected": [
+        {
+          "detector": "slack-token",
+          "type": "slack_app_level_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 16,
+          "end": 76
+        }
+      ],
+      "note": "A Socket Mode environment assignment resolves to the provider finding on the value alone."
+    },
+    {
+      "id": "slack-boundary-app-level-underscore-prefix-separator",
+      "detector": "slack-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xapp_1-A0SYNTHETIC-1234567890123-SYNTHETICREVOKEDAPPSECRET00",
+      "expected": [],
+      "note": "The prefix separator is `_` instead of `-`; only `xapp-` is documented."
+    },
+    {
+      "id": "slack-boundary-app-level-underscore-section-separator",
+      "detector": "slack-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xapp-1-A0SYNTHETIC_1234567890123-SYNTHETICREVOKEDAPPSECRET00",
+      "expected": [],
+      "note": "A section separator is `_`; sections are `-`-separated. The unpromoted interim guard admitted this (open ledger class differential-shared-detector-twin/slack-app-level-token)."
+    },
+    {
+      "id": "slack-boundary-app-level-letter-in-digit-section",
+      "detector": "slack-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xapp-1-A0SYNTHETIC-12345678901a3-SYNTHETICREVOKEDAPPSECRET00",
+      "expected": [],
+      "note": "A letter inside the all-digit third section. The unpromoted interim guard admitted this (open ledger class differential-shared-detector-twin/slack-app-level-token)."
+    },
+    {
+      "id": "slack-boundary-app-level-missing-section",
+      "detector": "slack-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xapp-1-A0SYNTHETIC-SYNTHETICREVOKEDAPPSECRET00",
+      "expected": [],
+      "note": "Only three sections; the frozen anatomy has four."
+    },
+    {
+      "id": "slack-boundary-app-level-opaque-body",
+      "detector": "slack-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xapp-SYNTHETICREVOKEDINTERIMVALUE0123456789",
+      "expected": [],
+      "note": "The beta.4 opaque-suffix shape with no section grammar is no longer claimed (issue #729)."
+    },
+    {
+      "id": "slack-negative-app-level-embedded-in-wider-identifier",
+      "detector": "slack-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "legacyxapp-1-A0SYNTHETIC-1234567890123-SYNTHETICREVOKEDAPPSECRET00_backup",
+      "expected": [],
+      "note": "A value embedded in a wider identifier on either side is not classified."
+    },
+    {
+      "id": "slack-overlap-context-app-level",
+      "detector": "slack-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "access_token=xapp-1-A0SYNTHETIC-1234567890123-SYNTHETICREVOKEDAPPSECRET00",
+      "expected": [
+        {
+          "detector": "slack-token",
+          "type": "slack_app_level_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 73
+        }
+      ],
+      "note": "Issue #729: an app-level value under a generic contextual assignment key is owned by slack-token (provider specificity) over generic-token's contextual candidate for the same span."
+    },
+    {
+      "id": "slack-overlap-bearer-app-level",
+      "detector": "slack-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Authorization: Bearer xapp-1-A0SYNTHETIC-1234567890123-SYNTHETICREVOKEDAPPSECRET00",
+      "expected": [
+        {
+          "detector": "slack-token",
+          "type": "slack_app_level_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 82
+        }
+      ],
+      "note": "Issue #729: an app-level value in a Bearer header (the Socket Mode form) is owned by slack-token over bearer-token's structural candidate for the same span."
     },
     {
       "id": "invisible-provider-grammar-zwnj",

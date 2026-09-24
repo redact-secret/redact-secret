@@ -669,7 +669,43 @@
     {
       "detector": "stripe-token",
       "evidence": {
-        "fixtureCount": 31,
+        "fixtureCount": 41,
+        "hostContextsExercised": [
+          "dotenv",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "stripe-positive-all-prefixes",
+        "stripe-positive-webhook-secret-base64-symbols",
+        "stripe-positive-webhook-secret-dotenv",
+        "stripe-positive-webhook-secret-padding",
+        "stripe-positive-webhook-secret-plain",
+        "stripe-positive-webhook-secret-rolling-pair"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "stripe_webhook_signing_secret"
+    },
+    {
+      "detector": "stripe-token",
+      "evidence": {
+        "fixtureCount": 41,
         "hostContextsExercised": [
           "dotenv",
           "json",
@@ -710,7 +746,44 @@
     {
       "detector": "slack-token",
       "evidence": {
-        "fixtureCount": 60,
+        "fixtureCount": 72,
+        "hostContextsExercised": [
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "markdown",
+          "plain-text",
+          "shell",
+          "toml",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "slack-positive-app-level-dotenv",
+        "slack-positive-app-level-json",
+        "slack-positive-app-level-open-widths",
+        "slack-positive-app-level-plain"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "slack_app_level_token"
+    },
+    {
+      "detector": "slack-token",
+      "evidence": {
+        "fixtureCount": 72,
         "hostContextsExercised": [
           "dotenv",
           "http",
@@ -3127,7 +3200,7 @@
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 70,
+    "supported": 72,
     "unresolved": 0
   }
 }

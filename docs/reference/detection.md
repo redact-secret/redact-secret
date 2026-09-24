@@ -44,7 +44,7 @@ for your host. An organization-specific format that is not listed here can be ad
 as a [declarative ruleset](../guides/rulesets.md).
 
 <!-- detector-inventory:start -->
-63 built-in detectors emit 70 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
+63 built-in detectors emit 72 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
 
 | Detector | Finding types | Default policy class | Schemes |
 | --- | --- | --- | --- |
@@ -56,8 +56,8 @@ as a [declarative ruleset](../guides/rulesets.md).
 | `anthropic-token` | `anthropic_api_key` | `always-redact` | — |
 | `shopify-token` | `shopify_access_token` | `always-redact` | — |
 | `vault-token` | `vault_token` | `always-redact` | — |
-| `stripe-token` | `stripe_credential` | `always-redact` | — |
-| `slack-token` | `slack_token` | `always-redact` | — |
+| `stripe-token` | `stripe_webhook_signing_secret`, `stripe_credential` | `always-redact` | — |
+| `slack-token` | `slack_app_level_token`, `slack_token` | `always-redact` | — |
 | `pypi-token` | `pypi_api_token` | `always-redact` | — |
 | `huggingface-token` | `huggingface_token` | `always-redact` | — |
 | `docker-token` | `docker_token` | `always-redact` | — |

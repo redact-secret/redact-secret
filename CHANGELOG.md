@@ -7,6 +7,20 @@ evidence is linked from each published version.
 
 ### Changed
 
+- `slack-token` now reports `xapp-` app-level tokens as their own finding type,
+  `slack_app_level_token`, and only for the frozen four-section shape
+  `xapp-<digits>-<alphanumeric>-<digits>-<alphanumeric>`. A value with a `_`
+  separator, a letter inside a digit section, a missing section, or a bare
+  opaque body such as `xapp-<20 bytes>` is no longer reported. Section widths
+  stay open. `xwfp-` and the other Slack prefixes are unchanged and keep
+  `slack_token` (#729).
+- `stripe-token` now reports `whsec_` webhook signing secrets as their own
+  finding type, `stripe_webhook_signing_secret`, separate from
+  `stripe_credential`. The body must be at least 32 Base64 bytes
+  (`[A-Za-z0-9+/]`) with up to two terminal `=` padding bytes, so `whsec_`
+  values shorter than 32 bytes are no longer reported. Detection stays bare:
+  it does not require a Stripe context marker (#729).
+
 - `twilio-auth-token`, `twilio-api-key-secret` and
   `confluent-cloud-api-secret-legacy` no longer report a value introduced by a
   hash-algorithm label (`md5=`, `sha256:`, `@sha256:`, `sha-512=`, ...), even

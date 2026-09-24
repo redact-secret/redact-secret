@@ -15,11 +15,11 @@ These counts describe finding-type inventory rows with corpus evidence, not dete
 
 | Row state | Count |
 | --- | --- |
-| supported | 70 |
+| supported | 72 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 81.
+Coverage declarations: 83.
 
 ## Coverage by detector
 
@@ -77,8 +77,8 @@ Coverage declarations: 81.
 | sentry-org-auth-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | sentry-user-auth-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | shopify-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
-| slack-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
-| stripe-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| slack-token | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
+| stripe-token | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
 | supabase-management-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | supabase-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | telegram-bot-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -151,8 +151,10 @@ Coverage declarations: 81.
 | sentry_org_auth_token | sentry-org-auth-token | provider | supported | not-applicable | none |
 | sentry_user_auth_token | sentry-user-auth-token | provider | supported | not-applicable | none |
 | shopify_access_token | shopify-token | provider | supported | not-applicable | none |
+| slack_app_level_token | slack-token | provider | supported | not-applicable | none |
 | slack_token | slack-token | provider | supported | not-applicable | none |
 | stripe_credential | stripe-token | provider | supported | not-applicable | none |
+| stripe_webhook_signing_secret | stripe-token | provider | supported | not-applicable | none |
 | supabase_personal_access_token | supabase-management-token | provider | supported | not-applicable | none |
 | supabase_secret_key | supabase-token | provider | supported | not-applicable | none |
 | telegram_bot_token | telegram-bot-token | provider | supported | not-applicable | none |
@@ -188,15 +190,15 @@ Coverage declarations: 81.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 81 | 0 | 0 |
-| boundary | 70 | 0 | 0 |
-| host-context | 70 | 0 | 0 |
+| adversarial | 83 | 0 | 0 |
+| boundary | 72 | 0 | 0 |
+| host-context | 72 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 81 | 0 | 0 |
-| near-miss-negative | 70 | 0 | 0 |
-| overlap | 70 | 0 | 0 |
-| positive | 70 | 0 | 0 |
-| range | 81 | 0 | 0 |
+| malformed | 83 | 0 | 0 |
+| near-miss-negative | 72 | 0 | 0 |
+| overlap | 72 | 0 | 0 |
+| positive | 72 | 0 | 0 |
+| range | 83 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

@@ -599,7 +599,7 @@
       "detector": "stripe-token",
       "falseNegativeGuards": {
         "actualFalseNegatives": 0,
-        "count": 11,
+        "count": 16,
         "fixtureIds": [
           "stripe-positive-all-prefixes",
           "stripe-positive-crlf-unicode-prefix",
@@ -611,12 +611,17 @@
           "stripe-positive-mixed-public-and-secret",
           "stripe-positive-mixed-public-and-secret-sandbox-mode",
           "stripe-positive-qualified",
+          "stripe-positive-webhook-secret-base64-symbols",
+          "stripe-positive-webhook-secret-dotenv",
+          "stripe-positive-webhook-secret-padding",
+          "stripe-positive-webhook-secret-plain",
+          "stripe-positive-webhook-secret-rolling-pair",
           "stripe-positive-yaml"
         ]
       },
       "falsePositiveGuards": {
         "actualFalsePositives": 0,
-        "count": 13,
+        "count": 15,
         "fixtureIds": [
           "stripe-negative-interpolated-secret-prefix",
           "stripe-negative-lookalike",
@@ -628,6 +633,8 @@
           "stripe-negative-public-prefix-sandbox-mode",
           "stripe-negative-public-prefix-unicode-crlf",
           "stripe-negative-sk-org-missing-separator",
+          "stripe-negative-webhook-public-identifiers",
+          "stripe-negative-webhook-secret-embedded-in-wider-identifier",
           "stripe-negative-whsec-missing-separator",
           "stripe-negative-whsec-wrong-separator",
           "stripe-negative-wrong-prefix"
