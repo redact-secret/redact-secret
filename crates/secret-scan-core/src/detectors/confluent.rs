@@ -56,6 +56,12 @@
 //!   this detector does not emit any Key ID finding at all (see "Out of
 //!   scope" below), so that half of its rule has no analog here.
 //!
+//!   A legacy candidate introduced by a hash-algorithm label
+//!   ([`text::is_labelled_digest`]: `@sha256:`, `sha512=`, ...) is never
+//!   reported (issue #744): `image: confluentinc/cp-server@sha256:<64 hex>`
+//!   names Confluent but carries a container image digest, and Confluent
+//!   documents no form in which an API secret follows such a label.
+//!
 //! No code from either tool is reproduced here; this module's matching and
 //! context-gating logic is authored independently.
 //!
@@ -274,7 +280,10 @@ impl Detector for ConfluentLegacyApiSecretDetector {
                 // are the ones that "lack the `cflt` prefix", so a `cflt`
                 // value whose checksum fails is no secret at all rather than
                 // a legacy one (#738).
-                if value.starts_with(SECRET_PREFIX) || text::is_repeated_character_filler(value) {
+                if value.starts_with(SECRET_PREFIX)
+                    || text::is_repeated_character_filler(value)
+                    || text::is_labelled_digest(line, relative_start)
+                {
                     continue;
                 }
                 let Some(range) =
@@ -441,6 +450,30 @@ mod tests {
             assert!(detect_prefixed(input).is_empty(), "{input}");
             assert!(detect_legacy(input).is_empty(), "{input}");
         }
+    }
+
+    #[test]
+    fn rejects_a_hash_algorithm_labelled_legacy_shaped_digest() {
+        // Issue #744: a container image digest on a line naming Confluent.
+        for input in [
+            format!("image: confluentinc/cp-server@sha256:{LEGACY_BODY}"),
+            format!("image: confluentinc/cp-server@SHA256:{LEGACY_BODY}"),
+            format!("confluent-7.6.0.tar.gz sha256={LEGACY_BODY}"),
+            format!("confluent checksum sha-256: {LEGACY_BODY}"),
+        ] {
+            assert!(detect_legacy(&input).is_empty(), "{input}");
+        }
+    }
+
+    #[test]
+    fn a_digest_label_does_not_hide_a_legacy_secret_after_an_ordinary_name() {
+        let input = format!("CONFLUENT_API_SECRET={LEGACY_BODY}");
+        let candidates = detect_legacy(&input);
+        assert_eq!(candidates.len(), 1);
+        assert_eq!(candidates[0].range().start(), 21);
+        assert_eq!(candidates[0].range().end(), 85);
+        let input = format!("confluent image@sha256:abc api_secret={LEGACY_BODY}");
+        assert_eq!(detect_legacy(&input).len(), 1);
     }
 
     #[test]

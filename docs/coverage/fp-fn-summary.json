@@ -77,7 +77,7 @@
       "detector": "bearer-token",
       "falseNegativeGuards": {
         "actualFalseNegatives": 0,
-        "count": 11,
+        "count": 13,
         "fixtureIds": [
           "bearer-boundary-prose-long-word-tradeoff",
           "bearer-positive-authorization-extra-whitespace-and-case",
@@ -89,12 +89,14 @@
           "bearer-positive-near-miss-repeated-character-filler",
           "bearer-positive-scheme",
           "bearer-positive-tab-and-uppercase",
-          "bearer-positive-yaml-real-token-still-detected"
+          "bearer-positive-yaml-real-token-still-detected",
+          "bearer-token-regression-base64url-value-still-detected",
+          "bearer-token-regression-placeholder-lead-word-with-random-suffix"
         ]
       },
       "falsePositiveGuards": {
         "actualFalsePositives": 0,
-        "count": 10,
+        "count": 12,
         "fixtureIds": [
           "bearer-negative-identifier",
           "bearer-negative-missing-value",
@@ -105,7 +107,9 @@
           "bearer-negative-repeated-character-filler-run-of-dash",
           "bearer-negative-repeated-character-filler-run-of-x",
           "bearer-negative-repeated-character-filler-run-of-zero",
-          "bearer-negative-repeated-character-filler-yaml"
+          "bearer-negative-repeated-character-filler-yaml",
+          "bearer-token-negative-insert-access-token-placeholder",
+          "bearer-token-negative-your-oauth-token-placeholder"
         ]
       },
       "hostContextsExercised": [

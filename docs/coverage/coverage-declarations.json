@@ -3704,7 +3704,9 @@
             "bearer-positive-near-miss-repeated-character-filler",
             "bearer-positive-scheme",
             "bearer-positive-tab-and-uppercase",
-            "bearer-positive-yaml-real-token-still-detected"
+            "bearer-positive-yaml-real-token-still-detected",
+            "bearer-token-regression-base64url-value-still-detected",
+            "bearer-token-regression-placeholder-lead-word-with-random-suffix"
           ],
           "state": "supported"
         },
@@ -3746,7 +3748,9 @@
             "bearer-negative-repeated-character-filler-run-of-dash",
             "bearer-negative-repeated-character-filler-run-of-x",
             "bearer-negative-repeated-character-filler-run-of-zero",
-            "bearer-negative-repeated-character-filler-yaml"
+            "bearer-negative-repeated-character-filler-yaml",
+            "bearer-token-negative-insert-access-token-placeholder",
+            "bearer-token-negative-your-oauth-token-placeholder"
           ],
           "state": "supported"
         },
@@ -4245,6 +4249,7 @@
             "contextual-positive-vals-scheme-prefix-still-detected",
             "generic-token-positive-unquoted-markdown-inline-code",
             "generic-token-regression-sql-bind-lookalike-still-detected",
+            "generic-token-regression-uppercase-hex-sid-lookalike",
             "generic-token-regression-windows-env-lookalike-still-detected",
             "regression-generic-token-markdown-inline-code-boundary",
             "regression-nested-credential-under-parent-key",
@@ -4438,6 +4443,7 @@
             "contextual-positive-vals-scheme-prefix-still-detected",
             "generic-token-positive-unquoted-markdown-inline-code",
             "generic-token-regression-sql-bind-lookalike-still-detected",
+            "generic-token-regression-uppercase-hex-sid-lookalike",
             "generic-token-regression-windows-env-lookalike-still-detected",
             "invisible-contextual-keyword-zwsp",
             "invisible-contextual-value-zwsp",
@@ -4796,6 +4802,7 @@
             "twilio-auth-token-negative-account-sid-on-a-different-line",
             "twilio-auth-token-negative-bare-value-with-no-context",
             "twilio-auth-token-negative-environment-variable-reference",
+            "twilio-auth-token-negative-md5-digest",
             "twilio-auth-token-negative-repeated-character-filler"
           ],
           "state": "supported"
@@ -6487,6 +6494,7 @@
           "evidenceFixtureIds": [
             "confluent-cloud-api-secret-legacy-negative-bare-no-context",
             "confluent-cloud-api-secret-legacy-negative-different-line",
+            "confluent-cloud-api-secret-legacy-negative-image-digest",
             "confluent-cloud-api-secret-legacy-negative-key-id-alone",
             "confluent-cloud-api-secret-legacy-negative-repeated-filler"
           ],
