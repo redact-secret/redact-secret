@@ -56,6 +56,25 @@ evidence is linked from each published version.
 
 ### Changed detection
 
+- `pinecone-api-key` now reports a legacy lowercase `8-4-4-4-12` UUID Pinecone
+  key as `pinecone_api_key` (high confidence, redacted), but only when it is
+  the value assigned to a Pinecone API-key name on the same line:
+  `PINECONE_API_KEY=`, `pinecone_api_key:`, `PINECONE_KEY=`, or `api_key` /
+  `apiKey` / `Api-Key` on a line that names `pinecone`
+  (`pinecone.init(api_key="...")`). These were missed before, while the same
+  UUID under `apiKey:` was already redacted as `contextual_secret`. That
+  spelling now reports `pinecone_api_key` on the same span. A bare UUID, a
+  UUID under an id-named key (`PINECONE_PROJECT_ID`, `project_id=`), and an
+  all-zero placeholder UUID stay unclaimed (#702).
+- `generic-token` no longer reports three non-secret values after a
+  credential-like name. The first is a `{keychain:<item>}` secret-store
+  reference (#730). The second is a partially masked console display with a
+  visible head, a run of at least four `*` or `•`, and a visible tail, such as
+  `Secret: gsk_****…Tn4q` (#264). The third is a colon-namespaced ACL scope
+  glued to the name, such as `"api-key:endpoint:chat"` in an xAI key's `acls`
+  list (#727). A mask with only one visible side (`********x`), an assignment
+  with a space after the colon, and a value with material after the
+  reference are still reported.
 - Added `perplexity-api-key`, `fireworks-ai-api-key`, `pinecone-api-key` and
   `gitlab-runner-authentication-token` detectors and a `slack_user_token`
   finding type for the five second-wave Beta.8 families, implementing the
