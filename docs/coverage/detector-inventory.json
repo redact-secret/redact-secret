@@ -440,7 +440,7 @@
       "type": "confluent_cloud_api_secret",
       "detector": "confluent-cloud-api-secret",
       "policyClass": "always-redact",
-      "reconciliationTrigger": "cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPQRSTUV",
+      "reconciliationTrigger": "cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPn2NMow",
       "schemes": null
     },
     {

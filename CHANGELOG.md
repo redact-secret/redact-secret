@@ -5,6 +5,16 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+### Changed
+
+- `confluent-cloud-api-secret` now validates the checksum Confluent documents
+  for `cflt` secrets. The last 6 characters must be the first 6
+  standard-Base64 characters of the little-endian CRC-32 of the 54 body
+  characters after `cflt`. A `cflt` value with the right length and alphabet
+  but a different checksum (a changed character, big-endian bytes, or a CRC
+  that includes the prefix) is no longer reported. The unprefixed legacy shape
+  is unchanged (#738).
+
 ### Changed detection
 
 - `heroku-api-key` now also detects the 41-character `HRKU-` OAuth access

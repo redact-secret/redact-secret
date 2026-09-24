@@ -2610,7 +2610,7 @@
     {
       "detector": "confluent-cloud-api-secret",
       "evidence": {
-        "fixtureCount": 19,
+        "fixtureCount": 23,
         "hostContextsExercised": [
           "dotenv",
           "github-actions",
@@ -2632,6 +2632,7 @@
         ]
       },
       "evidenceFixtureIds": [
+        "confluent-cloud-api-secret-checksum-valid",
         "confluent-cloud-api-secret-positive-bare",
         "confluent-cloud-api-secret-positive-crlf-unicode-prefix",
         "confluent-cloud-api-secret-positive-dotenv",
