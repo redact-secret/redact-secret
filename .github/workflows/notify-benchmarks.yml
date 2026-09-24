@@ -1,0 +1,65 @@
+# The copy that runs. `redact-secret/redact-secret-benchmarks` keeps the
+# reference copy at `docs/upstream/redact-secret--notify-benchmarks.yml`, since
+# it owns the staging pipeline this drives. Keep the two in sync when either
+# changes (redact-secret-benchmarks#153).
+#
+# When a push to redact-secret `main` passes `Artifact qualification`, ask
+# redact-secret-benchmarks to rebuild staging against that commit. Staging then
+# downloads the packages that same qualification run uploaded (#152), so the
+# dispatch waits for qualification to succeed rather than firing on the push.
+#
+# `workflow_dispatch`, not `repository_dispatch`: starting a workflow by name
+# needs only Actions: write on the target, where `repository_dispatch` needs
+# Contents: write. The GitHub App behind the organisation variable
+# BENCHMARKS_DISPATCH_APP_ID and secret BENCHMARKS_DISPATCH_APP_PRIVATE_KEY is
+# installed on redact-secret and redact-secret-benchmarks only, with Actions
+# read/write and Contents read; the token minted below is narrowed further to one repository.
+#
+# `workflow_run` only fires for workflow files on the default branch, so this
+# takes effect once it is merged to `main`.
+name: Notify benchmarks
+
+on:
+  workflow_run:
+    workflows: [Artifact qualification]
+    types: [completed]
+    branches: [main]
+
+permissions: {}
+
+jobs:
+  dispatch:
+    name: Rebuild benchmarks staging
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'main' &&
+      github.event.workflow_run.head_repository.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - name: Mint a token that can start workflows in redact-secret-benchmarks
+        id: app-token
+        uses: actions/create-github-app-token@fee1f7d63c2ff003460e3d139729b119787bc349 # v2.2.2
+        with:
+          app-id: ${{ vars.BENCHMARKS_DISPATCH_APP_ID }}
+          private-key: ${{ secrets.BENCHMARKS_DISPATCH_APP_PRIVATE_KEY }}
+          owner: redact-secret
+          repositories: redact-secret-benchmarks
+          permission-actions: write
+
+      # Every expression reaches the shell through the environment, never
+      # interpolated into the script.
+      - name: Dispatch staging for the qualified commit
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          PRODUCT_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          set -euo pipefail
+          [[ "$PRODUCT_SHA" =~ ^[0-9a-f]{40}$ ]] || { echo "::error::unexpected head SHA" >&2; exit 1; }
+          gh workflow run publish-site.yml \
+            -R redact-secret/redact-secret-benchmarks \
+            --ref develop \
+            -f environment=staging \
+            -f product_sha="$PRODUCT_SHA"
+          echo "Dispatched benchmarks staging for \`$PRODUCT_SHA\`." >> "$GITHUB_STEP_SUMMARY"
