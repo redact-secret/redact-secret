@@ -2806,9 +2806,10 @@
     {
       "detector": "heroku-api-key-legacy",
       "evidence": {
-        "fixtureCount": 11,
+        "fixtureCount": 12,
         "hostContextsExercised": [
           "dotenv",
+          "json",
           "plain-text",
           "yaml"
         ],

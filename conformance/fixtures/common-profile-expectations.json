@@ -3,7 +3,7 @@
   "corpus": "synchronous-corpus.json",
   "offsetUnit": "utf8-byte",
   "detectors": ["private-key","jwt","bearer-token","connection-string","otpauth-uri","generic-token"],
-  "fixtureCount": 1660,
+  "fixtureCount": 1661,
   "fixtures": [
     {"expected":[{"action":"warn","confidence":"medium","detector":"generic-token","end":48,"start":8,"type":"contextual_secret"}],"id":"host-dotenv-github"},
     {"expected":[{"action":"warn","confidence":"medium","detector":"generic-token","end":52,"start":12,"type":"contextual_secret"}],"id":"host-json-github"},
@@ -1661,6 +1661,7 @@
     {"expected":[],"id":"heroku-api-key-legacy-negative-bare-no-context"},
     {"expected":[],"id":"heroku-api-key-legacy-negative-different-line"},
     {"expected":[],"id":"heroku-api-key-legacy-negative-app-and-release-id"},
+    {"expected":[],"id":"heroku-api-key-legacy-negative-heroku-app-id"},
     {"expected":[],"id":"heroku-api-key-legacy-boundary-wrong-length"},
     {"expected":[],"id":"heroku-api-key-legacy-boundary-wrong-dash-offset"},
     {"expected":[{"action":"warn","confidence":"medium","detector":"generic-token","end":47,"start":11,"type":"contextual_secret"}],"id":"heroku-api-key-legacy-overlap-generic-context"},

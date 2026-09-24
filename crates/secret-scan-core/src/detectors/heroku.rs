@@ -54,6 +54,15 @@
 //!   deliberately left out of [`policy::ALWAYS_REDACT_TYPES`] rather than
 //!   promoted to an unconditional redact.
 //!
+//!   The keyword gate alone cannot tell the token from a Heroku app id: a
+//!   line such as `HEROKU_APP_ID=<uuid>` names heroku too, and both tools
+//!   above flag it. This detector departs from them there (issue #714): a
+//!   UUID assigned to an identifier-shaped key -- one whose last word is
+//!   `id` or `uuid`, e.g. `HEROKU_APP_ID`, `app_id`, `release-id`,
+//!   `appId`, `id` -- is a public identifier, not a credential, and is
+//!   never reported. The tradeoff is a false negative for a legacy token
+//!   stored under such a key name, which no Heroku tooling documents.
+//!
 //! No code from either tool is reproduced here; this module's matching and
 //! context-gating logic is authored independently.
 //!
@@ -183,9 +192,72 @@ fn is_uuid_shape(bytes: &[u8], start: usize, end: usize) -> bool {
     })
 }
 
+/// `true` for a byte an assignment may place between a key and its value:
+/// whitespace, a quote, or a byte of `=`, `:`, `:=`, `=>`, `?=`, `||`, `,`.
+fn is_assignment_gap(byte: u8) -> bool {
+    matches!(
+        byte,
+        b' ' | b'\t' | b'"' | b'\'' | b'`' | b'=' | b':' | b'>' | b'?' | b'|' | b','
+    )
+}
+
+/// `true` for a byte of a key name: `[A-Za-z0-9_.-]`.
+fn is_key_byte(byte: u8) -> bool {
+    byte.is_ascii_alphanumeric() || matches!(byte, b'_' | b'.' | b'-')
+}
+
+/// The key a value starting at `value_start` is assigned to: the run of
+/// [`is_key_byte`] bytes left of any [`is_assignment_gap`] bytes before the
+/// value. Empty when the value has no key (a `/` or line start before it).
+fn assigned_key(bytes: &[u8], value_start: usize) -> &[u8] {
+    let mut end = value_start;
+    while end > 0 && is_assignment_gap(bytes[end - 1]) {
+        end -= 1;
+    }
+    let mut start = end;
+    while start > 0 && is_key_byte(bytes[start - 1]) {
+        start -= 1;
+    }
+    &bytes[start..end]
+}
+
+/// The last words that make a key name an identifier rather than a secret.
+const IDENTIFIER_WORDS: [&[u8]; 2] = [b"id", b"uuid"];
+
+/// `true` when `key`'s last word is one of [`IDENTIFIER_WORDS`]: the whole
+/// key (`id`, `UUID`), the segment after its last `_`, `.` or `-`
+/// (`HEROKU_APP_ID`, `release-id`), or a camelCase tail after a lowercase
+/// letter or digit (`appId`, `appID`, `releaseUuid`).
+fn is_identifier_key(key: &[u8]) -> bool {
+    let segment_start = key
+        .iter()
+        .rposition(|&byte| matches!(byte, b'_' | b'.' | b'-'))
+        .map_or(0, |index| index + 1);
+    let segment = &key[segment_start..];
+    IDENTIFIER_WORDS.iter().any(|word| {
+        if segment.eq_ignore_ascii_case(word) {
+            return true;
+        }
+        let Some(split) = segment
+            .len()
+            .checked_sub(word.len())
+            .filter(|&split| split > 0)
+        else {
+            return false;
+        };
+        let (head, tail) = segment.split_at(split);
+        tail.eq_ignore_ascii_case(word)
+            && tail[0].is_ascii_uppercase()
+            && head
+                .last()
+                .is_some_and(|&byte| byte.is_ascii_lowercase() || byte.is_ascii_digit())
+    })
+}
+
 /// Detects a legacy (pre-`HRKU-`) Heroku API token: a bare UUID-shaped run
-/// on the same line as a case-insensitive `heroku` substring. Never emitted
-/// without that context; see the module doc.
+/// on the same line as a case-insensitive `heroku` substring, unless it is
+/// assigned to an identifier-shaped key ([`is_identifier_key`]). Never
+/// emitted without that context; see the module doc.
 pub(super) struct HerokuApiKeyLegacyDetector;
 
 impl Detector for HerokuApiKeyLegacyDetector {
@@ -207,7 +279,9 @@ impl Detector for HerokuApiKeyLegacyDetector {
             }
             let bytes = line.as_bytes();
             for (relative_start, relative_end) in raw_matches {
-                if !is_uuid_shape(bytes, relative_start, relative_end) {
+                if !is_uuid_shape(bytes, relative_start, relative_end)
+                    || is_identifier_key(assigned_key(bytes, relative_start))
+                {
                     continue;
                 }
                 let Some(range) =
@@ -410,6 +484,67 @@ mod tests {
             format!("release={LEGACY_UUID}"),
         ] {
             assert!(detect_legacy(&input).is_empty(), "{input}");
+        }
+    }
+
+    #[test]
+    fn rejects_a_uuid_assigned_to_an_identifier_key_on_a_heroku_line() {
+        // Issue #714: the benchmark's public-id control. The line names
+        // heroku, but the key says the value is an identifier.
+        for input in [
+            format!("HEROKU_APP_ID={LEGACY_UUID}\n"),
+            format!("heroku_app_id: {LEGACY_UUID}"),
+            format!("HEROKU_RELEASE_ID = \"{LEGACY_UUID}\""),
+            format!("heroku-app-uuid={LEGACY_UUID}"),
+            format!("heroku.app.id={LEGACY_UUID}"),
+            format!("{{\"herokuAppId\": \"{LEGACY_UUID}\"}}"),
+            format!("{{\"herokuAppID\": \"{LEGACY_UUID}\"}}"),
+            format!("{{\"id\": \"{LEGACY_UUID}\", \"stack\": \"heroku-24\"}}"),
+            format!("heroku apps:info --json # UUID: {LEGACY_UUID}"),
+        ] {
+            assert!(detect_legacy(&input).is_empty(), "{input}");
+        }
+    }
+
+    #[test]
+    fn keeps_a_token_assigned_to_a_key_whose_last_word_only_resembles_id() {
+        // `PAID`, `Paid`, `HEROKU_IDENTITY_KEY` and `valid` end in or
+        // contain "id" without it being their own last word.
+        for key in [
+            "HEROKU_PAID",
+            "herokuPaid",
+            "HEROKU_IDENTITY_KEY",
+            "heroku_valid",
+        ] {
+            let input = format!("{key}={LEGACY_UUID}");
+            assert_eq!(detect_legacy(&input).len(), 1, "{input}");
+        }
+    }
+
+    #[test]
+    fn judges_each_value_by_its_own_key_on_a_shared_line() {
+        let token = "fedcba98-7654-3210-fedc-ba9876543210";
+        let input = format!("HEROKU_APP_ID={LEGACY_UUID} HEROKU_API_KEY={token}");
+        let candidates = detect_legacy(&input);
+        assert_eq!(candidates.len(), 1);
+        let start = input.rfind(token).unwrap();
+        assert_eq!(
+            candidates[0].range(),
+            ByteRange::new(start, start + token.len()).unwrap()
+        );
+    }
+
+    #[test]
+    fn keeps_every_keyword_context_positive_shape() {
+        for input in [
+            format!("HEROKU_API_KEY={LEGACY_UUID}"),
+            format!("heroku_api_key: {LEGACY_UUID}\n"),
+            format!("heroku {LEGACY_UUID}"),
+            format!("password {LEGACY_UUID} # api.heroku.com\n"),
+            format!("secret_key={LEGACY_UUID} # heroku"),
+            format!("{{\"herokuApiKey\": \"{LEGACY_UUID}\"}}"),
+        ] {
+            assert_eq!(detect_legacy(&input).len(), 1, "{input}");
         }
     }
 
