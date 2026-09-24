@@ -56,6 +56,24 @@ evidence is linked from each published version.
 
 ### Changed detection
 
+- Added `perplexity-api-key`, `fireworks-ai-api-key`, `pinecone-api-key` and
+  `gitlab-runner-authentication-token` detectors and a `slack_user_token`
+  finding type for the five second-wave Beta.8 families, implementing the
+  grammars frozen by #726 and nothing broader: `pplx-` + 48 alphanumeric bytes;
+  `fw_` + 22 or 24 alphanumeric bytes; `pcsk_` + a 5-6 byte label + `_` + 63
+  alphanumeric bytes; `xoxp-` + three numeric sections + an alphanumeric secret
+  section with no width rule; and `glrt-` + a 20-byte body (optionally after
+  `t<hex>_`) or the routable dotted form whose base36 length holder and CRC-32
+  are verified offline. Each is provider-specific and always-redact.
+  `xoxp-` values are now reported as `slack_user_token`, and short numeric
+  sections or a short (pre-2016) secret, formerly missed by the 10-13 digit and
+  28-byte floors, are now detected. `glrt-` moved out of `gitlab-token`, so a
+  `glrt-` value of another width, or a routable value with a bad checksum or
+  length holder, is no longer reported as `gitlab_token`; the routable form is
+  now reported in full instead of truncated at its first dot. `glrtr-`,
+  `fpk_`, `pckey_` and the bare-UUID Pinecone key stay unclaimed. The Perplexity
+  and Fireworks widths and the Pinecone label width stay provisional until the
+  benchmarks#212 arrival evidence lands (#730).
 - Added `replicate-api-token`, `groq-api-key`, `xai-api-key` and
   `openrouter-api-key` detectors for the first Beta.8 AI inference families,
   implementing the grammars frozen by #726 and nothing broader: `r8_` + 37

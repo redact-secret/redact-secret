@@ -910,8 +910,6 @@
     "slack-boundary-short",
     "slack-boundary-user-missing-final-separator",
     "slack-boundary-user-no-section-grammar",
-    "slack-boundary-user-secret-27-bytes",
-    "slack-boundary-user-segment-14-digits",
     "slack-negative-interim-below-min-floor",
     "slack-positive-doc-style-placeholder",
     "slack-positive-log",
@@ -922,7 +920,13 @@
     "slack-positive-repeated-value",
     "slack-positive-shell-quoted",
     "slack-positive-yaml",
-    "slack-positive-yaml-crlf"
+    "slack-positive-yaml-crlf",
+    "slack-user-token-boundary-dash-in-secret",
+    "slack-user-token-boundary-empty-secret",
+    "slack-user-token-boundary-letter-in-numeric-section",
+    "slack-user-token-boundary-missing-secret-separator",
+    "slack-user-token-boundary-two-numeric-sections",
+    "slack-user-token-boundary-underscore-separator"
   ],
   "provenance": {
     "beta4TwinBaselineSource": "docs/audits/evidence/367/beta4-twin-baseline.json",
@@ -930,7 +934,7 @@
     "issue": "https://github.com/redact-secret/redact-secret/issues/375",
     "synchronousCorpus": "conformance/fixtures/synchronous-corpus.json"
   },
-  "rowCount": 446,
+  "rowCount": 471,
   "rows": [
     {
       "contexts": [],
@@ -8433,45 +8437,7 @@
       "findingCount": 0,
       "fixtureId": "slack-boundary-user-no-section-grammar",
       "kind": "boundary",
-      "note": "Issue #512: the user section grammar requires three `-`-separated 10-13 digit sections before the secret section; this value has none, so it is an intentional false negative, the same dimension issue #371 established for `xoxb-` (`slack-positive-qualified`).",
-      "result": "silent",
-      "runtimeConsumers": [
-        "rust-core",
-        "python-binding"
-      ],
-      "scanMode": "synchronous",
-      "support": "intentionally-unsupported"
-    },
-    {
-      "contexts": [
-        "plain-text"
-      ],
-      "contractTier": "malformed",
-      "detector": "slack-token",
-      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
-      "findingCount": 0,
-      "fixtureId": "slack-boundary-user-secret-27-bytes",
-      "kind": "boundary",
-      "note": "Issue #512: the secret section is exactly 27 bytes, one below the documented 28-byte floor (gitleaks' `slack-user-token` lower bound).",
-      "result": "silent",
-      "runtimeConsumers": [
-        "rust-core",
-        "python-binding"
-      ],
-      "scanMode": "synchronous",
-      "support": "intentionally-unsupported"
-    },
-    {
-      "contexts": [
-        "plain-text"
-      ],
-      "contractTier": "malformed",
-      "detector": "slack-token",
-      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
-      "findingCount": 0,
-      "fixtureId": "slack-boundary-user-segment-14-digits",
-      "kind": "boundary",
-      "note": "Issue #512: the first numeric section is 14 digits, one past the documented 10-13 range.",
+      "note": "Issue #512: the user section grammar requires three `-`-separated digit sections before the secret section; this value has none, so it is an intentional false negative, the same dimension issue #371 established for `xoxb-` (`slack-positive-qualified`).",
       "result": "silent",
       "runtimeConsumers": [
         "rust-core",
@@ -9288,7 +9254,7 @@
       "findingCount": 4,
       "fixtureId": "slack-positive-structural-prefixes",
       "kind": "positive",
-      "note": "Issue #512 (docs/decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md): each of the four newly-promoted families (user, refresh, rotating-bot, rotating-user) is independently detected at its own full documented section grammar, the corrected counterpart of `slack-positive-all-prefixes` for these four prefixes. The rotation tail here is 38 bytes, past its 20-byte floor, exercising issue #570's open-floor fix (#551 briefly turned the floor into an exact length and shrank this fixture's tail to fit; restored).",
+      "note": "Issue #512 (docs/decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md): each of the four newly-promoted families (user, refresh, rotating-bot, rotating-user) is independently detected at its own full documented section grammar, the corrected counterpart of `slack-positive-all-prefixes` for these four prefixes. The rotation tail here is 38 bytes, past its 20-byte floor, exercising issue #570's open-floor fix (#551 briefly turned the floor into an exact length and shrank this fixture's tail to fit; restored). Issue #730 gives the `xoxp-` user form its own `slack_user_token` type and open-width section grammar; this 75-byte value still matches it.",
       "result": "flagged",
       "runtimeConsumers": [
         "rust-core",
@@ -9308,6 +9274,44 @@
       "fixtureId": "slack-positive-unicode-byte-offset",
       "kind": "overlap",
       "note": "Reclassified by issue #371 (docs/decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md): the xoxb- value has no digit sections, so slack-token no longer claims it; the literal Bearer scheme is still owned by bearer-token instead, at the same UTF-8 byte offsets (a preceding astral-plane emoji, a 4-byte UTF-8 sequence, still shifts them correctly). Input unchanged; expectation corrected.",
+      "result": "flagged",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "supported"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractTier": "canonical",
+      "detector": "slack-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 1,
+      "fixtureId": "slack-positive-user-secret-27-bytes",
+      "kind": "positive",
+      "note": "Issue #730: the provider freezes no secret width (pre-2016 tokens carry 6 or 10 byte secrets), so a 27-byte secret (formerly below #512's tool-derived 28-byte floor) is inside the frozen grammar.",
+      "result": "flagged",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "supported"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractTier": "canonical",
+      "detector": "slack-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 1,
+      "fixtureId": "slack-positive-user-segment-14-digits",
+      "kind": "positive",
+      "note": "Issue #730: the provider freezes no numeric section width, so a 14-digit first section (formerly an intentional false negative under #512's tool-derived 10-13 range) is inside the `xoxp-<digits>-<digits>-<digits>-<alnum>` grammar.",
       "result": "flagged",
       "runtimeConsumers": [
         "rust-core",
@@ -9353,6 +9357,481 @@
       ],
       "scanMode": "synchronous",
       "support": "intentionally-unsupported"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractTier": "adversarial",
+      "detector": "slack-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 0,
+      "fixtureId": "slack-user-token-adversarial-long-suffix",
+      "kind": "adversarial",
+      "note": "A long run of repeated section prefixes is not a token: every attempt fails its section grammar and the scan stays linear and bounded.",
+      "result": "silent",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "supported"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractTier": "malformed",
+      "detector": "slack-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 0,
+      "fixtureId": "slack-user-token-boundary-dash-in-secret",
+      "kind": "boundary",
+      "note": "A dash inside the secret section makes it a wider identifier.",
+      "result": "silent",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "intentionally-unsupported"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractTier": "malformed",
+      "detector": "slack-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 0,
+      "fixtureId": "slack-user-token-boundary-empty-secret",
+      "kind": "boundary",
+      "note": "An empty secret section is not a token.",
+      "result": "silent",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "intentionally-unsupported"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractTier": "malformed",
+      "detector": "slack-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 0,
+      "fixtureId": "slack-user-token-boundary-letter-in-numeric-section",
+      "kind": "boundary",
+      "note": "A letter inside a numeric section breaks the section grammar.",
+      "result": "silent",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "intentionally-unsupported"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractTier": "malformed",
+      "detector": "slack-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 0,
+      "fixtureId": "slack-user-token-boundary-missing-secret-separator",
+      "kind": "boundary",
+      "note": "Without the dash before the secret section the value is one long numeric-then-alphabetic run.",
+      "result": "silent",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "intentionally-unsupported"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractTier": "malformed",
+      "detector": "slack-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 0,
+      "fixtureId": "slack-user-token-boundary-two-numeric-sections",
+      "kind": "boundary",
+      "note": "Only two numeric sections precede the secret.",
+      "result": "silent",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "intentionally-unsupported"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractTier": "malformed",
+      "detector": "slack-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 0,
+      "fixtureId": "slack-user-token-boundary-underscore-separator",
+      "kind": "boundary",
+      "note": "A different separator in the prefix is not the frozen prefix.",
+      "result": "silent",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "intentionally-unsupported"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractTier": "negative",
+      "detector": "slack-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 0,
+      "fixtureId": "slack-user-token-negative-bot-token-sibling",
+      "kind": "negative",
+      "note": "A bot-prefixed non-token value is not a user token.",
+      "result": "silent",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "supported"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractTier": "negative",
+      "detector": "slack-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 0,
+      "fixtureId": "slack-user-token-negative-embedded-in-wider-identifier",
+      "kind": "negative",
+      "note": "The prefix embedded inside a wider identifier is not boundary-delimited.",
+      "result": "silent",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "supported"
+    },
+    {
+      "contexts": [
+        "github-actions"
+      ],
+      "contractTier": "negative",
+      "detector": "slack-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 0,
+      "fixtureId": "slack-user-token-negative-github-actions-secret-reference",
+      "kind": "negative",
+      "note": "A GitHub Actions secret reference names the secret and carries no value.",
+      "result": "silent",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "supported"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractTier": "negative",
+      "detector": "slack-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 0,
+      "fixtureId": "slack-user-token-negative-masked",
+      "kind": "negative",
+      "note": "A masked value carries no numeric sections.",
+      "result": "silent",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "supported"
+    },
+    {
+      "contexts": [
+        "markdown"
+      ],
+      "contractTier": "negative",
+      "detector": "slack-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 0,
+      "fixtureId": "slack-user-token-negative-prefix-in-prose",
+      "kind": "negative",
+      "note": "A prose mention of the prefix has no sections.",
+      "result": "silent",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "supported"
+    },
+    {
+      "contexts": [
+        "json"
+      ],
+      "contractTier": "negative",
+      "detector": "slack-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 0,
+      "fixtureId": "slack-user-token-negative-public-identifiers",
+      "kind": "negative",
+      "note": "Public Slack identifiers are not tokens.",
+      "result": "silent",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "supported"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractTier": "contextual",
+      "detector": "slack-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 1,
+      "fixtureId": "slack-user-token-overlap-context",
+      "kind": "overlap",
+      "note": "Qualified provider evidence wins over a contextual assignment.",
+      "result": "flagged",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "supported"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractTier": "canonical",
+      "detector": "slack-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 1,
+      "fixtureId": "slack-user-token-positive-bare",
+      "kind": "positive",
+      "note": "The frozen xoxp- prefix, three numeric sections and a final secret section are sufficient on their own; no surrounding context is required.",
+      "result": "flagged",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "supported"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractTier": "canonical",
+      "detector": "slack-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 1,
+      "fixtureId": "slack-user-token-positive-crlf-unicode-prefix",
+      "kind": "positive",
+      "note": "CRLF and astral characters before the value keep the byte range exact.",
+      "result": "flagged",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "supported"
+    },
+    {
+      "contexts": [
+        "dotenv"
+      ],
+      "contractTier": "canonical",
+      "detector": "slack-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 1,
+      "fixtureId": "slack-user-token-positive-dotenv",
+      "kind": "positive",
+      "note": "A named dotenv assignment is reported at exactly the value.",
+      "result": "flagged",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "supported"
+    },
+    {
+      "contexts": [
+        "github-actions"
+      ],
+      "contractTier": "contextual",
+      "detector": "slack-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 1,
+      "fixtureId": "slack-user-token-positive-github-actions",
+      "kind": "positive",
+      "note": "A workflow env value is reported at exactly the value.",
+      "result": "flagged",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "supported"
+    },
+    {
+      "contexts": [
+        "json"
+      ],
+      "contractTier": "contextual",
+      "detector": "slack-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 1,
+      "fixtureId": "slack-user-token-positive-json-config",
+      "kind": "positive",
+      "note": "A structured configuration value is reported at exactly the value.",
+      "result": "flagged",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "supported"
+    },
+    {
+      "contexts": [
+        "log"
+      ],
+      "contractTier": "canonical",
+      "detector": "slack-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 1,
+      "fixtureId": "slack-user-token-positive-log",
+      "kind": "positive",
+      "note": "A log line embedding the value is reported at exactly the value.",
+      "result": "flagged",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "supported"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractTier": "canonical",
+      "detector": "slack-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 1,
+      "fixtureId": "slack-user-token-positive-long-secret",
+      "kind": "positive",
+      "note": "Widths are open: a long secret section is in the grammar.",
+      "result": "flagged",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "supported"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractTier": "canonical",
+      "detector": "slack-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 1,
+      "fixtureId": "slack-user-token-positive-punctuation-adjacent",
+      "kind": "positive",
+      "note": "Adjacent punctuation stays outside the span.",
+      "result": "flagged",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "supported"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractTier": "contextual",
+      "detector": "slack-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 2,
+      "fixtureId": "slack-user-token-positive-repeated-value",
+      "kind": "positive",
+      "note": "Each independent occurrence of a repeated value is reported.",
+      "result": "flagged",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "supported"
+    },
+    {
+      "contexts": [
+        "shell"
+      ],
+      "contractTier": "canonical",
+      "detector": "slack-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 1,
+      "fixtureId": "slack-user-token-positive-shell-quoted",
+      "kind": "positive",
+      "note": "A quoted shell export excludes the quotes from the span.",
+      "result": "flagged",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "supported"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractTier": "canonical",
+      "detector": "slack-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 1,
+      "fixtureId": "slack-user-token-positive-short-secret-and-sections",
+      "kind": "positive",
+      "note": "Widths are open: short numeric sections and a pre-2016 style 6-byte secret are in the grammar.",
+      "result": "flagged",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "supported"
     }
   ]
 }

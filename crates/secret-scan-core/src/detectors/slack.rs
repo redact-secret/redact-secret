@@ -11,7 +11,7 @@
 //!
 //! ```text
 //! xoxb-<10-13 [0-9]>-<10-13 [0-9]>-<18+ [A-Za-z0-9]>              bot
-//! xoxp-<10-13 [0-9]>-<10-13 [0-9]>-<10-13 [0-9]>-<28+ [A-Za-z0-9]>  user
+//! xoxp-<[0-9]+>-<[0-9]+>-<[0-9]+>-<[A-Za-z0-9]+>                  user
 //! xoxe-<1 [0-9]>-<20+ [A-Za-z0-9_-]>                              refresh
 //! xoxe.xoxb-<1 [0-9]>-<20+ [A-Za-z0-9_-]>                         rotating bot
 //! xoxe.xoxp-<1 [0-9]>-<20+ [A-Za-z0-9_-]>                         rotating user
@@ -19,13 +19,16 @@
 //!
 //! (`docs/decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md`,
 //! Slack user/rotation row).
-//! Every numeric section width above is tool-corroborated (gitleaks and
+//! The bot's numeric section widths above are tool-corroborated (gitleaks and
 //! trufflehog both use `10-13` for every Slack `-`-separated numeric
 //! section they recognize); the provider establishes only that sections are
-//! `-`-separated. The user secret's 28-byte floor is gitleaks'
-//! `slack-user-token` lower bound; the provider shows one full 32-byte
-//! example (`d6bc768406e5c2e6958cfc399b438004`,
-//! <https://docs.slack.dev/authentication/tokens>, observed 2026-09-20) but
+//! `-`-separated. Issue #730 froze the `xoxp-` user form as
+//! `xoxp-<digits>-<digits>-<digits>-<alnum>` with no width rule (its own
+//! `slack_user_token` type, see [`scan_user`]): the provider documents the
+//! prefix, the dash-separated sections and the three-numeric-section
+//! example, and shows a 32-byte secret example
+//! (`d6bc768406e5c2e6958cfc399b438004`,
+//! <https://docs.slack.dev/authentication/tokens>, observed 2026-09-20), but
 //! states no length rule, and pre-2016 6/10-byte secrets are documented as
 //! still rotatable. The rotation family's single-digit version section
 //! reproduces every provider example verbatim (`xoxe-1-...`,
@@ -111,16 +114,13 @@ const SECTION_MAX: usize = 13;
 /// Support-policy floor for the bot secret section: the smallest bot-secret
 /// width any consulted tool accepts (gitleaks' legacy-bot rule, 18).
 const BOT_SECRET_MIN: usize = 18;
-/// Support-policy floor for the user secret section: gitleaks'
-/// `slack-user-token` lower bound (`{28,34}`); see the module doc for why no
-/// exact length is adopted.
-const USER_SECRET_MIN: usize = 28;
 /// `[A-Za-z0-9]`, narrower than the `[A-Za-z0-9_-]` boundary, shared by the
 /// bot and user secret sections: a trailing `_` or `-` still rejects a
 /// truncated candidate instead of being folded into the secret.
 const SECRET_ALPHABET: Alphabet = pattern::is_alnum;
 const BOT_SIGNALS: [&str; 2] = ["slack-documented-prefix", "bot-section-grammar"];
 const USER_SIGNALS: [&str; 2] = ["slack-documented-prefix", "user-section-grammar"];
+const USER_TYPE: &str = "slack_user_token";
 
 /// The rotation family's documented version section (see the module doc).
 const ROTATION_DIGIT_WIDTH: usize = 1;
@@ -200,7 +200,7 @@ fn scan(input: &str) -> Vec<Match> {
     matches.extend(
         scan_user(input)
             .into_iter()
-            .map(|(start, end)| (start, end, TOKEN_TYPE, USER_SIGNALS.as_slice())),
+            .map(|(start, end)| (start, end, USER_TYPE, USER_SIGNALS.as_slice())),
     );
     let rotation_shape = SectionedShape {
         section_count: 1,
@@ -312,18 +312,24 @@ fn scan_bot(input: &str) -> Vec<(usize, usize)> {
     )
 }
 
-/// Every boundary-delimited `xoxp-` user value, left to right: three 10-13
-/// digit sections then a 28+ byte alnum secret.
+/// Every boundary-delimited `xoxp-` user value, left to right: the frozen
+/// anatomy `xoxp-<digits>-<digits>-<digits>-<alnum>` (issue #730,
+/// `docs/audits/evidence/726/README.md`). Every section is a non-empty run;
+/// the provider states only the prefix, the `-`-separated sections and the
+/// three-numeric-section example, so no width is a negative rule (tools say
+/// 10-13 digits and a 28+ byte secret, but pre-2016 tokens carry 6 or 10 byte
+/// secrets). A `xoxp-` that is the tail of the rotating `xoxe.xoxp-` prefix
+/// belongs to the rotation scan and is skipped here.
 fn scan_user(input: &str) -> Vec<(usize, usize)> {
     scan_sectioned(
         input,
         USER_PREFIX,
-        None,
+        Some(ROTATING_LEAD),
         SectionedShape {
             section_count: 3,
-            digit_min: SECTION_MIN,
-            digit_max: SECTION_MAX,
-            tail_min: USER_SECRET_MIN,
+            digit_min: 1,
+            digit_max: usize::MAX,
+            tail_min: 1,
             tail_alphabet: SECRET_ALPHABET,
         },
     )
@@ -561,10 +567,10 @@ mod tests {
     }
 
     #[test]
-    fn detects_the_user_form_with_exact_metadata() {
+    fn detects_the_user_form_with_its_own_type_and_metadata() {
         let candidates = detect(USER_POSITIVE);
         assert_eq!(candidates.len(), 1);
-        assert_eq!(candidates[0].type_name(), "slack_token");
+        assert_eq!(candidates[0].type_name(), USER_TYPE);
         assert_eq!(candidates[0].confidence(), Confidence::High);
         assert_eq!(candidates[0].effective_specificity(), Specificity::Provider);
         assert_eq!(
@@ -579,37 +585,39 @@ mod tests {
     }
 
     #[test]
-    fn rejects_a_user_numeric_section_one_byte_off_from_the_documented_width() {
-        for bad_len in [9, 14] {
-            let bad = "1".repeat(bad_len);
-            let good = "1".repeat(SECTION_MIN);
-            let input = format!("xoxp-{bad}-{good}-{good}-SYNTHETICREVOKEDUSERSECRETVALUE1");
-            assert!(ranges(&input).is_empty(), "{bad_len}");
+    fn user_section_and_secret_widths_are_open() {
+        // Issue #730: the provider freezes no width, so none is a negative
+        // rule: short and long numeric sections and pre-2016 6/10 byte
+        // secrets are all in the grammar.
+        for input in [
+            "xoxp-1-2-3-abcdef".to_owned(),
+            "xoxp-123456789-1234567890123456-12-0123456789".to_owned(),
+            format!("xoxp-{0}-{0}-{0}-{1}", "7".repeat(30), "S".repeat(255)),
+        ] {
+            assert_eq!(ranges(&input), vec![(0, input.len())], "{input}");
         }
     }
 
     #[test]
-    fn accepts_every_documented_numeric_width_from_ten_to_thirteen_for_the_user_form() {
-        for len in SECTION_MIN..=SECTION_MAX {
-            let section = "7".repeat(len);
-            let input =
-                format!("xoxp-{section}-{section}-{section}-SYNTHETICREVOKEDUSERSECRETVALUE1");
-            assert_eq!(ranges(&input), vec![(0, input.len())], "{len}");
+    fn rejects_a_user_value_missing_a_section_or_the_secret() {
+        for input in [
+            "xoxp-1234567890123-3210987654321-SYNTHETICREVOKEDUSERSECRETVALUE1",
+            "xoxp-1234567890123-3210987654321-1112223334445-",
+            "xoxp-1234567890123-3210987654321-1112223334445",
+            "xoxp--3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1",
+        ] {
+            assert!(ranges(input).is_empty(), "{input}");
         }
     }
 
     #[test]
-    fn rejects_a_user_secret_section_one_byte_short_of_the_twenty_eight_byte_floor() {
-        let short_secret = "S".repeat(USER_SECRET_MIN - 1);
-        let input = format!("xoxp-1234567890123-3210987654321-1112223334445-{short_secret}");
-        assert!(ranges(&input).is_empty());
-    }
-
-    #[test]
-    fn accepts_a_user_secret_section_at_exactly_the_twenty_eight_byte_floor() {
-        let secret = "S".repeat(USER_SECRET_MIN);
-        let input = format!("xoxp-1234567890123-3210987654321-1112223334445-{secret}");
-        assert_eq!(ranges(&input), vec![(0, input.len())]);
+    fn rejects_a_letter_or_underscore_in_a_numeric_section() {
+        for input in [
+            "xoxp-12345A7890-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1",
+            "xoxp-1234567890_3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1",
+        ] {
+            assert!(ranges(input).is_empty(), "{input}");
+        }
     }
 
     #[test]
@@ -617,11 +625,25 @@ mod tests {
         // The secret alphabet is `[A-Za-z0-9]` only, narrower than the
         // `[A-Za-z0-9_-]` boundary, the same choice the bot secret makes.
         for byte in ['_', '-'] {
-            let mut secret = "S".repeat(USER_SECRET_MIN);
+            let mut secret = "S".repeat(32);
             secret.replace_range(5..6, &byte.to_string());
             let input = format!("xoxp-1234567890123-3210987654321-1112223334445-{secret}");
             assert!(ranges(&input).is_empty(), "{byte}");
         }
+    }
+
+    #[test]
+    fn a_rotating_user_token_is_left_to_the_rotation_scan() {
+        let input = format!("xoxe.xoxp-1-{OPAQUE_TWENTY_BYTE_BODY}");
+        let candidates = detect(&input);
+        assert_eq!(candidates.len(), 1);
+        assert_eq!(candidates[0].type_name(), TOKEN_TYPE);
+        let three_section = "xoxe.xoxp-1-2-3-abcdef";
+        assert!(
+            detect(three_section)
+                .iter()
+                .all(|candidate| candidate.type_name() != USER_TYPE)
+        );
     }
 
     #[test]

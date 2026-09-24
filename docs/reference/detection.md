@@ -44,7 +44,7 @@ for your host. An organization-specific format that is not listed here can be ad
 as a [declarative ruleset](../guides/rulesets.md).
 
 <!-- detector-inventory:start -->
-63 built-in detectors emit 72 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
+67 built-in detectors emit 77 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
 
 | Detector | Finding types | Default policy class | Schemes |
 | --- | --- | --- | --- |
@@ -57,7 +57,7 @@ as a [declarative ruleset](../guides/rulesets.md).
 | `shopify-token` | `shopify_access_token` | `always-redact` | — |
 | `vault-token` | `vault_token` | `always-redact` | — |
 | `stripe-token` | `stripe_webhook_signing_secret`, `stripe_credential` | `always-redact` | — |
-| `slack-token` | `slack_app_level_token`, `slack_token` | `always-redact` | — |
+| `slack-token` | `slack_app_level_token`, `slack_user_token`, `slack_token` | `always-redact` | — |
 | `pypi-token` | `pypi_api_token` | `always-redact` | — |
 | `huggingface-token` | `huggingface_token` | `always-redact` | — |
 | `docker-token` | `docker_token` | `always-redact` | — |
@@ -102,6 +102,10 @@ as a [declarative ruleset](../guides/rulesets.md).
 | `groq-api-key` | `groq_api_key` | `always-redact` | — |
 | `xai-api-key` | `xai_api_key` | `always-redact` | — |
 | `openrouter-api-key` | `openrouter_api_key` | `always-redact` | — |
+| `perplexity-api-key` | `perplexity_api_key` | `always-redact` | — |
+| `fireworks-ai-api-key` | `fireworks_ai_api_key` | `always-redact` | — |
+| `pinecone-api-key` | `pinecone_api_key` | `always-redact` | — |
+| `gitlab-runner-authentication-token` | `gitlab_runner_authentication_token` | `always-redact` | — |
 | `databricks-personal-access-token` | `databricks_personal_access_token` | `always-redact` | — |
 | `confluent-cloud-api-secret` | `confluent_cloud_api_secret` | `always-redact` | — |
 | `confluent-cloud-api-secret-legacy` | `confluent_cloud_api_secret_legacy` | `confidence-gated` | — |
