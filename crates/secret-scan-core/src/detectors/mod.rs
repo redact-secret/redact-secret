@@ -41,6 +41,7 @@ mod okta;
 mod openai;
 mod otpauth;
 mod pattern;
+mod pinecone;
 mod postman;
 mod private_key;
 mod ruleset_adapter;
@@ -121,6 +122,10 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(ai_inference::GROQ),
         Box::new(ai_inference::XAI),
         Box::new(ai_inference::OPENROUTER),
+        Box::new(ai_inference::PERPLEXITY),
+        Box::new(ai_inference::FIREWORKS),
+        Box::new(pinecone::PINECONE),
+        Box::new(gitlab::GitlabRunnerAuthenticationTokenDetector),
         Box::new(databricks::DATABRICKS),
         Box::new(confluent::CONFLUENT_CLOUD_API_SECRET),
         Box::new(confluent::ConfluentLegacyApiSecretDetector),
@@ -229,6 +234,10 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("groq-api-key", Pack::Provider),
     ("xai-api-key", Pack::Provider),
     ("openrouter-api-key", Pack::Provider),
+    ("perplexity-api-key", Pack::Provider),
+    ("fireworks-ai-api-key", Pack::Provider),
+    ("pinecone-api-key", Pack::Provider),
+    ("gitlab-runner-authentication-token", Pack::Provider),
     ("databricks-personal-access-token", Pack::Provider),
     ("confluent-cloud-api-secret", Pack::Provider),
     ("confluent-cloud-api-secret-legacy", Pack::Provider),
@@ -326,6 +335,10 @@ mod tests {
                 "groq-api-key",
                 "xai-api-key",
                 "openrouter-api-key",
+                "perplexity-api-key",
+                "fireworks-ai-api-key",
+                "pinecone-api-key",
+                "gitlab-runner-authentication-token",
                 "databricks-personal-access-token",
                 "confluent-cloud-api-secret",
                 "confluent-cloud-api-secret-legacy",
@@ -643,6 +656,13 @@ mod tests {
         );
         let xai_api_key_input = format!("xai-{}", "0123456789".repeat(8));
         let openrouter_api_key_input = format!("sk-or-v1-{}", "0123456789abcdef".repeat(4));
+        let perplexity_api_key_input = format!("pplx-{}", "0123456789".repeat(4) + "abcdefgh");
+        let fireworks_ai_api_key_input = format!("fw_{}", "SyntheticRevokedFwKey1");
+        let pinecone_api_key_input = format!(
+            "pcsk_SynTh_{}",
+            "0123456789abcdef".repeat(4)[..63].to_owned()
+        );
+        let gitlab_runner_input = "glrt-SyntheticRevokedRunnerPayloadA1.01.0v0xy8zct";
         let cases = [
             (
                 "sentry-user-auth-token",
@@ -675,6 +695,10 @@ mod tests {
             ("groq-api-key", groq_api_key_input.as_str()),
             ("xai-api-key", xai_api_key_input.as_str()),
             ("openrouter-api-key", openrouter_api_key_input.as_str()),
+            ("perplexity-api-key", perplexity_api_key_input.as_str()),
+            ("fireworks-ai-api-key", fireworks_ai_api_key_input.as_str()),
+            ("pinecone-api-key", pinecone_api_key_input.as_str()),
+            ("gitlab-runner-authentication-token", gitlab_runner_input),
             (
                 "databricks-personal-access-token",
                 databricks_personal_access_token_input.as_str(),

@@ -463,7 +463,6 @@
         ],
         "kindsWithSupportedEvidence": [
           "adversarial",
-          "boundary",
           "negative",
           "overlap",
           "positive"
@@ -746,9 +745,10 @@
     {
       "detector": "slack-token",
       "evidence": {
-        "fixtureCount": 72,
+        "fixtureCount": 97,
         "hostContextsExercised": [
           "dotenv",
+          "github-actions",
           "http",
           "json",
           "log",
@@ -783,9 +783,58 @@
     {
       "detector": "slack-token",
       "evidence": {
-        "fixtureCount": 72,
+        "fixtureCount": 97,
         "hostContextsExercised": [
           "dotenv",
+          "github-actions",
+          "http",
+          "json",
+          "log",
+          "markdown",
+          "plain-text",
+          "shell",
+          "toml",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "slack-positive-structural-prefixes",
+        "slack-positive-user-secret-27-bytes",
+        "slack-positive-user-segment-14-digits",
+        "slack-user-token-positive-bare",
+        "slack-user-token-positive-crlf-unicode-prefix",
+        "slack-user-token-positive-dotenv",
+        "slack-user-token-positive-github-actions",
+        "slack-user-token-positive-json-config",
+        "slack-user-token-positive-log",
+        "slack-user-token-positive-long-secret",
+        "slack-user-token-positive-punctuation-adjacent",
+        "slack-user-token-positive-repeated-value",
+        "slack-user-token-positive-shell-quoted",
+        "slack-user-token-positive-short-secret-and-sections"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "slack_user_token"
+    },
+    {
+      "detector": "slack-token",
+      "evidence": {
+        "fixtureCount": 97,
+        "hostContextsExercised": [
+          "dotenv",
+          "github-actions",
           "http",
           "json",
           "log",
@@ -2820,6 +2869,172 @@
       "type": "openrouter_api_key"
     },
     {
+      "detector": "perplexity-api-key",
+      "evidence": {
+        "fixtureCount": 22,
+        "hostContextsExercised": [
+          "dotenv",
+          "github-actions",
+          "json",
+          "log",
+          "markdown",
+          "plain-text",
+          "shell"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "perplexity-api-key-positive-bare",
+        "perplexity-api-key-positive-crlf-unicode-prefix",
+        "perplexity-api-key-positive-dotenv",
+        "perplexity-api-key-positive-github-actions",
+        "perplexity-api-key-positive-json-config",
+        "perplexity-api-key-positive-log",
+        "perplexity-api-key-positive-punctuation-adjacent",
+        "perplexity-api-key-positive-repeated-value",
+        "perplexity-api-key-positive-shell-quoted"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "perplexity_api_key"
+    },
+    {
+      "detector": "fireworks-ai-api-key",
+      "evidence": {
+        "fixtureCount": 24,
+        "hostContextsExercised": [
+          "dotenv",
+          "github-actions",
+          "json",
+          "log",
+          "markdown",
+          "plain-text",
+          "shell"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "fireworks-ai-api-key-positive-24-byte-body",
+        "fireworks-ai-api-key-positive-bare",
+        "fireworks-ai-api-key-positive-crlf-unicode-prefix",
+        "fireworks-ai-api-key-positive-dotenv",
+        "fireworks-ai-api-key-positive-github-actions",
+        "fireworks-ai-api-key-positive-json-config",
+        "fireworks-ai-api-key-positive-log",
+        "fireworks-ai-api-key-positive-punctuation-adjacent",
+        "fireworks-ai-api-key-positive-repeated-value",
+        "fireworks-ai-api-key-positive-shell-quoted"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "fireworks_ai_api_key"
+    },
+    {
+      "detector": "pinecone-api-key",
+      "evidence": {
+        "fixtureCount": 25,
+        "hostContextsExercised": [
+          "dotenv",
+          "github-actions",
+          "json",
+          "log",
+          "markdown",
+          "plain-text",
+          "shell"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "pinecone-api-key-positive-bare",
+        "pinecone-api-key-positive-crlf-unicode-prefix",
+        "pinecone-api-key-positive-dotenv",
+        "pinecone-api-key-positive-github-actions",
+        "pinecone-api-key-positive-json-config",
+        "pinecone-api-key-positive-log",
+        "pinecone-api-key-positive-punctuation-adjacent",
+        "pinecone-api-key-positive-repeated-value",
+        "pinecone-api-key-positive-shell-quoted",
+        "pinecone-api-key-positive-six-byte-label"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "pinecone_api_key"
+    },
+    {
+      "detector": "gitlab-runner-authentication-token",
+      "evidence": {
+        "fixtureCount": 26,
+        "hostContextsExercised": [
+          "dotenv",
+          "github-actions",
+          "json",
+          "log",
+          "markdown",
+          "plain-text",
+          "shell"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "gitlab-runner-token-positive-bare",
+        "gitlab-runner-token-positive-crlf-unicode-prefix",
+        "gitlab-runner-token-positive-dotenv",
+        "gitlab-runner-token-positive-github-actions",
+        "gitlab-runner-token-positive-json-config",
+        "gitlab-runner-token-positive-log",
+        "gitlab-runner-token-positive-partitioned-body",
+        "gitlab-runner-token-positive-punctuation-adjacent",
+        "gitlab-runner-token-positive-repeated-value",
+        "gitlab-runner-token-positive-routable-checksum-valid",
+        "gitlab-runner-token-positive-routable-dash-underscore-payload",
+        "gitlab-runner-token-positive-routable-in-config-toml",
+        "gitlab-runner-token-positive-shell-quoted"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "gitlab_runner_authentication_token"
+    },
+    {
       "detector": "databricks-personal-access-token",
       "evidence": {
         "fixtureCount": 31,
@@ -3200,7 +3415,7 @@
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 72,
+    "supported": 77,
     "unresolved": 0
   }
 }

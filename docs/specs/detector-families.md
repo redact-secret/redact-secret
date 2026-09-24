@@ -37,12 +37,14 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `discord_bot_token` | `discord-bot-token` | `always-redact` | [Freeze the Discord bot token grammar as a three-segment digit-decoding snowflake token](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `docker_token` | `docker-token` | `always-redact` | [Freeze the Docker Hub access token grammar as two separately-sized exact-length prefixed shapes](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `firebase_server_key` | `firebase-server-key` | `always-redact` | [Add Firebase FCM legacy server key detection, and discriminate the public Web SDK client config from google-api-key](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
+| `fireworks_ai_api_key` | `fireworks-ai-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `github_app_installation_token` | `github-token` | `always-redact` | [Map GitHub's six token families onto six independent finding types under one detector](../decisions/2026-09-20-map-github-token-families-onto-independent-finding-types.md) |
 | `github_app_refresh_token` | `github-token` | `always-redact` | [Map GitHub's six token families onto six independent finding types under one detector](../decisions/2026-09-20-map-github-token-families-onto-independent-finding-types.md) |
 | `github_app_user_to_server_token` | `github-token` | `always-redact` | [Map GitHub's six token families onto six independent finding types under one detector](../decisions/2026-09-20-map-github-token-families-onto-independent-finding-types.md) |
 | `github_fine_grained_personal_access_token` | `github-token` | `always-redact` | [Map GitHub's six token families onto six independent finding types under one detector](../decisions/2026-09-20-map-github-token-families-onto-independent-finding-types.md) |
 | `github_oauth_token` | `github-token` | `always-redact` | [Map GitHub's six token families onto six independent finding types under one detector](../decisions/2026-09-20-map-github-token-families-onto-independent-finding-types.md) |
 | `github_token` | `github-token` | `always-redact` | [Map GitHub's six token families onto six independent finding types under one detector](../decisions/2026-09-20-map-github-token-families-onto-independent-finding-types.md) |
+| `gitlab_runner_authentication_token` | `gitlab-runner-authentication-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `gitlab_token` | `gitlab-token` | `always-redact` | [Inventory the GitLab token-prefix table and contract the two undeclared prefixes; record routable tokens and the legacy runner-registration token as explicit, tracked gaps](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `google_api_key` | `google-api-key` | `always-redact` | [Redact a Google API key inside a Firebase Web SDK client config, reversing the client-config exemption](../decisions/2026-09-24-redact-google-api-keys-inside-firebase-web-config.md); T1 provider source recorded in [#642 evidence](../audits/evidence/642/README.md) |
 | `grafana_cloud_access_policy_token` | `grafana-cloud-access-policy-token` | `always-redact` | [Freeze the Grafana service account and Cloud access policy token grammar, and exclude the legacy API key](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md); T1 provider source recorded in [#642 evidence](../audits/evidence/642/README.md) |
@@ -67,6 +69,8 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `openai_api_key` | `openai-token` | `always-redact` | [Freeze the OpenAI API key grammar as a marker-gated shape with exact segment lengths](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `openrouter_api_key` | `openrouter-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `otpauth_secret` | `otpauth-uri` | `always-redact` | generic policy default, no dedicated ADR in this repository |
+| `perplexity_api_key` | `perplexity-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository |
+| `pinecone_api_key` | `pinecone-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `postman_api_key` | `postman-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `private_key` | `private-key` | `block` | generic policy default, no dedicated ADR in this repository |
 | `pulumi_access_token` | `pulumi-access-token` | `always-redact` | [Freeze the Pulumi access token grammar as a documented-prefix, tool-corroborated exact-length hex shape](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
@@ -78,6 +82,7 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `shopify_access_token` | `shopify-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `slack_app_level_token` | `slack-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `slack_token` | `slack-token` | `always-redact` | [Freeze the Slack bot token grammar as a three-section dash-separated shape](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
+| `slack_user_token` | `slack-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `stripe_credential` | `stripe-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `stripe_webhook_signing_secret` | `stripe-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `supabase_personal_access_token` | `supabase-management-token` | `always-redact` | [Separate the Supabase management-token credential class from the secret-key class, and keep each class's evidence independent](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
@@ -152,6 +157,34 @@ also issue `whsec_` secrets, so a bare hit is still a secret, and attributing
 a value to Stripe is a benchmark scoring concept, not a detector gate. Both
 families keep their detector ids (`slack-token`, `stripe-token`) and stay
 empirical/documented per the freeze until the benchmark evidence gates pass.
+
+### Wave-2 credentials (#730)
+
+Issue [#730](https://github.com/redact-secret/redact-secret/issues/730)
+implements the five second-wave families above without changing a frozen
+contract; no replacement from the #523/#524 pool was needed.
+`perplexity:api-key` (`pplx-` + exactly 48 alphanumeric),
+`fireworks-ai:api-key` (`fw_` + 22 or 24 alphanumeric; the two widths are
+positive hypotheses, so no other width is a negative rule beyond the exact
+match) and `pinecone:api-key` (`pcsk_` + 5–6 alphanumeric + `_` + exactly 63
+alphanumeric) each get their own detector and finding type.
+`slack:user-token` now emits `slack_user_token` for
+`xoxp-<digits>-<digits>-<digits>-<alnum>`, replacing #512's tool-derived
+10–13 digit sections and 28-byte secret floor with the provider-stated anatomy
+and no width rule, so pre-2016 short secrets are detected; the detector id
+stays `slack-token`, and a `xoxp-` that is the tail of `xoxe.xoxp-` stays with
+the rotation family. `gitlab:runner-authentication-token` moves `glrt-` out of
+`gitlab-token` into `gitlab-runner-authentication-token`, which accepts the
+exact 20-byte body (optionally after `t<hex>_`) or the routable
+`<base64url>.<2 base36>.<2 base36 length><7 base36 CRC-32>` form and verifies
+the length holder and the CRC-32 (over everything before it, prefix included)
+offline; a routable value that fails either check, and a legacy body of any
+other width, is an intentional false negative. `glrtr-`, instance-prefixed and
+unversioned routable forms stay unclaimed (`glrtr-` remains under
+`gitlab-token`). The legacy bare-UUID Pinecone key is a separate
+context-constrained candidate and is not implemented here. Each family keeps
+its frozen qualification route; a documented or empirical route is a target,
+not a support-status promotion.
 
 ## Rules
 

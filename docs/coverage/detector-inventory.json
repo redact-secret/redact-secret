@@ -125,6 +125,13 @@
       "schemes": null
     },
     {
+      "type": "slack_user_token",
+      "detector": "slack-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1",
+      "schemes": null
+    },
+    {
       "type": "slack_token",
       "detector": "slack-token",
       "policyClass": "always-redact",
@@ -469,6 +476,34 @@
       "detector": "openrouter-api-key",
       "policyClass": "always-redact",
       "reconciliationTrigger": "sk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      "schemes": null
+    },
+    {
+      "type": "perplexity_api_key",
+      "detector": "perplexity-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "pplx-SyntheticRevokedPerplexityKeyValue00000000000001",
+      "schemes": null
+    },
+    {
+      "type": "fireworks_ai_api_key",
+      "detector": "fireworks-ai-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "fw_SyntheticRevokedFwKey1",
+      "schemes": null
+    },
+    {
+      "type": "pinecone_api_key",
+      "detector": "pinecone-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "pcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001",
+      "schemes": null
+    },
+    {
+      "type": "gitlab_runner_authentication_token",
+      "detector": "gitlab-runner-authentication-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "glrt-SyntheticRevokedRunnerPayloadA1.01.0v0xy8zct",
       "schemes": null
     },
     {

@@ -1,5 +1,6 @@
 //! Replicate, Groq, xAI and `OpenRouter` inference API credential detection
-//! (issue #727, Beta.8 wave 1).
+//! (issue #727, Beta.8 wave 1), plus Perplexity and Fireworks AI (issue #730,
+//! Beta.8 wave 2).
 //!
 //! The grammars are frozen by issue #726
 //! (`docs/audits/evidence/726/README.md`, `docs/specs/detector-families.md`);
@@ -14,6 +15,14 @@
 //! | `groq:api-key` | `gsk_` + 52 from `[A-Za-z0-9]` | empirical |
 //! | `xai:api-key` | `xai-` + 80 from `[A-Za-z0-9_-]` | empirical |
 //! | `openrouter:api-key` | `sk-or-v1-` + 64 lowercase hex (73 total) | documented |
+//!
+//! | `perplexity:api-key` | `pplx-` + 48 from `[A-Za-z0-9]` (53 total) | empirical |
+//! | `fireworks-ai:api-key` | `fw_` + 22 or 24 from `[A-Za-z0-9]` | empirical |
+//!
+//! The Fireworks widths are two provisional positive hypotheses, not an
+//! exhaustive negative boundary (23 is not a documented negative); `fpk_` Fire
+//! Pass keys and any unprefixed legacy key stay unclaimed. Perplexity's width
+//! is tool-corroborated only. Analytics and MCP OAuth shapes are unclaimed.
 //!
 //! The Replicate and xAI body alphabets are the provisional union
 //! `[A-Za-z0-9_-]` (a `-` or `_` inside the body is therefore not a negative
@@ -46,6 +55,8 @@ const REPLICATE_BODY_LEN: usize = 37;
 const GROQ_BODY_LEN: usize = 52;
 const XAI_BODY_LEN: usize = 80;
 const OPENROUTER_BODY_LEN: usize = 64;
+const PERPLEXITY_BODY_LEN: usize = 48;
+const FIREWORKS_BODY_LENS: &[usize] = &[22, 24];
 
 /// `[A-Za-z0-9_-]`: the Replicate and xAI body alphabet, and the boundary
 /// alphabet: a value is never a slice of a wider identifier.
@@ -57,6 +68,8 @@ const REPLICATE_SIGNALS: [&str; 2] = ["replicate-documented-prefix", "exact-leng
 const GROQ_SIGNALS: [&str; 2] = ["groq-tool-corroborated-prefix", "exact-length-suffix"];
 const XAI_SIGNALS: [&str; 2] = ["xai-documented-prefix", "exact-length-suffix"];
 const OPENROUTER_SIGNALS: [&str; 2] = ["openrouter-documented-prefix", "lowercase-hex-suffix"];
+const PERPLEXITY_SIGNALS: [&str; 2] = ["perplexity-documented-prefix", "exact-length-suffix"];
+const FIREWORKS_SIGNALS: [&str; 2] = ["fireworks-documented-prefix", "observed-length-suffix"];
 
 pub(super) const REPLICATE: KnownFormatProviderDetector = KnownFormatProviderDetector::new(
     "replicate-api-token",
@@ -102,6 +115,30 @@ pub(super) const OPENROUTER: KnownFormatProviderDetector = KnownFormatProviderDe
         OPENROUTER_BODY_LEN,
         pattern::is_lower_hex,
         &OPENROUTER_SIGNALS,
+    )],
+    is_token_char,
+);
+
+pub(super) const PERPLEXITY: KnownFormatProviderDetector = KnownFormatProviderDetector::new(
+    "perplexity-api-key",
+    "perplexity_api_key",
+    &[PrefixShape::exact(
+        "pplx-",
+        PERPLEXITY_BODY_LEN,
+        pattern::is_alnum,
+        &PERPLEXITY_SIGNALS,
+    )],
+    is_token_char,
+);
+
+pub(super) const FIREWORKS: KnownFormatProviderDetector = KnownFormatProviderDetector::new(
+    "fireworks-ai-api-key",
+    "fireworks_ai_api_key",
+    &[PrefixShape::one_of(
+        "fw_",
+        FIREWORKS_BODY_LENS,
+        pattern::is_alnum,
+        &FIREWORKS_SIGNALS,
     )],
     is_token_char,
 );
@@ -328,6 +365,86 @@ mod tests {
                     assert!(detect(other.detector, &token).is_empty(), "{}", other.id);
                 }
             }
+        }
+    }
+
+    const PERPLEXITY_BODY: &str = "SyntheticRevokedPerplexityKeyValue00000000000001";
+    const _: () = assert!(PERPLEXITY_BODY.len() == PERPLEXITY_BODY_LEN);
+    const FIREWORKS_BODY_22: &str = "SyntheticRevokedFwKey1";
+    const FIREWORKS_BODY_24: &str = "SyntheticRevokedFwKey123";
+    const _: () = assert!(FIREWORKS_BODY_22.len() == 22);
+    const _: () = assert!(FIREWORKS_BODY_24.len() == 24);
+
+    #[test]
+    fn perplexity_detects_the_exact_frozen_shape_and_rejects_neighbouring_widths() {
+        let token = format!("pplx-{PERPLEXITY_BODY}");
+        let candidates = detect(&PERPLEXITY, &token);
+        assert_eq!(candidates.len(), 1);
+        assert_eq!(candidates[0].type_name(), "perplexity_api_key");
+        assert_eq!(candidates[0].effective_specificity(), Specificity::Provider);
+        assert_eq!(
+            candidates[0].range(),
+            ByteRange::new(0, token.len()).unwrap()
+        );
+        for input in [
+            format!("pplx-{}", &PERPLEXITY_BODY[1..]),
+            format!("pplx-{PERPLEXITY_BODY}0"),
+            format!("pplx-{}-{}", &PERPLEXITY_BODY[..20], &PERPLEXITY_BODY[21..]),
+            format!("PPLX-{PERPLEXITY_BODY}"),
+            format!("x{token}"),
+            format!("{token}_backup"),
+        ] {
+            assert!(detect(&PERPLEXITY, &input).is_empty(), "{input}");
+        }
+    }
+
+    #[test]
+    fn perplexity_leaves_public_names_and_placeholders_clean() {
+        for input in [
+            "model: pplx-embed-v1-0.6b",
+            "npm install pplx-sdk-node",
+            "PERPLEXITY_API_KEY=pplx-********************",
+            "PERPLEXITY_API_KEY=pplx-your-api-key-here",
+        ] {
+            assert!(detect(&PERPLEXITY, input).is_empty(), "{input}");
+        }
+    }
+
+    #[test]
+    fn fireworks_detects_both_observed_widths_and_no_other() {
+        for body in [FIREWORKS_BODY_22, FIREWORKS_BODY_24] {
+            let token = format!("fw_{body}");
+            let candidates = detect(&FIREWORKS, &token);
+            assert_eq!(candidates.len(), 1, "{token}");
+            assert_eq!(candidates[0].type_name(), "fireworks_ai_api_key");
+            assert_eq!(
+                candidates[0].range(),
+                ByteRange::new(0, token.len()).unwrap()
+            );
+        }
+        for input in [
+            format!("fw_{}", &FIREWORKS_BODY_22[1..]),
+            format!("fw_{FIREWORKS_BODY_22}0"),
+            format!("fw_{FIREWORKS_BODY_24}0"),
+            format!("fw_{}-{}", &FIREWORKS_BODY_22[..5], &FIREWORKS_BODY_22[6..]),
+            format!("xfw_{FIREWORKS_BODY_22}"),
+            format!("fw_{FIREWORKS_BODY_22}_backup"),
+        ] {
+            assert!(detect(&FIREWORKS, &input).is_empty(), "{input}");
+        }
+    }
+
+    #[test]
+    fn fireworks_leaves_identifiers_keychain_references_and_fpk_keys_clean() {
+        for input in [
+            "fw_id: 4f2a",
+            "fw_version = 12",
+            "fw_spec_name",
+            "keychain: fw_api_key_reference",
+            "FIREWORKS_API_KEY=fw_********************",
+            "FIREWORKS_API_KEY=fpk_SyntheticRevokedFwKey1",
+        ] {
+            assert!(detect(&FIREWORKS, input).is_empty(), "{input}");
         }
     }
 }

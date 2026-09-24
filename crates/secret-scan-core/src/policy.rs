@@ -35,7 +35,7 @@ use crate::types::{Action, Confidence, DetectedFinding, Policy, PolicyContext};
 /// correct: a confidence-gated type here can still lose an overlap to a
 /// stricter-resolving lower-specificity candidate, without needing to be
 /// added to this list.
-const ALWAYS_REDACT_TYPES: [&str; 60] = [
+const ALWAYS_REDACT_TYPES: [&str; 65] = [
     "anthropic_api_key",
     "atlassian_api_token",
     "authorization_credential",
@@ -51,12 +51,14 @@ const ALWAYS_REDACT_TYPES: [&str; 60] = [
     "discord_bot_token",
     "docker_token",
     "firebase_server_key",
+    "fireworks_ai_api_key",
     "github_app_installation_token",
     "github_app_refresh_token",
     "github_app_user_to_server_token",
     "github_fine_grained_personal_access_token",
     "github_oauth_token",
     "github_token",
+    "gitlab_runner_authentication_token",
     "gitlab_token",
     "google_api_key",
     "grafana_cloud_access_policy_token",
@@ -76,6 +78,8 @@ const ALWAYS_REDACT_TYPES: [&str; 60] = [
     "openai_api_key",
     "openrouter_api_key",
     "otpauth_secret",
+    "perplexity_api_key",
+    "pinecone_api_key",
     "postman_api_key",
     "pulumi_access_token",
     "pypi_api_token",
@@ -86,6 +90,7 @@ const ALWAYS_REDACT_TYPES: [&str; 60] = [
     "shopify_access_token",
     "slack_app_level_token",
     "slack_token",
+    "slack_user_token",
     "stripe_credential",
     "stripe_webhook_signing_secret",
     "supabase_personal_access_token",

@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 1879,
+  "fixtureCount": 2001,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -3932,7 +3932,7 @@
       "expected": [
         {
           "detector": "slack-token",
-          "type": "slack_token",
+          "type": "slack_user_token",
           "confidence": "high",
           "specificity": "provider",
           "start": 0,
@@ -3963,7 +3963,7 @@
           "end": 223
         }
       ],
-      "note": "Issue #512 (docs/decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md): each of the four newly-promoted families (user, refresh, rotating-bot, rotating-user) is independently detected at its own full documented section grammar, the corrected counterpart of `slack-positive-all-prefixes` for these four prefixes. The rotation tail here is 38 bytes, past its 20-byte floor, exercising issue #570's open-floor fix (#551 briefly turned the floor into an exact length and shrank this fixture's tail to fit; restored)."
+      "note": "Issue #512 (docs/decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md): each of the four newly-promoted families (user, refresh, rotating-bot, rotating-user) is independently detected at its own full documented section grammar, the corrected counterpart of `slack-positive-all-prefixes` for these four prefixes. The rotation tail here is 38 bytes, past its 20-byte floor, exercising issue #570's open-floor fix (#551 briefly turned the floor into an exact length and shrank this fixture's tail to fit; restored). Issue #730 gives the `xoxp-` user form its own `slack_user_token` type and open-width section grammar; this 75-byte value still matches it."
     },
     {
       "id": "slack-boundary-user-no-section-grammar",
@@ -3976,7 +3976,7 @@
       ],
       "input": "xoxp-SYNTHETIC-REVOKED-SYNTHETIC-REVOKED-",
       "expected": [],
-      "note": "Issue #512: the user section grammar requires three `-`-separated 10-13 digit sections before the secret section; this value has none, so it is an intentional false negative, the same dimension issue #371 established for `xoxb-` (`slack-positive-qualified`)."
+      "note": "Issue #512: the user section grammar requires three `-`-separated digit sections before the secret section; this value has none, so it is an intentional false negative, the same dimension issue #371 established for `xoxb-` (`slack-positive-qualified`)."
     },
     {
       "id": "slack-boundary-user-missing-final-separator",
@@ -3992,30 +3992,48 @@
       "note": "Issue #512: the separator between the third numeric section and the secret is missing; the third section is still a valid 13-digit run, but with no `-` immediately after it the shape never resolves to the documented four-section grammar."
     },
     {
-      "id": "slack-boundary-user-segment-14-digits",
+      "id": "slack-positive-user-segment-14-digits",
       "detector": "slack-token",
-      "kind": "boundary",
-      "support": "intentionally-unsupported",
-      "tier": "malformed",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
       "contexts": [
         "plain-text"
       ],
       "input": "xoxp-12345678901234-3210987654321-1112223334445-SYNTHETICUSERSECRETVALUEFIX1",
-      "expected": [],
-      "note": "Issue #512: the first numeric section is 14 digits, one past the documented 10-13 range."
+      "expected": [
+        {
+          "detector": "slack-token",
+          "type": "slack_user_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 76
+        }
+      ],
+      "note": "Issue #730: the provider freezes no numeric section width, so a 14-digit first section (formerly an intentional false negative under #512's tool-derived 10-13 range) is inside the `xoxp-<digits>-<digits>-<digits>-<alnum>` grammar."
     },
     {
-      "id": "slack-boundary-user-secret-27-bytes",
+      "id": "slack-positive-user-secret-27-bytes",
       "detector": "slack-token",
-      "kind": "boundary",
-      "support": "intentionally-unsupported",
-      "tier": "malformed",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
       "contexts": [
         "plain-text"
       ],
       "input": "xoxp-1234567890123-3210987654321-1112223334445-SSSSSSSSSSSSSSSSSSSSSSSSSSS",
-      "expected": [],
-      "note": "Issue #512: the secret section is exactly 27 bytes, one below the documented 28-byte floor (gitleaks' `slack-user-token` lower bound)."
+      "expected": [
+        {
+          "detector": "slack-token",
+          "type": "slack_user_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 74
+        }
+      ],
+      "note": "Issue #730: the provider freezes no secret width (pre-2016 tokens carry 6 or 10 byte secrets), so a 27-byte secret (formerly below #512's tool-derived 28-byte floor) is inside the frozen grammar."
     },
     {
       "id": "slack-boundary-rotation-zero-digit-version",
@@ -10069,7 +10087,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "gloas-SYNTHETIC_REVOKED_SYNTHET\ngldt-SYNTHETIC_REVOKED_SYNTHET\nglrt-SYNTHETIC_REVOKED_SYNTHET\nglrtr-SYNTHETIC_REVOKED_SYNTHET\nglcbt-SYNTHETIC_REVOKED_SYNTHET\nglptt-SYNTHETIC_REVOKED_SYNTHET\nglft-SYNTHETIC_REVOKED_SYNTHET\nglimt-SYNTHETIC_REVOKED_SYNTHET\nglagent-SYNTHETIC_REVOKED_SYNTHET\nglwt-SYNTHETIC_REVOKED_SYNTHET\nglsoat-SYNTHETIC_REVOKED_SYNTHET\nglffct-SYNTHETIC_REVOKED_SYNTHET",
+      "input": "gloas-SYNTHETIC_REVOKED_SYNTHET\ngldt-SYNTHETIC_REVOKED_SYNTHET\nglrtr-SYNTHETIC_REVOKED_SYNTHET\nglcbt-SYNTHETIC_REVOKED_SYNTHET\nglptt-SYNTHETIC_REVOKED_SYNTHET\nglft-SYNTHETIC_REVOKED_SYNTHET\nglimt-SYNTHETIC_REVOKED_SYNTHET\nglagent-SYNTHETIC_REVOKED_SYNTHET\nglwt-SYNTHETIC_REVOKED_SYNTHET\nglsoat-SYNTHETIC_REVOKED_SYNTHET\nglffct-SYNTHETIC_REVOKED_SYNTHET",
       "expected": [
         {
           "detector": "gitlab-token",
@@ -10093,30 +10111,30 @@
           "confidence": "high",
           "specificity": "provider",
           "start": 63,
-          "end": 93
+          "end": 94
         },
         {
           "detector": "gitlab-token",
           "type": "gitlab_token",
           "confidence": "high",
           "specificity": "provider",
-          "start": 94,
-          "end": 125
+          "start": 95,
+          "end": 126
         },
         {
           "detector": "gitlab-token",
           "type": "gitlab_token",
           "confidence": "high",
           "specificity": "provider",
-          "start": 126,
-          "end": 157
+          "start": 127,
+          "end": 158
         },
         {
           "detector": "gitlab-token",
           "type": "gitlab_token",
           "confidence": "high",
           "specificity": "provider",
-          "start": 158,
+          "start": 159,
           "end": 189
         },
         {
@@ -10125,22 +10143,22 @@
           "confidence": "high",
           "specificity": "provider",
           "start": 190,
-          "end": 220
+          "end": 221
         },
         {
           "detector": "gitlab-token",
           "type": "gitlab_token",
           "confidence": "high",
           "specificity": "provider",
-          "start": 221,
-          "end": 252
+          "start": 222,
+          "end": 255
         },
         {
           "detector": "gitlab-token",
           "type": "gitlab_token",
           "confidence": "high",
           "specificity": "provider",
-          "start": 253,
+          "start": 256,
           "end": 286
         },
         {
@@ -10149,26 +10167,18 @@
           "confidence": "high",
           "specificity": "provider",
           "start": 287,
-          "end": 317
+          "end": 319
         },
         {
           "detector": "gitlab-token",
           "type": "gitlab_token",
           "confidence": "high",
           "specificity": "provider",
-          "start": 318,
-          "end": 350
-        },
-        {
-          "detector": "gitlab-token",
-          "type": "gitlab_token",
-          "confidence": "high",
-          "specificity": "provider",
-          "start": 351,
-          "end": 383
+          "start": 320,
+          "end": 352
         }
       ],
-      "note": "Every remaining documented prefix variant is independently supported."
+      "note": "Every remaining documented prefix variant is independently supported; `glrt-` moved to its own `gitlab-runner-authentication-token` grammar in issue #730 (see the gitlab-runner-authentication-token-* fixtures)."
     },
     {
       "id": "gitlab-adversarial-long-suffix",
@@ -10383,29 +10393,20 @@
       ],
       "input": "glrt-t3_short.0a.SYNTHETICCHECKSUM",
       "expected": [],
-      "note": "Issue #518 inventory: a routable runner authentication token's `.`-delimited version/checksum tail sits outside the alnum/dash/underscore alphabet, so the scan sees only the base64 payload before the first `.`. A short payload (here, under the 20-byte floor) is missed entirely rather than partially matched. No source corroborates the payload's own length, so this is recorded pending/unsupported rather than given an invented grammar (see docs/decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md)."
+      "note": "Issue #518 inventory, superseded by issue #730: `glrt-` has its own exact grammar, and a routable-shaped value whose payload is under 27 bytes fails it. `gitlab-token` no longer claims `glrt-`, so this stays unreported."
     },
     {
       "id": "gitlab-boundary-routable-truncated-match",
       "detector": "gitlab-token",
       "kind": "boundary",
-      "support": "supported",
+      "support": "intentionally-unsupported",
       "tier": "malformed",
       "contexts": [
         "plain-text"
       ],
       "input": "glrt-t3_QmFzZTY0UGF5bG9hZA.0a.SYNTHETICREVOKEDCHECKSUM",
-      "expected": [
-        {
-          "detector": "gitlab-token",
-          "type": "gitlab_token",
-          "confidence": "high",
-          "specificity": "provider",
-          "start": 0,
-          "end": 26
-        }
-      ],
-      "note": "Issue #518 inventory: when a routable runner authentication token's base64 payload alone reaches the 20-byte floor, the existing grammar still matches — truncated at the first `.`, missing the version/checksum tail, but still flagging and redacting the credential. This is the existing, deliberate maximal-run behavior, not a bug; the precise end offset is not corroborated to the routable format's real segment boundary, which is why the family stays pending rather than scored."
+      "expected": [],
+      "note": "Issue #518 inventory, superseded by issue #730: `gitlab-token` no longer claims `glrt-`, and the runner grammar rejects this value (its 21-byte payload is neither a 20-byte legacy body nor a 27+ byte routable payload with a valid CRC-32), so it is no longer reported, truncated or otherwise."
     },
     {
       "id": "openai-positive-project",
@@ -44348,6 +44349,2179 @@
       "input": "sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 ",
       "expected": [],
       "note": "Repeated near-miss values do not slow the scan or produce findings."
+    },
+    {
+      "id": "perplexity-api-key-positive-bare",
+      "detector": "perplexity-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "pplx-SyntheticRevokedPerplexityKeyValue00000000000001",
+      "expected": [
+        {
+          "detector": "perplexity-api-key",
+          "type": "perplexity_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 53
+        }
+      ],
+      "note": "The frozen pplx- plus exactly 48 alphanumeric bytes is sufficient on its own; no surrounding context is required."
+    },
+    {
+      "id": "perplexity-api-key-positive-dotenv",
+      "detector": "perplexity-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "PERPLEXITY_API_KEY=pplx-SyntheticRevokedPerplexityKeyValue00000000000001",
+      "expected": [
+        {
+          "detector": "perplexity-api-key",
+          "type": "perplexity_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 19,
+          "end": 72
+        }
+      ],
+      "note": "A named dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "perplexity-api-key-positive-json-config",
+      "detector": "perplexity-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\n  \"provider\": {\n    \"apiKey\": \"pplx-SyntheticRevokedPerplexityKeyValue00000000000001\"\n  }\n}\n",
+      "expected": [
+        {
+          "detector": "perplexity-api-key",
+          "type": "perplexity_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 33,
+          "end": 86
+        }
+      ],
+      "note": "A structured configuration value is reported at exactly the value."
+    },
+    {
+      "id": "perplexity-api-key-positive-github-actions",
+      "detector": "perplexity-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "github-actions"
+      ],
+      "input": "env:\n  PERPLEXITY_API_KEY: pplx-SyntheticRevokedPerplexityKeyValue00000000000001\n",
+      "expected": [
+        {
+          "detector": "perplexity-api-key",
+          "type": "perplexity_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 27,
+          "end": 80
+        }
+      ],
+      "note": "A workflow env value is reported at exactly the value."
+    },
+    {
+      "id": "perplexity-api-key-positive-log",
+      "detector": "perplexity-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-24T12:00:00Z INFO  calling API with credential pplx-SyntheticRevokedPerplexityKeyValue00000000000001 for request\n",
+      "expected": [
+        {
+          "detector": "perplexity-api-key",
+          "type": "perplexity_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 55,
+          "end": 108
+        }
+      ],
+      "note": "A log line embedding the value is reported at exactly the value."
+    },
+    {
+      "id": "perplexity-api-key-positive-shell-quoted",
+      "detector": "perplexity-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export PERPLEXITY_API_KEY=\"pplx-SyntheticRevokedPerplexityKeyValue00000000000001\"\n",
+      "expected": [
+        {
+          "detector": "perplexity-api-key",
+          "type": "perplexity_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 27,
+          "end": 80
+        }
+      ],
+      "note": "A quoted shell export excludes the quotes from the span."
+    },
+    {
+      "id": "perplexity-api-key-positive-punctuation-adjacent",
+      "detector": "perplexity-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "(pplx-SyntheticRevokedPerplexityKeyValue00000000000001).",
+      "expected": [
+        {
+          "detector": "perplexity-api-key",
+          "type": "perplexity_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1,
+          "end": 54
+        }
+      ],
+      "note": "Adjacent punctuation stays outside the span."
+    },
+    {
+      "id": "perplexity-api-key-positive-crlf-unicode-prefix",
+      "detector": "perplexity-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 reviewed format\r\npplx-SyntheticRevokedPerplexityKeyValue00000000000001\n\r\n",
+      "expected": [
+        {
+          "detector": "perplexity-api-key",
+          "type": "perplexity_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 24,
+          "end": 77
+        }
+      ],
+      "note": "CRLF and astral characters before the value keep the byte range exact."
+    },
+    {
+      "id": "perplexity-api-key-positive-repeated-value",
+      "detector": "perplexity-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "pplx-SyntheticRevokedPerplexityKeyValue00000000000001 pplx-SyntheticRevokedPerplexityKeyValue00000000000001",
+      "expected": [
+        {
+          "detector": "perplexity-api-key",
+          "type": "perplexity_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 53
+        },
+        {
+          "detector": "perplexity-api-key",
+          "type": "perplexity_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 54,
+          "end": 107
+        }
+      ],
+      "note": "Each independent occurrence of a repeated value is reported."
+    },
+    {
+      "id": "perplexity-api-key-boundary-one-short",
+      "detector": "perplexity-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "pplx-SyntheticRevokedPerplexityKeyValue0000000000000",
+      "expected": [],
+      "note": "A body one byte short of the frozen exact width is an intentional false negative, not a fuzzy match against a minimum."
+    },
+    {
+      "id": "perplexity-api-key-boundary-one-long",
+      "detector": "perplexity-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "pplx-SyntheticRevokedPerplexityKeyValue000000000000010",
+      "expected": [],
+      "note": "A body one byte past the frozen exact width is a wider identifier and stays unreported."
+    },
+    {
+      "id": "perplexity-api-key-boundary-invalid-alphabet",
+      "detector": "perplexity-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "pplx-Syn-heticRevokedPerplexityKeyValue00000000000001",
+      "expected": [],
+      "note": "A byte outside the frozen body alphabet breaks the exact-width run, so nothing is reported."
+    },
+    {
+      "id": "perplexity-api-key-boundary-wrong-separator",
+      "detector": "perplexity-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "pplx_SyntheticRevokedPerplexityKeyValue00000000000001",
+      "expected": [],
+      "note": "A different separator in the prefix is not the frozen prefix."
+    },
+    {
+      "id": "perplexity-api-key-boundary-encoded-prefix",
+      "detector": "perplexity-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "pplx%2DSyntheticRevokedPerplexityKeyValue00000000000001",
+      "expected": [],
+      "note": "A percent-encoded delimiter lookalike is not the frozen prefix."
+    },
+    {
+      "id": "perplexity-api-key-negative-embedded-in-wider-identifier",
+      "detector": "perplexity-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "legacypplx-SyntheticRevokedPerplexityKeyValue00000000000001",
+      "expected": [],
+      "note": "The prefix embedded inside a wider identifier is not boundary-delimited."
+    },
+    {
+      "id": "perplexity-api-key-negative-masked",
+      "detector": "perplexity-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "pplx-************************************************",
+      "expected": [],
+      "note": "A masked value of the correct width carries no valid body bytes."
+    },
+    {
+      "id": "perplexity-api-key-negative-model-identifier",
+      "detector": "perplexity-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"model\": \"pplx-embed-v1-0.6b\", \"dimensions\": 1024}\n",
+      "expected": [],
+      "note": "A public model identifier is not a pplx- credential."
+    },
+    {
+      "id": "perplexity-api-key-negative-placeholder",
+      "detector": "perplexity-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "PERPLEXITY_API_KEY=pplx-your-api-key-here\n",
+      "expected": [],
+      "note": "A documentation placeholder carries no exact-width body."
+    },
+    {
+      "id": "perplexity-api-key-negative-prefix-in-prose",
+      "detector": "perplexity-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "markdown"
+      ],
+      "input": "Perplexity keys begin with pplx- followed by an opaque value.\n",
+      "expected": [],
+      "note": "A prose mention of the prefix has no exact-width body."
+    },
+    {
+      "id": "perplexity-api-key-negative-github-actions-secret-reference",
+      "detector": "perplexity-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "github-actions"
+      ],
+      "input": "env:\n  PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}\n",
+      "expected": [],
+      "note": "A GitHub Actions secret reference names the secret and carries no value."
+    },
+    {
+      "id": "perplexity-api-key-overlap-context",
+      "detector": "perplexity-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "access_token=pplx-SyntheticRevokedPerplexityKeyValue00000000000001",
+      "expected": [
+        {
+          "detector": "perplexity-api-key",
+          "type": "perplexity_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 66
+        }
+      ],
+      "note": "Qualified provider evidence wins over a contextual assignment."
+    },
+    {
+      "id": "perplexity-api-key-adversarial-long-suffix",
+      "detector": "perplexity-api-key",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 12000,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      },
+      "input": "pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001pplx-SyntheticRevokedPerplexityKeyValue00000000000001",
+      "expected": [],
+      "note": "A long run built from the value repeated is a wider identifier, not a token: the exact-width contract never carves a valid-looking substring out of it, and the scan stays linear and bounded."
+    },
+    {
+      "id": "fireworks-ai-api-key-positive-bare",
+      "detector": "fireworks-ai-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "fw_SyntheticRevokedFwKey1",
+      "expected": [
+        {
+          "detector": "fireworks-ai-api-key",
+          "type": "fireworks_ai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 25
+        }
+      ],
+      "note": "The frozen fw_ plus a 22-byte alphanumeric body is sufficient on its own; no surrounding context is required."
+    },
+    {
+      "id": "fireworks-ai-api-key-positive-dotenv",
+      "detector": "fireworks-ai-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "FIREWORKS_API_KEY=fw_SyntheticRevokedFwKey1",
+      "expected": [
+        {
+          "detector": "fireworks-ai-api-key",
+          "type": "fireworks_ai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 18,
+          "end": 43
+        }
+      ],
+      "note": "A named dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "fireworks-ai-api-key-positive-json-config",
+      "detector": "fireworks-ai-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\n  \"provider\": {\n    \"apiKey\": \"fw_SyntheticRevokedFwKey1\"\n  }\n}\n",
+      "expected": [
+        {
+          "detector": "fireworks-ai-api-key",
+          "type": "fireworks_ai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 33,
+          "end": 58
+        }
+      ],
+      "note": "A structured configuration value is reported at exactly the value."
+    },
+    {
+      "id": "fireworks-ai-api-key-positive-github-actions",
+      "detector": "fireworks-ai-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "github-actions"
+      ],
+      "input": "env:\n  FIREWORKS_API_KEY: fw_SyntheticRevokedFwKey1\n",
+      "expected": [
+        {
+          "detector": "fireworks-ai-api-key",
+          "type": "fireworks_ai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 26,
+          "end": 51
+        }
+      ],
+      "note": "A workflow env value is reported at exactly the value."
+    },
+    {
+      "id": "fireworks-ai-api-key-positive-log",
+      "detector": "fireworks-ai-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-24T12:00:00Z INFO  calling API with credential fw_SyntheticRevokedFwKey1 for request\n",
+      "expected": [
+        {
+          "detector": "fireworks-ai-api-key",
+          "type": "fireworks_ai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 55,
+          "end": 80
+        }
+      ],
+      "note": "A log line embedding the value is reported at exactly the value."
+    },
+    {
+      "id": "fireworks-ai-api-key-positive-shell-quoted",
+      "detector": "fireworks-ai-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export FIREWORKS_API_KEY=\"fw_SyntheticRevokedFwKey1\"\n",
+      "expected": [
+        {
+          "detector": "fireworks-ai-api-key",
+          "type": "fireworks_ai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 26,
+          "end": 51
+        }
+      ],
+      "note": "A quoted shell export excludes the quotes from the span."
+    },
+    {
+      "id": "fireworks-ai-api-key-positive-punctuation-adjacent",
+      "detector": "fireworks-ai-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "(fw_SyntheticRevokedFwKey1).",
+      "expected": [
+        {
+          "detector": "fireworks-ai-api-key",
+          "type": "fireworks_ai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1,
+          "end": 26
+        }
+      ],
+      "note": "Adjacent punctuation stays outside the span."
+    },
+    {
+      "id": "fireworks-ai-api-key-positive-crlf-unicode-prefix",
+      "detector": "fireworks-ai-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 reviewed format\r\nfw_SyntheticRevokedFwKey1\n\r\n",
+      "expected": [
+        {
+          "detector": "fireworks-ai-api-key",
+          "type": "fireworks_ai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 24,
+          "end": 49
+        }
+      ],
+      "note": "CRLF and astral characters before the value keep the byte range exact."
+    },
+    {
+      "id": "fireworks-ai-api-key-positive-repeated-value",
+      "detector": "fireworks-ai-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "fw_SyntheticRevokedFwKey1 fw_SyntheticRevokedFwKey1",
+      "expected": [
+        {
+          "detector": "fireworks-ai-api-key",
+          "type": "fireworks_ai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 25
+        },
+        {
+          "detector": "fireworks-ai-api-key",
+          "type": "fireworks_ai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 26,
+          "end": 51
+        }
+      ],
+      "note": "Each independent occurrence of a repeated value is reported."
+    },
+    {
+      "id": "fireworks-ai-api-key-positive-24-byte-body",
+      "detector": "fireworks-ai-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "fw_SyntheticRevokedFwKey123",
+      "expected": [
+        {
+          "detector": "fireworks-ai-api-key",
+          "type": "fireworks_ai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 27
+        }
+      ],
+      "note": "The second observed body width, 24 bytes, is a positive of the same grammar."
+    },
+    {
+      "id": "fireworks-ai-api-key-boundary-invalid-alphabet",
+      "detector": "fireworks-ai-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "fw_Syn-heticRevokedFwKey1",
+      "expected": [],
+      "note": "A byte outside the alphanumeric body alphabet breaks the run, so nothing is reported."
+    },
+    {
+      "id": "fireworks-ai-api-key-boundary-wrong-separator",
+      "detector": "fireworks-ai-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "fw-SyntheticRevokedFwKey1",
+      "expected": [],
+      "note": "A different separator in the prefix is not the frozen prefix."
+    },
+    {
+      "id": "fireworks-ai-api-key-boundary-wrong-case-prefix",
+      "detector": "fireworks-ai-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "FW_SyntheticRevokedFwKey1",
+      "expected": [],
+      "note": "The prefix is case-sensitive lowercase."
+    },
+    {
+      "id": "fireworks-ai-api-key-boundary-encoded-prefix",
+      "detector": "fireworks-ai-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "fw%5FSyntheticRevokedFwKey1",
+      "expected": [],
+      "note": "A percent-encoded delimiter lookalike is not the frozen prefix."
+    },
+    {
+      "id": "fireworks-ai-api-key-boundary-glued-suffix",
+      "detector": "fireworks-ai-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "fw_SyntheticRevokedFwKey1_backup",
+      "expected": [],
+      "note": "A value glued to a wider identifier is not boundary-delimited."
+    },
+    {
+      "id": "fireworks-ai-api-key-negative-embedded-in-wider-identifier",
+      "detector": "fireworks-ai-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "legacyfw_SyntheticRevokedFwKey1",
+      "expected": [],
+      "note": "The prefix embedded inside a wider identifier is not boundary-delimited."
+    },
+    {
+      "id": "fireworks-ai-api-key-negative-masked",
+      "detector": "fireworks-ai-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "fw_**********************",
+      "expected": [],
+      "note": "A masked value carries no valid body bytes."
+    },
+    {
+      "id": "fireworks-ai-api-key-negative-identifier-names",
+      "detector": "fireworks-ai-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "fw_id = \"acct\"\nfw_version = 12\nfw_spec_name = \"demo\"\n",
+      "expected": [],
+      "note": "Public identifier names sharing the prefix never reach a key-width alphanumeric run."
+    },
+    {
+      "id": "fireworks-ai-api-key-negative-keychain-reference",
+      "detector": "fireworks-ai-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "keychain: fw_api_key_reference\n",
+      "expected": [],
+      "note": "A keychain reference carries underscores and is not a key body."
+    },
+    {
+      "id": "fireworks-ai-api-key-negative-fire-pass-prefix",
+      "detector": "fireworks-ai-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "FIREWORKS_API_KEY=fpk_SyntheticRevokedFwKey1\n",
+      "expected": [],
+      "note": "The fpk_ Fire Pass prefix is a separate, unclaimed grammar."
+    },
+    {
+      "id": "fireworks-ai-api-key-negative-prefix-in-prose",
+      "detector": "fireworks-ai-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "markdown"
+      ],
+      "input": "Fireworks keys begin with fw_ followed by an opaque value.\n",
+      "expected": [],
+      "note": "A prose mention of the prefix has no key-width body."
+    },
+    {
+      "id": "fireworks-ai-api-key-negative-github-actions-secret-reference",
+      "detector": "fireworks-ai-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "github-actions"
+      ],
+      "input": "env:\n  FIREWORKS_API_KEY: ${{ secrets.FIREWORKS_API_KEY }}\n",
+      "expected": [],
+      "note": "A GitHub Actions secret reference names the secret and carries no value."
+    },
+    {
+      "id": "fireworks-ai-api-key-overlap-context",
+      "detector": "fireworks-ai-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "access_token=fw_SyntheticRevokedFwKey1",
+      "expected": [
+        {
+          "detector": "fireworks-ai-api-key",
+          "type": "fireworks_ai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 38
+        }
+      ],
+      "note": "Qualified provider evidence wins over a contextual assignment."
+    },
+    {
+      "id": "fireworks-ai-api-key-adversarial-long-suffix",
+      "detector": "fireworks-ai-api-key",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 12000,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      },
+      "input": "fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1",
+      "expected": [],
+      "note": "A long run built from the value repeated is a wider identifier, not a token: the scan never carves a valid-looking substring out of it and stays linear and bounded."
+    },
+    {
+      "id": "pinecone-api-key-positive-bare",
+      "detector": "pinecone-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "pcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001",
+      "expected": [
+        {
+          "detector": "pinecone-api-key",
+          "type": "pinecone_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 74
+        }
+      ],
+      "note": "The frozen pcsk_ prefix, 5-6 byte label and 63-byte secret are sufficient on their own; no surrounding context is required."
+    },
+    {
+      "id": "pinecone-api-key-positive-dotenv",
+      "detector": "pinecone-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "PINECONE_API_KEY=pcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001",
+      "expected": [
+        {
+          "detector": "pinecone-api-key",
+          "type": "pinecone_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 17,
+          "end": 91
+        }
+      ],
+      "note": "A named dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "pinecone-api-key-positive-json-config",
+      "detector": "pinecone-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\n  \"provider\": {\n    \"apiKey\": \"pcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001\"\n  }\n}\n",
+      "expected": [
+        {
+          "detector": "pinecone-api-key",
+          "type": "pinecone_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 33,
+          "end": 107
+        }
+      ],
+      "note": "A structured configuration value is reported at exactly the value."
+    },
+    {
+      "id": "pinecone-api-key-positive-github-actions",
+      "detector": "pinecone-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "github-actions"
+      ],
+      "input": "env:\n  PINECONE_API_KEY: pcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001\n",
+      "expected": [
+        {
+          "detector": "pinecone-api-key",
+          "type": "pinecone_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 99
+        }
+      ],
+      "note": "A workflow env value is reported at exactly the value."
+    },
+    {
+      "id": "pinecone-api-key-positive-log",
+      "detector": "pinecone-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-24T12:00:00Z INFO  calling API with credential pcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001 for request\n",
+      "expected": [
+        {
+          "detector": "pinecone-api-key",
+          "type": "pinecone_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 55,
+          "end": 129
+        }
+      ],
+      "note": "A log line embedding the value is reported at exactly the value."
+    },
+    {
+      "id": "pinecone-api-key-positive-shell-quoted",
+      "detector": "pinecone-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export PINECONE_API_KEY=\"pcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001\"\n",
+      "expected": [
+        {
+          "detector": "pinecone-api-key",
+          "type": "pinecone_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 99
+        }
+      ],
+      "note": "A quoted shell export excludes the quotes from the span."
+    },
+    {
+      "id": "pinecone-api-key-positive-punctuation-adjacent",
+      "detector": "pinecone-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "(pcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001).",
+      "expected": [
+        {
+          "detector": "pinecone-api-key",
+          "type": "pinecone_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1,
+          "end": 75
+        }
+      ],
+      "note": "Adjacent punctuation stays outside the span."
+    },
+    {
+      "id": "pinecone-api-key-positive-crlf-unicode-prefix",
+      "detector": "pinecone-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 reviewed format\r\npcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001\n\r\n",
+      "expected": [
+        {
+          "detector": "pinecone-api-key",
+          "type": "pinecone_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 24,
+          "end": 98
+        }
+      ],
+      "note": "CRLF and astral characters before the value keep the byte range exact."
+    },
+    {
+      "id": "pinecone-api-key-positive-repeated-value",
+      "detector": "pinecone-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "pcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001 pcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001",
+      "expected": [
+        {
+          "detector": "pinecone-api-key",
+          "type": "pinecone_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 74
+        },
+        {
+          "detector": "pinecone-api-key",
+          "type": "pinecone_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 75,
+          "end": 149
+        }
+      ],
+      "note": "Each independent occurrence of a repeated value is reported."
+    },
+    {
+      "id": "pinecone-api-key-positive-six-byte-label",
+      "detector": "pinecone-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "pcsk_SynThe_SyntheticRevokedPineconeSecretValue0000000000000000000000000001",
+      "expected": [
+        {
+          "detector": "pinecone-api-key",
+          "type": "pinecone_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 75
+        }
+      ],
+      "note": "A 6-byte label is the second frozen label width."
+    },
+    {
+      "id": "pinecone-api-key-boundary-label-too-short",
+      "detector": "pinecone-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "pcsk_Syn_SyntheticRevokedPineconeSecretValue0000000000000000000000000001",
+      "expected": [],
+      "note": "A label under the frozen width leaves the run unsegmented."
+    },
+    {
+      "id": "pinecone-api-key-boundary-label-too-long",
+      "detector": "pinecone-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "pcsk_SynTheX_SyntheticRevokedPineconeSecretValue0000000000000000000000000001",
+      "expected": [],
+      "note": "A label over the frozen width leaves the run unsegmented."
+    },
+    {
+      "id": "pinecone-api-key-boundary-secret-one-short",
+      "detector": "pinecone-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "pcsk_SynTh_SyntheticRevokedPineconeSecretValue000000000000000000000000000",
+      "expected": [],
+      "note": "A secret one byte short of the frozen exact width is an intentional false negative."
+    },
+    {
+      "id": "pinecone-api-key-boundary-secret-one-long",
+      "detector": "pinecone-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "pcsk_SynTh_SyntheticRevokedPineconeSecretValue00000000000000000000000000010",
+      "expected": [],
+      "note": "A secret one byte past the frozen exact width is a wider identifier."
+    },
+    {
+      "id": "pinecone-api-key-boundary-missing-separator",
+      "detector": "pinecone-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "pcsk_SynThSyntheticRevokedPineconeSecretValue0000000000000000000000000001",
+      "expected": [],
+      "note": "Without the label separator the run has no segments."
+    },
+    {
+      "id": "pinecone-api-key-boundary-dash-separator",
+      "detector": "pinecone-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "pcsk_SynTh-SyntheticRevokedPineconeSecretValue0000000000000000000000000001",
+      "expected": [],
+      "note": "A dash is not the frozen segment separator."
+    },
+    {
+      "id": "pinecone-api-key-boundary-unresolved-pckey-prefix",
+      "detector": "pinecone-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "pckey_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001",
+      "expected": [],
+      "note": "The documented pckey_ prefix is unresolved and stays unclaimed."
+    },
+    {
+      "id": "pinecone-api-key-negative-embedded-in-wider-identifier",
+      "detector": "pinecone-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "legacypcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001",
+      "expected": [],
+      "note": "The prefix embedded inside a wider identifier is not boundary-delimited."
+    },
+    {
+      "id": "pinecone-api-key-negative-masked",
+      "detector": "pinecone-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "PINECONE_API_KEY=pcsk_***\n",
+      "expected": [],
+      "note": "A masked value carries no key body."
+    },
+    {
+      "id": "pinecone-api-key-negative-project-uuid",
+      "detector": "pinecone-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"project_id\": \"123e4567-e89b-12d3-a456-426614174000\"}\n",
+      "expected": [],
+      "note": "A Pinecone project identifier is a public UUID, not a pcsk_ key."
+    },
+    {
+      "id": "pinecone-api-key-negative-index-host",
+      "detector": "pinecone-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "host: my-index-1a2b3c4.svc.aped-4627-b74a.pinecone.io\n",
+      "expected": [],
+      "note": "An index host is a public endpoint, not a credential."
+    },
+    {
+      "id": "pinecone-api-key-negative-prefix-in-prose",
+      "detector": "pinecone-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "markdown"
+      ],
+      "input": "Pinecone keys begin with pcsk_ followed by a label and a secret.\n",
+      "expected": [],
+      "note": "A prose mention of the prefix has no key-width body."
+    },
+    {
+      "id": "pinecone-api-key-negative-github-actions-secret-reference",
+      "detector": "pinecone-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "github-actions"
+      ],
+      "input": "env:\n  PINECONE_API_KEY: ${{ secrets.PINECONE_API_KEY }}\n",
+      "expected": [],
+      "note": "A GitHub Actions secret reference names the secret and carries no value."
+    },
+    {
+      "id": "pinecone-api-key-overlap-context",
+      "detector": "pinecone-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "access_token=pcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001",
+      "expected": [
+        {
+          "detector": "pinecone-api-key",
+          "type": "pinecone_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 87
+        }
+      ],
+      "note": "Qualified provider evidence wins over a contextual assignment."
+    },
+    {
+      "id": "pinecone-api-key-adversarial-long-suffix",
+      "detector": "pinecone-api-key",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 12000,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      },
+      "input": "pcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001pcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001pcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001pcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001pcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001pcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001pcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001pcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001pcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001pcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001pcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001pcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001pcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001pcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001pcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001pcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001pcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001pcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001pcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001pcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001pcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001pcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001pcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001pcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001pcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001pcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001pcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001pcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001pcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001pcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001pcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001pcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001pcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001pcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001pcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001pcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001pcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001pcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001pcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001pcsk_SynTh_SyntheticRevokedPineconeSecretValue0000000000000000000000000001",
+      "expected": [],
+      "note": "A long run built from the value repeated is a wider identifier, not a token: the scan never carves a valid-looking substring out of it and stays linear and bounded."
+    },
+    {
+      "id": "slack-user-token-positive-bare",
+      "detector": "slack-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1",
+      "expected": [
+        {
+          "detector": "slack-token",
+          "type": "slack_user_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 79
+        }
+      ],
+      "note": "The frozen xoxp- prefix, three numeric sections and a final secret section are sufficient on their own; no surrounding context is required."
+    },
+    {
+      "id": "slack-user-token-positive-dotenv",
+      "detector": "slack-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "SLACK_USER_TOKEN=xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1",
+      "expected": [
+        {
+          "detector": "slack-token",
+          "type": "slack_user_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 17,
+          "end": 96
+        }
+      ],
+      "note": "A named dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "slack-user-token-positive-json-config",
+      "detector": "slack-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\n  \"provider\": {\n    \"apiKey\": \"xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1\"\n  }\n}\n",
+      "expected": [
+        {
+          "detector": "slack-token",
+          "type": "slack_user_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 33,
+          "end": 112
+        }
+      ],
+      "note": "A structured configuration value is reported at exactly the value."
+    },
+    {
+      "id": "slack-user-token-positive-github-actions",
+      "detector": "slack-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "github-actions"
+      ],
+      "input": "env:\n  SLACK_USER_TOKEN: xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1\n",
+      "expected": [
+        {
+          "detector": "slack-token",
+          "type": "slack_user_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 104
+        }
+      ],
+      "note": "A workflow env value is reported at exactly the value."
+    },
+    {
+      "id": "slack-user-token-positive-log",
+      "detector": "slack-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-24T12:00:00Z INFO  calling API with credential xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1 for request\n",
+      "expected": [
+        {
+          "detector": "slack-token",
+          "type": "slack_user_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 55,
+          "end": 134
+        }
+      ],
+      "note": "A log line embedding the value is reported at exactly the value."
+    },
+    {
+      "id": "slack-user-token-positive-shell-quoted",
+      "detector": "slack-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export SLACK_USER_TOKEN=\"xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1\"\n",
+      "expected": [
+        {
+          "detector": "slack-token",
+          "type": "slack_user_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 104
+        }
+      ],
+      "note": "A quoted shell export excludes the quotes from the span."
+    },
+    {
+      "id": "slack-user-token-positive-punctuation-adjacent",
+      "detector": "slack-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "(xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1).",
+      "expected": [
+        {
+          "detector": "slack-token",
+          "type": "slack_user_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1,
+          "end": 80
+        }
+      ],
+      "note": "Adjacent punctuation stays outside the span."
+    },
+    {
+      "id": "slack-user-token-positive-crlf-unicode-prefix",
+      "detector": "slack-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 reviewed format\r\nxoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1\n\r\n",
+      "expected": [
+        {
+          "detector": "slack-token",
+          "type": "slack_user_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 24,
+          "end": 103
+        }
+      ],
+      "note": "CRLF and astral characters before the value keep the byte range exact."
+    },
+    {
+      "id": "slack-user-token-positive-repeated-value",
+      "detector": "slack-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1 xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1",
+      "expected": [
+        {
+          "detector": "slack-token",
+          "type": "slack_user_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 79
+        },
+        {
+          "detector": "slack-token",
+          "type": "slack_user_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 80,
+          "end": 159
+        }
+      ],
+      "note": "Each independent occurrence of a repeated value is reported."
+    },
+    {
+      "id": "slack-user-token-positive-short-secret-and-sections",
+      "detector": "slack-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xoxp-11-22-33-abcdef",
+      "expected": [
+        {
+          "detector": "slack-token",
+          "type": "slack_user_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 20
+        }
+      ],
+      "note": "Widths are open: short numeric sections and a pre-2016 style 6-byte secret are in the grammar."
+    },
+    {
+      "id": "slack-user-token-positive-long-secret",
+      "detector": "slack-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xoxp-1234567890123-3210987654321-1112223334445-SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
+      "expected": [
+        {
+          "detector": "slack-token",
+          "type": "slack_user_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 111
+        }
+      ],
+      "note": "Widths are open: a long secret section is in the grammar."
+    },
+    {
+      "id": "slack-user-token-boundary-missing-secret-separator",
+      "detector": "slack-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xoxp-1234567890123-3210987654321-1112223334445SYNTHETICREVOKEDUSERSECRETVALUE1",
+      "expected": [],
+      "note": "Without the dash before the secret section the value is one long numeric-then-alphabetic run."
+    },
+    {
+      "id": "slack-user-token-boundary-two-numeric-sections",
+      "detector": "slack-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xoxp-1234567890123-3210987654321-SYNTHETICREVOKEDUSERSECRETVALUE1",
+      "expected": [],
+      "note": "Only two numeric sections precede the secret."
+    },
+    {
+      "id": "slack-user-token-boundary-letter-in-numeric-section",
+      "detector": "slack-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xoxp-12345A7890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1",
+      "expected": [],
+      "note": "A letter inside a numeric section breaks the section grammar."
+    },
+    {
+      "id": "slack-user-token-boundary-underscore-separator",
+      "detector": "slack-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xoxp_1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1",
+      "expected": [],
+      "note": "A different separator in the prefix is not the frozen prefix."
+    },
+    {
+      "id": "slack-user-token-boundary-dash-in-secret",
+      "detector": "slack-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xoxp-1234567890123-3210987654321-1112223334445-SYNTHETIC-REVOKEDUSERSECRETVALUE1",
+      "expected": [],
+      "note": "A dash inside the secret section makes it a wider identifier."
+    },
+    {
+      "id": "slack-user-token-boundary-empty-secret",
+      "detector": "slack-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xoxp-1234567890123-3210987654321-1112223334445-",
+      "expected": [],
+      "note": "An empty secret section is not a token."
+    },
+    {
+      "id": "slack-user-token-negative-embedded-in-wider-identifier",
+      "detector": "slack-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "legacyxoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1",
+      "expected": [],
+      "note": "The prefix embedded inside a wider identifier is not boundary-delimited."
+    },
+    {
+      "id": "slack-user-token-negative-masked",
+      "detector": "slack-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xoxp-****-****-****-********************************\n",
+      "expected": [],
+      "note": "A masked value carries no numeric sections."
+    },
+    {
+      "id": "slack-user-token-negative-public-identifiers",
+      "detector": "slack-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"team_id\": \"T0123456789\", \"user_id\": \"U0123456789\", \"bot_id\": \"B0123456789\"}\n",
+      "expected": [],
+      "note": "Public Slack identifiers are not tokens."
+    },
+    {
+      "id": "slack-user-token-negative-bot-token-sibling",
+      "detector": "slack-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xoxb-not-a-user-token-just-prose\n",
+      "expected": [],
+      "note": "A bot-prefixed non-token value is not a user token."
+    },
+    {
+      "id": "slack-user-token-negative-prefix-in-prose",
+      "detector": "slack-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "markdown"
+      ],
+      "input": "Slack user tokens begin with xoxp- followed by dash-separated sections.\n",
+      "expected": [],
+      "note": "A prose mention of the prefix has no sections."
+    },
+    {
+      "id": "slack-user-token-negative-github-actions-secret-reference",
+      "detector": "slack-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "github-actions"
+      ],
+      "input": "env:\n  SLACK_USER_TOKEN: ${{ secrets.SLACK_USER_TOKEN }}\n",
+      "expected": [],
+      "note": "A GitHub Actions secret reference names the secret and carries no value."
+    },
+    {
+      "id": "slack-user-token-overlap-context",
+      "detector": "slack-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "access_token=xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1",
+      "expected": [
+        {
+          "detector": "slack-token",
+          "type": "slack_user_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 92
+        }
+      ],
+      "note": "Qualified provider evidence wins over a contextual assignment."
+    },
+    {
+      "id": "slack-user-token-adversarial-long-suffix",
+      "detector": "slack-token",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 12000,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      },
+      "input": "xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1xoxp-1234567890123-3210987654321-1112223334445-SYNTHETICREVOKEDUSERSECRETVALUE1",
+      "expected": [],
+      "note": "A long run of repeated section prefixes is not a token: every attempt fails its section grammar and the scan stays linear and bounded."
+    },
+    {
+      "id": "gitlab-runner-token-positive-bare",
+      "detector": "gitlab-runner-authentication-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "glrt-SyntheticRevokedRun1",
+      "expected": [
+        {
+          "detector": "gitlab-runner-authentication-token",
+          "type": "gitlab_runner_authentication_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 25
+        }
+      ],
+      "note": "The frozen glrt- prefix plus a 20-byte friendly-token body is sufficient on its own; no surrounding context is required."
+    },
+    {
+      "id": "gitlab-runner-token-positive-dotenv",
+      "detector": "gitlab-runner-authentication-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "GITLAB_RUNNER_TOKEN=glrt-SyntheticRevokedRun1",
+      "expected": [
+        {
+          "detector": "gitlab-runner-authentication-token",
+          "type": "gitlab_runner_authentication_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 20,
+          "end": 45
+        }
+      ],
+      "note": "A named dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "gitlab-runner-token-positive-json-config",
+      "detector": "gitlab-runner-authentication-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\n  \"provider\": {\n    \"apiKey\": \"glrt-SyntheticRevokedRun1\"\n  }\n}\n",
+      "expected": [
+        {
+          "detector": "gitlab-runner-authentication-token",
+          "type": "gitlab_runner_authentication_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 33,
+          "end": 58
+        }
+      ],
+      "note": "A structured configuration value is reported at exactly the value."
+    },
+    {
+      "id": "gitlab-runner-token-positive-github-actions",
+      "detector": "gitlab-runner-authentication-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "github-actions"
+      ],
+      "input": "env:\n  GITLAB_RUNNER_TOKEN: glrt-SyntheticRevokedRun1\n",
+      "expected": [
+        {
+          "detector": "gitlab-runner-authentication-token",
+          "type": "gitlab_runner_authentication_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 28,
+          "end": 53
+        }
+      ],
+      "note": "A workflow env value is reported at exactly the value."
+    },
+    {
+      "id": "gitlab-runner-token-positive-log",
+      "detector": "gitlab-runner-authentication-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-24T12:00:00Z INFO  calling API with credential glrt-SyntheticRevokedRun1 for request\n",
+      "expected": [
+        {
+          "detector": "gitlab-runner-authentication-token",
+          "type": "gitlab_runner_authentication_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 55,
+          "end": 80
+        }
+      ],
+      "note": "A log line embedding the value is reported at exactly the value."
+    },
+    {
+      "id": "gitlab-runner-token-positive-shell-quoted",
+      "detector": "gitlab-runner-authentication-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export GITLAB_RUNNER_TOKEN=\"glrt-SyntheticRevokedRun1\"\n",
+      "expected": [
+        {
+          "detector": "gitlab-runner-authentication-token",
+          "type": "gitlab_runner_authentication_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 28,
+          "end": 53
+        }
+      ],
+      "note": "A quoted shell export excludes the quotes from the span."
+    },
+    {
+      "id": "gitlab-runner-token-positive-punctuation-adjacent",
+      "detector": "gitlab-runner-authentication-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "(glrt-SyntheticRevokedRun1).",
+      "expected": [
+        {
+          "detector": "gitlab-runner-authentication-token",
+          "type": "gitlab_runner_authentication_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1,
+          "end": 26
+        }
+      ],
+      "note": "Adjacent punctuation stays outside the span."
+    },
+    {
+      "id": "gitlab-runner-token-positive-crlf-unicode-prefix",
+      "detector": "gitlab-runner-authentication-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 reviewed format\r\nglrt-SyntheticRevokedRun1\n\r\n",
+      "expected": [
+        {
+          "detector": "gitlab-runner-authentication-token",
+          "type": "gitlab_runner_authentication_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 24,
+          "end": 49
+        }
+      ],
+      "note": "CRLF and astral characters before the value keep the byte range exact."
+    },
+    {
+      "id": "gitlab-runner-token-positive-repeated-value",
+      "detector": "gitlab-runner-authentication-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "glrt-SyntheticRevokedRun1 glrt-SyntheticRevokedRun1",
+      "expected": [
+        {
+          "detector": "gitlab-runner-authentication-token",
+          "type": "gitlab_runner_authentication_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 25
+        },
+        {
+          "detector": "gitlab-runner-authentication-token",
+          "type": "gitlab_runner_authentication_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 26,
+          "end": 51
+        }
+      ],
+      "note": "Each independent occurrence of a repeated value is reported."
+    },
+    {
+      "id": "gitlab-runner-token-positive-partitioned-body",
+      "detector": "gitlab-runner-authentication-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "glrt-t3_SyntheticRevokedRun1",
+      "expected": [
+        {
+          "detector": "gitlab-runner-authentication-token",
+          "type": "gitlab_runner_authentication_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 28
+        }
+      ],
+      "note": "The legacy t<hex>_ partition segment precedes the 20-byte body."
+    },
+    {
+      "id": "gitlab-runner-token-positive-routable-checksum-valid",
+      "detector": "gitlab-runner-authentication-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "glrt-SyntheticRevokedRunnerPayloadA1.01.0v0xy8zct",
+      "expected": [
+        {
+          "detector": "gitlab-runner-authentication-token",
+          "type": "gitlab_runner_authentication_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 49
+        }
+      ],
+      "note": "A routable token whose base36 length holder and CRC-32 verify offline is reported in full, past its first dot."
+    },
+    {
+      "id": "gitlab-runner-token-positive-routable-dash-underscore-payload",
+      "detector": "gitlab-runner-authentication-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "glrt-SyntheticRevokedRunnerPayloadA1_-xZZZZZZ.01.141tpsiyp",
+      "expected": [
+        {
+          "detector": "gitlab-runner-authentication-token",
+          "type": "gitlab_runner_authentication_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 58
+        }
+      ],
+      "note": "The routable payload admits the base64url dash and underscore."
+    },
+    {
+      "id": "gitlab-runner-token-positive-routable-in-config-toml",
+      "detector": "gitlab-runner-authentication-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "[[runners]]\n  name = \"demo\"\n  token = \"glrt-SyntheticRevokedRunnerPayloadA1.01.0v0xy8zct\"\n",
+      "expected": [
+        {
+          "detector": "gitlab-runner-authentication-token",
+          "type": "gitlab_runner_authentication_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 39,
+          "end": 88
+        }
+      ],
+      "note": "A config.toml runner token is reported in full."
+    },
+    {
+      "id": "gitlab-runner-token-boundary-routable-bad-checksum",
+      "detector": "gitlab-runner-authentication-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "glrt-SyntheticRevokedRunnerPayloadA1.01.0v0xy8zcu",
+      "expected": [],
+      "note": "A routable value whose CRC-32 fails is not a runner token."
+    },
+    {
+      "id": "gitlab-runner-token-boundary-routable-bad-length-holder",
+      "detector": "gitlab-runner-authentication-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "glrt-SyntheticRevokedRunnerPayloadA1.01.0w0xy8zct",
+      "expected": [],
+      "note": "A routable value whose length holder disagrees with its payload is not a runner token."
+    },
+    {
+      "id": "gitlab-runner-token-boundary-routable-truncated-tail",
+      "detector": "gitlab-runner-authentication-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "glrt-SyntheticRevokedRunnerPayloadA1.01.0v0xy8zc",
+      "expected": [],
+      "note": "A routable value with a short tail is not a runner token."
+    },
+    {
+      "id": "gitlab-runner-token-boundary-body-one-short",
+      "detector": "gitlab-runner-authentication-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "glrt-SyntheticRevokedRun",
+      "expected": [],
+      "note": "A legacy body one byte short of the frozen width is an intentional false negative."
+    },
+    {
+      "id": "gitlab-runner-token-boundary-body-one-long",
+      "detector": "gitlab-runner-authentication-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "glrt-SyntheticRevokedRun12",
+      "expected": [],
+      "note": "A legacy body one byte past the frozen width is a wider identifier."
+    },
+    {
+      "id": "gitlab-runner-token-boundary-wrong-separator",
+      "detector": "gitlab-runner-authentication-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "glrt_SyntheticRevokedRun1",
+      "expected": [],
+      "note": "A different separator in the prefix is not the frozen prefix."
+    },
+    {
+      "id": "gitlab-runner-token-negative-embedded-in-wider-identifier",
+      "detector": "gitlab-runner-authentication-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "legacyglrt-SyntheticRevokedRun1",
+      "expected": [],
+      "note": "The prefix embedded inside a wider identifier is not boundary-delimited."
+    },
+    {
+      "id": "gitlab-runner-token-negative-masked",
+      "detector": "gitlab-runner-authentication-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "glrt-********************\n",
+      "expected": [],
+      "note": "A masked value carries no valid body bytes."
+    },
+    {
+      "id": "gitlab-runner-token-negative-system-id-and-short-sha",
+      "detector": "gitlab-runner-authentication-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "runner system_id: s_0123456789ab\ncommit 1a2b3c4d\n",
+      "expected": [],
+      "note": "Runner system identifiers and short SHAs are not tokens."
+    },
+    {
+      "id": "gitlab-runner-token-negative-prefix-in-prose",
+      "detector": "gitlab-runner-authentication-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "markdown"
+      ],
+      "input": "Runner authentication tokens begin with glrt- followed by an opaque value.\n",
+      "expected": [],
+      "note": "A prose mention of the prefix has no body."
+    },
+    {
+      "id": "gitlab-runner-token-negative-github-actions-secret-reference",
+      "detector": "gitlab-runner-authentication-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "github-actions"
+      ],
+      "input": "env:\n  GITLAB_RUNNER_TOKEN: ${{ secrets.GITLAB_RUNNER_TOKEN }}\n",
+      "expected": [],
+      "note": "A GitHub Actions secret reference names the secret and carries no value."
+    },
+    {
+      "id": "gitlab-runner-token-overlap-context",
+      "detector": "gitlab-runner-authentication-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "access_token=glrt-SyntheticRevokedRun1",
+      "expected": [
+        {
+          "detector": "gitlab-runner-authentication-token",
+          "type": "gitlab_runner_authentication_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 38
+        }
+      ],
+      "note": "Qualified provider evidence wins over a contextual assignment."
+    },
+    {
+      "id": "gitlab-runner-token-adversarial-long-suffix",
+      "detector": "gitlab-runner-authentication-token",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 12000,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      },
+      "input": "glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1",
+      "expected": [],
+      "note": "A long run built from the value repeated is a wider identifier, not a token: the scan never carves a valid-looking substring out of it and stays linear and bounded."
     }
   ]
 }

@@ -15,11 +15,11 @@ These counts describe finding-type inventory rows with corpus evidence, not dete
 
 | Row state | Count |
 | --- | --- |
-| supported | 72 |
+| supported | 77 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 83.
+Coverage declarations: 88.
 
 ## Coverage by detector
 
@@ -42,8 +42,10 @@ Coverage declarations: 83.
 | discord-bot-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | docker-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | firebase-server-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| fireworks-ai-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | generic-token | 3 | supported: 3, intentionally-unsupported: 0, unresolved: 0 |
 | github-token | 6 | supported: 6, intentionally-unsupported: 0, unresolved: 0 |
+| gitlab-runner-authentication-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | gitlab-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | google-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | grafana-cloud-access-policy-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -68,6 +70,8 @@ Coverage declarations: 83.
 | openai-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | openrouter-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | otpauth-uri | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| perplexity-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| pinecone-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | postman-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | private-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | pulumi-access-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -77,7 +81,7 @@ Coverage declarations: 83.
 | sentry-org-auth-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | sentry-user-auth-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | shopify-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
-| slack-token | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
+| slack-token | 3 | supported: 3, intentionally-unsupported: 0, unresolved: 0 |
 | stripe-token | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
 | supabase-management-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | supabase-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -112,12 +116,14 @@ Coverage declarations: 83.
 | discord_bot_token | discord-bot-token | provider | supported | not-applicable | none |
 | docker_token | docker-token | provider | supported | not-applicable | none |
 | firebase_server_key | firebase-server-key | provider | supported | not-applicable | none |
+| fireworks_ai_api_key | fireworks-ai-api-key | provider | supported | not-applicable | none |
 | github_app_installation_token | github-token | provider | supported | not-applicable | none |
 | github_app_refresh_token | github-token | provider | supported | not-applicable | none |
 | github_app_user_to_server_token | github-token | provider | supported | not-applicable | none |
 | github_fine_grained_personal_access_token | github-token | provider | supported | not-applicable | none |
 | github_oauth_token | github-token | provider | supported | not-applicable | none |
 | github_token | github-token | provider | supported | not-applicable | none |
+| gitlab_runner_authentication_token | gitlab-runner-authentication-token | provider | supported | not-applicable | none |
 | gitlab_token | gitlab-token | provider | supported | not-applicable | none |
 | google_api_key | google-api-key | provider | supported | not-applicable | none |
 | grafana_cloud_access_policy_token | grafana-cloud-access-policy-token | provider | supported | not-applicable | none |
@@ -142,6 +148,8 @@ Coverage declarations: 83.
 | openai_api_key | openai-token | provider | supported | not-applicable | none |
 | openrouter_api_key | openrouter-api-key | provider | supported | not-applicable | none |
 | otpauth_secret | otpauth-uri | structural | supported | supported | none |
+| perplexity_api_key | perplexity-api-key | provider | supported | not-applicable | none |
+| pinecone_api_key | pinecone-api-key | provider | supported | not-applicable | none |
 | postman_api_key | postman-api-key | provider | supported | not-applicable | none |
 | private_key | private-key | structural | supported | not-applicable | none |
 | pulumi_access_token | pulumi-access-token | provider | supported | not-applicable | none |
@@ -153,6 +161,7 @@ Coverage declarations: 83.
 | shopify_access_token | shopify-token | provider | supported | not-applicable | none |
 | slack_app_level_token | slack-token | provider | supported | not-applicable | none |
 | slack_token | slack-token | provider | supported | not-applicable | none |
+| slack_user_token | slack-token | provider | supported | not-applicable | none |
 | stripe_credential | stripe-token | provider | supported | not-applicable | none |
 | stripe_webhook_signing_secret | stripe-token | provider | supported | not-applicable | none |
 | supabase_personal_access_token | supabase-management-token | provider | supported | not-applicable | none |
@@ -190,15 +199,15 @@ Coverage declarations: 83.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 83 | 0 | 0 |
-| boundary | 72 | 0 | 0 |
-| host-context | 72 | 0 | 0 |
+| adversarial | 88 | 0 | 0 |
+| boundary | 77 | 0 | 0 |
+| host-context | 77 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 83 | 0 | 0 |
-| near-miss-negative | 72 | 0 | 0 |
-| overlap | 72 | 0 | 0 |
-| positive | 72 | 0 | 0 |
-| range | 83 | 0 | 0 |
+| malformed | 88 | 0 | 0 |
+| near-miss-negative | 77 | 0 | 0 |
+| overlap | 77 | 0 | 0 |
+| positive | 77 | 0 | 0 |
+| range | 88 | 0 | 0 |
 
 ## Unresolved and pending coverage
 
