@@ -547,6 +547,21 @@ fn is_azure_keyvault_reference(value: &str) -> bool {
     has_vault_name && has_secret_name
 }
 
+/// `true` for an OS keychain secret-store reference, `{keychain:<item>}`
+/// (issue #730, benchmark gap `product-730`): the whole value is `{keychain:`,
+/// one non-empty path-safe item name ([`is_segment`]), then `}`. It names
+/// the keychain entry a client resolves at runtime, in the same
+/// brace-delimited `{kind:name}` shape as opencode's `{env:VAR}` /
+/// `{file:path}` substitutions, and carries no secret material. An empty
+/// item, a second `:` or `/`, whitespace, or any byte after the closing `}`
+/// keeps the value detected.
+fn is_keychain_reference(value: &str) -> bool {
+    value
+        .strip_prefix("{keychain:")
+        .and_then(|rest| rest.strip_suffix('}'))
+        .is_some_and(is_segment)
+}
+
 fn is_secret_manager_reference(value: &str) -> bool {
     is_onepassword_reference(value)
         || is_litellm_env_reference(value)
@@ -555,6 +570,98 @@ fn is_secret_manager_reference(value: &str) -> bool {
         || is_bank_vaults_reference(value)
         || is_aws_secretsmanager_arn(value)
         || is_azure_keyvault_reference(value)
+        || is_keychain_reference(value)
+}
+
+// --- partially masked display values (issue #264, benchmark gap
+// `product-264`) ----------------------------------------------------------
+
+/// The mask characters a console or CLI uses to hide the middle of a
+/// credential: `*` and the bullet `•` (U+2022), the same two characters the
+/// repeated-character filler exclusion (#264) already recognizes.
+fn is_mask_char(ch: char) -> bool {
+    matches!(ch, '*' | '\u{2022}')
+}
+
+/// The fewest mask characters that make a value a masked display.
+const MIN_MASK_RUN: usize = 4;
+/// The most visible characters a masked display keeps on either side of its
+/// mask run: a provider prefix plus a few identifying characters
+/// (`xai-AbCd`, `gsk_`) on the left, the last few characters on the right.
+const MAX_MASK_VISIBLE_SIDE: usize = 12;
+
+/// `true` for a byte a masked display leaves visible: `[A-Za-z0-9._-]`.
+fn is_mask_visible_char(ch: char) -> bool {
+    ch.is_ascii_alphanumeric() || matches!(ch, '.' | '_' | '-')
+}
+
+/// `true` for a partially masked display value, the shape a provider
+/// console prints after a key is created (`gsk_` + 48 `*` + `Tn4q`,
+/// `xai-AbCd****WxYz`): a visible head, one run of at least
+/// [`MIN_MASK_RUN`] identical [`is_mask_char`] characters, and a visible
+/// tail. Head and tail are each 1 to [`MAX_MASK_VISIBLE_SIDE`] characters of
+/// `[A-Za-z0-9._-]`, and the mask run is at least as long as head and tail
+/// together, so the value is mostly mask.
+///
+/// Both visible sides are required. A mask with only a visible tail
+/// (`********x`) stays in scope, keeping the near-miss that pins the #264
+/// filler exclusion as a whole-value rule. A second mask run, a mixed mask
+/// run, or any other byte keeps the value detected. The false-negative
+/// tradeoff is a real credential that happens to contain four or more
+/// consecutive `*` between two short visible ends, which no documented
+/// credential grammar allows.
+fn is_partially_masked_display(value: &str) -> bool {
+    let Some(mask_start) = value.find(is_mask_char) else {
+        return false;
+    };
+    let Some(mask) = value[mask_start..].chars().next() else {
+        return false;
+    };
+    let mask_end = value[mask_start..]
+        .find(|ch: char| ch != mask)
+        .map_or(value.len(), |offset| mask_start + offset);
+    let (head, tail) = (&value[..mask_start], &value[mask_end..]);
+    let run = value[mask_start..mask_end].chars().count();
+    let visible_side = |side: &str| {
+        (1..=MAX_MASK_VISIBLE_SIDE).contains(&side.len()) && side.chars().all(is_mask_visible_char)
+    };
+    run >= MIN_MASK_RUN
+        && visible_side(head)
+        && visible_side(tail)
+        && run >= head.len() + tail.len()
+}
+
+// --- colon-namespaced scope identifiers (issue #727, benchmark gap
+// `product-727`) ----------------------------------------------------------
+
+/// `true` for one segment of a colon-namespaced scope identifier: a
+/// lowercase word (`[a-z][a-z0-9_-]*`) or the `*` wildcard.
+fn is_scope_segment(segment: &str) -> bool {
+    if segment == "*" {
+        return true;
+    }
+    let mut chars = segment.chars();
+    matches!(chars.next(), Some(first) if first.is_ascii_lowercase())
+        && chars.all(|ch| ch.is_ascii_lowercase() || ch.is_ascii_digit() || matches!(ch, '_' | '-'))
+}
+
+/// `true` when an assignment is really one colon-namespaced scope or
+/// permission identifier (`api-key:endpoint:chat`, `api-key:model:*` in an
+/// xAI key's `acls` list): the operator is a bare `:` with nothing between
+/// it and the name or the value (`separator`), and the value itself goes on
+/// as a chain of two or more [`is_scope_segment`] segments joined by `:`.
+///
+/// The whole run is then one token, `<resource>:<action>[:...]`, rather
+/// than a name followed by a secret. Every other assignment keeps today's
+/// behavior: a space after the colon (`api_key: endpoint:chat`, a YAML
+/// mapping), a quote around the name (`"api_key":"..."`), an `=` operator,
+/// a single-segment value (`Api-Key:<token>`, a curl header with no space),
+/// or any uppercase letter, digit-led segment or other byte in the value.
+/// The false-negative tradeoff is a colon-joined lowercase passphrase glued
+/// to a credential name with no space, which is not how any credential
+/// grammar or config format writes a secret.
+fn is_colon_scope_identifier(separator: &str, value: &str) -> bool {
+    separator == ":" && value.contains(':') && value.split(':').all(is_scope_segment)
 }
 
 /// A small, explicit set of source-code roots whose member-access syntax is
@@ -790,6 +897,7 @@ fn is_non_secret_reference(value: &str, form: ValueForm) -> bool {
         || is_interpolation_reference(value)
         || is_secret_manager_reference(value)
         || is_repeated_character_filler(value)
+        || is_partially_masked_display(value)
         || is_source_code_expression(value, form)
         || is_windows_env_reference(value)
         || is_sql_bind_parameter(value)
@@ -1280,7 +1388,8 @@ fn assignment_candidates(input: &str, names: &NameSource) -> Vec<Candidate> {
         if let Some((value_start, value_end, form)) = assignment_value(input, prefix_end) {
             let value = &input[value_start..value_end];
             let normalized = normalize_name(&input[name_start..name_end]);
-            if let Some(confidence) = assignment_confidence(&normalized, value, form, names)
+            if !is_colon_scope_identifier(&input[name_end..value_start], value)
+                && let Some(confidence) = assignment_confidence(&normalized, value, form, names)
                 && let Some(range) = ByteRange::new(value_start, value_end)
             {
                 let name_signal = if matches!(names, NameSource::BuiltIn)
@@ -2867,5 +2976,109 @@ mod tests {
         let input = format!("sk-{VENDOR_PREFIX_LEGACY_BODY}");
         let candidates = detect_with_ruleset_names(&input, &["corp_token"]);
         assert!(candidates.is_empty());
+    }
+
+    // --- issue #730 (benchmark gap `product-730`): an OS keychain
+    // secret-store reference is excluded like the other secret-manager
+    // references.
+
+    #[test]
+    fn a_keychain_secret_store_reference_is_excluded() {
+        for input in [
+            "{\n  \"apiKey\": \"{keychain:fireworks-api-key}\"\n}\n",
+            "api_key='{keychain:synthetic.item_name}'",
+            "apiKey: {keychain:fireworks-api-key}",
+        ] {
+            assert!(detect(input).is_empty(), "{input:?}");
+        }
+    }
+
+    #[test]
+    fn a_malformed_or_embedded_keychain_reference_is_still_detected() {
+        for input in [
+            "\"apiKey\": \"{keychain:}SYNTHETIC0REVOKED\"",
+            "\"apiKey\": \"{keychain:a b SYNTHETIC0REVOKED}\"",
+            "\"apiKey\": \"{keychain:item}SYNTHETIC0REVOKED\"",
+            "\"apiKey\": \"{keychain:vault/item#SYNTHETIC0REVOKED}\"",
+            "\"apiKey\": \"{keyring:SYNTHETIC0REVOKED}\"",
+        ] {
+            assert!(!detect(input).is_empty(), "{input:?}");
+        }
+    }
+
+    // --- issue #264 (benchmark gap `product-264`): a partially masked
+    // console display (visible head, a mask run, visible tail) is excluded.
+
+    #[test]
+    fn a_partially_masked_console_display_is_excluded() {
+        let groq = format!("Secret: gsk_{}Tn4q    Created: 2026-09-01", "*".repeat(48));
+        let xai = format!("password: xai-AbCd{}WxYz", "*".repeat(72));
+        let bullets = format!("secret: sk-{}Ab12", "\u{2022}".repeat(8));
+        for input in [
+            groq.as_str(),
+            xai.as_str(),
+            bullets.as_str(),
+            "api_key=ab****cd",
+        ] {
+            assert!(detect(input).is_empty(), "{input:?}");
+        }
+    }
+
+    #[test]
+    fn values_near_a_partially_masked_display_are_still_detected() {
+        for input in [
+            // Only one visible side: the #264 near-miss stays in scope.
+            "Password: ********x".to_owned(),
+            "Password: x********".to_owned(),
+            // A mask run shorter than MIN_MASK_RUN.
+            "secret: SYNTHETIC***REVOKED".to_owned(),
+            // More visible characters than mask.
+            "secret: SYNTHETIC0R****EVOKED0VALUE".to_owned(),
+            // A visible side longer than MAX_MASK_VISIBLE_SIDE.
+            format!("secret: SYNTHETIC0REVOKED0{}Tn4q", "*".repeat(64)),
+            // Two mask runs, or a mixed run.
+            format!("secret: gsk_{}Tn{}4q", "*".repeat(20), "*".repeat(20)),
+            format!(
+                "secret: gsk_{}{}Tn4q",
+                "*".repeat(20),
+                "\u{2022}".repeat(20)
+            ),
+            // A byte outside the visible alphabet.
+            format!("secret: gsk+{}Tn4q", "*".repeat(48)),
+        ] {
+            assert!(!detect(&input).is_empty(), "{input:?}");
+        }
+    }
+
+    // --- issue #727 (benchmark gap `product-727`): a colon-namespaced
+    // scope identifier glued to a credential-like name is one token.
+
+    #[test]
+    fn a_colon_namespaced_acl_scope_is_not_an_assignment() {
+        for input in [
+            "{\n  \"acls\": [\"api-key:endpoint:chat\", \"api-key:model:*\"]\n}\n",
+            "scopes: api_key:models:read-write",
+            "secret:rotate:all_regions",
+        ] {
+            assert!(detect(input).is_empty(), "{input:?}");
+        }
+    }
+
+    #[test]
+    fn a_credential_assignment_near_a_scope_identifier_is_still_detected() {
+        for input in [
+            // A space after the colon is a real mapping.
+            "api_key: endpoint:chatSYNTHETIC",
+            "api-key: endpoint:chat",
+            // A single-segment value glued to the name (a curl header).
+            "Api-Key:SYNTHETIC0REVOKED0VALUE",
+            // An `=` operator, a quoted name, or a non-scope segment.
+            "api_key=endpoint:chat",
+            "\"api_key\":\"endpoint:chat\"",
+            "api_key:endpoint:SYNTHETIC0REVOKED",
+            "api_key:endpoint:0synthetic",
+        ] {
+            assert!(!detect(input).is_empty(), "{input:?}");
+        }
     }
 }
