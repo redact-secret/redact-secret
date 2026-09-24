@@ -24,18 +24,31 @@
 //! Atlassian's own guidance above disclaims a fixed length; a future token
 //! shorter than every currently observed 188-byte sample is intentionally
 //! still matched as long as it clears the minimum, while a future *longer*
-//! token is matched unconditionally by construction.
+//! token is matched unconditionally by construction. The run may be
+//! followed by the fixed `=` + 8-hex tail described below, which then
+//! belongs to the match.
 //!
 //! The body alphabet deliberately excludes `=`, even though both reference
-//! scanners' patterns allow it appearing anywhere in the body (real samples
-//! carry it once, near the end, as base64 padding ahead of a checksum
-//! suffix): including it in the *boundary* alphabet would make the ubiquitous
-//! `KEY=<token>` assignment delimiter immediately preceding a real token look
-//! like a truncated slice of a longer run and reject the whole match, which
-//! is a far worse outcome than the alternative -- a match that stops just
-//! short of an embedded `=`, still well past [`MIN_BODY_LEN`] on every
-//! observed sample, and still redacts the overwhelming majority of the
-//! secret.
+//! scanners' patterns allow it appearing anywhere in the body: including it
+//! in the *boundary* alphabet would make the ubiquitous `KEY=<token>`
+//! assignment delimiter immediately preceding a real token look like a
+//! truncated slice of a longer run and reject the whole match.
+//!
+//! Real 192-byte tokens do carry exactly one `=`, as a fixed tail: `=`
+//! followed by 8 uppercase hexadecimal bytes (read as a CRC32 by
+//! `CredSweeper`; the tail's *position and shape* is the consensus of issue
+//! #643's research and the benchmark contract widened in
+//! redact-secret-benchmarks#238). Issue #741: the run above stops at that
+//! `=`, so a match that ended there left the 9-byte tail outside the
+//! finding at `high`/`redact` -- a partial redaction. After the run, this
+//! detector therefore extends the span over an immediately following
+//! [`TAIL_SEPARATOR`] plus exactly [`TAIL_HEX_LEN`] bytes of `[0-9A-F]`,
+//! provided the byte after them is neither a body byte nor another `=` (so
+//! a longer or differently-shaped tail is never half-absorbed). The tail's
+//! value is not validated -- only its shape extends the span. A token with
+//! no such tail is matched exactly as before, and a tail that does not fit
+//! (lowercase, 7 or 9 hex bytes) leaves the span at the body run rather
+//! than guessing.
 //!
 //! Two variants are intentionally out of scope, not fuzzy-matched:
 //!
@@ -69,6 +82,35 @@ const PREFIX: &str = "ATAT";
 /// is not something ordinary text produces by chance.
 const MIN_BODY_LEN: usize = 100;
 
+/// The byte that opens the fixed checksum-shaped tail of a 192-byte token.
+const TAIL_SEPARATOR: u8 = b'=';
+
+/// The number of uppercase hexadecimal bytes after [`TAIL_SEPARATOR`].
+const TAIL_HEX_LEN: usize = 8;
+
+/// `true` for `[0-9A-F]`.
+fn is_upper_hex(byte: u8) -> bool {
+    byte.is_ascii_digit() || (b'A'..=b'F').contains(&byte)
+}
+
+/// The end of the match that begins with a body run ending at `end`: `end`
+/// extended past a `=` + 8-uppercase-hex tail when exactly that tail
+/// follows and is itself bounded, otherwise `end` unchanged.
+fn extend_over_tail(bytes: &[u8], end: usize) -> usize {
+    let hex_start = end + 1;
+    let tail_end = hex_start + TAIL_HEX_LEN;
+    if bytes.get(end) != Some(&TAIL_SEPARATOR) || bytes.len() < tail_end {
+        return end;
+    }
+    if !bytes[hex_start..tail_end].iter().copied().all(is_upper_hex) {
+        return end;
+    }
+    match bytes.get(tail_end) {
+        Some(&next) if pattern::is_alnum_dash(next) || next == TAIL_SEPARATOR => end,
+        _ => tail_end,
+    }
+}
+
 /// Detects an Atlassian Cloud API token by its documented-stable `ATAT`
 /// prefix and a minimum-length opaque body.
 pub(super) struct AtlassianApiTokenDetector;
@@ -83,6 +125,7 @@ impl Detector for AtlassianApiTokenDetector {
         input: &str,
         _context: &DetectorContext,
     ) -> Result<Vec<Candidate>, DetectorFailure> {
+        let bytes = input.as_bytes();
         let mut candidates = Vec::new();
         for (start, end) in pattern::scan_prefixed_runs(
             input,
@@ -91,6 +134,7 @@ impl Detector for AtlassianApiTokenDetector {
             pattern::is_alnum_dash,
             pattern::is_alnum_dash,
         ) {
+            let end = extend_over_tail(bytes, end);
             let Some(range) = ByteRange::new(start, end) else {
                 continue;
             };
@@ -159,14 +203,45 @@ mod tests {
     }
 
     #[test]
-    fn truncates_at_an_embedded_equals_sign_but_still_matches_past_the_minimum() {
-        let input = format!("{PREFIX}{BODY_100}=CHECKSUMSUFFIX");
-        let candidates = detect(&input);
-        assert_eq!(candidates.len(), 1);
-        assert_eq!(
-            candidates[0].range(),
-            ByteRange::new(0, PREFIX.len() + BODY_100.len()).unwrap()
-        );
+    fn stops_at_an_equals_sign_not_followed_by_the_documented_tail() {
+        for tail in [
+            "=CHECKSUMSUFFIX",
+            "=0A1B2C3",
+            "=0A1B2C3D4",
+            "=0a1b2c3d",
+            "=0A1B2C3D-",
+            "=0A1B2C3D=",
+        ] {
+            let input = format!("{PREFIX}{BODY_100}{tail}");
+            let candidates = detect(&input);
+            assert_eq!(candidates.len(), 1, "{tail}");
+            assert_eq!(
+                candidates[0].range(),
+                ByteRange::new(0, PREFIX.len() + BODY_100.len()).unwrap(),
+                "{tail}"
+            );
+        }
+    }
+
+    #[test]
+    fn includes_the_equals_and_eight_uppercase_hex_tail_in_the_span() {
+        // Issue #741: a 192-byte token ends in `=` + 8 uppercase hex.
+        for (before, after) in [
+            ("", ""),
+            ("ATLASSIAN_API_TOKEN=", "\n"),
+            ("{\"apiToken\": \"", "\"}"),
+            ("user@example.test:", " "),
+        ] {
+            let token = format!("{PREFIX}{BODY_100}=0A1B2C3D");
+            let input = format!("{before}{token}{after}");
+            let candidates = detect(&input);
+            assert_eq!(candidates.len(), 1, "{input}");
+            assert_eq!(
+                candidates[0].range(),
+                ByteRange::new(before.len(), before.len() + token.len()).unwrap(),
+                "{input}"
+            );
+        }
     }
 
     #[test]

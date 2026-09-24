@@ -14,6 +14,7 @@ Current rules: `docs/specs/detector-families.md`.
 - [Freeze reviewed precision contracts for seven provider families and refine their default rules in place](2026-09-17-freeze-precision-contracts-for-seven-provider-families.md)
 - [Map GitHub's six token families onto six independent finding types under one detector](2026-09-20-map-github-token-families-onto-independent-finding-types.md)
 - [Redact a bare, marker-less OpenAI-prefixed value under a generic policy layer, beneath the frozen contract](2026-09-21-govern-bare-vendor-prefixed-policy-layer.md)
+- [Redact a Google API key inside a Firebase Web SDK client config, reversing the client-config exemption](2026-09-24-redact-google-api-keys-inside-firebase-web-config.md)
 
 ## Contextual detection
 
