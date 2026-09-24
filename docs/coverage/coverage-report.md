@@ -15,11 +15,11 @@ These counts describe finding-type inventory rows with corpus evidence, not dete
 
 | Row state | Count |
 | --- | --- |
-| supported | 68 |
+| supported | 70 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 79.
+Coverage declarations: 81.
 
 ## Coverage by detector
 
@@ -53,6 +53,8 @@ Coverage declarations: 79.
 | heroku-api-key-legacy | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | huggingface-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | jwt | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| langfuse-secret-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| langsmith-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | linear-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | mailchimp-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | mailgun-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -125,6 +127,8 @@ Coverage declarations: 79.
 | heroku_api_key_legacy | heroku-api-key-legacy | provider | supported | not-applicable | none |
 | huggingface_token | huggingface-token | provider | supported | not-applicable | none |
 | jwt | jwt | structural | supported | not-applicable | none |
+| langfuse_secret_key | langfuse-secret-key | provider | supported | not-applicable | none |
+| langsmith_api_key | langsmith-api-key | provider | supported | not-applicable | none |
 | linear_token | linear-token | provider | supported | not-applicable | none |
 | mailchimp_api_key | mailchimp-api-key | provider | supported | not-applicable | none |
 | mailgun_api_key | mailgun-api-key | provider | supported | not-applicable | none |
@@ -184,15 +188,15 @@ Coverage declarations: 79.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 79 | 0 | 0 |
-| boundary | 68 | 0 | 0 |
-| host-context | 68 | 0 | 0 |
+| adversarial | 81 | 0 | 0 |
+| boundary | 70 | 0 | 0 |
+| host-context | 70 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 79 | 0 | 0 |
-| near-miss-negative | 68 | 0 | 0 |
-| overlap | 68 | 0 | 0 |
-| positive | 68 | 0 | 0 |
-| range | 79 | 0 | 0 |
+| malformed | 81 | 0 | 0 |
+| near-miss-negative | 70 | 0 | 0 |
+| overlap | 70 | 0 | 0 |
+| positive | 70 | 0 | 0 |
+| range | 81 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

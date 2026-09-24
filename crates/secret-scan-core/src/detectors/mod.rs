@@ -28,6 +28,8 @@ mod gitlab;
 mod grafana;
 mod heroku;
 mod jwt;
+mod langfuse;
+mod langsmith;
 mod linear;
 mod mailchimp;
 mod mailgun;
@@ -122,6 +124,8 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(confluent::CONFLUENT_CLOUD_API_SECRET),
         Box::new(confluent::ConfluentLegacyApiSecretDetector),
         Box::new(netlify::NetlifyPersonalAccessTokenDetector),
+        Box::new(langsmith::LangsmithApiKeyDetector),
+        Box::new(langfuse::LangfuseSecretKeyDetector),
         Box::new(postman::POSTMAN),
         Box::new(heroku::HEROKU_API_KEY),
         Box::new(heroku::HerokuApiKeyLegacyDetector),
@@ -228,6 +232,8 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("confluent-cloud-api-secret", Pack::Provider),
     ("confluent-cloud-api-secret-legacy", Pack::Provider),
     ("netlify-token", Pack::Provider),
+    ("langsmith-api-key", Pack::Provider),
+    ("langfuse-secret-key", Pack::Provider),
     ("postman-api-key", Pack::Provider),
     ("heroku-api-key", Pack::Provider),
     ("heroku-api-key-legacy", Pack::Provider),
@@ -323,6 +329,8 @@ mod tests {
                 "confluent-cloud-api-secret",
                 "confluent-cloud-api-secret-legacy",
                 "netlify-token",
+                "langsmith-api-key",
+                "langfuse-secret-key",
                 "postman-api-key",
                 "heroku-api-key",
                 "heroku-api-key-legacy",
@@ -578,6 +586,7 @@ mod tests {
     }
 
     #[test]
+    #[allow(clippy::too_many_lines)]
     fn recent_built_in_provider_candidates_claim_provider_specificity() {
         let sentry_user_auth_token_input = format!("sntryu_{}", "0123456789abcdef".repeat(4));
         let sentry_org_auth_token_input = format!(
@@ -615,6 +624,8 @@ mod tests {
         let confluent_cloud_api_secret_input =
             "cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPn2NMow";
         let netlify_token_input = "nfp_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01";
+        let langsmith_api_key_input = "lsv2_pt_0123456789abcdef0123456789abcdef_fedcba9876";
+        let langfuse_secret_key_input = "sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5d";
         let postman_api_key_input = format!(
             "PMAK-{}-{}",
             "0123456789abcdef01234567", "0123456789abcdef0123456789abcdef01"
@@ -672,6 +683,8 @@ mod tests {
                 confluent_cloud_api_secret_input,
             ),
             ("netlify-token", netlify_token_input),
+            ("langsmith-api-key", langsmith_api_key_input),
+            ("langfuse-secret-key", langfuse_secret_key_input),
             ("postman-api-key", postman_api_key_input.as_str()),
             ("heroku-api-key", heroku_api_key_input.as_str()),
             ("heroku-api-key-legacy", heroku_api_key_legacy_input),
