@@ -447,7 +447,7 @@ def render_release_note(matrix: dict, previous: dict | None) -> str:
         "",
         f"{matrix['providerCount']} providers, {matrix['familyCount']} credential families: "
         + ", ".join(f"{status} {distribution.get(status, 0)}" for status in STATUS_ORDER)
-        + ". See the [support matrix](docs/support-matrix.md).",
+        + ". See the [support matrix](/docs/support-matrix.md).",
         "",
         "Stable qualification: "
         + ", ".join(

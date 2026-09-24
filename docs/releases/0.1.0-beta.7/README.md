@@ -92,6 +92,9 @@ packages; see [release status](../status.md).
 
 ## Durable record
 
+The CHANGELOG's generated `### Support status` section comes from the committed
+[support-status fragment](support-status.md).
+
 Reconcile Release intentionally emits no replacement manifest. This
 checked-in [manifest](manifest.json) is therefore marked `reconstructed`. It
 combines:
