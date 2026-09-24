@@ -105,5 +105,6 @@ combines:
 
 Its `artifact_digests` entry for `@redact-secret/core` is corrected to the
 published and qualified `97fb760d…`, and it carries a note explaining the
-original `f82efd6b…`. Qualified CLI binaries remain Actions artifacts. No
-GitHub Release page is created by the workflow.
+original `f82efd6b…`. Qualified CLI binaries remain Actions artifacts. The
+[GitHub Release page](https://github.com/redact-secret/redact-secret/releases/tag/v0.1.0-beta.7)
+was created separately on 2026-09-24, as a prerelease on the existing tag.

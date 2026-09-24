@@ -20,7 +20,7 @@ and a GitHub Release page are separate facts.
 | 0.1.0-beta.4 | 8 npm packages, 2 crates, 9 Python files | `b4a9ae83d737d367ebc1d6d1732e634b44b2452a` | [Published](https://github.com/redact-secret/redact-secret/releases/tag/v0.1.0-beta.4) 2026-09-24 |
 | 0.1.0-beta.5 | 10 npm packages (including 2 musl), 2 crates, 9 Python files | `0cc48374d005a44334bf727e49125165ec7d4157` | [Published](https://github.com/redact-secret/redact-secret/releases/tag/v0.1.0-beta.5) 2026-09-24 |
 | 0.1.0-beta.6 | 10 npm packages (including 2 musl), 2 crates, 9 Python files | `079095e766e4a71e2b7e29413ed17be37bb3315d` | [Published](https://github.com/redact-secret/redact-secret/releases/tag/v0.1.0-beta.6) 2026-09-24 |
-| 0.1.0-beta.7 | 10 npm packages (including 2 musl), 2 crates, 9 Python files | `2b98027bbf38d63f07b75129fe2864ef32ed4732` | Not created yet |
+| 0.1.0-beta.7 | 10 npm packages (including 2 musl), 2 crates, 9 Python files | `2b98027bbf38d63f07b75129fe2864ef32ed4732` | [Published](https://github.com/redact-secret/redact-secret/releases/tag/v0.1.0-beta.7) 2026-09-24 |
 
 Observed on 2026-09-24, npm `beta` points to beta.7 and `latest` points to
 beta.6 for `@redact-secret/core`, `@redact-secret/wasm` and all eight native
