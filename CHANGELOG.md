@@ -5,6 +5,28 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+### Changed
+
+- `twilio-auth-token`, `twilio-api-key-secret` and
+  `confluent-cloud-api-secret-legacy` no longer report a value introduced by a
+  hash-algorithm label (`md5=`, `sha256:`, `@sha256:`, `sha-512=`, ...), even
+  on a line that names the provider. `twilio-9.3.0.tar.gz md5=<32 hex>` is a
+  package checksum and `confluentinc/cp-server@sha256:<64 hex>` is an image
+  digest. The label must sit directly in front of the value, so
+  `TWILIO_AUTH_TOKEN=<32 hex>` and `CONFLUENT_API_SECRET=<64 bytes>` are
+  reported as before (#744).
+- `bearer-token` no longer redacts an instructional placeholder of 16 or more
+  bytes, such as `YOUR_ACCESS_TOKEN`, `INSERT_ACCESS_TOKEN` or
+  `your-oauth-token-here`. The value must start with `your`, `insert`,
+  `enter` or `paste`, contain only credential words after that, and name a
+  `token`, `key`, `secret` or `jwt`. A value with any other word
+  (`YOUR_ACCESS_TOKEN_9f2cQ7xL`) is still redacted (#745).
+- `generic-token` no longer warns on a Twilio Account SID or API Key SID
+  (`AC`/`SK` + 32 lowercase hex) assigned to a credential-like name, such as
+  `credentials: SK...`. Twilio documents both as identifiers, and the Twilio
+  detectors already treat them only as context. Any other prefix, length, or
+  an uppercase body is still reported (#746).
+
 ### Internal, tooling, and qualification
 
 - The CHANGELOG `### Support status` section is now generated. A release

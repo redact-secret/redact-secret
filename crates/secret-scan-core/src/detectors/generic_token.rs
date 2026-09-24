@@ -791,6 +791,28 @@ fn is_non_secret_reference(value: &str, form: ValueForm) -> bool {
         || is_source_code_expression(value, form)
         || is_windows_env_reference(value)
         || is_sql_bind_parameter(value)
+        || is_twilio_public_sid(value)
+}
+
+/// `true` when the whole value is a Twilio Account SID (`AC`) or API Key
+/// SID (`SK`) in Twilio's documented SID shape: the two-letter uppercase
+/// prefix followed by exactly 32 lowercase hex bytes (issue #746).
+///
+/// Twilio documents both as identifiers, not secrets: the Account SID names
+/// the account and the API Key SID is the username sent alongside the API
+/// Key Secret (`https://www.twilio.com/docs/iam/api-keys`). The
+/// `twilio-auth-token` and `twilio-api-key-secret` detectors already use
+/// them only as context and never report them, so a SID after a
+/// credential-like name (`credentials: SK...`) is excluded here too. Only
+/// the exact shape counts: a different prefix, a different length, or an
+/// uppercase hex byte in the body keeps the value in scope.
+fn is_twilio_public_sid(value: &str) -> bool {
+    let bytes = value.as_bytes();
+    bytes.len() == 34
+        && (bytes.starts_with(b"AC") || bytes.starts_with(b"SK"))
+        && bytes[2..]
+            .iter()
+            .all(|&byte| byte.is_ascii_digit() || (b'a'..=b'f').contains(&byte))
 }
 
 // --- names: built-in vs. ruleset-supplied ----------------------------------
@@ -1817,6 +1839,47 @@ mod tests {
                 detect(input).is_empty(),
                 "expected no findings for {input:?}"
             );
+        }
+    }
+
+    /// A synthetic `prefix` + 32-byte SID body. Built at runtime rather than
+    /// written as a literal: GitHub push protection rejects a literal
+    /// `SK` + 32 hex value, even a synthetic one.
+    fn synthetic_sid(prefix: &str, body_half: &str) -> String {
+        format!("{prefix}{body_half}{body_half}")
+    }
+
+    #[test]
+    fn twilio_account_and_api_key_sids_are_public_identifiers() {
+        // Issue #746. Locally constructed synthetic SIDs.
+        let api_key_sid = synthetic_sid("SK", "0123456789abcdef");
+        let account_sid = "AC0123456789abcdef0123456789abcde0";
+        for input in [
+            format!("twilio credentials: {api_key_sid} {account_sid}"),
+            format!("credentials: {account_sid}"),
+            format!("credentials: {api_key_sid}"),
+            format!("api_key={api_key_sid}"),
+            format!("secret: \"{account_sid}\""),
+        ] {
+            assert!(detect(&input).is_empty(), "{input}");
+        }
+    }
+
+    #[test]
+    fn values_near_a_twilio_sid_shape_stay_detected() {
+        let full = synthetic_sid("SK", "0123456789abcdef");
+        for value in [
+            // Uppercase hex in the body: not Twilio's SID shape.
+            synthetic_sid("SK", "0123456789ABCDEF"),
+            "AC0123456789ABCDEF0123456789ABCDEF".to_owned(),
+            // One byte short and one byte long.
+            full[..full.len() - 1].to_owned(),
+            format!("{full}0"),
+            // Another prefix.
+            synthetic_sid("XK", "0123456789abcdef"),
+        ] {
+            let input = format!("credentials: {value}");
+            assert_eq!(only_range(&detect(&input)), (13, input.len()), "{input}");
         }
     }
 

@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 1661,
+  "fixtureCount": 1669,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -20846,6 +20846,19 @@
       "note": "A single twilio-context-bearing line densely packed with candidate-shaped runs stays linear: per-line (not per-candidate) context checks keep this bounded."
     },
     {
+      "id": "twilio-auth-token-negative-md5-digest",
+      "detector": "twilio-auth-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "twilio-8.1.0.tar.gz md5=0a1b2c3d4e5f60718293a4b5c6d7e8f9\n",
+      "expected": [],
+      "note": "Issue #744: a 32-hex value introduced by an `md5=` hash-algorithm label is a package checksum, not an Auth Token, even though the line names Twilio. twilio-auth-token-positive-dotenv-keyword is the control that keeps TWILIO_AUTH_TOKEN=<32 hex> exact at [18,50)."
+    },
+    {
       "id": "twilio-api-key-secret-adversarial-dense-findings",
       "detector": "twilio-api-key-secret",
       "kind": "adversarial",
@@ -33673,6 +33686,76 @@
       "note": "issue #475: the fenced-example fixture's paired positive -- a real-looking Bearer value in the same Markdown shape stays detected at high confidence."
     },
     {
+      "id": "bearer-token-negative-your-oauth-token-placeholder",
+      "detector": "bearer-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer YOUR_OAUTH_TOKEN\n",
+      "expected": [],
+      "note": "Issue #745: an instructional placeholder (lead word `your` followed only by credential words) of 16 or more bytes is not a credential; the 16-byte minimum no longer carries the exclusion alone."
+    },
+    {
+      "id": "bearer-token-negative-insert-access-token-placeholder",
+      "detector": "bearer-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer INSERT_ACCESS_TOKEN\n",
+      "expected": [],
+      "note": "Issue #745: matches bearer-token-negative-your-oauth-token-placeholder with the `insert` lead word."
+    },
+    {
+      "id": "bearer-token-regression-base64url-value-still-detected",
+      "detector": "bearer-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer SYNTHETIC_revoked-bearer_0123456789abcde\n",
+      "expected": [
+        {
+          "detector": "bearer-token",
+          "type": "bearer_token",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 22,
+          "end": 62
+        }
+      ],
+      "note": "Issue #745 control: a 40-byte base64url Bearer value that is not an instructional placeholder stays detected at its exact range."
+    },
+    {
+      "id": "bearer-token-regression-placeholder-lead-word-with-random-suffix",
+      "detector": "bearer-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer YOUR_ACCESS_TOKEN_9f2cQ7xL\n",
+      "expected": [
+        {
+          "detector": "bearer-token",
+          "type": "bearer_token",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 22,
+          "end": 48
+        }
+      ],
+      "note": "Issue #745 control: a value that starts like an instructional placeholder but carries a word outside the placeholder vocabulary stays detected."
+    },
+    {
       "id": "jwt-negative-legacy-supabase-anon-dotenv",
       "detector": "jwt",
       "kind": "negative",
@@ -34123,6 +34206,41 @@
         }
       ],
       "note": "Overlap evidence (issue #552), generic-token side: `openai-token` never claims a legacy-shaped 20/20 body under the explicit `sk-proj-` namespace (`openai-negative-explicit-namespace-legacy-body` records that silence), but the bare vendor-prefixed policy layer still claims the whole span at generic classification. Same input and disposition as `openai-negative-explicit-namespace-legacy-body`, filed a second time under this detector's own evidence so `vendor_prefixed_credential` carries direct overlap evidence rather than borrowing it."
+    },
+    {
+      "id": "generic-token-negative-twilio-account-sid",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "credentials: AC0123456789abcdef0123456789abcde0\n",
+      "expected": [],
+      "note": "Issue #746: a Twilio Account SID (`AC` + 32 lowercase hex) after an ambiguous `credentials:` name is a public account identifier, not a secret. The API Key SID (`SK`) half of the benchmark's wrong-companion pair is covered by generic_token.rs unit tests, which build the value at runtime: GitHub push protection rejects a literal `SK` + 32 hex value in this file."
+    },
+    {
+      "id": "generic-token-regression-uppercase-hex-sid-lookalike",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "credentials: AC0123456789ABCDEF0123456789ABCDEF\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "medium",
+          "specificity": "contextual",
+          "start": 13,
+          "end": 47
+        }
+      ],
+      "note": "Issue #746 control: only Twilio's exact SID shape is excluded; an `AC`-prefixed value whose body is uppercase hex is not a Twilio SID and stays detected."
     },
     {
       "id": "notion-token-positive-dotenv-secret",
@@ -38330,6 +38448,19 @@
         }
       ],
       "note": "A single confluent-context-bearing line densely packed with candidate-shaped runs stays linear: per-line (not per-candidate) context checks keep this bounded."
+    },
+    {
+      "id": "confluent-cloud-api-secret-legacy-negative-image-digest",
+      "detector": "confluent-cloud-api-secret-legacy",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "image: confluentinc/cp-kafka@sha256:0a1b2c3d4e5f60718293a4b5c6d7e8f9f9e8d7c6b5a4938271605f4e3d2c1b0a\n",
+      "expected": [],
+      "note": "Issue #744: a 64-hex value introduced by an `@sha256:` label is a container image digest, not a legacy API secret, even though the line names Confluent. confluent-cloud-api-secret-legacy-positive-dotenv-keyword is the control that keeps CONFLUENT_API_SECRET=<64 bytes> exact at [21,85)."
     },
     {
       "id": "postman-api-key-positive-bare",
