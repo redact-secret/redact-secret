@@ -246,6 +246,18 @@ const DIGEST_ALGORITHM_LABELS: &[&str] = &[
     "sha512", "sha-512", "sha3-256", "sha3-512", "blake2b", "blake2s", "blake3",
 ];
 
+/// `true` when `value` itself opens with a hash-algorithm label and `:` or
+/// `=`, optionally behind `hmac-` (`hmac-sha256:<hex>`, `sha256:<hex>`): an
+/// audit-log HMAC or content digest, not a credential (issue #702).
+pub(super) fn starts_with_digest_label(value: &str) -> bool {
+    let lower = value.to_ascii_lowercase();
+    let rest = lower.strip_prefix("hmac-").unwrap_or(&lower);
+    DIGEST_ALGORITHM_LABELS.iter().any(|label| {
+        rest.strip_prefix(label)
+            .is_some_and(|after| after.starts_with(':') || after.starts_with('='))
+    })
+}
+
 /// `true` when the value starting at byte offset `start` of `input` is
 /// introduced by a hash-algorithm label: one of [`DIGEST_ALGORITHM_LABELS`],
 /// then `=` or `:`, then optional spaces or tabs, directly before the value
@@ -365,4 +377,131 @@ pub(super) fn is_windows_env_reference(value: &str) -> bool {
         .strip_prefix('%')
         .and_then(|rest| rest.strip_suffix('%'))
         .is_some_and(is_env_var_identifier)
+}
+
+/// Last key-name segments that name a public identifier, a location or an
+/// account attribute rather than the credential itself (`OKTA_ORG_URL`,
+/// `MAILGUN_DOMAIN`, `TWILIO_ACCOUNT_SID`).
+const NON_CREDENTIAL_KEY_SEGMENTS: &[&str] = &[
+    "id", "ids", "uuid", "sid", "name", "url", "uri", "host", "hostname", "domain", "region",
+    "org", "site", "endpoint", "email", "user", "username", "account", "project", "version",
+];
+
+/// `true` for a byte of an assignment key name: `[A-Za-z0-9_.-]`.
+fn is_assignment_key_byte(byte: u8) -> bool {
+    byte.is_ascii_alphanumeric() || matches!(byte, b'_' | b'.' | b'-')
+}
+
+/// The key a value starting at `value_start` of `line` is assigned to: the
+/// run of [`is_assignment_key_byte`] bytes left of a gap of spaces, tabs,
+/// quotes and at least one `=` or `:`. `None` when no operator joins them.
+fn assignment_key(line: &[u8], value_start: usize) -> Option<&[u8]> {
+    let mut end = value_start.min(line.len());
+    let mut has_operator = false;
+    while end > 0 && matches!(line[end - 1], b' ' | b'\t' | b'"' | b'\'' | b'=' | b':') {
+        has_operator |= matches!(line[end - 1], b'=' | b':');
+        end -= 1;
+    }
+    let mut start = end;
+    while start > 0 && is_assignment_key_byte(line[start - 1]) {
+        start -= 1;
+    }
+    (has_operator && start < end).then_some(&line[start..end])
+}
+
+/// `true` when the value starting at byte `value_start` of `line` is the
+/// value of an assignment that names the provider's credential (issue #702):
+///
+/// - the key, after [`super::generic_token::normalize_name`], contains one
+///   of `keywords` (`MAILCHIMP_API_KEY`, `okta.api_token`,
+///   `"mailgunApiKey"`), unless its last segment is one of
+///   [`NON_CREDENTIAL_KEY_SEGMENTS`]; or
+/// - the key is a generic high-signal name (`api_key`, `auth_token`,
+///   `secret`) and `line` also names one of `keywords`.
+///
+/// Context-gated detectors report such a value at high confidence. The name
+/// is the same evidence `generic-token` already redacts at high confidence,
+/// so without this the provider's own medium finding would lose the span to
+/// the generic one, or leave it at `warn`. `keywords` are lowercase and
+/// already in normalized form (`new_relic`, `newrelic`).
+pub(super) fn is_provider_named_assignment(
+    line: &str,
+    value_start: usize,
+    keywords: &[&str],
+) -> bool {
+    let Some(key) = assignment_key(line.as_bytes(), value_start) else {
+        return false;
+    };
+    let Ok(key) = std::str::from_utf8(key) else {
+        return false;
+    };
+    let normalized = super::generic_token::normalize_name(key);
+    if normalized
+        .rsplit('_')
+        .next()
+        .is_some_and(|segment| NON_CREDENTIAL_KEY_SEGMENTS.contains(&segment))
+    {
+        return false;
+    }
+    if keywords.iter().any(|keyword| normalized.contains(keyword)) {
+        return true;
+    }
+    super::generic_token::is_high_signal_name(&normalized)
+        && keywords.iter().any(|keyword| {
+            line.len() >= keyword.len()
+                && (0..=line.len() - keyword.len()).any(|pos| starts_with_ci(line, pos, keyword))
+        })
+}
+
+#[cfg(test)]
+mod provider_named_assignment_tests {
+    use super::is_provider_named_assignment;
+
+    const VALUE: &str = "SYNTHETIC_REVOKED_VALUE";
+
+    fn value_start(line: &str) -> usize {
+        line.find(VALUE).unwrap()
+    }
+
+    #[test]
+    fn a_key_naming_the_provider_qualifies() {
+        for line in [
+            format!("MAILCHIMP_API_KEY={VALUE}"),
+            format!("mailchimp.api_key: {VALUE}"),
+            format!("{{\"mailchimpApiKey\": \"{VALUE}\"}}"),
+            format!("export MAILCHIMP_KEY='{VALUE}'"),
+        ] {
+            assert!(
+                is_provider_named_assignment(&line, value_start(&line), &["mailchimp"]),
+                "{line}"
+            );
+        }
+    }
+
+    #[test]
+    fn a_high_signal_key_on_a_line_naming_the_provider_qualifies() {
+        let line = format!("mailchimp.setConfig({{ apiKey: \"{VALUE}\" }})");
+        assert!(is_provider_named_assignment(
+            &line,
+            value_start(&line),
+            &["mailchimp"]
+        ));
+    }
+
+    #[test]
+    fn identifier_keys_prose_and_other_keys_do_not_qualify() {
+        for line in [
+            format!("MAILCHIMP_LIST_ID={VALUE}"),
+            format!("MAILCHIMP_SERVER_URL={VALUE}"),
+            format!("# Mailchimp API key {VALUE}"),
+            format!("list_id: {VALUE} # mailchimp"),
+            format!("MAILCHIMP_API_KEY {VALUE}"),
+            format!("SENDGRID_API_KEY={VALUE}"),
+        ] {
+            assert!(
+                !is_provider_named_assignment(&line, value_start(&line), &["mailchimp"]),
+                "{line}"
+            );
+        }
+    }
 }

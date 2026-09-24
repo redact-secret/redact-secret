@@ -23,6 +23,7 @@ Current rules: `docs/specs/contextual-detection.md`.
 
 - [Exclude a value fully delimited by `{{` and `}}` as a template reference](2026-09-15-exclude-fully-delimited-template-references.md)
 - [Warn unconditionally on high-signal contextual-name assignments despite prose false positives](2026-09-20-warn-unconditionally-on-high-signal-contextual-names.md)
+- [Redact a value assigned to a provider-named credential name](2026-09-24-redact-provider-named-credential-assignments.md)
 
 ## Engine
 

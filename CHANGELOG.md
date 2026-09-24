@@ -7,6 +7,20 @@ evidence is linked from each published version.
 
 ### Changed
 
+- A credential assigned to a provider-named key now redacts.
+  `okta-api-token`, `mailchimp-api-key`, `mailgun-api-key`,
+  `heroku-api-key-legacy`, `confluent-cloud-api-secret-legacy`, the Datadog
+  and Twilio keyword-gated detectors and `new-relic-license-key` report high
+  confidence (redact) instead of medium (warn) when the value is assigned to a
+  key that names the provider (`MAILCHIMP_API_KEY=`, `"oktaApiToken":`). A
+  provider keyword elsewhere on the line still gives medium. `generic-token`
+  now treats a high-signal name behind a generic prefix as high-signal, so
+  `MYAPP_API_KEY=`, `DB_PASSWORD=`, `jwt.secret:` and `CI_DEPLOY_TOKEN=`
+  redact like `api_key=`. A prefix that names a provider with its own
+  detector leaves the value to that detector, so a malformed value under
+  `GITHUB_TOKEN=` stays clean. Vendor-prefixed documentation placeholders
+  (`pplx-your-api-key-here`, `pcsk_***`, `dapixxxx...`, the all-zero UUID)
+  and digest-labelled values (`hmac-sha256:...`) are not reported (#702).
 - `slack-token` now reports `xapp-` app-level tokens as their own finding type,
   `slack_app_level_token`, and only for the frozen four-section shape
   `xapp-<digits>-<alphanumeric>-<digits>-<alphanumeric>`. A value with a `_`

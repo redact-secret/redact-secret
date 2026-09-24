@@ -22,12 +22,13 @@ use crate::types::{Action, Confidence, DetectedFinding, Policy, PolicyContext};
 /// `detectors::confluent`, `detectors::heroku`, `detectors::mailchimp`,
 /// `detectors::mailgun`, or `detectors::okta`) explaining why a bare
 /// keyword-cooccurrence match at medium confidence is too weak (an opaque
-/// bare value sharing a line with a vendor keyword) to redact by default;
-/// each of those legacy types only ever reports [`Confidence::Medium`], so
-/// it always warns rather than redacts under this default policy, except
-/// `okta_api_token`, which also reports [`Confidence::High`] when a stronger
-/// same-line `SSWS` scheme signal is present, which this default policy
-/// already redacts without needing a carve-out here. Overlap resolution's resolved-action
+/// bare value sharing a line with a vendor keyword) to redact by default.
+/// A keyword elsewhere on the line reports [`Confidence::Medium`] and warns.
+/// A value assigned to a key that names the provider reports
+/// [`Confidence::High`] (issue #702,
+/// `decision-redact-provider-named-credential-assignments`), and so does
+/// `okta_api_token` under a same-line `SSWS` scheme; this default policy
+/// already redacts both without needing a carve-out here. Overlap resolution's resolved-action
 /// severity ranking
 /// (`decision-resolve-overlap-precedence-by-resolved-action-severity`)
 /// exists precisely so this list does not have to be exhaustive over every

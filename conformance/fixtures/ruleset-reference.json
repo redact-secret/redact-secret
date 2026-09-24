@@ -97,18 +97,18 @@
   },
   "names": {
     "id": "ruleset-names-section",
-    "description": "The declarative ruleset's names section (issue #484, decision-define-declarative-detector-ruleset-contract): a names-only ruleset (no detector: blocks) adding one ambiguous-bucket name, plus the built-in no-op and unrecognized-name cases. `corp_token` is not a built-in name; `api_key` and `Auth` are, so declaring them is a no-op that adds nothing.",
-    "ruleset": "ruleset-revision: 1\nnames: ambiguous\nname: corp_token\nname: api_key\nname: Auth\n",
+    "description": "The declarative ruleset's names section (issue #484, decision-define-declarative-detector-ruleset-contract): a names-only ruleset (no detector: blocks) adding one ambiguous-bucket name, plus the built-in no-op and unrecognized-name cases. `corp_passphrase` is not a built-in name; `api_key` and `Auth` are, so declaring them is a no-op that adds nothing.",
+    "ruleset": "ruleset-revision: 1\nnames: ambiguous\nname: corp_passphrase\nname: api_key\nname: Auth\n",
     "cases": [
       {
         "id": "ruleset-ambiguous-name-at-threshold",
         "detector": "generic-token-ruleset-names",
-        "input": "corp_token=SYNTHETIC_REVOKED_RULESET_AMBIGUOUS_1234",
+        "input": "corp_passphrase=SYNTHETIC_REVOKED_RULESET_AMBIGUOUS_1234",
         "type": "contextual_secret",
         "confidence": "medium",
         "specificity": "contextual",
-        "start": 11,
-        "end": 51
+        "start": 16,
+        "end": 56
       },
       {
         "id": "unlisted-name-produces-no-finding",
@@ -211,7 +211,7 @@
     },
     {
       "class": "NAME_BUCKET_NOT_CLAIMABLE",
-      "ruleset": "ruleset-revision: 1\nnames: high-signal\nname: corp_token\n",
+      "ruleset": "ruleset-revision: 1\nnames: high-signal\nname: corp_passphrase\n",
       "note": "ambiguous is the only claimable bucket in this revision (issue #484)"
     },
     {

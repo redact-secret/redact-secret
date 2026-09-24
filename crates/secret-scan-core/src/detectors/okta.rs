@@ -233,6 +233,10 @@ impl Detector for OktaApiTokenDetector {
                     None
                 } else if ssws_scheme_immediately_precedes(line, pos) {
                     Some((Confidence::High, "ssws-scheme-adjacency"))
+                } else if has_keyword
+                    && text::is_provider_named_assignment(line, pos, &[CONTEXT_KEYWORD])
+                {
+                    Some((Confidence::High, "okta-named-assignment"))
                 } else if has_keyword {
                     Some((Confidence::Medium, "okta-keyword-cooccurrence"))
                 } else {
@@ -295,7 +299,7 @@ mod tests {
     }
 
     #[test]
-    fn detects_the_token_named_by_an_okta_keyword_at_medium_confidence() {
+    fn detects_the_token_named_by_an_okta_keyword() {
         for input in [
             format!("OKTA_API_TOKEN={}", token()),
             format!("okta.api_token: {}", token()),
@@ -306,7 +310,12 @@ mod tests {
             let candidates = detect(&input);
             assert_eq!(candidates.len(), 1, "{input}");
             assert_eq!(candidates[0].type_name(), "okta_api_token");
-            assert_eq!(candidates[0].confidence(), Confidence::Medium);
+            let expected = if input.starts_with('#') {
+                Confidence::Medium
+            } else {
+                Confidence::High
+            };
+            assert_eq!(candidates[0].confidence(), expected, "{input}");
             assert_eq!(candidates[0].effective_specificity(), Specificity::Provider);
         }
     }

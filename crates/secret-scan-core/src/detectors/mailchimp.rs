@@ -225,13 +225,16 @@ impl Detector for MailchimpMarketingApiKeyDetector {
                     && !text::is_repeated_character_filler(&line[start..hex_end])
                     && let Some(range) = ByteRange::new(line_start + start, line_start + full_end)
                 {
+                    let (confidence, context_signal) =
+                        if text::is_provider_named_assignment(line, start, &[CONTEXT_KEYWORD]) {
+                            (Confidence::High, "mailchimp-named-assignment")
+                        } else {
+                            (Confidence::Medium, "mailchimp-keyword-cooccurrence")
+                        };
                     candidates.push(
-                        Candidate::new("mailchimp_api_key", Confidence::Medium, range)
+                        Candidate::new("mailchimp_api_key", confidence, range)
                             .with_specificity(Specificity::Provider)
-                            .with_signals([
-                                "mailchimp-keyword-cooccurrence",
-                                "documented-datacenter-suffix",
-                            ]),
+                            .with_signals([context_signal, "documented-datacenter-suffix"]),
                     );
                 }
                 start = hex_end;
@@ -269,7 +272,12 @@ mod tests {
             let candidates = detect(&input);
             assert_eq!(candidates.len(), 1, "{input}");
             assert_eq!(candidates[0].type_name(), "mailchimp_api_key");
-            assert_eq!(candidates[0].confidence(), Confidence::Medium);
+            let expected = if input.starts_with('#') {
+                Confidence::Medium
+            } else {
+                Confidence::High
+            };
+            assert_eq!(candidates[0].confidence(), expected, "{input}");
             assert_eq!(candidates[0].effective_specificity(), Specificity::Provider);
             let start = input.rfind(&key()).unwrap();
             assert_eq!(

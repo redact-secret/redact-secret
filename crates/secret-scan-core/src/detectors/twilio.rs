@@ -230,6 +230,13 @@ fn detect_context_gated(
             else {
                 continue;
             };
+            let (confidence, signal) = if confidence == Confidence::Medium
+                && text::is_provider_named_assignment(line, relative_start, &[CONTEXT_KEYWORD])
+            {
+                (Confidence::High, "twilio-named-assignment")
+            } else {
+                (confidence, signal)
+            };
             candidates.push(
                 Candidate::new(type_name, confidence, range)
                     .with_specificity(Specificity::Provider)
@@ -337,11 +344,11 @@ mod tests {
     }
 
     #[test]
-    fn detects_an_auth_token_named_by_the_twilio_keyword_at_medium_confidence() {
+    fn detects_an_auth_token_under_a_twilio_named_key_at_high_confidence() {
         let input = format!("TWILIO_AUTH_TOKEN={AUTH_TOKEN}");
         let candidates = detect_auth_token(&input);
         assert_eq!(candidates.len(), 1);
-        assert_eq!(candidates[0].confidence(), Confidence::Medium);
+        assert_eq!(candidates[0].confidence(), Confidence::High);
         let start = input.rfind(AUTH_TOKEN).unwrap();
         assert_eq!(
             candidates[0].range(),
@@ -422,11 +429,11 @@ mod tests {
     }
 
     #[test]
-    fn detects_an_api_key_secret_named_by_the_twilio_keyword_at_medium_confidence() {
+    fn detects_an_api_key_secret_under_a_twilio_named_key_at_high_confidence() {
         let input = format!("{{\"twilioApiKeySecret\": \"{API_KEY_SECRET}\"}}");
         let candidates = detect_api_key_secret(&input);
         assert_eq!(candidates.len(), 1);
-        assert_eq!(candidates[0].confidence(), Confidence::Medium);
+        assert_eq!(candidates[0].confidence(), Confidence::High);
         let start = input.rfind(API_KEY_SECRET).unwrap();
         assert_eq!(
             candidates[0].range(),

@@ -20015,13 +20015,13 @@
         {
           "detector": "twilio-auth-token",
           "type": "twilio_auth_token",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 18,
           "end": 50
         }
       ],
-      "note": "The bare 32-byte lowercase-hex value has no marker of its own; the twilio-named dotenv key is the only context present, so this classifies at medium confidence, not high."
+      "note": "The value has no vendor marker of its own; the twilio-named key (TWILIO_AUTH_TOKEN) names the credential, so since issue #702 it classifies at high confidence (a twilio keyword elsewhere on the line, without the name, stays medium)."
     },
     {
       "id": "twilio-auth-token-positive-json-keyword",
@@ -20037,13 +20037,13 @@
         {
           "detector": "twilio-auth-token",
           "type": "twilio_auth_token",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 21,
           "end": 53
         }
       ],
-      "note": "A quoted JSON string value is detected the same as a bare one; the twilio-named field is a keyword-only context, so confidence is medium."
+      "note": "The value has no vendor marker of its own; the twilio-named key (twilioAuthToken) names the credential, so since issue #702 it classifies at high confidence (a twilio keyword elsewhere on the line, without the name, stays medium)."
     },
     {
       "id": "twilio-auth-token-positive-yaml-keyword",
@@ -20059,13 +20059,13 @@
         {
           "detector": "twilio-auth-token",
           "type": "twilio_auth_token",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 19,
           "end": 51
         }
       ],
-      "note": "YAML key syntax is lexical context only; the twilio-named key is a keyword-only signal, so confidence is medium."
+      "note": "The value has no vendor marker of its own; the twilio-named key (twilio_auth_token) names the credential, so since issue #702 it classifies at high confidence (a twilio keyword elsewhere on the line, without the name, stays medium)."
     },
     {
       "id": "twilio-auth-token-negative-account-sid-on-a-different-line",
@@ -20190,13 +20190,13 @@
         {
           "detector": "twilio-api-key-secret",
           "type": "twilio_api_key_secret",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 22,
           "end": 54
         }
       ],
-      "note": "The bare 32-byte mixed-alphanumeric value has no marker of its own; the twilio-named dotenv key is the only context present, so this classifies at medium confidence, not high."
+      "note": "The value has no vendor marker of its own; the twilio-named key (TWILIO_API_KEY_SECRET) names the credential, so since issue #702 it classifies at high confidence (a twilio keyword elsewhere on the line, without the name, stays medium)."
     },
     {
       "id": "twilio-api-key-secret-positive-yaml-keyword",
@@ -20212,13 +20212,13 @@
         {
           "detector": "twilio-api-key-secret",
           "type": "twilio_api_key_secret",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 23,
           "end": 55
         }
       ],
-      "note": "YAML key syntax is lexical context only; the twilio-named key is a keyword-only signal, so confidence is medium."
+      "note": "The value has no vendor marker of its own; the twilio-named key (twilio_api_key_secret) names the credential, so since issue #702 it classifies at high confidence (a twilio keyword elsewhere on the line, without the name, stays medium)."
     },
     {
       "id": "twilio-api-key-secret-negative-api-key-sid-on-a-different-line",
@@ -20378,13 +20378,13 @@
         {
           "detector": "twilio-auth-token",
           "type": "twilio_auth_token",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 8,
           "end": 40
         }
       ],
-      "note": "api_key is a recognized generic-token field name, so this assignment also proposes a contextual-secret candidate at the same medium confidence (this value's entropy is below generic-token's high-confidence threshold) as this keyword-gated bare hex format. Same resolved-action severity (both warn under DefaultPolicy), so the provider-specific candidate's higher specificity still decides the overlap, exactly as `decision-resolve-overlap-precedence-by-resolved-action-severity` intends: severity is checked first but only overrides specificity when it actually differs."
+      "note": "api_key is a generic-token high-signal name and the line names twilio, so since issue #702 the keyword-gated provider detector classifies the value at high confidence as a named assignment; the provider candidate wins the overlap on provider specificity."
     },
     {
       "id": "twilio-api-key-secret-overlap-generic-context",
@@ -20400,13 +20400,13 @@
         {
           "detector": "twilio-api-key-secret",
           "type": "twilio_api_key_secret",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 8,
           "end": 40
         }
       ],
-      "note": "api_key is a recognized generic-token field name, so this assignment also proposes a contextual-secret candidate at the same medium confidence (this value's entropy is below generic-token's high-confidence threshold) as this keyword-gated bare mixed-alphanumeric format. Same resolved-action severity (both warn under DefaultPolicy), so the provider-specific candidate's higher specificity still decides the overlap, exactly as `decision-resolve-overlap-precedence-by-resolved-action-severity` intends: severity is checked first but only overrides specificity when it actually differs."
+      "note": "api_key is a generic-token high-signal name and the line names twilio, so since issue #702 the keyword-gated provider detector classifies the value at high confidence as a named assignment; the provider candidate wins the overlap on provider specificity."
     },
     {
       "id": "twilio-auth-token-adversarial-dense-findings",
@@ -26275,13 +26275,13 @@
         {
           "detector": "new-relic-license-key",
           "type": "new_relic_license_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 22,
           "end": 62
         }
       ],
-      "note": "The bare 40-byte lowercase-hex value has no marker of its own; the new-relic-named dotenv key is the only context present, so confidence is medium rather than high."
+      "note": "The value has no vendor marker of its own; the new-relic-named key (NEW_RELIC_LICENSE_KEY) names the credential, so since issue #702 it classifies at high confidence (a new-relic keyword elsewhere on the line, without the name, stays medium)."
     },
     {
       "id": "new-relic-license-key-positive-json-keyword",
@@ -26297,13 +26297,13 @@
         {
           "detector": "new-relic-license-key",
           "type": "new_relic_license_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 24,
           "end": 64
         }
       ],
-      "note": "A quoted JSON string value is detected the same as a bare one; the new-relic-named field is a keyword-only context, so confidence is medium."
+      "note": "The value has no vendor marker of its own; the new-relic-named key (newRelicLicenseKey) names the credential, so since issue #702 it classifies at high confidence (a new-relic keyword elsewhere on the line, without the name, stays medium)."
     },
     {
       "id": "new-relic-license-key-positive-yaml-keyword",
@@ -26319,13 +26319,13 @@
         {
           "detector": "new-relic-license-key",
           "type": "new_relic_license_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 23,
           "end": 63
         }
       ],
-      "note": "A YAML mapping value on the same line as the new-relic-named key is detected at medium confidence, the same as any other keyword-only context."
+      "note": "The value has no vendor marker of its own; the new-relic-named key (new_relic_license_key) names the credential, so since issue #702 it classifies at high confidence (a new-relic keyword elsewhere on the line, without the name, stays medium)."
     },
     {
       "id": "new-relic-license-key-positive-log-keyword",
@@ -26599,13 +26599,13 @@
         {
           "detector": "new-relic-license-key",
           "type": "new_relic_license_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 8,
           "end": 48
         }
       ],
-      "note": "api_key is a recognized generic-token field name, so this assignment also proposes a contextual-secret candidate at the same medium confidence (this value's entropy is below generic-token's high-confidence threshold) as this keyword-gated bare hex format. Same resolved-action severity (both warn under DefaultPolicy), so the provider-specific candidate's higher specificity still decides the overlap, exactly as `decision-resolve-overlap-precedence-by-resolved-action-severity` intends: severity is checked first but only overrides specificity when it actually differs."
+      "note": "api_key is a generic-token high-signal name and the line names new-relic, so since issue #702 the keyword-gated provider detector classifies the value at high confidence as a named assignment; the provider candidate wins the overlap on provider specificity."
     },
     {
       "id": "new-relic-license-key-boundary-wrong-length",
@@ -26634,13 +26634,13 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 18,
           "end": 54
         }
       ],
-      "note": "The bare 32-byte lowercase-hex body plus its -us<N> datacenter suffix has no vendor marker of its own; the mailchimp-named dotenv key is the only context present, so confidence is medium rather than high."
+      "note": "The value has no vendor marker of its own; the mailchimp-named key (MAILCHIMP_API_KEY) names the credential, so since issue #702 it classifies at high confidence (a mailchimp keyword elsewhere on the line, without the name, stays medium)."
     },
     {
       "id": "mailchimp-api-key-positive-json-keyword",
@@ -26656,13 +26656,13 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 21,
           "end": 57
         }
       ],
-      "note": "A quoted JSON string value is detected the same as a bare one; the mailchimp-named field is a keyword-only context, so confidence is medium."
+      "note": "The value has no vendor marker of its own; the mailchimp-named key (mailchimpApiKey) names the credential, so since issue #702 it classifies at high confidence (a mailchimp keyword elsewhere on the line, without the name, stays medium)."
     },
     {
       "id": "mailchimp-api-key-positive-yaml-keyword",
@@ -26678,13 +26678,13 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 19,
           "end": 56
         }
       ],
-      "note": "A YAML mapping value on the same line as the mailchimp-named key is detected at medium confidence; this fixture also covers the two-digit datacenter suffix (-us21)."
+      "note": "The value has no vendor marker of its own; the mailchimp-named key (mailchimp_api_key) names the credential, so since issue #702 it classifies at high confidence (a mailchimp keyword elsewhere on the line, without the name, stays medium)."
     },
     {
       "id": "mailchimp-api-key-positive-log-keyword",
@@ -26722,13 +26722,13 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 26,
           "end": 62
         }
       ],
-      "note": "A quoted shell export still bounds the token to exactly its own bytes; the keyword-bearing variable name on the same line satisfies the context requirement."
+      "note": "The value has no vendor marker of its own; the mailchimp-named key (MAILCHIMP_API_KEY) names the credential, so since issue #702 it classifies at high confidence (a mailchimp keyword elsewhere on the line, without the name, stays medium)."
     },
     {
       "id": "mailchimp-api-key-regression-crlf-and-unicode-prefix",
@@ -26909,13 +26909,13 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 8,
           "end": 44
         }
       ],
-      "note": "api_key is a recognized generic-token field name, so this assignment also proposes a contextual-secret candidate at the same medium confidence (this value's low-entropy alternating pattern is below generic-token's high-confidence threshold) as this keyword-gated format. Same resolved-action severity (both warn under DefaultPolicy), so the provider-specific candidate's higher specificity decides the overlap."
+      "note": "api_key is a generic-token high-signal name and the line names mailchimp, so since issue #702 the keyword-gated provider detector classifies the value at high confidence as a named assignment; the provider candidate wins the overlap on provider specificity."
     },
     {
       "id": "mailchimp-api-key-adversarial-dense-findings",
@@ -27750,13 +27750,13 @@
         {
           "detector": "mailgun-api-key",
           "type": "mailgun_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 16,
           "end": 52
         }
       ],
-      "note": "The key-<32-byte-body> shape has no vendor marker of its own; the mailgun-named dotenv key is the only context present, so confidence is medium rather than high."
+      "note": "The value has no vendor marker of its own; the mailgun-named key (MAILGUN_API_KEY) names the credential, so since issue #702 it classifies at high confidence (a mailgun keyword elsewhere on the line, without the name, stays medium)."
     },
     {
       "id": "mailgun-api-key-positive-json-keyword",
@@ -27772,13 +27772,13 @@
         {
           "detector": "mailgun-api-key",
           "type": "mailgun_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 19,
           "end": 55
         }
       ],
-      "note": "A quoted JSON string value is detected the same as a bare one; the mailgun-named field is a keyword-only context, so confidence is medium."
+      "note": "The value has no vendor marker of its own; the mailgun-named key (mailgunApiKey) names the credential, so since issue #702 it classifies at high confidence (a mailgun keyword elsewhere on the line, without the name, stays medium)."
     },
     {
       "id": "mailgun-api-key-positive-yaml-keyword",
@@ -27794,13 +27794,13 @@
         {
           "detector": "mailgun-api-key",
           "type": "mailgun_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 17,
           "end": 53
         }
       ],
-      "note": "A YAML mapping value on the same line as the mailgun-named key is detected at medium confidence."
+      "note": "The value has no vendor marker of its own; the mailgun-named key (mailgun_api_key) names the credential, so since issue #702 it classifies at high confidence (a mailgun keyword elsewhere on the line, without the name, stays medium)."
     },
     {
       "id": "mailgun-api-key-positive-log-keyword",
@@ -27838,13 +27838,13 @@
         {
           "detector": "mailgun-api-key",
           "type": "mailgun_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 24,
           "end": 60
         }
       ],
-      "note": "A quoted shell export still bounds the token to exactly its own bytes; the keyword-bearing variable name on the same line satisfies the context requirement."
+      "note": "The value has no vendor marker of its own; the mailgun-named key (MAILGUN_API_KEY) names the credential, so since issue #702 it classifies at high confidence (a mailgun keyword elsewhere on the line, without the name, stays medium)."
     },
     {
       "id": "mailgun-api-key-positive-signing-key-field-name",
@@ -28021,13 +28021,13 @@
         {
           "detector": "mailgun-api-key",
           "type": "mailgun_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 8,
           "end": 44
         }
       ],
-      "note": "api_key is a recognized generic-token field name, so this assignment also proposes a contextual-secret candidate at the same medium confidence (this value's low-entropy alternating pattern is below generic-token's high-confidence threshold) as this keyword-gated format. Same resolved-action severity (both warn under DefaultPolicy), so the provider-specific candidate's higher specificity decides the overlap."
+      "note": "api_key is a generic-token high-signal name and the line names mailgun, so since issue #702 the keyword-gated provider detector classifies the value at high confidence as a named assignment; the provider candidate wins the overlap on provider specificity."
     },
     {
       "id": "mailgun-api-key-adversarial-dense-findings",
@@ -35234,13 +35234,13 @@
         {
           "detector": "okta-api-token",
           "type": "okta_api_token",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 15,
           "end": 57
         }
       ],
-      "note": "The 00-prefixed 42-byte shape has no vendor marker of its own; the okta-named dotenv key is the only context present, so confidence is medium rather than high."
+      "note": "The value has no vendor marker of its own; the okta-named key (OKTA_API_TOKEN) names the credential, so since issue #702 it classifies at high confidence (a okta keyword elsewhere on the line, without the name, stays medium)."
     },
     {
       "id": "okta-api-token-positive-json-keyword",
@@ -35256,13 +35256,13 @@
         {
           "detector": "okta-api-token",
           "type": "okta_api_token",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 18,
           "end": 60
         }
       ],
-      "note": "A quoted JSON string value is detected the same as a bare one; the okta-named field is a keyword-only context, so confidence is medium."
+      "note": "The value has no vendor marker of its own; the okta-named key (oktaApiToken) names the credential, so since issue #702 it classifies at high confidence (a okta keyword elsewhere on the line, without the name, stays medium)."
     },
     {
       "id": "okta-api-token-positive-yaml-keyword",
@@ -35278,13 +35278,13 @@
         {
           "detector": "okta-api-token",
           "type": "okta_api_token",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 16,
           "end": 58
         }
       ],
-      "note": "A YAML mapping value on the same line as the okta-named key is detected at medium confidence."
+      "note": "The value has no vendor marker of its own; the okta-named key (okta_api_token) names the credential, so since issue #702 it classifies at high confidence (a okta keyword elsewhere on the line, without the name, stays medium)."
     },
     {
       "id": "okta-api-token-positive-log-keyword",
@@ -35322,13 +35322,13 @@
         {
           "detector": "okta-api-token",
           "type": "okta_api_token",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 23,
           "end": 65
         }
       ],
-      "note": "A quoted shell export still bounds the token to exactly its own bytes; the keyword-bearing variable name on the same line satisfies the context requirement."
+      "note": "The value has no vendor marker of its own; the okta-named key (OKTA_API_TOKEN) names the credential, so since issue #702 it classifies at high confidence (a okta keyword elsewhere on the line, without the name, stays medium)."
     },
     {
       "id": "okta-api-token-positive-ssws-authorization-header",
@@ -35505,13 +35505,13 @@
         {
           "detector": "okta-api-token",
           "type": "okta_api_token",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 8,
           "end": 50
         }
       ],
-      "note": "api_key is a recognized generic-token field name, so this assignment also proposes a contextual-secret candidate at the same medium confidence (this value's low-entropy alternating pattern is below generic-token's high-confidence threshold) as this keyword-gated format. Same resolved-action severity (both warn under DefaultPolicy), so the provider-specific candidate's higher specificity decides the overlap."
+      "note": "api_key is a generic-token high-signal name and the line names okta, so since issue #702 the keyword-gated provider detector classifies the value at high confidence as a named assignment; the provider candidate wins the overlap on provider specificity."
     },
     {
       "id": "okta-api-token-adversarial-dense-findings",
@@ -38416,13 +38416,13 @@
         {
           "detector": "confluent-cloud-api-secret-legacy",
           "type": "confluent_cloud_api_secret_legacy",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 21,
           "end": 85
         }
       ],
-      "note": "The bare 64-byte base64-body value has no marker of its own; the confluent-named dotenv key is the only context present, so this classifies at medium confidence."
+      "note": "The value has no vendor marker of its own; the confluent-named key (CONFLUENT_API_SECRET) names the credential, so since issue #702 it classifies at high confidence (a confluent keyword elsewhere on the line, without the name, stays medium)."
     },
     {
       "id": "confluent-cloud-api-secret-legacy-positive-yaml-keyword",
@@ -38438,13 +38438,13 @@
         {
           "detector": "confluent-cloud-api-secret-legacy",
           "type": "confluent_cloud_api_secret_legacy",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 22,
           "end": 86
         }
       ],
-      "note": "YAML key syntax is lexical context only; the confluent-named key is a keyword-only signal, so confidence is medium."
+      "note": "The value has no vendor marker of its own; the confluent-named key (confluent_api_secret) names the credential, so since issue #702 it classifies at high confidence (a confluent keyword elsewhere on the line, without the name, stays medium)."
     },
     {
       "id": "confluent-cloud-api-secret-legacy-positive-bare-with-keyword",
@@ -38547,13 +38547,13 @@
         {
           "detector": "confluent-cloud-api-secret-legacy",
           "type": "confluent_cloud_api_secret_legacy",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 11,
           "end": 75
         }
       ],
-      "note": "secret_key is a recognized generic-token field name, so this low-entropy assignment also proposes a contextual_secret candidate; generic-token's own entropy heuristic keeps that candidate at the same medium confidence (action warn) as this keyword-gated legacy candidate, so the same resolved-action severity leaves specificity to decide, and the provider-specific candidate wins, exactly as decision-resolve-overlap-precedence-by-resolved-action-severity intends."
+      "note": "secret_key is a generic-token high-signal name and the line names confluent, so since issue #702 the keyword-gated provider detector classifies the value at high confidence as a named assignment; the provider candidate wins the overlap on provider specificity."
     },
     {
       "id": "confluent-cloud-api-secret-legacy-adversarial-dense-findings",
@@ -40770,13 +40770,13 @@
         {
           "detector": "heroku-api-key-legacy",
           "type": "heroku_api_key_legacy",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 15,
           "end": 51
         }
       ],
-      "note": "The bare UUID-shaped value has no marker of its own; the heroku-named dotenv key is the only context present, so this classifies at medium confidence."
+      "note": "The value has no vendor marker of its own; the heroku-named key (HEROKU_API_KEY) names the credential, so since issue #702 it classifies at high confidence (a heroku keyword elsewhere on the line, without the name, stays medium)."
     },
     {
       "id": "heroku-api-key-legacy-positive-yaml-keyword",
@@ -40792,13 +40792,13 @@
         {
           "detector": "heroku-api-key-legacy",
           "type": "heroku_api_key_legacy",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 16,
           "end": 52
         }
       ],
-      "note": "YAML key syntax is lexical context only; the heroku-named key is a keyword-only signal, so confidence is medium."
+      "note": "The value has no vendor marker of its own; the heroku-named key (heroku_api_key) names the credential, so since issue #702 it classifies at high confidence (a heroku keyword elsewhere on the line, without the name, stays medium)."
     },
     {
       "id": "heroku-api-key-legacy-positive-bare-with-keyword",
@@ -41007,13 +41007,13 @@
         {
           "detector": "heroku-api-key-legacy",
           "type": "heroku_api_key_legacy",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 11,
           "end": 47
         }
       ],
-      "note": "secret_key is a recognized generic-token field name, so this low-entropy assignment also proposes a contextual_secret candidate; generic-token's own entropy heuristic keeps that candidate at the same medium confidence (action warn) as this keyword-gated legacy candidate, so the same resolved-action severity leaves specificity to decide, and the provider-specific candidate wins, matching decision-resolve-overlap-precedence-by-resolved-action-severity."
+      "note": "secret_key is a generic-token high-signal name and the line names heroku, so since issue #702 the keyword-gated provider detector classifies the value at high confidence as a named assignment; the provider candidate wins the overlap on provider specificity."
     },
     {
       "id": "heroku-api-key-legacy-adversarial-dense-findings",

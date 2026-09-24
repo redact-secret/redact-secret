@@ -13,7 +13,7 @@ use super::text::{
     is_line_start, is_opencode_reference, is_repeated_character_filler,
     is_ruby_interpolation_reference, is_template_reference, is_windows_env_reference,
     matches_placeholder_vocabulary, prev_char, rskip_while_chars, skip_while_chars,
-    starts_with_bare_dollar_reference, starts_with_ci,
+    starts_with_bare_dollar_reference, starts_with_ci, starts_with_digest_label,
 };
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
@@ -43,6 +43,162 @@ const AMBIGUOUS_NAMES: &[&str] = &[
     "signing_key",
 ];
 
+/// `<prefix>_token` names that hold a request-scoped or public value rather
+/// than a credential. Every other prefixed `_token` name is high-signal
+/// (issue #702).
+const NON_CREDENTIAL_TOKEN_NAMES: &[&str] = &[
+    "csrf_token",
+    "xsrf_token",
+    "page_token",
+    "next_page_token",
+    "prev_page_token",
+    "pagination_token",
+    "continuation_token",
+    "cancel_token",
+    "cancellation_token",
+    "sync_token",
+    "resume_token",
+    "device_token",
+    "push_token",
+];
+
+/// Name segments that name a provider with its own built-in detector. A
+/// prefixed name carrying one (`MAILCHIMP_API_KEY`, `GITHUB_TOKEN`,
+/// `DD_API_KEY`) belongs to that detector's contract, which decides whether
+/// the value is a credential: a value it declines (a truncated or
+/// mis-delimited near miss) stays silent instead of being claimed by
+/// `generic-token` (issue #702).
+const DEDICATED_PROVIDER_SEGMENTS: &[&str] = &[
+    "anthropic",
+    "atlassian",
+    "jira",
+    "confluence",
+    "cloudflare",
+    "cf",
+    "confluent",
+    "databricks",
+    "datadog",
+    "dd",
+    "digitalocean",
+    "discord",
+    "docker",
+    "dockerhub",
+    "fireworks",
+    "github",
+    "gh",
+    "gitlab",
+    "grafana",
+    "groq",
+    "heroku",
+    "huggingface",
+    "hf",
+    "langfuse",
+    "langsmith",
+    "langchain",
+    "linear",
+    "mailchimp",
+    "mailgun",
+    "netlify",
+    "newrelic",
+    "notion",
+    "npm",
+    "okta",
+    "openai",
+    "openrouter",
+    "perplexity",
+    "pplx",
+    "pinecone",
+    "postman",
+    "pulumi",
+    "pypi",
+    "replicate",
+    "sendgrid",
+    "sentry",
+    "shopify",
+    "slack",
+    "stripe",
+    "supabase",
+    "telegram",
+    "terraform",
+    "twilio",
+    "vault",
+    "vercel",
+    "xai",
+];
+
+/// Multi-segment spellings of [`DEDICATED_PROVIDER_SEGMENTS`] entries.
+const DEDICATED_PROVIDER_PHRASES: &[&str] = &["new_relic", "digital_ocean", "hugging_face"];
+
+/// First name segments that say the value is not the secret itself
+/// (`redacted_api_key`, `hashed_token`, `publishable_key`).
+const NON_SECRET_NAME_LEADS: &[&str] = &[
+    "redacted",
+    "masked",
+    "hashed",
+    "hash",
+    "obfuscated",
+    "truncated",
+    "sanitized",
+    "publishable",
+];
+
+/// `true` when a prefixed name's prefix may make it a generic contextual
+/// name: it names no provider with a dedicated detector and does not say the
+/// value is redacted, hashed or public.
+fn prefix_is_generic(normalized: &str) -> bool {
+    let mut segments = normalized.split('_');
+    let lead_is_non_secret = segments
+        .next()
+        .is_some_and(|lead| NON_SECRET_NAME_LEADS.contains(&lead));
+    !lead_is_non_secret
+        && !normalized
+            .split('_')
+            .any(|segment| DEDICATED_PROVIDER_SEGMENTS.contains(&segment))
+        && !DEDICATED_PROVIDER_PHRASES
+            .iter()
+            .any(|phrase| normalized.contains(phrase))
+}
+
+/// `true` when `normalized` is `<prefix>_<name>` for one of `names`, with a
+/// non-empty [`prefix_is_generic`] prefix: `myapp_api_key`, `db_password`,
+/// `jwt_secret`.
+fn has_prefixed_name(normalized: &str, names: &[&str]) -> bool {
+    names.iter().any(|name| {
+        normalized.len() > name.len() + 1
+            && normalized.ends_with(name)
+            && normalized.as_bytes()[normalized.len() - name.len() - 1] == b'_'
+    }) && prefix_is_generic(normalized)
+}
+
+/// `true` for a high-signal name: one of [`HIGH_SIGNAL_NAMES`], the same
+/// name behind a generic prefix (`MYAPP_API_KEY`, `DB_PASSWORD`,
+/// `JWT_SECRET`), or a prefixed `_token` name outside
+/// [`NON_CREDENTIAL_TOKEN_NAMES`] (`CI_DEPLOY_TOKEN`). A prefix that names a
+/// provider with its own detector does not qualify; see
+/// [`prefix_is_generic`].
+///
+/// Issue #702: before this, only the bare names matched, so a secret under a
+/// prefixed variable for a service with no dedicated detector got no finding
+/// at all. The false-positive cost is a prefixed name holding a non-secret,
+/// high-entropy value of at least eight bytes; placeholder, reference and
+/// masked-value exclusions still apply unchanged.
+pub(crate) fn is_high_signal_name(normalized: &str) -> bool {
+    HIGH_SIGNAL_NAMES.contains(&normalized)
+        || has_prefixed_name(normalized, HIGH_SIGNAL_NAMES)
+        || (!AMBIGUOUS_NAMES.contains(&normalized)
+            && has_prefixed_name(normalized, &["token"])
+            && !NON_CREDENTIAL_TOKEN_NAMES.contains(&normalized)
+            && !has_prefixed_name(normalized, NON_CREDENTIAL_TOKEN_NAMES))
+}
+
+/// `true` for an ambiguous name: one of [`AMBIGUOUS_NAMES`] or the same name
+/// behind a prefix (`GITHUB_CREDENTIALS`), when it is not already
+/// [`is_high_signal_name`].
+fn is_ambiguous_name(normalized: &str) -> bool {
+    !is_high_signal_name(normalized)
+        && (AMBIGUOUS_NAMES.contains(&normalized) || has_prefixed_name(normalized, AMBIGUOUS_NAMES))
+}
+
 const MIN_CONTEXT_VALUE_LENGTH: usize = 8;
 const MIN_HIGH_ENTROPY_LENGTH: usize = 16;
 const HIGH_ENTROPY_THRESHOLD: f64 = 3.0;
@@ -59,8 +215,8 @@ const MIN_AUTHORIZATION_VALUE_LENGTH: usize = 12;
 /// section normalizes a caller-supplied `name:` value to before checking it
 /// against [`HIGH_SIGNAL_NAMES`]/[`AMBIGUOUS_NAMES`]
 /// (`crate::ruleset`, issue #484): the same function, applied to the same
-/// kind of input, so a ruleset author's `CorpToken` and a scanned input's
-/// `CorpToken=` assignment normalize to the identical key.
+/// kind of input, so a ruleset author's `CorpPassphrase` and a scanned input's
+/// `CorpPassphrase=` assignment normalize to the identical key.
 pub(crate) fn normalize_name(name: &str) -> String {
     let bytes = name.as_bytes();
     let mut out = String::with_capacity(name.len() + 4);
@@ -93,7 +249,7 @@ fn is_open_assignment_boundary_char(ch: char) -> bool {
 /// a caller cannot remove, override, or re-bucket a built-in name).
 #[must_use]
 pub(crate) fn is_reserved_name(normalized: &str) -> bool {
-    HIGH_SIGNAL_NAMES.contains(&normalized) || AMBIGUOUS_NAMES.contains(&normalized)
+    is_high_signal_name(normalized) || is_ambiguous_name(normalized)
 }
 
 /// The fixed, reserved id of the internal detector the declarative
@@ -158,8 +314,7 @@ pub(crate) fn has_open_contextual_assignment(input: &str) -> bool {
     }
 
     let normalized = normalize_name(&input[name_start..name_end]);
-    HIGH_SIGNAL_NAMES.contains(&normalized.as_str())
-        || AMBIGUOUS_NAMES.contains(&normalized.as_str())
+    is_high_signal_name(&normalized) || is_ambiguous_name(&normalized)
 }
 
 // --- non-secret reference exclusions -----------------------------------
@@ -902,6 +1057,75 @@ fn is_non_secret_reference(value: &str, form: ValueForm) -> bool {
         || is_windows_env_reference(value)
         || is_sql_bind_parameter(value)
         || is_twilio_public_sid(value)
+        || is_vendor_prefixed_placeholder(value)
+        || is_prefixed_filler(value)
+        || starts_with_digest_label(value)
+}
+
+/// The longest alphanumeric lead [`is_prefixed_filler`] allows before the
+/// filler.
+const MAX_FILLER_PREFIX_LEN: usize = 8;
+
+/// The shortest filler run [`is_prefixed_filler`] accepts.
+const MIN_FILLER_LEN: usize = 8;
+
+/// `true` for documentation filler behind an optional short prefix, with
+/// `-`, `_` and `.` ignored: `dapixxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`,
+/// `PMAK-xxxxxxxx-xxxxxxxx`, `00000000-0000-0000-0000-000000000000`. After
+/// at most [`MAX_FILLER_PREFIX_LEN`] leading alphanumeric bytes, every
+/// remaining byte is one repeated character, at least [`MIN_FILLER_LEN`]
+/// long (issue #702, the provider-named placeholders its wider name
+/// matching exposes). A real credential body is never one repeated
+/// character.
+fn is_prefixed_filler(value: &str) -> bool {
+    let body: Vec<u8> = value
+        .bytes()
+        .filter(|byte| !matches!(byte, b'-' | b'_' | b'.'))
+        .collect();
+    if !body.iter().all(u8::is_ascii_alphanumeric) {
+        return false;
+    }
+    (0..=MAX_FILLER_PREFIX_LEN.min(body.len())).any(|split| {
+        let filler = &body[split..];
+        filler.len() >= MIN_FILLER_LEN && filler.iter().all(|&byte| byte == filler[0])
+    })
+}
+
+/// The longest vendor prefix [`is_vendor_prefixed_placeholder`] strips.
+const MAX_VENDOR_PLACEHOLDER_PREFIX_LEN: usize = 12;
+
+/// `true` for a documentation placeholder behind a short vendor prefix:
+/// `pplx-your-api-key-here`, `lsv2_pt_your_key_here`, `pcsk_***`,
+/// `pul-xxxxxxxx`, `xapp-<your-app-level-token>`. The prefix is at most
+/// [`MAX_VENDOR_PLACEHOLDER_PREFIX_LEN`] lowercase alphanumeric bytes and
+/// separators, the way vendor prefixes are written (an uppercase lead such
+/// as `KEY_YOUR_API_KEY` stays detected, #756),
+/// and the rest, after one of its `_`/`-` separators, is an instructional
+/// placeholder, an `<...>` reference, repeated filler, or a placeholder word.
+///
+/// Issue #702: provider-named assignments (`PERPLEXITY_API_KEY=`) now reach
+/// the generic detector, and their documentation examples keep the vendor
+/// prefix in front of the placeholder. A real token's body is random
+/// material, which fails all three checks, so the prefix alone never
+/// excludes a value.
+fn is_vendor_prefixed_placeholder(value: &str) -> bool {
+    value
+        .char_indices()
+        .take_while(|&(index, _)| index <= MAX_VENDOR_PLACEHOLDER_PREFIX_LEN)
+        .filter(|&(index, ch)| index > 0 && matches!(ch, '_' | '-'))
+        .any(|(index, _)| {
+            let rest = &value[index + 1..];
+            !rest.is_empty()
+                && value[..index].bytes().all(|byte| {
+                    byte.is_ascii_lowercase()
+                        || byte.is_ascii_digit()
+                        || matches!(byte, b'_' | b'-')
+                })
+                && (is_instructional_token_placeholder(rest)
+                    || starts_with_angle_bracket_reference(rest)
+                    || is_repeated_character_filler(rest)
+                    || is_generic_placeholder_word(&rest.to_ascii_lowercase()))
+        })
 }
 
 /// `true` when the whole value is a Twilio Account SID (`AC`) or API Key
@@ -972,7 +1196,7 @@ fn assignment_confidence(
 
     match names {
         NameSource::BuiltIn => {
-            if HIGH_SIGNAL_NAMES.contains(&name) {
+            if is_high_signal_name(name) {
                 return Some(
                     if value.len() >= MIN_HIGH_ENTROPY_LENGTH && entropy >= HIGH_ENTROPY_THRESHOLD {
                         Confidence::High
@@ -982,7 +1206,7 @@ fn assignment_confidence(
                 );
             }
 
-            if AMBIGUOUS_NAMES.contains(&name)
+            if is_ambiguous_name(name)
                 && value.len() >= MIN_HIGH_ENTROPY_LENGTH
                 && entropy >= AMBIGUOUS_ENTROPY_THRESHOLD
             {
@@ -1392,13 +1616,12 @@ fn assignment_candidates(input: &str, names: &NameSource) -> Vec<Candidate> {
                 && let Some(confidence) = assignment_confidence(&normalized, value, form, names)
                 && let Some(range) = ByteRange::new(value_start, value_end)
             {
-                let name_signal = if matches!(names, NameSource::BuiltIn)
-                    && HIGH_SIGNAL_NAMES.contains(&normalized.as_str())
-                {
-                    "high-signal-name"
-                } else {
-                    "ambiguous-name"
-                };
+                let name_signal =
+                    if matches!(names, NameSource::BuiltIn) && is_high_signal_name(&normalized) {
+                        "high-signal-name"
+                    } else {
+                        "ambiguous-name"
+                    };
                 let entropy_signal = if confidence == Confidence::High {
                     "bounded-entropy"
                 } else {
@@ -1737,6 +1960,129 @@ mod tests {
         assert_eq!(only_range(&candidates), (8, input.len()));
         assert_eq!(candidates[0].confidence(), Confidence::High);
         assert_eq!(candidates[0].specificity(), Some(Specificity::Contextual));
+    }
+
+    // issue #702: a high-signal name behind a generic prefix, and a prefixed
+    // `_token` name, is the same evidence as the bare name.
+    #[test]
+    fn a_generically_prefixed_high_signal_name_is_high_confidence() {
+        for name in [
+            "MYAPP_API_KEY",
+            "backendSecretKey",
+            "DB_PASSWORD",
+            "jwt.secret",
+            "CI_DEPLOY_TOKEN",
+            "internal-service-token",
+            "SMTP_PASSWORD",
+            "ADMIN_TOKEN",
+        ] {
+            let input = format!("{name}=SYNTHETIC_REVOKED_CONTEXT_VALUE");
+            let candidates = detect(&input);
+            assert_eq!(candidates.len(), 1, "{input}");
+            assert_eq!(candidates[0].confidence(), Confidence::High, "{input}");
+            assert_eq!(only_range(&candidates), (name.len() + 1, input.len()));
+            assert!(
+                has_open_contextual_assignment(&format!("{name}=")),
+                "{name}"
+            );
+        }
+    }
+
+    // issue #702: a prefix that names a provider with its own detector hands
+    // the value to that detector's contract, and a lead that says the value
+    // is redacted, hashed or public is not a secret name.
+    #[test]
+    fn provider_named_and_non_secret_prefixes_are_not_generic_names() {
+        for name in [
+            "POSTMAN_API_KEY",
+            "GITHUB_TOKEN",
+            "GH_TOKEN",
+            "DD_API_KEY",
+            "NEW_RELIC_API_KEY",
+            "stripeSecretKey",
+            "SLACK_BOT_TOKEN",
+            "redactedApiKey",
+            "hashed_token",
+            "publishable_key",
+        ] {
+            let input = format!("{name}=SYNTHETIC_REVOKED_CONTEXT_VALUE");
+            assert!(detect(&input).is_empty(), "{input}");
+        }
+    }
+
+    #[test]
+    fn a_prefixed_ambiguous_name_stays_medium_at_the_ambiguous_entropy_bar() {
+        let input = "SERVICE_CREDENTIALS=SYNTHETIC_REVOKED_CONTEXT_VALUE_9f3K";
+        let candidates = detect(input);
+        assert_eq!(candidates.len(), 1);
+        assert_eq!(candidates[0].confidence(), Confidence::Medium);
+    }
+
+    #[test]
+    fn request_scoped_token_names_and_unprefixed_suffix_lookalikes_stay_clean() {
+        for name in [
+            "csrf_token",
+            "X_CSRF_TOKEN",
+            "next_page_token",
+            "nextPageToken",
+            "cancellation_token",
+            "device_token",
+            "token",
+            "tokens",
+            "api_keys_count",
+            "passwordless",
+            "secretary",
+            "_token",
+        ] {
+            let input = format!("{name}=SYNTHETIC_REVOKED_CONTEXT_VALUE");
+            assert!(detect(&input).is_empty(), "{input}");
+        }
+    }
+
+    #[test]
+    fn a_vendor_prefixed_placeholder_is_not_a_secret() {
+        for input in [
+            "api_key=pplx-your-api-key-here",
+            "app_token: xapp-<your-app-level-token>",
+            "api_key=lsv2_pt_your_key_here",
+            "api_key=pcsk_***",
+            "access_token=pul-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+            "api_key=sk-proj-YOUR_API_KEY",
+            "api_key=sk-placeholder",
+            "access_token=dapixxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+            "api_key=PMAK-xxxxxxxxxxxxxxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+            "api_key=00000000-0000-0000-0000-000000000000",
+            "client_token=hmac-sha256:3122799486cdfa0be2445049d8a1f0c2",
+            "secret=sha256:9f86d081884c7d659a2feaa0c55ad015a3bf4f1b",
+        ] {
+            assert!(detect(input).is_empty(), "{input}");
+        }
+    }
+
+    #[test]
+    fn a_vendor_prefix_before_random_material_stays_detected() {
+        for input in [
+            "api_key=pplx-9f2cQ7xLm4Rt8Wz3Nc6Bh1Jd",
+            "access_token=pul-xxxx9f2cQ7xLm4Rt8Wz3Nc6Bh1Jd",
+            "api_key=verylongvendorprefix_your_api_key_here",
+            "access_token=dapixxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx9",
+            "secret=sha256x9f86d081884c7d659a2feaa0c55ad015",
+            "api_key=abcdefghixxxxxxxxxxxxxxx",
+        ] {
+            assert_eq!(detect(input).len(), 1, "{input}");
+        }
+    }
+
+    #[test]
+    fn a_prefixed_name_keeps_every_non_secret_value_exclusion() {
+        for input in [
+            "MYAPP_API_KEY=${MYAPP_API_KEY}",
+            "DB_PASSWORD=<your-db-password>",
+            "CI_DEPLOY_TOKEN=YOUR_ACCESS_TOKEN",
+            "ADMIN_TOKEN=short",
+        ] {
+            assert!(detect(input).is_empty(), "{input}");
+        }
     }
 
     // issue #473: `assignment_confidence` returns `Some` unconditionally for
@@ -2817,9 +3163,9 @@ mod tests {
 
     #[test]
     fn a_ruleset_supplied_ambiguous_name_is_medium_confidence_at_the_ambiguous_threshold() {
-        let input = "corp_token=SYNTHETIC_REVOKED_RULESET_AMBIGUOUS_1234";
-        let candidates = detect_with_ruleset_names(input, &["corp_token"]);
-        assert_eq!(only_range(&candidates), (11, input.len()));
+        let input = "corp_passphrase=SYNTHETIC_REVOKED_RULESET_AMBIGUOUS_1234";
+        let candidates = detect_with_ruleset_names(input, &["corp_passphrase"]);
+        assert_eq!(only_range(&candidates), (16, input.len()));
         assert_eq!(candidates[0].confidence(), Confidence::Medium);
         assert_eq!(candidates[0].specificity(), Some(Specificity::Contextual));
     }
@@ -2832,23 +3178,23 @@ mod tests {
         // candidate). The ruleset path is restricted to the ambiguous
         // bucket, so it must stay `Medium` no matter how high the value's
         // entropy is.
-        let input = "corp_token=SYNTHETIC_REVOKED_CONTEXT_VALUE";
-        let candidates = detect_with_ruleset_names(input, &["corp_token"]);
+        let input = "corp_passphrase=SYNTHETIC_REVOKED_CONTEXT_VALUE";
+        let candidates = detect_with_ruleset_names(input, &["corp_passphrase"]);
         assert_eq!(candidates.len(), 1);
         assert_eq!(candidates[0].confidence(), Confidence::Medium);
     }
 
     #[test]
     fn a_ruleset_supplied_name_below_the_ambiguous_entropy_threshold_is_ignored() {
-        let input = "corp_token=aaaaaaaaaaaaaaaaaaaa";
-        let candidates = detect_with_ruleset_names(input, &["corp_token"]);
+        let input = "corp_passphrase=aaaaaaaaaaaaaaaaaaaa";
+        let candidates = detect_with_ruleset_names(input, &["corp_passphrase"]);
         assert!(candidates.is_empty());
     }
 
     #[test]
     fn an_unlisted_name_produces_no_ruleset_candidate() {
         let input = "unrelated_field=SYNTHETIC_REVOKED_RULESET_AMBIGUOUS_1234";
-        let candidates = detect_with_ruleset_names(input, &["corp_token"]);
+        let candidates = detect_with_ruleset_names(input, &["corp_passphrase"]);
         assert!(candidates.is_empty());
     }
 
@@ -2860,20 +3206,20 @@ mod tests {
         // passed in the extra list, since `crate::ruleset` never does that;
         // this asserts the detector's own restriction as a second layer.
         let input = "api_key=SYNTHETIC_REVOKED_CONTEXT_VALUE";
-        let candidates = detect_with_ruleset_names(input, &["corp_token"]);
+        let candidates = detect_with_ruleset_names(input, &["corp_passphrase"]);
         assert!(candidates.is_empty());
     }
 
     #[test]
     fn the_ruleset_names_detector_does_not_match_authorization_schemes() {
         let input = "Authorization: Basic aGVsbG86d29ybGQtc3ludGhldGljLXJldm9rZWQ=";
-        let candidates = detect_with_ruleset_names(input, &["corp_token"]);
+        let candidates = detect_with_ruleset_names(input, &["corp_passphrase"]);
         assert!(candidates.is_empty());
     }
 
     #[test]
     fn the_ruleset_names_detector_claims_the_fixed_reserved_id() {
-        let detector = generic_token_ruleset_names_detector(vec!["corp_token".to_owned()]);
+        let detector = generic_token_ruleset_names_detector(vec!["corp_passphrase".to_owned()]);
         assert_eq!(detector.id(), RULESET_NAMES_DETECTOR_ID);
     }
 
@@ -2882,7 +3228,7 @@ mod tests {
         for name in HIGH_SIGNAL_NAMES.iter().chain(AMBIGUOUS_NAMES.iter()) {
             assert!(is_reserved_name(name), "{name}");
         }
-        assert!(!is_reserved_name("corp_token"));
+        assert!(!is_reserved_name("corp_passphrase"));
     }
 
     // --- bare vendor-prefixed policy candidates (issue #552) ------------
@@ -2974,7 +3320,7 @@ mod tests {
     #[test]
     fn the_ruleset_names_detector_does_not_match_bare_vendor_prefixed_values() {
         let input = format!("sk-{VENDOR_PREFIX_LEGACY_BODY}");
-        let candidates = detect_with_ruleset_names(&input, &["corp_token"]);
+        let candidates = detect_with_ruleset_names(&input, &["corp_passphrase"]);
         assert!(candidates.is_empty());
     }
 

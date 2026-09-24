@@ -217,13 +217,16 @@ impl Detector for MailgunApiKeyDetector {
                     && !text::is_repeated_character_filler(&line[body_start..body_end])
                     && let Some(range) = ByteRange::new(line_start + pos, line_start + body_end)
                 {
+                    let (confidence, context_signal) =
+                        if text::is_provider_named_assignment(line, pos, &[CONTEXT_KEYWORD]) {
+                            (Confidence::High, "mailgun-named-assignment")
+                        } else {
+                            (Confidence::Medium, "mailgun-keyword-cooccurrence")
+                        };
                     candidates.push(
-                        Candidate::new("mailgun_api_key", Confidence::Medium, range)
+                        Candidate::new("mailgun_api_key", confidence, range)
                             .with_specificity(Specificity::Provider)
-                            .with_signals([
-                                "mailgun-keyword-cooccurrence",
-                                "documented-key-prefix",
-                            ]),
+                            .with_signals([context_signal, "documented-key-prefix"]),
                     );
                 }
                 pos += literal.len();
@@ -261,7 +264,12 @@ mod tests {
             let candidates = detect(&input);
             assert_eq!(candidates.len(), 1, "{input}");
             assert_eq!(candidates[0].type_name(), "mailgun_api_key");
-            assert_eq!(candidates[0].confidence(), Confidence::Medium);
+            let expected = if input.starts_with('#') {
+                Confidence::Medium
+            } else {
+                Confidence::High
+            };
+            assert_eq!(candidates[0].confidence(), expected, "{input}");
             assert_eq!(candidates[0].effective_specificity(), Specificity::Provider);
             let start = input.rfind(&key()).unwrap();
             assert_eq!(
