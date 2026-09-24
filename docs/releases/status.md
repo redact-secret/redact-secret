@@ -53,3 +53,36 @@ prereleases. Creating those pages follows the
 Qualified CLI binaries remain Actions artifacts; these bodies do not promise
 new binary attachments. Security fixes target the latest beta under
 [SECURITY.md](../../SECURITY.md).
+
+## Host-integration adapters
+
+The adapters are released from
+[`redact-secret-adapters`](https://github.com/redact-secret/redact-secret-adapters),
+on their own versions, not in lockstep with the core. Observed on the
+registries on 2026-09-24:
+
+| Package | Registry | Published version | Published | Requires core |
+| --- | --- | --- | --- | --- |
+| `@redact-secret/adapter` | npm | `0.1.0` (`latest`) | 2026-09-22 | `@redact-secret/core ^0.1.0-beta.6` (peer) |
+| `@redact-secret/adapter-pino` | npm | `0.1.0` (`latest`) | 2026-09-22 | `@redact-secret/core ^0.1.0-beta.6`; peer `pino ^10.0.0` |
+| `@redact-secret/adapter-otel` | npm | `0.1.0` (`latest`) | 2026-09-22 | `@redact-secret/core ^0.1.0-beta.6`; peer `@opentelemetry/sdk-trace-base ^2.0.0` |
+| `redact-secret-adapters` | PyPI | `0.1.0` | 2026-09-22 | `redact-secret>=0.1.0b6,<0.2`; `[otel]` extra `opentelemetry-sdk>=1.16.0,<2` |
+
+Source tags `adapter@0.1.0`, `adapter-pino@0.1.0`, `adapter-otel@0.1.0` and
+`redact-secret-adapters@0.1.0` are on that repository, with the
+[`train/2026.09.22`](https://github.com/redact-secret/redact-secret-adapters/releases/tag/train/2026.09.22)
+GitHub Release. These commands were run from empty directories against the
+public registries on 2026-09-24; each resolved core 0.1.0-beta.6 and redacted
+a synthetic value through the adapter:
+
+```bash
+npm install @redact-secret/core @redact-secret/adapter-pino pino
+npm install @redact-secret/core @redact-secret/adapter-otel @opentelemetry/sdk-trace-base
+python -m pip install redact-secret redact-secret-adapters
+python -m pip install redact-secret "redact-secret-adapters[otel]"
+```
+
+Published 0.1.0 of `@redact-secret/adapter-pino` exports
+`createRedactingLogMethod`, `createRedactingLogMethodWith` and
+`formatPinoMessage` only. The `createRedactingStreamWrite` hook shown in the
+adapters repository's `main` README is unreleased.
