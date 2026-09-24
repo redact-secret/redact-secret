@@ -163,7 +163,7 @@ class RenderMatrixMarkdownTests(unittest.TestCase):
         text = GEN.render_matrix_markdown(m)
         self.assertIn(
             "https://github.com/redact-secret/redact-secret-benchmarks/blob/"
-            f"{m['sourceReport']['revision']}/docs/support-status.md",
+            f"{m['sourceReport']['revision']}/docs/specs/support-status.md",
             text,
         )
         self.assertIn("You do not need to read it", text)
