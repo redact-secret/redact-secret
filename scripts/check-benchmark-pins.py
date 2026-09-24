@@ -64,14 +64,10 @@ inside the fast, network-free `npm run ci` path (see the
 5. `benchmarks/support-matrix-schema.json` -- the other file this repository
    vendors from redact-secret-benchmarks, read by
    `check-support-matrix-drift.py` and `generate-support-matrix-docs.py` --
-   must stay byte-identical to that repository's own current copy
-   (`schemas/support-matrix-v1.json` there; moved from
-   `benchmarks/support-matrix-schema.json` by
-   redact-secret-benchmarks#133). This schema describes a format rather
-   than a detector-registry snapshot, so it is compared against
-   BENCHMARKS_BRANCH rather than the manifest's pinned `revision` -- a
-   historical revision may predate the #133 path move or simply be missing
-   later schema changes that carry no detector-snapshot implications.
+   must stay byte-identical to `schemas/support-matrix-v1.json` at
+   BENCHMARKS_SUPPORT_MATRIX_SCHEMA_REF. The immutable ref is the accepted
+   evidence contract this repository consumes; it is independent of both the
+   detector-registry snapshot and the benchmarks site's promotion cadence.
    Unlike checks 1-4, this is a copy of a whole file rather than a set of
    ids, so it can only be verified by fetching that file's content live --
    it runs alongside checks 3 and 4, not in the offline path.
@@ -107,8 +103,8 @@ repository, no network needed) and the GitHub compare and contents APIs for
 checks 3, 5, and 6 (the other repository, where only a live query can
 answer).
 
-`--sync` rewrites both vendored files from BENCHMARKS_BRANCH before running
-the offline checks, so re-pinning is one command
+`--sync` rewrites both vendored files from their declared upstream refs before
+running the offline checks, so re-pinning is one command
 (`npm run benchmark-pins:sync`) rather than a hand-copy.
 """
 
@@ -136,11 +132,20 @@ BENCHMARKS_BRANCH = "main"
 # of that repository's own `benchmarks/`.
 BENCHMARKS_MANIFEST_PATH = "benchmarks/pin-manifest.json"
 BENCHMARKS_SUPPORT_MATRIX_SCHEMA_PATH = "schemas/support-matrix-v1.json"
-# (local vendored path, upstream path) for every file `--sync` rewrites and
-# checks 5 and 6 compare byte-for-byte against BENCHMARKS_BRANCH.
-VENDORED_FILES: tuple[tuple[Path, str], ...] = (
-    (MANIFEST_PATH, BENCHMARKS_MANIFEST_PATH),
-    (SUPPORT_MATRIX_SCHEMA_PATH, BENCHMARKS_SUPPORT_MATRIX_SCHEMA_PATH),
+# The beta.8 support-evidence schema landed on the benchmarks integration
+# branch before its next production-site promotion. Pin that accepted contract
+# to its immutable merge commit; the benchmarks manifest continues to track
+# the living `main` copy independently.
+BENCHMARKS_SUPPORT_MATRIX_SCHEMA_REF = "d5438c5e55b286c7fbe59da441431d2c9b27e810"
+# (local vendored path, upstream path, upstream ref) for every file `--sync`
+# rewrites and checks 5 and 6 compare byte-for-byte.
+VENDORED_FILES: tuple[tuple[Path, str, str], ...] = (
+    (MANIFEST_PATH, BENCHMARKS_MANIFEST_PATH, BENCHMARKS_BRANCH),
+    (
+        SUPPORT_MATRIX_SCHEMA_PATH,
+        BENCHMARKS_SUPPORT_MATRIX_SCHEMA_PATH,
+        BENCHMARKS_SUPPORT_MATRIX_SCHEMA_REF,
+    ),
 )
 PRODUCT_BRANCH = "main"
 # actions/checkout (fetch-depth: 0, pull_request trigger) fetches every
@@ -461,13 +466,15 @@ def resolve_manifest_provenance_facts(root: Path, manifest: dict) -> dict:
     }
 
 
-def sync_vendored_files(root: Path, fetch: Callable[[str, str, str], str] = gh_fetch_file) -> list[Path]:
-    """Rewrite every vendored copy from BENCHMARKS_BRANCH; returns the paths written."""
-    written: list[Path] = []
-    for local_path, upstream_path in VENDORED_FILES:
-        content = fetch(BENCHMARKS_REPO, BENCHMARKS_BRANCH, upstream_path)
+def sync_vendored_files(
+    root: Path, fetch: Callable[[str, str, str], str] = gh_fetch_file
+) -> list[tuple[Path, str]]:
+    """Rewrite every vendored copy from its declared upstream ref."""
+    written: list[tuple[Path, str]] = []
+    for local_path, upstream_path, upstream_ref in VENDORED_FILES:
+        content = fetch(BENCHMARKS_REPO, upstream_ref, upstream_path)
         (root / local_path).write_text(content, encoding="utf-8")
-        written.append(local_path)
+        written.append((local_path, upstream_ref))
     return written
 
 
@@ -486,7 +493,7 @@ def main(argv: list[str] | None = None) -> int:
         "--sync",
         action="store_true",
         help=(
-            f"rewrite the vendored copies from {BENCHMARKS_REPO}@{BENCHMARKS_BRANCH} before checking; "
+            f"rewrite the vendored copies from their declared refs in {BENCHMARKS_REPO} before checking; "
             "needs `gh api` access"
         ),
     )
@@ -494,8 +501,8 @@ def main(argv: list[str] | None = None) -> int:
     root = args.root.resolve()
 
     if args.sync:
-        for path in sync_vendored_files(root):
-            print(f"SYNCED {path} from {BENCHMARKS_REPO}@{BENCHMARKS_BRANCH}")
+        for path, upstream_ref in sync_vendored_files(root):
+            print(f"SYNCED {path} from {BENCHMARKS_REPO}@{upstream_ref}")
 
     manifest = load_json(root / MANIFEST_PATH)
     ledger = load_json(root / LEDGER_PATH)
@@ -509,9 +516,16 @@ def main(argv: list[str] | None = None) -> int:
         errors += findings.errors
         warnings += findings.warnings
 
-        live_source = f"{BENCHMARKS_REPO}@{BENCHMARKS_BRANCH}:{BENCHMARKS_SUPPORT_MATRIX_SCHEMA_PATH}"
+        live_source = (
+            f"{BENCHMARKS_REPO}@{BENCHMARKS_SUPPORT_MATRIX_SCHEMA_REF}:"
+            f"{BENCHMARKS_SUPPORT_MATRIX_SCHEMA_PATH}"
+        )
         local_schema = (root / SUPPORT_MATRIX_SCHEMA_PATH).read_text(encoding="utf-8")
-        live_schema = gh_fetch_file(BENCHMARKS_REPO, BENCHMARKS_BRANCH, BENCHMARKS_SUPPORT_MATRIX_SCHEMA_PATH)
+        live_schema = gh_fetch_file(
+            BENCHMARKS_REPO,
+            BENCHMARKS_SUPPORT_MATRIX_SCHEMA_REF,
+            BENCHMARKS_SUPPORT_MATRIX_SCHEMA_PATH,
+        )
         errors += check_schema_drift(local_schema, live_schema, live_source=live_source)
 
         errors += check_manifest_provenance(manifest, **resolve_manifest_provenance_facts(root, manifest))

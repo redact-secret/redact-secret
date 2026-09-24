@@ -3,46 +3,33 @@
   "taxonomySchemaVersion": 1,
   "sourceReport": {
     "schemaVersion": 1,
-    "generatedAt": "2026-09-24T08:46:00.653Z",
-    "runId": "d87f63dd-5d38-4cf6-a8d1-6ab28f3c7f95",
-    "revision": "28fc818966d9acf7ad3f77ce38577d6b5c14ea0b",
+    "generatedAt": "2026-09-24T13:54:20.947Z",
+    "runId": "405be78a-c35d-432b-a381-5f127c4812e0",
+    "revision": "d5438c5e55b286c7fbe59da441431d2c9b27e810",
     "dirty": false,
-    "criteriaSchemaVersion": 1,
-    "product": {
-      "sourceCommit": "6a2dca04b9f88b82f1b88a7acfeeb93a82510c21",
-      "packageName": "@redact-secret/core",
-      "declaredVersion": "0.1.0-beta.7",
-      "artifacts": [
-        {
-          "role": "package",
-          "sha256": "8b6e759b98201ebfed797a5389eca57a3aa52fef1bc96783d522c60418662520"
-        },
-        {
-          "role": "node",
-          "sha256": "cd801afc5bc3921642e8fa18b829eb5e0585f1c4c21ae8db1e961a5f8d5ef7af"
-        },
-        {
-          "role": "wasm",
-          "sha256": "2c288cb36fce4d2f176a61f4cd09efbfadf1781eb70b76aba4195630879c166c"
-        }
-      ]
-    }
+    "criteriaSchemaVersion": 1
   },
   "providerCount": 42,
   "familyCount": 93,
   "distribution": {
-    "stable": 51,
-    "provisional": 21,
+    "stable": 0,
+    "provisional": 72,
     "pending": 2,
     "unsupported": 19
+  },
+  "stableDistribution": {
+    "documented": 0,
+    "empirical": 0
   },
   "families": [
     {
       "provider": "anthropic",
       "family": "anthropic:secret-api-key",
       "familyName": "Secret API key",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
+      "evidenceBasis": "provider-documented",
+      "qualificationProfile": null,
       "providerSource": {
         "url": "https://platform.claude.com/docs/en/manage-claude/compliance-api-access",
         "observedAt": "2026-09-23",
@@ -63,10 +50,31 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 5,
+        "positiveAxes": 2,
+        "benignCases": 5,
+        "controlAxes": 3,
+        "twinPairs": 6,
+        "totalFixtures": 16,
+        "contextTwinPairs": 0,
+        "confusionAxes": 4
+      },
       "detectors": [
         "anthropic-token"
       ],
-      "reason": null
+      "reason": "documented.minimumPositiveCases: 5 < 6 — The documented profile requires six independently authored positive or supported-context fixtures. | documented.minimumPositiveAxes: 2 < 4 — Positive coverage must span four source-context axes rather than repeat one serialization. | documented.minimumBenignCases: 5 < 8 — Eight independent benign controls are required by the documented fixture profile. | documented.minimumControlAxes: 3 < 4 — Benign coverage must span four reviewed confusion axes."
     },
     {
       "provider": "atlassian",
@@ -74,10 +82,14 @@
       "familyName": "Access token",
       "status": "unsupported",
       "evidenceTier": null,
+      "evidenceBasis": "none",
+      "qualificationProfile": null,
       "providerSource": null,
       "corroboratingScanners": [],
       "twinCoverage": null,
       "unresolvedCriticalItems": null,
+      "empiricalEvidence": null,
+      "fixtureProfile": null,
       "detectors": [],
       "reason": "atlassian-api-token's contract review states the pinned TruffleHog detector targets the distinct ATCT access-token family, not the ATAT-prefixed API-token shape."
     },
@@ -87,6 +99,8 @@
       "familyName": "API token",
       "status": "provisional",
       "evidenceTier": "T2",
+      "evidenceBasis": "independently-corroborated",
+      "qualificationProfile": null,
       "providerSource": null,
       "corroboratingScanners": [
         "gitleaks 8.30.1"
@@ -101,10 +115,31 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 3,
+        "positiveAxes": 1,
+        "benignCases": 5,
+        "controlAxes": 3,
+        "twinPairs": 3,
+        "totalFixtures": 11,
+        "contextTwinPairs": 0,
+        "confusionAxes": 4
+      },
       "detectors": [
         "atlassian-api-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret."
+      "reason": "empirical.evidenceBasis: independently-corroborated — T2 remains empirical provenance and qualifies only through observation, corroboration, fixture, behavioral, uncertainty, and context gates. | empirical.minimumObservations: 0 < 5 — Five safe provider-issued observations are the minimum empirical sample. | empirical.minimumSubjects: 0 < 2 — Observations must span at least two pseudonymous accounts or projects. | empirical.minimumIssuanceDates: 0 < 2 — Observations must span at least two issuance dates. | empirical.minimumCorroborationClasses: 0 < 2 — Two independent corroboration classes must agree with the observed structure. | empirical.uncertainty: missing — explicit uncertainty is required | empirical.supportedContexts: none — supported-context limits are required | empirical.minimumPositiveCases: 3 < 10 — The empirical fixture profile requires ten independently authored positive or supported-context fixtures. | empirical.minimumPositiveAxes: 1 < 6 — Empirical positives must span at least six source-context axes. | empirical.minimumBenignCases: 5 < 14 — The empirical fixture profile requires fourteen non-twin benign controls. | empirical.minimumControlAxes: 3 < 5 — Empirical controls must span at least five reviewed confusion axes. | empirical.minimumTwinPairs: 3 < 8 — Eight independently authored twin pairs complete the 40-fixture empirical profile. | empirical.mode: missing — choose shape or context-constrained qualification"
     },
     {
       "provider": "aws",
@@ -112,10 +147,14 @@
       "familyName": "Context-specific credential",
       "status": "unsupported",
       "evidenceTier": null,
+      "evidenceBasis": "none",
+      "qualificationProfile": null,
       "providerSource": null,
       "corroboratingScanners": [],
       "twinCoverage": null,
       "unresolvedCriticalItems": null,
+      "empiricalEvidence": null,
+      "fixtureProfile": null,
       "detectors": [],
       "reason": "Documented in the same IAM unique-identifier prefix table as AKIA/ASIA; not matched by the AKIA-only pattern. Provider source: https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_identifiers.html#identifiers-prefixes."
     },
@@ -123,8 +162,10 @@
       "provider": "aws",
       "family": "aws:iam-user-access-key",
       "familyName": "IAM user access key",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
+      "evidenceBasis": "provider-documented",
+      "qualificationProfile": null,
       "providerSource": {
         "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_identifiers.html#identifiers-prefixes",
         "observedAt": "2026-09-17",
@@ -145,10 +186,31 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 10,
+        "positiveAxes": 4,
+        "benignCases": 6,
+        "controlAxes": 3,
+        "twinPairs": 6,
+        "totalFixtures": 22,
+        "contextTwinPairs": 0,
+        "confusionAxes": 4
+      },
       "detectors": [
         "aws-access-key"
       ],
-      "reason": null
+      "reason": "documented.minimumBenignCases: 6 < 8 — Eight independent benign controls are required by the documented fixture profile. | documented.minimumControlAxes: 3 < 4 — Benign coverage must span four reviewed confusion axes."
     },
     {
       "provider": "aws",
@@ -156,10 +218,14 @@
       "familyName": "IAM user secret access key",
       "status": "unsupported",
       "evidenceTier": null,
+      "evidenceBasis": "none",
+      "qualificationProfile": null,
       "providerSource": null,
       "corroboratingScanners": [],
       "twinCoverage": null,
       "unresolvedCriticalItems": null,
+      "empiricalEvidence": null,
+      "fixtureProfile": null,
       "detectors": [],
       "reason": "The aws-access-key contract's companion field states a separate 40-character secret access key is required alongside the access key ID; this project has no dedicated detector for the secret half, which carries no stable prefix to anchor on."
     },
@@ -169,10 +235,14 @@
       "familyName": "STS service bearer token",
       "status": "unsupported",
       "evidenceTier": null,
+      "evidenceBasis": "none",
+      "qualificationProfile": null,
       "providerSource": null,
       "corroboratingScanners": [],
       "twinCoverage": null,
       "unresolvedCriticalItems": null,
+      "empiricalEvidence": null,
+      "fixtureProfile": null,
       "detectors": [],
       "reason": "Documented in the same IAM unique-identifier prefix table as AKIA/ASIA; not matched by the AKIA-only pattern. Provider source: https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_identifiers.html#identifiers-prefixes."
     },
@@ -182,10 +252,14 @@
       "familyName": "STS temporary access key",
       "status": "unsupported",
       "evidenceTier": null,
+      "evidenceBasis": "none",
+      "qualificationProfile": null,
       "providerSource": null,
       "corroboratingScanners": [],
       "twinCoverage": null,
       "unresolvedCriticalItems": null,
+      "empiricalEvidence": null,
+      "fixtureProfile": null,
       "detectors": [],
       "reason": "aws-access-key's pattern is anchored to AKIA only (benchmarks/lib/assessment.ts contract), so ASIA values are not matched. classifyFixture already special-cases a bare AWS positive as policy, not must-redact, because \"some legacy ASIA values also use digits outside the base32 alphabet\". Provider source: https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_identifiers.html#identifiers-prefixes."
     },
@@ -193,8 +267,10 @@
       "provider": "azure-devops",
       "family": "azure-devops:personal-access-token",
       "familyName": "Personal access token",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
+      "evidenceBasis": "provider-documented",
+      "qualificationProfile": null,
       "providerSource": {
         "url": "https://learn.microsoft.com/en-us/azure/devops/organizations/accounts/use-personal-access-tokens-to-authenticate#pat-format",
         "observedAt": "2026-09-23",
@@ -212,17 +288,40 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 3,
+        "positiveAxes": 1,
+        "benignCases": 5,
+        "controlAxes": 3,
+        "twinPairs": 6,
+        "totalFixtures": 14,
+        "contextTwinPairs": 0,
+        "confusionAxes": 5
+      },
       "detectors": [
         "azure-devops-personal-access-token"
       ],
-      "reason": null
+      "reason": "documented.minimumPositiveCases: 3 < 6 — The documented profile requires six independently authored positive or supported-context fixtures. | documented.minimumPositiveAxes: 1 < 4 — Positive coverage must span four source-context axes rather than repeat one serialization. | documented.minimumBenignCases: 5 < 8 — Eight independent benign controls are required by the documented fixture profile. | documented.minimumControlAxes: 3 < 4 — Benign coverage must span four reviewed confusion axes."
     },
     {
       "provider": "cloudflare",
       "family": "cloudflare:api-token",
       "familyName": "Scannable API token",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
+      "evidenceBasis": "provider-documented",
+      "qualificationProfile": null,
       "providerSource": {
         "url": "https://developers.cloudflare.com/fundamentals/api/get-started/create-token/",
         "observedAt": "2026-09-17",
@@ -242,17 +341,40 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 5,
+        "positiveAxes": 2,
+        "benignCases": 8,
+        "controlAxes": 3,
+        "twinPairs": 6,
+        "totalFixtures": 19,
+        "contextTwinPairs": 0,
+        "confusionAxes": 6
+      },
       "detectors": [
         "cloudflare-token"
       ],
-      "reason": null
+      "reason": "documented.minimumPositiveCases: 5 < 6 — The documented profile requires six independently authored positive or supported-context fixtures. | documented.minimumPositiveAxes: 2 < 4 — Positive coverage must span four source-context axes rather than repeat one serialization. | documented.minimumControlAxes: 3 < 4 — Benign coverage must span four reviewed confusion axes."
     },
     {
       "provider": "confluent",
       "family": "confluent:cloud-api-secret",
       "familyName": "Cloud API secret (cflt-prefixed)",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
+      "evidenceBasis": "provider-documented",
+      "qualificationProfile": null,
       "providerSource": {
         "url": "https://docs.confluent.io/cloud/current/security/authenticate/workload-identities/service-accounts/api-keys/overview.html",
         "observedAt": "2026-09-23",
@@ -273,10 +395,31 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 3,
+        "positiveAxes": 1,
+        "benignCases": 6,
+        "controlAxes": 4,
+        "twinPairs": 6,
+        "totalFixtures": 15,
+        "contextTwinPairs": 0,
+        "confusionAxes": 6
+      },
       "detectors": [
         "confluent-cloud-api-secret"
       ],
-      "reason": null
+      "reason": "documented.minimumPositiveCases: 3 < 6 — The documented profile requires six independently authored positive or supported-context fixtures. | documented.minimumPositiveAxes: 1 < 4 — Positive coverage must span four source-context axes rather than repeat one serialization. | documented.minimumBenignCases: 6 < 8 — Eight independent benign controls are required by the documented fixture profile."
     },
     {
       "provider": "confluent",
@@ -284,6 +427,8 @@
       "familyName": "Cloud API secret (unprefixed, pre-2025-07-30)",
       "status": "provisional",
       "evidenceTier": "T2",
+      "evidenceBasis": "independently-corroborated",
+      "qualificationProfile": null,
       "providerSource": null,
       "corroboratingScanners": [
         "gitleaks 8.30.1",
@@ -297,12 +442,33 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 6
+        "differential": 0
+      },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 3,
+        "positiveAxes": 1,
+        "benignCases": 5,
+        "controlAxes": 3,
+        "twinPairs": 3,
+        "totalFixtures": 11,
+        "contextTwinPairs": 0,
+        "confusionAxes": 4
       },
       "detectors": [
         "confluent-cloud-api-secret-legacy"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": "empirical.evidenceBasis: independently-corroborated — T2 remains empirical provenance and qualifies only through observation, corroboration, fixture, behavioral, uncertainty, and context gates. | empirical.minimumObservations: 0 < 5 — Five safe provider-issued observations are the minimum empirical sample. | empirical.minimumSubjects: 0 < 2 — Observations must span at least two pseudonymous accounts or projects. | empirical.minimumIssuanceDates: 0 < 2 — Observations must span at least two issuance dates. | empirical.minimumCorroborationClasses: 0 < 2 — Two independent corroboration classes must agree with the observed structure. | empirical.uncertainty: missing — explicit uncertainty is required | empirical.supportedContexts: none — supported-context limits are required | empirical.minimumPositiveCases: 3 < 10 — The empirical fixture profile requires ten independently authored positive or supported-context fixtures. | empirical.minimumPositiveAxes: 1 < 6 — Empirical positives must span at least six source-context axes. | empirical.minimumBenignCases: 5 < 14 — The empirical fixture profile requires fourteen non-twin benign controls. | empirical.minimumControlAxes: 3 < 5 — Empirical controls must span at least five reviewed confusion axes. | empirical.minimumTwinPairs: 3 < 8 — Eight independently authored twin pairs complete the 40-fixture empirical profile. | empirical.mode: missing — choose shape or context-constrained qualification"
     },
     {
       "provider": "databricks",
@@ -310,6 +476,8 @@
       "familyName": "Personal access token",
       "status": "provisional",
       "evidenceTier": "T2",
+      "evidenceBasis": "independently-corroborated",
+      "qualificationProfile": null,
       "providerSource": null,
       "corroboratingScanners": [
         "gitleaks 8.30.1",
@@ -323,19 +491,42 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 6
+        "differential": 0
+      },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 6,
+        "positiveAxes": 1,
+        "benignCases": 6,
+        "controlAxes": 4,
+        "twinPairs": 9,
+        "totalFixtures": 21,
+        "contextTwinPairs": 0,
+        "confusionAxes": 7
       },
       "detectors": [
         "databricks-personal-access-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": "empirical.evidenceBasis: independently-corroborated — T2 remains empirical provenance and qualifies only through observation, corroboration, fixture, behavioral, uncertainty, and context gates. | empirical.minimumObservations: 0 < 5 — Five safe provider-issued observations are the minimum empirical sample. | empirical.minimumSubjects: 0 < 2 — Observations must span at least two pseudonymous accounts or projects. | empirical.minimumIssuanceDates: 0 < 2 — Observations must span at least two issuance dates. | empirical.minimumCorroborationClasses: 0 < 2 — Two independent corroboration classes must agree with the observed structure. | empirical.uncertainty: missing — explicit uncertainty is required | empirical.supportedContexts: none — supported-context limits are required | empirical.minimumPositiveCases: 6 < 10 — The empirical fixture profile requires ten independently authored positive or supported-context fixtures. | empirical.minimumPositiveAxes: 1 < 6 — Empirical positives must span at least six source-context axes. | empirical.minimumBenignCases: 6 < 14 — The empirical fixture profile requires fourteen non-twin benign controls. | empirical.minimumControlAxes: 4 < 5 — Empirical controls must span at least five reviewed confusion axes. | empirical.mode: missing — choose shape or context-constrained qualification"
     },
     {
       "provider": "datadog",
       "family": "datadog:api-key",
       "familyName": "API key",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
+      "evidenceBasis": "provider-documented",
+      "qualificationProfile": null,
       "providerSource": {
         "url": "https://docs.datadoghq.com/resources/json/full_spec_v1.json",
         "observedAt": "2026-09-23",
@@ -355,17 +546,40 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 11,
+        "positiveAxes": 7,
+        "benignCases": 5,
+        "controlAxes": 3,
+        "twinPairs": 11,
+        "totalFixtures": 27,
+        "contextTwinPairs": 8,
+        "confusionAxes": 4
+      },
       "detectors": [
         "datadog-api-key"
       ],
-      "reason": null
+      "reason": "documented.minimumBenignCases: 5 < 8 — Eight independent benign controls are required by the documented fixture profile. | documented.minimumControlAxes: 3 < 4 — Benign coverage must span four reviewed confusion axes."
     },
     {
       "provider": "datadog",
       "family": "datadog:application-key",
       "familyName": "Application key (ddapp_-prefixed)",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
+      "evidenceBasis": "provider-documented",
+      "qualificationProfile": null,
       "providerSource": {
         "url": "https://docs.datadoghq.com/account_management/personal-access-tokens/",
         "observedAt": "2026-09-22",
@@ -391,10 +605,31 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 3,
+        "positiveAxes": 1,
+        "benignCases": 5,
+        "controlAxes": 4,
+        "twinPairs": 6,
+        "totalFixtures": 14,
+        "contextTwinPairs": 0,
+        "confusionAxes": 6
+      },
       "detectors": [
         "datadog-application-key"
       ],
-      "reason": null
+      "reason": "documented.minimumPositiveCases: 3 < 6 — The documented profile requires six independently authored positive or supported-context fixtures. | documented.minimumPositiveAxes: 1 < 4 — Positive coverage must span four source-context axes rather than repeat one serialization. | documented.minimumBenignCases: 5 < 8 — Eight independent benign controls are required by the documented fixture profile."
     },
     {
       "provider": "datadog",
@@ -402,6 +637,8 @@
       "familyName": "Application key (legacy 40-hex)",
       "status": "provisional",
       "evidenceTier": "T2",
+      "evidenceBasis": "independently-corroborated",
+      "qualificationProfile": null,
       "providerSource": null,
       "corroboratingScanners": [
         "gitleaks 8.30.1",
@@ -417,17 +654,40 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 11,
+        "positiveAxes": 7,
+        "benignCases": 5,
+        "controlAxes": 3,
+        "twinPairs": 3,
+        "totalFixtures": 19,
+        "contextTwinPairs": 0,
+        "confusionAxes": 4
+      },
       "detectors": [
         "datadog-application-key-legacy"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret."
+      "reason": "empirical.evidenceBasis: independently-corroborated — T2 remains empirical provenance and qualifies only through observation, corroboration, fixture, behavioral, uncertainty, and context gates. | empirical.minimumObservations: 0 < 5 — Five safe provider-issued observations are the minimum empirical sample. | empirical.minimumSubjects: 0 < 2 — Observations must span at least two pseudonymous accounts or projects. | empirical.minimumIssuanceDates: 0 < 2 — Observations must span at least two issuance dates. | empirical.minimumCorroborationClasses: 0 < 2 — Two independent corroboration classes must agree with the observed structure. | empirical.uncertainty: missing — explicit uncertainty is required | empirical.supportedContexts: none — supported-context limits are required | empirical.minimumBenignCases: 5 < 14 — The empirical fixture profile requires fourteen non-twin benign controls. | empirical.minimumControlAxes: 3 < 5 — Empirical controls must span at least five reviewed confusion axes. | empirical.minimumTwinPairs: 3 < 8 — Eight independently authored twin pairs complete the 40-fixture empirical profile. | empirical.mode: missing — choose shape or context-constrained qualification"
     },
     {
       "provider": "digitalocean",
       "family": "digitalocean:oauth-token",
       "familyName": "OAuth token",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
+      "evidenceBasis": "provider-documented",
+      "qualificationProfile": null,
       "providerSource": {
         "url": "https://docs.digitalocean.com/release-notes/api/",
         "observedAt": "2026-09-17",
@@ -448,17 +708,40 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 18,
+        "positiveAxes": 2,
+        "benignCases": 9,
+        "controlAxes": 3,
+        "twinPairs": 8,
+        "totalFixtures": 35,
+        "contextTwinPairs": 0,
+        "confusionAxes": 5
+      },
       "detectors": [
         "digitalocean-token"
       ],
-      "reason": null
+      "reason": "documented.minimumPositiveAxes: 2 < 4 — Positive coverage must span four source-context axes rather than repeat one serialization. | documented.minimumControlAxes: 3 < 4 — Benign coverage must span four reviewed confusion axes."
     },
     {
       "provider": "digitalocean",
       "family": "digitalocean:personal-access-token",
       "familyName": "Personal access token",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
+      "evidenceBasis": "provider-documented",
+      "qualificationProfile": null,
       "providerSource": {
         "url": "https://docs.digitalocean.com/release-notes/api/",
         "observedAt": "2026-09-17",
@@ -479,17 +762,40 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 18,
+        "positiveAxes": 2,
+        "benignCases": 9,
+        "controlAxes": 3,
+        "twinPairs": 8,
+        "totalFixtures": 35,
+        "contextTwinPairs": 0,
+        "confusionAxes": 5
+      },
       "detectors": [
         "digitalocean-token"
       ],
-      "reason": null
+      "reason": "documented.minimumPositiveAxes: 2 < 4 — Positive coverage must span four source-context axes rather than repeat one serialization. | documented.minimumControlAxes: 3 < 4 — Benign coverage must span four reviewed confusion axes."
     },
     {
       "provider": "digitalocean",
       "family": "digitalocean:refresh-token",
       "familyName": "Refresh token",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
+      "evidenceBasis": "provider-documented",
+      "qualificationProfile": null,
       "providerSource": {
         "url": "https://docs.digitalocean.com/release-notes/api/",
         "observedAt": "2026-09-17",
@@ -510,10 +816,31 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 18,
+        "positiveAxes": 2,
+        "benignCases": 9,
+        "controlAxes": 3,
+        "twinPairs": 8,
+        "totalFixtures": 35,
+        "contextTwinPairs": 0,
+        "confusionAxes": 5
+      },
       "detectors": [
         "digitalocean-token"
       ],
-      "reason": null
+      "reason": "documented.minimumPositiveAxes: 2 < 4 — Positive coverage must span four source-context axes rather than repeat one serialization. | documented.minimumControlAxes: 3 < 4 — Benign coverage must span four reviewed confusion axes."
     },
     {
       "provider": "discord",
@@ -521,6 +848,8 @@
       "familyName": "Bot token",
       "status": "provisional",
       "evidenceTier": "T2",
+      "evidenceBasis": "independently-corroborated",
+      "qualificationProfile": null,
       "providerSource": null,
       "corroboratingScanners": [
         "trufflehog 3.97.4"
@@ -536,19 +865,42 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 12
+        "differential": 0
+      },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 17,
+        "positiveAxes": 7,
+        "benignCases": 7,
+        "controlAxes": 3,
+        "twinPairs": 0,
+        "totalFixtures": 24,
+        "contextTwinPairs": 0,
+        "confusionAxes": 3
       },
       "detectors": [
         "discord-bot-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | differential.unresolvedContractDisagreements: 12 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": "empirical.evidenceBasis: independently-corroborated — T2 remains empirical provenance and qualifies only through observation, corroboration, fixture, behavioral, uncertainty, and context gates. | empirical.minimumObservations: 0 < 5 — Five safe provider-issued observations are the minimum empirical sample. | empirical.minimumSubjects: 0 < 2 — Observations must span at least two pseudonymous accounts or projects. | empirical.minimumIssuanceDates: 0 < 2 — Observations must span at least two issuance dates. | empirical.minimumCorroborationClasses: 0 < 2 — Two independent corroboration classes must agree with the observed structure. | empirical.uncertainty: missing — explicit uncertainty is required | empirical.supportedContexts: none — supported-context limits are required | empirical.minimumBenignCases: 7 < 14 — The empirical fixture profile requires fourteen non-twin benign controls. | empirical.minimumControlAxes: 3 < 5 — Empirical controls must span at least five reviewed confusion axes. | empirical.minimumTwinPairs: 0 < 8 — Eight independently authored twin pairs complete the 40-fixture empirical profile. | empirical.mode: missing — choose shape or context-constrained qualification"
     },
     {
       "provider": "docker",
       "family": "docker:oauth-access-token",
       "familyName": "OAuth access token",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
+      "evidenceBasis": "provider-documented",
+      "qualificationProfile": null,
       "providerSource": {
         "url": "https://docs.docker.com/reference/api/ai-governance/api.yaml",
         "observedAt": "2026-09-23",
@@ -568,17 +920,40 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 13,
+        "positiveAxes": 2,
+        "benignCases": 7,
+        "controlAxes": 3,
+        "twinPairs": 16,
+        "totalFixtures": 36,
+        "contextTwinPairs": 0,
+        "confusionAxes": 5
+      },
       "detectors": [
         "docker-token"
       ],
-      "reason": null
+      "reason": "documented.minimumPositiveAxes: 2 < 4 — Positive coverage must span four source-context axes rather than repeat one serialization. | documented.minimumBenignCases: 7 < 8 — Eight independent benign controls are required by the documented fixture profile. | documented.minimumControlAxes: 3 < 4 — Benign coverage must span four reviewed confusion axes."
     },
     {
       "provider": "docker",
       "family": "docker:personal-access-token",
       "familyName": "Personal access token",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
+      "evidenceBasis": "provider-documented",
+      "qualificationProfile": null,
       "providerSource": {
         "url": "https://docs.docker.com/reference/api/ai-governance/api.yaml",
         "observedAt": "2026-09-23",
@@ -598,10 +973,31 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 13,
+        "positiveAxes": 2,
+        "benignCases": 7,
+        "controlAxes": 3,
+        "twinPairs": 16,
+        "totalFixtures": 36,
+        "contextTwinPairs": 0,
+        "confusionAxes": 5
+      },
       "detectors": [
         "docker-token"
       ],
-      "reason": null
+      "reason": "documented.minimumPositiveAxes: 2 < 4 — Positive coverage must span four source-context axes rather than repeat one serialization. | documented.minimumBenignCases: 7 < 8 — Eight independent benign controls are required by the documented fixture profile. | documented.minimumControlAxes: 3 < 4 — Benign coverage must span four reviewed confusion axes."
     },
     {
       "provider": "firebase",
@@ -609,6 +1005,8 @@
       "familyName": "Legacy FCM server key",
       "status": "provisional",
       "evidenceTier": "T2",
+      "evidenceBasis": "independently-corroborated",
+      "qualificationProfile": null,
       "providerSource": null,
       "corroboratingScanners": [
         "nuclei-templates (projectdiscovery)"
@@ -623,10 +1021,31 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 3,
+        "positiveAxes": 1,
+        "benignCases": 5,
+        "controlAxes": 3,
+        "twinPairs": 3,
+        "totalFixtures": 11,
+        "contextTwinPairs": 0,
+        "confusionAxes": 4
+      },
       "detectors": [
         "firebase-server-key"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret."
+      "reason": "empirical.evidenceBasis: independently-corroborated — T2 remains empirical provenance and qualifies only through observation, corroboration, fixture, behavioral, uncertainty, and context gates. | empirical.minimumObservations: 0 < 5 — Five safe provider-issued observations are the minimum empirical sample. | empirical.minimumSubjects: 0 < 2 — Observations must span at least two pseudonymous accounts or projects. | empirical.minimumIssuanceDates: 0 < 2 — Observations must span at least two issuance dates. | empirical.minimumCorroborationClasses: 0 < 2 — Two independent corroboration classes must agree with the observed structure. | empirical.uncertainty: missing — explicit uncertainty is required | empirical.supportedContexts: none — supported-context limits are required | empirical.minimumPositiveCases: 3 < 10 — The empirical fixture profile requires ten independently authored positive or supported-context fixtures. | empirical.minimumPositiveAxes: 1 < 6 — Empirical positives must span at least six source-context axes. | empirical.minimumBenignCases: 5 < 14 — The empirical fixture profile requires fourteen non-twin benign controls. | empirical.minimumControlAxes: 3 < 5 — Empirical controls must span at least five reviewed confusion axes. | empirical.minimumTwinPairs: 3 < 8 — Eight independently authored twin pairs complete the 40-fixture empirical profile. | empirical.mode: missing — choose shape or context-constrained qualification"
     },
     {
       "provider": null,
@@ -634,6 +1053,8 @@
       "familyName": "Bearer credential",
       "status": "provisional",
       "evidenceTier": "T3",
+      "evidenceBasis": "project-policy",
+      "qualificationProfile": null,
       "providerSource": null,
       "corroboratingScanners": [],
       "twinCoverage": {
@@ -646,10 +1067,31 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 7,
+        "positiveAxes": 3,
+        "benignCases": 5,
+        "controlAxes": 4,
+        "twinPairs": 3,
+        "totalFixtures": 15,
+        "contextTwinPairs": 0,
+        "confusionAxes": 5
+      },
       "detectors": [
         "bearer-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret."
+      "reason": "qualificationProfile: tier T3 is not eligible for documented or empirical stable"
     },
     {
       "provider": null,
@@ -657,6 +1099,8 @@
       "familyName": "Connection-string password",
       "status": "provisional",
       "evidenceTier": "T3",
+      "evidenceBasis": "project-policy",
+      "qualificationProfile": null,
       "providerSource": null,
       "corroboratingScanners": [],
       "twinCoverage": {
@@ -669,17 +1113,40 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 24,
+        "positiveAxes": 4,
+        "benignCases": 15,
+        "controlAxes": 3,
+        "twinPairs": 15,
+        "totalFixtures": 54,
+        "contextTwinPairs": 0,
+        "confusionAxes": 4
+      },
       "detectors": [
         "connection-string"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts."
+      "reason": "qualificationProfile: tier T3 is not eligible for documented or empirical stable"
     },
     {
       "provider": null,
       "family": "generic:jwt",
       "familyName": "JSON Web Token",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
+      "evidenceBasis": "provider-documented",
+      "qualificationProfile": null,
       "providerSource": {
         "url": "https://www.rfc-editor.org/rfc/rfc7519",
         "observedAt": "2026-09-17",
@@ -699,10 +1166,31 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 5,
+        "positiveAxes": 2,
+        "benignCases": 5,
+        "controlAxes": 4,
+        "twinPairs": 7,
+        "totalFixtures": 17,
+        "contextTwinPairs": 0,
+        "confusionAxes": 6
+      },
       "detectors": [
         "jwt"
       ],
-      "reason": null
+      "reason": "documented.minimumPositiveCases: 5 < 6 — The documented profile requires six independently authored positive or supported-context fixtures. | documented.minimumPositiveAxes: 2 < 4 — Positive coverage must span four source-context axes rather than repeat one serialization. | documented.minimumBenignCases: 5 < 8 — Eight independent benign controls are required by the documented fixture profile."
     },
     {
       "provider": null,
@@ -710,6 +1198,8 @@
       "familyName": "OTP seed",
       "status": "provisional",
       "evidenceTier": "T3",
+      "evidenceBasis": "project-policy",
+      "qualificationProfile": null,
       "providerSource": null,
       "corroboratingScanners": [],
       "twinCoverage": {
@@ -722,17 +1212,40 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 6,
+        "positiveAxes": 1,
+        "benignCases": 5,
+        "controlAxes": 3,
+        "twinPairs": 6,
+        "totalFixtures": 17,
+        "contextTwinPairs": 0,
+        "confusionAxes": 4
+      },
       "detectors": [
         "otpauth-uri"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts."
+      "reason": "qualificationProfile: tier T3 is not eligible for documented or empirical stable"
     },
     {
       "provider": null,
       "family": "generic:private-key",
       "familyName": "PEM-encoded private key",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
+      "evidenceBasis": "provider-documented",
+      "qualificationProfile": null,
       "providerSource": {
         "url": "https://www.rfc-editor.org/rfc/rfc7468",
         "observedAt": "2026-09-17",
@@ -752,10 +1265,31 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 20,
+        "positiveAxes": 2,
+        "benignCases": 5,
+        "controlAxes": 3,
+        "twinPairs": 5,
+        "totalFixtures": 30,
+        "contextTwinPairs": 0,
+        "confusionAxes": 5
+      },
       "detectors": [
         "private-key"
       ],
-      "reason": null
+      "reason": "documented.minimumPositiveAxes: 2 < 4 — Positive coverage must span four source-context axes rather than repeat one serialization. | documented.minimumBenignCases: 5 < 8 — Eight independent benign controls are required by the documented fixture profile. | documented.minimumControlAxes: 3 < 4 — Benign coverage must span four reviewed confusion axes."
     },
     {
       "provider": null,
@@ -763,6 +1297,8 @@
       "familyName": "Unclassified assignment literal",
       "status": "provisional",
       "evidenceTier": "T3",
+      "evidenceBasis": "project-policy",
+      "qualificationProfile": null,
       "providerSource": null,
       "corroboratingScanners": [],
       "twinCoverage": {
@@ -775,17 +1311,40 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 44,
+        "positiveAxes": 12,
+        "benignCases": 75,
+        "controlAxes": 4,
+        "twinPairs": 9,
+        "totalFixtures": 128,
+        "contextTwinPairs": 0,
+        "confusionAxes": 5
+      },
       "detectors": [
         "generic-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts."
+      "reason": "qualificationProfile: tier T3 is not eligible for documented or empirical stable"
     },
     {
       "provider": "github",
       "family": "github:app-server-to-server-token",
       "familyName": "GitHub App server-to-server token",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
+      "evidenceBasis": "provider-documented",
+      "qualificationProfile": null,
       "providerSource": {
         "url": "https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/about-authentication-to-github#githubs-token-formats",
         "observedAt": "2026-09-17",
@@ -806,17 +1365,40 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 67,
+        "positiveAxes": 22,
+        "benignCases": 6,
+        "controlAxes": 3,
+        "twinPairs": 42,
+        "totalFixtures": 115,
+        "contextTwinPairs": 17,
+        "confusionAxes": 5
+      },
       "detectors": [
         "github-token"
       ],
-      "reason": null
+      "reason": "documented.minimumBenignCases: 6 < 8 — Eight independent benign controls are required by the documented fixture profile. | documented.minimumControlAxes: 3 < 4 — Benign coverage must span four reviewed confusion axes."
     },
     {
       "provider": "github",
       "family": "github:app-user-to-server-token",
       "familyName": "GitHub App user-to-server token",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
+      "evidenceBasis": "provider-documented",
+      "qualificationProfile": null,
       "providerSource": {
         "url": "https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/about-authentication-to-github#githubs-token-formats",
         "observedAt": "2026-09-17",
@@ -837,17 +1419,40 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 67,
+        "positiveAxes": 22,
+        "benignCases": 6,
+        "controlAxes": 3,
+        "twinPairs": 42,
+        "totalFixtures": 115,
+        "contextTwinPairs": 17,
+        "confusionAxes": 5
+      },
       "detectors": [
         "github-token"
       ],
-      "reason": null
+      "reason": "documented.minimumBenignCases: 6 < 8 — Eight independent benign controls are required by the documented fixture profile. | documented.minimumControlAxes: 3 < 4 — Benign coverage must span four reviewed confusion axes."
     },
     {
       "provider": "github",
       "family": "github:classic-personal-access-token",
       "familyName": "Classic personal access token",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
+      "evidenceBasis": "provider-documented",
+      "qualificationProfile": null,
       "providerSource": {
         "url": "https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/about-authentication-to-github#githubs-token-formats",
         "observedAt": "2026-09-17",
@@ -868,10 +1473,31 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 67,
+        "positiveAxes": 22,
+        "benignCases": 6,
+        "controlAxes": 3,
+        "twinPairs": 42,
+        "totalFixtures": 115,
+        "contextTwinPairs": 17,
+        "confusionAxes": 5
+      },
       "detectors": [
         "github-token"
       ],
-      "reason": null
+      "reason": "documented.minimumBenignCases: 6 < 8 — Eight independent benign controls are required by the documented fixture profile. | documented.minimumControlAxes: 3 < 4 — Benign coverage must span four reviewed confusion axes."
     },
     {
       "provider": "github",
@@ -879,10 +1505,14 @@
       "familyName": "Fine-grained personal access token",
       "status": "unsupported",
       "evidenceTier": null,
+      "evidenceBasis": "none",
+      "qualificationProfile": null,
       "providerSource": null,
       "corroboratingScanners": [],
       "twinCoverage": null,
       "unresolvedCriticalItems": null,
+      "empiricalEvidence": null,
+      "fixtureProfile": null,
       "detectors": [],
       "reason": "Named explicitly in issue #502 as a family the github-token detector does not cover: its pattern only matches the ghp_/gho_/ghu_/ghs_/ghr_ underscore-plus-36-character-body shape, which github_pat_ does not fit. Provider source: https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/about-authentication-to-github#githubs-token-formats."
     },
@@ -890,8 +1520,10 @@
       "provider": "github",
       "family": "github:oauth-access-token",
       "familyName": "OAuth access token",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
+      "evidenceBasis": "provider-documented",
+      "qualificationProfile": null,
       "providerSource": {
         "url": "https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/about-authentication-to-github#githubs-token-formats",
         "observedAt": "2026-09-17",
@@ -912,17 +1544,40 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 67,
+        "positiveAxes": 22,
+        "benignCases": 6,
+        "controlAxes": 3,
+        "twinPairs": 42,
+        "totalFixtures": 115,
+        "contextTwinPairs": 17,
+        "confusionAxes": 5
+      },
       "detectors": [
         "github-token"
       ],
-      "reason": null
+      "reason": "documented.minimumBenignCases: 6 < 8 — Eight independent benign controls are required by the documented fixture profile. | documented.minimumControlAxes: 3 < 4 — Benign coverage must span four reviewed confusion axes."
     },
     {
       "provider": "github",
       "family": "github:oauth-refresh-token",
       "familyName": "OAuth refresh token",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
+      "evidenceBasis": "provider-documented",
+      "qualificationProfile": null,
       "providerSource": {
         "url": "https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/about-authentication-to-github#githubs-token-formats",
         "observedAt": "2026-09-17",
@@ -943,17 +1598,40 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 67,
+        "positiveAxes": 22,
+        "benignCases": 6,
+        "controlAxes": 3,
+        "twinPairs": 42,
+        "totalFixtures": 115,
+        "contextTwinPairs": 17,
+        "confusionAxes": 5
+      },
       "detectors": [
         "github-token"
       ],
-      "reason": null
+      "reason": "documented.minimumBenignCases: 6 < 8 — Eight independent benign controls are required by the documented fixture profile. | documented.minimumControlAxes: 3 < 4 — Benign coverage must span four reviewed confusion axes."
     },
     {
       "provider": "gitlab",
       "family": "gitlab:legacy-personal-access-token",
       "familyName": "Legacy personal access token",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
+      "evidenceBasis": "provider-documented",
+      "qualificationProfile": null,
       "providerSource": {
         "url": "https://docs.gitlab.com/security/tokens/",
         "observedAt": "2026-09-17",
@@ -974,10 +1652,31 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 8,
+        "positiveAxes": 3,
+        "benignCases": 6,
+        "controlAxes": 3,
+        "twinPairs": 7,
+        "totalFixtures": 21,
+        "contextTwinPairs": 0,
+        "confusionAxes": 5
+      },
       "detectors": [
         "gitlab-token"
       ],
-      "reason": null
+      "reason": "documented.minimumPositiveAxes: 3 < 4 — Positive coverage must span four source-context axes rather than repeat one serialization. | documented.minimumBenignCases: 6 < 8 — Eight independent benign controls are required by the documented fixture profile. | documented.minimumControlAxes: 3 < 4 — Benign coverage must span four reviewed confusion axes."
     },
     {
       "provider": "gitlab",
@@ -985,10 +1684,14 @@
       "familyName": "Routable personal access token",
       "status": "unsupported",
       "evidenceTier": null,
+      "evidenceBasis": "none",
+      "qualificationProfile": null,
       "providerSource": null,
       "corroboratingScanners": [],
       "twinCoverage": null,
       "unresolvedCriticalItems": null,
+      "empiricalEvidence": null,
+      "fixtureProfile": null,
       "detectors": [],
       "reason": "gitlab-token's contract review states explicitly that routable tokens are not covered by the 20-character-body pattern. Provider source: https://docs.gitlab.com/security/tokens/."
     },
@@ -996,8 +1699,10 @@
       "provider": "google",
       "family": "google:generic-api-key",
       "familyName": "Generic API key",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
+      "evidenceBasis": "provider-documented",
+      "qualificationProfile": null,
       "providerSource": {
         "url": "https://docs.cloud.google.com/docs/authentication/api-keys",
         "observedAt": "2026-09-23",
@@ -1017,10 +1722,31 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 3,
+        "positiveAxes": 1,
+        "benignCases": 5,
+        "controlAxes": 3,
+        "twinPairs": 6,
+        "totalFixtures": 14,
+        "contextTwinPairs": 0,
+        "confusionAxes": 5
+      },
       "detectors": [
         "google-api-key"
       ],
-      "reason": null
+      "reason": "documented.minimumPositiveCases: 3 < 6 — The documented profile requires six independently authored positive or supported-context fixtures. | documented.minimumPositiveAxes: 1 < 4 — Positive coverage must span four source-context axes rather than repeat one serialization. | documented.minimumBenignCases: 5 < 8 — Eight independent benign controls are required by the documented fixture profile. | documented.minimumControlAxes: 3 < 4 — Benign coverage must span four reviewed confusion axes."
     },
     {
       "provider": "google",
@@ -1028,10 +1754,14 @@
       "familyName": "OAuth2 credential",
       "status": "unsupported",
       "evidenceTier": null,
+      "evidenceBasis": "none",
+      "qualificationProfile": null,
       "providerSource": null,
       "corroboratingScanners": [],
       "twinCoverage": null,
       "unresolvedCriticalItems": null,
+      "empiricalEvidence": null,
+      "fixtureProfile": null,
       "detectors": [],
       "reason": "google-api-key's contract review notes the pinned TruffleHog detectors separately cover Gemini and OAuth2 credentials, not this generic AIza API-key shape."
     },
@@ -1039,8 +1769,10 @@
       "provider": "grafana",
       "family": "grafana:cloud-access-policy-token",
       "familyName": "Cloud access policy token",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
+      "evidenceBasis": "provider-documented",
+      "qualificationProfile": null,
       "providerSource": {
         "url": "https://grafana.com/docs/grafana-cloud/observe-and-act/agent-observability/get-started/grafana-cloud/",
         "observedAt": "2026-09-23",
@@ -1060,17 +1792,40 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 11,
+        "positiveAxes": 7,
+        "benignCases": 5,
+        "controlAxes": 3,
+        "twinPairs": 11,
+        "totalFixtures": 27,
+        "contextTwinPairs": 8,
+        "confusionAxes": 4
+      },
       "detectors": [
         "grafana-cloud-access-policy-token"
       ],
-      "reason": null
+      "reason": "documented.minimumBenignCases: 5 < 8 — Eight independent benign controls are required by the documented fixture profile. | documented.minimumControlAxes: 3 < 4 — Benign coverage must span four reviewed confusion axes."
     },
     {
       "provider": "grafana",
       "family": "grafana:service-account-token",
       "familyName": "Service account token",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
+      "evidenceBasis": "provider-documented",
+      "qualificationProfile": null,
       "providerSource": {
         "url": "https://grafana.com/blog/new-in-grafana-9-1-service-accounts-are-now-ga/",
         "observedAt": "2026-09-23",
@@ -1091,17 +1846,40 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 11,
+        "positiveAxes": 7,
+        "benignCases": 5,
+        "controlAxes": 3,
+        "twinPairs": 11,
+        "totalFixtures": 27,
+        "contextTwinPairs": 8,
+        "confusionAxes": 4
+      },
       "detectors": [
         "grafana-service-account-token"
       ],
-      "reason": null
+      "reason": "documented.minimumBenignCases: 5 < 8 — Eight independent benign controls are required by the documented fixture profile. | documented.minimumControlAxes: 3 < 4 — Benign coverage must span four reviewed confusion axes."
     },
     {
       "provider": "hashicorp-terraform",
       "family": "hashicorp-terraform:organization-token",
       "familyName": "Organization token",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
+      "evidenceBasis": "provider-documented",
+      "qualificationProfile": null,
       "providerSource": {
         "url": "https://developer.hashicorp.com/terraform/cloud-docs/api-docs/user-tokens",
         "observedAt": "2026-09-21",
@@ -1122,17 +1900,40 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 9,
+        "positiveAxes": 1,
+        "benignCases": 6,
+        "controlAxes": 3,
+        "twinPairs": 6,
+        "totalFixtures": 21,
+        "contextTwinPairs": 0,
+        "confusionAxes": 5
+      },
       "detectors": [
         "terraform-cloud-token"
       ],
-      "reason": null
+      "reason": "documented.minimumPositiveAxes: 1 < 4 — Positive coverage must span four source-context axes rather than repeat one serialization. | documented.minimumBenignCases: 6 < 8 — Eight independent benign controls are required by the documented fixture profile. | documented.minimumControlAxes: 3 < 4 — Benign coverage must span four reviewed confusion axes."
     },
     {
       "provider": "hashicorp-terraform",
       "family": "hashicorp-terraform:team-token",
       "familyName": "Team token",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
+      "evidenceBasis": "provider-documented",
+      "qualificationProfile": null,
       "providerSource": {
         "url": "https://developer.hashicorp.com/terraform/cloud-docs/api-docs/user-tokens",
         "observedAt": "2026-09-21",
@@ -1153,17 +1954,40 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 9,
+        "positiveAxes": 1,
+        "benignCases": 6,
+        "controlAxes": 3,
+        "twinPairs": 6,
+        "totalFixtures": 21,
+        "contextTwinPairs": 0,
+        "confusionAxes": 5
+      },
       "detectors": [
         "terraform-cloud-token"
       ],
-      "reason": null
+      "reason": "documented.minimumPositiveAxes: 1 < 4 — Positive coverage must span four source-context axes rather than repeat one serialization. | documented.minimumBenignCases: 6 < 8 — Eight independent benign controls are required by the documented fixture profile. | documented.minimumControlAxes: 3 < 4 — Benign coverage must span four reviewed confusion axes."
     },
     {
       "provider": "hashicorp-terraform",
       "family": "hashicorp-terraform:user-token",
       "familyName": "User token",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
+      "evidenceBasis": "provider-documented",
+      "qualificationProfile": null,
       "providerSource": {
         "url": "https://developer.hashicorp.com/terraform/cloud-docs/api-docs/user-tokens",
         "observedAt": "2026-09-21",
@@ -1184,17 +2008,40 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 9,
+        "positiveAxes": 1,
+        "benignCases": 6,
+        "controlAxes": 3,
+        "twinPairs": 6,
+        "totalFixtures": 21,
+        "contextTwinPairs": 0,
+        "confusionAxes": 5
+      },
       "detectors": [
         "terraform-cloud-token"
       ],
-      "reason": null
+      "reason": "documented.minimumPositiveAxes: 1 < 4 — Positive coverage must span four source-context axes rather than repeat one serialization. | documented.minimumBenignCases: 6 < 8 — Eight independent benign controls are required by the documented fixture profile. | documented.minimumControlAxes: 3 < 4 — Benign coverage must span four reviewed confusion axes."
     },
     {
       "provider": "hashicorp-vault",
       "family": "hashicorp-vault:batch-token",
       "familyName": "Batch token",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
+      "evidenceBasis": "provider-documented",
+      "qualificationProfile": null,
       "providerSource": {
         "url": "https://developer.hashicorp.com/vault/docs/concepts/tokens",
         "observedAt": "2026-09-17",
@@ -1215,17 +2062,40 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 11,
+        "positiveAxes": 2,
+        "benignCases": 5,
+        "controlAxes": 3,
+        "twinPairs": 6,
+        "totalFixtures": 22,
+        "contextTwinPairs": 0,
+        "confusionAxes": 6
+      },
       "detectors": [
         "vault-token"
       ],
-      "reason": null
+      "reason": "documented.minimumPositiveAxes: 2 < 4 — Positive coverage must span four source-context axes rather than repeat one serialization. | documented.minimumBenignCases: 5 < 8 — Eight independent benign controls are required by the documented fixture profile. | documented.minimumControlAxes: 3 < 4 — Benign coverage must span four reviewed confusion axes."
     },
     {
       "provider": "hashicorp-vault",
       "family": "hashicorp-vault:recovery-token",
       "familyName": "Recovery token",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
+      "evidenceBasis": "provider-documented",
+      "qualificationProfile": null,
       "providerSource": {
         "url": "https://developer.hashicorp.com/vault/docs/concepts/tokens",
         "observedAt": "2026-09-17",
@@ -1246,17 +2116,40 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 11,
+        "positiveAxes": 2,
+        "benignCases": 5,
+        "controlAxes": 3,
+        "twinPairs": 6,
+        "totalFixtures": 22,
+        "contextTwinPairs": 0,
+        "confusionAxes": 6
+      },
       "detectors": [
         "vault-token"
       ],
-      "reason": null
+      "reason": "documented.minimumPositiveAxes: 2 < 4 — Positive coverage must span four source-context axes rather than repeat one serialization. | documented.minimumBenignCases: 5 < 8 — Eight independent benign controls are required by the documented fixture profile. | documented.minimumControlAxes: 3 < 4 — Benign coverage must span four reviewed confusion axes."
     },
     {
       "provider": "hashicorp-vault",
       "family": "hashicorp-vault:service-token",
       "familyName": "Service token",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
+      "evidenceBasis": "provider-documented",
+      "qualificationProfile": null,
       "providerSource": {
         "url": "https://developer.hashicorp.com/vault/docs/concepts/tokens",
         "observedAt": "2026-09-17",
@@ -1277,10 +2170,31 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 11,
+        "positiveAxes": 2,
+        "benignCases": 5,
+        "controlAxes": 3,
+        "twinPairs": 6,
+        "totalFixtures": 22,
+        "contextTwinPairs": 0,
+        "confusionAxes": 6
+      },
       "detectors": [
         "vault-token"
       ],
-      "reason": null
+      "reason": "documented.minimumPositiveAxes: 2 < 4 — Positive coverage must span four source-context axes rather than repeat one serialization. | documented.minimumBenignCases: 5 < 8 — Eight independent benign controls are required by the documented fixture profile. | documented.minimumControlAxes: 3 < 4 — Benign coverage must span four reviewed confusion axes."
     },
     {
       "provider": "heroku",
@@ -1288,6 +2202,8 @@
       "familyName": "Legacy API key (bare UUID)",
       "status": "provisional",
       "evidenceTier": "T2",
+      "evidenceBasis": "independently-corroborated",
+      "qualificationProfile": null,
       "providerSource": null,
       "corroboratingScanners": [
         "gitleaks 8.30.1",
@@ -1303,17 +2219,40 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 3,
+        "positiveAxes": 1,
+        "benignCases": 6,
+        "controlAxes": 4,
+        "twinPairs": 3,
+        "totalFixtures": 12,
+        "contextTwinPairs": 0,
+        "confusionAxes": 5
+      },
       "detectors": [
         "heroku-api-key-legacy"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret."
+      "reason": "empirical.evidenceBasis: independently-corroborated — T2 remains empirical provenance and qualifies only through observation, corroboration, fixture, behavioral, uncertainty, and context gates. | empirical.minimumObservations: 0 < 5 — Five safe provider-issued observations are the minimum empirical sample. | empirical.minimumSubjects: 0 < 2 — Observations must span at least two pseudonymous accounts or projects. | empirical.minimumIssuanceDates: 0 < 2 — Observations must span at least two issuance dates. | empirical.minimumCorroborationClasses: 0 < 2 — Two independent corroboration classes must agree with the observed structure. | empirical.uncertainty: missing — explicit uncertainty is required | empirical.supportedContexts: none — supported-context limits are required | empirical.minimumPositiveCases: 3 < 10 — The empirical fixture profile requires ten independently authored positive or supported-context fixtures. | empirical.minimumPositiveAxes: 1 < 6 — Empirical positives must span at least six source-context axes. | empirical.minimumBenignCases: 6 < 14 — The empirical fixture profile requires fourteen non-twin benign controls. | empirical.minimumControlAxes: 4 < 5 — Empirical controls must span at least five reviewed confusion axes. | empirical.minimumTwinPairs: 3 < 8 — Eight independently authored twin pairs complete the 40-fixture empirical profile. | empirical.mode: missing — choose shape or context-constrained qualification"
     },
     {
       "provider": "heroku",
       "family": "heroku:oauth-access-token",
       "familyName": "OAuth access token (HRKU-prefixed)",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
+      "evidenceBasis": "provider-documented",
+      "qualificationProfile": null,
       "providerSource": {
         "url": "https://devcenter.heroku.com/articles/oauth",
         "observedAt": "2026-09-23",
@@ -1334,17 +2273,40 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 3,
+        "positiveAxes": 1,
+        "benignCases": 5,
+        "controlAxes": 3,
+        "twinPairs": 6,
+        "totalFixtures": 14,
+        "contextTwinPairs": 0,
+        "confusionAxes": 5
+      },
       "detectors": [
         "heroku-api-key"
       ],
-      "reason": null
+      "reason": "documented.minimumPositiveCases: 3 < 6 — The documented profile requires six independently authored positive or supported-context fixtures. | documented.minimumPositiveAxes: 1 < 4 — Positive coverage must span four source-context axes rather than repeat one serialization. | documented.minimumBenignCases: 5 < 8 — Eight independent benign controls are required by the documented fixture profile. | documented.minimumControlAxes: 3 < 4 — Benign coverage must span four reviewed confusion axes."
     },
     {
       "provider": "huggingface",
       "family": "huggingface:api-token",
       "familyName": "API token",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
+      "evidenceBasis": "provider-documented",
+      "qualificationProfile": null,
       "providerSource": {
         "url": "https://huggingface.co/docs/huggingface.js/hub/modules",
         "observedAt": "2026-09-23",
@@ -1365,10 +2327,31 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 5,
+        "positiveAxes": 2,
+        "benignCases": 7,
+        "controlAxes": 3,
+        "twinPairs": 7,
+        "totalFixtures": 19,
+        "contextTwinPairs": 0,
+        "confusionAxes": 5
+      },
       "detectors": [
         "huggingface-token"
       ],
-      "reason": null
+      "reason": "documented.minimumPositiveCases: 5 < 6 — The documented profile requires six independently authored positive or supported-context fixtures. | documented.minimumPositiveAxes: 2 < 4 — Positive coverage must span four source-context axes rather than repeat one serialization. | documented.minimumBenignCases: 7 < 8 — Eight independent benign controls are required by the documented fixture profile. | documented.minimumControlAxes: 3 < 4 — Benign coverage must span four reviewed confusion axes."
     },
     {
       "provider": "linear",
@@ -1376,10 +2359,14 @@
       "familyName": "OAuth access token",
       "status": "unsupported",
       "evidenceTier": null,
+      "evidenceBasis": "none",
+      "qualificationProfile": null,
       "providerSource": null,
       "corroboratingScanners": [],
       "twinCoverage": null,
       "unresolvedCriticalItems": null,
+      "empiricalEvidence": null,
+      "fixtureProfile": null,
       "detectors": [],
       "reason": "classifyFixture explicitly routes lin_oauth_ values to the \"needs a separate format contract; related detector support is not evidence of parity\" guard. Provider source: benchmarks/lib/assessment.ts (classifyFixture variant guard: \"Variant support must not be inferred from a related family name.\")."
     },
@@ -1387,8 +2374,10 @@
       "provider": "linear",
       "family": "linear:personal-api-key",
       "familyName": "Personal API key",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
+      "evidenceBasis": "provider-documented",
+      "qualificationProfile": null,
       "providerSource": {
         "url": "https://linear.app/changelog/2021-08-19-github-secret-scanning",
         "observedAt": "2026-09-23",
@@ -1409,10 +2398,31 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 8,
+        "positiveAxes": 2,
+        "benignCases": 10,
+        "controlAxes": 3,
+        "twinPairs": 5,
+        "totalFixtures": 23,
+        "contextTwinPairs": 0,
+        "confusionAxes": 4
+      },
       "detectors": [
         "linear-token"
       ],
-      "reason": null
+      "reason": "documented.minimumPositiveAxes: 2 < 4 — Positive coverage must span four source-context axes rather than repeat one serialization. | documented.minimumControlAxes: 3 < 4 — Benign coverage must span four reviewed confusion axes."
     },
     {
       "provider": "mailchimp",
@@ -1420,6 +2430,8 @@
       "familyName": "Marketing API key",
       "status": "provisional",
       "evidenceTier": "T2",
+      "evidenceBasis": "independently-corroborated",
+      "qualificationProfile": null,
       "providerSource": null,
       "corroboratingScanners": [
         "gitleaks 8.30.1",
@@ -1435,10 +2447,31 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 6,
+        "positiveAxes": 1,
+        "benignCases": 6,
+        "controlAxes": 4,
+        "twinPairs": 6,
+        "totalFixtures": 18,
+        "contextTwinPairs": 0,
+        "confusionAxes": 6
+      },
       "detectors": [
         "mailchimp-api-key"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts."
+      "reason": "empirical.evidenceBasis: independently-corroborated — T2 remains empirical provenance and qualifies only through observation, corroboration, fixture, behavioral, uncertainty, and context gates. | empirical.minimumObservations: 0 < 5 — Five safe provider-issued observations are the minimum empirical sample. | empirical.minimumSubjects: 0 < 2 — Observations must span at least two pseudonymous accounts or projects. | empirical.minimumIssuanceDates: 0 < 2 — Observations must span at least two issuance dates. | empirical.minimumCorroborationClasses: 0 < 2 — Two independent corroboration classes must agree with the observed structure. | empirical.uncertainty: missing — explicit uncertainty is required | empirical.supportedContexts: none — supported-context limits are required | empirical.minimumPositiveCases: 6 < 10 — The empirical fixture profile requires ten independently authored positive or supported-context fixtures. | empirical.minimumPositiveAxes: 1 < 6 — Empirical positives must span at least six source-context axes. | empirical.minimumBenignCases: 6 < 14 — The empirical fixture profile requires fourteen non-twin benign controls. | empirical.minimumControlAxes: 4 < 5 — Empirical controls must span at least five reviewed confusion axes. | empirical.minimumTwinPairs: 6 < 8 — Eight independently authored twin pairs complete the 40-fixture empirical profile. | empirical.mode: missing — choose shape or context-constrained qualification"
     },
     {
       "provider": "mailgun",
@@ -1446,10 +2479,14 @@
       "familyName": "Legacy 32-8-8 hex signing key",
       "status": "unsupported",
       "evidenceTier": null,
+      "evidenceBasis": "none",
+      "qualificationProfile": null,
       "providerSource": null,
       "corroboratingScanners": [],
       "twinCoverage": null,
       "unresolvedCriticalItems": null,
+      "empiricalEvidence": null,
+      "fixtureProfile": null,
       "detectors": [],
       "reason": "Known unsupported legacy variant per redact-secret#314 (product PR #680); not fixtured because the provider no longer documents it. Provider source: https://github.com/gitleaks/gitleaks/blob/v8.30.1/config/gitleaks.toml."
     },
@@ -1459,6 +2496,8 @@
       "familyName": "Private API key and HTTP webhook signing key",
       "status": "provisional",
       "evidenceTier": "T2",
+      "evidenceBasis": "independently-corroborated",
+      "qualificationProfile": null,
       "providerSource": null,
       "corroboratingScanners": [
         "gitleaks 8.30.1",
@@ -1474,10 +2513,31 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 6,
+        "positiveAxes": 1,
+        "benignCases": 6,
+        "controlAxes": 4,
+        "twinPairs": 9,
+        "totalFixtures": 21,
+        "contextTwinPairs": 0,
+        "confusionAxes": 7
+      },
       "detectors": [
         "mailgun-api-key"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts."
+      "reason": "empirical.evidenceBasis: independently-corroborated — T2 remains empirical provenance and qualifies only through observation, corroboration, fixture, behavioral, uncertainty, and context gates. | empirical.minimumObservations: 0 < 5 — Five safe provider-issued observations are the minimum empirical sample. | empirical.minimumSubjects: 0 < 2 — Observations must span at least two pseudonymous accounts or projects. | empirical.minimumIssuanceDates: 0 < 2 — Observations must span at least two issuance dates. | empirical.minimumCorroborationClasses: 0 < 2 — Two independent corroboration classes must agree with the observed structure. | empirical.uncertainty: missing — explicit uncertainty is required | empirical.supportedContexts: none — supported-context limits are required | empirical.minimumPositiveCases: 6 < 10 — The empirical fixture profile requires ten independently authored positive or supported-context fixtures. | empirical.minimumPositiveAxes: 1 < 6 — Empirical positives must span at least six source-context axes. | empirical.minimumBenignCases: 6 < 14 — The empirical fixture profile requires fourteen non-twin benign controls. | empirical.minimumControlAxes: 4 < 5 — Empirical controls must span at least five reviewed confusion axes. | empirical.mode: missing — choose shape or context-constrained qualification"
     },
     {
       "provider": "mailgun",
@@ -1485,10 +2545,14 @@
       "familyName": "Public validation key (pubkey-)",
       "status": "unsupported",
       "evidenceTier": null,
+      "evidenceBasis": "none",
+      "qualificationProfile": null,
       "providerSource": null,
       "corroboratingScanners": [],
       "twinCoverage": null,
       "unresolvedCriticalItems": null,
+      "empiricalEvidence": null,
+      "fixtureProfile": null,
       "detectors": [],
       "reason": "Documented public per redact-secret#314's scope; gitleaks 8.30.1's mailgun-pub-key rule still flags it, which the mailgun-api-key public-id control records. Provider source: https://github.com/gitleaks/gitleaks/blob/v8.30.1/config/gitleaks.toml."
     },
@@ -1496,8 +2560,10 @@
       "provider": "microsoft-entra",
       "family": "microsoft-entra:application-client-secret",
       "familyName": "Application client secret",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
+      "evidenceBasis": "provider-documented",
+      "qualificationProfile": null,
       "providerSource": {
         "url": "https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.applications/add-mgapplicationpassword?view=graph-powershell-1.0",
         "observedAt": "2026-09-23",
@@ -1518,10 +2584,31 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 14,
+        "positiveAxes": 7,
+        "benignCases": 7,
+        "controlAxes": 3,
+        "twinPairs": 17,
+        "totalFixtures": 38,
+        "contextTwinPairs": 8,
+        "confusionAxes": 5
+      },
       "detectors": [
         "microsoft-entra-client-secret"
       ],
-      "reason": null
+      "reason": "documented.minimumBenignCases: 7 < 8 — Eight independent benign controls are required by the documented fixture profile. | documented.minimumControlAxes: 3 < 4 — Benign coverage must span four reviewed confusion axes."
     },
     {
       "provider": "netlify",
@@ -1529,10 +2616,14 @@
       "familyName": "CLI, OAuth, app and build tokens (nfc_/nfo_/nfu_/nfb_)",
       "status": "unsupported",
       "evidenceTier": null,
+      "evidenceBasis": "none",
+      "qualificationProfile": null,
       "providerSource": null,
       "corroboratingScanners": [],
       "twinCoverage": null,
       "unresolvedCriticalItems": null,
+      "empiricalEvidence": null,
+      "fixtureProfile": null,
       "detectors": [],
       "reason": "Out of redact-secret#311's explicit scope; each is a distinct credential, so none is a control or positive for netlify:personal-access-token. Provider source: https://answers.netlify.com/t/change-to-the-netlify-authentication-token-format/106146."
     },
@@ -1540,8 +2631,10 @@
       "provider": "netlify",
       "family": "netlify:personal-access-token",
       "familyName": "Personal access token",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
+      "evidenceBasis": "provider-documented",
+      "qualificationProfile": null,
       "providerSource": {
         "url": "https://answers.netlify.com/t/change-to-the-netlify-authentication-token-format/106146",
         "observedAt": "2026-09-23",
@@ -1562,17 +2655,40 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 6,
+        "positiveAxes": 1,
+        "benignCases": 6,
+        "controlAxes": 4,
+        "twinPairs": 6,
+        "totalFixtures": 18,
+        "contextTwinPairs": 0,
+        "confusionAxes": 6
+      },
       "detectors": [
         "netlify-token"
       ],
-      "reason": null
+      "reason": "documented.minimumPositiveAxes: 1 < 4 — Positive coverage must span four source-context axes rather than repeat one serialization. | documented.minimumBenignCases: 6 < 8 — Eight independent benign controls are required by the documented fixture profile."
     },
     {
       "provider": "new-relic",
       "family": "new-relic:license-key",
       "familyName": "License key",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
+      "evidenceBasis": "provider-documented",
+      "qualificationProfile": null,
       "providerSource": {
         "url": "https://docs.newrelic.com/docs/opentelemetry/integrations/ibm-mq/host/",
         "observedAt": "2026-09-23",
@@ -1592,17 +2708,40 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 6,
+        "positiveAxes": 1,
+        "benignCases": 5,
+        "controlAxes": 3,
+        "twinPairs": 9,
+        "totalFixtures": 20,
+        "contextTwinPairs": 0,
+        "confusionAxes": 5
+      },
       "detectors": [
         "new-relic-license-key"
       ],
-      "reason": null
+      "reason": "documented.minimumPositiveAxes: 1 < 4 — Positive coverage must span four source-context axes rather than repeat one serialization. | documented.minimumBenignCases: 5 < 8 — Eight independent benign controls are required by the documented fixture profile. | documented.minimumControlAxes: 3 < 4 — Benign coverage must span four reviewed confusion axes."
     },
     {
       "provider": "new-relic",
       "family": "new-relic:user-api-key",
       "familyName": "User API key",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
+      "evidenceBasis": "provider-documented",
+      "qualificationProfile": null,
       "providerSource": {
         "url": "https://docs.newrelic.com/docs/infrastructure-as-code/terraform/terraform-intro/",
         "observedAt": "2026-09-23",
@@ -1623,10 +2762,31 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 11,
+        "positiveAxes": 7,
+        "benignCases": 5,
+        "controlAxes": 3,
+        "twinPairs": 11,
+        "totalFixtures": 27,
+        "contextTwinPairs": 8,
+        "confusionAxes": 4
+      },
       "detectors": [
         "new-relic-user-api-key"
       ],
-      "reason": null
+      "reason": "documented.minimumBenignCases: 5 < 8 — Eight independent benign controls are required by the documented fixture profile. | documented.minimumControlAxes: 3 < 4 — Benign coverage must span four reviewed confusion axes."
     },
     {
       "provider": "notion",
@@ -1634,10 +2794,14 @@
       "familyName": "Integration token",
       "status": "unsupported",
       "evidenceTier": null,
+      "evidenceBasis": "none",
+      "qualificationProfile": null,
       "providerSource": null,
       "corroboratingScanners": [],
       "twinCoverage": null,
       "unresolvedCriticalItems": null,
+      "empiricalEvidence": null,
+      "fixtureProfile": null,
       "detectors": [],
       "reason": "notion-token's contract review states this current ntn_-prefixed format has no contract here; the pinned gitleaks rule targets it instead of the legacy secret_ shape."
     },
@@ -1645,8 +2809,10 @@
       "provider": "notion",
       "family": "notion:legacy-integration-token",
       "familyName": "Legacy integration token",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
+      "evidenceBasis": "provider-documented",
+      "qualificationProfile": null,
       "providerSource": {
         "url": "https://developers.notion.com/page/changelog",
         "observedAt": "2026-09-23",
@@ -1666,17 +2832,40 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 3,
+        "positiveAxes": 1,
+        "benignCases": 5,
+        "controlAxes": 3,
+        "twinPairs": 6,
+        "totalFixtures": 14,
+        "contextTwinPairs": 0,
+        "confusionAxes": 5
+      },
       "detectors": [
         "notion-token"
       ],
-      "reason": null
+      "reason": "documented.minimumPositiveCases: 3 < 6 — The documented profile requires six independently authored positive or supported-context fixtures. | documented.minimumPositiveAxes: 1 < 4 — Positive coverage must span four source-context axes rather than repeat one serialization. | documented.minimumBenignCases: 5 < 8 — Eight independent benign controls are required by the documented fixture profile. | documented.minimumControlAxes: 3 < 4 — Benign coverage must span four reviewed confusion axes."
     },
     {
       "provider": "npm",
       "family": "npm:granular-access-token",
       "familyName": "Granular access token",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
+      "evidenceBasis": "provider-documented",
+      "qualificationProfile": null,
       "providerSource": {
         "url": "https://github.blog/changelog/2021-09-23-npm-has-a-new-access-token-format/",
         "observedAt": "2026-09-17",
@@ -1697,10 +2886,31 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 8,
+        "positiveAxes": 3,
+        "benignCases": 6,
+        "controlAxes": 3,
+        "twinPairs": 6,
+        "totalFixtures": 20,
+        "contextTwinPairs": 0,
+        "confusionAxes": 6
+      },
       "detectors": [
         "npm-token"
       ],
-      "reason": null
+      "reason": "documented.minimumPositiveAxes: 3 < 4 — Positive coverage must span four source-context axes rather than repeat one serialization. | documented.minimumBenignCases: 6 < 8 — Eight independent benign controls are required by the documented fixture profile. | documented.minimumControlAxes: 3 < 4 — Benign coverage must span four reviewed confusion axes."
     },
     {
       "provider": "npm",
@@ -1708,10 +2918,14 @@
       "familyName": "Legacy token",
       "status": "unsupported",
       "evidenceTier": null,
+      "evidenceBasis": "none",
+      "qualificationProfile": null,
       "providerSource": null,
       "corroboratingScanners": [],
       "twinCoverage": null,
       "unresolvedCriticalItems": null,
+      "empiricalEvidence": null,
+      "fixtureProfile": null,
       "detectors": [],
       "reason": "npm-token's own provider source is the changelog announcing the npm_ prefix scheme as a replacement, implying the prior UUID-format token predates it; that legacy shape is not matched by the npm_-prefixed pattern. Provider source: https://github.blog/changelog/2021-09-23-npm-has-a-new-access-token-format/."
     },
@@ -1721,6 +2935,8 @@
       "familyName": "Management API token (SSWS)",
       "status": "provisional",
       "evidenceTier": "T2",
+      "evidenceBasis": "independently-corroborated",
+      "qualificationProfile": null,
       "providerSource": null,
       "corroboratingScanners": [
         "gitleaks 8.30.1",
@@ -1734,12 +2950,33 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 9
+        "differential": 0
+      },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 6,
+        "positiveAxes": 1,
+        "benignCases": 6,
+        "controlAxes": 4,
+        "twinPairs": 9,
+        "totalFixtures": 21,
+        "contextTwinPairs": 0,
+        "confusionAxes": 7
       },
       "detectors": [
         "okta-api-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | differential.unresolvedContractDisagreements: 9 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": "empirical.evidenceBasis: independently-corroborated — T2 remains empirical provenance and qualifies only through observation, corroboration, fixture, behavioral, uncertainty, and context gates. | empirical.minimumObservations: 0 < 5 — Five safe provider-issued observations are the minimum empirical sample. | empirical.minimumSubjects: 0 < 2 — Observations must span at least two pseudonymous accounts or projects. | empirical.minimumIssuanceDates: 0 < 2 — Observations must span at least two issuance dates. | empirical.minimumCorroborationClasses: 0 < 2 — Two independent corroboration classes must agree with the observed structure. | empirical.uncertainty: missing — explicit uncertainty is required | empirical.supportedContexts: none — supported-context limits are required | empirical.minimumPositiveCases: 6 < 10 — The empirical fixture profile requires ten independently authored positive or supported-context fixtures. | empirical.minimumPositiveAxes: 1 < 6 — Empirical positives must span at least six source-context axes. | empirical.minimumBenignCases: 6 < 14 — The empirical fixture profile requires fourteen non-twin benign controls. | empirical.minimumControlAxes: 4 < 5 — Empirical controls must span at least five reviewed confusion axes. | empirical.mode: missing — choose shape or context-constrained qualification"
     },
     {
       "provider": "openai",
@@ -1747,6 +2984,8 @@
       "familyName": "Secret API key",
       "status": "provisional",
       "evidenceTier": "T2",
+      "evidenceBasis": "independently-corroborated",
+      "qualificationProfile": null,
       "providerSource": null,
       "corroboratingScanners": [
         "gitleaks 8.30.1",
@@ -1762,10 +3001,31 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 15,
+        "positiveAxes": 2,
+        "benignCases": 7,
+        "controlAxes": 3,
+        "twinPairs": 6,
+        "totalFixtures": 28,
+        "contextTwinPairs": 0,
+        "confusionAxes": 5
+      },
       "detectors": [
         "openai-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts."
+      "reason": "empirical.evidenceBasis: independently-corroborated — T2 remains empirical provenance and qualifies only through observation, corroboration, fixture, behavioral, uncertainty, and context gates. | empirical.minimumObservations: 0 < 5 — Five safe provider-issued observations are the minimum empirical sample. | empirical.minimumSubjects: 0 < 2 — Observations must span at least two pseudonymous accounts or projects. | empirical.minimumIssuanceDates: 0 < 2 — Observations must span at least two issuance dates. | empirical.minimumCorroborationClasses: 0 < 2 — Two independent corroboration classes must agree with the observed structure. | empirical.uncertainty: missing — explicit uncertainty is required | empirical.supportedContexts: none — supported-context limits are required | empirical.minimumPositiveAxes: 2 < 6 — Empirical positives must span at least six source-context axes. | empirical.minimumBenignCases: 7 < 14 — The empirical fixture profile requires fourteen non-twin benign controls. | empirical.minimumControlAxes: 3 < 5 — Empirical controls must span at least five reviewed confusion axes. | empirical.minimumTwinPairs: 6 < 8 — Eight independently authored twin pairs complete the 40-fixture empirical profile. | empirical.mode: missing — choose shape or context-constrained qualification"
     },
     {
       "provider": "postman",
@@ -1773,6 +3033,8 @@
       "familyName": "API key",
       "status": "provisional",
       "evidenceTier": "T2",
+      "evidenceBasis": "independently-corroborated",
+      "qualificationProfile": null,
       "providerSource": null,
       "corroboratingScanners": [
         "gitleaks 8.30.1",
@@ -1788,17 +3050,40 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 3,
+        "positiveAxes": 1,
+        "benignCases": 6,
+        "controlAxes": 4,
+        "twinPairs": 9,
+        "totalFixtures": 18,
+        "contextTwinPairs": 0,
+        "confusionAxes": 7
+      },
       "detectors": [
         "postman-api-key"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts."
+      "reason": "empirical.evidenceBasis: independently-corroborated — T2 remains empirical provenance and qualifies only through observation, corroboration, fixture, behavioral, uncertainty, and context gates. | empirical.minimumObservations: 0 < 5 — Five safe provider-issued observations are the minimum empirical sample. | empirical.minimumSubjects: 0 < 2 — Observations must span at least two pseudonymous accounts or projects. | empirical.minimumIssuanceDates: 0 < 2 — Observations must span at least two issuance dates. | empirical.minimumCorroborationClasses: 0 < 2 — Two independent corroboration classes must agree with the observed structure. | empirical.uncertainty: missing — explicit uncertainty is required | empirical.supportedContexts: none — supported-context limits are required | empirical.minimumPositiveCases: 3 < 10 — The empirical fixture profile requires ten independently authored positive or supported-context fixtures. | empirical.minimumPositiveAxes: 1 < 6 — Empirical positives must span at least six source-context axes. | empirical.minimumBenignCases: 6 < 14 — The empirical fixture profile requires fourteen non-twin benign controls. | empirical.minimumControlAxes: 4 < 5 — Empirical controls must span at least five reviewed confusion axes. | empirical.mode: missing — choose shape or context-constrained qualification"
     },
     {
       "provider": "pulumi",
       "family": "pulumi:organization-access-token",
       "familyName": "Organization access token",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
+      "evidenceBasis": "provider-documented",
+      "qualificationProfile": null,
       "providerSource": {
         "url": "https://www.pulumi.com/docs/reference/cloud-rest-api/access-tokens/",
         "observedAt": "2026-09-21",
@@ -1819,17 +3104,40 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 9,
+        "positiveAxes": 1,
+        "benignCases": 6,
+        "controlAxes": 3,
+        "twinPairs": 6,
+        "totalFixtures": 21,
+        "contextTwinPairs": 0,
+        "confusionAxes": 5
+      },
       "detectors": [
         "pulumi-access-token"
       ],
-      "reason": null
+      "reason": "documented.minimumPositiveAxes: 1 < 4 — Positive coverage must span four source-context axes rather than repeat one serialization. | documented.minimumBenignCases: 6 < 8 — Eight independent benign controls are required by the documented fixture profile. | documented.minimumControlAxes: 3 < 4 — Benign coverage must span four reviewed confusion axes."
     },
     {
       "provider": "pulumi",
       "family": "pulumi:personal-access-token",
       "familyName": "Personal access token",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
+      "evidenceBasis": "provider-documented",
+      "qualificationProfile": null,
       "providerSource": {
         "url": "https://www.pulumi.com/docs/reference/cloud-rest-api/access-tokens/",
         "observedAt": "2026-09-21",
@@ -1850,17 +3158,40 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 9,
+        "positiveAxes": 1,
+        "benignCases": 6,
+        "controlAxes": 3,
+        "twinPairs": 6,
+        "totalFixtures": 21,
+        "contextTwinPairs": 0,
+        "confusionAxes": 5
+      },
       "detectors": [
         "pulumi-access-token"
       ],
-      "reason": null
+      "reason": "documented.minimumPositiveAxes: 1 < 4 — Positive coverage must span four source-context axes rather than repeat one serialization. | documented.minimumBenignCases: 6 < 8 — Eight independent benign controls are required by the documented fixture profile. | documented.minimumControlAxes: 3 < 4 — Benign coverage must span four reviewed confusion axes."
     },
     {
       "provider": "pulumi",
       "family": "pulumi:team-access-token",
       "familyName": "Team access token",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
+      "evidenceBasis": "provider-documented",
+      "qualificationProfile": null,
       "providerSource": {
         "url": "https://www.pulumi.com/docs/reference/cloud-rest-api/access-tokens/",
         "observedAt": "2026-09-21",
@@ -1881,17 +3212,40 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 9,
+        "positiveAxes": 1,
+        "benignCases": 6,
+        "controlAxes": 3,
+        "twinPairs": 6,
+        "totalFixtures": 21,
+        "contextTwinPairs": 0,
+        "confusionAxes": 5
+      },
       "detectors": [
         "pulumi-access-token"
       ],
-      "reason": null
+      "reason": "documented.minimumPositiveAxes: 1 < 4 — Positive coverage must span four source-context axes rather than repeat one serialization. | documented.minimumBenignCases: 6 < 8 — Eight independent benign controls are required by the documented fixture profile. | documented.minimumControlAxes: 3 < 4 — Benign coverage must span four reviewed confusion axes."
     },
     {
       "provider": "pypi",
       "family": "pypi:api-token",
       "familyName": "API token",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
+      "evidenceBasis": "provider-documented",
+      "qualificationProfile": null,
       "providerSource": {
         "url": "https://docs.pypi.org/api/secrets/",
         "observedAt": "2026-09-21",
@@ -1912,17 +3266,40 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 3,
+        "positiveAxes": 1,
+        "benignCases": 8,
+        "controlAxes": 6,
+        "twinPairs": 9,
+        "totalFixtures": 20,
+        "contextTwinPairs": 0,
+        "confusionAxes": 9
+      },
       "detectors": [
         "pypi-token"
       ],
-      "reason": null
+      "reason": "documented.minimumPositiveCases: 3 < 6 — The documented profile requires six independently authored positive or supported-context fixtures. | documented.minimumPositiveAxes: 1 < 4 — Positive coverage must span four source-context axes rather than repeat one serialization."
     },
     {
       "provider": "sendgrid",
       "family": "sendgrid:api-key",
       "familyName": "API key",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
+      "evidenceBasis": "provider-documented",
+      "qualificationProfile": null,
       "providerSource": {
         "url": "https://support.sendgrid.com/hc/en-us/articles/44146758703387-Can-I-Use-a-Reduced-Shorter-API-Key-Size-in-SendGrid",
         "observedAt": "2026-09-20",
@@ -1943,10 +3320,31 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 38,
+        "positiveAxes": 9,
+        "benignCases": 11,
+        "controlAxes": 3,
+        "twinPairs": 18,
+        "totalFixtures": 67,
+        "contextTwinPairs": 0,
+        "confusionAxes": 5
+      },
       "detectors": [
         "sendgrid-token"
       ],
-      "reason": null
+      "reason": "documented.minimumControlAxes: 3 < 4 — Benign coverage must span four reviewed confusion axes."
     },
     {
       "provider": "sentry",
@@ -1954,6 +3352,8 @@
       "familyName": "Organization auth token",
       "status": "provisional",
       "evidenceTier": "T2",
+      "evidenceBasis": "independently-corroborated",
+      "qualificationProfile": null,
       "providerSource": null,
       "corroboratingScanners": [
         "gitleaks 8.30.1",
@@ -1972,10 +3372,31 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 11,
+        "positiveAxes": 7,
+        "benignCases": 5,
+        "controlAxes": 3,
+        "twinPairs": 0,
+        "totalFixtures": 16,
+        "contextTwinPairs": 0,
+        "confusionAxes": 3
+      },
       "detectors": [
         "sentry-org-auth-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret."
+      "reason": "empirical.evidenceBasis: independently-corroborated — T2 remains empirical provenance and qualifies only through observation, corroboration, fixture, behavioral, uncertainty, and context gates. | empirical.minimumObservations: 0 < 5 — Five safe provider-issued observations are the minimum empirical sample. | empirical.minimumSubjects: 0 < 2 — Observations must span at least two pseudonymous accounts or projects. | empirical.minimumIssuanceDates: 0 < 2 — Observations must span at least two issuance dates. | empirical.minimumCorroborationClasses: 0 < 2 — Two independent corroboration classes must agree with the observed structure. | empirical.uncertainty: missing — explicit uncertainty is required | empirical.supportedContexts: none — supported-context limits are required | empirical.minimumBenignCases: 5 < 14 — The empirical fixture profile requires fourteen non-twin benign controls. | empirical.minimumControlAxes: 3 < 5 — Empirical controls must span at least five reviewed confusion axes. | empirical.minimumTwinPairs: 0 < 8 — Eight independently authored twin pairs complete the 40-fixture empirical profile. | empirical.mode: missing — choose shape or context-constrained qualification"
     },
     {
       "provider": "sentry",
@@ -1983,6 +3404,8 @@
       "familyName": "User auth token",
       "status": "provisional",
       "evidenceTier": "T2",
+      "evidenceBasis": "independently-corroborated",
+      "qualificationProfile": null,
       "providerSource": null,
       "corroboratingScanners": [
         "gitleaks 8.30.1"
@@ -2000,17 +3423,40 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 11,
+        "positiveAxes": 7,
+        "benignCases": 5,
+        "controlAxes": 3,
+        "twinPairs": 0,
+        "totalFixtures": 16,
+        "contextTwinPairs": 0,
+        "confusionAxes": 3
+      },
       "detectors": [
         "sentry-user-auth-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret."
+      "reason": "empirical.evidenceBasis: independently-corroborated — T2 remains empirical provenance and qualifies only through observation, corroboration, fixture, behavioral, uncertainty, and context gates. | empirical.minimumObservations: 0 < 5 — Five safe provider-issued observations are the minimum empirical sample. | empirical.minimumSubjects: 0 < 2 — Observations must span at least two pseudonymous accounts or projects. | empirical.minimumIssuanceDates: 0 < 2 — Observations must span at least two issuance dates. | empirical.minimumCorroborationClasses: 0 < 2 — Two independent corroboration classes must agree with the observed structure. | empirical.uncertainty: missing — explicit uncertainty is required | empirical.supportedContexts: none — supported-context limits are required | empirical.minimumBenignCases: 5 < 14 — The empirical fixture profile requires fourteen non-twin benign controls. | empirical.minimumControlAxes: 3 < 5 — Empirical controls must span at least five reviewed confusion axes. | empirical.minimumTwinPairs: 0 < 8 — Eight independently authored twin pairs complete the 40-fixture empirical profile. | empirical.mode: missing — choose shape or context-constrained qualification"
     },
     {
       "provider": "shopify",
       "family": "shopify:custom-app-access-token",
       "familyName": "Custom app access token",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
+      "evidenceBasis": "provider-documented",
+      "qualificationProfile": null,
       "providerSource": {
         "url": "https://shopify.dev/docs/apps/build/authentication-authorization/access-tokens",
         "observedAt": "2026-09-17",
@@ -2031,17 +3477,40 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 10,
+        "positiveAxes": 2,
+        "benignCases": 5,
+        "controlAxes": 3,
+        "twinPairs": 6,
+        "totalFixtures": 21,
+        "contextTwinPairs": 0,
+        "confusionAxes": 5
+      },
       "detectors": [
         "shopify-token"
       ],
-      "reason": null
+      "reason": "documented.minimumPositiveAxes: 2 < 4 — Positive coverage must span four source-context axes rather than repeat one serialization. | documented.minimumBenignCases: 5 < 8 — Eight independent benign controls are required by the documented fixture profile. | documented.minimumControlAxes: 3 < 4 — Benign coverage must span four reviewed confusion axes."
     },
     {
       "provider": "shopify",
       "family": "shopify:public-app-access-token",
       "familyName": "Public app access token",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
+      "evidenceBasis": "provider-documented",
+      "qualificationProfile": null,
       "providerSource": {
         "url": "https://shopify.dev/docs/apps/build/authentication-authorization/access-tokens",
         "observedAt": "2026-09-17",
@@ -2062,10 +3531,31 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 10,
+        "positiveAxes": 2,
+        "benignCases": 5,
+        "controlAxes": 3,
+        "twinPairs": 6,
+        "totalFixtures": 21,
+        "contextTwinPairs": 0,
+        "confusionAxes": 5
+      },
       "detectors": [
         "shopify-token"
       ],
-      "reason": null
+      "reason": "documented.minimumPositiveAxes: 2 < 4 — Positive coverage must span four source-context axes rather than repeat one serialization. | documented.minimumBenignCases: 5 < 8 — Eight independent benign controls are required by the documented fixture profile. | documented.minimumControlAxes: 3 < 4 — Benign coverage must span four reviewed confusion axes."
     },
     {
       "provider": "slack",
@@ -2073,10 +3563,14 @@
       "familyName": "App-level token",
       "status": "unsupported",
       "evidenceTier": null,
+      "evidenceBasis": "none",
+      "qualificationProfile": null,
       "providerSource": null,
       "corroboratingScanners": [],
       "twinCoverage": null,
       "unresolvedCriticalItems": null,
+      "empiricalEvidence": null,
+      "fixtureProfile": null,
       "detectors": [],
       "reason": "Documented alongside xoxb- in the same provider prefix table; not matched by the bot-token-only pattern. Provider source: https://docs.slack.dev/authentication/tokens."
     },
@@ -2084,8 +3578,10 @@
       "provider": "slack",
       "family": "slack:bot-token",
       "familyName": "Bot token",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
+      "evidenceBasis": "provider-documented",
+      "qualificationProfile": null,
       "providerSource": {
         "url": "https://docs.slack.dev/authentication/tokens",
         "observedAt": "2026-09-17",
@@ -2106,10 +3602,31 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 26,
+        "positiveAxes": 3,
+        "benignCases": 12,
+        "controlAxes": 3,
+        "twinPairs": 6,
+        "totalFixtures": 44,
+        "contextTwinPairs": 0,
+        "confusionAxes": 5
+      },
       "detectors": [
         "slack-token"
       ],
-      "reason": null
+      "reason": "documented.minimumPositiveAxes: 3 < 4 — Positive coverage must span four source-context axes rather than repeat one serialization. | documented.minimumControlAxes: 3 < 4 — Benign coverage must span four reviewed confusion axes."
     },
     {
       "provider": "slack",
@@ -2117,10 +3634,14 @@
       "familyName": "User token",
       "status": "unsupported",
       "evidenceTier": null,
+      "evidenceBasis": "none",
+      "qualificationProfile": null,
       "providerSource": null,
       "corroboratingScanners": [],
       "twinCoverage": null,
       "unresolvedCriticalItems": null,
+      "empiricalEvidence": null,
+      "fixtureProfile": null,
       "detectors": [],
       "reason": "slack-token's contract lists xoxp- among the provider-documented prefixes but its pattern only matches xoxb-. Provider source: https://docs.slack.dev/authentication/tokens."
     },
@@ -2130,10 +3651,14 @@
       "familyName": "Workflow webhook token",
       "status": "unsupported",
       "evidenceTier": null,
+      "evidenceBasis": "none",
+      "qualificationProfile": null,
       "providerSource": null,
       "corroboratingScanners": [],
       "twinCoverage": null,
       "unresolvedCriticalItems": null,
+      "empiricalEvidence": null,
+      "fixtureProfile": null,
       "detectors": [],
       "reason": "classifyFixture explicitly routes xwfp- values to the \"needs a separate format contract\" guard. Provider source: benchmarks/lib/assessment.ts (classifyFixture variant guard: \"Variant support must not be inferred from a related family name.\")."
     },
@@ -2143,10 +3668,14 @@
       "familyName": "Organization API key",
       "status": "unsupported",
       "evidenceTier": null,
+      "evidenceBasis": "none",
+      "qualificationProfile": null,
       "providerSource": null,
       "corroboratingScanners": [],
       "twinCoverage": null,
       "unresolvedCriticalItems": null,
+      "empiricalEvidence": null,
+      "fixtureProfile": null,
       "detectors": [],
       "reason": "classifyFixture explicitly routes sk_org_ values to \"this variant needs a separate format contract; related detector support is not evidence of parity\", so it is not claimed by stripe-token's live/test secret-key pattern. Provider source: benchmarks/lib/assessment.ts (classifyFixture variant guard: \"Variant support must not be inferred from a related family name.\")."
     },
@@ -2154,8 +3683,10 @@
       "provider": "stripe",
       "family": "stripe:restricted-key-live",
       "familyName": "Live restricted key",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
+      "evidenceBasis": "provider-documented",
+      "qualificationProfile": null,
       "providerSource": {
         "url": "https://docs.stripe.com/keys",
         "observedAt": "2026-09-17",
@@ -2176,17 +3707,40 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 22,
+        "positiveAxes": 2,
+        "benignCases": 5,
+        "controlAxes": 3,
+        "twinPairs": 6,
+        "totalFixtures": 33,
+        "contextTwinPairs": 0,
+        "confusionAxes": 5
+      },
       "detectors": [
         "stripe-token"
       ],
-      "reason": null
+      "reason": "documented.minimumPositiveAxes: 2 < 4 — Positive coverage must span four source-context axes rather than repeat one serialization. | documented.minimumBenignCases: 5 < 8 — Eight independent benign controls are required by the documented fixture profile. | documented.minimumControlAxes: 3 < 4 — Benign coverage must span four reviewed confusion axes."
     },
     {
       "provider": "stripe",
       "family": "stripe:restricted-key-test",
       "familyName": "Test restricted key",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
+      "evidenceBasis": "provider-documented",
+      "qualificationProfile": null,
       "providerSource": {
         "url": "https://docs.stripe.com/keys",
         "observedAt": "2026-09-17",
@@ -2207,17 +3761,40 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 22,
+        "positiveAxes": 2,
+        "benignCases": 5,
+        "controlAxes": 3,
+        "twinPairs": 6,
+        "totalFixtures": 33,
+        "contextTwinPairs": 0,
+        "confusionAxes": 5
+      },
       "detectors": [
         "stripe-token"
       ],
-      "reason": null
+      "reason": "documented.minimumPositiveAxes: 2 < 4 — Positive coverage must span four source-context axes rather than repeat one serialization. | documented.minimumBenignCases: 5 < 8 — Eight independent benign controls are required by the documented fixture profile. | documented.minimumControlAxes: 3 < 4 — Benign coverage must span four reviewed confusion axes."
     },
     {
       "provider": "stripe",
       "family": "stripe:secret-key-live",
       "familyName": "Live secret key",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
+      "evidenceBasis": "provider-documented",
+      "qualificationProfile": null,
       "providerSource": {
         "url": "https://docs.stripe.com/keys",
         "observedAt": "2026-09-17",
@@ -2238,17 +3815,40 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 22,
+        "positiveAxes": 2,
+        "benignCases": 5,
+        "controlAxes": 3,
+        "twinPairs": 6,
+        "totalFixtures": 33,
+        "contextTwinPairs": 0,
+        "confusionAxes": 5
+      },
       "detectors": [
         "stripe-token"
       ],
-      "reason": null
+      "reason": "documented.minimumPositiveAxes: 2 < 4 — Positive coverage must span four source-context axes rather than repeat one serialization. | documented.minimumBenignCases: 5 < 8 — Eight independent benign controls are required by the documented fixture profile. | documented.minimumControlAxes: 3 < 4 — Benign coverage must span four reviewed confusion axes."
     },
     {
       "provider": "stripe",
       "family": "stripe:secret-key-test",
       "familyName": "Test secret key",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
+      "evidenceBasis": "provider-documented",
+      "qualificationProfile": null,
       "providerSource": {
         "url": "https://docs.stripe.com/keys",
         "observedAt": "2026-09-17",
@@ -2269,10 +3869,31 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 22,
+        "positiveAxes": 2,
+        "benignCases": 5,
+        "controlAxes": 3,
+        "twinPairs": 6,
+        "totalFixtures": 33,
+        "contextTwinPairs": 0,
+        "confusionAxes": 5
+      },
       "detectors": [
         "stripe-token"
       ],
-      "reason": null
+      "reason": "documented.minimumPositiveAxes: 2 < 4 — Positive coverage must span four source-context axes rather than repeat one serialization. | documented.minimumBenignCases: 5 < 8 — Eight independent benign controls are required by the documented fixture profile. | documented.minimumControlAxes: 3 < 4 — Benign coverage must span four reviewed confusion axes."
     },
     {
       "provider": "stripe",
@@ -2280,10 +3901,14 @@
       "familyName": "Webhook signing secret",
       "status": "unsupported",
       "evidenceTier": null,
+      "evidenceBasis": "none",
+      "qualificationProfile": null,
       "providerSource": null,
       "corroboratingScanners": [],
       "twinCoverage": null,
       "unresolvedCriticalItems": null,
+      "empiricalEvidence": null,
+      "fixtureProfile": null,
       "detectors": [],
       "reason": "Same classifyFixture guard as the organization API key covers whsec_ values; stripe-token's pattern does not match them. Provider source: benchmarks/lib/assessment.ts (classifyFixture variant guard: \"Variant support must not be inferred from a related family name.\")."
     },
@@ -2291,8 +3916,10 @@
       "provider": "supabase",
       "family": "supabase:personal-access-token",
       "familyName": "Personal access token",
-      "status": "stable",
+      "status": "provisional",
       "evidenceTier": "T1",
+      "evidenceBasis": "provider-documented",
+      "qualificationProfile": null,
       "providerSource": {
         "url": "https://supabase.com/docs/guides/platform/personal-access-tokens",
         "observedAt": "2026-09-20",
@@ -2312,10 +3939,31 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 6,
+        "positiveAxes": 1,
+        "benignCases": 5,
+        "controlAxes": 3,
+        "twinPairs": 6,
+        "totalFixtures": 17,
+        "contextTwinPairs": 0,
+        "confusionAxes": 5
+      },
       "detectors": [
         "supabase-management-token"
       ],
-      "reason": null
+      "reason": "documented.minimumPositiveAxes: 1 < 4 — Positive coverage must span four source-context axes rather than repeat one serialization. | documented.minimumBenignCases: 5 < 8 — Eight independent benign controls are required by the documented fixture profile. | documented.minimumControlAxes: 3 < 4 — Benign coverage must span four reviewed confusion axes."
     },
     {
       "provider": "supabase",
@@ -2323,6 +3971,8 @@
       "familyName": "Project secret key",
       "status": "pending",
       "evidenceTier": "T0",
+      "evidenceBasis": "none",
+      "qualificationProfile": null,
       "providerSource": null,
       "corroboratingScanners": [
         "trufflehog 3.97.4"
@@ -2340,6 +3990,27 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 3,
+        "positiveAxes": 1,
+        "benignCases": 5,
+        "controlAxes": 3,
+        "twinPairs": 0,
+        "totalFixtures": 8,
+        "contextTwinPairs": 0,
+        "confusionAxes": 3
+      },
       "detectors": [
         "supabase-token"
       ],
@@ -2351,6 +4022,8 @@
       "familyName": "Bot token",
       "status": "provisional",
       "evidenceTier": "T2",
+      "evidenceBasis": "independently-corroborated",
+      "qualificationProfile": null,
       "providerSource": null,
       "corroboratingScanners": [
         "trufflehog 3.97.4"
@@ -2368,10 +4041,31 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 11,
+        "positiveAxes": 7,
+        "benignCases": 5,
+        "controlAxes": 3,
+        "twinPairs": 0,
+        "totalFixtures": 16,
+        "contextTwinPairs": 0,
+        "confusionAxes": 3
+      },
       "detectors": [
         "telegram-bot-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret."
+      "reason": "empirical.evidenceBasis: independently-corroborated — T2 remains empirical provenance and qualifies only through observation, corroboration, fixture, behavioral, uncertainty, and context gates. | empirical.minimumObservations: 0 < 5 — Five safe provider-issued observations are the minimum empirical sample. | empirical.minimumSubjects: 0 < 2 — Observations must span at least two pseudonymous accounts or projects. | empirical.minimumIssuanceDates: 0 < 2 — Observations must span at least two issuance dates. | empirical.minimumCorroborationClasses: 0 < 2 — Two independent corroboration classes must agree with the observed structure. | empirical.uncertainty: missing — explicit uncertainty is required | empirical.supportedContexts: none — supported-context limits are required | empirical.minimumBenignCases: 5 < 14 — The empirical fixture profile requires fourteen non-twin benign controls. | empirical.minimumControlAxes: 3 < 5 — Empirical controls must span at least five reviewed confusion axes. | empirical.minimumTwinPairs: 0 < 8 — Eight independently authored twin pairs complete the 40-fixture empirical profile. | empirical.mode: missing — choose shape or context-constrained qualification"
     },
     {
       "provider": "twilio",
@@ -2379,6 +4073,8 @@
       "familyName": "API key secret",
       "status": "provisional",
       "evidenceTier": "T2",
+      "evidenceBasis": "independently-corroborated",
+      "qualificationProfile": null,
       "providerSource": null,
       "corroboratingScanners": [
         "trufflehog 3.97.4"
@@ -2396,10 +4092,31 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 11,
+        "positiveAxes": 7,
+        "benignCases": 5,
+        "controlAxes": 3,
+        "twinPairs": 0,
+        "totalFixtures": 16,
+        "contextTwinPairs": 0,
+        "confusionAxes": 3
+      },
       "detectors": [
         "twilio-api-key-secret"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret."
+      "reason": "empirical.evidenceBasis: independently-corroborated — T2 remains empirical provenance and qualifies only through observation, corroboration, fixture, behavioral, uncertainty, and context gates. | empirical.minimumObservations: 0 < 5 — Five safe provider-issued observations are the minimum empirical sample. | empirical.minimumSubjects: 0 < 2 — Observations must span at least two pseudonymous accounts or projects. | empirical.minimumIssuanceDates: 0 < 2 — Observations must span at least two issuance dates. | empirical.minimumCorroborationClasses: 0 < 2 — Two independent corroboration classes must agree with the observed structure. | empirical.uncertainty: missing — explicit uncertainty is required | empirical.supportedContexts: none — supported-context limits are required | empirical.minimumBenignCases: 5 < 14 — The empirical fixture profile requires fourteen non-twin benign controls. | empirical.minimumControlAxes: 3 < 5 — Empirical controls must span at least five reviewed confusion axes. | empirical.minimumTwinPairs: 0 < 8 — Eight independently authored twin pairs complete the 40-fixture empirical profile. | empirical.mode: missing — choose shape or context-constrained qualification"
     },
     {
       "provider": "twilio",
@@ -2407,6 +4124,8 @@
       "familyName": "Account auth token",
       "status": "provisional",
       "evidenceTier": "T2",
+      "evidenceBasis": "independently-corroborated",
+      "qualificationProfile": null,
       "providerSource": null,
       "corroboratingScanners": [
         "trufflehog 3.97.4"
@@ -2424,10 +4143,31 @@
         "mutation": 0,
         "differential": 0
       },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 11,
+        "positiveAxes": 7,
+        "benignCases": 5,
+        "controlAxes": 3,
+        "twinPairs": 0,
+        "totalFixtures": 16,
+        "contextTwinPairs": 0,
+        "confusionAxes": 3
+      },
       "detectors": [
         "twilio-auth-token"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 0 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret."
+      "reason": "empirical.evidenceBasis: independently-corroborated — T2 remains empirical provenance and qualifies only through observation, corroboration, fixture, behavioral, uncertainty, and context gates. | empirical.minimumObservations: 0 < 5 — Five safe provider-issued observations are the minimum empirical sample. | empirical.minimumSubjects: 0 < 2 — Observations must span at least two pseudonymous accounts or projects. | empirical.minimumIssuanceDates: 0 < 2 — Observations must span at least two issuance dates. | empirical.minimumCorroborationClasses: 0 < 2 — Two independent corroboration classes must agree with the observed structure. | empirical.uncertainty: missing — explicit uncertainty is required | empirical.supportedContexts: none — supported-context limits are required | empirical.minimumBenignCases: 5 < 14 — The empirical fixture profile requires fourteen non-twin benign controls. | empirical.minimumControlAxes: 3 < 5 — Empirical controls must span at least five reviewed confusion axes. | empirical.minimumTwinPairs: 0 < 8 — Eight independently authored twin pairs complete the 40-fixture empirical profile. | empirical.mode: missing — choose shape or context-constrained qualification"
     },
     {
       "provider": "vercel",
@@ -2435,6 +4175,8 @@
       "familyName": "Access token",
       "status": "pending",
       "evidenceTier": "T0",
+      "evidenceBasis": "none",
+      "qualificationProfile": null,
       "providerSource": null,
       "corroboratingScanners": [
         "trufflehog 3.97.4"
@@ -2451,6 +4193,27 @@
         "metamorphic": 0,
         "mutation": 0,
         "differential": 0
+      },
+      "empiricalEvidence": {
+        "observations": 0,
+        "subjects": 0,
+        "issuanceDates": 0,
+        "corroborationClasses": [],
+        "contradictions": 0,
+        "uncertainty": null,
+        "supportedContexts": [],
+        "mode": null,
+        "supportsBareValues": false
+      },
+      "fixtureProfile": {
+        "positiveCases": 15,
+        "positiveAxes": 1,
+        "benignCases": 5,
+        "controlAxes": 3,
+        "twinPairs": 0,
+        "totalFixtures": 20,
+        "contextTwinPairs": 0,
+        "confusionAxes": 3
       },
       "detectors": [
         "vercel-token"

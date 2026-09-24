@@ -44,7 +44,10 @@ Of the four kinds of drift:
   evidence bundle is carried in the record for review, already backed by
   whatever the stable criteria (#503) required to earn it.
 - a **newAndUnclassified** family never blocks either.
-- **staleProviderProvenance** is a warning only, per the issue's own text.
+- **staleProviderProvenance** is a warning only, per the issue's own text. The
+  compatibility key now covers drift in any evidence-provenance field, including
+  evidence tier, basis, qualification profile, empirical evidence, and fixture
+  profile, rather than silently checking `providerSource` alone.
 
 Release authority is unchanged (acceptance criterion 5): a nonzero exit here
 fails the qualification job and blocks publication in `release.yml`, but
@@ -67,10 +70,14 @@ ACKNOWLEDGEMENTS_PATH = ROOT / "benchmarks" / "support-matrix-drift-acknowledgem
 
 EVIDENCE_FIELDS = (
     "evidenceTier",
+    "evidenceBasis",
+    "qualificationProfile",
     "providerSource",
     "corroboratingScanners",
     "twinCoverage",
     "unresolvedCriticalItems",
+    "empiricalEvidence",
+    "fixtureProfile",
     "detectors",
 )
 
@@ -85,7 +92,11 @@ def validate_matrix(label: str, matrix: dict, schema: dict) -> list[str]:
     docs projection, duplicated rather than imported -- every script in
     `scripts/` is a standalone gate."""
     errors: list[str] = []
-    vocabulary = schema["properties"]["families"]["items"]["properties"]["status"]["enum"]
+    family_properties = schema["properties"]["families"]["items"]["properties"]
+    vocabulary = family_properties["status"]["enum"]
+    evidence_tiers = family_properties.get("evidenceTier", {}).get("enum", [])
+    evidence_bases = family_properties.get("evidenceBasis", {}).get("enum", [])
+    qualification_profiles = family_properties.get("qualificationProfile", {}).get("enum", [])
     families = matrix.get("families")
     if not isinstance(families, list):
         return [f"{label}: 'families' must be a list"]
@@ -101,6 +112,40 @@ def validate_matrix(label: str, matrix: dict, schema: dict) -> list[str]:
         status = entry.get("status")
         if status not in vocabulary:
             errors.append(f"{label}: {name}: status {status!r} is not in {vocabulary}")
+        tier = entry.get("evidenceTier")
+        basis = entry.get("evidenceBasis")
+        profile = entry.get("qualificationProfile")
+        current_contract = "stableDistribution" in matrix
+        if current_contract or "evidenceBasis" in entry:
+            if tier not in evidence_tiers:
+                errors.append(f"{label}: {name}: evidence tier {tier!r} is not in {evidence_tiers}")
+            if basis not in evidence_bases:
+                errors.append(f"{label}: {name}: evidence basis {basis!r} is not in {evidence_bases}")
+            if profile not in qualification_profiles:
+                errors.append(
+                    f"{label}: {name}: qualification profile {profile!r} is not in {qualification_profiles}"
+                )
+            if status == "stable" and profile is None:
+                errors.append(f"{label}: {name}: stable carries no qualification profile")
+            if status != "stable" and profile is not None:
+                errors.append(f"{label}: {name}: {status!r} carries qualification profile {profile!r}")
+            if profile == "documented" and (tier != "T1" or basis != "provider-documented"):
+                errors.append(f"{label}: {name}: documented qualification is not T1 provider-documented")
+            if profile == "empirical" and (tier != "T2" or basis != "empirically-observed"):
+                errors.append(f"{label}: {name}: empirical qualification is not T2 empirically-observed")
+
+    if "stableDistribution" in matrix:
+        actual = {
+            profile: sum(
+                entry.get("status") == "stable" and entry.get("qualificationProfile") == profile
+                for entry in families
+            )
+            for profile in ("documented", "empirical")
+        }
+        if matrix.get("stableDistribution") != actual:
+            errors.append(
+                f"{label}: stableDistribution {matrix.get('stableDistribution')} does not match {actual}"
+            )
     return errors
 
 
@@ -155,7 +200,7 @@ def build_drift(baseline: dict, candidate: dict) -> dict[str, list[dict]]:
                     "evidence": {field: entry.get(field) for field in EVIDENCE_FIELDS},
                 }
             )
-        elif baseline_entry.get("providerSource") != entry.get("providerSource"):
+        elif any(baseline_entry.get(field) != entry.get(field) for field in EVIDENCE_FIELDS):
             stale_provider_provenance.append(
                 {
                     **identity,
@@ -163,6 +208,8 @@ def build_drift(baseline: dict, candidate: dict) -> dict[str, list[dict]]:
                     "candidateStatus": candidate_status,
                     "baselineProviderSource": baseline_entry.get("providerSource"),
                     "candidateProviderSource": entry.get("providerSource"),
+                    "baselineEvidence": {field: baseline_entry.get(field) for field in EVIDENCE_FIELDS},
+                    "candidateEvidence": {field: entry.get(field) for field in EVIDENCE_FIELDS},
                 }
             )
 
@@ -278,8 +325,8 @@ def main(argv: list[str] | None = None) -> int:
 
     for entry in drift["staleProviderProvenance"]:
         print(
-            f"WARNING stale provider provenance for {entry['family']}: baseline and candidate "
-            "providerSource disagree under an unchanged status",
+            f"WARNING stale evidence provenance for {entry['family']}: baseline and candidate "
+            "evidence metadata disagree under an unchanged status",
             file=sys.stderr,
         )
 

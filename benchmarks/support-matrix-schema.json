@@ -3,7 +3,7 @@
   "$id": "urn:redact-secret-benchmarks:support-matrix:1",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schemaVersion", "taxonomySchemaVersion", "sourceReport", "providerCount", "familyCount", "distribution", "families"],
+  "required": ["schemaVersion", "taxonomySchemaVersion", "sourceReport", "providerCount", "familyCount", "distribution", "stableDistribution", "families"],
   "properties": {
     "schemaVersion": { "const": 1 },
     "taxonomySchemaVersion": { "const": 1 },
@@ -53,18 +53,24 @@
         "unsupported": { "type": "integer", "minimum": 0 }
       }
     },
+    "stableDistribution": {
+      "type": "object", "additionalProperties": false, "required": ["documented", "empirical"],
+      "properties": { "documented": { "type": "integer", "minimum": 0 }, "empirical": { "type": "integer", "minimum": 0 } }
+    },
     "families": {
       "type": "array",
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["provider", "family", "familyName", "status", "evidenceTier", "providerSource", "corroboratingScanners", "twinCoverage", "unresolvedCriticalItems", "detectors", "reason"],
+        "required": ["provider", "family", "familyName", "status", "evidenceTier", "evidenceBasis", "qualificationProfile", "providerSource", "corroboratingScanners", "twinCoverage", "unresolvedCriticalItems", "empiricalEvidence", "fixtureProfile", "detectors", "reason"],
         "properties": {
           "provider": { "type": ["string", "null"] },
           "family": { "type": "string" },
           "familyName": { "type": "string" },
           "status": { "enum": ["stable", "provisional", "pending", "unsupported"] },
           "evidenceTier": { "enum": ["T0", "T1", "T2", "T3", null] },
+          "evidenceBasis": { "enum": ["provider-documented", "independently-corroborated", "empirically-observed", "project-policy", "none"] },
+          "qualificationProfile": { "enum": ["documented", "empirical", null] },
           "providerSource": {
             "type": ["object", "null"],
             "additionalProperties": false,
@@ -103,6 +109,27 @@
               "metamorphic": { "type": "integer", "minimum": 0 },
               "mutation": { "type": "integer", "minimum": 0 },
               "differential": { "type": "integer", "minimum": 0 }
+            }
+          },
+          "empiricalEvidence": {
+            "type": ["object", "null"], "additionalProperties": false,
+            "required": ["observations", "subjects", "issuanceDates", "corroborationClasses", "contradictions", "uncertainty", "supportedContexts", "mode", "supportsBareValues"],
+            "properties": {
+              "observations": { "type": "integer", "minimum": 0 }, "subjects": { "type": "integer", "minimum": 0 },
+              "issuanceDates": { "type": "integer", "minimum": 0 }, "corroborationClasses": { "type": "array", "items": { "type": "string" } },
+              "contradictions": { "type": "integer", "minimum": 0 }, "uncertainty": { "type": ["string", "null"] },
+              "supportedContexts": { "type": "array", "items": { "type": "string" } }, "mode": { "enum": ["shape", "context-constrained", null] },
+              "supportsBareValues": { "type": "boolean" }
+            }
+          },
+          "fixtureProfile": {
+            "type": ["object", "null"], "additionalProperties": false,
+            "required": ["positiveCases", "positiveAxes", "benignCases", "controlAxes", "twinPairs", "totalFixtures", "contextTwinPairs", "confusionAxes"],
+            "properties": {
+              "positiveCases": { "type": "integer", "minimum": 0 }, "positiveAxes": { "type": "integer", "minimum": 0 },
+              "benignCases": { "type": "integer", "minimum": 0 }, "controlAxes": { "type": "integer", "minimum": 0 },
+              "twinPairs": { "type": "integer", "minimum": 0 }, "totalFixtures": { "type": "integer", "minimum": 0 },
+              "contextTwinPairs": { "type": "integer", "minimum": 0 }, "confusionAxes": { "type": "integer", "minimum": 0 }
             }
           },
           "detectors": { "type": "array", "items": { "type": "string" } },

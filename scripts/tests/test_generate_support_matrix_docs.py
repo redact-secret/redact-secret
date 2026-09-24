@@ -16,23 +16,64 @@ ROOT = SCRIPT.resolve().parents[1]
 
 SCHEMA = {
     "properties": {
-        "families": {"items": {"properties": {"status": {"enum": ["stable", "provisional", "pending", "unsupported"]}}}},
+        "families": {
+            "items": {
+                "properties": {
+                    "status": {"enum": ["stable", "provisional", "pending", "unsupported"]},
+                    "evidenceTier": {"enum": ["T0", "T1", "T2", "T3", None]},
+                    "evidenceBasis": {
+                        "enum": [
+                            "provider-documented",
+                            "independently-corroborated",
+                            "empirically-observed",
+                            "project-policy",
+                            "none",
+                        ]
+                    },
+                    "qualificationProfile": {"enum": ["documented", "empirical", None]},
+                }
+            }
+        },
         "distribution": {"properties": {"stable": {}, "provisional": {}, "pending": {}, "unsupported": {}}},
     }
 }
 
 
-def family(provider, family_id, name, status, *, reason=None, tier="T1", detectors=("widget-token",), provider_source=None):
+def family(
+    provider,
+    family_id,
+    name,
+    status,
+    *,
+    reason=None,
+    tier="T1",
+    basis=None,
+    profile=None,
+    detectors=("widget-token",),
+    provider_source=None,
+    empirical_evidence=None,
+):
+    if status == "stable":
+        basis = basis or "provider-documented"
+        profile = profile or "documented"
+    elif status == "unsupported":
+        basis = "none"
+    else:
+        basis = basis or "independently-corroborated"
     return {
         "provider": provider,
         "family": family_id,
         "familyName": name,
         "status": status,
         "evidenceTier": tier if status != "unsupported" else None,
+        "evidenceBasis": basis,
+        "qualificationProfile": profile,
         "providerSource": provider_source,
         "corroboratingScanners": [],
         "twinCoverage": None,
         "unresolvedCriticalItems": None,
+        "empiricalEvidence": empirical_evidence,
+        "fixtureProfile": None,
         "detectors": list(detectors) if status != "unsupported" else [],
         "reason": reason if status != "stable" else None,
     }
@@ -59,6 +100,14 @@ def matrix(families):
         "providerCount": len(providers),
         "familyCount": len(families),
         "distribution": distribution,
+        "stableDistribution": {
+            "documented": sum(
+                f["status"] == "stable" and f["qualificationProfile"] == "documented" for f in families
+            ),
+            "empirical": sum(
+                f["status"] == "stable" and f["qualificationProfile"] == "empirical" for f in families
+            ),
+        },
         "families": families,
     }
 
@@ -97,6 +146,54 @@ class ValidateMatrixTests(unittest.TestCase):
         m["familyCount"] = 2
         errors = GEN.validate_matrix(m, SCHEMA)
         self.assertTrue(any("families present" in e for e in errors))
+
+    def test_accepts_t2_empirical_stable_without_rewriting_it_as_t1(self) -> None:
+        m = matrix(
+            [
+                family(
+                    "widget",
+                    "widget:token",
+                    "Widget token",
+                    "stable",
+                    tier="T2",
+                    basis="empirically-observed",
+                    profile="empirical",
+                )
+            ]
+        )
+        self.assertEqual(GEN.validate_matrix(m, SCHEMA), [])
+        self.assertEqual(m["families"][0]["evidenceTier"], "T2")
+
+    def test_rejects_empirical_qualification_that_masquerades_as_t1(self) -> None:
+        m = matrix(
+            [
+                family(
+                    "widget",
+                    "widget:token",
+                    "Widget token",
+                    "stable",
+                    tier="T1",
+                    basis="empirically-observed",
+                    profile="empirical",
+                )
+            ]
+        )
+        errors = GEN.validate_matrix(m, SCHEMA)
+        self.assertTrue(any("must remain T2" in error for error in errors))
+
+    def test_rejects_an_unknown_evidence_basis_and_qualification_profile(self) -> None:
+        m = matrix([family("widget", "widget:token", "Widget token", "stable")])
+        m["families"][0]["evidenceBasis"] = "marketing-claim"
+        m["families"][0]["qualificationProfile"] = "assumed"
+        errors = GEN.validate_matrix(m, SCHEMA)
+        self.assertTrue(any("evidence basis" in error and "not in" in error for error in errors))
+        self.assertTrue(any("qualification profile" in error and "not in" in error for error in errors))
+
+    def test_rejects_a_stable_distribution_that_disagrees_with_profiles(self) -> None:
+        m = matrix([family("widget", "widget:token", "Widget token", "stable")])
+        m["stableDistribution"] = {"documented": 0, "empirical": 1}
+        errors = GEN.validate_matrix(m, SCHEMA)
+        self.assertTrue(any("stableDistribution" in error for error in errors))
 
 
 class RenderMatrixMarkdownTests(unittest.TestCase):
@@ -142,7 +239,7 @@ class RenderMatrixMarkdownTests(unittest.TestCase):
         table_line = next(line for line in text.splitlines() if "Widget token" in line)
         # The literal pipe in the reason is escaped, not a sixth table delimiter.
         self.assertIn("first check failed \\| second check failed", table_line)
-        self.assertEqual(len(table_line.split(" | ")), 5)
+        self.assertEqual(len(table_line.split(" | ")), 8)
 
     def test_rendering_is_deterministic(self) -> None:
         m = matrix([family("widget", "widget:token", "Widget token", "stable")])
@@ -198,6 +295,64 @@ class RenderMatrixMarkdownTests(unittest.TestCase):
         text = GEN.render_matrix_markdown(m)
         self.assertIn("not recorded in the pinned evidence", text)
 
+    def test_empirical_stable_keeps_t2_and_uses_the_expected_user_label(self) -> None:
+        m = matrix(
+            [
+                family(
+                    "widget",
+                    "widget:token",
+                    "Widget token",
+                    "stable",
+                    tier="T2",
+                    basis="empirically-observed",
+                    profile="empirical",
+                    empirical_evidence={
+                        "supportedContexts": ["assignment values"],
+                        "uncertainty": "bare values are not covered",
+                    },
+                )
+            ]
+        )
+        text = GEN.render_matrix_markdown(m)
+        self.assertIn("Stable · Empirically qualified", text)
+        self.assertIn("| T2 | Provider-issued observation | Empirical |", text)
+        self.assertIn("supported contexts: assignment values", text)
+        self.assertIn("uncertainty: bare values are not covered", text)
+
+    def test_documented_and_tool_corroborated_labels_are_user_facing(self) -> None:
+        m = matrix(
+            [
+                family("widget", "widget:token", "Widget token", "stable"),
+                family("gadget", "gadget:token", "Gadget token", "provisional", reason="more evidence needed", tier="T2"),
+            ]
+        )
+        text = GEN.render_matrix_markdown(m)
+        self.assertIn("Stable · Provider documented", text)
+        self.assertIn("Provisional · Tool corroborated", text)
+
+    def test_counts_are_split_by_qualification_profile_and_evidence_tier(self) -> None:
+        m = matrix(
+            [
+                family("widget", "widget:token", "Widget token", "stable"),
+                family(
+                    "gadget",
+                    "gadget:token",
+                    "Gadget token",
+                    "stable",
+                    tier="T2",
+                    basis="empirically-observed",
+                    profile="empirical",
+                ),
+                family("policy", "policy:token", "Policy token", "provisional", reason="policy only", tier="T3", basis="project-policy"),
+            ]
+        )
+        text = GEN.render_matrix_markdown(m)
+        self.assertIn("| Documented | 1 |", text)
+        self.assertIn("| Empirical | 1 |", text)
+        self.assertIn("| T1 | 1 |", text)
+        self.assertIn("| T2 | 1 |", text)
+        self.assertIn("| T3 | 1 |", text)
+
 
 class ReadmeFragmentTests(unittest.TestCase):
     def test_injects_between_markers(self) -> None:
@@ -212,6 +367,14 @@ class ReadmeFragmentTests(unittest.TestCase):
     def test_raises_when_markers_are_missing(self) -> None:
         with self.assertRaises(ValueError):
             GEN.inject_readme_fragment("# Title\n\nno markers here\n", "fragment")
+
+    def test_explains_stable_profiles_and_reports_tier_counts(self) -> None:
+        m = matrix([family("widget", "widget:token", "Widget token", "stable")])
+        fragment = GEN.render_readme_fragment(m)
+        self.assertIn("Provider documented", fragment)
+        self.assertIn("Empirically qualified", fragment)
+        self.assertIn("empirical qualification remains T2", fragment)
+        self.assertIn("evidence tiers: T1: 1, T2: 0, T3: 0, T0: 0", fragment)
 
 
 class ReleaseNoteTests(unittest.TestCase):
