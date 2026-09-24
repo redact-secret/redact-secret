@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 1661,
+  "fixtureCount": 1670,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -39609,6 +39609,98 @@
       "note": "A pathological run of near-miss prefixes -- each one byte short of the documented length -- must not make the scan quadratic; none matches and the scan stays linear and bounded."
     },
     {
+      "id": "heroku-api-key-hrku-uuid-env",
+      "detector": "heroku-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "HEROKU_API_KEY=HRKU-5e7e71c0-0000-4000-8000-00000000fa11\n",
+      "expected": [
+        {
+          "detector": "heroku-api-key",
+          "type": "heroku_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 15,
+          "end": 56
+        }
+      ],
+      "note": "Issue #740: the 41-character HRKU-<uuid> generation (granted 2024-04-01 through 2025-04-22, devcenter.heroku.com/changelog-items/2842 and /3175) is detected by its documented HRKU- prefix and lower-case UUID body alone."
+    },
+    {
+      "id": "heroku-api-key-hrku-uuid-bare",
+      "detector": "heroku-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "HRKU-5e7e71c0-0000-4000-8000-00000000fa11\n",
+      "expected": [
+        {
+          "detector": "heroku-api-key",
+          "type": "heroku_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 41
+        }
+      ],
+      "note": "Issue #740: the 41-character generation needs no surrounding context, like the 65-character HRKU-AA generation."
+    },
+    {
+      "id": "heroku-api-key-hrku-uuid-authorizations-create",
+      "detector": "heroku-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "terminal"
+      ],
+      "input": "$ heroku authorizations:create\nCreating OAuth Authorization... done\nClient:      <none>\nScope:       global\nToken:       HRKU-5e7e71c0-0000-4000-8000-00000000fa11\n",
+      "expected": [
+        {
+          "detector": "heroku-api-key",
+          "type": "heroku_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 121,
+          "end": 162
+        }
+      ],
+      "note": "Issue #740: a heroku authorizations:create transcript prints the token on its Token: line; the span is the 41-byte token only."
+    },
+    {
+      "id": "heroku-api-key-negative-hrku-uuid-one-short",
+      "detector": "heroku-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "HEROKU_API_KEY=HRKU-5e7e71c0-0000-4000-8000-00000000fa1\n",
+      "expected": [],
+      "note": "Issue #740: a 40-character HRKU-<uuid> near miss (35-byte body) is not the documented shape and stays clean."
+    },
+    {
+      "id": "heroku-api-key-negative-hrku-underscore-separator",
+      "detector": "heroku-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "HEROKU_API_KEY=HRKU_5e7e71c0-0000-4000-8000-00000000fa11\n",
+      "expected": [],
+      "note": "Issue #740: HRKU_ with an underscore is not the documented HRKU- prefix, and the UUID after it is not a legacy token either (the key line names heroku, but the run is glued to HRKU_), so it stays clean."
+    },
+    {
       "id": "heroku-api-key-legacy-positive-dotenv-keyword",
       "detector": "heroku-api-key-legacy",
       "kind": "positive",
@@ -39697,6 +39789,50 @@
       "note": "The Heroku CLI historically stored this legacy token in a netrc-style machine block; the heroku.com host commented on the same line as the password value is sufficient context (context is scoped per line, matching the negative-different-line control below)."
     },
     {
+      "id": "heroku-api-key-legacy-positive-netrc-multi-line",
+      "detector": "heroku-api-key-legacy",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "machine api.heroku.com\n  login someone@example.invalid\n  password 7c1d9e42-5b3a-4f60-9e2d-0a8b6c4d1e73\n",
+      "expected": [
+        {
+          "detector": "heroku-api-key-legacy",
+          "type": "heroku_api_key_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 66,
+          "end": 102
+        }
+      ],
+      "note": "Issue #743: the Heroku CLI's multi-line .netrc entry puts machine api.heroku.com two lines above password <uuid>. The UUID is reported as the value of the entry's password token."
+    },
+    {
+      "id": "heroku-api-key-legacy-positive-auth-token-output",
+      "detector": "heroku-api-key-legacy",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "terminal"
+      ],
+      "input": "$ heroku auth:token\n7c1d9e42-5b3a-4f60-9e2d-0a8b6c4d1e73\n",
+      "expected": [
+        {
+          "detector": "heroku-api-key-legacy",
+          "type": "heroku_api_key_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 20,
+          "end": 56
+        }
+      ],
+      "note": "Issue #743: heroku auth:token prints the token alone on the line after the command."
+    },
+    {
       "id": "heroku-api-key-legacy-negative-bare-no-context",
       "detector": "heroku-api-key-legacy",
       "kind": "negative",
@@ -39748,6 +39884,32 @@
       "input": "HEROKU_APP_ID=01234567-89ab-cdef-0123-456789abcdef\n{\"herokuAppId\": \"01234567-89ab-cdef-0123-456789abcdef\"}\n",
       "expected": [],
       "note": "Issue #714: each line names heroku, but the UUID is assigned to an identifier-shaped key (last word id), so it is a public app id, not a legacy token, and stays clean."
+    },
+    {
+      "id": "heroku-api-key-legacy-negative-uuid-without-heroku-context",
+      "detector": "heroku-api-key-legacy",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "terminal"
+      ],
+      "input": "$ echo build finished\n7c1d9e42-5b3a-4f60-9e2d-0a8b6c4d1e73\n",
+      "expected": [],
+      "note": "Issue #743 control: a bare UUID on the line after an unrelated command stays clean, so the multi-line window never becomes an unconditional UUID match."
+    },
+    {
+      "id": "heroku-api-key-legacy-negative-app-url-path",
+      "detector": "heroku-api-key-legacy",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "http"
+      ],
+      "input": "GET https://api.heroku.com/apps/7c1d9e42-5b3a-4f60-9e2d-0a8b6c4d1e73/dynos\n",
+      "expected": [],
+      "note": "Issue #743: a Heroku app UUID in a Platform API URL path is a public resource id, not a token, and stays clean even though the line names heroku."
     },
     {
       "id": "heroku-api-key-legacy-boundary-wrong-length",
