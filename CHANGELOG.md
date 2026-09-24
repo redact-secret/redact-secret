@@ -15,6 +15,25 @@ evidence is linked from each published version.
   that includes the prefix) is no longer reported. The unprefixed legacy shape
   is unchanged (#738).
 
+### Changed detection
+
+- `heroku-api-key` now also detects the 41-character `HRKU-` OAuth access
+  token generation: `HRKU-` followed by a lower-case `8-4-4-4-12` hex UUID,
+  granted from 2024-04-01 through 2025-04-22 and valid until regenerated
+  (Heroku changelog items 2842 and 3175). Like the 65-character `HRKU-AA`
+  form, it is always redacted and needs no surrounding context. A 35-byte
+  body, an upper-case body, or an `HRKU_` separator is not this shape (#740).
+- `heroku-api-key-legacy` now also reports a bare-UUID token in two
+  documented multi-line layouts where `heroku` is not on the token's line: the
+  `password` of a `.netrc` entry whose `machine` host names heroku (with at
+  most two `login`/`account` lines between them), and the line after a
+  `heroku auth:token` command that holds only the token. The incremental
+  session holds such a unit open until the token's line arrives, so chunked
+  and whole-input results match. A UUID after any other line stays clean. A
+  UUID that is a URL path segment (`https://api.heroku.com/apps/<uuid>/...`)
+  is now treated as a public resource id and never reported, even on a line
+  that names heroku (#743).
+
 ### Internal, tooling, and qualification
 
 - The CHANGELOG `### Support status` section is now generated. A release
