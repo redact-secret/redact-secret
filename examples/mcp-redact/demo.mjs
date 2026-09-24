@@ -50,7 +50,9 @@ function redact(result) {
   return outcome.outcome === "blocked" ? buildBlockedResult() : outcome.result;
 }
 
-console.log("Synthetic tool result:\n" + JSON.stringify(syntheticToolResult, null, 2) + "\n");
+// Never print the unscanned result: no example logs raw input before scanning
+// (issue #587), even a synthetic one. Only its shape is shown.
+console.log(`Synthetic tool result: ${syntheticToolResult.content.length} content item(s), not printed before scanning\n`);
 
 console.log("=== block-all (Docker MCP Gateway --block-secrets style) ===");
 console.log(JSON.stringify(blockAll(syntheticToolResult), null, 2) + "\n");

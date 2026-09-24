@@ -59,7 +59,9 @@ def redact(result: dict) -> dict:
 
 
 def main() -> None:
-    print("Synthetic tool result:\n" + json.dumps(SYNTHETIC_TOOL_RESULT, indent=2) + "\n")
+    # Never print the unscanned result: no example logs raw input before
+    # scanning (issue #587), even a synthetic one. Only its shape is shown.
+    print(f"Synthetic tool result: {len(SYNTHETIC_TOOL_RESULT['content'])} content item(s), not printed before scanning\n")
 
     print("=== block-all (Docker MCP Gateway --block-secrets style) ===")
     print(json.dumps(block_all(SYNTHETIC_TOOL_RESULT), indent=2) + "\n")
