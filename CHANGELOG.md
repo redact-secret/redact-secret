@@ -85,6 +85,17 @@ evidence is linked from each published version.
   detectors already treat them only as context. Any other prefix, length, or
   an uppercase body is still reported (#746).
 
+- `new_relic_license_key` now reports the current-generation License Key
+  (32 lowercase hex then `FFFFNRAL`, and the EU `eu01xx` form) even when no
+  `newrelic`/`new_relic`/`new-relic`/`new relic` keyword is on its line. New
+  Relic's own configs name the credential rather than the provider, for
+  example `license_key:` in `newrelic.yml` and `newrelic.js`, the Log API's
+  `X-License-Key:` header and the Helm bundle's `licenseKey:`, so these keys
+  used to produce no finding. The provider-documented `NRAL` suffix is the
+  marker now. The legacy bare 40-hex shape keeps the keyword gate, so a commit
+  SHA or SHA-1 digest stays clean. Confidence stays `Medium` (warn, not
+  redact) (#754).
+
 ### Internal, tooling, and qualification
 
 - The CHANGELOG `### Support status` section is now generated. A release

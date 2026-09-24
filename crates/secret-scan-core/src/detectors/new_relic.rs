@@ -42,12 +42,13 @@
 //!   generation and its EU-region form, 40 bytes each; see "Current-generation
 //!   suffix" below), bounded by a byte
 //!   outside [`pattern::is_alnum`]. Unlike the User
-//!   Key, this format carries no marker of its own -- a 40-character hex
+//!   Key, the legacy all-hex format carries no marker of its own -- a 40-character hex
 //!   string is indistinguishable by shape alone from a `git` commit hash, a
-//!   SHA-1 digest, or countless other opaque hex blobs, and neither
-//!   independent reference scanner's own attempt at a stronger structural
-//!   marker (see "Rejected: an unofficial license-key suffix" below)
-//!   corroborates the other. Per the issue's own "ambiguous unprefixed
+//!   SHA-1 digest, or countless other opaque hex blobs; only the current
+//!   generation carries a marker (the `FFFFNRAL` suffix, see
+//!   "Current-generation suffix" below). For that legacy shape only (the marked shapes
+//!   need no context, see "No keyword gate for the marked shapes" below),
+//!   per the issue's own "ambiguous unprefixed
 //!   values require reliable context" instruction, this detector requires a
 //!   case-insensitive `newrelic`/`new_relic`/`new-relic`/`new relic`
 //!   substring ([`CONTEXT_KEYWORDS`]) anywhere on the same line -- the same
@@ -110,12 +111,29 @@
 //!   `([0-9a-f]{32}|eu01xx[0-9a-f]{26})FFFFNRAL`.
 //!
 //! The provider's own sources leave the body alphabet and the `FFFF` segment
-//! tool-corroborated only. Both new shapes share the legacy shape's keyword
-//! gate, `Medium` confidence and finding type: the suffix makes a false
-//! positive far less likely, but promoting confidence is a separate policy
-//! decision this change does not make. The hex body must be a maximal run of
-//! exactly the stated length, so a longer hex run before the marker is
-//! rejected rather than truncated.
+//! tool-corroborated only. Both marked shapes keep the legacy shape's
+//! `Medium` confidence and finding type: promoting confidence is a separate
+//! policy decision neither #672 nor #754 makes. The hex body must be a
+//! maximal run of exactly the stated length, so a longer hex run before the
+//! marker is rejected rather than truncated.
+//!
+//! ### No keyword gate for the marked shapes (issue #754)
+//!
+//! #672 first put the marked shapes behind the same-line keyword gate built
+//! for the legacy bare 40-hex shape. That gate missed the contexts New Relic's
+//! own agents and APIs actually use, which name the credential rather than the
+//! provider: `license_key:` in `newrelic.yml` and `newrelic.js`, the Log API's
+//! `X-License-Key:` header, and the Helm bundle's `licenseKey:`. The marked
+//! shapes are now detected without any context, and the gate stays only on the
+//! legacy shape. `FFFFNRAL` is the provider-documented `NRAL` suffix
+//! ("40 chars, suffix NRAL", docs.newrelic.com IBM MQ host-integration guide;
+//! `FFFFNRAL`-ending `licenseKey` examples on the eBPF install pages). It is an
+//! uppercase, 8-byte literal that must follow an exact 32-byte lowercase-hex
+//! run (or `eu01xx` plus 26), with an alphanumeric boundary on both sides.
+//! Commit hashes, SHA-1/SHA-256 digests and other hex blobs cannot take that
+//! shape, and the legacy bare 40-hex shape still needs a keyword. The
+//! context-free path emits the `new-relic-license-key-suffix-marker` signal
+//! only; a keyword on the line adds `new-relic-keyword-cooccurrence`.
 //!
 //! Not adopted, and left as documented gaps: the first `NRAL` generation (36
 //! hex bytes then `NRAL`, labelled `_OLD` in New Relic's own scanner), and
@@ -131,9 +149,11 @@
 //!   the existing generic-token path regardless of format.
 //! - A first-generation `NRAL` License Key (36 hex bytes then `NRAL`) or a
 //!   region-aware key with a prefix other than `eu01xx` goes undetected.
-//! - A License Key with no `newrelic`/`new_relic`/`new-relic`/`new relic`
-//!   keyword anywhere on its own line goes undetected -- the same accepted
-//!   tradeoff [`super::twilio`]'s own bare hex formats already carry.
+//! - A legacy all-hex License Key with no
+//!   `newrelic`/`new_relic`/`new-relic`/`new relic` keyword anywhere on its
+//!   own line goes undetected -- the same accepted tradeoff
+//!   [`super::twilio`]'s own bare hex formats already carry. The marked
+//!   (`FFFFNRAL`) shapes need no keyword (#754).
 //! - A benign 40-byte lowercase-hex value (a commit SHA, a digest) that
 //!   happens to share a line with one of the four keywords would false
 //!   positive; this is the same class of risk every other keyword-gated
@@ -247,7 +267,8 @@ fn line_has_context_keyword(line: &str) -> bool {
     })
 }
 
-/// Detects a New Relic License Key: a bare 40-byte lowercase-hex run on a
+/// Detects a New Relic License Key: a marked current-generation key
+/// (`FFFFNRAL` suffix) anywhere, or a bare 40-byte lowercase-hex run on a
 /// line that also carries a [`CONTEXT_KEYWORDS`] substring.
 pub(super) struct NewRelicLicenseKeyDetector;
 
@@ -264,9 +285,30 @@ impl Detector for NewRelicLicenseKeyDetector {
         let mut candidates = Vec::new();
         for (line_start, line_end) in lines(input) {
             let line = &input[line_start..line_end];
-            if !line_has_context_keyword(line) {
+            let has_keyword = line_has_context_keyword(line);
+            // A context-free line can only hold a marked (current-generation)
+            // key, so skip it outright unless the marker literal is present.
+            if !has_keyword && !line.contains(LICENSE_KEY_MARKER) {
                 continue;
             }
+            let push = |candidates: &mut Vec<Candidate>, start: usize, end: usize, marked: bool| {
+                let Some(range) = ByteRange::new(line_start + start, line_start + end) else {
+                    return;
+                };
+                let signals: &[&str] = match (has_keyword, marked) {
+                    (true, true) => &[
+                        "new-relic-keyword-cooccurrence",
+                        "new-relic-license-key-suffix-marker",
+                    ],
+                    (true, false) => &["new-relic-keyword-cooccurrence"],
+                    (false, _) => &["new-relic-license-key-suffix-marker"],
+                };
+                candidates.push(
+                    Candidate::new("new_relic_license_key", Confidence::Medium, range)
+                        .with_specificity(Specificity::Provider)
+                        .with_signals(signals.iter().copied()),
+                );
+            };
 
             let bytes = line.as_bytes();
             let ends = pattern::run_ends(bytes, is_lower_hex);
@@ -277,7 +319,9 @@ impl Detector for NewRelicLicenseKeyDetector {
                     continue;
                 }
                 let run_end = ends[start];
-                let key_end = if run_end - start == LICENSE_KEY_LEN {
+                // The legacy all-hex shape carries no marker of its own, so it
+                // still needs a same-line keyword; the marked shape does not.
+                let key_end = if has_keyword && run_end - start == LICENSE_KEY_LEN {
                     Some(run_end)
                 } else if run_end - start == LICENSE_KEY_MARKED_BODY_LEN
                     && line[run_end..].starts_with(LICENSE_KEY_MARKER)
@@ -289,21 +333,8 @@ impl Detector for NewRelicLicenseKeyDetector {
                 if let Some(key_end) = key_end
                     && pattern::boundary_ok(bytes, start, key_end, pattern::is_alnum)
                     && !text::is_repeated_character_filler(&line[start..run_end])
-                    && let Some(range) = ByteRange::new(line_start + start, line_start + key_end)
                 {
-                    let signals: &[&str] = if key_end == run_end {
-                        &["new-relic-keyword-cooccurrence"]
-                    } else {
-                        &[
-                            "new-relic-keyword-cooccurrence",
-                            "new-relic-license-key-suffix-marker",
-                        ]
-                    };
-                    candidates.push(
-                        Candidate::new("new_relic_license_key", Confidence::Medium, range)
-                            .with_specificity(Specificity::Provider)
-                            .with_signals(signals.iter().copied()),
-                    );
+                    push(&mut candidates, start, key_end, key_end != run_end);
                 }
                 start = run_end;
             }
@@ -316,17 +347,8 @@ impl Detector for NewRelicLicenseKeyDetector {
                     && line[body_end..].starts_with(LICENSE_KEY_MARKER)
                     && pattern::boundary_ok(bytes, prefix_at, key_end, pattern::is_alnum)
                     && !text::is_repeated_character_filler(&line[body_start..body_end])
-                    && let Some(range) =
-                        ByteRange::new(line_start + prefix_at, line_start + key_end)
                 {
-                    candidates.push(
-                        Candidate::new("new_relic_license_key", Confidence::Medium, range)
-                            .with_specificity(Specificity::Provider)
-                            .with_signals([
-                                "new-relic-keyword-cooccurrence",
-                                "new-relic-license-key-suffix-marker",
-                            ]),
-                    );
+                    push(&mut candidates, prefix_at, key_end, true);
                 }
             }
         }
@@ -529,9 +551,54 @@ mod tests {
     }
 
     #[test]
-    fn rejects_a_current_generation_license_key_with_no_context() {
-        assert!(detect_license_key(CURRENT_KEY).is_empty());
-        assert!(detect_license_key(EU_KEY).is_empty());
+    fn detects_a_current_generation_license_key_with_no_keyword_on_the_line() {
+        for key in [CURRENT_KEY, EU_KEY] {
+            for input in [
+                key.to_owned(),
+                format!("common: &default_settings\n  license_key: '{key}'\n"),
+                format!("exports.config = {{\n  license_key: '{key}',\n}}\n"),
+                format!("POST /log/v1 HTTP/1.1\nX-License-Key: {key}\n"),
+                format!("global:\n  licenseKey: {key}\n"),
+            ] {
+                let candidates = detect_license_key(&input);
+                assert_eq!(candidates.len(), 1, "{input}");
+                assert_eq!(candidates[0].type_name(), "new_relic_license_key");
+                assert_eq!(candidates[0].confidence(), Confidence::Medium);
+                assert_eq!(candidates[0].effective_specificity(), Specificity::Provider);
+                let start = input.find(key).unwrap();
+                assert_eq!(
+                    candidates[0].range(),
+                    ByteRange::new(start, start + key.len()).unwrap()
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn keeps_the_keyword_gate_on_the_legacy_shape_beside_a_context_free_marked_key() {
+        let input = format!("license_key: {CURRENT_KEY} commit {LICENSE_KEY}");
+        let candidates = detect_license_key(&input);
+        assert_eq!(candidates.len(), 1);
+        let start = input.find(CURRENT_KEY).unwrap();
+        assert_eq!(
+            candidates[0].range(),
+            ByteRange::new(start, start + CURRENT_KEY.len()).unwrap()
+        );
+    }
+
+    #[test]
+    fn rejects_marked_lookalikes_with_the_wrong_body_length_and_no_keyword() {
+        let short = &CURRENT_KEY[1..];
+        let long = format!("0{CURRENT_KEY}");
+        for input in [
+            format!("license_key: {short}"),
+            format!("license_key: {long}"),
+            "commit 9b2f47c1e08d3a65f4c7b29e1d0a86f3c5e71b24".to_owned(),
+            format!("license_key: x{CURRENT_KEY}"),
+            format!("license_key: {CURRENT_KEY}x"),
+        ] {
+            assert!(detect_license_key(&input).is_empty(), "{input}");
+        }
     }
 
     #[test]
@@ -674,6 +741,12 @@ mod tests {
     fn stays_bounded_over_a_long_context_free_line_packed_with_license_key_candidates() {
         let input = format!("{LICENSE_KEY} ").repeat(10_000);
         assert_eq!(detect_license_key(&input).len(), 0);
+    }
+
+    #[test]
+    fn stays_bounded_over_a_long_context_free_line_of_rejected_marked_candidates() {
+        let input = format!("{} ", &CURRENT_KEY[1..]).repeat(10_000);
+        assert!(detect_license_key(&input).is_empty());
     }
 
     #[test]
