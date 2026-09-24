@@ -5607,6 +5607,10 @@
         {
           "dimension": "positive",
           "evidenceFixtureIds": [
+            "new-relic-license-key-marked-helm-values-no-keyword",
+            "new-relic-license-key-marked-log-api-header-no-keyword",
+            "new-relic-license-key-marked-newrelic-js-no-keyword",
+            "new-relic-license-key-marked-newrelic-yml-no-keyword",
             "new-relic-license-key-positive-dotenv-keyword",
             "new-relic-license-key-positive-json-keyword",
             "new-relic-license-key-positive-log-keyword",
@@ -5632,6 +5636,9 @@
         {
           "dimension": "boundary",
           "evidenceFixtureIds": [
+            "new-relic-license-key-boundary-marked-31-byte-body",
+            "new-relic-license-key-boundary-marked-33-byte-body",
+            "new-relic-license-key-boundary-marked-joined-identifier",
             "new-relic-license-key-boundary-wrong-length"
           ],
           "state": "supported"

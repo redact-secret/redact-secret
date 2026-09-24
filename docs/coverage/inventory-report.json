@@ -2310,13 +2310,17 @@
     {
       "detector": "new-relic-license-key",
       "evidence": {
-        "fixtureCount": 12,
+        "fixtureCount": 20,
         "hostContextsExercised": [
           "dotenv",
+          "http",
+          "javascript",
           "json",
+          "kubernetes",
           "log",
           "plain-text",
           "shell",
+          "terminal",
           "yaml"
         ],
         "kindsWithSupportedEvidence": [
@@ -2331,6 +2335,10 @@
         ]
       },
       "evidenceFixtureIds": [
+        "new-relic-license-key-marked-helm-values-no-keyword",
+        "new-relic-license-key-marked-log-api-header-no-keyword",
+        "new-relic-license-key-marked-newrelic-js-no-keyword",
+        "new-relic-license-key-marked-newrelic-yml-no-keyword",
         "new-relic-license-key-positive-dotenv-keyword",
         "new-relic-license-key-positive-json-keyword",
         "new-relic-license-key-positive-log-keyword",

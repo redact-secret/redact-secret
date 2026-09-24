@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 1661,
+  "fixtureCount": 1669,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -25975,6 +25975,146 @@
         }
       ],
       "note": "A multi-byte Unicode prefix and CRLF line ending on the line before the keyword and key do not defeat detection."
+    },
+    {
+      "id": "new-relic-license-key-marked-newrelic-yml-no-keyword",
+      "detector": "new-relic-license-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "common: &default_settings\n  license_key: '7c3e91a0b5d24f68e1a9c07b3d5f2e84FFFFNRAL'\n  app_name: checkout-api\n",
+      "expected": [
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 42,
+          "end": 82
+        }
+      ],
+      "note": "Issue #754: a current-generation key (32 lowercase hex + FFFFNRAL) under newrelic.yml's license_key, with no New Relic keyword on its line, is detected; the provider-documented NRAL suffix is its own marker."
+    },
+    {
+      "id": "new-relic-license-key-marked-newrelic-js-no-keyword",
+      "detector": "new-relic-license-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "javascript"
+      ],
+      "input": "exports.config = {\n  app_name: ['checkout-api'],\n  license_key: '7c3e91a0b5d24f68e1a9c07b3d5f2e84FFFFNRAL',\n}\n",
+      "expected": [
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 65,
+          "end": 105
+        }
+      ],
+      "note": "Issue #754: the newrelic.js agent config's license_key property carries a marked key with no New Relic keyword on the line; it is detected without context."
+    },
+    {
+      "id": "new-relic-license-key-marked-log-api-header-no-keyword",
+      "detector": "new-relic-license-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "http"
+      ],
+      "input": "POST /log/v1 HTTP/1.1\nContent-Type: application/json\nX-License-Key: 7c3e91a0b5d24f68e1a9c07b3d5f2e84FFFFNRAL\n",
+      "expected": [
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 68,
+          "end": 108
+        }
+      ],
+      "note": "Issue #754: the Log API's X-License-Key header names the credential, not the provider; a marked key there is detected without a New Relic keyword."
+    },
+    {
+      "id": "new-relic-license-key-marked-helm-values-no-keyword",
+      "detector": "new-relic-license-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "kubernetes"
+      ],
+      "input": "global:\n  cluster: prod-eu-1\n  licenseKey: 7c3e91a0b5d24f68e1a9c07b3d5f2e84FFFFNRAL\n",
+      "expected": [
+        {
+          "detector": "new-relic-license-key",
+          "type": "new_relic_license_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 43,
+          "end": 83
+        }
+      ],
+      "note": "Issue #754: the Helm bundle's global.licenseKey value is a marked key with no New Relic keyword on its line; it is detected without context."
+    },
+    {
+      "id": "new-relic-license-key-negative-sha1-without-suffix",
+      "detector": "new-relic-license-key",
+      "kind": "negative",
+      "support": "intentionally-unsupported",
+      "tier": "regression",
+      "contexts": [
+        "terminal"
+      ],
+      "input": "$ git log -1 --format=%H\n9b2f47c1e08d3a65f4c7b29e1d0a86f3c5e71b24\n",
+      "expected": [],
+      "note": "Issue #754 control: a bare 40-byte lowercase-hex SHA-1 with no FFFFNRAL suffix and no New Relic keyword stays clean; only the marked shape dropped the keyword gate."
+    },
+    {
+      "id": "new-relic-license-key-boundary-marked-31-byte-body",
+      "detector": "new-relic-license-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "regression",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "license_key: 'c3e91a0b5d24f68e1a9c07b3d5f2e84FFFFNRAL'\n",
+      "expected": [],
+      "note": "Issue #754 control: a 31-byte hex body before FFFFNRAL (39 bytes in total) is rejected; the documented total length is exactly 40."
+    },
+    {
+      "id": "new-relic-license-key-boundary-marked-33-byte-body",
+      "detector": "new-relic-license-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "regression",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "license_key: '07c3e91a0b5d24f68e1a9c07b3d5f2e84FFFFNRAL'\n",
+      "expected": [],
+      "note": "Issue #754 control: a 33-byte hex body before FFFFNRAL (41 bytes in total) is rejected rather than truncated to a 40-byte key."
+    },
+    {
+      "id": "new-relic-license-key-boundary-marked-joined-identifier",
+      "detector": "new-relic-license-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "license_key=x7c3e91a0b5d24f68e1a9c07b3d5f2e84FFFFNRAL0\n",
+      "expected": [],
+      "note": "Issue #754 control: a correctly sized marked key glued inside a longer alphanumeric identifier is not reported; the alphanumeric boundary is unchanged."
     },
     {
       "id": "new-relic-license-key-negative-bare-value-with-no-context",
