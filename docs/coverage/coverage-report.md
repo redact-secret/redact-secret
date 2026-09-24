@@ -15,11 +15,11 @@ These counts describe finding-type inventory rows with corpus evidence, not dete
 
 | Row state | Count |
 | --- | --- |
-| supported | 64 |
+| supported | 68 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 75.
+Coverage declarations: 79.
 
 ## Coverage by detector
 
@@ -48,6 +48,7 @@ Coverage declarations: 75.
 | google-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | grafana-cloud-access-policy-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | grafana-service-account-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| groq-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | heroku-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | heroku-api-key-legacy | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | huggingface-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -63,11 +64,13 @@ Coverage declarations: 75.
 | npm-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | okta-api-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | openai-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| openrouter-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | otpauth-uri | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | postman-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | private-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | pulumi-access-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | pypi-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| replicate-api-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | sendgrid-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | sentry-org-auth-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | sentry-user-auth-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -82,6 +85,7 @@ Coverage declarations: 75.
 | twilio-auth-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | vault-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | vercel-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| xai-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 
 ## Coverage by finding type
 
@@ -116,6 +120,7 @@ Coverage declarations: 75.
 | google_api_key | google-api-key | provider | supported | not-applicable | none |
 | grafana_cloud_access_policy_token | grafana-cloud-access-policy-token | provider | supported | not-applicable | none |
 | grafana_service_account_token | grafana-service-account-token | provider | supported | not-applicable | none |
+| groq_api_key | groq-api-key | provider | supported | not-applicable | none |
 | heroku_api_key | heroku-api-key | provider | supported | not-applicable | none |
 | heroku_api_key_legacy | heroku-api-key-legacy | provider | supported | not-applicable | none |
 | huggingface_token | huggingface-token | provider | supported | not-applicable | none |
@@ -131,11 +136,13 @@ Coverage declarations: 75.
 | npm_access_token | npm-token | provider | supported | not-applicable | none |
 | okta_api_token | okta-api-token | provider | supported | not-applicable | none |
 | openai_api_key | openai-token | provider | supported | not-applicable | none |
+| openrouter_api_key | openrouter-api-key | provider | supported | not-applicable | none |
 | otpauth_secret | otpauth-uri | structural | supported | supported | none |
 | postman_api_key | postman-api-key | provider | supported | not-applicable | none |
 | private_key | private-key | structural | supported | not-applicable | none |
 | pulumi_access_token | pulumi-access-token | provider | supported | not-applicable | none |
 | pypi_api_token | pypi-token | provider | supported | not-applicable | none |
+| replicate_api_token | replicate-api-token | provider | supported | not-applicable | none |
 | sendgrid_api_key | sendgrid-token | provider | supported | not-applicable | none |
 | sentry_org_auth_token | sentry-org-auth-token | provider | supported | not-applicable | none |
 | sentry_user_auth_token | sentry-user-auth-token | provider | supported | not-applicable | none |
@@ -151,6 +158,7 @@ Coverage declarations: 75.
 | vault_token | vault-token | provider | supported | not-applicable | none |
 | vendor_prefixed_credential | generic-token | provider | supported | not-applicable | none |
 | vercel_token | vercel-token | provider | supported | not-applicable | none |
+| xai_api_key | xai-api-key | provider | supported | not-applicable | none |
 
 ## Coverage by scheme
 
@@ -176,15 +184,15 @@ Coverage declarations: 75.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 75 | 0 | 0 |
-| boundary | 64 | 0 | 0 |
-| host-context | 64 | 0 | 0 |
+| adversarial | 79 | 0 | 0 |
+| boundary | 68 | 0 | 0 |
+| host-context | 68 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 75 | 0 | 0 |
-| near-miss-negative | 64 | 0 | 0 |
-| overlap | 64 | 0 | 0 |
-| positive | 64 | 0 | 0 |
-| range | 75 | 0 | 0 |
+| malformed | 79 | 0 | 0 |
+| near-miss-negative | 68 | 0 | 0 |
+| overlap | 68 | 0 | 0 |
+| positive | 68 | 0 | 0 |
+| range | 79 | 0 | 0 |
 
 ## Unresolved and pending coverage
 
