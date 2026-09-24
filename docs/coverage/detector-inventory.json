@@ -535,6 +535,13 @@
       "schemes": null
     },
     {
+      "type": "neon_api_key",
+      "detector": "neon-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444",
+      "schemes": null
+    },
+    {
       "type": "langsmith_api_key",
       "detector": "langsmith-api-key",
       "policyClass": "always-redact",

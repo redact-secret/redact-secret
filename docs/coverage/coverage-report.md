@@ -15,11 +15,11 @@ These counts describe finding-type inventory rows with corpus evidence, not dete
 
 | Row state | Count |
 | --- | --- |
-| supported | 78 |
+| supported | 79 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 89.
+Coverage declarations: 90.
 
 ## Coverage by detector
 
@@ -61,6 +61,7 @@ Coverage declarations: 89.
 | mailchimp-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | mailgun-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | microsoft-entra-client-secret | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| neon-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | netlify-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | new-relic-license-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | new-relic-user-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -140,6 +141,7 @@ Coverage declarations: 89.
 | mailchimp_api_key | mailchimp-api-key | provider | supported | not-applicable | none |
 | mailgun_api_key | mailgun-api-key | provider | supported | not-applicable | none |
 | microsoft_entra_client_secret | microsoft-entra-client-secret | provider | supported | not-applicable | none |
+| neon_api_key | neon-api-key | provider | supported | not-applicable | none |
 | netlify_personal_access_token | netlify-token | provider | supported | not-applicable | none |
 | new_relic_license_key | new-relic-license-key | provider | supported | not-applicable | none |
 | new_relic_user_api_key | new-relic-user-api-key | provider | supported | not-applicable | none |
@@ -201,15 +203,15 @@ Coverage declarations: 89.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 89 | 0 | 0 |
-| boundary | 78 | 0 | 0 |
-| host-context | 78 | 0 | 0 |
+| adversarial | 90 | 0 | 0 |
+| boundary | 79 | 0 | 0 |
+| host-context | 79 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 89 | 0 | 0 |
-| near-miss-negative | 78 | 0 | 0 |
-| overlap | 78 | 0 | 0 |
-| positive | 78 | 0 | 0 |
-| range | 89 | 0 | 0 |
+| malformed | 90 | 0 | 0 |
+| near-miss-negative | 79 | 0 | 0 |
+| overlap | 79 | 0 | 0 |
+| positive | 79 | 0 | 0 |
+| range | 90 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

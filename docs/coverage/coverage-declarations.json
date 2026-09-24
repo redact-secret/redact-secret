@@ -7952,6 +7952,98 @@
     },
     {
       "behaviorClass": "provider",
+      "detector": "neon-api-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "neon-api-key-positive-dotenv",
+            "neon-api-key-positive-json",
+            "neon-api-key-positive-log",
+            "neon-api-key-positive-longer-body",
+            "neon-api-key-positive-shell-quoted",
+            "neon-api-key-positive-typescript-client",
+            "neon-api-key-positive-yaml",
+            "neon-api-key-regression-crlf-and-unicode-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "neon-api-key-overlap-bearer"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "neon-api-key-adversarial-dense-findings"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "neon-api-key-boundary-dash-in-body",
+            "neon-api-key-boundary-embedded-in-identifier",
+            "neon-api-key-boundary-one-short"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "neon-api-key-negative-branch-and-endpoint-ids",
+            "neon-api-key-negative-env-reference",
+            "neon-api-key-negative-filler",
+            "neon-api-key-negative-placeholder",
+            "neon-api-key-negative-pooled-hostname",
+            "neon-api-key-negative-project-id"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "neon-api-key-boundary-dash-in-body",
+            "neon-api-key-boundary-embedded-in-identifier",
+            "neon-api-key-boundary-one-short"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for neon_api_key (neon-api-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "neon_api_key"
+    },
+    {
+      "behaviorClass": "provider",
       "detector": "langsmith-api-key",
       "dimensions": [
         {
@@ -8725,6 +8817,7 @@
             "mailchimp-api-key-adversarial-dense-findings",
             "mailgun-api-key-adversarial-dense-findings",
             "microsoft-entra-client-secret-adversarial-long-padding",
+            "neon-api-key-adversarial-dense-findings",
             "netlify-adversarial-long-suffix",
             "new-relic-license-key-adversarial-dense-findings",
             "new-relic-user-api-key-adversarial-long-padding",
@@ -9144,6 +9237,7 @@
             "mailchimp-api-key-adversarial-dense-findings",
             "mailgun-api-key-adversarial-dense-findings",
             "microsoft-entra-client-secret-adversarial-long-padding",
+            "neon-api-key-adversarial-dense-findings",
             "netlify-adversarial-long-suffix",
             "new-relic-license-key-adversarial-dense-findings",
             "new-relic-user-api-key-adversarial-long-padding",

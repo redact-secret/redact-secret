@@ -98,6 +98,7 @@ const DEDICATED_PROVIDER_SEGMENTS: &[&str] = &[
     "linear",
     "mailchimp",
     "mailgun",
+    "neon",
     "netlify",
     "newrelic",
     "notion",

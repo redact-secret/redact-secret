@@ -3,7 +3,7 @@
   "corpus": "synchronous-corpus.json",
   "offsetUnit": "utf8-byte",
   "detectors": ["private-key","jwt","bearer-token","connection-string","otpauth-uri","generic-token"],
-  "fixtureCount": 2035,
+  "fixtureCount": 2055,
   "fixtures": [
     {"expected":[{"action":"warn","confidence":"medium","detector":"generic-token","end":48,"start":8,"type":"contextual_secret"}],"id":"host-dotenv-github"},
     {"expected":[{"action":"warn","confidence":"medium","detector":"generic-token","end":52,"start":12,"type":"contextual_secret"}],"id":"host-json-github"},
@@ -2039,6 +2039,26 @@
     {"expected":[],"id":"travisci-api-token-boundary-one-long"},
     {"expected":[],"id":"travisci-api-token-boundary-underscore-embedded"},
     {"expected":[{"action":"redact","confidence":"high","detector":"generic-token","end":30,"start":8,"type":"contextual_secret"}],"id":"travisci-api-token-overlap-generic-context"},
-    {"expected":[],"id":"travisci-api-token-adversarial-dense-findings"}
+    {"expected":[],"id":"travisci-api-token-adversarial-dense-findings"},
+    {"expected":[],"id":"neon-api-key-positive-dotenv"},
+    {"expected":[],"id":"neon-api-key-positive-json"},
+    {"expected":[{"action":"redact","confidence":"high","detector":"generic-token","end":86,"start":17,"type":"contextual_secret"}],"id":"neon-api-key-positive-yaml"},
+    {"expected":[],"id":"neon-api-key-positive-shell-quoted"},
+    {"expected":[{"action":"redact","confidence":"high","detector":"generic-token","end":109,"start":40,"type":"contextual_secret"}],"id":"neon-api-key-positive-typescript-client"},
+    {"expected":[],"id":"neon-api-key-positive-log"},
+    {"expected":[],"id":"neon-api-key-positive-longer-body"},
+    {"expected":[],"id":"neon-api-key-regression-crlf-and-unicode-prefix"},
+    {"expected":[],"id":"neon-api-key-negative-project-id"},
+    {"expected":[],"id":"neon-api-key-negative-branch-and-endpoint-ids"},
+    {"expected":[],"id":"neon-api-key-negative-pooled-hostname"},
+    {"expected":[],"id":"neon-api-key-negative-placeholder"},
+    {"expected":[],"id":"neon-api-key-negative-filler"},
+    {"expected":[],"id":"neon-api-key-negative-env-reference"},
+    {"expected":[],"id":"neon-api-key-boundary-one-short"},
+    {"expected":[],"id":"neon-api-key-boundary-embedded-in-identifier"},
+    {"expected":[],"id":"neon-api-key-boundary-dash-in-body"},
+    {"expected":[{"action":"redact","confidence":"high","detector":"connection-string","end":58,"start":39,"type":"connection_string_password"}],"id":"neon-api-key-overlap-connection-uri"},
+    {"expected":[{"action":"redact","confidence":"high","detector":"bearer-token","end":91,"start":22,"type":"bearer_token"}],"id":"neon-api-key-overlap-bearer"},
+    {"expected":[],"id":"neon-api-key-adversarial-dense-findings"}
   ]
 }

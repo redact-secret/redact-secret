@@ -34,6 +34,7 @@ mod linear;
 mod mailchimp;
 mod mailgun;
 mod microsoft_entra;
+mod neon;
 mod netlify;
 mod new_relic;
 mod notion;
@@ -131,6 +132,7 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(confluent::CONFLUENT_CLOUD_API_SECRET),
         Box::new(confluent::ConfluentLegacyApiSecretDetector),
         Box::new(netlify::NetlifyPersonalAccessTokenDetector),
+        Box::new(neon::NEON),
         Box::new(langsmith::LangsmithApiKeyDetector),
         Box::new(langfuse::LangfuseSecretKeyDetector),
         Box::new(postman::POSTMAN),
@@ -244,6 +246,7 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("confluent-cloud-api-secret", Pack::Provider),
     ("confluent-cloud-api-secret-legacy", Pack::Provider),
     ("netlify-token", Pack::Provider),
+    ("neon-api-key", Pack::Provider),
     ("langsmith-api-key", Pack::Provider),
     ("langfuse-secret-key", Pack::Provider),
     ("postman-api-key", Pack::Provider),
@@ -346,6 +349,7 @@ mod tests {
                 "confluent-cloud-api-secret",
                 "confluent-cloud-api-secret-legacy",
                 "netlify-token",
+                "neon-api-key",
                 "langsmith-api-key",
                 "langfuse-secret-key",
                 "postman-api-key",
@@ -642,6 +646,10 @@ mod tests {
         let confluent_cloud_api_secret_input =
             "cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPn2NMow";
         let netlify_token_input = "nfp_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01";
+        let neon_api_key_input = format!(
+            "napi_{}",
+            "SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444"
+        );
         let langsmith_api_key_input = "lsv2_pt_0123456789abcdef0123456789abcdef_fedcba9876";
         let langfuse_secret_key_input = "sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5d";
         let postman_api_key_input = format!(
@@ -713,6 +721,7 @@ mod tests {
                 confluent_cloud_api_secret_input,
             ),
             ("netlify-token", netlify_token_input),
+            ("neon-api-key", neon_api_key_input.as_str()),
             ("langsmith-api-key", langsmith_api_key_input),
             ("langfuse-secret-key", langfuse_secret_key_input),
             ("postman-api-key", postman_api_key_input.as_str()),

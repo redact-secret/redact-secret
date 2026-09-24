@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 2035,
+  "fixtureCount": 2055,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -47924,6 +47924,1162 @@
         }
       ],
       "note": "Issue #523: 100 space-separated tokens on one travis line are each reported once at their own range, within the declared resource bounds."
+    },
+    {
+      "id": "neon-api-key-positive-dotenv",
+      "detector": "neon-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "NEON_API_KEY=napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444\n",
+      "expected": [
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 82
+        }
+      ],
+      "note": "Issue #524: Neon API key, provider-stated napi_ prefix (T1) plus a tool-corroborated 64-byte [A-Za-z0-9] body floor (T2). A dotenv assignment; the prefix alone identifies the key, so it is high confidence and always redacted."
+    },
+    {
+      "id": "neon-api-key-positive-json",
+      "detector": "neon-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"neonApiKey\": \"napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444\"}",
+      "expected": [
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 16,
+          "end": 85
+        }
+      ],
+      "note": "Issue #524: Neon API key, provider-stated napi_ prefix (T1) plus a tool-corroborated 64-byte [A-Za-z0-9] body floor (T2). A quoted JSON value is bounded to the key's own bytes."
+    },
+    {
+      "id": "neon-api-key-positive-yaml",
+      "detector": "neon-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "neon:\n  api_key: napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444\n",
+      "expected": [
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 17,
+          "end": 86
+        }
+      ],
+      "note": "Issue #524: Neon API key, provider-stated napi_ prefix (T1) plus a tool-corroborated 64-byte [A-Za-z0-9] body floor (T2). A nested YAML value."
+    },
+    {
+      "id": "neon-api-key-positive-shell-quoted",
+      "detector": "neon-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export NEON_API_KEY=\"napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444\"\n",
+      "expected": [
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 21,
+          "end": 90
+        }
+      ],
+      "note": "Issue #524: Neon API key, provider-stated napi_ prefix (T1) plus a tool-corroborated 64-byte [A-Za-z0-9] body floor (T2). A quoted shell export."
+    },
+    {
+      "id": "neon-api-key-positive-typescript-client",
+      "detector": "neon-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "typescript"
+      ],
+      "input": "const neon = createApiClient({ apiKey: \"napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444\" });\n",
+      "expected": [
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 40,
+          "end": 109
+        }
+      ],
+      "note": "Issue #524: Neon API key, provider-stated napi_ prefix (T1) plus a tool-corroborated 64-byte [A-Za-z0-9] body floor (T2). An SDK client configuration in source."
+    },
+    {
+      "id": "neon-api-key-positive-log",
+      "detector": "neon-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-24T12:00:00Z created API key napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 for project cool-darkness-123456\n",
+      "expected": [
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 37,
+          "end": 106
+        }
+      ],
+      "note": "Issue #524: Neon API key, provider-stated napi_ prefix (T1) plus a tool-corroborated 64-byte [A-Za-z0-9] body floor (T2). Log text with no assignment: the bare prefix is enough."
+    },
+    {
+      "id": "neon-api-key-positive-longer-body",
+      "detector": "neon-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "NEON_API_KEY=napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding333344449Z\n",
+      "expected": [
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 84
+        }
+      ],
+      "note": "Issue #524: Neon API key, provider-stated napi_ prefix (T1) plus a tool-corroborated 64-byte [A-Za-z0-9] body floor (T2). 64 is a floor, not an exact width: a longer body is read to the end of its run so a lengthened key is redacted whole."
+    },
+    {
+      "id": "neon-api-key-regression-crlf-and-unicode-prefix",
+      "detector": "neon-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 café\r\nNEON_API_KEY=napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444\r\n",
+      "expected": [
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 27,
+          "end": 96
+        }
+      ],
+      "note": "Issue #524: Neon API key, provider-stated napi_ prefix (T1) plus a tool-corroborated 64-byte [A-Za-z0-9] body floor (T2). Byte offsets stay exact after a multi-byte prefix line and across CRLF."
+    },
+    {
+      "id": "neon-api-key-negative-project-id",
+      "detector": "neon-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "NEON_PROJECT_ID=cool-darkness-123456\n",
+      "expected": [],
+      "note": "Issue #524: Neon API key, provider-stated napi_ prefix (T1) plus a tool-corroborated 64-byte [A-Za-z0-9] body floor (T2). A Neon project id is a public identifier."
+    },
+    {
+      "id": "neon-api-key-negative-branch-and-endpoint-ids",
+      "detector": "neon-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "NEON_BRANCH_ID=br-wispy-meadow-a1b2c3d4\nNEON_ENDPOINT_ID=ep-cool-darkness-a1b2c3d4\n",
+      "expected": [],
+      "note": "Issue #524: Neon API key, provider-stated napi_ prefix (T1) plus a tool-corroborated 64-byte [A-Za-z0-9] body floor (T2). Branch and endpoint ids are public identifiers."
+    },
+    {
+      "id": "neon-api-key-negative-pooled-hostname",
+      "detector": "neon-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "PGHOST=ep-cool-darkness-a1b2c3d4-pooler.us-east-2.aws.neon.tech\nPGDATABASE=neondb\n",
+      "expected": [],
+      "note": "Issue #524: Neon API key, provider-stated napi_ prefix (T1) plus a tool-corroborated 64-byte [A-Za-z0-9] body floor (T2). A pooled-connection hostname and database name carry no credential."
+    },
+    {
+      "id": "neon-api-key-negative-placeholder",
+      "detector": "neon-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "NEON_API_KEY=napi_your_api_key_here\n",
+      "expected": [],
+      "note": "Issue #524: Neon API key, provider-stated napi_ prefix (T1) plus a tool-corroborated 64-byte [A-Za-z0-9] body floor (T2). A documentation placeholder after the prefix. The NEON-named key leaves the value to this detector, so generic-token stays silent too."
+    },
+    {
+      "id": "neon-api-key-negative-filler",
+      "detector": "neon-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "NEON_API_KEY=napi_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n",
+      "expected": [],
+      "note": "Issue #524: Neon API key, provider-stated napi_ prefix (T1) plus a tool-corroborated 64-byte [A-Za-z0-9] body floor (T2). A repeated filler body is a placeholder."
+    },
+    {
+      "id": "neon-api-key-negative-env-reference",
+      "detector": "neon-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "shell"
+      ],
+      "input": "NEON_API_KEY=${NEON_API_KEY}\n",
+      "expected": [],
+      "note": "Issue #524: Neon API key, provider-stated napi_ prefix (T1) plus a tool-corroborated 64-byte [A-Za-z0-9] body floor (T2). An environment-variable reference is not a key."
+    },
+    {
+      "id": "neon-api-key-boundary-one-short",
+      "detector": "neon-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "NEON_API_KEY=napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding3333444\n",
+      "expected": [],
+      "note": "Issue #524: Neon API key, provider-stated napi_ prefix (T1) plus a tool-corroborated 64-byte [A-Za-z0-9] body floor (T2). A 63-byte body is below the floor and is not reported."
+    },
+    {
+      "id": "neon-api-key-boundary-embedded-in-identifier",
+      "detector": "neon-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "x_napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444\n",
+      "expected": [],
+      "note": "Issue #524: Neon API key, provider-stated napi_ prefix (T1) plus a tool-corroborated 64-byte [A-Za-z0-9] body floor (T2). A key joined to a wider identifier by _ is not reported."
+    },
+    {
+      "id": "neon-api-key-boundary-dash-in-body",
+      "detector": "neon-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "NEON_API_KEY=napi_SyntheticRevokedNeonApiKey0000Fi-xture1111Body2222Padding33334444\n",
+      "expected": [],
+      "note": "Issue #524: Neon API key, provider-stated napi_ prefix (T1) plus a tool-corroborated 64-byte [A-Za-z0-9] body floor (T2). A dash splits the body into two runs below the floor."
+    },
+    {
+      "id": "neon-api-key-overlap-connection-uri",
+      "detector": "neon-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "DATABASE_URL=postgresql://neondb_owner:npg_SynthRevokedPw1@ep-cool-darkness-a1b2c3d4.us-east-2.aws.neon.tech/neondb?sslmode=require\n",
+      "expected": [
+        {
+          "detector": "connection-string",
+          "type": "connection_string_password",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 39,
+          "end": 58
+        }
+      ],
+      "note": "Issue #524: Neon API key, provider-stated napi_ prefix (T1) plus a tool-corroborated 64-byte [A-Za-z0-9] body floor (T2). A Neon connection URI's password stays with connection-string; neon-api-key claims no span in it, so nothing is double-reported."
+    },
+    {
+      "id": "neon-api-key-overlap-bearer",
+      "detector": "neon-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444\n",
+      "expected": [
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 91
+        }
+      ],
+      "note": "Issue #524: Neon API key, provider-stated napi_ prefix (T1) plus a tool-corroborated 64-byte [A-Za-z0-9] body floor (T2). bearer-token proposes the same span; the provider candidate wins on specificity."
+    },
+    {
+      "id": "neon-api-key-adversarial-dense-findings",
+      "detector": "neon-api-key",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 6999,
+        "maxFindings": 100,
+        "maxRuntimeMs": 250
+      },
+      "input": "napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444",
+      "expected": [
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 69
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 70,
+          "end": 139
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 140,
+          "end": 209
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 210,
+          "end": 279
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 280,
+          "end": 349
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 350,
+          "end": 419
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 420,
+          "end": 489
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 490,
+          "end": 559
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 560,
+          "end": 629
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 630,
+          "end": 699
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 700,
+          "end": 769
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 770,
+          "end": 839
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 840,
+          "end": 909
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 910,
+          "end": 979
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 980,
+          "end": 1049
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1050,
+          "end": 1119
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1120,
+          "end": 1189
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1190,
+          "end": 1259
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1260,
+          "end": 1329
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1330,
+          "end": 1399
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1400,
+          "end": 1469
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1470,
+          "end": 1539
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1540,
+          "end": 1609
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1610,
+          "end": 1679
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1680,
+          "end": 1749
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1750,
+          "end": 1819
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1820,
+          "end": 1889
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1890,
+          "end": 1959
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1960,
+          "end": 2029
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2030,
+          "end": 2099
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2100,
+          "end": 2169
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2170,
+          "end": 2239
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2240,
+          "end": 2309
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2310,
+          "end": 2379
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2380,
+          "end": 2449
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2450,
+          "end": 2519
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2520,
+          "end": 2589
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2590,
+          "end": 2659
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2660,
+          "end": 2729
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2730,
+          "end": 2799
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2800,
+          "end": 2869
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2870,
+          "end": 2939
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2940,
+          "end": 3009
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3010,
+          "end": 3079
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3080,
+          "end": 3149
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3150,
+          "end": 3219
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3220,
+          "end": 3289
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3290,
+          "end": 3359
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3360,
+          "end": 3429
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3430,
+          "end": 3499
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3500,
+          "end": 3569
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3570,
+          "end": 3639
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3640,
+          "end": 3709
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3710,
+          "end": 3779
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3780,
+          "end": 3849
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3850,
+          "end": 3919
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3920,
+          "end": 3989
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3990,
+          "end": 4059
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4060,
+          "end": 4129
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4130,
+          "end": 4199
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4200,
+          "end": 4269
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4270,
+          "end": 4339
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4340,
+          "end": 4409
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4410,
+          "end": 4479
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4480,
+          "end": 4549
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4550,
+          "end": 4619
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4620,
+          "end": 4689
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4690,
+          "end": 4759
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4760,
+          "end": 4829
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4830,
+          "end": 4899
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4900,
+          "end": 4969
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4970,
+          "end": 5039
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5040,
+          "end": 5109
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5110,
+          "end": 5179
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5180,
+          "end": 5249
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5250,
+          "end": 5319
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5320,
+          "end": 5389
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5390,
+          "end": 5459
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5460,
+          "end": 5529
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5530,
+          "end": 5599
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5600,
+          "end": 5669
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5670,
+          "end": 5739
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5740,
+          "end": 5809
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5810,
+          "end": 5879
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5880,
+          "end": 5949
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5950,
+          "end": 6019
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 6020,
+          "end": 6089
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 6090,
+          "end": 6159
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 6160,
+          "end": 6229
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 6230,
+          "end": 6299
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 6300,
+          "end": 6369
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 6370,
+          "end": 6439
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 6440,
+          "end": 6509
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 6510,
+          "end": 6579
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 6580,
+          "end": 6649
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 6650,
+          "end": 6719
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 6720,
+          "end": 6789
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 6790,
+          "end": 6859
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 6860,
+          "end": 6929
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 6930,
+          "end": 6999
+        }
+      ],
+      "note": "Issue #524: Neon API key, provider-stated napi_ prefix (T1) plus a tool-corroborated 64-byte [A-Za-z0-9] body floor (T2). 100 space-separated keys on one line are each reported once within the declared resource bounds."
     }
   ]
 }

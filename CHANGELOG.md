@@ -70,6 +70,12 @@ evidence is linked from each published version.
 
 ### Changed detection
 
+- New `neon-api-key` detector reports a Neon API key as `neon_api_key`
+  (always redacted): `napi_` followed by at least 64 letters and digits. The
+  prefix is stated by Neon; the 64-byte body floor is tool-corroborated, so a
+  shorter body is not reported. A Neon connection URI's password stays with
+  `connection-string`. PlanetScale, CockroachDB Cloud and MongoDB Atlas are
+  ranked as follow-up candidates (#524).
 - New `travisci-api-token` detector reports a Travis CI API token as
   `travisci_api_token`: a 22-byte `[A-Za-z0-9]` value that mixes letters and
   digits, on a line that contains `travis`. It is high confidence (redact)
