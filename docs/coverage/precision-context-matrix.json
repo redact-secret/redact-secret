@@ -887,6 +887,11 @@
     "openai-positive-shell-quoted",
     "openai-positive-yaml",
     "openai-positive-yaml-crlf",
+    "slack-boundary-app-level-letter-in-digit-section",
+    "slack-boundary-app-level-missing-section",
+    "slack-boundary-app-level-opaque-body",
+    "slack-boundary-app-level-underscore-prefix-separator",
+    "slack-boundary-app-level-underscore-section-separator",
     "slack-boundary-below-min",
     "slack-boundary-case-sensitivity",
     "slack-boundary-delimiter",
@@ -925,7 +930,7 @@
     "issue": "https://github.com/redact-secret/redact-secret/issues/375",
     "synchronousCorpus": "conformance/fixtures/synchronous-corpus.json"
   },
-  "rowCount": 432,
+  "rowCount": 446,
   "rows": [
     {
       "contexts": [],
@@ -7902,6 +7907,40 @@
       "detector": "slack-token",
       "enforcedBy": "crates/secret-scan-core/tests/incremental_partitions.rs::every_fixture_reproduces_the_canonical_whole_input_reference",
       "findingCount": 1,
+      "fixtureId": "slack-incremental-app-level-positive",
+      "kind": null,
+      "note": "issue #729: the four-section app-level grammar, so every UTF-8 byte and char partition -- including splits inside each `-` separator and the final section -- reproduces the whole-input reference.",
+      "result": "flagged",
+      "runtimeConsumers": [
+        "rust-core",
+        "javascript-package-consumer"
+      ],
+      "scanMode": "incremental",
+      "support": null
+    },
+    {
+      "contexts": [],
+      "contractTier": null,
+      "detector": "slack-token",
+      "enforcedBy": "crates/secret-scan-core/tests/incremental_partitions.rs::every_fixture_reproduces_the_canonical_whole_input_reference",
+      "findingCount": 0,
+      "fixtureId": "slack-incremental-app-level-underscore-separator-negative",
+      "kind": null,
+      "note": "issue #729: the `_`-separator twin of slack-incremental-app-level-positive confirms no partition of the contract-rejected shape ever emits a finding.",
+      "result": "silent",
+      "runtimeConsumers": [
+        "rust-core",
+        "javascript-package-consumer"
+      ],
+      "scanMode": "incremental",
+      "support": null
+    },
+    {
+      "contexts": [],
+      "contractTier": null,
+      "detector": "slack-token",
+      "enforcedBy": "crates/secret-scan-core/tests/incremental_partitions.rs::every_fixture_reproduces_the_canonical_whole_input_reference",
+      "findingCount": 1,
       "fixtureId": "slack-incremental-bot-grammar-positive",
       "kind": null,
       "note": "issue #375: the full three-section bot grammar was missing from the incremental corpus (only a lookalike negative existed), so every UTF-8 byte and char partition of a real bot token -- including splits inside both `-` separators and the secret section -- had never been proven to reproduce the whole-input reference.",
@@ -7965,6 +8004,101 @@
       ],
       "scanMode": "synchronous",
       "support": "supported"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractTier": "malformed",
+      "detector": "slack-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 0,
+      "fixtureId": "slack-boundary-app-level-letter-in-digit-section",
+      "kind": "boundary",
+      "note": "A letter inside the all-digit third section. The unpromoted interim guard admitted this (open ledger class differential-shared-detector-twin/slack-app-level-token).",
+      "result": "silent",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "intentionally-unsupported"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractTier": "malformed",
+      "detector": "slack-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 0,
+      "fixtureId": "slack-boundary-app-level-missing-section",
+      "kind": "boundary",
+      "note": "Only three sections; the frozen anatomy has four.",
+      "result": "silent",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "intentionally-unsupported"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractTier": "malformed",
+      "detector": "slack-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 0,
+      "fixtureId": "slack-boundary-app-level-opaque-body",
+      "kind": "boundary",
+      "note": "The beta.4 opaque-suffix shape with no section grammar is no longer claimed (issue #729).",
+      "result": "silent",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "intentionally-unsupported"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractTier": "malformed",
+      "detector": "slack-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 0,
+      "fixtureId": "slack-boundary-app-level-underscore-prefix-separator",
+      "kind": "boundary",
+      "note": "The prefix separator is `_` instead of `-`; only `xapp-` is documented.",
+      "result": "silent",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "intentionally-unsupported"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractTier": "malformed",
+      "detector": "slack-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 0,
+      "fixtureId": "slack-boundary-app-level-underscore-section-separator",
+      "kind": "boundary",
+      "note": "A section separator is `_`; sections are `-`-separated. The unpromoted interim guard admitted this (open ledger class differential-shared-detector-twin/slack-app-level-token).",
+      "result": "silent",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "intentionally-unsupported"
     },
     {
       "contexts": [
@@ -8348,6 +8482,25 @@
     },
     {
       "contexts": [
+        "plain-text"
+      ],
+      "contractTier": "negative",
+      "detector": "slack-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 0,
+      "fixtureId": "slack-negative-app-level-embedded-in-wider-identifier",
+      "kind": "negative",
+      "note": "A value embedded in a wider identifier on either side is not classified.",
+      "result": "silent",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "supported"
+    },
+    {
+      "contexts": [
         "dotenv"
       ],
       "contractTier": "negative",
@@ -8413,7 +8566,7 @@
       "findingCount": 0,
       "fixtureId": "slack-negative-interim-below-min-floor",
       "kind": "boundary",
-      "note": "The retained interim `xapp-` guard keeps beta.4's 20-byte minimum unchanged; a 19-byte body is one below that floor. Issue #375 checkbox 6: explicit boundary evidence for the still-interim-guarded prefixes alongside slack-positive-all-prefixes. Issue #512 promoted `xoxp-` to a structural contract, so this fixture was retargeted to `xapp-`, one of the two prefixes (with `xwfp-`) that remain interim-guarded.",
+      "note": "The retained interim `xwfp-` guard keeps beta.4's 20-byte minimum unchanged; a 19-byte body is one below that floor. Issue #375 checkbox 6: explicit boundary evidence for the still-interim-guarded prefixes alongside slack-positive-all-prefixes. Issue #512 promoted `xoxp-` to a structural contract, so this fixture was retargeted to `xapp-`, one of the two prefixes (with `xwfp-`) that remain interim-guarded.",
       "result": "silent",
       "runtimeConsumers": [
         "rust-core",
@@ -8563,9 +8716,47 @@
       "detector": "slack-token",
       "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
       "findingCount": 1,
+      "fixtureId": "slack-overlap-bearer-app-level",
+      "kind": "overlap",
+      "note": "Issue #729: an app-level value in a Bearer header (the Socket Mode form) is owned by slack-token over bearer-token's structural candidate for the same span.",
+      "result": "flagged",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "supported"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractTier": "contextual",
+      "detector": "slack-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 1,
       "fixtureId": "slack-overlap-context",
       "kind": "overlap",
       "note": "Reclassified by issue #371 (docs/decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md): slack-token no longer claims a xoxb- value with no digit sections, so the same input is owned by generic-token's contextual assignment path instead (the value under access_token= is still redacted, at contextual specificity). A bare malformed provider shape and the same value under an assignment key legitimately have different outcomes; nothing is globally suppressed.",
+      "result": "flagged",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "supported"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractTier": "contextual",
+      "detector": "slack-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 1,
+      "fixtureId": "slack-overlap-context-app-level",
+      "kind": "overlap",
+      "note": "Issue #729: an app-level value under a generic contextual assignment key is owned by slack-token (provider specificity) over generic-token's contextual candidate for the same span.",
       "result": "flagged",
       "runtimeConsumers": [
         "rust-core",
@@ -8600,10 +8791,86 @@
       "contractTier": "contextual",
       "detector": "slack-token",
       "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
-      "findingCount": 2,
+      "findingCount": 1,
       "fixtureId": "slack-positive-all-prefixes",
       "kind": "positive",
-      "note": "Reclassified by issue #512 (docs/decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md): `xoxp-`, `xoxe-`, `xoxe.xoxb-`, and `xoxe.xoxp-` now require their own documented digit section, which none of these opaque bodies carry, so slack-token no longer claims them; `xapp-` and `xwfp-` are not promoted and still match at their original ranges. Every opaque body here is 25 bytes, past the interim guards' 20-byte floor, exercising issue #570's open-floor fix (#551 briefly turned the floor into an exact length, which stopped matching this fixture entirely; restored). `slack-positive-structural-prefixes` is the corrected counterpart demonstrating every promoted family's full grammar.",
+      "note": "Reclassified by issue #512 (docs/decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md): `xoxp-`, `xoxe-`, `xoxe.xoxb-`, and `xoxe.xoxp-` now require their own documented digit section, which none of these opaque bodies carry, so slack-token no longer claims them; `xwfp-` is not promoted and still matches at its original range; issue #729 moved `xapp-` to its own section grammar (see slack-positive-app-level-plain), so this opaque `xapp-` body is no longer claimed. Every opaque body here is 25 bytes, past the interim guards' 20-byte floor, exercising issue #570's open-floor fix (#551 briefly turned the floor into an exact length, which stopped matching this fixture entirely; restored). `slack-positive-structural-prefixes` is the corrected counterpart demonstrating every promoted family's full grammar.",
+      "result": "flagged",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "supported"
+    },
+    {
+      "contexts": [
+        "dotenv"
+      ],
+      "contractTier": "canonical",
+      "detector": "slack-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 1,
+      "fixtureId": "slack-positive-app-level-dotenv",
+      "kind": "positive",
+      "note": "A Socket Mode environment assignment resolves to the provider finding on the value alone.",
+      "result": "flagged",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "supported"
+    },
+    {
+      "contexts": [
+        "json"
+      ],
+      "contractTier": "canonical",
+      "detector": "slack-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 1,
+      "fixtureId": "slack-positive-app-level-json",
+      "kind": "positive",
+      "note": "A quoted JSON string value is detected the same as a bare one; the enclosing quotes are not part of the match.",
+      "result": "flagged",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "supported"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractTier": "canonical",
+      "detector": "slack-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 1,
+      "fixtureId": "slack-positive-app-level-open-widths",
+      "kind": "positive",
+      "note": "Every app-level section is a non-empty run and no width is a negative rule (issue #729: tool sources disagree on widths).",
+      "result": "flagged",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "supported"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractTier": "canonical",
+      "detector": "slack-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 1,
+      "fixtureId": "slack-positive-app-level-plain",
+      "kind": "positive",
+      "note": "The frozen app-level anatomy `xapp-<digits>-<alnum>-<digits>-<alnum>` classified bare, as its own finding type (issue #729). Section widths are open.",
       "result": "flagged",
       "runtimeConsumers": [
         "rust-core",

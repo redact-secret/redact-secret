@@ -45,6 +45,7 @@ mod sendgrid;
 mod sentry;
 mod shopify;
 mod slack;
+mod stripe;
 mod telegram;
 mod terraform;
 mod text;
@@ -76,7 +77,7 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(anthropic::AnthropicTokenDetector),
         Box::new(shopify::ShopifyTokenDetector),
         Box::new(vault::VaultTokenDetector),
-        Box::new(additional_providers::STRIPE),
+        Box::new(stripe::StripeTokenDetector),
         Box::new(slack::SlackTokenDetector),
         Box::new(additional_providers::PYPI),
         Box::new(additional_providers::HUGGING_FACE),

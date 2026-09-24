@@ -37,20 +37,25 @@
 //! neither source constrains it (`xoxe.xoxp-`'s own extra `-1234-` section
 //! is a single uncorroborated example and is not decomposed further).
 //!
-//! `xapp-` and `xwfp-` keep beta.4's rule unchanged as a plain interim
-//! guard: `xapp-`'s only candidate structure is a single uncorroborated
-//! tool source (gitleaks, case-insensitive) and `xwfp-` has no tool source
-//! at all, so neither clears this project's two-source (or
+//! `xapp-` app-level tokens have their own `slack_app_level_token` finding
+//! type and section grammar since issue #729: `xapp-<digits>-<alnum>-<digits>-<alnum>`,
+//! `-`-separated, every section a non-empty run. The order is the frozen
+//! anatomy in `docs/audits/evidence/726/README.md`; widths and alphabets stay
+//! open because tool sources disagree (Nosey Parker's two-section rule
+//! contradicts it), so no width is a negative rule. This retires beta.4's
+//! opaque `xapp-[A-Za-z0-9_-]{20,}` guard, which admitted a `_` separator and
+//! a letter inside a digit section (the open
+//! `differential-shared-detector-twin/slack-app-level-token` ledger rows).
+//!
+//! `xwfp-` keeps beta.4's rule unchanged as a plain interim guard: it has no
+//! tool source at all, so it does not clear this project's two-source (or
 //! provider-plus-tool) bar for a structural contract
 //! (`docs/contracts/precision/precision-contracts.json`,
-//! `slack-token.variants[app-level|workflow]`). Decision
-//! `decision-freeze-precision-contracts-seven-provider-families` (Slack
-//! user/rotation row, #512) froze
-//! both prefixes' shape as unchanged from beta.4. The `regex` crate cannot
-//! be used here — this crate is dependency-free — so [`scan_sectioned`] and
-//! the interim guard compose every shape from the shared `pattern`
-//! primitives, the same way [`super::openai`] does for its own segmented
-//! grammar.
+//! `slack-token.variants[workflow]`). The `regex` crate cannot
+//! be used here — this crate is dependency-free — so [`scan_sectioned`],
+//! [`scan_app_level`] and the interim guard compose every shape from the
+//! shared `pattern` primitives, the same way [`super::openai`] does for its
+//! own segmented grammar.
 //!
 //! Issue #551 diagnosed a real defect: every prefix above whose tail kept
 //! beta.4's open floor (`RunLength::AtLeast`, no documented maximum)
@@ -82,6 +87,9 @@
 use crate::detectors::pattern::{self, Alphabet, PrefixShape};
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
+
+/// `(start, end, finding type, signals)`.
+type Match = (usize, usize, &'static str, &'static [&'static str]);
 
 const BOT_PREFIX: &str = "xoxb-";
 const USER_PREFIX: &str = "xoxp-";
@@ -123,17 +131,24 @@ const ROTATION_TAIL_ALPHABET: Alphabet = pattern::is_alnum_dash;
 const ROTATION_SIGNALS: [&str; 2] = ["slack-documented-prefix", "rotation-version-section"];
 const ROTATION_PREFIXES: [&str; 3] = [REFRESH_PREFIX, ROTATING_BOT_PREFIX, ROTATING_USER_PREFIX];
 
-/// `xapp-` and `xwfp-`, unchanged from beta.4 (see the module doc for why
-/// neither is promoted). Issue #570: an open floor (see the module doc's
+/// `xwfp-`, unchanged from beta.4 (see the module doc for why it is not
+/// promoted; `xapp-` moved to its own grammar in issue #729). Issue #570: an open floor (see the module doc's
 /// boundary-defect paragraph), restoring #512's frozen shape after #551
 /// mistakenly narrowed it to an exact length.
 const INTERIM_MIN_LEN: usize = 20;
 const INTERIM_ALPHABET: Alphabet = pattern::is_alnum_dash;
 const INTERIM_SIGNALS: [&str; 2] = ["slack-documented-prefix", "opaque-suffix"];
-const INTERIM_SHAPES: [PrefixShape<'static>; 2] = [
-    PrefixShape::open_floor("xapp-", INTERIM_MIN_LEN, INTERIM_ALPHABET, &INTERIM_SIGNALS),
-    PrefixShape::open_floor("xwfp-", INTERIM_MIN_LEN, INTERIM_ALPHABET, &INTERIM_SIGNALS),
-];
+const INTERIM_SHAPES: [PrefixShape<'static>; 1] = [PrefixShape::open_floor(
+    "xwfp-",
+    INTERIM_MIN_LEN,
+    INTERIM_ALPHABET,
+    &INTERIM_SIGNALS,
+)];
+
+const APP_LEVEL_PREFIX: &str = "xapp-";
+const APP_LEVEL_TYPE: &str = "slack_app_level_token";
+const TOKEN_TYPE: &str = "slack_token";
+const APP_LEVEL_SIGNALS: [&str; 2] = ["slack-documented-prefix", "app-level-section-grammar"];
 
 /// A value is never a slice of a wider `[A-Za-z0-9_-]` identifier.
 const BOUNDARY: Alphabet = pattern::is_alnum_dash;
@@ -157,12 +172,12 @@ impl Detector for SlackTokenDetector {
         _context: &DetectorContext,
     ) -> Result<Vec<Candidate>, DetectorFailure> {
         let mut candidates = Vec::new();
-        for (start, end, signals) in scan(input) {
+        for (start, end, type_name, signals) in scan(input) {
             let Some(range) = ByteRange::new(start, end) else {
                 continue;
             };
             candidates.push(
-                Candidate::new("slack_token", Confidence::High, range)
+                Candidate::new(type_name, Confidence::High, range)
                     .with_specificity(Specificity::Provider)
                     .with_signals(signals.iter().copied()),
             );
@@ -177,15 +192,15 @@ impl Detector for SlackTokenDetector {
 /// rotating-bot pass (`ROTATING_LEAD`), so scanning each family
 /// independently and merging by position reproduces the same left-to-right,
 /// longest-prefix result a single combined scan would.
-fn scan(input: &str) -> Vec<(usize, usize, &'static [&'static str])> {
-    let mut matches: Vec<(usize, usize, &'static [&'static str])> = scan_bot(input)
+fn scan(input: &str) -> Vec<Match> {
+    let mut matches: Vec<Match> = scan_bot(input)
         .into_iter()
-        .map(|(start, end)| (start, end, BOT_SIGNALS.as_slice()))
+        .map(|(start, end)| (start, end, TOKEN_TYPE, BOT_SIGNALS.as_slice()))
         .collect();
     matches.extend(
         scan_user(input)
             .into_iter()
-            .map(|(start, end)| (start, end, USER_SIGNALS.as_slice())),
+            .map(|(start, end)| (start, end, TOKEN_TYPE, USER_SIGNALS.as_slice())),
     );
     let rotation_shape = SectionedShape {
         section_count: 1,
@@ -198,16 +213,84 @@ fn scan(input: &str) -> Vec<(usize, usize, &'static [&'static str])> {
         matches.extend(
             scan_sectioned(input, prefix, None, rotation_shape)
                 .into_iter()
-                .map(|(start, end)| (start, end, ROTATION_SIGNALS.as_slice())),
+                .map(|(start, end)| (start, end, TOKEN_TYPE, ROTATION_SIGNALS.as_slice())),
         );
     }
-    matches.extend(pattern::scan_prefixed_shapes(
-        input,
-        &INTERIM_SHAPES,
-        BOUNDARY,
-    ));
-    matches.sort_unstable_by_key(|&(start, _, _)| start);
+    matches.extend(
+        scan_app_level(input)
+            .into_iter()
+            .map(|(start, end)| (start, end, APP_LEVEL_TYPE, APP_LEVEL_SIGNALS.as_slice())),
+    );
+    matches.extend(
+        pattern::scan_prefixed_shapes(input, &INTERIM_SHAPES, BOUNDARY)
+            .into_iter()
+            .map(|(start, end, signals)| (start, end, TOKEN_TYPE, signals)),
+    );
+    matches.sort_unstable_by_key(|&(start, ..)| start);
     matches
+}
+
+/// Every boundary-delimited `xapp-` app-level value, left to right: the
+/// frozen section anatomy `xapp-<digits>-<alnum>-<digits>-<alnum>` (issue
+/// #729, `docs/audits/evidence/726/README.md`). Every section is a
+/// non-empty run; widths are open on purpose (tool sources disagree, so no
+/// width is a negative rule), but the digit sections stay all-digit and the
+/// separators stay `-`, so a `_` separator or a letter inside a digit
+/// section is rejected. As in [`scan_sectioned`], each run is maximal, so
+/// a missing separator is rejected rather than re-read into a wider run.
+fn scan_app_level(input: &str) -> Vec<(usize, usize)> {
+    let bytes = input.as_bytes();
+    let digit_ends = pattern::run_ends(bytes, DIGIT_ALPHABET);
+    let alnum_ends = pattern::run_ends(bytes, pattern::is_alnum);
+    let mut matches = Vec::new();
+    let mut start = 0;
+    while start < bytes.len() {
+        if !bytes[start..].starts_with(APP_LEVEL_PREFIX.as_bytes()) {
+            start += 1;
+            continue;
+        }
+        let Some(end) = app_level_end(
+            bytes,
+            &digit_ends,
+            &alnum_ends,
+            start + APP_LEVEL_PREFIX.len(),
+        ) else {
+            start += 1;
+            continue;
+        };
+        if pattern::boundary_ok(bytes, start, end, BOUNDARY) {
+            matches.push((start, end));
+        }
+        start = end;
+    }
+    matches
+}
+
+/// The end of the four `-`-separated app-level sections beginning at
+/// `cursor`, in digit, alphanumeric, digit, alphanumeric order.
+fn app_level_end(
+    bytes: &[u8],
+    digit_ends: &[usize],
+    alnum_ends: &[usize],
+    mut cursor: usize,
+) -> Option<usize> {
+    for (index, ends) in [digit_ends, alnum_ends, digit_ends, alnum_ends]
+        .into_iter()
+        .enumerate()
+    {
+        let section_end = *ends.get(cursor)?;
+        if section_end == cursor {
+            return None;
+        }
+        cursor = section_end;
+        if index < 3 {
+            if bytes.get(cursor) != Some(&b'-') {
+                return None;
+            }
+            cursor += 1;
+        }
+    }
+    Some(cursor)
 }
 
 /// Every boundary-delimited `xoxb-` bot value, left to right: two 10-13
@@ -662,22 +745,20 @@ mod tests {
 
     #[test]
     fn interim_prefixes_keep_the_beta4_minimum_length_rule_unchanged() {
-        for prefix in ["xapp-", "xwfp-"] {
-            let body = "SYNTHETICREVOKEDINTERIMVALUE0123456789";
-            let input = format!("{prefix}{}", &body[..INTERIM_MIN_LEN]);
-            assert_eq!(ranges(&input), vec![(0, input.len())], "{prefix}");
-            let one_short = format!("{prefix}{}", &body[..INTERIM_MIN_LEN - 1]);
-            assert!(ranges(&one_short).is_empty(), "{prefix} one-short");
-        }
+        let body = "SYNTHETICREVOKEDINTERIMVALUE0123456789";
+        let input = format!("xwfp-{}", &body[..INTERIM_MIN_LEN]);
+        assert_eq!(ranges(&input), vec![(0, input.len())]);
+        let one_short = format!("xwfp-{}", &body[..INTERIM_MIN_LEN - 1]);
+        assert!(ranges(&one_short).is_empty(), "one-short");
     }
 
     /// Issue #321 dimensions, carried over from `additional_providers.rs`
     /// for Slack's still-interim-guarded prefixes (issue #371 moved Slack
     /// to its own module; issue #512 promoted every other prefix to a
-    /// structural contract, leaving only `xapp-`/`xwfp-` here).
+    /// structural contract, leaving only `xwfp-` here; issue #729 moved `xapp-` to its own grammar).
     #[test]
     fn interim_prefixes_accept_an_all_valid_alphabet_documentation_placeholder() {
-        let value = format!("xapp-{}", "x".repeat(20));
+        let value = format!("xwfp-{}", "x".repeat(20));
         let candidates = detect(&value);
         assert_eq!(candidates.len(), 1);
         assert_eq!(candidates[0].confidence(), Confidence::High);
@@ -685,7 +766,7 @@ mod tests {
 
     #[test]
     fn interim_prefixes_reject_the_prefix_embedded_in_a_wider_identifier() {
-        let value = "legacyxapp-SYNTHETIC_REVOKED_KEY_VALUE";
+        let value = "legacyxwfp-SYNTHETIC_REVOKED_KEY_VALUE";
         assert!(ranges(value).is_empty());
     }
 
@@ -695,10 +776,8 @@ mod tests {
     /// maximum instead of fixing the boundary defect a different way.
     #[test]
     fn interim_prefixes_match_a_body_longer_than_the_twenty_byte_floor() {
-        for prefix in ["xapp-", "xwfp-"] {
-            let value = format!("{prefix}{OPAQUE_TWENTY_BYTE_BODY}0");
-            assert_eq!(ranges(&value), vec![(0, value.len())], "{value}");
-        }
+        let value = format!("xwfp-{OPAQUE_TWENTY_BYTE_BODY}0");
+        assert_eq!(ranges(&value), vec![(0, value.len())], "{value}");
     }
 
     /// Issue #551's shared boundary/delimiter regression set, mirrored from
@@ -709,42 +788,124 @@ mod tests {
     /// rather than absorbed, leaving it for the boundary check to reject.
     #[test]
     fn interim_prefixes_reject_a_value_embedded_in_a_wider_identifier() {
-        for prefix in ["xapp-", "xwfp-"] {
-            let value = format!("{prefix}{OPAQUE_TWENTY_BYTE_BODY}");
-            assert!(ranges(&format!("legacy{value}")).is_empty(), "{value}");
-            assert!(ranges(&format!("{value}_backup")).is_empty(), "{value}");
-            assert!(ranges(&format!("{value}-1")).is_empty(), "{value}");
-        }
+        let value = format!("xwfp-{OPAQUE_TWENTY_BYTE_BODY}");
+        assert!(ranges(&format!("legacy{value}")).is_empty(), "{value}");
+        assert!(ranges(&format!("{value}_backup")).is_empty(), "{value}");
+        assert!(ranges(&format!("{value}-1")).is_empty(), "{value}");
     }
 
     #[test]
     fn interim_prefixes_reject_a_percent_encoded_delimiter_lookalike() {
-        let value = "xapp%2DSYNTHETIC_REVOKED_CONFORMANCE_KEY";
+        let value = "xwfp%2DSYNTHETIC_REVOKED_CONFORMANCE_KEY";
         assert!(ranges(value).is_empty());
     }
 
     #[test]
     fn interim_prefixes_report_a_repeated_identical_value_once_per_occurrence() {
-        let value = format!("xapp-{OPAQUE_TWENTY_BYTE_BODY}");
+        let value = format!("xwfp-{OPAQUE_TWENTY_BYTE_BODY}");
         let input = format!("{value} {value}");
         assert_eq!(detect(&input).len(), 2);
     }
 
     #[test]
-    fn xapp_and_xwfp_are_not_promoted_to_a_digit_section_grammar() {
-        // Issue #512: `xapp-`'s only candidate structure is a single
-        // uncorroborated tool source and `xwfp-` has no tool source at all
+    fn xwfp_is_not_promoted_to_a_digit_section_grammar() {
+        // Issue #512: `xwfp-` has no tool source at all
         // (docs/contracts/precision/precision-contracts.json,
-        // `slack-token.variants[app-level|workflow]`), so a value shaped
-        // like the bot/user digit-section grammar is still accepted by the
-        // plain opaque-suffix guard rather than being required to have one.
-        // The dash-bearing body is exactly the floor's length, so it never
+        // `slack-token.variants[workflow]`), so a value shaped like the
+        // bot/user digit-section grammar is still accepted by the plain
+        // opaque-suffix guard rather than being required to have one. The
+        // dash-bearing body is exactly the floor's length, so it never
         // reaches `open_floor_run_end`'s past-the-floor delimiter check at
         // all -- the dash here is part of the value, not a suffix.
-        for prefix in ["xapp-", "xwfp-"] {
-            let input = format!("{prefix}1234567890123-321098");
-            assert_eq!(ranges(&input), vec![(0, input.len())], "{prefix}");
+        let input = "xwfp-1234567890123-321098";
+        assert_eq!(ranges(input), vec![(0, input.len())]);
+        assert_eq!(detect(input)[0].type_name(), TOKEN_TYPE);
+    }
+
+    /// A synthetic, never-issued app-level token at the frozen anatomy:
+    /// digits, alphanumeric, digits, alphanumeric, `-`-separated.
+    const APP_POSITIVE: &str = "xapp-1-A0SYNTHETIC-1234567890123-SYNTHETICREVOKEDAPPSECRET00";
+
+    #[test]
+    fn detects_the_app_level_form_with_its_own_type_and_metadata() {
+        let candidates = detect(APP_POSITIVE);
+        assert_eq!(candidates.len(), 1);
+        assert_eq!(candidates[0].type_name(), APP_LEVEL_TYPE);
+        assert_eq!(candidates[0].confidence(), Confidence::High);
+        assert_eq!(candidates[0].effective_specificity(), Specificity::Provider);
+        assert_eq!(
+            candidates[0].range(),
+            ByteRange::new(0, APP_POSITIVE.len()).unwrap()
+        );
+    }
+
+    #[test]
+    fn app_level_section_widths_are_open() {
+        for input in [
+            "xapp-1-A-2-b",
+            "xapp-12345678901234567890-ABCDEFGHIJKLMNOP-9-zzzzzzzzzzzzzzzzzzzzzzzzzz",
+        ] {
+            assert_eq!(ranges(input), vec![(0, input.len())], "{input}");
         }
+    }
+
+    #[test]
+    fn app_level_rejects_a_wrong_separator_or_a_letter_in_a_digit_section() {
+        // The open `differential-shared-detector-twin/slack-app-level-token`
+        // ledger rows: the interim guard admitted both.
+        for input in [
+            "xapp_1-A0SYNTHETIC-1234567890123-SYNTHETICREVOKEDAPPSECRET00",
+            "xapp-1_A0SYNTHETIC-1234567890123-SYNTHETICREVOKEDAPPSECRET00",
+            "xapp-1-A0SYNTHETIC_1234567890123-SYNTHETICREVOKEDAPPSECRET00",
+            "xapp-1-A0SYNTHETIC-1234567890123_SYNTHETICREVOKEDAPPSECRET00",
+            "xapp-1a-A0SYNTHETIC-1234567890123-SYNTHETICREVOKEDAPPSECRET00",
+            "xapp-1-A0SYNTHETIC-12345678901a3-SYNTHETICREVOKEDAPPSECRET00",
+        ] {
+            assert!(ranges(input).is_empty(), "{input}");
+        }
+    }
+
+    #[test]
+    fn app_level_rejects_a_missing_or_empty_section() {
+        for input in [
+            "xapp-1-A0SYNTHETIC-SYNTHETICREVOKEDAPPSECRET00",
+            "xapp--A0SYNTHETIC-1234567890123-SYNTHETICREVOKEDAPPSECRET00",
+            "xapp-1-A0SYNTHETIC--SYNTHETICREVOKEDAPPSECRET00",
+            "xapp-1-A0SYNTHETIC-1234567890123-",
+            "xapp-1-A0SYNTHETIC-1234567890123",
+            "xapp-SYNTHETICREVOKEDINTERIMVALUE0123456789",
+            "xapp-",
+        ] {
+            assert!(ranges(input).is_empty(), "{input}");
+        }
+    }
+
+    #[test]
+    fn app_level_rejects_a_value_embedded_in_a_wider_identifier() {
+        assert!(ranges(&format!("legacy{APP_POSITIVE}")).is_empty());
+        assert!(ranges(&format!("{APP_POSITIVE}_backup")).is_empty());
+        assert!(ranges(&format!("{APP_POSITIVE}-1")).is_empty());
+    }
+
+    #[test]
+    fn app_level_reports_each_occurrence_and_keeps_surrounding_punctuation_out() {
+        let input = format!("\"{APP_POSITIVE}\", {APP_POSITIVE}");
+        let second = APP_POSITIVE.len() + 4;
+        assert_eq!(
+            ranges(&input),
+            vec![
+                (1, 1 + APP_POSITIVE.len()),
+                (second, second + APP_POSITIVE.len())
+            ]
+        );
+    }
+
+    #[test]
+    fn app_level_and_bot_prefixes_stay_distinct_in_one_input() {
+        let input = format!("{BOT_POSITIVE} {APP_POSITIVE}");
+        let candidates = detect(&input);
+        let types: Vec<&str> = candidates.iter().map(Candidate::type_name).collect();
+        assert_eq!(types, vec![TOKEN_TYPE, APP_LEVEL_TYPE]);
     }
 
     #[test]

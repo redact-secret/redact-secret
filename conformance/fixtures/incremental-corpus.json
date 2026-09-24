@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 89,
+  "fixtureCount": 93,
   "fixtures": [
     {
       "id": "synthetic-regression-malformed-authority",
@@ -489,6 +489,29 @@
         }
       ],
       "note": "issue #316: a public identifier prefix and a documented secret prefix on adjacent lines stay correctly discriminated at every chunk split, including splits that fall inside either prefix's own bytes. Shopify's and Supabase's known-format provider detectors share the identical scan_prefixed_runs mechanism this exercises, so this one representative exemplar generalizes to their equivalent public/secret prefix pairs."
+    },
+    {
+      "id": "stripe-incremental-webhook-secret-padding-positive",
+      "input": "whsec_SYNTHETICREVOKEDWEBHOOKSECRET012==",
+      "text": "<SECRET_1>",
+      "expected": [
+        {
+          "detector": "stripe-token",
+          "type": "stripe_webhook_signing_secret",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 40
+        }
+      ],
+      "note": "issue #729: a `whsec_` value whose trailing `=` padding is part of the span, so partitions that split the body from its padding still reproduce the whole-input reference."
+    },
+    {
+      "id": "stripe-incremental-webhook-secret-below-floor-negative",
+      "input": "whsec_SYNTHETICREVOKEDWEBHOOKSECRET01",
+      "text": "whsec_SYNTHETICREVOKEDWEBHOOKSECRET01",
+      "expected": [],
+      "note": "issue #729: one byte below the 32-byte body floor; no partition may emit a finding."
     },
     {
       "id": "shopify-public-secret-prefix-discriminating-boundary",
@@ -1232,6 +1255,29 @@
       "text": "xoxb-1234567890123-3210987654321-SSSSSSSSSSSSSSSSS",
       "expected": [],
       "note": "issue #375: the 17-byte (one-below-floor) secret twin of slack-incremental-bot-grammar-positive confirms no partition of the contract-rejected shape ever accidentally emits a finding."
+    },
+    {
+      "id": "slack-incremental-app-level-positive",
+      "input": "xapp-1-A0SYNTHETIC-1234567890123-SYNTHETICREVOKEDAPPSECRET00",
+      "text": "<SECRET_1>",
+      "expected": [
+        {
+          "detector": "slack-token",
+          "type": "slack_app_level_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 60
+        }
+      ],
+      "note": "issue #729: the four-section app-level grammar, so every UTF-8 byte and char partition -- including splits inside each `-` separator and the final section -- reproduces the whole-input reference."
+    },
+    {
+      "id": "slack-incremental-app-level-underscore-separator-negative",
+      "input": "xapp-1-A0SYNTHETIC_1234567890123-SYNTHETICREVOKEDAPPSECRET00",
+      "text": "xapp-1-A0SYNTHETIC_1234567890123-SYNTHETICREVOKEDAPPSECRET00",
+      "expected": [],
+      "note": "issue #729: the `_`-separator twin of slack-incremental-app-level-positive confirms no partition of the contract-rejected shape ever emits a finding."
     },
     {
       "id": "invisible-incremental-provider-grammar-zwnj",

@@ -1501,6 +1501,114 @@
           "dimension": "positive",
           "evidenceFixtureIds": [
             "stripe-positive-all-prefixes",
+            "stripe-positive-webhook-secret-base64-symbols",
+            "stripe-positive-webhook-secret-dotenv",
+            "stripe-positive-webhook-secret-padding",
+            "stripe-positive-webhook-secret-plain",
+            "stripe-positive-webhook-secret-rolling-pair"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "stripe-overlap-bearer-webhook-secret",
+            "stripe-overlap-context-webhook-secret"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "single-detector-family",
+            "sharedWith": "stripe_credential"
+          },
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "stripe-boundary-below-min",
+            "stripe-boundary-case-sensitivity",
+            "stripe-boundary-delimiter",
+            "stripe-boundary-invalid-alphabet",
+            "stripe-boundary-short",
+            "stripe-boundary-webhook-secret-below-32-floor"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "stripe-negative-interpolated-secret-prefix",
+            "stripe-negative-lookalike",
+            "stripe-negative-masked-secret-prefix",
+            "stripe-negative-no-rk-org-prefix",
+            "stripe-negative-ordinary-reference",
+            "stripe-negative-placeholder",
+            "stripe-negative-public-prefix-punctuation",
+            "stripe-negative-public-prefix-sandbox-mode",
+            "stripe-negative-public-prefix-unicode-crlf",
+            "stripe-negative-sk-org-missing-separator",
+            "stripe-negative-webhook-public-identifiers",
+            "stripe-negative-webhook-secret-embedded-in-wider-identifier",
+            "stripe-negative-whsec-missing-separator",
+            "stripe-negative-whsec-wrong-separator",
+            "stripe-negative-wrong-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "stripe-boundary-below-min",
+            "stripe-boundary-case-sensitivity",
+            "stripe-boundary-delimiter",
+            "stripe-boundary-invalid-alphabet",
+            "stripe-boundary-short",
+            "stripe-boundary-webhook-secret-below-32-floor"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for stripe_webhook_signing_secret (stripe-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "stripe_webhook_signing_secret"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "stripe-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "stripe-positive-all-prefixes",
             "stripe-positive-crlf-unicode-prefix",
             "stripe-positive-doc-style-placeholder",
             "stripe-positive-dotenv",
@@ -1535,7 +1643,8 @@
             "stripe-boundary-case-sensitivity",
             "stripe-boundary-delimiter",
             "stripe-boundary-invalid-alphabet",
-            "stripe-boundary-short"
+            "stripe-boundary-short",
+            "stripe-boundary-webhook-secret-below-32-floor"
           ],
           "state": "supported"
         },
@@ -1552,6 +1661,8 @@
             "stripe-negative-public-prefix-sandbox-mode",
             "stripe-negative-public-prefix-unicode-crlf",
             "stripe-negative-sk-org-missing-separator",
+            "stripe-negative-webhook-public-identifiers",
+            "stripe-negative-webhook-secret-embedded-in-wider-identifier",
             "stripe-negative-whsec-missing-separator",
             "stripe-negative-whsec-wrong-separator",
             "stripe-negative-wrong-prefix"
@@ -1565,7 +1676,8 @@
             "stripe-boundary-case-sensitivity",
             "stripe-boundary-delimiter",
             "stripe-boundary-invalid-alphabet",
-            "stripe-boundary-short"
+            "stripe-boundary-short",
+            "stripe-boundary-webhook-secret-below-32-floor"
           ],
           "state": "supported"
         },
@@ -1598,6 +1710,166 @@
       ],
       "note": "Coverage declaration for stripe_credential (stripe-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
       "type": "stripe_credential"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "slack-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "slack-positive-app-level-dotenv",
+            "slack-positive-app-level-json",
+            "slack-positive-app-level-open-widths",
+            "slack-positive-app-level-plain"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "slack-overlap-bearer-app-level",
+            "slack-overlap-context-app-level"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "slack-adversarial-long-suffix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "slack-boundary-app-level-letter-in-digit-section",
+            "slack-boundary-app-level-missing-section",
+            "slack-boundary-app-level-opaque-body",
+            "slack-boundary-app-level-underscore-prefix-separator",
+            "slack-boundary-app-level-underscore-section-separator",
+            "slack-boundary-below-min",
+            "slack-boundary-case-sensitivity",
+            "slack-boundary-delimiter",
+            "slack-boundary-invalid-alphabet",
+            "slack-boundary-missing-first-separator",
+            "slack-boundary-missing-second-separator",
+            "slack-boundary-replaced-separator",
+            "slack-boundary-rotation-two-digit-version",
+            "slack-boundary-rotation-zero-digit-version",
+            "slack-boundary-secret-17-bytes",
+            "slack-boundary-secret-alphabet-violation",
+            "slack-boundary-segment1-14-digits",
+            "slack-boundary-segment1-9-digits",
+            "slack-boundary-segment2-14-digits",
+            "slack-boundary-segment2-9-digits",
+            "slack-boundary-short",
+            "slack-boundary-user-missing-final-separator",
+            "slack-boundary-user-no-section-grammar",
+            "slack-boundary-user-secret-27-bytes",
+            "slack-boundary-user-segment-14-digits",
+            "slack-negative-interim-below-min-floor",
+            "slack-positive-doc-style-placeholder",
+            "slack-positive-log",
+            "slack-positive-markdown-delimiter",
+            "slack-positive-min-length",
+            "slack-positive-punctuation-adjacent",
+            "slack-positive-qualified",
+            "slack-positive-repeated-value",
+            "slack-positive-shell-quoted",
+            "slack-positive-yaml",
+            "slack-positive-yaml-crlf"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "slack-negative-app-level-embedded-in-wider-identifier",
+            "slack-negative-bot-grammar-dotenv",
+            "slack-negative-bot-grammar-toml",
+            "slack-negative-embedded-in-wider-identifier",
+            "slack-negative-lookalike",
+            "slack-negative-ordinary-reference",
+            "slack-negative-percent-encoded-lookalike",
+            "slack-negative-placeholder",
+            "slack-negative-placeholder-rotation",
+            "slack-negative-placeholder-user",
+            "slack-negative-team-channel-id"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "slack-boundary-app-level-letter-in-digit-section",
+            "slack-boundary-app-level-missing-section",
+            "slack-boundary-app-level-opaque-body",
+            "slack-boundary-app-level-underscore-prefix-separator",
+            "slack-boundary-app-level-underscore-section-separator",
+            "slack-boundary-below-min",
+            "slack-boundary-case-sensitivity",
+            "slack-boundary-delimiter",
+            "slack-boundary-invalid-alphabet",
+            "slack-boundary-missing-first-separator",
+            "slack-boundary-missing-second-separator",
+            "slack-boundary-replaced-separator",
+            "slack-boundary-rotation-two-digit-version",
+            "slack-boundary-rotation-zero-digit-version",
+            "slack-boundary-secret-17-bytes",
+            "slack-boundary-secret-alphabet-violation",
+            "slack-boundary-segment1-14-digits",
+            "slack-boundary-segment1-9-digits",
+            "slack-boundary-segment2-14-digits",
+            "slack-boundary-segment2-9-digits",
+            "slack-boundary-short",
+            "slack-boundary-user-missing-final-separator",
+            "slack-boundary-user-no-section-grammar",
+            "slack-boundary-user-secret-27-bytes",
+            "slack-boundary-user-segment-14-digits",
+            "slack-negative-interim-below-min-floor",
+            "slack-positive-doc-style-placeholder",
+            "slack-positive-log",
+            "slack-positive-markdown-delimiter",
+            "slack-positive-min-length",
+            "slack-positive-punctuation-adjacent",
+            "slack-positive-qualified",
+            "slack-positive-repeated-value",
+            "slack-positive-shell-quoted",
+            "slack-positive-yaml",
+            "slack-positive-yaml-crlf"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for slack_app_level_token (slack-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "slack_app_level_token"
     },
     {
       "behaviorClass": "provider",
@@ -1640,6 +1912,11 @@
         {
           "dimension": "boundary",
           "evidenceFixtureIds": [
+            "slack-boundary-app-level-letter-in-digit-section",
+            "slack-boundary-app-level-missing-section",
+            "slack-boundary-app-level-opaque-body",
+            "slack-boundary-app-level-underscore-prefix-separator",
+            "slack-boundary-app-level-underscore-section-separator",
             "slack-boundary-below-min",
             "slack-boundary-case-sensitivity",
             "slack-boundary-delimiter",
@@ -1677,6 +1954,7 @@
         {
           "dimension": "near-miss-negative",
           "evidenceFixtureIds": [
+            "slack-negative-app-level-embedded-in-wider-identifier",
             "slack-negative-bot-grammar-dotenv",
             "slack-negative-bot-grammar-toml",
             "slack-negative-embedded-in-wider-identifier",
@@ -1693,6 +1971,11 @@
         {
           "dimension": "malformed",
           "evidenceFixtureIds": [
+            "slack-boundary-app-level-letter-in-digit-section",
+            "slack-boundary-app-level-missing-section",
+            "slack-boundary-app-level-opaque-body",
+            "slack-boundary-app-level-underscore-prefix-separator",
+            "slack-boundary-app-level-underscore-section-separator",
             "slack-boundary-below-min",
             "slack-boundary-case-sensitivity",
             "slack-boundary-delimiter",
@@ -7044,9 +7327,13 @@
             "redis-password-only-connection",
             "sendgrid-lookalike-token-discriminating-boundary",
             "shopify-public-secret-prefix-discriminating-boundary",
+            "slack-incremental-app-level-positive",
+            "slack-incremental-app-level-underscore-separator-negative",
             "slack-incremental-bot-grammar-positive",
             "slack-incremental-secret-floor-boundary",
             "slack-lookalike-token-discriminating-boundary",
+            "stripe-incremental-webhook-secret-below-floor-negative",
+            "stripe-incremental-webhook-secret-padding-positive",
             "stripe-public-secret-prefix-discriminating-boundary",
             "structural-overlap",
             "supabase-public-secret-prefix-discriminating-boundary",
@@ -7386,9 +7673,13 @@
             "redis-password-only-connection",
             "sendgrid-lookalike-token-discriminating-boundary",
             "shopify-public-secret-prefix-discriminating-boundary",
+            "slack-incremental-app-level-positive",
+            "slack-incremental-app-level-underscore-separator-negative",
             "slack-incremental-bot-grammar-positive",
             "slack-incremental-secret-floor-boundary",
             "slack-lookalike-token-discriminating-boundary",
+            "stripe-incremental-webhook-secret-below-floor-negative",
+            "stripe-incremental-webhook-secret-padding-positive",
             "stripe-public-secret-prefix-discriminating-boundary",
             "structural-overlap",
             "supabase-public-secret-prefix-discriminating-boundary",
@@ -7850,9 +8141,13 @@
             "redis-password-only-connection",
             "sendgrid-lookalike-token-discriminating-boundary",
             "shopify-public-secret-prefix-discriminating-boundary",
+            "slack-incremental-app-level-positive",
+            "slack-incremental-app-level-underscore-separator-negative",
             "slack-incremental-bot-grammar-positive",
             "slack-incremental-secret-floor-boundary",
             "slack-lookalike-token-discriminating-boundary",
+            "stripe-incremental-webhook-secret-below-floor-negative",
+            "stripe-incremental-webhook-secret-padding-positive",
             "stripe-public-secret-prefix-discriminating-boundary",
             "structural-overlap",
             "supabase-public-secret-prefix-discriminating-boundary",

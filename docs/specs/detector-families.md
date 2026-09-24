@@ -71,8 +71,10 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `sentry_org_auth_token` | `sentry-org-auth-token` | `always-redact` | [Freeze the Sentry user and organization auth token grammar as two unambiguous prefixed shapes](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `sentry_user_auth_token` | `sentry-user-auth-token` | `always-redact` | [Freeze the Sentry user and organization auth token grammar as two unambiguous prefixed shapes](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `shopify_access_token` | `shopify-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
+| `slack_app_level_token` | `slack-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `slack_token` | `slack-token` | `always-redact` | [Freeze the Slack bot token grammar as a three-section dash-separated shape](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `stripe_credential` | `stripe-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
+| `stripe_webhook_signing_secret` | `stripe-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `supabase_personal_access_token` | `supabase-management-token` | `always-redact` | [Separate the Supabase management-token credential class from the secret-key class, and keep each class's evidence independent](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `supabase_secret_key` | `supabase-token` | `always-redact` | [Separate the Supabase management-token credential class from the secret-key class, and keep each class's evidence independent](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `telegram_bot_token` | `telegram-bot-token` | `always-redact` | [Freeze the Telegram Bot API token grammar as a minimum-length digit-colon-secret shape](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
@@ -126,6 +128,24 @@ safe-observation plan and FP/FN boundary are in [#726 evidence](../audits/eviden
 | 2 | `pinecone:api-key` | `pcsk_` + 5–6 alphanumeric + `_` + 63 alphanumeric; legacy UUID is context-only | empirical |
 | 2 | `slack:user-token` | `xoxp-` + three numeric sections + final secret section; widths/alphabet open | documented |
 | 2 | `gitlab:runner-authentication-token` | `glrt-` legacy/partitioned 20-byte body or checksum-valid routable dotted form | empirical |
+
+### Wave-1 developer credentials (#729)
+
+Issue [#729](https://github.com/redact-secret/redact-secret/issues/729)
+implements the four developer-credential families above without changing a
+frozen contract. `github:fine-grained-personal-access-token` and
+`notion:integration-token` already had their own finding types and exact
+grammars, so their detectors are unchanged. `slack:app-level-token` now emits
+`slack_app_level_token` for the four-section anatomy, retiring the beta.4
+opaque `xapp-` guard: a `_` separator, a letter in a digit section, a missing
+section and a bare opaque body are no longer claimed. `stripe:webhook-signing-secret`
+now emits `stripe_webhook_signing_secret`, split from `stripe_credential`, for
+`whsec_` plus at least 32 Base64 bytes and up to two `=` padding bytes.
+Detection stays bare rather than context-gated: Svix and Standard Webhooks
+also issue `whsec_` secrets, so a bare hit is still a secret, and attributing
+a value to Stripe is a benchmark scoring concept, not a detector gate. Both
+families keep their detector ids (`slack-token`, `stripe-token`) and stay
+empirical/documented per the freeze until the benchmark evidence gates pass.
 
 ## Rules
 

@@ -104,10 +104,24 @@
       "schemes": null
     },
     {
+      "type": "stripe_webhook_signing_secret",
+      "detector": "stripe-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "whsec_SYNTHETICREVOKEDWEBHOOKSECRET012",
+      "schemes": null
+    },
+    {
       "type": "stripe_credential",
       "detector": "stripe-token",
       "policyClass": "always-redact",
       "reconciliationTrigger": "sk_live_SYNTHETICREVOKEDPROVIDERVALUE",
+      "schemes": null
+    },
+    {
+      "type": "slack_app_level_token",
+      "detector": "slack-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "xapp-1-A0SYNTHETIC-1234567890123-SYNTHETICREVOKEDAPPSECRET00",
       "schemes": null
     },
     {
