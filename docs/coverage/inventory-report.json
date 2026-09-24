@@ -2764,7 +2764,7 @@
     {
       "detector": "heroku-api-key",
       "evidence": {
-        "fixtureCount": 22,
+        "fixtureCount": 27,
         "hostContextsExercised": [
           "dotenv",
           "github-actions",
@@ -2773,6 +2773,7 @@
           "log",
           "plain-text",
           "shell",
+          "terminal",
           "yaml"
         ],
         "kindsWithSupportedEvidence": [
@@ -2787,6 +2788,9 @@
         ]
       },
       "evidenceFixtureIds": [
+        "heroku-api-key-hrku-uuid-authorizations-create",
+        "heroku-api-key-hrku-uuid-bare",
+        "heroku-api-key-hrku-uuid-env",
         "heroku-api-key-positive-bare",
         "heroku-api-key-positive-crlf-unicode-prefix",
         "heroku-api-key-positive-dotenv",
@@ -2807,11 +2811,13 @@
     {
       "detector": "heroku-api-key-legacy",
       "evidence": {
-        "fixtureCount": 12,
+        "fixtureCount": 16,
         "hostContextsExercised": [
           "dotenv",
+          "http",
           "json",
           "plain-text",
+          "terminal",
           "yaml"
         ],
         "kindsWithSupportedEvidence": [
@@ -2826,8 +2832,10 @@
         ]
       },
       "evidenceFixtureIds": [
+        "heroku-api-key-legacy-positive-auth-token-output",
         "heroku-api-key-legacy-positive-bare-with-keyword",
         "heroku-api-key-legacy-positive-dotenv-keyword",
+        "heroku-api-key-legacy-positive-netrc-multi-line",
         "heroku-api-key-legacy-positive-netrc-style",
         "heroku-api-key-legacy-positive-yaml-keyword"
       ],
