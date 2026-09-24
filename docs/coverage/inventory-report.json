@@ -1865,7 +1865,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 155,
+        "fixtureCount": 161,
         "hostContextsExercised": [
           "chat",
           "dotenv",
@@ -1885,6 +1885,7 @@
         ],
         "kindsWithSupportedEvidence": [
           "adversarial",
+          "boundary",
           "negative",
           "overlap",
           "positive"
@@ -1955,7 +1956,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 155,
+        "fixtureCount": 161,
         "hostContextsExercised": [
           "chat",
           "dotenv",
@@ -1975,6 +1976,7 @@
         ],
         "kindsWithSupportedEvidence": [
           "adversarial",
+          "boundary",
           "negative",
           "overlap",
           "positive"
@@ -2016,7 +2018,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 155,
+        "fixtureCount": 161,
         "hostContextsExercised": [
           "chat",
           "dotenv",
@@ -2036,6 +2038,7 @@
         ],
         "kindsWithSupportedEvidence": [
           "adversarial",
+          "boundary",
           "negative",
           "overlap",
           "positive"
@@ -2952,7 +2955,7 @@
     {
       "detector": "pinecone-api-key",
       "evidence": {
-        "fixtureCount": 25,
+        "fixtureCount": 34,
         "hostContextsExercised": [
           "dotenv",
           "github-actions",
@@ -2960,7 +2963,10 @@
           "log",
           "markdown",
           "plain-text",
-          "shell"
+          "python",
+          "shell",
+          "typescript",
+          "yaml"
         ],
         "kindsWithSupportedEvidence": [
           "adversarial",
@@ -2979,6 +2985,10 @@
         "pinecone-api-key-positive-dotenv",
         "pinecone-api-key-positive-github-actions",
         "pinecone-api-key-positive-json-config",
+        "pinecone-api-key-positive-legacy-uuid-dotenv",
+        "pinecone-api-key-positive-legacy-uuid-legacy-init",
+        "pinecone-api-key-positive-legacy-uuid-shell-key",
+        "pinecone-api-key-positive-legacy-uuid-yaml",
         "pinecone-api-key-positive-log",
         "pinecone-api-key-positive-punctuation-adjacent",
         "pinecone-api-key-positive-repeated-value",

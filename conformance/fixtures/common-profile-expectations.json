@@ -3,7 +3,7 @@
   "corpus": "synchronous-corpus.json",
   "offsetUnit": "utf8-byte",
   "detectors": ["private-key","jwt","bearer-token","connection-string","otpauth-uri","generic-token"],
-  "fixtureCount": 2001,
+  "fixtureCount": 2016,
   "fixtures": [
     {"expected":[{"action":"warn","confidence":"medium","detector":"generic-token","end":48,"start":8,"type":"contextual_secret"}],"id":"host-dotenv-github"},
     {"expected":[{"action":"warn","confidence":"medium","detector":"generic-token","end":52,"start":12,"type":"contextual_secret"}],"id":"host-json-github"},
@@ -2005,6 +2005,21 @@
     {"expected":[],"id":"gitlab-runner-token-negative-prefix-in-prose"},
     {"expected":[],"id":"gitlab-runner-token-negative-github-actions-secret-reference"},
     {"expected":[{"action":"redact","confidence":"high","detector":"generic-token","end":38,"start":13,"type":"contextual_secret"}],"id":"gitlab-runner-token-overlap-context"},
-    {"expected":[],"id":"gitlab-runner-token-adversarial-long-suffix"}
+    {"expected":[],"id":"gitlab-runner-token-adversarial-long-suffix"},
+    {"expected":[],"id":"generic-token-negative-colon-namespaced-acl-scope"},
+    {"expected":[{"action":"redact","confidence":"high","detector":"generic-token","end":39,"start":9,"type":"contextual_secret"}],"id":"generic-token-positive-colon-scope-shaped-value-after-a-space"},
+    {"expected":[],"id":"generic-token-negative-partially-masked-console-display"},
+    {"expected":[{"action":"warn","confidence":"medium","detector":"generic-token","end":19,"start":10,"type":"contextual_secret"}],"id":"generic-token-positive-mask-with-one-visible-side"},
+    {"expected":[],"id":"generic-token-negative-keychain-secret-store-reference"},
+    {"expected":[{"action":"redact","confidence":"high","detector":"generic-token","end":47,"start":15,"type":"contextual_secret"}],"id":"generic-token-positive-keychain-reference-embedded-in-a-value"},
+    {"expected":[],"id":"pinecone-api-key-positive-legacy-uuid-dotenv"},
+    {"expected":[],"id":"pinecone-api-key-positive-legacy-uuid-legacy-init"},
+    {"expected":[],"id":"pinecone-api-key-positive-legacy-uuid-yaml"},
+    {"expected":[],"id":"pinecone-api-key-positive-legacy-uuid-shell-key"},
+    {"expected":[{"action":"redact","confidence":"high","detector":"generic-token","end":67,"start":31,"type":"contextual_secret"}],"id":"pinecone-api-key-overlap-legacy-uuid-api-key-property"},
+    {"expected":[],"id":"pinecone-api-key-negative-legacy-uuid-project-id-name"},
+    {"expected":[],"id":"pinecone-api-key-negative-legacy-uuid-init-project-id"},
+    {"expected":[],"id":"pinecone-api-key-negative-legacy-uuid-zero-uuid-placeholder"},
+    {"expected":[],"id":"pinecone-api-key-negative-legacy-uuid-bare-uuid-prose"}
   ]
 }

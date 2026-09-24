@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 2001,
+  "fixtureCount": 2016,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -46522,6 +46522,273 @@
       "input": "glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1glrt-SyntheticRevokedRun1",
       "expected": [],
       "note": "A long run built from the value repeated is a wider identifier, not a token: the scan never carves a valid-looking substring out of it and stays linear and bounded."
+    },
+    {
+      "id": "generic-token-negative-colon-namespaced-acl-scope",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\n  \"acls\": [\"api-key:endpoint:chat\", \"api-key:model:*\"]\n}\n",
+      "expected": [],
+      "note": "Benchmark gap product-727 (issue #727): a colon-namespaced ACL scope glued to a credential-like name (api-key:endpoint:chat) is one scope identifier, not an api-key assignment."
+    },
+    {
+      "id": "generic-token-positive-colon-scope-shaped-value-after-a-space",
+      "detector": "generic-token",
+      "kind": "boundary",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "api_key: endpoint:chatSYNTHETIC0REVOKED\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 9,
+          "end": 39
+        }
+      ],
+      "note": "Paired positive for product-727: a space after the colon is a real mapping, so the scope exclusion does not apply."
+    },
+    {
+      "id": "generic-token-negative-partially-masked-console-display",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "terminal"
+      ],
+      "input": "Key name: laptop-dev    Secret: gsk_************************************************Tn4q    Created: 2026-09-01\n",
+      "expected": [],
+      "note": "Benchmark gap product-264 (issue #264): a console display that keeps a visible prefix and the last characters around a run of mask characters is a masked value, not a secret."
+    },
+    {
+      "id": "generic-token-positive-mask-with-one-visible-side",
+      "detector": "generic-token",
+      "kind": "boundary",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Password: ********x",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "medium",
+          "specificity": "contextual",
+          "start": 10,
+          "end": 19
+        }
+      ],
+      "note": "Paired near-miss for product-264: a mask with only one visible side is neither uniform filler nor a partially masked display, so it stays detected."
+    },
+    {
+      "id": "generic-token-negative-keychain-secret-store-reference",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\n  \"apiKey\": \"{keychain:fireworks-api-key}\"\n}\n",
+      "expected": [],
+      "note": "Benchmark gap product-730 (issue #730): a {keychain:<item>} secret-store reference names where the key lives, not the key."
+    },
+    {
+      "id": "generic-token-positive-keychain-reference-embedded-in-a-value",
+      "detector": "generic-token",
+      "kind": "boundary",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\n  \"apiKey\": \"{keychain:item}SYNTHETIC0REVOKED\"\n}\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 15,
+          "end": 47
+        }
+      ],
+      "note": "Paired positive for product-730: a keychain reference followed by more material is not a whole-value reference and stays detected."
+    },
+    {
+      "id": "pinecone-api-key-positive-legacy-uuid-dotenv",
+      "detector": "pinecone-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "PINECONE_API_KEY=5e7a1c0d-0b9e-4f3a-8d2c-6a1b0c9d8e7f\nPINECONE_ENVIRONMENT=us-west1-gcp\n",
+      "expected": [
+        {
+          "detector": "pinecone-api-key",
+          "type": "pinecone_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 17,
+          "end": 53
+        }
+      ],
+      "note": "Issue #702 (benchmark gap product-702): a legacy bare-UUID Pinecone key is claimed as the value of a PINECONE_API_KEY dotenv assignment."
+    },
+    {
+      "id": "pinecone-api-key-positive-legacy-uuid-legacy-init",
+      "detector": "pinecone-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "python"
+      ],
+      "input": "import pinecone\n\npinecone.init(api_key=\"5e7a1c0d-0b9e-4f3a-8d2c-6a1b0c9d8e7f\", environment=\"us-west1-gcp\")\n",
+      "expected": [
+        {
+          "detector": "pinecone-api-key",
+          "type": "pinecone_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 40,
+          "end": 76
+        }
+      ],
+      "note": "Issue #702 (benchmark gap product-702): a legacy bare-UUID Pinecone key is claimed as the value of the api_key= keyword of pinecone.init on a line naming pinecone."
+    },
+    {
+      "id": "pinecone-api-key-positive-legacy-uuid-yaml",
+      "detector": "pinecone-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "vectorstore:\n  pinecone_api_key: 5e7a1c0d-0b9e-4f3a-8d2c-6a1b0c9d8e7f\n",
+      "expected": [
+        {
+          "detector": "pinecone-api-key",
+          "type": "pinecone_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 33,
+          "end": 69
+        }
+      ],
+      "note": "Issue #702 (benchmark gap product-702): a legacy bare-UUID Pinecone key is claimed as the value of a pinecone_api_key YAML key."
+    },
+    {
+      "id": "pinecone-api-key-positive-legacy-uuid-shell-key",
+      "detector": "pinecone-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export PINECONE_KEY=5e7a1c0d-0b9e-4f3a-8d2c-6a1b0c9d8e7f\n",
+      "expected": [
+        {
+          "detector": "pinecone-api-key",
+          "type": "pinecone_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 20,
+          "end": 56
+        }
+      ],
+      "note": "Issue #702 (benchmark gap product-702): a legacy bare-UUID Pinecone key is claimed as the value of a PINECONE_KEY shell export."
+    },
+    {
+      "id": "pinecone-api-key-overlap-legacy-uuid-api-key-property",
+      "detector": "pinecone-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "typescript"
+      ],
+      "input": "await pinecone.init({ apiKey: \"5e7a1c0d-0b9e-4f3a-8d2c-6a1b0c9d8e7f\", environment: \"us-west4-gcp\" });\n",
+      "expected": [
+        {
+          "detector": "pinecone-api-key",
+          "type": "pinecone_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 31,
+          "end": 67
+        }
+      ],
+      "note": "Issue #702: the Pinecone name-gated legacy path wins over generic-token's apiKey assignment on the same span, at the same redact action."
+    },
+    {
+      "id": "pinecone-api-key-negative-legacy-uuid-project-id-name",
+      "detector": "pinecone-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "PINECONE_PROJECT_ID=5e7a1c0d-0b9e-4f3a-8d2c-6a1b0c9d8e7f\n",
+      "expected": [],
+      "note": "Issue #702 twin: a UUID under a Pinecone project-id name is a public identifier; the legacy UUID path is gated on an API-key name."
+    },
+    {
+      "id": "pinecone-api-key-negative-legacy-uuid-init-project-id",
+      "detector": "pinecone-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "python"
+      ],
+      "input": "pinecone.init(project_id=\"5e7a1c0d-0b9e-4f3a-8d2c-6a1b0c9d8e7f\", environment=\"us-west1-gcp\")\n",
+      "expected": [],
+      "note": "Issue #702 twin: a UUID under a project_id keyword is a public identifier; the legacy UUID path is gated on an API-key name."
+    },
+    {
+      "id": "pinecone-api-key-negative-legacy-uuid-zero-uuid-placeholder",
+      "detector": "pinecone-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "PINECONE_API_KEY=00000000-0000-0000-0000-000000000000\n",
+      "expected": [],
+      "note": "Issue #702 twin: an all-zero UUID is a placeholder; the legacy UUID path is gated on an API-key name."
+    },
+    {
+      "id": "pinecone-api-key-negative-legacy-uuid-bare-uuid-prose",
+      "detector": "pinecone-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Pinecone key id 5e7a1c0d-0b9e-4f3a-8d2c-6a1b0c9d8e7f was rotated.\n",
+      "expected": [],
+      "note": "Issue #702 twin: a bare UUID with no Pinecone API-key name stays unclaimed; the legacy UUID path is gated on an API-key name."
     }
   ]
 }

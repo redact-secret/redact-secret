@@ -4778,7 +4778,10 @@
         {
           "dimension": "boundary",
           "evidenceFixtureIds": [
-            "contextual-boundary-short"
+            "contextual-boundary-short",
+            "generic-token-positive-colon-scope-shaped-value-after-a-space",
+            "generic-token-positive-keychain-reference-embedded-in-a-value",
+            "generic-token-positive-mask-with-one-visible-side"
           ],
           "state": "supported"
         },
@@ -4940,6 +4943,9 @@
             "contextual-positive-template-embedded-still-detected",
             "contextual-positive-template-prefix-only-still-detected",
             "contextual-positive-vals-scheme-prefix-still-detected",
+            "generic-token-positive-colon-scope-shaped-value-after-a-space",
+            "generic-token-positive-keychain-reference-embedded-in-a-value",
+            "generic-token-positive-mask-with-one-visible-side",
             "generic-token-positive-unquoted-markdown-inline-code",
             "generic-token-regression-placeholder-lead-word-random-suffix",
             "generic-token-regression-random-api-key-value-still-detected",
@@ -7356,6 +7362,10 @@
             "pinecone-api-key-positive-dotenv",
             "pinecone-api-key-positive-github-actions",
             "pinecone-api-key-positive-json-config",
+            "pinecone-api-key-positive-legacy-uuid-dotenv",
+            "pinecone-api-key-positive-legacy-uuid-legacy-init",
+            "pinecone-api-key-positive-legacy-uuid-shell-key",
+            "pinecone-api-key-positive-legacy-uuid-yaml",
             "pinecone-api-key-positive-log",
             "pinecone-api-key-positive-punctuation-adjacent",
             "pinecone-api-key-positive-repeated-value",
@@ -7367,7 +7377,8 @@
         {
           "dimension": "overlap",
           "evidenceFixtureIds": [
-            "pinecone-api-key-overlap-context"
+            "pinecone-api-key-overlap-context",
+            "pinecone-api-key-overlap-legacy-uuid-api-key-property"
           ],
           "state": "supported"
         },
@@ -7397,6 +7408,10 @@
             "pinecone-api-key-negative-embedded-in-wider-identifier",
             "pinecone-api-key-negative-github-actions-secret-reference",
             "pinecone-api-key-negative-index-host",
+            "pinecone-api-key-negative-legacy-uuid-bare-uuid-prose",
+            "pinecone-api-key-negative-legacy-uuid-init-project-id",
+            "pinecone-api-key-negative-legacy-uuid-project-id-name",
+            "pinecone-api-key-negative-legacy-uuid-zero-uuid-placeholder",
             "pinecone-api-key-negative-masked",
             "pinecone-api-key-negative-prefix-in-prose",
             "pinecone-api-key-negative-project-uuid"
