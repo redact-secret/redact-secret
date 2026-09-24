@@ -9,10 +9,11 @@ use super::pattern::{self, PrefixShape};
 use super::text::{
     OPENCODE_REFERENCE_KINDS, ascii_run_len, char_at, ends_with_ci,
     is_command_substitution_reference, is_env_var_identifier, is_fully_delimited,
-    is_horizontal_js_whitespace, is_js_whitespace, is_line_start, is_opencode_reference,
-    is_repeated_character_filler, is_ruby_interpolation_reference, is_template_reference,
-    is_windows_env_reference, matches_placeholder_vocabulary, prev_char, rskip_while_chars,
-    skip_while_chars, starts_with_bare_dollar_reference, starts_with_ci,
+    is_horizontal_js_whitespace, is_instructional_token_placeholder, is_js_whitespace,
+    is_line_start, is_opencode_reference, is_repeated_character_filler,
+    is_ruby_interpolation_reference, is_template_reference, is_windows_env_reference,
+    matches_placeholder_vocabulary, prev_char, rskip_while_chars, skip_while_chars,
+    starts_with_bare_dollar_reference, starts_with_ci,
 };
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
@@ -780,6 +781,7 @@ fn is_source_code_expression(value: &str, form: ValueForm) -> bool {
 fn is_non_secret_reference(value: &str, form: ValueForm) -> bool {
     let lower = value.to_ascii_lowercase();
     is_generic_placeholder_word(&lower)
+        || is_instructional_token_placeholder(value)
         || is_boolean_null_or_digits(&lower)
         || starts_with_env_reference(value)
         || starts_with_path_like(value)
@@ -1880,6 +1882,56 @@ mod tests {
         ] {
             let input = format!("credentials: {value}");
             assert_eq!(only_range(&detect(&input)), (13, input.len()), "{input}");
+        }
+    }
+
+    #[test]
+    fn instructional_placeholders_in_key_assignments_are_excluded() {
+        // Issue #756: the same predicate `bearer-token` applies (#745).
+        for input in [
+            "mailchimp.setConfig({ apiKey: \"YOUR_API_KEY\", server: \"us19\" });",
+            "apiKey: \"YOUR_API_KEY\"",
+            "const apiKey = \"YOUR_API_KEY\";",
+            "api_key = \"YOUR_API_KEY\"",
+            "API_KEY=YOUR_API_KEY",
+            "apiKey: \"your_api_key\"",
+            "apiKey: \"YOUR_KEY\"",
+            "client_secret: 'YOUR_CLIENT_SECRET'",
+            "access_token=YOUR_ACCESS_TOKEN",
+            "API_KEY=your-api-key-here",
+            "SECRET_KEY=INSERT_SECRET_KEY_HERE",
+            "api_key: ENTER_YOUR_API_KEY",
+            "Authorization: Token YOUR_API_TOKEN",
+        ] {
+            assert!(detect(input).is_empty(), "{input}");
+        }
+    }
+
+    #[test]
+    fn real_values_in_placeholder_style_assignments_stay_detected() {
+        for (prefix, value, suffix) in [
+            ("apiKey: \"", "YOUR_API_KEY_9f2cQ7xLm4Rt", "\""),
+            ("apiKey: \"", "YOUR_API_KEY9f2cQ7xLm4Rt", "\""),
+            ("API_KEY=", "YOUR_MAILCHIMP_API_KEY", ""),
+            ("API_KEY=", "KEY_YOUR_API_KEY", ""),
+            (
+                "mailchimp.setConfig({ apiKey: \"",
+                "q7Lm2Xv9Rt4Kp8Wz3Nc6Bh1Jd5Fs0GyTa",
+                "\", server: \"us19\" });",
+            ),
+            (
+                "const apiKey = \"",
+                "Zx81QpVn4Lk7Tr2Wm9Hs6Dc3Jf0Gb5Ye8Ua1Io4",
+                "\";",
+            ),
+        ] {
+            let input = format!("{prefix}{value}{suffix}");
+            let start = prefix.len();
+            assert_eq!(
+                only_range(&detect(&input)),
+                (start, start + value.len()),
+                "{input}"
+            );
         }
     }
 
