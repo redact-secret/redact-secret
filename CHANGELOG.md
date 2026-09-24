@@ -5,6 +5,97 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+### Internal, tooling, and qualification
+
+- `Release` now records the npm facade's identity after the package is built,
+  and publishes that exact packed tarball. It used to pack a
+  `packages/javascript` tree with no `dist/` before `release:check` built it,
+  so beta.7's `Verify npm publication` compared a correct publish against a
+  3-file tarball and failed. That also skipped registry install verification
+  and tagging, which `Reconcile Release` then completed. `release-gate:check`
+  now fails if the identity step comes before the build or the publish step
+  does not publish the recorded tarball (#732).
+- The vendored `benchmarks/pin-manifest.json` and
+  `benchmarks/support-matrix-schema.json` are re-synced from
+  `redact-secret-benchmarks` `main`, which now pins the published 0.1.0-beta.7
+  (`2b98027`). The schema only gains an optional `product` object describing
+  a candidate-build measurement.
+
+## 0.1.0-beta.7 — 2026-09-24
+
+[Publication and qualification evidence](docs/releases/0.1.0-beta.7/README.md).
+
+Beta.7 moves Epic A's 15 existing families to `stable` and adds Okta,
+Mailgun, Mailchimp, Heroku, Netlify, Postman, Databricks and Confluent
+detection. It splits the legacy Datadog application key into its own finding
+type and fixes Microsoft Entra and Docker token grammars. For adoption, it
+adds a qualified five-minute clean install, a tested MCP/AI-context golden
+path, a browser-prevention and server-enforcement reference, and a
+generated support guide. Against the published beta.6 package, on the same
+corpus and scanner pins, `stable` goes from 43 to 51 with no regression
+(#584). The generated section below diffs against the matrix shipped with
+beta.6 instead, which was measured under an earlier corpus and ledger (#724).
+
+The Release run published every artifact correctly but failed its facade
+checksum check on a defect in the check itself (#732). `Reconcile Release`
+then verified every artifact without republishing anything, ran the registry
+install checks, and created the tag. See the evidence record.
+
+### Support status
+
+42 providers, 93 credential families: stable 51, provisional 21, pending 2, unsupported 19. See the [support matrix](docs/support-matrix.md).
+
+Stable: 51 (+48 from 3).
+
+Moved since the previous release:
+- `anthropic:secret-api-key`: provisional -> stable (improvement)
+- `aws:iam-user-access-key`: provisional -> stable (improvement)
+- `azure-devops:personal-access-token`: provisional -> stable (improvement)
+- `cloudflare:api-token`: provisional -> stable (improvement)
+- `datadog:api-key`: provisional -> stable (improvement)
+- `datadog:application-key`: provisional -> stable (improvement)
+- `digitalocean:oauth-token`: provisional -> stable (improvement)
+- `digitalocean:personal-access-token`: provisional -> stable (improvement)
+- `digitalocean:refresh-token`: provisional -> stable (improvement)
+- `docker:oauth-access-token`: provisional -> stable (improvement)
+- `docker:personal-access-token`: provisional -> stable (improvement)
+- `generic:jwt`: provisional -> stable (improvement)
+- `generic:private-key`: provisional -> stable (improvement)
+- `github:app-server-to-server-token`: provisional -> stable (improvement)
+- `github:app-user-to-server-token`: provisional -> stable (improvement)
+- `github:classic-personal-access-token`: provisional -> stable (improvement)
+- `github:oauth-access-token`: provisional -> stable (improvement)
+- `github:oauth-refresh-token`: provisional -> stable (improvement)
+- `google:generic-api-key`: provisional -> stable (improvement)
+- `grafana:cloud-access-policy-token`: provisional -> stable (improvement)
+- `grafana:service-account-token`: provisional -> stable (improvement)
+- `hashicorp-terraform:organization-token`: provisional -> stable (improvement)
+- `hashicorp-terraform:team-token`: provisional -> stable (improvement)
+- `hashicorp-terraform:user-token`: provisional -> stable (improvement)
+- `hashicorp-vault:batch-token`: provisional -> stable (improvement)
+- `hashicorp-vault:recovery-token`: provisional -> stable (improvement)
+- `hashicorp-vault:service-token`: provisional -> stable (improvement)
+- `huggingface:api-token`: provisional -> stable (improvement)
+- `linear:personal-api-key`: provisional -> stable (improvement)
+- `microsoft-entra:application-client-secret`: provisional -> stable (improvement)
+- `new-relic:license-key`: provisional -> stable (improvement)
+- `new-relic:user-api-key`: provisional -> stable (improvement)
+- `notion:legacy-integration-token`: provisional -> stable (improvement)
+- `pulumi:organization-access-token`: provisional -> stable (improvement)
+- `pulumi:personal-access-token`: provisional -> stable (improvement)
+- `pulumi:team-access-token`: provisional -> stable (improvement)
+- `pypi:api-token`: provisional -> stable (improvement)
+- `shopify:custom-app-access-token`: provisional -> stable (improvement)
+- `shopify:public-app-access-token`: provisional -> stable (improvement)
+- `slack:bot-token`: provisional -> stable (improvement)
+- `stripe:restricted-key-live`: provisional -> stable (improvement)
+- `stripe:restricted-key-test`: provisional -> stable (improvement)
+- `stripe:secret-key-live`: provisional -> stable (improvement)
+- `stripe:secret-key-test`: provisional -> stable (improvement)
+- `supabase:personal-access-token`: provisional -> stable (improvement)
+
+New families tracked: `confluent:cloud-api-secret`, `confluent:cloud-api-secret-legacy`, `databricks:personal-access-token`, `datadog:application-key-legacy`, `heroku:legacy-api-key`, `heroku:oauth-access-token`, `mailchimp:marketing-api-key`, `mailgun:legacy-signing-key-triplet`, `mailgun:private-api-key`, `mailgun:public-validation-key`, `netlify:other-prefixed-tokens`, `netlify:personal-access-token`, `okta:api-token`, `postman:api-key`.
+
 ### Breaking and compatibility changes
 
 - `datadog_application_key` no longer covers the legacy, bare 40-byte
@@ -184,22 +275,6 @@ evidence is linked from each published version.
   from an empty directory against the public registries. Getting started no
   longer tells readers to select beta.6 above beta.7 install commands.
 
-
-### Internal, tooling, and qualification
-
-- `Release` now records the npm facade's identity after the package is built,
-  and publishes that exact packed tarball. It used to pack a
-  `packages/javascript` tree with no `dist/` before `release:check` built it,
-  so beta.7's `Verify npm publication` compared a correct publish against a
-  3-file tarball and failed. That also skipped registry install verification
-  and tagging, which `Reconcile Release` then completed. `release-gate:check`
-  now fails if the identity step comes before the build or the publish step
-  does not publish the recorded tarball (#732).
-- The vendored `benchmarks/pin-manifest.json` and
-  `benchmarks/support-matrix-schema.json` are re-synced from
-  `redact-secret-benchmarks` `main`, which now pins the published 0.1.0-beta.7
-  (`2b98027`). The schema only gains an optional `product` object describing
-  a candidate-build measurement.
 
 ## 0.1.0-beta.6 — 2026-09-22
 

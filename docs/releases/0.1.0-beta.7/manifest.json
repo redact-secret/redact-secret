@@ -1,0 +1,2090 @@
+{
+  "record_schema_version": 1,
+  "record_kind": "reconstructed",
+  "source_revision": "2b98027bbf38d63f07b75129fe2864ef32ed4732",
+  "conformance_identity": "81d79450b32a1ae724c6318977c89283811e6596",
+  "version": "0.1.0-beta.7",
+  "artifact_inventory_sha256": "e407e56ad2506d7b499c411257be07f1c0c1c50d7544b3413ba04a684cb1dfd4",
+  "artifact_set": [
+    "crate:redact-secret",
+    "crate:redact-secret-cli",
+    "npm:@redact-secret/core",
+    "npm:@redact-secret/node-darwin-arm64",
+    "npm:@redact-secret/node-darwin-x64",
+    "npm:@redact-secret/node-linux-arm64-gnu",
+    "npm:@redact-secret/node-linux-arm64-musl",
+    "npm:@redact-secret/node-linux-x64-gnu",
+    "npm:@redact-secret/node-linux-x64-musl",
+    "npm:@redact-secret/node-win32-arm64-msvc",
+    "npm:@redact-secret/node-win32-x64-msvc",
+    "npm:@redact-secret/wasm",
+    "pypi:redact-secret"
+  ],
+  "registry_state": {
+    "crate:redact-secret": "published",
+    "crate:redact-secret-cli": "published",
+    "npm:@redact-secret/core": "published",
+    "npm:@redact-secret/node-darwin-arm64": "published",
+    "npm:@redact-secret/node-darwin-x64": "published",
+    "npm:@redact-secret/node-linux-arm64-gnu": "published",
+    "npm:@redact-secret/node-linux-arm64-musl": "published",
+    "npm:@redact-secret/node-linux-x64-gnu": "published",
+    "npm:@redact-secret/node-linux-x64-musl": "published",
+    "npm:@redact-secret/node-win32-arm64-msvc": "published",
+    "npm:@redact-secret/node-win32-x64-msvc": "published",
+    "npm:@redact-secret/wasm": "published",
+    "pypi:redact-secret": "published"
+  },
+  "artifact_digests": {
+    "crate:redact-secret": [
+      {
+        "built": "1501d88ab2db8eef098c06bd2bd89cb7ee575ed11c2185a34ccc3b1eb57b5bba",
+        "comparable": true,
+        "file": "redact-secret-0.1.0-beta.7.crate",
+        "note": null,
+        "published": "1501d88ab2db8eef098c06bd2bd89cb7ee575ed11c2185a34ccc3b1eb57b5bba",
+        "qualified": "1501d88ab2db8eef098c06bd2bd89cb7ee575ed11c2185a34ccc3b1eb57b5bba"
+      }
+    ],
+    "crate:redact-secret-cli": [
+      {
+        "built": "0686dfdd170929f47b12193c7c6bc812b2a9e2a5fc60dce20dc81d7e49cd241a",
+        "comparable": true,
+        "file": "redact-secret-cli-0.1.0-beta.7.crate",
+        "note": null,
+        "published": "0686dfdd170929f47b12193c7c6bc812b2a9e2a5fc60dce20dc81d7e49cd241a",
+        "qualified": "0686dfdd170929f47b12193c7c6bc812b2a9e2a5fc60dce20dc81d7e49cd241a"
+      }
+    ],
+    "npm:@redact-secret/core": [
+      {
+        "built": "97fb760d03771d8c31a69d662e7e32de6f7d9e90",
+        "comparable": true,
+        "file": "packages/javascript",
+        "note": "Corrected from the original manifest (original-manifest.json), which recorded built=qualified=f82efd6b8aae6b50894ffd6f76918f20ac84a174: Release's 'Compute the wrapper package identity' step packed packages/javascript before 'Qualify release' built dist/, so that shasum belongs to a 3-entry tarball without dist/ (issue #732). The published tarball (shasum 97fb760d..., SHA-256 8b6e759b98201ebfed797a5389eca57a3aa52fef1bc96783d522c60418662520) is the qualified package: that SHA-256 is the core artifact every installedJavaScriptQualification and cleanInstallQualification report in artifact-inventory.json installed, and Reconcile Release 35993751064 rebuilt, packed and matched it before tagging.",
+        "published": "97fb760d03771d8c31a69d662e7e32de6f7d9e90",
+        "qualified": "97fb760d03771d8c31a69d662e7e32de6f7d9e90"
+      }
+    ],
+    "npm:@redact-secret/node-darwin-arm64": [
+      {
+        "built": "dc58d9dbc804d518145166c95e08f108c944e2f923670794e4e3ffa583ca9560\n0583b5ebbd093706af8eb7bf9aa0ca8b029869721bc0fc0a04dc2829b783e9ff\n4c1891c3f85338a51b4d4ce5ef754ab8fcb9acf1fe7fb7d5598faec82a178596",
+        "comparable": false,
+        "file": "index.d.ts\nindex.js\nredact-secret.darwin-arm64.node",
+        "note": "npm repacks the qualified compiled addon into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack file. \"Verify the assembled addon matches the qualified inventory\" already verified the pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "4aff72d723c9dadbfe37c19e3e1719e98bd32ec3",
+        "qualified": "dc58d9dbc804d518145166c95e08f108c944e2f923670794e4e3ffa583ca9560\n0583b5ebbd093706af8eb7bf9aa0ca8b029869721bc0fc0a04dc2829b783e9ff\n4c1891c3f85338a51b4d4ce5ef754ab8fcb9acf1fe7fb7d5598faec82a178596"
+      }
+    ],
+    "npm:@redact-secret/node-darwin-x64": [
+      {
+        "built": "dc58d9dbc804d518145166c95e08f108c944e2f923670794e4e3ffa583ca9560\n0583b5ebbd093706af8eb7bf9aa0ca8b029869721bc0fc0a04dc2829b783e9ff\n571d82d51302ece4b5ec3410f6772ed65e43a6b1c931543bfc3c71690db38714",
+        "comparable": false,
+        "file": "index.d.ts\nindex.js\nredact-secret.darwin-x64.node",
+        "note": "npm repacks the qualified compiled addon into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack file. \"Verify the assembled addon matches the qualified inventory\" already verified the pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "75e506a6f46fc0ff5d7bdda627590d1d54277e7a",
+        "qualified": "dc58d9dbc804d518145166c95e08f108c944e2f923670794e4e3ffa583ca9560\n0583b5ebbd093706af8eb7bf9aa0ca8b029869721bc0fc0a04dc2829b783e9ff\n571d82d51302ece4b5ec3410f6772ed65e43a6b1c931543bfc3c71690db38714"
+      }
+    ],
+    "npm:@redact-secret/node-linux-arm64-gnu": [
+      {
+        "built": "dc58d9dbc804d518145166c95e08f108c944e2f923670794e4e3ffa583ca9560\n0583b5ebbd093706af8eb7bf9aa0ca8b029869721bc0fc0a04dc2829b783e9ff\nac22800cc774fe42210a25f7bc4094dc24296990b2390bbc47839de803bbdaff",
+        "comparable": false,
+        "file": "index.d.ts\nindex.js\nredact-secret.linux-arm64-gnu.node",
+        "note": "npm repacks the qualified compiled addon into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack file. \"Verify the assembled addon matches the qualified inventory\" already verified the pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "2f52fbfdbb2ecf6a3bc48b8989eb40c494bcc845",
+        "qualified": "dc58d9dbc804d518145166c95e08f108c944e2f923670794e4e3ffa583ca9560\n0583b5ebbd093706af8eb7bf9aa0ca8b029869721bc0fc0a04dc2829b783e9ff\nac22800cc774fe42210a25f7bc4094dc24296990b2390bbc47839de803bbdaff"
+      }
+    ],
+    "npm:@redact-secret/node-linux-arm64-musl": [
+      {
+        "built": "dc58d9dbc804d518145166c95e08f108c944e2f923670794e4e3ffa583ca9560\n0583b5ebbd093706af8eb7bf9aa0ca8b029869721bc0fc0a04dc2829b783e9ff\n4860b83df1b46e027b5bbb0a0af90de3c05db7f083c125715216caf5832f5b22",
+        "comparable": false,
+        "file": "index.d.ts\nindex.js\nredact-secret.linux-arm64-musl.node",
+        "note": "npm repacks the qualified compiled addon into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack file. \"Verify the assembled addon matches the qualified inventory\" already verified the pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "8ed142b950d6793b1c3aaf898e1103b4cc629f71",
+        "qualified": "dc58d9dbc804d518145166c95e08f108c944e2f923670794e4e3ffa583ca9560\n0583b5ebbd093706af8eb7bf9aa0ca8b029869721bc0fc0a04dc2829b783e9ff\n4860b83df1b46e027b5bbb0a0af90de3c05db7f083c125715216caf5832f5b22"
+      }
+    ],
+    "npm:@redact-secret/node-linux-x64-gnu": [
+      {
+        "built": "dc58d9dbc804d518145166c95e08f108c944e2f923670794e4e3ffa583ca9560\n0583b5ebbd093706af8eb7bf9aa0ca8b029869721bc0fc0a04dc2829b783e9ff\n2a7607147314cff0657ef8e5c762010a4008c92c1bde79d8363fbbccc15c43c4",
+        "comparable": false,
+        "file": "index.d.ts\nindex.js\nredact-secret.linux-x64-gnu.node",
+        "note": "npm repacks the qualified compiled addon into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack file. \"Verify the assembled addon matches the qualified inventory\" already verified the pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "e1436a82155e3e66b386467c8dec69943b343faa",
+        "qualified": "dc58d9dbc804d518145166c95e08f108c944e2f923670794e4e3ffa583ca9560\n0583b5ebbd093706af8eb7bf9aa0ca8b029869721bc0fc0a04dc2829b783e9ff\n2a7607147314cff0657ef8e5c762010a4008c92c1bde79d8363fbbccc15c43c4"
+      }
+    ],
+    "npm:@redact-secret/node-linux-x64-musl": [
+      {
+        "built": "dc58d9dbc804d518145166c95e08f108c944e2f923670794e4e3ffa583ca9560\n0583b5ebbd093706af8eb7bf9aa0ca8b029869721bc0fc0a04dc2829b783e9ff\ne15e8a5ce7beb34e7fb1809ae8811b9ab951f089ecafb326c050853a6d3ee845",
+        "comparable": false,
+        "file": "index.d.ts\nindex.js\nredact-secret.linux-x64-musl.node",
+        "note": "npm repacks the qualified compiled addon into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack file. \"Verify the assembled addon matches the qualified inventory\" already verified the pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": null,
+        "qualified": "dc58d9dbc804d518145166c95e08f108c944e2f923670794e4e3ffa583ca9560\n0583b5ebbd093706af8eb7bf9aa0ca8b029869721bc0fc0a04dc2829b783e9ff\ne15e8a5ce7beb34e7fb1809ae8811b9ab951f089ecafb326c050853a6d3ee845"
+      }
+    ],
+    "npm:@redact-secret/node-win32-arm64-msvc": [
+      {
+        "built": "dc58d9dbc804d518145166c95e08f108c944e2f923670794e4e3ffa583ca9560\n0583b5ebbd093706af8eb7bf9aa0ca8b029869721bc0fc0a04dc2829b783e9ff\nbf33a7624b09defa18d5f941ec8091bb752fecc59cfc58823233cd0d3c4cd38f",
+        "comparable": false,
+        "file": "index.d.ts\nindex.js\nredact-secret.win32-arm64-msvc.node",
+        "note": "npm repacks the qualified compiled addon into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack file. \"Verify the assembled addon matches the qualified inventory\" already verified the pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "1245e46538dee46003ab01b776c3a0b1ca23513e",
+        "qualified": "dc58d9dbc804d518145166c95e08f108c944e2f923670794e4e3ffa583ca9560\n0583b5ebbd093706af8eb7bf9aa0ca8b029869721bc0fc0a04dc2829b783e9ff\nbf33a7624b09defa18d5f941ec8091bb752fecc59cfc58823233cd0d3c4cd38f"
+      }
+    ],
+    "npm:@redact-secret/node-win32-x64-msvc": [
+      {
+        "built": "dc58d9dbc804d518145166c95e08f108c944e2f923670794e4e3ffa583ca9560\n0583b5ebbd093706af8eb7bf9aa0ca8b029869721bc0fc0a04dc2829b783e9ff\nfbcf3915545a27946d3e768ac32b652dd2baccaed1ac94a215b9e5a3d71905c9",
+        "comparable": false,
+        "file": "index.d.ts\nindex.js\nredact-secret.win32-x64-msvc.node",
+        "note": "npm repacks the qualified compiled addon into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack file. \"Verify the assembled addon matches the qualified inventory\" already verified the pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "a08793adfd0d8fe81b8f86a5ffd96baca589ae0c",
+        "qualified": "dc58d9dbc804d518145166c95e08f108c944e2f923670794e4e3ffa583ca9560\n0583b5ebbd093706af8eb7bf9aa0ca8b029869721bc0fc0a04dc2829b783e9ff\nfbcf3915545a27946d3e768ac32b652dd2baccaed1ac94a215b9e5a3d71905c9"
+      }
+    ],
+    "npm:@redact-secret/wasm": [
+      {
+        "built": "5138d03cc77df98b922c1c345c612f105a84ecb4c0e846d3fa505295a52d8691",
+        "comparable": false,
+        "file": "redact_secret_wasm.d.ts",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "2dac4c3b32c719a4bc2d038adc304fb0874e2dcf",
+        "qualified": "5138d03cc77df98b922c1c345c612f105a84ecb4c0e846d3fa505295a52d8691"
+      },
+      {
+        "built": "90e4bd20e25f6a3aa1fa5f59abd9fe9f54e0ef80224957c252f4c33834731f82",
+        "comparable": false,
+        "file": "redact_secret_wasm.js",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "2dac4c3b32c719a4bc2d038adc304fb0874e2dcf",
+        "qualified": "90e4bd20e25f6a3aa1fa5f59abd9fe9f54e0ef80224957c252f4c33834731f82"
+      },
+      {
+        "built": "9b168247b9901dae599d18a7f481cbdedfc400096c13259e46eed661cf0e9233",
+        "comparable": false,
+        "file": "redact_secret_wasm_bg.wasm",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "2dac4c3b32c719a4bc2d038adc304fb0874e2dcf",
+        "qualified": "9b168247b9901dae599d18a7f481cbdedfc400096c13259e46eed661cf0e9233"
+      },
+      {
+        "built": "0576fab4123fba64e698a000a981e5007e4487a2170bedb121e7479ec081bdc5",
+        "comparable": false,
+        "file": "redact_secret_wasm_bg.wasm.d.ts",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "2dac4c3b32c719a4bc2d038adc304fb0874e2dcf",
+        "qualified": "0576fab4123fba64e698a000a981e5007e4487a2170bedb121e7479ec081bdc5"
+      },
+      {
+        "built": "5138d03cc77df98b922c1c345c612f105a84ecb4c0e846d3fa505295a52d8691",
+        "comparable": false,
+        "file": "redact_secret_wasm_common.d.ts",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "2dac4c3b32c719a4bc2d038adc304fb0874e2dcf",
+        "qualified": "5138d03cc77df98b922c1c345c612f105a84ecb4c0e846d3fa505295a52d8691"
+      },
+      {
+        "built": "37f9df06843d2670626f5c1783a89135e0107cb7809ae11b9662ea54960018ed",
+        "comparable": false,
+        "file": "redact_secret_wasm_common.js",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "2dac4c3b32c719a4bc2d038adc304fb0874e2dcf",
+        "qualified": "37f9df06843d2670626f5c1783a89135e0107cb7809ae11b9662ea54960018ed"
+      },
+      {
+        "built": "278e590091f42b1ae0854b572303ef2b6bab0810ed5ed07183daa970d6563b9e",
+        "comparable": false,
+        "file": "redact_secret_wasm_common_bg.wasm",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "2dac4c3b32c719a4bc2d038adc304fb0874e2dcf",
+        "qualified": "278e590091f42b1ae0854b572303ef2b6bab0810ed5ed07183daa970d6563b9e"
+      },
+      {
+        "built": "0576fab4123fba64e698a000a981e5007e4487a2170bedb121e7479ec081bdc5",
+        "comparable": false,
+        "file": "redact_secret_wasm_common_bg.wasm.d.ts",
+        "note": "npm repacks the qualified WebAssembly build into a new versioned tarball before publishing; the tarball is not byte-comparable to the pre-pack files. \"Verify the assembled browser artifacts match the qualified inventory\" already verified each pre-pack file byte-identical to the qualified digest; \"published\" here is the registry tarball's own shasum, recorded for traceability rather than byte comparison.",
+        "published": "2dac4c3b32c719a4bc2d038adc304fb0874e2dcf",
+        "qualified": "0576fab4123fba64e698a000a981e5007e4487a2170bedb121e7479ec081bdc5"
+      }
+    ],
+    "pypi:redact-secret": [
+      {
+        "built": "0ad7d302623759b438d9016d07beedc1de080fbfde3338a2d48c2ec442eb4ab7",
+        "comparable": true,
+        "file": "redact_secret-0.1.0b7.tar.gz",
+        "note": null,
+        "published": "0ad7d302623759b438d9016d07beedc1de080fbfde3338a2d48c2ec442eb4ab7",
+        "qualified": "0ad7d302623759b438d9016d07beedc1de080fbfde3338a2d48c2ec442eb4ab7"
+      },
+      {
+        "built": "d712a2b428dfdffbbd54dacdb8cc31728711d1be42bef13df7f333ad4bd90df8",
+        "comparable": true,
+        "file": "redact_secret-0.1.0b7-cp310-abi3-macosx_11_0_arm64.whl",
+        "note": null,
+        "published": "d712a2b428dfdffbbd54dacdb8cc31728711d1be42bef13df7f333ad4bd90df8",
+        "qualified": "d712a2b428dfdffbbd54dacdb8cc31728711d1be42bef13df7f333ad4bd90df8"
+      },
+      {
+        "built": "afab02ff4a36a77adaa8ec8adfe8ded51aa8404cb6566fe1b3a4b8fbef3ddce2",
+        "comparable": true,
+        "file": "redact_secret-0.1.0b7-cp310-abi3-win_arm64.whl",
+        "note": null,
+        "published": "afab02ff4a36a77adaa8ec8adfe8ded51aa8404cb6566fe1b3a4b8fbef3ddce2",
+        "qualified": "afab02ff4a36a77adaa8ec8adfe8ded51aa8404cb6566fe1b3a4b8fbef3ddce2"
+      },
+      {
+        "built": "79e1398d39601142be723b4353eb5df3eda34bceefee8a513c22c7d8045ac3ef",
+        "comparable": true,
+        "file": "redact_secret-0.1.0b7-cp310-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl",
+        "note": null,
+        "published": "79e1398d39601142be723b4353eb5df3eda34bceefee8a513c22c7d8045ac3ef",
+        "qualified": "79e1398d39601142be723b4353eb5df3eda34bceefee8a513c22c7d8045ac3ef"
+      },
+      {
+        "built": "e73d29d9feb47a14a3d5b7f4add3617f1a6925208a9a955e3a4f693c8147e99f",
+        "comparable": true,
+        "file": "redact_secret-0.1.0b7-cp310-abi3-musllinux_1_2_aarch64.whl",
+        "note": null,
+        "published": "e73d29d9feb47a14a3d5b7f4add3617f1a6925208a9a955e3a4f693c8147e99f",
+        "qualified": "e73d29d9feb47a14a3d5b7f4add3617f1a6925208a9a955e3a4f693c8147e99f"
+      },
+      {
+        "built": "8097975171cb8487e58c317fbff921d734b88efaf0ce13c654de90a64a65d95b",
+        "comparable": true,
+        "file": "redact_secret-0.1.0b7-cp310-abi3-macosx_10_12_x86_64.whl",
+        "note": null,
+        "published": "8097975171cb8487e58c317fbff921d734b88efaf0ce13c654de90a64a65d95b",
+        "qualified": "8097975171cb8487e58c317fbff921d734b88efaf0ce13c654de90a64a65d95b"
+      },
+      {
+        "built": "f70905ab9ee32520f6ba8cc4f1685340d5b217076e203b902ee204205c7918e8",
+        "comparable": true,
+        "file": "redact_secret-0.1.0b7-cp310-abi3-win_amd64.whl",
+        "note": null,
+        "published": "f70905ab9ee32520f6ba8cc4f1685340d5b217076e203b902ee204205c7918e8",
+        "qualified": "f70905ab9ee32520f6ba8cc4f1685340d5b217076e203b902ee204205c7918e8"
+      },
+      {
+        "built": "cabe27c76716c47ce34f98442e5d07777e36871f0f5e26749527ca97c49987e5",
+        "comparable": true,
+        "file": "redact_secret-0.1.0b7-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+        "note": null,
+        "published": "cabe27c76716c47ce34f98442e5d07777e36871f0f5e26749527ca97c49987e5",
+        "qualified": "cabe27c76716c47ce34f98442e5d07777e36871f0f5e26749527ca97c49987e5"
+      },
+      {
+        "built": "5d0a6b1463f02667061caa63dc4a25b5665550eb118f9507a2bf95fa3dfc6231",
+        "comparable": true,
+        "file": "redact_secret-0.1.0b7-cp310-abi3-musllinux_1_2_x86_64.whl",
+        "note": null,
+        "published": "5d0a6b1463f02667061caa63dc4a25b5665550eb118f9507a2bf95fa3dfc6231",
+        "qualified": "5d0a6b1463f02667061caa63dc4a25b5665550eb118f9507a2bf95fa3dfc6231"
+      }
+    ]
+  },
+  "support_matrix_drift": {
+    "baseline": {
+      "generatedAt": "2026-09-22T00:26:30.496Z",
+      "revision": "a502fdd715c5a5882430e951d5493de32fe8621c",
+      "runId": "d0e99d6b-a252-4e30-8b24-a1195c94ee99"
+    },
+    "candidate": {
+      "generatedAt": "2026-09-24T08:46:00.653Z",
+      "revision": "28fc818966d9acf7ad3f77ce38577d6b5c14ea0b",
+      "runId": "d87f63dd-5d38-4cf6-a8d1-6ab28f3c7f95"
+    },
+    "familyCount": 93,
+    "generatedAt": "2026-09-24T10:48:15.859375+00:00",
+    "improvements": [
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "anthropic-token"
+          ],
+          "evidenceTier": "T1",
+          "providerSource": {
+            "covers": "the provider identifies sk-ant-api03- as the Claude API key prefix; the 93-character body, alphabet and AA suffix remain tool-corroborated",
+            "formatVersion": "Claude API key prefix table",
+            "observedAt": "2026-09-23",
+            "url": "https://platform.claude.com/docs/en/manage-claude/compliance-api-access"
+          },
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 6,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "anthropic:secret-api-key",
+        "familyName": "Secret API key",
+        "provider": "anthropic"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "aws-access-key"
+          ],
+          "evidenceTier": "T1",
+          "providerSource": {
+            "covers": "AKIA/ASIA/ABIA/ACCA prefixes, and AIDA as the IAM-user unique-ID prefix rather than an access key (re-checked 2026-09-20, #36); 16-character base32 body and 40-character secret are tool-corroborated",
+            "formatVersion": "IAM unique-ID prefix table",
+            "observedAt": "2026-09-17",
+            "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_identifiers.html#identifiers-prefixes"
+          },
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 6,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "aws:iam-user-access-key",
+        "familyName": "IAM user access key",
+        "provider": "aws"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [],
+          "detectors": [
+            "azure-devops-personal-access-token"
+          ],
+          "evidenceTier": "T1",
+          "providerSource": {
+            "covers": "tokens are 84 characters long with a fixed AZDO signature at positions 76-80; Microsoft Purview separately supplies the alphanumeric detail used by the pattern",
+            "formatVersion": "84-character PAT with AZDO signature",
+            "observedAt": "2026-09-23",
+            "url": "https://learn.microsoft.com/en-us/azure/devops/organizations/accounts/use-personal-access-tokens-to-authenticate#pat-format"
+          },
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 6,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "azure-devops:personal-access-token",
+        "familyName": "Personal access token",
+        "provider": "azure-devops"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "cloudflare-token"
+          ],
+          "evidenceTier": "T1",
+          "providerSource": {
+            "covers": "cfut_ prefix documented as the scannable token format; 40+8 body structure is tool-corroborated",
+            "formatVersion": "cfut_ scannable format",
+            "observedAt": "2026-09-17",
+            "url": "https://developers.cloudflare.com/fundamentals/api/get-started/create-token/"
+          },
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 6,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "cloudflare:api-token",
+        "familyName": "Scannable API token",
+        "provider": "cloudflare"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "datadog-api-key"
+          ],
+          "evidenceTier": "T1",
+          "providerSource": {
+            "covers": "Datadog's own API reference spec (docs.datadoghq.com /resources/json/full_spec_v1.json, v1 ApiKey schema, generated from DataDog/documentation hugo/data/api/v1/full_spec.yaml) fixes the API key value at exactly 32 characters (minLength 32, maxLength 32) and names the DD-API-KEY header and DD_API_KEY environment variable. The constraint is stated on the v1 key model; the v2 schema states no length. The lowercase-hex alphabet is not provider-stated: the spec's example fits it, and it is corroborated by Datadog-owned code and tools only",
+            "formatVersion": "OpenAPI v1 ApiKey.key minLength/maxLength 32 and apiKeyAuth scheme",
+            "observedAt": "2026-09-23",
+            "url": "https://docs.datadoghq.com/resources/json/full_spec_v1.json"
+          },
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 11,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "datadog:api-key",
+        "familyName": "API key",
+        "provider": "datadog"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "AWS Secrets Manager partner doc",
+            "DataDog/cloudformation-template",
+            "DataDog/datadog-agent (Agent app-key validator)",
+            "DataDog/datadog-agent (Agent log/config scrubber)",
+            "DataDog/terraform-module-datadog-agentless-scanner",
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "datadog-application-key"
+          ],
+          "evidenceTier": "T1",
+          "providerSource": {
+            "covers": "Application keys column: \"Identifiable prefix \u2026 ddapp_ (new)\" establishes ddapp_ as the identifying prefix of current-format application keys. Body length (34 characters) and alphabet are not stated on this page; both are corroborated only by Datadog-owned code and a third-party partner doc, never by a provider-domain page",
+            "formatVersion": "Access-token comparison table (mirrored at /account_management/service-access-tokens/)",
+            "observedAt": "2026-09-22",
+            "url": "https://docs.datadoghq.com/account_management/personal-access-tokens/"
+          },
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 6,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "datadog:application-key",
+        "familyName": "Application key (ddapp_-prefixed)",
+        "provider": "datadog"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "digitalocean-token"
+          ],
+          "evidenceTier": "T1",
+          "providerSource": {
+            "covers": "dop_v1_/doo_v1_/dor_v1_ prefixes; 64-hex body is tool-corroborated",
+            "formatVersion": "2022-03-29 token prefixes",
+            "observedAt": "2026-09-17",
+            "url": "https://docs.digitalocean.com/release-notes/api/"
+          },
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 8,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "digitalocean:oauth-token",
+        "familyName": "OAuth token",
+        "provider": "digitalocean"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "digitalocean-token"
+          ],
+          "evidenceTier": "T1",
+          "providerSource": {
+            "covers": "dop_v1_/doo_v1_/dor_v1_ prefixes; 64-hex body is tool-corroborated",
+            "formatVersion": "2022-03-29 token prefixes",
+            "observedAt": "2026-09-17",
+            "url": "https://docs.digitalocean.com/release-notes/api/"
+          },
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 8,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "digitalocean:personal-access-token",
+        "familyName": "Personal access token",
+        "provider": "digitalocean"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "digitalocean-token"
+          ],
+          "evidenceTier": "T1",
+          "providerSource": {
+            "covers": "dop_v1_/doo_v1_/dor_v1_ prefixes; 64-hex body is tool-corroborated",
+            "formatVersion": "2022-03-29 token prefixes",
+            "observedAt": "2026-09-17",
+            "url": "https://docs.digitalocean.com/release-notes/api/"
+          },
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 8,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "digitalocean:refresh-token",
+        "familyName": "Refresh token",
+        "provider": "digitalocean"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "docker-token"
+          ],
+          "evidenceTier": "T1",
+          "providerSource": {
+            "covers": "Docker's own API reference (docs.docker.com AI Governance API spec, bearerAuth credential table) states the Personal Access Token format as dckr_pat_* and the Organization Access Token format as dckr_oat_*, establishing both prefixes (the * is a glob, not a grammar). Body lengths and alphabet are not provider-stated, except that Docker's Hub API spec (createOrgAccessTokenResponse.token) shows an example OAT with a 27-character alphanumeric body, on example strength only. The 27-character dckr_pat_ body, the 32-character dckr_oat_ width and the [A-Za-z0-9_-] alphabet remain tool-corroborated",
+            "formatVersion": "AI Governance API bearerAuth credential table (Format column: dckr_pat_*, dckr_oat_*)",
+            "observedAt": "2026-09-23",
+            "url": "https://docs.docker.com/reference/api/ai-governance/api.yaml"
+          },
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 16,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "docker:oauth-access-token",
+        "familyName": "OAuth access token",
+        "provider": "docker"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "docker-token"
+          ],
+          "evidenceTier": "T1",
+          "providerSource": {
+            "covers": "Docker's own API reference (docs.docker.com AI Governance API spec, bearerAuth credential table) states the Personal Access Token format as dckr_pat_* and the Organization Access Token format as dckr_oat_*, establishing both prefixes (the * is a glob, not a grammar). Body lengths and alphabet are not provider-stated, except that Docker's Hub API spec (createOrgAccessTokenResponse.token) shows an example OAT with a 27-character alphanumeric body, on example strength only. The 27-character dckr_pat_ body, the 32-character dckr_oat_ width and the [A-Za-z0-9_-] alphabet remain tool-corroborated",
+            "formatVersion": "AI Governance API bearerAuth credential table (Format column: dckr_pat_*, dckr_oat_*)",
+            "observedAt": "2026-09-23",
+            "url": "https://docs.docker.com/reference/api/ai-governance/api.yaml"
+          },
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 16,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "docker:personal-access-token",
+        "familyName": "Personal access token",
+        "provider": "docker"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "jwt"
+          ],
+          "evidenceTier": "T1",
+          "providerSource": {
+            "covers": "three base64url segments; the reviewed control is additionally signature-verified offline",
+            "formatVersion": "RFC 7519 compact serialization",
+            "observedAt": "2026-09-17",
+            "url": "https://www.rfc-editor.org/rfc/rfc7519"
+          },
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 7,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "generic:jwt",
+        "familyName": "JSON Web Token",
+        "provider": null
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "private-key"
+          ],
+          "evidenceTier": "T1",
+          "providerSource": {
+            "covers": "BEGIN/END PRIVATE KEY labels and base64 body; the reviewed control is additionally parsed as PKCS#8 offline",
+            "formatVersion": "RFC 7468 textual encodings",
+            "observedAt": "2026-09-17",
+            "url": "https://www.rfc-editor.org/rfc/rfc7468"
+          },
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 5,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "generic:private-key",
+        "familyName": "PEM-encoded private key",
+        "provider": null
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "github-token"
+          ],
+          "evidenceTier": "T1",
+          "providerSource": {
+            "covers": "ghp_/gho_/ghu_/ghs_/ghr_ prefixes and underscore separator; 36-character body is tool-corroborated (checksum in the last six characters per github.blog/2021-04-05)",
+            "formatVersion": "2021-04 prefix scheme",
+            "observedAt": "2026-09-17",
+            "url": "https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/about-authentication-to-github#githubs-token-formats"
+          },
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 42,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "github:app-server-to-server-token",
+        "familyName": "GitHub App server-to-server token",
+        "provider": "github"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "github-token"
+          ],
+          "evidenceTier": "T1",
+          "providerSource": {
+            "covers": "ghp_/gho_/ghu_/ghs_/ghr_ prefixes and underscore separator; 36-character body is tool-corroborated (checksum in the last six characters per github.blog/2021-04-05)",
+            "formatVersion": "2021-04 prefix scheme",
+            "observedAt": "2026-09-17",
+            "url": "https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/about-authentication-to-github#githubs-token-formats"
+          },
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 42,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "github:app-user-to-server-token",
+        "familyName": "GitHub App user-to-server token",
+        "provider": "github"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "github-token"
+          ],
+          "evidenceTier": "T1",
+          "providerSource": {
+            "covers": "ghp_/gho_/ghu_/ghs_/ghr_ prefixes and underscore separator; 36-character body is tool-corroborated (checksum in the last six characters per github.blog/2021-04-05)",
+            "formatVersion": "2021-04 prefix scheme",
+            "observedAt": "2026-09-17",
+            "url": "https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/about-authentication-to-github#githubs-token-formats"
+          },
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 42,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "github:classic-personal-access-token",
+        "familyName": "Classic personal access token",
+        "provider": "github"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "github-token"
+          ],
+          "evidenceTier": "T1",
+          "providerSource": {
+            "covers": "ghp_/gho_/ghu_/ghs_/ghr_ prefixes and underscore separator; 36-character body is tool-corroborated (checksum in the last six characters per github.blog/2021-04-05)",
+            "formatVersion": "2021-04 prefix scheme",
+            "observedAt": "2026-09-17",
+            "url": "https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/about-authentication-to-github#githubs-token-formats"
+          },
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 42,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "github:oauth-access-token",
+        "familyName": "OAuth access token",
+        "provider": "github"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "github-token"
+          ],
+          "evidenceTier": "T1",
+          "providerSource": {
+            "covers": "ghp_/gho_/ghu_/ghs_/ghr_ prefixes and underscore separator; 36-character body is tool-corroborated (checksum in the last six characters per github.blog/2021-04-05)",
+            "formatVersion": "2021-04 prefix scheme",
+            "observedAt": "2026-09-17",
+            "url": "https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/about-authentication-to-github#githubs-token-formats"
+          },
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 42,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "github:oauth-refresh-token",
+        "familyName": "OAuth refresh token",
+        "provider": "github"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1"
+          ],
+          "detectors": [
+            "google-api-key"
+          ],
+          "evidenceTier": "T1",
+          "providerSource": {
+            "covers": "the provider page identifies the exposed key_string as an API key and shows an AIza-prefixed example; the 35-character suffix and alphabet remain gitleaks-corroborated",
+            "formatVersion": "Google Cloud API key example",
+            "observedAt": "2026-09-23",
+            "url": "https://docs.cloud.google.com/docs/authentication/api-keys"
+          },
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 6,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "google:generic-api-key",
+        "familyName": "Generic API key",
+        "provider": "google"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1"
+          ],
+          "detectors": [
+            "grafana-cloud-access-policy-token"
+          ],
+          "evidenceTier": "T1",
+          "providerSource": {
+            "covers": "Grafana states that Cloud access policy tokens start with glc_; body length and alphabet remain tool-corroborated",
+            "formatVersion": "glc_ access-policy token prefix",
+            "observedAt": "2026-09-23",
+            "url": "https://grafana.com/docs/grafana-cloud/observe-and-act/agent-observability/get-started/grafana-cloud/"
+          },
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 11,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "grafana:cloud-access-policy-token",
+        "familyName": "Cloud access policy token",
+        "provider": "grafana"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "grafana-service-account-token"
+          ],
+          "evidenceTier": "T1",
+          "providerSource": {
+            "covers": "Grafana states that service account tokens carry a glsa prefix; the delimiter, segment lengths, alphabet and checksum placement remain tool-corroborated",
+            "formatVersion": "glsa service-account token prefix",
+            "observedAt": "2026-09-23",
+            "url": "https://grafana.com/blog/new-in-grafana-9-1-service-accounts-are-now-ga/"
+          },
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 11,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "grafana:service-account-token",
+        "familyName": "Service account token",
+        "provider": "grafana"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "terraform-cloud-token"
+          ],
+          "evidenceTier": "T1",
+          "providerSource": {
+            "covers": "three independent HCP Terraform API-reference pages (user-tokens, organization-tokens, team-tokens) each publish a full example token; every one of the three is exactly 14 bytes before the literal .atlasv1. marker and exactly 67 bytes after it, and the mirrored Terraform Enterprise organization-tokens page publishes the identical shape and example, confirming Cloud and Enterprise are one grammar rather than two. Neither page documents a checksum or any marker beyond the literal .atlasv1. tag",
+            "formatVersion": "HCP Terraform/Enterprise 14+67-byte API token",
+            "observedAt": "2026-09-21",
+            "url": "https://developer.hashicorp.com/terraform/cloud-docs/api-docs/user-tokens"
+          },
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 6,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "hashicorp-terraform:organization-token",
+        "familyName": "Organization token",
+        "provider": "hashicorp-terraform"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "terraform-cloud-token"
+          ],
+          "evidenceTier": "T1",
+          "providerSource": {
+            "covers": "three independent HCP Terraform API-reference pages (user-tokens, organization-tokens, team-tokens) each publish a full example token; every one of the three is exactly 14 bytes before the literal .atlasv1. marker and exactly 67 bytes after it, and the mirrored Terraform Enterprise organization-tokens page publishes the identical shape and example, confirming Cloud and Enterprise are one grammar rather than two. Neither page documents a checksum or any marker beyond the literal .atlasv1. tag",
+            "formatVersion": "HCP Terraform/Enterprise 14+67-byte API token",
+            "observedAt": "2026-09-21",
+            "url": "https://developer.hashicorp.com/terraform/cloud-docs/api-docs/user-tokens"
+          },
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 6,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "hashicorp-terraform:team-token",
+        "familyName": "Team token",
+        "provider": "hashicorp-terraform"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "terraform-cloud-token"
+          ],
+          "evidenceTier": "T1",
+          "providerSource": {
+            "covers": "three independent HCP Terraform API-reference pages (user-tokens, organization-tokens, team-tokens) each publish a full example token; every one of the three is exactly 14 bytes before the literal .atlasv1. marker and exactly 67 bytes after it, and the mirrored Terraform Enterprise organization-tokens page publishes the identical shape and example, confirming Cloud and Enterprise are one grammar rather than two. Neither page documents a checksum or any marker beyond the literal .atlasv1. tag",
+            "formatVersion": "HCP Terraform/Enterprise 14+67-byte API token",
+            "observedAt": "2026-09-21",
+            "url": "https://developer.hashicorp.com/terraform/cloud-docs/api-docs/user-tokens"
+          },
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 6,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "hashicorp-terraform:user-token",
+        "familyName": "User token",
+        "provider": "hashicorp-terraform"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "vault-token"
+          ],
+          "evidenceTier": "T1",
+          "providerSource": {
+            "covers": "prefixes and minimum length; the provider states the structure is opaque, so the 90\u2013120-character rule the pinned tools use is corroboration, not contract",
+            "formatVersion": "hvs./hvb./hvr. prefixes, 24+ random characters",
+            "observedAt": "2026-09-17",
+            "url": "https://developer.hashicorp.com/vault/docs/concepts/tokens"
+          },
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 6,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "hashicorp-vault:batch-token",
+        "familyName": "Batch token",
+        "provider": "hashicorp-vault"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "vault-token"
+          ],
+          "evidenceTier": "T1",
+          "providerSource": {
+            "covers": "prefixes and minimum length; the provider states the structure is opaque, so the 90\u2013120-character rule the pinned tools use is corroboration, not contract",
+            "formatVersion": "hvs./hvb./hvr. prefixes, 24+ random characters",
+            "observedAt": "2026-09-17",
+            "url": "https://developer.hashicorp.com/vault/docs/concepts/tokens"
+          },
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 6,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "hashicorp-vault:recovery-token",
+        "familyName": "Recovery token",
+        "provider": "hashicorp-vault"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "vault-token"
+          ],
+          "evidenceTier": "T1",
+          "providerSource": {
+            "covers": "prefixes and minimum length; the provider states the structure is opaque, so the 90\u2013120-character rule the pinned tools use is corroboration, not contract",
+            "formatVersion": "hvs./hvb./hvr. prefixes, 24+ random characters",
+            "observedAt": "2026-09-17",
+            "url": "https://developer.hashicorp.com/vault/docs/concepts/tokens"
+          },
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 6,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "hashicorp-vault:service-token",
+        "familyName": "Service token",
+        "provider": "hashicorp-vault"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "huggingface-token"
+          ],
+          "evidenceTier": "T1",
+          "providerSource": {
+            "covers": "Hugging Face's SDK reference on huggingface.co types the user access token as hf_${string}, establishing the hf_ prefix; the provider's Hub OpenAPI spec (/.well-known/openapi.json, POST /api/credentials/revoke) gives a raw access-token example of hf_ followed by 34 placeholder characters, which establishes the 34-character body length on example strength only. The [A-Za-z0-9] body alphabet is not provider-stated and remains a support-policy union of the tool alphabets (gitleaks letters only, TruffleHog alphanumeric); the api_org_ variant is not covered by this provider source",
+            "formatVersion": "@huggingface/hub SDK reference AccessToken type (hf_${string})",
+            "observedAt": "2026-09-23",
+            "url": "https://huggingface.co/docs/huggingface.js/hub/modules"
+          },
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 7,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "huggingface:api-token",
+        "familyName": "API token",
+        "provider": "huggingface"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "linear-token"
+          ],
+          "evidenceTier": "T1",
+          "providerSource": {
+            "covers": "the provider documents lin_api_ for API keys and lin_oauth_ for OAuth access tokens; the 40-character body and alphabet remain tool-corroborated",
+            "formatVersion": "Linear-specific API and OAuth prefixes",
+            "observedAt": "2026-09-23",
+            "url": "https://linear.app/changelog/2021-08-19-github-secret-scanning"
+          },
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 5,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "linear:personal-api-key",
+        "familyName": "Personal API key",
+        "provider": "linear"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "microsoft-entra-client-secret"
+          ],
+          "evidenceTier": "T1",
+          "providerSource": {
+            "covers": "Microsoft Graph PowerShell's Add-MgApplicationPassword reference (learn.microsoft.com) prints two example SecretText values, each 3 characters (equal to the printed 3-character Hint), the digit 8, the literal Q~, and 34 characters, 40 in total. The Q~ marker at offset 4 and the 8-variant's 40-character width come from these examples, not from a stated grammar. The 7Q~ 37-character previous format, the digit-to-length coupling and the body alphabet are corroborated only by Microsoft's security-utilities code (SEC101/156) and third-party tools",
+            "formatVersion": "Graph PowerShell Add-MgApplicationPassword SecretText examples (3 + 8Q~ + 34)",
+            "observedAt": "2026-09-23",
+            "url": "https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.applications/add-mgapplicationpassword?view=graph-powershell-1.0"
+          },
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 17,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "microsoft-entra:application-client-secret",
+        "familyName": "Application client secret",
+        "provider": "microsoft-entra"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "new-relic-license-key"
+          ],
+          "evidenceTier": "T1",
+          "providerSource": {
+            "covers": "New Relic's own documentation (docs.newrelic.com, IBM MQ host-integration page) states the ingest license key as 40 characters with the literal suffix NRAL, establishing the suffix and total length; its eBPF install pages show elided examples ending FFFFNRAL. The body alphabet, the FFFF segment and the EU eu01xx prefix are not provider-stated: they rest on New Relic-authored code (newrelic-cli IsValidLicenseKeyFormat, docs-website check-for-keys.sh) and trufflehog 3.97.4",
+            "formatVersion": "ingest license key length and NRAL suffix",
+            "observedAt": "2026-09-23",
+            "url": "https://docs.newrelic.com/docs/opentelemetry/integrations/ibm-mq/host/"
+          },
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 9,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "new-relic:license-key",
+        "familyName": "License key",
+        "provider": "new-relic"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "new-relic-user-api-key"
+          ],
+          "evidenceTier": "T1",
+          "providerSource": {
+            "covers": "New Relic says most user keys begin with NRAK-; body length and alphabet remain tool-corroborated",
+            "formatVersion": "NRAK- user-key prefix",
+            "observedAt": "2026-09-23",
+            "url": "https://docs.newrelic.com/docs/infrastructure-as-code/terraform/terraform-intro/"
+          },
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 11,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "new-relic:user-api-key",
+        "familyName": "User API key",
+        "provider": "new-relic"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "notion-token"
+          ],
+          "evidenceTier": "T1",
+          "providerSource": {
+            "covers": "the provider documents secret_ as the still-working legacy Public API token prefix and ntn_ as the prefix for newly generated tokens; the 43-character body and alphabet remain tool-corroborated",
+            "formatVersion": "2024-09 Public API token prefix migration",
+            "observedAt": "2026-09-23",
+            "url": "https://developers.notion.com/page/changelog"
+          },
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 6,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "notion:legacy-integration-token",
+        "familyName": "Legacy integration token",
+        "provider": "notion"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "pulumi-access-token"
+          ],
+          "evidenceTier": "T1",
+          "providerSource": {
+            "covers": "Pulumi's own Cloud REST API reference states, of the token-creation response: \"The response includes the token ID and the tokenValue (prefixed with 'pul-').\" Its personal-access-tokens sibling page carries the identical sentence. Neither page states a length or alphabet for the value that follows the prefix",
+            "formatVersion": "pul- prefixed opaque token",
+            "observedAt": "2026-09-21",
+            "url": "https://www.pulumi.com/docs/reference/cloud-rest-api/access-tokens/"
+          },
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 6,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "pulumi:organization-access-token",
+        "familyName": "Organization access token",
+        "provider": "pulumi"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "pulumi-access-token"
+          ],
+          "evidenceTier": "T1",
+          "providerSource": {
+            "covers": "Pulumi's own Cloud REST API reference states, of the token-creation response: \"The response includes the token ID and the tokenValue (prefixed with 'pul-').\" Its personal-access-tokens sibling page carries the identical sentence. Neither page states a length or alphabet for the value that follows the prefix",
+            "formatVersion": "pul- prefixed opaque token",
+            "observedAt": "2026-09-21",
+            "url": "https://www.pulumi.com/docs/reference/cloud-rest-api/access-tokens/"
+          },
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 6,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "pulumi:personal-access-token",
+        "familyName": "Personal access token",
+        "provider": "pulumi"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "pulumi-access-token"
+          ],
+          "evidenceTier": "T1",
+          "providerSource": {
+            "covers": "Pulumi's own Cloud REST API reference states, of the token-creation response: \"The response includes the token ID and the tokenValue (prefixed with 'pul-').\" Its personal-access-tokens sibling page carries the identical sentence. Neither page states a length or alphabet for the value that follows the prefix",
+            "formatVersion": "pul- prefixed opaque token",
+            "observedAt": "2026-09-21",
+            "url": "https://www.pulumi.com/docs/reference/cloud-rest-api/access-tokens/"
+          },
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 6,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "pulumi:team-access-token",
+        "familyName": "Team access token",
+        "provider": "pulumi"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "pypi-token"
+          ],
+          "evidenceTier": "T1",
+          "providerSource": {
+            "covers": "docs.pypi.org's own detection-format page publishes this contract's exact regex, pypi-[A-Za-z0-9-_]{85,}: the pypi- prefix, a \"-\" separator, a base64 PyMacaroon serialization, an 85-character floor and no ceiling",
+            "formatVersion": "pypi- prefix, base64-serialized PyMacaroon, {85,} length floor",
+            "observedAt": "2026-09-21",
+            "url": "https://docs.pypi.org/api/secrets/"
+          },
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 9,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "pypi:api-token",
+        "familyName": "API token",
+        "provider": "pypi"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "shopify-token"
+          ],
+          "evidenceTier": "T1",
+          "providerSource": {
+            "covers": "shpat_ and shppa_ prefixes; 32-hex body is tool-corroborated",
+            "formatVersion": "shpat_/shppa_ opaque tokens",
+            "observedAt": "2026-09-17",
+            "url": "https://shopify.dev/docs/apps/build/authentication-authorization/access-tokens"
+          },
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 6,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "shopify:custom-app-access-token",
+        "familyName": "Custom app access token",
+        "provider": "shopify"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "shopify-token"
+          ],
+          "evidenceTier": "T1",
+          "providerSource": {
+            "covers": "shpat_ and shppa_ prefixes; 32-hex body is tool-corroborated",
+            "formatVersion": "shpat_/shppa_ opaque tokens",
+            "observedAt": "2026-09-17",
+            "url": "https://shopify.dev/docs/apps/build/authentication-authorization/access-tokens"
+          },
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 6,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "shopify:public-app-access-token",
+        "familyName": "Public app access token",
+        "provider": "shopify"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "slack-token"
+          ],
+          "evidenceTier": "T1",
+          "providerSource": {
+            "covers": "prefixes and section structure with the secret last; numeric section widths and 24-character secret are tool-corroborated",
+            "formatVersion": "xoxb-/xoxp-/xapp-/xwfp- prefixes, dash-separated sections",
+            "observedAt": "2026-09-17",
+            "url": "https://docs.slack.dev/authentication/tokens"
+          },
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 6,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "slack:bot-token",
+        "familyName": "Bot token",
+        "provider": "slack"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "stripe-token"
+          ],
+          "evidenceTier": "T1",
+          "providerSource": {
+            "covers": "sk_live_/sk_test_/rk_live_/rk_test_ secret and restricted keys, pk_ publishable keys documented as safe to expose, sk_org_ organization keys; 32-character body is tool-corroborated",
+            "formatVersion": "sk_/rk_/pk_ key types",
+            "observedAt": "2026-09-17",
+            "url": "https://docs.stripe.com/keys"
+          },
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 6,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "stripe:restricted-key-live",
+        "familyName": "Live restricted key",
+        "provider": "stripe"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "stripe-token"
+          ],
+          "evidenceTier": "T1",
+          "providerSource": {
+            "covers": "sk_live_/sk_test_/rk_live_/rk_test_ secret and restricted keys, pk_ publishable keys documented as safe to expose, sk_org_ organization keys; 32-character body is tool-corroborated",
+            "formatVersion": "sk_/rk_/pk_ key types",
+            "observedAt": "2026-09-17",
+            "url": "https://docs.stripe.com/keys"
+          },
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 6,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "stripe:restricted-key-test",
+        "familyName": "Test restricted key",
+        "provider": "stripe"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "stripe-token"
+          ],
+          "evidenceTier": "T1",
+          "providerSource": {
+            "covers": "sk_live_/sk_test_/rk_live_/rk_test_ secret and restricted keys, pk_ publishable keys documented as safe to expose, sk_org_ organization keys; 32-character body is tool-corroborated",
+            "formatVersion": "sk_/rk_/pk_ key types",
+            "observedAt": "2026-09-17",
+            "url": "https://docs.stripe.com/keys"
+          },
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 6,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "stripe:secret-key-live",
+        "familyName": "Live secret key",
+        "provider": "stripe"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "gitleaks 8.30.1",
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "stripe-token"
+          ],
+          "evidenceTier": "T1",
+          "providerSource": {
+            "covers": "sk_live_/sk_test_/rk_live_/rk_test_ secret and restricted keys, pk_ publishable keys documented as safe to expose, sk_org_ organization keys; 32-character body is tool-corroborated",
+            "formatVersion": "sk_/rk_/pk_ key types",
+            "observedAt": "2026-09-17",
+            "url": "https://docs.stripe.com/keys"
+          },
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 6,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "stripe:secret-key-test",
+        "familyName": "Test secret key",
+        "provider": "stripe"
+      },
+      {
+        "baselineStatus": "provisional",
+        "candidateStatus": "stable",
+        "evidence": {
+          "corroboratingScanners": [
+            "trufflehog 3.97.4"
+          ],
+          "detectors": [
+            "supabase-management-token"
+          ],
+          "evidenceTier": "T1",
+          "providerSource": {
+            "covers": "documents the sbp_ prefix by example (sbp_fc...) and the classic-vs-scoped distinction; states no exact body grammar",
+            "formatVersion": "sbp_/sbp_v0_ personal access tokens",
+            "observedAt": "2026-09-20",
+            "url": "https://supabase.com/docs/guides/platform/personal-access-tokens"
+          },
+          "twinCoverage": {
+            "failures": 0,
+            "pairs": 6,
+            "unprobeable": null
+          },
+          "unresolvedCriticalItems": {
+            "differential": 0,
+            "metamorphic": 0,
+            "mutation": 0
+          }
+        },
+        "family": "supabase:personal-access-token",
+        "familyName": "Personal access token",
+        "provider": "supabase"
+      }
+    ],
+    "newAndUnclassified": [
+      {
+        "family": "confluent:cloud-api-secret",
+        "familyName": "Cloud API secret (cflt-prefixed)",
+        "provider": "confluent",
+        "status": "stable"
+      },
+      {
+        "family": "confluent:cloud-api-secret-legacy",
+        "familyName": "Cloud API secret (unprefixed, pre-2025-07-30)",
+        "provider": "confluent",
+        "status": "provisional"
+      },
+      {
+        "family": "databricks:personal-access-token",
+        "familyName": "Personal access token",
+        "provider": "databricks",
+        "status": "provisional"
+      },
+      {
+        "family": "datadog:application-key-legacy",
+        "familyName": "Application key (legacy 40-hex)",
+        "provider": "datadog",
+        "status": "provisional"
+      },
+      {
+        "family": "heroku:legacy-api-key",
+        "familyName": "Legacy API key (bare UUID)",
+        "provider": "heroku",
+        "status": "provisional"
+      },
+      {
+        "family": "heroku:oauth-access-token",
+        "familyName": "OAuth access token (HRKU-prefixed)",
+        "provider": "heroku",
+        "status": "stable"
+      },
+      {
+        "family": "mailchimp:marketing-api-key",
+        "familyName": "Marketing API key",
+        "provider": "mailchimp",
+        "status": "provisional"
+      },
+      {
+        "family": "mailgun:legacy-signing-key-triplet",
+        "familyName": "Legacy 32-8-8 hex signing key",
+        "provider": "mailgun",
+        "status": "unsupported"
+      },
+      {
+        "family": "mailgun:private-api-key",
+        "familyName": "Private API key and HTTP webhook signing key",
+        "provider": "mailgun",
+        "status": "provisional"
+      },
+      {
+        "family": "mailgun:public-validation-key",
+        "familyName": "Public validation key (pubkey-)",
+        "provider": "mailgun",
+        "status": "unsupported"
+      },
+      {
+        "family": "netlify:other-prefixed-tokens",
+        "familyName": "CLI, OAuth, app and build tokens (nfc_/nfo_/nfu_/nfb_)",
+        "provider": "netlify",
+        "status": "unsupported"
+      },
+      {
+        "family": "netlify:personal-access-token",
+        "familyName": "Personal access token",
+        "provider": "netlify",
+        "status": "stable"
+      },
+      {
+        "family": "okta:api-token",
+        "familyName": "Management API token (SSWS)",
+        "provider": "okta",
+        "status": "provisional"
+      },
+      {
+        "family": "postman:api-key",
+        "familyName": "API key",
+        "provider": "postman",
+        "status": "provisional"
+      }
+    ],
+    "regressions": [],
+    "schemaVersion": 1,
+    "staleProviderProvenance": [],
+    "summary": {
+      "improvements": 45,
+      "newAndUnclassified": 14,
+      "regressions": 0,
+      "staleProviderProvenance": 0
+    },
+    "taxonomySchemaVersion": 1
+  },
+  "release_evidence": {
+    "manifest_reconstructed": true,
+    "reason": "Release run 35989289538 uploaded a manifest (preserved verbatim as original-manifest.json) whose final state is incomplete: it records npm:@redact-secret/node-linux-x64-gnu as unpublished because that leg's registry-state report ran while npm was still propagating an accepted publish, and it records a wrapper digest mismatch because the facade identity was computed before dist/ was built (issue #732). The facade publish job then failed verification, so registry-install verification and the tag were left to Reconcile Release, which intentionally emits no replacement manifest. Final registry metadata observed directly, the successful clean-install jobs, and the annotated tag are combined here with the preserved inventory.",
+    "observed_at": "2026-09-24",
+    "original_run": 35989289538,
+    "original_manifest": {
+      "provenance": "Summary of original-manifest.json, the release-manifest-0.1.0-beta.7 artifact uploaded by run 35989289538, kept verbatim alongside this record.",
+      "artifact_set": [
+        "crate:redact-secret",
+        "crate:redact-secret-cli",
+        "npm:@redact-secret/core",
+        "npm:@redact-secret/node-darwin-arm64",
+        "npm:@redact-secret/node-darwin-x64",
+        "npm:@redact-secret/node-linux-arm64-gnu",
+        "npm:@redact-secret/node-linux-arm64-musl",
+        "npm:@redact-secret/node-linux-x64-gnu",
+        "npm:@redact-secret/node-linux-x64-musl",
+        "npm:@redact-secret/node-win32-arm64-msvc",
+        "npm:@redact-secret/node-win32-x64-msvc",
+        "npm:@redact-secret/wasm",
+        "pypi:redact-secret"
+      ],
+      "conformance_identity": "81d79450b32a1ae724c6318977c89283811e6596",
+      "registry_state": {
+        "crate:redact-secret": "published",
+        "crate:redact-secret-cli": "published",
+        "npm:@redact-secret/core": "published",
+        "npm:@redact-secret/node-darwin-arm64": "published",
+        "npm:@redact-secret/node-darwin-x64": "published",
+        "npm:@redact-secret/node-linux-arm64-gnu": "published",
+        "npm:@redact-secret/node-linux-arm64-musl": "published",
+        "npm:@redact-secret/node-linux-x64-gnu": "unpublished",
+        "npm:@redact-secret/node-linux-x64-musl": "unpublished",
+        "npm:@redact-secret/node-win32-arm64-msvc": "published",
+        "npm:@redact-secret/node-win32-x64-msvc": "published",
+        "npm:@redact-secret/wasm": "published",
+        "pypi:redact-secret": "published"
+      },
+      "source_revision": "2b98027bbf38d63f07b75129fe2864ef32ed4732",
+      "version": "0.1.0-beta.7",
+      "errors": [
+        "npm:@redact-secret/core (packages/javascript): digest mismatch across stages -- built=qualified=f82efd6b8aae6b50894ffd6f76918f20ac84a174, published=97fb760d03771d8c31a69d662e7e32de6f7d9e90"
+      ]
+    },
+    "registries": {
+      "npm:@redact-secret/core": {
+        "shasum": "97fb760d03771d8c31a69d662e7e32de6f7d9e90",
+        "integrity": "sha512-3qjqKpmj8APbD+5sYJp7vtZQFBz1ctlPSHsWuZryC40vThEpkfj5MnagxxpIzMC5v+vCase0FK0H7zDxiA17yQ=="
+      },
+      "npm:@redact-secret/wasm": {
+        "shasum": "2dac4c3b32c719a4bc2d038adc304fb0874e2dcf",
+        "integrity": "sha512-dgTi+xGTc2kvwBpTmZkiGZFitwGxr0sQv656+Yqh5sZZ0qR/QtqqfFEc91rESjf5ojmxjWfArVqKN891hhyurQ=="
+      },
+      "npm:@redact-secret/node-darwin-arm64": {
+        "shasum": "4aff72d723c9dadbfe37c19e3e1719e98bd32ec3",
+        "integrity": "sha512-q5r31KQNZIjLjKDTshFCUsp8QF5KoSuw/ATqXcYqDVVv9QJeooan/P9Awal6I8sM2zDdAiP8eYOwb8I70eYKHg=="
+      },
+      "npm:@redact-secret/node-darwin-x64": {
+        "shasum": "75e506a6f46fc0ff5d7bdda627590d1d54277e7a",
+        "integrity": "sha512-7xTRPeMYoblstD/6TFTOFY6ppz1rFH4pD5t2WCQsiB78mjCZ7lrglX4zlad32JLFiaPbJY567ygLorPfXQaQjw=="
+      },
+      "npm:@redact-secret/node-linux-arm64-gnu": {
+        "shasum": "2f52fbfdbb2ecf6a3bc48b8989eb40c494bcc845",
+        "integrity": "sha512-vD28FCCptiiL9tjLQL83EDGJssEvHasxDCWrLLK54CZcf6fHmMI3N9u+TOBjHw2m7OlCEKYnRyTakivrXqtGLQ=="
+      },
+      "npm:@redact-secret/node-linux-x64-gnu": {
+        "shasum": "e1436a82155e3e66b386467c8dec69943b343faa",
+        "integrity": "sha512-/WSgnr5/09vCP/IxHpXa8ln7F9yXfaAvUu2ZbaLiqY94vf6Zf7NfjWqgQ0kWiCno7wPt0/z5QwIHrZNZEdUO1A=="
+      },
+      "npm:@redact-secret/node-linux-arm64-musl": {
+        "shasum": "8ed142b950d6793b1c3aaf898e1103b4cc629f71",
+        "integrity": "sha512-UUuMGyuv2MDLrhKPJ+NeYsMQgtjXci+oF9z4aDqm1w6cVOxWpqOaWpE4GJKA6XpTLkfnblgEsJlM1GGldvqB+g=="
+      },
+      "npm:@redact-secret/node-linux-x64-musl": {
+        "shasum": "a8288dfcf873a12ac30885c20d2449fd2519db34",
+        "integrity": "sha512-uFyoa06mKswPLZPmjSdOqNcj57vs1vF27zWg/whRJh/Cj+nbpoJtwVd8+ejqvdf/TZxSgnuAAcCI7qoKvRCx3g=="
+      },
+      "npm:@redact-secret/node-win32-x64-msvc": {
+        "shasum": "a08793adfd0d8fe81b8f86a5ffd96baca589ae0c",
+        "integrity": "sha512-Ojv7qMXrxhVZfDs6iCZBv9C6iNIwVqqgAqeyvdI8UDG+x3D1wKBTmfPOLMKU++6v+AFO/ZGvuFehV+Mo3bUChg=="
+      },
+      "npm:@redact-secret/node-win32-arm64-msvc": {
+        "shasum": "1245e46538dee46003ab01b776c3a0b1ca23513e",
+        "integrity": "sha512-9Os3rcOp7l+4dJzWKHsJem46JU5Ajb06mXBcXoWHyGOQfhwksIHHQMPz9jcX+IWkZEbPGfrKeAJs39Tc1kPB5A=="
+      },
+      "crate:redact-secret": {
+        "checksum": "1501d88ab2db8eef098c06bd2bd89cb7ee575ed11c2185a34ccc3b1eb57b5bba"
+      },
+      "crate:redact-secret-cli": {
+        "checksum": "0686dfdd170929f47b12193c7c6bc812b2a9e2a5fc60dce20dc81d7e49cd241a"
+      },
+      "pypi:redact-secret": {
+        "files": [
+          {
+            "filename": "redact_secret-0.1.0b7-cp310-abi3-macosx_10_12_x86_64.whl",
+            "sha256": "8097975171cb8487e58c317fbff921d734b88efaf0ce13c654de90a64a65d95b"
+          },
+          {
+            "filename": "redact_secret-0.1.0b7-cp310-abi3-macosx_11_0_arm64.whl",
+            "sha256": "d712a2b428dfdffbbd54dacdb8cc31728711d1be42bef13df7f333ad4bd90df8"
+          },
+          {
+            "filename": "redact_secret-0.1.0b7-cp310-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl",
+            "sha256": "79e1398d39601142be723b4353eb5df3eda34bceefee8a513c22c7d8045ac3ef"
+          },
+          {
+            "filename": "redact_secret-0.1.0b7-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+            "sha256": "cabe27c76716c47ce34f98442e5d07777e36871f0f5e26749527ca97c49987e5"
+          },
+          {
+            "filename": "redact_secret-0.1.0b7-cp310-abi3-musllinux_1_2_aarch64.whl",
+            "sha256": "e73d29d9feb47a14a3d5b7f4add3617f1a6925208a9a955e3a4f693c8147e99f"
+          },
+          {
+            "filename": "redact_secret-0.1.0b7-cp310-abi3-musllinux_1_2_x86_64.whl",
+            "sha256": "5d0a6b1463f02667061caa63dc4a25b5665550eb118f9507a2bf95fa3dfc6231"
+          },
+          {
+            "filename": "redact_secret-0.1.0b7-cp310-abi3-win_amd64.whl",
+            "sha256": "f70905ab9ee32520f6ba8cc4f1685340d5b217076e203b902ee204205c7918e8"
+          },
+          {
+            "filename": "redact_secret-0.1.0b7-cp310-abi3-win_arm64.whl",
+            "sha256": "afab02ff4a36a77adaa8ec8adfe8ded51aa8404cb6566fe1b3a4b8fbef3ddce2"
+          },
+          {
+            "filename": "redact_secret-0.1.0b7.tar.gz",
+            "sha256": "0ad7d302623759b438d9016d07beedc1de080fbfde3338a2d48c2ec442eb4ab7"
+          }
+        ]
+      }
+    },
+    "runs": [
+      {
+        "id": 35985834032,
+        "result": "CI passed at the frozen source revision 2b98027 on rc/0.1.0-beta.7."
+      },
+      {
+        "id": 35985834076,
+        "result": "SAST passed at the frozen source revision."
+      },
+      {
+        "id": 35985834058,
+        "result": "Python wheels passed at the frozen source revision."
+      },
+      {
+        "id": 35985834573,
+        "result": "Artifact qualification passed at the frozen source revision (55 jobs, 3 skipped); the #584 benchmark re-run on its CI-built darwin-arm64 addon and wasm matched the recorded candidate evaluation on all 1,466 fixtures."
+      },
+      {
+        "id": 35987819361,
+        "result": "Package Release Rehearsal passed at the frozen source revision with throwaway version 0.1.0-beta.35987819361; all ten npm dependency packages present in the cutover plan, nothing published."
+      },
+      {
+        "id": 35989289538,
+        "result": "Release re-ran qualification (producing the preserved inventory), then published both crates, all nine PyPI files, all nine npm dependency packages, and @redact-secret/core. node-linux-x64-gnu's post-publish check accepted npm's publish during propagation lag (issue #614 path), so its leg reported 'unpublished'. 'Verify npm publication' failed because the facade identity had been computed before the build (issue #732); 'Record release manifest' recorded that same mismatch as an error. Registry-install verification and the tag were skipped."
+      },
+      {
+        "id": 35991840838,
+        "result": "Authorized dry-run reconciliation stopped at the guard before planning: it was dispatched with source_run but without source_commit, and a source_run skips the manifest download. Nothing was published."
+      },
+      {
+        "id": 35992781937,
+        "result": "Authorized dry-run reconciliation (source_run 35989289538, source_commit 2b98027) confirmed the source revision is an ancestor of rc/0.1.0-beta.7, content-matched all nine npm dependency packages, both crates, all nine PyPI files, and the rebuilt npm facade, and planned no publication."
+      },
+      {
+        "id": 35993751064,
+        "result": "Authorized recovery republished nothing, passed registry installs on all eight Node targets and Chromium, and created annotated tag v0.1.0-beta.7 at the frozen source revision."
+      }
+    ],
+    "verification": {
+      "run": 35993751064,
+      "node": [
+        "aarch64-apple-darwin",
+        "x86_64-apple-darwin",
+        "aarch64-unknown-linux-gnu",
+        "x86_64-unknown-linux-gnu",
+        "aarch64-unknown-linux-musl",
+        "x86_64-unknown-linux-musl",
+        "aarch64-pc-windows-msvc",
+        "x86_64-pc-windows-msvc"
+      ],
+      "browser": "chromium",
+      "rust": {
+        "observed_at": "2026-09-24",
+        "platform": "aarch64-apple-darwin",
+        "version": "0.1.0-beta.7",
+        "install": "cargo install redact-secret-cli --version 0.1.0-beta.7 --locked --root <empty-temporary-root>",
+        "checks": [
+          "synthetic standard-input redaction"
+        ],
+        "result": "passed"
+      },
+      "python": {
+        "observed_at": "2026-09-24",
+        "platform": "macosx_11_0_arm64",
+        "version": "0.1.0b7",
+        "install": "python -m pip install --only-binary=:all: redact-secret==0.1.0b7 in a new virtual environment",
+        "checks": [
+          "synthetic scan_and_redact call"
+        ],
+        "files": 9,
+        "result": "passed"
+      },
+      "independent": "On 2026-09-24 every npm tarball's .node/.wasm payload, both crate checksums and all nine PyPI file hashes were checked directly against artifact-inventory.json, and the core tarball's SHA-256 against the inventory's installed-package reports; all matched."
+    },
+    "tag": {
+      "name": "v0.1.0-beta.7",
+      "object": "696e19c0b4304b07c2040edec6e707b5982052a5",
+      "target": "2b98027bbf38d63f07b75129fe2864ef32ed4732"
+    }
+  }
+}
