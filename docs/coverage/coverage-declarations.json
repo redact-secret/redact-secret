@@ -2533,13 +2533,14 @@
           "evidenceFixtureIds": [
             "supabase-positive-crlf-unicode-prefix",
             "supabase-positive-doc-style-placeholder",
+            "supabase-positive-documented-layout-exact-width",
             "supabase-positive-dotenv",
             "supabase-positive-json",
             "supabase-positive-log",
-            "supabase-positive-min-length",
             "supabase-positive-mixed-public-and-secret",
             "supabase-positive-qualified",
-            "supabase-positive-yaml"
+            "supabase-positive-yaml",
+            "supabase-token-positive-documented-layout"
           ],
           "state": "supported"
         },
@@ -2564,7 +2565,10 @@
             "supabase-boundary-case-sensitivity",
             "supabase-boundary-delimiter",
             "supabase-boundary-invalid-alphabet",
-            "supabase-boundary-short"
+            "supabase-boundary-short",
+            "supabase-token-negative-checksum-9",
+            "supabase-token-negative-dash-delimiter",
+            "supabase-token-negative-random-part-21"
           ],
           "state": "supported"
         },
@@ -2917,7 +2921,12 @@
         {
           "dimension": "positive",
           "evidenceFixtureIds": [
+            "firebase-positive-client-config-dotenv",
+            "firebase-positive-client-config-javascript",
+            "firebase-positive-client-config-json",
+            "firebase-positive-client-config-minimal-javascript",
             "firebase-positive-google-api-key-as-server-key-context",
+            "firebase-positive-google-services-json",
             "google-positive-dotenv",
             "google-positive-javascript-firebase-config",
             "google-positive-json",
@@ -2944,7 +2953,6 @@
         {
           "dimension": "boundary",
           "evidenceFixtureIds": [
-            "firebase-negative-client-config-wide-gap-does-not-suppress",
             "google-boundary-below-min",
             "google-boundary-case-sensitivity",
             "google-boundary-crlf",
@@ -2959,8 +2967,6 @@
           "dimension": "near-miss-negative",
           "evidenceFixtureIds": [
             "firebase-negative-authdomain-bare",
-            "firebase-negative-client-config-javascript",
-            "firebase-negative-client-config-json",
             "firebase-negative-messaging-sender-id-bare",
             "google-negative-key-id",
             "google-negative-masked",
@@ -3399,10 +3405,13 @@
           "dimension": "positive",
           "evidenceFixtureIds": [
             "atlassian-api-token-positive-bare",
+            "atlassian-api-token-positive-crc32-suffix-full-span",
+            "atlassian-api-token-positive-crc32-suffix-json",
             "atlassian-api-token-positive-crlf-unicode-prefix",
             "atlassian-api-token-positive-dotenv",
             "atlassian-api-token-positive-json",
-            "atlassian-api-token-positive-log"
+            "atlassian-api-token-positive-log",
+            "atlassian-api-token-positive-no-suffix-exact"
           ],
           "state": "supported"
         },
@@ -3425,6 +3434,7 @@
           "evidenceFixtureIds": [
             "atlassian-api-token-boundary-below-min",
             "atlassian-api-token-boundary-invalid-alphabet",
+            "atlassian-api-token-boundary-nine-hex-tail",
             "atlassian-api-token-boundary-wrong-prefix-access-token",
             "atlassian-api-token-boundary-wrong-prefix-app-password"
           ],
@@ -3490,6 +3500,7 @@
           "evidenceFixtureIds": [
             "telegram-bot-token-positive-bare",
             "telegram-bot-token-positive-bot-api-url",
+            "telegram-bot-token-positive-control-exact",
             "telegram-bot-token-positive-crlf-unicode-prefix",
             "telegram-bot-token-positive-dotenv",
             "telegram-bot-token-positive-json",
@@ -3523,6 +3534,8 @@
         {
           "dimension": "near-miss-negative",
           "evidenceFixtureIds": [
+            "telegram-bot-token-negative-atlassian-account-id",
+            "telegram-bot-token-negative-atlassian-account-id-uppercase",
             "telegram-bot-token-negative-bare-numeric-id",
             "telegram-bot-token-negative-malformed-numeric-colon",
             "telegram-bot-token-negative-masked",
@@ -6354,6 +6367,7 @@
         {
           "dimension": "positive",
           "evidenceFixtureIds": [
+            "confluent-cloud-api-secret-checksum-valid",
             "confluent-cloud-api-secret-positive-bare",
             "confluent-cloud-api-secret-positive-crlf-unicode-prefix",
             "confluent-cloud-api-secret-positive-dotenv",
@@ -6392,6 +6406,9 @@
         {
           "dimension": "near-miss-negative",
           "evidenceFixtureIds": [
+            "confluent-cloud-api-secret-negative-checksum-big-endian",
+            "confluent-cloud-api-secret-negative-checksum-mismatch",
+            "confluent-cloud-api-secret-negative-checksum-prefix-included",
             "confluent-cloud-api-secret-negative-cluster-and-host-context",
             "confluent-cloud-api-secret-negative-doc-style-placeholder",
             "confluent-cloud-api-secret-negative-embedded-identifier",
@@ -6728,6 +6745,9 @@
         {
           "dimension": "positive",
           "evidenceFixtureIds": [
+            "heroku-api-key-hrku-uuid-authorizations-create",
+            "heroku-api-key-hrku-uuid-bare",
+            "heroku-api-key-hrku-uuid-env",
             "heroku-api-key-positive-bare",
             "heroku-api-key-positive-crlf-unicode-prefix",
             "heroku-api-key-positive-dotenv",
@@ -6773,6 +6793,8 @@
             "heroku-api-key-negative-embedded-in-wider-identifier",
             "heroku-api-key-negative-env-var-reference",
             "heroku-api-key-negative-github-actions-secret-reference",
+            "heroku-api-key-negative-hrku-underscore-separator",
+            "heroku-api-key-negative-hrku-uuid-one-short",
             "heroku-api-key-negative-masked"
           ],
           "state": "supported"
@@ -6824,8 +6846,10 @@
         {
           "dimension": "positive",
           "evidenceFixtureIds": [
+            "heroku-api-key-legacy-positive-auth-token-output",
             "heroku-api-key-legacy-positive-bare-with-keyword",
             "heroku-api-key-legacy-positive-dotenv-keyword",
+            "heroku-api-key-legacy-positive-netrc-multi-line",
             "heroku-api-key-legacy-positive-netrc-style",
             "heroku-api-key-legacy-positive-yaml-keyword"
           ],
@@ -6857,9 +6881,11 @@
           "dimension": "near-miss-negative",
           "evidenceFixtureIds": [
             "heroku-api-key-legacy-negative-app-and-release-id",
+            "heroku-api-key-legacy-negative-app-url-path",
             "heroku-api-key-legacy-negative-bare-no-context",
             "heroku-api-key-legacy-negative-different-line",
-            "heroku-api-key-legacy-negative-heroku-app-id"
+            "heroku-api-key-legacy-negative-heroku-app-id",
+            "heroku-api-key-legacy-negative-uuid-without-heroku-context"
           ],
           "state": "supported"
         },
@@ -6935,6 +6961,7 @@
             "adjacent-findings",
             "amqp-amqps-scheme-prefix-discriminating-boundary",
             "anthropic-legacy-versioned-prefix-discriminating-boundary",
+            "atlassian-api-token-crc32-tail-partition",
             "aws-access-key-exact-length-discriminating-boundary",
             "aws-contextual-assignment",
             "bearer-token-filler-and-placeholder-exclusion-boundary",
@@ -6970,6 +6997,9 @@
             "gitlab-lookalike-token-discriminating-boundary",
             "grafana-cloud-access-policy-token-basic",
             "grafana-service-account-token-basic",
+            "heroku-hrku-uuid-generation-partitions",
+            "heroku-legacy-auth-token-output-partitions",
+            "heroku-legacy-netrc-multi-line-partitions",
             "huggingface-incremental-exact-length-positive",
             "huggingface-incremental-one-short-negative",
             "huggingface-incremental-org-token-non-conforming-negative",
@@ -7273,6 +7303,7 @@
             "adjacent-findings",
             "amqp-amqps-scheme-prefix-discriminating-boundary",
             "anthropic-legacy-versioned-prefix-discriminating-boundary",
+            "atlassian-api-token-crc32-tail-partition",
             "aws-access-key-exact-length-discriminating-boundary",
             "aws-contextual-assignment",
             "bearer-token-filler-and-placeholder-exclusion-boundary",
@@ -7308,6 +7339,9 @@
             "gitlab-lookalike-token-discriminating-boundary",
             "grafana-cloud-access-policy-token-basic",
             "grafana-service-account-token-basic",
+            "heroku-hrku-uuid-generation-partitions",
+            "heroku-legacy-auth-token-output-partitions",
+            "heroku-legacy-netrc-multi-line-partitions",
             "huggingface-incremental-exact-length-positive",
             "huggingface-incremental-one-short-negative",
             "huggingface-incremental-org-token-non-conforming-negative",
@@ -7733,6 +7767,7 @@
             "adjacent-findings",
             "amqp-amqps-scheme-prefix-discriminating-boundary",
             "anthropic-legacy-versioned-prefix-discriminating-boundary",
+            "atlassian-api-token-crc32-tail-partition",
             "aws-access-key-exact-length-discriminating-boundary",
             "aws-contextual-assignment",
             "bearer-token-filler-and-placeholder-exclusion-boundary",
@@ -7768,6 +7803,9 @@
             "gitlab-lookalike-token-discriminating-boundary",
             "grafana-cloud-access-policy-token-basic",
             "grafana-service-account-token-basic",
+            "heroku-hrku-uuid-generation-partitions",
+            "heroku-legacy-auth-token-output-partitions",
+            "heroku-legacy-netrc-multi-line-partitions",
             "huggingface-incremental-exact-length-positive",
             "huggingface-incremental-one-short-negative",
             "huggingface-incremental-org-token-non-conforming-negative",

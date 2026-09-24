@@ -26,6 +26,59 @@ evidence is linked from each published version.
   `credentials: SK...`. Twilio documents both as identifiers, and the Twilio
   detectors already treat them only as context. Any other prefix, length, or
   an uppercase body is still reported (#746).
+- `confluent-cloud-api-secret` now validates the checksum Confluent documents
+  for `cflt` secrets. The last 6 characters must be the first 6
+  standard-Base64 characters of the little-endian CRC-32 of the 54 body
+  characters after `cflt`. A `cflt` value with the right length and alphabet
+  but a different checksum (a changed character, big-endian bytes, or a CRC
+  that includes the prefix) is no longer reported. The unprefixed legacy shape
+  is unchanged (#738).
+
+### Changed detection
+
+- `heroku-api-key` now also detects the 41-character `HRKU-` OAuth access
+  token generation: `HRKU-` followed by a lower-case `8-4-4-4-12` hex UUID,
+  granted from 2024-04-01 through 2025-04-22 and valid until regenerated
+  (Heroku changelog items 2842 and 3175). Like the 65-character `HRKU-AA`
+  form, it is always redacted and needs no surrounding context. A 35-byte
+  body, an upper-case body, or an `HRKU_` separator is not this shape (#740).
+- `heroku-api-key-legacy` now also reports a bare-UUID token in two
+  documented multi-line layouts where `heroku` is not on the token's line: the
+  `password` of a `.netrc` entry whose `machine` host names heroku (with at
+  most two `login`/`account` lines between them), and the line after a
+  `heroku auth:token` command that holds only the token. The incremental
+  session holds such a unit open until the token's line arrives, so chunked
+  and whole-input results match. A UUID after any other line stays clean. A
+  UUID that is a URL path segment (`https://api.heroku.com/apps/<uuid>/...`)
+  is now treated as a public resource id and never reported, even on a line
+  that names heroku (#743).
+- `atlassian-api-token` now redacts the whole 192-character token. It used to
+  stop at the `=` and leave the `=` plus 8 uppercase hex characters at the end
+  outside the finding. The detector now extends a match over exactly that tail
+  when the byte after it ends the token; the tail's value is not validated,
+  and a token without it is matched as before (#741).
+- `supabase-token` now accepts only the documented `sb_secret_` layout: a
+  22-character random part, `_`, and an 8-character checksum part, all
+  base64url. A 21- or 23-character random part, a 7- or 9-character checksum,
+  or a `-` in place of the `_` is no longer reported; the former 20-character
+  minimum is withdrawn. The checksum value is not validated, because the
+  hosted platform's checksum input is not documented (#742).
+- `telegram-bot-token` no longer reports an Atlassian account id
+  (`<digits>:<8-4-4-4-12 UUID>`) as a bot token. A candidate whose secret
+  segment is exactly a canonical hexadecimal UUID is rejected; every other
+  token shape is unchanged (#747).
+- A Google API key (`google-api-key`, `AIza` + 35) inside a Firebase Web SDK
+  client config is reported again. Since beta.6 (#520), the pipeline dropped
+  an `AIza` value when two or more Firebase config field names (`authDomain`,
+  `projectId`, `appId`, ...) sat within 512 bytes of it. That exemption is
+  removed. The `AIza` format carries no API scope, and an unrestricted key on
+  a project with the Generative Language API enabled can call Gemini, so a
+  surrounding `firebaseConfig` does not show that the key is safe. This widens
+  detection: a `firebaseConfig` `apiKey`, a `NEXT_PUBLIC_FIREBASE_API_KEY=`
+  line and a `google-services.json` `current_key` are now redacted. The
+  config's identifier fields stay unflagged. The Firebase FCM server key
+  detection is unchanged (#749,
+  `decision-redact-google-api-keys-inside-firebase-web-config`).
 
 ### Internal, tooling, and qualification
 

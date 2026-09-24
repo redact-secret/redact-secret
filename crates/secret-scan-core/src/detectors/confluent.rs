@@ -6,23 +6,29 @@
 //! (`docs.confluent.io/cloud/current/security/authenticate/workload-identities/service-accounts/api-keys/overview.html`,
 //! observed 2026-09-22):
 //!
-//! - **Current (created on or after 2026-07-30).** The literal `cflt`
-//!   prefix followed by exactly 60 bytes of the standard base64 body
-//!   alphabet ([`pattern::is_base64_body`], `[A-Za-z0-9+/]`), 64 bytes
-//!   total. Confluent's own documentation states the final 6 of those 60
-//!   bytes carry a base64-encoded CRC32 checksum of the rest, but does not
-//!   publish the exact byte range or encoding padding rule the checksum
-//!   covers precisely enough to recompute independently, and the checksum
-//!   shares its enclosing body's alphabet, so (matching
-//!   [`super::cloudflare::CLOUDFLARE`]'s and [`super::additional_providers::GRAFANA_CLOUD`]'s
-//!   same "no distinguishing shape to check" precedent) this detector
-//!   validates the `cflt`-prefixed exact length only, not the checksum
-//!   value. A `cflt`-prefixed body that is not a genuine checksum is
-//!   therefore an intentional false positive already accepted for every
-//!   shape-only checksum precedent in this crate.
-//! - **Legacy (created before 2026-07-30).** The same documentation states
-//!   older secrets "may lack the `cflt` prefix but remain valid" -- a bare
-//!   64-byte run of the same alphabet, with no marker of its own. This
+//! - **Current (created after 2025-07-30).** The literal `cflt` prefix
+//!   followed by exactly 60 bytes of the standard base64 body alphabet
+//!   ([`pattern::is_base64_body`], `[A-Za-z0-9+/]`), 64 bytes total.
+//!   Confluent's page states that "the final 6 characters contain a
+//!   Base64-encoded CRC32 checksum of the prior 54 characters", and its own
+//!   secret-detection example fixes the algorithm precisely enough to
+//!   recompute independently (issue #738): the IEEE CRC-32 of the 54 body
+//!   bytes after `cflt` (the prefix is not covered), serialized as 4
+//!   little-endian bytes, standard-base64 encoded, first 6 characters. That
+//!   recipe reproduces the page's own example exactly, and a big-endian or
+//!   prefix-included variant fails it. This detector therefore validates
+//!   the checksum ([`checksum_matches`]): a `cflt`-prefixed value of the
+//!   right length and alphabet whose final 6 bytes are not that checksum is
+//!   rejected. This supersedes the earlier shape-only reading, which
+//!   treated the checksum as unpublished and accepted every checksum-invalid
+//!   value as an intentional false positive.
+//! - **Legacy (created on or before 2025-07-30).** The same documentation
+//!   states older secrets "may lack the `cflt` prefix but remain valid" -- a bare
+//!   64-byte run of the same alphabet, with no marker of its own and no
+//!   documented checksum, so this path is not checksum-validated. A run
+//!   that starts with `cflt` is the current generation's shape and is left
+//!   to the prefixed detector alone, so a checksum-invalid `cflt` value is
+//!   not re-reported here as a legacy secret. This
 //!   shape is indistinguishable by structure alone from any other opaque
 //!   base64 blob, so it is never reported without same-line corroboration,
 //!   the same reasoning [`super::twilio`] already documents for its own
@@ -99,10 +105,77 @@ fn is_confluent_secret_boundary(byte: u8) -> bool {
     pattern::is_base64_body(byte) || byte == b'_' || byte == b'-'
 }
 
-const PREFIXED_SIGNALS: [&str; 2] = ["confluent-documented-prefix", "base64-exact-length"];
+/// The documented checksum length: the final 6 of the 60 body bytes.
+const CHECKSUM_LEN: usize = 6;
+
+const PREFIXED_SIGNALS: [&str; 3] = [
+    "confluent-documented-prefix",
+    "base64-exact-length",
+    "crc32-checksum",
+];
+
+/// The IEEE CRC-32 lookup table (reflected polynomial `0xEDB88320`), built
+/// at compile time so the core keeps its empty dependency list.
+const CRC32_TABLE: [u32; 256] = {
+    let mut table = [0u32; 256];
+    let mut index = 0;
+    while index < 256 {
+        #[allow(clippy::cast_possible_truncation)]
+        let mut crc = index as u32;
+        let mut bit = 0;
+        while bit < 8 {
+            crc = if crc & 1 == 1 {
+                (crc >> 1) ^ 0xEDB8_8320
+            } else {
+                crc >> 1
+            };
+            bit += 1;
+        }
+        table[index] = crc;
+        index += 1;
+    }
+    table
+};
+
+/// The IEEE CRC-32 (the one zlib, PNG and Ethernet use) of `bytes`.
+fn crc32(bytes: &[u8]) -> u32 {
+    !bytes.iter().fold(!0u32, |crc, &byte| {
+        CRC32_TABLE[usize::from(crc.to_le_bytes()[0] ^ byte)] ^ (crc >> 8)
+    })
+}
+
+const STANDARD_BASE64: &[u8; 64] =
+    b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+/// The documented checksum of `body`: its CRC-32 as 4 little-endian bytes,
+/// standard-base64 encoded, first [`CHECKSUM_LEN`] characters (the 8-byte
+/// padded encoding minus its trailing `==`).
+fn documented_checksum(body: &[u8]) -> [u8; CHECKSUM_LEN] {
+    let [b0, b1, b2, b3] = crc32(body).to_le_bytes();
+    let sextets = [
+        b0 >> 2,
+        ((b0 & 0x03) << 4) | (b1 >> 4),
+        ((b1 & 0x0f) << 2) | (b2 >> 6),
+        b2 & 0x3f,
+        b3 >> 2,
+        (b3 & 0x03) << 4,
+    ];
+    sextets.map(|sextet| STANDARD_BASE64[usize::from(sextet)])
+}
+
+/// `true` when the matched `cflt` value's final [`CHECKSUM_LEN`] bytes equal
+/// the documented checksum of the 54 body bytes between the prefix and the
+/// checksum -- the [`pattern::PostCheck`] the exact-length shape alone
+/// cannot express. `start..end` is the whole match, prefix included.
+fn checksum_matches(bytes: &[u8], start: usize, end: usize) -> bool {
+    let body_start = start + SECRET_PREFIX.len();
+    let checksum_start = end - CHECKSUM_LEN;
+    documented_checksum(&bytes[body_start..checksum_start]) == bytes[checksum_start..end]
+}
 
 /// The `cflt`-prefixed current-format secret: an exact `cflt` + 60-byte
-/// base64-body shape, unconditionally [`Confidence::High`] and
+/// base64-body shape whose final 6 bytes are the documented CRC-32 checksum
+/// ([`checksum_matches`]), unconditionally [`Confidence::High`] and
 /// [`Specificity::Provider`] -- no context needed, matching
 /// [`super::additional_providers::NPM`] and
 /// [`super::additional_providers::DIGITALOCEAN`]'s own "documented literal
@@ -116,7 +189,8 @@ pub(super) const CONFLUENT_CLOUD_API_SECRET: KnownFormatProviderDetector =
             PREFIXED_BODY_LEN,
             pattern::is_base64_body,
             &PREFIXED_SIGNALS,
-        )],
+        )
+        .with_post_check(checksum_matches)],
         is_confluent_secret_boundary,
     );
 
@@ -200,7 +274,14 @@ impl Detector for ConfluentLegacyApiSecretDetector {
                 continue;
             }
             for (relative_start, relative_end) in raw_matches {
-                if text::is_repeated_character_filler(&line[relative_start..relative_end])
+                let value = &line[relative_start..relative_end];
+                // A `cflt`-led run is the current generation's shape, which
+                // `CONFLUENT_CLOUD_API_SECRET` alone judges: legacy secrets
+                // are the ones that "lack the `cflt` prefix", so a `cflt`
+                // value whose checksum fails is no secret at all rather than
+                // a legacy one (#738).
+                if value.starts_with(SECRET_PREFIX)
+                    || text::is_repeated_character_filler(value)
                     || text::is_labelled_digest(line, relative_start)
                 {
                     continue;
@@ -229,9 +310,10 @@ impl Detector for ConfluentLegacyApiSecretDetector {
 mod tests {
     use super::*;
 
-    /// Exactly [`PREFIXED_BODY_LEN`] base64-body bytes. Locally constructed
-    /// synthetic value; never provider-issued.
-    const PREFIXED_BODY: &str = "SYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPQRSTUV";
+    /// Exactly [`PREFIXED_BODY_LEN`] base64-body bytes whose final
+    /// [`CHECKSUM_LEN`] bytes are the documented checksum of the first 54.
+    /// Locally constructed synthetic value; never provider-issued.
+    const PREFIXED_BODY: &str = "SYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPn2NMow";
     const _: () = assert!(PREFIXED_BODY.len() == PREFIXED_BODY_LEN);
 
     /// Exactly [`LEGACY_SECRET_LEN`] base64-body bytes, carrying no
@@ -276,6 +358,46 @@ mod tests {
             candidates[0].range(),
             ByteRange::new(0, value.len()).unwrap()
         );
+    }
+
+    /// The issue #738 canonical body: 54 synthetic bytes and the
+    /// checksum each documented or undocumented recipe gives for them.
+    const CANONICAL_BODY: &str = "SYNTHETIC0REVOKED0ConfluentChecksumFixture0ABCDEFGHIJK";
+    const _: () = assert!(CANONICAL_BODY.len() == PREFIXED_BODY_LEN - CHECKSUM_LEN);
+
+    #[test]
+    fn computes_the_ieee_crc32_check_value() {
+        assert_eq!(crc32(b"123456789"), 0xCBF4_3926);
+        assert_eq!(crc32(b""), 0);
+    }
+
+    #[test]
+    fn computes_the_documented_little_endian_standard_base64_checksum() {
+        assert_eq!(&documented_checksum(CANONICAL_BODY.as_bytes()), b"E3aswA");
+        let body = &PREFIXED_BODY.as_bytes()[..PREFIXED_BODY_LEN - CHECKSUM_LEN];
+        assert_eq!(
+            &documented_checksum(body),
+            &PREFIXED_BODY.as_bytes()[PREFIXED_BODY_LEN - CHECKSUM_LEN..]
+        );
+    }
+
+    #[test]
+    fn accepts_only_the_documented_checksum() {
+        let valid = format!("{SECRET_PREFIX}{CANONICAL_BODY}E3aswA");
+        assert_eq!(detect_prefixed(&valid).len(), 1);
+        // A changed first checksum byte, the big-endian serialization, and a
+        // CRC over `cflt` + body each keep prefix, length and alphabet.
+        for checksum in ["A3aswA", "wKx2Ew", "pw1DTQ"] {
+            let input = format!("{SECRET_PREFIX}{CANONICAL_BODY}{checksum}");
+            assert!(detect_prefixed(&input).is_empty(), "{checksum}");
+        }
+    }
+
+    #[test]
+    fn rejects_a_valid_checksum_after_a_changed_body_byte() {
+        let mut body = PREFIXED_BODY.to_owned();
+        body.replace_range(0..1, "T");
+        assert!(detect_prefixed(&format!("{SECRET_PREFIX}{body}")).is_empty());
     }
 
     #[test]
@@ -425,6 +547,14 @@ mod tests {
             candidates[0].range(),
             ByteRange::new(start, start + LEGACY_BODY.len()).unwrap()
         );
+    }
+
+    #[test]
+    fn never_reports_a_cflt_led_run_as_a_legacy_secret() {
+        for checksum in ["E3aswA", "A3aswA"] {
+            let input = format!("CONFLUENT_CLOUD_API_SECRET=cflt{CANONICAL_BODY}{checksum}");
+            assert!(detect_legacy(&input).is_empty(), "{checksum}");
+        }
     }
 
     #[test]

@@ -308,17 +308,58 @@ pub(super) const DIGITALOCEAN: KnownFormatProviderDetector = KnownFormatProvider
 /// deliberately excluded — it names a public identifier, not a secret —
 /// so classifying it would be a false positive; an undocumented prefix is
 /// a false negative.
-const SUPABASE_SIGNALS: [&str; 2] = ["supabase-secret-prefix", "elevated-access-key"];
+///
+/// Issue #742: the body is the provider-documented layout, not an open
+/// floor. Supabase's self-hosting key page
+/// (<https://supabase.com/docs/guides/self-hosting/self-hosted-auth-keys>)
+/// documents `sb_secret_<22-char-random>_<8-char-checksum>` and states that
+/// hosted keys "use the same format as the platform"; the provider's
+/// `docker/utils/add-new-auth-keys.sh` builds both segments from base64url
+/// (`[A-Za-z0-9_-]`), and the Supabase CLI's local-dev keys measure the same
+/// 22 + `_` + 8 (redact-secret-benchmarks#231, rows 4-6). So the body is
+/// exactly [`SUPABASE_BODY_LEN`] bytes of `[A-Za-z0-9_-]` with a literal `_`
+/// at [`SUPABASE_DELIMITER_OFFSET`]; because the alphabet itself contains
+/// `_` and `-`, the delimiter is checked by position, never by splitting.
+/// A 21- or 23-byte random part, a 7- or 9-byte checksum, or a `-` in the
+/// delimiter position is rejected rather than truncated.
+///
+/// The checksum *value* is not validated. The provider script computes it
+/// as the first 8 base64url characters of
+/// `sha256("<project ref>|" + prefix + random)` with the fixed self-hosted
+/// ref `supabase-self-hosted`; a hosted key's input (presumably the real
+/// project ref, which does not appear in the key) is undocumented, so
+/// validating against the self-hosted constant would reject every hosted
+/// key, and there is no documented input to validate a hosted key against.
+const SUPABASE_SIGNALS: [&str; 3] = [
+    "supabase-secret-prefix",
+    "elevated-access-key",
+    "documented-random-checksum-layout",
+];
+
+/// The documented `<22-char-random>_<8-char-checksum>` body length.
+const SUPABASE_BODY_LEN: usize = 22 + 1 + 8;
+
+/// The body offset of the documented `_` between the random and checksum
+/// segments.
+const SUPABASE_DELIMITER_OFFSET: usize = 22;
+
+const SUPABASE_PREFIX: &str = "sb_secret_";
+
+/// `true` when the byte at the documented delimiter offset is `_`.
+fn supabase_delimiter_ok(bytes: &[u8], start: usize, _end: usize) -> bool {
+    bytes.get(start + SUPABASE_PREFIX.len() + SUPABASE_DELIMITER_OFFSET) == Some(&b'_')
+}
 
 pub(super) const SUPABASE: KnownFormatProviderDetector = KnownFormatProviderDetector {
     id: "supabase-token",
     type_name: "supabase_secret_key",
-    shapes: &[PrefixShape::at_least(
-        "sb_secret_",
-        20,
+    shapes: &[PrefixShape::exact(
+        SUPABASE_PREFIX,
+        SUPABASE_BODY_LEN,
         pattern::is_alnum_dash,
         &SUPABASE_SIGNALS,
-    )],
+    )
+    .with_post_check(supabase_delimiter_ok)],
     boundary: pattern::is_alnum_dash,
 };
 
@@ -419,17 +460,15 @@ pub(super) const NPM: KnownFormatProviderDetector = KnownFormatProviderDetector 
 /// shorter or longer than exactly 35 bytes, or an undocumented prefix, is
 /// also an intentional false negative rather than a fuzzy match. The same
 /// `AIza`-prefixed shape appears in public Firebase/browser configuration
-/// (referrer-restricted, not always a privileged secret) as well as in
-/// service-scoped Cloud/Gemini use, so this detector always reports the
-/// shape at `Confidence::High`, never suppressing a match itself. Issue
-/// #520 (B3a) discriminates the public Firebase Web SDK client config from
-/// everywhere else this shape appears, but does so at the pipeline level
-/// (`crate::pipeline::is_within_firebase_client_config_context`), not here:
-/// a candidate that survives this detector unchanged is dropped afterward,
-/// only when it also sits inside a recognized client-config object. Outside
-/// that narrow, evidenced exemption, the shape still leaves the redact/warn
-/// action call to policy, the same tradeoff npm and the other known-format
-/// providers above make.
+/// as well as in service-scoped Cloud/Gemini use, and the shape carries no
+/// API scope: an unrestricted key on a project with the Generative Language
+/// API enabled can call Gemini whatever config object surrounds it. So this
+/// detector always reports the shape at `Confidence::High`, and nothing
+/// downstream exempts it by context. Issue #520 (B3a) once dropped a match
+/// inside a recognized Firebase Web SDK client-config object at the
+/// pipeline level; #749 reversed that, so a `firebaseConfig` `apiKey` is
+/// reported like any other. The redact/warn action call is left to policy,
+/// the same tradeoff npm and the other known-format providers above make.
 const GOOGLE_SIGNALS: [&str; 2] = ["google-documented-prefix", "exact-length-suffix"];
 
 pub(super) const GOOGLE: KnownFormatProviderDetector = KnownFormatProviderDetector {
@@ -570,6 +609,10 @@ mod tests {
     /// instead, the same style [`DIGITALOCEAN_BODY`] uses for its own
     /// narrowed alphabet.
     const SUPABASE_PAT_BODY: &str = "synthetic0revoked1provider2value3padding";
+    /// The documented `sb_secret_` body (issue #742): a 22-byte random part,
+    /// `_`, and an 8-byte checksum part, all base64url.
+    const SUPABASE_BODY: &str = "SYNTHETIC_REVOKED_SUPA_CHECKSUM";
+    const _: () = assert!(SUPABASE_BODY.len() == SUPABASE_BODY_LEN);
     const _: () = assert!(SUPABASE_PAT_BODY.len() == 40);
     const DIGITALOCEAN_REFRESH_BODY: &str =
         "123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0";
@@ -633,7 +676,12 @@ mod tests {
                 DIGITALOCEAN_BODY,
                 "dop_v1_SYNTHETIC_SHORT",
             ),
-            family(SUPABASE, "sb_secret_", BODY, "sb_secret_SYNTHETIC_SHORT"),
+            family(
+                SUPABASE,
+                "sb_secret_",
+                SUPABASE_BODY,
+                "sb_secret_SYNTHETIC_SHORT",
+            ),
             family(
                 SUPABASE_PAT,
                 "sbp_",
@@ -747,16 +795,69 @@ mod tests {
             // documented exactly as safe to expose as its live-mode
             // counterpart (docs.stripe.com/keys, observed 2026-09-20).
             format!("pk_test_{BODY}"),
-            format!("sb_publishable_{BODY}"),
+            format!("sb_publishable_{SUPABASE_BODY}"),
             format!("SK{}", "0".repeat(32)),
             // An undocumented near-miss prefix (not one byte-for-byte equal to
             // any documented prefix) stays a false-negative-by-design, never a
             // fuzzy match.
             format!("sk_liv_{BODY}"),
-            format!("sb_secrets_{BODY}"),
+            format!("sb_secrets_{SUPABASE_BODY}"),
         ] {
             assert_eq!(detect(&STRIPE, &input).len(), 0, "{input}");
             assert_eq!(detect(&SUPABASE, &input).len(), 0, "{input}");
+        }
+    }
+
+    /// Issue #742: only the documented `<22>_<8>` body layout is a
+    /// Supabase secret key. Each twin below keeps the prefix and the
+    /// base64url alphabet and breaks exactly one structural fact, so every
+    /// one would have cleared the former 20-byte open floor.
+    #[test]
+    fn supabase_accepts_only_the_documented_random_checksum_layout() {
+        let random = &SUPABASE_BODY[..SUPABASE_DELIMITER_OFFSET];
+        let checksum = &SUPABASE_BODY[SUPABASE_DELIMITER_OFFSET + 1..];
+        assert_eq!((random.len(), checksum.len()), (22, 8));
+
+        // The alphabet admits `_` and `-` inside both segments, so a
+        // documented-layout key may carry them anywhere but the delimiter.
+        for body in [
+            SUPABASE_BODY.to_string(),
+            "a-b_c-d_e-f_g-h_i-j_k-_l-m_n-o_".to_string(),
+            format!("{}_{}", "_-".repeat(11), "-_".repeat(4)),
+        ] {
+            assert_eq!(body.len(), SUPABASE_BODY_LEN, "{body}");
+            let input = format!("SUPABASE_SECRET_KEY=sb_secret_{body}\n");
+            let candidates = detect(&SUPABASE, &input);
+            assert_eq!(candidates.len(), 1, "{input}");
+            assert_eq!(
+                candidates[0].range(),
+                ByteRange::new(20, 20 + 10 + SUPABASE_BODY_LEN).unwrap(),
+                "{input}"
+            );
+        }
+
+        for body in [
+            // Random part 21 instead of 22.
+            format!("{}_{checksum}", &random[..21]),
+            // Random part 23 instead of 22.
+            format!("{random}X_{checksum}"),
+            // Checksum 9 instead of 8.
+            format!("{random}_{checksum}X"),
+            // Checksum 7 instead of 8.
+            format!("{random}_{}", &checksum[..7]),
+            // `-` in the delimiter position.
+            format!("{random}-{checksum}"),
+            // No delimiter at all: 31 bytes with no `_` at offset 22.
+            format!("{random}X{checksum}"),
+            // The former 40-byte alphanumeric-only shape.
+            "SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETI".to_string(),
+        ] {
+            for input in [
+                format!("sb_secret_{body}"),
+                format!("SUPABASE_SECRET_KEY=sb_secret_{body}\n"),
+            ] {
+                assert_eq!(detect(&SUPABASE, &input).len(), 0, "{input}");
+            }
         }
     }
 
@@ -789,9 +890,9 @@ mod tests {
     fn rejects_masked_interpolated_and_contextualized_near_misses() {
         for input in [
             format!("(pk_live_{BODY})."),
-            format!("(sb_publishable_{BODY})."),
+            format!("(sb_publishable_{SUPABASE_BODY})."),
             format!("# \u{1F511} caf\u{e9}\r\npk_live_{BODY}\r\n"),
-            format!("# \u{1F511} caf\u{e9}\r\nsb_publishable_{BODY}\r\n"),
+            format!("# \u{1F511} caf\u{e9}\r\nsb_publishable_{SUPABASE_BODY}\r\n"),
             "sk_live_********************".to_string(),
             "sb_secret_********************".to_string(),
             "sk_live_${STRIPE_SECRET_KEY}".to_string(),
