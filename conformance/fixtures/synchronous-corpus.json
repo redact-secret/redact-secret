@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 2016,
+  "fixtureCount": 2035,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -46789,6 +46789,1141 @@
       "input": "Pinecone key id 5e7a1c0d-0b9e-4f3a-8d2c-6a1b0c9d8e7f was rotated.\n",
       "expected": [],
       "note": "Issue #702 twin: a bare UUID with no Pinecone API-key name stays unclaimed; the legacy UUID path is gated on an API-key name."
+    },
+    {
+      "id": "travisci-api-token-positive-dotenv",
+      "detector": "travisci-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "TRAVIS_TOKEN=Syn7hRevok3dTrvCi0Tok1",
+      "expected": [
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 35
+        }
+      ],
+      "note": "Issue #523: Travis CI API token, 22 [A-Za-z0-9] bytes gated on a same-line travis keyword (gitleaks travisci-access-token, trufflehog travisci). A travis-named dotenv key names the credential, so confidence is high (decision-redact-provider-named-credential-assignments)."
+    },
+    {
+      "id": "travisci-api-token-positive-json",
+      "detector": "travisci-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"travisApiToken\": \"Syn7hRevok3dTrvCi0Tok1\"}",
+      "expected": [
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 20,
+          "end": 42
+        }
+      ],
+      "note": "Issue #523: Travis CI API token, 22 [A-Za-z0-9] bytes gated on a same-line travis keyword (gitleaks travisci-access-token, trufflehog travisci). A travis-named JSON member is a named assignment: high."
+    },
+    {
+      "id": "travisci-api-token-positive-yaml",
+      "detector": "travisci-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "travis_api_token: Syn7hRevok3dTrvCi0Tok1\n",
+      "expected": [
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 18,
+          "end": 40
+        }
+      ],
+      "note": "Issue #523: Travis CI API token, 22 [A-Za-z0-9] bytes gated on a same-line travis keyword (gitleaks travisci-access-token, trufflehog travisci). A travis-named YAML key is a named assignment: high."
+    },
+    {
+      "id": "travisci-api-token-positive-shell-quoted",
+      "detector": "travisci-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export TRAVIS_API_TOKEN=\"Syn7hRevok3dTrvCi0Tok1\"\n",
+      "expected": [
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 47
+        }
+      ],
+      "note": "Issue #523: Travis CI API token, 22 [A-Za-z0-9] bytes gated on a same-line travis keyword (gitleaks travisci-access-token, trufflehog travisci). The quoted shell export bounds the token to its own 22 bytes."
+    },
+    {
+      "id": "travisci-api-token-positive-cli-flag",
+      "detector": "travisci-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "terminal"
+      ],
+      "input": "travis login --pro --api-token Syn7hRevok3dTrvCi0Tok1\n",
+      "expected": [
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 31,
+          "end": 53
+        }
+      ],
+      "note": "Issue #523: Travis CI API token, 22 [A-Za-z0-9] bytes gated on a same-line travis keyword (gitleaks travisci-access-token, trufflehog travisci). A CLI flag has no = or : operator, so the travis keyword on the line is the only context: medium."
+    },
+    {
+      "id": "travisci-api-token-positive-curl-header",
+      "detector": "travisci-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl",
+        "http"
+      ],
+      "input": "curl -H \"Travis-API-Version: 3\" -H \"Authorization: token Syn7hRevok3dTrvCi0Tok1\" https://api.travis-ci.com/user\n",
+      "expected": [
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 57,
+          "end": 79
+        }
+      ],
+      "note": "Issue #523: Travis CI API token, 22 [A-Za-z0-9] bytes gated on a same-line travis keyword (gitleaks travisci-access-token, trufflehog travisci). The documented Authorization: token header, with the Travis host on the same line: medium."
+    },
+    {
+      "id": "travisci-api-token-positive-log",
+      "detector": "travisci-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "log"
+      ],
+      "input": "# Travis CI API token: Syn7hRevok3dTrvCi0Tok1",
+      "expected": [
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 23,
+          "end": 45
+        }
+      ],
+      "note": "Issue #523: Travis CI API token, 22 [A-Za-z0-9] bytes gated on a same-line travis keyword (gitleaks travisci-access-token, trufflehog travisci). Prose naming Travis before a bare token key: the keyword is the only context, so medium."
+    },
+    {
+      "id": "travisci-api-token-regression-crlf-and-unicode-prefix",
+      "detector": "travisci-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 café\r\nTRAVIS_TOKEN=Syn7hRevok3dTrvCi0Tok1\r\n",
+      "expected": [
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 27,
+          "end": 49
+        }
+      ],
+      "note": "Issue #523: Travis CI API token, 22 [A-Za-z0-9] bytes gated on a same-line travis keyword (gitleaks travisci-access-token, trufflehog travisci). Byte offsets stay exact after a multi-byte prefix line and across CRLF."
+    },
+    {
+      "id": "travisci-api-token-negative-bare-value-with-no-context",
+      "detector": "travisci-api-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Syn7hRevok3dTrvCi0Tok1",
+      "expected": [],
+      "note": "Issue #523: Travis CI API token, 22 [A-Za-z0-9] bytes gated on a same-line travis keyword (gitleaks travisci-access-token, trufflehog travisci). A bare 22-byte value with no travis keyword is not reported."
+    },
+    {
+      "id": "travisci-api-token-negative-context-on-a-different-line",
+      "detector": "travisci-api-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# travis\nSyn7hRevok3dTrvCi0Tok1\n",
+      "expected": [],
+      "note": "Issue #523: Travis CI API token, 22 [A-Za-z0-9] bytes gated on a same-line travis keyword (gitleaks travisci-access-token, trufflehog travisci). The keyword must be on the token's own line."
+    },
+    {
+      "id": "travisci-api-token-negative-environment-variable-reference",
+      "detector": "travisci-api-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "shell"
+      ],
+      "input": "TRAVIS_TOKEN=${TRAVIS_TOKEN}",
+      "expected": [],
+      "note": "Issue #523: Travis CI API token, 22 [A-Za-z0-9] bytes gated on a same-line travis keyword (gitleaks travisci-access-token, trufflehog travisci). An environment-variable reference is not a token."
+    },
+    {
+      "id": "travisci-api-token-negative-repeated-character-filler",
+      "detector": "travisci-api-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "TRAVIS_TOKEN=xxxxxxxxxxxxxxxxxxxxxx",
+      "expected": [],
+      "note": "Issue #523: Travis CI API token, 22 [A-Za-z0-9] bytes gated on a same-line travis keyword (gitleaks travisci-access-token, trufflehog travisci). A repeated filler character is a placeholder."
+    },
+    {
+      "id": "travisci-api-token-negative-identifier-key",
+      "detector": "travisci-api-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "TRAVIS_REPO_SLUG=Syn7hRevok3dTrvCi0Tok1",
+      "expected": [],
+      "note": "Issue #523: Travis CI API token, 22 [A-Za-z0-9] bytes gated on a same-line travis keyword (gitleaks travisci-access-token, trufflehog travisci). A key whose last segment names an identifier (slug) is not a credential name."
+    },
+    {
+      "id": "travisci-api-token-negative-letters-only",
+      "detector": "travisci-api-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "travis build: TravisContinuousIntegr",
+      "expected": [],
+      "note": "Issue #523: Travis CI API token, 22 [A-Za-z0-9] bytes gated on a same-line travis keyword (gitleaks travisci-access-token, trufflehog travisci). A run with no digit is a word, not a token; about 2% of random tokens have no digit and are missed."
+    },
+    {
+      "id": "travisci-api-token-boundary-one-short",
+      "detector": "travisci-api-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "TRAVIS_TOKEN=Syn7hRevok3dTrvCi0Tok",
+      "expected": [],
+      "note": "Issue #523: Travis CI API token, 22 [A-Za-z0-9] bytes gated on a same-line travis keyword (gitleaks travisci-access-token, trufflehog travisci). 21 bytes: rejected, not extended. The travis-named key leaves the value to this detector, so generic-token stays silent too."
+    },
+    {
+      "id": "travisci-api-token-boundary-one-long",
+      "detector": "travisci-api-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "TRAVIS_TOKEN=Syn7hRevok3dTrvCi0Tok19",
+      "expected": [],
+      "note": "Issue #523: Travis CI API token, 22 [A-Za-z0-9] bytes gated on a same-line travis keyword (gitleaks travisci-access-token, trufflehog travisci). 23 bytes: rejected, not truncated."
+    },
+    {
+      "id": "travisci-api-token-boundary-underscore-embedded",
+      "detector": "travisci-api-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "travis x_Syn7hRevok3dTrvCi0Tok1",
+      "expected": [],
+      "note": "Issue #523: Travis CI API token, 22 [A-Za-z0-9] bytes gated on a same-line travis keyword (gitleaks travisci-access-token, trufflehog travisci). A run joined to a wider identifier by _ is not a token."
+    },
+    {
+      "id": "travisci-api-token-overlap-generic-context",
+      "detector": "travisci-api-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "api_key=a0B1c2D3e4F5g6H7i8J9k0 travis",
+      "expected": [
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 8,
+          "end": 30
+        }
+      ],
+      "note": "Issue #523: Travis CI API token, 22 [A-Za-z0-9] bytes gated on a same-line travis keyword (gitleaks travisci-access-token, trufflehog travisci). api_key is a generic-token high-signal name and the line names travis, so the provider reports a named assignment at high confidence and wins the overlap on provider specificity."
+    },
+    {
+      "id": "travisci-api-token-adversarial-dense-findings",
+      "detector": "travisci-api-token",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 2306,
+        "maxFindings": 100,
+        "maxRuntimeMs": 250
+      },
+      "input": "travis Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1",
+      "expected": [
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 7,
+          "end": 29
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 30,
+          "end": 52
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 53,
+          "end": 75
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 76,
+          "end": 98
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 99,
+          "end": 121
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 122,
+          "end": 144
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 145,
+          "end": 167
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 168,
+          "end": 190
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 191,
+          "end": 213
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 214,
+          "end": 236
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 237,
+          "end": 259
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 260,
+          "end": 282
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 283,
+          "end": 305
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 306,
+          "end": 328
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 329,
+          "end": 351
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 352,
+          "end": 374
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 375,
+          "end": 397
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 398,
+          "end": 420
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 421,
+          "end": 443
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 444,
+          "end": 466
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 467,
+          "end": 489
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 490,
+          "end": 512
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 513,
+          "end": 535
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 536,
+          "end": 558
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 559,
+          "end": 581
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 582,
+          "end": 604
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 605,
+          "end": 627
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 628,
+          "end": 650
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 651,
+          "end": 673
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 674,
+          "end": 696
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 697,
+          "end": 719
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 720,
+          "end": 742
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 743,
+          "end": 765
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 766,
+          "end": 788
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 789,
+          "end": 811
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 812,
+          "end": 834
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 835,
+          "end": 857
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 858,
+          "end": 880
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 881,
+          "end": 903
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 904,
+          "end": 926
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 927,
+          "end": 949
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 950,
+          "end": 972
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 973,
+          "end": 995
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 996,
+          "end": 1018
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1019,
+          "end": 1041
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1042,
+          "end": 1064
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1065,
+          "end": 1087
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1088,
+          "end": 1110
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1111,
+          "end": 1133
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1134,
+          "end": 1156
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1157,
+          "end": 1179
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1180,
+          "end": 1202
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1203,
+          "end": 1225
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1226,
+          "end": 1248
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1249,
+          "end": 1271
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1272,
+          "end": 1294
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1295,
+          "end": 1317
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1318,
+          "end": 1340
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1341,
+          "end": 1363
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1364,
+          "end": 1386
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1387,
+          "end": 1409
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1410,
+          "end": 1432
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1433,
+          "end": 1455
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1456,
+          "end": 1478
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1479,
+          "end": 1501
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1502,
+          "end": 1524
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1525,
+          "end": 1547
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1548,
+          "end": 1570
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1571,
+          "end": 1593
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1594,
+          "end": 1616
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1617,
+          "end": 1639
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1640,
+          "end": 1662
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1663,
+          "end": 1685
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1686,
+          "end": 1708
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1709,
+          "end": 1731
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1732,
+          "end": 1754
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1755,
+          "end": 1777
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1778,
+          "end": 1800
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1801,
+          "end": 1823
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1824,
+          "end": 1846
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1847,
+          "end": 1869
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1870,
+          "end": 1892
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1893,
+          "end": 1915
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1916,
+          "end": 1938
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1939,
+          "end": 1961
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1962,
+          "end": 1984
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1985,
+          "end": 2007
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2008,
+          "end": 2030
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2031,
+          "end": 2053
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2054,
+          "end": 2076
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2077,
+          "end": 2099
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2100,
+          "end": 2122
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2123,
+          "end": 2145
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2146,
+          "end": 2168
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2169,
+          "end": 2191
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2192,
+          "end": 2214
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2215,
+          "end": 2237
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2238,
+          "end": 2260
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2261,
+          "end": 2283
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2284,
+          "end": 2306
+        }
+      ],
+      "note": "Issue #523: 100 space-separated tokens on one travis line are each reported once at their own range, within the declared resource bounds."
     }
   ]
 }

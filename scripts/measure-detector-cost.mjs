@@ -75,7 +75,7 @@ export const CANONICAL_IDS = [
   "mailchimp-api-key", "mailgun-api-key", "okta-api-token",
   "firebase-server-key", "terraform-cloud-token", "pulumi-access-token", "replicate-api-token", "groq-api-key", "xai-api-key", "openrouter-api-key", "perplexity-api-key", "fireworks-ai-api-key", "pinecone-api-key", "gitlab-runner-authentication-token", "databricks-personal-access-token",
   "confluent-cloud-api-secret", "confluent-cloud-api-secret-legacy", "netlify-token", "langsmith-api-key", "langfuse-secret-key",
-  "postman-api-key", "heroku-api-key", "heroku-api-key-legacy",
+  "postman-api-key", "heroku-api-key", "heroku-api-key-legacy", "travisci-api-token",
   "jwt", "bearer-token", "connection-string", "otpauth-uri", "generic-token",
 ];
 
@@ -105,7 +105,7 @@ export const GROUPS = {
   ],
   devtools: [
     "github-token", "gitlab-token", "gitlab-runner-authentication-token", "azure-devops-personal-access-token", "notion-token",
-    "atlassian-api-token", "linear-token",
+    "atlassian-api-token", "linear-token", "travisci-api-token",
   ],
   "pkg-registry": ["pypi-token", "docker-token", "npm-token"],
   saas: [

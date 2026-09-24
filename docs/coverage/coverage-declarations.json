@@ -8454,6 +8454,98 @@
       "type": "heroku_api_key_legacy"
     },
     {
+      "behaviorClass": "provider",
+      "detector": "travisci-api-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "travisci-api-token-positive-cli-flag",
+            "travisci-api-token-positive-curl-header",
+            "travisci-api-token-positive-dotenv",
+            "travisci-api-token-positive-json",
+            "travisci-api-token-positive-log",
+            "travisci-api-token-positive-shell-quoted",
+            "travisci-api-token-positive-yaml",
+            "travisci-api-token-regression-crlf-and-unicode-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "travisci-api-token-overlap-generic-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "travisci-api-token-adversarial-dense-findings"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "travisci-api-token-boundary-one-long",
+            "travisci-api-token-boundary-one-short",
+            "travisci-api-token-boundary-underscore-embedded"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "travisci-api-token-negative-bare-value-with-no-context",
+            "travisci-api-token-negative-context-on-a-different-line",
+            "travisci-api-token-negative-environment-variable-reference",
+            "travisci-api-token-negative-identifier-key",
+            "travisci-api-token-negative-letters-only",
+            "travisci-api-token-negative-repeated-character-filler"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "travisci-api-token-boundary-one-long",
+            "travisci-api-token-boundary-one-short",
+            "travisci-api-token-boundary-underscore-embedded"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for travisci_api_token (travisci-api-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "travisci_api_token"
+    },
+    {
       "behaviorClass": "incremental",
       "detector": "unassigned",
       "dimensions": [
@@ -8663,6 +8755,7 @@
             "supabase-management-adversarial-long-suffix",
             "telegram-bot-token-adversarial-long-padding",
             "terraform-cloud-token-adversarial-near-miss-suffix",
+            "travisci-api-token-adversarial-dense-findings",
             "twilio-api-key-secret-adversarial-dense-findings",
             "twilio-auth-token-adversarial-dense-findings",
             "vault-adversarial-long-suffix",
@@ -9081,6 +9174,7 @@
             "supabase-management-adversarial-long-suffix",
             "telegram-bot-token-adversarial-long-padding",
             "terraform-cloud-token-adversarial-near-miss-suffix",
+            "travisci-api-token-adversarial-dense-findings",
             "twilio-api-key-secret-adversarial-dense-findings",
             "twilio-auth-token-adversarial-dense-findings",
             "vault-adversarial-long-suffix",

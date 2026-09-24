@@ -11,16 +11,17 @@ use crate::types::{Action, Confidence, DetectedFinding, Policy, PolicyContext};
 /// here: `twilio_auth_token`, `twilio_api_key_secret`, `datadog_api_key`,
 /// `datadog_application_key_legacy`, `new_relic_license_key`,
 /// `mailchimp_api_key`, `mailgun_api_key`, `okta_api_token`,
-/// `confluent_cloud_api_secret_legacy`,
-/// and `heroku_api_key_legacy` are deliberately left confidence-gated
+/// `confluent_cloud_api_secret_legacy`, `heroku_api_key_legacy`,
+/// and `travisci_api_token` are deliberately left confidence-gated
 /// (redact at [`Confidence::High`], warn otherwise) even though that is a
 /// weaker action than their specificity alone would suggest — each has a
 /// documented `decision-freeze-*` grammar record (or, for
 /// `datadog_application_key_legacy`, `confluent_cloud_api_secret_legacy`,
-/// `heroku_api_key_legacy`, `mailchimp_api_key`, `mailgun_api_key`, and
-/// `okta_api_token`, its own module doc in `detectors::datadog`,
-/// `detectors::confluent`, `detectors::heroku`, `detectors::mailchimp`,
-/// `detectors::mailgun`, or `detectors::okta`) explaining why a bare
+/// `heroku_api_key_legacy`, `mailchimp_api_key`, `mailgun_api_key`,
+/// `okta_api_token` and `travisci_api_token`, its own module doc in
+/// `detectors::datadog`, `detectors::confluent`, `detectors::heroku`,
+/// `detectors::mailchimp`, `detectors::mailgun`, `detectors::okta` or
+/// `detectors::travisci`) explaining why a bare
 /// keyword-cooccurrence match at medium confidence is too weak (an opaque
 /// bare value sharing a line with a vendor keyword) to redact by default.
 /// A keyword elsewhere on the line reports [`Confidence::Medium`] and warns.

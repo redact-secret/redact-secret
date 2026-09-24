@@ -53,6 +53,7 @@ mod stripe;
 mod telegram;
 mod terraform;
 mod text;
+mod travisci;
 mod twilio;
 mod vault;
 
@@ -135,6 +136,7 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(postman::POSTMAN),
         Box::new(heroku::HEROKU_API_KEY),
         Box::new(heroku::HerokuApiKeyLegacyDetector),
+        Box::new(travisci::TravisCiApiTokenDetector),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
         Box::new(ConnectionStringDetector),
@@ -247,6 +249,7 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("postman-api-key", Pack::Provider),
     ("heroku-api-key", Pack::Provider),
     ("heroku-api-key-legacy", Pack::Provider),
+    ("travisci-api-token", Pack::Provider),
     ("jwt", Pack::Common),
     ("bearer-token", Pack::Common),
     ("connection-string", Pack::Common),
@@ -348,6 +351,7 @@ mod tests {
                 "postman-api-key",
                 "heroku-api-key",
                 "heroku-api-key-legacy",
+                "travisci-api-token",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -649,6 +653,7 @@ mod tests {
             "SYNTHETIC0REVOKED0HerokuOAuthAccessTokenBodyFixture0123456"
         );
         let heroku_api_key_legacy_input = "heroku 01234567-89ab-cdef-0123-456789abcdef";
+        let travisci_api_token_input = "travis Syn7hRevok3dTrvCi0Tok1";
         let replicate_api_token_input = format!("r8_{}", "SYNTHETIC_REVOKED-REPLICATE-TOKEN-001");
         let groq_api_key_input = format!(
             "gsk_{}",
@@ -713,6 +718,7 @@ mod tests {
             ("postman-api-key", postman_api_key_input.as_str()),
             ("heroku-api-key", heroku_api_key_input.as_str()),
             ("heroku-api-key-legacy", heroku_api_key_legacy_input),
+            ("travisci-api-token", travisci_api_token_input),
         ];
         assert_provider_candidates(&cases);
     }

@@ -385,6 +385,7 @@ pub(super) fn is_windows_env_reference(value: &str) -> bool {
 const NON_CREDENTIAL_KEY_SEGMENTS: &[&str] = &[
     "id", "ids", "uuid", "sid", "name", "url", "uri", "host", "hostname", "domain", "region",
     "org", "site", "endpoint", "email", "user", "username", "account", "project", "version",
+    "slug", "commit", "sha", "branch", "tag", "number",
 ];
 
 /// `true` for a byte of an assignment key name: `[A-Za-z0-9_.-]`.
@@ -407,6 +408,21 @@ fn assignment_key(line: &[u8], value_start: usize) -> Option<&[u8]> {
         start -= 1;
     }
     (has_operator && start < end).then_some(&line[start..end])
+}
+
+/// `true` when the value starting at byte `value_start` of `line` is
+/// assigned to a key whose last normalized segment names an identifier, a
+/// location or an account attribute ([`NON_CREDENTIAL_KEY_SEGMENTS`]):
+/// `TRAVIS_REPO_SLUG=`, `build_id:`, `"projectUrl":`.
+pub(super) fn is_non_credential_assignment(line: &str, value_start: usize) -> bool {
+    assignment_key(line.as_bytes(), value_start)
+        .and_then(|key| std::str::from_utf8(key).ok())
+        .is_some_and(|key| {
+            super::generic_token::normalize_name(key)
+                .rsplit('_')
+                .next()
+                .is_some_and(|segment| NON_CREDENTIAL_KEY_SEGMENTS.contains(&segment))
+        })
 }
 
 /// `true` when the value starting at byte `value_start` of `line` is the

@@ -120,6 +120,8 @@ const DEDICATED_PROVIDER_SEGMENTS: &[&str] = &[
     "supabase",
     "telegram",
     "terraform",
+    "travis",
+    "travisci",
     "twilio",
     "vault",
     "vercel",

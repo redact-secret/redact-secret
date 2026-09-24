@@ -568,6 +568,13 @@
       "policyClass": "confidence-gated",
       "reconciliationTrigger": "heroku 01234567-89ab-cdef-0123-456789abcdef",
       "schemes": null
+    },
+    {
+      "type": "travisci_api_token",
+      "detector": "travisci-api-token",
+      "policyClass": "confidence-gated",
+      "reconciliationTrigger": "travis Syn7hRevok3dTrvCi0Tok1",
+      "schemes": null
     }
   ],
   "consumers": [

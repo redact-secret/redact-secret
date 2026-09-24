@@ -15,11 +15,11 @@ These counts describe finding-type inventory rows with corpus evidence, not dete
 
 | Row state | Count |
 | --- | --- |
-| supported | 77 |
+| supported | 78 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 88.
+Coverage declarations: 89.
 
 ## Coverage by detector
 
@@ -87,6 +87,7 @@ Coverage declarations: 88.
 | supabase-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | telegram-bot-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | terraform-cloud-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| travisci-api-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | twilio-api-key-secret | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | twilio-auth-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | vault-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -168,6 +169,7 @@ Coverage declarations: 88.
 | supabase_secret_key | supabase-token | provider | supported | not-applicable | none |
 | telegram_bot_token | telegram-bot-token | provider | supported | not-applicable | none |
 | terraform_cloud_token | terraform-cloud-token | provider | supported | not-applicable | none |
+| travisci_api_token | travisci-api-token | provider | supported | not-applicable | none |
 | twilio_api_key_secret | twilio-api-key-secret | provider | supported | not-applicable | none |
 | twilio_auth_token | twilio-auth-token | provider | supported | not-applicable | none |
 | vault_token | vault-token | provider | supported | not-applicable | none |
@@ -199,15 +201,15 @@ Coverage declarations: 88.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 88 | 0 | 0 |
-| boundary | 77 | 0 | 0 |
-| host-context | 77 | 0 | 0 |
+| adversarial | 89 | 0 | 0 |
+| boundary | 78 | 0 | 0 |
+| host-context | 78 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 88 | 0 | 0 |
-| near-miss-negative | 77 | 0 | 0 |
-| overlap | 77 | 0 | 0 |
-| positive | 77 | 0 | 0 |
-| range | 88 | 0 | 0 |
+| malformed | 89 | 0 | 0 |
+| near-miss-negative | 78 | 0 | 0 |
+| overlap | 78 | 0 | 0 |
+| positive | 78 | 0 | 0 |
+| range | 89 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

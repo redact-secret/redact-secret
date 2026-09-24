@@ -3420,12 +3420,53 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "heroku_api_key_legacy"
+    },
+    {
+      "detector": "travisci-api-token",
+      "evidence": {
+        "fixtureCount": 19,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "terminal",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "travisci-api-token-positive-cli-flag",
+        "travisci-api-token-positive-curl-header",
+        "travisci-api-token-positive-dotenv",
+        "travisci-api-token-positive-json",
+        "travisci-api-token-positive-log",
+        "travisci-api-token-positive-shell-quoted",
+        "travisci-api-token-positive-yaml",
+        "travisci-api-token-regression-crlf-and-unicode-prefix"
+      ],
+      "policyClass": "confidence-gated",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "travisci_api_token"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 77,
+    "supported": 78,
     "unresolved": 0
   }
 }

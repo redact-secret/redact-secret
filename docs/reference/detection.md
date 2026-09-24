@@ -44,7 +44,7 @@ for your host. An organization-specific format that is not listed here can be ad
 as a [declarative ruleset](../guides/rulesets.md).
 
 <!-- detector-inventory:start -->
-67 built-in detectors emit 77 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
+68 built-in detectors emit 78 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
 
 | Detector | Finding types | Default policy class | Schemes |
 | --- | --- | --- | --- |
@@ -115,6 +115,7 @@ as a [declarative ruleset](../guides/rulesets.md).
 | `postman-api-key` | `postman_api_key` | `always-redact` | — |
 | `heroku-api-key` | `heroku_api_key` | `always-redact` | — |
 | `heroku-api-key-legacy` | `heroku_api_key_legacy` | `confidence-gated` | — |
+| `travisci-api-token` | `travisci_api_token` | `confidence-gated` | — |
 <!-- detector-inventory:end -->
 
 ## Detector profiles

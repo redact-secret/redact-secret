@@ -70,6 +70,15 @@ evidence is linked from each published version.
 
 ### Changed detection
 
+- New `travisci-api-token` detector reports a Travis CI API token as
+  `travisci_api_token`: a 22-byte `[A-Za-z0-9]` value that mixes letters and
+  digits, on a line that contains `travis`. It is high confidence (redact)
+  under a Travis-named key such as `TRAVIS_TOKEN=`, and medium (warn) when
+  `travis` appears elsewhere on the line, for example in an
+  `Authorization: token` header with the Travis host. A value under an
+  identifier key (`TRAVIS_REPO_SLUG=`) is not reported. The grammar is
+  tool-corroborated (T2), because Travis CI documents no length or alphabet.
+  CircleCI and Buildkite are ranked as follow-up candidates (#523).
 - `pinecone-api-key` now reports a legacy lowercase `8-4-4-4-12` UUID Pinecone
   key as `pinecone_api_key` (high confidence, redacted), but only when it is
   the value assigned to a Pinecone API-key name on the same line:

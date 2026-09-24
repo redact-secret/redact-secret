@@ -3,7 +3,7 @@
   "corpus": "synchronous-corpus.json",
   "offsetUnit": "utf8-byte",
   "detectors": ["private-key","jwt","bearer-token","connection-string","otpauth-uri","generic-token"],
-  "fixtureCount": 2016,
+  "fixtureCount": 2035,
   "fixtures": [
     {"expected":[{"action":"warn","confidence":"medium","detector":"generic-token","end":48,"start":8,"type":"contextual_secret"}],"id":"host-dotenv-github"},
     {"expected":[{"action":"warn","confidence":"medium","detector":"generic-token","end":52,"start":12,"type":"contextual_secret"}],"id":"host-json-github"},
@@ -2020,6 +2020,25 @@
     {"expected":[],"id":"pinecone-api-key-negative-legacy-uuid-project-id-name"},
     {"expected":[],"id":"pinecone-api-key-negative-legacy-uuid-init-project-id"},
     {"expected":[],"id":"pinecone-api-key-negative-legacy-uuid-zero-uuid-placeholder"},
-    {"expected":[],"id":"pinecone-api-key-negative-legacy-uuid-bare-uuid-prose"}
+    {"expected":[],"id":"pinecone-api-key-negative-legacy-uuid-bare-uuid-prose"},
+    {"expected":[],"id":"travisci-api-token-positive-dotenv"},
+    {"expected":[],"id":"travisci-api-token-positive-json"},
+    {"expected":[],"id":"travisci-api-token-positive-yaml"},
+    {"expected":[],"id":"travisci-api-token-positive-shell-quoted"},
+    {"expected":[],"id":"travisci-api-token-positive-cli-flag"},
+    {"expected":[],"id":"travisci-api-token-positive-curl-header"},
+    {"expected":[],"id":"travisci-api-token-positive-log"},
+    {"expected":[],"id":"travisci-api-token-regression-crlf-and-unicode-prefix"},
+    {"expected":[],"id":"travisci-api-token-negative-bare-value-with-no-context"},
+    {"expected":[],"id":"travisci-api-token-negative-context-on-a-different-line"},
+    {"expected":[],"id":"travisci-api-token-negative-environment-variable-reference"},
+    {"expected":[],"id":"travisci-api-token-negative-repeated-character-filler"},
+    {"expected":[],"id":"travisci-api-token-negative-identifier-key"},
+    {"expected":[],"id":"travisci-api-token-negative-letters-only"},
+    {"expected":[],"id":"travisci-api-token-boundary-one-short"},
+    {"expected":[],"id":"travisci-api-token-boundary-one-long"},
+    {"expected":[],"id":"travisci-api-token-boundary-underscore-embedded"},
+    {"expected":[{"action":"redact","confidence":"high","detector":"generic-token","end":30,"start":8,"type":"contextual_secret"}],"id":"travisci-api-token-overlap-generic-context"},
+    {"expected":[],"id":"travisci-api-token-adversarial-dense-findings"}
   ]
 }
