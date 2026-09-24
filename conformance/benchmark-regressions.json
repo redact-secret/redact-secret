@@ -271,6 +271,461 @@
         }
       },
       "note": "docker-token rejected a dckr_oat_ organization access token with a 27-byte body, the width Docker's own Hub API reference example shows (#647). The fix (dc855b6, PR #709) adds RunLength::OneOf, so dckr_oat_ accepts exactly 27 or 32 bytes of [A-Za-z0-9_-]. The 26- and 28-byte controls pin both exact edges, and the former docker-boundary-pat-length-under-oat-prefix rejection is now a supported positive. No incremental case: the change is inside one bounded match, with no chunk or retention state. Canonical inputs are freshly built synthetic values. The benchmark reran the fixed detector (candidate 0233674, identical detector code) and got exact spans; the clean-main rerun (candidate 44bb3d6, run a9862a93) reproduced them."
+    },
+    {
+      "id": "benchmark-gap-738",
+      "benchmarkRecordId": "product-738",
+      "benchmarkIssue": "https://github.com/redact-secret/redact-secret-benchmarks/issues/10",
+      "productIssue": "https://github.com/redact-secret/redact-secret/issues/738",
+      "benchmarkFixtureIds": [
+        "beta8-209--confluent-cloud-api-secret-env-cloud-secret-checksum-twin",
+        "beta8-209--confluent-cloud-api-secret-kafka-client-properties-checksum-byte-order-twin",
+        "beta8-209--confluent-cloud-api-secret-cli-api-key-create-json-checksum-prefix-included-twin"
+      ],
+      "corpusHashes": [
+        "35457096ead3ba8ecf719abd121532c8d77ac33ca113a8df8c73cb006211dc42"
+      ],
+      "fixingCommit": "b8515bc7dbb223a4ad778e840b40ad7e17732837",
+      "canonicalFixtures": {
+        "synchronous": [
+          "confluent-cloud-api-secret-checksum-valid",
+          "confluent-cloud-api-secret-negative-checksum-mismatch",
+          "confluent-cloud-api-secret-negative-checksum-big-endian",
+          "confluent-cloud-api-secret-negative-checksum-prefix-included"
+        ],
+        "incremental": []
+      },
+      "gates": {
+        "productConformance": {
+          "status": "pending",
+          "evidence": []
+        },
+        "benchmarkRevalidation": {
+          "status": "pending",
+          "evidence": []
+        }
+      },
+      "note": "confluent-cloud-api-secret accepted a cflt value whose trailing 6-character checksum did not match, so the beta8-209 checksum twins (a wrong checksum, the byte-order twin and the prefix-included twin) were reported as Confluent secrets. The fix (PR #750) validates the documented checksum: the last 6 characters must be the first 6 standard-Base64 characters of the little-endian IEEE CRC-32 of the 54 body characters after cflt, the recipe on Confluent's API-key overview page. The keyword-gated legacy detector also skips a 64-byte run that starts with cflt, so a checksum-invalid cflt value does not fall through to it. One valid-checksum positive and three negatives (mismatch, big-endian, prefix-included) pin the rule. No incremental case: the check is inside one bounded match. Canonical inputs are freshly built synthetic values; no benchmark fixture input was copied. Benchmark measurement: corpus beta8-209. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded."
+    },
+    {
+      "id": "benchmark-gap-740",
+      "benchmarkRecordId": "product-740",
+      "benchmarkIssue": "https://github.com/redact-secret/redact-secret-benchmarks/issues/10",
+      "productIssue": "https://github.com/redact-secret/redact-secret/issues/740",
+      "benchmarkFixtureIds": [
+        "beta8-209--heroku-api-key-env-g1",
+        "beta8-209--heroku-api-key-authorizations-create-g1"
+      ],
+      "corpusHashes": [
+        "35457096ead3ba8ecf719abd121532c8d77ac33ca113a8df8c73cb006211dc42"
+      ],
+      "fixingCommit": "f0c713c9f0baa373688dba67f58cd9d9ceaa4a55",
+      "canonicalFixtures": {
+        "synchronous": [
+          "heroku-api-key-hrku-uuid-env",
+          "heroku-api-key-hrku-uuid-bare",
+          "heroku-api-key-hrku-uuid-authorizations-create",
+          "heroku-api-key-negative-hrku-uuid-one-short",
+          "heroku-api-key-negative-hrku-underscore-separator"
+        ],
+        "incremental": [
+          "heroku-hrku-uuid-generation-partitions"
+        ]
+      },
+      "gates": {
+        "productConformance": {
+          "status": "pending",
+          "evidence": []
+        },
+        "benchmarkRevalidation": {
+          "status": "pending",
+          "evidence": []
+        }
+      },
+      "note": "heroku-api-key missed the documented 41-character HRKU-<uuid> OAuth access token (granted 2024-04-01 through 2025-04-22, still valid until regenerated; devcenter.heroku.com/changelog-items/2842 and /3175). The benchmark found both beta8-209 -g1 positives (corpus beta8-209, benchmark commit 85dc5604892243111aa2230b4081e82e168c86b7, published 0.1.0-beta.7) returning nothing. The fix adds an HRKU- shape to heroku-api-key: exactly 36 bytes whose post check requires a lower-case 8-4-4-4-12 hex UUID, next to the unchanged HRKU-AA + 58 shape. No context is needed, and heroku-api-key-legacy's identifier-key exclusion (#714) does not apply to it. The one-short and underscore-separator twins pin both edges. Canonical inputs are freshly built synthetic values; no benchmark fixture input was copied. Both gates stay pending until CI evidence and a fixed-candidate benchmark rerun are recorded."
+    },
+    {
+      "id": "benchmark-gap-207-atlassian-crc32-tail",
+      "benchmarkRecordId": "product-741",
+      "benchmarkIssue": "https://github.com/redact-secret/redact-secret-benchmarks/issues/10",
+      "productIssue": "https://github.com/redact-secret/redact-secret/issues/741",
+      "benchmarkFixtureIds": [
+        "beta8-207--atlassian-api-token-env",
+        "beta8-207--atlassian-api-token-curl-basic",
+        "beta8-207--atlassian-api-token-python-client-yaml",
+        "beta8-207--atlassian-api-token-jira-client",
+        "beta8-207--atlassian-api-token-pipelines-variable",
+        "beta8-207--atlassian-api-token-settings-json",
+        "beta8-207--atlassian-api-token-acli-login",
+        "beta8-207--atlassian-api-token-compose-env",
+        "beta8-207--atlassian-api-token-debug-log",
+        "beta8-207--atlassian-api-token-ticket-paste"
+      ],
+      "corpusHashes": [
+        "8b886af52072dcca835c672295e3d0daab273d3ed9421e41340f38720d3fc131"
+      ],
+      "fixingCommit": "a4d7c595ce3a478192dc0bc95dfe7efbce06f646",
+      "canonicalFixtures": {
+        "synchronous": [
+          "atlassian-api-token-positive-crc32-suffix-full-span",
+          "atlassian-api-token-positive-crc32-suffix-json",
+          "atlassian-api-token-positive-no-suffix-exact",
+          "atlassian-api-token-boundary-nine-hex-tail"
+        ],
+        "incremental": [
+          "atlassian-api-token-crc32-tail-partition"
+        ]
+      },
+      "gates": {
+        "productConformance": {
+          "status": "pending",
+          "evidence": []
+        },
+        "benchmarkRevalidation": {
+          "status": "pending",
+          "evidence": []
+        }
+      },
+      "note": "atlassian-api-token stopped its span at the `=` of a 192-byte token and left the `=` + 8 uppercase hex tail (read as a CRC32 by CredSweeper; shape per #643 and redact-secret-benchmarks#238) unredacted at high/redact. The detector now extends a match over an immediately following `=` + exactly 8 `[0-9A-F]` bytes when the byte after them is neither a body byte nor another `=`; the tail's value is not validated. A token without the tail is matched exactly as before (no-suffix control), and a 9-hex tail is not absorbed. The incremental fixture covers a chunk split between the body and `=` and between `=` and the hex. Canonical inputs are freshly constructed synthetic values; no benchmark fixture input was copied. The corpus hash is the beta8-207 corpus hash from the issue. Benchmark measurement: redact-secret-benchmarks#207 (corpus beta8-207)."
+    },
+    {
+      "id": "benchmark-gap-207-supabase-layout-twins",
+      "benchmarkRecordId": "product-742",
+      "benchmarkIssue": "https://github.com/redact-secret/redact-secret-benchmarks/issues/10",
+      "productIssue": "https://github.com/redact-secret/redact-secret/issues/742",
+      "benchmarkFixtureIds": [
+        "beta8-207--supabase-token-short-random-twin",
+        "beta8-207--supabase-token-long-checksum-twin",
+        "beta8-207--supabase-token-dash-delimiter-twin"
+      ],
+      "corpusHashes": [
+        "8b886af52072dcca835c672295e3d0daab273d3ed9421e41340f38720d3fc131"
+      ],
+      "fixingCommit": "a4d7c595ce3a478192dc0bc95dfe7efbce06f646",
+      "canonicalFixtures": {
+        "synchronous": [
+          "supabase-token-positive-documented-layout",
+          "supabase-token-negative-random-part-21",
+          "supabase-token-negative-checksum-9",
+          "supabase-token-negative-dash-delimiter",
+          "supabase-positive-documented-layout-exact-width"
+        ],
+        "incremental": []
+      },
+      "gates": {
+        "productConformance": {
+          "status": "pending",
+          "evidence": []
+        },
+        "benchmarkRevalidation": {
+          "status": "pending",
+          "evidence": []
+        }
+      },
+      "note": "supabase-token accepted any sb_secret_ value with at least 20 bytes of [A-Za-z0-9_-]. It now requires exactly the documented layout: a 22-byte random part, `_` at body offset 22, and an 8-byte checksum part, all base64url (Supabase self-hosted auth-keys page, which states hosted keys use the same format; provider script docker/utils/add-new-auth-keys.sh; research in redact-secret-benchmarks#231). The delimiter is checked by position because both segments may contain `_` and `-`. The checksum value is not validated: the provider script hashes a project ref, the hosted input is undocumented, and the self-hosted constant would reject every hosted key. No incremental case: the value is one bounded token. Canonical inputs are freshly constructed synthetic values; no benchmark fixture input was copied. Benchmark measurement: redact-secret-benchmarks#207 (corpus beta8-207)."
+    },
+    {
+      "id": "benchmark-gap-207-heroku-legacy-multi-line",
+      "benchmarkRecordId": "product-743-multi-line",
+      "benchmarkIssue": "https://github.com/redact-secret/redact-secret-benchmarks/issues/10",
+      "productIssue": "https://github.com/redact-secret/redact-secret/issues/743",
+      "benchmarkFixtureIds": [
+        "beta8-207--heroku-api-key-legacy-netrc-multi-line",
+        "beta8-207--heroku-api-key-legacy-auth-token-output"
+      ],
+      "corpusHashes": [
+        "8b886af52072dcca835c672295e3d0daab273d3ed9421e41340f38720d3fc131"
+      ],
+      "fixingCommit": "f0c713c9f0baa373688dba67f58cd9d9ceaa4a55",
+      "canonicalFixtures": {
+        "synchronous": [
+          "heroku-api-key-legacy-positive-netrc-multi-line",
+          "heroku-api-key-legacy-positive-auth-token-output",
+          "heroku-api-key-legacy-negative-uuid-without-heroku-context"
+        ],
+        "incremental": [
+          "heroku-legacy-netrc-multi-line-partitions",
+          "heroku-legacy-auth-token-output-partitions"
+        ]
+      },
+      "gates": {
+        "productConformance": {
+          "status": "pending",
+          "evidence": []
+        },
+        "benchmarkRevalidation": {
+          "status": "pending",
+          "evidence": []
+        }
+      },
+      "note": "False negative. heroku-api-key-legacy's same-line heroku gate missed a multi-line .netrc entry (machine api.heroku.com two lines above password <uuid>) and heroku auth:token output (the token alone on the next line), both asked for by redact-secret-benchmarks#232 (corpus beta8-207, benchmark commit 85dc5604892243111aa2230b4081e82e168c86b7, published 0.1.0-beta.7). The fix accepts exactly those two layouts: a password token's value inside a .netrc entry whose machine host names heroku, with at most two login/account lines between, and a whole-line UUID right after a line ending in heroku auth:token. The negative control keeps a UUID after an unrelated line clean. Incremental: the session gets a retention hint that holds the machine or command line open until the token line, so both partition fixtures match the whole-input scan at every boundary. Canonical inputs are freshly built synthetic values. Both gates stay pending."
+    },
+    {
+      "id": "benchmark-gap-207-heroku-legacy-url-path",
+      "benchmarkRecordId": "product-743-url-path",
+      "benchmarkIssue": "https://github.com/redact-secret/redact-secret-benchmarks/issues/10",
+      "productIssue": "https://github.com/redact-secret/redact-secret/issues/743",
+      "benchmarkFixtureIds": [
+        "beta8-207--heroku-api-key-legacy-app-url-path-public-id"
+      ],
+      "corpusHashes": [
+        "8b886af52072dcca835c672295e3d0daab273d3ed9421e41340f38720d3fc131"
+      ],
+      "fixingCommit": "f0c713c9f0baa373688dba67f58cd9d9ceaa4a55",
+      "canonicalFixtures": {
+        "synchronous": [
+          "heroku-api-key-legacy-negative-app-url-path"
+        ],
+        "incremental": []
+      },
+      "gates": {
+        "productConformance": {
+          "status": "pending",
+          "evidence": []
+        },
+        "benchmarkRevalidation": {
+          "status": "pending",
+          "evidence": []
+        }
+      },
+      "note": "False positive. A Heroku app UUID in a Platform API URL path (https://api.heroku.com/apps/<uuid>/...) was flagged medium/warn because the line names heroku; #714's identifier-key exclusion does not cover a path segment. The fix never reports a UUID whose preceding byte is '/'. The existing same-line HEROKU_API_KEY=<uuid> positive stays exact. No incremental case: the change is inside one line with no retention state. Canonical input is a freshly built synthetic value. Both gates stay pending."
+    },
+    {
+      "id": "benchmark-gap-207-labelled-digest-controls",
+      "benchmarkRecordId": "product-744",
+      "benchmarkIssue": "https://github.com/redact-secret/redact-secret-benchmarks/issues/10",
+      "productIssue": "https://github.com/redact-secret/redact-secret/issues/744",
+      "benchmarkFixtureIds": [
+        "beta8-207--twilio-auth-token-package-md5-encoded-value",
+        "beta8-207--confluent-cloud-api-secret-legacy-image-digest-encoded-value"
+      ],
+      "corpusHashes": [
+        "8b886af52072dcca835c672295e3d0daab273d3ed9421e41340f38720d3fc131"
+      ],
+      "fixingCommit": "95166f152a1f4e656f5e227655ac570c9b0cdd8e",
+      "canonicalFixtures": {
+        "synchronous": [
+          "twilio-auth-token-negative-md5-digest",
+          "confluent-cloud-api-secret-legacy-negative-image-digest"
+        ],
+        "incremental": []
+      },
+      "gates": {
+        "productConformance": {
+          "status": "pending",
+          "evidence": []
+        },
+        "benchmarkRevalidation": {
+          "status": "pending",
+          "evidence": []
+        }
+      },
+      "note": "twilio-auth-token and confluent-cloud-api-secret-legacy flagged a hex digest introduced by a hash-algorithm label (md5=, @sha256:) on a line naming their provider (#744, benchmarks #207 corpus beta8-207). The fix adds the shared text::is_labelled_digest check, applied to both Twilio detectors and the Confluent legacy detector: a value directly after <algorithm>= or <algorithm>: is a digest. The two negative fixtures pin the reported shapes; the existing dotenv-keyword positives are the controls that keep TWILIO_AUTH_TOKEN=<32 hex> [18,50) and CONFLUENT_API_SECRET=<64 bytes> [21,85) exact. No incremental case: the check reads only bytes on the candidate's own line, before the candidate. Canonical inputs are freshly constructed synthetic values; gates stay pending until supported-surface evidence and a fixed-candidate benchmark rerun are recorded."
+    },
+    {
+      "id": "benchmark-gap-207-bearer-long-placeholder",
+      "benchmarkRecordId": "product-745",
+      "benchmarkIssue": "https://github.com/redact-secret/redact-secret-benchmarks/issues/10",
+      "productIssue": "https://github.com/redact-secret/redact-secret/issues/745",
+      "benchmarkFixtureIds": [
+        "beta8-207--bearer-token-your-access-token-placeholder"
+      ],
+      "corpusHashes": [
+        "8b886af52072dcca835c672295e3d0daab273d3ed9421e41340f38720d3fc131"
+      ],
+      "fixingCommit": "95166f152a1f4e656f5e227655ac570c9b0cdd8e",
+      "canonicalFixtures": {
+        "synchronous": [
+          "bearer-token-negative-your-oauth-token-placeholder",
+          "bearer-token-negative-insert-access-token-placeholder",
+          "bearer-token-regression-base64url-value-still-detected",
+          "bearer-token-regression-placeholder-lead-word-with-random-suffix"
+        ],
+        "incremental": []
+      },
+      "gates": {
+        "productConformance": {
+          "status": "pending",
+          "evidence": []
+        },
+        "benchmarkRevalidation": {
+          "status": "pending",
+          "evidence": []
+        }
+      },
+      "note": "bearer-token redacted upper-snake instructional placeholders of 16 or more bytes (YOUR_ACCESS_TOKEN) that the #468 placeholder vocabulary did not cover; shorter ones were clean only because of the 16-byte minimum (#745, benchmarks #207 corpus beta8-207). The fix adds is_instructional_token_placeholder: a your/insert/enter/paste lead word followed only by credential words naming a token, key, secret, or jwt. Two negatives pin the issue's drafts; the 40-byte base64url positive keeps [22,62) exact and the random-suffix positive shows one unlisted word keeps a value detected. No incremental case: the change is inside one bounded match. Canonical inputs are freshly constructed synthetic values; gates stay pending."
+    },
+    {
+      "id": "benchmark-gap-207-generic-twilio-sid",
+      "benchmarkRecordId": "product-746",
+      "benchmarkIssue": "https://github.com/redact-secret/redact-secret-benchmarks/issues/10",
+      "productIssue": "https://github.com/redact-secret/redact-secret/issues/746",
+      "benchmarkFixtureIds": [
+        "beta8-207--twilio-api-key-secret-wrong-companion-near-miss"
+      ],
+      "corpusHashes": [
+        "8b886af52072dcca835c672295e3d0daab273d3ed9421e41340f38720d3fc131"
+      ],
+      "fixingCommit": "95166f152a1f4e656f5e227655ac570c9b0cdd8e",
+      "canonicalFixtures": {
+        "synchronous": [
+          "generic-token-negative-twilio-account-sid",
+          "generic-token-regression-uppercase-hex-sid-lookalike"
+        ],
+        "incremental": []
+      },
+      "gates": {
+        "productConformance": {
+          "status": "pending",
+          "evidence": []
+        },
+        "benchmarkRevalidation": {
+          "status": "pending",
+          "evidence": []
+        }
+      },
+      "note": "generic-token warned on a Twilio API Key SID after a 'credentials:' label in the wrong-companion control (SK + AC, no secret) (#746, benchmarks #207 corpus beta8-207). Twilio documents AC and SK SIDs as identifiers (https://www.twilio.com/docs/iam/api-keys), so this is fixed as a false positive, not recorded as a policy-decision: generic-token now excludes a value that is exactly AC/SK + 32 lowercase hex. The uppercase-body positive pins that only the exact SID shape is excluded. The issue's proposed 'credentials: <32 hex>' clean control is not added: an ambiguous name warns on a 32-hex value whenever its entropy reaches 3.5, so its outcome depends on the sampled value rather than on this change. No incremental case. Canonical inputs are freshly constructed synthetic values; gates stay pending."
+    },
+    {
+      "id": "benchmark-gap-207-telegram-atlassian-account-id",
+      "benchmarkRecordId": "product-747",
+      "benchmarkIssue": "https://github.com/redact-secret/redact-secret-benchmarks/issues/10",
+      "productIssue": "https://github.com/redact-secret/redact-secret/issues/747",
+      "benchmarkFixtureIds": [
+        "beta8-207--atlassian-api-token-account-id-public-id"
+      ],
+      "corpusHashes": [
+        "8b886af52072dcca835c672295e3d0daab273d3ed9421e41340f38720d3fc131"
+      ],
+      "fixingCommit": "a4d7c595ce3a478192dc0bc95dfe7efbce06f646",
+      "canonicalFixtures": {
+        "synchronous": [
+          "telegram-bot-token-negative-atlassian-account-id",
+          "telegram-bot-token-negative-atlassian-account-id-uppercase",
+          "telegram-bot-token-positive-control-exact"
+        ],
+        "incremental": []
+      },
+      "gates": {
+        "productConformance": {
+          "status": "pending",
+          "evidence": []
+        },
+        "benchmarkRevalidation": {
+          "status": "pending",
+          "evidence": []
+        }
+      },
+      "note": "telegram-bot-token reported an Atlassian account id (`<digits>:<8-4-4-4-12 uuid>`, a public identifier) as a bot token at high/redact. The detector now rejects a candidate whose secret segment is exactly a canonical hexadecimal UUID (either case); nothing else about the grammar changes, so a secret that is near but not exactly a UUID, or that continues past one, is still detected, and the 10-digit + 35-byte control stays exact. The narrower exact-35 rule from #660 was not adopted here because Telegram documents no length and the current contract is a floor. No incremental case: the change is inside one bounded match. Canonical inputs are freshly constructed synthetic values; no benchmark fixture input was copied. Benchmark measurement: redact-secret-benchmarks#207 (corpus beta8-207)."
+    },
+    {
+      "id": "benchmark-gap-749",
+      "benchmarkRecordId": "product-749",
+      "benchmarkIssue": "https://github.com/redact-secret/redact-secret-benchmarks/issues/10",
+      "productIssue": "https://github.com/redact-secret/redact-secret/issues/749",
+      "benchmarkFixtureIds": [
+        "beta8-209--google-api-key-firebase-web-config"
+      ],
+      "corpusHashes": [
+        "35457096ead3ba8ecf719abd121532c8d77ac33ca113a8df8c73cb006211dc42"
+      ],
+      "fixingCommit": "f7245262bd4ec9754abdcddedbdd411e4ca6b113",
+      "canonicalFixtures": {
+        "synchronous": [
+          "firebase-positive-client-config-javascript",
+          "firebase-positive-client-config-json",
+          "firebase-positive-client-config-minimal-javascript",
+          "firebase-positive-client-config-dotenv",
+          "firebase-positive-google-services-json"
+        ],
+        "incremental": []
+      },
+      "gates": {
+        "productConformance": {
+          "status": "pending",
+          "evidence": []
+        },
+        "benchmarkRevalidation": {
+          "status": "pending",
+          "evidence": []
+        }
+      },
+      "note": "google-api-key suppressed an AIza key inside a Firebase web client config (the #520 B3a client-config exemption), so the beta8-209 Firebase fixture returned nothing. #749 reverses that policy (ADR decision-redact-google-api-keys-inside-firebase-web-config): the key format carries no API scope and an unrestricted key can reach other Google APIs. The fix (PR #753) removes the client-config window; the key is reported on its own span and neighbouring config identifiers stay clean. Canonical fixtures are the two former client-config negatives now renamed positive (JavaScript, JSON) plus three new positives (the benchmark's minimal three-field shape from fresh synthetic bytes, a .env file and google-services.json). No incremental case: the change removes a same-window exemption and adds no retention state. This record supersedes the benchmark's former product-520 record. Benchmark measurement: corpus beta8-209. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded."
+    },
+    {
+      "id": "benchmark-gap-754",
+      "benchmarkRecordId": "product-754",
+      "benchmarkIssue": "https://github.com/redact-secret/redact-secret-benchmarks/issues/10",
+      "productIssue": "https://github.com/redact-secret/redact-secret/issues/754",
+      "benchmarkFixtureIds": [
+        "beta8-213c--new-relic-license-key-newrelic-yml",
+        "beta8-213c--new-relic-license-key-newrelic-js-config",
+        "beta8-213c--new-relic-license-key-log-api-license-header",
+        "beta8-213c--new-relic-license-key-helm-bundle-values"
+      ],
+      "corpusHashes": [
+        "d39630d42d62950f5c3ae2fb64d8ed767c6e737272f87536034cb0a234f0e638"
+      ],
+      "fixingCommit": "c8b6caf8259de00331376286faed5f65708f7fa6",
+      "canonicalFixtures": {
+        "synchronous": [
+          "new-relic-license-key-marked-newrelic-yml-no-keyword",
+          "new-relic-license-key-marked-newrelic-js-no-keyword",
+          "new-relic-license-key-marked-log-api-header-no-keyword",
+          "new-relic-license-key-marked-helm-values-no-keyword",
+          "new-relic-license-key-negative-sha1-without-suffix",
+          "new-relic-license-key-boundary-marked-31-byte-body",
+          "new-relic-license-key-boundary-marked-33-byte-body",
+          "new-relic-license-key-boundary-marked-joined-identifier"
+        ],
+        "incremental": []
+      },
+      "gates": {
+        "productConformance": {
+          "status": "pending",
+          "evidence": []
+        },
+        "benchmarkRevalidation": {
+          "status": "pending",
+          "evidence": []
+        }
+      },
+      "note": "new-relic-license-key required a newrelic keyword on the same line, so marked License Keys (32 lowercase hex then FFFFNRAL, and the EU eu01xx form) in newrelic.yml, newrelic.js, an X-License-Key header and Helm values were missed. The fix (PR #757) reports the marked shape on any line, citing New Relic's documentation of the NRAL suffix (docs/audits/evidence/656/README.md); the bare legacy 40-hex shape stays keyword-gated. Four no-keyword positives pin the benchmark contexts; a bare SHA-1, 31- and 33-byte bodies and a joined identifier stay clean. No incremental case: the change is inside one line-bounded match with no chunk or retention state. Canonical inputs are freshly built synthetic values; no benchmark fixture input was copied. Benchmark measurement: corpus beta8-213c. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded."
+    },
+    {
+      "id": "benchmark-gap-756",
+      "benchmarkRecordId": "product-756",
+      "benchmarkIssue": "https://github.com/redact-secret/redact-secret-benchmarks/issues/10",
+      "productIssue": "https://github.com/redact-secret/redact-secret/issues/756",
+      "benchmarkFixtureIds": [
+        "beta8-213d--mailchimp-api-key-docs-template-placeholder",
+        "beta8-212--pinecone-api-key-header-placeholder-placeholder"
+      ],
+      "corpusHashes": [
+        "165039a8f594a04ab9a0903d8dc3834c01629545bcb830543d7aec8f7b63a2cc",
+        "bbdcd601e1bd31a007db0a820f49bba376869e34ac7c9f606a2b60fcd4e3b399"
+      ],
+      "fixingCommit": "99d83c4c4d8070da754fcf021f1be43cdebd7afc",
+      "canonicalFixtures": {
+        "synchronous": [
+          "generic-token-negative-your-api-key-placeholder",
+          "generic-token-negative-env-your-api-key-placeholder",
+          "generic-token-regression-placeholder-lead-word-random-suffix",
+          "generic-token-regression-random-api-key-value-still-detected"
+        ],
+        "incremental": []
+      },
+      "gates": {
+        "productConformance": {
+          "status": "pending",
+          "evidence": []
+        },
+        "benchmarkRevalidation": {
+          "status": "pending",
+          "evidence": []
+        }
+      },
+      "note": "generic-token reported instructional placeholders such as YOUR_API_KEY assigned to a credential-like name, including the beta8-213d Mailchimp docs-template control and the beta8-212 Pinecone Api-Key header control. The fix (PR #758) moves #755's is_instructional_token_placeholder into detectors/text.rs and has generic-token apply it: a your/insert/enter/paste lead word followed only by lead or credential words, at least one naming a token, key, secret or jwt. Two negatives pin the placeholder shapes; a random-suffix placeholder and a random 40-byte value in the same assignment stay detected at exact ranges. No incremental case: the change is inside one bounded match. Canonical inputs are freshly built synthetic values; no benchmark fixture input was copied. Benchmark measurement: corpora beta8-213d and beta8-212. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded."
     }
   ]
 }
