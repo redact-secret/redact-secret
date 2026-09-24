@@ -50,7 +50,9 @@ checksums, and tag identity; it must not be described as a new qualification run
 The beta.2 through beta.6 GitHub Release pages were created on 2026-09-24,
 as prereleases on the existing annotated tags, with explicit maintainer
 approval under the [release authority](../../AGENTS.md#release-authority).
-Beta.2 and beta.3 use their prepared bodies; beta.4 through beta.6 use the
+Beta.2 and beta.3 use their prepared bodies
+([beta.2](0.1.0-beta.2/github-release-notes.md),
+[beta.3](0.1.0-beta.3/github-release-notes.md)); beta.4 through beta.6 use the
 same shape and link their durable records. No package was republished, no tag
 was created or moved, and no workflow was dispatched.
 Qualified CLI binaries remain Actions artifacts; these bodies do not promise
