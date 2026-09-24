@@ -66,6 +66,15 @@
             "negative": [],
             "positive": ["contextual-positive-prose-high-signal-name-tradeoff", "contextual-positive-prose-high-signal-name-tradeoff-markdown"]
           }
+        },
+        {
+          "id": "twilio-public-sid",
+          "description": "A value that is exactly a Twilio Account SID or API Key SID (AC/SK + 32 lowercase hex) is a documented public identifier, not a secret, under any contextual name. Another prefix, another length, or an uppercase body stays detected.",
+          "basis": {"kind": "code", "ref": "generic_token.rs:is_twilio_public_sid and test twilio_account_and_api_key_sids_are_public_identifiers (issue #746)"},
+          "fixtures": {
+            "negative": ["generic-token-negative-twilio-account-sid"],
+            "positive": ["generic-token-regression-uppercase-hex-sid-lookalike"]
+          }
         }
       ]
     },
@@ -90,6 +99,15 @@
           "fixtures": {
             "negative": ["bearer-negative-placeholder-whole-value", "bearer-negative-placeholder-markdown"],
             "positive": ["bearer-positive-compound-placeholder-not-excluded", "bearer-positive-markdown-real-token-still-detected"]
+          }
+        },
+        {
+          "id": "instructional-placeholder",
+          "description": "A Bearer value of 16 or more bytes that reads as an instruction to supply a credential (YOUR_ACCESS_TOKEN, INSERT_ACCESS_TOKEN): a your/insert/enter/paste lead word, then only credential words, naming a token, key, secret, or jwt. One word outside that vocabulary keeps the value detected.",
+          "basis": {"kind": "code", "ref": "bearer_token.rs:is_instructional_token_placeholder (issue #745)"},
+          "fixtures": {
+            "negative": ["bearer-token-negative-your-oauth-token-placeholder", "bearer-token-negative-insert-access-token-placeholder"],
+            "positive": ["bearer-token-regression-placeholder-lead-word-with-random-suffix", "bearer-token-regression-base64url-value-still-detected"]
           }
         },
         {

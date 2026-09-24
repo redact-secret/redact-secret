@@ -1048,7 +1048,7 @@
     {
       "detector": "supabase-token",
       "evidence": {
-        "fixtureCount": 24,
+        "fixtureCount": 28,
         "hostContextsExercised": [
           "dotenv",
           "json",
@@ -1071,13 +1071,14 @@
       "evidenceFixtureIds": [
         "supabase-positive-crlf-unicode-prefix",
         "supabase-positive-doc-style-placeholder",
+        "supabase-positive-documented-layout-exact-width",
         "supabase-positive-dotenv",
         "supabase-positive-json",
         "supabase-positive-log",
-        "supabase-positive-min-length",
         "supabase-positive-mixed-public-and-secret",
         "supabase-positive-qualified",
-        "supabase-positive-yaml"
+        "supabase-positive-yaml",
+        "supabase-token-positive-documented-layout"
       ],
       "policyClass": "always-redact",
       "schemeRows": "not-applicable",
@@ -1193,7 +1194,7 @@
     {
       "detector": "google-api-key",
       "evidence": {
-        "fixtureCount": 30,
+        "fixtureCount": 32,
         "hostContextsExercised": [
           "dotenv",
           "javascript",
@@ -1204,7 +1205,6 @@
         ],
         "kindsWithSupportedEvidence": [
           "adversarial",
-          "boundary",
           "negative",
           "overlap",
           "positive"
@@ -1215,7 +1215,12 @@
         ]
       },
       "evidenceFixtureIds": [
+        "firebase-positive-client-config-dotenv",
+        "firebase-positive-client-config-javascript",
+        "firebase-positive-client-config-json",
+        "firebase-positive-client-config-minimal-javascript",
         "firebase-positive-google-api-key-as-server-key-context",
+        "firebase-positive-google-services-json",
         "google-positive-dotenv",
         "google-positive-javascript-firebase-config",
         "google-positive-json",
@@ -1373,7 +1378,7 @@
     {
       "detector": "atlassian-api-token",
       "evidence": {
-        "fixtureCount": 16,
+        "fixtureCount": 20,
         "hostContextsExercised": [
           "dotenv",
           "json",
@@ -1382,6 +1387,7 @@
         ],
         "kindsWithSupportedEvidence": [
           "adversarial",
+          "boundary",
           "negative",
           "overlap",
           "positive"
@@ -1393,10 +1399,13 @@
       },
       "evidenceFixtureIds": [
         "atlassian-api-token-positive-bare",
+        "atlassian-api-token-positive-crc32-suffix-full-span",
+        "atlassian-api-token-positive-crc32-suffix-json",
         "atlassian-api-token-positive-crlf-unicode-prefix",
         "atlassian-api-token-positive-dotenv",
         "atlassian-api-token-positive-json",
-        "atlassian-api-token-positive-log"
+        "atlassian-api-token-positive-log",
+        "atlassian-api-token-positive-no-suffix-exact"
       ],
       "policyClass": "always-redact",
       "schemeRows": "not-applicable",
@@ -1406,7 +1415,7 @@
     {
       "detector": "telegram-bot-token",
       "evidence": {
-        "fixtureCount": 16,
+        "fixtureCount": 19,
         "hostContextsExercised": [
           "dotenv",
           "http",
@@ -1428,6 +1437,7 @@
       "evidenceFixtureIds": [
         "telegram-bot-token-positive-bare",
         "telegram-bot-token-positive-bot-api-url",
+        "telegram-bot-token-positive-control-exact",
         "telegram-bot-token-positive-crlf-unicode-prefix",
         "telegram-bot-token-positive-dotenv",
         "telegram-bot-token-positive-json",
@@ -1483,7 +1493,7 @@
     {
       "detector": "bearer-token",
       "evidence": {
-        "fixtureCount": 31,
+        "fixtureCount": 35,
         "hostContextsExercised": [
           "dotenv",
           "http",
@@ -1515,7 +1525,9 @@
         "bearer-positive-near-miss-repeated-character-filler",
         "bearer-positive-scheme",
         "bearer-positive-tab-and-uppercase",
-        "bearer-positive-yaml-real-token-still-detected"
+        "bearer-positive-yaml-real-token-still-detected",
+        "bearer-token-regression-base64url-value-still-detected",
+        "bearer-token-regression-placeholder-lead-word-with-random-suffix"
       ],
       "policyClass": "always-redact",
       "schemeRows": "not-applicable",
@@ -1731,7 +1743,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 149,
+        "fixtureCount": 151,
         "hostContextsExercised": [
           "chat",
           "dotenv",
@@ -1802,6 +1814,7 @@
         "contextual-positive-vals-scheme-prefix-still-detected",
         "generic-token-positive-unquoted-markdown-inline-code",
         "generic-token-regression-sql-bind-lookalike-still-detected",
+        "generic-token-regression-uppercase-hex-sid-lookalike",
         "generic-token-regression-windows-env-lookalike-still-detected",
         "regression-generic-token-markdown-inline-code-boundary",
         "regression-nested-credential-under-parent-key",
@@ -1818,7 +1831,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 149,
+        "fixtureCount": 151,
         "hostContextsExercised": [
           "chat",
           "dotenv",
@@ -1879,7 +1892,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 149,
+        "fixtureCount": 151,
         "hostContextsExercised": [
           "chat",
           "dotenv",
@@ -1965,7 +1978,7 @@
     {
       "detector": "twilio-auth-token",
       "evidence": {
-        "fixtureCount": 13,
+        "fixtureCount": 14,
         "hostContextsExercised": [
           "dotenv",
           "json",
@@ -2618,7 +2631,7 @@
     {
       "detector": "confluent-cloud-api-secret",
       "evidence": {
-        "fixtureCount": 19,
+        "fixtureCount": 23,
         "hostContextsExercised": [
           "dotenv",
           "github-actions",
@@ -2640,6 +2653,7 @@
         ]
       },
       "evidenceFixtureIds": [
+        "confluent-cloud-api-secret-checksum-valid",
         "confluent-cloud-api-secret-positive-bare",
         "confluent-cloud-api-secret-positive-crlf-unicode-prefix",
         "confluent-cloud-api-secret-positive-dotenv",
@@ -2659,7 +2673,7 @@
     {
       "detector": "confluent-cloud-api-secret-legacy",
       "evidence": {
-        "fixtureCount": 10,
+        "fixtureCount": 11,
         "hostContextsExercised": [
           "dotenv",
           "plain-text",
@@ -2771,7 +2785,7 @@
     {
       "detector": "heroku-api-key",
       "evidence": {
-        "fixtureCount": 22,
+        "fixtureCount": 27,
         "hostContextsExercised": [
           "dotenv",
           "github-actions",
@@ -2780,6 +2794,7 @@
           "log",
           "plain-text",
           "shell",
+          "terminal",
           "yaml"
         ],
         "kindsWithSupportedEvidence": [
@@ -2794,6 +2809,9 @@
         ]
       },
       "evidenceFixtureIds": [
+        "heroku-api-key-hrku-uuid-authorizations-create",
+        "heroku-api-key-hrku-uuid-bare",
+        "heroku-api-key-hrku-uuid-env",
         "heroku-api-key-positive-bare",
         "heroku-api-key-positive-crlf-unicode-prefix",
         "heroku-api-key-positive-dotenv",
@@ -2814,11 +2832,13 @@
     {
       "detector": "heroku-api-key-legacy",
       "evidence": {
-        "fixtureCount": 12,
+        "fixtureCount": 16,
         "hostContextsExercised": [
           "dotenv",
+          "http",
           "json",
           "plain-text",
+          "terminal",
           "yaml"
         ],
         "kindsWithSupportedEvidence": [
@@ -2833,8 +2853,10 @@
         ]
       },
       "evidenceFixtureIds": [
+        "heroku-api-key-legacy-positive-auth-token-output",
         "heroku-api-key-legacy-positive-bare-with-keyword",
         "heroku-api-key-legacy-positive-dotenv-keyword",
+        "heroku-api-key-legacy-positive-netrc-multi-line",
         "heroku-api-key-legacy-positive-netrc-style",
         "heroku-api-key-legacy-positive-yaml-keyword"
       ],

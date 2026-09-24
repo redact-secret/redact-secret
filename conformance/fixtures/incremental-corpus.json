@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 85,
+  "fixtureCount": 89,
   "fixtures": [
     {
       "id": "synthetic-regression-malformed-authority",
@@ -59,7 +59,7 @@
     },
     {
       "id": "additional-provider-families",
-      "input": "sk_live_SYNTHETICREVOKEDSYNTHETICREVOKED\nxoxb-SYNTHETIC-REVOKED-SYNTHETIC-REVOKED-\npypi-SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\n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\ndckr_pat_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\ncfut_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\ndop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\nlin_api_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\nsb_secret_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\nvcp_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_",
+      "input": "sk_live_SYNTHETICREVOKEDSYNTHETICREVOKED\nxoxb-SYNTHETIC-REVOKED-SYNTHETIC-REVOKED-\npypi-SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\n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\ndckr_pat_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\ncfut_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\ndop_v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\nlin_api_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\nsb_secret_SYNTHETIC_REVOKED_SUPA_CHECKSUM\nvcp_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_",
       "text": "<SECRET_1>\nxoxb-SYNTHETIC-REVOKED-SYNTHETIC-REVOKED-\n<SECRET_2>\n<SECRET_3>\ndckr_pat_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\ncfut_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\n<SECRET_4>\nlin_api_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\n<SECRET_5>\n<SECRET_6>",
       "expected": [
         {
@@ -100,15 +100,15 @@
           "confidence": "high",
           "specificity": "provider",
           "start": 422,
-          "end": 468
+          "end": 463
         },
         {
           "detector": "vercel-token",
           "type": "vercel_token",
           "confidence": "high",
           "specificity": "provider",
-          "start": 469,
-          "end": 509
+          "start": 464,
+          "end": 504
         }
       ],
       "note": "Every newly qualified variable-length provider family remains whole across partitions. Reclassified by issue #370 (decision-freeze-precision-contracts-seven-provider-families): the dckr_pat_ line carries a 36-byte suffix, which is neither documented Docker Hub length, so it now stays as plain text at every partition while its neighbours are still redacted; docker-pat-oat-exact-length-partitions carries the exact-length shapes. Input unchanged; expectation corrected. The DigitalOcean line carries the reviewed exact 64-byte hex contract (issue #369); later offsets shifted accordingly. Reclassified again by issue #371 (docs/decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md): the xoxb- line has no digit sections, so it now stays as plain text at every partition too. Reclassified again by issue #372 (docs/contracts/precision/precision-contracts.json, families.huggingface-token): the hf_ line now carries the reviewed exact 34-byte letters-only body instead of the retired 20-byte-minimum, underscore-inclusive shape, shifting every later detector's start/end by -2; every offset above already reflects that shift. Reclassified again by issue #373 (docs/contracts/precision/precision-contracts.json, families.cloudflare-token): the cfut_ line carries a 36-byte underscore-including body, not the reviewed 40-byte alphanumeric body plus 8-byte lowercase-hex checksum, so it now stays as plain text at every partition too; every SECRET tag after it is renumbered down by one but no later detector's input start/end offset shifts, since the cfut_ line's input text is unchanged. Reclassified again by issue #374 (docs/contracts/precision/precision-contracts.json, families.linear-token): the lin_api_ line carries a 45-byte underscore-including body, not the reviewed 40-byte alphanumeric body, so it now stays as plain text at every partition too; every SECRET tag after it is renumbered down by one but no later detector's input start/end offset shifts, since the lin_api_ line's input text is unchanged."
@@ -287,7 +287,7 @@
           "end": 20
         }
       ],
-      "note": "issue #318: aws-access-key's scan_prefixed_runs uses RunLength::Exact(16), a family it shares with github-token, new_relic, notion, sentry, and twilio. Its discriminating boundary is the byte immediately after the fixed-length run: one more alphanumeric byte there turns a match into the rejected longer run on the second line (deliberately a distinct value from the first line's, not a shared prefix, so the rejected run's own un-redacted text can never coincide with the first line's detected value). A chunk split anywhere in either run, including exactly at that boundary byte, must still resolve to the single first-line finding, the same as the whole-input scan \u2014 the Exact-length-family counterpart to stripe-public-secret-prefix-discriminating-boundary's AtLeast-family exemplar."
+      "note": "issue #318: aws-access-key's scan_prefixed_runs uses RunLength::Exact(16), a family it shares with github-token, new_relic, notion, sentry, and twilio. Its discriminating boundary is the byte immediately after the fixed-length run: one more alphanumeric byte there turns a match into the rejected longer run on the second line (deliberately a distinct value from the first line's, not a shared prefix, so the rejected run's own un-redacted text can never coincide with the first line's detected value). A chunk split anywhere in either run, including exactly at that boundary byte, must still resolve to the single first-line finding, the same as the whole-input scan — the Exact-length-family counterpart to stripe-public-secret-prefix-discriminating-boundary's AtLeast-family exemplar."
     },
     {
       "id": "multiline-private-key",
@@ -508,16 +508,16 @@
     },
     {
       "id": "supabase-public-secret-prefix-discriminating-boundary",
-      "input": "sb_publishable_SYNTHETICREVOKEDSYNT\nsb_secret_SYNTHETICREVOKEDSYNTHETICREVOKED",
-      "text": "sb_publishable_SYNTHETICREVOKEDSYNT\n<SECRET_1>",
+      "input": "sb_publishable_SYNTHETICREVOKEDPUBLIC_CHKSUM01\nsb_secret_SYNTHETICREVOKEDSECRET_CHKSUM02",
+      "text": "sb_publishable_SYNTHETICREVOKEDPUBLIC_CHKSUM01\n<SECRET_1>",
       "expected": [
         {
           "detector": "supabase-token",
           "type": "supabase_secret_key",
           "confidence": "high",
           "specificity": "provider",
-          "start": 36,
-          "end": 78
+          "start": 47,
+          "end": 88
         }
       ],
       "note": "issue #316: a public identifier prefix and a documented secret prefix on adjacent lines stay correctly discriminated at every chunk split, including splits that fall inside either prefix's own bytes."
@@ -1344,6 +1344,70 @@
         }
       ],
       "note": "issue #480 (#468 residual): a whole-value placeholder-vocabulary Bearer credential on the first line is excluded and produces no finding, distinct from the repeated-character filler case already covered by bearer-token-filler-and-placeholder-exclusion-boundary, while a genuine Bearer credential on the second line is still reported; every UTF-8 chunk split, including splits inside the placeholder word or across the line boundary, must reproduce this whole-input reference."
+    },
+    {
+      "id": "heroku-legacy-netrc-multi-line-partitions",
+      "input": "machine api.heroku.com\n  login someone@example.invalid\n  password 7c1d9e42-5b3a-4f60-9e2d-0a8b6c4d1e73\n",
+      "text": "machine api.heroku.com\n  login someone@example.invalid\n  password 7c1d9e42-5b3a-4f60-9e2d-0a8b6c4d1e73\n",
+      "expected": [
+        {
+          "detector": "heroku-api-key-legacy",
+          "type": "heroku_api_key_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 66,
+          "end": 102
+        }
+      ],
+      "note": "Issue #743: the machine api.heroku.com line and the password line can fall in different chunks. The session holds the Heroku .netrc entry open until its password line arrives, so every partition reports the same medium-confidence finding (a warn, so the text is unchanged) as the whole-input scan."
+    },
+    {
+      "id": "heroku-legacy-auth-token-output-partitions",
+      "input": "$ heroku auth:token\n7c1d9e42-5b3a-4f60-9e2d-0a8b6c4d1e73\n",
+      "text": "$ heroku auth:token\n7c1d9e42-5b3a-4f60-9e2d-0a8b6c4d1e73\n",
+      "expected": [
+        {
+          "detector": "heroku-api-key-legacy",
+          "type": "heroku_api_key_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 20,
+          "end": 56
+        }
+      ],
+      "note": "Issue #743: the heroku auth:token command line is held open until the output line arrives, so the token on the next line is reported at every partition."
+    },
+    {
+      "id": "heroku-hrku-uuid-generation-partitions",
+      "input": "HEROKU_API_KEY=HRKU-5e7e71c0-0000-4000-8000-00000000fa11\n",
+      "text": "HEROKU_API_KEY=<SECRET_1>\n",
+      "expected": [
+        {
+          "detector": "heroku-api-key",
+          "type": "heroku_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 15,
+          "end": 56
+        }
+      ],
+      "note": "Issue #740: the 41-character HRKU-<uuid> generation stays whole across partitions, split anywhere in its prefix or UUID body."
+    },
+    {
+      "id": "atlassian-api-token-crc32-tail-partition",
+      "input": "ATLASSIAN_API_TOKEN=ATATT3xFfGF0SYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY_SYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY_SYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY_SYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY=0A1B2C3D\nnext=line\n",
+      "text": "ATLASSIAN_API_TOKEN=<SECRET_1>\nnext=line\n",
+      "expected": [
+        {
+          "detector": "atlassian-api-token",
+          "type": "atlassian_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 20,
+          "end": 212
+        }
+      ],
+      "note": "Issue #741: the `=` + 8-hex tail sits after a byte the body grammar treats as a terminator, so a chunk split between the body and `=`, or between `=` and the hex, must still resolve to the whole 192-byte token, the same as the whole-input scan."
     }
   ]
 }

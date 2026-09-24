@@ -185,6 +185,47 @@ pub(super) fn is_repeated_character_filler(value: &str) -> bool {
     count >= 3
 }
 
+/// Hash-algorithm names that, written directly in front of an opaque value
+/// with a `=` or `:` separator, label that value as a digest (issue #744).
+/// Matched case-insensitively.
+const DIGEST_ALGORITHM_LABELS: &[&str] = &[
+    "md5", "sha1", "sha-1", "sha224", "sha-224", "sha256", "sha-256", "sha384", "sha-384",
+    "sha512", "sha-512", "sha3-256", "sha3-512", "blake2b", "blake2s", "blake3",
+];
+
+/// `true` when the value starting at byte offset `start` of `input` is
+/// introduced by a hash-algorithm label: one of [`DIGEST_ALGORITHM_LABELS`],
+/// then `=` or `:`, then optional spaces or tabs, directly before the value
+/// (`md5=<hex>`, `image@sha256:<hex>`, `sha256: <hex>`). The label itself
+/// must not continue a wider identifier on its left (`xmd5=` does not
+/// count), though a `_`, `-`, `@`, or any other non-alphanumeric byte may
+/// precede it.
+///
+/// A value introduced this way is a published checksum or content digest,
+/// not a credential, so the keyword-gated bare-value detectors
+/// (`twilio-auth-token`, `twilio-api-key-secret`,
+/// `confluent-cloud-api-secret-legacy`) skip it even when their provider's
+/// name is on the same line. The label must sit immediately in front of the
+/// value: a digest label elsewhere on the line proves nothing about an
+/// unrelated value.
+pub(super) fn is_labelled_digest(input: &str, start: usize) -> bool {
+    let bytes = input.as_bytes();
+    let mut cursor = start;
+    while cursor > 0 && matches!(bytes[cursor - 1], b' ' | b'\t') {
+        cursor -= 1;
+    }
+    if cursor == 0 || !matches!(bytes[cursor - 1], b'=' | b':') {
+        return false;
+    }
+    let label_end = cursor - 1;
+    DIGEST_ALGORITHM_LABELS.iter().any(|label| {
+        label_end >= label.len()
+            && starts_with_ci(input, label_end - label.len(), label)
+            && (label_end == label.len()
+                || !bytes[label_end - label.len() - 1].is_ascii_alphanumeric())
+    })
+}
+
 // --- interpolation / environment-reference exclusions -------------------
 //
 // Shared by `generic_token` and `connection_string` (issue #279, #292,

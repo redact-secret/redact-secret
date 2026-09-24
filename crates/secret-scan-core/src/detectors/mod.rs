@@ -60,6 +60,7 @@ pub(crate) use generic_token::{
     RULESET_NAMES_DETECTOR_ID, generic_token_ruleset_names_detector,
     has_open_contextual_assignment, is_reserved_name, normalize_name,
 };
+pub(crate) use heroku::has_open_heroku_legacy_context;
 pub(crate) use private_key::PrivateKeyRetentionTracker;
 pub(crate) use ruleset_adapter::RulesetDetector;
 
@@ -529,7 +530,10 @@ mod tests {
                 "linear-token",
                 "lin_api_SYNTHETICREVOKEDLINEARAPITOKENVALUE01234",
             ),
-            ("supabase-token", "sb_secret_SYNTHETICREVOKEDPROVIDERVALUE"),
+            (
+                "supabase-token",
+                "sb_secret_SYNTHETIC_REVOKED_SUPA_CHECKSUM",
+            ),
             (
                 "supabase-management-token",
                 "sbp_synthetic0revoked1provider2value3padding",
@@ -596,7 +600,7 @@ mod tests {
         let databricks_personal_access_token_input =
             format!("dapi{}", "0123456789abcdef0123456789abcdef");
         let confluent_cloud_api_secret_input =
-            "cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPQRSTUV";
+            "cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPn2NMow";
         let netlify_token_input = "nfp_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01";
         let postman_api_key_input = format!(
             "PMAK-{}-{}",

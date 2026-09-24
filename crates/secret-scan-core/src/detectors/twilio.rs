@@ -75,6 +75,14 @@
 //! (`TWILIO_AUTH_TOKEN=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`) from otherwise
 //! matching the bare alphabet outright.
 //!
+//! A candidate introduced by a hash-algorithm label
+//! ([`text::is_labelled_digest`]: `md5=`, `sha256:`, ...) is excluded for
+//! the same reason (issue #744): `twilio-9.3.0.tar.gz md5=<32 hex>` names
+//! Twilio but carries a package checksum, and Twilio publishes no form in
+//! which an Auth Token or API Key Secret follows such a label. A real
+//! token after an ordinary name (`TWILIO_AUTH_TOKEN=<32 hex>`) is
+//! unaffected.
+//!
 //! ## Action
 //!
 //! Both finding types are `Specificity::Provider` but intentionally left out
@@ -212,7 +220,9 @@ fn detect_context_gated(
             };
 
         for (relative_start, relative_end) in raw_matches {
-            if text::is_repeated_character_filler(&line[relative_start..relative_end]) {
+            if text::is_repeated_character_filler(&line[relative_start..relative_end])
+                || text::is_labelled_digest(line, relative_start)
+            {
                 continue;
             }
             let Some(range) =
@@ -486,5 +496,37 @@ mod tests {
                 .iter()
                 .all(|candidate| candidate.confidence() == Confidence::High)
         );
+    }
+
+    #[test]
+    fn rejects_a_hash_algorithm_labelled_digest_on_a_twilio_line() {
+        // Issue #744: a package checksum on a line that names Twilio.
+        for input in [
+            format!("twilio-9.3.0.tar.gz md5={AUTH_TOKEN}"),
+            format!("twilio-9.3.0.tar.gz MD5={AUTH_TOKEN}"),
+            format!("twilio checksum sha256: {AUTH_TOKEN}"),
+            format!("twilio@sha256:{AUTH_TOKEN}"),
+            format!("{ACCOUNT_SID} md5={AUTH_TOKEN}"),
+        ] {
+            assert!(detect_auth_token(&input).is_empty(), "{input}");
+        }
+        assert!(detect_api_key_secret(&format!("twilio md5={API_KEY_SECRET}")).is_empty());
+    }
+
+    #[test]
+    fn a_digest_label_elsewhere_on_the_line_does_not_hide_a_real_auth_token() {
+        let input = format!("TWILIO_AUTH_TOKEN={AUTH_TOKEN}");
+        let candidates = detect_auth_token(&input);
+        assert_eq!(candidates.len(), 1);
+        assert_eq!(candidates[0].range().start(), 18);
+        assert_eq!(candidates[0].range().end(), 50);
+
+        for input in [
+            format!("twilio md5=ok token={AUTH_TOKEN}"),
+            format!("TWILIO_AUTH_TOKEN_MD5X={AUTH_TOKEN}"),
+            format!("twilio xmd5={AUTH_TOKEN}"),
+        ] {
+            assert_eq!(detect_auth_token(&input).len(), 1, "{input}");
+        }
     }
 }

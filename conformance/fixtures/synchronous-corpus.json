@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 1669,
+  "fixtureCount": 1703,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -6665,7 +6665,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "sb_secret_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_",
+      "input": "sb_secret_SYNTHETIC_REVOKED_SUPA_CHECKSUM",
       "expected": [
         {
           "detector": "supabase-token",
@@ -6673,10 +6673,10 @@
           "confidence": "high",
           "specificity": "provider",
           "start": 0,
-          "end": 46
+          "end": 41
         }
       ],
-      "note": "A provider-published prefix with a substantial synthetic suffix is supported."
+      "note": "The documented sb_secret_ layout (a 22-byte random part, `_`, and an 8-byte checksum part, all base64url) is supported (#742)."
     },
     {
       "id": "supabase-negative-ordinary-reference",
@@ -6719,7 +6719,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "access_token=sb_secret_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_",
+      "input": "access_token=sb_secret_SYNTHETIC_REVOKED_SUPA_CHECKSUM",
       "expected": [
         {
           "detector": "supabase-token",
@@ -6727,13 +6727,13 @@
           "confidence": "high",
           "specificity": "provider",
           "start": 13,
-          "end": 59
+          "end": 54
         }
       ],
       "note": "Qualified provider evidence wins over a contextual assignment."
     },
     {
-      "id": "supabase-positive-min-length",
+      "id": "supabase-positive-documented-layout-exact-width",
       "detector": "supabase-token",
       "kind": "positive",
       "support": "supported",
@@ -6741,7 +6741,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "sb_secret_SYNTHETIC_REVOKED_SY",
+      "input": "sb_secret_SYNTHETICREVOKED012345_CHKSUM03",
       "expected": [
         {
           "detector": "supabase-token",
@@ -6749,10 +6749,10 @@
           "confidence": "high",
           "specificity": "provider",
           "start": 0,
-          "end": 30
+          "end": 41
         }
       ],
-      "note": "The documented minimum suffix length, at its exact boundary, is supported."
+      "note": "Issue #742: the body is exactly the documented 31 bytes (22 + `_` + 8); the former 20-byte open floor is withdrawn, so this is the only accepted width."
     },
     {
       "id": "supabase-boundary-below-min",
@@ -6828,9 +6828,9 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "sb_publishable_SYNTHETIC_REVOKED_SY",
+      "input": "sb_publishable_SYNTHETIC_REVOKED_SUPA_CHECKSUM",
       "expected": [],
-      "note": "Supabase's publishable key prefix is a public identifier, not an elevated-access secret."
+      "note": "The public sb_publishable_ key with the same documented 22 + `_` + 8 body is a public identifier, not a secret; only the prefix discriminates."
     },
     {
       "id": "supabase-adversarial-long-suffix",
@@ -6843,21 +6843,12 @@
       ],
       "resource": {
         "maxInputBytes": 33783,
-        "maxFindings": 1,
+        "maxFindings": 0,
         "maxRuntimeMs": 250
       },
       "input": "sb_secret_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_!",
-      "expected": [
-        {
-          "detector": "supabase-token",
-          "type": "supabase_secret_key",
-          "confidence": "high",
-          "specificity": "provider",
-          "start": 0,
-          "end": 11260
-        }
-      ],
-      "note": "A long delimited provider match remains deterministic and bounded."
+      "expected": [],
+      "note": "A long base64url run after sb_secret_ is not the documented 22 + `_` + 8 layout, so it is rejected rather than truncated (#742), deterministically and within bounds."
     },
     {
       "id": "supabase-negative-wrong-prefix",
@@ -6868,7 +6859,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "sb_secrets_SYNTHETICREVOKEDSYNTHETICREVOKED",
+      "input": "sb_secrets_SYNTHETICREVOKEDSECRET_CHKSUM02",
       "expected": [],
       "note": "An undocumented near-miss prefix ('sb_secrets_') that is not one byte-for-byte equal to any documented prefix is not classified, however long or well-formed the following run is."
     },
@@ -6881,7 +6872,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "(sb_publishable_SYNTHETICREVOKEDSYNT).",
+      "input": "(sb_publishable_SYNTHETICREVOKEDPUBLIC_CHKSUM01).",
       "expected": [],
       "note": "The public identifier prefix stays unclassified when immediately surrounded by punctuation, mirroring the positive suffix's own punctuation-boundary behavior."
     },
@@ -6894,7 +6885,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 密钥 café\r\nsb_publishable_SYNTHETICREVOKEDSYNT\r\n",
+      "input": "# 🔑 密钥 café\r\nsb_publishable_SYNTHETICREVOKEDPUBLIC_CHKSUM01\r\n",
       "expected": [],
       "note": "A preceding Unicode comment line and CRLF line endings do not turn the public identifier prefix into a classified credential."
     },
@@ -6933,7 +6924,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "sb_secret_xxxxxxxxxxxxxxxxxxxxxxxx",
+      "input": "sb_secret_xxxxxxxxxxxxxxxxxxxxxx_xxxxxxxx",
       "expected": [
         {
           "detector": "supabase-token",
@@ -6941,10 +6932,10 @@
           "confidence": "high",
           "specificity": "provider",
           "start": 0,
-          "end": 34
+          "end": 41
         }
       ],
-      "note": "A documentation placeholder built entirely from valid alphabet characters (e.g. a repeated filler letter) is indistinguishable from a real secret's shape and is classified: an accepted precision/recall tradeoff, not a bug. Only a placeholder that breaks the alphabet run (angle brackets, underscores outside the allowed set) is excluded."
+      "note": "A documentation placeholder built entirely from valid alphabet characters in the documented 22 + `_` + 8 layout (e.g. a repeated filler letter) is indistinguishable from a real secret's shape and is classified: an accepted precision/recall tradeoff, not a bug. Only a placeholder that breaks the alphabet run or the documented layout is excluded."
     },
     {
       "id": "supabase-positive-mixed-public-and-secret",
@@ -6955,15 +6946,15 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "sb_publishable_SYNTHETICREVOKEDSYNT\nsb_secret_SYNTHETICREVOKEDSYNTHETICREVOKED",
+      "input": "sb_publishable_SYNTHETICREVOKEDPUBLIC_CHKSUM01\nsb_secret_SYNTHETICREVOKEDSECRET_CHKSUM02",
       "expected": [
         {
           "detector": "supabase-token",
           "type": "supabase_secret_key",
           "confidence": "high",
           "specificity": "provider",
-          "start": 36,
-          "end": 78
+          "start": 47,
+          "end": 88
         }
       ],
       "note": "A public identifier and a secret credential on adjacent lines: the public prefix never generates a candidate at all (not merely suppressed by overlap resolution), while the paired secret is still classified with the correct range."
@@ -6977,7 +6968,7 @@
       "contexts": [
         "dotenv"
       ],
-      "input": "SUPABASE_SERVICE_ROLE_KEY=sb_secret_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_",
+      "input": "SUPABASE_SERVICE_ROLE_KEY=sb_secret_SYNTHETIC_REVOKED_SUPA_CHECKSUM",
       "expected": [
         {
           "detector": "supabase-token",
@@ -6985,7 +6976,7 @@
           "confidence": "high",
           "specificity": "provider",
           "start": 26,
-          "end": 72
+          "end": 67
         }
       ],
       "note": "A bare dotenv-style assignment (SUPABASE_SERVICE_ROLE_KEY=<token>, no quotes) is detected by format alone."
@@ -6999,7 +6990,7 @@
       "contexts": [
         "json"
       ],
-      "input": "{\"supabaseServiceRoleKey\": \"sb_secret_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\"}",
+      "input": "{\"supabaseServiceRoleKey\": \"sb_secret_SYNTHETIC_REVOKED_SUPA_CHECKSUM\"}",
       "expected": [
         {
           "detector": "supabase-token",
@@ -7007,7 +6998,7 @@
           "confidence": "high",
           "specificity": "provider",
           "start": 28,
-          "end": 74
+          "end": 69
         }
       ],
       "note": "A quoted JSON string value is detected the same as a bare one; the enclosing quotes are not part of the match."
@@ -7021,7 +7012,7 @@
       "contexts": [
         "yaml"
       ],
-      "input": "supabase_service_role_key: sb_secret_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\n",
+      "input": "supabase_service_role_key: sb_secret_SYNTHETIC_REVOKED_SUPA_CHECKSUM\n",
       "expected": [
         {
           "detector": "supabase-token",
@@ -7029,7 +7020,7 @@
           "confidence": "high",
           "specificity": "provider",
           "start": 27,
-          "end": 73
+          "end": 68
         }
       ],
       "note": "A YAML mapping value is detected the same as a bare one."
@@ -7043,7 +7034,7 @@
       "contexts": [
         "log"
       ],
-      "input": "2026-09-16T00:00:00Z INFO refreshing session key=sb_secret_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_ project=example",
+      "input": "2026-09-16T00:00:00Z INFO refreshing session key=sb_secret_SYNTHETIC_REVOKED_SUPA_CHECKSUM project=example",
       "expected": [
         {
           "detector": "supabase-token",
@@ -7051,7 +7042,7 @@
           "confidence": "high",
           "specificity": "provider",
           "start": 49,
-          "end": 95
+          "end": 90
         }
       ],
       "note": "A provider token embedded in a structured log line is still detected."
@@ -7065,7 +7056,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\nsb_secret_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\r\n",
+      "input": "# 🔑 café\r\nsb_secret_SYNTHETIC_REVOKED_SUPA_CHECKSUM\r\n",
       "expected": [
         {
           "detector": "supabase-token",
@@ -7073,7 +7064,7 @@
           "confidence": "high",
           "specificity": "provider",
           "start": 14,
-          "end": 60
+          "end": 55
         }
       ],
       "note": "A match after a CRLF line ending and a Unicode-prefixed comment line is still found at the correct UTF-8 byte offset."
@@ -7317,6 +7308,67 @@
       "input": "sbp_synthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3padding",
       "expected": [],
       "note": "An 8000-byte homogeneous lowercase-alnum run after the documented prefix is neither documented exact length, so the exact-length-plus-truncation rule reports nothing; the scan still stays deterministic and bounded (a long same-alphabet run is not misread as the exact shape plus trailing bytes)."
+    },
+    {
+      "id": "supabase-token-positive-documented-layout",
+      "detector": "supabase-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "SUPABASE_SECRET_KEY=sb_secret_SYNTHETIC-REVOKED_SUPA_CHK-SUM0",
+      "expected": [
+        {
+          "detector": "supabase-token",
+          "type": "supabase_secret_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 20,
+          "end": 61
+        }
+      ],
+      "note": "Issue #742: sb_secret_ + a 22-byte base64url random part + `_` + an 8-byte base64url checksum part, the layout Supabase documents, is detected; `-` and `_` inside a segment are part of the base64url alphabet, so only the delimiter position is structural."
+    },
+    {
+      "id": "supabase-token-negative-random-part-21",
+      "detector": "supabase-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "regression",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "SUPABASE_SECRET_KEY=sb_secret_SYNTHETIC-REVOKED_SUP_CHK-SUM0",
+      "expected": [],
+      "note": "Issue #742 twin: a 21-byte random part is outside the documented 22 + `_` + 8 layout and is rejected."
+    },
+    {
+      "id": "supabase-token-negative-checksum-9",
+      "detector": "supabase-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "regression",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "SUPABASE_SECRET_KEY=sb_secret_SYNTHETIC-REVOKED_SUPA_CHK-SUM0X",
+      "expected": [],
+      "note": "Issue #742 twin: a 9-byte checksum part is outside the documented layout and is rejected rather than truncated to 8."
+    },
+    {
+      "id": "supabase-token-negative-dash-delimiter",
+      "detector": "supabase-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "regression",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "SUPABASE_SECRET_KEY=sb_secret_SYNTHETIC-REVOKED_SUPA-CHK-SUM0",
+      "expected": [],
+      "note": "Issue #742 twin: `-` where the documented `_` delimiter belongs is rejected; the delimiter is checked by position because both segments may themselves contain `-` and `_`."
     },
     {
       "id": "vercel-positive-qualified",
@@ -8242,7 +8294,7 @@
           "end": 75
         }
       ],
-      "note": "The AIza-prefixed shape also appears in public Firebase/browser configuration, referrer-restricted rather than a privileged secret; the detector still reports the documented shape at high confidence. Issue #520 (B3a) added a pipeline-level exemption for a *recognized* Firebase Web SDK client-config object (crate::pipeline::is_within_firebase_client_config_context), but this fixture carries only one config sibling field (authDomain) alongside apiKey -- below the two-field threshold that distinguishes a real, complete client config from a coincidental single field name -- so it is intentionally unaffected and stays a positive finding. See firebase-negative-client-config-javascript for the full eight-field block that does resolve empty, and firebase-positive-google-api-key-as-server-key-context for a privileged (non-config) AIza use that also stays detected."
+      "note": "The AIza-prefixed shape also appears in public Firebase/browser configuration. The shape carries no API scope -- an unrestricted key can call any API enabled on its project, including Gemini -- so the detector reports it at high confidence wherever it appears. Issue #520 (B3a) once exempted a key inside a recognized Firebase Web SDK client-config object; #749 reversed that, so this two-field snippet and the fuller firebase-positive-client-config-* blocks all report the key's span."
     },
     {
       "id": "google-overlap-context",
@@ -18756,6 +18808,94 @@
       "note": "A public Atlassian cloud/site identifier (a UUID) shares no shape with the ATAT-prefixed API token grammar and is not classified."
     },
     {
+      "id": "atlassian-api-token-positive-crc32-suffix-full-span",
+      "detector": "atlassian-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "ATLASSIAN_API_TOKEN=ATATT3xFfGF0SYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY_SYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY_SYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY_SYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY=0A1B2C3D",
+      "expected": [
+        {
+          "detector": "atlassian-api-token",
+          "type": "atlassian_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 20,
+          "end": 212
+        }
+      ],
+      "note": "Issue #741: a 192-byte token ends in `=` + 8 uppercase hex; the whole token, tail included, is the finding. The tail's value is not validated."
+    },
+    {
+      "id": "atlassian-api-token-positive-crc32-suffix-json",
+      "detector": "atlassian-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"apiToken\": \"ATATT3xFfGF0SYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY_SYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY_SYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY_SYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY=0A1B2C3D\"}",
+      "expected": [
+        {
+          "detector": "atlassian-api-token",
+          "type": "atlassian_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 206
+        }
+      ],
+      "note": "Issue #741: the `=` + 8-hex tail stays inside the span when a quote closes the value."
+    },
+    {
+      "id": "atlassian-api-token-positive-no-suffix-exact",
+      "detector": "atlassian-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "ATLASSIAN_API_TOKEN=ATATT3xFfGF0SYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY_SYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY_SYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY_SYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY",
+      "expected": [
+        {
+          "detector": "atlassian-api-token",
+          "type": "atlassian_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 20,
+          "end": 203
+        }
+      ],
+      "note": "Issue #741 control: a token with no `=` tail is matched exactly as before."
+    },
+    {
+      "id": "atlassian-api-token-boundary-nine-hex-tail",
+      "detector": "atlassian-api-token",
+      "kind": "boundary",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "ATLASSIAN_API_TOKEN=ATATT3xFfGF0SYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY_SYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY_SYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY_SYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY=0A1B2C3D4",
+      "expected": [
+        {
+          "detector": "atlassian-api-token",
+          "type": "atlassian_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 20,
+          "end": 203
+        }
+      ],
+      "note": "Issue #741 control: only `=` + exactly 8 uppercase hex is the documented tail; a 9-byte tail is not absorbed, so the finding stays at the body run."
+    },
+    {
       "id": "contextual-positive-nested-no-separator-api-key",
       "detector": "generic-token",
       "kind": "positive",
@@ -19219,6 +19359,54 @@
       "input": "1694812800:0",
       "expected": [],
       "note": "A short numeric:numeric pair (e.g. a Unix timestamp followed by an unrelated digit) shares only superficial punctuation with the documented grammar and never reaches the secret minimum."
+    },
+    {
+      "id": "telegram-bot-token-negative-atlassian-account-id",
+      "detector": "telegram-bot-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"accountId\": \"557058:0f3c9a4e-7b21-4d8e-9a6c-2e5b8d1f7c30\"}\n",
+      "expected": [],
+      "note": "Issue #747: an Atlassian account id (`<digits>:<8-4-4-4-12 uuid>`) is a public identifier, not a Telegram bot token; a secret segment that is exactly a canonical UUID is excluded."
+    },
+    {
+      "id": "telegram-bot-token-negative-atlassian-account-id-uppercase",
+      "detector": "telegram-bot-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "assignee 712020:0F3C9A4E-7B21-4D8E-9A6C-2E5B8D1F7C30",
+      "expected": [],
+      "note": "Issue #747: the UUID exclusion is case-insensitive over hex."
+    },
+    {
+      "id": "telegram-bot-token-positive-control-exact",
+      "detector": "telegram-bot-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "TELEGRAM_BOT_TOKEN=1234567890:AASYNTHETIC_REVOKED-TELEGRAM-BOT-TK\n",
+      "expected": [
+        {
+          "detector": "telegram-bot-token",
+          "type": "telegram_bot_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 19,
+          "end": 65
+        }
+      ],
+      "note": "Issue #747 control: a 10-digit id and a 35-byte AA-led secret stay detected exactly."
     },
     {
       "id": "discord-bot-token-positive-bare",
@@ -20844,6 +21032,19 @@
         }
       ],
       "note": "A single twilio-context-bearing line densely packed with candidate-shaped runs stays linear: per-line (not per-candidate) context checks keep this bounded."
+    },
+    {
+      "id": "twilio-auth-token-negative-md5-digest",
+      "detector": "twilio-auth-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "twilio-8.1.0.tar.gz md5=0a1b2c3d4e5f60718293a4b5c6d7e8f9\n",
+      "expected": [],
+      "note": "Issue #744: a 32-hex value introduced by an `md5=` hash-algorithm label is a package checksum, not an Auth Token, even though the line names Twilio. twilio-auth-token-positive-dotenv-keyword is the control that keeps TWILIO_AUTH_TOKEN=<32 hex> exact at [18,50)."
     },
     {
       "id": "twilio-api-key-secret-adversarial-dense-findings",
@@ -33813,6 +34014,76 @@
       "note": "issue #475: the fenced-example fixture's paired positive -- a real-looking Bearer value in the same Markdown shape stays detected at high confidence."
     },
     {
+      "id": "bearer-token-negative-your-oauth-token-placeholder",
+      "detector": "bearer-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer YOUR_OAUTH_TOKEN\n",
+      "expected": [],
+      "note": "Issue #745: an instructional placeholder (lead word `your` followed only by credential words) of 16 or more bytes is not a credential; the 16-byte minimum no longer carries the exclusion alone."
+    },
+    {
+      "id": "bearer-token-negative-insert-access-token-placeholder",
+      "detector": "bearer-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer INSERT_ACCESS_TOKEN\n",
+      "expected": [],
+      "note": "Issue #745: matches bearer-token-negative-your-oauth-token-placeholder with the `insert` lead word."
+    },
+    {
+      "id": "bearer-token-regression-base64url-value-still-detected",
+      "detector": "bearer-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer SYNTHETIC_revoked-bearer_0123456789abcde\n",
+      "expected": [
+        {
+          "detector": "bearer-token",
+          "type": "bearer_token",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 22,
+          "end": 62
+        }
+      ],
+      "note": "Issue #745 control: a 40-byte base64url Bearer value that is not an instructional placeholder stays detected at its exact range."
+    },
+    {
+      "id": "bearer-token-regression-placeholder-lead-word-with-random-suffix",
+      "detector": "bearer-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer YOUR_ACCESS_TOKEN_9f2cQ7xL\n",
+      "expected": [
+        {
+          "detector": "bearer-token",
+          "type": "bearer_token",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 22,
+          "end": 48
+        }
+      ],
+      "note": "Issue #745 control: a value that starts like an instructional placeholder but carries a word outside the placeholder vocabulary stays detected."
+    },
+    {
       "id": "jwt-negative-legacy-supabase-anon-dotenv",
       "detector": "jwt",
       "kind": "negative",
@@ -34263,6 +34534,41 @@
         }
       ],
       "note": "Overlap evidence (issue #552), generic-token side: `openai-token` never claims a legacy-shaped 20/20 body under the explicit `sk-proj-` namespace (`openai-negative-explicit-namespace-legacy-body` records that silence), but the bare vendor-prefixed policy layer still claims the whole span at generic classification. Same input and disposition as `openai-negative-explicit-namespace-legacy-body`, filed a second time under this detector's own evidence so `vendor_prefixed_credential` carries direct overlap evidence rather than borrowing it."
+    },
+    {
+      "id": "generic-token-negative-twilio-account-sid",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "credentials: AC0123456789abcdef0123456789abcde0\n",
+      "expected": [],
+      "note": "Issue #746: a Twilio Account SID (`AC` + 32 lowercase hex) after an ambiguous `credentials:` name is a public account identifier, not a secret. The API Key SID (`SK`) half of the benchmark's wrong-companion pair is covered by generic_token.rs unit tests, which build the value at runtime: GitHub push protection rejects a literal `SK` + 32 hex value in this file."
+    },
+    {
+      "id": "generic-token-regression-uppercase-hex-sid-lookalike",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "credentials: AC0123456789ABCDEF0123456789ABCDEF\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "medium",
+          "specificity": "contextual",
+          "start": 13,
+          "end": 47
+        }
+      ],
+      "note": "Issue #746 control: only Twilio's exact SID shape is excluded; an `AC`-prefixed value whose body is uppercase hex is not a Twilio SID and stays detected."
     },
     {
       "id": "notion-token-positive-dotenv-secret",
@@ -35755,30 +36061,114 @@
       "note": "An environment-variable interpolation reference shares no shape with the AAAA grammar and is not classified."
     },
     {
-      "id": "firebase-negative-client-config-javascript",
+      "id": "firebase-positive-client-config-javascript",
       "detector": "google-api-key",
-      "kind": "negative",
+      "kind": "positive",
       "support": "supported",
-      "tier": "negative",
+      "tier": "regression",
       "contexts": [
         "javascript"
       ],
       "input": "const firebaseConfig = {\n  apiKey: \"AIzaSYNTHETIC_REVOKED_GOOGLE_API_KEY012\",\n  authDomain: \"synthetic-revoked.firebaseapp.com\",\n  databaseURL: \"https://synthetic-revoked-default-rtdb.firebaseio.com\",\n  projectId: \"synthetic-revoked\",\n  storageBucket: \"synthetic-revoked.firebasestorage.app\",\n  messagingSenderId: \"000000000000\",\n  appId: \"1:000000000000:web:synthetic0revoked1fixture2\",\n  measurementId: \"G-SYNTHETIC0\"\n};",
-      "expected": [],
-      "note": "Issue #520 (B3a): a realistic, full Firebase Web SDK client-config object. Firebase's own documentation (firebase.google.com/docs/projects/api-keys, observed 2026-09-20) states that an API key restricted to Firebase services 'does not need to be treated as secret... safe to include in your code or configuration files.' At least two other config field names (authDomain, databaseURL, projectId, storageBucket, messagingSenderId, appId, measurementId) sit within the pipeline's bounded context window of the apiKey value, so both google-api-key's own candidate and generic-token's contextual apiKey-name match are suppressed (crate::pipeline::is_within_firebase_client_config_context). Zero findings anywhere in the block."
+      "expected": [
+        {
+          "detector": "google-api-key",
+          "type": "google_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 36,
+          "end": 75
+        }
+      ],
+      "note": "Issue #749 (benchmark-gap-749; benchmark fixture beta8-209--google-api-key-firebase-web-config): a realistic, full eight-field Firebase Web SDK client-config object as a JS source literal. #520 (B3a) suppressed the apiKey here on Firebase's 'restricted keys need not be treated as secrets' guidance; #749 reversed that, because the surrounding config proves nothing about the key's API restrictions (an unrestricted key on a project with the Generative Language API enabled can call Gemini). Only the key's span is reported; authDomain, databaseURL, projectId, storageBucket, messagingSenderId, appId and measurementId stay unflagged."
     },
     {
-      "id": "firebase-negative-client-config-json",
+      "id": "firebase-positive-client-config-json",
       "detector": "google-api-key",
-      "kind": "negative",
+      "kind": "positive",
       "support": "supported",
-      "tier": "negative",
+      "tier": "regression",
       "contexts": [
         "json"
       ],
       "input": "{\"apiKey\": \"AIzaSYNTHETIC_REVOKED_GOOGLE_API_KEY012\", \"authDomain\": \"synthetic-revoked.firebaseapp.com\", \"databaseURL\": \"https://synthetic-revoked-default-rtdb.firebaseio.com\", \"projectId\": \"synthetic-revoked\", \"storageBucket\": \"synthetic-revoked.firebasestorage.app\", \"messagingSenderId\": \"000000000000\", \"appId\": \"1:000000000000:web:synthetic0revoked1fixture2\", \"measurementId\": \"G-SYNTHETIC0\"}",
-      "expected": [],
-      "note": "The same realistic full client-config object as firebase-negative-client-config-javascript, as a plain JSON document rather than a JS source literal. Quoted JSON keys are recognized by the same field-name-plus-colon check, so the discrimination is context-shape-independent within the two contexts Firebase's own console actually offers (Add Firebase to your JavaScript project) versus a REST/JSON export."
+      "expected": [
+        {
+          "detector": "google-api-key",
+          "type": "google_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 12,
+          "end": 51
+        }
+      ],
+      "note": "Issue #749 (benchmark-gap-749; benchmark fixture beta8-209--google-api-key-firebase-web-config): a realistic, full eight-field Firebase Web SDK client-config object as a plain JSON document. #520 (B3a) suppressed the apiKey here on Firebase's 'restricted keys need not be treated as secrets' guidance; #749 reversed that, because the surrounding config proves nothing about the key's API restrictions (an unrestricted key on a project with the Generative Language API enabled can call Gemini). Only the key's span is reported; authDomain, databaseURL, projectId, storageBucket, messagingSenderId, appId and measurementId stay unflagged."
+    },
+    {
+      "id": "firebase-positive-client-config-minimal-javascript",
+      "detector": "google-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "javascript"
+      ],
+      "input": "const firebaseConfig = {\n  apiKey: \"AIzaSYNTHETIC_REVOKED_GOOGLE_API_KEY012\",\n  authDomain: \"synthetic-revoked.firebaseapp.com\",\n  projectId: \"synthetic-revoked\",\n};\n",
+      "expected": [
+        {
+          "detector": "google-api-key",
+          "type": "google_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 36,
+          "end": 75
+        }
+      ],
+      "note": "Issue #749: the benchmark fixture's shape (beta8-209--google-api-key-firebase-web-config) rebuilt from fresh synthetic bytes -- a firebaseConfig object with apiKey, authDomain and projectId. #520's two-field exemption dropped the key here; it is now reported, and authDomain and projectId stay unflagged."
+    },
+    {
+      "id": "firebase-positive-client-config-dotenv",
+      "detector": "google-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "NEXT_PUBLIC_FIREBASE_API_KEY=AIzaSYNTHETIC_REVOKED_GOOGLE_API_KEY012\nNEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=synthetic-revoked.firebaseapp.com\nNEXT_PUBLIC_FIREBASE_PROJECT_ID=synthetic-revoked\nNEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=synthetic-revoked.firebasestorage.app\nNEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=000000000000\nNEXT_PUBLIC_FIREBASE_APP_ID=1:000000000000:web:synthetic0revoked1fixture2\nNEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=G-SYNTHETIC0\n",
+      "expected": [
+        {
+          "detector": "google-api-key",
+          "type": "google_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 29,
+          "end": 68
+        }
+      ],
+      "note": "Issue #749: the same Firebase Web SDK client config injected through build-time environment variables (a Next.js NEXT_PUBLIC_FIREBASE_* .env file). Only the API key's value is reported; the auth domain, project id, storage bucket, sender id, app id and measurement id lines stay unflagged."
+    },
+    {
+      "id": "firebase-positive-google-services-json",
+      "detector": "google-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\n  \"project_info\": {\n    \"project_number\": \"000000000000\",\n    \"project_id\": \"synthetic-revoked\",\n    \"storage_bucket\": \"synthetic-revoked.firebasestorage.app\"\n  },\n  \"client\": [\n    {\n      \"client_info\": {\n        \"mobilesdk_app_id\": \"1:000000000000:android:synthetic0revoked1fixture2\",\n        \"android_client_info\": {\"package_name\": \"dev.synthetic.revoked\"}\n      },\n      \"api_key\": [\n        {\"current_key\": \"AIzaSYNTHETIC_REVOKED_GOOGLE_API_KEY012\"}\n      ]\n    }\n  ],\n  \"configuration_version\": \"1\"\n}\n",
+      "expected": [
+        {
+          "detector": "google-api-key",
+          "type": "google_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 416,
+          "end": 455
+        }
+      ],
+      "note": "Issue #749: an Android google-services.json, which carries the same AIza key under client[].api_key[].current_key beside public project identifiers. Only the key's span is reported; project_number, project_id, storage_bucket and mobilesdk_app_id stay unflagged."
     },
     {
       "id": "firebase-positive-google-api-key-as-server-key-context",
@@ -35827,28 +36217,6 @@
       "input": "messagingSenderId: \"000000000000\"",
       "expected": [],
       "note": "A bare messagingSenderId field with no paired apiKey value: a purely numeric project identifier, not a credential."
-    },
-    {
-      "id": "firebase-negative-client-config-wide-gap-does-not-suppress",
-      "detector": "google-api-key",
-      "kind": "boundary",
-      "support": "supported",
-      "tier": "contextual",
-      "contexts": [
-        "javascript"
-      ],
-      "input": "GEMINI_API_KEY=AIzaSYNTHETIC_REVOKED_GOOGLE_API_KEY012\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\nauthDomain: \"a\"\nmessagingSenderId: \"b\"\n",
-      "expected": [
-        {
-          "detector": "google-api-key",
-          "type": "google_api_key",
-          "confidence": "high",
-          "specificity": "provider",
-          "start": 15,
-          "end": 54
-        }
-      ],
-      "note": "Two Firebase config field names (authDomain, messagingSenderId) do appear in this input, but more than FIREBASE_CONTEXT_WINDOW_BYTES past the key -- an unrelated Gemini key earlier in a large file must not be suppressed just because unrelated config-shaped text exists somewhere else in the same document."
     },
     {
       "id": "firebase-database-secret-query-param-negative-out-of-scope",
@@ -37149,7 +37517,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPQRSTUV",
+      "input": "cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPn2NMow",
       "expected": [
         {
           "detector": "confluent-cloud-api-secret",
@@ -37171,7 +37539,7 @@
       "contexts": [
         "dotenv"
       ],
-      "input": "CONFLUENT_CLOUD_API_SECRET=cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPQRSTUV",
+      "input": "CONFLUENT_CLOUD_API_SECRET=cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPn2NMow",
       "expected": [
         {
           "detector": "confluent-cloud-api-secret",
@@ -37193,7 +37561,7 @@
       "contexts": [
         "json"
       ],
-      "input": "{\"apiSecret\": \"cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPQRSTUV\"}",
+      "input": "{\"apiSecret\": \"cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPn2NMow\"}",
       "expected": [
         {
           "detector": "confluent-cloud-api-secret",
@@ -37215,7 +37583,7 @@
       "contexts": [
         "yaml"
       ],
-      "input": "sasl.password: cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPQRSTUV",
+      "input": "sasl.password: cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPn2NMow",
       "expected": [
         {
           "detector": "confluent-cloud-api-secret",
@@ -37237,7 +37605,7 @@
       "contexts": [
         "github-actions"
       ],
-      "input": "env:\n  CONFLUENT_CLOUD_API_SECRET: cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPQRSTUV\n",
+      "input": "env:\n  CONFLUENT_CLOUD_API_SECRET: cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPn2NMow\n",
       "expected": [
         {
           "detector": "confluent-cloud-api-secret",
@@ -37259,7 +37627,7 @@
       "contexts": [
         "log"
       ],
-      "input": "2026-09-22T12:00:00Z INFO  connecting with confluent api secret cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPQRSTUV to cluster\n",
+      "input": "2026-09-22T12:00:00Z INFO  connecting with confluent api secret cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPn2NMow to cluster\n",
       "expected": [
         {
           "detector": "confluent-cloud-api-secret",
@@ -37281,7 +37649,7 @@
       "contexts": [
         "shell"
       ],
-      "input": "export CONFLUENT_CLOUD_API_SECRET=\"cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPQRSTUV\"\n",
+      "input": "export CONFLUENT_CLOUD_API_SECRET=\"cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPn2NMow\"\n",
       "expected": [
         {
           "detector": "confluent-cloud-api-secret",
@@ -37303,7 +37671,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "(cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPQRSTUV).",
+      "input": "(cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPn2NMow).",
       "expected": [
         {
           "detector": "confluent-cloud-api-secret",
@@ -37325,7 +37693,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\ncfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPQRSTUV\r\n",
+      "input": "# 🔑 café\r\ncfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPn2NMow\r\n",
       "expected": [
         {
           "detector": "confluent-cloud-api-secret",
@@ -37347,7 +37715,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPQRSTUV cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPQRSTUV",
+      "input": "cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPn2NMow cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPn2NMow",
       "expected": [
         {
           "detector": "confluent-cloud-api-secret",
@@ -37377,7 +37745,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPQRSTU",
+      "input": "cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPn2NMo",
       "expected": [],
       "note": "A body one byte short of the documented 60-byte length is rejected rather than truncated."
     },
@@ -37390,7 +37758,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPQRSTUVa",
+      "input": "cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPn2NMowa",
       "expected": [],
       "note": "A body one byte longer than the documented length is rejected rather than matched up to the documented length."
     },
@@ -37403,7 +37771,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "CfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPQRSTUV",
+      "input": "CfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPn2NMow",
       "expected": [],
       "note": "The documented prefix is the literal lowercase cflt; a case-mangled twin is rejected rather than matched."
     },
@@ -37416,7 +37784,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "legacy_cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPQRSTUV_backup",
+      "input": "legacy_cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPn2NMow_backup",
       "expected": [],
       "note": "A cflt-prefixed run directly glued to a wider identifier on either side is rejected rather than matched as a substring."
     },
@@ -37460,6 +37828,67 @@
       "note": "A bootstrap host string and a cluster identifier carry no cflt-prefixed run and are excluded automatically, matching the issue's explicit scope."
     },
     {
+      "id": "confluent-cloud-api-secret-checksum-valid",
+      "detector": "confluent-cloud-api-secret",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "CONFLUENT_CLOUD_API_SECRET=cfltSYNTHETIC0REVOKED0ConfluentChecksumFixture0ABCDEFGHIJKE3aswA\n",
+      "expected": [
+        {
+          "detector": "confluent-cloud-api-secret",
+          "type": "confluent_cloud_api_secret",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 27,
+          "end": 91
+        }
+      ],
+      "note": "The final 6 body bytes are the documented checksum: the CRC-32 of the 54 bytes after cflt, as little-endian bytes, standard-base64 encoded, first 6 characters (#738)."
+    },
+    {
+      "id": "confluent-cloud-api-secret-negative-checksum-mismatch",
+      "detector": "confluent-cloud-api-secret",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "CONFLUENT_CLOUD_API_SECRET=cfltSYNTHETIC0REVOKED0ConfluentChecksumFixture0ABCDEFGHIJKA3aswA\n",
+      "expected": [],
+      "note": "Same prefix, length and alphabet as the checksum-valid case with the first checksum character changed; a value whose checksum does not match is not a Confluent secret (#738)."
+    },
+    {
+      "id": "confluent-cloud-api-secret-negative-checksum-big-endian",
+      "detector": "confluent-cloud-api-secret",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "CONFLUENT_CLOUD_API_SECRET=cfltSYNTHETIC0REVOKED0ConfluentChecksumFixture0ABCDEFGHIJKwKx2Ew\n",
+      "expected": [],
+      "note": "The checksum computed over the right bytes but serialized big-endian is not the documented checksum and is rejected (#738)."
+    },
+    {
+      "id": "confluent-cloud-api-secret-negative-checksum-prefix-included",
+      "detector": "confluent-cloud-api-secret",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "CONFLUENT_CLOUD_API_SECRET=cfltSYNTHETIC0REVOKED0ConfluentChecksumFixture0ABCDEFGHIJKpw1DTQ\n",
+      "expected": [],
+      "note": "The checksum computed over cflt plus the body is not the documented checksum, which excludes the prefix, and is rejected (#738)."
+    },
+    {
       "id": "confluent-cloud-api-secret-overlap-context",
       "detector": "confluent-cloud-api-secret",
       "kind": "overlap",
@@ -37468,7 +37897,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "secret_key=cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPQRSTUV",
+      "input": "secret_key=cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPn2NMow",
       "expected": [
         {
           "detector": "confluent-cloud-api-secret",
@@ -37495,7 +37924,7 @@
         "maxFindings": 0,
         "maxRuntimeMs": 250
       },
-      "input": "cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPQRSTUVAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      "input": "cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPn2NMowAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
       "expected": [],
       "note": "A single documented-length secret immediately followed by a very long run of the same alphabet is rejected outright as one wider, non-matching run rather than truncated back down to the documented shape; this stays linear in input length."
     },
@@ -38470,6 +38899,19 @@
         }
       ],
       "note": "A single confluent-context-bearing line densely packed with candidate-shaped runs stays linear: per-line (not per-candidate) context checks keep this bounded."
+    },
+    {
+      "id": "confluent-cloud-api-secret-legacy-negative-image-digest",
+      "detector": "confluent-cloud-api-secret-legacy",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "image: confluentinc/cp-kafka@sha256:0a1b2c3d4e5f60718293a4b5c6d7e8f9f9e8d7c6b5a4938271605f4e3d2c1b0a\n",
+      "expected": [],
+      "note": "Issue #744: a 64-hex value introduced by an `@sha256:` label is a container image digest, not a legacy API secret, even though the line names Confluent. confluent-cloud-api-secret-legacy-positive-dotenv-keyword is the control that keeps CONFLUENT_API_SECRET=<64 bytes> exact at [21,85)."
     },
     {
       "id": "postman-api-key-positive-bare",
@@ -39749,6 +40191,98 @@
       "note": "A pathological run of near-miss prefixes -- each one byte short of the documented length -- must not make the scan quadratic; none matches and the scan stays linear and bounded."
     },
     {
+      "id": "heroku-api-key-hrku-uuid-env",
+      "detector": "heroku-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "HEROKU_API_KEY=HRKU-5e7e71c0-0000-4000-8000-00000000fa11\n",
+      "expected": [
+        {
+          "detector": "heroku-api-key",
+          "type": "heroku_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 15,
+          "end": 56
+        }
+      ],
+      "note": "Issue #740: the 41-character HRKU-<uuid> generation (granted 2024-04-01 through 2025-04-22, devcenter.heroku.com/changelog-items/2842 and /3175) is detected by its documented HRKU- prefix and lower-case UUID body alone."
+    },
+    {
+      "id": "heroku-api-key-hrku-uuid-bare",
+      "detector": "heroku-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "HRKU-5e7e71c0-0000-4000-8000-00000000fa11\n",
+      "expected": [
+        {
+          "detector": "heroku-api-key",
+          "type": "heroku_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 41
+        }
+      ],
+      "note": "Issue #740: the 41-character generation needs no surrounding context, like the 65-character HRKU-AA generation."
+    },
+    {
+      "id": "heroku-api-key-hrku-uuid-authorizations-create",
+      "detector": "heroku-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "terminal"
+      ],
+      "input": "$ heroku authorizations:create\nCreating OAuth Authorization... done\nClient:      <none>\nScope:       global\nToken:       HRKU-5e7e71c0-0000-4000-8000-00000000fa11\n",
+      "expected": [
+        {
+          "detector": "heroku-api-key",
+          "type": "heroku_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 121,
+          "end": 162
+        }
+      ],
+      "note": "Issue #740: a heroku authorizations:create transcript prints the token on its Token: line; the span is the 41-byte token only."
+    },
+    {
+      "id": "heroku-api-key-negative-hrku-uuid-one-short",
+      "detector": "heroku-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "HEROKU_API_KEY=HRKU-5e7e71c0-0000-4000-8000-00000000fa1\n",
+      "expected": [],
+      "note": "Issue #740: a 40-character HRKU-<uuid> near miss (35-byte body) is not the documented shape and stays clean."
+    },
+    {
+      "id": "heroku-api-key-negative-hrku-underscore-separator",
+      "detector": "heroku-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "HEROKU_API_KEY=HRKU_5e7e71c0-0000-4000-8000-00000000fa11\n",
+      "expected": [],
+      "note": "Issue #740: HRKU_ with an underscore is not the documented HRKU- prefix, and the UUID after it is not a legacy token either (the key line names heroku, but the run is glued to HRKU_), so it stays clean."
+    },
+    {
       "id": "heroku-api-key-legacy-positive-dotenv-keyword",
       "detector": "heroku-api-key-legacy",
       "kind": "positive",
@@ -39837,6 +40371,50 @@
       "note": "The Heroku CLI historically stored this legacy token in a netrc-style machine block; the heroku.com host commented on the same line as the password value is sufficient context (context is scoped per line, matching the negative-different-line control below)."
     },
     {
+      "id": "heroku-api-key-legacy-positive-netrc-multi-line",
+      "detector": "heroku-api-key-legacy",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "machine api.heroku.com\n  login someone@example.invalid\n  password 7c1d9e42-5b3a-4f60-9e2d-0a8b6c4d1e73\n",
+      "expected": [
+        {
+          "detector": "heroku-api-key-legacy",
+          "type": "heroku_api_key_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 66,
+          "end": 102
+        }
+      ],
+      "note": "Issue #743: the Heroku CLI's multi-line .netrc entry puts machine api.heroku.com two lines above password <uuid>. The UUID is reported as the value of the entry's password token."
+    },
+    {
+      "id": "heroku-api-key-legacy-positive-auth-token-output",
+      "detector": "heroku-api-key-legacy",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "terminal"
+      ],
+      "input": "$ heroku auth:token\n7c1d9e42-5b3a-4f60-9e2d-0a8b6c4d1e73\n",
+      "expected": [
+        {
+          "detector": "heroku-api-key-legacy",
+          "type": "heroku_api_key_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 20,
+          "end": 56
+        }
+      ],
+      "note": "Issue #743: heroku auth:token prints the token alone on the line after the command."
+    },
+    {
       "id": "heroku-api-key-legacy-negative-bare-no-context",
       "detector": "heroku-api-key-legacy",
       "kind": "negative",
@@ -39888,6 +40466,32 @@
       "input": "HEROKU_APP_ID=01234567-89ab-cdef-0123-456789abcdef\n{\"herokuAppId\": \"01234567-89ab-cdef-0123-456789abcdef\"}\n",
       "expected": [],
       "note": "Issue #714: each line names heroku, but the UUID is assigned to an identifier-shaped key (last word id), so it is a public app id, not a legacy token, and stays clean."
+    },
+    {
+      "id": "heroku-api-key-legacy-negative-uuid-without-heroku-context",
+      "detector": "heroku-api-key-legacy",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "terminal"
+      ],
+      "input": "$ echo build finished\n7c1d9e42-5b3a-4f60-9e2d-0a8b6c4d1e73\n",
+      "expected": [],
+      "note": "Issue #743 control: a bare UUID on the line after an unrelated command stays clean, so the multi-line window never becomes an unconditional UUID match."
+    },
+    {
+      "id": "heroku-api-key-legacy-negative-app-url-path",
+      "detector": "heroku-api-key-legacy",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "http"
+      ],
+      "input": "GET https://api.heroku.com/apps/7c1d9e42-5b3a-4f60-9e2d-0a8b6c4d1e73/dynos\n",
+      "expected": [],
+      "note": "Issue #743: a Heroku app UUID in a Platform API URL path is a public resource id, not a token, and stays clean even though the line names heroku."
     },
     {
       "id": "heroku-api-key-legacy-boundary-wrong-length",

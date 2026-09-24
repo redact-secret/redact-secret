@@ -2,9 +2,9 @@
 //!
 //! Issue #520 (B3a, under Epic #501) scopes Firebase to "server keys,
 //! service-account credentials, privileged tokens" as the genuinely secret
-//! material, explicitly excluding the public Web SDK client config
-//! (`apiKey`, `authDomain`, `projectId`, `appId`, `messagingSenderId`, ...)
-//! from that target set. This module covers the one Firebase-specific
+//! material. The Web SDK client config's identifiers (`authDomain`,
+//! `projectId`, `appId`, `messagingSenderId`, ...) are not secrets and no
+//! detector claims them. This module covers the one Firebase-specific
 //! secret format with a documented lexical shape: the legacy FCM HTTP/XMPP
 //! "server key". The other two named categories are already covered
 //! elsewhere and are not duplicated here:
@@ -17,12 +17,11 @@
 //!   identical conclusion for Google's own service-account exports).
 //! - **The `AIza`-prefixed key issued for Firebase/Gemini/Cloud use** is
 //!   the same shape [`super::additional_providers`]'s `google-api-key`
-//!   detector already matches (see issue #519's audit, Family 3). Public
-//!   client-config discrimination for that shape is handled at the pipeline
-//!   level (`crate::pipeline::is_within_firebase_client_config_context`),
-//!   not here, because it is a cross-cutting exemption over an existing
-//!   detector's candidates, the same mechanism already used for vendor
-//!   placeholder literals (`crate::pipeline::KNOWN_VENDOR_PLACEHOLDER_LITERALS`).
+//!   detector already matches (see issue #519's audit, Family 3). It is
+//!   reported inside a client-config object too: #520 originally exempted
+//!   the config's `apiKey` at the pipeline level, and #749 reversed that,
+//!   because a surrounding config proves nothing about the key's API
+//!   restrictions.
 //!
 //! ## Server key grammar
 //!
