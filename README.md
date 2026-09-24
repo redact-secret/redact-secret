@@ -235,7 +235,7 @@ one whole-input operation, under explicit limits that fail closed. See
 ## Detection coverage
 
 <!-- support-matrix:start -->
-**Support status** (42 providers, 93 credential families; stable: 51, provisional: 21, pending: 2, unsupported: 19) -- generated from evaluation evidence, never hand-written. `provisional` means useful but evidence-incomplete, not "almost stable"; unsupported families are listed with their reason. See the full [support matrix](docs/support-matrix.md).
+**Support status** (42 providers, 93 credential families; stable: 0, provisional: 72, pending: 2, unsupported: 19; stable qualification: documented: 0, empirical: 0; evidence tiers: T1: 51, T2: 17, T3: 4, T0: 2) -- generated from evaluation evidence, never hand-written. Stable families are labeled `Stable · Provider documented` or `Stable · Empirically qualified`; empirical qualification remains T2. `provisional` means useful but evidence-incomplete, not "almost stable"; unsupported families are listed with their reason. See the full [support matrix](docs/support-matrix.md).
 <!-- support-matrix:end -->
 
 Built-in detection covers private keys, provider-issued tokens, JWT and

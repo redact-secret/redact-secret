@@ -329,7 +329,7 @@ class ManifestProvenanceTests(unittest.TestCase):
         """#637 acceptance: the schema (check 5) and the manifest (check 6c)
         share one drift rule, and `--sync` rewrites exactly those files."""
         self.assertEqual(
-            [str(local) for local, _ in CHECK.VENDORED_FILES],
+            [str(local) for local, _, _ in CHECK.VENDORED_FILES],
             [str(CHECK.MANIFEST_PATH), str(CHECK.SUPPORT_MATRIX_SCHEMA_PATH)],
         )
         drift = CHECK.check_vendored_file_drift(CHECK.MANIFEST_PATH, "a", "b", live_source="x")
@@ -338,7 +338,7 @@ class ManifestProvenanceTests(unittest.TestCase):
 
 
 class SyncVendoredFilesTests(unittest.TestCase):
-    def test_rewrites_every_vendored_copy_from_the_benchmarks_branch(self) -> None:
+    def test_rewrites_every_vendored_copy_from_its_declared_ref(self) -> None:
         tmp = tempfile.TemporaryDirectory()
         self.addCleanup(tmp.cleanup)
         root = Path(tmp.name)
@@ -351,12 +351,22 @@ class SyncVendoredFilesTests(unittest.TestCase):
             return f"fresh {path}\n"
 
         written = CHECK.sync_vendored_files(root, fetch)
-        self.assertEqual(written, [CHECK.MANIFEST_PATH, CHECK.SUPPORT_MATRIX_SCHEMA_PATH])
+        self.assertEqual(
+            written,
+            [
+                (CHECK.MANIFEST_PATH, CHECK.BENCHMARKS_BRANCH),
+                (CHECK.SUPPORT_MATRIX_SCHEMA_PATH, CHECK.BENCHMARKS_SUPPORT_MATRIX_SCHEMA_REF),
+            ],
+        )
         self.assertEqual(
             requested,
             [
                 (CHECK.BENCHMARKS_REPO, CHECK.BENCHMARKS_BRANCH, CHECK.BENCHMARKS_MANIFEST_PATH),
-                (CHECK.BENCHMARKS_REPO, CHECK.BENCHMARKS_BRANCH, CHECK.BENCHMARKS_SUPPORT_MATRIX_SCHEMA_PATH),
+                (
+                    CHECK.BENCHMARKS_REPO,
+                    CHECK.BENCHMARKS_SUPPORT_MATRIX_SCHEMA_REF,
+                    CHECK.BENCHMARKS_SUPPORT_MATRIX_SCHEMA_PATH,
+                ),
             ],
         )
         self.assertEqual((root / CHECK.MANIFEST_PATH).read_text(encoding="utf-8"), "fresh benchmarks/pin-manifest.json\n")

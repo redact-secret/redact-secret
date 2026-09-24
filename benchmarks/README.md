@@ -10,7 +10,7 @@ a support matrix that was produced by a recorded benchmark run.
 | File | Upstream (at benchmarks `main`) | Covered by | Re-pinned by |
 | --- | --- | --- | --- |
 | `pin-manifest.json` | `benchmarks/pin-manifest.json`, written by `scripts/generate-pin-manifest.mjs` | `scripts/check-benchmark-pins.py` check 6 (live, `benchmark-pin-drift` job): its `revision` must be an ancestor of benchmarks `main` and must already contain the manifest, and the content must be byte-identical to the benchmarks copy. Checks 1, 2, and 7 (offline, `npm run ci`) reconcile the ledger and the pinned product version against it. | `npm run benchmark-pins:sync` |
-| `support-matrix-schema.json` | `schemas/support-matrix-v1.json` (moved there by benchmarks#133) | `scripts/check-benchmark-pins.py` check 5 (live): byte-identical to the benchmarks copy. | `npm run benchmark-pins:sync` |
+| `support-matrix-schema.json` | `schemas/support-matrix-v1.json` at immutable beta.8 contract commit [`d5438c5e55b286c7fbe59da441431d2c9b27e810`](https://github.com/redact-secret/redact-secret-benchmarks/blob/d5438c5e55b286c7fbe59da441431d2c9b27e810/schemas/support-matrix-v1.json) | `scripts/check-benchmark-pins.py` check 5 (live): byte-identical to that pinned benchmark commit. | `npm run benchmark-pins:sync` |
 | `support-matrix.json` | a gitignored `npm run eval:classify && npm run eval:matrix` output, not a committed file | `npm run support-matrix:check` (docs generated from it must not drift) and the release gate in `scripts/check-support-matrix-drift.py`. Whether it is current against benchmarks `main` is not checked; there is no committed upstream file to compare with. | Regenerate in a benchmarks checkout and copy the result here (`scripts/generate-support-matrix-docs.py` docstring). |
 | `support-matrix-drift-acknowledgements.json` | none; this repository owns it | `scripts/check-support-matrix-drift.py` | Release qualification, per [`decision-gate-releases-on-support-matrix-drift`](../docs/decisions/2026-09-21-gate-releases-on-support-matrix-drift.md). |
 
@@ -30,8 +30,10 @@ branch head, not against the file at `revision`.
 ## Who re-pins, and when
 
 Whoever's change turns the `benchmark-pin-drift` job red. That job fails as
-soon as benchmarks `main` regenerates its manifest or schema, and the fix is
-one command in this repository:
+soon as benchmarks `main` regenerates its manifest. The support-matrix schema
+is instead pinned to the immutable benchmark commit whose contract this
+repository consumes; advancing that pin is an explicit product-contract
+change. Refresh either declared source with one command in this repository:
 
 ```bash
 npm run benchmark-pins:sync   # needs `gh` authenticated for the benchmarks repo

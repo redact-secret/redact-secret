@@ -16,22 +16,61 @@ SPEC.loader.exec_module(DRIFT)
 
 SCHEMA = {
     "properties": {
-        "families": {"items": {"properties": {"status": {"enum": ["stable", "provisional", "pending", "unsupported"]}}}},
+        "families": {
+            "items": {
+                "properties": {
+                    "status": {"enum": ["stable", "provisional", "pending", "unsupported"]},
+                    "evidenceTier": {"enum": ["T0", "T1", "T2", "T3", None]},
+                    "evidenceBasis": {
+                        "enum": [
+                            "provider-documented",
+                            "independently-corroborated",
+                            "empirically-observed",
+                            "project-policy",
+                            "none",
+                        ]
+                    },
+                    "qualificationProfile": {"enum": ["documented", "empirical", None]},
+                }
+            }
+        },
     }
 }
 
 
-def family(family_id, status, *, provider="widget", name=None, reason=None, provider_source=None, tier="T1"):
+def family(
+    family_id,
+    status,
+    *,
+    provider="widget",
+    name=None,
+    reason=None,
+    provider_source=None,
+    tier="T1",
+    basis=None,
+    profile=None,
+):
+    if status == "stable":
+        basis = basis or "provider-documented"
+        profile = profile or "documented"
+    elif status == "unsupported":
+        basis = "none"
+    else:
+        basis = basis or "independently-corroborated"
     return {
         "provider": provider,
         "family": family_id,
         "familyName": name or family_id,
         "status": status,
         "evidenceTier": tier if status != "unsupported" else None,
+        "evidenceBasis": basis,
+        "qualificationProfile": profile,
         "providerSource": provider_source,
         "corroboratingScanners": [],
         "twinCoverage": None,
         "unresolvedCriticalItems": None,
+        "empiricalEvidence": None,
+        "fixtureProfile": None,
         "detectors": ["widget-token"] if status != "unsupported" else [],
         "reason": reason if status != "stable" else None,
     }
@@ -52,6 +91,14 @@ def matrix(families, *, dirty=False):
         "providerCount": len({f["provider"] for f in families if f["provider"]}),
         "familyCount": len(families),
         "distribution": {},
+        "stableDistribution": {
+            "documented": sum(
+                f["status"] == "stable" and f["qualificationProfile"] == "documented" for f in families
+            ),
+            "empirical": sum(
+                f["status"] == "stable" and f["qualificationProfile"] == "empirical" for f in families
+            ),
+        },
         "families": families,
     }
 
@@ -77,6 +124,35 @@ class ValidateMatrixTests(unittest.TestCase):
         errors = DRIFT.validate_matrix("candidate", m, SCHEMA)
         self.assertTrue(any("duplicate family" in e for e in errors))
 
+    def test_accepts_a_t2_empirical_stable_family(self) -> None:
+        candidate = matrix(
+            [
+                family(
+                    "widget:token",
+                    "stable",
+                    tier="T2",
+                    basis="empirically-observed",
+                    profile="empirical",
+                )
+            ]
+        )
+        self.assertEqual(DRIFT.validate_matrix("candidate", candidate, SCHEMA), [])
+
+    def test_rejects_unknown_basis_and_profile(self) -> None:
+        candidate = matrix([family("widget:token", "stable")])
+        candidate["families"][0]["evidenceBasis"] = "marketing-claim"
+        candidate["families"][0]["qualificationProfile"] = "assumed"
+        errors = DRIFT.validate_matrix("candidate", candidate, SCHEMA)
+        self.assertTrue(any("evidence basis" in error and "not in" in error for error in errors))
+        self.assertTrue(any("qualification profile" in error and "not in" in error for error in errors))
+
+    def test_accepts_a_legacy_baseline_without_the_new_metadata(self) -> None:
+        baseline = matrix([family("widget:token", "stable")])
+        del baseline["stableDistribution"]
+        del baseline["families"][0]["evidenceBasis"]
+        del baseline["families"][0]["qualificationProfile"]
+        self.assertEqual(DRIFT.validate_matrix("baseline", baseline, SCHEMA), [])
+
 
 class BuildDriftTests(unittest.TestCase):
     def test_a_family_dropping_out_of_stable_is_a_regression(self) -> None:
@@ -99,7 +175,26 @@ class BuildDriftTests(unittest.TestCase):
         drift = DRIFT.build_drift(baseline, candidate)
         self.assertEqual(len(drift["improvements"]), 1)
         self.assertEqual(drift["improvements"][0]["evidence"]["evidenceTier"], "T1")
+        self.assertEqual(drift["improvements"][0]["evidence"]["qualificationProfile"], "documented")
         self.assertEqual(drift["regressions"], [])
+
+    def test_t2_empirical_improvement_keeps_its_tier_and_profile(self) -> None:
+        baseline = matrix([family("widget:token", "provisional", reason="more evidence required", tier="T2")])
+        candidate = matrix(
+            [
+                family(
+                    "widget:token",
+                    "stable",
+                    tier="T2",
+                    basis="empirically-observed",
+                    profile="empirical",
+                )
+            ]
+        )
+        improvement = DRIFT.build_drift(baseline, candidate)["improvements"][0]
+        self.assertEqual(improvement["evidence"]["evidenceTier"], "T2")
+        self.assertEqual(improvement["evidence"]["evidenceBasis"], "empirically-observed")
+        self.assertEqual(improvement["evidence"]["qualificationProfile"], "empirical")
 
     def test_a_family_absent_from_the_baseline_is_new_and_unclassified(self) -> None:
         baseline = matrix([])
@@ -125,6 +220,26 @@ class BuildDriftTests(unittest.TestCase):
         self.assertEqual(drift["regressions"], [])
         self.assertEqual(drift["improvements"], [])
         self.assertEqual(drift["staleProviderProvenance"], [])
+
+    def test_unchanged_status_with_differing_basis_is_stale_provenance(self) -> None:
+        baseline = matrix([family("widget:token", "provisional", reason="more evidence required", tier="T2")])
+        candidate = matrix(
+            [
+                family(
+                    "widget:token",
+                    "provisional",
+                    reason="more evidence required",
+                    tier="T2",
+                    basis="empirically-observed",
+                )
+            ]
+        )
+        drift = DRIFT.build_drift(baseline, candidate)
+        self.assertEqual(len(drift["staleProviderProvenance"]), 1)
+        self.assertEqual(
+            drift["staleProviderProvenance"][0]["candidateEvidence"]["evidenceBasis"],
+            "empirically-observed",
+        )
 
     def test_a_family_dropped_by_the_candidate_is_out_of_scope(self) -> None:
         baseline = matrix([family("widget:token", "stable"), family("gadget:key", "stable")])

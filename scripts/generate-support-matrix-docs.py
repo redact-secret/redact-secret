@@ -54,15 +54,26 @@ README_START = "<!-- support-matrix:start -->"
 README_END = "<!-- support-matrix:end -->"
 
 STATUS_ORDER = ("stable", "provisional", "pending", "unsupported")
+EVIDENCE_TIER_ORDER = ("T1", "T2", "T3", "T0")
+QUALIFICATION_PROFILE_ORDER = ("documented", "empirical")
+
+EVIDENCE_BASIS_COPY = {
+    "provider-documented": "Provider documentation",
+    "independently-corroborated": "Independent tool/community corroboration",
+    "empirically-observed": "Provider-issued observation",
+    "project-policy": "Project policy",
+    "none": "None",
+}
 
 STATUS_COPY = {
     "stable": (
-        "Officially supported. Provider-documented (T1) contract, negative "
-        "twins, benign controls, metamorphic and mutation evidence, with no "
-        "unresolved critical disagreement. You can rely on this family's "
-        "detection and its precision behavior. Stable does not mean every "
-        "historical or future variant of this credential is detected -- see "
-        "each family's supported contexts and known limitations below."
+        "Officially supported through one of two qualification profiles: "
+        "`documented` uses a provider-documented T1 contract, while `empirical` "
+        "uses T2 provider-issued observations plus stronger fixture and behavioral "
+        "gates. Empirical qualification never promotes T2 evidence to T1. You can "
+        "rely on this family's detection and its precision behavior. Stable does "
+        "not mean every historical or future variant of this credential is detected "
+        "-- see each family's supported contexts and known limitations below."
     ),
     "provisional": (
         "Useful today, but the evidence behind it is incomplete -- typically "
@@ -94,7 +105,11 @@ def validate_matrix(matrix: dict, schema: dict) -> list[str]:
     guarantees: this is the second line of defense against a pinned copy that
     was hand-edited or copied from a stale/broken generator run."""
     errors: list[str] = []
-    vocabulary = schema["properties"]["families"]["items"]["properties"]["status"]["enum"]
+    family_properties = schema["properties"]["families"]["items"]["properties"]
+    vocabulary = family_properties["status"]["enum"]
+    evidence_tiers = family_properties["evidenceTier"]["enum"]
+    evidence_bases = family_properties["evidenceBasis"]["enum"]
+    qualification_profiles = family_properties["qualificationProfile"]["enum"]
     distribution_keys = list(schema["properties"]["distribution"]["properties"])
     if sorted(vocabulary) != sorted(distribution_keys):
         errors.append(
@@ -109,11 +124,29 @@ def validate_matrix(matrix: dict, schema: dict) -> list[str]:
 
     families = matrix.get("families", [])
     for family in families:
+        name = family.get("family", "<unknown>")
         status = family.get("status")
         if status not in vocabulary:
-            errors.append(f"{family.get('family', '<unknown>')}: status {status!r} is not in the matrix vocabulary")
+            errors.append(f"{name}: status {status!r} is not in the matrix vocabulary")
         if status not in ("stable",) and not family.get("reason"):
-            errors.append(f"{family.get('family', '<unknown>')}: status {status!r} carries no reason")
+            errors.append(f"{name}: status {status!r} carries no reason")
+        tier = family.get("evidenceTier")
+        basis = family.get("evidenceBasis")
+        profile = family.get("qualificationProfile")
+        if tier not in evidence_tiers:
+            errors.append(f"{name}: evidence tier {tier!r} is not in the matrix vocabulary")
+        if basis not in evidence_bases:
+            errors.append(f"{name}: evidence basis {basis!r} is not in the matrix vocabulary")
+        if profile not in qualification_profiles:
+            errors.append(f"{name}: qualification profile {profile!r} is not in the matrix vocabulary")
+        if status == "stable" and profile is None:
+            errors.append(f"{name}: stable carries no qualification profile")
+        if status != "stable" and profile is not None:
+            errors.append(f"{name}: {status!r} carries qualification profile {profile!r}")
+        if profile == "documented" and (tier != "T1" or basis != "provider-documented"):
+            errors.append(f"{name}: documented qualification must remain T1 provider-documented evidence")
+        if profile == "empirical" and (tier != "T2" or basis != "empirically-observed"):
+            errors.append(f"{name}: empirical qualification must remain T2 empirically-observed evidence")
 
     if matrix.get("familyCount") != len(families):
         errors.append(f"familyCount {matrix.get('familyCount')} != {len(families)} families present")
@@ -126,6 +159,19 @@ def validate_matrix(matrix: dict, schema: dict) -> list[str]:
         errors.append(
             f"distribution {matrix.get('distribution')} does not match the families actually "
             f"present {actual_distribution}"
+        )
+
+    actual_stable_distribution = {
+        profile: sum(
+            family.get("status") == "stable" and family.get("qualificationProfile") == profile
+            for family in families
+        )
+        for profile in QUALIFICATION_PROFILE_ORDER
+    }
+    if matrix.get("stableDistribution") != actual_stable_distribution:
+        errors.append(
+            f"stableDistribution {matrix.get('stableDistribution')} does not match the stable families actually "
+            f"present {actual_stable_distribution}"
         )
 
     actual_providers = {family["provider"] for family in families if family.get("provider")}
@@ -146,6 +192,29 @@ def _markdown_table(headers: list[str], rows: list[list[str]]) -> str:
 
 def _escape_cell(value: str) -> str:
     return value.replace("|", "\\|").replace("\n", " ")
+
+
+def _tier_counts(matrix: dict) -> dict[str, int]:
+    counts = {tier: 0 for tier in EVIDENCE_TIER_ORDER}
+    counts["none"] = 0
+    for family in matrix["families"]:
+        counts[family.get("evidenceTier") or "none"] += 1
+    return counts
+
+
+def _support_label(family: dict) -> str:
+    status = family["status"]
+    profile = family.get("qualificationProfile")
+    basis = family.get("evidenceBasis")
+    if status == "stable" and profile == "documented":
+        return "Stable · Provider documented"
+    if status == "stable" and profile == "empirical":
+        return "Stable · Empirically qualified"
+    if status == "provisional" and basis == "independently-corroborated":
+        return "Provisional · Tool corroborated"
+    if status == "provisional":
+        return f"Provisional · {EVIDENCE_BASIS_COPY[basis]}"
+    return status.capitalize()
 
 
 def render_matrix_markdown(matrix: dict) -> str:
@@ -170,6 +239,12 @@ def render_matrix_markdown(matrix: dict) -> str:
         "",
         f"{matrix['providerCount']} providers, {matrix['familyCount']} credential families.",
         "",
+        "Support status, evidence provenance, and qualification are separate dimensions. "
+        "In particular, a T2 family may be stable through the empirical profile without "
+        "being described as provider-documented or rewritten as T1. User-facing labels combine "
+        "the dimensions without conflating them: `Stable · Provider documented`, "
+        "`Stable · Empirically qualified`, and `Provisional · Tool corroborated`.",
+        "",
         "For the detailed measurement protocol behind these statuses -- evidence tiers, and "
         "the twin, benign, metamorphic, mutation, and differential criteria a family must clear "
         "-- see `redact-secret-benchmarks`'s "
@@ -185,6 +260,30 @@ def render_matrix_markdown(matrix: dict) -> str:
         lines.append("")
         lines.append(STATUS_COPY[status])
         lines.append("")
+
+    stable_distribution = matrix["stableDistribution"]
+    tier_counts = _tier_counts(matrix)
+    lines.extend(
+        [
+            "## Evidence and qualification counts",
+            "",
+            "Stable qualification profiles:",
+            "",
+            _markdown_table(
+                ["Qualification profile", "Stable families"],
+                [[profile.capitalize(), str(stable_distribution[profile])] for profile in QUALIFICATION_PROFILE_ORDER],
+            ),
+            "",
+            "Evidence tiers across all families:",
+            "",
+            _markdown_table(
+                ["Evidence tier", "Families"],
+                [[tier, str(tier_counts[tier])] for tier in EVIDENCE_TIER_ORDER]
+                + [["No reviewed tier", str(tier_counts["none"])]],
+            ),
+            "",
+        ]
+    )
 
     by_status: dict[str, list[dict]] = {status: [] for status in STATUS_ORDER}
     for family in families:
@@ -206,13 +305,30 @@ def render_matrix_markdown(matrix: dict) -> str:
                 [
                     _escape_cell(family["provider"] or "(format)"),
                     _escape_cell(family["familyName"]),
+                    _escape_cell(_support_label(family)),
                     _escape_cell(family["evidenceTier"] or "—"),
+                    _escape_cell(EVIDENCE_BASIS_COPY[family["evidenceBasis"]]),
+                    _escape_cell((family.get("qualificationProfile") or "—").capitalize()),
                     _escape_cell(", ".join(family["detectors"]) or "—"),
                     _escape_cell(_last_column(family, status)),
                 ]
             )
         last_header = "Supported contexts & known limitations" if status == "stable" else "Reason"
-        lines.append(_markdown_table(["Provider", "Family", "Evidence tier", "Detector(s)", last_header], rows))
+        lines.append(
+            _markdown_table(
+                [
+                    "Provider",
+                    "Family",
+                    "Support",
+                    "Evidence tier",
+                    "Evidence basis",
+                    "Qualification profile",
+                    "Detector(s)",
+                    last_header,
+                ],
+                rows,
+            )
+        )
         lines.append("")
 
     return "\n".join(lines).rstrip("\n") + "\n"
@@ -229,16 +345,33 @@ def _last_column(family: dict, status: str) -> str:
     provider_source = family.get("providerSource")
     if provider_source and provider_source.get("covers"):
         return provider_source["covers"]
+    empirical = family.get("empiricalEvidence")
+    if empirical:
+        details = []
+        if empirical.get("supportedContexts"):
+            details.append("supported contexts: " + ", ".join(empirical["supportedContexts"]))
+        if empirical.get("uncertainty"):
+            details.append("uncertainty: " + empirical["uncertainty"])
+        if details:
+            return "; ".join(details)
     return "not recorded in the pinned evidence"
 
 
 def render_readme_fragment(matrix: dict) -> str:
     distribution = matrix["distribution"]
+    stable_distribution = matrix["stableDistribution"]
+    tier_counts = _tier_counts(matrix)
     counts = ", ".join(f"{status}: {distribution.get(status, 0)}" for status in STATUS_ORDER)
+    profile_counts = ", ".join(
+        f"{profile}: {stable_distribution[profile]}" for profile in QUALIFICATION_PROFILE_ORDER
+    )
+    evidence_counts = ", ".join(f"{tier}: {tier_counts[tier]}" for tier in EVIDENCE_TIER_ORDER)
     lines = [
         README_START,
         f"**Support status** ({matrix['providerCount']} providers, {matrix['familyCount']} credential "
-        f"families; {counts}) -- generated from evaluation evidence, never hand-written. "
+        f"families; {counts}; stable qualification: {profile_counts}; evidence tiers: {evidence_counts}) "
+        "-- generated from evaluation evidence, never hand-written. Stable families are labeled "
+        "`Stable · Provider documented` or `Stable · Empirically qualified`; empirical qualification remains T2. "
         "`provisional` means useful but evidence-incomplete, not \"almost stable\"; unsupported "
         "families are listed with their reason. See the full "
         "[support matrix](docs/support-matrix.md).",
@@ -282,6 +415,14 @@ def render_release_note(matrix: dict, previous: dict | None) -> str:
         f"{matrix['providerCount']} providers, {matrix['familyCount']} credential families: "
         + ", ".join(f"{status} {distribution.get(status, 0)}" for status in STATUS_ORDER)
         + ". See the [support matrix](docs/support-matrix.md).",
+        "",
+        "Stable qualification: "
+        + ", ".join(
+            f"{profile} {matrix['stableDistribution'][profile]}" for profile in QUALIFICATION_PROFILE_ORDER
+        )
+        + ". Evidence tiers: "
+        + ", ".join(f"{tier} {_tier_counts(matrix)[tier]}" for tier in EVIDENCE_TIER_ORDER)
+        + ".",
     ]
     if previous is None:
         lines.append("")
