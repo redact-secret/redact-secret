@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 1669,
+  "fixtureCount": 1673,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -34241,6 +34241,76 @@
         }
       ],
       "note": "Issue #746 control: only Twilio's exact SID shape is excluded; an `AC`-prefixed value whose body is uppercase hex is not a Twilio SID and stays detected."
+    },
+    {
+      "id": "generic-token-negative-your-api-key-placeholder",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "javascript"
+      ],
+      "input": "mailchimp.setConfig({ apiKey: \"YOUR_API_KEY\", server: \"us19\" });\n",
+      "expected": [],
+      "note": "Issue #756: an instructional placeholder (lead word `your` followed only by credential words, naming a `key`) assigned to `apiKey` is not a credential. generic-token shares `is_instructional_token_placeholder` with bearer-token (#745). beta.7 reported [31,43)."
+    },
+    {
+      "id": "generic-token-negative-env-your-api-key-placeholder",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "API_KEY=YOUR_API_KEY\n",
+      "expected": [],
+      "note": "Issue #756: the same instructional placeholder as an unquoted dotenv value."
+    },
+    {
+      "id": "generic-token-regression-placeholder-lead-word-random-suffix",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "javascript"
+      ],
+      "input": "mailchimp.setConfig({ apiKey: \"YOUR_API_KEY_9f2cQ7xLm4Rt\", server: \"us19\" });\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 31,
+          "end": 56
+        }
+      ],
+      "note": "Issue #756 control: a value that starts like an instructional placeholder but carries a word outside the placeholder vocabulary stays detected at its exact range."
+    },
+    {
+      "id": "generic-token-regression-random-api-key-value-still-detected",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "javascript"
+      ],
+      "input": "mailchimp.setConfig({ apiKey: \"q7Lm2Xv9Rt4Kp8Wz3Nc6Bh1Jd5Fs0GyTaE4uVb\", server: \"us19\" });\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 31,
+          "end": 69
+        }
+      ],
+      "note": "Issue #756 control: a random 38-byte value in the same `apiKey` assignment stays detected at its exact range."
     },
     {
       "id": "notion-token-positive-dotenv-secret",

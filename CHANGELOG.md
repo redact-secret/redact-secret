@@ -26,6 +26,12 @@ evidence is linked from each published version.
   `credentials: SK...`. Twilio documents both as identifiers, and the Twilio
   detectors already treat them only as context. Any other prefix, length, or
   an uppercase body is still reported (#746).
+- `generic-token` no longer warns on the same instructional placeholders when
+  they are assigned to a credential-like name: `apiKey: "YOUR_API_KEY"`,
+  `API_KEY=YOUR_API_KEY`, `apiKey: "your_api_key"` and `apiKey: "YOUR_KEY"`
+  are clean. It uses the predicate `bearer-token` uses, so the two detectors
+  agree. `YOUR_API_KEY_9f2cQ7xLm4Rt`, `YOUR_MAILCHIMP_API_KEY` and random
+  values in the same assignments are still reported (#756).
 
 ### Internal, tooling, and qualification
 

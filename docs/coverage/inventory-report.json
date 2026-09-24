@@ -1733,7 +1733,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 151,
+        "fixtureCount": 155,
         "hostContextsExercised": [
           "chat",
           "dotenv",
@@ -1803,6 +1803,8 @@
         "contextual-positive-template-prefix-only-still-detected",
         "contextual-positive-vals-scheme-prefix-still-detected",
         "generic-token-positive-unquoted-markdown-inline-code",
+        "generic-token-regression-placeholder-lead-word-random-suffix",
+        "generic-token-regression-random-api-key-value-still-detected",
         "generic-token-regression-sql-bind-lookalike-still-detected",
         "generic-token-regression-uppercase-hex-sid-lookalike",
         "generic-token-regression-windows-env-lookalike-still-detected",
@@ -1821,7 +1823,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 151,
+        "fixtureCount": 155,
         "hostContextsExercised": [
           "chat",
           "dotenv",
@@ -1882,7 +1884,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 151,
+        "fixtureCount": 155,
         "hostContextsExercised": [
           "chat",
           "dotenv",
