@@ -9,13 +9,14 @@ on:
     - cron: "17 5 * * 1"
   workflow_dispatch:
 
-permissions:
-  contents: read
+permissions: {}
 
 jobs:
   wiki-links:
     name: Wiki cross-repository links
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     env:
       GH_TOKEN: ${{ github.token }}
 
