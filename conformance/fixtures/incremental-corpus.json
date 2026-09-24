@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 86,
+  "fixtureCount": 89,
   "fixtures": [
     {
       "id": "synthetic-regression-malformed-authority",
@@ -287,7 +287,7 @@
           "end": 20
         }
       ],
-      "note": "issue #318: aws-access-key's scan_prefixed_runs uses RunLength::Exact(16), a family it shares with github-token, new_relic, notion, sentry, and twilio. Its discriminating boundary is the byte immediately after the fixed-length run: one more alphanumeric byte there turns a match into the rejected longer run on the second line (deliberately a distinct value from the first line's, not a shared prefix, so the rejected run's own un-redacted text can never coincide with the first line's detected value). A chunk split anywhere in either run, including exactly at that boundary byte, must still resolve to the single first-line finding, the same as the whole-input scan \u2014 the Exact-length-family counterpart to stripe-public-secret-prefix-discriminating-boundary's AtLeast-family exemplar."
+      "note": "issue #318: aws-access-key's scan_prefixed_runs uses RunLength::Exact(16), a family it shares with github-token, new_relic, notion, sentry, and twilio. Its discriminating boundary is the byte immediately after the fixed-length run: one more alphanumeric byte there turns a match into the rejected longer run on the second line (deliberately a distinct value from the first line's, not a shared prefix, so the rejected run's own un-redacted text can never coincide with the first line's detected value). A chunk split anywhere in either run, including exactly at that boundary byte, must still resolve to the single first-line finding, the same as the whole-input scan — the Exact-length-family counterpart to stripe-public-secret-prefix-discriminating-boundary's AtLeast-family exemplar."
     },
     {
       "id": "multiline-private-key",
@@ -1344,6 +1344,54 @@
         }
       ],
       "note": "issue #480 (#468 residual): a whole-value placeholder-vocabulary Bearer credential on the first line is excluded and produces no finding, distinct from the repeated-character filler case already covered by bearer-token-filler-and-placeholder-exclusion-boundary, while a genuine Bearer credential on the second line is still reported; every UTF-8 chunk split, including splits inside the placeholder word or across the line boundary, must reproduce this whole-input reference."
+    },
+    {
+      "id": "heroku-legacy-netrc-multi-line-partitions",
+      "input": "machine api.heroku.com\n  login someone@example.invalid\n  password 7c1d9e42-5b3a-4f60-9e2d-0a8b6c4d1e73\n",
+      "text": "machine api.heroku.com\n  login someone@example.invalid\n  password 7c1d9e42-5b3a-4f60-9e2d-0a8b6c4d1e73\n",
+      "expected": [
+        {
+          "detector": "heroku-api-key-legacy",
+          "type": "heroku_api_key_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 66,
+          "end": 102
+        }
+      ],
+      "note": "Issue #743: the machine api.heroku.com line and the password line can fall in different chunks. The session holds the Heroku .netrc entry open until its password line arrives, so every partition reports the same medium-confidence finding (a warn, so the text is unchanged) as the whole-input scan."
+    },
+    {
+      "id": "heroku-legacy-auth-token-output-partitions",
+      "input": "$ heroku auth:token\n7c1d9e42-5b3a-4f60-9e2d-0a8b6c4d1e73\n",
+      "text": "$ heroku auth:token\n7c1d9e42-5b3a-4f60-9e2d-0a8b6c4d1e73\n",
+      "expected": [
+        {
+          "detector": "heroku-api-key-legacy",
+          "type": "heroku_api_key_legacy",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 20,
+          "end": 56
+        }
+      ],
+      "note": "Issue #743: the heroku auth:token command line is held open until the output line arrives, so the token on the next line is reported at every partition."
+    },
+    {
+      "id": "heroku-hrku-uuid-generation-partitions",
+      "input": "HEROKU_API_KEY=HRKU-5e7e71c0-0000-4000-8000-00000000fa11\n",
+      "text": "HEROKU_API_KEY=<SECRET_1>\n",
+      "expected": [
+        {
+          "detector": "heroku-api-key",
+          "type": "heroku_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 15,
+          "end": 56
+        }
+      ],
+      "note": "Issue #740: the 41-character HRKU-<uuid> generation stays whole across partitions, split anywhere in its prefix or UUID body."
     },
     {
       "id": "atlassian-api-token-crc32-tail-partition",

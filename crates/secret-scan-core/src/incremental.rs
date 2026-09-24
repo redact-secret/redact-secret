@@ -4,9 +4,10 @@
 //! from [`finalize`], only the sanitized text and findings whose detection
 //! window is closed: a chunk boundary, a minimum token length, or a
 //! provisional match is never a closing boundary by itself. An open logical
-//! line, structural authorization header, contextual assignment, or
-//! PEM-style private-key block is retained until it closes or a configured
-//! limit fails. Because retained plaintext is scanned fresh only once per
+//! line, structural authorization header, contextual assignment, PEM-style
+//! private-key block, or Heroku `.netrc` entry or `heroku auth:token`
+//! command awaiting its token line is retained until it closes or a
+//! configured limit fails. Because retained plaintext is scanned fresh only once per
 //! closed unit and never rescanned once finalized, whole-input acceptance
 //! does not depend on how the caller partitions it into chunks.
 //!
@@ -65,6 +66,7 @@ use std::collections::HashMap;
 
 use crate::detectors::{
     PrivateKeyRetentionTracker, has_open_bearer_authorization, has_open_contextual_assignment,
+    has_open_heroku_legacy_context,
 };
 use crate::error::{FormatterFailure, PolicyFailure, SecretScanError, SecretScanErrorCode};
 use crate::normalize::NormalizedInput;
@@ -86,6 +88,11 @@ use crate::types::{
 /// [`IncrementalLimits::minimum_buffered_bytes`] for the derived requirement
 /// instead of reproducing this arithmetic.
 const LOOKAROUND_BYTES: usize = 128;
+
+/// The built-in detector whose multi-line `.netrc` and `heroku auth:token`
+/// layouts need a retention hint; a session whose profile omits it (the
+/// `common` profile) never holds a unit open for them.
+const HEROKU_LEGACY_DETECTOR_ID: &str = "heroku-api-key-legacy";
 
 /// Explicit, positive byte limits every incremental session requires. There
 /// are no environment-derived or silent defaults.
@@ -513,7 +520,10 @@ impl IncrementalSanitizer {
     /// yield different findings under a different partition.
     fn has_open_single_line_construct(&self) -> bool {
         let scanned = NormalizedInput::new(&self.retained).into_text();
-        has_open_contextual_assignment(&scanned) || has_open_bearer_authorization(&scanned)
+        has_open_contextual_assignment(&scanned)
+            || has_open_bearer_authorization(&scanned)
+            || (self.registry.contains(HEROKU_LEGACY_DETECTOR_ID)
+                && has_open_heroku_legacy_context(&scanned))
     }
 
     fn append_retained(&mut self, piece: &str, closes_line: bool) -> Result<(), SecretScanError> {

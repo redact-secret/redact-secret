@@ -6358,6 +6358,7 @@
         {
           "dimension": "positive",
           "evidenceFixtureIds": [
+            "confluent-cloud-api-secret-checksum-valid",
             "confluent-cloud-api-secret-positive-bare",
             "confluent-cloud-api-secret-positive-crlf-unicode-prefix",
             "confluent-cloud-api-secret-positive-dotenv",
@@ -6396,6 +6397,9 @@
         {
           "dimension": "near-miss-negative",
           "evidenceFixtureIds": [
+            "confluent-cloud-api-secret-negative-checksum-big-endian",
+            "confluent-cloud-api-secret-negative-checksum-mismatch",
+            "confluent-cloud-api-secret-negative-checksum-prefix-included",
             "confluent-cloud-api-secret-negative-cluster-and-host-context",
             "confluent-cloud-api-secret-negative-doc-style-placeholder",
             "confluent-cloud-api-secret-negative-embedded-identifier",
@@ -6731,6 +6735,9 @@
         {
           "dimension": "positive",
           "evidenceFixtureIds": [
+            "heroku-api-key-hrku-uuid-authorizations-create",
+            "heroku-api-key-hrku-uuid-bare",
+            "heroku-api-key-hrku-uuid-env",
             "heroku-api-key-positive-bare",
             "heroku-api-key-positive-crlf-unicode-prefix",
             "heroku-api-key-positive-dotenv",
@@ -6776,6 +6783,8 @@
             "heroku-api-key-negative-embedded-in-wider-identifier",
             "heroku-api-key-negative-env-var-reference",
             "heroku-api-key-negative-github-actions-secret-reference",
+            "heroku-api-key-negative-hrku-underscore-separator",
+            "heroku-api-key-negative-hrku-uuid-one-short",
             "heroku-api-key-negative-masked"
           ],
           "state": "supported"
@@ -6827,8 +6836,10 @@
         {
           "dimension": "positive",
           "evidenceFixtureIds": [
+            "heroku-api-key-legacy-positive-auth-token-output",
             "heroku-api-key-legacy-positive-bare-with-keyword",
             "heroku-api-key-legacy-positive-dotenv-keyword",
+            "heroku-api-key-legacy-positive-netrc-multi-line",
             "heroku-api-key-legacy-positive-netrc-style",
             "heroku-api-key-legacy-positive-yaml-keyword"
           ],
@@ -6860,9 +6871,11 @@
           "dimension": "near-miss-negative",
           "evidenceFixtureIds": [
             "heroku-api-key-legacy-negative-app-and-release-id",
+            "heroku-api-key-legacy-negative-app-url-path",
             "heroku-api-key-legacy-negative-bare-no-context",
             "heroku-api-key-legacy-negative-different-line",
-            "heroku-api-key-legacy-negative-heroku-app-id"
+            "heroku-api-key-legacy-negative-heroku-app-id",
+            "heroku-api-key-legacy-negative-uuid-without-heroku-context"
           ],
           "state": "supported"
         },
@@ -6974,6 +6987,9 @@
             "gitlab-lookalike-token-discriminating-boundary",
             "grafana-cloud-access-policy-token-basic",
             "grafana-service-account-token-basic",
+            "heroku-hrku-uuid-generation-partitions",
+            "heroku-legacy-auth-token-output-partitions",
+            "heroku-legacy-netrc-multi-line-partitions",
             "huggingface-incremental-exact-length-positive",
             "huggingface-incremental-one-short-negative",
             "huggingface-incremental-org-token-non-conforming-negative",
@@ -7313,6 +7329,9 @@
             "gitlab-lookalike-token-discriminating-boundary",
             "grafana-cloud-access-policy-token-basic",
             "grafana-service-account-token-basic",
+            "heroku-hrku-uuid-generation-partitions",
+            "heroku-legacy-auth-token-output-partitions",
+            "heroku-legacy-netrc-multi-line-partitions",
             "huggingface-incremental-exact-length-positive",
             "huggingface-incremental-one-short-negative",
             "huggingface-incremental-org-token-non-conforming-negative",
@@ -7774,6 +7793,9 @@
             "gitlab-lookalike-token-discriminating-boundary",
             "grafana-cloud-access-policy-token-basic",
             "grafana-service-account-token-basic",
+            "heroku-hrku-uuid-generation-partitions",
+            "heroku-legacy-auth-token-output-partitions",
+            "heroku-legacy-netrc-multi-line-partitions",
             "huggingface-incremental-exact-length-positive",
             "huggingface-incremental-one-short-negative",
             "huggingface-incremental-org-token-non-conforming-negative",
