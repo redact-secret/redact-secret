@@ -70,6 +70,12 @@ evidence is linked from each published version.
 
 ### Changed detection
 
+- `mailgun-api-key` now also reports the prefix-less `<32 hex>-<8 hex>-<8 hex>`
+  triplet on a line that names Mailgun. Three sources describe it as the newer
+  private API key, and both pinned tools match it. It reports medium
+  confidence, or high under a Mailgun-named key. An identifier-named key
+  (`MAILGUN_KEY_ID=`), uppercase hex or a misplaced dash is not reported. No
+  issued key has been observed, so the shape stays recorded uncertainty (#701).
 - New `postman-collection-access-key` detector reports a Postman collection
   access key as `postman_collection_access_key` (always redacted): `PMAT-`
   followed by exactly 26 letters and digits, including in a share-via-API

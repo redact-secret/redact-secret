@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 2072,
+  "fixtureCount": 2078,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -50198,6 +50198,102 @@
         }
       ],
       "note": "Issue #700: Postman collection access key, a documented read-only credential; PMAT- + 26 [A-Za-z0-9] per GitLab's rule (T2). x-api-key is a generic-token high-signal name (x_api_key); the provider candidate wins the span on provider specificity."
+    },
+    {
+      "id": "mailgun-api-key-positive-triplet-dotenv",
+      "detector": "mailgun-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "MAILGUN_API_KEY=0123456789abcdef0123456789abcdef\u002d01234567\u002d89abcdef\n",
+      "expected": [
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 16,
+          "end": 66
+        }
+      ],
+      "note": "Issue #701: the prefix-less 32-8-8 lowercase-hex triplet that three sources describe as Mailgun's newer private API key, gated on a same-line mailgun keyword (recorded uncertainty; no issued key observed). The dashes of the synthetic triplet are JSON-escaped (\\u002d) so the committed text does not trip GitHub push protection; the decoded input is unchanged. A Mailgun-named key: high confidence."
+    },
+    {
+      "id": "mailgun-api-key-positive-triplet-log",
+      "detector": "mailgun-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "log"
+      ],
+      "input": "mailgun private key rotated: 0123456789abcdef0123456789abcdef\u002d01234567\u002d89abcdef\n",
+      "expected": [
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 29,
+          "end": 79
+        }
+      ],
+      "note": "Issue #701: the prefix-less 32-8-8 lowercase-hex triplet that three sources describe as Mailgun's newer private API key, gated on a same-line mailgun keyword (recorded uncertainty; no issued key observed). The dashes of the synthetic triplet are JSON-escaped (\\u002d) so the committed text does not trip GitHub push protection; the decoded input is unchanged. A keyword elsewhere on the line: medium."
+    },
+    {
+      "id": "mailgun-api-key-negative-triplet-no-keyword",
+      "detector": "mailgun-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "0123456789abcdef0123456789abcdef\u002d01234567\u002d89abcdef",
+      "expected": [],
+      "note": "Issue #701: the prefix-less 32-8-8 lowercase-hex triplet that three sources describe as Mailgun's newer private API key, gated on a same-line mailgun keyword (recorded uncertainty; no issued key observed). The dashes of the synthetic triplet are JSON-escaped (\\u002d) so the committed text does not trip GitHub push protection; the decoded input is unchanged. A bare triplet with no mailgun keyword is not reported."
+    },
+    {
+      "id": "mailgun-api-key-negative-triplet-identifier-key",
+      "detector": "mailgun-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "MAILGUN_KEY_ID=0123456789abcdef0123456789abcdef\u002d01234567\u002d89abcdef\n",
+      "expected": [],
+      "note": "Issue #701: the prefix-less 32-8-8 lowercase-hex triplet that three sources describe as Mailgun's newer private API key, gated on a same-line mailgun keyword (recorded uncertainty; no issued key observed). The dashes of the synthetic triplet are JSON-escaped (\\u002d) so the committed text does not trip GitHub push protection; the decoded input is unchanged. An identifier-named key is not a credential name."
+    },
+    {
+      "id": "mailgun-api-key-boundary-triplet-uppercase",
+      "detector": "mailgun-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "mailgun 0123456789ABCDEF0123456789ABCDEF\u002d01234567\u002d89ABCDEF",
+      "expected": [],
+      "note": "Issue #701: the prefix-less 32-8-8 lowercase-hex triplet that three sources describe as Mailgun's newer private API key, gated on a same-line mailgun keyword (recorded uncertainty; no issued key observed). The dashes of the synthetic triplet are JSON-escaped (\\u002d) so the committed text does not trip GitHub push protection; the decoded input is unchanged. Both tools match the triplet in lowercase only; uppercase is not reported."
+    },
+    {
+      "id": "mailgun-api-key-boundary-triplet-shifted-dash",
+      "detector": "mailgun-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "mailgun 0123456789abcdef0123456789abcde--01234567-89abcdef",
+      "expected": [],
+      "note": "Issue #701: the prefix-less 32-8-8 lowercase-hex triplet that three sources describe as Mailgun's newer private API key, gated on a same-line mailgun keyword (recorded uncertainty; no issued key observed). The dashes of the synthetic triplet are JSON-escaped (\\u002d) so the committed text does not trip GitHub push protection; the decoded input is unchanged. A dash at the wrong offset is not the triplet."
     }
   ]
 }

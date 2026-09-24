@@ -2530,7 +2530,7 @@
     {
       "detector": "mailgun-api-key",
       "evidence": {
-        "fixtureCount": 18,
+        "fixtureCount": 24,
         "hostContextsExercised": [
           "dotenv",
           "json",
@@ -2556,6 +2556,8 @@
         "mailgun-api-key-positive-log-keyword",
         "mailgun-api-key-positive-shell-quoted",
         "mailgun-api-key-positive-signing-key-field-name",
+        "mailgun-api-key-positive-triplet-dotenv",
+        "mailgun-api-key-positive-triplet-log",
         "mailgun-api-key-positive-yaml-keyword",
         "mailgun-api-key-regression-crlf-and-unicode-prefix"
       ],

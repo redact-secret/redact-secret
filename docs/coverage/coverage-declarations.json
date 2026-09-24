@@ -6324,6 +6324,8 @@
             "mailgun-api-key-positive-log-keyword",
             "mailgun-api-key-positive-shell-quoted",
             "mailgun-api-key-positive-signing-key-field-name",
+            "mailgun-api-key-positive-triplet-dotenv",
+            "mailgun-api-key-positive-triplet-log",
             "mailgun-api-key-positive-yaml-keyword",
             "mailgun-api-key-regression-crlf-and-unicode-prefix"
           ],
@@ -6348,6 +6350,8 @@
           "evidenceFixtureIds": [
             "mailgun-api-key-boundary-one-long",
             "mailgun-api-key-boundary-one-short",
+            "mailgun-api-key-boundary-triplet-shifted-dash",
+            "mailgun-api-key-boundary-triplet-uppercase",
             "mailgun-api-key-boundary-uppercase-body",
             "mailgun-api-key-boundary-uppercase-literal"
           ],
@@ -6360,7 +6364,9 @@
             "mailgun-api-key-negative-context-on-a-different-line",
             "mailgun-api-key-negative-environment-variable-reference",
             "mailgun-api-key-negative-public-validation-key-reference",
-            "mailgun-api-key-negative-repeated-character-filler"
+            "mailgun-api-key-negative-repeated-character-filler",
+            "mailgun-api-key-negative-triplet-identifier-key",
+            "mailgun-api-key-negative-triplet-no-keyword"
           ],
           "state": "supported"
         },
@@ -6369,6 +6375,8 @@
           "evidenceFixtureIds": [
             "mailgun-api-key-boundary-one-long",
             "mailgun-api-key-boundary-one-short",
+            "mailgun-api-key-boundary-triplet-shifted-dash",
+            "mailgun-api-key-boundary-triplet-uppercase",
             "mailgun-api-key-boundary-uppercase-body",
             "mailgun-api-key-boundary-uppercase-literal"
           ],

@@ -90,6 +90,23 @@
 //! identifiers/keys" exclusion the issue's own scope section requires,
 //! reached structurally rather than by a special case.
 //!
+//! ## The prefix-less triplet (issue #701)
+//!
+//! Three sources describe a prefix-less `<32 hex>-<8 hex>-<8 hex>` value as
+//! Mailgun's newer private API key: a Mailgun-repository contributor (2019),
+//! customer reports (2018) and trufflehog#3870 (2025). Both pinned tools
+//! also match it: gitleaks' `mailgun-signing-key` and trufflehog's "Hex
+//! MailGun Token". Mailgun's docs state no shape for any key and show a key
+//! `id` shaped 8-8 hex. No issued key has been observed, so whether a fresh
+//! private key or signing key uses this shape stays recorded uncertainty.
+//! Missing a real key costs more than a rare false alarm, so this detector
+//! reports the triplet too, under the same `mailgun_api_key` type and the
+//! same same-line `mailgun` keyword gate: [`pattern::is_lower_hex`]
+//! segments of exactly 32, 8 and 8 bytes joined by `-`, not a slice of a
+//! wider identifier, not one repeated character, and not assigned to an
+//! identifier-named key (`MAILGUN_KEY_ID=`). It reports medium confidence,
+//! and high under a Mailgun-named key.
+//!
 //! ## Scope
 //!
 //! Per the issue's stated boundary ("Public validation identifiers/keys and
@@ -109,11 +126,9 @@
 //! ## Consequences and known gaps
 //!
 //! - The legacy 72-byte `[A-Za-z0-9-]{72}` shape (trufflehog's "Original
-//!   `MailGun` Token") and the legacy 32-8-8 hex triplet shape (both tools'
-//!   pre-current-API "signing key" reading, superseded above) are known
-//!   unsupported variants: neither appears in Mailgun's current
-//!   documentation, and implementing them would mean detecting a shape the
-//!   provider's own current interface no longer issues.
+//!   `MailGun` Token") is a known unsupported variant: it appears in no
+//!   Mailgun documentation or recent report. The 32-8-8 triplet, once
+//!   treated the same way, is detected since issue #701 (see above).
 //! - A key with no `mailgun` keyword anywhere on its own line goes
 //!   undetected -- for example a JSON response field named only
 //!   `http_signing_key` with no `mailgun` substring nearby. This is the
@@ -133,6 +148,12 @@ use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, 
 
 const KEY_LITERAL: &str = "key-";
 const BODY_LEN: usize = 32;
+
+/// The prefix-less triplet's segment widths: `<32>-<8>-<8>` lowercase hex
+/// (issue #701).
+const TRIPLET_SEGMENTS: [usize; 3] = [32, 8, 8];
+/// `32 + 1 + 8 + 1 + 8`.
+const TRIPLET_LEN: usize = 50;
 
 /// Mailgun's own product name, case-insensitively, the same substring
 /// gitleaks' independent `mailgun-private-api-token` and
@@ -179,9 +200,47 @@ fn line_has_context_keyword(line: &str) -> bool {
             .any(|pos| text::starts_with_ci(line, pos, CONTEXT_KEYWORD))
 }
 
-/// Detects a Mailgun private API key or HTTP webhook signing key: a literal
-/// `key-` immediately followed by an exact 32-byte [`pattern::is_lower_alnum`]
-/// body, on a line that also carries [`CONTEXT_KEYWORD`].
+/// `true` when `run` is exactly the `<32>-<8>-<8>` lowercase-hex triplet and
+/// is not one repeated hex character.
+fn is_triplet(run: &[u8]) -> bool {
+    if run.len() != TRIPLET_LEN {
+        return false;
+    }
+    let mut offset = 0usize;
+    for (index, width) in TRIPLET_SEGMENTS.iter().enumerate() {
+        if index > 0 {
+            if run[offset] != b'-' {
+                return false;
+            }
+            offset += 1;
+        }
+        if !run[offset..offset + width]
+            .iter()
+            .copied()
+            .all(pattern::is_lower_hex)
+        {
+            return false;
+        }
+        offset += width;
+    }
+    let first = run[0];
+    run.iter().any(|&byte| byte != b'-' && byte != first)
+}
+
+/// The confidence and context signal for a value starting at `start` of a
+/// keyword-bearing `line`.
+fn context_confidence(line: &str, start: usize) -> (Confidence, &'static str) {
+    if text::is_provider_named_assignment(line, start, &[CONTEXT_KEYWORD]) {
+        (Confidence::High, "mailgun-named-assignment")
+    } else {
+        (Confidence::Medium, "mailgun-keyword-cooccurrence")
+    }
+}
+
+/// Detects a Mailgun private API key or HTTP webhook signing key on a line
+/// that also carries [`CONTEXT_KEYWORD`]: a literal `key-` immediately
+/// followed by an exact 32-byte [`pattern::is_lower_alnum`] body, or the
+/// prefix-less `<32>-<8>-<8>` lowercase-hex triplet (issue #701).
 pub(super) struct MailgunApiKeyDetector;
 
 impl Detector for MailgunApiKeyDetector {
@@ -217,12 +276,7 @@ impl Detector for MailgunApiKeyDetector {
                     && !text::is_repeated_character_filler(&line[body_start..body_end])
                     && let Some(range) = ByteRange::new(line_start + pos, line_start + body_end)
                 {
-                    let (confidence, context_signal) =
-                        if text::is_provider_named_assignment(line, pos, &[CONTEXT_KEYWORD]) {
-                            (Confidence::High, "mailgun-named-assignment")
-                        } else {
-                            (Confidence::Medium, "mailgun-keyword-cooccurrence")
-                        };
+                    let (confidence, context_signal) = context_confidence(line, pos);
                     candidates.push(
                         Candidate::new("mailgun_api_key", confidence, range)
                             .with_specificity(Specificity::Provider)
@@ -230,6 +284,29 @@ impl Detector for MailgunApiKeyDetector {
                     );
                 }
                 pos += literal.len();
+            }
+
+            let hex_or_dash = pattern::run_ends(bytes, pattern::is_hex_or_dash);
+            let mut start = 0usize;
+            while start < bytes.len() {
+                if !pattern::is_hex_or_dash(bytes[start]) {
+                    start += 1;
+                    continue;
+                }
+                let end = hex_or_dash[start];
+                if is_triplet(&bytes[start..end])
+                    && pattern::boundary_ok(bytes, start, end, BOUNDARY)
+                    && !text::is_non_credential_assignment(line, start)
+                    && let Some(range) = ByteRange::new(line_start + start, line_start + end)
+                {
+                    let (confidence, context_signal) = context_confidence(line, start);
+                    candidates.push(
+                        Candidate::new("mailgun_api_key", confidence, range)
+                            .with_specificity(Specificity::Provider)
+                            .with_signals([context_signal, "hex-triplet-shape"]),
+                    );
+                }
+                start = end;
             }
         }
         Ok(candidates)
@@ -251,6 +328,48 @@ mod tests {
         MailgunApiKeyDetector
             .detect(input, &DetectorContext::new(input.len()))
             .unwrap()
+    }
+
+    /// Locally constructed synthetic triplet; never issued by Mailgun.
+    const TRIPLET: &str = concat!("0123456789abcdef0123456789abcdef", "-01234567", "-89abcdef");
+    const _: () = assert!(TRIPLET.len() == TRIPLET_LEN);
+
+    #[test]
+    fn detects_the_prefix_less_triplet_alongside_a_mailgun_keyword() {
+        for (input, confidence) in [
+            (format!("MAILGUN_API_KEY={TRIPLET}"), Confidence::High),
+            (format!("mailgun private key {TRIPLET}"), Confidence::Medium),
+            (
+                format!("{{\"mailgunSigningKey\": \"{TRIPLET}\"}}"),
+                Confidence::High,
+            ),
+        ] {
+            let candidates = detect(&input);
+            assert_eq!(candidates.len(), 1, "{input}");
+            assert_eq!(candidates[0].type_name(), "mailgun_api_key");
+            assert_eq!(candidates[0].confidence(), confidence, "{input}");
+            let start = input.find(TRIPLET).unwrap();
+            assert_eq!(
+                candidates[0].range(),
+                ByteRange::new(start, start + TRIPLET.len()).unwrap()
+            );
+        }
+    }
+
+    #[test]
+    fn rejects_triplet_near_misses() {
+        let upper = TRIPLET.to_ascii_uppercase();
+        let short = TRIPLET[1..].to_owned();
+        let long = format!("{TRIPLET}0");
+        let shifted = format!("{}-{}", &TRIPLET[..31], &TRIPLET[32..]);
+        let filler = format!("{}-{}-{}", "0".repeat(32), "0".repeat(8), "0".repeat(8));
+        for value in [upper, short, long, shifted, filler] {
+            let input = format!("mailgun {value}");
+            assert!(detect(&input).is_empty(), "{input}");
+        }
+        assert!(detect(TRIPLET).is_empty());
+        assert!(detect(&format!("MAILGUN_KEY_ID={TRIPLET}")).is_empty());
+        assert!(detect(&format!("mailgun x-{TRIPLET}")).is_empty());
     }
 
     #[test]
