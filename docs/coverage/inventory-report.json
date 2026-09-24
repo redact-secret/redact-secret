@@ -1194,7 +1194,7 @@
     {
       "detector": "google-api-key",
       "evidence": {
-        "fixtureCount": 30,
+        "fixtureCount": 32,
         "hostContextsExercised": [
           "dotenv",
           "javascript",
@@ -1205,7 +1205,6 @@
         ],
         "kindsWithSupportedEvidence": [
           "adversarial",
-          "boundary",
           "negative",
           "overlap",
           "positive"
@@ -1216,7 +1215,12 @@
         ]
       },
       "evidenceFixtureIds": [
+        "firebase-positive-client-config-dotenv",
+        "firebase-positive-client-config-javascript",
+        "firebase-positive-client-config-json",
+        "firebase-positive-client-config-minimal-javascript",
         "firebase-positive-google-api-key-as-server-key-context",
+        "firebase-positive-google-services-json",
         "google-positive-dotenv",
         "google-positive-javascript-firebase-config",
         "google-positive-json",

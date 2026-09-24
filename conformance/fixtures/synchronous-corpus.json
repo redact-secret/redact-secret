@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 1685,
+  "fixtureCount": 1687,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -8294,7 +8294,7 @@
           "end": 75
         }
       ],
-      "note": "The AIza-prefixed shape also appears in public Firebase/browser configuration, referrer-restricted rather than a privileged secret; the detector still reports the documented shape at high confidence. Issue #520 (B3a) added a pipeline-level exemption for a *recognized* Firebase Web SDK client-config object (crate::pipeline::is_within_firebase_client_config_context), but this fixture carries only one config sibling field (authDomain) alongside apiKey -- below the two-field threshold that distinguishes a real, complete client config from a coincidental single field name -- so it is intentionally unaffected and stays a positive finding. See firebase-negative-client-config-javascript for the full eight-field block that does resolve empty, and firebase-positive-google-api-key-as-server-key-context for a privileged (non-config) AIza use that also stays detected."
+      "note": "The AIza-prefixed shape also appears in public Firebase/browser configuration. The shape carries no API scope -- an unrestricted key can call any API enabled on its project, including Gemini -- so the detector reports it at high confidence wherever it appears. Issue #520 (B3a) once exempted a key inside a recognized Firebase Web SDK client-config object; #749 reversed that, so this two-field snippet and the fuller firebase-positive-client-config-* blocks all report the key's span."
     },
     {
       "id": "google-overlap-context",
@@ -35803,30 +35803,114 @@
       "note": "An environment-variable interpolation reference shares no shape with the AAAA grammar and is not classified."
     },
     {
-      "id": "firebase-negative-client-config-javascript",
+      "id": "firebase-positive-client-config-javascript",
       "detector": "google-api-key",
-      "kind": "negative",
+      "kind": "positive",
       "support": "supported",
-      "tier": "negative",
+      "tier": "regression",
       "contexts": [
         "javascript"
       ],
       "input": "const firebaseConfig = {\n  apiKey: \"AIzaSYNTHETIC_REVOKED_GOOGLE_API_KEY012\",\n  authDomain: \"synthetic-revoked.firebaseapp.com\",\n  databaseURL: \"https://synthetic-revoked-default-rtdb.firebaseio.com\",\n  projectId: \"synthetic-revoked\",\n  storageBucket: \"synthetic-revoked.firebasestorage.app\",\n  messagingSenderId: \"000000000000\",\n  appId: \"1:000000000000:web:synthetic0revoked1fixture2\",\n  measurementId: \"G-SYNTHETIC0\"\n};",
-      "expected": [],
-      "note": "Issue #520 (B3a): a realistic, full Firebase Web SDK client-config object. Firebase's own documentation (firebase.google.com/docs/projects/api-keys, observed 2026-09-20) states that an API key restricted to Firebase services 'does not need to be treated as secret... safe to include in your code or configuration files.' At least two other config field names (authDomain, databaseURL, projectId, storageBucket, messagingSenderId, appId, measurementId) sit within the pipeline's bounded context window of the apiKey value, so both google-api-key's own candidate and generic-token's contextual apiKey-name match are suppressed (crate::pipeline::is_within_firebase_client_config_context). Zero findings anywhere in the block."
+      "expected": [
+        {
+          "detector": "google-api-key",
+          "type": "google_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 36,
+          "end": 75
+        }
+      ],
+      "note": "Issue #749 (benchmark-gap-749; benchmark fixture beta8-209--google-api-key-firebase-web-config): a realistic, full eight-field Firebase Web SDK client-config object as a JS source literal. #520 (B3a) suppressed the apiKey here on Firebase's 'restricted keys need not be treated as secrets' guidance; #749 reversed that, because the surrounding config proves nothing about the key's API restrictions (an unrestricted key on a project with the Generative Language API enabled can call Gemini). Only the key's span is reported; authDomain, databaseURL, projectId, storageBucket, messagingSenderId, appId and measurementId stay unflagged."
     },
     {
-      "id": "firebase-negative-client-config-json",
+      "id": "firebase-positive-client-config-json",
       "detector": "google-api-key",
-      "kind": "negative",
+      "kind": "positive",
       "support": "supported",
-      "tier": "negative",
+      "tier": "regression",
       "contexts": [
         "json"
       ],
       "input": "{\"apiKey\": \"AIzaSYNTHETIC_REVOKED_GOOGLE_API_KEY012\", \"authDomain\": \"synthetic-revoked.firebaseapp.com\", \"databaseURL\": \"https://synthetic-revoked-default-rtdb.firebaseio.com\", \"projectId\": \"synthetic-revoked\", \"storageBucket\": \"synthetic-revoked.firebasestorage.app\", \"messagingSenderId\": \"000000000000\", \"appId\": \"1:000000000000:web:synthetic0revoked1fixture2\", \"measurementId\": \"G-SYNTHETIC0\"}",
-      "expected": [],
-      "note": "The same realistic full client-config object as firebase-negative-client-config-javascript, as a plain JSON document rather than a JS source literal. Quoted JSON keys are recognized by the same field-name-plus-colon check, so the discrimination is context-shape-independent within the two contexts Firebase's own console actually offers (Add Firebase to your JavaScript project) versus a REST/JSON export."
+      "expected": [
+        {
+          "detector": "google-api-key",
+          "type": "google_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 12,
+          "end": 51
+        }
+      ],
+      "note": "Issue #749 (benchmark-gap-749; benchmark fixture beta8-209--google-api-key-firebase-web-config): a realistic, full eight-field Firebase Web SDK client-config object as a plain JSON document. #520 (B3a) suppressed the apiKey here on Firebase's 'restricted keys need not be treated as secrets' guidance; #749 reversed that, because the surrounding config proves nothing about the key's API restrictions (an unrestricted key on a project with the Generative Language API enabled can call Gemini). Only the key's span is reported; authDomain, databaseURL, projectId, storageBucket, messagingSenderId, appId and measurementId stay unflagged."
+    },
+    {
+      "id": "firebase-positive-client-config-minimal-javascript",
+      "detector": "google-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "javascript"
+      ],
+      "input": "const firebaseConfig = {\n  apiKey: \"AIzaSYNTHETIC_REVOKED_GOOGLE_API_KEY012\",\n  authDomain: \"synthetic-revoked.firebaseapp.com\",\n  projectId: \"synthetic-revoked\",\n};\n",
+      "expected": [
+        {
+          "detector": "google-api-key",
+          "type": "google_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 36,
+          "end": 75
+        }
+      ],
+      "note": "Issue #749: the benchmark fixture's shape (beta8-209--google-api-key-firebase-web-config) rebuilt from fresh synthetic bytes -- a firebaseConfig object with apiKey, authDomain and projectId. #520's two-field exemption dropped the key here; it is now reported, and authDomain and projectId stay unflagged."
+    },
+    {
+      "id": "firebase-positive-client-config-dotenv",
+      "detector": "google-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "NEXT_PUBLIC_FIREBASE_API_KEY=AIzaSYNTHETIC_REVOKED_GOOGLE_API_KEY012\nNEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=synthetic-revoked.firebaseapp.com\nNEXT_PUBLIC_FIREBASE_PROJECT_ID=synthetic-revoked\nNEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=synthetic-revoked.firebasestorage.app\nNEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=000000000000\nNEXT_PUBLIC_FIREBASE_APP_ID=1:000000000000:web:synthetic0revoked1fixture2\nNEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=G-SYNTHETIC0\n",
+      "expected": [
+        {
+          "detector": "google-api-key",
+          "type": "google_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 29,
+          "end": 68
+        }
+      ],
+      "note": "Issue #749: the same Firebase Web SDK client config injected through build-time environment variables (a Next.js NEXT_PUBLIC_FIREBASE_* .env file). Only the API key's value is reported; the auth domain, project id, storage bucket, sender id, app id and measurement id lines stay unflagged."
+    },
+    {
+      "id": "firebase-positive-google-services-json",
+      "detector": "google-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\n  \"project_info\": {\n    \"project_number\": \"000000000000\",\n    \"project_id\": \"synthetic-revoked\",\n    \"storage_bucket\": \"synthetic-revoked.firebasestorage.app\"\n  },\n  \"client\": [\n    {\n      \"client_info\": {\n        \"mobilesdk_app_id\": \"1:000000000000:android:synthetic0revoked1fixture2\",\n        \"android_client_info\": {\"package_name\": \"dev.synthetic.revoked\"}\n      },\n      \"api_key\": [\n        {\"current_key\": \"AIzaSYNTHETIC_REVOKED_GOOGLE_API_KEY012\"}\n      ]\n    }\n  ],\n  \"configuration_version\": \"1\"\n}\n",
+      "expected": [
+        {
+          "detector": "google-api-key",
+          "type": "google_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 416,
+          "end": 455
+        }
+      ],
+      "note": "Issue #749: an Android google-services.json, which carries the same AIza key under client[].api_key[].current_key beside public project identifiers. Only the key's span is reported; project_number, project_id, storage_bucket and mobilesdk_app_id stay unflagged."
     },
     {
       "id": "firebase-positive-google-api-key-as-server-key-context",
@@ -35875,28 +35959,6 @@
       "input": "messagingSenderId: \"000000000000\"",
       "expected": [],
       "note": "A bare messagingSenderId field with no paired apiKey value: a purely numeric project identifier, not a credential."
-    },
-    {
-      "id": "firebase-negative-client-config-wide-gap-does-not-suppress",
-      "detector": "google-api-key",
-      "kind": "boundary",
-      "support": "supported",
-      "tier": "contextual",
-      "contexts": [
-        "javascript"
-      ],
-      "input": "GEMINI_API_KEY=AIzaSYNTHETIC_REVOKED_GOOGLE_API_KEY012\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\nauthDomain: \"a\"\nmessagingSenderId: \"b\"\n",
-      "expected": [
-        {
-          "detector": "google-api-key",
-          "type": "google_api_key",
-          "confidence": "high",
-          "specificity": "provider",
-          "start": 15,
-          "end": 54
-        }
-      ],
-      "note": "Two Firebase config field names (authDomain, messagingSenderId) do appear in this input, but more than FIREBASE_CONTEXT_WINDOW_BYTES past the key -- an unrelated Gemini key earlier in a large file must not be suppressed just because unrelated config-shaped text exists somewhere else in the same document."
     },
     {
       "id": "firebase-database-secret-query-param-negative-out-of-scope",
