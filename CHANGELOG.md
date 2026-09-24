@@ -48,6 +48,18 @@ evidence is linked from each published version.
   (`<digits>:<8-4-4-4-12 UUID>`) as a bot token. A candidate whose secret
   segment is exactly a canonical hexadecimal UUID is rejected; every other
   token shape is unchanged (#747).
+- A Google API key (`google-api-key`, `AIza` + 35) inside a Firebase Web SDK
+  client config is reported again. Since beta.6 (#520), the pipeline dropped
+  an `AIza` value when two or more Firebase config field names (`authDomain`,
+  `projectId`, `appId`, ...) sat within 512 bytes of it. That exemption is
+  removed. The `AIza` format carries no API scope, and an unrestricted key on
+  a project with the Generative Language API enabled can call Gemini, so a
+  surrounding `firebaseConfig` does not show that the key is safe. This widens
+  detection: a `firebaseConfig` `apiKey`, a `NEXT_PUBLIC_FIREBASE_API_KEY=`
+  line and a `google-services.json` `current_key` are now redacted. The
+  config's identifier fields stay unflagged. The Firebase FCM server key
+  detection is unchanged (#749,
+  `decision-redact-google-api-keys-inside-firebase-web-config`).
 
 ### Internal, tooling, and qualification
 
