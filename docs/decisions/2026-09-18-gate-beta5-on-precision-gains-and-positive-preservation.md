@@ -24,7 +24,7 @@ loss on required positives, no new collateral redaction, and every intended
 behavioral change explicitly recorded. Full evidence remains in
 [`docs/audits/evidence/376/README.md`](../audits/evidence/376/README.md) and,
 for the durable candidate comparison, `redact-secret-benchmarks`'s
-[`docs/beta-5-results.md`](https://github.com/redact-secret/redact-secret-benchmarks/blob/main/docs/beta-5-results.md).
+[`docs/reports/beta-5/results.md`](https://github.com/redact-secret/redact-secret-benchmarks/blob/main/docs/reports/beta-5/results.md).
 In summary: fixed-corpus twin discrimination moved 32/56 → 56/56 (24 twin
 false alarms eliminated), all 58 fixed-corpus and 168 expanded-corpus
 required T1/T2 positives were preserved at zero leaked spans, and existing

@@ -248,6 +248,26 @@ jobs:
       - name: Every benchmarkCommit, pins.sourceRevision, and the manifest revision must trace to a real ancestor; vendored manifest and schema must match benchmarks main
         run: npm run benchmark-pins:check:ancestry
 
+  cross-repository-links:
+    name: Cross-repository links (blob permalinks resolve)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+
+    steps:
+      # Pinned permalinks resolve against this repository's own history, so
+      # this needs the full history, not the default single-commit checkout.
+      - name: Check out repository with full history
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Every github.com/redact-secret/<repo>/blob/<ref>/<path> link must resolve (network; not part of the offline `npm run ci`)
+        run: npm run cross-repo-links:check
+
   changelog-coverage:
     name: Changelog coverage (pull requests)
     if: github.event_name == 'pull_request'

@@ -11,7 +11,7 @@ python3 -B scripts/generate-support-matrix-docs.py
 
 42 providers, 93 credential families.
 
-For the detailed measurement protocol behind these statuses -- evidence tiers, and the twin, benign, metamorphic, mutation, and differential criteria a family must clear -- see `redact-secret-benchmarks`'s [support-status specification](https://github.com/redact-secret/redact-secret-benchmarks/blob/28fc818966d9acf7ad3f77ce38577d6b5c14ea0b/docs/support-status.md). You do not need to read it to use this table.
+For the detailed measurement protocol behind these statuses -- evidence tiers, and the twin, benign, metamorphic, mutation, and differential criteria a family must clear -- see `redact-secret-benchmarks`'s [support-status specification](https://github.com/redact-secret/redact-secret-benchmarks/blob/28fc818966d9acf7ad3f77ce38577d6b5c14ea0b/docs/specs/support-status.md). You do not need to read it to use this table.
 
 ## What each status means
 

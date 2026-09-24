@@ -17,6 +17,8 @@ run belongs in `redact-secret-benchmarks`, never copied here; and an
 iterative or exploratory log stays in an issue comment, linked by permalink
 from whichever final record cites it, not duplicated into a repository file.
 
+Cross-repository `github.com/redact-secret/<repo>/blob/<ref>/<path>` links follow one rule: a past state uses a 40-hex permalink, living documentation uses `main`, never a branch. `npm run cross-repo-links:check` enforces resolvability; see [`docs/specs/evidence-and-gates.md`](docs/specs/evidence-and-gates.md).
+
 Current rules are stated in the five spec files under `docs/specs/`
 (`detector-families.md`, `contextual-detection.md`, `engine.md`,
 `distribution.md`, `evidence-and-gates.md`); each links the ADR that decided

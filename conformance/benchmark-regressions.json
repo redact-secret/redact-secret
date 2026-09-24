@@ -31,7 +31,7 @@
         "benchmarkRevalidation": {
           "status": "passed",
           "evidence": [
-            "https://github.com/redact-secret/redact-secret/blob/workbench/429-close-benchmark-gates/docs/audits/evidence/429/candidate-evidence-summary.json"
+            "https://github.com/redact-secret/redact-secret/blob/75fd4de5770d068b891d3826913291c5b636ae6a/docs/audits/evidence/429/candidate-evidence-summary.json"
           ]
         }
       },
@@ -70,7 +70,7 @@
         "benchmarkRevalidation": {
           "status": "passed",
           "evidence": [
-            "https://github.com/redact-secret/redact-secret/blob/workbench/429-close-benchmark-gates/docs/audits/evidence/429/candidate-evidence-summary.json"
+            "https://github.com/redact-secret/redact-secret/blob/75fd4de5770d068b891d3826913291c5b636ae6a/docs/audits/evidence/429/candidate-evidence-summary.json"
           ]
         }
       },
