@@ -185,6 +185,17 @@ evidence is linked from each published version.
   longer tells readers to select beta.6 above beta.7 install commands.
 
 
+### Internal, tooling, and qualification
+
+- `Release` now records the npm facade's identity after the package is built,
+  and publishes that exact packed tarball. It used to pack a
+  `packages/javascript` tree with no `dist/` before `release:check` built it,
+  so beta.7's `Verify npm publication` compared a correct publish against a
+  3-file tarball and failed. That also skipped registry install verification
+  and tagging, which `Reconcile Release` then completed. `release-gate:check`
+  now fails if the identity step comes before the build or the publish step
+  does not publish the recorded tarball (#732).
+
 ## 0.1.0-beta.6 — 2026-09-22
 
 [Publication and qualification evidence](docs/releases/0.1.0-beta.6/README.md).

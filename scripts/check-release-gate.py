@@ -95,6 +95,18 @@ PUBLISH_JOBS = ("publish", "publish-crates", "publish-pypi")
 # this applies to `publish` alone, not every job in PUBLISH_JOBS.
 NPM_DEPENDENCY_GATES = ("publish-native-dependencies", "publish-wasm-dependency")
 
+# Issue #732: the wrapper's recorded identity must be the shasum of a built
+# package, and the publish step must publish that exact tarball. Before
+# `js:build`, `packages/javascript/dist/` does not exist, so an identity
+# computed ahead of the build describes a tarball with no `dist/` and fails
+# verification against a correct publish, as beta.7's Release did.
+WRAPPER_JOB = "publish"
+WRAPPER_BUILD_STEP = "Qualify release"
+WRAPPER_IDENTITY_STEP = "Compute the wrapper package identity"
+WRAPPER_PUBLISH_STEP = "Release package"
+WRAPPER_BUILD_COMMAND = "npm run js:build"
+WRAPPER_TARBALL_OUTPUT = "steps.pack.outputs.tarball"
+
 # Issue #417: `publish-wasm-dependency` must verify, at publish time, that the
 # artifact it is about to pack under the `@redact-secret/wasm` package
 # identity actually reports the profile that identity promises -- and that
@@ -351,6 +363,41 @@ def validate(root: Path) -> list[str]:
                     f"{RELEASE_WORKFLOW.as_posix()}: '{PROFILE_VERIFICATION_STEP}' does not "
                     'assert the common artifact reports "common"'
                 )
+
+    wrapper_job = jobs.get(WRAPPER_JOB)
+    if wrapper_job is not None:
+        steps = extract_step_blocks(wrapper_job)
+        found = {
+            name: next((step for step in steps if step[1] == name), None)
+            for name in (WRAPPER_BUILD_STEP, WRAPPER_IDENTITY_STEP, WRAPPER_PUBLISH_STEP)
+        }
+        for name, step in found.items():
+            if step is None:
+                errors.append(
+                    f"{RELEASE_WORKFLOW.as_posix()}: job '{WRAPPER_JOB}' is missing the '{name}' step"
+                )
+        build, identity, publish = (found[name] for name in (WRAPPER_BUILD_STEP, WRAPPER_IDENTITY_STEP, WRAPPER_PUBLISH_STEP))
+        if build is not None and identity is not None and identity[0] < build[0]:
+            errors.append(
+                f"{RELEASE_WORKFLOW.as_posix()}: '{WRAPPER_IDENTITY_STEP}' must follow "
+                f"'{WRAPPER_BUILD_STEP}' in job '{WRAPPER_JOB}' -- before the build the "
+                "packed wrapper has no dist/"
+            )
+        if identity is not None and publish is not None and identity[0] > publish[0]:
+            errors.append(
+                f"{RELEASE_WORKFLOW.as_posix()}: '{WRAPPER_IDENTITY_STEP}' must precede "
+                f"'{WRAPPER_PUBLISH_STEP}' in job '{WRAPPER_JOB}'"
+            )
+        if identity is not None and WRAPPER_BUILD_COMMAND not in identity[2]:
+            errors.append(
+                f"{RELEASE_WORKFLOW.as_posix()}: '{WRAPPER_IDENTITY_STEP}' does not run "
+                f"{WRAPPER_BUILD_COMMAND} before packing"
+            )
+        if publish is not None and WRAPPER_TARBALL_OUTPUT not in publish[2]:
+            errors.append(
+                f"{RELEASE_WORKFLOW.as_posix()}: '{WRAPPER_PUBLISH_STEP}' does not publish "
+                f"the tarball '{WRAPPER_IDENTITY_STEP}' recorded ({WRAPPER_TARBALL_OUTPUT})"
+            )
 
     pypi_job = jobs.get(PYPI_JOB)
     if pypi_job is None:
