@@ -163,7 +163,7 @@
       "type": "supabase_secret_key",
       "detector": "supabase-token",
       "policyClass": "always-redact",
-      "reconciliationTrigger": "sb_secret_SYNTHETICREVOKEDPROVIDERVALUE",
+      "reconciliationTrigger": "sb_secret_SYNTHETIC_REVOKED_SUPA_CHECKSUM",
       "schemes": null
     },
     {

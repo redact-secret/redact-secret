@@ -529,7 +529,10 @@ mod tests {
                 "linear-token",
                 "lin_api_SYNTHETICREVOKEDLINEARAPITOKENVALUE01234",
             ),
-            ("supabase-token", "sb_secret_SYNTHETICREVOKEDPROVIDERVALUE"),
+            (
+                "supabase-token",
+                "sb_secret_SYNTHETIC_REVOKED_SUPA_CHECKSUM",
+            ),
             (
                 "supabase-management-token",
                 "sbp_synthetic0revoked1provider2value3padding",
