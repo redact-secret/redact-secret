@@ -20,14 +20,16 @@ evidence is linked from each published version.
 
 - The pinned [support matrix](docs/support-matrix.md) was re-measured for the
   beta.7 candidate: product `main` (`6a2dca0`, candidate mode, core artifact
-  `8b6e759b`) against benchmarks `main` (`28fc818`, run `d87f63dd`), with
+  `8b6e759b`) against benchmarks `develop` (`28fc818`, run `d87f63dd`), with
   gitleaks 8.30.1 and trufflehog 3.97.4. Epic A's 15 existing families move
   from `provisional` to `stable`: anthropic, linear, notion, New Relic user
   and license, both Grafana families, Azure DevOps, Google, both Datadog
   families, Hugging Face, Microsoft Entra, and both Docker families. 51 of 93
-  families are now `stable`, up from 34 at the start of beta.7, and none
-  regressed (#575, #584,
-  [evidence](docs/audits/evidence/584/README.md)).
+  families are now `stable`. The published beta.6 package, measured on the
+  same corpus with the same scanner pins, reads 43, and no family left
+  `stable` (#575, #584, [evidence](docs/audits/evidence/584/README.md)). The
+  matrix shipped with beta.6 read 3 `stable` under an earlier benchmark
+  corpus and ledger, so it is not a like-for-like baseline.
 - `microsoft-entra-client-secret` now detects a client secret whose first
   three characters include `-`, including one that starts with `-`. The
   three bytes before the `<digit>Q~` marker now accept the same
@@ -40,10 +42,11 @@ evidence is linked from each published version.
 - The pinned [support matrix](docs/support-matrix.md) was re-measured after
   the beta.7 committed families' differential ledger sweep
   (redact-secret-benchmarks#175, #176): `netlify:personal-access-token` and
-  `confluent:cloud-api-secret` move from `provisional` to `stable` (36 stable
-  of 93). Postman, Databricks and Okta stay `provisional` at T2, with no
-  unresolved differential items; no provider source states their grammar
-  (#574).
+  `confluent:cloud-api-secret` move from `provisional` to `stable` (#574).
+  Postman, Databricks and Okta stay `provisional` at T2; no provider source
+  states their grammar. The beta.7 candidate measurement still records
+  unresolved differential items for Databricks (6) and Okta (9)
+  ([#584 evidence](docs/audits/evidence/584/README.md#open-items)).
 - `Package Release Rehearsal` now qualifies a throwaway, never-published
   `<X.Y.Z>-beta.<run id>` version instead of the branch's already-published
   one, moved onto its own uncommitted checkout after proving npm, crates.io,
@@ -173,6 +176,13 @@ evidence is linked from each published version.
   now precede the architecture, and the README's hand-maintained provider
   list gives way to the generated support matrix. `npm run
   product-positioning:check` keeps those surfaces from drifting apart.
+- The README no longer says the host-integration adapters are unpublished.
+  `@redact-secret/adapter`, `@redact-secret/adapter-pino`,
+  `@redact-secret/adapter-otel` and PyPI `redact-secret-adapters` 0.1.0 were
+  published on 2026-09-22. [Release status](docs/releases/status.md#host-integration-adapters)
+  now lists their versions, core ranges and install commands, each re-run
+  from an empty directory against the public registries. Getting started no
+  longer tells readers to select beta.6 above beta.7 install commands.
 
 
 ## 0.1.0-beta.6 — 2026-09-22

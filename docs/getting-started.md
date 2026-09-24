@@ -30,9 +30,10 @@ Python, Rust, and the CLI expose. See
 
 ## Install a published release
 
-The following versions were published on 2026-09-22; see
-[release status](releases/status.md). npm `latest` still points to beta.1, so
-select beta.6 explicitly rather than relying on an unqualified install.
+The commands below install the version this documentation describes; check
+[release status](releases/status.md) for what the registries currently carry.
+npm `latest` still points to beta.1, so select the version explicitly rather
+than relying on an unqualified install.
 Keep the selected version in your application's dependency lockfile.
 
 ```bash

@@ -112,14 +112,18 @@ behavior contract that every surface passes lives in
 
 ## Integrations
 
-Pino, Python `logging`, and OpenTelemetry `SpanProcessor` integrations are
-being graduated to a separate repository,
+Pino, Python `logging`, and OpenTelemetry `SpanProcessor` integrations ship
+from a separate repository,
 [`redact-secret-adapters`](https://github.com/redact-secret/redact-secret-adapters),
-as `@redact-secret/adapter-pino`, `@redact-secret/adapter-otel`, and the PyPI
-`redact-secret-adapters` distribution; none of those packages is published
-yet — see
+as `@redact-secret/adapter`, `@redact-secret/adapter-pino`,
+`@redact-secret/adapter-otel` (npm) and `redact-secret-adapters` (PyPI).
+Version 0.1.0 of each was published on 2026-09-22 and requires core
+0.1.0-beta.6 or later. The published versions, their core ranges, and the
+verified install commands are in
+[release status](docs/releases/status.md#host-integration-adapters). See
 [`docs/decisions/2026-09-19-graduate-adapters-to-a-separate-repository.md`](./docs/decisions/2026-09-19-graduate-adapters-to-a-separate-repository.md)
-for why, including why this repository's own release matrix is unaffected.
+for why they live apart, including why this repository's own release matrix
+is unaffected.
 Model context (MCP) and LangChain remain application use cases with no
 dedicated package: [`examples/mcp-redact/`](examples/mcp-redact/) is a
 tested, example-only integration — see its README for its stated support
