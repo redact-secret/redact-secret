@@ -7,6 +7,14 @@ evidence is linked from each published version.
 
 ### Changed
 
+- `docs/support-matrix.md` explains why a family is not yet stable in plain
+  language. Related evaluator gates are grouped into one sentence, for
+  example "Not yet stable: needs broader positive test contexts and more
+  benign controls.", instead of showing raw gate names such as
+  `documented.minimumPositiveAxes: 2 < 4`. The status descriptions no longer
+  depend on evidence-tier codes. `benchmarks/support-matrix.json` keeps the
+  complete raw reason, and a gate the generator does not recognize fails the
+  check instead of being published (#723).
 - A credential assigned to a provider-named key now redacts.
   `okta-api-token`, `mailchimp-api-key`, `mailgun-api-key`,
   `heroku-api-key-legacy`, `confluent-cloud-api-secret-legacy`, the Datadog

@@ -544,5 +544,99 @@ class RealRepoReconciliationTests(unittest.TestCase):
                 self.assertIn(f"### {other.capitalize()}\n\nNone.", text)
 
 
+DOCUMENTED_REASON = (
+    "documented.minimumPositiveAxes: 2 < 4 — Positive coverage must span four axes. | "
+    "documented.minimumBenignCases: 5 < 8 — Eight benign controls are required. | "
+    "documented.minimumControlAxes: 3 < 4 — Benign coverage must span four axes."
+)
+EMPIRICAL_REASON = (
+    "empirical.evidenceBasis: independently-corroborated — T2 remains empirical provenance. | "
+    "empirical.minimumObservations: 0 < 5 — Five observations are the minimum. | "
+    "empirical.minimumSubjects: 0 < 2 — Two subjects. | "
+    "empirical.minimumIssuanceDates: 0 < 2 — Two dates. | "
+    "empirical.minimumCorroborationClasses: 0 < 2 — Two classes. | "
+    "empirical.uncertainty: missing — explicit uncertainty is required | "
+    "empirical.supportedContexts: none — supported-context limits are required | "
+    "empirical.minimumTwinPairs: 3 < 8 — Eight twin pairs. | "
+    "empirical.mode: missing — choose shape or context-constrained qualification"
+)
+RAW_IDENTIFIERS = ("documented.", "empirical.", "qualificationProfile", "positiveContractTier", " < ")
+
+
+class UserFacingReasonTests(unittest.TestCase):
+    """Issue #723: Reason cells group evaluator gates into plain language."""
+
+    def assert_plain(self, text: str) -> None:
+        for identifier in RAW_IDENTIFIERS:
+            self.assertNotIn(identifier, text)
+
+    def test_documented_fixture_gates_group_into_one_sentence(self) -> None:
+        text = GEN.user_facing_reason(DOCUMENTED_REASON)
+        self.assertEqual(text, "Not yet stable: needs broader positive test contexts and more benign controls.")
+        self.assert_plain(text)
+
+    def test_empirical_gates_group_observations_twins_and_boundary(self) -> None:
+        text = GEN.user_facing_reason(EMPIRICAL_REASON)
+        self.assertEqual(
+            text,
+            "Not yet stable: needs independent observations of provider-issued keys, more near-miss twin pairs "
+            "and a defined supported-context boundary with its uncertainty stated.",
+        )
+        self.assertIn("independent observations of provider-issued keys", text)
+        self.assertIn("more near-miss twin pairs", text)
+        self.assertIn("a defined supported-context boundary with its uncertainty stated", text)
+        self.assertNotIn("positive test contexts", text)
+        self.assert_plain(text)
+
+    def test_context_boundary_alone(self) -> None:
+        text = GEN.user_facing_reason("empirical.mode: missing — choose a mode")
+        self.assertEqual(
+            text, "Not yet stable: needs a defined supported-context boundary with its uncertainty stated."
+        )
+
+    def test_project_policy_family_is_explained_without_tier_names(self) -> None:
+        text = GEN.user_facing_reason(
+            "qualificationProfile: tier T3 is not eligible for documented or empirical stable"
+        )
+        self.assertIn("project policy", text)
+        self.assertIn("not eligible for stable qualification", text)
+        self.assert_plain(text)
+        self.assertNotIn("T3", text)
+
+    def test_pending_family_with_no_contract(self) -> None:
+        text = GEN.user_facing_reason("positiveContractTier T0 — no positive fixture has cleared review yet")
+        self.assertEqual(text, "No reviewed detection contract is available yet.")
+
+    def test_unsupported_free_text_is_kept_verbatim(self) -> None:
+        reason = "superseded by sprocket:token; no contract for the legacy shape"
+        self.assertEqual(GEN.user_facing_reason(reason), reason)
+
+    def test_an_unmapped_gate_identifier_fails_loudly(self) -> None:
+        with self.assertRaisesRegex(ValueError, "unmapped support-matrix gate 'empirical.newGate'"):
+            GEN.user_facing_reason("empirical.newGate: 0 < 1 — a gate added upstream")
+
+    def test_rendering_changes_only_the_reason_cell(self) -> None:
+        fam = family("gadget", "gadget:token", "Gadget token", "provisional", reason=DOCUMENTED_REASON, tier="T1",
+                     basis="provider-documented")
+        m = matrix([fam])
+        before = repr(m)
+        doc = GEN.render_matrix_markdown(m)
+        self.assertEqual(repr(m), before, "rendering must not mutate the pinned matrix")
+        self.assertIn("Not yet stable: needs broader positive test contexts and more benign controls.", doc)
+        self.assertIn("| gadget | Gadget token | Provisional · Provider documentation | T1 |", doc)
+        self.assertNotIn("documented.minimumPositiveAxes", doc)
+
+    def test_the_committed_matrix_renders_without_raw_identifiers(self) -> None:
+        committed = GEN.load_json(GEN.MATRIX_PATH)
+        for fam in committed["families"]:
+            if fam.get("reason"):
+                self.assert_plain(GEN.user_facing_reason(fam["reason"]))
+
+    def test_status_descriptions_do_not_depend_on_tier_codes(self) -> None:
+        for status, copy in GEN.STATUS_COPY.items():
+            for code in ("T0", "T1", "T2", "T3"):
+                self.assertNotIn(code, copy, status)
+
+
 if __name__ == "__main__":
     unittest.main()
