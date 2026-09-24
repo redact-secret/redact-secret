@@ -99,6 +99,32 @@ generated finding-type inventory above.
 | `microsoft-entra:application-client-secret` | T1 on the provider-domain SDK example: 3 characters, then `8Q~`, then 34, for 40 in total, by maintainer ruling. The leading run accepts `-` (#707). | [#655](../audits/evidence/655/README.md), [#575](../audits/evidence/575/README.md) |
 | `docker:personal-access-token`, `docker:oauth-access-token` | T1 on the provider-stated `dckr_pat_` / `dckr_oat_` prefixes; the OAT body is exactly 27 (the provider example) or 32 bytes (#708). | [#647](../audits/evidence/647/README.md), [#648](../audits/evidence/648/README.md), [#575](../audits/evidence/575/README.md) |
 
+## Beta.8 arrival contracts
+
+Issue #726 freezes these 15 contracts and their wave order before detector
+implementation. A documented or empirical route is a qualification target,
+not a current support-status claim. Provisional and unresolved fields are not
+negative rules. The complete evidence, measured beta.7 overlap, cost estimate,
+safe-observation plan and FP/FN boundary are in [#726 evidence](../audits/evidence/726/README.md).
+
+| Wave | Family | Frozen supported contract | Qualification route |
+| --- | --- | --- | --- |
+| 1 | `replicate:api-token` | `r8_` + 37 from `[A-Za-z0-9_-]`; 40 total, alphabet provisional | documented |
+| 1 | `groq:api-key` | `gsk_` + 52 alphanumeric | empirical |
+| 1 | `xai:api-key` | `xai-` + 80 from `[A-Za-z0-9_-]`; alphabet provisional | empirical |
+| 1 | `openrouter:api-key` | `sk-or-v1-` + 64 lowercase hex | documented |
+| 1 | `langsmith:api-key` | `lsv2_(pt|sk)_` + 32 lowercase hex + `_` + 10 lowercase hex | empirical |
+| 1 | `langfuse:secret-key` | `sk-lf-` + lowercase UUIDv4; issuer-minted keys only | empirical |
+| 1 | `github:fine-grained-personal-access-token` | `github_pat_` + 22 alphanumeric + `_` + 59 alphanumeric | empirical |
+| 1 | `slack:app-level-token` | `xapp-` + four digit/alphanumeric/digit/alphanumeric dash-separated sections; widths open | empirical |
+| 1 | `stripe:webhook-signing-secret` | context-gated `whsec_` + 32-or-more Base64 bytes with optional padding | documented, context-constrained |
+| 1 | `notion:integration-token` | `ntn_` + 11 digits + 35 alphanumeric | empirical |
+| 2 | `perplexity:api-key` | `pplx-` + 48 alphanumeric | empirical |
+| 2 | `fireworks-ai:api-key` | `fw_` + 22 or 24 alphanumeric; widths are provisional positive hypotheses | empirical |
+| 2 | `pinecone:api-key` | `pcsk_` + 5–6 alphanumeric + `_` + 63 alphanumeric; legacy UUID is context-only | empirical |
+| 2 | `slack:user-token` | `xoxp-` + three numeric sections + final secret section; widths/alphabet open | documented |
+| 2 | `gitlab:runner-authentication-token` | `glrt-` legacy/partitioned 20-byte body or checksum-valid routable dotted form | empirical |
+
 ## Rules
 
 | Rule | Governing ADR |
@@ -130,4 +156,3 @@ generated finding-type inventory above.
 | Terraform Cloud/Enterprise API token detection is added. | [Add Terraform Cloud/Enterprise API token detection](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | The Pulumi access token grammar is frozen as a documented-prefix, tool-corroborated exact-length hex shape. | [Freeze the Pulumi access token grammar as a documented-prefix, tool-corroborated exact-length hex shape](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | A bare, marker-less vendor-prefixed value (for example an unmarked OpenAI-prefixed value) is redacted under a generic `vendor_prefixed_credential` policy layer, beneath the frozen per-provider contract. | [Redact a bare, marker-less OpenAI-prefixed value under a generic policy layer, beneath the frozen contract](../decisions/2026-09-21-govern-bare-vendor-prefixed-policy-layer.md) |
-
