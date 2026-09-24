@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 2055,
+  "fixtureCount": 2059,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -26873,27 +26873,45 @@
       "id": "mailchimp-api-key-boundary-datacenter-digit-count-too-long",
       "detector": "mailchimp-api-key",
       "kind": "boundary",
-      "support": "intentionally-unsupported",
+      "support": "supported",
       "tier": "malformed",
       "contexts": [
         "plain-text"
       ],
       "input": "mailchimp 0123456789abcdef0123456789abcdef-us123",
-      "expected": [],
-      "note": "The datacenter digit run is consumed greedily; a three-digit run is outside the documented one-or-two-digit range and the whole candidate is rejected rather than matched as a two-digit suffix followed by a stray digit."
+      "expected": [
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 10,
+          "end": 48
+        }
+      ],
+      "note": "Issue #698: Nosey Parker reads 1-3 datacenter digits and no source decides the count, so a three-digit suffix is accepted rather than losing the whole key (recorded uncertainty). Four digits still reject."
     },
     {
       "id": "mailchimp-api-key-boundary-uppercase-hex",
       "detector": "mailchimp-api-key",
       "kind": "boundary",
-      "support": "intentionally-unsupported",
+      "support": "supported",
       "tier": "malformed",
       "contexts": [
         "plain-text"
       ],
       "input": "mailchimp 0123456789ABCDEF0123456789ABCDEF-us6",
-      "expected": [],
-      "note": "The documented worked example's alphabet is lowercase hex only; an uppercase-hex run is a structurally different value, not a coincidental case variant."
+      "expected": [
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 10,
+          "end": 46
+        }
+      ],
+      "note": "Issue #697: gitleaks, betterleaks and Nosey Parker match case-insensitively and no source decides the case, so an uppercase-hex body is accepted (recorded uncertainty)."
     },
     {
       "id": "mailchimp-api-key-overlap-generic-context",
@@ -37764,14 +37782,23 @@
       "id": "databricks-personal-access-token-boundary-invalid-alphabet",
       "detector": "databricks-personal-access-token",
       "kind": "boundary",
-      "support": "intentionally-unsupported",
+      "support": "supported",
       "tier": "malformed",
       "contexts": [
         "plain-text"
       ],
       "input": "dapiD123456789abcdef0123456789abcdef",
-      "expected": [],
-      "note": "Both corroborating tools (gitleaks, trufflehog) pin the body to lowercase hex only; an uppercase hex digit inside an otherwise documented-length body is rejected."
+      "expected": [
+        {
+          "detector": "databricks-personal-access-token",
+          "type": "databricks_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 36
+        }
+      ],
+      "note": "Issue #697: Microsoft Purview allows A-F and no Databricks source decides the case, so an uppercase hex byte is accepted (recorded uncertainty). A non-hex letter still rejects; see databricks-personal-access-token-boundary-non-hex-letter."
     },
     {
       "id": "databricks-personal-access-token-boundary-rotation-separator",
@@ -37790,14 +37817,23 @@
       "id": "databricks-personal-access-token-boundary-rotation-multi-digit",
       "detector": "databricks-personal-access-token",
       "kind": "boundary",
-      "support": "intentionally-unsupported",
+      "support": "supported",
       "tier": "malformed",
       "contexts": [
         "plain-text"
       ],
       "input": "dapi0123456789abcdef0123456789abcdef-22",
-      "expected": [],
-      "note": "Both tools model the rotation suffix as exactly one digit; a two-digit suffix is an intentional false negative rather than a match on the first digit alone."
+      "expected": [
+        {
+          "detector": "databricks-personal-access-token",
+          "type": "databricks_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 39
+        }
+      ],
+      "note": "Issue #698: Nosey Parker allows a multi-digit rotation suffix and no source decides the count, so 1-3 digits are part of the token rather than losing it whole (recorded uncertainty). Four digits still reject."
     },
     {
       "id": "databricks-personal-access-token-boundary-rotation-non-digit",
@@ -49080,6 +49116,58 @@
         }
       ],
       "note": "Issue #524: Neon API key, provider-stated napi_ prefix (T1) plus a tool-corroborated 64-byte [A-Za-z0-9] body floor (T2). 100 space-separated keys on one line are each reported once within the declared resource bounds."
+    },
+    {
+      "id": "mailchimp-api-key-boundary-datacenter-four-digits",
+      "detector": "mailchimp-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "mailchimp 0123456789abcdef0123456789abcdef-us1234",
+      "expected": [],
+      "note": "Issue #698: four datacenter digits exceed every source's reading (at most three) and reject the whole value rather than truncating it."
+    },
+    {
+      "id": "mailchimp-api-key-boundary-non-hex-letter",
+      "detector": "mailchimp-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "mailchimp 0123456789abcdefz123456789abcdef-us6",
+      "expected": [],
+      "note": "Issue #697: case widening admits A-F only; a non-hex letter still rejects the body."
+    },
+    {
+      "id": "databricks-personal-access-token-boundary-non-hex-letter",
+      "detector": "databricks-personal-access-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "dapi0123g56789abcdef0123456789abcdef",
+      "expected": [],
+      "note": "Issue #697: case widening admits A-F only; a non-hex letter still rejects the body."
+    },
+    {
+      "id": "databricks-personal-access-token-boundary-rotation-four-digits",
+      "detector": "databricks-personal-access-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "dapi0123456789abcdef0123456789abcdef-1234",
+      "expected": [],
+      "note": "Issue #698: a four-digit rotation suffix exceeds the accepted 1-3 digits and rejects the whole value rather than truncating it."
     }
   ]
 }

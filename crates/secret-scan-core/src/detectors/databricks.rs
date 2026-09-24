@@ -24,29 +24,43 @@
 //! (`learn.microsoft.com/purview/sit-defn-azure-databricks-personal-access-token`,
 //! observed 2026-09-22) tertiarily corroborates a 32-character body and
 //! lists `dapi` among its match keywords, though it does not itself state a
-//! prefix-plus-body grammar. A body shorter or longer than 32 bytes, in
-//! uppercase hex, or using any other undocumented character is an
-//! intentional false negative rather than a fuzzy match, the same
-//! exact-length precedent [`super::linear::LINEAR`]'s `lin_api_` shape
-//! already set.
+//! prefix-plus-body grammar. A body shorter or longer than 32 bytes, or
+//! using a non-hex character, is an intentional false negative rather than
+//! a fuzzy match, the same exact-length precedent
+//! [`super::linear::LINEAR`]'s `lin_api_` shape already set.
+//!
+//! ## Unresolved provider facts (issues #697, #698)
+//!
+//! No issued token has been observed and no Databricks source states either
+//! property, so both stay recorded uncertainty. The grammar takes the
+//! reading that misses fewer real tokens:
+//!
+//! - **Case (#697).** Microsoft Purview's entity definition allows `A-F`
+//!   and `a-f`; gitleaks and trufflehog match lowercase only. The body
+//!   accepts both cases. A `dapi` + 32 uppercase-hex run is not plausibly
+//!   anything else. The benchmark's alphabet twins use a non-hex letter,
+//!   which is still rejected.
+//! - **Rotation suffix (#698).** gitleaks, trufflehog and betterleaks allow
+//!   `-` plus one digit. Nosey Parker allows several. plenoai, CredSweeper
+//!   and secrets-patterns-db allow no suffix. All 19 suffixed public-code
+//!   candidates had one digit. The suffix accepts 1–3 digits, so a
+//!   multi-digit rotation no longer loses the whole token. Four or more
+//!   digits, or a non-digit after the dash, still reject.
 //!
 //! **The rotation suffix.** Neither tool's suffix is a simple fixed-length
 //! extension of the body's own alphabet: the literal `-` separator falls
-//! outside `[a-f0-9]`, so the body and an optional rotated suffix cannot be
-//! read as one exact-length run the way [`super::cloudflare::CLOUDFLARE`]'s
-//! checksum tail is (that checksum shares its body's alphabet; this
-//! separator does not). Matching therefore widens the run alphabet to
-//! [`is_lower_hex_or_dash`] (hex or a literal dash) and takes the maximal
-//! available run via [`pattern::RunLength::AtLeast`], then
+//! outside the hex alphabet, so the body and an optional rotated suffix
+//! cannot be read as one exact-length run the way
+//! [`super::cloudflare::CLOUDFLARE`]'s checksum tail is (that checksum shares
+//! its body's alphabet; this separator does not). Matching therefore widens
+//! the run alphabet to [`is_hex_or_dash`] (hex or a literal dash) and takes
+//! the maximal available run via [`pattern::RunLength::AtLeast`], then
 //! [`databricks_body_shape`] -- this shape's own [`pattern::PostCheck`] --
-//! rejects anything whose length is not exactly the bare 32-byte body or
-//! exactly the 34-byte body-plus-rotation shape, and for the 34-byte case
-//! additionally requires the dash to land at byte 32 and the following byte
-//! to be an ASCII digit specifically (not any hex letter). A rotation
-//! suffix with two or more digits, a dash with nothing after it, or a dash
-//! followed by a non-digit hex letter therefore also is an intentional
+//! accepts only the bare 32-byte body or that body followed by a dash and 1
+//! to [`MAX_ROTATION_DIGITS`] ASCII digits. A longer digit run, a dash with
+//! nothing after it, or a dash followed by a hex letter is an intentional
 //! false negative -- the run's greedy, non-backtracking match already
-//! absorbed the extra bytes into a length the post-check does not accept,
+//! absorbed the extra bytes into a shape the post-check does not accept,
 //! the same "reject a longer glued run outright" precedent
 //! [`super::linear::LINEAR`]'s one-byte-longer-body rejection and
 //! [`super::cloudflare::CLOUDFLARE`]'s checksum-tail post-check both already
@@ -65,17 +79,17 @@ use crate::detectors::pattern::{self, Alphabet, PrefixShape};
 const PREFIX: &str = "dapi";
 /// The two-tool-corroborated exact body length.
 const BODY_LEN: usize = 32;
-/// The body plus a `-` and a single rotation digit.
-const ROTATED_LEN: usize = BODY_LEN + 2;
+/// The most rotation digits accepted after the `-` (issue #698).
+const MAX_ROTATION_DIGITS: usize = 3;
 
-/// `[0-9a-f-]`: the body's lowercase-hex alphabet widened to also admit the
+/// `[0-9A-Fa-f-]`: the body's hex alphabet widened to also admit the
 /// rotation suffix's literal dash, so a rotated token's dash does not itself
 /// trip the boundary check before [`databricks_body_shape`] gets to accept
 /// it (see the module doc).
-fn is_lower_hex_or_dash(byte: u8) -> bool {
-    pattern::is_lower_hex(byte) || byte == b'-'
+fn is_hex_or_dash(byte: u8) -> bool {
+    pattern::is_hex(byte) || byte == b'-'
 }
-const BODY_ALPHABET: Alphabet = is_lower_hex_or_dash;
+const BODY_ALPHABET: Alphabet = is_hex_or_dash;
 
 const SIGNALS: [&str; 2] = [
     "databricks-documented-prefix",
@@ -83,27 +97,26 @@ const SIGNALS: [&str; 2] = [
 ];
 
 /// `true` when the matched run's body (excluding the `dapi` prefix) is
-/// exactly 32 lowercase-hex bytes, or exactly that body followed by a
-/// literal `-` and a single ASCII digit -- the [`pattern::PostCheck`] the
-/// widened run alphabet alone cannot express (see the module doc).
+/// exactly 32 hex bytes, or exactly that body followed by a literal `-` and
+/// 1 to [`MAX_ROTATION_DIGITS`] ASCII digits -- the [`pattern::PostCheck`]
+/// the widened run alphabet alone cannot express (see the module doc).
 fn databricks_body_shape(bytes: &[u8], start: usize, end: usize) -> bool {
     let body = &bytes[start + PREFIX.len()..end];
-    match body.len() {
-        BODY_LEN => body.iter().copied().all(pattern::is_lower_hex),
-        ROTATED_LEN => {
-            body[..BODY_LEN].iter().copied().all(pattern::is_lower_hex)
-                && body[BODY_LEN] == b'-'
-                && body[BODY_LEN + 1].is_ascii_digit()
-        }
-        _ => false,
+    if body.len() < BODY_LEN || !body[..BODY_LEN].iter().copied().all(pattern::is_hex) {
+        return false;
     }
+    let suffix = &body[BODY_LEN..];
+    suffix.is_empty()
+        || (suffix[0] == b'-'
+            && (2..=MAX_ROTATION_DIGITS + 1).contains(&suffix.len())
+            && suffix[1..].iter().all(u8::is_ascii_digit))
 }
 
-/// Requires the exact `dapi<32 lowercase-hex bytes>` shape, optionally
-/// followed by a `-` and a single rotation digit. A body short of or longer
-/// than the documented length, a non-hex or uppercase-hex byte, a
-/// multi-digit or missing rotation suffix, or a run embedded in a wider
-/// identifier is an intentional false negative rather than a fuzzy match.
+/// Requires the exact `dapi<32 hex bytes>` shape, optionally followed by a
+/// `-` and 1 to 3 rotation digits. A body short of or longer than the
+/// documented length, a non-hex byte, a longer or missing rotation suffix,
+/// or a run embedded in a wider identifier is an intentional false negative
+/// rather than a fuzzy match.
 pub(super) const DATABRICKS: KnownFormatProviderDetector = KnownFormatProviderDetector::new(
     "databricks-personal-access-token",
     "databricks_personal_access_token",
@@ -189,34 +202,50 @@ mod tests {
         assert!(detect(&format!("{PREFIX}{BODY}a")).is_empty());
     }
 
-    /// Both consulted tools agree the body is lowercase hex only; an
-    /// uppercase hex digit or a non-hex letter inside an otherwise
-    /// documented-length body is rejected rather than truncated to its
-    /// longest valid-alphabet prefix.
+    /// Issue #697: uppercase hex is accepted (recorded uncertainty, see the
+    /// module doc); a non-hex letter inside an otherwise documented-length
+    /// body is still rejected rather than truncated.
     #[test]
-    fn rejects_uppercase_hex_and_non_hex_bytes_inside_the_body() {
-        for byte in ['A', 'F', 'g', 'Z'] {
+    fn accepts_uppercase_hex_and_rejects_non_hex_bytes_inside_the_body() {
+        for byte in ['A', 'F'] {
+            let mut body = BODY.to_string();
+            body.replace_range(4..5, &byte.to_string());
+            let value = format!("{PREFIX}{body}");
+            assert_eq!(detect(&value).len(), 1, "{byte}");
+        }
+        let upper = format!("{PREFIX}{}", BODY.to_ascii_uppercase());
+        assert_eq!(detect(&upper).len(), 1);
+        for byte in ['g', 'Z'] {
             let mut body = BODY.to_string();
             body.replace_range(4..5, &byte.to_string());
             assert!(detect(&format!("{PREFIX}{body}")).is_empty(), "{byte}");
         }
     }
 
-    /// Both tools model the rotation suffix as exactly one digit; two
-    /// digits is an intentional false negative rather than a match on the
-    /// first digit alone (see the module doc: the greedy run already
-    /// absorbed both digits into a length the post-check does not accept).
+    /// Issue #698: a rotation suffix of 1 to 3 digits is part of the token.
     #[test]
-    fn rejects_a_rotation_suffix_with_two_digits() {
-        assert!(detect(&format!("{PREFIX}{BODY}-22")).is_empty());
+    fn accepts_a_rotation_suffix_of_up_to_three_digits() {
+        for suffix in ["-22", "-123"] {
+            let value = format!("{PREFIX}{BODY}{suffix}");
+            let candidates = detect(&value);
+            assert_eq!(candidates.len(), 1, "{suffix}");
+            assert_eq!(
+                candidates[0].range(),
+                ByteRange::new(0, value.len()).unwrap()
+            );
+        }
     }
 
-    /// `-a` extends the widened run alphabet past the dash (a lowercase hex
-    /// letter is still `is_lower_hex_or_dash`), so the post-check sees a
-    /// 34-byte body whose last byte fails the ASCII-digit check. `-A` and
-    /// `-#` each stop the run at the dash instead, since neither an
-    /// uppercase hex letter nor `#` is in the alphabet, leaving a 33-byte
-    /// body the post-check also rejects.
+    #[test]
+    fn rejects_a_rotation_suffix_with_four_digits() {
+        assert!(detect(&format!("{PREFIX}{BODY}-1234")).is_empty());
+    }
+
+    /// `-a` and `-A` extend the widened run alphabet past the dash (a hex
+    /// letter of either case is still `is_hex_or_dash`), so the post-check
+    /// sees a suffix whose last byte fails the ASCII-digit check. `-#`
+    /// stops the run at the dash instead, leaving a bare trailing dash the
+    /// post-check also rejects.
     #[test]
     fn rejects_a_rotation_suffix_with_a_non_digit_after_the_dash() {
         for suffix in ["-a", "-A", "-#"] {

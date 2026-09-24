@@ -3,7 +3,7 @@
   "corpus": "synchronous-corpus.json",
   "offsetUnit": "utf8-byte",
   "detectors": ["private-key","jwt","bearer-token","connection-string","otpauth-uri","generic-token"],
-  "fixtureCount": 2055,
+  "fixtureCount": 2059,
   "fixtures": [
     {"expected":[{"action":"warn","confidence":"medium","detector":"generic-token","end":48,"start":8,"type":"contextual_secret"}],"id":"host-dotenv-github"},
     {"expected":[{"action":"warn","confidence":"medium","detector":"generic-token","end":52,"start":12,"type":"contextual_secret"}],"id":"host-json-github"},
@@ -2059,6 +2059,10 @@
     {"expected":[],"id":"neon-api-key-boundary-dash-in-body"},
     {"expected":[{"action":"redact","confidence":"high","detector":"connection-string","end":58,"start":39,"type":"connection_string_password"}],"id":"neon-api-key-overlap-connection-uri"},
     {"expected":[{"action":"redact","confidence":"high","detector":"bearer-token","end":91,"start":22,"type":"bearer_token"}],"id":"neon-api-key-overlap-bearer"},
-    {"expected":[],"id":"neon-api-key-adversarial-dense-findings"}
+    {"expected":[],"id":"neon-api-key-adversarial-dense-findings"},
+    {"expected":[],"id":"mailchimp-api-key-boundary-datacenter-four-digits"},
+    {"expected":[],"id":"mailchimp-api-key-boundary-non-hex-letter"},
+    {"expected":[],"id":"databricks-personal-access-token-boundary-non-hex-letter"},
+    {"expected":[],"id":"databricks-personal-access-token-boundary-rotation-four-digits"}
   ]
 }

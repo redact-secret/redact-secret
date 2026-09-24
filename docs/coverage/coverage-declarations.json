@@ -6249,7 +6249,9 @@
           "dimension": "boundary",
           "evidenceFixtureIds": [
             "mailchimp-api-key-boundary-datacenter-digit-count-too-long",
+            "mailchimp-api-key-boundary-datacenter-four-digits",
             "mailchimp-api-key-boundary-missing-datacenter-suffix",
+            "mailchimp-api-key-boundary-non-hex-letter",
             "mailchimp-api-key-boundary-one-long",
             "mailchimp-api-key-boundary-one-short",
             "mailchimp-api-key-boundary-uppercase-hex",
@@ -6270,7 +6272,9 @@
           "dimension": "malformed",
           "evidenceFixtureIds": [
             "mailchimp-api-key-boundary-datacenter-digit-count-too-long",
+            "mailchimp-api-key-boundary-datacenter-four-digits",
             "mailchimp-api-key-boundary-missing-datacenter-suffix",
+            "mailchimp-api-key-boundary-non-hex-letter",
             "mailchimp-api-key-boundary-one-long",
             "mailchimp-api-key-boundary-one-short",
             "mailchimp-api-key-boundary-uppercase-hex",
@@ -7605,8 +7609,10 @@
           "evidenceFixtureIds": [
             "databricks-personal-access-token-boundary-encoded-prefix",
             "databricks-personal-access-token-boundary-invalid-alphabet",
+            "databricks-personal-access-token-boundary-non-hex-letter",
             "databricks-personal-access-token-boundary-one-long",
             "databricks-personal-access-token-boundary-one-short",
+            "databricks-personal-access-token-boundary-rotation-four-digits",
             "databricks-personal-access-token-boundary-rotation-multi-digit",
             "databricks-personal-access-token-boundary-rotation-non-digit",
             "databricks-personal-access-token-boundary-rotation-separator"
@@ -7633,8 +7639,10 @@
           "evidenceFixtureIds": [
             "databricks-personal-access-token-boundary-encoded-prefix",
             "databricks-personal-access-token-boundary-invalid-alphabet",
+            "databricks-personal-access-token-boundary-non-hex-letter",
             "databricks-personal-access-token-boundary-one-long",
             "databricks-personal-access-token-boundary-one-short",
+            "databricks-personal-access-token-boundary-rotation-four-digits",
             "databricks-personal-access-token-boundary-rotation-multi-digit",
             "databricks-personal-access-token-boundary-rotation-non-digit",
             "databricks-personal-access-token-boundary-rotation-separator"

@@ -70,6 +70,14 @@ evidence is linked from each published version.
 
 ### Changed detection
 
+- `mailchimp-api-key` and `databricks-personal-access-token` now accept
+  uppercase hex in the key body (#697) and a longer suffix (#698): Mailchimp
+  `-us` plus 1–3 digits, and a Databricks `-` rotation suffix of 1–3 digits.
+  Before, such a key was missed whole. No issued key or provider statement
+  settles either property, so they stay recorded uncertainty, and the grammar
+  takes the reading that misses fewer keys. A non-hex letter or four or more
+  suffix digits still reject. The Mailchimp body stays exactly 32 bytes: the
+  provider's one 31-byte example is treated as a documentation typo (#699).
 - New `neon-api-key` detector reports a Neon API key as `neon_api_key`
   (always redacted): `napi_` followed by at least 64 letters and digits. The
   prefix is stated by Neon; the 64-byte body floor is tool-corroborated, so a

@@ -2493,7 +2493,7 @@
     {
       "detector": "mailchimp-api-key",
       "evidence": {
-        "fixtureCount": 19,
+        "fixtureCount": 21,
         "hostContextsExercised": [
           "dotenv",
           "json",
@@ -2504,6 +2504,7 @@
         ],
         "kindsWithSupportedEvidence": [
           "adversarial",
+          "boundary",
           "negative",
           "overlap",
           "positive"
@@ -3047,7 +3048,7 @@
     {
       "detector": "databricks-personal-access-token",
       "evidence": {
-        "fixtureCount": 31,
+        "fixtureCount": 33,
         "hostContextsExercised": [
           "dotenv",
           "github-actions",
@@ -3060,6 +3061,7 @@
         ],
         "kindsWithSupportedEvidence": [
           "adversarial",
+          "boundary",
           "negative",
           "overlap",
           "positive"

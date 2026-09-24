@@ -33,12 +33,12 @@
 //! therefore [`MIN_DATACENTER_DIGITS`]..=[`MAX_DATACENTER_DIGITS`], not
 //! gitleaks' fixed two.
 //!
-//! ## Grammar (frozen before implementation, per issue #313)
+//! ## Grammar (frozen per issue #313, revised by #697, #698 and #699)
 //!
-//! A bare run of exactly [`KEY_HEX_LEN`] [`is_lower_hex`] (`[0-9a-f]`) bytes,
-//! immediately followed by the literal `-us`, then a run of
+//! A bare run of exactly [`KEY_HEX_LEN`] [`is_key_hex`] (`[0-9A-Fa-f]`)
+//! bytes, immediately followed by the literal `-us`, then a run of
 //! [`MIN_DATACENTER_DIGITS`] to [`MAX_DATACENTER_DIGITS`] ASCII digits
-//! (greedily consumed, so a three-digit run never matches a two-digit
+//! (greedily consumed, so a four-digit run never matches a three-digit
 //! prefix of itself), bounded on both sides by a byte outside
 //! [`pattern::is_alnum_dash`] -- wider than the match alphabet on the left so
 //! an adjacent letter or a joining dash still rejects a truncated slice of a
@@ -58,12 +58,37 @@
 //! `mailchimp` substring ([`CONTEXT_KEYWORD`]) anywhere on the same line --
 //! the same "same line" scope [`super::new_relic`] and [`super::twilio`]
 //! already use for their own bare-hex formats, for the same
-//! incremental-consistency reason documented there. `Medium` confidence,
-//! `Provider` specificity, confidence-gated (not in `ALWAYS_REDACT_TYPES`)
-//! -- there is no paired-identifier signal available here the way
-//! [`super::twilio`]'s Account SID/API Key SID give its own bare formats a
-//! `High`-confidence tier, so this format never rises above `Medium`, the
-//! same reasoning [`super::new_relic`]'s License Key already documents.
+//! incremental-consistency reason documented there. `Provider` specificity,
+//! confidence-gated (not in `ALWAYS_REDACT_TYPES`): `Medium` for a keyword
+//! anywhere on the line, and `High` when the value is assigned to a key that
+//! names Mailchimp (`decision-redact-provider-named-credential-assignments`,
+//! issue #702).
+//!
+//! ## Unresolved provider facts (issues #697, #698, #699)
+//!
+//! No issued key has been observed and Mailchimp's prose states none of the
+//! following, so each stays recorded uncertainty. The grammar takes the
+//! reading that misses fewer real keys, except where a scored benchmark
+//! twin pins the narrower reading.
+//!
+//! - **Case (#697).** The tools disagree: gitleaks, betterleaks and Nosey
+//!   Parker match case-insensitively, trufflehog lowercase only. 2 of 115
+//!   public-code candidates carried `A-F`. The body accepts `A-F` and
+//!   `a-f`. An uppercase key is no longer missed, and a 32-byte uppercase
+//!   hex run followed by `-us<N>` on a Mailchimp line is not plausibly
+//!   anything else.
+//! - **Datacenter digits (#698).** trufflehog accepts 1–2 digits, gitleaks
+//!   exactly 2, and Nosey Parker 1–3. Public code shows 35 one-digit and 80
+//!   two-digit suffixes, and none with three. The suffix accepts 1–3 digits,
+//!   so a key from a future `us100`+ datacenter is not missed whole. Four or
+//!   more digits still reject.
+//! - **Body length (#699).** The fundamentals page's one worked example has
+//!   a 31-byte body. Every scanner rule, a 2009 Mailchimp staff post and 111
+//!   of 115 public-code candidates use 32. The example is read as a
+//!   documentation typo, not a grammar. The body stays exactly 32 bytes;
+//!   the benchmark's scored 31-byte twins
+//!   (`mailchimp-api-key-*-datacenter-*-twin`) also assert that a 31-byte
+//!   body stays silent.
 //!
 //! A candidate whose hex body is a single repeated character
 //! ([`text::is_repeated_character_filler`]) is excluded: the alphabet
@@ -100,7 +125,7 @@
 //! - A key with no `mailchimp` keyword anywhere on its own line goes
 //!   undetected -- the same accepted tradeoff [`super::new_relic`]'s own
 //!   License Key already carries.
-//! - A benign 32-byte lowercase-hex value immediately followed by a
+//! - A benign 32-byte hex value immediately followed by a
 //!   coincidental `-us<N>` (for example a region-sharded resource id) that
 //!   happens to share a line with the word "mailchimp" would false
 //!   positive; this is the same class of risk every other keyword-gated
@@ -114,7 +139,7 @@ use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, 
 const KEY_HEX_LEN: usize = 32;
 const DATACENTER_LITERAL: &str = "-us";
 const MIN_DATACENTER_DIGITS: usize = 1;
-const MAX_DATACENTER_DIGITS: usize = 2;
+const MAX_DATACENTER_DIGITS: usize = 3;
 
 /// Mailchimp's own product name, case-insensitively, the same substring
 /// gitleaks' independent `mailchimp-api-key` rule keys its own keyword gate
@@ -125,12 +150,10 @@ const CONTEXT_KEYWORD: &str = "mailchimp";
 /// boundary rule [`super::postman`] uses for its own dash-containing shape.
 const BOUNDARY: Alphabet = pattern::is_alnum_dash;
 
-/// `[0-9a-f]`: the documented worked example's alphabet, lowercase only.
-/// Matches [`super::new_relic`]'s own `is_lower_hex`, which documents the
-/// same rationale: an uppercase-hex run is not a coincidental case variant
-/// of this format, it is a structurally different value.
-fn is_lower_hex(byte: u8) -> bool {
-    byte.is_ascii_digit() || (byte.is_ascii_lowercase() && byte <= b'f')
+/// `[0-9A-Fa-f]`: the body alphabet, case-insensitive since issue #697 (see
+/// the module doc's unresolved provider facts).
+fn is_key_hex(byte: u8) -> bool {
+    byte.is_ascii_hexdigit()
 }
 
 /// Every line of `input` as a byte range, excluding the terminating `\n`
@@ -211,10 +234,10 @@ impl Detector for MailchimpMarketingApiKeyDetector {
             }
 
             let bytes = line.as_bytes();
-            let ends = pattern::run_ends(bytes, is_lower_hex);
+            let ends = pattern::run_ends(bytes, is_key_hex);
             let mut start = 0usize;
             while start < bytes.len() {
-                if !is_lower_hex(bytes[start]) {
+                if !is_key_hex(bytes[start]) {
                     start += 1;
                     continue;
                 }
@@ -333,8 +356,21 @@ mod tests {
     }
 
     #[test]
-    fn rejects_a_three_digit_datacenter_suffix() {
-        assert!(detect(&format!("mailchimp {KEY_HEX}-us123")).is_empty());
+    fn accepts_a_three_digit_datacenter_suffix() {
+        let value = format!("{KEY_HEX}-us123");
+        let input = format!("mailchimp {value}");
+        let candidates = detect(&input);
+        assert_eq!(candidates.len(), 1);
+        let start = input.rfind(&value).unwrap();
+        assert_eq!(
+            candidates[0].range(),
+            ByteRange::new(start, start + value.len()).unwrap()
+        );
+    }
+
+    #[test]
+    fn rejects_a_four_digit_datacenter_suffix() {
+        assert!(detect(&format!("mailchimp {KEY_HEX}-us1234")).is_empty());
     }
 
     #[test]
@@ -350,9 +386,26 @@ mod tests {
     }
 
     #[test]
-    fn rejects_an_uppercase_hex_body() {
+    fn accepts_an_uppercase_or_mixed_case_hex_body() {
         let upper = KEY_HEX.to_ascii_uppercase();
-        assert!(detect(&format!("mailchimp {upper}-us6")).is_empty());
+        let mixed = format!("{}{}", &KEY_HEX[..16], &upper[16..]);
+        for body in [upper, mixed] {
+            let value = format!("{body}-us6");
+            let input = format!("mailchimp {value}");
+            let candidates = detect(&input);
+            assert_eq!(candidates.len(), 1, "{input}");
+            let start = input.rfind(&value).unwrap();
+            assert_eq!(
+                candidates[0].range(),
+                ByteRange::new(start, start + value.len()).unwrap()
+            );
+        }
+    }
+
+    #[test]
+    fn rejects_a_non_hex_letter_in_the_body() {
+        let body = format!("{}z{}", &KEY_HEX[..16], &KEY_HEX[17..]);
+        assert!(detect(&format!("mailchimp {body}-us6")).is_empty());
     }
 
     #[test]
