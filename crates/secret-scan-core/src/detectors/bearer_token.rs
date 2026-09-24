@@ -9,7 +9,9 @@
 //! recognized placeholder vocabulary is excluded
 //! ([`is_non_secret_bearer_value`]), the same two exclusions
 //! `generic-token` applies to the `Basic`/`Token` schemes -- see issue #468
-//! and `docs/specs/contextual-detection.md`.
+//! and `docs/specs/contextual-detection.md`. An instructional placeholder
+//! (`YOUR_ACCESS_TOKEN`, `INSERT_ACCESS_TOKEN`) is excluded as well
+//! ([`is_instructional_token_placeholder`], issue #745).
 
 use super::text::{
     ascii_run_len, ends_with_ci, is_js_whitespace, is_repeated_character_filler,
@@ -58,6 +60,60 @@ const DIGIT_SUFFIX_PLACEHOLDER_WORDS: &[&str] = &[
 fn is_non_secret_bearer_value(value: &str) -> bool {
     is_repeated_character_filler(value)
         || matches_placeholder_vocabulary(value, PLACEHOLDER_WORDS, DIGIT_SUFFIX_PLACEHOLDER_WORDS)
+        || is_instructional_token_placeholder(value)
+}
+
+/// Words that open a documentation placeholder asking the reader to supply
+/// their own credential (`YOUR_ACCESS_TOKEN`, `INSERT_API_KEY`).
+const PLACEHOLDER_LEAD_WORDS: &[&str] = &["your", "insert", "enter", "paste"];
+
+/// Words that name the kind of credential a placeholder stands for. Every
+/// word after the lead word must come from this list.
+const PLACEHOLDER_CREDENTIAL_WORDS: &[&str] = &[
+    "access", "api", "app", "auth", "bearer", "client", "id", "jwt", "key", "oauth", "oauth2",
+    "personal", "refresh", "secret", "service", "session", "token", "user", "here",
+];
+
+/// Credential nouns a placeholder must name at least once, so a lead word
+/// followed only by qualifiers (`YOUR_PERSONAL_ACCESS`) is not enough.
+const PLACEHOLDER_CREDENTIAL_NOUNS: &[&str] = &["jwt", "key", "secret", "token"];
+
+/// `true` for an instructional placeholder such as `YOUR_ACCESS_TOKEN`,
+/// `INSERT_ACCESS_TOKEN`, or `your-oauth-token-here` (issue #745): the
+/// value splits on `_`, `-`, and `.` into two or more words, the first is a
+/// [`PLACEHOLDER_LEAD_WORDS`] entry, every later word is a
+/// [`PLACEHOLDER_CREDENTIAL_WORDS`] or lead-word entry
+/// (`ENTER_YOUR_ACCESS_TOKEN_HERE`), and at least one later word is a
+/// [`PLACEHOLDER_CREDENTIAL_NOUNS`] entry, all matched case-insensitively.
+///
+/// Shorter placeholders (`YOUR_API_TOKEN`) already fall under
+/// [`MIN_TOKEN_LEN`]; this closes the same shape once it reaches 16 bytes.
+/// Any byte outside `[A-Za-z0-9._-]`, any word off the lists, or a word
+/// glued to random material (`YOUR_ACCESS_TOKEN9f2c`) keeps the value
+/// detected, so a real token is never excluded for merely starting with
+/// `your`.
+fn is_instructional_token_placeholder(value: &str) -> bool {
+    let is_listed =
+        |word: &str, words: &[&str]| words.iter().any(|listed| word.eq_ignore_ascii_case(listed));
+    let mut words = value.split(['_', '-', '.']);
+    let Some(lead) = words.next() else {
+        return false;
+    };
+    if !is_listed(lead, PLACEHOLDER_LEAD_WORDS) {
+        return false;
+    }
+    let mut saw_noun = false;
+    let mut count = 0usize;
+    for word in words {
+        if !is_listed(word, PLACEHOLDER_CREDENTIAL_WORDS)
+            && !is_listed(word, PLACEHOLDER_LEAD_WORDS)
+        {
+            return false;
+        }
+        saw_noun |= is_listed(word, PLACEHOLDER_CREDENTIAL_NOUNS);
+        count += 1;
+    }
+    count > 0 && saw_noun
 }
 
 /// `true` for the token alphabet: `[A-Za-z0-9._~+/-]`.
@@ -416,5 +472,41 @@ mod tests {
         let candidates = detect("Bearer SYNTHETIC_REVOKED_BEARER_VALUE");
         assert_eq!(candidates.len(), 1);
         assert_eq!(candidates[0].confidence(), Confidence::High);
+    }
+
+    #[test]
+    fn instructional_placeholders_of_sixteen_or_more_bytes_are_excluded() {
+        // Issue #745.
+        for value in [
+            "YOUR_ACCESS_TOKEN",
+            "YOUR_OAUTH_TOKEN",
+            "YOUR_SECRET_TOKEN",
+            "INSERT_ACCESS_TOKEN",
+            "your_access_token",
+            "your-oauth-token-here",
+            "ENTER_YOUR_ACCESS_TOKEN_HERE",
+            "YOUR_PERSONAL_ACCESS_TOKEN",
+            "PASTE_API_KEY_HERE",
+        ] {
+            let input = format!("Authorization: Bearer {value}");
+            assert!(detect(&input).is_empty(), "{input}");
+        }
+    }
+
+    #[test]
+    fn values_that_only_resemble_an_instructional_placeholder_stay_detected() {
+        for value in [
+            "YOUR_ACCESS_TOKEN9f2c",
+            "YOUR_ACCESS_TOKEN_Zx81Qp",
+            "YOUR_PERSONAL_ACCESS_VALUE",
+            "TOKEN_YOUR_ACCESS_TOKEN",
+            "yourAccessTokenAbcdef",
+            "YOUR_PERSONAL_ACCESS",
+            "SYNTHETIC_REVOKED_BEARER_VALUE",
+        ] {
+            let input = format!("Authorization: Bearer {value}");
+            let candidates = detect(&input);
+            assert_eq!(only_range(&candidates), (22, input.len()), "{input}");
+        }
     }
 }

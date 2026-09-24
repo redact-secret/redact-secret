@@ -1493,7 +1493,7 @@
     {
       "detector": "bearer-token",
       "evidence": {
-        "fixtureCount": 31,
+        "fixtureCount": 35,
         "hostContextsExercised": [
           "dotenv",
           "http",
@@ -1525,7 +1525,9 @@
         "bearer-positive-near-miss-repeated-character-filler",
         "bearer-positive-scheme",
         "bearer-positive-tab-and-uppercase",
-        "bearer-positive-yaml-real-token-still-detected"
+        "bearer-positive-yaml-real-token-still-detected",
+        "bearer-token-regression-base64url-value-still-detected",
+        "bearer-token-regression-placeholder-lead-word-with-random-suffix"
       ],
       "policyClass": "always-redact",
       "schemeRows": "not-applicable",
@@ -1741,7 +1743,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 149,
+        "fixtureCount": 151,
         "hostContextsExercised": [
           "chat",
           "dotenv",
@@ -1812,6 +1814,7 @@
         "contextual-positive-vals-scheme-prefix-still-detected",
         "generic-token-positive-unquoted-markdown-inline-code",
         "generic-token-regression-sql-bind-lookalike-still-detected",
+        "generic-token-regression-uppercase-hex-sid-lookalike",
         "generic-token-regression-windows-env-lookalike-still-detected",
         "regression-generic-token-markdown-inline-code-boundary",
         "regression-nested-credential-under-parent-key",
@@ -1828,7 +1831,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 149,
+        "fixtureCount": 151,
         "hostContextsExercised": [
           "chat",
           "dotenv",
@@ -1889,7 +1892,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 149,
+        "fixtureCount": 151,
         "hostContextsExercised": [
           "chat",
           "dotenv",
@@ -1975,7 +1978,7 @@
     {
       "detector": "twilio-auth-token",
       "evidence": {
-        "fixtureCount": 13,
+        "fixtureCount": 14,
         "hostContextsExercised": [
           "dotenv",
           "json",
@@ -2662,7 +2665,7 @@
     {
       "detector": "confluent-cloud-api-secret-legacy",
       "evidence": {
-        "fixtureCount": 10,
+        "fixtureCount": 11,
         "hostContextsExercised": [
           "dotenv",
           "plain-text",
