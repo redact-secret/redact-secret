@@ -195,6 +195,11 @@ evidence is linked from each published version.
   and tagging, which `Reconcile Release` then completed. `release-gate:check`
   now fails if the identity step comes before the build or the publish step
   does not publish the recorded tarball (#732).
+- The vendored `benchmarks/pin-manifest.json` and
+  `benchmarks/support-matrix-schema.json` are re-synced from
+  `redact-secret-benchmarks` `main`, which now pins the published 0.1.0-beta.7
+  (`2b98027`). The schema only gains an optional `product` object describing
+  a candidate-build measurement.
 
 ## 0.1.0-beta.6 — 2026-09-22
 

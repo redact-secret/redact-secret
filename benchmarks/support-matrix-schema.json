@@ -17,7 +17,27 @@
         "runId": { "type": "string" },
         "revision": { "type": "string" },
         "dirty": { "type": ["boolean", "null"] },
-        "criteriaSchemaVersion": { "const": 1 }
+        "criteriaSchemaVersion": { "const": 1 },
+        "product": {
+          "description": "Present only when the evidence run measured a redact-secret candidate build (eval:classify with --candidate-*) instead of the published package; absent means the published package.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["sourceCommit", "packageName", "declaredVersion", "artifacts"],
+          "properties": {
+            "sourceCommit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+            "packageName": { "type": "string" },
+            "declaredVersion": { "type": "string" },
+            "artifacts": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["role", "sha256"],
+                "properties": { "role": { "type": "string" }, "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" } }
+              }
+            }
+          }
+        }
       }
     },
     "providerCount": { "type": "integer", "minimum": 0 },
