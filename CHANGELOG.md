@@ -42,8 +42,18 @@ evidence is linked from each published version.
 
 ### Changed detection
 
+- Added `replicate-api-token`, `groq-api-key`, `xai-api-key` and
+  `openrouter-api-key` detectors for the first Beta.8 AI inference families,
+  implementing the grammars frozen by #726 and nothing broader: `r8_` + 37
+  bytes from `[A-Za-z0-9_-]`, `gsk_` + 52 alphanumeric bytes, `xai-` + 80
+  bytes from `[A-Za-z0-9_-]`, and `sk-or-v1-` + 64 lowercase hex bytes. Each
+  matches bare, is exact-width, provider-specific and always-redact, and wins
+  overlap with the generic, bearer and vendor-prefix findings. A body one
+  byte short or long, uppercase OpenRouter hex, `sk-or-mgmt-` management keys
+  and a value glued to a wider identifier are documented out-of-scope gaps.
+  The Replicate and xAI body alphabets and the Groq width are provisional
+  until the benchmarks#208 arrival evidence lands (#727).
 - Adds the `langsmith-api-key` and `langfuse-secret-key` detectors (Beta.8, #728). `langsmith-api-key` detects `lsv2_pt_` personal access tokens and `lsv2_sk_` service keys: 32 lowercase hex, `_`, 10 lowercase hex. `langfuse-secret-key` detects `sk-lf-` followed by a lowercase UUIDv4. Both are always redacted and need no surrounding context. The public `pk-lf-` key, `sk-lf-gw-` gateway keys, legacy `ls__` keys, uppercase or wrong-width bodies, masked placeholders, hosts and project/trace IDs stay clean. Both families are empirical (T2), so the frozen grammars are provisional until the benchmarks#210 arrival evidence lands.
-
 - `heroku-api-key` now also detects the 41-character `HRKU-` OAuth access
   token generation: `HRKU-` followed by a lower-case `8-4-4-4-12` hex UUID,
   granted from 2024-04-01 through 2025-04-22 and valid until regenerated

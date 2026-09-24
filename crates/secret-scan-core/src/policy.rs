@@ -35,7 +35,7 @@ use crate::types::{Action, Confidence, DetectedFinding, Policy, PolicyContext};
 /// correct: a confidence-gated type here can still lose an overlap to a
 /// stricter-resolving lower-specificity candidate, without needing to be
 /// added to this list.
-const ALWAYS_REDACT_TYPES: [&str; 54] = [
+const ALWAYS_REDACT_TYPES: [&str; 58] = [
     "anthropic_api_key",
     "atlassian_api_token",
     "authorization_credential",
@@ -61,6 +61,7 @@ const ALWAYS_REDACT_TYPES: [&str; 54] = [
     "google_api_key",
     "grafana_cloud_access_policy_token",
     "grafana_service_account_token",
+    "groq_api_key",
     "heroku_api_key",
     "huggingface_token",
     "jwt",
@@ -73,10 +74,12 @@ const ALWAYS_REDACT_TYPES: [&str; 54] = [
     "notion_integration_token",
     "npm_access_token",
     "openai_api_key",
+    "openrouter_api_key",
     "otpauth_secret",
     "postman_api_key",
     "pulumi_access_token",
     "pypi_api_token",
+    "replicate_api_token",
     "sendgrid_api_key",
     "sentry_org_auth_token",
     "sentry_user_auth_token",
@@ -90,6 +93,7 @@ const ALWAYS_REDACT_TYPES: [&str; 54] = [
     "vault_token",
     "vendor_prefixed_credential",
     "vercel_token",
+    "xai_api_key",
 ];
 
 /// Chooses the default action for a candidate identified only by `type_name`

@@ -44,7 +44,7 @@ for your host. An organization-specific format that is not listed here can be ad
 as a [declarative ruleset](../guides/rulesets.md).
 
 <!-- detector-inventory:start -->
-59 built-in detectors emit 66 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
+63 built-in detectors emit 70 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
 
 | Detector | Finding types | Default policy class | Schemes |
 | --- | --- | --- | --- |
@@ -98,6 +98,10 @@ as a [declarative ruleset](../guides/rulesets.md).
 | `firebase-server-key` | `firebase_server_key` | `always-redact` | — |
 | `terraform-cloud-token` | `terraform_cloud_token` | `always-redact` | — |
 | `pulumi-access-token` | `pulumi_access_token` | `always-redact` | — |
+| `replicate-api-token` | `replicate_api_token` | `always-redact` | — |
+| `groq-api-key` | `groq_api_key` | `always-redact` | — |
+| `xai-api-key` | `xai_api_key` | `always-redact` | — |
+| `openrouter-api-key` | `openrouter_api_key` | `always-redact` | — |
 | `databricks-personal-access-token` | `databricks_personal_access_token` | `always-redact` | — |
 | `confluent-cloud-api-secret` | `confluent_cloud_api_secret` | `always-redact` | — |
 | `confluent-cloud-api-secret-legacy` | `confluent_cloud_api_secret_legacy` | `confidence-gated` | — |

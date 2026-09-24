@@ -47,6 +47,7 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `google_api_key` | `google-api-key` | `always-redact` | [Redact a Google API key inside a Firebase Web SDK client config, reversing the client-config exemption](../decisions/2026-09-24-redact-google-api-keys-inside-firebase-web-config.md); T1 provider source recorded in [#642 evidence](../audits/evidence/642/README.md) |
 | `grafana_cloud_access_policy_token` | `grafana-cloud-access-policy-token` | `always-redact` | [Freeze the Grafana service account and Cloud access policy token grammar, and exclude the legacy API key](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md); T1 provider source recorded in [#642 evidence](../audits/evidence/642/README.md) |
 | `grafana_service_account_token` | `grafana-service-account-token` | `always-redact` | [Freeze the Grafana service account and Cloud access policy token grammar, and exclude the legacy API key](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md); T1 provider source recorded in [#642 evidence](../audits/evidence/642/README.md) |
+| `groq_api_key` | `groq-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `heroku_api_key` | `heroku-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; issue #740 adds the documented 41-character `HRKU-` + lower-case UUID generation beside `HRKU-AA` + 58, grammar in `detectors::heroku`'s module doc |
 | `heroku_api_key_legacy` | `heroku-api-key-legacy` | `confidence-gated` | generic policy default, no dedicated ADR in this repository; issue #714 excludes a UUID assigned to an identifier-shaped key (last word `id` or `uuid`, e.g. `HEROKU_APP_ID`) from the `heroku` keyword gate, grammar in `detectors::heroku`'s module doc; issue #743 also accepts two documented multi-line layouts (a Heroku `.netrc` entry's `password`, `heroku auth:token` output, held open by an incremental retention hint) and excludes a UUID that is a URL path segment |
 | `huggingface_token` | `huggingface-token` | `always-redact` | [Adopt the Hugging Face organization-token prefix under hf_'s frozen body grammar, re-tiered to T2](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
@@ -64,11 +65,13 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `npm_access_token` | `npm-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `okta_api_token` | `okta-api-token` | `confidence-gated` | no dedicated ADR in this repository; grammar frozen in `detectors::okta`'s own module doc, per issue #315 |
 | `openai_api_key` | `openai-token` | `always-redact` | [Freeze the OpenAI API key grammar as a marker-gated shape with exact segment lengths](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
+| `openrouter_api_key` | `openrouter-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `otpauth_secret` | `otpauth-uri` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `postman_api_key` | `postman-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `private_key` | `private-key` | `block` | generic policy default, no dedicated ADR in this repository |
 | `pulumi_access_token` | `pulumi-access-token` | `always-redact` | [Freeze the Pulumi access token grammar as a documented-prefix, tool-corroborated exact-length hex shape](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `pypi_api_token` | `pypi-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
+| `replicate_api_token` | `replicate-api-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `sendgrid_api_key` | `sendgrid-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `sentry_org_auth_token` | `sentry-org-auth-token` | `always-redact` | [Freeze the Sentry user and organization auth token grammar as two unambiguous prefixed shapes](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `sentry_user_auth_token` | `sentry-user-auth-token` | `always-redact` | [Freeze the Sentry user and organization auth token grammar as two unambiguous prefixed shapes](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
@@ -84,6 +87,7 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `vault_token` | `vault-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `vendor_prefixed_credential` | `generic-token` | `always-redact` | [Redact a bare, marker-less OpenAI-prefixed value under a generic policy layer, beneath the frozen contract](../decisions/2026-09-21-govern-bare-vendor-prefixed-policy-layer.md) |
 | `vercel_token` | `vercel-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
+| `xai_api_key` | `xai-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 <!-- detector-families:end -->
 
 ## Evidence-backed family applications

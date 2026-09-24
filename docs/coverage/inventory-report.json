@@ -2586,6 +2586,167 @@
       "type": "pulumi_access_token"
     },
     {
+      "detector": "replicate-api-token",
+      "evidence": {
+        "fixtureCount": 22,
+        "hostContextsExercised": [
+          "dotenv",
+          "github-actions",
+          "json",
+          "log",
+          "markdown",
+          "plain-text",
+          "python",
+          "shell"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "replicate-api-token-positive-bare",
+        "replicate-api-token-positive-crlf-unicode-prefix",
+        "replicate-api-token-positive-dotenv",
+        "replicate-api-token-positive-github-actions",
+        "replicate-api-token-positive-json-config",
+        "replicate-api-token-positive-log",
+        "replicate-api-token-positive-punctuation-adjacent",
+        "replicate-api-token-positive-repeated-value",
+        "replicate-api-token-positive-shell-quoted"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "replicate_api_token"
+    },
+    {
+      "detector": "groq-api-key",
+      "evidence": {
+        "fixtureCount": 22,
+        "hostContextsExercised": [
+          "dotenv",
+          "github-actions",
+          "json",
+          "log",
+          "markdown",
+          "plain-text",
+          "shell"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "groq-api-key-positive-bare",
+        "groq-api-key-positive-crlf-unicode-prefix",
+        "groq-api-key-positive-dotenv",
+        "groq-api-key-positive-github-actions",
+        "groq-api-key-positive-json-config",
+        "groq-api-key-positive-log",
+        "groq-api-key-positive-punctuation-adjacent",
+        "groq-api-key-positive-repeated-value",
+        "groq-api-key-positive-shell-quoted"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "groq_api_key"
+    },
+    {
+      "detector": "xai-api-key",
+      "evidence": {
+        "fixtureCount": 22,
+        "hostContextsExercised": [
+          "dotenv",
+          "github-actions",
+          "json",
+          "log",
+          "markdown",
+          "plain-text",
+          "shell"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "xai-api-key-positive-bare",
+        "xai-api-key-positive-crlf-unicode-prefix",
+        "xai-api-key-positive-dotenv",
+        "xai-api-key-positive-github-actions",
+        "xai-api-key-positive-json-config",
+        "xai-api-key-positive-log",
+        "xai-api-key-positive-punctuation-adjacent",
+        "xai-api-key-positive-repeated-value",
+        "xai-api-key-positive-shell-quoted"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "xai_api_key"
+    },
+    {
+      "detector": "openrouter-api-key",
+      "evidence": {
+        "fixtureCount": 22,
+        "hostContextsExercised": [
+          "dotenv",
+          "github-actions",
+          "json",
+          "log",
+          "markdown",
+          "plain-text",
+          "shell"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "openrouter-api-key-positive-bare",
+        "openrouter-api-key-positive-crlf-unicode-prefix",
+        "openrouter-api-key-positive-dotenv",
+        "openrouter-api-key-positive-github-actions",
+        "openrouter-api-key-positive-json-config",
+        "openrouter-api-key-positive-log",
+        "openrouter-api-key-positive-punctuation-adjacent",
+        "openrouter-api-key-positive-repeated-value",
+        "openrouter-api-key-positive-shell-quoted"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "openrouter_api_key"
+    },
+    {
       "detector": "databricks-personal-access-token",
       "evidence": {
         "fixtureCount": 31,
@@ -2966,7 +3127,7 @@
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 66,
+    "supported": 70,
     "unresolved": 0
   }
 }
