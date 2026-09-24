@@ -42,6 +42,8 @@ evidence is linked from each published version.
 
 ### Changed detection
 
+- Adds the `langsmith-api-key` and `langfuse-secret-key` detectors (Beta.8, #728). `langsmith-api-key` detects `lsv2_pt_` personal access tokens and `lsv2_sk_` service keys: 32 lowercase hex, `_`, 10 lowercase hex. `langfuse-secret-key` detects `sk-lf-` followed by a lowercase UUIDv4. Both are always redacted and need no surrounding context. The public `pk-lf-` key, `sk-lf-gw-` gateway keys, legacy `ls__` keys, uppercase or wrong-width bodies, masked placeholders, hosts and project/trace IDs stay clean. Both families are empirical (T2), so the frozen grammars are provisional until the benchmarks#210 arrival evidence lands.
+
 - `heroku-api-key` now also detects the 41-character `HRKU-` OAuth access
   token generation: `HRKU-` followed by a lower-case `8-4-4-4-12` hex UUID,
   granted from 2024-04-01 through 2025-04-22 and valid until regenerated

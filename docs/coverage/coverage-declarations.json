@@ -6652,6 +6652,221 @@
     },
     {
       "behaviorClass": "provider",
+      "detector": "langsmith-api-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "langsmith-positive-dotenv",
+            "langsmith-positive-json",
+            "langsmith-positive-legacy-langchain-env",
+            "langsmith-positive-log",
+            "langsmith-positive-markdown-delimiter",
+            "langsmith-positive-nested-observability-metadata",
+            "langsmith-positive-otlp-headers",
+            "langsmith-positive-personal-access-token",
+            "langsmith-positive-punctuation-adjacent",
+            "langsmith-positive-repeated-value",
+            "langsmith-positive-service-key",
+            "langsmith-positive-shell-export",
+            "langsmith-positive-unicode-crlf",
+            "langsmith-positive-x-api-key-header",
+            "langsmith-positive-yaml"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "langsmith-overlap-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "langsmith-adversarial-near-miss-prefixes"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "langsmith-boundary-first-segment-short",
+            "langsmith-boundary-masked-placeholder",
+            "langsmith-boundary-missing-separator",
+            "langsmith-boundary-non-hex-alphabet",
+            "langsmith-boundary-second-segment-long",
+            "langsmith-boundary-second-segment-short",
+            "langsmith-boundary-uppercase"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "langsmith-negative-embedded-in-wider-identifier",
+            "langsmith-negative-endpoint-and-ids",
+            "langsmith-negative-env-reference",
+            "langsmith-negative-legacy-ls-prefix",
+            "langsmith-negative-other-prefixes",
+            "langsmith-negative-percent-encoded-lookalike",
+            "langsmith-negative-placeholder-dotenv",
+            "langsmith-negative-x-masked-placeholder"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "langsmith-boundary-first-segment-short",
+            "langsmith-boundary-masked-placeholder",
+            "langsmith-boundary-missing-separator",
+            "langsmith-boundary-non-hex-alphabet",
+            "langsmith-boundary-second-segment-long",
+            "langsmith-boundary-second-segment-short",
+            "langsmith-boundary-uppercase"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for langsmith_api_key (langsmith-api-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "langsmith_api_key"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "langfuse-secret-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "langfuse-positive-basic-auth-pair",
+            "langfuse-positive-dotenv",
+            "langfuse-positive-dotenv-pair",
+            "langfuse-positive-json",
+            "langfuse-positive-log",
+            "langfuse-positive-markdown-delimiter",
+            "langfuse-positive-otlp-headers",
+            "langfuse-positive-punctuation-adjacent",
+            "langfuse-positive-repeated-value",
+            "langfuse-positive-sdk-config",
+            "langfuse-positive-second-variant",
+            "langfuse-positive-secret-key",
+            "langfuse-positive-shell-export",
+            "langfuse-positive-unicode-crlf",
+            "langfuse-positive-yaml"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "langfuse-overlap-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "langfuse-adversarial-near-miss-prefixes"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "langfuse-boundary-no-dashes",
+            "langfuse-boundary-not-uuid-v4-variant",
+            "langfuse-boundary-not-uuid-v4-version",
+            "langfuse-boundary-one-long",
+            "langfuse-boundary-one-short",
+            "langfuse-boundary-uppercase"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "langfuse-negative-embedded-in-wider-identifier",
+            "langfuse-negative-env-reference",
+            "langfuse-negative-gateway-prefix",
+            "langfuse-negative-ids-and-hosts",
+            "langfuse-negative-public-key",
+            "langfuse-negative-self-hosting-placeholder",
+            "langfuse-negative-x-masked-placeholder"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "langfuse-boundary-no-dashes",
+            "langfuse-boundary-not-uuid-v4-variant",
+            "langfuse-boundary-not-uuid-v4-version",
+            "langfuse-boundary-one-long",
+            "langfuse-boundary-one-short",
+            "langfuse-boundary-uppercase"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for langfuse_secret_key (langfuse-secret-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "langfuse_secret_key"
+    },
+    {
+      "behaviorClass": "provider",
       "detector": "postman-api-key",
       "dimensions": [
         {
@@ -7105,6 +7320,8 @@
             "invisible-provider-grammar-zwnj",
             "invisible-structural-authorization-zwsp",
             "jwt-adversarial-incomplete",
+            "langfuse-adversarial-near-miss-prefixes",
+            "langsmith-adversarial-near-miss-prefixes",
             "linear-adversarial-long-suffix",
             "mailchimp-api-key-adversarial-dense-findings",
             "mailgun-api-key-adversarial-dense-findings",
@@ -7508,6 +7725,8 @@
             "invisible-provider-grammar-zwnj",
             "invisible-structural-authorization-zwsp",
             "jwt-adversarial-incomplete",
+            "langfuse-adversarial-near-miss-prefixes",
+            "langsmith-adversarial-near-miss-prefixes",
             "linear-adversarial-long-suffix",
             "mailchimp-api-key-adversarial-dense-findings",
             "mailgun-api-key-adversarial-dense-findings",

@@ -74,8 +74,8 @@ export const CANONICAL_IDS = [
   "grafana-cloud-access-policy-token", "new-relic-user-api-key", "new-relic-license-key",
   "mailchimp-api-key", "mailgun-api-key", "okta-api-token",
   "firebase-server-key", "terraform-cloud-token", "pulumi-access-token", "databricks-personal-access-token",
-  "confluent-cloud-api-secret", "confluent-cloud-api-secret-legacy", "netlify-token", "postman-api-key",
-  "heroku-api-key", "heroku-api-key-legacy",
+  "confluent-cloud-api-secret", "confluent-cloud-api-secret-legacy", "netlify-token", "langsmith-api-key", "langfuse-secret-key",
+  "postman-api-key", "heroku-api-key", "heroku-api-key-legacy",
   "jwt", "bearer-token", "connection-string", "otpauth-uri", "generic-token",
 ];
 
@@ -89,7 +89,7 @@ export const STRUCTURAL_IDS = [
   "private-key", "jwt", "bearer-token", "connection-string", "otpauth-uri", "generic-token",
 ];
 export const GROUPS = {
-  ai: ["openai-token", "anthropic-token", "huggingface-token"],
+  ai: ["openai-token", "anthropic-token", "huggingface-token", "langsmith-api-key", "langfuse-secret-key"],
   cloud: [
     "aws-access-key", "vault-token", "cloudflare-token", "digitalocean-token", "supabase-token",
     "supabase-management-token", "vercel-token", "google-api-key", "microsoft-entra-client-secret", "datadog-api-key",

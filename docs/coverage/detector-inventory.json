@@ -458,6 +458,20 @@
       "schemes": null
     },
     {
+      "type": "langsmith_api_key",
+      "detector": "langsmith-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "lsv2_pt_0123456789abcdef0123456789abcdef_fedcba9876",
+      "schemes": null
+    },
+    {
+      "type": "langfuse_secret_key",
+      "detector": "langfuse-secret-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5d",
+      "schemes": null
+    },
+    {
       "type": "postman_api_key",
       "detector": "postman-api-key",
       "policyClass": "always-redact",

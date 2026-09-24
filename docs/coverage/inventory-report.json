@@ -2744,6 +2744,101 @@
       "type": "netlify_personal_access_token"
     },
     {
+      "detector": "langsmith-api-key",
+      "evidence": {
+        "fixtureCount": 32,
+        "hostContextsExercised": [
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "markdown",
+          "plain-text",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "langsmith-positive-dotenv",
+        "langsmith-positive-json",
+        "langsmith-positive-legacy-langchain-env",
+        "langsmith-positive-log",
+        "langsmith-positive-markdown-delimiter",
+        "langsmith-positive-nested-observability-metadata",
+        "langsmith-positive-otlp-headers",
+        "langsmith-positive-personal-access-token",
+        "langsmith-positive-punctuation-adjacent",
+        "langsmith-positive-repeated-value",
+        "langsmith-positive-service-key",
+        "langsmith-positive-shell-export",
+        "langsmith-positive-unicode-crlf",
+        "langsmith-positive-x-api-key-header",
+        "langsmith-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "langsmith_api_key"
+    },
+    {
+      "detector": "langfuse-secret-key",
+      "evidence": {
+        "fixtureCount": 30,
+        "hostContextsExercised": [
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "markdown",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "langfuse-positive-basic-auth-pair",
+        "langfuse-positive-dotenv",
+        "langfuse-positive-dotenv-pair",
+        "langfuse-positive-json",
+        "langfuse-positive-log",
+        "langfuse-positive-markdown-delimiter",
+        "langfuse-positive-otlp-headers",
+        "langfuse-positive-punctuation-adjacent",
+        "langfuse-positive-repeated-value",
+        "langfuse-positive-sdk-config",
+        "langfuse-positive-second-variant",
+        "langfuse-positive-secret-key",
+        "langfuse-positive-shell-export",
+        "langfuse-positive-unicode-crlf",
+        "langfuse-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "langfuse_secret_key"
+    },
+    {
       "detector": "postman-api-key",
       "evidence": {
         "fixtureCount": 23,
@@ -2871,7 +2966,7 @@
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 64,
+    "supported": 66,
     "unresolved": 0
   }
 }
