@@ -26,7 +26,14 @@ status change in the matrix reaches every surface without further editing:
                             `<!-- support-matrix:end -->` markers.
   --release-note            A Markdown fragment for the next release's
                             changelog entry: the status distribution and what
-                            moved since a previous pinned matrix (`--previous`).
+                            moved since a previous pinned matrix (`--previous`),
+                            but only when that matrix is a like-for-like
+                            baseline (see `baseline_problem`). Otherwise the
+                            fragment says the baseline is not comparable.
+
+`--check` also requires each committed `docs/releases/<version>/support-status.md`
+fragment to equal the `### Support status` section of that version's CHANGELOG
+entry (issue #724): the fragment is the source, the CHANGELOG copies it.
 
     python3 -B scripts/generate-support-matrix-docs.py --check
     python3 -B scripts/generate-support-matrix-docs.py
@@ -41,6 +48,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -49,6 +57,9 @@ MATRIX_PATH = ROOT / "benchmarks" / "support-matrix.json"
 SCHEMA_PATH = ROOT / "benchmarks" / "support-matrix-schema.json"
 DOC_PATH = ROOT / "docs" / "support-matrix.md"
 README_PATH = ROOT / "README.md"
+CHANGELOG_PATH = ROOT / "CHANGELOG.md"
+RELEASES_DIR = ROOT / "docs" / "releases"
+FRAGMENT_NAME = "support-status.md"
 
 README_START = "<!-- support-matrix:start -->"
 README_END = "<!-- support-matrix:end -->"
@@ -404,6 +415,28 @@ def _move_tag(old_status: str, new_status: str) -> str:
     return ""
 
 
+def baseline_problem(matrix: dict, previous: dict) -> str | None:
+    """Why `previous` is not a like-for-like baseline for `matrix`, or None.
+
+    Like-for-like means the previous release's *published package* measured
+    on the same corpus and scanner pins as `matrix`. Every measurement is
+    keyed to one `redact-secret-benchmarks` revision, so a different
+    `sourceReport.revision` is a different corpus/ledger/pin set, and a
+    `sourceReport.product` block marks a candidate-build measurement rather
+    than a published package. Either makes a status diff misleading (beta.6's
+    3 stable were measured under an earlier corpus and ledger; the same
+    package measured on beta.7's corpus is 43, #584)."""
+    if "product" in previous["sourceReport"]:
+        return "it measured a candidate build, not the published previous release"
+    old, new = previous["sourceReport"]["revision"], matrix["sourceReport"]["revision"]
+    if old != new:
+        return (
+            f"it was measured at benchmarks revision {old[:12]}, not the candidate's {new[:12]}, "
+            "so corpus and scanner pins differ"
+        )
+    return None
+
+
 def render_release_note(matrix: dict, previous: dict | None) -> str:
     """A fragment meant for the dated `CHANGELOG.md` entry (this repository's
     release notes; see docs/releasing.md), not `docs/releases/<version>/README.md`,
@@ -414,7 +447,7 @@ def render_release_note(matrix: dict, previous: dict | None) -> str:
         "",
         f"{matrix['providerCount']} providers, {matrix['familyCount']} credential families: "
         + ", ".join(f"{status} {distribution.get(status, 0)}" for status in STATUS_ORDER)
-        + ". See the [support matrix](docs/support-matrix.md).",
+        + ". See the [support matrix](/docs/support-matrix.md).",
         "",
         "Stable qualification: "
         + ", ".join(
@@ -429,6 +462,15 @@ def render_release_note(matrix: dict, previous: dict | None) -> str:
         lines.append("No previous pinned matrix was given to diff against.")
         return "\n".join(lines) + "\n"
 
+    problem = baseline_problem(matrix, previous)
+    if problem is not None:
+        lines.append("")
+        lines.append(
+            "The previous pinned matrix is not comparable, so no stable delta is stated: "
+            f"{problem}."
+        )
+        return "\n".join(lines) + "\n"
+
     previous_by_family = {f["family"]: f["status"] for f in previous["families"]}
     current_by_family = {f["family"]: f["status"] for f in matrix["families"]}
     moved = sorted(
@@ -441,6 +483,11 @@ def render_release_note(matrix: dict, previous: dict | None) -> str:
 
     previous_stable = previous["distribution"].get("stable", 0)
     current_stable = distribution.get("stable", 0)
+    lines.append("")
+    lines.append(
+        "Baseline: the previous release's published package measured on this corpus and "
+        f"scanner pins (benchmarks revision {matrix['sourceReport']['revision'][:12]})."
+    )
     lines.append("")
     lines.append(
         f"Stable: {current_stable} ({current_stable - previous_stable:+d} from {previous_stable})."
@@ -461,12 +508,47 @@ def render_release_note(matrix: dict, previous: dict | None) -> str:
     return "\n".join(lines) + "\n"
 
 
+def changelog_section(changelog: str, version: str) -> str | None:
+    """The `### Support status` block of `## <version>` in the CHANGELOG, as
+    text ending in one newline, or None when the version or block is absent."""
+    entry = re.search(rf"^## {re.escape(version)}(?: .*)?$", changelog, re.M)
+    if entry is None:
+        return None
+    rest = changelog[entry.end():]
+    next_entry = re.search(r"^## ", rest, re.M)
+    body = rest[: next_entry.start()] if next_entry else rest
+    heading = re.search(r"^### Support status$", body, re.M)
+    if heading is None:
+        return None
+    tail = body[heading.start():]
+    following = re.search(r"^### ", tail[len("### Support status"):], re.M)
+    block = tail[: len("### Support status") + following.start()] if following else tail
+    return block.rstrip("\n") + "\n"
+
+
+def check_changelog_fragments(changelog_path: Path, releases_dir: Path) -> list[str]:
+    changelog = changelog_path.read_text(encoding="utf-8")
+    problems = []
+    for fragment_path in sorted(releases_dir.glob(f"*/{FRAGMENT_NAME}")):
+        version = fragment_path.parent.name
+        actual = changelog_section(changelog, version)
+        if actual != fragment_path.read_text(encoding="utf-8"):
+            problems.append(
+                f"{changelog_path.name} `## {version}` support-status section differs from "
+                f"{fragment_path.relative_to(ROOT) if fragment_path.is_relative_to(ROOT) else fragment_path}; "
+                "the fragment is the source -- copy it into the CHANGELOG entry"
+            )
+    return problems
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[2] if __doc__ else "")
     parser.add_argument("--matrix", type=Path, default=MATRIX_PATH)
     parser.add_argument("--schema", type=Path, default=SCHEMA_PATH)
     parser.add_argument("--doc-out", type=Path, default=DOC_PATH)
     parser.add_argument("--readme", type=Path, default=README_PATH)
+    parser.add_argument("--changelog", type=Path, default=CHANGELOG_PATH)
+    parser.add_argument("--releases-dir", type=Path, default=RELEASES_DIR)
     parser.add_argument("--check", action="store_true", help="fail if docs/support-matrix.md or README.md are out of date; write nothing")
     parser.add_argument("--release-note", action="store_true", help="print the release-note fragment to stdout instead of writing docs")
     parser.add_argument("--previous", type=Path, default=None, help="a previous support-matrix.json to diff against, for --release-note")
@@ -503,6 +585,7 @@ def main(argv: list[str] | None = None) -> int:
                 f"{args.readme} support-status section is out of date; regenerate with "
                 "`python3 -B scripts/generate-support-matrix-docs.py`"
             )
+        problems.extend(check_changelog_fragments(args.changelog, args.releases_dir))
         for problem in problems:
             print(f"error: {problem}", file=sys.stderr)
         if problems:
