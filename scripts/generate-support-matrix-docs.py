@@ -173,7 +173,7 @@ def render_matrix_markdown(matrix: dict) -> str:
         "For the detailed measurement protocol behind these statuses -- evidence tiers, and "
         "the twin, benign, metamorphic, mutation, and differential criteria a family must clear "
         "-- see `redact-secret-benchmarks`'s "
-        f"[support-status specification](https://github.com/redact-secret/redact-secret-benchmarks/blob/{revision}/docs/support-status.md). "
+        f"[support-status specification](https://github.com/redact-secret/redact-secret-benchmarks/blob/{revision}/docs/specs/support-status.md). "
         "You do not need to read it to use this table.",
         "",
         "## What each status means",
