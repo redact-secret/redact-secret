@@ -9,6 +9,7 @@
 //! and the conformance corpus.
 
 mod additional_providers;
+mod ai_inference;
 mod anthropic;
 mod atlassian;
 mod aws;
@@ -114,6 +115,10 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(firebase::FirebaseServerKeyDetector),
         Box::new(terraform::TerraformCloudTokenDetector),
         Box::new(additional_providers::PULUMI),
+        Box::new(ai_inference::REPLICATE),
+        Box::new(ai_inference::GROQ),
+        Box::new(ai_inference::XAI),
+        Box::new(ai_inference::OPENROUTER),
         Box::new(databricks::DATABRICKS),
         Box::new(confluent::CONFLUENT_CLOUD_API_SECRET),
         Box::new(confluent::ConfluentLegacyApiSecretDetector),
@@ -216,6 +221,10 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("firebase-server-key", Pack::Provider),
     ("terraform-cloud-token", Pack::Provider),
     ("pulumi-access-token", Pack::Provider),
+    ("replicate-api-token", Pack::Provider),
+    ("groq-api-key", Pack::Provider),
+    ("xai-api-key", Pack::Provider),
+    ("openrouter-api-key", Pack::Provider),
     ("databricks-personal-access-token", Pack::Provider),
     ("confluent-cloud-api-secret", Pack::Provider),
     ("confluent-cloud-api-secret-legacy", Pack::Provider),
@@ -307,6 +316,10 @@ mod tests {
                 "firebase-server-key",
                 "terraform-cloud-token",
                 "pulumi-access-token",
+                "replicate-api-token",
+                "groq-api-key",
+                "xai-api-key",
+                "openrouter-api-key",
                 "databricks-personal-access-token",
                 "confluent-cloud-api-secret",
                 "confluent-cloud-api-secret-legacy",
@@ -612,6 +625,13 @@ mod tests {
             "SYNTHETIC0REVOKED0HerokuOAuthAccessTokenBodyFixture0123456"
         );
         let heroku_api_key_legacy_input = "heroku 01234567-89ab-cdef-0123-456789abcdef";
+        let replicate_api_token_input = format!("r8_{}", "SYNTHETIC_REVOKED-REPLICATE-TOKEN-001");
+        let groq_api_key_input = format!(
+            "gsk_{}",
+            "SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001"
+        );
+        let xai_api_key_input = format!("xai-{}", "0123456789".repeat(8));
+        let openrouter_api_key_input = format!("sk-or-v1-{}", "0123456789abcdef".repeat(4));
         let cases = [
             (
                 "sentry-user-auth-token",
@@ -640,6 +660,10 @@ mod tests {
                 terraform_cloud_token_input.as_str(),
             ),
             ("pulumi-access-token", pulumi_access_token_input.as_str()),
+            ("replicate-api-token", replicate_api_token_input.as_str()),
+            ("groq-api-key", groq_api_key_input.as_str()),
+            ("xai-api-key", xai_api_key_input.as_str()),
+            ("openrouter-api-key", openrouter_api_key_input.as_str()),
             (
                 "databricks-personal-access-token",
                 databricks_personal_access_token_input.as_str(),

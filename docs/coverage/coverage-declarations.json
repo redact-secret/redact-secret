@@ -6548,6 +6548,394 @@
     },
     {
       "behaviorClass": "provider",
+      "detector": "replicate-api-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "replicate-api-token-positive-bare",
+            "replicate-api-token-positive-crlf-unicode-prefix",
+            "replicate-api-token-positive-dotenv",
+            "replicate-api-token-positive-github-actions",
+            "replicate-api-token-positive-json-config",
+            "replicate-api-token-positive-log",
+            "replicate-api-token-positive-punctuation-adjacent",
+            "replicate-api-token-positive-repeated-value",
+            "replicate-api-token-positive-shell-quoted"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "replicate-api-token-overlap-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "replicate-api-token-adversarial-long-suffix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "replicate-api-token-boundary-encoded-prefix",
+            "replicate-api-token-boundary-invalid-alphabet",
+            "replicate-api-token-boundary-one-long",
+            "replicate-api-token-boundary-one-short",
+            "replicate-api-token-boundary-wrong-separator"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "replicate-api-token-negative-embedded-in-wider-identifier",
+            "replicate-api-token-negative-github-actions-secret-reference",
+            "replicate-api-token-negative-masked",
+            "replicate-api-token-negative-model-reference",
+            "replicate-api-token-negative-prefix-in-prose",
+            "replicate-api-token-negative-public-registry-path"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "replicate-api-token-boundary-encoded-prefix",
+            "replicate-api-token-boundary-invalid-alphabet",
+            "replicate-api-token-boundary-one-long",
+            "replicate-api-token-boundary-one-short",
+            "replicate-api-token-boundary-wrong-separator"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for replicate_api_token (replicate-api-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "replicate_api_token"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "groq-api-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "groq-api-key-positive-bare",
+            "groq-api-key-positive-crlf-unicode-prefix",
+            "groq-api-key-positive-dotenv",
+            "groq-api-key-positive-github-actions",
+            "groq-api-key-positive-json-config",
+            "groq-api-key-positive-log",
+            "groq-api-key-positive-punctuation-adjacent",
+            "groq-api-key-positive-repeated-value",
+            "groq-api-key-positive-shell-quoted"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "groq-api-key-overlap-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "groq-api-key-adversarial-long-suffix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "groq-api-key-boundary-encoded-prefix",
+            "groq-api-key-boundary-invalid-alphabet",
+            "groq-api-key-boundary-one-long",
+            "groq-api-key-boundary-one-short",
+            "groq-api-key-boundary-wrong-separator"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "groq-api-key-negative-embedded-in-wider-identifier",
+            "groq-api-key-negative-github-actions-secret-reference",
+            "groq-api-key-negative-masked",
+            "groq-api-key-negative-model-identifier",
+            "groq-api-key-negative-prefix-in-prose",
+            "groq-api-key-negative-underscore-body"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "groq-api-key-boundary-encoded-prefix",
+            "groq-api-key-boundary-invalid-alphabet",
+            "groq-api-key-boundary-one-long",
+            "groq-api-key-boundary-one-short",
+            "groq-api-key-boundary-wrong-separator"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for groq_api_key (groq-api-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "groq_api_key"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "xai-api-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "xai-api-key-positive-bare",
+            "xai-api-key-positive-crlf-unicode-prefix",
+            "xai-api-key-positive-dotenv",
+            "xai-api-key-positive-github-actions",
+            "xai-api-key-positive-json-config",
+            "xai-api-key-positive-log",
+            "xai-api-key-positive-punctuation-adjacent",
+            "xai-api-key-positive-repeated-value",
+            "xai-api-key-positive-shell-quoted"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "xai-api-key-overlap-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "xai-api-key-adversarial-long-suffix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "xai-api-key-boundary-encoded-prefix",
+            "xai-api-key-boundary-invalid-alphabet",
+            "xai-api-key-boundary-one-long",
+            "xai-api-key-boundary-one-short",
+            "xai-api-key-boundary-wrong-separator"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "xai-api-key-negative-embedded-in-wider-identifier",
+            "xai-api-key-negative-github-actions-secret-reference",
+            "xai-api-key-negative-masked",
+            "xai-api-key-negative-model-identifier",
+            "xai-api-key-negative-package-name",
+            "xai-api-key-negative-prefix-in-prose"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "xai-api-key-boundary-encoded-prefix",
+            "xai-api-key-boundary-invalid-alphabet",
+            "xai-api-key-boundary-one-long",
+            "xai-api-key-boundary-one-short",
+            "xai-api-key-boundary-wrong-separator"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for xai_api_key (xai-api-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "xai_api_key"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "openrouter-api-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "openrouter-api-key-positive-bare",
+            "openrouter-api-key-positive-crlf-unicode-prefix",
+            "openrouter-api-key-positive-dotenv",
+            "openrouter-api-key-positive-github-actions",
+            "openrouter-api-key-positive-json-config",
+            "openrouter-api-key-positive-log",
+            "openrouter-api-key-positive-punctuation-adjacent",
+            "openrouter-api-key-positive-repeated-value",
+            "openrouter-api-key-positive-shell-quoted"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "openrouter-api-key-overlap-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "openrouter-api-key-adversarial-long-suffix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "openrouter-api-key-boundary-encoded-prefix",
+            "openrouter-api-key-boundary-invalid-alphabet",
+            "openrouter-api-key-boundary-one-long",
+            "openrouter-api-key-boundary-one-short",
+            "openrouter-api-key-boundary-wrong-separator"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "openrouter-api-key-negative-embedded-in-wider-identifier",
+            "openrouter-api-key-negative-github-actions-secret-reference",
+            "openrouter-api-key-negative-management-key-prefix",
+            "openrouter-api-key-negative-masked",
+            "openrouter-api-key-negative-model-identifier",
+            "openrouter-api-key-negative-prefix-in-prose"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "openrouter-api-key-boundary-encoded-prefix",
+            "openrouter-api-key-boundary-invalid-alphabet",
+            "openrouter-api-key-boundary-one-long",
+            "openrouter-api-key-boundary-one-short",
+            "openrouter-api-key-boundary-wrong-separator"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for openrouter_api_key (openrouter-api-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "openrouter_api_key"
+    },
+    {
+      "behaviorClass": "provider",
       "detector": "databricks-personal-access-token",
       "dimensions": [
         {
@@ -7377,6 +7765,7 @@
             "google-adversarial-long-suffix",
             "grafana-cloud-access-policy-token-adversarial-long-suffix",
             "grafana-service-account-token-adversarial-near-miss-body",
+            "groq-api-key-adversarial-long-suffix",
             "heroku-api-key-adversarial-long-suffix",
             "heroku-api-key-legacy-adversarial-dense-findings",
             "huggingface-adversarial-long-suffix",
@@ -7404,6 +7793,7 @@
             "okta-api-token-adversarial-dense-findings",
             "openai-adversarial-long-suffix",
             "openai-adversarial-marker-prefix-flood",
+            "openrouter-api-key-adversarial-long-suffix",
             "otpauth-adversarial-overlong-query",
             "postman-api-key-adversarial-long-suffix",
             "private-key-adversarial-incomplete",
@@ -7411,6 +7801,7 @@
             "private-key-adversarial-nested",
             "pulumi-access-token-adversarial-long-suffix",
             "pypi-adversarial-long-suffix",
+            "replicate-api-token-adversarial-long-suffix",
             "sendgrid-adversarial-incomplete-suffix",
             "sentry-org-auth-token-adversarial-long-run",
             "sentry-user-auth-token-adversarial-long-run",
@@ -7424,7 +7815,8 @@
             "twilio-api-key-secret-adversarial-dense-findings",
             "twilio-auth-token-adversarial-dense-findings",
             "vault-adversarial-long-suffix",
-            "vercel-adversarial-long-suffix"
+            "vercel-adversarial-long-suffix",
+            "xai-api-key-adversarial-long-suffix"
           ],
           "state": "supported"
         }
@@ -7784,6 +8176,7 @@
             "google-adversarial-long-suffix",
             "grafana-cloud-access-policy-token-adversarial-long-suffix",
             "grafana-service-account-token-adversarial-near-miss-body",
+            "groq-api-key-adversarial-long-suffix",
             "heroku-api-key-adversarial-long-suffix",
             "heroku-api-key-legacy-adversarial-dense-findings",
             "huggingface-adversarial-long-suffix",
@@ -7811,6 +8204,7 @@
             "okta-api-token-adversarial-dense-findings",
             "openai-adversarial-long-suffix",
             "openai-adversarial-marker-prefix-flood",
+            "openrouter-api-key-adversarial-long-suffix",
             "otpauth-adversarial-overlong-query",
             "postman-api-key-adversarial-long-suffix",
             "private-key-adversarial-incomplete",
@@ -7818,6 +8212,7 @@
             "private-key-adversarial-nested",
             "pulumi-access-token-adversarial-long-suffix",
             "pypi-adversarial-long-suffix",
+            "replicate-api-token-adversarial-long-suffix",
             "sendgrid-adversarial-incomplete-suffix",
             "sentry-org-auth-token-adversarial-long-run",
             "sentry-user-auth-token-adversarial-long-run",
@@ -7831,7 +8226,8 @@
             "twilio-api-key-secret-adversarial-dense-findings",
             "twilio-auth-token-adversarial-dense-findings",
             "vault-adversarial-long-suffix",
-            "vercel-adversarial-long-suffix"
+            "vercel-adversarial-long-suffix",
+            "xai-api-key-adversarial-long-suffix"
           ],
           "state": "supported"
         }

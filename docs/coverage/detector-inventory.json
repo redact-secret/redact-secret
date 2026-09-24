@@ -444,6 +444,34 @@
       "schemes": null
     },
     {
+      "type": "replicate_api_token",
+      "detector": "replicate-api-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001",
+      "schemes": null
+    },
+    {
+      "type": "groq_api_key",
+      "detector": "groq-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001",
+      "schemes": null
+    },
+    {
+      "type": "xai_api_key",
+      "detector": "xai-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001",
+      "schemes": null
+    },
+    {
+      "type": "openrouter_api_key",
+      "detector": "openrouter-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "sk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      "schemes": null
+    },
+    {
       "type": "databricks_personal_access_token",
       "detector": "databricks-personal-access-token",
       "policyClass": "always-redact",

@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 1729,
+  "fixtureCount": 1817,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -41672,6 +41672,1562 @@
         }
       ],
       "note": "A long line packing many heroku-context-qualified UUID candidates stays linear in input length and reports every independent occurrence."
+    },
+    {
+      "id": "replicate-api-token-positive-bare",
+      "detector": "replicate-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001",
+      "expected": [
+        {
+          "detector": "replicate-api-token",
+          "type": "replicate_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 40
+        }
+      ],
+      "note": "The frozen r8_ plus exactly 37 bytes from [A-Za-z0-9_-] is sufficient on its own; no surrounding context is required."
+    },
+    {
+      "id": "replicate-api-token-positive-dotenv",
+      "detector": "replicate-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "REPLICATE_API_TOKEN=r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001",
+      "expected": [
+        {
+          "detector": "replicate-api-token",
+          "type": "replicate_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 20,
+          "end": 60
+        }
+      ],
+      "note": "A named dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "replicate-api-token-positive-json-config",
+      "detector": "replicate-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\n  \"provider\": {\n    \"apiKey\": \"r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001\"\n  }\n}\n",
+      "expected": [
+        {
+          "detector": "replicate-api-token",
+          "type": "replicate_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 33,
+          "end": 73
+        }
+      ],
+      "note": "A structured configuration value is reported at exactly the value."
+    },
+    {
+      "id": "replicate-api-token-positive-github-actions",
+      "detector": "replicate-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "github-actions"
+      ],
+      "input": "env:\n  REPLICATE_API_TOKEN: r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001\n",
+      "expected": [
+        {
+          "detector": "replicate-api-token",
+          "type": "replicate_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 28,
+          "end": 68
+        }
+      ],
+      "note": "A workflow env value is reported at exactly the value."
+    },
+    {
+      "id": "replicate-api-token-positive-log",
+      "detector": "replicate-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-24T12:00:00Z INFO  calling inference API with key r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001 for request\n",
+      "expected": [
+        {
+          "detector": "replicate-api-token",
+          "type": "replicate_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 58,
+          "end": 98
+        }
+      ],
+      "note": "A log line embedding the value is reported at exactly the value."
+    },
+    {
+      "id": "replicate-api-token-positive-shell-quoted",
+      "detector": "replicate-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export REPLICATE_API_TOKEN=\"r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001\"\n",
+      "expected": [
+        {
+          "detector": "replicate-api-token",
+          "type": "replicate_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 28,
+          "end": 68
+        }
+      ],
+      "note": "A quoted shell export excludes the quotes from the span."
+    },
+    {
+      "id": "replicate-api-token-positive-punctuation-adjacent",
+      "detector": "replicate-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "(r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001).",
+      "expected": [
+        {
+          "detector": "replicate-api-token",
+          "type": "replicate_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1,
+          "end": 41
+        }
+      ],
+      "note": "Adjacent punctuation stays outside the span."
+    },
+    {
+      "id": "replicate-api-token-positive-crlf-unicode-prefix",
+      "detector": "replicate-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 reviewed format\r\nr8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001\n\r\n",
+      "expected": [
+        {
+          "detector": "replicate-api-token",
+          "type": "replicate_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 24,
+          "end": 64
+        }
+      ],
+      "note": "CRLF and astral characters before the value keep the byte range exact."
+    },
+    {
+      "id": "replicate-api-token-positive-repeated-value",
+      "detector": "replicate-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001 r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001",
+      "expected": [
+        {
+          "detector": "replicate-api-token",
+          "type": "replicate_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 40
+        },
+        {
+          "detector": "replicate-api-token",
+          "type": "replicate_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 41,
+          "end": 81
+        }
+      ],
+      "note": "Each independent occurrence of a repeated value is reported."
+    },
+    {
+      "id": "replicate-api-token-boundary-one-short",
+      "detector": "replicate-api-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-00",
+      "expected": [],
+      "note": "A body one byte short of the frozen exact width is an intentional false negative, not a fuzzy match against a minimum."
+    },
+    {
+      "id": "replicate-api-token-boundary-one-long",
+      "detector": "replicate-api-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-0010",
+      "expected": [],
+      "note": "A body one byte past the frozen exact width is a wider identifier and stays unreported."
+    },
+    {
+      "id": "replicate-api-token-boundary-invalid-alphabet",
+      "detector": "replicate-api-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "r8_SYN+HETIC_REVOKED-REPLICATE-TOKEN-001",
+      "expected": [],
+      "note": "A byte outside the frozen body alphabet breaks the exact-width run, so nothing is reported."
+    },
+    {
+      "id": "replicate-api-token-boundary-wrong-separator",
+      "detector": "replicate-api-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "r8-SYNTHETIC_REVOKED-REPLICATE-TOKEN-001",
+      "expected": [],
+      "note": "A different separator in the prefix is not the frozen prefix."
+    },
+    {
+      "id": "replicate-api-token-boundary-encoded-prefix",
+      "detector": "replicate-api-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "r8%5FSYNTHETIC_REVOKED-REPLICATE-TOKEN-001",
+      "expected": [],
+      "note": "A percent-encoded delimiter lookalike is not the frozen prefix."
+    },
+    {
+      "id": "replicate-api-token-negative-embedded-in-wider-identifier",
+      "detector": "replicate-api-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "legacyr8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001",
+      "expected": [],
+      "note": "The prefix embedded inside a wider identifier is not boundary-delimited."
+    },
+    {
+      "id": "replicate-api-token-negative-masked",
+      "detector": "replicate-api-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "r8_*************************************",
+      "expected": [],
+      "note": "A masked value of the correct width carries no valid body bytes."
+    },
+    {
+      "id": "replicate-api-token-negative-public-registry-path",
+      "detector": "replicate-api-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "docker pull r8.im/acme/example-model@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\n",
+      "expected": [],
+      "note": "A public r8.im registry path carries no r8_ credential prefix."
+    },
+    {
+      "id": "replicate-api-token-negative-prefix-in-prose",
+      "detector": "replicate-api-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "markdown"
+      ],
+      "input": "Replicate API tokens begin with r8_ followed by a long opaque value.\n",
+      "expected": [],
+      "note": "A prose mention of the prefix has no exact-width body."
+    },
+    {
+      "id": "replicate-api-token-negative-model-reference",
+      "detector": "replicate-api-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "python"
+      ],
+      "input": "output = replicate.run(\"acme/example-model:0123456789abcdef\")\n",
+      "expected": [],
+      "note": "A model reference is public and carries no r8_ prefix."
+    },
+    {
+      "id": "replicate-api-token-negative-github-actions-secret-reference",
+      "detector": "replicate-api-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "github-actions"
+      ],
+      "input": "env:\n  REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}\n",
+      "expected": [],
+      "note": "A GitHub Actions secret reference names the secret and carries no value."
+    },
+    {
+      "id": "replicate-api-token-overlap-context",
+      "detector": "replicate-api-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "access_token=r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001",
+      "expected": [
+        {
+          "detector": "replicate-api-token",
+          "type": "replicate_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 53
+        }
+      ],
+      "note": "Qualified provider evidence wins over a contextual assignment."
+    },
+    {
+      "id": "replicate-api-token-adversarial-long-suffix",
+      "detector": "replicate-api-token",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 12000,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      },
+      "input": "r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001",
+      "expected": [],
+      "note": "A long run built from the value repeated is a wider identifier, not a token: the exact-width contract never carves a valid-looking substring out of it, and the scan stays linear and bounded."
+    },
+    {
+      "id": "groq-api-key-positive-bare",
+      "detector": "groq-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001",
+      "expected": [
+        {
+          "detector": "groq-api-key",
+          "type": "groq_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 56
+        }
+      ],
+      "note": "The frozen gsk_ plus exactly 52 alphanumeric bytes is sufficient on its own; no surrounding context is required."
+    },
+    {
+      "id": "groq-api-key-positive-dotenv",
+      "detector": "groq-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "GROQ_API_KEY=gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001",
+      "expected": [
+        {
+          "detector": "groq-api-key",
+          "type": "groq_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 69
+        }
+      ],
+      "note": "A named dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "groq-api-key-positive-json-config",
+      "detector": "groq-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\n  \"provider\": {\n    \"apiKey\": \"gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001\"\n  }\n}\n",
+      "expected": [
+        {
+          "detector": "groq-api-key",
+          "type": "groq_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 33,
+          "end": 89
+        }
+      ],
+      "note": "A structured configuration value is reported at exactly the value."
+    },
+    {
+      "id": "groq-api-key-positive-github-actions",
+      "detector": "groq-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "github-actions"
+      ],
+      "input": "env:\n  GROQ_API_KEY: gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001\n",
+      "expected": [
+        {
+          "detector": "groq-api-key",
+          "type": "groq_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 21,
+          "end": 77
+        }
+      ],
+      "note": "A workflow env value is reported at exactly the value."
+    },
+    {
+      "id": "groq-api-key-positive-log",
+      "detector": "groq-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-24T12:00:00Z INFO  calling inference API with key gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001 for request\n",
+      "expected": [
+        {
+          "detector": "groq-api-key",
+          "type": "groq_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 58,
+          "end": 114
+        }
+      ],
+      "note": "A log line embedding the value is reported at exactly the value."
+    },
+    {
+      "id": "groq-api-key-positive-shell-quoted",
+      "detector": "groq-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export GROQ_API_KEY=\"gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001\"\n",
+      "expected": [
+        {
+          "detector": "groq-api-key",
+          "type": "groq_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 21,
+          "end": 77
+        }
+      ],
+      "note": "A quoted shell export excludes the quotes from the span."
+    },
+    {
+      "id": "groq-api-key-positive-punctuation-adjacent",
+      "detector": "groq-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "(gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001).",
+      "expected": [
+        {
+          "detector": "groq-api-key",
+          "type": "groq_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1,
+          "end": 57
+        }
+      ],
+      "note": "Adjacent punctuation stays outside the span."
+    },
+    {
+      "id": "groq-api-key-positive-crlf-unicode-prefix",
+      "detector": "groq-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 reviewed format\r\ngsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001\n\r\n",
+      "expected": [
+        {
+          "detector": "groq-api-key",
+          "type": "groq_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 24,
+          "end": 80
+        }
+      ],
+      "note": "CRLF and astral characters before the value keep the byte range exact."
+    },
+    {
+      "id": "groq-api-key-positive-repeated-value",
+      "detector": "groq-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001 gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001",
+      "expected": [
+        {
+          "detector": "groq-api-key",
+          "type": "groq_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 56
+        },
+        {
+          "detector": "groq-api-key",
+          "type": "groq_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 57,
+          "end": 113
+        }
+      ],
+      "note": "Each independent occurrence of a repeated value is reported."
+    },
+    {
+      "id": "groq-api-key-boundary-one-short",
+      "detector": "groq-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE00000000000000000000",
+      "expected": [],
+      "note": "A body one byte short of the frozen exact width is an intentional false negative, not a fuzzy match against a minimum."
+    },
+    {
+      "id": "groq-api-key-boundary-one-long",
+      "detector": "groq-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE0000000000000000000010",
+      "expected": [],
+      "note": "A body one byte past the frozen exact width is a wider identifier and stays unreported."
+    },
+    {
+      "id": "groq-api-key-boundary-invalid-alphabet",
+      "detector": "groq-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "gsk_SYN-HETICREVOKEDGROQAPIKEYVALUE000000000000000000001",
+      "expected": [],
+      "note": "A byte outside the frozen body alphabet breaks the exact-width run, so nothing is reported."
+    },
+    {
+      "id": "groq-api-key-boundary-wrong-separator",
+      "detector": "groq-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "gsk-SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001",
+      "expected": [],
+      "note": "A different separator in the prefix is not the frozen prefix."
+    },
+    {
+      "id": "groq-api-key-boundary-encoded-prefix",
+      "detector": "groq-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "gsk%5FSYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001",
+      "expected": [],
+      "note": "A percent-encoded delimiter lookalike is not the frozen prefix."
+    },
+    {
+      "id": "groq-api-key-negative-embedded-in-wider-identifier",
+      "detector": "groq-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "legacygsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001",
+      "expected": [],
+      "note": "The prefix embedded inside a wider identifier is not boundary-delimited."
+    },
+    {
+      "id": "groq-api-key-negative-masked",
+      "detector": "groq-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "gsk_****************************************************",
+      "expected": [],
+      "note": "A masked value of the correct width carries no valid body bytes."
+    },
+    {
+      "id": "groq-api-key-negative-model-identifier",
+      "detector": "groq-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"model\": \"llama-3.3-70b-versatile\", \"temperature\": 0.2}\n",
+      "expected": [],
+      "note": "A public model identifier is not a gsk_ credential."
+    },
+    {
+      "id": "groq-api-key-negative-prefix-in-prose",
+      "detector": "groq-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "markdown"
+      ],
+      "input": "Groq keys begin with gsk_ followed by an opaque value.\n",
+      "expected": [],
+      "note": "A prose mention of the prefix has no exact-width body."
+    },
+    {
+      "id": "groq-api-key-negative-underscore-body",
+      "detector": "groq-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "gsk_this_is_a_snake_case_helper_name_and_not_a_key\n",
+      "expected": [],
+      "note": "A snake-case identifier starting with gsk_ contains underscores, which the frozen alphanumeric body excludes."
+    },
+    {
+      "id": "groq-api-key-negative-github-actions-secret-reference",
+      "detector": "groq-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "github-actions"
+      ],
+      "input": "env:\n  GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}\n",
+      "expected": [],
+      "note": "A GitHub Actions secret reference names the secret and carries no value."
+    },
+    {
+      "id": "groq-api-key-overlap-context",
+      "detector": "groq-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "access_token=gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001",
+      "expected": [
+        {
+          "detector": "groq-api-key",
+          "type": "groq_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 69
+        }
+      ],
+      "note": "Qualified provider evidence wins over a contextual assignment."
+    },
+    {
+      "id": "groq-api-key-adversarial-long-suffix",
+      "detector": "groq-api-key",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 12000,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      },
+      "input": "gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001gsk_SYNTHETICREV",
+      "expected": [],
+      "note": "A long run built from the value repeated is a wider identifier, not a token: the exact-width contract never carves a valid-looking substring out of it, and the scan stays linear and bounded."
+    },
+    {
+      "id": "xai-api-key-positive-bare",
+      "detector": "xai-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001",
+      "expected": [
+        {
+          "detector": "xai-api-key",
+          "type": "xai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 84
+        }
+      ],
+      "note": "The frozen xai- plus exactly 80 bytes from [A-Za-z0-9_-] is sufficient on its own; no surrounding context is required."
+    },
+    {
+      "id": "xai-api-key-positive-dotenv",
+      "detector": "xai-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "XAI_API_KEY=xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001",
+      "expected": [
+        {
+          "detector": "xai-api-key",
+          "type": "xai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 12,
+          "end": 96
+        }
+      ],
+      "note": "A named dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "xai-api-key-positive-json-config",
+      "detector": "xai-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\n  \"provider\": {\n    \"apiKey\": \"xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001\"\n  }\n}\n",
+      "expected": [
+        {
+          "detector": "xai-api-key",
+          "type": "xai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 33,
+          "end": 117
+        }
+      ],
+      "note": "A structured configuration value is reported at exactly the value."
+    },
+    {
+      "id": "xai-api-key-positive-github-actions",
+      "detector": "xai-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "github-actions"
+      ],
+      "input": "env:\n  XAI_API_KEY: xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001\n",
+      "expected": [
+        {
+          "detector": "xai-api-key",
+          "type": "xai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 20,
+          "end": 104
+        }
+      ],
+      "note": "A workflow env value is reported at exactly the value."
+    },
+    {
+      "id": "xai-api-key-positive-log",
+      "detector": "xai-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-24T12:00:00Z INFO  calling inference API with key xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001 for request\n",
+      "expected": [
+        {
+          "detector": "xai-api-key",
+          "type": "xai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 58,
+          "end": 142
+        }
+      ],
+      "note": "A log line embedding the value is reported at exactly the value."
+    },
+    {
+      "id": "xai-api-key-positive-shell-quoted",
+      "detector": "xai-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export XAI_API_KEY=\"xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001\"\n",
+      "expected": [
+        {
+          "detector": "xai-api-key",
+          "type": "xai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 20,
+          "end": 104
+        }
+      ],
+      "note": "A quoted shell export excludes the quotes from the span."
+    },
+    {
+      "id": "xai-api-key-positive-punctuation-adjacent",
+      "detector": "xai-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "(xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001).",
+      "expected": [
+        {
+          "detector": "xai-api-key",
+          "type": "xai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1,
+          "end": 85
+        }
+      ],
+      "note": "Adjacent punctuation stays outside the span."
+    },
+    {
+      "id": "xai-api-key-positive-crlf-unicode-prefix",
+      "detector": "xai-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 reviewed format\r\nxai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001\n\r\n",
+      "expected": [
+        {
+          "detector": "xai-api-key",
+          "type": "xai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 24,
+          "end": 108
+        }
+      ],
+      "note": "CRLF and astral characters before the value keep the byte range exact."
+    },
+    {
+      "id": "xai-api-key-positive-repeated-value",
+      "detector": "xai-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001 xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001",
+      "expected": [
+        {
+          "detector": "xai-api-key",
+          "type": "xai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 84
+        },
+        {
+          "detector": "xai-api-key",
+          "type": "xai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 85,
+          "end": 169
+        }
+      ],
+      "note": "Each independent occurrence of a repeated value is reported."
+    },
+    {
+      "id": "xai-api-key-boundary-one-short",
+      "detector": "xai-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-0000000000000000000000000000000000000000000",
+      "expected": [],
+      "note": "A body one byte short of the frozen exact width is an intentional false negative, not a fuzzy match against a minimum."
+    },
+    {
+      "id": "xai-api-key-boundary-one-long",
+      "detector": "xai-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-000000000000000000000000000000000000000000010",
+      "expected": [],
+      "note": "A body one byte past the frozen exact width is a wider identifier and stays unreported."
+    },
+    {
+      "id": "xai-api-key-boundary-invalid-alphabet",
+      "detector": "xai-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xai-SYN+HETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001",
+      "expected": [],
+      "note": "A byte outside the frozen body alphabet breaks the exact-width run, so nothing is reported."
+    },
+    {
+      "id": "xai-api-key-boundary-wrong-separator",
+      "detector": "xai-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xai_SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001",
+      "expected": [],
+      "note": "A different separator in the prefix is not the frozen prefix."
+    },
+    {
+      "id": "xai-api-key-boundary-encoded-prefix",
+      "detector": "xai-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xai%2DSYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001",
+      "expected": [],
+      "note": "A percent-encoded delimiter lookalike is not the frozen prefix."
+    },
+    {
+      "id": "xai-api-key-negative-embedded-in-wider-identifier",
+      "detector": "xai-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "legacyxai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001",
+      "expected": [],
+      "note": "The prefix embedded inside a wider identifier is not boundary-delimited."
+    },
+    {
+      "id": "xai-api-key-negative-masked",
+      "detector": "xai-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xai-********************************************************************************",
+      "expected": [],
+      "note": "A masked value of the correct width carries no valid body bytes."
+    },
+    {
+      "id": "xai-api-key-negative-model-identifier",
+      "detector": "xai-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"model\": \"grok-4-fast-reasoning\", \"base_url\": \"https://api.x.ai/v1\"}\n",
+      "expected": [],
+      "note": "A public model identifier and host are not an xai- credential."
+    },
+    {
+      "id": "xai-api-key-negative-prefix-in-prose",
+      "detector": "xai-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "markdown"
+      ],
+      "input": "xAI keys begin with xai- followed by a long opaque value.\n",
+      "expected": [],
+      "note": "A prose mention of the prefix has no exact-width body."
+    },
+    {
+      "id": "xai-api-key-negative-package-name",
+      "detector": "xai-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"dependencies\": {\"@ai-sdk/xai\": \"^1.0.0\"}}\n",
+      "expected": [],
+      "note": "A package name is not an xai- credential."
+    },
+    {
+      "id": "xai-api-key-negative-github-actions-secret-reference",
+      "detector": "xai-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "github-actions"
+      ],
+      "input": "env:\n  XAI_API_KEY: ${{ secrets.XAI_API_KEY }}\n",
+      "expected": [],
+      "note": "A GitHub Actions secret reference names the secret and carries no value."
+    },
+    {
+      "id": "xai-api-key-overlap-context",
+      "detector": "xai-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "access_token=xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001",
+      "expected": [
+        {
+          "detector": "xai-api-key",
+          "type": "xai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 97
+        }
+      ],
+      "note": "Qualified provider evidence wins over a contextual assignment."
+    },
+    {
+      "id": "xai-api-key-adversarial-long-suffix",
+      "detector": "xai-api-key",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 12000,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      },
+      "input": "xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000",
+      "expected": [],
+      "note": "A long run built from the value repeated is a wider identifier, not a token: the exact-width contract never carves a valid-looking substring out of it, and the scan stays linear and bounded."
+    },
+    {
+      "id": "openrouter-api-key-positive-bare",
+      "detector": "openrouter-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      "expected": [
+        {
+          "detector": "openrouter-api-key",
+          "type": "openrouter_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 73
+        }
+      ],
+      "note": "The frozen sk-or-v1- plus exactly 64 lowercase hexadecimal bytes is sufficient on its own; no surrounding context is required."
+    },
+    {
+      "id": "openrouter-api-key-positive-dotenv",
+      "detector": "openrouter-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "OPENROUTER_API_KEY=sk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      "expected": [
+        {
+          "detector": "openrouter-api-key",
+          "type": "openrouter_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 19,
+          "end": 92
+        }
+      ],
+      "note": "A named dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "openrouter-api-key-positive-json-config",
+      "detector": "openrouter-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\n  \"provider\": {\n    \"apiKey\": \"sk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\"\n  }\n}\n",
+      "expected": [
+        {
+          "detector": "openrouter-api-key",
+          "type": "openrouter_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 33,
+          "end": 106
+        }
+      ],
+      "note": "A structured configuration value is reported at exactly the value."
+    },
+    {
+      "id": "openrouter-api-key-positive-github-actions",
+      "detector": "openrouter-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "github-actions"
+      ],
+      "input": "env:\n  OPENROUTER_API_KEY: sk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\n",
+      "expected": [
+        {
+          "detector": "openrouter-api-key",
+          "type": "openrouter_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 27,
+          "end": 100
+        }
+      ],
+      "note": "A workflow env value is reported at exactly the value."
+    },
+    {
+      "id": "openrouter-api-key-positive-log",
+      "detector": "openrouter-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-24T12:00:00Z INFO  calling inference API with key sk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef for request\n",
+      "expected": [
+        {
+          "detector": "openrouter-api-key",
+          "type": "openrouter_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 58,
+          "end": 131
+        }
+      ],
+      "note": "A log line embedding the value is reported at exactly the value."
+    },
+    {
+      "id": "openrouter-api-key-positive-shell-quoted",
+      "detector": "openrouter-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export OPENROUTER_API_KEY=\"sk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\"\n",
+      "expected": [
+        {
+          "detector": "openrouter-api-key",
+          "type": "openrouter_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 27,
+          "end": 100
+        }
+      ],
+      "note": "A quoted shell export excludes the quotes from the span."
+    },
+    {
+      "id": "openrouter-api-key-positive-punctuation-adjacent",
+      "detector": "openrouter-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "(sk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef).",
+      "expected": [
+        {
+          "detector": "openrouter-api-key",
+          "type": "openrouter_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1,
+          "end": 74
+        }
+      ],
+      "note": "Adjacent punctuation stays outside the span."
+    },
+    {
+      "id": "openrouter-api-key-positive-crlf-unicode-prefix",
+      "detector": "openrouter-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 reviewed format\r\nsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\n\r\n",
+      "expected": [
+        {
+          "detector": "openrouter-api-key",
+          "type": "openrouter_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 24,
+          "end": 97
+        }
+      ],
+      "note": "CRLF and astral characters before the value keep the byte range exact."
+    },
+    {
+      "id": "openrouter-api-key-positive-repeated-value",
+      "detector": "openrouter-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef sk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      "expected": [
+        {
+          "detector": "openrouter-api-key",
+          "type": "openrouter_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 73
+        },
+        {
+          "detector": "openrouter-api-key",
+          "type": "openrouter_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 74,
+          "end": 147
+        }
+      ],
+      "note": "Each independent occurrence of a repeated value is reported."
+    },
+    {
+      "id": "openrouter-api-key-boundary-one-short",
+      "detector": "openrouter-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcde",
+      "expected": [],
+      "note": "A body one byte short of the frozen exact width is an intentional false negative, not a fuzzy match against a minimum."
+    },
+    {
+      "id": "openrouter-api-key-boundary-one-long",
+      "detector": "openrouter-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0",
+      "expected": [],
+      "note": "A body one byte past the frozen exact width is a wider identifier and stays unreported."
+    },
+    {
+      "id": "openrouter-api-key-boundary-invalid-alphabet",
+      "detector": "openrouter-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk-or-v1-0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF",
+      "expected": [],
+      "note": "Uppercase hexadecimal is outside the frozen lowercase-hex body; it is an intentional false negative."
+    },
+    {
+      "id": "openrouter-api-key-boundary-wrong-separator",
+      "detector": "openrouter-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk-or-v1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      "expected": [],
+      "note": "A different separator in the prefix is not the frozen prefix."
+    },
+    {
+      "id": "openrouter-api-key-boundary-encoded-prefix",
+      "detector": "openrouter-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk-or-v1%2D0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      "expected": [],
+      "note": "A percent-encoded delimiter lookalike is not the frozen prefix."
+    },
+    {
+      "id": "openrouter-api-key-negative-embedded-in-wider-identifier",
+      "detector": "openrouter-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "legacysk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      "expected": [],
+      "note": "The prefix embedded inside a wider identifier is not boundary-delimited."
+    },
+    {
+      "id": "openrouter-api-key-negative-masked",
+      "detector": "openrouter-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk-or-v1-****************************************************************",
+      "expected": [],
+      "note": "A masked value of the correct width carries no valid body bytes."
+    },
+    {
+      "id": "openrouter-api-key-negative-model-identifier",
+      "detector": "openrouter-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"model\": \"openai/gpt-4o-mini\", \"route\": \"fallback\"}\n",
+      "expected": [],
+      "note": "A public model identifier is not an sk-or-v1- credential."
+    },
+    {
+      "id": "openrouter-api-key-negative-prefix-in-prose",
+      "detector": "openrouter-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "markdown"
+      ],
+      "input": "OpenRouter keys begin with sk-or-v1- followed by 64 hexadecimal characters.\n",
+      "expected": [],
+      "note": "A prose mention of the prefix has no exact-width body."
+    },
+    {
+      "id": "openrouter-api-key-negative-management-key-prefix",
+      "detector": "openrouter-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk-or-mgmt-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\n",
+      "expected": [],
+      "note": "The separate management-key namespace is deliberately unclaimed by this family."
+    },
+    {
+      "id": "openrouter-api-key-negative-github-actions-secret-reference",
+      "detector": "openrouter-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "github-actions"
+      ],
+      "input": "env:\n  OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}\n",
+      "expected": [],
+      "note": "A GitHub Actions secret reference names the secret and carries no value."
+    },
+    {
+      "id": "openrouter-api-key-overlap-context",
+      "detector": "openrouter-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "access_token=sk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      "expected": [
+        {
+          "detector": "openrouter-api-key",
+          "type": "openrouter_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 86
+        }
+      ],
+      "note": "Qualified provider evidence wins over a contextual assignment."
+    },
+    {
+      "id": "openrouter-api-key-adversarial-long-suffix",
+      "detector": "openrouter-api-key",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 12000,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      },
+      "input": "sk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef012",
+      "expected": [],
+      "note": "A long run built from the value repeated is a wider identifier, not a token: the exact-width contract never carves a valid-looking substring out of it, and the scan stays linear and bounded."
     }
   ]
 }
