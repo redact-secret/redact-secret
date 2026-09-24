@@ -3,17 +3,36 @@
   "taxonomySchemaVersion": 1,
   "sourceReport": {
     "schemaVersion": 1,
-    "generatedAt": "2026-09-23T22:14:55.709Z",
-    "runId": "715d2d8e-0862-4ba8-9ef2-18b90091030c",
-    "revision": "186e6e7053195ad14ebecf823c1cb269d3496654",
+    "generatedAt": "2026-09-24T08:46:00.653Z",
+    "runId": "d87f63dd-5d38-4cf6-a8d1-6ab28f3c7f95",
+    "revision": "28fc818966d9acf7ad3f77ce38577d6b5c14ea0b",
     "dirty": false,
-    "criteriaSchemaVersion": 1
+    "criteriaSchemaVersion": 1,
+    "product": {
+      "sourceCommit": "6a2dca04b9f88b82f1b88a7acfeeb93a82510c21",
+      "packageName": "@redact-secret/core",
+      "declaredVersion": "0.1.0-beta.7",
+      "artifacts": [
+        {
+          "role": "package",
+          "sha256": "8b6e759b98201ebfed797a5389eca57a3aa52fef1bc96783d522c60418662520"
+        },
+        {
+          "role": "node",
+          "sha256": "cd801afc5bc3921642e8fa18b829eb5e0585f1c4c21ae8db1e961a5f8d5ef7af"
+        },
+        {
+          "role": "wasm",
+          "sha256": "2c288cb36fce4d2f176a61f4cd09efbfadf1781eb70b76aba4195630879c166c"
+        }
+      ]
+    }
   },
   "providerCount": 42,
   "familyCount": 93,
   "distribution": {
-    "stable": 49,
-    "provisional": 23,
+    "stable": 51,
+    "provisional": 21,
     "pending": 2,
     "unsupported": 19
   },
@@ -232,7 +251,7 @@
       "provider": "confluent",
       "family": "confluent:cloud-api-secret",
       "familyName": "Cloud API secret (cflt-prefixed)",
-      "status": "provisional",
+      "status": "stable",
       "evidenceTier": "T1",
       "providerSource": {
         "url": "https://docs.confluent.io/cloud/current/security/authenticate/workload-identities/service-accounts/api-keys/overview.html",
@@ -252,12 +271,12 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 6
+        "differential": 0
       },
       "detectors": [
         "confluent-cloud-api-secret"
       ],
-      "reason": "differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": null
     },
     {
       "provider": "confluent",
@@ -1280,14 +1299,14 @@
         "unprobeable": null
       },
       "unresolvedCriticalItems": {
-        "metamorphic": 7,
-        "mutation": 1,
+        "metamorphic": 0,
+        "mutation": 0,
         "differential": 0
       },
       "detectors": [
         "heroku-api-key-legacy"
       ],
-      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret. | benign.falseAlarms: 1 > 0 — A false alarm on a benign control is a recorded false positive; stable tolerates none. | metamorphic.criticalFailures: 7 > 0 — A metamorphic invariant violation (for example, detection lost after an envelope-preserving transform) shows the detector is not robust to construction, independent of how many cases were run. | mutation.unresolvedCritical: 1 > 0 — An unresolved critical mutation finding is a fixture-versus-detector disagreement nobody has reviewed yet; tier or sample size cannot substitute for that review."
+      "reason": "positiveContract: no T1 provider-documented contract — T2 (tool-corroborated) and T3 (project policy) have no provider-documented ground truth to certify against, and T0 has no positive at all; only a T1 contract, backed by providerSource, counts. | minimumTwinPairs: 3 < 5 — Five discriminated positive/negative twin pairs is the minimum sample that the detector reliably tells the credential apart from a near-identical non-secret."
     },
     {
       "provider": "heroku",
@@ -1521,7 +1540,7 @@
       "provider": "netlify",
       "family": "netlify:personal-access-token",
       "familyName": "Personal access token",
-      "status": "provisional",
+      "status": "stable",
       "evidenceTier": "T1",
       "providerSource": {
         "url": "https://answers.netlify.com/t/change-to-the-netlify-authentication-token-format/106146",
@@ -1541,12 +1560,12 @@
       "unresolvedCriticalItems": {
         "metamorphic": 0,
         "mutation": 0,
-        "differential": 6
+        "differential": 0
       },
       "detectors": [
         "netlify-token"
       ],
-      "reason": "differential.unresolvedContractDisagreements: 6 > 0 — An unresolved disagreement with a peer scanner over what the provider contract requires means the contract itself may be wrong; stable requires it settled."
+      "reason": null
     },
     {
       "provider": "new-relic",
