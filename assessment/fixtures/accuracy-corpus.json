@@ -337,7 +337,7 @@
       "id": "chat-additional-provider-tokens-one",
       "category": "chat",
       "unicode": false,
-      "input": "here are the leaked values from the audit: slack=xoxb-1234567890123-3210987654321-ASSESSMENTSYNTHETICSLACK1 supabase=sb_secret_SYNTHETIC_REVOKED_SUPABASE_1 vault=hvs.SYNTHETIC_REVOKED_VAULT_TOKEN1 vercel=vcp_SYNTHETIC_REVOKED_VERCEL_1 please rotate all four now",
+      "input": "here are the leaked values from the audit: slack=xoxb-1234567890123-3210987654321-ASSESSMENTSYNTHETICSLACK1 supabase=sb_secret_SYNTHETIC_REVOKED_SUPA_ACCURACY vault=hvs.SYNTHETIC_REVOKED_VAULT_TOKEN1 vercel=vcp_SYNTHETIC_REVOKED_VERCEL_1 please rotate all four now",
       "expected": [
         {
           "detector": "slack-token",
@@ -354,7 +354,7 @@
           "confidence": "high",
           "specificity": "provider",
           "start": 117,
-          "end": 155,
+          "end": 158,
           "policyOutcome": "redact"
         },
         {
@@ -362,8 +362,8 @@
           "type": "vault_token",
           "confidence": "high",
           "specificity": "provider",
-          "start": 162,
-          "end": 196,
+          "start": 165,
+          "end": 199,
           "policyOutcome": "redact"
         },
         {
@@ -371,12 +371,12 @@
           "type": "vercel_token",
           "confidence": "high",
           "specificity": "provider",
-          "start": 204,
-          "end": 234,
+          "start": 207,
+          "end": 237,
           "policyOutcome": "redact"
         }
       ],
-      "note": "Four provider tokens (Slack, Supabase, Vault, Vercel) pasted mid-sentence in a chat message; always-redact provider types at high confidence. Slack's value and offsets re-pinned to its beta.5 frozen bot-token contract (issue #371, contract review #367) by the beta.5 precision gate (#376); Supabase, Vault and Vercel are unchanged."
+      "note": "Four provider tokens (Slack, Supabase, Vault, Vercel) pasted mid-sentence in a chat message; always-redact provider types at high confidence. Slack's value and offsets re-pinned to its beta.5 frozen bot-token contract (issue #371, contract review #367) by the beta.5 precision gate (#376); Vault and Vercel are unchanged. Supabase's value re-pinned to the provider-documented `sb_secret_` + 22 + `_` + 8 layout that #742 (PR #752) made the detector require, which shifts the Vault and Vercel offsets by three."
     },
     {
       "id": "code-otpauth-provisioning-uri",
