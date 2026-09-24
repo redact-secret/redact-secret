@@ -586,6 +586,7 @@ mod tests {
     }
 
     #[test]
+    #[allow(clippy::too_many_lines)]
     fn recent_built_in_provider_candidates_claim_provider_specificity() {
         let sentry_user_auth_token_input = format!("sntryu_{}", "0123456789abcdef".repeat(4));
         let sentry_org_auth_token_input = format!(
