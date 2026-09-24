@@ -5,7 +5,7 @@ evidence is linked from each published version.
 
 ## Unreleased
 
-### Changed
+### Changed detection
 
 - `confluent-cloud-api-secret` now validates the checksum Confluent documents
   for `cflt` secrets. The last 6 characters must be the first 6
@@ -14,9 +14,6 @@ evidence is linked from each published version.
   but a different checksum (a changed character, big-endian bytes, or a CRC
   that includes the prefix) is no longer reported. The unprefixed legacy shape
   is unchanged (#738).
-
-### Changed detection
-
 - `heroku-api-key` now also detects the 41-character `HRKU-` OAuth access
   token generation: `HRKU-` followed by a lower-case `8-4-4-4-12` hex UUID,
   granted from 2024-04-01 through 2025-04-22 and valid until regenerated
@@ -33,7 +30,6 @@ evidence is linked from each published version.
   UUID that is a URL path segment (`https://api.heroku.com/apps/<uuid>/...`)
   is now treated as a public resource id and never reported, even on a line
   that names heroku (#743).
-
 - `atlassian-api-token` now redacts the whole 192-character token. It used to
   stop at the `=` and leave the `=` plus 8 uppercase hex characters at the end
   outside the finding. The detector now extends a match over exactly that tail
@@ -49,9 +45,6 @@ evidence is linked from each published version.
   (`<digits>:<8-4-4-4-12 UUID>`) as a bot token. A candidate whose secret
   segment is exactly a canonical hexadecimal UUID is rejected; every other
   token shape is unchanged (#747).
-
-### Changed detection
-
 - A Google API key (`google-api-key`, `AIza` + 35) inside a Firebase Web SDK
   client config is reported again. Since beta.6 (#520), the pipeline dropped
   an `AIza` value when two or more Firebase config field names (`authDomain`,
@@ -64,7 +57,6 @@ evidence is linked from each published version.
   config's identifier fields stay unflagged. The Firebase FCM server key
   detection is unchanged (#749,
   `decision-redact-google-api-keys-inside-firebase-web-config`).
-
 - `twilio-auth-token`, `twilio-api-key-secret` and
   `confluent-cloud-api-secret-legacy` no longer report a value introduced by a
   hash-algorithm label (`md5=`, `sha256:`, `@sha256:`, `sha-512=`, ...), even
@@ -90,7 +82,6 @@ evidence is linked from each published version.
   are clean. It uses the predicate `bearer-token` uses, so the two detectors
   agree. `YOUR_API_KEY_9f2cQ7xLm4Rt`, `YOUR_MAILCHIMP_API_KEY` and random
   values in the same assignments are still reported (#756).
-
 - `new_relic_license_key` now reports the current-generation License Key
   (32 lowercase hex then `FFFFNRAL`, and the EU `eu01xx` form) even when no
   `newrelic`/`new_relic`/`new-relic`/`new relic` keyword is on its line. New
