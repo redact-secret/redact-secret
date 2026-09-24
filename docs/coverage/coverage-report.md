@@ -53,6 +53,8 @@ Coverage declarations: 81.
 | heroku-api-key-legacy | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | huggingface-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | jwt | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| langfuse-secret-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| langsmith-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | linear-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | mailchimp-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | mailgun-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -125,6 +127,8 @@ Coverage declarations: 81.
 | heroku_api_key_legacy | heroku-api-key-legacy | provider | supported | not-applicable | none |
 | huggingface_token | huggingface-token | provider | supported | not-applicable | none |
 | jwt | jwt | structural | supported | not-applicable | none |
+| langfuse_secret_key | langfuse-secret-key | provider | supported | not-applicable | none |
+| langsmith_api_key | langsmith-api-key | provider | supported | not-applicable | none |
 | linear_token | linear-token | provider | supported | not-applicable | none |
 | mailchimp_api_key | mailchimp-api-key | provider | supported | not-applicable | none |
 | mailgun_api_key | mailgun-api-key | provider | supported | not-applicable | none |

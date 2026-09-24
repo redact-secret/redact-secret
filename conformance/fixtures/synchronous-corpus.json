@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 1817,
+  "fixtureCount": 1879,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -43228,6 +43228,1126 @@
       "input": "sk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefsk-or-v1-0123456789abcdef012",
       "expected": [],
       "note": "A long run built from the value repeated is a wider identifier, not a token: the exact-width contract never carves a valid-looking substring out of it, and the scan stays linear and bounded."
+    },
+    {
+      "id": "langsmith-positive-personal-access-token",
+      "detector": "langsmith-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "lsv2_pt_0123456789abcdef0123456789abcdef_fedcba9876",
+      "expected": [
+        {
+          "detector": "langsmith-api-key",
+          "type": "langsmith_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 51
+        }
+      ],
+      "note": "A synthetic `lsv2_pt_` personal access token with the frozen 32+10 lowercase-hex segments is detected."
+    },
+    {
+      "id": "langsmith-positive-service-key",
+      "detector": "langsmith-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "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",
+      "expected": [
+        {
+          "detector": "langsmith-api-key",
+          "type": "langsmith_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 51
+        }
+      ],
+      "note": "A synthetic `lsv2_sk_` service key is detected under the same grammar."
+    },
+    {
+      "id": "langsmith-positive-dotenv",
+      "detector": "langsmith-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "LANGSMITH_API_KEY=lsv2_pt_0123456789abcdef0123456789abcdef_fedcba9876\nLANGSMITH_TRACING=true\n",
+      "expected": [
+        {
+          "detector": "langsmith-api-key",
+          "type": "langsmith_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 18,
+          "end": 69
+        }
+      ],
+      "note": "Synthetic langsmith credential in a dotenv context is redacted by span."
+    },
+    {
+      "id": "langsmith-positive-legacy-langchain-env",
+      "detector": "langsmith-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "LANGCHAIN_API_KEY=\"lsv2_pt_0123456789abcdef0123456789abcdef_fedcba9876\"\nLANGCHAIN_TRACING_V2=true\n",
+      "expected": [
+        {
+          "detector": "langsmith-api-key",
+          "type": "langsmith_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 19,
+          "end": 70
+        }
+      ],
+      "note": "Synthetic langsmith credential in a dotenv context is redacted by span."
+    },
+    {
+      "id": "langsmith-positive-shell-export",
+      "detector": "langsmith-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export LANGSMITH_API_KEY='lsv2_pt_0123456789abcdef0123456789abcdef_fedcba9876'\n",
+      "expected": [
+        {
+          "detector": "langsmith-api-key",
+          "type": "langsmith_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 26,
+          "end": 77
+        }
+      ],
+      "note": "Synthetic langsmith credential in a shell context is redacted by span."
+    },
+    {
+      "id": "langsmith-positive-x-api-key-header",
+      "detector": "langsmith-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "POST /runs HTTP/1.1\r\nHost: api.smith.langchain.com\r\nX-API-Key: lsv2_pt_0123456789abcdef0123456789abcdef_fedcba9876\r\n\r\n",
+      "expected": [
+        {
+          "detector": "langsmith-api-key",
+          "type": "langsmith_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 63,
+          "end": 114
+        }
+      ],
+      "note": "Synthetic langsmith credential in a http context is redacted by span."
+    },
+    {
+      "id": "langsmith-positive-otlp-headers",
+      "detector": "langsmith-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "OTEL_EXPORTER_OTLP_HEADERS=x-api-key=lsv2_pt_0123456789abcdef0123456789abcdef_fedcba9876,Langsmith-Project=demo\n",
+      "expected": [
+        {
+          "detector": "langsmith-api-key",
+          "type": "langsmith_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 37,
+          "end": 88
+        }
+      ],
+      "note": "Synthetic langsmith credential in a dotenv context is redacted by span."
+    },
+    {
+      "id": "langsmith-positive-json",
+      "detector": "langsmith-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"langsmith\":{\"api_key\":\"lsv2_pt_0123456789abcdef0123456789abcdef_fedcba9876\",\"project\":\"demo\"}}",
+      "expected": [
+        {
+          "detector": "langsmith-api-key",
+          "type": "langsmith_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 76
+        }
+      ],
+      "note": "Synthetic langsmith credential in a json context is redacted by span."
+    },
+    {
+      "id": "langsmith-positive-yaml",
+      "detector": "langsmith-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "langsmith:\n  api_key: lsv2_pt_0123456789abcdef0123456789abcdef_fedcba9876\n  endpoint: https://api.smith.langchain.com\n",
+      "expected": [
+        {
+          "detector": "langsmith-api-key",
+          "type": "langsmith_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 73
+        }
+      ],
+      "note": "Synthetic langsmith credential in a yaml context is redacted by span."
+    },
+    {
+      "id": "langsmith-positive-log",
+      "detector": "langsmith-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-24T10:00:00Z INFO tracing client configured api_key=lsv2_pt_0123456789abcdef0123456789abcdef_fedcba9876\n",
+      "expected": [
+        {
+          "detector": "langsmith-api-key",
+          "type": "langsmith_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 60,
+          "end": 111
+        }
+      ],
+      "note": "Synthetic langsmith credential in a log context is redacted by span."
+    },
+    {
+      "id": "langsmith-positive-markdown-delimiter",
+      "detector": "langsmith-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "markdown"
+      ],
+      "input": "Set the key to `lsv2_pt_0123456789abcdef0123456789abcdef_fedcba9876` before running.\n",
+      "expected": [
+        {
+          "detector": "langsmith-api-key",
+          "type": "langsmith_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 16,
+          "end": 67
+        }
+      ],
+      "note": "Synthetic langsmith credential in a markdown context is redacted by span."
+    },
+    {
+      "id": "langsmith-positive-repeated-value",
+      "detector": "langsmith-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "lsv2_pt_0123456789abcdef0123456789abcdef_fedcba9876 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba9876",
+      "expected": [
+        {
+          "detector": "langsmith-api-key",
+          "type": "langsmith_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 51
+        },
+        {
+          "detector": "langsmith-api-key",
+          "type": "langsmith_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 52,
+          "end": 103
+        }
+      ],
+      "note": "Synthetic langsmith credential in a plain-text context is redacted by span."
+    },
+    {
+      "id": "langsmith-positive-punctuation-adjacent",
+      "detector": "langsmith-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "(lsv2_pt_0123456789abcdef0123456789abcdef_fedcba9876).",
+      "expected": [
+        {
+          "detector": "langsmith-api-key",
+          "type": "langsmith_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1,
+          "end": 52
+        }
+      ],
+      "note": "Synthetic langsmith credential in a plain-text context is redacted by span."
+    },
+    {
+      "id": "langsmith-positive-unicode-crlf",
+      "detector": "langsmith-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 café\r\nlsv2_pt_0123456789abcdef0123456789abcdef_fedcba9876\r\n",
+      "expected": [
+        {
+          "detector": "langsmith-api-key",
+          "type": "langsmith_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 65
+        }
+      ],
+      "note": "Synthetic langsmith credential in a plain-text context is redacted by span."
+    },
+    {
+      "id": "langsmith-positive-nested-observability-metadata",
+      "detector": "langsmith-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"observability\":{\"langsmith\":{\"credentials\":{\"key\":\"lsv2_pt_0123456789abcdef0123456789abcdef_fedcba9876\"}}}}",
+      "expected": [
+        {
+          "detector": "langsmith-api-key",
+          "type": "langsmith_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 53,
+          "end": 104
+        }
+      ],
+      "note": "Synthetic langsmith credential in a json context is redacted by span."
+    },
+    {
+      "id": "langsmith-overlap-context",
+      "detector": "langsmith-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "api_key=lsv2_pt_0123456789abcdef0123456789abcdef_fedcba9876",
+      "expected": [
+        {
+          "detector": "langsmith-api-key",
+          "type": "langsmith_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 8,
+          "end": 59
+        }
+      ],
+      "note": "Qualified provider evidence wins over a contextual assignment."
+    },
+    {
+      "id": "langsmith-boundary-second-segment-short",
+      "detector": "langsmith-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987",
+      "expected": [],
+      "note": "A 9-hex second segment is one byte short of the frozen shape and is silent by construction."
+    },
+    {
+      "id": "langsmith-boundary-second-segment-long",
+      "detector": "langsmith-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "lsv2_pt_0123456789abcdef0123456789abcdef_fedcba9876a",
+      "expected": [],
+      "note": "An 11-hex second segment is rejected, not truncated to the frozen shape."
+    },
+    {
+      "id": "langsmith-boundary-first-segment-short",
+      "detector": "langsmith-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "lsv2_pt_0123456789abcdef0123456789abcde_fedcba9876",
+      "expected": [],
+      "note": "A 31-hex first segment is rejected."
+    },
+    {
+      "id": "langsmith-boundary-uppercase",
+      "detector": "langsmith-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "lsv2_pt_0123456789ABCDEF0123456789ABCDEF_FEDCBA9876",
+      "expected": [],
+      "note": "The frozen alphabet is lowercase hex; an uppercase body is silent."
+    },
+    {
+      "id": "langsmith-boundary-non-hex-alphabet",
+      "detector": "langsmith-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "lsv2_pt_0123456789abcdef0123456789abcdeg_fedcba9876",
+      "expected": [],
+      "note": "A non-hex byte in the first segment is rejected."
+    },
+    {
+      "id": "langsmith-boundary-missing-separator",
+      "detector": "langsmith-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "lsv2_pt_0123456789abcdef0123456789abcdeffedcba9876_",
+      "expected": [],
+      "note": "The underscore must sit between the two segments."
+    },
+    {
+      "id": "langsmith-boundary-masked-placeholder",
+      "detector": "langsmith-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "lsv2_pt_00000000000000000000000000000000_0000000000",
+      "expected": [],
+      "note": "A body of one repeated digit is a masked placeholder and is silent."
+    },
+    {
+      "id": "langsmith-negative-x-masked-placeholder",
+      "detector": "langsmith-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "lsv2_pt_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx_xxxxxxxxxx",
+      "expected": [],
+      "note": "An `x`-masked value is not the frozen alphabet."
+    },
+    {
+      "id": "langsmith-negative-other-prefixes",
+      "detector": "langsmith-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "lsv2_ak_0123456789abcdef0123456789abcdef_fedcba9876 lsv3_pt_0123456789abcdef0123456789abcdef_fedcba9876 LSV2_PT_0123456789abcdef0123456789abcdef_fedcba9876",
+      "expected": [],
+      "note": "Unfrozen prefixes are unclaimed siblings, not this family."
+    },
+    {
+      "id": "langsmith-negative-legacy-ls-prefix",
+      "detector": "langsmith-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "ls__0123456789abcdef0123456789abcdeffedcba98",
+      "expected": [],
+      "note": "The legacy `ls__` key is a separate unclaimed sibling."
+    },
+    {
+      "id": "langsmith-negative-embedded-in-wider-identifier",
+      "detector": "langsmith-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "my_lsv2_pt_0123456789abcdef0123456789abcdef_fedcba9876_backup",
+      "expected": [],
+      "note": "A value glued to a wider identifier is rejected rather than truncated."
+    },
+    {
+      "id": "langsmith-negative-endpoint-and-ids",
+      "detector": "langsmith-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "endpoint=https://api.smith.langchain.com workspace_id=6f1e2d3c-4b5a-4c6d-8e7f-0a1b2c3d4e5f project=my-project",
+      "expected": [],
+      "note": "Endpoints, workspace and project identifiers are public and stay clean."
+    },
+    {
+      "id": "langsmith-negative-env-reference",
+      "detector": "langsmith-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "LANGSMITH_API_KEY=${LANGSMITH_API_KEY}\nLANGSMITH_TRACING=true\n",
+      "expected": [],
+      "note": "A variable reference is not a credential value."
+    },
+    {
+      "id": "langsmith-negative-placeholder-dotenv",
+      "detector": "langsmith-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "LANGSMITH_API_KEY=lsv2_pt_your_key_here\n",
+      "expected": [],
+      "note": "A documentation placeholder with the prefix is clean."
+    },
+    {
+      "id": "langsmith-negative-percent-encoded-lookalike",
+      "detector": "langsmith-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "lsv2%5Fpt%5F0123456789abcdef0123456789abcdef_fedcba9876",
+      "expected": [],
+      "note": "A percent-encoded delimiter is not the literal prefix."
+    },
+    {
+      "id": "langsmith-adversarial-near-miss-prefixes",
+      "detector": "langsmith-api-key",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 25500,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      },
+      "input": "lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 lsv2_pt_0123456789abcdef0123456789abcdef_fedcba987 ",
+      "expected": [],
+      "note": "Repeated near-miss values do not slow the scan or produce findings."
+    },
+    {
+      "id": "langfuse-positive-secret-key",
+      "detector": "langfuse-secret-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5d",
+      "expected": [
+        {
+          "detector": "langfuse-secret-key",
+          "type": "langfuse_secret_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 42
+        }
+      ],
+      "note": "A synthetic `sk-lf-` lowercase UUIDv4 secret key is detected."
+    },
+    {
+      "id": "langfuse-positive-second-variant",
+      "detector": "langfuse-secret-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk-lf-9f8e7d6c-5b4a-4938-a271-605f4e3d2c1b",
+      "expected": [
+        {
+          "detector": "langfuse-secret-key",
+          "type": "langfuse_secret_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 42
+        }
+      ],
+      "note": "A second synthetic key with a different variant nibble is detected."
+    },
+    {
+      "id": "langfuse-positive-dotenv",
+      "detector": "langfuse-secret-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "LANGFUSE_SECRET_KEY=sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5d\nLANGFUSE_HOST=https://cloud.langfuse.com\n",
+      "expected": [
+        {
+          "detector": "langfuse-secret-key",
+          "type": "langfuse_secret_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 20,
+          "end": 62
+        }
+      ],
+      "note": "Synthetic langfuse credential in a dotenv context is redacted by span."
+    },
+    {
+      "id": "langfuse-positive-dotenv-pair",
+      "detector": "langfuse-secret-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "LANGFUSE_PUBLIC_KEY=pk-lf-6f1e2d3c-4b5a-4c6d-8e7f-0a1b2c3d4e5f\nLANGFUSE_SECRET_KEY=sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5d\n",
+      "expected": [
+        {
+          "detector": "langfuse-secret-key",
+          "type": "langfuse_secret_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 83,
+          "end": 125
+        }
+      ],
+      "note": "Synthetic langfuse credential in a dotenv context is redacted by span."
+    },
+    {
+      "id": "langfuse-positive-shell-export",
+      "detector": "langfuse-secret-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export LANGFUSE_SECRET_KEY='sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5d'\n",
+      "expected": [
+        {
+          "detector": "langfuse-secret-key",
+          "type": "langfuse_secret_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 28,
+          "end": 70
+        }
+      ],
+      "note": "Synthetic langfuse credential in a shell context is redacted by span."
+    },
+    {
+      "id": "langfuse-positive-sdk-config",
+      "detector": "langfuse-secret-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "python"
+      ],
+      "input": "langfuse = Langfuse(secret_key=\"sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5d\", host=\"https://cloud.langfuse.com\")\n",
+      "expected": [
+        {
+          "detector": "langfuse-secret-key",
+          "type": "langfuse_secret_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 32,
+          "end": 74
+        }
+      ],
+      "note": "Synthetic langfuse credential in a python context is redacted by span."
+    },
+    {
+      "id": "langfuse-positive-basic-auth-pair",
+      "detector": "langfuse-secret-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "curl -u pk-lf-6f1e2d3c-4b5a-4c6d-8e7f-0a1b2c3d4e5f:sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5d https://cloud.langfuse.com/api/public/traces\n",
+      "expected": [
+        {
+          "detector": "langfuse-secret-key",
+          "type": "langfuse_secret_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 51,
+          "end": 93
+        }
+      ],
+      "note": "Synthetic langfuse credential in a http context is redacted by span."
+    },
+    {
+      "id": "langfuse-positive-otlp-headers",
+      "detector": "langfuse-secret-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "OTEL_EXPORTER_OTLP_HEADERS=Authorization=Basic sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5d\n",
+      "expected": [
+        {
+          "detector": "langfuse-secret-key",
+          "type": "langfuse_secret_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 47,
+          "end": 89
+        }
+      ],
+      "note": "Synthetic langfuse credential in a dotenv context is redacted by span."
+    },
+    {
+      "id": "langfuse-positive-json",
+      "detector": "langfuse-secret-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"langfuse\":{\"secretKey\":\"sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5d\",\"baseUrl\":\"https://cloud.langfuse.com\"}}",
+      "expected": [
+        {
+          "detector": "langfuse-secret-key",
+          "type": "langfuse_secret_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 26,
+          "end": 68
+        }
+      ],
+      "note": "Synthetic langfuse credential in a json context is redacted by span."
+    },
+    {
+      "id": "langfuse-positive-yaml",
+      "detector": "langfuse-secret-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "langfuse:\n  secret_key: sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5d\n",
+      "expected": [
+        {
+          "detector": "langfuse-secret-key",
+          "type": "langfuse_secret_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 24,
+          "end": 66
+        }
+      ],
+      "note": "Synthetic langfuse credential in a yaml context is redacted by span."
+    },
+    {
+      "id": "langfuse-positive-log",
+      "detector": "langfuse-secret-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-24T10:00:00Z WARN langfuse init secret_key=sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5d\n",
+      "expected": [
+        {
+          "detector": "langfuse-secret-key",
+          "type": "langfuse_secret_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 51,
+          "end": 93
+        }
+      ],
+      "note": "Synthetic langfuse credential in a log context is redacted by span."
+    },
+    {
+      "id": "langfuse-positive-markdown-delimiter",
+      "detector": "langfuse-secret-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "markdown"
+      ],
+      "input": "Use `sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5d` as the secret.\n",
+      "expected": [
+        {
+          "detector": "langfuse-secret-key",
+          "type": "langfuse_secret_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5,
+          "end": 47
+        }
+      ],
+      "note": "Synthetic langfuse credential in a markdown context is redacted by span."
+    },
+    {
+      "id": "langfuse-positive-repeated-value",
+      "detector": "langfuse-secret-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5d sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5d",
+      "expected": [
+        {
+          "detector": "langfuse-secret-key",
+          "type": "langfuse_secret_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 42
+        },
+        {
+          "detector": "langfuse-secret-key",
+          "type": "langfuse_secret_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 43,
+          "end": 85
+        }
+      ],
+      "note": "Synthetic langfuse credential in a plain-text context is redacted by span."
+    },
+    {
+      "id": "langfuse-positive-punctuation-adjacent",
+      "detector": "langfuse-secret-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "(\"sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5d\").",
+      "expected": [
+        {
+          "detector": "langfuse-secret-key",
+          "type": "langfuse_secret_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2,
+          "end": 44
+        }
+      ],
+      "note": "Synthetic langfuse credential in a plain-text context is redacted by span."
+    },
+    {
+      "id": "langfuse-positive-unicode-crlf",
+      "detector": "langfuse-secret-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 café\r\nsk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5d\r\n",
+      "expected": [
+        {
+          "detector": "langfuse-secret-key",
+          "type": "langfuse_secret_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 56
+        }
+      ],
+      "note": "Synthetic langfuse credential in a plain-text context is redacted by span."
+    },
+    {
+      "id": "langfuse-overlap-context",
+      "detector": "langfuse-secret-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "secret_key=sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5d",
+      "expected": [
+        {
+          "detector": "langfuse-secret-key",
+          "type": "langfuse_secret_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 53
+        }
+      ],
+      "note": "Qualified provider evidence wins over a contextual assignment."
+    },
+    {
+      "id": "langfuse-boundary-one-short",
+      "detector": "langfuse-secret-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5",
+      "expected": [],
+      "note": "A 35-byte UUID body is silent by construction."
+    },
+    {
+      "id": "langfuse-boundary-one-long",
+      "detector": "langfuse-secret-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5d0",
+      "expected": [],
+      "note": "A 37-byte body is rejected, not truncated."
+    },
+    {
+      "id": "langfuse-boundary-uppercase",
+      "detector": "langfuse-secret-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk-lf-0A1B2C3D-4E5F-4A6B-8C7D-0E1F2A3B4C5D",
+      "expected": [],
+      "note": "The minted shape is lowercase; an uppercase UUID is silent."
+    },
+    {
+      "id": "langfuse-boundary-not-uuid-v4-version",
+      "detector": "langfuse-secret-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk-lf-0a1b2c3d-4e5f-1a6b-8c7d-0e1f2a3b4c5d",
+      "expected": [],
+      "note": "A UUID whose version nibble is not 4 is not the minted shape."
+    },
+    {
+      "id": "langfuse-boundary-not-uuid-v4-variant",
+      "detector": "langfuse-secret-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk-lf-0a1b2c3d-4e5f-4a6b-cc7d-0e1f2a3b4c5d",
+      "expected": [],
+      "note": "A UUID whose variant nibble is outside 8-b is not the minted shape."
+    },
+    {
+      "id": "langfuse-boundary-no-dashes",
+      "detector": "langfuse-secret-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk-lf-0a1b2c3d4e5f4a6b8c7d0e1f2a3b4c5d",
+      "expected": [],
+      "note": "A dashless hex body is not the minted shape."
+    },
+    {
+      "id": "langfuse-negative-public-key",
+      "detector": "langfuse-secret-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "pk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5d",
+      "expected": [],
+      "note": "The `pk-lf-` public key is client-safe and stays clean."
+    },
+    {
+      "id": "langfuse-negative-gateway-prefix",
+      "detector": "langfuse-secret-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk-lf-gw-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5d",
+      "expected": [],
+      "note": "The `sk-lf-gw-` gateway prefix is outside the claim."
+    },
+    {
+      "id": "langfuse-negative-self-hosting-placeholder",
+      "detector": "langfuse-secret-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "LANGFUSE_SECRET_KEY=sk-lf-your-secret-key\nLANGFUSE_HOST=http://localhost:3000\n",
+      "expected": [],
+      "note": "A self-hosting placeholder is clean."
+    },
+    {
+      "id": "langfuse-negative-x-masked-placeholder",
+      "detector": "langfuse-secret-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk-lf-xxxxxxxx-xxxx-4xxx-8xxx-xxxxxxxxxxxx",
+      "expected": [],
+      "note": "An `x`-masked value is not a lowercase hex body."
+    },
+    {
+      "id": "langfuse-negative-embedded-in-wider-identifier",
+      "detector": "langfuse-secret-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "task-sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5d_backup",
+      "expected": [],
+      "note": "A value glued to a wider identifier is rejected rather than truncated."
+    },
+    {
+      "id": "langfuse-negative-ids-and-hosts",
+      "detector": "langfuse-secret-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "host=https://cloud.langfuse.com project_id=cm9f8e7d6c5b4a4938a27160 trace_id=9f8e7d6c-5b4a-4938-a271-605f4e3d2c1b org_id=0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5d",
+      "expected": [],
+      "note": "Hosts, project, organization and trace identifiers stay clean."
+    },
+    {
+      "id": "langfuse-negative-env-reference",
+      "detector": "langfuse-secret-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "LANGFUSE_SECRET_KEY=${LANGFUSE_SECRET_KEY}\n",
+      "expected": [],
+      "note": "A variable reference is not a credential value."
+    },
+    {
+      "id": "langfuse-adversarial-near-miss-prefixes",
+      "detector": "langfuse-secret-key",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 21000,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      },
+      "input": "sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5 ",
+      "expected": [],
+      "note": "Repeated near-miss values do not slow the scan or produce findings."
     }
   ]
 }
