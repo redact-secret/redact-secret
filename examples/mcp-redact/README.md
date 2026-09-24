@@ -50,7 +50,7 @@ version.
 | [`wrap-tool-call.mjs`](./wrap-tool-call.mjs) / [`python/wrap_tool_call.py`](./python/wrap_tool_call.py) | Server-side (`wrapServerToolHandler`/`wrap_server_tool_handler`) and client-side (`wrapClientCallTool`/`wrap_client_call_tool`) wrappers built on the primitive above, shaped to drop into a real `ToolCallback` / `on_call_tool` handler / `callTool`/`call_tool`. |
 | [`streaming-tool-result.mjs`](./streaming-tool-result.mjs) / [`python/streaming_tool_result.py`](./python/streaming_tool_result.py) | Redaction for a tool result assembled progressively (a handler piping a subprocess/file/HTTP response in chunks), built on `createIncrementalSanitizer`/`IncrementalSanitizer`. See [Streamed results](#streamed-or-progressive-results). |
 | [`agent-context.mjs`](./agent-context.mjs) / [`python/agent_context.py`](./python/agent_context.py) | The AI-context golden path (`buildSafeContext`/`build_safe_context`): composes the primitives above into the full turn — user input, then an optional tool call, then the assembled safe context. See [below](#the-ai-context-golden-path). |
-| [`demo.mjs`](./demo.mjs) / [`python/demo.py`](./python/demo.py) | Runnable, side-by-side: the same synthetic tool result through block-all vs. this middleware's redact behavior. |
+| [`demo.mjs`](./demo.mjs) / [`python/demo.py`](./python/demo.py) | Runnable, side-by-side: the same synthetic tool result through block-all vs. this middleware's redact behavior. Neither prints the unscanned input, even though it is synthetic; only the two outputs are shown. |
 
 ## The AI-context golden path
 
