@@ -528,33 +528,37 @@ jobs:
           echo "npm_tag=$npm_tag" >> "$GITHUB_OUTPUT"
           echo "tag_name=$tag_name" >> "$GITHUB_OUTPUT"
 
+      - name: Qualify release
+        run: npm run release:check
+
       # Issue #528: the wrapper has no separate qualification build to
       # compare against (unlike the Node addon, browser, crate, and Python
-      # artifacts, it is packed straight from this checkout by both this
-      # step and `npm publish`), so this records the shasum `npm pack` would
-      # produce right now, before anything publishes, as its "qualified"
-      # digest -- comparable to the published shasum below because packing
-      # this exact, unmodified tree is the whole identity here, not a
-      # pre-pack file that publication then repackages the way the runtime
-      # dependency packages do.
+      # artifacts, it is packed straight from this checkout), so this records
+      # the shasum of the exact tarball `Release package` then publishes, as
+      # its "qualified" digest. Issue #732: it must run after the build --
+      # before `js:build`, `packages/javascript/dist/` does not exist and the
+      # recorded shasum belongs to a tarball with no `dist/` at all, which is
+      # what failed beta.7's `Verify npm publication` against a correct
+      # publish. Publishing the packed file, not the directory, means the
+      # verified bytes and the published bytes cannot diverge.
       - name: Compute the wrapper package identity
         id: pack
         shell: bash
         run: |
-          shasum=$(npm pack --dry-run --json ./packages/javascript | node -e "
-            let input = '';
-            process.stdin.on('data', (chunk) => { input += chunk; });
-            process.stdin.on('end', () => { process.stdout.write(JSON.parse(input)[0].shasum); });
-          ")
-          echo "shasum=$shasum" >> "$GITHUB_OUTPUT"
-
-      - name: Qualify release
-        run: npm run release:check
+          npm run js:build
+          npm pack --json --pack-destination "$RUNNER_TEMP" ./packages/javascript > "$RUNNER_TEMP/wrapper-pack.json"
+          tarball="$RUNNER_TEMP/$(jq -r '.[0].filename' "$RUNNER_TEMP/wrapper-pack.json")"
+          [[ -f "$tarball" ]]
+          echo "tarball=$tarball" >> "$GITHUB_OUTPUT"
+          echo "shasum=$(jq -r '.[0].shasum' "$RUNNER_TEMP/wrapper-pack.json")" >> "$GITHUB_OUTPUT"
 
       - name: Release package
-        run: npm run release -- --tag "${{ steps.release.outputs.npm_tag }}"
+        shell: bash
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TAG: ${{ steps.release.outputs.npm_tag }}
+          WRAPPER_TARBALL: ${{ steps.pack.outputs.tarball }}
+        run: npm publish --access public --tag "$NPM_TAG" "$WRAPPER_TARBALL"
 
       # `npm view` consults npm's aggregate package metadata, which can stay a
       # cached 404 for a while after a fresh publish -- that is what produced

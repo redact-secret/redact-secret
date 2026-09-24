@@ -93,6 +93,15 @@ jobs:
     steps:
       - name: Check out repository
         run: echo noop
+      - name: Qualify release
+        run: npm run release:check
+      - name: Compute the wrapper package identity
+        id: pack
+        run: npm run js:build && npm pack --json ./packages/javascript
+      - name: Release package
+        env:
+          WRAPPER_TARBALL: ${{ steps.pack.outputs.tarball }}
+        run: npm publish "$WRAPPER_TARBALL"
 
   publish-crates:
     name: Publish crates.io
@@ -415,6 +424,67 @@ class ReleaseGateTests(unittest.TestCase):
         self.assertTrue(
             any(
                 'does not assert the common artifact reports "common"' in error
+                for error in errors
+            )
+        )
+
+    def test_wrapper_identity_before_build_is_an_error(self) -> None:
+        build = "      - name: Qualify release\n        run: npm run release:check\n"
+        identity = (
+            "      - name: Compute the wrapper package identity\n"
+            "        id: pack\n"
+            "        run: npm run js:build && npm pack --json ./packages/javascript\n"
+        )
+        broken = RELEASE_YML.replace(build + identity, identity + build)
+        self.assertNotEqual(broken, RELEASE_YML)
+        self._write("release.yml", broken)
+        errors = CHECK.validate(self.root)
+        self.assertTrue(
+            any(
+                "'Compute the wrapper package identity' must follow 'Qualify release'" in error
+                for error in errors
+            )
+        )
+
+    def test_wrapper_identity_without_build_is_an_error(self) -> None:
+        broken = RELEASE_YML.replace(
+            "run: npm run js:build && npm pack --json ./packages/javascript",
+            "run: npm pack --dry-run --json ./packages/javascript",
+        )
+        self.assertNotEqual(broken, RELEASE_YML)
+        self._write("release.yml", broken)
+        errors = CHECK.validate(self.root)
+        self.assertTrue(
+            any("does not run npm run js:build before packing" in error for error in errors)
+        )
+
+    def test_wrapper_publish_not_using_recorded_tarball_is_an_error(self) -> None:
+        broken = RELEASE_YML.replace(
+            "        env:\n          WRAPPER_TARBALL: ${{ steps.pack.outputs.tarball }}\n"
+            "        run: npm publish \"$WRAPPER_TARBALL\"\n",
+            "        run: npm publish ./packages/javascript\n",
+        )
+        self.assertNotEqual(broken, RELEASE_YML)
+        self._write("release.yml", broken)
+        errors = CHECK.validate(self.root)
+        self.assertTrue(
+            any(
+                "'Release package' does not publish the tarball" in error
+                for error in errors
+            )
+        )
+
+    def test_missing_wrapper_identity_step_is_an_error(self) -> None:
+        broken = RELEASE_YML.replace(
+            "      - name: Compute the wrapper package identity\n",
+            "      - name: Pack something\n",
+        )
+        self.assertNotEqual(broken, RELEASE_YML)
+        self._write("release.yml", broken)
+        errors = CHECK.validate(self.root)
+        self.assertTrue(
+            any(
+                "job 'publish' is missing the 'Compute the wrapper package identity' step" in error
                 for error in errors
             )
         )
