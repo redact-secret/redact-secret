@@ -3,7 +3,7 @@
   "corpus": "synchronous-corpus.json",
   "offsetUnit": "utf8-byte",
   "detectors": ["private-key","jwt","bearer-token","connection-string","otpauth-uri","generic-token"],
-  "fixtureCount": 2059,
+  "fixtureCount": 2072,
   "fixtures": [
     {"expected":[{"action":"warn","confidence":"medium","detector":"generic-token","end":48,"start":8,"type":"contextual_secret"}],"id":"host-dotenv-github"},
     {"expected":[{"action":"warn","confidence":"medium","detector":"generic-token","end":52,"start":12,"type":"contextual_secret"}],"id":"host-json-github"},
@@ -2063,6 +2063,19 @@
     {"expected":[],"id":"mailchimp-api-key-boundary-datacenter-four-digits"},
     {"expected":[],"id":"mailchimp-api-key-boundary-non-hex-letter"},
     {"expected":[],"id":"databricks-personal-access-token-boundary-non-hex-letter"},
-    {"expected":[],"id":"databricks-personal-access-token-boundary-rotation-four-digits"}
+    {"expected":[],"id":"databricks-personal-access-token-boundary-rotation-four-digits"},
+    {"expected":[],"id":"postman-collection-access-key-positive-share-url"},
+    {"expected":[],"id":"postman-collection-access-key-positive-dotenv"},
+    {"expected":[],"id":"postman-collection-access-key-positive-json"},
+    {"expected":[],"id":"postman-collection-access-key-positive-lowercase-body"},
+    {"expected":[],"id":"postman-collection-access-key-regression-crlf-and-unicode-prefix"},
+    {"expected":[],"id":"postman-collection-access-key-negative-masked"},
+    {"expected":[],"id":"postman-collection-access-key-negative-placeholder"},
+    {"expected":[],"id":"postman-collection-access-key-negative-collection-id"},
+    {"expected":[],"id":"postman-collection-access-key-boundary-one-short"},
+    {"expected":[],"id":"postman-collection-access-key-boundary-one-long"},
+    {"expected":[],"id":"postman-collection-access-key-boundary-embedded"},
+    {"expected":[],"id":"postman-collection-access-key-adversarial-dense-findings"},
+    {"expected":[{"action":"redact","confidence":"high","detector":"generic-token","end":42,"start":11,"type":"contextual_secret"}],"id":"postman-collection-access-key-overlap-api-key-header"}
   ]
 }

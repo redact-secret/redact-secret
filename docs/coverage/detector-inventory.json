@@ -563,6 +563,13 @@
       "schemes": null
     },
     {
+      "type": "postman_collection_access_key",
+      "detector": "postman-collection-access-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "PMAT-SynthRevoked0Postman0Pmat1",
+      "schemes": null
+    },
+    {
       "type": "heroku_api_key",
       "detector": "heroku-api-key",
       "policyClass": "always-redact",

@@ -8366,6 +8366,92 @@
     },
     {
       "behaviorClass": "provider",
+      "detector": "postman-collection-access-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "postman-collection-access-key-positive-dotenv",
+            "postman-collection-access-key-positive-json",
+            "postman-collection-access-key-positive-lowercase-body",
+            "postman-collection-access-key-positive-share-url",
+            "postman-collection-access-key-regression-crlf-and-unicode-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "postman-collection-access-key-overlap-api-key-header"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "postman-collection-access-key-adversarial-dense-findings"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "postman-collection-access-key-boundary-embedded",
+            "postman-collection-access-key-boundary-one-long",
+            "postman-collection-access-key-boundary-one-short"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "postman-collection-access-key-negative-collection-id",
+            "postman-collection-access-key-negative-masked",
+            "postman-collection-access-key-negative-placeholder"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "postman-collection-access-key-boundary-embedded",
+            "postman-collection-access-key-boundary-one-long",
+            "postman-collection-access-key-boundary-one-short"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for postman_collection_access_key (postman-collection-access-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "postman_collection_access_key"
+    },
+    {
+      "behaviorClass": "provider",
       "detector": "heroku-api-key",
       "dimensions": [
         {
@@ -8839,6 +8925,7 @@
             "perplexity-api-key-adversarial-long-suffix",
             "pinecone-api-key-adversarial-long-suffix",
             "postman-api-key-adversarial-long-suffix",
+            "postman-collection-access-key-adversarial-dense-findings",
             "private-key-adversarial-incomplete",
             "private-key-adversarial-mismatched",
             "private-key-adversarial-nested",
@@ -9259,6 +9346,7 @@
             "perplexity-api-key-adversarial-long-suffix",
             "pinecone-api-key-adversarial-long-suffix",
             "postman-api-key-adversarial-long-suffix",
+            "postman-collection-access-key-adversarial-dense-findings",
             "private-key-adversarial-incomplete",
             "private-key-adversarial-mismatched",
             "private-key-adversarial-nested",

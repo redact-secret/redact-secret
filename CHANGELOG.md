@@ -70,6 +70,12 @@ evidence is linked from each published version.
 
 ### Changed detection
 
+- New `postman-collection-access-key` detector reports a Postman collection
+  access key as `postman_collection_access_key` (always redacted): `PMAT-`
+  followed by exactly 26 letters and digits, including in a share-via-API
+  URL's `access_key=` parameter. Postman documents the key as a read-only
+  credential without stating its shape, so the grammar follows GitLab's rule
+  (T2). A body in either case is accepted (#700).
 - `mailchimp-api-key` and `databricks-personal-access-token` now accept
   uppercase hex in the key body (#697) and a longer suffix (#698): Mailchimp
   `-us` plus 1–3 digits, and a Databricks `-` rotation suffix of 1–3 digits.

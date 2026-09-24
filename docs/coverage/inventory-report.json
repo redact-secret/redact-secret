@@ -3381,6 +3381,40 @@
       "type": "postman_api_key"
     },
     {
+      "detector": "postman-collection-access-key",
+      "evidence": {
+        "fixtureCount": 13,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "plain-text"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "postman-collection-access-key-positive-dotenv",
+        "postman-collection-access-key-positive-json",
+        "postman-collection-access-key-positive-lowercase-body",
+        "postman-collection-access-key-positive-share-url",
+        "postman-collection-access-key-regression-crlf-and-unicode-prefix"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "postman_collection_access_key"
+    },
+    {
       "detector": "heroku-api-key",
       "evidence": {
         "fixtureCount": 27,
@@ -3508,7 +3542,7 @@
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 79,
+    "supported": 80,
     "unresolved": 0
   }
 }
