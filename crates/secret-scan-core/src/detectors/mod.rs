@@ -596,7 +596,7 @@ mod tests {
         let databricks_personal_access_token_input =
             format!("dapi{}", "0123456789abcdef0123456789abcdef");
         let confluent_cloud_api_secret_input =
-            "cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPQRSTUV";
+            "cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPn2NMow";
         let netlify_token_input = "nfp_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01";
         let postman_api_key_input = format!(
             "PMAK-{}-{}",
