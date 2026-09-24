@@ -14,11 +14,11 @@ and a GitHub Release page are separate facts.
 | Version | Registry artifacts | Annotated source tag | GitHub Release |
 | --- | --- | --- | --- |
 | 0.1.0-beta.1 | 8 npm packages, 2 crates, 9 Python files | `7bbd345be0604b8c3d50335985e0bfbbbe3703c9` | [Published](https://github.com/redact-secret/redact-secret/releases/tag/v0.1.0-beta.1) |
-| 0.1.0-beta.2 | 8 npm packages, 2 crates, 9 Python files | `8cdc1b118449a15be545ecf70bb7f0df53f6126e` | Missing; [body prepared](0.1.0-beta.2/github-release-notes.md) |
-| 0.1.0-beta.3 | 8 npm packages, 2 crates, 9 Python files | `34ea9b92ed8879082e99f56f8f4715ee4e4f1f35` | Missing; [body prepared](0.1.0-beta.3/github-release-notes.md) |
-| 0.1.0-beta.4 | 8 npm packages, 2 crates, 9 Python files | `b4a9ae83d737d367ebc1d6d1732e634b44b2452a` | Missing; [record](0.1.0-beta.4/README.md) |
-| 0.1.0-beta.5 | 10 npm packages (including 2 musl), 2 crates, 9 Python files | `0cc48374d005a44334bf727e49125165ec7d4157` | Missing; [record](0.1.0-beta.5/README.md) |
-| 0.1.0-beta.6 | 10 npm packages (including 2 musl), 2 crates, 9 Python files | `079095e766e4a71e2b7e29413ed17be37bb3315d` | Missing; [record](0.1.0-beta.6/README.md) |
+| 0.1.0-beta.2 | 8 npm packages, 2 crates, 9 Python files | `8cdc1b118449a15be545ecf70bb7f0df53f6126e` | [Published](https://github.com/redact-secret/redact-secret/releases/tag/v0.1.0-beta.2) 2026-09-24 |
+| 0.1.0-beta.3 | 8 npm packages, 2 crates, 9 Python files | `34ea9b92ed8879082e99f56f8f4715ee4e4f1f35` | [Published](https://github.com/redact-secret/redact-secret/releases/tag/v0.1.0-beta.3) 2026-09-24 |
+| 0.1.0-beta.4 | 8 npm packages, 2 crates, 9 Python files | `b4a9ae83d737d367ebc1d6d1732e634b44b2452a` | [Published](https://github.com/redact-secret/redact-secret/releases/tag/v0.1.0-beta.4) 2026-09-24 |
+| 0.1.0-beta.5 | 10 npm packages (including 2 musl), 2 crates, 9 Python files | `0cc48374d005a44334bf727e49125165ec7d4157` | [Published](https://github.com/redact-secret/redact-secret/releases/tag/v0.1.0-beta.5) 2026-09-24 |
+| 0.1.0-beta.6 | 10 npm packages (including 2 musl), 2 crates, 9 Python files | `079095e766e4a71e2b7e29413ed17be37bb3315d` | [Published](https://github.com/redact-secret/redact-secret/releases/tag/v0.1.0-beta.6) 2026-09-24 |
 
 For `@redact-secret/core`, npm `beta` points to beta.6 and `latest` still points
 to beta.1. Use `@redact-secret/core@0.1.0-beta.6` or `@redact-secret/core@beta`
@@ -47,9 +47,12 @@ artifact's original qualification chain. Beta.3's durable record is
 limited to that original manifest and inventory, workflow evidence, registry
 checksums, and tag identity; it must not be described as a new qualification run.
 
-The prepared GitHub Release bodies target the existing annotated tags and are
-prereleases. Creating those pages follows the
-[release authority](../../AGENTS.md#release-authority); no package republish, new tag, or workflow dispatch is needed.
+The beta.2 through beta.6 GitHub Release pages were created on 2026-09-24,
+as prereleases on the existing annotated tags, with explicit maintainer
+approval under the [release authority](../../AGENTS.md#release-authority).
+Beta.2 and beta.3 use their prepared bodies; beta.4 through beta.6 use the
+same shape and link their durable records. No package was republished, no tag
+was created or moved, and no workflow was dispatched.
 Qualified CLI binaries remain Actions artifacts; these bodies do not promise
 new binary attachments. Security fixes target the latest beta under
 [SECURITY.md](../../SECURITY.md).
