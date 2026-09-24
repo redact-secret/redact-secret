@@ -33,6 +33,21 @@ evidence is linked from each published version.
   UUID that is a URL path segment (`https://api.heroku.com/apps/<uuid>/...`)
   is now treated as a public resource id and never reported, even on a line
   that names heroku (#743).
+- `atlassian-api-token` now redacts the whole 192-character token. It used to
+  stop at the `=` and leave the `=` plus 8 uppercase hex characters at the end
+  outside the finding. The detector now extends a match over exactly that tail
+  when the byte after it ends the token; the tail's value is not validated,
+  and a token without it is matched as before (#741).
+- `supabase-token` now accepts only the documented `sb_secret_` layout: a
+  22-character random part, `_`, and an 8-character checksum part, all
+  base64url. A 21- or 23-character random part, a 7- or 9-character checksum,
+  or a `-` in place of the `_` is no longer reported; the former 20-character
+  minimum is withdrawn. The checksum value is not validated, because the
+  hosted platform's checksum input is not documented (#742).
+- `telegram-bot-token` no longer reports an Atlassian account id
+  (`<digits>:<8-4-4-4-12 UUID>`) as a bot token. A candidate whose secret
+  segment is exactly a canonical hexadecimal UUID is rejected; every other
+  token shape is unchanged (#747).
 
 ### Internal, tooling, and qualification
 

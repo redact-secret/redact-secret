@@ -50,6 +50,17 @@
 //! - A public bot username handle (e.g. `@ExampleBot`) is a public identifier
 //!   Telegram itself displays and shares, an entirely different shape from
 //!   the `id:secret` token grammar, and is out of scope for the same reason.
+//! - A `<digits>:<uuid>` value whose secret segment is exactly a canonical
+//!   8-4-4-4-12 hexadecimal UUID (issue #747). This is the shape of an
+//!   Atlassian account id (`557058:<uuid>`), a public identifier every
+//!   Jira/Confluence user API returns, and it otherwise satisfies this
+//!   grammar's floors (36 bytes of `[A-Za-z0-9_-]`). A Telegram secret
+//!   segment is not UUID-shaped: tools and community sources (issue #660)
+//!   describe it as 35 bytes, one shorter than a UUID, and nothing in
+//!   Telegram's documentation or example places hyphens at the UUID's fixed
+//!   offsets 8/13/18/23. Only that exact layout is excluded, so a secret
+//!   that merely contains hex bytes or hyphens is still matched, and a
+//!   secret run that continues past the UUID is not a UUID and is matched.
 //! - Telegram's separate `MTProto` client API credentials (`api_id`/`api_hash`,
 //!   issued at <https://my.telegram.org> for building a Telegram *client*,
 //!   not a bot) are a distinct credential family with no `id:secret` shape
@@ -160,8 +171,31 @@ fn match_at(
     if secret_end - secret_start < MIN_SECRET_LEN {
         return None;
     }
+    if is_canonical_uuid(&bytes[secret_start..secret_end]) {
+        return None;
+    }
 
     Some(secret_end)
+}
+
+/// Byte offsets of the four hyphens in a canonical 8-4-4-4-12 UUID.
+const UUID_HYPHENS: [usize; 4] = [8, 13, 18, 23];
+
+/// The length of a canonical 8-4-4-4-12 UUID.
+const UUID_LEN: usize = 36;
+
+/// `true` when `segment` is exactly a canonical 8-4-4-4-12 hexadecimal UUID
+/// (either case): the secret segment of an Atlassian account id, not of a
+/// Telegram bot token (issue #747).
+fn is_canonical_uuid(segment: &[u8]) -> bool {
+    segment.len() == UUID_LEN
+        && segment.iter().enumerate().all(|(index, &byte)| {
+            if UUID_HYPHENS.contains(&index) {
+                byte == b'-'
+            } else {
+                byte.is_ascii_hexdigit()
+            }
+        })
 }
 
 /// `true` when the id run starting at `start` is not a truncated slice of a
@@ -302,6 +336,38 @@ mod tests {
         // trailing one does not reject the match -- it extends the secret's
         // maximal run instead, exactly like `detects_a_secret_longer_than_the_documented_example`.
         assert!(detect(&format!("x{}", token())).is_empty());
+    }
+
+    #[test]
+    fn rejects_an_atlassian_account_id_with_a_uuid_secret_segment() {
+        for input in [
+            "557058:0f3c9a4e-7b21-4d8e-9a6c-2e5b8d1f7c30".to_string(),
+            "{\"accountId\": \"557058:0F3C9A4E-7B21-4D8E-9A6C-2E5B8D1F7C30\"}\n".to_string(),
+            "assignee=712020:0f3c9a4e-7b21-4d8e-9a6c-2e5b8d1f7c30\r\n".to_string(),
+        ] {
+            assert!(detect(&input).is_empty(), "{input}");
+        }
+    }
+
+    #[test]
+    fn detects_a_secret_that_is_near_but_not_exactly_a_uuid() {
+        for secret in [
+            // A hyphen moved one byte off the UUID layout.
+            "0f3c9a4e7-b21-4d8e-9a6c-2e5b8d1f7c30",
+            // A non-hex byte in a UUID-shaped layout.
+            "0f3c9a4e-7b21-4d8e-9a6c-2e5b8d1f7c3g",
+            // A UUID with more secret bytes glued on.
+            "0f3c9a4e-7b21-4d8e-9a6c-2e5b8d1f7c30ab",
+        ] {
+            let value = format!("{ID}:{secret}");
+            let candidates = detect(&value);
+            assert_eq!(candidates.len(), 1, "{secret}");
+            assert_eq!(
+                candidates[0].range(),
+                ByteRange::new(0, value.len()).unwrap(),
+                "{secret}"
+            );
+        }
     }
 
     #[test]

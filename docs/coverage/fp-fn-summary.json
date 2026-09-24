@@ -642,17 +642,18 @@
       "detector": "supabase-token",
       "falseNegativeGuards": {
         "actualFalseNegatives": 0,
-        "count": 9,
+        "count": 10,
         "fixtureIds": [
           "supabase-positive-crlf-unicode-prefix",
           "supabase-positive-doc-style-placeholder",
+          "supabase-positive-documented-layout-exact-width",
           "supabase-positive-dotenv",
           "supabase-positive-json",
           "supabase-positive-log",
-          "supabase-positive-min-length",
           "supabase-positive-mixed-public-and-secret",
           "supabase-positive-qualified",
-          "supabase-positive-yaml"
+          "supabase-positive-yaml",
+          "supabase-token-positive-documented-layout"
         ]
       },
       "falsePositiveGuards": {
