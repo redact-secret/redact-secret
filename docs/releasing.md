@@ -344,6 +344,15 @@ python3 -B scripts/generate-support-matrix-docs.py --release-note \
   --previous <(git show "v$PREVIOUS_VERSION:benchmarks/support-matrix.json")
 ```
 
+The fragment states a delta only against a like-for-like baseline: the
+published previous release measured at the same `redact-secret-benchmarks`
+revision as the candidate matrix. A `--previous` matrix from an earlier tag
+was normally measured under an earlier corpus and ledger, so the fragment then
+says it is not comparable and states no delta. Commit the fragment as
+`docs/releases/$RELEASE_VERSION/support-status.md` and copy it into the dated
+changelog entry as its `### Support status` section. `npm run
+support-matrix:check` (in `npm run ci`) fails when the two differ (#724).
+
 Run the deterministic, offline durable-record check before opening the
 closeout PR:
 

@@ -433,6 +433,63 @@ class ReleaseNoteTests(unittest.TestCase):
         self.assertIn("New families tracked: `widget:new-token`.", text)
         self.assertIn("Families no longer tracked: `widget:old-token`.", text)
 
+    def test_a_different_benchmarks_revision_is_not_comparable(self) -> None:
+        current = matrix([family("widget", "widget:token", "Widget token", "stable")])
+        previous = matrix([family("widget", "widget:token", "Widget token", "provisional", reason="tool-corroborated only")])
+        previous["sourceReport"]["revision"] = "1" * 40
+        text = GEN.render_release_note(current, previous)
+        self.assertIn("The previous pinned matrix is not comparable", text)
+        self.assertNotIn("Stable: 1 (", text)
+        self.assertNotIn("improvement", text)
+
+    def test_a_candidate_build_baseline_is_not_comparable(self) -> None:
+        current = matrix([family("widget", "widget:token", "Widget token", "stable")])
+        previous = matrix([family("widget", "widget:token", "Widget token", "stable")])
+        previous["sourceReport"]["product"] = {"sourceCommit": "2" * 40}
+        text = GEN.render_release_note(current, previous)
+        self.assertIn("The previous pinned matrix is not comparable", text)
+        self.assertIn("candidate build", text)
+
+    def test_a_comparable_baseline_is_named(self) -> None:
+        current = matrix([family("widget", "widget:token", "Widget token", "stable")])
+        previous = matrix([family("widget", "widget:token", "Widget token", "stable")])
+        text = GEN.render_release_note(current, previous)
+        self.assertIn("Baseline: the previous release's published package measured on this corpus", text)
+
+
+class ChangelogFragmentTests(unittest.TestCase):
+    def setUp(self) -> None:
+        import tempfile
+
+        self.tmp = Path(tempfile.mkdtemp())
+        self.addCleanup(__import__("shutil").rmtree, self.tmp)
+        (self.tmp / "releases" / "1.0.0").mkdir(parents=True)
+        self.fragment = "### Support status\n\n1 providers, 1 credential families.\n"
+        (self.tmp / "releases" / "1.0.0" / GEN.FRAGMENT_NAME).write_text(self.fragment, encoding="utf-8")
+        self.changelog = self.tmp / "CHANGELOG.md"
+
+    def problems(self, body: str) -> list[str]:
+        self.changelog.write_text(body, encoding="utf-8")
+        return GEN.check_changelog_fragments(self.changelog, self.tmp / "releases")
+
+    def test_matching_section_passes(self) -> None:
+        body = "## Unreleased\n\n## 1.0.0 — 2026-01-01\n\nProse.\n\n" + self.fragment + "\n### Other\n\nx\n"
+        self.assertEqual(self.problems(body), [])
+
+    def test_hand_edited_section_fails(self) -> None:
+        body = "## 1.0.0 — 2026-01-01\n\n### Support status\n\n1 providers, 2 credential families.\n"
+        self.assertEqual(len(self.problems(body)), 1)
+
+    def test_missing_section_fails(self) -> None:
+        self.assertEqual(len(self.problems("## 1.0.0 — 2026-01-01\n\nProse.\n")), 1)
+
+    def test_the_next_version_is_not_read_into_this_one(self) -> None:
+        body = "## 1.0.0 — 2026-01-01\n\nProse.\n\n## 0.9.0 — 2025-01-01\n\n" + self.fragment
+        self.assertEqual(len(self.problems(body)), 1)
+
+    def test_committed_changelog_matches_committed_fragments(self) -> None:
+        self.assertEqual(GEN.check_changelog_fragments(GEN.CHANGELOG_PATH, GEN.RELEASES_DIR), [])
+
 
 class RealRepoReconciliationTests(unittest.TestCase):
     """Exercises the generator over the real, pinned `benchmarks/support-matrix.json`
