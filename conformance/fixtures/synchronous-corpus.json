@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 1674,
+  "fixtureCount": 1685,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -6665,7 +6665,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "sb_secret_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_",
+      "input": "sb_secret_SYNTHETIC_REVOKED_SUPA_CHECKSUM",
       "expected": [
         {
           "detector": "supabase-token",
@@ -6673,10 +6673,10 @@
           "confidence": "high",
           "specificity": "provider",
           "start": 0,
-          "end": 46
+          "end": 41
         }
       ],
-      "note": "A provider-published prefix with a substantial synthetic suffix is supported."
+      "note": "The documented sb_secret_ layout (a 22-byte random part, `_`, and an 8-byte checksum part, all base64url) is supported (#742)."
     },
     {
       "id": "supabase-negative-ordinary-reference",
@@ -6719,7 +6719,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "access_token=sb_secret_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_",
+      "input": "access_token=sb_secret_SYNTHETIC_REVOKED_SUPA_CHECKSUM",
       "expected": [
         {
           "detector": "supabase-token",
@@ -6727,13 +6727,13 @@
           "confidence": "high",
           "specificity": "provider",
           "start": 13,
-          "end": 59
+          "end": 54
         }
       ],
       "note": "Qualified provider evidence wins over a contextual assignment."
     },
     {
-      "id": "supabase-positive-min-length",
+      "id": "supabase-positive-documented-layout-exact-width",
       "detector": "supabase-token",
       "kind": "positive",
       "support": "supported",
@@ -6741,7 +6741,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "sb_secret_SYNTHETIC_REVOKED_SY",
+      "input": "sb_secret_SYNTHETICREVOKED012345_CHKSUM03",
       "expected": [
         {
           "detector": "supabase-token",
@@ -6749,10 +6749,10 @@
           "confidence": "high",
           "specificity": "provider",
           "start": 0,
-          "end": 30
+          "end": 41
         }
       ],
-      "note": "The documented minimum suffix length, at its exact boundary, is supported."
+      "note": "Issue #742: the body is exactly the documented 31 bytes (22 + `_` + 8); the former 20-byte open floor is withdrawn, so this is the only accepted width."
     },
     {
       "id": "supabase-boundary-below-min",
@@ -6828,9 +6828,9 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "sb_publishable_SYNTHETIC_REVOKED_SY",
+      "input": "sb_publishable_SYNTHETIC_REVOKED_SUPA_CHECKSUM",
       "expected": [],
-      "note": "Supabase's publishable key prefix is a public identifier, not an elevated-access secret."
+      "note": "The public sb_publishable_ key with the same documented 22 + `_` + 8 body is a public identifier, not a secret; only the prefix discriminates."
     },
     {
       "id": "supabase-adversarial-long-suffix",
@@ -6843,21 +6843,12 @@
       ],
       "resource": {
         "maxInputBytes": 33783,
-        "maxFindings": 1,
+        "maxFindings": 0,
         "maxRuntimeMs": 250
       },
       "input": "sb_secret_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_!",
-      "expected": [
-        {
-          "detector": "supabase-token",
-          "type": "supabase_secret_key",
-          "confidence": "high",
-          "specificity": "provider",
-          "start": 0,
-          "end": 11260
-        }
-      ],
-      "note": "A long delimited provider match remains deterministic and bounded."
+      "expected": [],
+      "note": "A long base64url run after sb_secret_ is not the documented 22 + `_` + 8 layout, so it is rejected rather than truncated (#742), deterministically and within bounds."
     },
     {
       "id": "supabase-negative-wrong-prefix",
@@ -6868,7 +6859,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "sb_secrets_SYNTHETICREVOKEDSYNTHETICREVOKED",
+      "input": "sb_secrets_SYNTHETICREVOKEDSECRET_CHKSUM02",
       "expected": [],
       "note": "An undocumented near-miss prefix ('sb_secrets_') that is not one byte-for-byte equal to any documented prefix is not classified, however long or well-formed the following run is."
     },
@@ -6881,7 +6872,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "(sb_publishable_SYNTHETICREVOKEDSYNT).",
+      "input": "(sb_publishable_SYNTHETICREVOKEDPUBLIC_CHKSUM01).",
       "expected": [],
       "note": "The public identifier prefix stays unclassified when immediately surrounded by punctuation, mirroring the positive suffix's own punctuation-boundary behavior."
     },
@@ -6894,7 +6885,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 密钥 café\r\nsb_publishable_SYNTHETICREVOKEDSYNT\r\n",
+      "input": "# 🔑 密钥 café\r\nsb_publishable_SYNTHETICREVOKEDPUBLIC_CHKSUM01\r\n",
       "expected": [],
       "note": "A preceding Unicode comment line and CRLF line endings do not turn the public identifier prefix into a classified credential."
     },
@@ -6933,7 +6924,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "sb_secret_xxxxxxxxxxxxxxxxxxxxxxxx",
+      "input": "sb_secret_xxxxxxxxxxxxxxxxxxxxxx_xxxxxxxx",
       "expected": [
         {
           "detector": "supabase-token",
@@ -6941,10 +6932,10 @@
           "confidence": "high",
           "specificity": "provider",
           "start": 0,
-          "end": 34
+          "end": 41
         }
       ],
-      "note": "A documentation placeholder built entirely from valid alphabet characters (e.g. a repeated filler letter) is indistinguishable from a real secret's shape and is classified: an accepted precision/recall tradeoff, not a bug. Only a placeholder that breaks the alphabet run (angle brackets, underscores outside the allowed set) is excluded."
+      "note": "A documentation placeholder built entirely from valid alphabet characters in the documented 22 + `_` + 8 layout (e.g. a repeated filler letter) is indistinguishable from a real secret's shape and is classified: an accepted precision/recall tradeoff, not a bug. Only a placeholder that breaks the alphabet run or the documented layout is excluded."
     },
     {
       "id": "supabase-positive-mixed-public-and-secret",
@@ -6955,15 +6946,15 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "sb_publishable_SYNTHETICREVOKEDSYNT\nsb_secret_SYNTHETICREVOKEDSYNTHETICREVOKED",
+      "input": "sb_publishable_SYNTHETICREVOKEDPUBLIC_CHKSUM01\nsb_secret_SYNTHETICREVOKEDSECRET_CHKSUM02",
       "expected": [
         {
           "detector": "supabase-token",
           "type": "supabase_secret_key",
           "confidence": "high",
           "specificity": "provider",
-          "start": 36,
-          "end": 78
+          "start": 47,
+          "end": 88
         }
       ],
       "note": "A public identifier and a secret credential on adjacent lines: the public prefix never generates a candidate at all (not merely suppressed by overlap resolution), while the paired secret is still classified with the correct range."
@@ -6977,7 +6968,7 @@
       "contexts": [
         "dotenv"
       ],
-      "input": "SUPABASE_SERVICE_ROLE_KEY=sb_secret_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_",
+      "input": "SUPABASE_SERVICE_ROLE_KEY=sb_secret_SYNTHETIC_REVOKED_SUPA_CHECKSUM",
       "expected": [
         {
           "detector": "supabase-token",
@@ -6985,7 +6976,7 @@
           "confidence": "high",
           "specificity": "provider",
           "start": 26,
-          "end": 72
+          "end": 67
         }
       ],
       "note": "A bare dotenv-style assignment (SUPABASE_SERVICE_ROLE_KEY=<token>, no quotes) is detected by format alone."
@@ -6999,7 +6990,7 @@
       "contexts": [
         "json"
       ],
-      "input": "{\"supabaseServiceRoleKey\": \"sb_secret_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\"}",
+      "input": "{\"supabaseServiceRoleKey\": \"sb_secret_SYNTHETIC_REVOKED_SUPA_CHECKSUM\"}",
       "expected": [
         {
           "detector": "supabase-token",
@@ -7007,7 +6998,7 @@
           "confidence": "high",
           "specificity": "provider",
           "start": 28,
-          "end": 74
+          "end": 69
         }
       ],
       "note": "A quoted JSON string value is detected the same as a bare one; the enclosing quotes are not part of the match."
@@ -7021,7 +7012,7 @@
       "contexts": [
         "yaml"
       ],
-      "input": "supabase_service_role_key: sb_secret_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\n",
+      "input": "supabase_service_role_key: sb_secret_SYNTHETIC_REVOKED_SUPA_CHECKSUM\n",
       "expected": [
         {
           "detector": "supabase-token",
@@ -7029,7 +7020,7 @@
           "confidence": "high",
           "specificity": "provider",
           "start": 27,
-          "end": 73
+          "end": 68
         }
       ],
       "note": "A YAML mapping value is detected the same as a bare one."
@@ -7043,7 +7034,7 @@
       "contexts": [
         "log"
       ],
-      "input": "2026-09-16T00:00:00Z INFO refreshing session key=sb_secret_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_ project=example",
+      "input": "2026-09-16T00:00:00Z INFO refreshing session key=sb_secret_SYNTHETIC_REVOKED_SUPA_CHECKSUM project=example",
       "expected": [
         {
           "detector": "supabase-token",
@@ -7051,7 +7042,7 @@
           "confidence": "high",
           "specificity": "provider",
           "start": 49,
-          "end": 95
+          "end": 90
         }
       ],
       "note": "A provider token embedded in a structured log line is still detected."
@@ -7065,7 +7056,7 @@
       "contexts": [
         "plain-text"
       ],
-      "input": "# 🔑 café\r\nsb_secret_SYNTHETIC_REVOKED_SYNTHETIC_REVOKED_\r\n",
+      "input": "# 🔑 café\r\nsb_secret_SYNTHETIC_REVOKED_SUPA_CHECKSUM\r\n",
       "expected": [
         {
           "detector": "supabase-token",
@@ -7073,7 +7064,7 @@
           "confidence": "high",
           "specificity": "provider",
           "start": 14,
-          "end": 60
+          "end": 55
         }
       ],
       "note": "A match after a CRLF line ending and a Unicode-prefixed comment line is still found at the correct UTF-8 byte offset."
@@ -7317,6 +7308,67 @@
       "input": "sbp_synthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3paddingsynthetic0revoked1provider2value3padding",
       "expected": [],
       "note": "An 8000-byte homogeneous lowercase-alnum run after the documented prefix is neither documented exact length, so the exact-length-plus-truncation rule reports nothing; the scan still stays deterministic and bounded (a long same-alphabet run is not misread as the exact shape plus trailing bytes)."
+    },
+    {
+      "id": "supabase-token-positive-documented-layout",
+      "detector": "supabase-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "SUPABASE_SECRET_KEY=sb_secret_SYNTHETIC-REVOKED_SUPA_CHK-SUM0",
+      "expected": [
+        {
+          "detector": "supabase-token",
+          "type": "supabase_secret_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 20,
+          "end": 61
+        }
+      ],
+      "note": "Issue #742: sb_secret_ + a 22-byte base64url random part + `_` + an 8-byte base64url checksum part, the layout Supabase documents, is detected; `-` and `_` inside a segment are part of the base64url alphabet, so only the delimiter position is structural."
+    },
+    {
+      "id": "supabase-token-negative-random-part-21",
+      "detector": "supabase-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "regression",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "SUPABASE_SECRET_KEY=sb_secret_SYNTHETIC-REVOKED_SUP_CHK-SUM0",
+      "expected": [],
+      "note": "Issue #742 twin: a 21-byte random part is outside the documented 22 + `_` + 8 layout and is rejected."
+    },
+    {
+      "id": "supabase-token-negative-checksum-9",
+      "detector": "supabase-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "regression",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "SUPABASE_SECRET_KEY=sb_secret_SYNTHETIC-REVOKED_SUPA_CHK-SUM0X",
+      "expected": [],
+      "note": "Issue #742 twin: a 9-byte checksum part is outside the documented layout and is rejected rather than truncated to 8."
+    },
+    {
+      "id": "supabase-token-negative-dash-delimiter",
+      "detector": "supabase-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "regression",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "SUPABASE_SECRET_KEY=sb_secret_SYNTHETIC-REVOKED_SUPA-CHK-SUM0",
+      "expected": [],
+      "note": "Issue #742 twin: `-` where the documented `_` delimiter belongs is rejected; the delimiter is checked by position because both segments may themselves contain `-` and `_`."
     },
     {
       "id": "vercel-positive-qualified",
@@ -18756,6 +18808,94 @@
       "note": "A public Atlassian cloud/site identifier (a UUID) shares no shape with the ATAT-prefixed API token grammar and is not classified."
     },
     {
+      "id": "atlassian-api-token-positive-crc32-suffix-full-span",
+      "detector": "atlassian-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "ATLASSIAN_API_TOKEN=ATATT3xFfGF0SYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY_SYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY_SYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY_SYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY=0A1B2C3D",
+      "expected": [
+        {
+          "detector": "atlassian-api-token",
+          "type": "atlassian_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 20,
+          "end": 212
+        }
+      ],
+      "note": "Issue #741: a 192-byte token ends in `=` + 8 uppercase hex; the whole token, tail included, is the finding. The tail's value is not validated."
+    },
+    {
+      "id": "atlassian-api-token-positive-crc32-suffix-json",
+      "detector": "atlassian-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"apiToken\": \"ATATT3xFfGF0SYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY_SYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY_SYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY_SYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY=0A1B2C3D\"}",
+      "expected": [
+        {
+          "detector": "atlassian-api-token",
+          "type": "atlassian_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 206
+        }
+      ],
+      "note": "Issue #741: the `=` + 8-hex tail stays inside the span when a quote closes the value."
+    },
+    {
+      "id": "atlassian-api-token-positive-no-suffix-exact",
+      "detector": "atlassian-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "ATLASSIAN_API_TOKEN=ATATT3xFfGF0SYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY_SYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY_SYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY_SYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY",
+      "expected": [
+        {
+          "detector": "atlassian-api-token",
+          "type": "atlassian_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 20,
+          "end": 203
+        }
+      ],
+      "note": "Issue #741 control: a token with no `=` tail is matched exactly as before."
+    },
+    {
+      "id": "atlassian-api-token-boundary-nine-hex-tail",
+      "detector": "atlassian-api-token",
+      "kind": "boundary",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "ATLASSIAN_API_TOKEN=ATATT3xFfGF0SYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY_SYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY_SYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY_SYNTHETIC_REVOKED_ATLASSIAN_API_TOKEN_BODY=0A1B2C3D4",
+      "expected": [
+        {
+          "detector": "atlassian-api-token",
+          "type": "atlassian_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 20,
+          "end": 203
+        }
+      ],
+      "note": "Issue #741 control: only `=` + exactly 8 uppercase hex is the documented tail; a 9-byte tail is not absorbed, so the finding stays at the body run."
+    },
+    {
       "id": "contextual-positive-nested-no-separator-api-key",
       "detector": "generic-token",
       "kind": "positive",
@@ -19219,6 +19359,54 @@
       "input": "1694812800:0",
       "expected": [],
       "note": "A short numeric:numeric pair (e.g. a Unix timestamp followed by an unrelated digit) shares only superficial punctuation with the documented grammar and never reaches the secret minimum."
+    },
+    {
+      "id": "telegram-bot-token-negative-atlassian-account-id",
+      "detector": "telegram-bot-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"accountId\": \"557058:0f3c9a4e-7b21-4d8e-9a6c-2e5b8d1f7c30\"}\n",
+      "expected": [],
+      "note": "Issue #747: an Atlassian account id (`<digits>:<8-4-4-4-12 uuid>`) is a public identifier, not a Telegram bot token; a secret segment that is exactly a canonical UUID is excluded."
+    },
+    {
+      "id": "telegram-bot-token-negative-atlassian-account-id-uppercase",
+      "detector": "telegram-bot-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "assignee 712020:0F3C9A4E-7B21-4D8E-9A6C-2E5B8D1F7C30",
+      "expected": [],
+      "note": "Issue #747: the UUID exclusion is case-insensitive over hex."
+    },
+    {
+      "id": "telegram-bot-token-positive-control-exact",
+      "detector": "telegram-bot-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "TELEGRAM_BOT_TOKEN=1234567890:AASYNTHETIC_REVOKED-TELEGRAM-BOT-TK\n",
+      "expected": [
+        {
+          "detector": "telegram-bot-token",
+          "type": "telegram_bot_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 19,
+          "end": 65
+        }
+      ],
+      "note": "Issue #747 control: a 10-digit id and a 35-byte AA-led secret stay detected exactly."
     },
     {
       "id": "discord-bot-token-positive-bare",
