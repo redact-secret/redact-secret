@@ -6347,6 +6347,7 @@
         {
           "dimension": "positive",
           "evidenceFixtureIds": [
+            "confluent-cloud-api-secret-checksum-valid",
             "confluent-cloud-api-secret-positive-bare",
             "confluent-cloud-api-secret-positive-crlf-unicode-prefix",
             "confluent-cloud-api-secret-positive-dotenv",
@@ -6385,6 +6386,9 @@
         {
           "dimension": "near-miss-negative",
           "evidenceFixtureIds": [
+            "confluent-cloud-api-secret-negative-checksum-big-endian",
+            "confluent-cloud-api-secret-negative-checksum-mismatch",
+            "confluent-cloud-api-secret-negative-checksum-prefix-included",
             "confluent-cloud-api-secret-negative-cluster-and-host-context",
             "confluent-cloud-api-secret-negative-doc-style-placeholder",
             "confluent-cloud-api-secret-negative-embedded-identifier",
