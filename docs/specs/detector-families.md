@@ -70,7 +70,7 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `openrouter_api_key` | `openrouter-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `otpauth_secret` | `otpauth-uri` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `perplexity_api_key` | `perplexity-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository |
-| `pinecone_api_key` | `pinecone-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository |
+| `pinecone_api_key` | `pinecone-api-key` | `always-redact` | [Claim a legacy Pinecone UUID key only under a Pinecone API-key name, and redact it](../decisions/2026-09-24-claim-a-legacy-pinecone-uuid-key-only-under-its-api-key-name.md) |
 | `postman_api_key` | `postman-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `private_key` | `private-key` | `block` | generic policy default, no dedicated ADR in this repository |
 | `pulumi_access_token` | `pulumi-access-token` | `always-redact` | [Freeze the Pulumi access token grammar as a documented-prefix, tool-corroborated exact-length hex shape](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
@@ -136,7 +136,7 @@ safe-observation plan and FP/FN boundary are in [#726 evidence](../audits/eviden
 | 1 | `notion:integration-token` | `ntn_` + 11 digits + 35 alphanumeric | empirical |
 | 2 | `perplexity:api-key` | `pplx-` + 48 alphanumeric | empirical |
 | 2 | `fireworks-ai:api-key` | `fw_` + 22 or 24 alphanumeric; widths are provisional positive hypotheses | empirical |
-| 2 | `pinecone:api-key` | `pcsk_` + 5–6 alphanumeric + `_` + 63 alphanumeric; legacy UUID is context-only | empirical |
+| 2 | `pinecone:api-key` | `pcsk_` + 5–6 alphanumeric + `_` + 63 alphanumeric; legacy UUID only as the value of a Pinecone API-key name (#702) | empirical |
 | 2 | `slack:user-token` | `xoxp-` + three numeric sections + final secret section; widths/alphabet open | documented |
 | 2 | `gitlab:runner-authentication-token` | `glrt-` legacy/partitioned 20-byte body or checksum-valid routable dotted form | empirical |
 
@@ -181,8 +181,9 @@ the length holder and the CRC-32 (over everything before it, prefix included)
 offline; a routable value that fails either check, and a legacy body of any
 other width, is an intentional false negative. `glrtr-`, instance-prefixed and
 unversioned routable forms stay unclaimed (`glrtr-` remains under
-`gitlab-token`). The legacy bare-UUID Pinecone key is a separate
-context-constrained candidate and is not implemented here. Each family keeps
+`gitlab-token`). The legacy bare-UUID Pinecone key is claimed only as the
+value of a Pinecone API-key name on the same line (#702, rule below); a bare
+UUID stays unclaimed. Each family keeps
 its frozen qualification route; a documented or empirical route is a target,
 not a support-status promotion.
 
@@ -211,6 +212,7 @@ not a support-status promotion.
 | The Hugging Face organization-token prefix is adopted under `hf_`'s frozen body grammar, tiered as T2. | [Adopt the Hugging Face organization-token prefix under hf_'s frozen body grammar, re-tiered to T2](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | The Slack credential family is completed: the user-token grammar and the rotation family's version section are frozen. | [Complete the Slack credential family by freezing the user-token grammar and the rotation family's version section](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | The GitLab token-prefix table is inventoried, and its two undeclared prefixes are given a contract. | [Inventory the GitLab token-prefix table and contract the two undeclared prefixes; record routable tokens and the legacy runner-registration token as explicit, tracked gaps](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
+| `pinecone-api-key` reports a legacy lowercase `8-4-4-4-12` UUID as `pinecone_api_key` at high confidence only when it is the value assigned to a Pinecone API-key name on the same line: a name normalizing to `pinecone_api_key`/`pinecone_apikey`/`pinecone_key`, or to `api_key`/`apikey` on a line containing `pinecone`. A bare UUID, a UUID under an id-named key, a UUID whose name is on another line, and an all-one-digit placeholder UUID stay unclaimed ([#702](https://github.com/redact-secret/redact-secret/issues/702)). | [Claim a legacy Pinecone UUID key only under a Pinecone API-key name, and redact it](../decisions/2026-09-24-claim-a-legacy-pinecone-uuid-key-only-under-its-api-key-name.md) |
 | GitHub's six token families map onto six independent finding types under one detector. | [Map GitHub's six token families onto six independent finding types under one detector](../decisions/2026-09-20-map-github-token-families-onto-independent-finding-types.md) |
 | The legacy Supabase anon JWT's payload-trusting exclusion is scoped to `iss` and `role` together. | [Scope a payload-trusting exclusion for the legacy Supabase anon JWT to iss+role together](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | The Supabase management-token credential class is kept separate from the secret-key class, with independent evidence for each. | [Separate the Supabase management-token credential class from the secret-key class, and keep each class's evidence independent](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |

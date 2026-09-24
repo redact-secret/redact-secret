@@ -124,7 +124,7 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(ai_inference::OPENROUTER),
         Box::new(ai_inference::PERPLEXITY),
         Box::new(ai_inference::FIREWORKS),
-        Box::new(pinecone::PINECONE),
+        Box::new(pinecone::PineconeApiKeyDetector),
         Box::new(gitlab::GitlabRunnerAuthenticationTokenDetector),
         Box::new(databricks::DATABRICKS),
         Box::new(confluent::CONFLUENT_CLOUD_API_SECRET),
