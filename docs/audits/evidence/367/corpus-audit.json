@@ -4107,78 +4107,6 @@
       "contexts": [
         "javascript"
       ],
-      "contractOnlyMatches": [
-        {
-          "end": 75,
-          "start": 36,
-          "variant": "api-key"
-        }
-      ],
-      "corpus": "conformance/synchronous",
-      "detector": "google-api-key",
-      "disposition": "review",
-      "expectedRanges": [],
-      "id": "firebase-negative-client-config-javascript",
-      "kind": "negative",
-      "lostRanges": [],
-      "policyOutcomes": [],
-      "retainedRanges": [],
-      "support": "supported",
-      "tier": "negative"
-    },
-    {
-      "contexts": [
-        "json"
-      ],
-      "contractOnlyMatches": [
-        {
-          "end": 51,
-          "start": 12,
-          "variant": "api-key"
-        }
-      ],
-      "corpus": "conformance/synchronous",
-      "detector": "google-api-key",
-      "disposition": "review",
-      "expectedRanges": [],
-      "id": "firebase-negative-client-config-json",
-      "kind": "negative",
-      "lostRanges": [],
-      "policyOutcomes": [],
-      "retainedRanges": [],
-      "support": "supported",
-      "tier": "negative"
-    },
-    {
-      "contexts": [
-        "javascript"
-      ],
-      "contractOnlyMatches": [],
-      "corpus": "conformance/synchronous",
-      "detector": "google-api-key",
-      "disposition": "retained",
-      "expectedRanges": [
-        {
-          "end": 54,
-          "start": 15
-        }
-      ],
-      "id": "firebase-negative-client-config-wide-gap-does-not-suppress",
-      "kind": "boundary",
-      "lostRanges": [],
-      "retainedRanges": [
-        {
-          "end": 54,
-          "start": 15
-        }
-      ],
-      "support": "supported",
-      "tier": "contextual"
-    },
-    {
-      "contexts": [
-        "javascript"
-      ],
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "google-api-key",
@@ -4190,6 +4118,110 @@
       "retainedRanges": [],
       "support": "supported",
       "tier": "negative"
+    },
+    {
+      "contexts": [
+        "dotenv"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "google-api-key",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 68,
+          "start": 29
+        }
+      ],
+      "id": "firebase-positive-client-config-dotenv",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 68,
+          "start": 29
+        }
+      ],
+      "support": "supported",
+      "tier": "regression"
+    },
+    {
+      "contexts": [
+        "javascript"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "google-api-key",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 75,
+          "start": 36
+        }
+      ],
+      "id": "firebase-positive-client-config-javascript",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 75,
+          "start": 36
+        }
+      ],
+      "support": "supported",
+      "tier": "regression"
+    },
+    {
+      "contexts": [
+        "json"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "google-api-key",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 51,
+          "start": 12
+        }
+      ],
+      "id": "firebase-positive-client-config-json",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 51,
+          "start": 12
+        }
+      ],
+      "support": "supported",
+      "tier": "regression"
+    },
+    {
+      "contexts": [
+        "javascript"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "google-api-key",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 75,
+          "start": 36
+        }
+      ],
+      "id": "firebase-positive-client-config-minimal-javascript",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 75,
+          "start": 36
+        }
+      ],
+      "support": "supported",
+      "tier": "regression"
     },
     {
       "contexts": [
@@ -4216,6 +4248,32 @@
       ],
       "support": "supported",
       "tier": "canonical"
+    },
+    {
+      "contexts": [
+        "json"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "google-api-key",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 455,
+          "start": 416
+        }
+      ],
+      "id": "firebase-positive-google-services-json",
+      "kind": "positive",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 455,
+          "start": 416
+        }
+      ],
+      "support": "supported",
+      "tier": "regression"
     },
     {
       "contexts": [
@@ -10135,8 +10193,8 @@
     },
     "google-api-key": {
       "broad-shape": 0,
-      "retained": 11,
-      "review": 2,
+      "retained": 15,
+      "review": 0,
       "silent": 18
     },
     "huggingface-token": {

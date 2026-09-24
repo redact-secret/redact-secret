@@ -2917,7 +2917,12 @@
         {
           "dimension": "positive",
           "evidenceFixtureIds": [
+            "firebase-positive-client-config-dotenv",
+            "firebase-positive-client-config-javascript",
+            "firebase-positive-client-config-json",
+            "firebase-positive-client-config-minimal-javascript",
             "firebase-positive-google-api-key-as-server-key-context",
+            "firebase-positive-google-services-json",
             "google-positive-dotenv",
             "google-positive-javascript-firebase-config",
             "google-positive-json",
@@ -2944,7 +2949,6 @@
         {
           "dimension": "boundary",
           "evidenceFixtureIds": [
-            "firebase-negative-client-config-wide-gap-does-not-suppress",
             "google-boundary-below-min",
             "google-boundary-case-sensitivity",
             "google-boundary-crlf",
@@ -2959,8 +2963,6 @@
           "dimension": "near-miss-negative",
           "evidenceFixtureIds": [
             "firebase-negative-authdomain-bare",
-            "firebase-negative-client-config-javascript",
-            "firebase-negative-client-config-json",
             "firebase-negative-messaging-sender-id-bare",
             "google-negative-key-id",
             "google-negative-masked",
