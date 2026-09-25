@@ -1,0 +1,10 @@
+{
+  "name": "redact-secret-example-mcp-redact",
+  "private": true,
+  "type": "module",
+  "description": "The MCP / AI-context golden path. Its dependencies are publish-shaped redact-secret-adapters tarballs pinned in adapters/pin-source.json; install them with `npm run adapter-pins:install` from the repository root.",
+  "dependencies": {
+    "@redact-secret/adapter": "file:../../.cache/adapters/a7fbcc32b56ada3b5107e9fbddb9a019eeaf6d43/redact-secret-adapter-0.1.0.tgz",
+    "@redact-secret/adapter-ai-context": "file:../../.cache/adapters/a7fbcc32b56ada3b5107e9fbddb9a019eeaf6d43/redact-secret-adapter-ai-context-0.1.0.tgz"
+  }
+}

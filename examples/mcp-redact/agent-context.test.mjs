@@ -1,248 +1,224 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { buildSafeContext, redactUserInput } from "./agent-context.mjs";
-import { fakeScanAndRedact } from "./fixtures/fake-scanner.mjs";
+import { buildSafeContext, createGoldenPathBoundary, createGoldenPathBoundaryWith, EXAMPLE_LIMITS } from "./agent-context.mjs";
+import { fakeCore, uninitializedCore } from "./fixtures/fake-core.mjs";
 
-// --- redactUserInput -------------------------------------------------------
+function setup(overrides = {}) {
+  const events = [];
+  const boundary = createGoldenPathBoundaryWith(fakeCore, {
+    onFinding: (finding, context) => events.push({ boundary: context.boundary, action: finding.action }),
+    ...overrides,
+  });
+  return { boundary, events };
+}
 
-test("redactUserInput: allow — clean input passes through untouched, no findings", () => {
-  const result = redactUserInput(fakeScanAndRedact, "hello there");
-  assert.deepEqual(result, { outcome: "ok", text: "hello there", findings: [] });
+const { boundary } = setup();
+
+// --- the four policy actions -------------------------------------------------
+
+test("allow — clean input and no tool call produce a one-message safe context", async () => {
+  const result = await buildSafeContext({ boundary, userInput: "hello" });
+  assert.deepEqual(result, { outcome: "ok", value: [{ role: "user", content: "hello" }], findings: [] });
 });
 
-test("redactUserInput: redact — a finding's span is replaced, the call continues", () => {
-  const result = redactUserInput(fakeScanAndRedact, "here is SECRET_TOKEN_1 ok");
+test("redact — a secret in user input is redacted before context construction", async () => {
+  const result = await buildSafeContext({ boundary, userInput: "my token is SECRET_TOKEN_1" });
   assert.equal(result.outcome, "ok");
-  assert.equal(result.text, "here is <SECRET_1> ok");
+  assert.deepEqual(result.value, [{ role: "user", content: "my token is <SECRET_1>" }]);
   assert.equal(result.findings[0].action, "redact");
 });
 
-test("redactUserInput: warn — text passes through unchanged, finding still reported", () => {
-  const result = redactUserInput(fakeScanAndRedact, "WARN_ME please");
+test("warn — a warning in user input passes through and is still reported", async () => {
+  const { boundary: audited, events } = setup();
+  const result = await buildSafeContext({ boundary: audited, userInput: "WARN_ME" });
   assert.equal(result.outcome, "ok");
-  assert.equal(result.text, "WARN_ME please");
-  assert.equal(result.findings[0].action, "warn");
+  assert.deepEqual(result.value, [{ role: "user", content: "WARN_ME" }]);
+  assert.deepEqual(events, [{ boundary: "user-input", action: "warn" }]);
 });
 
-test("redactUserInput: block — a block finding blocks with no text or input retained", () => {
-  const result = redactUserInput(fakeScanAndRedact, "BLOCK_ME now");
-  assert.equal(result.outcome, "blocked");
-  assert.equal(result.blockReason, "policy");
-  assert.equal(result.findings.length, 1);
-  assert.equal(result.findings[0].action, "block");
-  assert.equal("text" in result, false);
-  assert.equal(JSON.stringify(result).includes("BLOCK_ME"), false);
-});
-
-test("redactUserInput: oversized input is rejected by length alone, scanAndRedact is never called", () => {
+test("block at the input stage never dispatches a tool, never builds context, and carries no findings", async () => {
   let called = false;
-  const scanAndRedact = () => {
-    called = true;
-    return { text: "", findings: [] };
-  };
-  const result = redactUserInput(scanAndRedact, "x".repeat(10), { limits: { maxInputLength: 5 } });
-  assert.deepEqual(result, { outcome: "blocked", blockReason: "input_too_large", findings: [] });
-  assert.equal(called, false);
-});
-
-test("redactUserInput: a scanAndRedact failure (including calling before initialize()) fails closed", () => {
-  const result = redactUserInput(fakeScanAndRedact, "BOOM here");
-  assert.deepEqual(result, { outcome: "blocked", blockReason: "core_error", findings: [] });
-});
-
-test("redactUserInput: rejects a non-function scanAndRedact or non-string text", () => {
-  assert.throws(() => redactUserInput(null, "x"), TypeError);
-  assert.throws(() => redactUserInput(fakeScanAndRedact, 123), TypeError);
-});
-
-// --- buildSafeContext --------------------------------------------------------
-
-test("buildSafeContext: allow — clean input and no tool call produce a one-message safe context", async () => {
-  const result = await buildSafeContext({ scanAndRedact: fakeScanAndRedact, userInput: "hello" });
-  assert.equal(result.outcome, "ok");
-  assert.deepEqual(result.context.messages, [{ role: "user", content: "hello" }]);
-  assert.deepEqual(result.findings, []);
-});
-
-test("buildSafeContext: redact — a secret in user input is redacted before context construction", async () => {
+  const { boundary: audited, events } = setup();
   const result = await buildSafeContext({
-    scanAndRedact: fakeScanAndRedact,
-    userInput: "my token is SECRET_TOKEN_1",
-  });
-  assert.equal(result.outcome, "ok");
-  assert.deepEqual(result.context.messages, [{ role: "user", content: "my token is <SECRET_1>" }]);
-});
-
-test("buildSafeContext: warn — a warning in user input passes through and is still reported", async () => {
-  const seen = [];
-  const result = await buildSafeContext({
-    scanAndRedact: fakeScanAndRedact,
-    userInput: "WARN_ME",
-    onFinding: (finding, ctx) => seen.push({ scope: ctx.scope, action: finding.action }),
-  });
-  assert.equal(result.outcome, "ok");
-  assert.deepEqual(result.context.messages, [{ role: "user", content: "WARN_ME" }]);
-  assert.deepEqual(seen, [{ scope: "input", action: "warn" }]);
-});
-
-test("buildSafeContext: block at the input stage never dispatches a tool and never builds context", async () => {
-  let called = false;
-  const callTool = async () => {
-    called = true;
-    return { content: [] };
-  };
-  const result = await buildSafeContext({
-    scanAndRedact: fakeScanAndRedact,
+    boundary: audited,
     userInput: "BLOCK_ME",
-    callTool,
+    callTool: async () => {
+      called = true;
+      return { content: [] };
+    },
     buildToolRequest: () => ({ name: "x" }),
   });
-  assert.equal(result.outcome, "blocked");
-  assert.equal(result.stage, "input");
-  assert.equal(result.blockReason, "policy");
-  assert.equal(result.findings.length, 1);
-  assert.equal(result.findings[0].action, "block");
+  assert.deepEqual(result, { outcome: "blocked", reason: "policy", stage: "input" });
   assert.equal(called, false);
-  assert.equal("context" in result, false);
+  // Auditing still sees the finding, through telemetry only.
+  assert.deepEqual(events, [{ boundary: "user-input", action: "block" }]);
 });
 
-test("buildSafeContext: a tool result is scanned before entering context (tool result -> scan -> context construction)", async () => {
-  const callTool = async (request) => ({
-    content: [{ type: "text", text: `ran ${request.name}: SECRET_TOKEN_1` }],
-  });
+// --- tool result -> scan -> context construction -----------------------------
+
+test("a tool result is sanitized before it enters context", async () => {
   const result = await buildSafeContext({
-    scanAndRedact: fakeScanAndRedact,
+    boundary,
     userInput: "run the tool",
-    callTool,
+    callTool: async (request) => ({ content: [{ type: "text", text: `ran ${request.name}: SECRET_TOKEN_1` }] }),
     buildToolRequest: () => ({ name: "read_file" }),
   });
   assert.equal(result.outcome, "ok");
-  assert.deepEqual(result.context.messages[1], {
+  assert.deepEqual(result.value[1], {
     role: "tool",
     content: { content: [{ type: "text", text: "ran read_file: <SECRET_1>" }] },
   });
 });
 
-test("buildSafeContext: block at the tool stage discards context, never retains the leaked value", async () => {
-  const callTool = async () => ({ content: [{ type: "text", text: "leak BLOCK_ME here" }] });
+test("block at the tool stage discards the context and never retains the leaked value", async () => {
   const result = await buildSafeContext({
-    scanAndRedact: fakeScanAndRedact,
+    boundary,
     userInput: "run the tool",
-    callTool,
+    callTool: async () => ({ content: [{ type: "text", text: "leak BLOCK_ME here" }] }),
     buildToolRequest: () => ({ name: "x" }),
   });
-  assert.equal(result.outcome, "blocked");
-  assert.equal(result.stage, "tool");
-  assert.equal("context" in result, false);
-  assert.equal(JSON.stringify(result).includes("leak"), false);
+  assert.deepEqual(result, { outcome: "blocked", reason: "policy", stage: "tool" });
 });
 
-test("buildSafeContext: tool dispatch is built from the sanitized input text, never the raw one", async () => {
+test("#610: a structured tool result with a secret in a key, a non-JSON value, or past a limit blocks the turn", async () => {
+  for (const [structuredContent, reason] of [
+    [{ SECRET_TOKEN_1: "value" }, "policy"],
+    [{ when: new Date(0) }, "unsupported_value"],
+    [JSON.parse(`${"[".repeat(9)}"x"${"]".repeat(9)}`), "limit_exceeded"],
+  ]) {
+    const result = await buildSafeContext({
+      boundary,
+      userInput: "run the tool",
+      callTool: async () => ({ content: [], structuredContent }),
+    });
+    assert.deepEqual(result, { outcome: "blocked", reason, stage: "tool" });
+  }
+});
+
+test("tool dispatch is built from the sanitized input text, never the raw one", async () => {
   let seenText;
-  const callTool = async (request) => {
-    seenText = request.text;
-    return { content: [{ type: "text", text: "ok" }] };
-  };
   await buildSafeContext({
-    scanAndRedact: fakeScanAndRedact,
+    boundary,
     userInput: "carrying SECRET_TOKEN_1 along",
-    callTool,
+    callTool: async (request) => {
+      seenText = request.text;
+      return { content: [{ type: "text", text: "ok" }] };
+    },
     buildToolRequest: (safeText) => ({ text: safeText }),
   });
   assert.equal(seenText, "carrying <SECRET_1> along");
 });
 
-test("buildSafeContext: initialization/core failure at the input stage fails closed like any other scanner error", async () => {
-  const result = await buildSafeContext({ scanAndRedact: fakeScanAndRedact, userInput: "BOOM" });
-  assert.deepEqual(result, { outcome: "blocked", stage: "input", blockReason: "core_error", findings: [] });
+// --- fixed, input-free failures ----------------------------------------------
+
+test("#610: oversized input is refused by the core's whole-input limit before any detection", async () => {
+  const userInput = "x".repeat(EXAMPLE_LIMITS.wholeInputLimits.maxInputBytes + 1);
+  const result = await buildSafeContext({ boundary, userInput });
+  assert.deepEqual(result, { outcome: "blocked", reason: "limit_exceeded", code: "INPUT_LIMIT_EXCEEDED", stage: "input" });
 });
 
-test("buildSafeContext: a throwing onFinding never breaks the call", async () => {
-  const onFinding = () => {
-    throw new Error("audit sink is down");
-  };
+test("calling before initialize() fails closed with the core's own NOT_INITIALIZED", async () => {
   const result = await buildSafeContext({
-    scanAndRedact: fakeScanAndRedact,
+    boundary: createGoldenPathBoundaryWith(uninitializedCore),
     userInput: "SECRET_TOKEN_1",
-    onFinding,
   });
+  assert.deepEqual(result, { outcome: "blocked", reason: "core_error", code: "NOT_INITIALIZED", stage: "input" });
+});
+
+test("the live boundary fails closed when the core cannot be loaded, and never returns input", async () => {
+  // This example project installs no core (its tests inject one), so the
+  // live factory's core import fails: every operation is core_error.
+  const live = await createGoldenPathBoundary();
+  const result = await buildSafeContext({ boundary: live, userInput: "SECRET_TOKEN_1" });
+  assert.deepEqual(result, { outcome: "blocked", reason: "core_error", stage: "input" });
+});
+
+test("any other core failure fails closed as core_error, with nothing derived from input", async () => {
+  const result = await buildSafeContext({ boundary, userInput: "BOOM" });
+  assert.deepEqual(result, { outcome: "blocked", reason: "core_error", stage: "input" });
+});
+
+test("a throwing onFinding never breaks the call", async () => {
+  const { boundary: audited } = setup({
+    onFinding: () => {
+      throw new Error("audit sink is down");
+    },
+  });
+  const result = await buildSafeContext({ boundary: audited, userInput: "SECRET_TOKEN_1" });
   assert.equal(result.outcome, "ok");
-  assert.deepEqual(result.context.messages, [{ role: "user", content: "<SECRET_1>" }]);
+  assert.deepEqual(result.value, [{ role: "user", content: "<SECRET_1>" }]);
 });
 
-test("buildSafeContext: cancellation — an already-aborted signal short-circuits before scanning starts", async () => {
-  const controller = new AbortController();
-  controller.abort();
-  let scanCalled = false;
-  const scanAndRedact = (text) => {
-    scanCalled = true;
-    return fakeScanAndRedact(text);
-  };
+test("a rejecting tool call is a host tool_error with no detail and nothing retained", async () => {
   const result = await buildSafeContext({
-    scanAndRedact,
-    userInput: "SECRET_TOKEN_1",
-    signal: controller.signal,
-  });
-  assert.deepEqual(result, { outcome: "aborted", findings: [] });
-  assert.equal(scanCalled, false);
-});
-
-test("buildSafeContext: abort — the signal firing during the tool call discards the (already-sanitized) result", async () => {
-  const controller = new AbortController();
-  const callTool = async () => {
-    controller.abort();
-    return { content: [{ type: "text", text: "ok" }] };
-  };
-  const result = await buildSafeContext({
-    scanAndRedact: fakeScanAndRedact,
+    boundary,
     userInput: "hello",
-    callTool,
+    callTool: async () => {
+      throw new Error("AbortError: the operation was aborted near SECRET_TOKEN_1");
+    },
+    buildToolRequest: () => ({}),
+  });
+  assert.deepEqual(result, { outcome: "tool_error", stage: "tool" });
+});
+
+// --- cancellation and abort --------------------------------------------------
+
+test("cancellation — an already-aborted signal short-circuits before scanning starts", async () => {
+  let scanned = false;
+  const counting = createGoldenPathBoundaryWith({
+    ...fakeCore,
+    scanAndRedact(text, options) {
+      scanned = true;
+      return fakeCore.scanAndRedact(text, options);
+    },
+  });
+  const result = await buildSafeContext({ boundary: counting, userInput: "SECRET_TOKEN_1", signal: AbortSignal.abort() });
+  assert.deepEqual(result, { outcome: "aborted", stage: "input" });
+  assert.equal(scanned, false);
+});
+
+test("abort — the signal firing during the tool call discards the already-sanitized input", async () => {
+  const controller = new AbortController();
+  const result = await buildSafeContext({
+    boundary,
+    userInput: "hello SECRET_TOKEN_1",
+    callTool: async () => {
+      controller.abort();
+      return { content: [{ type: "text", text: "ok" }] };
+    },
     buildToolRequest: () => ({}),
     signal: controller.signal,
   });
-  assert.deepEqual(result, { outcome: "aborted", findings: [] });
+  assert.deepEqual(result, { outcome: "aborted", stage: "tool" });
 });
 
-test("buildSafeContext: a rejecting/aborted tool call blocks with no leaked detail, nothing retained", async () => {
-  const callTool = async () => {
-    throw new Error("AbortError: the operation was aborted");
-  };
-  const result = await buildSafeContext({
-    scanAndRedact: fakeScanAndRedact,
-    userInput: "hello",
-    callTool,
-    buildToolRequest: () => ({}),
-  });
-  assert.equal(result.outcome, "blocked");
-  assert.equal(result.stage, "tool");
-  assert.equal(result.blockReason, "tool_call_failed");
-  assert.equal(JSON.stringify(result).includes("AbortError"), false);
+test("rejects a missing boundary", async () => {
+  await assert.rejects(buildSafeContext({ userInput: "x" }), TypeError);
 });
 
 // --- end-to-end smoke test ---------------------------------------------------
 
 test("smoke: a secret in user input and a secret in the tool result never reach the model-facing safe context", async () => {
-  const callTool = async (request) => ({
-    content: [{ type: "text", text: `looked up ${request.query}: leaked DATABASE_URL=SECRET_TOKEN_2` }],
-  });
   const result = await buildSafeContext({
-    scanAndRedact: fakeScanAndRedact,
+    boundary,
     userInput: "look up my key SECRET_TOKEN_1 please",
-    callTool,
+    callTool: async (request) => ({
+      content: [{ type: "text", text: `looked up ${request.query}: leaked DATABASE_URL=SECRET_TOKEN_2` }],
+    }),
     buildToolRequest: (safeText) => ({ query: safeText }),
   });
 
   assert.equal(result.outcome, "ok");
-  const serialized = JSON.stringify(result.context);
+  const serialized = JSON.stringify(result.value);
   assert.equal(serialized.includes("SECRET_TOKEN_1"), false);
   assert.equal(serialized.includes("SECRET_TOKEN_2"), false);
   assert.equal(serialized.includes("<SECRET_1>"), true);
 
-  // What actually reaches "the model" — proving the composed value, not
-  // just each piece in isolation, is what a caller would forward.
-  const modelCall = async (context) => JSON.stringify(context);
-  const sentToModel = await modelCall(result.context);
+  // What actually reaches "the model": the composed value, not each piece
+  // in isolation, is what a caller forwards.
+  const modelCall = async (messages) => JSON.stringify(messages);
+  const sentToModel = await modelCall(result.value);
   assert.equal(sentToModel.includes("SECRET_TOKEN_1"), false);
   assert.equal(sentToModel.includes("SECRET_TOKEN_2"), false);
 });

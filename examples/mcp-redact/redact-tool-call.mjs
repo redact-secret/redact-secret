@@ -1,45 +1,38 @@
 /**
- * The pure redaction core for MCP tool calls (issue #327): given an injected
- * `scanAndRedact`, redacts a `CallToolResult`'s content blocks / structured
- * content, or a tool call's argument object, and maps the outcome onto the
- * issue's policy contract:
+ * MCP tool calls through the AI-context boundary (issue #327, migrated onto
+ * `@redact-secret/adapter-ai-context` by redact-secret-adapters#12): given a
+ * boundary, sanitizes a `CallToolResult`'s content blocks and
+ * `structuredContent`, or a tool call's argument object, and returns the
+ * boundary's own outcome shape (`docs/reference/ai-context-boundary.md`):
  *
- * - `redact` findings: the span is replaced, the call continues.
- * - `warn` findings: the text passes through unchanged; still reported.
- * - `block` findings, or a `scanAndRedact` failure: the *whole* call becomes
- *   a fixed, input-free block outcome — never a partial or per-leaf marker.
- *   This differs from `examples/tracing-masking`'s per-leaf `BLOCK_MARKER`:
- *   MCP already has a first-class "tool error" outcome
- *   (`CallToolResult.isError`), so blocking maps onto that instead of a
- *   leaf-level placeholder.
+ * - `{ outcome: "ok", value, findings }`: `redact` findings replaced,
+ *   `warn`/`allow` text unchanged; `value` is the only safe thing to return.
+ * - `{ outcome: "blocked", reason, code? }`: any `block` finding, a key that
+ *   would be redacted, a limit, a non-JSON value, or a core failure, anywhere
+ *   in the call. No value, no findings, nothing derived from input. The caller
+ *   returns {@link buildBlockedResult} instead: MCP has a first-class "tool
+ *   error" outcome (`CallToolResult.isError`), so a blocked call maps onto
+ *   that rather than a partial result.
+ * - `{ outcome: "aborted" }`: the signal fired.
+ *
+ * This file owns only the MCP shape: which content blocks carry text, and
+ * JSON-in-text. Every scan, every traversal, every limit and every failure
+ * mapping is the adapter's. There is no walker, marker or leaf budget here.
  *
  * No `@modelcontextprotocol/sdk` import: `CallToolResult` and its content
- * blocks are a structural (duck-typed) shape here, the same choice
- * `examples/tracing-masking/redact-span-attributes.mjs` makes for
- * OpenTelemetry's `SpanProcessor`. This file is testable without the built
- * native addon or the MCP SDK installed.
+ * blocks are a structural (duck-typed) shape here.
  */
 
-/** Bounds enforced while walking arguments and JSON-in-text content. Beyond
- * these, a subtree is marked with {@link LIMIT_MARKER} and dropped rather
- * than passed through unmasked — the call itself is not blocked, since these
- * are complexity guards, not secret-detection outcomes. */
-export const DEFAULT_LIMITS = Object.freeze({
-  maxDepth: 8,
-  maxArrayLength: 1000,
-  maxObjectKeys: 200,
-  maxStringLength: 200_000,
-  maxTotalLeaves: 5000,
-  maxContentBlocks: 200,
-});
+/**
+ * The most content blocks one result may carry. Past it the whole result is
+ * blocked as `limit_exceeded`; blocks are never dropped or passed on unscanned.
+ */
+export const DEFAULT_MAX_CONTENT_BLOCKS = 200;
 
 /** Fixed, input-free text for every blocked outcome. Never carries the
  * input, a matched value, or the underlying error's own message. */
 export const BLOCKED_MESSAGE =
   "This MCP tool call was blocked by secret-redaction policy. No content, arguments, or error detail is included.";
-
-export const LIMIT_MARKER = "[REDACTED:LIMIT_EXCEEDED]";
-export const CYCLE_MARKER = "[REDACTED:CYCLE]";
 
 function isPlainObject(value) {
   if (typeof value !== "object" || value === null) return false;
@@ -47,82 +40,24 @@ function isPlainObject(value) {
   return proto === Object.prototype || proto === null;
 }
 
-/** Scans and redacts one leaf string, recording findings and flipping
- * `ctx.blocked` on a `block` finding or a core failure. Never throws. */
-function redactLeaf(scanAndRedact, text, ctx) {
-  if (text.length > ctx.limits.maxStringLength) return LIMIT_MARKER;
-  if (ctx.budget.leaves <= 0) return LIMIT_MARKER;
-  ctx.budget.leaves -= 1;
-
-  let result;
-  try {
-    result = scanAndRedact(text, { policy: ctx.policy });
-  } catch {
-    ctx.blocked = true;
-    ctx.blockReason = "core_error";
-    return "";
+function requireBoundary(boundary, caller) {
+  if (boundary === null || typeof boundary !== "object" || typeof boundary.sanitizeValue !== "function") {
+    throw new TypeError(`${caller}: boundary must be an @redact-secret/adapter-ai-context boundary`);
   }
-  ctx.findings.push(...result.findings);
-  if (result.findings.some((finding) => finding.action === "block")) {
-    ctx.blocked = true;
-    ctx.blockReason = "policy";
-    return "";
-  }
-  return result.text;
 }
 
-function redactJsonValue(scanAndRedact, value, ctx, depth, seen) {
-  if (ctx.blocked) return value;
-
-  if (typeof value === "string") {
-    return redactLeaf(scanAndRedact, value, ctx);
-  }
-
-  if (Array.isArray(value)) {
-    if (depth >= ctx.limits.maxDepth) return LIMIT_MARKER;
-    if (seen.has(value)) return CYCLE_MARKER;
-    seen.add(value);
-    const bounded = value.slice(0, ctx.limits.maxArrayLength);
-    const out = bounded.map((item) => redactJsonValue(scanAndRedact, item, ctx, depth + 1, seen));
-    seen.delete(value);
-    return out;
-  }
-
-  if (isPlainObject(value)) {
-    if (depth >= ctx.limits.maxDepth) return LIMIT_MARKER;
-    if (seen.has(value)) return CYCLE_MARKER;
-    seen.add(value);
-    const keys = Object.keys(value).slice(0, ctx.limits.maxObjectKeys);
-    const out = {};
-    for (const key of keys) {
-      // Define data keys without invoking inherited setters such as __proto__.
-      Object.defineProperty(out, key, {
-        value: redactJsonValue(scanAndRedact, value[key], ctx, depth + 1, seen),
-        enumerable: true,
-        configurable: true,
-        writable: true,
-      });
-    }
-    seen.delete(value);
-    return out;
-  }
-
-  // Numbers, booleans, null, undefined, and non-plain objects are left
-  // unchanged: only plain objects, arrays, and strings are walked.
-  return value;
-}
+const UNSUPPORTED = Object.freeze({ outcome: "blocked", reason: "unsupported_value" });
+const OVER_LIMIT = Object.freeze({ outcome: "blocked", reason: "limit_exceeded" });
 
 /**
- * Redacts one piece of text that may be a JSON-serialized object/array (an
- * MCP "JSON-in-text" result, e.g. a stringified API response). When it
- * parses as a JSON object or array, every string leaf inside is redacted and
- * the value is re-serialized, which — unlike scanning the raw JSON text as
- * one opaque string — can never place a placeholder outside a quoted string
- * and corrupt the JSON. Anything else (plain text, or JSON scalars like a
- * bare number or boolean) is scanned as opaque text.
+ * One piece of text that may be a JSON-serialized object or array (an MCP
+ * "JSON-in-text" result, such as a stringified API response). When it
+ * parses as one, the parsed value goes through `sanitizeValue` and is
+ * re-serialized, which, unlike scanning the raw JSON text as one opaque
+ * string, can never place a placeholder outside a quoted string and corrupt
+ * the JSON. Anything else is scanned as text.
  */
-function redactTextOrJson(scanAndRedact, text, ctx) {
-  if (ctx.blocked) return text;
+function sanitizeTextOrJson(boundary, text, options) {
   let parsed;
   try {
     parsed = JSON.parse(text);
@@ -130,102 +65,92 @@ function redactTextOrJson(scanAndRedact, text, ctx) {
     parsed = undefined;
   }
   if (Array.isArray(parsed) || isPlainObject(parsed)) {
-    const redacted = redactJsonValue(scanAndRedact, parsed, ctx, 0, new Set());
-    if (ctx.blocked) return "";
-    return JSON.stringify(redacted);
+    const outcome = boundary.sanitizeValue(parsed, options);
+    return outcome.outcome === "ok" ? { ...outcome, value: JSON.stringify(outcome.value) } : outcome;
   }
-  return redactLeaf(scanAndRedact, text, ctx);
+  return boundary.sanitizeText(text, options);
 }
 
-function redactContentBlock(scanAndRedact, block, ctx) {
-  if (ctx.blocked) return block;
-  if (!isPlainObject(block)) return block;
-
+/**
+ * Text blocks and embedded text resources are scanned. `image`, `audio`,
+ * `resource_link`, and embedded blob resources (base64 binary) pass through
+ * unchanged: non-text content is outside the boundary contract, a documented
+ * false negative.
+ */
+function sanitizeContentBlock(boundary, block, options) {
+  if (!isPlainObject(block)) return UNSUPPORTED;
   if (block.type === "text" && typeof block.text === "string") {
-    return { ...block, text: redactTextOrJson(scanAndRedact, block.text, ctx) };
+    const outcome = sanitizeTextOrJson(boundary, block.text, options);
+    return outcome.outcome === "ok" ? { ...outcome, value: { ...block, text: outcome.value } } : outcome;
   }
-
-  // An embedded text resource (`{ type: "resource", resource: { text } }`)
-  // carries scannable text; a blob resource (`resource.blob`) is base64
-  // binary and, like `image`/`audio`/`resource_link` blocks, passes through
-  // unchanged — the documented non-text false-negative boundary.
   if (block.type === "resource" && isPlainObject(block.resource) && typeof block.resource.text === "string") {
-    return {
-      ...block,
-      resource: { ...block.resource, text: redactTextOrJson(scanAndRedact, block.resource.text, ctx) },
-    };
+    const outcome = sanitizeTextOrJson(boundary, block.resource.text, options);
+    return outcome.outcome === "ok"
+      ? { ...outcome, value: { ...block, resource: { ...block.resource, text: outcome.value } } }
+      : outcome;
   }
-
-  return block;
+  return { outcome: "ok", value: block, findings: [] };
 }
 
-function makeContext(scanAndRedact, options) {
-  if (typeof scanAndRedact !== "function") {
-    throw new TypeError("scanAndRedact must be a function");
-  }
-  const limits = { ...DEFAULT_LIMITS, ...options.limits };
-  return {
-    policy: options.policy,
-    limits,
-    budget: { leaves: limits.maxTotalLeaves },
-    blocked: false,
-    blockReason: undefined,
-    findings: [],
-  };
-}
-
-/** The fixed `CallToolResult`-shaped tool error every blocked outcome maps
+/** The fixed `CallToolResult`-shaped tool error every blocked or aborted outcome maps
  * to: no content, no arguments, no error detail beyond the fixed message. */
 export function buildBlockedResult() {
   return { content: [{ type: "text", text: BLOCKED_MESSAGE }], isError: true };
 }
 
 /**
- * Redacts a tool call's argument object in place (a plain object tree, as
- * MCP `CallToolRequest.params.arguments` always is). Returns `outcome:
- * "blocked"` — with no `arguments` field — when any argument value contains
- * a `block` finding or `scanAndRedact` fails; the caller must not forward
- * the original arguments to the tool in that case.
+ * Sanitizes a tool call's argument object (MCP
+ * `CallToolRequest.params.arguments`, a plain object tree) with
+ * `sanitizeValue`: every string value and every key is scanned. On a
+ * non-`ok` outcome the caller must not forward the original arguments.
+ *
+ * @param {import("@redact-secret/adapter-ai-context").AiContextBoundary} boundary
+ * @param {unknown} args
+ * @param {{ signal?: AbortSignal }} [options]
  */
-export function redactArguments(scanAndRedact, args, options = {}) {
-  const ctx = makeContext(scanAndRedact, options);
-  if (!isPlainObject(args)) {
-    throw new TypeError("redactArguments: args must be a plain object");
-  }
-  const redacted = redactJsonValue(scanAndRedact, args, ctx, 0, new Set());
-  if (ctx.blocked) {
-    return { outcome: "blocked", blockReason: ctx.blockReason, findings: ctx.findings };
-  }
-  return { outcome: "ok", arguments: redacted, findings: ctx.findings };
+export function redactArguments(boundary, args, { signal } = {}) {
+  requireBoundary(boundary, "redactArguments");
+  if (!isPlainObject(args)) return UNSUPPORTED;
+  // The contract has no label for tool arguments yet (#612 defines the MCP
+  // boundary); they cross into a tool, so they are labelled `context`.
+  return boundary.sanitizeValue(args, { boundary: "context", signal });
 }
 
 /**
- * Redacts a `CallToolResult`'s `content` blocks and `structuredContent`
- * before it reaches the client or model context. Returns `outcome:
- * "blocked"` — with no `result` field — on any `block` finding or core
- * failure; the caller must return {@link buildBlockedResult} instead of the
- * original result in that case.
+ * Sanitizes a `CallToolResult`'s `content` blocks and `structuredContent`
+ * before it reaches the client, a log, or model context. All or nothing:
+ * the first non-`ok` block, or a non-`ok` `structuredContent`, is the
+ * outcome for the whole result. Other top-level fields (`isError`, `_meta`)
+ * are copied unchanged.
+ *
+ * @param {import("@redact-secret/adapter-ai-context").AiContextBoundary} boundary
+ * @param {unknown} result
+ * @param {{ signal?: AbortSignal, maxContentBlocks?: number }} [options]
  */
-export function redactToolResult(scanAndRedact, result, options = {}) {
-  const ctx = makeContext(scanAndRedact, options);
-  if (!isPlainObject(result)) {
-    throw new TypeError("redactToolResult: result must be a plain object");
-  }
+export function redactToolResult(boundary, result, { signal, maxContentBlocks = DEFAULT_MAX_CONTENT_BLOCKS } = {}) {
+  requireBoundary(boundary, "redactToolResult");
+  if (signal?.aborted === true) return Object.freeze({ outcome: "aborted" });
+  if (!isPlainObject(result)) return UNSUPPORTED;
+  if (result.content !== undefined && !Array.isArray(result.content)) return UNSUPPORTED;
+  const contentIn = result.content ?? [];
+  if (contentIn.length > maxContentBlocks) return OVER_LIMIT;
 
-  const contentIn = Array.isArray(result.content) ? result.content : [];
-  const bounded = contentIn.slice(0, ctx.limits.maxContentBlocks);
-  const content = bounded.map((block) => redactContentBlock(scanAndRedact, block, ctx));
-
-  let structuredContent = result.structuredContent;
-  if (!ctx.blocked && isPlainObject(structuredContent)) {
-    structuredContent = redactJsonValue(scanAndRedact, structuredContent, ctx, 0, new Set());
-  }
-
-  if (ctx.blocked) {
-    return { outcome: "blocked", blockReason: ctx.blockReason, findings: ctx.findings };
+  const options = { boundary: "tool-result", signal };
+  const findings = [];
+  const content = [];
+  for (const block of contentIn) {
+    const outcome = sanitizeContentBlock(boundary, block, options);
+    if (outcome.outcome !== "ok") return outcome;
+    findings.push(...outcome.findings);
+    content.push(outcome.value);
   }
 
   const out = { ...result, content };
-  if ("structuredContent" in result) out.structuredContent = structuredContent;
-  return { outcome: "ok", result: out, findings: ctx.findings };
+  if (result.structuredContent !== undefined) {
+    const outcome = boundary.sanitizeValue(result.structuredContent, options);
+    if (outcome.outcome !== "ok") return outcome;
+    findings.push(...outcome.findings);
+    out.structuredContent = outcome.value;
+  }
+  return Object.freeze({ outcome: "ok", value: out, findings: Object.freeze(findings) });
 }

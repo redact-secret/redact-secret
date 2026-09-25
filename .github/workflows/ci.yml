@@ -61,6 +61,14 @@ jobs:
       - name: Install dependencies
         run: npm ci --ignore-scripts
 
+      # Network, outside the offline `npm run ci`: fetches redact-secret-adapters
+      # at the 40-hex commit in adapters/pin-source.json, builds and `npm pack`s
+      # the pinned packages, verifies each content digest, and installs them into
+      # every consumer (examples/mcp-redact). `npm run ci` then only verifies the
+      # installed tree (scripts/adapter-pins.py verify-installed).
+      - name: Build and install the pinned adapter artifacts
+        run: npm run adapter-pins:install
+
       - name: Run deterministic checks
         run: npm run ci
 
@@ -255,6 +263,26 @@ jobs:
         env:
           BENCHMARK_BRANCH: ${{ inputs.benchmark_branch || 'develop' }}
         run: npm run benchmark-pins:check:ancestry -- --benchmark-branch "$BENCHMARK_BRANCH"
+
+  adapter-pin-drift:
+    name: Adapter pin drift (commit ancestry)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+
+      # A GitHub fetch by SHA succeeds for a commit on any branch, including an
+      # unmerged one, so the build in the test job alone does not prove the pin
+      # is merged. This does, through the compare API.
+      - name: The pinned redact-secret-adapters commit must be on develop
+        run: npm run adapter-pins:check:ancestry -- --adapters-branch develop
 
   cross-repository-links:
     name: Cross-repository links (blob permalinks resolve)

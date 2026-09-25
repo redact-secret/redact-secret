@@ -1,8 +1,8 @@
 /**
- * The AI-context golden path (issue #587): where authoritative redaction
- * belongs across a whole agent turn, not just inside one MCP tool call.
- * Composes `redact-tool-call.mjs`'s primitives into the flow the issue
- * requires:
+ * The AI-context golden path (issue #587), on the framework-neutral
+ * AI-context boundary (`docs/reference/ai-context-boundary.md`, #610) as
+ * implemented by `@redact-secret/adapter-ai-context`
+ * (redact-secret-adapters#12). One agent turn:
  *
  * ```
  * user input -> scan -> application policy
@@ -10,143 +10,126 @@
  * safe context -> model
  * ```
  *
- * `userInput` is scanned first. A `block` finding there ends the call
- * before a tool is ever dispatched, before anything is logged, and before
- * `context` is built — `userInput` itself never appears in this module's
- * return value on any path. When `buildToolRequest` is supplied, it is
- * called with the *sanitized* input text, never the raw `userInput`, so a
- * tool argument derived from what the user typed is dispatched from
- * already-scanned text. The tool's result is then scanned the same way
- * `wrapClientCallTool` does, before either piece is added to
- * `context.messages` — the only value here that is safe to hand to a model
- * call or a log line.
+ * `userInput` is sanitized first. A non-`ok` outcome there ends the turn
+ * before a tool is dispatched, before anything is logged, and before any
+ * context exists; `userInput` never appears in the return value on any
+ * path. When `buildToolRequest` is supplied it gets the *sanitized* input
+ * text, never the raw `userInput`, so a tool argument derived from what the
+ * user typed is dispatched from already-scanned text. The tool's result is
+ * then sanitized (`redactToolResult`) before either piece joins the
+ * context, the only value here that is safe to hand to a model call or a
+ * log line.
  *
- * No `@modelcontextprotocol/sdk` import, matching `redact-tool-call.mjs`
- * and `wrap-tool-call.mjs`: `callTool` is a plain, duck-typed async
- * function.
+ * This file detects nothing, walks nothing, and maps no failure: the
+ * boundary does all three. What it adds is the order of the turn.
+ *
+ * No `@modelcontextprotocol/sdk` import: `callTool` is a plain, duck-typed
+ * async function.
  */
+
+import { createAiContextBoundary, createAiContextBoundaryWith } from "@redact-secret/adapter-ai-context";
 
 import { redactToolResult } from "./redact-tool-call.mjs";
-import { emitFindings } from "./wrap-tool-call.mjs";
-
-/** `maxInputLength` mirrors `DEFAULT_LIMITS.maxStringLength` in
- * `redact-tool-call.mjs`, applied to the whole user turn up front — before
- * `scanAndRedact` is ever called — rather than relying on the per-leaf
- * `LIMIT_MARKER` a huge tool-result leaf would fall back on. */
-export const DEFAULT_INPUT_LIMITS = Object.freeze({ maxInputLength: 200_000 });
-
-function isAborted(signal) {
-  return signal != null && signal.aborted === true;
-}
-
-function aborted(findings) {
-  return { outcome: "aborted", findings };
-}
 
 /**
- * Scans one plain-text user turn and maps the outcome onto the issue's
- * `redact`/`warn`/`block`/allow contract. Oversized input is rejected by
- * length alone, before `scanAndRedact` sees any of it — no retained
- * plaintext for that path, by construction.
- *
- * @param {Function} scanAndRedact
- * @param {string} text
- * @param {{ policy?: unknown, limits?: { maxInputLength?: number } }} [options]
+ * The limits this example's boundary runs under. The contract makes every
+ * limit mandatory and explicit, so there is no default to fall back on:
+ * a host chooses its own. Exceeding any of them blocks the whole operation
+ * as `limit_exceeded`; nothing is truncated or marked and passed on.
  */
-export function redactUserInput(scanAndRedact, text, options = {}) {
-  if (typeof scanAndRedact !== "function") {
-    throw new TypeError("redactUserInput: scanAndRedact must be a function");
-  }
-  if (typeof text !== "string") {
-    throw new TypeError("redactUserInput: text must be a string");
-  }
+export const EXAMPLE_LIMITS = Object.freeze({
+  wholeInputLimits: Object.freeze({ maxInputBytes: 262_144, maxFindings: 1024 }),
+  incrementalLimits: Object.freeze({
+    maxInputCodeUnits: 1_048_576,
+    maxBufferedCodeUnits: 65_536,
+    maxTokenCodeUnits: 8192,
+    maxMultilineCodeUnits: 32_768,
+  }),
+  traversalLimits: Object.freeze({ maxDepth: 8, maxNodes: 10_000 }),
+});
 
-  const maxInputLength = options.limits?.maxInputLength ?? DEFAULT_INPUT_LIMITS.maxInputLength;
-  if (text.length > maxInputLength) {
-    return { outcome: "blocked", blockReason: "input_too_large", findings: [] };
-  }
-
-  let result;
-  try {
-    result = scanAndRedact(text, { policy: options.policy });
-  } catch {
-    // Covers every core failure the same way, including calling this
-    // before `initialize()` — `packages/javascript/src/errors.ts` throws
-    // for that case too, so it fails closed exactly like any other
-    // scanner error rather than needing its own branch.
-    return { outcome: "blocked", blockReason: "core_error", findings: [] };
-  }
-  if (result.findings.some((finding) => finding.action === "block")) {
-    return { outcome: "blocked", blockReason: "policy", findings: result.findings };
-  }
-  return { outcome: "ok", text: result.text, findings: result.findings };
+/**
+ * The boundary over the real core: loads `@redact-secret/core`, awaits its
+ * `initialize()`, and fails every operation closed if that fails.
+ *
+ * @param {{ policy?: object, onFinding?: Function }} [options]
+ */
+export function createGoldenPathBoundary(options = {}) {
+  return createAiContextBoundary({ ...EXAMPLE_LIMITS, ...options });
 }
 
 /**
- * Runs one full agent turn through the required flow and returns the safe
- * context to hand to the model, or a blocked/aborted outcome with no
- * `context` field at all.
+ * The same boundary over an injected core (`{ scanAndRedact,
+ * createIncrementalSanitizer }`): the real core after `initialize()`, or a
+ * fake in tests.
  *
- * `signal` (a standard `AbortSignal`) is checked before scanning starts,
- * before the tool is dispatched, and again before the tool result is
- * folded into context — covering both cancellation (already aborted before
- * this call began) and abort (the signal fires while the tool call is in
- * flight). Either way the return is `{ outcome: "aborted" }`: whatever was
- * scanned so far is discarded along with everything unscanned, and the
- * caller must not reuse a prior `context`.
+ * @param {import("@redact-secret/adapter-ai-context").AiContextCore} core
+ * @param {{ policy?: object, onFinding?: Function }} [options]
+ */
+export function createGoldenPathBoundaryWith(core, options = {}) {
+  return createAiContextBoundaryWith(core, { ...EXAMPLE_LIMITS, ...options });
+}
+
+function withStage(outcome, stage) {
+  return Object.freeze({ ...outcome, stage });
+}
+
+/**
+ * Runs one agent turn and returns the safe context for the model, or a
+ * non-`ok` outcome with nothing derived from input:
+ *
+ * - `{ outcome: "ok", value: [{ role, content }], findings }`, the same
+ *   shape the boundary's `buildContext` returns;
+ * - the boundary's `{ outcome: "blocked", reason, code? }` or
+ *   `{ outcome: "aborted" }`, plus `stage` (`"input"` or `"tool"`);
+ * - `{ outcome: "tool_error", stage: "tool" }` when `callTool` rejects. This
+ *   is the host's own outcome, outside the contract's set: dispatching a tool
+ *   is the host's job, and the rejection's error, which may carry input, is
+ *   never read.
+ *
+ * `signal` (an `AbortSignal`) is checked by the boundary before and after
+ * every scan, and here before the tool is dispatched and after it returns.
+ * An abort at any point discards everything, including text already
+ * sanitized; the caller must not reuse an earlier context.
  *
  * @param {{
- *   scanAndRedact: Function,
+ *   boundary: import("@redact-secret/adapter-ai-context").AiContextBoundary,
  *   userInput: string,
- *   policy?: unknown,
- *   limits?: { maxInputLength?: number },
- *   onFinding?: (finding: object, context: { scope: "input" | "result" }) => void,
  *   callTool?: (request: unknown, opts: { signal?: AbortSignal }) => Promise<unknown>,
  *   buildToolRequest?: unknown | ((safeInputText: string) => unknown),
  *   signal?: AbortSignal,
+ *   maxContentBlocks?: number,
  * }} options
  */
 export async function buildSafeContext(options = {}) {
-  const { scanAndRedact, userInput, policy, limits, onFinding, callTool, buildToolRequest, signal } = options;
-
-  if (isAborted(signal)) return aborted([]);
-
-  const inputOutcome = redactUserInput(scanAndRedact, userInput, { policy, limits });
-  emitFindings(inputOutcome.findings, onFinding, "input");
-  if (inputOutcome.outcome === "blocked") {
-    return { outcome: "blocked", stage: "input", blockReason: inputOutcome.blockReason, findings: inputOutcome.findings };
+  const { boundary, userInput, callTool, buildToolRequest, signal, maxContentBlocks } = options;
+  if (typeof boundary?.sanitizeText !== "function") {
+    throw new TypeError("buildSafeContext: boundary must be an @redact-secret/adapter-ai-context boundary");
   }
 
-  const findings = [...inputOutcome.findings];
-  const messages = [{ role: "user", content: inputOutcome.text }];
+  const input = boundary.sanitizeText(userInput, { boundary: "user-input", signal });
+  if (input.outcome !== "ok") return withStage(input, "input");
+
+  const findings = [...input.findings];
+  const messages = [Object.freeze({ role: "user", content: input.value })];
 
   if (callTool) {
-    if (isAborted(signal)) return aborted(findings);
-
-    const request = typeof buildToolRequest === "function" ? buildToolRequest(inputOutcome.text) : buildToolRequest;
+    if (signal?.aborted === true) return withStage({ outcome: "aborted" }, "tool");
+    const request = typeof buildToolRequest === "function" ? buildToolRequest(input.value) : buildToolRequest;
     let raw;
     try {
       raw = await callTool(request, { signal });
     } catch {
-      // A rejected or aborted call has no result to redact and nothing new
-      // was ever captured -- `messages` (holding only the already-sanitized
-      // input) is discarded along with this return, since a blocked
-      // outcome carries no `context` field for the caller to reuse.
-      return { outcome: "blocked", stage: "tool", blockReason: "tool_call_failed", findings };
+      // Nothing was captured from the failed call, and the sanitized input
+      // is discarded with this return: a non-ok outcome carries no context.
+      return Object.freeze({ outcome: "tool_error", stage: "tool" });
     }
-
-    if (isAborted(signal)) return aborted(findings);
-
-    const resultOutcome = redactToolResult(scanAndRedact, raw, { policy, limits });
-    emitFindings(resultOutcome.findings, onFinding, "result");
-    findings.push(...resultOutcome.findings);
-    if (resultOutcome.outcome === "blocked") {
-      return { outcome: "blocked", stage: "tool", blockReason: resultOutcome.blockReason, findings };
-    }
-    messages.push({ role: "tool", content: resultOutcome.result });
+    const result = redactToolResult(boundary, raw, { signal, maxContentBlocks });
+    if (result.outcome !== "ok") return withStage(result, "tool");
+    findings.push(...result.findings);
+    messages.push(Object.freeze({ role: "tool", content: result.value }));
   }
 
-  if (isAborted(signal)) return aborted(findings);
-
-  return { outcome: "ok", context: Object.freeze({ messages: Object.freeze(messages) }), findings };
+  if (signal?.aborted === true) return withStage({ outcome: "aborted" }, callTool ? "tool" : "input");
+  return Object.freeze({ outcome: "ok", value: Object.freeze(messages), findings: Object.freeze(findings) });
 }
