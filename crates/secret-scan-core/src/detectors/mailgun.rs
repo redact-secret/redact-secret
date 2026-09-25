@@ -96,7 +96,7 @@
 //! Mailgun's newer private API key: a Mailgun-repository contributor (2019),
 //! customer reports (2018) and trufflehog#3870 (2025). Both pinned tools
 //! also match it: gitleaks' `mailgun-signing-key` and trufflehog's "Hex
-//! MailGun Token". Mailgun's docs state no shape for any key and show a key
+//! `MailGun` Token". Mailgun's docs state no shape for any key and show a key
 //! `id` shaped 8-8 hex. No issued key has been observed, so whether a fresh
 //! private key or signing key uses this shape stays recorded uncertainty.
 //! Missing a real key costs more than a rare false alarm, so this detector

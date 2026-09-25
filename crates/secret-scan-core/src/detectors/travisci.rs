@@ -9,12 +9,12 @@
 //! | candidate | gitleaks 8.30.1 | trufflehog 3.97.4 | tools |
 //! | --- | --- | --- | --- |
 //! | Travis CI | `travisci-access-token` | `travisci` | 2 |
-//! | CircleCI | none | `circleci/v1`, `circleci/v2` | 1 |
+//! | `CircleCI` | none | `circleci/v1`, `circleci/v2` | 1 |
 //! | Buildkite | none | `buildkite/v1`, `buildkite/v2` | 1 |
 //! | GitHub Actions | none | none | 0 |
 //!
 //! The maintainer chose Travis CI (2026-09-24): it is the only candidate two
-//! independent tools corroborate. CircleCI and Buildkite are the next
+//! independent tools corroborate. `CircleCI` and Buildkite are the next
 //! candidates. Each has one corroborating tool and needs its own contract
 //! issue. GitHub Actions has no token grammar in either tool.
 //!

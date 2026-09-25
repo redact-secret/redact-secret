@@ -41,7 +41,7 @@
 //!   anything else. The benchmark's alphabet twins use a non-hex letter,
 //!   which is still rejected.
 //! - **Rotation suffix (#698).** gitleaks, trufflehog and betterleaks allow
-//!   `-` plus one digit. Nosey Parker allows several. plenoai, CredSweeper
+//!   `-` plus one digit. Nosey Parker allows several. plenoai, `CredSweeper`
 //!   and secrets-patterns-db allow no suffix. All 19 suffixed public-code
 //!   candidates had one digit. The suffix accepts 1–3 digits, so a
 //!   multi-digit rotation no longer loses the whole token. Four or more
