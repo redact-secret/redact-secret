@@ -679,12 +679,25 @@ The first stable architecture does not include:
 - a pure-Python, TypeScript, or Go detector fallback;
 - runtime provider lookups or network-assisted validation;
 - credential storage, credential management, or secret rotation;
-- UI components, server-framework integration, or model/tool invocation; or
-- PII detection, prompt-injection analysis, organization data policy, or other
-  broader context-safety functions.
+- UI components, server-framework integration, or model/tool invocation;
+- PII without a decidable shape: names, street addresses, dates of birth,
+  free-text identity, or semantic entity recognition; or
+- prompt-injection analysis, organization data policy, or other broader
+  context-safety functions.
 
 Those capabilities may wrap or follow Redact Secret, but they must not weaken
 the deterministic core or create another authoritative detector implementation.
+
+Structured PII whose shape can be decided deterministically (email address,
+payment card, IPv4/IPv6 address, IBAN, US SSN, and phone number in constrained
+context) is not excluded. It is planned for beta.10 on the shared evidence
+foundation, once the PII evidence model is settled
+([#578](https://github.com/redact-secret/redact-secret/issues/578),
+[#579](https://github.com/redact-secret/redact-secret/issues/579)). That model
+keeps type evidence separate from sensitivity. Beta.9 ships no PII detector and
+makes no PII support claim; the
+[PII-readiness study](https://github.com/redact-secret/redact-secret-benchmarks/blob/bdfe39b6a9c1e61ce6424e03ec4f9ee623aecaf6/docs/reports/2026-09-25-beta9-258-pii-readiness.md)
+records which beta.9 evidence groups transfer.
 
 The invisible-character normalization step above deliberately excludes, each
 tracked by its own future issue:
