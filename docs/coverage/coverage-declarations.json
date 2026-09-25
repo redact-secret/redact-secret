@@ -6249,7 +6249,9 @@
           "dimension": "boundary",
           "evidenceFixtureIds": [
             "mailchimp-api-key-boundary-datacenter-digit-count-too-long",
+            "mailchimp-api-key-boundary-datacenter-four-digits",
             "mailchimp-api-key-boundary-missing-datacenter-suffix",
+            "mailchimp-api-key-boundary-non-hex-letter",
             "mailchimp-api-key-boundary-one-long",
             "mailchimp-api-key-boundary-one-short",
             "mailchimp-api-key-boundary-uppercase-hex",
@@ -6270,7 +6272,9 @@
           "dimension": "malformed",
           "evidenceFixtureIds": [
             "mailchimp-api-key-boundary-datacenter-digit-count-too-long",
+            "mailchimp-api-key-boundary-datacenter-four-digits",
             "mailchimp-api-key-boundary-missing-datacenter-suffix",
+            "mailchimp-api-key-boundary-non-hex-letter",
             "mailchimp-api-key-boundary-one-long",
             "mailchimp-api-key-boundary-one-short",
             "mailchimp-api-key-boundary-uppercase-hex",
@@ -6320,6 +6324,8 @@
             "mailgun-api-key-positive-log-keyword",
             "mailgun-api-key-positive-shell-quoted",
             "mailgun-api-key-positive-signing-key-field-name",
+            "mailgun-api-key-positive-triplet-dotenv",
+            "mailgun-api-key-positive-triplet-log",
             "mailgun-api-key-positive-yaml-keyword",
             "mailgun-api-key-regression-crlf-and-unicode-prefix"
           ],
@@ -6344,6 +6350,8 @@
           "evidenceFixtureIds": [
             "mailgun-api-key-boundary-one-long",
             "mailgun-api-key-boundary-one-short",
+            "mailgun-api-key-boundary-triplet-shifted-dash",
+            "mailgun-api-key-boundary-triplet-uppercase",
             "mailgun-api-key-boundary-uppercase-body",
             "mailgun-api-key-boundary-uppercase-literal"
           ],
@@ -6356,7 +6364,9 @@
             "mailgun-api-key-negative-context-on-a-different-line",
             "mailgun-api-key-negative-environment-variable-reference",
             "mailgun-api-key-negative-public-validation-key-reference",
-            "mailgun-api-key-negative-repeated-character-filler"
+            "mailgun-api-key-negative-repeated-character-filler",
+            "mailgun-api-key-negative-triplet-identifier-key",
+            "mailgun-api-key-negative-triplet-no-keyword"
           ],
           "state": "supported"
         },
@@ -6365,6 +6375,8 @@
           "evidenceFixtureIds": [
             "mailgun-api-key-boundary-one-long",
             "mailgun-api-key-boundary-one-short",
+            "mailgun-api-key-boundary-triplet-shifted-dash",
+            "mailgun-api-key-boundary-triplet-uppercase",
             "mailgun-api-key-boundary-uppercase-body",
             "mailgun-api-key-boundary-uppercase-literal"
           ],
@@ -7605,8 +7617,10 @@
           "evidenceFixtureIds": [
             "databricks-personal-access-token-boundary-encoded-prefix",
             "databricks-personal-access-token-boundary-invalid-alphabet",
+            "databricks-personal-access-token-boundary-non-hex-letter",
             "databricks-personal-access-token-boundary-one-long",
             "databricks-personal-access-token-boundary-one-short",
+            "databricks-personal-access-token-boundary-rotation-four-digits",
             "databricks-personal-access-token-boundary-rotation-multi-digit",
             "databricks-personal-access-token-boundary-rotation-non-digit",
             "databricks-personal-access-token-boundary-rotation-separator"
@@ -7633,8 +7647,10 @@
           "evidenceFixtureIds": [
             "databricks-personal-access-token-boundary-encoded-prefix",
             "databricks-personal-access-token-boundary-invalid-alphabet",
+            "databricks-personal-access-token-boundary-non-hex-letter",
             "databricks-personal-access-token-boundary-one-long",
             "databricks-personal-access-token-boundary-one-short",
+            "databricks-personal-access-token-boundary-rotation-four-digits",
             "databricks-personal-access-token-boundary-rotation-multi-digit",
             "databricks-personal-access-token-boundary-rotation-non-digit",
             "databricks-personal-access-token-boundary-rotation-separator"
@@ -7952,6 +7968,98 @@
     },
     {
       "behaviorClass": "provider",
+      "detector": "neon-api-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "neon-api-key-positive-dotenv",
+            "neon-api-key-positive-json",
+            "neon-api-key-positive-log",
+            "neon-api-key-positive-longer-body",
+            "neon-api-key-positive-shell-quoted",
+            "neon-api-key-positive-typescript-client",
+            "neon-api-key-positive-yaml",
+            "neon-api-key-regression-crlf-and-unicode-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "neon-api-key-overlap-bearer"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "neon-api-key-adversarial-dense-findings"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "neon-api-key-boundary-dash-in-body",
+            "neon-api-key-boundary-embedded-in-identifier",
+            "neon-api-key-boundary-one-short"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "neon-api-key-negative-branch-and-endpoint-ids",
+            "neon-api-key-negative-env-reference",
+            "neon-api-key-negative-filler",
+            "neon-api-key-negative-placeholder",
+            "neon-api-key-negative-pooled-hostname",
+            "neon-api-key-negative-project-id"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "neon-api-key-boundary-dash-in-body",
+            "neon-api-key-boundary-embedded-in-identifier",
+            "neon-api-key-boundary-one-short"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for neon_api_key (neon-api-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "neon_api_key"
+    },
+    {
+      "behaviorClass": "provider",
       "detector": "langsmith-api-key",
       "dimensions": [
         {
@@ -8266,6 +8374,92 @@
     },
     {
       "behaviorClass": "provider",
+      "detector": "postman-collection-access-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "postman-collection-access-key-positive-dotenv",
+            "postman-collection-access-key-positive-json",
+            "postman-collection-access-key-positive-lowercase-body",
+            "postman-collection-access-key-positive-share-url",
+            "postman-collection-access-key-regression-crlf-and-unicode-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "postman-collection-access-key-overlap-api-key-header"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "postman-collection-access-key-adversarial-dense-findings"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "postman-collection-access-key-boundary-embedded",
+            "postman-collection-access-key-boundary-one-long",
+            "postman-collection-access-key-boundary-one-short"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "postman-collection-access-key-negative-collection-id",
+            "postman-collection-access-key-negative-masked",
+            "postman-collection-access-key-negative-placeholder"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "postman-collection-access-key-boundary-embedded",
+            "postman-collection-access-key-boundary-one-long",
+            "postman-collection-access-key-boundary-one-short"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for postman_collection_access_key (postman-collection-access-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "postman_collection_access_key"
+    },
+    {
+      "behaviorClass": "provider",
       "detector": "heroku-api-key",
       "dimensions": [
         {
@@ -8454,6 +8648,98 @@
       "type": "heroku_api_key_legacy"
     },
     {
+      "behaviorClass": "provider",
+      "detector": "travisci-api-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "travisci-api-token-positive-cli-flag",
+            "travisci-api-token-positive-curl-header",
+            "travisci-api-token-positive-dotenv",
+            "travisci-api-token-positive-json",
+            "travisci-api-token-positive-log",
+            "travisci-api-token-positive-shell-quoted",
+            "travisci-api-token-positive-yaml",
+            "travisci-api-token-regression-crlf-and-unicode-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "travisci-api-token-overlap-generic-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "travisci-api-token-adversarial-dense-findings"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "travisci-api-token-boundary-one-long",
+            "travisci-api-token-boundary-one-short",
+            "travisci-api-token-boundary-underscore-embedded"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "travisci-api-token-negative-bare-value-with-no-context",
+            "travisci-api-token-negative-context-on-a-different-line",
+            "travisci-api-token-negative-environment-variable-reference",
+            "travisci-api-token-negative-identifier-key",
+            "travisci-api-token-negative-letters-only",
+            "travisci-api-token-negative-repeated-character-filler"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "travisci-api-token-boundary-one-long",
+            "travisci-api-token-boundary-one-short",
+            "travisci-api-token-boundary-underscore-embedded"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for travisci_api_token (travisci-api-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "travisci_api_token"
+    },
+    {
       "behaviorClass": "incremental",
       "detector": "unassigned",
       "dimensions": [
@@ -8633,6 +8919,7 @@
             "mailchimp-api-key-adversarial-dense-findings",
             "mailgun-api-key-adversarial-dense-findings",
             "microsoft-entra-client-secret-adversarial-long-padding",
+            "neon-api-key-adversarial-dense-findings",
             "netlify-adversarial-long-suffix",
             "new-relic-license-key-adversarial-dense-findings",
             "new-relic-user-api-key-adversarial-long-padding",
@@ -8646,6 +8933,7 @@
             "perplexity-api-key-adversarial-long-suffix",
             "pinecone-api-key-adversarial-long-suffix",
             "postman-api-key-adversarial-long-suffix",
+            "postman-collection-access-key-adversarial-dense-findings",
             "private-key-adversarial-incomplete",
             "private-key-adversarial-mismatched",
             "private-key-adversarial-nested",
@@ -8663,6 +8951,7 @@
             "supabase-management-adversarial-long-suffix",
             "telegram-bot-token-adversarial-long-padding",
             "terraform-cloud-token-adversarial-near-miss-suffix",
+            "travisci-api-token-adversarial-dense-findings",
             "twilio-api-key-secret-adversarial-dense-findings",
             "twilio-auth-token-adversarial-dense-findings",
             "vault-adversarial-long-suffix",
@@ -9051,6 +9340,7 @@
             "mailchimp-api-key-adversarial-dense-findings",
             "mailgun-api-key-adversarial-dense-findings",
             "microsoft-entra-client-secret-adversarial-long-padding",
+            "neon-api-key-adversarial-dense-findings",
             "netlify-adversarial-long-suffix",
             "new-relic-license-key-adversarial-dense-findings",
             "new-relic-user-api-key-adversarial-long-padding",
@@ -9064,6 +9354,7 @@
             "perplexity-api-key-adversarial-long-suffix",
             "pinecone-api-key-adversarial-long-suffix",
             "postman-api-key-adversarial-long-suffix",
+            "postman-collection-access-key-adversarial-dense-findings",
             "private-key-adversarial-incomplete",
             "private-key-adversarial-mismatched",
             "private-key-adversarial-nested",
@@ -9081,6 +9372,7 @@
             "supabase-management-adversarial-long-suffix",
             "telegram-bot-token-adversarial-long-padding",
             "terraform-cloud-token-adversarial-near-miss-suffix",
+            "travisci-api-token-adversarial-dense-findings",
             "twilio-api-key-secret-adversarial-dense-findings",
             "twilio-auth-token-adversarial-dense-findings",
             "vault-adversarial-long-suffix",

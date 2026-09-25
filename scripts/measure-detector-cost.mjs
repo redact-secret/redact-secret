@@ -74,8 +74,8 @@ export const CANONICAL_IDS = [
   "grafana-cloud-access-policy-token", "new-relic-user-api-key", "new-relic-license-key",
   "mailchimp-api-key", "mailgun-api-key", "okta-api-token",
   "firebase-server-key", "terraform-cloud-token", "pulumi-access-token", "replicate-api-token", "groq-api-key", "xai-api-key", "openrouter-api-key", "perplexity-api-key", "fireworks-ai-api-key", "pinecone-api-key", "gitlab-runner-authentication-token", "databricks-personal-access-token",
-  "confluent-cloud-api-secret", "confluent-cloud-api-secret-legacy", "netlify-token", "langsmith-api-key", "langfuse-secret-key",
-  "postman-api-key", "heroku-api-key", "heroku-api-key-legacy",
+  "confluent-cloud-api-secret", "confluent-cloud-api-secret-legacy", "netlify-token", "neon-api-key", "langsmith-api-key", "langfuse-secret-key",
+  "postman-api-key", "postman-collection-access-key", "heroku-api-key", "heroku-api-key-legacy", "travisci-api-token",
   "jwt", "bearer-token", "connection-string", "otpauth-uri", "generic-token",
 ];
 
@@ -100,12 +100,12 @@ export const GROUPS = {
     "datadog-application-key", "datadog-application-key-legacy", "grafana-service-account-token", "grafana-cloud-access-policy-token",
     "new-relic-user-api-key", "new-relic-license-key", "firebase-server-key", "terraform-cloud-token",
     "pulumi-access-token", "pinecone-api-key", "databricks-personal-access-token",
-    "confluent-cloud-api-secret", "confluent-cloud-api-secret-legacy", "netlify-token", "postman-api-key",
+    "confluent-cloud-api-secret", "confluent-cloud-api-secret-legacy", "netlify-token", "neon-api-key", "postman-api-key", "postman-collection-access-key",
     "heroku-api-key", "heroku-api-key-legacy",
   ],
   devtools: [
     "github-token", "gitlab-token", "gitlab-runner-authentication-token", "azure-devops-personal-access-token", "notion-token",
-    "atlassian-api-token", "linear-token",
+    "atlassian-api-token", "linear-token", "travisci-api-token",
   ],
   "pkg-registry": ["pypi-token", "docker-token", "npm-token"],
   saas: [

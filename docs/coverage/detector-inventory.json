@@ -535,6 +535,13 @@
       "schemes": null
     },
     {
+      "type": "neon_api_key",
+      "detector": "neon-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444",
+      "schemes": null
+    },
+    {
       "type": "langsmith_api_key",
       "detector": "langsmith-api-key",
       "policyClass": "always-redact",
@@ -556,6 +563,13 @@
       "schemes": null
     },
     {
+      "type": "postman_collection_access_key",
+      "detector": "postman-collection-access-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "PMAT-SynthRevoked0Postman0Pmat1",
+      "schemes": null
+    },
+    {
       "type": "heroku_api_key",
       "detector": "heroku-api-key",
       "policyClass": "always-redact",
@@ -567,6 +581,13 @@
       "detector": "heroku-api-key-legacy",
       "policyClass": "confidence-gated",
       "reconciliationTrigger": "heroku 01234567-89ab-cdef-0123-456789abcdef",
+      "schemes": null
+    },
+    {
+      "type": "travisci_api_token",
+      "detector": "travisci-api-token",
+      "policyClass": "confidence-gated",
+      "reconciliationTrigger": "travis Syn7hRevok3dTrvCi0Tok1",
       "schemes": null
     }
   ],

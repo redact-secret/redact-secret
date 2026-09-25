@@ -34,6 +34,7 @@ mod linear;
 mod mailchimp;
 mod mailgun;
 mod microsoft_entra;
+mod neon;
 mod netlify;
 mod new_relic;
 mod notion;
@@ -53,6 +54,7 @@ mod stripe;
 mod telegram;
 mod terraform;
 mod text;
+mod travisci;
 mod twilio;
 mod vault;
 
@@ -130,11 +132,14 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(confluent::CONFLUENT_CLOUD_API_SECRET),
         Box::new(confluent::ConfluentLegacyApiSecretDetector),
         Box::new(netlify::NetlifyPersonalAccessTokenDetector),
+        Box::new(neon::NEON),
         Box::new(langsmith::LangsmithApiKeyDetector),
         Box::new(langfuse::LangfuseSecretKeyDetector),
         Box::new(postman::POSTMAN),
+        Box::new(postman::POSTMAN_COLLECTION_ACCESS_KEY),
         Box::new(heroku::HEROKU_API_KEY),
         Box::new(heroku::HerokuApiKeyLegacyDetector),
+        Box::new(travisci::TravisCiApiTokenDetector),
         jwt::jwt_detector(),
         bearer_token::bearer_token_detector(),
         Box::new(ConnectionStringDetector),
@@ -242,11 +247,14 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("confluent-cloud-api-secret", Pack::Provider),
     ("confluent-cloud-api-secret-legacy", Pack::Provider),
     ("netlify-token", Pack::Provider),
+    ("neon-api-key", Pack::Provider),
     ("langsmith-api-key", Pack::Provider),
     ("langfuse-secret-key", Pack::Provider),
     ("postman-api-key", Pack::Provider),
+    ("postman-collection-access-key", Pack::Provider),
     ("heroku-api-key", Pack::Provider),
     ("heroku-api-key-legacy", Pack::Provider),
+    ("travisci-api-token", Pack::Provider),
     ("jwt", Pack::Common),
     ("bearer-token", Pack::Common),
     ("connection-string", Pack::Common),
@@ -343,11 +351,14 @@ mod tests {
                 "confluent-cloud-api-secret",
                 "confluent-cloud-api-secret-legacy",
                 "netlify-token",
+                "neon-api-key",
                 "langsmith-api-key",
                 "langfuse-secret-key",
                 "postman-api-key",
+                "postman-collection-access-key",
                 "heroku-api-key",
                 "heroku-api-key-legacy",
+                "travisci-api-token",
                 "jwt",
                 "bearer-token",
                 "connection-string",
@@ -638,6 +649,10 @@ mod tests {
         let confluent_cloud_api_secret_input =
             "cfltSYNTHETIC0REVOKED0PrefixedSecretValue0ABCDEFGHIJKLMNOPn2NMow";
         let netlify_token_input = "nfp_SYNTHETIC_REVOKED_NETLIFY_PAT_BODY01";
+        let neon_api_key_input = format!(
+            "napi_{}",
+            "SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444"
+        );
         let langsmith_api_key_input = "lsv2_pt_0123456789abcdef0123456789abcdef_fedcba9876";
         let langfuse_secret_key_input = "sk-lf-0a1b2c3d-4e5f-4a6b-8c7d-0e1f2a3b4c5d";
         let postman_api_key_input = format!(
@@ -649,6 +664,7 @@ mod tests {
             "SYNTHETIC0REVOKED0HerokuOAuthAccessTokenBodyFixture0123456"
         );
         let heroku_api_key_legacy_input = "heroku 01234567-89ab-cdef-0123-456789abcdef";
+        let travisci_api_token_input = "travis Syn7hRevok3dTrvCi0Tok1";
         let replicate_api_token_input = format!("r8_{}", "SYNTHETIC_REVOKED-REPLICATE-TOKEN-001");
         let groq_api_key_input = format!(
             "gsk_{}",
@@ -708,11 +724,17 @@ mod tests {
                 confluent_cloud_api_secret_input,
             ),
             ("netlify-token", netlify_token_input),
+            ("neon-api-key", neon_api_key_input.as_str()),
             ("langsmith-api-key", langsmith_api_key_input),
             ("langfuse-secret-key", langfuse_secret_key_input),
             ("postman-api-key", postman_api_key_input.as_str()),
+            (
+                "postman-collection-access-key",
+                "PMAT-SynthRevoked0Postman0Pmat1",
+            ),
             ("heroku-api-key", heroku_api_key_input.as_str()),
             ("heroku-api-key-legacy", heroku_api_key_legacy_input),
+            ("travisci-api-token", travisci_api_token_input),
         ];
         assert_provider_candidates(&cases);
     }

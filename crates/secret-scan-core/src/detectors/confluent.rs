@@ -291,14 +291,17 @@ impl Detector for ConfluentLegacyApiSecretDetector {
                 else {
                     continue;
                 };
+                let (confidence, signal) =
+                    if text::is_provider_named_assignment(line, relative_start, &[CONTEXT_KEYWORD])
+                    {
+                        (Confidence::High, "confluent-named-assignment")
+                    } else {
+                        (Confidence::Medium, "confluent-keyword-cooccurrence")
+                    };
                 candidates.push(
-                    Candidate::new(
-                        "confluent_cloud_api_secret_legacy",
-                        Confidence::Medium,
-                        range,
-                    )
-                    .with_specificity(Specificity::Provider)
-                    .with_signals(["confluent-keyword-cooccurrence"]),
+                    Candidate::new("confluent_cloud_api_secret_legacy", confidence, range)
+                        .with_specificity(Specificity::Provider)
+                        .with_signals([signal]),
                 );
             }
         }
@@ -532,7 +535,7 @@ mod tests {
     // -- Legacy (bare, keyword-gated) detector ------------------------------
 
     #[test]
-    fn detects_a_legacy_secret_alongside_the_confluent_keyword_at_medium_confidence() {
+    fn detects_a_legacy_secret_under_a_confluent_named_key_at_high_confidence() {
         let input = format!("CONFLUENT_API_SECRET={LEGACY_BODY}");
         let candidates = detect_legacy(&input);
         assert_eq!(candidates.len(), 1);
@@ -540,7 +543,7 @@ mod tests {
             candidates[0].type_name(),
             "confluent_cloud_api_secret_legacy"
         );
-        assert_eq!(candidates[0].confidence(), Confidence::Medium);
+        assert_eq!(candidates[0].confidence(), Confidence::High);
         assert_eq!(candidates[0].effective_specificity(), Specificity::Provider);
         let start = input.rfind(LEGACY_BODY).unwrap();
         assert_eq!(

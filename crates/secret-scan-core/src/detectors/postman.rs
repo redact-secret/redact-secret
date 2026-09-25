@@ -30,6 +30,21 @@
 //! position, is an intentional false negative rather than a fuzzy match
 //! against the looser union.
 //!
+//! ## Collection access keys (issue #700)
+//!
+//! Postman documents a second credential, the collection access key
+//! (`learning.postman.com/docs/collaborating-in-postman/sharing/` and
+//! `.../developer/postman-api/authentication/`, observed 2026-09-24). It
+//! grants read-only access to one collection's JSON, expires after 60 days
+//! of inactivity, and Postman tells users to remove sensitive data before
+//! sharing one. The docs show only a masked `PMAT-` key and state no
+//! length. GitLab's secret-detection rules match `PMAT-` + 26 `[A-Z0-9]`,
+//! and GitHub secret scanning lists partner pattern `postman_collection_key`.
+//! It is a separate family, [`POSTMAN_COLLECTION_ACCESS_KEY`], reported as
+//! `postman_collection_access_key`: `PMAT-` followed by exactly 26
+//! [`pattern::is_alnum`] bytes. The case is read loosely because only one
+//! tool states it. Tier T2.
+//!
 //! No other Postman credential form (a collection or workspace id, a
 //! Postman Vault variable reference, a redacted export placeholder) is
 //! documented or tool-corroborated with its own grammar, so none is given
@@ -97,6 +112,108 @@ pub(super) const POSTMAN: KnownFormatProviderDetector = KnownFormatProviderDetec
     ],
     BOUNDARY,
 );
+
+const COLLECTION_ACCESS_KEY_PREFIX: &str = "PMAT-";
+/// GitLab's rule body length for a collection access key.
+const COLLECTION_ACCESS_KEY_BODY_LEN: usize = 26;
+const COLLECTION_ACCESS_KEY_SIGNALS: [&str; 2] = [
+    "postman-collection-access-key-prefix",
+    "tool-corroborated-length",
+];
+
+/// Rejects a body that is one repeated character, a masked placeholder.
+fn collection_access_key_is_not_filler(bytes: &[u8], start: usize, end: usize) -> bool {
+    let body = &bytes[start + COLLECTION_ACCESS_KEY_PREFIX.len()..end];
+    body.iter().any(|&byte| byte != body[0])
+}
+
+/// Requires `PMAT-` followed by exactly 26 `[A-Za-z0-9]` bytes that are not
+/// one repeated character (issue #700; see the module doc).
+pub(super) const POSTMAN_COLLECTION_ACCESS_KEY: KnownFormatProviderDetector =
+    KnownFormatProviderDetector::new(
+        "postman-collection-access-key",
+        "postman_collection_access_key",
+        &[PrefixShape::exact(
+            COLLECTION_ACCESS_KEY_PREFIX,
+            COLLECTION_ACCESS_KEY_BODY_LEN,
+            pattern::is_alnum,
+            &COLLECTION_ACCESS_KEY_SIGNALS,
+        )
+        .with_post_check(collection_access_key_is_not_filler)],
+        BOUNDARY,
+    );
+
+#[cfg(test)]
+mod collection_access_key_tests {
+    use super::*;
+    use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
+
+    /// Exactly 26 bytes. Locally constructed synthetic value; never issued
+    /// by Postman.
+    const BODY: &str = "SynthRevoked0Postman0Pmat1";
+    const _: () = assert!(BODY.len() == COLLECTION_ACCESS_KEY_BODY_LEN);
+
+    fn key() -> String {
+        format!("{COLLECTION_ACCESS_KEY_PREFIX}{BODY}")
+    }
+
+    fn detect(input: &str) -> Vec<Candidate> {
+        POSTMAN_COLLECTION_ACCESS_KEY
+            .detect(input, &DetectorContext::new(input.len()))
+            .unwrap()
+    }
+
+    #[test]
+    fn detects_a_key_bare_and_in_a_share_url() {
+        let key = key();
+        for input in [
+            key.clone(),
+            format!(
+                "https://api.getpostman.com/collections/12345678-0000-0000-0000-000000000000?access_key={key}"
+            ),
+            format!("POSTMAN_COLLECTION_ACCESS_KEY={key}"),
+        ] {
+            let candidates = detect(&input);
+            assert_eq!(candidates.len(), 1, "{input}");
+            assert_eq!(candidates[0].type_name(), "postman_collection_access_key");
+            assert_eq!(candidates[0].confidence(), Confidence::High);
+            assert_eq!(candidates[0].effective_specificity(), Specificity::Provider);
+            let start = input.find(&key).unwrap();
+            assert_eq!(
+                candidates[0].range(),
+                ByteRange::new(start, start + key.len()).unwrap()
+            );
+        }
+    }
+
+    #[test]
+    fn accepts_a_lowercase_body() {
+        assert_eq!(
+            detect(&format!("PMAT-{}", BODY.to_ascii_lowercase())).len(),
+            1
+        );
+    }
+
+    #[test]
+    fn rejects_the_wrong_length_filler_and_embedding() {
+        for input in [
+            format!("PMAT-{}", &BODY[..25]),
+            format!("PMAT-{BODY}X"),
+            format!("PMAT-{}", "*".repeat(26)),
+            format!("PMAT-{}", "X".repeat(26)),
+            format!("xPMAT-{BODY}"),
+            format!("PMAT-{BODY}-x"),
+            "PMAT-<your-collection-access-key>".to_owned(),
+        ] {
+            assert!(detect(&input).is_empty(), "{input}");
+        }
+    }
+
+    #[test]
+    fn the_api_key_prefix_is_not_a_collection_access_key() {
+        assert!(detect(&format!("PMAK-{BODY}")).is_empty());
+    }
+}
 
 #[cfg(test)]
 mod tests {

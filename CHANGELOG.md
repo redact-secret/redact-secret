@@ -7,6 +7,28 @@ evidence is linked from each published version.
 
 ### Changed
 
+- `docs/support-matrix.md` explains why a family is not yet stable in plain
+  language. Related evaluator gates are grouped into one sentence, for
+  example "Not yet stable: needs broader positive test contexts and more
+  benign controls.", instead of showing raw gate names such as
+  `documented.minimumPositiveAxes: 2 < 4`. The status descriptions no longer
+  depend on evidence-tier codes. `benchmarks/support-matrix.json` keeps the
+  complete raw reason, and a gate the generator does not recognize fails the
+  check instead of being published (#723).
+- A credential assigned to a provider-named key now redacts.
+  `okta-api-token`, `mailchimp-api-key`, `mailgun-api-key`,
+  `heroku-api-key-legacy`, `confluent-cloud-api-secret-legacy`, the Datadog
+  and Twilio keyword-gated detectors and `new-relic-license-key` report high
+  confidence (redact) instead of medium (warn) when the value is assigned to a
+  key that names the provider (`MAILCHIMP_API_KEY=`, `"oktaApiToken":`). A
+  provider keyword elsewhere on the line still gives medium. `generic-token`
+  now treats a high-signal name behind a generic prefix as high-signal, so
+  `MYAPP_API_KEY=`, `DB_PASSWORD=`, `jwt.secret:` and `CI_DEPLOY_TOKEN=`
+  redact like `api_key=`. A prefix that names a provider with its own
+  detector leaves the value to that detector, so a malformed value under
+  `GITHUB_TOKEN=` stays clean. Vendor-prefixed documentation placeholders
+  (`pplx-your-api-key-here`, `pcsk_***`, `dapixxxx...`, the all-zero UUID)
+  and digest-labelled values (`hmac-sha256:...`) are not reported (#702).
 - `slack-token` now reports `xapp-` app-level tokens as their own finding type,
   `slack_app_level_token`, and only for the frozen four-section shape
   `xapp-<digits>-<alphanumeric>-<digits>-<alphanumeric>`. A value with a `_`
@@ -56,6 +78,41 @@ evidence is linked from each published version.
 
 ### Changed detection
 
+- `mailgun-api-key` now also reports the prefix-less `<32 hex>-<8 hex>-<8 hex>`
+  triplet on a line that names Mailgun. Three sources describe it as the newer
+  private API key, and both pinned tools match it. It reports medium
+  confidence, or high under a Mailgun-named key. An identifier-named key
+  (`MAILGUN_KEY_ID=`), uppercase hex or a misplaced dash is not reported. No
+  issued key has been observed, so the shape stays recorded uncertainty (#701).
+- New `postman-collection-access-key` detector reports a Postman collection
+  access key as `postman_collection_access_key` (always redacted): `PMAT-`
+  followed by exactly 26 letters and digits, including in a share-via-API
+  URL's `access_key=` parameter. Postman documents the key as a read-only
+  credential without stating its shape, so the grammar follows GitLab's rule
+  (T2). A body in either case is accepted (#700).
+- `mailchimp-api-key` and `databricks-personal-access-token` now accept
+  uppercase hex in the key body (#697) and a longer suffix (#698): Mailchimp
+  `-us` plus 1–3 digits, and a Databricks `-` rotation suffix of 1–3 digits.
+  Before, such a key was missed whole. No issued key or provider statement
+  settles either property, so they stay recorded uncertainty, and the grammar
+  takes the reading that misses fewer keys. A non-hex letter or four or more
+  suffix digits still reject. The Mailchimp body stays exactly 32 bytes: the
+  provider's one 31-byte example is treated as a documentation typo (#699).
+- New `neon-api-key` detector reports a Neon API key as `neon_api_key`
+  (always redacted): `napi_` followed by at least 64 letters and digits. The
+  prefix is stated by Neon; the 64-byte body floor is tool-corroborated, so a
+  shorter body is not reported. A Neon connection URI's password stays with
+  `connection-string`. PlanetScale, CockroachDB Cloud and MongoDB Atlas are
+  ranked as follow-up candidates (#524).
+- New `travisci-api-token` detector reports a Travis CI API token as
+  `travisci_api_token`: a 22-byte `[A-Za-z0-9]` value that mixes letters and
+  digits, on a line that contains `travis`. It is high confidence (redact)
+  under a Travis-named key such as `TRAVIS_TOKEN=`, and medium (warn) when
+  `travis` appears elsewhere on the line, for example in an
+  `Authorization: token` header with the Travis host. A value under an
+  identifier key (`TRAVIS_REPO_SLUG=`) is not reported. The grammar is
+  tool-corroborated (T2), because Travis CI documents no length or alphabet.
+  CircleCI and Buildkite are ranked as follow-up candidates (#523).
 - `pinecone-api-key` now reports a legacy lowercase `8-4-4-4-12` UUID Pinecone
   key as `pinecone_api_key` (high confidence, redacted), but only when it is
   the value assigned to a Pinecone API-key name on the same line:

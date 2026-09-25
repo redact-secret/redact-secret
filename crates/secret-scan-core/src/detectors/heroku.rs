@@ -480,10 +480,17 @@ impl Detector for HerokuApiKeyLegacyDetector {
                 else {
                     continue;
                 };
+                let (confidence, signal) = if same_line
+                    && text::is_provider_named_assignment(line, relative_start, &[CONTEXT_KEYWORD])
+                {
+                    (Confidence::High, "heroku-named-assignment")
+                } else {
+                    (Confidence::Medium, "heroku-keyword-cooccurrence")
+                };
                 candidates.push(
-                    Candidate::new("heroku_api_key_legacy", Confidence::Medium, range)
+                    Candidate::new("heroku_api_key_legacy", confidence, range)
                         .with_specificity(Specificity::Provider)
-                        .with_signals(["heroku-keyword-cooccurrence"]),
+                        .with_signals([signal]),
                 );
             }
         }
@@ -716,12 +723,12 @@ mod tests {
     // -- Legacy (bare UUID, keyword-gated) detector -------------------------
 
     #[test]
-    fn detects_a_legacy_token_alongside_the_heroku_keyword_at_medium_confidence() {
+    fn detects_a_legacy_token_under_a_heroku_named_key_at_high_confidence() {
         let input = format!("HEROKU_API_KEY={LEGACY_UUID}");
         let candidates = detect_legacy(&input);
         assert_eq!(candidates.len(), 1);
         assert_eq!(candidates[0].type_name(), "heroku_api_key_legacy");
-        assert_eq!(candidates[0].confidence(), Confidence::Medium);
+        assert_eq!(candidates[0].confidence(), Confidence::High);
         assert_eq!(candidates[0].effective_specificity(), Specificity::Provider);
         let start = input.rfind(LEGACY_UUID).unwrap();
         assert_eq!(

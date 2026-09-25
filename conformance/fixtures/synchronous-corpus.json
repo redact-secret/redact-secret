@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 2016,
+  "fixtureCount": 2078,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -20015,13 +20015,13 @@
         {
           "detector": "twilio-auth-token",
           "type": "twilio_auth_token",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 18,
           "end": 50
         }
       ],
-      "note": "The bare 32-byte lowercase-hex value has no marker of its own; the twilio-named dotenv key is the only context present, so this classifies at medium confidence, not high."
+      "note": "The value has no vendor marker of its own; the twilio-named key (TWILIO_AUTH_TOKEN) names the credential, so since issue #702 it classifies at high confidence (a twilio keyword elsewhere on the line, without the name, stays medium)."
     },
     {
       "id": "twilio-auth-token-positive-json-keyword",
@@ -20037,13 +20037,13 @@
         {
           "detector": "twilio-auth-token",
           "type": "twilio_auth_token",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 21,
           "end": 53
         }
       ],
-      "note": "A quoted JSON string value is detected the same as a bare one; the twilio-named field is a keyword-only context, so confidence is medium."
+      "note": "The value has no vendor marker of its own; the twilio-named key (twilioAuthToken) names the credential, so since issue #702 it classifies at high confidence (a twilio keyword elsewhere on the line, without the name, stays medium)."
     },
     {
       "id": "twilio-auth-token-positive-yaml-keyword",
@@ -20059,13 +20059,13 @@
         {
           "detector": "twilio-auth-token",
           "type": "twilio_auth_token",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 19,
           "end": 51
         }
       ],
-      "note": "YAML key syntax is lexical context only; the twilio-named key is a keyword-only signal, so confidence is medium."
+      "note": "The value has no vendor marker of its own; the twilio-named key (twilio_auth_token) names the credential, so since issue #702 it classifies at high confidence (a twilio keyword elsewhere on the line, without the name, stays medium)."
     },
     {
       "id": "twilio-auth-token-negative-account-sid-on-a-different-line",
@@ -20190,13 +20190,13 @@
         {
           "detector": "twilio-api-key-secret",
           "type": "twilio_api_key_secret",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 22,
           "end": 54
         }
       ],
-      "note": "The bare 32-byte mixed-alphanumeric value has no marker of its own; the twilio-named dotenv key is the only context present, so this classifies at medium confidence, not high."
+      "note": "The value has no vendor marker of its own; the twilio-named key (TWILIO_API_KEY_SECRET) names the credential, so since issue #702 it classifies at high confidence (a twilio keyword elsewhere on the line, without the name, stays medium)."
     },
     {
       "id": "twilio-api-key-secret-positive-yaml-keyword",
@@ -20212,13 +20212,13 @@
         {
           "detector": "twilio-api-key-secret",
           "type": "twilio_api_key_secret",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 23,
           "end": 55
         }
       ],
-      "note": "YAML key syntax is lexical context only; the twilio-named key is a keyword-only signal, so confidence is medium."
+      "note": "The value has no vendor marker of its own; the twilio-named key (twilio_api_key_secret) names the credential, so since issue #702 it classifies at high confidence (a twilio keyword elsewhere on the line, without the name, stays medium)."
     },
     {
       "id": "twilio-api-key-secret-negative-api-key-sid-on-a-different-line",
@@ -20378,13 +20378,13 @@
         {
           "detector": "twilio-auth-token",
           "type": "twilio_auth_token",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 8,
           "end": 40
         }
       ],
-      "note": "api_key is a recognized generic-token field name, so this assignment also proposes a contextual-secret candidate at the same medium confidence (this value's entropy is below generic-token's high-confidence threshold) as this keyword-gated bare hex format. Same resolved-action severity (both warn under DefaultPolicy), so the provider-specific candidate's higher specificity still decides the overlap, exactly as `decision-resolve-overlap-precedence-by-resolved-action-severity` intends: severity is checked first but only overrides specificity when it actually differs."
+      "note": "api_key is a generic-token high-signal name and the line names twilio, so since issue #702 the keyword-gated provider detector classifies the value at high confidence as a named assignment; the provider candidate wins the overlap on provider specificity."
     },
     {
       "id": "twilio-api-key-secret-overlap-generic-context",
@@ -20400,13 +20400,13 @@
         {
           "detector": "twilio-api-key-secret",
           "type": "twilio_api_key_secret",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 8,
           "end": 40
         }
       ],
-      "note": "api_key is a recognized generic-token field name, so this assignment also proposes a contextual-secret candidate at the same medium confidence (this value's entropy is below generic-token's high-confidence threshold) as this keyword-gated bare mixed-alphanumeric format. Same resolved-action severity (both warn under DefaultPolicy), so the provider-specific candidate's higher specificity still decides the overlap, exactly as `decision-resolve-overlap-precedence-by-resolved-action-severity` intends: severity is checked first but only overrides specificity when it actually differs."
+      "note": "api_key is a generic-token high-signal name and the line names twilio, so since issue #702 the keyword-gated provider detector classifies the value at high confidence as a named assignment; the provider candidate wins the overlap on provider specificity."
     },
     {
       "id": "twilio-auth-token-adversarial-dense-findings",
@@ -26275,13 +26275,13 @@
         {
           "detector": "new-relic-license-key",
           "type": "new_relic_license_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 22,
           "end": 62
         }
       ],
-      "note": "The bare 40-byte lowercase-hex value has no marker of its own; the new-relic-named dotenv key is the only context present, so confidence is medium rather than high."
+      "note": "The value has no vendor marker of its own; the new-relic-named key (NEW_RELIC_LICENSE_KEY) names the credential, so since issue #702 it classifies at high confidence (a new-relic keyword elsewhere on the line, without the name, stays medium)."
     },
     {
       "id": "new-relic-license-key-positive-json-keyword",
@@ -26297,13 +26297,13 @@
         {
           "detector": "new-relic-license-key",
           "type": "new_relic_license_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 24,
           "end": 64
         }
       ],
-      "note": "A quoted JSON string value is detected the same as a bare one; the new-relic-named field is a keyword-only context, so confidence is medium."
+      "note": "The value has no vendor marker of its own; the new-relic-named key (newRelicLicenseKey) names the credential, so since issue #702 it classifies at high confidence (a new-relic keyword elsewhere on the line, without the name, stays medium)."
     },
     {
       "id": "new-relic-license-key-positive-yaml-keyword",
@@ -26319,13 +26319,13 @@
         {
           "detector": "new-relic-license-key",
           "type": "new_relic_license_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 23,
           "end": 63
         }
       ],
-      "note": "A YAML mapping value on the same line as the new-relic-named key is detected at medium confidence, the same as any other keyword-only context."
+      "note": "The value has no vendor marker of its own; the new-relic-named key (new_relic_license_key) names the credential, so since issue #702 it classifies at high confidence (a new-relic keyword elsewhere on the line, without the name, stays medium)."
     },
     {
       "id": "new-relic-license-key-positive-log-keyword",
@@ -26599,13 +26599,13 @@
         {
           "detector": "new-relic-license-key",
           "type": "new_relic_license_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 8,
           "end": 48
         }
       ],
-      "note": "api_key is a recognized generic-token field name, so this assignment also proposes a contextual-secret candidate at the same medium confidence (this value's entropy is below generic-token's high-confidence threshold) as this keyword-gated bare hex format. Same resolved-action severity (both warn under DefaultPolicy), so the provider-specific candidate's higher specificity still decides the overlap, exactly as `decision-resolve-overlap-precedence-by-resolved-action-severity` intends: severity is checked first but only overrides specificity when it actually differs."
+      "note": "api_key is a generic-token high-signal name and the line names new-relic, so since issue #702 the keyword-gated provider detector classifies the value at high confidence as a named assignment; the provider candidate wins the overlap on provider specificity."
     },
     {
       "id": "new-relic-license-key-boundary-wrong-length",
@@ -26634,13 +26634,13 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 18,
           "end": 54
         }
       ],
-      "note": "The bare 32-byte lowercase-hex body plus its -us<N> datacenter suffix has no vendor marker of its own; the mailchimp-named dotenv key is the only context present, so confidence is medium rather than high."
+      "note": "The value has no vendor marker of its own; the mailchimp-named key (MAILCHIMP_API_KEY) names the credential, so since issue #702 it classifies at high confidence (a mailchimp keyword elsewhere on the line, without the name, stays medium)."
     },
     {
       "id": "mailchimp-api-key-positive-json-keyword",
@@ -26656,13 +26656,13 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 21,
           "end": 57
         }
       ],
-      "note": "A quoted JSON string value is detected the same as a bare one; the mailchimp-named field is a keyword-only context, so confidence is medium."
+      "note": "The value has no vendor marker of its own; the mailchimp-named key (mailchimpApiKey) names the credential, so since issue #702 it classifies at high confidence (a mailchimp keyword elsewhere on the line, without the name, stays medium)."
     },
     {
       "id": "mailchimp-api-key-positive-yaml-keyword",
@@ -26678,13 +26678,13 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 19,
           "end": 56
         }
       ],
-      "note": "A YAML mapping value on the same line as the mailchimp-named key is detected at medium confidence; this fixture also covers the two-digit datacenter suffix (-us21)."
+      "note": "The value has no vendor marker of its own; the mailchimp-named key (mailchimp_api_key) names the credential, so since issue #702 it classifies at high confidence (a mailchimp keyword elsewhere on the line, without the name, stays medium)."
     },
     {
       "id": "mailchimp-api-key-positive-log-keyword",
@@ -26722,13 +26722,13 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 26,
           "end": 62
         }
       ],
-      "note": "A quoted shell export still bounds the token to exactly its own bytes; the keyword-bearing variable name on the same line satisfies the context requirement."
+      "note": "The value has no vendor marker of its own; the mailchimp-named key (MAILCHIMP_API_KEY) names the credential, so since issue #702 it classifies at high confidence (a mailchimp keyword elsewhere on the line, without the name, stays medium)."
     },
     {
       "id": "mailchimp-api-key-regression-crlf-and-unicode-prefix",
@@ -26873,27 +26873,45 @@
       "id": "mailchimp-api-key-boundary-datacenter-digit-count-too-long",
       "detector": "mailchimp-api-key",
       "kind": "boundary",
-      "support": "intentionally-unsupported",
+      "support": "supported",
       "tier": "malformed",
       "contexts": [
         "plain-text"
       ],
       "input": "mailchimp 0123456789abcdef0123456789abcdef-us123",
-      "expected": [],
-      "note": "The datacenter digit run is consumed greedily; a three-digit run is outside the documented one-or-two-digit range and the whole candidate is rejected rather than matched as a two-digit suffix followed by a stray digit."
+      "expected": [
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 10,
+          "end": 48
+        }
+      ],
+      "note": "Issue #698: Nosey Parker reads 1-3 datacenter digits and no source decides the count, so a three-digit suffix is accepted rather than losing the whole key (recorded uncertainty). Four digits still reject."
     },
     {
       "id": "mailchimp-api-key-boundary-uppercase-hex",
       "detector": "mailchimp-api-key",
       "kind": "boundary",
-      "support": "intentionally-unsupported",
+      "support": "supported",
       "tier": "malformed",
       "contexts": [
         "plain-text"
       ],
       "input": "mailchimp 0123456789ABCDEF0123456789ABCDEF-us6",
-      "expected": [],
-      "note": "The documented worked example's alphabet is lowercase hex only; an uppercase-hex run is a structurally different value, not a coincidental case variant."
+      "expected": [
+        {
+          "detector": "mailchimp-api-key",
+          "type": "mailchimp_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 10,
+          "end": 46
+        }
+      ],
+      "note": "Issue #697: gitleaks, betterleaks and Nosey Parker match case-insensitively and no source decides the case, so an uppercase-hex body is accepted (recorded uncertainty)."
     },
     {
       "id": "mailchimp-api-key-overlap-generic-context",
@@ -26909,13 +26927,13 @@
         {
           "detector": "mailchimp-api-key",
           "type": "mailchimp_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 8,
           "end": 44
         }
       ],
-      "note": "api_key is a recognized generic-token field name, so this assignment also proposes a contextual-secret candidate at the same medium confidence (this value's low-entropy alternating pattern is below generic-token's high-confidence threshold) as this keyword-gated format. Same resolved-action severity (both warn under DefaultPolicy), so the provider-specific candidate's higher specificity decides the overlap."
+      "note": "api_key is a generic-token high-signal name and the line names mailchimp, so since issue #702 the keyword-gated provider detector classifies the value at high confidence as a named assignment; the provider candidate wins the overlap on provider specificity."
     },
     {
       "id": "mailchimp-api-key-adversarial-dense-findings",
@@ -27750,13 +27768,13 @@
         {
           "detector": "mailgun-api-key",
           "type": "mailgun_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 16,
           "end": 52
         }
       ],
-      "note": "The key-<32-byte-body> shape has no vendor marker of its own; the mailgun-named dotenv key is the only context present, so confidence is medium rather than high."
+      "note": "The value has no vendor marker of its own; the mailgun-named key (MAILGUN_API_KEY) names the credential, so since issue #702 it classifies at high confidence (a mailgun keyword elsewhere on the line, without the name, stays medium)."
     },
     {
       "id": "mailgun-api-key-positive-json-keyword",
@@ -27772,13 +27790,13 @@
         {
           "detector": "mailgun-api-key",
           "type": "mailgun_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 19,
           "end": 55
         }
       ],
-      "note": "A quoted JSON string value is detected the same as a bare one; the mailgun-named field is a keyword-only context, so confidence is medium."
+      "note": "The value has no vendor marker of its own; the mailgun-named key (mailgunApiKey) names the credential, so since issue #702 it classifies at high confidence (a mailgun keyword elsewhere on the line, without the name, stays medium)."
     },
     {
       "id": "mailgun-api-key-positive-yaml-keyword",
@@ -27794,13 +27812,13 @@
         {
           "detector": "mailgun-api-key",
           "type": "mailgun_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 17,
           "end": 53
         }
       ],
-      "note": "A YAML mapping value on the same line as the mailgun-named key is detected at medium confidence."
+      "note": "The value has no vendor marker of its own; the mailgun-named key (mailgun_api_key) names the credential, so since issue #702 it classifies at high confidence (a mailgun keyword elsewhere on the line, without the name, stays medium)."
     },
     {
       "id": "mailgun-api-key-positive-log-keyword",
@@ -27838,13 +27856,13 @@
         {
           "detector": "mailgun-api-key",
           "type": "mailgun_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 24,
           "end": 60
         }
       ],
-      "note": "A quoted shell export still bounds the token to exactly its own bytes; the keyword-bearing variable name on the same line satisfies the context requirement."
+      "note": "The value has no vendor marker of its own; the mailgun-named key (MAILGUN_API_KEY) names the credential, so since issue #702 it classifies at high confidence (a mailgun keyword elsewhere on the line, without the name, stays medium)."
     },
     {
       "id": "mailgun-api-key-positive-signing-key-field-name",
@@ -28021,13 +28039,13 @@
         {
           "detector": "mailgun-api-key",
           "type": "mailgun_api_key",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 8,
           "end": 44
         }
       ],
-      "note": "api_key is a recognized generic-token field name, so this assignment also proposes a contextual-secret candidate at the same medium confidence (this value's low-entropy alternating pattern is below generic-token's high-confidence threshold) as this keyword-gated format. Same resolved-action severity (both warn under DefaultPolicy), so the provider-specific candidate's higher specificity decides the overlap."
+      "note": "api_key is a generic-token high-signal name and the line names mailgun, so since issue #702 the keyword-gated provider detector classifies the value at high confidence as a named assignment; the provider candidate wins the overlap on provider specificity."
     },
     {
       "id": "mailgun-api-key-adversarial-dense-findings",
@@ -35234,13 +35252,13 @@
         {
           "detector": "okta-api-token",
           "type": "okta_api_token",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 15,
           "end": 57
         }
       ],
-      "note": "The 00-prefixed 42-byte shape has no vendor marker of its own; the okta-named dotenv key is the only context present, so confidence is medium rather than high."
+      "note": "The value has no vendor marker of its own; the okta-named key (OKTA_API_TOKEN) names the credential, so since issue #702 it classifies at high confidence (a okta keyword elsewhere on the line, without the name, stays medium)."
     },
     {
       "id": "okta-api-token-positive-json-keyword",
@@ -35256,13 +35274,13 @@
         {
           "detector": "okta-api-token",
           "type": "okta_api_token",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 18,
           "end": 60
         }
       ],
-      "note": "A quoted JSON string value is detected the same as a bare one; the okta-named field is a keyword-only context, so confidence is medium."
+      "note": "The value has no vendor marker of its own; the okta-named key (oktaApiToken) names the credential, so since issue #702 it classifies at high confidence (a okta keyword elsewhere on the line, without the name, stays medium)."
     },
     {
       "id": "okta-api-token-positive-yaml-keyword",
@@ -35278,13 +35296,13 @@
         {
           "detector": "okta-api-token",
           "type": "okta_api_token",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 16,
           "end": 58
         }
       ],
-      "note": "A YAML mapping value on the same line as the okta-named key is detected at medium confidence."
+      "note": "The value has no vendor marker of its own; the okta-named key (okta_api_token) names the credential, so since issue #702 it classifies at high confidence (a okta keyword elsewhere on the line, without the name, stays medium)."
     },
     {
       "id": "okta-api-token-positive-log-keyword",
@@ -35322,13 +35340,13 @@
         {
           "detector": "okta-api-token",
           "type": "okta_api_token",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 23,
           "end": 65
         }
       ],
-      "note": "A quoted shell export still bounds the token to exactly its own bytes; the keyword-bearing variable name on the same line satisfies the context requirement."
+      "note": "The value has no vendor marker of its own; the okta-named key (OKTA_API_TOKEN) names the credential, so since issue #702 it classifies at high confidence (a okta keyword elsewhere on the line, without the name, stays medium)."
     },
     {
       "id": "okta-api-token-positive-ssws-authorization-header",
@@ -35505,13 +35523,13 @@
         {
           "detector": "okta-api-token",
           "type": "okta_api_token",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 8,
           "end": 50
         }
       ],
-      "note": "api_key is a recognized generic-token field name, so this assignment also proposes a contextual-secret candidate at the same medium confidence (this value's low-entropy alternating pattern is below generic-token's high-confidence threshold) as this keyword-gated format. Same resolved-action severity (both warn under DefaultPolicy), so the provider-specific candidate's higher specificity decides the overlap."
+      "note": "api_key is a generic-token high-signal name and the line names okta, so since issue #702 the keyword-gated provider detector classifies the value at high confidence as a named assignment; the provider candidate wins the overlap on provider specificity."
     },
     {
       "id": "okta-api-token-adversarial-dense-findings",
@@ -37764,14 +37782,23 @@
       "id": "databricks-personal-access-token-boundary-invalid-alphabet",
       "detector": "databricks-personal-access-token",
       "kind": "boundary",
-      "support": "intentionally-unsupported",
+      "support": "supported",
       "tier": "malformed",
       "contexts": [
         "plain-text"
       ],
       "input": "dapiD123456789abcdef0123456789abcdef",
-      "expected": [],
-      "note": "Both corroborating tools (gitleaks, trufflehog) pin the body to lowercase hex only; an uppercase hex digit inside an otherwise documented-length body is rejected."
+      "expected": [
+        {
+          "detector": "databricks-personal-access-token",
+          "type": "databricks_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 36
+        }
+      ],
+      "note": "Issue #697: Microsoft Purview allows A-F and no Databricks source decides the case, so an uppercase hex byte is accepted (recorded uncertainty). A non-hex letter still rejects; see databricks-personal-access-token-boundary-non-hex-letter."
     },
     {
       "id": "databricks-personal-access-token-boundary-rotation-separator",
@@ -37790,14 +37817,23 @@
       "id": "databricks-personal-access-token-boundary-rotation-multi-digit",
       "detector": "databricks-personal-access-token",
       "kind": "boundary",
-      "support": "intentionally-unsupported",
+      "support": "supported",
       "tier": "malformed",
       "contexts": [
         "plain-text"
       ],
       "input": "dapi0123456789abcdef0123456789abcdef-22",
-      "expected": [],
-      "note": "Both tools model the rotation suffix as exactly one digit; a two-digit suffix is an intentional false negative rather than a match on the first digit alone."
+      "expected": [
+        {
+          "detector": "databricks-personal-access-token",
+          "type": "databricks_personal_access_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 39
+        }
+      ],
+      "note": "Issue #698: Nosey Parker allows a multi-digit rotation suffix and no source decides the count, so 1-3 digits are part of the token rather than losing it whole (recorded uncertainty). Four digits still reject."
     },
     {
       "id": "databricks-personal-access-token-boundary-rotation-non-digit",
@@ -38416,13 +38452,13 @@
         {
           "detector": "confluent-cloud-api-secret-legacy",
           "type": "confluent_cloud_api_secret_legacy",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 21,
           "end": 85
         }
       ],
-      "note": "The bare 64-byte base64-body value has no marker of its own; the confluent-named dotenv key is the only context present, so this classifies at medium confidence."
+      "note": "The value has no vendor marker of its own; the confluent-named key (CONFLUENT_API_SECRET) names the credential, so since issue #702 it classifies at high confidence (a confluent keyword elsewhere on the line, without the name, stays medium)."
     },
     {
       "id": "confluent-cloud-api-secret-legacy-positive-yaml-keyword",
@@ -38438,13 +38474,13 @@
         {
           "detector": "confluent-cloud-api-secret-legacy",
           "type": "confluent_cloud_api_secret_legacy",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 22,
           "end": 86
         }
       ],
-      "note": "YAML key syntax is lexical context only; the confluent-named key is a keyword-only signal, so confidence is medium."
+      "note": "The value has no vendor marker of its own; the confluent-named key (confluent_api_secret) names the credential, so since issue #702 it classifies at high confidence (a confluent keyword elsewhere on the line, without the name, stays medium)."
     },
     {
       "id": "confluent-cloud-api-secret-legacy-positive-bare-with-keyword",
@@ -38547,13 +38583,13 @@
         {
           "detector": "confluent-cloud-api-secret-legacy",
           "type": "confluent_cloud_api_secret_legacy",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 11,
           "end": 75
         }
       ],
-      "note": "secret_key is a recognized generic-token field name, so this low-entropy assignment also proposes a contextual_secret candidate; generic-token's own entropy heuristic keeps that candidate at the same medium confidence (action warn) as this keyword-gated legacy candidate, so the same resolved-action severity leaves specificity to decide, and the provider-specific candidate wins, exactly as decision-resolve-overlap-precedence-by-resolved-action-severity intends."
+      "note": "secret_key is a generic-token high-signal name and the line names confluent, so since issue #702 the keyword-gated provider detector classifies the value at high confidence as a named assignment; the provider candidate wins the overlap on provider specificity."
     },
     {
       "id": "confluent-cloud-api-secret-legacy-adversarial-dense-findings",
@@ -40770,13 +40806,13 @@
         {
           "detector": "heroku-api-key-legacy",
           "type": "heroku_api_key_legacy",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 15,
           "end": 51
         }
       ],
-      "note": "The bare UUID-shaped value has no marker of its own; the heroku-named dotenv key is the only context present, so this classifies at medium confidence."
+      "note": "The value has no vendor marker of its own; the heroku-named key (HEROKU_API_KEY) names the credential, so since issue #702 it classifies at high confidence (a heroku keyword elsewhere on the line, without the name, stays medium)."
     },
     {
       "id": "heroku-api-key-legacy-positive-yaml-keyword",
@@ -40792,13 +40828,13 @@
         {
           "detector": "heroku-api-key-legacy",
           "type": "heroku_api_key_legacy",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 16,
           "end": 52
         }
       ],
-      "note": "YAML key syntax is lexical context only; the heroku-named key is a keyword-only signal, so confidence is medium."
+      "note": "The value has no vendor marker of its own; the heroku-named key (heroku_api_key) names the credential, so since issue #702 it classifies at high confidence (a heroku keyword elsewhere on the line, without the name, stays medium)."
     },
     {
       "id": "heroku-api-key-legacy-positive-bare-with-keyword",
@@ -41007,13 +41043,13 @@
         {
           "detector": "heroku-api-key-legacy",
           "type": "heroku_api_key_legacy",
-          "confidence": "medium",
+          "confidence": "high",
           "specificity": "provider",
           "start": 11,
           "end": 47
         }
       ],
-      "note": "secret_key is a recognized generic-token field name, so this low-entropy assignment also proposes a contextual_secret candidate; generic-token's own entropy heuristic keeps that candidate at the same medium confidence (action warn) as this keyword-gated legacy candidate, so the same resolved-action severity leaves specificity to decide, and the provider-specific candidate wins, matching decision-resolve-overlap-precedence-by-resolved-action-severity."
+      "note": "secret_key is a generic-token high-signal name and the line names heroku, so since issue #702 the keyword-gated provider detector classifies the value at high confidence as a named assignment; the provider candidate wins the overlap on provider specificity."
     },
     {
       "id": "heroku-api-key-legacy-adversarial-dense-findings",
@@ -46789,6 +46825,3475 @@
       "input": "Pinecone key id 5e7a1c0d-0b9e-4f3a-8d2c-6a1b0c9d8e7f was rotated.\n",
       "expected": [],
       "note": "Issue #702 twin: a bare UUID with no Pinecone API-key name stays unclaimed; the legacy UUID path is gated on an API-key name."
+    },
+    {
+      "id": "travisci-api-token-positive-dotenv",
+      "detector": "travisci-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "TRAVIS_TOKEN=Syn7hRevok3dTrvCi0Tok1",
+      "expected": [
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 35
+        }
+      ],
+      "note": "Issue #523: Travis CI API token, 22 [A-Za-z0-9] bytes gated on a same-line travis keyword (gitleaks travisci-access-token, trufflehog travisci). A travis-named dotenv key names the credential, so confidence is high (decision-redact-provider-named-credential-assignments)."
+    },
+    {
+      "id": "travisci-api-token-positive-json",
+      "detector": "travisci-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"travisApiToken\": \"Syn7hRevok3dTrvCi0Tok1\"}",
+      "expected": [
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 20,
+          "end": 42
+        }
+      ],
+      "note": "Issue #523: Travis CI API token, 22 [A-Za-z0-9] bytes gated on a same-line travis keyword (gitleaks travisci-access-token, trufflehog travisci). A travis-named JSON member is a named assignment: high."
+    },
+    {
+      "id": "travisci-api-token-positive-yaml",
+      "detector": "travisci-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "travis_api_token: Syn7hRevok3dTrvCi0Tok1\n",
+      "expected": [
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 18,
+          "end": 40
+        }
+      ],
+      "note": "Issue #523: Travis CI API token, 22 [A-Za-z0-9] bytes gated on a same-line travis keyword (gitleaks travisci-access-token, trufflehog travisci). A travis-named YAML key is a named assignment: high."
+    },
+    {
+      "id": "travisci-api-token-positive-shell-quoted",
+      "detector": "travisci-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export TRAVIS_API_TOKEN=\"Syn7hRevok3dTrvCi0Tok1\"\n",
+      "expected": [
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 47
+        }
+      ],
+      "note": "Issue #523: Travis CI API token, 22 [A-Za-z0-9] bytes gated on a same-line travis keyword (gitleaks travisci-access-token, trufflehog travisci). The quoted shell export bounds the token to its own 22 bytes."
+    },
+    {
+      "id": "travisci-api-token-positive-cli-flag",
+      "detector": "travisci-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "terminal"
+      ],
+      "input": "travis login --pro --api-token Syn7hRevok3dTrvCi0Tok1\n",
+      "expected": [
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 31,
+          "end": 53
+        }
+      ],
+      "note": "Issue #523: Travis CI API token, 22 [A-Za-z0-9] bytes gated on a same-line travis keyword (gitleaks travisci-access-token, trufflehog travisci). A CLI flag has no = or : operator, so the travis keyword on the line is the only context: medium."
+    },
+    {
+      "id": "travisci-api-token-positive-curl-header",
+      "detector": "travisci-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl",
+        "http"
+      ],
+      "input": "curl -H \"Travis-API-Version: 3\" -H \"Authorization: token Syn7hRevok3dTrvCi0Tok1\" https://api.travis-ci.com/user\n",
+      "expected": [
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 57,
+          "end": 79
+        }
+      ],
+      "note": "Issue #523: Travis CI API token, 22 [A-Za-z0-9] bytes gated on a same-line travis keyword (gitleaks travisci-access-token, trufflehog travisci). The documented Authorization: token header, with the Travis host on the same line: medium."
+    },
+    {
+      "id": "travisci-api-token-positive-log",
+      "detector": "travisci-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "log"
+      ],
+      "input": "# Travis CI API token: Syn7hRevok3dTrvCi0Tok1",
+      "expected": [
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 23,
+          "end": 45
+        }
+      ],
+      "note": "Issue #523: Travis CI API token, 22 [A-Za-z0-9] bytes gated on a same-line travis keyword (gitleaks travisci-access-token, trufflehog travisci). Prose naming Travis before a bare token key: the keyword is the only context, so medium."
+    },
+    {
+      "id": "travisci-api-token-regression-crlf-and-unicode-prefix",
+      "detector": "travisci-api-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 café\r\nTRAVIS_TOKEN=Syn7hRevok3dTrvCi0Tok1\r\n",
+      "expected": [
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 27,
+          "end": 49
+        }
+      ],
+      "note": "Issue #523: Travis CI API token, 22 [A-Za-z0-9] bytes gated on a same-line travis keyword (gitleaks travisci-access-token, trufflehog travisci). Byte offsets stay exact after a multi-byte prefix line and across CRLF."
+    },
+    {
+      "id": "travisci-api-token-negative-bare-value-with-no-context",
+      "detector": "travisci-api-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Syn7hRevok3dTrvCi0Tok1",
+      "expected": [],
+      "note": "Issue #523: Travis CI API token, 22 [A-Za-z0-9] bytes gated on a same-line travis keyword (gitleaks travisci-access-token, trufflehog travisci). A bare 22-byte value with no travis keyword is not reported."
+    },
+    {
+      "id": "travisci-api-token-negative-context-on-a-different-line",
+      "detector": "travisci-api-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# travis\nSyn7hRevok3dTrvCi0Tok1\n",
+      "expected": [],
+      "note": "Issue #523: Travis CI API token, 22 [A-Za-z0-9] bytes gated on a same-line travis keyword (gitleaks travisci-access-token, trufflehog travisci). The keyword must be on the token's own line."
+    },
+    {
+      "id": "travisci-api-token-negative-environment-variable-reference",
+      "detector": "travisci-api-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "shell"
+      ],
+      "input": "TRAVIS_TOKEN=${TRAVIS_TOKEN}",
+      "expected": [],
+      "note": "Issue #523: Travis CI API token, 22 [A-Za-z0-9] bytes gated on a same-line travis keyword (gitleaks travisci-access-token, trufflehog travisci). An environment-variable reference is not a token."
+    },
+    {
+      "id": "travisci-api-token-negative-repeated-character-filler",
+      "detector": "travisci-api-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "TRAVIS_TOKEN=xxxxxxxxxxxxxxxxxxxxxx",
+      "expected": [],
+      "note": "Issue #523: Travis CI API token, 22 [A-Za-z0-9] bytes gated on a same-line travis keyword (gitleaks travisci-access-token, trufflehog travisci). A repeated filler character is a placeholder."
+    },
+    {
+      "id": "travisci-api-token-negative-identifier-key",
+      "detector": "travisci-api-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "TRAVIS_REPO_SLUG=Syn7hRevok3dTrvCi0Tok1",
+      "expected": [],
+      "note": "Issue #523: Travis CI API token, 22 [A-Za-z0-9] bytes gated on a same-line travis keyword (gitleaks travisci-access-token, trufflehog travisci). A key whose last segment names an identifier (slug) is not a credential name."
+    },
+    {
+      "id": "travisci-api-token-negative-letters-only",
+      "detector": "travisci-api-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "travis build: TravisContinuousIntegr",
+      "expected": [],
+      "note": "Issue #523: Travis CI API token, 22 [A-Za-z0-9] bytes gated on a same-line travis keyword (gitleaks travisci-access-token, trufflehog travisci). A run with no digit is a word, not a token; about 2% of random tokens have no digit and are missed."
+    },
+    {
+      "id": "travisci-api-token-boundary-one-short",
+      "detector": "travisci-api-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "TRAVIS_TOKEN=Syn7hRevok3dTrvCi0Tok",
+      "expected": [],
+      "note": "Issue #523: Travis CI API token, 22 [A-Za-z0-9] bytes gated on a same-line travis keyword (gitleaks travisci-access-token, trufflehog travisci). 21 bytes: rejected, not extended. The travis-named key leaves the value to this detector, so generic-token stays silent too."
+    },
+    {
+      "id": "travisci-api-token-boundary-one-long",
+      "detector": "travisci-api-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "TRAVIS_TOKEN=Syn7hRevok3dTrvCi0Tok19",
+      "expected": [],
+      "note": "Issue #523: Travis CI API token, 22 [A-Za-z0-9] bytes gated on a same-line travis keyword (gitleaks travisci-access-token, trufflehog travisci). 23 bytes: rejected, not truncated."
+    },
+    {
+      "id": "travisci-api-token-boundary-underscore-embedded",
+      "detector": "travisci-api-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "travis x_Syn7hRevok3dTrvCi0Tok1",
+      "expected": [],
+      "note": "Issue #523: Travis CI API token, 22 [A-Za-z0-9] bytes gated on a same-line travis keyword (gitleaks travisci-access-token, trufflehog travisci). A run joined to a wider identifier by _ is not a token."
+    },
+    {
+      "id": "travisci-api-token-overlap-generic-context",
+      "detector": "travisci-api-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "api_key=a0B1c2D3e4F5g6H7i8J9k0 travis",
+      "expected": [
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 8,
+          "end": 30
+        }
+      ],
+      "note": "Issue #523: Travis CI API token, 22 [A-Za-z0-9] bytes gated on a same-line travis keyword (gitleaks travisci-access-token, trufflehog travisci). api_key is a generic-token high-signal name and the line names travis, so the provider reports a named assignment at high confidence and wins the overlap on provider specificity."
+    },
+    {
+      "id": "travisci-api-token-adversarial-dense-findings",
+      "detector": "travisci-api-token",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 2306,
+        "maxFindings": 100,
+        "maxRuntimeMs": 250
+      },
+      "input": "travis Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1 Syn7hRevok3dTrvCi0Tok1",
+      "expected": [
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 7,
+          "end": 29
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 30,
+          "end": 52
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 53,
+          "end": 75
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 76,
+          "end": 98
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 99,
+          "end": 121
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 122,
+          "end": 144
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 145,
+          "end": 167
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 168,
+          "end": 190
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 191,
+          "end": 213
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 214,
+          "end": 236
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 237,
+          "end": 259
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 260,
+          "end": 282
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 283,
+          "end": 305
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 306,
+          "end": 328
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 329,
+          "end": 351
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 352,
+          "end": 374
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 375,
+          "end": 397
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 398,
+          "end": 420
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 421,
+          "end": 443
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 444,
+          "end": 466
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 467,
+          "end": 489
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 490,
+          "end": 512
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 513,
+          "end": 535
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 536,
+          "end": 558
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 559,
+          "end": 581
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 582,
+          "end": 604
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 605,
+          "end": 627
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 628,
+          "end": 650
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 651,
+          "end": 673
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 674,
+          "end": 696
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 697,
+          "end": 719
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 720,
+          "end": 742
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 743,
+          "end": 765
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 766,
+          "end": 788
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 789,
+          "end": 811
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 812,
+          "end": 834
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 835,
+          "end": 857
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 858,
+          "end": 880
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 881,
+          "end": 903
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 904,
+          "end": 926
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 927,
+          "end": 949
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 950,
+          "end": 972
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 973,
+          "end": 995
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 996,
+          "end": 1018
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1019,
+          "end": 1041
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1042,
+          "end": 1064
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1065,
+          "end": 1087
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1088,
+          "end": 1110
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1111,
+          "end": 1133
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1134,
+          "end": 1156
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1157,
+          "end": 1179
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1180,
+          "end": 1202
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1203,
+          "end": 1225
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1226,
+          "end": 1248
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1249,
+          "end": 1271
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1272,
+          "end": 1294
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1295,
+          "end": 1317
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1318,
+          "end": 1340
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1341,
+          "end": 1363
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1364,
+          "end": 1386
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1387,
+          "end": 1409
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1410,
+          "end": 1432
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1433,
+          "end": 1455
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1456,
+          "end": 1478
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1479,
+          "end": 1501
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1502,
+          "end": 1524
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1525,
+          "end": 1547
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1548,
+          "end": 1570
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1571,
+          "end": 1593
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1594,
+          "end": 1616
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1617,
+          "end": 1639
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1640,
+          "end": 1662
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1663,
+          "end": 1685
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1686,
+          "end": 1708
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1709,
+          "end": 1731
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1732,
+          "end": 1754
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1755,
+          "end": 1777
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1778,
+          "end": 1800
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1801,
+          "end": 1823
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1824,
+          "end": 1846
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1847,
+          "end": 1869
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1870,
+          "end": 1892
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1893,
+          "end": 1915
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1916,
+          "end": 1938
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1939,
+          "end": 1961
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1962,
+          "end": 1984
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 1985,
+          "end": 2007
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2008,
+          "end": 2030
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2031,
+          "end": 2053
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2054,
+          "end": 2076
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2077,
+          "end": 2099
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2100,
+          "end": 2122
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2123,
+          "end": 2145
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2146,
+          "end": 2168
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2169,
+          "end": 2191
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2192,
+          "end": 2214
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2215,
+          "end": 2237
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2238,
+          "end": 2260
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2261,
+          "end": 2283
+        },
+        {
+          "detector": "travisci-api-token",
+          "type": "travisci_api_token",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 2284,
+          "end": 2306
+        }
+      ],
+      "note": "Issue #523: 100 space-separated tokens on one travis line are each reported once at their own range, within the declared resource bounds."
+    },
+    {
+      "id": "neon-api-key-positive-dotenv",
+      "detector": "neon-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "NEON_API_KEY=napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444\n",
+      "expected": [
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 82
+        }
+      ],
+      "note": "Issue #524: Neon API key, provider-stated napi_ prefix (T1) plus a tool-corroborated 64-byte [A-Za-z0-9] body floor (T2). A dotenv assignment; the prefix alone identifies the key, so it is high confidence and always redacted."
+    },
+    {
+      "id": "neon-api-key-positive-json",
+      "detector": "neon-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"neonApiKey\": \"napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444\"}",
+      "expected": [
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 16,
+          "end": 85
+        }
+      ],
+      "note": "Issue #524: Neon API key, provider-stated napi_ prefix (T1) plus a tool-corroborated 64-byte [A-Za-z0-9] body floor (T2). A quoted JSON value is bounded to the key's own bytes."
+    },
+    {
+      "id": "neon-api-key-positive-yaml",
+      "detector": "neon-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "neon:\n  api_key: napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444\n",
+      "expected": [
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 17,
+          "end": 86
+        }
+      ],
+      "note": "Issue #524: Neon API key, provider-stated napi_ prefix (T1) plus a tool-corroborated 64-byte [A-Za-z0-9] body floor (T2). A nested YAML value."
+    },
+    {
+      "id": "neon-api-key-positive-shell-quoted",
+      "detector": "neon-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export NEON_API_KEY=\"napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444\"\n",
+      "expected": [
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 21,
+          "end": 90
+        }
+      ],
+      "note": "Issue #524: Neon API key, provider-stated napi_ prefix (T1) plus a tool-corroborated 64-byte [A-Za-z0-9] body floor (T2). A quoted shell export."
+    },
+    {
+      "id": "neon-api-key-positive-typescript-client",
+      "detector": "neon-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "typescript"
+      ],
+      "input": "const neon = createApiClient({ apiKey: \"napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444\" });\n",
+      "expected": [
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 40,
+          "end": 109
+        }
+      ],
+      "note": "Issue #524: Neon API key, provider-stated napi_ prefix (T1) plus a tool-corroborated 64-byte [A-Za-z0-9] body floor (T2). An SDK client configuration in source."
+    },
+    {
+      "id": "neon-api-key-positive-log",
+      "detector": "neon-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-24T12:00:00Z created API key napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 for project cool-darkness-123456\n",
+      "expected": [
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 37,
+          "end": 106
+        }
+      ],
+      "note": "Issue #524: Neon API key, provider-stated napi_ prefix (T1) plus a tool-corroborated 64-byte [A-Za-z0-9] body floor (T2). Log text with no assignment: the bare prefix is enough."
+    },
+    {
+      "id": "neon-api-key-positive-longer-body",
+      "detector": "neon-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "NEON_API_KEY=napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding333344449Z\n",
+      "expected": [
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 84
+        }
+      ],
+      "note": "Issue #524: Neon API key, provider-stated napi_ prefix (T1) plus a tool-corroborated 64-byte [A-Za-z0-9] body floor (T2). 64 is a floor, not an exact width: a longer body is read to the end of its run so a lengthened key is redacted whole."
+    },
+    {
+      "id": "neon-api-key-regression-crlf-and-unicode-prefix",
+      "detector": "neon-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 café\r\nNEON_API_KEY=napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444\r\n",
+      "expected": [
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 27,
+          "end": 96
+        }
+      ],
+      "note": "Issue #524: Neon API key, provider-stated napi_ prefix (T1) plus a tool-corroborated 64-byte [A-Za-z0-9] body floor (T2). Byte offsets stay exact after a multi-byte prefix line and across CRLF."
+    },
+    {
+      "id": "neon-api-key-negative-project-id",
+      "detector": "neon-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "NEON_PROJECT_ID=cool-darkness-123456\n",
+      "expected": [],
+      "note": "Issue #524: Neon API key, provider-stated napi_ prefix (T1) plus a tool-corroborated 64-byte [A-Za-z0-9] body floor (T2). A Neon project id is a public identifier."
+    },
+    {
+      "id": "neon-api-key-negative-branch-and-endpoint-ids",
+      "detector": "neon-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "NEON_BRANCH_ID=br-wispy-meadow-a1b2c3d4\nNEON_ENDPOINT_ID=ep-cool-darkness-a1b2c3d4\n",
+      "expected": [],
+      "note": "Issue #524: Neon API key, provider-stated napi_ prefix (T1) plus a tool-corroborated 64-byte [A-Za-z0-9] body floor (T2). Branch and endpoint ids are public identifiers."
+    },
+    {
+      "id": "neon-api-key-negative-pooled-hostname",
+      "detector": "neon-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "PGHOST=ep-cool-darkness-a1b2c3d4-pooler.us-east-2.aws.neon.tech\nPGDATABASE=neondb\n",
+      "expected": [],
+      "note": "Issue #524: Neon API key, provider-stated napi_ prefix (T1) plus a tool-corroborated 64-byte [A-Za-z0-9] body floor (T2). A pooled-connection hostname and database name carry no credential."
+    },
+    {
+      "id": "neon-api-key-negative-placeholder",
+      "detector": "neon-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "NEON_API_KEY=napi_your_api_key_here\n",
+      "expected": [],
+      "note": "Issue #524: Neon API key, provider-stated napi_ prefix (T1) plus a tool-corroborated 64-byte [A-Za-z0-9] body floor (T2). A documentation placeholder after the prefix. The NEON-named key leaves the value to this detector, so generic-token stays silent too."
+    },
+    {
+      "id": "neon-api-key-negative-filler",
+      "detector": "neon-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "NEON_API_KEY=napi_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n",
+      "expected": [],
+      "note": "Issue #524: Neon API key, provider-stated napi_ prefix (T1) plus a tool-corroborated 64-byte [A-Za-z0-9] body floor (T2). A repeated filler body is a placeholder."
+    },
+    {
+      "id": "neon-api-key-negative-env-reference",
+      "detector": "neon-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "shell"
+      ],
+      "input": "NEON_API_KEY=${NEON_API_KEY}\n",
+      "expected": [],
+      "note": "Issue #524: Neon API key, provider-stated napi_ prefix (T1) plus a tool-corroborated 64-byte [A-Za-z0-9] body floor (T2). An environment-variable reference is not a key."
+    },
+    {
+      "id": "neon-api-key-boundary-one-short",
+      "detector": "neon-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "NEON_API_KEY=napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding3333444\n",
+      "expected": [],
+      "note": "Issue #524: Neon API key, provider-stated napi_ prefix (T1) plus a tool-corroborated 64-byte [A-Za-z0-9] body floor (T2). A 63-byte body is below the floor and is not reported."
+    },
+    {
+      "id": "neon-api-key-boundary-embedded-in-identifier",
+      "detector": "neon-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "x_napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444\n",
+      "expected": [],
+      "note": "Issue #524: Neon API key, provider-stated napi_ prefix (T1) plus a tool-corroborated 64-byte [A-Za-z0-9] body floor (T2). A key joined to a wider identifier by _ is not reported."
+    },
+    {
+      "id": "neon-api-key-boundary-dash-in-body",
+      "detector": "neon-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "NEON_API_KEY=napi_SyntheticRevokedNeonApiKey0000Fi-xture1111Body2222Padding33334444\n",
+      "expected": [],
+      "note": "Issue #524: Neon API key, provider-stated napi_ prefix (T1) plus a tool-corroborated 64-byte [A-Za-z0-9] body floor (T2). A dash splits the body into two runs below the floor."
+    },
+    {
+      "id": "neon-api-key-overlap-connection-uri",
+      "detector": "neon-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "DATABASE_URL=postgresql://neondb_owner:npg_SynthRevokedPw1@ep-cool-darkness-a1b2c3d4.us-east-2.aws.neon.tech/neondb?sslmode=require\n",
+      "expected": [
+        {
+          "detector": "connection-string",
+          "type": "connection_string_password",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 39,
+          "end": 58
+        }
+      ],
+      "note": "Issue #524: Neon API key, provider-stated napi_ prefix (T1) plus a tool-corroborated 64-byte [A-Za-z0-9] body floor (T2). A Neon connection URI's password stays with connection-string; neon-api-key claims no span in it, so nothing is double-reported."
+    },
+    {
+      "id": "neon-api-key-overlap-bearer",
+      "detector": "neon-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444\n",
+      "expected": [
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 91
+        }
+      ],
+      "note": "Issue #524: Neon API key, provider-stated napi_ prefix (T1) plus a tool-corroborated 64-byte [A-Za-z0-9] body floor (T2). bearer-token proposes the same span; the provider candidate wins on specificity."
+    },
+    {
+      "id": "neon-api-key-adversarial-dense-findings",
+      "detector": "neon-api-key",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 6999,
+        "maxFindings": 100,
+        "maxRuntimeMs": 250
+      },
+      "input": "napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444 napi_SyntheticRevokedNeonApiKey0000Fixture1111Body2222Padding33334444",
+      "expected": [
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 69
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 70,
+          "end": 139
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 140,
+          "end": 209
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 210,
+          "end": 279
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 280,
+          "end": 349
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 350,
+          "end": 419
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 420,
+          "end": 489
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 490,
+          "end": 559
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 560,
+          "end": 629
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 630,
+          "end": 699
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 700,
+          "end": 769
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 770,
+          "end": 839
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 840,
+          "end": 909
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 910,
+          "end": 979
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 980,
+          "end": 1049
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1050,
+          "end": 1119
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1120,
+          "end": 1189
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1190,
+          "end": 1259
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1260,
+          "end": 1329
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1330,
+          "end": 1399
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1400,
+          "end": 1469
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1470,
+          "end": 1539
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1540,
+          "end": 1609
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1610,
+          "end": 1679
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1680,
+          "end": 1749
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1750,
+          "end": 1819
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1820,
+          "end": 1889
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1890,
+          "end": 1959
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1960,
+          "end": 2029
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2030,
+          "end": 2099
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2100,
+          "end": 2169
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2170,
+          "end": 2239
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2240,
+          "end": 2309
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2310,
+          "end": 2379
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2380,
+          "end": 2449
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2450,
+          "end": 2519
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2520,
+          "end": 2589
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2590,
+          "end": 2659
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2660,
+          "end": 2729
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2730,
+          "end": 2799
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2800,
+          "end": 2869
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2870,
+          "end": 2939
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2940,
+          "end": 3009
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3010,
+          "end": 3079
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3080,
+          "end": 3149
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3150,
+          "end": 3219
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3220,
+          "end": 3289
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3290,
+          "end": 3359
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3360,
+          "end": 3429
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3430,
+          "end": 3499
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3500,
+          "end": 3569
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3570,
+          "end": 3639
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3640,
+          "end": 3709
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3710,
+          "end": 3779
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3780,
+          "end": 3849
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3850,
+          "end": 3919
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3920,
+          "end": 3989
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3990,
+          "end": 4059
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4060,
+          "end": 4129
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4130,
+          "end": 4199
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4200,
+          "end": 4269
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4270,
+          "end": 4339
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4340,
+          "end": 4409
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4410,
+          "end": 4479
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4480,
+          "end": 4549
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4550,
+          "end": 4619
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4620,
+          "end": 4689
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4690,
+          "end": 4759
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4760,
+          "end": 4829
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4830,
+          "end": 4899
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4900,
+          "end": 4969
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4970,
+          "end": 5039
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5040,
+          "end": 5109
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5110,
+          "end": 5179
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5180,
+          "end": 5249
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5250,
+          "end": 5319
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5320,
+          "end": 5389
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5390,
+          "end": 5459
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5460,
+          "end": 5529
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5530,
+          "end": 5599
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5600,
+          "end": 5669
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5670,
+          "end": 5739
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5740,
+          "end": 5809
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5810,
+          "end": 5879
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5880,
+          "end": 5949
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5950,
+          "end": 6019
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 6020,
+          "end": 6089
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 6090,
+          "end": 6159
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 6160,
+          "end": 6229
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 6230,
+          "end": 6299
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 6300,
+          "end": 6369
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 6370,
+          "end": 6439
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 6440,
+          "end": 6509
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 6510,
+          "end": 6579
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 6580,
+          "end": 6649
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 6650,
+          "end": 6719
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 6720,
+          "end": 6789
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 6790,
+          "end": 6859
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 6860,
+          "end": 6929
+        },
+        {
+          "detector": "neon-api-key",
+          "type": "neon_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 6930,
+          "end": 6999
+        }
+      ],
+      "note": "Issue #524: Neon API key, provider-stated napi_ prefix (T1) plus a tool-corroborated 64-byte [A-Za-z0-9] body floor (T2). 100 space-separated keys on one line are each reported once within the declared resource bounds."
+    },
+    {
+      "id": "mailchimp-api-key-boundary-datacenter-four-digits",
+      "detector": "mailchimp-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "mailchimp 0123456789abcdef0123456789abcdef-us1234",
+      "expected": [],
+      "note": "Issue #698: four datacenter digits exceed every source's reading (at most three) and reject the whole value rather than truncating it."
+    },
+    {
+      "id": "mailchimp-api-key-boundary-non-hex-letter",
+      "detector": "mailchimp-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "mailchimp 0123456789abcdefz123456789abcdef-us6",
+      "expected": [],
+      "note": "Issue #697: case widening admits A-F only; a non-hex letter still rejects the body."
+    },
+    {
+      "id": "databricks-personal-access-token-boundary-non-hex-letter",
+      "detector": "databricks-personal-access-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "dapi0123g56789abcdef0123456789abcdef",
+      "expected": [],
+      "note": "Issue #697: case widening admits A-F only; a non-hex letter still rejects the body."
+    },
+    {
+      "id": "databricks-personal-access-token-boundary-rotation-four-digits",
+      "detector": "databricks-personal-access-token",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "dapi0123456789abcdef0123456789abcdef-1234",
+      "expected": [],
+      "note": "Issue #698: a four-digit rotation suffix exceeds the accepted 1-3 digits and rejects the whole value rather than truncating it."
+    },
+    {
+      "id": "postman-collection-access-key-positive-share-url",
+      "detector": "postman-collection-access-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "curl",
+        "http"
+      ],
+      "input": "curl https://api.getpostman.com/collections/12345678-0000-4000-8000-000000000000?access_key=PMAT-SynthRevoked0Postman0Pmat1\n",
+      "expected": [
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 92,
+          "end": 123
+        }
+      ],
+      "note": "Issue #700: Postman collection access key, a documented read-only credential; PMAT- + 26 [A-Za-z0-9] per GitLab's rule (T2). The share-via-API URL carries the key as a query parameter."
+    },
+    {
+      "id": "postman-collection-access-key-positive-dotenv",
+      "detector": "postman-collection-access-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "POSTMAN_COLLECTION_ACCESS_KEY=PMAT-SynthRevoked0Postman0Pmat1\n",
+      "expected": [
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 30,
+          "end": 61
+        }
+      ],
+      "note": "Issue #700: Postman collection access key, a documented read-only credential; PMAT- + 26 [A-Za-z0-9] per GitLab's rule (T2). A dotenv assignment."
+    },
+    {
+      "id": "postman-collection-access-key-positive-json",
+      "detector": "postman-collection-access-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"collectionAccessKey\": \"PMAT-SynthRevoked0Postman0Pmat1\"}",
+      "expected": [
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 56
+        }
+      ],
+      "note": "Issue #700: Postman collection access key, a documented read-only credential; PMAT- + 26 [A-Za-z0-9] per GitLab's rule (T2). A quoted JSON value."
+    },
+    {
+      "id": "postman-collection-access-key-positive-lowercase-body",
+      "detector": "postman-collection-access-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "PMAT-synthrevoked0postman0pmat1",
+      "expected": [
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 31
+        }
+      ],
+      "note": "Issue #700: Postman collection access key, a documented read-only credential; PMAT- + 26 [A-Za-z0-9] per GitLab's rule (T2). GitLab's rule states uppercase, but only one tool states the case, so a lowercase body is accepted."
+    },
+    {
+      "id": "postman-collection-access-key-regression-crlf-and-unicode-prefix",
+      "detector": "postman-collection-access-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 café\r\nPMAT-SynthRevoked0Postman0Pmat1\r\n",
+      "expected": [
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 45
+        }
+      ],
+      "note": "Issue #700: Postman collection access key, a documented read-only credential; PMAT- + 26 [A-Za-z0-9] per GitLab's rule (T2). Byte offsets stay exact after a multi-byte prefix line and across CRLF."
+    },
+    {
+      "id": "postman-collection-access-key-negative-masked",
+      "detector": "postman-collection-access-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "PMAT-**************************",
+      "expected": [],
+      "note": "Issue #700: Postman collection access key, a documented read-only credential; PMAT- + 26 [A-Za-z0-9] per GitLab's rule (T2). A masked display is not a key."
+    },
+    {
+      "id": "postman-collection-access-key-negative-placeholder",
+      "detector": "postman-collection-access-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "POSTMAN_COLLECTION_ACCESS_KEY=PMAT-<your-collection-access-key>\n",
+      "expected": [],
+      "note": "Issue #700: Postman collection access key, a documented read-only credential; PMAT- + 26 [A-Za-z0-9] per GitLab's rule (T2). A documentation placeholder."
+    },
+    {
+      "id": "postman-collection-access-key-negative-collection-id",
+      "detector": "postman-collection-access-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "collection id 12345678-0000-4000-8000-000000000000\n",
+      "expected": [],
+      "note": "Issue #700: Postman collection access key, a documented read-only credential; PMAT- + 26 [A-Za-z0-9] per GitLab's rule (T2). A collection id is a public identifier."
+    },
+    {
+      "id": "postman-collection-access-key-boundary-one-short",
+      "detector": "postman-collection-access-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "PMAT-SYNTHREVOKED0POSTMAN0PMAT",
+      "expected": [],
+      "note": "Issue #700: Postman collection access key, a documented read-only credential; PMAT- + 26 [A-Za-z0-9] per GitLab's rule (T2). 25 bytes: rejected, not extended."
+    },
+    {
+      "id": "postman-collection-access-key-boundary-one-long",
+      "detector": "postman-collection-access-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "PMAT-SynthRevoked0Postman0Pmat1X",
+      "expected": [],
+      "note": "Issue #700: Postman collection access key, a documented read-only credential; PMAT- + 26 [A-Za-z0-9] per GitLab's rule (T2). 27 bytes: rejected, not truncated."
+    },
+    {
+      "id": "postman-collection-access-key-boundary-embedded",
+      "detector": "postman-collection-access-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xPMAT-SynthRevoked0Postman0Pmat1",
+      "expected": [],
+      "note": "Issue #700: Postman collection access key, a documented read-only credential; PMAT- + 26 [A-Za-z0-9] per GitLab's rule (T2). A key joined to a wider identifier is not reported."
+    },
+    {
+      "id": "postman-collection-access-key-adversarial-dense-findings",
+      "detector": "postman-collection-access-key",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 3199,
+        "maxFindings": 100,
+        "maxRuntimeMs": 250
+      },
+      "input": "PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1 PMAT-SynthRevoked0Postman0Pmat1",
+      "expected": [
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 31
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 32,
+          "end": 63
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 64,
+          "end": 95
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 96,
+          "end": 127
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 128,
+          "end": 159
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 160,
+          "end": 191
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 192,
+          "end": 223
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 224,
+          "end": 255
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 256,
+          "end": 287
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 288,
+          "end": 319
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 320,
+          "end": 351
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 352,
+          "end": 383
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 384,
+          "end": 415
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 416,
+          "end": 447
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 448,
+          "end": 479
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 480,
+          "end": 511
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 512,
+          "end": 543
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 544,
+          "end": 575
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 576,
+          "end": 607
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 608,
+          "end": 639
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 640,
+          "end": 671
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 672,
+          "end": 703
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 704,
+          "end": 735
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 736,
+          "end": 767
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 768,
+          "end": 799
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 800,
+          "end": 831
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 832,
+          "end": 863
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 864,
+          "end": 895
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 896,
+          "end": 927
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 928,
+          "end": 959
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 960,
+          "end": 991
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 992,
+          "end": 1023
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1024,
+          "end": 1055
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1056,
+          "end": 1087
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1088,
+          "end": 1119
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1120,
+          "end": 1151
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1152,
+          "end": 1183
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1184,
+          "end": 1215
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1216,
+          "end": 1247
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1248,
+          "end": 1279
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1280,
+          "end": 1311
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1312,
+          "end": 1343
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1344,
+          "end": 1375
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1376,
+          "end": 1407
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1408,
+          "end": 1439
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1440,
+          "end": 1471
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1472,
+          "end": 1503
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1504,
+          "end": 1535
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1536,
+          "end": 1567
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1568,
+          "end": 1599
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1600,
+          "end": 1631
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1632,
+          "end": 1663
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1664,
+          "end": 1695
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1696,
+          "end": 1727
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1728,
+          "end": 1759
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1760,
+          "end": 1791
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1792,
+          "end": 1823
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1824,
+          "end": 1855
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1856,
+          "end": 1887
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1888,
+          "end": 1919
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1920,
+          "end": 1951
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1952,
+          "end": 1983
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1984,
+          "end": 2015
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2016,
+          "end": 2047
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2048,
+          "end": 2079
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2080,
+          "end": 2111
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2112,
+          "end": 2143
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2144,
+          "end": 2175
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2176,
+          "end": 2207
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2208,
+          "end": 2239
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2240,
+          "end": 2271
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2272,
+          "end": 2303
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2304,
+          "end": 2335
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2336,
+          "end": 2367
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2368,
+          "end": 2399
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2400,
+          "end": 2431
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2432,
+          "end": 2463
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2464,
+          "end": 2495
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2496,
+          "end": 2527
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2528,
+          "end": 2559
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2560,
+          "end": 2591
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2592,
+          "end": 2623
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2624,
+          "end": 2655
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2656,
+          "end": 2687
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2688,
+          "end": 2719
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2720,
+          "end": 2751
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2752,
+          "end": 2783
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2784,
+          "end": 2815
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2816,
+          "end": 2847
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2848,
+          "end": 2879
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2880,
+          "end": 2911
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2912,
+          "end": 2943
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2944,
+          "end": 2975
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2976,
+          "end": 3007
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3008,
+          "end": 3039
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3040,
+          "end": 3071
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3072,
+          "end": 3103
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3104,
+          "end": 3135
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3136,
+          "end": 3167
+        },
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3168,
+          "end": 3199
+        }
+      ],
+      "note": "Issue #700: Postman collection access key, a documented read-only credential; PMAT- + 26 [A-Za-z0-9] per GitLab's rule (T2). 100 keys on one line are each reported once within the declared bounds."
+    },
+    {
+      "id": "postman-collection-access-key-overlap-api-key-header",
+      "detector": "postman-collection-access-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "X-API-Key: PMAT-SynthRevoked0Postman0Pmat1\n",
+      "expected": [
+        {
+          "detector": "postman-collection-access-key",
+          "type": "postman_collection_access_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 11,
+          "end": 42
+        }
+      ],
+      "note": "Issue #700: Postman collection access key, a documented read-only credential; PMAT- + 26 [A-Za-z0-9] per GitLab's rule (T2). x-api-key is a generic-token high-signal name (x_api_key); the provider candidate wins the span on provider specificity."
+    },
+    {
+      "id": "mailgun-api-key-positive-triplet-dotenv",
+      "detector": "mailgun-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "MAILGUN_API_KEY=0123456789abcdef0123456789abcdef\u002d01234567\u002d89abcdef\n",
+      "expected": [
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 16,
+          "end": 66
+        }
+      ],
+      "note": "Issue #701: the prefix-less 32-8-8 lowercase-hex triplet that three sources describe as Mailgun's newer private API key, gated on a same-line mailgun keyword (recorded uncertainty; no issued key observed). The dashes of the synthetic triplet are JSON-escaped (\\u002d) so the committed text does not trip GitHub push protection; the decoded input is unchanged. A Mailgun-named key: high confidence."
+    },
+    {
+      "id": "mailgun-api-key-positive-triplet-log",
+      "detector": "mailgun-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "log"
+      ],
+      "input": "mailgun private key rotated: 0123456789abcdef0123456789abcdef\u002d01234567\u002d89abcdef\n",
+      "expected": [
+        {
+          "detector": "mailgun-api-key",
+          "type": "mailgun_api_key",
+          "confidence": "medium",
+          "specificity": "provider",
+          "start": 29,
+          "end": 79
+        }
+      ],
+      "note": "Issue #701: the prefix-less 32-8-8 lowercase-hex triplet that three sources describe as Mailgun's newer private API key, gated on a same-line mailgun keyword (recorded uncertainty; no issued key observed). The dashes of the synthetic triplet are JSON-escaped (\\u002d) so the committed text does not trip GitHub push protection; the decoded input is unchanged. A keyword elsewhere on the line: medium."
+    },
+    {
+      "id": "mailgun-api-key-negative-triplet-no-keyword",
+      "detector": "mailgun-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "0123456789abcdef0123456789abcdef\u002d01234567\u002d89abcdef",
+      "expected": [],
+      "note": "Issue #701: the prefix-less 32-8-8 lowercase-hex triplet that three sources describe as Mailgun's newer private API key, gated on a same-line mailgun keyword (recorded uncertainty; no issued key observed). The dashes of the synthetic triplet are JSON-escaped (\\u002d) so the committed text does not trip GitHub push protection; the decoded input is unchanged. A bare triplet with no mailgun keyword is not reported."
+    },
+    {
+      "id": "mailgun-api-key-negative-triplet-identifier-key",
+      "detector": "mailgun-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "MAILGUN_KEY_ID=0123456789abcdef0123456789abcdef\u002d01234567\u002d89abcdef\n",
+      "expected": [],
+      "note": "Issue #701: the prefix-less 32-8-8 lowercase-hex triplet that three sources describe as Mailgun's newer private API key, gated on a same-line mailgun keyword (recorded uncertainty; no issued key observed). The dashes of the synthetic triplet are JSON-escaped (\\u002d) so the committed text does not trip GitHub push protection; the decoded input is unchanged. An identifier-named key is not a credential name."
+    },
+    {
+      "id": "mailgun-api-key-boundary-triplet-uppercase",
+      "detector": "mailgun-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "mailgun 0123456789ABCDEF0123456789ABCDEF\u002d01234567\u002d89ABCDEF",
+      "expected": [],
+      "note": "Issue #701: the prefix-less 32-8-8 lowercase-hex triplet that three sources describe as Mailgun's newer private API key, gated on a same-line mailgun keyword (recorded uncertainty; no issued key observed). The dashes of the synthetic triplet are JSON-escaped (\\u002d) so the committed text does not trip GitHub push protection; the decoded input is unchanged. Both tools match the triplet in lowercase only; uppercase is not reported."
+    },
+    {
+      "id": "mailgun-api-key-boundary-triplet-shifted-dash",
+      "detector": "mailgun-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "mailgun 0123456789abcdef0123456789abcde--01234567-89abcdef",
+      "expected": [],
+      "note": "Issue #701: the prefix-less 32-8-8 lowercase-hex triplet that three sources describe as Mailgun's newer private API key, gated on a same-line mailgun keyword (recorded uncertainty; no issued key observed). The dashes of the synthetic triplet are JSON-escaped (\\u002d) so the committed text does not trip GitHub push protection; the decoded input is unchanged. A dash at the wrong offset is not the triplet."
     }
   ]
 }

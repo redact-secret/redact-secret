@@ -78,25 +78,25 @@ EVIDENCE_BASIS_COPY = {
 
 STATUS_COPY = {
     "stable": (
-        "Officially supported through one of two qualification profiles: "
-        "`documented` uses a provider-documented T1 contract, while `empirical` "
-        "uses T2 provider-issued observations plus stronger fixture and behavioral "
-        "gates. Empirical qualification never promotes T2 evidence to T1. You can "
-        "rely on this family's detection and its precision behavior. Stable does "
-        "not mean every historical or future variant of this credential is detected "
-        "-- see each family's supported contexts and known limitations below."
+        "Officially supported. The family qualified in one of two ways: its format is "
+        "documented by the provider (`documented`), or it was checked against keys the "
+        "provider actually issued, with stricter test and behavior checks (`empirical`). "
+        "An empirically qualified family is never described as provider-documented. You "
+        "can rely on this family's detection and its precision behavior. Stable does not "
+        "mean every historical or future variant of this credential is detected -- see "
+        "each family's supported contexts and known limitations below."
     ),
     "provisional": (
-        "Useful today, but the evidence behind it is incomplete -- typically "
-        "a T2, tool-corroborated contract rather than a provider-documented "
-        "(T1) one. Provisional is not \"almost stable\": it is a distinct, "
-        "load-bearing evidence state that can persist indefinitely if a "
-        "provider never publishes a documented format."
+        "Useful today, but the evidence behind it is incomplete -- usually the format "
+        "is confirmed by other scanners or by public examples rather than by the "
+        "provider's own documentation. Provisional is not \"almost stable\": it can "
+        "stay this way indefinitely if a provider never publishes its format. The "
+        "Reason column says what is still missing."
     ),
     "pending": (
-        "No stable positive contract exists yet (T0): no fixture for this "
-        "family has cleared review. Do not rely on this family's detection "
-        "or its absence."
+        "No reviewed detection contract exists yet: nothing about this family's "
+        "detection has been verified. Do not rely on this family's detection or its "
+        "absence."
     ),
     "unsupported": (
         "This project explicitly does not detect this credential family. "
@@ -105,6 +105,89 @@ STATUS_COPY = {
         "rather than the family being silently absent from this document."
     ),
 }
+
+# Issue #723: each evaluator gate in a non-stable family's raw `reason`
+# belongs to one user-facing group. The Markdown shows the groups; the raw
+# reason stays unchanged in `benchmarks/support-matrix.json`.
+REASON_GATE_GROUPS = {
+    "empirical.evidenceBasis": "observations",
+    "empirical.minimumObservations": "observations",
+    "empirical.minimumSubjects": "observations",
+    "empirical.minimumIssuanceDates": "observations",
+    "empirical.minimumCorroborationClasses": "observations",
+    "documented.minimumPositiveCases": "positives",
+    "documented.minimumPositiveAxes": "positives",
+    "empirical.minimumPositiveCases": "positives",
+    "empirical.minimumPositiveAxes": "positives",
+    "documented.minimumBenignCases": "controls",
+    "documented.minimumControlAxes": "controls",
+    "empirical.minimumBenignCases": "controls",
+    "empirical.minimumControlAxes": "controls",
+    "empirical.minimumTwinPairs": "twins",
+    "empirical.supportedContexts": "boundary",
+    "empirical.mode": "boundary",
+    "empirical.uncertainty": "boundary",
+    "qualificationProfile": "policy",
+    "positiveContractTier": "no-contract",
+}
+
+# The user-facing text for each group, in rendering order.
+REASON_GROUP_COPY = (
+    ("observations", "independent observations of provider-issued keys"),
+    ("positives", "broader positive test contexts"),
+    ("controls", "more benign controls"),
+    ("twins", "more near-miss twin pairs"),
+    ("boundary", "a defined supported-context boundary with its uncertainty stated"),
+)
+
+# A raw reason segment that names an evaluator gate: `profile.gate: ...`,
+# `qualificationProfile: ...` or `positiveContractTier T0 ...`.
+GATE_SEGMENT = re.compile(r"^(?:(?P<dotted>[a-z][A-Za-z]*\.[A-Za-z]+):|(?P<bare>[a-z][A-Za-z]+)(?=[: ]))")
+
+
+def user_facing_reason(reason: str) -> str:
+    """The concise Reason cell for a raw evaluator `reason` (issue #723).
+
+    Gate segments (split on ` | `) are grouped through
+    [`REASON_GATE_GROUPS`] into one sentence; free-text segments, such as an
+    unsupported family's written reason, are kept verbatim. A gate
+    identifier the table does not know raises `ValueError`, so evaluator
+    syntax never leaks into published documentation unreviewed.
+    """
+    groups: list[str] = []
+    free_text: list[str] = []
+    for segment in (part.strip() for part in reason.split(" | ")):
+        match = GATE_SEGMENT.match(segment)
+        gate = match and (match.group("dotted") or match.group("bare"))
+        if gate and ("." in gate or gate in REASON_GATE_GROUPS or segment.startswith(gate + ":")):
+            if gate not in REASON_GATE_GROUPS:
+                raise ValueError(
+                    f"unmapped support-matrix gate {gate!r}; add it to REASON_GATE_GROUPS in "
+                    "scripts/generate-support-matrix-docs.py with a user-facing group"
+                )
+            group = REASON_GATE_GROUPS[gate]
+            if group not in groups:
+                groups.append(group)
+        else:
+            free_text.append(segment)
+
+    if not groups:
+        return reason
+    sentences: list[str] = []
+    if "no-contract" in groups:
+        sentences.append("No reviewed detection contract is available yet.")
+    if "policy" in groups:
+        sentences.append(
+            "Detected under project policy rather than a provider format, so it is not "
+            "eligible for stable qualification."
+        )
+    needs = [copy for group, copy in REASON_GROUP_COPY if group in groups]
+    if needs:
+        listed = needs[0] if len(needs) == 1 else ", ".join(needs[:-1]) + " and " + needs[-1]
+        sentences.append(f"Not yet stable: needs {listed}.")
+    if free_text:
+        sentences.append(" | ".join(free_text))
+    return " ".join(sentences)
 
 
 def load_json(path: Path) -> dict:
@@ -349,10 +432,10 @@ def _last_column(family: dict, status: str) -> str:
     """For `stable` families, the table's fifth column names supported
     contexts and known limitations instead of a reason (`stable` carries no
     `reason` -- see `validate_matrix`), drawn from the T1 `providerSource`
-    evidence required to reach `stable` at all. Every other status keeps its
-    recorded `reason` there, as before."""
+    evidence required to reach `stable` at all. Every other status shows its
+    recorded `reason` through `user_facing_reason`."""
     if status != "stable":
-        return family["reason"] or "—"
+        return user_facing_reason(family["reason"]) if family["reason"] else "—"
     provider_source = family.get("providerSource")
     if provider_source and provider_source.get("covers"):
         return provider_source["covers"]

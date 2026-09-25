@@ -352,6 +352,13 @@ fn detect_context_gated(
             else {
                 continue;
             };
+            let (confidence, signal) = if confidence == Confidence::Medium
+                && text::is_provider_named_assignment(line, relative_start, &[VENDOR_KEYWORD])
+            {
+                (Confidence::High, "datadog-named-assignment")
+            } else {
+                (confidence, signal)
+            };
             candidates.push(
                 Candidate::new(type_name, confidence, range)
                     .with_specificity(Specificity::Provider)

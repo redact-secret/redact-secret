@@ -159,7 +159,7 @@ pub(crate) const MAX_RULESET_BYTES: usize = 64 * 1024;
 /// Maximum length in bytes of one caller-supplied `name:` value in a
 /// `names: ambiguous` block, checked on the raw wire value before
 /// [`normalize_name`] runs. Matches [`crate::types::MAX_IDENTIFIER_LENGTH`]:
-/// a ruleset name is a human-chosen assignment keyword (`corp_token`), the
+/// a ruleset name is a human-chosen assignment keyword (`corp_passphrase`), the
 /// same kind of caller-chosen string every other identifier bound in this
 /// crate already covers.
 const MAX_RULESET_NAME_BYTES: usize = crate::types::MAX_IDENTIFIER_LENGTH;
@@ -1234,35 +1234,35 @@ validator: none\n";
     #[test]
     fn parses_a_names_only_ruleset_and_normalizes_its_names() {
         let text =
-            "ruleset-revision: 1\nnames: ambiguous\nname: CorpToken\nname: internal-secret\n";
+            "ruleset-revision: 1\nnames: ambiguous\nname: CorpPassphrase\nname: internal-cipher\n";
         let parsed = parse_ruleset(text.as_bytes()).unwrap();
         assert!(parsed.detectors.is_empty());
         assert_eq!(
             parsed.ambiguous_names,
-            vec!["corp_token".to_owned(), "internal_secret".to_owned()]
+            vec!["corp_passphrase".to_owned(), "internal_cipher".to_owned()]
         );
     }
 
     #[test]
     fn a_names_only_ruleset_does_not_trip_empty_ruleset() {
-        let text = "ruleset-revision: 1\nnames: ambiguous\nname: corp_token\n";
+        let text = "ruleset-revision: 1\nnames: ambiguous\nname: corp_passphrase\n";
         assert!(parse_ruleset(text.as_bytes()).is_ok());
     }
 
     #[test]
     fn a_names_block_may_interleave_with_detector_blocks_in_either_order() {
-        let text = format!("{VALID}names: ambiguous\nname: corp_token\n");
+        let text = format!("{VALID}names: ambiguous\nname: corp_passphrase\n");
         let parsed = parse_ruleset(text.as_bytes()).unwrap();
         assert_eq!(parsed.detectors.len(), 1);
-        assert_eq!(parsed.ambiguous_names, vec!["corp_token".to_owned()]);
+        assert_eq!(parsed.ambiguous_names, vec!["corp_passphrase".to_owned()]);
 
         let text = format!(
-            "ruleset-revision: 1\nnames: ambiguous\nname: corp_token\n{}",
+            "ruleset-revision: 1\nnames: ambiguous\nname: corp_passphrase\n{}",
             &VALID[VALID.find("detector:").unwrap()..]
         );
         let parsed = parse_ruleset(text.as_bytes()).unwrap();
         assert_eq!(parsed.detectors.len(), 1);
-        assert_eq!(parsed.ambiguous_names, vec!["corp_token".to_owned()]);
+        assert_eq!(parsed.ambiguous_names, vec!["corp_passphrase".to_owned()]);
     }
 
     #[test]
@@ -1276,15 +1276,16 @@ validator: none\n";
 
     #[test]
     fn a_repeated_name_is_deduplicated_not_an_error() {
-        let text = "ruleset-revision: 1\nnames: ambiguous\nname: corp_token\nname: CorpToken\n";
+        let text =
+            "ruleset-revision: 1\nnames: ambiguous\nname: corp_passphrase\nname: CorpPassphrase\n";
         let parsed = parse_ruleset(text.as_bytes()).unwrap();
-        assert_eq!(parsed.ambiguous_names, vec!["corp_token".to_owned()]);
+        assert_eq!(parsed.ambiguous_names, vec!["corp_passphrase".to_owned()]);
     }
 
     #[test]
     fn rejects_a_bucket_other_than_ambiguous() {
         for bucket in ["high-signal", "bogus"] {
-            let text = format!("ruleset-revision: 1\nnames: {bucket}\nname: corp_token\n");
+            let text = format!("ruleset-revision: 1\nnames: {bucket}\nname: corp_passphrase\n");
             assert_eq!(
                 parse_ruleset(text.as_bytes()),
                 Err(RulesetLoadError::NameBucketNotClaimable),
@@ -1361,7 +1362,7 @@ validator: none\n";
 
     #[test]
     fn load_ruleset_registers_a_separate_detector_for_a_names_only_ruleset() {
-        let text = b"ruleset-revision: 1\nnames: ambiguous\nname: corp_token\n";
+        let text = b"ruleset-revision: 1\nnames: ambiguous\nname: corp_passphrase\n";
         let detectors = load_ruleset(text).unwrap();
         assert_eq!(detectors.len(), 1);
         assert_eq!(detectors[0].id(), RULESET_NAMES_DETECTOR_ID);
@@ -1378,7 +1379,7 @@ validator: none\n";
     fn rejections_involving_names_never_carry_the_rejected_content() {
         let canary = "S3CR3T_CANARY_MARKER";
         let cases = [
-            format!("ruleset-revision: 1\nnames: {canary}\nname: corp_token\n"),
+            format!("ruleset-revision: 1\nnames: {canary}\nname: corp_passphrase\n"),
             format!("ruleset-revision: 1\nnames: ambiguous\nname: {canary}!\n"),
         ];
         for text in cases {

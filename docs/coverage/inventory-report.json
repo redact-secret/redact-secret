@@ -2493,7 +2493,7 @@
     {
       "detector": "mailchimp-api-key",
       "evidence": {
-        "fixtureCount": 19,
+        "fixtureCount": 21,
         "hostContextsExercised": [
           "dotenv",
           "json",
@@ -2504,6 +2504,7 @@
         ],
         "kindsWithSupportedEvidence": [
           "adversarial",
+          "boundary",
           "negative",
           "overlap",
           "positive"
@@ -2529,7 +2530,7 @@
     {
       "detector": "mailgun-api-key",
       "evidence": {
-        "fixtureCount": 18,
+        "fixtureCount": 24,
         "hostContextsExercised": [
           "dotenv",
           "json",
@@ -2555,6 +2556,8 @@
         "mailgun-api-key-positive-log-keyword",
         "mailgun-api-key-positive-shell-quoted",
         "mailgun-api-key-positive-signing-key-field-name",
+        "mailgun-api-key-positive-triplet-dotenv",
+        "mailgun-api-key-positive-triplet-log",
         "mailgun-api-key-positive-yaml-keyword",
         "mailgun-api-key-regression-crlf-and-unicode-prefix"
       ],
@@ -3047,7 +3050,7 @@
     {
       "detector": "databricks-personal-access-token",
       "evidence": {
-        "fixtureCount": 31,
+        "fixtureCount": 33,
         "hostContextsExercised": [
           "dotenv",
           "github-actions",
@@ -3060,6 +3063,7 @@
         ],
         "kindsWithSupportedEvidence": [
           "adversarial",
+          "boundary",
           "negative",
           "overlap",
           "positive"
@@ -3203,6 +3207,46 @@
       "type": "netlify_personal_access_token"
     },
     {
+      "detector": "neon-api-key",
+      "evidence": {
+        "fixtureCount": 20,
+        "hostContextsExercised": [
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "typescript",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "neon-api-key-positive-dotenv",
+        "neon-api-key-positive-json",
+        "neon-api-key-positive-log",
+        "neon-api-key-positive-longer-body",
+        "neon-api-key-positive-shell-quoted",
+        "neon-api-key-positive-typescript-client",
+        "neon-api-key-positive-yaml",
+        "neon-api-key-regression-crlf-and-unicode-prefix"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "neon_api_key"
+    },
+    {
       "detector": "langsmith-api-key",
       "evidence": {
         "fixtureCount": 32,
@@ -3339,6 +3383,40 @@
       "type": "postman_api_key"
     },
     {
+      "detector": "postman-collection-access-key",
+      "evidence": {
+        "fixtureCount": 13,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "plain-text"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "postman-collection-access-key-positive-dotenv",
+        "postman-collection-access-key-positive-json",
+        "postman-collection-access-key-positive-lowercase-body",
+        "postman-collection-access-key-positive-share-url",
+        "postman-collection-access-key-regression-crlf-and-unicode-prefix"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "postman_collection_access_key"
+    },
+    {
       "detector": "heroku-api-key",
       "evidence": {
         "fixtureCount": 27,
@@ -3420,12 +3498,53 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "heroku_api_key_legacy"
+    },
+    {
+      "detector": "travisci-api-token",
+      "evidence": {
+        "fixtureCount": 19,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "terminal",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "travisci-api-token-positive-cli-flag",
+        "travisci-api-token-positive-curl-header",
+        "travisci-api-token-positive-dotenv",
+        "travisci-api-token-positive-json",
+        "travisci-api-token-positive-log",
+        "travisci-api-token-positive-shell-quoted",
+        "travisci-api-token-positive-yaml",
+        "travisci-api-token-regression-crlf-and-unicode-prefix"
+      ],
+      "policyClass": "confidence-gated",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "travisci_api_token"
     }
   ],
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 77,
+    "supported": 80,
     "unresolved": 0
   }
 }

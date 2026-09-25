@@ -73,16 +73,16 @@ vocabulary, without a `detector:` block at all:
 ```text
 ruleset-revision: 1
 names: ambiguous
-name: corp_token
+name: corp_passphrase
 ```
 
 `names: ambiguous` is the only claimable bucket in this revision — a caller
-can add an in-house assignment keyword (`corp_token`) to the same **ambiguous**
+can add an in-house assignment keyword (`corp_passphrase`) to the same **ambiguous**
 bucket `auth`/`credential`/`signing_key` already belong to, kept at that
 bucket's higher entropy bar and always `Confidence::Medium`; a ruleset cannot
 add to the high-signal bucket (`api_key`, `password`, …) in this revision.
 Every `name:` value is normalized the same way a scanned input's captured
-assignment name already is, so `CorpToken`, `corp-token`, and `corp_token` are
+assignment name already is, so `CorpPassphrase`, `corp-passphrase`, and `corp_passphrase` are
 the same addition. A name that normalizes to an existing built-in name is a
 silent no-op — a ruleset can never remove, override, or re-bucket a built-in
 name. A names-only ruleset (no `detector:` blocks) is valid; a names section

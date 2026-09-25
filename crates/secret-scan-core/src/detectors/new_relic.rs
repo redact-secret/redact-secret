@@ -184,6 +184,9 @@ const LICENSE_KEY_EU_BODY_LEN: usize = LICENSE_KEY_MARKED_BODY_LEN - LICENSE_KEY
 /// `# New Relic license key: <hex>`.
 const CONTEXT_KEYWORDS: [&str; 4] = ["newrelic", "new_relic", "new-relic", "new relic"];
 
+/// [`CONTEXT_KEYWORDS`] as they appear in a normalized key name.
+const NAMED_ASSIGNMENT_KEYWORDS: [&str; 2] = ["newrelic", "new_relic"];
+
 /// `[0-9a-f]`: the License Key's documented "hexadecimal string" alphabet,
 /// lowercase only. Matches [`super::twilio`]'s own `is_lower_hex`, which
 /// documents the same rationale: an uppercase-hex run is not a coincidental
@@ -303,10 +306,24 @@ impl Detector for NewRelicLicenseKeyDetector {
                     (true, false) => &["new-relic-keyword-cooccurrence"],
                     (false, _) => &["new-relic-license-key-suffix-marker"],
                 };
+                // Issue #702: a key that names New Relic's credential is the
+                // same evidence generic-token redacts at high confidence.
+                let named = has_keyword
+                    && text::is_provider_named_assignment(line, start, &NAMED_ASSIGNMENT_KEYWORDS);
+                let confidence = if named {
+                    Confidence::High
+                } else {
+                    Confidence::Medium
+                };
                 candidates.push(
-                    Candidate::new("new_relic_license_key", Confidence::Medium, range)
+                    Candidate::new("new_relic_license_key", confidence, range)
                         .with_specificity(Specificity::Provider)
-                        .with_signals(signals.iter().copied()),
+                        .with_signals(
+                            signals
+                                .iter()
+                                .copied()
+                                .chain(named.then_some("new-relic-named-assignment")),
+                        ),
                 );
             };
 
@@ -507,7 +524,12 @@ mod tests {
             let candidates = detect_license_key(&input);
             assert_eq!(candidates.len(), 1, "{input}");
             assert_eq!(candidates[0].type_name(), "new_relic_license_key");
-            assert_eq!(candidates[0].confidence(), Confidence::Medium);
+            let expected = if input.starts_with('#') {
+                Confidence::Medium
+            } else {
+                Confidence::High
+            };
+            assert_eq!(candidates[0].confidence(), expected, "{input}");
             assert_eq!(candidates[0].effective_specificity(), Specificity::Provider);
             let start = input.rfind(LICENSE_KEY).unwrap();
             assert_eq!(
@@ -539,7 +561,12 @@ mod tests {
                 let candidates = detect_license_key(&input);
                 assert_eq!(candidates.len(), 1, "{input}");
                 assert_eq!(candidates[0].type_name(), "new_relic_license_key");
-                assert_eq!(candidates[0].confidence(), Confidence::Medium);
+                let expected = if input.contains('=') || input.contains(':') {
+                    Confidence::High
+                } else {
+                    Confidence::Medium
+                };
+                assert_eq!(candidates[0].confidence(), expected, "{input}");
                 assert_eq!(candidates[0].effective_specificity(), Specificity::Provider);
                 let start = input.rfind(key).unwrap();
                 assert_eq!(

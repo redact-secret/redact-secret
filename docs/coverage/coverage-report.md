@@ -15,11 +15,11 @@ These counts describe finding-type inventory rows with corpus evidence, not dete
 
 | Row state | Count |
 | --- | --- |
-| supported | 77 |
+| supported | 80 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 88.
+Coverage declarations: 91.
 
 ## Coverage by detector
 
@@ -61,6 +61,7 @@ Coverage declarations: 88.
 | mailchimp-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | mailgun-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | microsoft-entra-client-secret | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| neon-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | netlify-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | new-relic-license-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | new-relic-user-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -73,6 +74,7 @@ Coverage declarations: 88.
 | perplexity-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | pinecone-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | postman-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| postman-collection-access-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | private-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | pulumi-access-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | pypi-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -87,6 +89,7 @@ Coverage declarations: 88.
 | supabase-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | telegram-bot-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | terraform-cloud-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| travisci-api-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | twilio-api-key-secret | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | twilio-auth-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | vault-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -139,6 +142,7 @@ Coverage declarations: 88.
 | mailchimp_api_key | mailchimp-api-key | provider | supported | not-applicable | none |
 | mailgun_api_key | mailgun-api-key | provider | supported | not-applicable | none |
 | microsoft_entra_client_secret | microsoft-entra-client-secret | provider | supported | not-applicable | none |
+| neon_api_key | neon-api-key | provider | supported | not-applicable | none |
 | netlify_personal_access_token | netlify-token | provider | supported | not-applicable | none |
 | new_relic_license_key | new-relic-license-key | provider | supported | not-applicable | none |
 | new_relic_user_api_key | new-relic-user-api-key | provider | supported | not-applicable | none |
@@ -151,6 +155,7 @@ Coverage declarations: 88.
 | perplexity_api_key | perplexity-api-key | provider | supported | not-applicable | none |
 | pinecone_api_key | pinecone-api-key | provider | supported | not-applicable | none |
 | postman_api_key | postman-api-key | provider | supported | not-applicable | none |
+| postman_collection_access_key | postman-collection-access-key | provider | supported | not-applicable | none |
 | private_key | private-key | structural | supported | not-applicable | none |
 | pulumi_access_token | pulumi-access-token | provider | supported | not-applicable | none |
 | pypi_api_token | pypi-token | provider | supported | not-applicable | none |
@@ -168,6 +173,7 @@ Coverage declarations: 88.
 | supabase_secret_key | supabase-token | provider | supported | not-applicable | none |
 | telegram_bot_token | telegram-bot-token | provider | supported | not-applicable | none |
 | terraform_cloud_token | terraform-cloud-token | provider | supported | not-applicable | none |
+| travisci_api_token | travisci-api-token | provider | supported | not-applicable | none |
 | twilio_api_key_secret | twilio-api-key-secret | provider | supported | not-applicable | none |
 | twilio_auth_token | twilio-auth-token | provider | supported | not-applicable | none |
 | vault_token | vault-token | provider | supported | not-applicable | none |
@@ -199,15 +205,15 @@ Coverage declarations: 88.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 88 | 0 | 0 |
-| boundary | 77 | 0 | 0 |
-| host-context | 77 | 0 | 0 |
+| adversarial | 91 | 0 | 0 |
+| boundary | 80 | 0 | 0 |
+| host-context | 80 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 88 | 0 | 0 |
-| near-miss-negative | 77 | 0 | 0 |
-| overlap | 77 | 0 | 0 |
-| positive | 77 | 0 | 0 |
-| range | 88 | 0 | 0 |
+| malformed | 91 | 0 | 0 |
+| near-miss-negative | 80 | 0 | 0 |
+| overlap | 80 | 0 | 0 |
+| positive | 80 | 0 | 0 |
+| range | 91 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

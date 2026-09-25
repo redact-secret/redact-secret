@@ -11,23 +11,25 @@ use crate::types::{Action, Confidence, DetectedFinding, Policy, PolicyContext};
 /// here: `twilio_auth_token`, `twilio_api_key_secret`, `datadog_api_key`,
 /// `datadog_application_key_legacy`, `new_relic_license_key`,
 /// `mailchimp_api_key`, `mailgun_api_key`, `okta_api_token`,
-/// `confluent_cloud_api_secret_legacy`,
-/// and `heroku_api_key_legacy` are deliberately left confidence-gated
+/// `confluent_cloud_api_secret_legacy`, `heroku_api_key_legacy`,
+/// and `travisci_api_token` are deliberately left confidence-gated
 /// (redact at [`Confidence::High`], warn otherwise) even though that is a
 /// weaker action than their specificity alone would suggest — each has a
 /// documented `decision-freeze-*` grammar record (or, for
 /// `datadog_application_key_legacy`, `confluent_cloud_api_secret_legacy`,
-/// `heroku_api_key_legacy`, `mailchimp_api_key`, `mailgun_api_key`, and
-/// `okta_api_token`, its own module doc in `detectors::datadog`,
-/// `detectors::confluent`, `detectors::heroku`, `detectors::mailchimp`,
-/// `detectors::mailgun`, or `detectors::okta`) explaining why a bare
+/// `heroku_api_key_legacy`, `mailchimp_api_key`, `mailgun_api_key`,
+/// `okta_api_token` and `travisci_api_token`, its own module doc in
+/// `detectors::datadog`, `detectors::confluent`, `detectors::heroku`,
+/// `detectors::mailchimp`, `detectors::mailgun`, `detectors::okta` or
+/// `detectors::travisci`) explaining why a bare
 /// keyword-cooccurrence match at medium confidence is too weak (an opaque
-/// bare value sharing a line with a vendor keyword) to redact by default;
-/// each of those legacy types only ever reports [`Confidence::Medium`], so
-/// it always warns rather than redacts under this default policy, except
-/// `okta_api_token`, which also reports [`Confidence::High`] when a stronger
-/// same-line `SSWS` scheme signal is present, which this default policy
-/// already redacts without needing a carve-out here. Overlap resolution's resolved-action
+/// bare value sharing a line with a vendor keyword) to redact by default.
+/// A keyword elsewhere on the line reports [`Confidence::Medium`] and warns.
+/// A value assigned to a key that names the provider reports
+/// [`Confidence::High`] (issue #702,
+/// `decision-redact-provider-named-credential-assignments`), and so does
+/// `okta_api_token` under a same-line `SSWS` scheme; this default policy
+/// already redacts both without needing a carve-out here. Overlap resolution's resolved-action
 /// severity ranking
 /// (`decision-resolve-overlap-precedence-by-resolved-action-severity`)
 /// exists precisely so this list does not have to be exhaustive over every
@@ -35,7 +37,7 @@ use crate::types::{Action, Confidence, DetectedFinding, Policy, PolicyContext};
 /// correct: a confidence-gated type here can still lose an overlap to a
 /// stricter-resolving lower-specificity candidate, without needing to be
 /// added to this list.
-const ALWAYS_REDACT_TYPES: [&str; 65] = [
+const ALWAYS_REDACT_TYPES: [&str; 67] = [
     "anthropic_api_key",
     "atlassian_api_token",
     "authorization_credential",
@@ -72,6 +74,7 @@ const ALWAYS_REDACT_TYPES: [&str; 65] = [
     "linear_token",
     "microsoft_entra_client_secret",
     "netlify_personal_access_token",
+    "neon_api_key",
     "new_relic_user_api_key",
     "notion_integration_token",
     "npm_access_token",
@@ -81,6 +84,7 @@ const ALWAYS_REDACT_TYPES: [&str; 65] = [
     "perplexity_api_key",
     "pinecone_api_key",
     "postman_api_key",
+    "postman_collection_access_key",
     "pulumi_access_token",
     "pypi_api_token",
     "replicate_api_token",
