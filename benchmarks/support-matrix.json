@@ -3,9 +3,9 @@
   "taxonomySchemaVersion": 1,
   "sourceReport": {
     "schemaVersion": 1,
-    "generatedAt": "2026-09-25T02:39:11.289Z",
-    "runId": "c68347b4-3ad5-413d-8f8f-2b283a57d61c",
-    "revision": "25e31c8319c441097f98db4e00b560395676f4a4",
+    "generatedAt": "2026-09-25T03:13:04.731Z",
+    "runId": "00f89d82-625a-4a34-8bba-debf6a2362c7",
+    "revision": "cfaeac4d83a4c98cffd77328d3416eb920a7d25b",
     "dirty": false,
     "criteriaSchemaVersion": 1,
     "product": {
@@ -31,14 +31,14 @@
   "providerCount": 53,
   "familyCount": 108,
   "distribution": {
-    "stable": 73,
-    "provisional": 17,
+    "stable": 83,
+    "provisional": 7,
     "pending": 1,
     "unsupported": 17
   },
   "stableDistribution": {
     "documented": 57,
-    "empirical": 16
+    "empirical": 26
   },
   "families": [
     {
@@ -3577,16 +3577,16 @@
       "provider": "gitlab",
       "family": "gitlab:runner-authentication-token",
       "familyName": "Runner authentication token",
-      "status": "provisional",
+      "status": "stable",
       "evidenceTier": "T2",
       "evidenceBasis": "independently-corroborated",
-      "qualificationProfile": null,
+      "qualificationProfile": "empirical",
       "providerSource": null,
       "corroboratingScanners": [
         "gitleaks 8.30.1"
       ],
       "twinCoverage": {
-        "pairs": 6,
+        "pairs": 8,
         "failures": 0,
         "unprobeable": null
       },
@@ -3618,31 +3618,35 @@
         "supportsBareValues": true
       },
       "fixtureProfile": {
-        "positiveCases": 10,
-        "positiveAxes": 6,
+        "positiveCases": 19,
+        "positiveAxes": 15,
         "benignCases": 16,
         "controlAxes": 6,
-        "twinPairs": 6,
-        "totalFixtures": 32,
+        "twinPairs": 8,
+        "totalFixtures": 43,
         "contextTwinPairs": 0,
         "confusionAxes": 10
       },
       "detectors": [
         "gitlab-runner-authentication-token"
       ],
-      "reason": "empirical.minimumTwinPairs: 6 < 8 — Eight independently authored twin pairs complete the 40-fixture empirical profile. | fixtureProfile stable-empirical: 32 total fixtures < 40 (8 short) | fixtureProfile stable-empirical: 4 positive/context cases < 10 (6 short) | fixtureProfile stable-empirical: 6 twin pairs < 8 (2 short)",
+      "reason": null,
       "profileCoverage": {
         "profilesVersion": 1,
         "claimed": "stable-empirical",
         "explicit": false,
         "target": "stable-empirical",
-        "cellsMet": [],
+        "cellsMet": [
+          "arrival-provisional",
+          "stable-documented",
+          "stable-empirical"
+        ],
         "cells": {
-          "totalFixtures": 32,
-          "positiveCases": 4,
+          "totalFixtures": 43,
+          "positiveCases": 11,
           "benignControls": 16,
-          "twinPairs": 6,
-          "positiveContextAxes": 6,
+          "twinPairs": 8,
+          "positiveContextAxes": 15,
           "controlAxes": 6,
           "confusionAxes": 10,
           "positiveContextAxisIds": [
@@ -3651,6 +3655,15 @@
             "#212 · gitlab-runner-authentication-token · env",
             "#212 · gitlab-runner-authentication-token · structured-file",
             "#212 · gitlab-runner-authentication-token · tool-output",
+            "#263 · gitlab-runner-authentication-token · cli",
+            "#263 · gitlab-runner-authentication-token · header",
+            "#263 · gitlab-runner-authentication-token · log",
+            "#263 · gitlab-runner-authentication-token · prose",
+            "#263 · gitlab-runner-authentication-token · sdk-config",
+            "#263 · gitlab-runner-authentication-token · shell-export",
+            "#263 · gitlab-runner-authentication-token · structured-file",
+            "#263 · gitlab-runner-authentication-token · tool-output",
+            "#263 · gitlab-runner-authentication-token · url",
             "gitlab-runner-authentication-token"
           ],
           "controlAxisIds": [
@@ -3674,26 +3687,7 @@
             "twin:prefix"
           ]
         },
-        "debt": [
-          {
-            "cell": "totalFixtures",
-            "actual": 32,
-            "required": 40,
-            "shortfall": 8
-          },
-          {
-            "cell": "positiveCases",
-            "actual": 4,
-            "required": 10,
-            "shortfall": 6
-          },
-          {
-            "cell": "twinPairs",
-            "actual": 6,
-            "required": 8,
-            "shortfall": 2
-          }
-        ]
+        "debt": []
       }
     },
     {
@@ -4039,16 +4033,16 @@
       "provider": "groq",
       "family": "groq:api-key",
       "familyName": "API key",
-      "status": "provisional",
+      "status": "stable",
       "evidenceTier": "T2",
       "evidenceBasis": "independently-corroborated",
-      "qualificationProfile": null,
+      "qualificationProfile": "empirical",
       "providerSource": null,
       "corroboratingScanners": [
         "trufflehog 3.97.4"
       ],
       "twinCoverage": {
-        "pairs": 6,
+        "pairs": 8,
         "failures": 0,
         "unprobeable": null
       },
@@ -4080,19 +4074,19 @@
         "supportsBareValues": true
       },
       "fixtureProfile": {
-        "positiveCases": 12,
-        "positiveAxes": 9,
+        "positiveCases": 19,
+        "positiveAxes": 16,
         "benignCases": 14,
         "controlAxes": 6,
-        "twinPairs": 6,
-        "totalFixtures": 32,
+        "twinPairs": 8,
+        "totalFixtures": 41,
         "contextTwinPairs": 0,
         "confusionAxes": 10
       },
       "detectors": [
         "groq-api-key"
       ],
-      "reason": "empirical.minimumTwinPairs: 6 < 8 — Eight independently authored twin pairs complete the 40-fixture empirical profile. | fixtureProfile stable-empirical: 32 total fixtures < 40 (8 short) | fixtureProfile stable-empirical: 6 positive/context cases < 10 (4 short) | fixtureProfile stable-empirical: 6 twin pairs < 8 (2 short)",
+      "reason": null,
       "profileCoverage": {
         "profilesVersion": 1,
         "claimed": "stable-empirical",
@@ -4100,14 +4094,15 @@
         "target": "stable-empirical",
         "cellsMet": [
           "arrival-provisional",
-          "stable-documented"
+          "stable-documented",
+          "stable-empirical"
         ],
         "cells": {
-          "totalFixtures": 32,
-          "positiveCases": 6,
+          "totalFixtures": 41,
+          "positiveCases": 11,
           "benignControls": 14,
-          "twinPairs": 6,
-          "positiveContextAxes": 9,
+          "twinPairs": 8,
+          "positiveContextAxes": 16,
           "controlAxes": 6,
           "confusionAxes": 10,
           "positiveContextAxisIds": [
@@ -4119,6 +4114,13 @@
             "#208 · groq-api-key · source-code",
             "#208 · groq-api-key · structured-file",
             "#208 · groq-api-key · tool-output",
+            "#263 · groq-api-key · cli",
+            "#263 · groq-api-key · container-config",
+            "#263 · groq-api-key · env",
+            "#263 · groq-api-key · log",
+            "#263 · groq-api-key · sdk-config",
+            "#263 · groq-api-key · structured-file",
+            "#263 · groq-api-key · tool-output",
             "groq-api-key"
           ],
           "controlAxisIds": [
@@ -4142,26 +4144,7 @@
             "twin:prefix"
           ]
         },
-        "debt": [
-          {
-            "cell": "totalFixtures",
-            "actual": 32,
-            "required": 40,
-            "shortfall": 8
-          },
-          {
-            "cell": "positiveCases",
-            "actual": 6,
-            "required": 10,
-            "shortfall": 4
-          },
-          {
-            "cell": "twinPairs",
-            "actual": 6,
-            "required": 8,
-            "shortfall": 2
-          }
-        ]
+        "debt": []
       }
     },
     {
@@ -5092,17 +5075,17 @@
       "provider": "langfuse",
       "family": "langfuse:secret-key",
       "familyName": "Secret API key",
-      "status": "provisional",
+      "status": "stable",
       "evidenceTier": "T2",
       "evidenceBasis": "independently-corroborated",
-      "qualificationProfile": null,
+      "qualificationProfile": "empirical",
       "providerSource": null,
       "corroboratingScanners": [
         "betterleaks",
         "trufflehog 3.97.4"
       ],
       "twinCoverage": {
-        "pairs": 5,
+        "pairs": 8,
         "failures": 0,
         "unprobeable": null
       },
@@ -5135,19 +5118,19 @@
         "supportsBareValues": true
       },
       "fixtureProfile": {
-        "positiveCases": 11,
-        "positiveAxes": 9,
+        "positiveCases": 18,
+        "positiveAxes": 16,
         "benignCases": 16,
         "controlAxes": 6,
-        "twinPairs": 5,
-        "totalFixtures": 32,
+        "twinPairs": 8,
+        "totalFixtures": 42,
         "contextTwinPairs": 0,
         "confusionAxes": 10
       },
       "detectors": [
         "langfuse-secret-key"
       ],
-      "reason": "empirical.minimumTwinPairs: 5 < 8 — Eight independently authored twin pairs complete the 40-fixture empirical profile. | fixtureProfile stable-empirical: 32 total fixtures < 40 (8 short) | fixtureProfile stable-empirical: 6 positive/context cases < 10 (4 short) | fixtureProfile stable-empirical: 5 twin pairs < 8 (3 short)",
+      "reason": null,
       "profileCoverage": {
         "profilesVersion": 1,
         "claimed": "stable-empirical",
@@ -5155,14 +5138,15 @@
         "target": "stable-empirical",
         "cellsMet": [
           "arrival-provisional",
-          "stable-documented"
+          "stable-documented",
+          "stable-empirical"
         ],
         "cells": {
-          "totalFixtures": 32,
-          "positiveCases": 6,
+          "totalFixtures": 42,
+          "positiveCases": 10,
           "benignControls": 16,
-          "twinPairs": 5,
-          "positiveContextAxes": 9,
+          "twinPairs": 8,
+          "positiveContextAxes": 16,
           "controlAxes": 6,
           "confusionAxes": 10,
           "positiveContextAxisIds": [
@@ -5174,6 +5158,13 @@
             "#210 · langfuse-secret-key · sdk-config",
             "#210 · langfuse-secret-key · source-code",
             "#210 · langfuse-secret-key · structured-file",
+            "#263 · langfuse-secret-key · ci-config",
+            "#263 · langfuse-secret-key · cli",
+            "#263 · langfuse-secret-key · env",
+            "#263 · langfuse-secret-key · prose",
+            "#263 · langfuse-secret-key · sdk-config",
+            "#263 · langfuse-secret-key · shell-export",
+            "#263 · langfuse-secret-key · tool-output",
             "langfuse-secret-key"
           ],
           "controlAxisIds": [
@@ -5197,36 +5188,17 @@
             "twin:public-prefix"
           ]
         },
-        "debt": [
-          {
-            "cell": "totalFixtures",
-            "actual": 32,
-            "required": 40,
-            "shortfall": 8
-          },
-          {
-            "cell": "positiveCases",
-            "actual": 6,
-            "required": 10,
-            "shortfall": 4
-          },
-          {
-            "cell": "twinPairs",
-            "actual": 5,
-            "required": 8,
-            "shortfall": 3
-          }
-        ]
+        "debt": []
       }
     },
     {
       "provider": "langsmith",
       "family": "langsmith:api-key",
       "familyName": "API key (personal access token or service key)",
-      "status": "provisional",
+      "status": "stable",
       "evidenceTier": "T2",
       "evidenceBasis": "independently-corroborated",
-      "qualificationProfile": null,
+      "qualificationProfile": "empirical",
       "providerSource": null,
       "corroboratingScanners": [
         "poltergeist",
@@ -5234,7 +5206,7 @@
         "trufflehog 3.97.4"
       ],
       "twinCoverage": {
-        "pairs": 5,
+        "pairs": 8,
         "failures": 0,
         "unprobeable": null
       },
@@ -5266,19 +5238,19 @@
         "supportsBareValues": true
       },
       "fixtureProfile": {
-        "positiveCases": 11,
-        "positiveAxes": 9,
+        "positiveCases": 18,
+        "positiveAxes": 16,
         "benignCases": 16,
         "controlAxes": 6,
-        "twinPairs": 5,
-        "totalFixtures": 32,
+        "twinPairs": 8,
+        "totalFixtures": 42,
         "contextTwinPairs": 0,
         "confusionAxes": 10
       },
       "detectors": [
         "langsmith-api-key"
       ],
-      "reason": "empirical.minimumTwinPairs: 5 < 8 — Eight independently authored twin pairs complete the 40-fixture empirical profile. | fixtureProfile stable-empirical: 32 total fixtures < 40 (8 short) | fixtureProfile stable-empirical: 6 positive/context cases < 10 (4 short) | fixtureProfile stable-empirical: 5 twin pairs < 8 (3 short)",
+      "reason": null,
       "profileCoverage": {
         "profilesVersion": 1,
         "claimed": "stable-empirical",
@@ -5286,14 +5258,15 @@
         "target": "stable-empirical",
         "cellsMet": [
           "arrival-provisional",
-          "stable-documented"
+          "stable-documented",
+          "stable-empirical"
         ],
         "cells": {
-          "totalFixtures": 32,
-          "positiveCases": 6,
+          "totalFixtures": 42,
+          "positiveCases": 10,
           "benignControls": 16,
-          "twinPairs": 5,
-          "positiveContextAxes": 9,
+          "twinPairs": 8,
+          "positiveContextAxes": 16,
           "controlAxes": 6,
           "confusionAxes": 10,
           "positiveContextAxisIds": [
@@ -5305,6 +5278,13 @@
             "#210 · langsmith-api-key · sdk-config",
             "#210 · langsmith-api-key · shell-export",
             "#210 · langsmith-api-key · structured-file",
+            "#263 · langsmith-api-key · ci-config",
+            "#263 · langsmith-api-key · cli",
+            "#263 · langsmith-api-key · env",
+            "#263 · langsmith-api-key · prose",
+            "#263 · langsmith-api-key · shell-export",
+            "#263 · langsmith-api-key · structured-file",
+            "#263 · langsmith-api-key · tool-output",
             "langsmith-api-key"
           ],
           "controlAxisIds": [
@@ -5328,26 +5308,7 @@
             "twin:prefix"
           ]
         },
-        "debt": [
-          {
-            "cell": "totalFixtures",
-            "actual": 32,
-            "required": 40,
-            "shortfall": 8
-          },
-          {
-            "cell": "positiveCases",
-            "actual": 6,
-            "required": 10,
-            "shortfall": 4
-          },
-          {
-            "cell": "twinPairs",
-            "actual": 5,
-            "required": 8,
-            "shortfall": 3
-          }
-        ]
+        "debt": []
       }
     },
     {
@@ -5837,17 +5798,17 @@
       "provider": "neon",
       "family": "neon:api-key",
       "familyName": "API key",
-      "status": "provisional",
+      "status": "stable",
       "evidenceTier": "T2",
       "evidenceBasis": "independently-corroborated",
-      "qualificationProfile": null,
+      "qualificationProfile": "empirical",
       "providerSource": null,
       "corroboratingScanners": [
         "betterleaks",
         "mask-go"
       ],
       "twinCoverage": {
-        "pairs": 5,
+        "pairs": 8,
         "failures": 0,
         "unprobeable": null
       },
@@ -5880,19 +5841,19 @@
         "supportsBareValues": true
       },
       "fixtureProfile": {
-        "positiveCases": 11,
-        "positiveAxes": 9,
+        "positiveCases": 18,
+        "positiveAxes": 16,
         "benignCases": 16,
         "controlAxes": 6,
-        "twinPairs": 5,
-        "totalFixtures": 32,
+        "twinPairs": 8,
+        "totalFixtures": 42,
         "contextTwinPairs": 0,
         "confusionAxes": 10
       },
       "detectors": [
         "neon-api-key"
       ],
-      "reason": "empirical.minimumTwinPairs: 5 < 8 — Eight independently authored twin pairs complete the 40-fixture empirical profile. | fixtureProfile stable-empirical: 32 total fixtures < 40 (8 short) | fixtureProfile stable-empirical: 6 positive/context cases < 10 (4 short) | fixtureProfile stable-empirical: 5 twin pairs < 8 (3 short)",
+      "reason": null,
       "profileCoverage": {
         "profilesVersion": 1,
         "claimed": "stable-empirical",
@@ -5900,14 +5861,15 @@
         "target": "stable-empirical",
         "cellsMet": [
           "arrival-provisional",
-          "stable-documented"
+          "stable-documented",
+          "stable-empirical"
         ],
         "cells": {
-          "totalFixtures": 32,
-          "positiveCases": 6,
+          "totalFixtures": 42,
+          "positiveCases": 10,
           "benignControls": 16,
-          "twinPairs": 5,
-          "positiveContextAxes": 9,
+          "twinPairs": 8,
+          "positiveContextAxes": 16,
           "controlAxes": 6,
           "confusionAxes": 10,
           "positiveContextAxisIds": [
@@ -5919,6 +5881,13 @@
             "#259 · neon-api-key · shell-export",
             "#259 · neon-api-key · structured-file",
             "#259 · neon-api-key · tool-output",
+            "#263 · neon-api-key · container-config",
+            "#263 · neon-api-key · env",
+            "#263 · neon-api-key · header",
+            "#263 · neon-api-key · prose",
+            "#263 · neon-api-key · sdk-config",
+            "#263 · neon-api-key · structured-file",
+            "#263 · neon-api-key · tool-output",
             "neon-api-key"
           ],
           "controlAxisIds": [
@@ -5942,26 +5911,7 @@
             "twin:prefix"
           ]
         },
-        "debt": [
-          {
-            "cell": "totalFixtures",
-            "actual": 32,
-            "required": 40,
-            "shortfall": 8
-          },
-          {
-            "cell": "positiveCases",
-            "actual": 6,
-            "required": 10,
-            "shortfall": 4
-          },
-          {
-            "cell": "twinPairs",
-            "actual": 5,
-            "required": 8,
-            "shortfall": 3
-          }
-        ]
+        "debt": []
       }
     },
     {
@@ -6892,16 +6842,16 @@
       "provider": "perplexity",
       "family": "perplexity:api-key",
       "familyName": "API key",
-      "status": "provisional",
+      "status": "stable",
       "evidenceTier": "T2",
       "evidenceBasis": "independently-corroborated",
-      "qualificationProfile": null,
+      "qualificationProfile": "empirical",
       "providerSource": null,
       "corroboratingScanners": [
         "gitleaks 8.30.1"
       ],
       "twinCoverage": {
-        "pairs": 6,
+        "pairs": 8,
         "failures": 0,
         "unprobeable": null
       },
@@ -6933,31 +6883,35 @@
         "supportsBareValues": true
       },
       "fixtureProfile": {
-        "positiveCases": 11,
-        "positiveAxes": 8,
+        "positiveCases": 18,
+        "positiveAxes": 15,
         "benignCases": 15,
         "controlAxes": 6,
-        "twinPairs": 6,
-        "totalFixtures": 32,
+        "twinPairs": 8,
+        "totalFixtures": 41,
         "contextTwinPairs": 0,
         "confusionAxes": 10
       },
       "detectors": [
         "perplexity-api-key"
       ],
-      "reason": "empirical.minimumTwinPairs: 6 < 8 — Eight independently authored twin pairs complete the 40-fixture empirical profile. | fixtureProfile stable-empirical: 32 total fixtures < 40 (8 short) | fixtureProfile stable-empirical: 5 positive/context cases < 10 (5 short) | fixtureProfile stable-empirical: 6 twin pairs < 8 (2 short)",
+      "reason": null,
       "profileCoverage": {
         "profilesVersion": 1,
         "claimed": "stable-empirical",
         "explicit": false,
         "target": "stable-empirical",
-        "cellsMet": [],
+        "cellsMet": [
+          "arrival-provisional",
+          "stable-documented",
+          "stable-empirical"
+        ],
         "cells": {
-          "totalFixtures": 32,
-          "positiveCases": 5,
+          "totalFixtures": 41,
+          "positiveCases": 10,
           "benignControls": 15,
-          "twinPairs": 6,
-          "positiveContextAxes": 8,
+          "twinPairs": 8,
+          "positiveContextAxes": 15,
           "controlAxes": 6,
           "confusionAxes": 10,
           "positiveContextAxisIds": [
@@ -6968,6 +6922,13 @@
             "#212 · perplexity-api-key · shell-export",
             "#212 · perplexity-api-key · structured-file",
             "#212 · perplexity-api-key · tool-output",
+            "#263 · perplexity-api-key · cli",
+            "#263 · perplexity-api-key · container-config",
+            "#263 · perplexity-api-key · env",
+            "#263 · perplexity-api-key · log",
+            "#263 · perplexity-api-key · prose",
+            "#263 · perplexity-api-key · sdk-config",
+            "#263 · perplexity-api-key · tool-output",
             "perplexity-api-key"
           ],
           "controlAxisIds": [
@@ -6991,42 +6952,23 @@
             "twin:prefix"
           ]
         },
-        "debt": [
-          {
-            "cell": "totalFixtures",
-            "actual": 32,
-            "required": 40,
-            "shortfall": 8
-          },
-          {
-            "cell": "positiveCases",
-            "actual": 5,
-            "required": 10,
-            "shortfall": 5
-          },
-          {
-            "cell": "twinPairs",
-            "actual": 6,
-            "required": 8,
-            "shortfall": 2
-          }
-        ]
+        "debt": []
       }
     },
     {
       "provider": "pinecone",
       "family": "pinecone:api-key",
       "familyName": "API key (pcsk_)",
-      "status": "provisional",
+      "status": "stable",
       "evidenceTier": "T2",
       "evidenceBasis": "independently-corroborated",
-      "qualificationProfile": null,
+      "qualificationProfile": "empirical",
       "providerSource": null,
       "corroboratingScanners": [
         "trufflehog 3.97.4"
       ],
       "twinCoverage": {
-        "pairs": 5,
+        "pairs": 8,
         "failures": 0,
         "unprobeable": null
       },
@@ -7059,19 +7001,19 @@
         "supportsBareValues": true
       },
       "fixtureProfile": {
-        "positiveCases": 11,
-        "positiveAxes": 9,
+        "positiveCases": 18,
+        "positiveAxes": 16,
         "benignCases": 16,
         "controlAxes": 6,
-        "twinPairs": 5,
-        "totalFixtures": 32,
+        "twinPairs": 8,
+        "totalFixtures": 42,
         "contextTwinPairs": 0,
-        "confusionAxes": 8
+        "confusionAxes": 9
       },
       "detectors": [
         "pinecone-api-key"
       ],
-      "reason": "empirical.minimumTwinPairs: 5 < 8 — Eight independently authored twin pairs complete the 40-fixture empirical profile. | fixtureProfile stable-empirical: 32 total fixtures < 40 (8 short) | fixtureProfile stable-empirical: 6 positive/context cases < 10 (4 short) | fixtureProfile stable-empirical: 5 twin pairs < 8 (3 short)",
+      "reason": null,
       "profileCoverage": {
         "profilesVersion": 1,
         "claimed": "stable-empirical",
@@ -7079,16 +7021,17 @@
         "target": "stable-empirical",
         "cellsMet": [
           "arrival-provisional",
-          "stable-documented"
+          "stable-documented",
+          "stable-empirical"
         ],
         "cells": {
-          "totalFixtures": 32,
-          "positiveCases": 6,
+          "totalFixtures": 42,
+          "positiveCases": 10,
           "benignControls": 16,
-          "twinPairs": 5,
-          "positiveContextAxes": 9,
+          "twinPairs": 8,
+          "positiveContextAxes": 16,
           "controlAxes": 6,
-          "confusionAxes": 8,
+          "confusionAxes": 9,
           "positiveContextAxisIds": [
             "#212 · pinecone-api-key · ci-config",
             "#212 · pinecone-api-key · cli",
@@ -7098,6 +7041,13 @@
             "#212 · pinecone-api-key · shell-export",
             "#212 · pinecone-api-key · source-code",
             "#212 · pinecone-api-key · structured-file",
+            "#263 · pinecone-api-key · container-config",
+            "#263 · pinecone-api-key · env",
+            "#263 · pinecone-api-key · log",
+            "#263 · pinecone-api-key · sdk-config",
+            "#263 · pinecone-api-key · shell-export",
+            "#263 · pinecone-api-key · structured-file",
+            "#263 · pinecone-api-key · tool-output",
             "pinecone-api-key"
           ],
           "controlAxisIds": [
@@ -7116,29 +7066,11 @@
             "public-identifier",
             "reference",
             "twin:boundary",
-            "twin:length"
+            "twin:length",
+            "twin:prefix"
           ]
         },
-        "debt": [
-          {
-            "cell": "totalFixtures",
-            "actual": 32,
-            "required": 40,
-            "shortfall": 8
-          },
-          {
-            "cell": "positiveCases",
-            "actual": 6,
-            "required": 10,
-            "shortfall": 4
-          },
-          {
-            "cell": "twinPairs",
-            "actual": 5,
-            "required": 8,
-            "shortfall": 3
-          }
-        ]
+        "debt": []
       }
     },
     {
@@ -7278,16 +7210,16 @@
       "provider": "postman",
       "family": "postman:collection-access-key",
       "familyName": "Collection access key",
-      "status": "provisional",
+      "status": "stable",
       "evidenceTier": "T2",
       "evidenceBasis": "independently-corroborated",
-      "qualificationProfile": null,
+      "qualificationProfile": "empirical",
       "providerSource": null,
       "corroboratingScanners": [
         "GitLab secret-detection-rules"
       ],
       "twinCoverage": {
-        "pairs": 5,
+        "pairs": 8,
         "failures": 0,
         "unprobeable": null
       },
@@ -7319,19 +7251,19 @@
         "supportsBareValues": true
       },
       "fixtureProfile": {
-        "positiveCases": 11,
-        "positiveAxes": 9,
+        "positiveCases": 18,
+        "positiveAxes": 16,
         "benignCases": 16,
         "controlAxes": 6,
-        "twinPairs": 5,
-        "totalFixtures": 32,
+        "twinPairs": 8,
+        "totalFixtures": 42,
         "contextTwinPairs": 0,
         "confusionAxes": 9
       },
       "detectors": [
         "postman-collection-access-key"
       ],
-      "reason": "empirical.minimumTwinPairs: 5 < 8 — Eight independently authored twin pairs complete the 40-fixture empirical profile. | fixtureProfile stable-empirical: 32 total fixtures < 40 (8 short) | fixtureProfile stable-empirical: 6 positive/context cases < 10 (4 short) | fixtureProfile stable-empirical: 5 twin pairs < 8 (3 short)",
+      "reason": null,
       "profileCoverage": {
         "profilesVersion": 1,
         "claimed": "stable-empirical",
@@ -7339,14 +7271,15 @@
         "target": "stable-empirical",
         "cellsMet": [
           "arrival-provisional",
-          "stable-documented"
+          "stable-documented",
+          "stable-empirical"
         ],
         "cells": {
-          "totalFixtures": 32,
-          "positiveCases": 6,
+          "totalFixtures": 42,
+          "positiveCases": 10,
           "benignControls": 16,
-          "twinPairs": 5,
-          "positiveContextAxes": 9,
+          "twinPairs": 8,
+          "positiveContextAxes": 16,
           "controlAxes": 6,
           "confusionAxes": 9,
           "positiveContextAxisIds": [
@@ -7358,6 +7291,13 @@
             "#259 · postman-collection-access-key · structured-file",
             "#259 · postman-collection-access-key · tool-output",
             "#259 · postman-collection-access-key · url",
+            "#263 · postman-collection-access-key · container-config",
+            "#263 · postman-collection-access-key · env",
+            "#263 · postman-collection-access-key · log",
+            "#263 · postman-collection-access-key · shell-export",
+            "#263 · postman-collection-access-key · structured-file",
+            "#263 · postman-collection-access-key · tool-output",
+            "#263 · postman-collection-access-key · url",
             "postman-collection-access-key"
           ],
           "controlAxisIds": [
@@ -7380,26 +7320,7 @@
             "twin:prefix"
           ]
         },
-        "debt": [
-          {
-            "cell": "totalFixtures",
-            "actual": 32,
-            "required": 40,
-            "shortfall": 8
-          },
-          {
-            "cell": "positiveCases",
-            "actual": 6,
-            "required": 10,
-            "shortfall": 4
-          },
-          {
-            "cell": "twinPairs",
-            "actual": 5,
-            "required": 8,
-            "shortfall": 3
-          }
-        ]
+        "debt": []
       }
     },
     {
@@ -9634,17 +9555,17 @@
       "provider": "travis-ci",
       "family": "travis-ci:api-token",
       "familyName": "API token",
-      "status": "provisional",
+      "status": "stable",
       "evidenceTier": "T2",
       "evidenceBasis": "independently-corroborated",
-      "qualificationProfile": null,
+      "qualificationProfile": "empirical",
       "providerSource": null,
       "corroboratingScanners": [
         "gitleaks 8.30.1",
         "trufflehog 3.97.4"
       ],
       "twinCoverage": {
-        "pairs": 5,
+        "pairs": 13,
         "failures": 0,
         "unprobeable": null
       },
@@ -9677,19 +9598,19 @@
         "supportsBareValues": false
       },
       "fixtureProfile": {
-        "positiveCases": 11,
-        "positiveAxes": 9,
+        "positiveCases": 19,
+        "positiveAxes": 17,
         "benignCases": 16,
         "controlAxes": 6,
-        "twinPairs": 5,
-        "totalFixtures": 32,
-        "contextTwinPairs": 2,
+        "twinPairs": 13,
+        "totalFixtures": 48,
+        "contextTwinPairs": 10,
         "confusionAxes": 9
       },
       "detectors": [
         "travisci-api-token"
       ],
-      "reason": "empirical.minimumTwinPairs: 5 < 8 — Eight independently authored twin pairs complete the 40-fixture empirical profile. | empirical.contextConstrained.minimumContextTwinPairs: 2 < 10 — Opaque values require ten context-twin pairs and no bare-value claim. | empirical.contextConstrained.minimumFixtures: 32 < 48 — The context-constrained empirical profile contains at least 48 fixtures. | fixtureProfile context-constrained-empirical: 32 total fixtures < 48 (16 short) | fixtureProfile context-constrained-empirical: 5 twin pairs < 10 (5 short)",
+      "reason": null,
       "profileCoverage": {
         "profilesVersion": 1,
         "claimed": "context-constrained-empirical",
@@ -9697,14 +9618,15 @@
         "target": "context-constrained-empirical",
         "cellsMet": [
           "arrival-provisional",
-          "stable-documented"
+          "stable-documented",
+          "context-constrained-empirical"
         ],
         "cells": {
-          "totalFixtures": 32,
+          "totalFixtures": 48,
           "positiveCases": 6,
           "benignControls": 16,
-          "twinPairs": 5,
-          "positiveContextAxes": 9,
+          "twinPairs": 13,
+          "positiveContextAxes": 17,
           "controlAxes": 6,
           "confusionAxes": 9,
           "positiveContextAxisIds": [
@@ -9716,6 +9638,14 @@
             "#259 · travisci-api-token · shell-export",
             "#259 · travisci-api-token · source-code",
             "#259 · travisci-api-token · structured-file",
+            "#263 · travisci-api-token · ci-config",
+            "#263 · travisci-api-token · cli",
+            "#263 · travisci-api-token · env",
+            "#263 · travisci-api-token · header",
+            "#263 · travisci-api-token · log",
+            "#263 · travisci-api-token · shell-export",
+            "#263 · travisci-api-token · source-code",
+            "#263 · travisci-api-token · structured-file",
             "travisci-api-token"
           ],
           "controlAxisIds": [
@@ -9738,20 +9668,7 @@
             "twin:length"
           ]
         },
-        "debt": [
-          {
-            "cell": "totalFixtures",
-            "actual": 32,
-            "required": 48,
-            "shortfall": 16
-          },
-          {
-            "cell": "twinPairs",
-            "actual": 5,
-            "required": 10,
-            "shortfall": 5
-          }
-        ]
+        "debt": []
       }
     },
     {
@@ -10109,16 +10026,16 @@
       "provider": "xai",
       "family": "xai:api-key",
       "familyName": "API key",
-      "status": "provisional",
+      "status": "stable",
       "evidenceTier": "T2",
       "evidenceBasis": "independently-corroborated",
-      "qualificationProfile": null,
+      "qualificationProfile": "empirical",
       "providerSource": null,
       "corroboratingScanners": [
         "trufflehog 3.97.4"
       ],
       "twinCoverage": {
-        "pairs": 6,
+        "pairs": 8,
         "failures": 0,
         "unprobeable": null
       },
@@ -10150,19 +10067,19 @@
         "supportsBareValues": true
       },
       "fixtureProfile": {
-        "positiveCases": 12,
-        "positiveAxes": 9,
+        "positiveCases": 19,
+        "positiveAxes": 16,
         "benignCases": 14,
         "controlAxes": 6,
-        "twinPairs": 6,
-        "totalFixtures": 32,
+        "twinPairs": 8,
+        "totalFixtures": 41,
         "contextTwinPairs": 0,
         "confusionAxes": 10
       },
       "detectors": [
         "xai-api-key"
       ],
-      "reason": "empirical.minimumTwinPairs: 6 < 8 — Eight independently authored twin pairs complete the 40-fixture empirical profile. | fixtureProfile stable-empirical: 32 total fixtures < 40 (8 short) | fixtureProfile stable-empirical: 6 positive/context cases < 10 (4 short) | fixtureProfile stable-empirical: 6 twin pairs < 8 (2 short)",
+      "reason": null,
       "profileCoverage": {
         "profilesVersion": 1,
         "claimed": "stable-empirical",
@@ -10170,14 +10087,15 @@
         "target": "stable-empirical",
         "cellsMet": [
           "arrival-provisional",
-          "stable-documented"
+          "stable-documented",
+          "stable-empirical"
         ],
         "cells": {
-          "totalFixtures": 32,
-          "positiveCases": 6,
+          "totalFixtures": 41,
+          "positiveCases": 11,
           "benignControls": 14,
-          "twinPairs": 6,
-          "positiveContextAxes": 9,
+          "twinPairs": 8,
+          "positiveContextAxes": 16,
           "controlAxes": 6,
           "confusionAxes": 10,
           "positiveContextAxisIds": [
@@ -10189,6 +10107,13 @@
             "#208 · xai-api-key · shell-export",
             "#208 · xai-api-key · structured-file",
             "#208 · xai-api-key · tool-output",
+            "#263 · xai-api-key · cli",
+            "#263 · xai-api-key · container-config",
+            "#263 · xai-api-key · env",
+            "#263 · xai-api-key · log",
+            "#263 · xai-api-key · sdk-config",
+            "#263 · xai-api-key · structured-file",
+            "#263 · xai-api-key · tool-output",
             "xai-api-key"
           ],
           "controlAxisIds": [
@@ -10212,26 +10137,7 @@
             "twin:prefix"
           ]
         },
-        "debt": [
-          {
-            "cell": "totalFixtures",
-            "actual": 32,
-            "required": 40,
-            "shortfall": 8
-          },
-          {
-            "cell": "positiveCases",
-            "actual": 6,
-            "required": 10,
-            "shortfall": 4
-          },
-          {
-            "cell": "twinPairs",
-            "actual": 6,
-            "required": 8,
-            "shortfall": 2
-          }
-        ]
+        "debt": []
       }
     }
   ]
