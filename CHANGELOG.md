@@ -8,6 +8,19 @@ evidence is linked from each published version.
 ### Changed
 
 - `benchmarks/support-matrix.json` is regenerated in candidate mode from
+  redact-secret-benchmarks `main` cfaeac4 (#280, which adds the empirical
+  floor raise and the `beta8-263` corpus) against product source 10263e5
+  (unchanged on `main`), with trufflehog 3.97.4 and gitleaks 8.30.1. The
+  result is 83 stable (57 documented, 26 empirical), 7 provisional,
+  1 pending and 17 unsupported, up from 73 stable at benchmarks 25e31c8.
+  Ten families move from provisional to stable through the empirical
+  profile: gitlab runner authentication token, groq, langfuse secret key,
+  langsmith, neon, perplexity, pinecone `pcsk_`, postman collection access
+  key, travis-ci and xai. Against `v0.1.0-beta.7` the drift gate reports
+  0 regressions. `benchmarks/support-matrix-schema.json` now pins cfaeac4
+  (content unchanged), and `benchmarks/pin-manifest.json` is resynced and
+  adds the `beta8-263` corpus.
+- `benchmarks/support-matrix.json` is regenerated in candidate mode from
   redact-secret-benchmarks `main` 25e31c8 against product `main` 10263e5
   (trufflehog 3.97.4, gitleaks 8.30.1): 73 stable (57 documented, 16
   empirical), 17 provisional, 1 pending, 17 unsupported across 108
