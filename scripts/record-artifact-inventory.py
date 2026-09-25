@@ -27,6 +27,11 @@ Four things are recorded, all tied to one source commit:
    ``docs/quickstart.md`` lane (Node, Python, browser bundler), each tied to
    that page's digest and to binaries that must be byte-identical to
    artifacts recorded in (1).
+6. **Golden-path qualification** (issue #720) - one result per
+   ``examples/mcp-redact`` lane (Node, Python): ``buildSafeContext`` run on
+   the installed candidate, tied to this revision's example files, the pinned
+   adapter packages, and binaries that must be byte-identical to artifacts
+   recorded in (1).
 
     python3 -B scripts/record-artifact-inventory.py \\
         --artifacts qualification-artifacts --out artifact-inventory.json
@@ -115,7 +120,7 @@ def collect(artifacts: Path) -> list[dict]:
     collected: list[dict] = []
     for directory in sorted(p for p in artifacts.iterdir() if p.is_dir()):
         name = directory.name
-        if name.startswith("installed-javascript-") or name.startswith("clean-install-"):
+        if name.startswith(("installed-javascript-", "clean-install-", "golden-path-")):
             continue
         if name == "support-matrix-drift":
             # Issue #511: a release-decision record consumed by release.yml's
@@ -173,6 +178,16 @@ def collect_installed_javascript_qualification(
         report["reportSha256"] = digest(files[0])
         results.append(report)
     return results, errors
+
+
+def collect_clean_install_qualification(artifacts: Path) -> tuple[list[dict], list[str]]:
+    """Read the one JSON report each `clean-install-<lane>` job uploaded."""
+    return collect_lane_reports(artifacts, "clean-install-")
+
+
+def collect_golden_path_qualification(artifacts: Path) -> tuple[list[dict], list[str]]:
+    """Read the one JSON report each `golden-path-<lane>` job uploaded."""
+    return collect_lane_reports(artifacts, "golden-path-")
 
 
 def require_installed_javascript_qualification(
@@ -267,12 +282,20 @@ CLEAN_INSTALL_ARTIFACT = {"node": "addon", "python": "native", "browser": "wasm"
 # The issue's own bound: the documented path completes in about five minutes.
 CLEAN_INSTALL_MAX_BUDGET_SECONDS = 300
 
+GOLDEN_PATH_EXAMPLE = Path("examples") / "mcp-redact"
+ADAPTER_PIN = Path("adapters") / "pin-source.json"
+GOLDEN_PATH_CHECKS = {
+    "node": ("install", "contents", "artifact", "toolInput", "sanitized", "realCoreTests"),
+    "python": ("install", "contents", "artifact", "toolInput", "sanitized"),
+}
+GOLDEN_PATH_ARTIFACT = {"node": "addon", "python": "native"}
 
-def collect_clean_install_qualification(artifacts: Path) -> tuple[list[dict], list[str]]:
-    """Read the one JSON report each `clean-install-<lane>` job uploaded."""
+
+def collect_lane_reports(artifacts: Path, prefix: str) -> tuple[list[dict], list[str]]:
+    """Read the one JSON report each `<prefix><lane>` job uploaded."""
     results: list[dict] = []
     errors: list[str] = []
-    for directory in sorted(artifacts.glob("clean-install-*")):
+    for directory in sorted(artifacts.glob(f"{prefix}*")):
         files = sorted(path for path in directory.rglob("*") if path.is_file())
         if len(files) != 1 or files[0].suffix != ".json":
             errors.append(f"{directory.name}: expected exactly one JSON report")
@@ -516,6 +539,87 @@ def release_readiness_record() -> dict:
     }
 
 
+def require_golden_path_qualification(
+    results: list[dict],
+    collected: list[dict],
+    expected_commit: str,
+    expected_version: str,
+) -> list[str]:
+    """Both golden-path lanes passed on this revision's example, the Node lane
+    on the pinned adapter packages, and every reported binary is an artifact
+    this run built (file name and SHA-256), which is what makes the installed
+    core the exact candidate the rest of this run qualified."""
+    errors: list[str] = []
+    built = {(Path(entry["file"]).name, entry["sha256"]) for entry in collected}
+    pin = json.loads((ROOT / ADAPTER_PIN).read_text(encoding="utf-8"))
+    pinned_adapters = {
+        "repository": pin["repository"],
+        "commit": pin["commit"],
+        "packages": sorted(
+            (
+                {"name": package["name"], "version": package["version"], "contentDigest": package["contentDigest"]}
+                for package in pin["packages"]
+            ),
+            key=lambda package: package["name"],
+        ),
+    }
+    example = GOLDEN_PATH_EXAMPLE.as_posix()
+    lanes = [result.get("lane") for result in results]
+    for result in results:
+        lane = result.get("lane")
+        label = f"golden path {lane}"
+        if lane not in GOLDEN_PATH_CHECKS:
+            errors.append(f"{result.get('artifact', 'golden path')}: invalid lane")
+            continue
+        if result.get("artifact") != f"golden-path-{lane}":
+            errors.append(f"{label}: artifact directory does not match its lane")
+        if result.get("schemaVersion") != 1:
+            errors.append(f"{label}: unsupported evidence schema")
+        if result.get("sourceCommit") != expected_commit:
+            errors.append(f"{label}: source revision does not match the inventory")
+        if result.get("published") is not False:
+            errors.append(f"{label}: must qualify candidate artifacts (published=false)")
+        if result.get("productVersion") != expected_version:
+            errors.append(f"{label}: product version does not match the inventory")
+        record = result.get("example") or {}
+        files = record.get("files") or []
+        paths = [str(entry.get("path", "")) for entry in files]
+        stale = [
+            entry
+            for entry in files
+            if not str(entry.get("path", "")).startswith(f"{example}/")
+            or not (ROOT / str(entry.get("path"))).is_file()
+            or digest(ROOT / str(entry.get("path"))) != entry.get("sha256")
+        ]
+        if record.get("path") != example or not files or record.get("entry") not in paths or stale:
+            errors.append(f"{label}: did not run this revision's {example}")
+        real_core_tests = result.get("realCoreTests") or []
+        if lane == "node" and (not real_core_tests or not set(real_core_tests) <= set(paths)):
+            errors.append(f"{label}: did not run this revision's real-core example tests")
+        if lane == "node" and result.get("adapters") != pinned_adapters:
+            errors.append(f"{label}: did not install the adapters pinned in {ADAPTER_PIN.as_posix()}")
+        if result.get("loadedArtifact") != GOLDEN_PATH_ARTIFACT[lane]:
+            errors.append(f"{label}: did not load the {GOLDEN_PATH_ARTIFACT[lane]} artifact")
+        checks = result.get("results") or {}
+        for check in GOLDEN_PATH_CHECKS[lane]:
+            if checks.get(check) != "passed":
+                errors.append(f"{label}: {check} did not pass")
+        binaries = result.get("binaries") or []
+        suffixes = sorted(Path(str(binary.get("file", ""))).suffix for binary in binaries)
+        expected_suffixes = [".whl"] if lane == "python" else [".node", ".wasm", ".wasm"]
+        if suffixes != expected_suffixes:
+            errors.append(f"{label}: expected binaries {expected_suffixes}, reported {suffixes}")
+        for binary in binaries:
+            key = (Path(str(binary.get("file", ""))).name, binary.get("sha256"))
+            if key not in built:
+                errors.append(f"{label}: {key[0]} is not an artifact this run qualified")
+    for lane in sorted(set(GOLDEN_PATH_CHECKS) - set(lanes)):
+        errors.append(f"golden path {lane}: no qualification")
+    for lane in sorted({lane for lane in lanes if lanes.count(lane) > 1}):
+        errors.append(f"golden path {lane}: duplicate qualification")
+    return errors
+
+
 def render_summary(inventory: dict) -> str:
     lines = [
         "## Qualification matrix",
@@ -568,6 +672,21 @@ def render_summary(inventory: dict) -> str:
             f"| {result.get('lane')} | {runtime.get('name')} {runtime.get('version')} | "
             f"{result.get('loadedArtifact')} | {result.get('elapsedSeconds')}s | "
             f"`{result['reportSha256'][:16]}…` |"
+        )
+    lines.extend(
+        [
+            "",
+            "### Golden-path qualification",
+            "",
+            "| Lane | Runtime | Loaded | Evidence SHA-256 |",
+            "| --- | --- | --- | --- |",
+        ]
+    )
+    for result in inventory.get("goldenPathQualification", []):
+        runtime = result.get("runtime") or {}
+        lines.append(
+            f"| {result.get('lane')} | {runtime.get('name')} {runtime.get('version')} | "
+            f"{result.get('loadedArtifact')} | `{result['reportSha256'][:16]}…` |"
         )
     readiness = inventory.get("releaseReadiness", {})
     review = readiness.get("publicApiAndChangelogReview", {})
@@ -633,6 +752,11 @@ def main() -> int:
             clean_install, collected, revision, product_version, digest(ROOT / QUICKSTART)
         )
     )
+    golden_path, golden_path_errors = collect_golden_path_qualification(arguments.artifacts)
+    errors.extend(golden_path_errors)
+    errors.extend(
+        require_golden_path_qualification(golden_path, collected, revision, product_version)
+    )
 
     inventory = {
         "sourceCommit": revision,
@@ -657,6 +781,7 @@ def main() -> int:
         "artifacts": collected,
         "installedJavaScriptQualification": qualification,
         "cleanInstallQualification": clean_install,
+        "goldenPathQualification": golden_path,
         "releaseReadiness": release_readiness_record(),
     }
 

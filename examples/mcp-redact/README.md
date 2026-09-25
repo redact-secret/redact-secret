@@ -376,9 +376,12 @@ candidate package) and fails, never skips, without one:
 npm run examples:real-core:test
 ```
 
-It is not part of `npm run ci`, whose Node job builds no core. With a core
-linked, `agent-context.test.mjs`'s "core cannot be loaded" case fails by
-design, since it asserts this directory has no core.
+It is not part of `npm run ci`, whose Node job builds no core. The
+`golden-path` qualification job runs it against the installed candidate core
+(see [below](#running-the-golden-path-against-the-installed-candidate)).
+`agent-context.test.mjs`'s "core cannot be loaded" case makes the core
+unloadable with a module resolve hook, so it holds with or without a core
+here.
 
 ## Running the demo
 
@@ -396,6 +399,43 @@ node examples/mcp-redact/demo.mjs
 
 python3 examples/mcp-redact/python/demo.py   # requires a built redact_secret extension on PYTHONPATH
 ```
+
+## Running the golden path against the installed candidate
+
+The suites above never touch the real engine. The `golden-path` job of
+[`artifact-qualification.yml`](../../.github/workflows/artifact-qualification.yml)
+does (issue #720): it runs `buildSafeContext` on an installed release
+candidate, once in Node.js and once through the Python twin, and fails unless
+the model-facing context is sanitized. It is one command, the same one CI
+runs:
+
+```bash
+npm run golden-path:qualify -- --lane <node|python> --candidate-dir <dir>
+```
+
+`<dir>` holds the candidate: the npm tarballs
+`scripts/pack-npm-candidate.mjs` packs for this host (core, wasm, and the host
+addon) and/or the wheel. The Node lane also needs the pinned adapter
+tarballs, so run `npm run adapter-pins:install` first.
+[`docs/qualification.md`](../../docs/qualification.md#golden-path-qualification)
+shows how to build a candidate locally.
+
+[`scripts/qualify-golden-path.mjs`](../../scripts/qualify-golden-path.mjs)
+copies `agent-context.mjs` (or `python/agent_context.py`) and every example
+module it imports into an empty directory outside the checkout. The Node lane
+installs `@redact-secret/core` and this directory's pinned adapters from a
+local registry that serves only the candidate and pinned tarballs. The Python
+lane installs the candidate wheel into a fresh virtual environment with no
+index. One turn carries a synthetic credential in the user input and another
+in the tool result. The lane passes only if the turn is `ok`, the tool was
+called with already-sanitized input, and the model-facing value carries a
+placeholder instead of either credential. The Node lane then runs the test
+files `npm run examples:real-core:test` names in the same project, so the
+streamed path runs on the installed candidate's `IncrementalSanitizer` too.
+The installed packages must match
+the candidate files byte for byte. In CI the candidate is this run's own
+qualified addon, wasm builds, and wheel, and the `inventory` job rejects a
+report whose `.node`, `.wasm`, or `.whl` digests are not ones it recorded.
 
 ## Python
 
