@@ -54,12 +54,18 @@ jobs:
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
           PRODUCT_SHA: ${{ github.event.workflow_run.head_sha }}
+          PRODUCT_REF: ${{ github.event.workflow_run.head_branch }}
+          QUALIFICATION_RUN_ID: ${{ github.event.workflow_run.id }}
         run: |
           set -euo pipefail
           [[ "$PRODUCT_SHA" =~ ^[0-9a-f]{40}$ ]] || { echo "::error::unexpected head SHA" >&2; exit 1; }
+          [[ "$PRODUCT_REF" == main ]] || { echo "::error::unexpected product ref" >&2; exit 1; }
+          [[ "$QUALIFICATION_RUN_ID" =~ ^[1-9][0-9]*$ ]] || { echo "::error::unexpected qualification run id" >&2; exit 1; }
           gh workflow run publish-site.yml \
             -R redact-secret/redact-secret-benchmarks \
             --ref develop \
             -f environment=staging \
-            -f product_sha="$PRODUCT_SHA"
-          echo "Dispatched benchmarks staging for \`$PRODUCT_SHA\`." >> "$GITHUB_STEP_SUMMARY"
+            -f product_sha="$PRODUCT_SHA" \
+            -f product_ref="$PRODUCT_REF" \
+            -f qualification_run_id="$QUALIFICATION_RUN_ID"
+          echo "Dispatched benchmarks staging for \`$PRODUCT_REF@$PRODUCT_SHA\` from qualification run \`$QUALIFICATION_RUN_ID\`." >> "$GITHUB_STEP_SUMMARY"

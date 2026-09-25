@@ -73,6 +73,8 @@ jobs:
   ci:
     name: CI
     uses: ./.github/workflows/ci.yml
+    with:
+      benchmark_branch: main
     permissions:
       contents: read
 
@@ -122,10 +124,10 @@ jobs:
             platform: win32-x64-msvc
 
     steps:
-      - name: Require a release candidate branch
-        if: ${{ !startsWith(github.ref, 'refs/heads/rc/') }}
+      - name: Require main as the release source
+        if: ${{ github.ref != 'refs/heads/main' }}
         run: |
-          echo "Releases must run from an rc/<version> branch." >&2
+          echo "Releases must run from main." >&2
           exit 1
 
       - name: Check out repository
@@ -133,7 +135,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Validate candidate branch version
+      - name: Validate release source and version
         run: python3 -B scripts/check-release-refs.py --candidate-ref "$GITHUB_REF"
 
       - name: Set up Node.js
@@ -280,10 +282,10 @@ jobs:
       artifact_digest_json: ${{ steps.digest.outputs.artifact_digest_json }}
 
     steps:
-      - name: Require a release candidate branch
-        if: ${{ !startsWith(github.ref, 'refs/heads/rc/') }}
+      - name: Require main as the release source
+        if: ${{ github.ref != 'refs/heads/main' }}
         run: |
-          echo "Releases must run from an rc/<version> branch." >&2
+          echo "Releases must run from main." >&2
           exit 1
 
       - name: Check out repository
@@ -291,7 +293,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Validate candidate branch version
+      - name: Validate release source and version
         run: python3 -B scripts/check-release-refs.py --candidate-ref "$GITHUB_REF"
 
       - name: Set up Node.js
@@ -458,10 +460,10 @@ jobs:
       artifact_digest_json: ${{ steps.digest.outputs.artifact_digest_json }}
 
     steps:
-      - name: Require a release candidate branch
-        if: ${{ !startsWith(github.ref, 'refs/heads/rc/') }}
+      - name: Require main as the release source
+        if: ${{ github.ref != 'refs/heads/main' }}
         run: |
-          echo "Releases must run from an rc/<version> branch." >&2
+          echo "Releases must run from main." >&2
           exit 1
 
       - name: Check out repository
@@ -470,7 +472,7 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Validate candidate branch version
+      - name: Validate release source and version
         run: python3 -B scripts/check-release-refs.py --candidate-ref "$GITHUB_REF"
 
       - name: Set up Node.js
@@ -639,10 +641,10 @@ jobs:
       artifact_digest_json: ${{ steps.digest.outputs.artifact_digest_json }}
 
     steps:
-      - name: Require a release candidate branch
-        if: ${{ !startsWith(github.ref, 'refs/heads/rc/') }}
+      - name: Require main as the release source
+        if: ${{ github.ref != 'refs/heads/main' }}
         run: |
-          echo "Releases must run from an rc/<version> branch." >&2
+          echo "Releases must run from main." >&2
           exit 1
 
       - name: Check out repository
@@ -650,7 +652,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Validate candidate branch version
+      - name: Validate release source and version
         run: python3 -B scripts/check-release-refs.py --candidate-ref "$GITHUB_REF"
 
       # `artifact-qualification`'s `inventory` job packages both crates once
@@ -841,10 +843,10 @@ jobs:
       artifact_digest_json: ${{ steps.digest.outputs.artifact_digest_json }}
 
     steps:
-      - name: Require a release candidate branch
-        if: ${{ !startsWith(github.ref, 'refs/heads/rc/') }}
+      - name: Require main as the release source
+        if: ${{ github.ref != 'refs/heads/main' }}
         run: |
-          echo "Releases must run from an rc/<version> branch." >&2
+          echo "Releases must run from main." >&2
           exit 1
 
       - name: Check out repository
@@ -852,7 +854,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Validate candidate branch version
+      - name: Validate release source and version
         run: python3 -B scripts/check-release-refs.py --candidate-ref "$GITHUB_REF"
 
       - name: Download qualified wheels and source distribution
@@ -1071,8 +1073,8 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Require a release candidate branch
-        if: ${{ !startsWith(github.ref, 'refs/heads/rc/') }}
+      - name: Require main as the release source
+        if: ${{ github.ref != 'refs/heads/main' }}
         run: exit 1
 
       - name: Check out repository
@@ -1080,7 +1082,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Validate candidate branch version
+      - name: Validate release source and version
         run: python3 -B scripts/check-release-refs.py --candidate-ref "$GITHUB_REF"
 
       - name: Create annotated Git tag

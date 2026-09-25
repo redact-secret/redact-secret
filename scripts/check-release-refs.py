@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Enforce RC-only publication, matching candidate identity, and final tag gates.
+"""Enforce main-only publication, valid versions, and final tag gates.
 
-Every release-capable job rejects non-RC refs and validates rc/<version> against
-its product or requested version before mutation. The tag job depends on all
+Every release-capable job rejects refs other than main and validates the stable
+or beta product/requested version before mutation. The tag job depends on all
 publishers and clean registry-install verification. Uses dependency-free text
 parsing, consistent with the other workflow policy checks.
 """
@@ -29,15 +29,17 @@ RECONCILE_JOBS = ("reconcile", "tag-reconciled-release")
 JOB_BLOCK = re.compile(r"^  (?P<name>[A-Za-z][\w-]*):\n(?P<body>(?:[ \t]{3,}.*\n|[ \t]*\n)*)", re.M)
 
 # Match the explicit GitHub expression wrapper: a leading ! is YAML syntax.
-REF_GUARD = re.compile(r"if:\s*\$\{\{\s*!startsWith\(github\.ref, 'refs/heads/rc/'\)\s*\}\}")
+REF_GUARD = re.compile(r"if:\s*\$\{\{\s*github\.ref\s*!=\s*'refs/heads/main'\s*\}\}")
 CANDIDATE_CHECK = 'python3 -B scripts/check-release-refs.py --candidate-ref "$GITHUB_REF"'
 VERSION = re.compile(r"(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)(?:-beta\.(?:0|[1-9][0-9]*))?")
 TAG_NEEDS = ("publish", "publish-crates", "publish-pypi", "verify-registry-install", "verify-registry-install-browser")
 
 
 def validate_candidate_ref(ref: str, version: str) -> list[str]:
-    if not VERSION.fullmatch(version) or ref != f"refs/heads/rc/{version}":
-        return ["release requires the rc/<version> branch matching the stable or beta product version"]
+    if not VERSION.fullmatch(version):
+        return ["release requires a valid stable or beta product version"]
+    if ref != "refs/heads/main":
+        return ["release requires refs/heads/main"]
     return []
 
 
@@ -48,7 +50,7 @@ def job_body(workflow_text: str, job_name: str) -> str | None:
     return None
 
 
-def rejects_non_rc(job_text: str) -> bool:
+def requires_main(job_text: str) -> bool:
     return bool(REF_GUARD.search(job_text))
 
 
@@ -63,9 +65,9 @@ def _check_workflow(root: Path, workflow: Path, jobs: tuple[str, ...]) -> list[s
         if body is None:
             errors.append(f"{workflow.as_posix()}: missing job {job_name!r}")
             continue
-        if not rejects_non_rc(body):
+        if not requires_main(body):
             errors.append(
-                f"{workflow.as_posix()}: job {job_name!r} does not reject non-RC refs"
+                f"{workflow.as_posix()}: job {job_name!r} does not require main"
             )
         if CANDIDATE_CHECK not in body:
             errors.append(f"{workflow.as_posix()}: job {job_name!r} lacks candidate version validation")
@@ -93,7 +95,7 @@ def validate(root: Path) -> list[str]:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("root", nargs="?", default=Path.cwd(), type=Path)
-    parser.add_argument("--candidate-ref", help="validate a runtime publication ref")
+    parser.add_argument("--candidate-ref", help="validate the runtime publication ref (must be main)")
     parser.add_argument("--version", help="requested reconcile version; defaults to the product manifest")
     args = parser.parse_args()
 

@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "revision": "7e505fa8da0596303f9e3ac597bfd43839b2abc8",
+  "revision": "69f99a1bcfc1bc842a70cf29a5492b63570d0639",
   "pins": {
     "sourceRevision": "3144bb32c6ebf8f1eefa2cbbad7d431d1d6e8c4c",
     "redactSecretRevision": "3144bb32c6ebf8f1eefa2cbbad7d431d1d6e8c4c",
-    "redactSecretVersion": "0.1.0-beta.7",
-    "packageVersion": "0.1.0-beta.7"
+    "redactSecretVersion": "0.1.0-beta.8",
+    "packageVersion": "0.1.0-beta.8"
   },
   "corpusHashes": {
     "common-formats": "0094f4fc2576ae072f72b5f2f5f14541911e8ccbaa42f92b360de2925d5f7f2f",

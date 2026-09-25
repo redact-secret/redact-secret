@@ -2,13 +2,16 @@ name: CI
 
 on:
   pull_request:
-  push:
-    branches:
-      - "rc/*"
   # `Artifact qualification` calls this workflow so one commit's Rust format,
   # lint, test, MSRV, conformance, and wasm32 evidence is part of the same
   # run as every artifact built from it.
   workflow_call:
+    inputs:
+      benchmark_branch:
+        description: Branch that must contain the immutable benchmark pin.
+        type: string
+        required: false
+        default: develop
 
 permissions: {}
 
@@ -245,8 +248,10 @@ jobs:
       - name: Install dependencies
         run: npm ci --ignore-scripts
 
-      - name: Every benchmarkCommit, pins.sourceRevision, and the manifest revision must trace to a real ancestor; vendored manifest and schema must match benchmarks main
-        run: npm run benchmark-pins:check:ancestry
+      - name: Every benchmarkCommit, pins.sourceRevision, and the manifest revision must trace to a real ancestor; vendored files must match immutable refs
+        env:
+          BENCHMARK_BRANCH: ${{ inputs.benchmark_branch || 'develop' }}
+        run: npm run benchmark-pins:check:ancestry -- --benchmark-branch "$BENCHMARK_BRANCH"
 
   cross-repository-links:
     name: Cross-repository links (blob permalinks resolve)

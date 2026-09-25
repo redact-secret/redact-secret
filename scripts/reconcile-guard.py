@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """Decide whether Reconcile Release may repair a recorded manifest's commit.
 
-The repair source must be an ancestor of the dispatched RC branch's current
-tip, including that exact tip. It need not have been merged into main yet.
+The repair source must be an ancestor of the dispatched main branch's current
+tip, including that exact tip.
 A manifest records the source, or an explicitly authorized --source-commit
-input supplies it. A source outside that RC history is rejected even when
-an override is provided. The workflow separately requires rc/<version> to
-match the requested version before invoking this guard.
+input supplies it. A source outside main's history is rejected even when an
+override is provided. The workflow separately requires a valid requested
+version before invoking this guard.
 
 This module only decides; it never creates a tag, publishes anything, or
 queries a registry. `reconcile-release.yml` performs the tag creation itself,
@@ -98,14 +98,14 @@ def evaluate(
             f"{source_revision} is not an ancestor of {candidate_ref}",
         )
 
-    return GuardResult(True, source_revision, "source_revision is an ancestor of the RC branch and may be tagged")
+    return GuardResult(True, source_revision, "source_revision is an ancestor of main and may be tagged")
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--manifest", type=Path, default=None, help="path to the downloaded manifest.json, if any")
     parser.add_argument("--repo", type=Path, default=Path.cwd())
-    parser.add_argument("--candidate-ref", required=True, help="the RC branch's current tip commit or ref")
+    parser.add_argument("--candidate-ref", required=True, help="main's current tip commit or ref")
     parser.add_argument("--version", required=True)
     parser.add_argument(
         "--source-commit",
