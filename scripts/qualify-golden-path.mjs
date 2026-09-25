@@ -403,7 +403,7 @@ async function main() {
 
   const { parent, project } = await freshWorkspace(`redact-secret-golden-path-${options.lane}-`, LABEL);
   try {
-    const lane = { node: nodeLane, python: pythonLane }[options.lane];
+    const lane = options.lane === "node" ? nodeLane : pythonLane;
     const outcome = await lane({ project, parent, version, closure, candidateDir: options.candidateDir });
     const report = {
       schemaVersion: 1,
