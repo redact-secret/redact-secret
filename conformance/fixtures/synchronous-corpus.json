@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 2117,
+  "fixtureCount": 2121,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -35785,6 +35785,76 @@
         }
       ],
       "note": "Issue #817 control: an arn: prefix without the ARN grammar stays detected."
+    },
+    {
+      "id": "generic-token-regression-jwk-symmetric-key-member",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"kty\":\"oct\",\"alg\":\"HS256\",\"k\":\"U1lOVEhFVElDX1JFVk9LRURfSldLX1NZTU1FVFJJQ19LRVk\"}\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 32,
+          "end": 79
+        }
+      ],
+      "note": "Issue #821: the k member of a JWK is the symmetric key; on a line that carries kty it takes the private_key name's high-signal bucket."
+    },
+    {
+      "id": "generic-token-regression-jwk-ec-private-member",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"kty\":\"EC\",\"crv\":\"P-256\",\"x\":\"U1lOVEhFVElDX1BVQkxJQ19YX0NPT1JE\",\"y\":\"U1lOVEhFVElDX1BVQkxJQ19ZX0NPT1JE\",\"d\":\"U1lOVEhFVElDX1JFVk9LRURfSldLX0VDX0Q\"}\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 109,
+          "end": 144
+        }
+      ],
+      "note": "Issue #821: an EC JWK reports only its private d member; the public x and y coordinates stay unreported."
+    },
+    {
+      "id": "generic-token-negative-jwk-public-rsa-key",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"kty\":\"RSA\",\"kid\":\"fixture-1\",\"n\":\"U1lOVEhFVElDX1BVQkxJQ19NT0RVTFVT\",\"e\":\"AQAB\"}\n",
+      "expected": [],
+      "note": "Issue #821 control: a public JWK carries no secret member."
+    },
+    {
+      "id": "generic-token-negative-one-letter-key-without-kty",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"k\":\"U1lOVEhFVElDX1JFVk9LRURfSldLX1NZTU1FVFJJQ19LRVk\",\"v\":2}\n",
+      "expected": [],
+      "note": "Issue #821 control: a one-letter k key without a kty member on the line is not a JWK member."
     },
     {
       "id": "notion-token-positive-dotenv-secret",

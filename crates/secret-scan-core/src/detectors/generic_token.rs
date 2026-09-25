@@ -1844,6 +1844,47 @@ fn otpauth_uri_spans(input: &str) -> Vec<(usize, usize)> {
     spans
 }
 
+/// JSON Web Key members that hold secret key material: the symmetric key
+/// `k` (RFC 7518 section 6.4.1) and the RSA/EC/OKP private members `d`,
+/// `p`, `q`, `dp`, `dq`, `qi` (sections 6.2.2 and 6.3.2, RFC 8037).
+/// Public members (`n`, `e`, `x`, `y`, `crv`, `kid`) are never listed.
+const JWK_SECRET_MEMBERS: &[&str] = &["k", "d", "p", "q", "dp", "dq", "qi"];
+
+/// The byte spans of every line that carries a quoted `"kty"` member, in
+/// one linear pass, so a JWK member check never rescans a line.
+fn jwk_line_spans(input: &str) -> Vec<(usize, usize)> {
+    let mut spans = Vec::new();
+    let mut line_start = 0usize;
+    for line in input.split_inclusive('\n') {
+        if line.contains("\"kty\"") {
+            spans.push((line_start, line_start + line.len()));
+        }
+        line_start += line.len();
+    }
+    spans
+}
+
+/// `true` when the assignment name at `name_start..name_end` is a quoted
+/// JWK secret member (`"k":`, `"d":`) on a line that also carries `"kty"`
+/// (issue #821). The `"kty"` requirement is what keeps a one-letter JSON
+/// key elsewhere out of scope; a pretty-printed JWK whose `"kty"` is on
+/// another line is the accepted false negative, because whole-input and
+/// incremental scans must agree and neither holds a line open for it.
+fn is_jwk_secret_member(
+    input: &str,
+    name_start: usize,
+    name_end: usize,
+    jwk_lines: &[(usize, usize)],
+) -> bool {
+    JWK_SECRET_MEMBERS.contains(&&input[name_start..name_end])
+        && input[..name_start].ends_with('"')
+        && input[name_end..].starts_with('"')
+        && jwk_lines
+            .partition_point(|&(start, _)| start <= name_start)
+            .checked_sub(1)
+            .is_some_and(|index| name_start < jwk_lines[index].1)
+}
+
 /// A matched assignment prefix: the name span, the offset where the value
 /// starts, and whether the name was a URL query/fragment/form parameter.
 struct AssignmentPrefix {
@@ -1889,6 +1930,7 @@ fn assignment_candidates(input: &str, names: &NameSource) -> Vec<Candidate> {
     let mut candidates = Vec::new();
     let mut cursor = 0usize;
     let otpauth_spans = otpauth_uri_spans(input);
+    let jwk_lines = jwk_line_spans(input);
 
     while cursor < input.len() {
         let Some(AssignmentPrefix {
@@ -1918,7 +1960,14 @@ fn assignment_candidates(input: &str, names: &NameSource) -> Vec<Candidate> {
         };
         if let Some((value_start, value_end, form)) = value_span {
             let value = &input[value_start..value_end];
-            let normalized = normalize_name(&input[name_start..name_end]);
+            let mut normalized = normalize_name(&input[name_start..name_end]);
+            if matches!(names, NameSource::BuiltIn)
+                && is_jwk_secret_member(input, name_start, name_end, &jwk_lines)
+            {
+                // A JWK secret member is private key material; it takes the
+                // `private_key` name's high-signal bucket (issue #821).
+                normalized = String::from("private_key");
+            }
             if !is_colon_scope_identifier(&input[name_end..value_start], value)
                 && let Some(confidence) =
                     assignment_confidence(&normalized, value, form, names, query)
@@ -2651,6 +2700,36 @@ mod tests {
             (format!("password = \"arn:{V}\""), format!("arn:{V}")),
         ] {
             assert_eq!(only_value(&input), value, "{input}");
+        }
+    }
+
+    #[test]
+    fn jwk_secret_members_are_detected_only_on_a_kty_line() {
+        // Issue #821. The values are base64url of `SYNTHETIC_...` text.
+        let symmetric = r#"{"kty":"oct","k":"U1lOVEhFVElDX1JFVk9LRURfSldLX1NZTU1FVFJJQ19LRVk"}"#;
+        assert_eq!(
+            only_value(symmetric),
+            "U1lOVEhFVElDX1JFVk9LRURfSldLX1NZTU1FVFJJQ19LRVk"
+        );
+        let rsa = r#"{"kty":"RSA","n":"U1lOVEhFVElDX1BVQkxJQ19NT0RVTFVT","e":"AQAB","d":"U1lOVEhFVElDX1JFVk9LRURfUlNBX0Q","qi":"U1lOVEhFVElDX1JFVk9LRURfUlNBX1FJ"}"#;
+        let values: Vec<&str> = detect(rsa)
+            .iter()
+            .map(|candidate| &rsa[candidate.range().start()..candidate.range().end()])
+            .collect();
+        assert_eq!(
+            values,
+            [
+                "U1lOVEhFVElDX1JFVk9LRURfUlNBX0Q",
+                "U1lOVEhFVElDX1JFVk9LRURfUlNBX1FJ"
+            ]
+        );
+        for clean in [
+            r#"{"k":"U1lOVEhFVElDX1JFVk9LRURfSldLX1NZTU1FVFJJQ19LRVk"}"#,
+            r#"{"kty":"RSA","n":"U1lOVEhFVElDX1BVQkxJQ19NT0RVTFVT","e":"AQAB"}"#,
+            "{\"kty\":\"oct\",\n\"k\":\"U1lOVEhFVElDX1JFVk9LRURfSldLX1NZTU1FVFJJQ19LRVk\"}",
+            r#"{"kty":"oct","k":"placeholder"}"#,
+        ] {
+            assert!(detect(clean).is_empty(), "{clean}");
         }
     }
 
