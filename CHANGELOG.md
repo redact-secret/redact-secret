@@ -5,6 +5,28 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+## 0.1.0-beta.8 — 2026-09-25
+
+[Publication and qualification evidence](docs/releases/0.1.0-beta.8/README.md).
+Candidate measurement record: [#731](docs/audits/evidence/731/README.md).
+
+Beta.8 moves 19 existing families to `stable` against the beta.7 matrix (16
+provisional through the empirical profile, 3 reclassified from unsupported or
+pending) with no regression, and adds new provider families including
+travis-ci, neon and postman. The release was authorized with two qualification
+items open, recorded in #731: the epic's stated 34-family beta.7 baseline
+against the 51 the beta.7 tag records, and two of the 15 new families
+(`openrouter:management-api-key`, `pinecone:legacy-api-key`) that are
+unsupported rather than provisional or better.
+
+### Support status
+
+53 providers, 108 credential families: stable 83, provisional 7, pending 1, unsupported 17. See the [support matrix](/docs/support-matrix.md).
+
+Stable qualification: documented 57, empirical 26. Evidence tiers: T1 57, T2 29, T3 4, T0 1.
+
+The previous pinned matrix is not comparable, so no stable delta is stated: it measured a candidate build, not the published previous release.
+
 ### Changed
 
 - `benchmarks/support-matrix.json` is regenerated in candidate mode from
