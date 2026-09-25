@@ -404,6 +404,43 @@ class RustWorkspaceCheckTests(unittest.TestCase):
         errors = self.run_check(configure)
         self.assertTrue(any("sneak is public but not in core-public-api" in error for error in errors), errors)
 
+    # -- no public score surface (#768) -----------------------------------
+
+    def test_a_public_score_item_in_the_core_is_rejected(self) -> None:
+        def configure(workspace: Workspace) -> None:
+            workspace.write("crates/secret-scan-core/src/shadow.rs", "pub fn evidence_score() -> u32 { 0 }\n")
+
+        errors = self.run_check(configure)
+        self.assertTrue(any("public name 'evidence_score'" in error for error in errors), errors)
+
+    def test_a_public_probability_field_in_a_binding_is_rejected(self) -> None:
+        def configure(workspace: Workspace) -> None:
+            workspace.write(
+                "bindings/wasm/src/finding.rs",
+                "pub struct Finding {\n    pub id: String,\n    pub probability: u32,\n}\n",
+            )
+
+        errors = self.run_check(configure)
+        self.assertTrue(any("public name 'probability'" in error for error in errors), errors)
+        self.assertFalse(any("'id'" in error for error in errors), errors)
+
+    def test_a_public_calibration_reexport_is_rejected(self) -> None:
+        def configure(workspace: Workspace) -> None:
+            workspace.write("crates/secret-scan-core/src/shadow.rs", "pub use crate::band::Calibration;\n")
+
+        errors = self.run_check(configure)
+        self.assertTrue(any("Calibration" in error and "score, probability" in error for error in errors), errors)
+
+    def test_a_crate_internal_score_item_is_allowed(self) -> None:
+        def configure(workspace: Workspace) -> None:
+            workspace.write(
+                "crates/secret-scan-core/src/shadow.rs",
+                "pub(crate) struct EvidenceScore {\n    pub(crate) score: u32,\n}\n"
+                "pub(crate) fn shadow_score() -> u32 { 0 }\nfn calibrate() {}\n",
+            )
+
+        self.assertEqual(self.run_check(configure), [])
+
     def test_a_removed_export_is_rejected(self) -> None:
         def configure(workspace: Workspace) -> None:
             workspace.public_api.append("removed")

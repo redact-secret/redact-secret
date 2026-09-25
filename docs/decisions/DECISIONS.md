@@ -39,6 +39,7 @@ Current rules: `docs/specs/engine.md`.
 - [Resolve overlap precedence by resolved-action severity](2026-09-19-resolve-overlap-precedence-by-resolved-action-severity.md)
 - [Select optimal disjoint candidates by total evidence weight](2026-09-19-select-optimal-disjoint-candidates-by-total-evidence-weight.md)
 - [Defer encoded-input decoding out of scope, with reasoning](2026-09-20-defer-encoded-input-decoding.md)
+- [Freeze the shadow evidence score and confidence contract](2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md)
 
 ## Distribution
 

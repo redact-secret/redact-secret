@@ -140,7 +140,14 @@ places that must agree:
   the range contract, the `scan_and_redact` ≡ `scan` + `redact` equivalence
   over the canonical corpus, and the sanitized-error shape.
 
-Two things are deliberately outside the surface and must stay there:
+Three things are deliberately outside the surface and must stay there:
+
+- **The beta.9 shadow evidence scorer.** Its score, band, thresholds, weights
+  and contributions are crate-internal (`pub(crate)` or narrower).
+  `npm run rust:check` fails on any plainly `pub` item, field or re-export in
+  the core crate or a `bindings/*` crate whose name contains `score`,
+  `probabilit` or `calibrat`. See
+  [`decision-freeze-the-shadow-evidence-score-and-confidence-contract`](decisions/2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md).
 
 - **The built-in detector registry.** `detectors` is a private module.
   Callers reach the built-in set only through
