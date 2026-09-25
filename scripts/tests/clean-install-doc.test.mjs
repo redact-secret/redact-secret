@@ -52,7 +52,9 @@ test("the quickstart uses only the synthetic input and never installs from a pat
 
 test("CI runs the quickstart driver for every lane and the qualification guide names the same command", async () => {
   const workflow = await read(".github/workflows/artifact-qualification.yml");
-  const job = workflow.slice(workflow.indexOf("\n  clean-install:\n"), workflow.indexOf("\n  inventory:\n"));
+  const start = workflow.indexOf("\n  clean-install:\n");
+  const next = workflow.slice(start + 1).search(/\n {2}[a-z][a-z0-9-]*:\n/);
+  const job = workflow.slice(start, start + 1 + next);
   assert.deepEqual([...job.matchAll(/^ {10}- (node|python|browser)$/gm)].map((match) => match[1]), LANES);
   assert.match(job, /node scripts\/qualify-clean-install\.mjs \\\n\s+--lane "\$\{\{ matrix\.lane \}\}" \\\n\s+--candidate-dir candidate/);
   assert.match(workflow, /\n {6}- clean-install\n/);

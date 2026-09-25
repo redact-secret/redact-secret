@@ -49,6 +49,14 @@ evidence is linked from each published version.
   removed in favor of the released packages, along with the root `pino` and
   `quick-format-unescaped` devDependencies. The Python halves are unchanged.
 
+- Artifact qualification now runs the MCP AI-context golden path end to end
+  on the installed candidate (issue #720). The new `golden-path` job calls
+  `buildSafeContext` on this run's packed addon and wasm builds (Node, with
+  the pinned adapters) and on its wheel (the Python twin), and fails unless
+  the model-facing context is sanitized. The artifact inventory requires both
+  lanes and ties their binaries to its recorded digests. Reproduce a lane with
+  `npm run golden-path:qualify -- --lane <node|python> --candidate-dir <dir>`.
+
 - Benchmark inputs now pin an exact `redact-secret-benchmarks` commit instead
   of following its live `main`: development CI accepts a commit on
   benchmarks `develop`, while the Release workflow requires that same commit

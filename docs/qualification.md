@@ -112,6 +112,7 @@ pull request does not trigger it.
 | `package-consumer-browser` | Installs the same candidates and exercises public scan, incremental, and Web stream APIs in Chromium, Firefox, and WebKit |
 | `package-consumer-wasm-runtimes` | Qualifies the Node WebAssembly fallback and the Cloudflare Workers path against the `browser` job's builds, for both detector profiles |
 | `clean-install` | Runs the [five-minute quickstart](quickstart.md) for Node, Python, and a Vite browser bundle from an empty directory against this run's addon, wasm builds, and wheel; see [clean-install qualification](#clean-install-qualification) |
+| `golden-path` | Runs the MCP AI-context golden path (`examples/mcp-redact`, `buildSafeContext`) on the installed Node and Python candidates and requires a sanitized model-facing context; see [golden-path qualification](#golden-path-qualification) |
 | `inventory` | Requires the whole declared matrix and records what was built |
 
 Because `rust` and `python` are called workflows rather than copies, their
@@ -499,6 +500,49 @@ Without `--candidate-dir`, the driver installs the published packages from
 the public registries. That is the post-publication check of the same page.
 Only versions whose failure messages meet the actionable requirement (from
 0.1.0-beta.7) pass it.
+
+## Golden-path qualification
+
+Issue #720. The example's own tests (`examples/mcp-redact/*.test.mjs` and
+`python/test_*.py`) inject a fake core, so they prove the order of the turn,
+not that the real engine keeps a credential out of the model's context. The
+`golden-path` job runs `buildSafeContext` on the installed candidate with
+`scripts/qualify-golden-path.mjs`, in two lanes:
+
+- `node` installs `@redact-secret/core` and the example's pinned adapter
+  packages (`adapters/pin-source.json`) from a local registry that serves
+  only the candidate tarballs and the pinned adapter tarballs. Each adapter
+  tarball must match its pinned content digest, and nothing comes from a
+  public registry. The installed core must load the addon.
+- `python` installs the candidate wheel into a fresh virtual environment
+  with `PIP_NO_INDEX` and `PIP_FIND_LINKS`, and passes the installed
+  `redact_secret.scan_and_redact` to the Python twin's `build_safe_context`.
+
+Both lanes copy the example's entry module and every example module it
+imports, followed from the source, into an empty directory outside the
+checkout. One turn carries a synthetic credential in the user input and
+another in the tool result. The lane fails unless the turn is `ok`, the tool
+was dispatched with already-sanitized input, and the serialized model-facing
+value carries a placeholder and the surrounding text but neither credential.
+
+The job installs the same candidate `clean-install` does: the `node-addon`,
+`wasm-web`, and `wasm-web-common` artifacts packed by
+`scripts/pack-npm-candidate.mjs`, and the `python` job's wheel, downloaded
+from this run, never rebuilt. Each lane uploads a `golden-path-<lane>` report
+that records outcomes, versions, the example files' digests, the adapter pin,
+and the installed binaries' digests, never the model-facing value. The
+`inventory` job requires both lanes. It rejects a report produced from a
+different revision of the example or on adapters other than the pinned ones.
+It also rejects any report whose `.node`, `.wasm`, or `.whl` does not match,
+by file name and SHA-256, an artifact it recorded from the same run.
+
+To reproduce a lane locally, build the host candidate as in
+[clean-install qualification](#clean-install-qualification), then:
+
+```bash
+npm run adapter-pins:install   # the Node lane's pinned adapter tarballs
+npm run golden-path:qualify -- --lane <node|python> --candidate-dir <dir>
+```
 
 ## Running it locally
 
