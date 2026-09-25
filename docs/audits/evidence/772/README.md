@@ -77,10 +77,10 @@ kept, are in the benchmarks record.
 ## 2. Cross-runtime determinism
 
 The input set is `node scripts/shadow-determinism.mjs inputs`: every fixture
-of `conformance/fixtures/synchronous-corpus.json` (2,078),
-`incremental-corpus.json` (97) and `unicode-conversion-corpus.json` (9), and
-54 generated hostile inputs, 2,238 lines in all. The `shadow_evaluation`
-example evaluates it on each host, for the `full` and `common` profiles.
+of the synchronous, incremental and Unicode-conversion conformance corpora,
+and 54 generated hostile inputs. The `shadow_evaluation` example evaluates it
+on each host, for the `full` and `common` profiles. The corpora grow with the
+detectors, so the counts and digests below belong to one commit each.
 
 | Host | How | Result |
 | --- | --- | --- |
@@ -88,20 +88,24 @@ example evaluates it on each host, for the `full` and `common` profiles.
 | macOS arm64 (`macos-latest`) | CI `rust-native`, release build | identical |
 | Windows x86_64 (`windows-latest`) | CI `rust-native`, release build | identical |
 | `wasm32-wasip1` on V8 (Node 24 WASI) | CI `rust-wasm`, release build | identical |
-| macOS arm64 workstation, and `wasm32-wasip1` on Node 22.16 | local | identical |
+| macOS arm64 workstation, and `wasm32-wasip1` on Node 22.16 and 24 | local | identical |
 
-CI job `shadow-determinism` in [CI run 36187043511](https://github.com/redact-secret/redact-secret/actions/runs/36187043511) found the four hosts byte-identical for both profiles. `full`: 3,834 comparisons, 1,217 of
-them statistical, sha256
-`78b07b9a40721d63904a0e42eebb9595760b0e9dec32883f5c9e71866e748952`.
-`common`: 1,492 comparisons, 1,351 statistical, sha256
-`8edc30ff72f563ea6d4bb1ae4e2e6a0d3d866610cb14f5476cdad4bce2e51d38`.
-Statistical bands in `full`: 3 `none`, 46 `low`, 44 `medium`, 1,124 `high`.
+| Commit | Inputs | Profile | Comparisons | Statistical (`none`/`low`/`medium`/`high`) | SHA-256 of the output |
+| --- | ---: | --- | ---: | --- | --- |
+| `d4bab4e` and the fix before rebasing on #831–#839 | 2,238 | `full` | 3,834 | 1,217 (3/46/44/1,124) | `78b07b9a40721d63904a0e42eebb9595760b0e9dec32883f5c9e71866e748952` |
+| same | 2,238 | `common` | 1,492 | 1,351 | `8edc30ff72f563ea6d4bb1ae4e2e6a0d3d866610cb14f5476cdad4bce2e51d38` |
+| rebased on `192c964` (#839) | 2,283 | `full` | 3,862 | 1,235 (3/46/46/1,140) | `33f7fe9a546f9163435ce0d29fe0fe62a248e17eeade8834a554bb7149ee5a20` |
+| same | 2,283 | `common` | 1,520 | 1,369 (3/99/65/1,202) | `d67b987c142e0ea02882116f34281128c2f937810cb815dcb44e34950e7c5974` |
+
+For the first pair of rows, CI job `shadow-determinism` in
+[CI run 36187043511](https://github.com/redact-secret/redact-secret/actions/runs/36187043511)
+found the four hosts byte-identical for both profiles. The same job checks
+every later push, including this pull request's final head.
 
 The shipped `wasm32-unknown-unknown` binding cannot reach the scorer, which is
 crate-internal. The `wasm32-wasip1` build compiles the same source with the
 same wasm32 code generator, and the two differ only in the operating-system
-layer, which the scorer does not use. On `wasm32-wasip1` the core's 1,280
-unit tests, which include the evidence golden vectors, the artifact drift
+layer, which the scorer does not use. On `wasm32-wasip1` the core's unit tests, which include the evidence golden vectors, the artifact drift
 test and the hostile-input tests, pass, and so does the canonical corpus
 test. Locally, every other core integration test passes there too.
 
@@ -109,8 +113,9 @@ The Node addon, the Python wheels and the WebAssembly binding do not expose
 the scorer. For them parity means that legacy outcomes are unchanged:
 
 - A digest of every finding's detector, type, `Confidence`, range and action
-  over the 2,238 inputs is equal at beta.8, `0e3ba95`, `d4bab4e` and the fix
-  (3,834 findings each).
+  is equal at beta.8, `0e3ba95`, `d4bab4e` and the fix before rebasing: 3,834
+  findings each over the 2,238-input set above. This isolates the scorer
+  change from the detector changes that later merged to `main`.
 - The artifact-qualification runs replay the conformance corpora through
   every addon triple, every wheel, the browser engines and the CLI.
 - No scorer source outside tests names floating point (new
