@@ -112,8 +112,8 @@ turn or an outcome with nothing derived from input.
 checks, on the released core, that an MCP-shaped result with secrets in a
 text block, an embedded text resource, and nested `structuredContent`
 reaches the host's model call, log, and store only in sanitized form, as
-fresh objects that share no reference with the raw result. The golden path
-predates this contract; its differences are listed under
+fresh objects that share no reference with the raw result. The golden
+path's JavaScript side runs on `@redact-secret/adapter-mcp`; see
 [The golden path today](#the-golden-path-today).
 
 ## Operations
@@ -297,19 +297,23 @@ matrix plus an edit of the distribution spec row; it is not a new decision.
 
 ## The golden path today
 
-`examples/mcp-redact` predates this contract and still differs from it. It
-stays an example until it moves onto `@redact-secret/adapter-mcp` (the
-follow-up to redact-secret-adapters#13), as #610's example did:
+The JavaScript side of `examples/mcp-redact` runs on
+`@redact-secret/adapter-mcp`, consumed as a publish-shaped tarball pinned in
+[`adapters/pin-source.json`](../../adapters/README.md), so it follows this
+contract. Its `redactToolResult`, `redactArguments`,
+`redactStreamedToolResult`, and wrappers are the adapter's
+`sanitizeToolResult`, `sanitizeToolArguments`,
+`sanitizeStreamedToolResult`, `wrapToolHandler`, and `sanitizeToolCall`
+over the host's AI-context boundary. The differences this section used to
+list (binary and `resource_link` passthrough, unscanned `_meta`, parsed
+JSON-in-text, separately scanned `content` and `structuredContent` with a
+block count, no key-context check, the `context` label for arguments, and a
+stream that kept pulling after failure) are gone from it.
 
-| Golden path | This contract |
-| --- | --- |
-| `image`, `audio`, `resource_link`, and `blob` resources pass through unscanned | binary payloads block by default; `resource_link` fields are scanned |
-| `_meta` on the result is copied unchanged | `_meta` is scanned |
-| A text block that parses as a JSON object or array is scanned leaf by leaf and re-serialized | text is scanned as text |
-| `content` and `structuredContent` are scanned separately, each with its own traversal limits, and `maxContentBlocks` bounds blocks | one value, limits counted from the result root |
-| no key-context check | key-context check |
-| arguments use the `context` label | `tool-arguments` |
-| a failed stream keeps pulling (and discarding) chunks until the producer ends | the stream stops pulling when `accepting` is `false` |
+The Python twins under `examples/mcp-redact/python/` still have those
+differences. They are not an MCP support claim: the Python `mcp` SDK is
+outside the [supported range](#supported-range). Aligning or retiring them
+is [#810](https://github.com/redact-secret/redact-secret/issues/810).
 
 ## Conformance
 

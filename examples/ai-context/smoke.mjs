@@ -47,8 +47,8 @@ const userInput = `Deploy with ${SYNTHETIC.awsKeyId} and summarize the logs`;
 const toolResult = Object.freeze({
   content: [
     { type: "text", text: `deploy log: login ok with password=${SYNTHETIC.password}` },
-    // JSON-in-text is parsed and scanned leaf by leaf. A leaf carries its own
-    // context: `{"api_key": "..."}` would lose it (see the README).
+    // JSON-in-text is scanned as text (#612), so `"env":"API_KEY=..."` keeps
+    // its own context inside the string.
     { type: "text", text: JSON.stringify({ config: { env: `API_KEY=${SYNTHETIC.apiKey}`, region: "eu-west-1" } }) },
   ],
   structuredContent: { upstream: `Authorization: Bearer ${SYNTHETIC.bearer}` },

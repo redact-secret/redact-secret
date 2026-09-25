@@ -2,7 +2,9 @@
  * The AI-context golden path (issue #587), on the framework-neutral
  * AI-context boundary (`docs/reference/ai-context-boundary.md`, #610) as
  * implemented by `@redact-secret/adapter-ai-context`
- * (redact-secret-adapters#12). One agent turn:
+ * (redact-secret-adapters#12), with the tool result sanitized by the MCP
+ * boundary (`docs/reference/mcp-boundary.md`, #612) as implemented by
+ * `@redact-secret/adapter-mcp` (redact-secret-adapters#13). One agent turn:
  *
  * ```
  * user input -> scan -> application policy
@@ -114,11 +116,11 @@ function withStage(outcome, stage) {
  *   streamTool?: (request: unknown, opts: { signal?: AbortSignal }) => AsyncIterable<string> | Iterable<string>,
  *   buildToolRequest?: unknown | ((safeInputText: string) => unknown),
  *   signal?: AbortSignal,
- *   maxContentBlocks?: number,
+ *   binaryContent?: "block" | "pass",
  * }} options
  */
 export async function buildSafeContext(options = {}) {
-  const { boundary, userInput, callTool, streamTool, buildToolRequest, signal, maxContentBlocks } = options;
+  const { boundary, userInput, callTool, streamTool, buildToolRequest, signal, binaryContent } = options;
   if (typeof boundary?.sanitizeText !== "function") {
     throw new TypeError("buildSafeContext: boundary must be an @redact-secret/adapter-ai-context boundary");
   }
@@ -146,7 +148,7 @@ export async function buildSafeContext(options = {}) {
         // is discarded with this return: a non-ok outcome carries no context.
         return TOOL_ERROR;
       }
-      result = redactToolResult(boundary, raw, { signal, maxContentBlocks });
+      result = redactToolResult(boundary, raw, { signal, binaryContent });
     } else {
       let chunks;
       try {

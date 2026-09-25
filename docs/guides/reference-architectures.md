@@ -12,7 +12,7 @@ command that runs its end-to-end smoke test against the real core.
 | --- | --- | --- | --- |
 | Application logging | [`examples/logging-redaction`](../../examples/logging-redaction/README.md) | `@redact-secret/adapter-pino`, `@redact-secret/core`, and `pino` from npm, pinned exactly by its `package-lock.json` | `npm run reference:logging` |
 | OpenTelemetry tracing | [`examples/tracing-masking`](../../examples/tracing-masking/README.md) | `@redact-secret/adapter-otel`, `@redact-secret/adapter`, `@redact-secret/core`, and the OpenTelemetry SDK from npm, pinned exactly by its `package-lock.json` | `npm run reference:tracing` |
-| AI context construction | [`examples/ai-context`](../../examples/ai-context/README.md) | `@redact-secret/core` from npm, pinned exactly; `@redact-secret/adapter-ai-context` as the publish-shaped tarball pinned in [`adapters/pin-source.json`](../../adapters/README.md), through the [`examples/mcp-redact`](../../examples/mcp-redact/README.md) golden path | `npm run reference:ai-context` |
+| AI context construction | [`examples/ai-context`](../../examples/ai-context/README.md) | `@redact-secret/core` from npm, pinned exactly; `@redact-secret/adapter-ai-context` and `@redact-secret/adapter-mcp` as the publish-shaped tarballs pinned in [`adapters/pin-source.json`](../../adapters/README.md), through the [`examples/mcp-redact`](../../examples/mcp-redact/README.md) golden path | `npm run reference:ai-context` |
 
 `npm run references:smoke` runs all three. The `Reference architectures`
 job in `.github/workflows/ci.yml` runs exactly these commands on every push
@@ -61,11 +61,11 @@ are:
   [beta.8 report](https://github.com/redact-secret/redact-secret-benchmarks/blob/main/docs/reports/2026-09-25-beta8-141-operational-evidence.md)
   (redact-secret-benchmarks#141).
 - **Adapter compatibility.** The adapters repository's
-  [`compatibility.json`](https://github.com/redact-secret/redact-secret-adapters/blob/a7fbcc32b56ada3b5107e9fbddb9a019eeaf6d43/compatibility.json)
+  [`compatibility.json`](https://github.com/redact-secret/redact-secret-adapters/blob/f014a996ebb9693fbe1c8cc14f144435f011c2b8/compatibility.json)
   at the pinned commit: which host and core ranges each package is
   qualified against, and which versions it refuses (redact-secret-adapters#11).
   Its overhead workloads are
-  [`scripts/measure-overhead.mjs`](https://github.com/redact-secret/redact-secret-adapters/blob/a7fbcc32b56ada3b5107e9fbddb9a019eeaf6d43/scripts/measure-overhead.mjs).
+  [`scripts/measure-overhead.mjs`](https://github.com/redact-secret/redact-secret-adapters/blob/f014a996ebb9693fbe1c8cc14f144435f011c2b8/scripts/measure-overhead.mjs).
 
 ## Python
 
