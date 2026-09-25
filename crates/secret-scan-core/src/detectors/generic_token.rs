@@ -33,6 +33,9 @@ const HIGH_SIGNAL_NAMES: &[&str] = &[
     "private_key",
     "client_secret",
     "webhook_secret",
+    // RFC 7636 PKCE verifier: the secret half of the code challenge
+    // (issue #816).
+    "code_verifier",
 ];
 
 const AMBIGUOUS_NAMES: &[&str] = &[
@@ -42,6 +45,12 @@ const AMBIGUOUS_NAMES: &[&str] = &[
     "credentials",
     "signing_key",
 ];
+
+/// Names that are credential-bearing only as a URL query, fragment or form
+/// parameter (`?code=`, `&code=`), and then only in the ambiguous bucket:
+/// the OAuth 2.0 authorization code (RFC 6749 section 4.1.2). Anywhere else
+/// `code` is a status, error or country code (issue #816).
+const QUERY_ONLY_AMBIGUOUS_NAMES: &[&str] = &["code"];
 
 /// `<prefix>_token` names that hold a request-scoped or public value rather
 /// than a credential. Every other prefixed `_token` name is high-signal
@@ -241,7 +250,9 @@ pub(crate) fn normalize_name(name: &str) -> String {
 }
 
 fn is_open_assignment_boundary_char(ch: char) -> bool {
-    is_js_whitespace(ch) || matches!(ch, '{' | ',' | ';')
+    // `?`, `&` and `#` open a URL query, fragment or form parameter
+    // (issue #816).
+    is_js_whitespace(ch) || matches!(ch, '{' | ',' | ';' | '?' | '&' | '#')
 }
 
 /// `true` when `normalized` (already passed through [`normalize_name`]) is
@@ -1220,6 +1231,7 @@ fn assignment_confidence(
     value: &str,
     form: ValueForm,
     names: &NameSource,
+    query: bool,
 ) -> Option<Confidence> {
     if value.len() < MIN_CONTEXT_VALUE_LENGTH
         || value.len() > MAX_CONTEXT_VALUE_LENGTH
@@ -1242,7 +1254,7 @@ fn assignment_confidence(
                 );
             }
 
-            if is_ambiguous_name(name)
+            if (is_ambiguous_name(name) || (query && QUERY_ONLY_AMBIGUOUS_NAMES.contains(&name)))
                 && value.len() >= MIN_HIGH_ENTROPY_LENGTH
                 && entropy >= AMBIGUOUS_ENTROPY_THRESHOLD
             {
@@ -1543,6 +1555,11 @@ fn unquoted_assignment_value(input: &str, start: usize) -> Option<(usize, usize)
         if is_unquoted_value_boundary(Some(ch)) && !(ch == '`' && cursor == start) {
             break;
         }
+        // `refresh_token=VALUE&client_id=...`: the next form or query
+        // parameter is not part of this value (issue #816).
+        if cursor > start && starts_query_parameter(input, cursor) {
+            break;
+        }
         cursor += ch.len_utf8();
         if cursor - start > MAX_CONTEXT_VALUE_LENGTH {
             return None;
@@ -1690,17 +1707,111 @@ fn parse_name_and_operator(input: &str, start: usize) -> Option<(usize, usize, u
     Some((name_start, name_end, cursor))
 }
 
+/// `true` at `&name=` — the start of the next `application/x-www-form-urlencoded`
+/// or URL query parameter (issue #816).
+fn starts_query_parameter(input: &str, pos: usize) -> bool {
+    char_at(input, pos) == Some('&') && parse_query_parameter(input, pos + 1).is_some()
+}
+
+/// Parses `([A-Za-z][A-Za-z0-9_.-]*)=` at `start`: a URL query, fragment or
+/// form-body parameter name followed directly by `=` (issue #816). No
+/// whitespace or quote is allowed around the name, which is what keeps a
+/// prose `?`, `&` or `#` from opening an assignment.
+fn parse_query_parameter(input: &str, start: usize) -> Option<(usize, usize, usize)> {
+    let bytes = input.as_bytes();
+    if !bytes.get(start)?.is_ascii_alphabetic() {
+        return None;
+    }
+    let mut cursor = start + 1;
+    while bytes
+        .get(cursor)
+        .is_some_and(|byte| byte.is_ascii_alphanumeric() || matches!(byte, b'_' | b'.' | b'-'))
+    {
+        cursor += 1;
+    }
+    (bytes.get(cursor) == Some(&b'=')).then_some((start, cursor, cursor + 1))
+}
+
+/// A query parameter value ends at the next parameter (`&`), the fragment
+/// (`#`), or anything that ends a URL in running text.
+fn query_parameter_value(input: &str, start: usize) -> Option<(usize, usize)> {
+    let mut cursor = start;
+    while let Some(ch) = char_at(input, cursor) {
+        if is_unquoted_value_boundary(Some(ch)) || matches!(ch, '&' | '#' | ')' | '<' | '>') {
+            break;
+        }
+        cursor += ch.len_utf8();
+        if cursor - start > MAX_CONTEXT_VALUE_LENGTH {
+            return None;
+        }
+    }
+    (cursor > start).then_some((start, cursor))
+}
+
+/// The byte spans of every `otpauth://` URI (scheme matched
+/// case-insensitively, up to the end of the line or the next quote, so a
+/// label with an unencoded space still counts), in one linear
+/// pass. A query parameter inside one belongs to `otpauth-uri`'s contract,
+/// which decides whether the URI is valid; a URI it declines stays silent
+/// instead of being claimed here, the same deference a provider-named
+/// assignment gets (issue #702, applied by issue #816).
+fn otpauth_uri_spans(input: &str) -> Vec<(usize, usize)> {
+    const SCHEME: &[u8] = b"otpauth://";
+    let bytes = input.as_bytes();
+    let mut spans = Vec::new();
+    let mut index = 0usize;
+    while index + SCHEME.len() <= bytes.len() {
+        if bytes[index..index + SCHEME.len()].eq_ignore_ascii_case(SCHEME) {
+            let mut end = index + SCHEME.len();
+            while end < bytes.len() && !matches!(bytes[end], b'\r' | b'\n' | b'"' | b'\'' | b'`') {
+                end += 1;
+            }
+            spans.push((index, end));
+            index = end;
+        } else {
+            index += 1;
+        }
+    }
+    spans
+}
+
+/// A matched assignment prefix: the name span, the offset where the value
+/// starts, and whether the name was a URL query/fragment/form parameter.
+struct AssignmentPrefix {
+    name_start: usize,
+    name_end: usize,
+    prefix_end: usize,
+    query: bool,
+}
+
 /// Tries the `(?:^|[\s{,;])` prefix alternative at `pos` (line start first,
-/// per regex alternation order) followed by the rest of the pattern.
-fn try_match_assignment_prefix(input: &str, pos: usize) -> Option<(usize, usize, usize)> {
+/// per regex alternation order) followed by the rest of the pattern, then
+/// the URL query/fragment/form alternative `[?&#]name=` (issue #816).
+fn try_match_assignment_prefix(input: &str, pos: usize) -> Option<AssignmentPrefix> {
+    let plain = |(name_start, name_end, prefix_end)| AssignmentPrefix {
+        name_start,
+        name_end,
+        prefix_end,
+        query: false,
+    };
     if is_line_start(input, pos)
         && let Some(m) = parse_name_and_operator(input, pos)
     {
-        return Some(m);
+        return Some(plain(m));
     }
     let ch = char_at(input, pos)?;
     if is_prefix_boundary_char(ch) {
-        return parse_name_and_operator(input, pos + ch.len_utf8());
+        return parse_name_and_operator(input, pos + ch.len_utf8()).map(plain);
+    }
+    if matches!(ch, '?' | '&' | '#') {
+        return parse_query_parameter(input, pos + 1).map(|(name_start, name_end, prefix_end)| {
+            AssignmentPrefix {
+                name_start,
+                name_end,
+                prefix_end,
+                query: true,
+            }
+        });
     }
     None
 }
@@ -1708,19 +1819,40 @@ fn try_match_assignment_prefix(input: &str, pos: usize) -> Option<(usize, usize,
 fn assignment_candidates(input: &str, names: &NameSource) -> Vec<Candidate> {
     let mut candidates = Vec::new();
     let mut cursor = 0usize;
+    let otpauth_spans = otpauth_uri_spans(input);
 
     while cursor < input.len() {
-        let Some((name_start, name_end, prefix_end)) = try_match_assignment_prefix(input, cursor)
+        let Some(AssignmentPrefix {
+            name_start,
+            name_end,
+            prefix_end,
+            query,
+        }) = try_match_assignment_prefix(input, cursor).filter(|prefix| {
+            // The spans are sorted and disjoint: only the last one that
+            // starts before `cursor` can contain it.
+            !prefix.query
+                || otpauth_spans
+                    .partition_point(|&(start, _)| start < cursor)
+                    .checked_sub(1)
+                    .is_none_or(|index| otpauth_spans[index].1 <= cursor)
+        })
         else {
             cursor += char_at(input, cursor).map_or(1, char::len_utf8);
             continue;
         };
 
-        if let Some((value_start, value_end, form)) = assignment_value(input, prefix_end) {
+        let value_span = if query {
+            query_parameter_value(input, prefix_end)
+                .map(|(value_start, value_end)| (value_start, value_end, ValueForm::Unquoted))
+        } else {
+            assignment_value(input, prefix_end)
+        };
+        if let Some((value_start, value_end, form)) = value_span {
             let value = &input[value_start..value_end];
             let normalized = normalize_name(&input[name_start..name_end]);
             if !is_colon_scope_identifier(&input[name_end..value_start], value)
-                && let Some(confidence) = assignment_confidence(&normalized, value, form, names)
+                && let Some(confidence) =
+                    assignment_confidence(&normalized, value, form, names, query)
                 && let Some(range) = ByteRange::new(value_start, value_end)
             {
                 let name_signal =
@@ -2336,6 +2468,63 @@ mod tests {
         assert_eq!(only_value(nested), r#"SYNTHETIC\\\"q8vN3xR7tLm2Kp9Wd"#);
         // A reference stays excluded in the escaped form too.
         assert!(detect(r#"{"body":"{\"password\":\"${DB_PASSWORD}\"}"}"#).is_empty());
+    }
+
+    #[test]
+    fn url_query_fragment_and_form_body_parameters_are_detected() {
+        // Issue #816.
+        const V: &str = "SYNTHETICq8vN3xR7tLm2Kp9Wd";
+        for input in [
+            format!("https://api.example.test/r?access_token={V}&p=q"),
+            format!("GET /resource?access_token={V} HTTP/1.1"),
+            format!("Location: https://client.example.test/cb#access_token={V}&state=xyz"),
+            format!("grant_type=refresh_token&refresh_token={V}"),
+            format!("&client_secret={V}"),
+            format!("[docs](https://api.example.test/r?access_token={V})"),
+        ] {
+            assert_eq!(only_value(&input), V, "{input}");
+        }
+        // A leading parameter ends at the next `&name=`.
+        assert_eq!(only_value(&format!("refresh_token={V}&client_id=s6Bhd")), V);
+        // PKCE verifier.
+        let verifier = format!("code_verifier={V}{V}");
+        assert_eq!(only_value(&verifier), format!("{V}{V}"));
+    }
+
+    #[test]
+    fn the_authorization_code_is_ambiguous_and_only_as_a_query_parameter() {
+        // Issue #816.
+        let input = "https://client.example.test/cb?code=SYNTHETICq8vN3xR7tLm2Kp9Wd&state=xyz";
+        let candidates = detect(input);
+        assert_eq!(&input[36..62], "SYNTHETICq8vN3xR7tLm2Kp9Wd");
+        assert_eq!(only_range(&candidates), (36, 62));
+        assert_eq!(candidates[0].confidence(), Confidence::Medium);
+        for clean in [
+            "https://x.example.test/?code=200",
+            "https://x.example.test/?code=US&lang=en",
+            "code = SYNTHETICq8vN3xR7tLm2Kp9Wd",
+            "error code=SYNTHETICq8vN3xR7tLm2Kp9Wd",
+            "code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM",
+            "access_token_type=Bearer&refresh_token_expires_in=3600",
+            "see docs?password=hunter",
+        ] {
+            assert!(detect(clean).is_empty(), "{clean}");
+        }
+    }
+
+    #[test]
+    fn query_parameters_inside_an_otpauth_uri_are_left_to_otpauth_uri() {
+        // Issue #816, deferring like a provider-named assignment (#702).
+        for input in [
+            "otpauth://push/Example:alice@example.com?secret=SYNTHETICOTPAUTHSEEDVALUEQPWKYV",
+            "OTPAUTH://TOTP/Example:alice@example.com?secret=SYNTHETICOTPAUTHSEEDVALUEQPWKYV",
+            "otpauth://totp/Example Label:alice?issuer=x&secret=SYNTHETICOTPAUTHSEEDVALUEQPWKYV",
+        ] {
+            assert!(detect(input).is_empty(), "{input}");
+        }
+        // The deference ends with the URI's line.
+        let input = "otpauth://totp/x?secret=SYNTHETICOTPAUTHSEEDVALUEQPWKYV\nhttps://api.example.test/r?access_token=SYNTHETICq8vN3xR7tLm2Kp9Wd";
+        assert_eq!(only_value(input), "SYNTHETICq8vN3xR7tLm2Kp9Wd");
     }
 
     #[test]

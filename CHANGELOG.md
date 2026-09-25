@@ -112,6 +112,13 @@ evidence is linked from each published version.
   in type-expression bytes, so `password: "Optional[SecretStr]"` stays
   clean while a quoted literal holding `{`, `$` or `#` is reported. Found by
   the beta9 external-inputs adversarial pack (#815).
+- `generic-token` now reads credential parameters in URL query strings,
+  fragments and form bodies (`?access_token=`, `#access_token=`,
+  `&client_secret=`); each value ends at the next `&`. `code_verifier` is a
+  high-signal name, and the OAuth `code` is reported at medium confidence
+  (warn) only as a query or form parameter. Parameters inside an
+  `otpauth://` URI stay with `otpauth-uri`. A Firebase `?auth=` database
+  secret, previously a documented gap, now warns (#816).
 
 ## 0.1.0-beta.8 — 2026-09-25
 
