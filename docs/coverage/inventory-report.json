@@ -1874,7 +1874,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 191,
+        "fixtureCount": 193,
         "hostContextsExercised": [
           "chat",
           "curl",
@@ -1948,6 +1948,7 @@
         "contextual-positive-vals-scheme-prefix-still-detected",
         "generic-token-positive-unquoted-markdown-inline-code",
         "generic-token-regression-arn-prefixed-literal",
+        "generic-token-regression-db-pass-name",
         "generic-token-regression-escaped-json-string-assignment",
         "generic-token-regression-form-body-parameters",
         "generic-token-regression-go-short-assignment",
@@ -1982,7 +1983,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 191,
+        "fixtureCount": 193,
         "hostContextsExercised": [
           "chat",
           "curl",
@@ -2052,7 +2053,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 191,
+        "fixtureCount": 193,
         "hostContextsExercised": [
           "chat",
           "curl",

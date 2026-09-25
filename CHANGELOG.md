@@ -141,6 +141,9 @@ evidence is linked from each published version.
   (`"k"` of an `oct` key; `"d"`, `"p"`, `"q"`, `"dp"`, `"dq"`, `"qi"` of
   an RSA, EC or OKP key) when the same line carries `"kty"`. Public members
   are not reported (#821).
+- `generic-token` treats `db_pass` (`DB_PASS`, `dbPass`) as a high-signal
+  name when it is the whole name. `pass` is still not a name token, so
+  `render_pass`, `first_pass` and `app_db_pass` stay unreported (#823).
 
 ## 0.1.0-beta.8 — 2026-09-25
 
