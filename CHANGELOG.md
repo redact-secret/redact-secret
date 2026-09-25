@@ -7,6 +7,7 @@ evidence is linked from each published version.
 
 ## 0.1.0-beta.8 — 2026-09-25
 
+[Publication and qualification evidence](docs/releases/0.1.0-beta.8/README.md).
 Candidate measurement record: [#731](docs/audits/evidence/731/README.md).
 
 Beta.8 moves 19 existing families to `stable` against the beta.7 matrix (16
