@@ -1,0 +1,395 @@
+{
+  "schemaVersion": 1,
+  "contract": "docs/reference/ai-context-boundary.md",
+  "note": "Framework-neutral AI-context boundary contract cases (issue #610). Every input is synthetic and already present in synchronous-corpus.json (host-dotenv-github, contextual-positive-minimum-length-is-medium-confidence, private-key-positive). All inputs are ASCII, so JavaScript UTF-16 and Python code-point offsets are identical. Runners: conformance/ai-context-boundary.mjs (JavaScript) and bindings/python/tests/test_ai_context_boundary.py (Python).",
+  "limits": {
+    "wholeInput": { "maxInputBytes": 4096, "maxFindings": 16 },
+    "incremental": {
+      "maxInputBytes": 4096,
+      "maxBufferedBytes": 2176,
+      "maxTokenBytes": 1024,
+      "maxMultilineBytes": 2048
+    },
+    "traversal": { "maxDepth": 4, "maxNodes": 64 }
+  },
+  "safeFindingFields": ["id", "type", "detector", "confidence", "action", "obfuscation", "start", "end"],
+  "blockReasons": ["policy", "limit_exceeded", "unsupported_value", "lifecycle", "core_error"],
+  "cases": [
+    {
+      "id": "text-allow-clean",
+      "operation": "sanitizeText",
+      "boundary": "user-input",
+      "input": "ordinary text with no credential",
+      "secrets": [],
+      "expected": { "outcome": "ok", "value": "ordinary text with no credential", "findings": [] }
+    },
+    {
+      "id": "text-redact-provider-token",
+      "operation": "sanitizeText",
+      "boundary": "user-input",
+      "input": "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000",
+      "secrets": ["ghp_SYNTHETICREVOKED00000000000000000000"],
+      "expected": {
+        "outcome": "ok",
+        "value": "API_KEY=<SECRET_1>",
+        "findings": [
+          { "id": "finding-1", "type": "github_token", "detector": "github-token", "confidence": "high", "action": "redact", "obfuscation": "none", "start": 8, "end": 48 }
+        ]
+      }
+    },
+    {
+      "id": "text-warn-contextual-passes-through",
+      "operation": "sanitizeText",
+      "boundary": "user-input",
+      "input": "secret=SECRET01",
+      "secrets": ["SECRET01"],
+      "valueMayContainSecrets": true,
+      "expected": {
+        "outcome": "ok",
+        "value": "secret=SECRET01",
+        "findings": [
+          { "id": "finding-1", "type": "contextual_secret", "detector": "generic-token", "confidence": "medium", "action": "warn", "obfuscation": "none", "start": 7, "end": 15 }
+        ]
+      }
+    },
+    {
+      "id": "text-block-private-key",
+      "operation": "sanitizeText",
+      "boundary": "user-input",
+      "input": "-----BEGIN PRIVATE KEY-----\nU1lOVEhFVElDX1JFVk9LRURfQ09ORk9STUFOQ0U=\n-----END PRIVATE KEY-----",
+      "secrets": ["U1lOVEhFVElDX1JFVk9LRURfQ09ORk9STUFOQ0U="],
+      "expected": { "outcome": "blocked", "reason": "policy" }
+    },
+    {
+      "id": "text-tool-result-redacts-before-context",
+      "operation": "sanitizeText",
+      "boundary": "tool-result",
+      "input": "tool output\nAPI_KEY=ghp_SYNTHETICREVOKED00000000000000000000\n",
+      "secrets": ["ghp_SYNTHETICREVOKED00000000000000000000"],
+      "expected": {
+        "outcome": "ok",
+        "value": "tool output\nAPI_KEY=<SECRET_1>\n",
+        "findings": [
+          { "id": "finding-1", "type": "github_token", "detector": "github-token", "confidence": "high", "action": "redact", "obfuscation": "none", "start": 20, "end": 60 }
+        ]
+      }
+    },
+    {
+      "id": "text-block-all-policy-blocks",
+      "operation": "sanitizeText",
+      "boundary": "user-input",
+      "policy": "block-all",
+      "input": "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000",
+      "secrets": ["ghp_SYNTHETICREVOKED00000000000000000000"],
+      "expected": { "outcome": "blocked", "reason": "policy" }
+    },
+    {
+      "id": "text-throwing-policy-fails-closed",
+      "operation": "sanitizeText",
+      "boundary": "user-input",
+      "policy": "throwing",
+      "input": "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000",
+      "secrets": ["ghp_SYNTHETICREVOKED00000000000000000000"],
+      "expected": { "outcome": "blocked", "reason": "core_error", "code": "POLICY_FAILURE" }
+    },
+    {
+      "id": "text-throwing-telemetry-is-ignored",
+      "operation": "sanitizeText",
+      "boundary": "user-input",
+      "telemetry": "throwing",
+      "input": "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000",
+      "secrets": ["ghp_SYNTHETICREVOKED00000000000000000000"],
+      "expected": {
+        "outcome": "ok",
+        "value": "API_KEY=<SECRET_1>",
+        "findings": [
+          { "id": "finding-1", "type": "github_token", "detector": "github-token", "confidence": "high", "action": "redact", "obfuscation": "none", "start": 8, "end": 48 }
+        ]
+      }
+    },
+    {
+      "id": "text-oversized-input-fails-closed",
+      "operation": "sanitizeText",
+      "boundary": "user-input",
+      "input": { "repeat": "ordinary text\n", "count": 360 },
+      "secrets": [],
+      "expected": { "outcome": "blocked", "reason": "limit_exceeded", "code": "INPUT_LIMIT_EXCEEDED" }
+    },
+    {
+      "id": "text-finding-limit-fails-closed",
+      "operation": "sanitizeText",
+      "boundary": "tool-result",
+      "input": { "repeat": "secret=SECRET01\n", "count": 17 },
+      "secrets": [],
+      "incrementalEquivalence": false,
+      "incrementalEquivalenceNote": "An incremental session has no finding-count limit, so this whole-input failure has no incremental counterpart.",
+      "expected": { "outcome": "blocked", "reason": "limit_exceeded", "code": "FINDING_LIMIT_EXCEEDED" }
+    },
+    {
+      "id": "text-cancelled-before-scan",
+      "operation": "sanitizeText",
+      "boundary": "user-input",
+      "signal": "aborted-before",
+      "input": "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000",
+      "secrets": ["ghp_SYNTHETICREVOKED00000000000000000000"],
+      "expected": { "outcome": "aborted" }
+    },
+    {
+      "id": "text-before-initialization-fails-closed",
+      "operation": "sanitizeText",
+      "boundary": "user-input",
+      "phase": "uninitialized",
+      "runtimes": ["javascript"],
+      "input": "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000",
+      "secrets": ["ghp_SYNTHETICREVOKED00000000000000000000"],
+      "expected": { "outcome": "blocked", "reason": "core_error", "code": "NOT_INITIALIZED" }
+    },
+    {
+      "id": "text-unpaired-surrogate-fails-closed",
+      "operation": "sanitizeText",
+      "boundary": "user-input",
+      "runtimes": ["javascript"],
+      "input": "prefix \ud800 suffix",
+      "secrets": [],
+      "incrementalEquivalence": false,
+      "incrementalEquivalenceNote": "Partitioning would split nothing new; the surrogate check is a whole-string host validation.",
+      "expected": { "outcome": "blocked", "reason": "core_error", "code": "UNPAIRED_SURROGATE" }
+    },
+    {
+      "id": "value-nested-redact",
+      "operation": "sanitizeValue",
+      "boundary": "tool-result",
+      "value": { "status": "ok", "items": [{ "env": "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000" }, { "count": 3, "ok": true, "none": null }] },
+      "secrets": ["ghp_SYNTHETICREVOKED00000000000000000000"],
+      "expected": {
+        "outcome": "ok",
+        "value": { "status": "ok", "items": [{ "env": "API_KEY=<SECRET_1>" }, { "count": 3, "ok": true, "none": null }] },
+        "findings": [
+          { "id": "finding-1", "type": "github_token", "detector": "github-token", "confidence": "high", "action": "redact", "obfuscation": "none", "start": 8, "end": 48 }
+        ]
+      }
+    },
+    {
+      "id": "value-nested-block-blocks-whole-value",
+      "operation": "sanitizeValue",
+      "boundary": "tool-result",
+      "value": { "safe": "ordinary text", "pem": "-----BEGIN PRIVATE KEY-----\nU1lOVEhFVElDX1JFVk9LRURfQ09ORk9STUFOQ0U=\n-----END PRIVATE KEY-----" },
+      "secrets": ["U1lOVEhFVElDX1JFVk9LRURfQ09ORk9STUFOQ0U="],
+      "expected": { "outcome": "blocked", "reason": "policy" }
+    },
+    {
+      "id": "value-key-finding-blocks-whole-value",
+      "operation": "sanitizeValue",
+      "boundary": "tool-result",
+      "value": { "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000": "ordinary text" },
+      "secrets": ["ghp_SYNTHETICREVOKED00000000000000000000"],
+      "expected": { "outcome": "blocked", "reason": "policy" }
+    },
+    {
+      "id": "value-depth-limit-fails-closed",
+      "operation": "sanitizeValue",
+      "boundary": "tool-result",
+      "value": { "a": { "b": { "c": { "d": { "e": "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000" } } } } },
+      "secrets": ["ghp_SYNTHETICREVOKED00000000000000000000"],
+      "expected": { "outcome": "blocked", "reason": "limit_exceeded" }
+    },
+    {
+      "id": "value-node-limit-fails-closed",
+      "operation": "sanitizeValue",
+      "boundary": "tool-result",
+      "value": { "construct": "array-of-strings", "count": 100, "item": "ordinary text" },
+      "secrets": [],
+      "expected": { "outcome": "blocked", "reason": "limit_exceeded" }
+    },
+    {
+      "id": "value-unsupported-type-fails-closed",
+      "operation": "sanitizeValue",
+      "boundary": "tool-result",
+      "value": { "construct": "non-plain-object" },
+      "secrets": [],
+      "expected": { "outcome": "blocked", "reason": "unsupported_value" }
+    },
+    {
+      "id": "value-cycle-fails-closed",
+      "operation": "sanitizeValue",
+      "boundary": "tool-result",
+      "value": { "construct": "cycle" },
+      "secrets": [],
+      "expected": { "outcome": "blocked", "reason": "unsupported_value" }
+    },
+    {
+      "id": "context-built-only-from-sanitized-parts",
+      "operation": "buildContext",
+      "parts": [
+        { "role": "user", "boundary": "user-input", "text": "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000" },
+        { "role": "tool", "boundary": "tool-result", "value": { "result": "ordinary text" } }
+      ],
+      "secrets": ["ghp_SYNTHETICREVOKED00000000000000000000"],
+      "expected": {
+        "outcome": "ok",
+        "value": [
+          { "role": "user", "content": "API_KEY=<SECRET_1>" },
+          { "role": "tool", "content": { "result": "ordinary text" } }
+        ],
+        "findings": [
+          { "id": "finding-1", "type": "github_token", "detector": "github-token", "confidence": "high", "action": "redact", "obfuscation": "none", "start": 8, "end": 48 }
+        ]
+      }
+    },
+    {
+      "id": "context-any-blocked-part-blocks-whole-context",
+      "operation": "buildContext",
+      "parts": [
+        { "role": "user", "boundary": "user-input", "text": "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000" },
+        { "role": "tool", "boundary": "tool-result", "text": "-----BEGIN PRIVATE KEY-----\nU1lOVEhFVElDX1JFVk9LRURfQ09ORk9STUFOQ0U=\n-----END PRIVATE KEY-----" }
+      ],
+      "secrets": ["ghp_SYNTHETICREVOKED00000000000000000000", "U1lOVEhFVElDX1JFVk9LRURfQ09ORk9STUFOQ0U="],
+      "expected": { "outcome": "blocked", "reason": "policy" }
+    },
+    {
+      "id": "stream-secret-split-across-chunks-is-redacted",
+      "operation": "stream",
+      "boundary": "tool-result",
+      "steps": [
+        { "op": "append", "chunk": "API_KEY=ghp_SYNTHETIC" },
+        { "op": "append", "chunk": "REVOKED00000000000000000000" },
+        { "op": "finalize" }
+      ],
+      "secrets": ["ghp_SYNTHETICREVOKED00000000000000000000", "ghp_SYNTHETIC"],
+      "expected": [
+        {
+          "outcome": "ok",
+          "value": "API_KEY=<SECRET_1>",
+          "findings": [
+            { "id": "finding-1", "type": "github_token", "detector": "github-token", "confidence": "high", "action": "redact", "obfuscation": "none", "start": 8, "end": 48 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "stream-block-finding-discards-staged-output",
+      "operation": "stream",
+      "boundary": "tool-result",
+      "steps": [
+        { "op": "append", "chunk": "ordinary text\n-----BEGIN PRIVATE KEY-----\nU1lOVEhFVElD" },
+        { "op": "append", "chunk": "X1JFVk9LRURfQ09ORk9STUFOQ0U=\n-----END PRIVATE KEY-----\n" },
+        { "op": "append", "chunk": "trailing text\n" },
+        { "op": "finalize" }
+      ],
+      "secrets": ["U1lOVEhFVElDX1JFVk9LRURfQ09ORk9STUFOQ0U=", "U1lOVEhFVElD"],
+      "expected": [{ "outcome": "blocked", "reason": "policy" }]
+    },
+    {
+      "id": "stream-abort-discards-everything",
+      "operation": "stream",
+      "boundary": "tool-result",
+      "steps": [
+        { "op": "append", "chunk": "ordinary text\nAPI_KEY=ghp_SYNTHETIC" },
+        { "op": "abort" },
+        { "op": "append", "chunk": "REVOKED00000000000000000000" },
+        { "op": "finalize" }
+      ],
+      "secrets": ["ghp_SYNTHETIC"],
+      "expected": [{ "outcome": "aborted" }]
+    },
+    {
+      "id": "stream-signal-aborted-mid-stream",
+      "operation": "stream",
+      "boundary": "tool-result",
+      "steps": [
+        { "op": "append", "chunk": "ordinary text\n" },
+        { "op": "signal" },
+        { "op": "append", "chunk": "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000" },
+        { "op": "finalize" }
+      ],
+      "secrets": ["ghp_SYNTHETICREVOKED00000000000000000000"],
+      "expected": [{ "outcome": "aborted" }]
+    },
+    {
+      "id": "stream-cancelled-before-open",
+      "operation": "stream",
+      "boundary": "tool-result",
+      "signal": "aborted-before",
+      "steps": [
+        { "op": "append", "chunk": "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000" },
+        { "op": "finalize" }
+      ],
+      "secrets": ["ghp_SYNTHETICREVOKED00000000000000000000"],
+      "expected": [{ "outcome": "aborted" }]
+    },
+    {
+      "id": "stream-double-finalize-never-re-releases",
+      "operation": "stream",
+      "boundary": "tool-result",
+      "steps": [
+        { "op": "append", "chunk": "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000" },
+        { "op": "finalize" },
+        { "op": "finalize" }
+      ],
+      "secrets": ["ghp_SYNTHETICREVOKED00000000000000000000"],
+      "expected": [
+        {
+          "outcome": "ok",
+          "value": "API_KEY=<SECRET_1>",
+          "findings": [
+            { "id": "finding-1", "type": "github_token", "detector": "github-token", "confidence": "high", "action": "redact", "obfuscation": "none", "start": 8, "end": 48 }
+          ]
+        },
+        { "outcome": "blocked", "reason": "lifecycle" }
+      ]
+    },
+    {
+      "id": "stream-append-after-finalize-is-discarded",
+      "operation": "stream",
+      "boundary": "tool-result",
+      "steps": [
+        { "op": "append", "chunk": "ordinary text" },
+        { "op": "finalize" },
+        { "op": "append", "chunk": "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000" },
+        { "op": "finalize" }
+      ],
+      "secrets": ["ghp_SYNTHETICREVOKED00000000000000000000"],
+      "expected": [
+        { "outcome": "ok", "value": "ordinary text", "findings": [] },
+        { "outcome": "blocked", "reason": "lifecycle" }
+      ]
+    },
+    {
+      "id": "stream-input-limit-fails-closed",
+      "operation": "stream",
+      "boundary": "tool-result",
+      "steps": [
+        { "op": "append", "chunk": "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000\n" },
+        { "op": "append", "chunk": { "repeat": "ordinary text\n", "count": 360 } },
+        { "op": "finalize" }
+      ],
+      "secrets": ["ghp_SYNTHETICREVOKED00000000000000000000"],
+      "expected": [{ "outcome": "blocked", "reason": "limit_exceeded", "code": "INPUT_LIMIT_EXCEEDED" }]
+    },
+    {
+      "id": "stream-throwing-policy-fails-closed",
+      "operation": "stream",
+      "boundary": "tool-result",
+      "policy": "throwing",
+      "steps": [
+        { "op": "append", "chunk": "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000\n" },
+        { "op": "finalize" }
+      ],
+      "secrets": ["ghp_SYNTHETICREVOKED00000000000000000000"],
+      "expected": [{ "outcome": "blocked", "reason": "core_error", "code": "POLICY_FAILURE" }]
+    },
+    {
+      "id": "stream-before-initialization-fails-closed",
+      "operation": "stream",
+      "boundary": "tool-result",
+      "phase": "uninitialized",
+      "runtimes": ["javascript"],
+      "steps": [
+        { "op": "append", "chunk": "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000" },
+        { "op": "finalize" }
+      ],
+      "secrets": ["ghp_SYNTHETICREVOKED00000000000000000000"],
+      "expected": [{ "outcome": "blocked", "reason": "core_error", "code": "NOT_INITIALIZED" }]
+    }
+  ]
+}

@@ -69,6 +69,18 @@ depend on `src/`.
   cross-language error-code registry (`fixtures/error-codes.source.ts`):
   every stable code the incremental sanitizer and its stream adapters can
   raise, paired with its fixed, input-free message.
+- [`fixtures/ai-context-boundary.json`](./fixtures/ai-context-boundary.json) —
+  the framework-neutral AI-context boundary contract's cases (issue #610,
+  [`docs/reference/ai-context-boundary.md`](../docs/reference/ai-context-boundary.md)):
+  text, nested-value, context-construction, and staged-stream operations
+  with their `ok`/`blocked`/`aborted` outcomes, plus the limits, safe finding
+  fields, and block reasons they run under. Replayed by
+  [`ai-context-boundary.mjs`](./ai-context-boundary.mjs) against the packed
+  JavaScript package (`scripts/consumer-harness.mjs`) and by
+  `bindings/python/tests/test_ai_context_boundary.py` against the installed
+  wheel; `ai-context-boundary.test.mjs` tests the runner itself against a
+  fake core. Every input is synthetic and already present in
+  `synchronous-corpus.json`.
 - [`fixtures/ruleset-reference.json`](./fixtures/ruleset-reference.json) —
   the reference declarative ruleset fixture (issue #495 and #484,
   `decision-define-declarative-detector-ruleset-contract`): a ruleset
