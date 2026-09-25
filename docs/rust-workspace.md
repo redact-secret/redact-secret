@@ -148,6 +148,11 @@ Three things are deliberately outside the surface and must stay there:
   the core crate or a `bindings/*` crate whose name contains `score`,
   `probabilit` or `calibrat`. See
   [`decision-freeze-the-shadow-evidence-score-and-confidence-contract`](decisions/2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md).
+  Maintainers reach it only through
+  `crates/secret-scan-core/examples/shadow_evaluation.rs`, which is outside
+  the published package and compiles the core's source files as its own
+  modules instead of linking a public item
+  ([`docs/specs/engine.md`](specs/engine.md#maintainer-local-shadow-evaluation)).
 
 - **The built-in detector registry.** `detectors` is a private module.
   Callers reach the built-in set only through

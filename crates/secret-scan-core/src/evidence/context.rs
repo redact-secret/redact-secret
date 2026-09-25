@@ -30,6 +30,13 @@ pub(crate) enum ContextClass {
     /// built-in detector emits a candidate for such a name today, so the core
     /// never produces this class; it exists so the benchmark's vocabulary is
     /// complete and a later detector can use it.
+    #[cfg_attr(
+        not(test),
+        expect(
+            dead_code,
+            reason = "no built-in detector emits a non-credential assignment"
+        )
+    )]
     OtherName,
     /// None of the above.
     Bare,

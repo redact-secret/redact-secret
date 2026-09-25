@@ -3,7 +3,7 @@
   "format": "redact-secret/shadow-scoring-artifact/1",
   "artifact": {
     "id": "redact-secret/shadow-scoring-artifact",
-    "revision": 1
+    "revision": 2
   },
   "status": "reviewed",
   "contract": {
@@ -120,7 +120,12 @@
       {
         "path": "docs/specs/engine.md",
         "section": "Shadow evidence aggregation",
-        "sha256": "83351f5c56b4c41cf664f43764d1c0530854ba0b271d2996dfa3a5606f69cc04"
+        "sha256": "fe88a17c5d0af6de3369386b151ecc0fd1f84d703ccde0f3b078e86f9f7625b8"
+      },
+      {
+        "path": "docs/specs/engine.md",
+        "section": "Maintainer-local shadow evaluation",
+        "sha256": "9d798596adbb40b7c73224b49701141663a223eb9e434dc0a6ceb493e064cfe2"
       }
     ],
     "code": [
@@ -130,11 +135,11 @@
       },
       {
         "path": "crates/secret-scan-core/src/evidence/fixed_point.rs",
-        "sha256": "27f0717227d4c99e97bfb141a69c843597c548cb6e374f38bd65eca11123a3bd"
+        "sha256": "7a5cb4dcc66c8d055fa203c5a009db042434acdd37076b6b121269f145276f89"
       },
       {
         "path": "crates/secret-scan-core/src/evidence/context.rs",
-        "sha256": "0586f5350436fb5050e18885d04c57d7498640885bb5433575e233368c42ec77"
+        "sha256": "33571857934a0408edf7932ce28290956ce5f3cae934d7b39b07dd3907f33060"
       },
       {
         "path": "crates/secret-scan-core/src/evidence/exclusion.rs",
@@ -142,7 +147,11 @@
       },
       {
         "path": "crates/secret-scan-core/src/evidence/aggregate.rs",
-        "sha256": "acb810c880f1e042ec0289282113dcce0d77db3f7b27dcab44fbc807c2ad22e1"
+        "sha256": "dce312f7672537b8b70b74e5eecf94630bb0bef35d49e9670530306d934306fe"
+      },
+      {
+        "path": "crates/secret-scan-core/src/evidence/shadow.rs",
+        "sha256": "c339e115a0d7e23dc8038de190df4969525fb53f1ca4e973c45c58fdd88882d6"
       }
     ]
   },
@@ -328,12 +337,16 @@
     {
       "id": "tuning-manifest-pending",
       "statement": "The #256 tuning manifest is not bound yet (tuningManifest.status is pending), so this artifact records the draft's identity rather than a final tuning manifest hash."
+    },
+    {
+      "id": "adversarial-evidence-pending",
+      "statement": "Adversarial evidence from redact-secret-benchmarks#289 must be linked before qualification. The maintainer-local evaluation path (docs/specs/engine.md, 'Maintainer-local shadow evaluation') is what that evidence is produced with."
     }
   ],
   "review": {
-    "generation": "model is rendered from the compiled core by crates/secret-scan-core/src/evidence/aggregate/artifact_drift.rs; its failing assertion prints the rendering. sources are SHA-256 hashes of the listed files and spec sections. calibration, corpora and tuningManifest are copied from the benchmark run's identities and hashes, never from its fitted detail.",
+    "generation": "model is rendered from the compiled core by crates/secret-scan-core/src/evidence/aggregate/artifact_drift.rs; its failing assertion prints the rendering. sources are SHA-256 hashes of the listed files and spec sections, including the maintainer-local evaluation path (evidence/shadow.rs and its spec section), so a change to its record format is a new revision. calibration, corpora and tuningManifest are copied from the benchmark run's identities and hashes, never from its fitted detail.",
     "method": "Reviewed in the pull request that changes this file. The reviewer confirms that a changed model carries a new model identity (and a changed featureSchema a new feature schema identity), that every change raises artifact.revision, and that no probability, score, weight or threshold reaches a public surface.",
-    "reviewedIn": "https://github.com/redact-secret/redact-secret/issues/798",
+    "reviewedIn": "https://github.com/redact-secret/redact-secret/issues/771",
     "check": "npm run scoring-artifact:check (offline, part of npm run ci); the cargo test the_compiled_scorer_matches_the_reviewed_scoring_artifact; and the pull-request CI job that runs the same check against the base branch's artifact."
   }
 }

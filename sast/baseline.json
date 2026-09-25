@@ -63,6 +63,13 @@
       "rationale": "The process arguments are collected only to serialize the assessment invocation as JSON provenance. They are never interpreted as a command, passed to a shell, or used to launch another process, so the command-argument injection class reported by this generic rule is absent.",
       "rule_id": "sast.rules.rust.lang.security.args"
     },
+    "ed99fa6c17e46509": {
+      "classification": "false_positive",
+      "line": 137,
+      "path": "crates/secret-scan-core/examples/shadow_evaluation.rs",
+      "rationale": "The maintainer-local shadow evaluation example reads only two options from its arguments: a --profile name matched against the closed set full/common, and an --artifact path read as JSON. They are never interpreted as a command, passed to a shell, or used to launch another process, and the example is outside every published package, so the command-argument injection class reported by this generic rule is absent.",
+      "rule_id": "sast.rules.rust.lang.security.args"
+    },
     "bd6f826f125bd4aa": {
       "classification": "false_positive",
       "line": 353,

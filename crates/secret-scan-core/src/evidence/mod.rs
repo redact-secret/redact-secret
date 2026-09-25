@@ -6,10 +6,13 @@
 //! policy. [`features`] extracts the integer statistical features (#769);
 //! [`aggregate`] groups, caps and combines them with contextual and negative
 //! evidence into a shadow band and its explanation (#770), using
-//! [`context`] and [`exclusion`].
+//! [`context`] and [`exclusion`]. [`shadow`] compares that band with the
+//! legacy decision of each candidate the pipeline selects, only when a
+//! maintainer-local caller asks for it, and renders the comparison (#771).
 
 pub(crate) mod aggregate;
 pub(crate) mod context;
 pub(crate) mod exclusion;
 pub(crate) mod features;
 pub(crate) mod fixed_point;
+pub(crate) mod shadow;

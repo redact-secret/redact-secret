@@ -11,6 +11,13 @@
 pub(crate) const Q16_FRACTION_BITS: u32 = 16;
 
 /// `1.0` in Q16 fixed point.
+#[cfg_attr(
+    not(test),
+    expect(
+        dead_code,
+        reason = "only the fixed-point and feature tests convert to Q16"
+    )
+)]
 pub(crate) const Q16_ONE: u32 = 1 << Q16_FRACTION_BITS;
 
 /// Base-2 logarithm of `x` in Q16 fixed point (`log2(x) * 65536`, rounded

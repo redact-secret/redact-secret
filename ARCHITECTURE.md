@@ -228,7 +228,11 @@ Beta.9 adds an explainable evidence scorer in shadow mode only
 (`decision-freeze-the-shadow-evidence-score-and-confidence-contract`). For a
 selected `contextual` or `entropy` candidate it computes, in integer
 fixed-point, a grouped and capped evidence score and a shadow band. The
-result is recorded for maintainer comparison and nothing else. It is not a
+result is recorded for maintainer comparison and nothing else, and only when
+the maintainer-local evaluation path asks for it: an unpublished example that
+compiles the core's own source and writes JSON Lines, described in
+[`docs/specs/engine.md`](docs/specs/engine.md#maintainer-local-shadow-evaluation).
+Every public entry point skips the scorer entirely. It is not a
 probability, it is never public, and it never changes confidence, overlap
 resolution, or the resolved action. `private-key`, `provider`, and
 `structural` candidates are never scored, so statistical evidence cannot

@@ -48,6 +48,10 @@ pub(crate) const GROUP_COUNT: usize = 5;
 
 impl EvidenceGroup {
     /// Every group, in [`AggregationModel::groups`] order.
+    #[cfg_attr(
+        not(test),
+        expect(dead_code, reason = "only the aggregation tests enumerate the groups")
+    )]
     pub(crate) const ALL: [Self; GROUP_COUNT] = [
         Self::Randomness,
         Self::Lexical,
@@ -538,6 +542,13 @@ pub(crate) struct EvidenceExplanation {
 
 impl EvidenceExplanation {
     /// The groups whose contribution is non-zero.
+    #[cfg_attr(
+        not(test),
+        expect(
+            dead_code,
+            reason = "only the aggregation tests list contributing groups"
+        )
+    )]
     pub(crate) fn contributing_groups(&self) -> impl Iterator<Item = EvidenceGroup> + '_ {
         self.groups
             .iter()

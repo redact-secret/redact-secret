@@ -9,6 +9,7 @@
 use std::cmp::Ordering;
 
 use crate::error::{SecretScanError, SecretScanErrorCode};
+use crate::evidence::shadow::ShadowComparison;
 use crate::limits::WholeInputLimits;
 use crate::normalize::NormalizedInput;
 use crate::policy::default_action_for;
@@ -378,6 +379,25 @@ pub fn run_detector_pipeline(
     input: &str,
     registry: &DetectorRegistry,
 ) -> Result<Vec<DetectedFinding>, SecretScanError> {
+    detect(input, registry, None)
+}
+
+/// [`run_detector_pipeline`], optionally recording the non-enforcing shadow
+/// comparison of every selected candidate into `shadow`
+/// (`decision-freeze-the-shadow-evidence-score-and-confidence-contract`,
+/// issue #771).
+///
+/// Every public entry point passes `None`, so on the public path the scorer
+/// never runs and the only added work is one `Option` check per call. When
+/// `shadow` is `Some`, the comparisons are computed after overlap resolution,
+/// from the selected candidates only, and they read the candidate and its
+/// text in the scan copy; the returned findings are the same either way.
+/// A candidate that loses overlap resolution is never evaluated.
+pub(crate) fn detect(
+    input: &str,
+    registry: &DetectorRegistry,
+    shadow: Option<&mut Vec<ShadowComparison>>,
+) -> Result<Vec<DetectedFinding>, SecretScanError> {
     if input.is_empty() {
         return Ok(Vec::new());
     }
@@ -416,6 +436,20 @@ pub fn run_detector_pipeline(
 
     // Accepted spans are disjoint, so start offsets are unique.
     accepted.sort_unstable_by_key(|candidate| candidate.range.start());
+
+    if let Some(shadow) = shadow {
+        for (index, selected) in accepted.iter().enumerate() {
+            let candidate = &per_detector[selected.detector_order][selected.candidate_order];
+            let scanned_range = candidate.range();
+            shadow.push(ShadowComparison::of(
+                index,
+                selected.range,
+                selected.detector,
+                candidate,
+                &scanned[scanned_range.start()..scanned_range.end()],
+            ));
+        }
+    }
 
     accepted
         .into_iter()
