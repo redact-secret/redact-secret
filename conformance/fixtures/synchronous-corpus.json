@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 2085,
+  "fixtureCount": 2093,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -35201,6 +35201,163 @@
       "note": "Issue #815 control: a quoted forward-reference type annotation written only in type-expression bytes stays excluded as subscript syntax."
     },
     {
+      "id": "generic-token-regression-url-query-access-token",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "log"
+      ],
+      "input": "GET https://api.example.test/resource?access_token=SYNTHETICq8vN3xR7tLm2Kp9Wd&page=2 HTTP/1.1\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 51,
+          "end": 77
+        }
+      ],
+      "note": "Issue #816: a high-signal name introduced by ? and followed directly by = is a URL query parameter; its value ends at the next &."
+    },
+    {
+      "id": "generic-token-regression-url-fragment-access-token",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "http"
+      ],
+      "input": "HTTP/1.1 302 Found\nLocation: https://client.example.test/cb#access_token=SYNTHETICq8vN3xR7tLm2Kp9Wd&state=xyz\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 73,
+          "end": 99
+        }
+      ],
+      "note": "Issue #816: an implicit-grant redirect carries the token as a URL fragment parameter introduced by #."
+    },
+    {
+      "id": "generic-token-regression-form-body-parameters",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "http"
+      ],
+      "input": "grant_type=refresh_token&refresh_token=SYNTHETICq8vN3xR7tLm2Kp9Wd&client_id=fixture&client_secret=SYNTHETICzW4hT6yU1iO3pA5sD\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 39,
+          "end": 65
+        },
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 98,
+          "end": 124
+        }
+      ],
+      "note": "Issue #816: form-encoded parameters are introduced by &; each credential value ends at the next &name=."
+    },
+    {
+      "id": "generic-token-regression-pkce-code-verifier",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "code_verifier=SYNTHETICq8vN3xR7tLm2Kp9WdSYNTHETICzW4hT6yU1iO3pA5\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 14,
+          "end": 64
+        }
+      ],
+      "note": "Issue #816: code_verifier (RFC 7636 PKCE) is a high-signal name."
+    },
+    {
+      "id": "generic-token-regression-query-authorization-code",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "http"
+      ],
+      "input": "Location: https://client.example.test/cb?code=SYNTHETICq8vN3xR7tLm2Kp9Wd&state=xyz\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "medium",
+          "specificity": "contextual",
+          "start": 46,
+          "end": 72
+        }
+      ],
+      "note": "Issue #816: code is credential-bearing only as a query or form parameter, in the ambiguous bucket (length and entropy gated, medium confidence)."
+    },
+    {
+      "id": "generic-token-negative-query-code-and-challenge",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "log"
+      ],
+      "input": "GET /authorize?code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM&code_challenge_method=S256&code=200 HTTP/1.1\n",
+      "expected": [],
+      "note": "Issue #816 control: a PKCE code_challenge is a public hash, and a short code query value is below the ambiguous-name bar."
+    },
+    {
+      "id": "generic-token-negative-code-outside-query",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "code = SYNTHETICq8vN3xR7tLm2Kp9Wd\n",
+      "expected": [],
+      "note": "Issue #816 control: outside a query or form parameter, code is not a credential name."
+    },
+    {
+      "id": "generic-token-negative-extended-token-parameter-names",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "access_token_type=Bearer&refresh_token_expires_in=3600\n",
+      "expected": [],
+      "note": "Issue #816 control: parameter names that extend access_token and refresh_token hold a type and a lifetime."
+    },
+    {
       "id": "notion-token-positive-dotenv-secret",
       "detector": "notion-token",
       "kind": "positive",
@@ -36851,15 +37008,24 @@
     {
       "id": "firebase-database-secret-query-param-negative-out-of-scope",
       "detector": "google-api-key",
-      "kind": "negative",
-      "support": "intentionally-unsupported",
+      "kind": "boundary",
+      "support": "supported",
       "tier": "negative",
       "contexts": [
         "plain-text"
       ],
       "input": "https://synthetic-revoked-default-rtdb.firebaseio.com/users.json?auth=aB3xQ9zK7mN2pR5sT8vW1yC4dF6gH0jL9nM3oP7qS1uV5wX8zA2bC4dE6fG8hJ0k",
-      "expected": [],
-      "note": "The legacy Firebase Realtime Database secret (firebase.google.com/docs/database/rest/auth, observed 2026-09-20: 'The Realtime Database REST API still supports authentication via legacy authentication tokens, including secrets'; no format, length, or character-set is documented for the value) is passed as a bare `?auth=<secret>` query parameter on a `*.firebaseio.com` URL -- an opaque value with zero lexical evidence, the same category issue #519's audit records as correctly left uncovered for Google's own OAuth access/refresh tokens. generic-token's AMBIGUOUS_NAMES list already includes `auth`, but its open-assignment boundary check requires whitespace or `{`/`,`/`;` immediately before the key name; the `?` that precedes a URL query parameter is not in that set, so this realistic form is not classified even incidentally (a bare `auth=<value>` assignment elsewhere in the corpus already is). Widening that boundary set is a generic_token.rs-wide change affecting every URL query string this crate scans, not a Firebase-specific one, and is out of this issue's scope; this fixture pins the current, deliberate silence as a documented gap rather than an unnoticed one, the same pattern issue #519 used for google-negative-oauth-client-secret."
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "medium",
+          "specificity": "contextual",
+          "start": 70,
+          "end": 134
+        }
+      ],
+      "note": "The legacy Firebase Realtime Database secret (firebase.google.com/docs/database/rest/auth, observed 2026-09-20: 'The Realtime Database REST API still supports authentication via legacy authentication tokens, including secrets'; no format, length, or character-set is documented for the value) is passed as a bare `?auth=<secret>` query parameter on a `*.firebaseio.com` URL. No provider detector (google-api-key, firebase-server-key) has lexical evidence to claim it, and they stay silent. Until issue #816 this fixture pinned generic-token's silence too, because `?` was not an assignment boundary; #816 made a `?`/`&`/`#` parameter name followed directly by `=` a query parameter, so `auth` (an ambiguous generic-token name) now reports the value at medium confidence (warn), and the fixture moved from negative to boundary."
     },
     {
       "id": "pulumi-access-token-positive-bare",

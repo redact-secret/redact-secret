@@ -4105,10 +4105,10 @@
       "disposition": "silent",
       "expectedRanges": [],
       "id": "firebase-database-secret-query-param-negative-out-of-scope",
-      "kind": "negative",
+      "kind": "boundary",
       "lostRanges": [],
       "retainedRanges": [],
-      "support": "intentionally-unsupported",
+      "support": "supported",
       "tier": "negative"
     },
     {
