@@ -47,6 +47,12 @@ Checks, in order:
    public score API that
    ``decision-freeze-the-shadow-evidence-score-and-confidence-contract``
    rules out.
+11. Integer-only scorer: no non-test source under the core's
+   ``src/evidence/`` names ``f32`` or ``f64`` or writes a floating-point
+   literal. The same contract (section 7) requires integer fixed-point
+   arithmetic from feature extraction to band, so every host, native or
+   WebAssembly, computes identical scores and bands (#772). Test modules,
+   which compare the fixed-point values with ``f64`` references, are exempt.
 
 Run ``--recheck-crate-name`` to also query crates.io for the preferred crate
 name; that is the only check that uses the network and it is off by default.
@@ -126,6 +132,15 @@ PUBLIC_RUST_NAMES = (
     re.compile(r"\bpub\s+use\s+(?P<name>[^;]+);"),
 )
 PUBLIC_SCORE_WORD = re.compile(r"score|probabilit|calibrat", re.I)
+# Check 11: a floating-point type or literal in scorer code (#772). A literal
+# is digits, a point and digits, not part of a longer dotted run such as a
+# version string.
+FLOAT_USE = re.compile(r"\bf(?:32|64)\b|(?<![\w.])\d[\d_]*\.\d[\d_]*(?:[eE][+-]?\d+)?(?![\w.])")
+LINE_COMMENT = re.compile(r"//.*$", re.M)
+# `#[cfg(test)] mod name;` (a test-only module file) and `#[cfg(test)] mod
+# name {` (an inline test module), with any further attributes between.
+TEST_MODULE_FILE = re.compile(r"#\[cfg\(test\)\]\s*(?:#\[[^\]]*\]\s*)*mod\s+(?P<name>[A-Za-z_][A-Za-z0-9_]*)\s*;")
+INLINE_TEST_MODULE = re.compile(r"#\[cfg\(test\)\]\s*(?:#\[[^\]]*\]\s*)*mod\s+[A-Za-z_][A-Za-z0-9_]*\s*\{")
 USER_AGENT = "redact-secret workspace check (https://github.com/redact-secret/redact-secret)"
 
 
@@ -547,6 +562,39 @@ def check_core_package_contents(policy: dict, listed: list[str]) -> list[str]:
     return errors
 
 
+def check_integer_only_scorer(root: Path, metadata: dict, policy: dict) -> list[str]:
+    """No non-test scorer source names a floating-point type or literal."""
+    crate = core_root(metadata, policy)
+    evidence = crate / "src" / "evidence" if crate is not None else None
+    if evidence is None or not evidence.is_dir():
+        return []
+    sources = sorted(evidence.rglob("*.rs"))
+    test_only: set[Path] = set()
+    for path in sources:
+        module_dir = path.parent if path.name == "mod.rs" else path.with_suffix("")
+        for match in TEST_MODULE_FILE.finditer(path.read_text(encoding="utf-8")):
+            test_only.add(module_dir / f"{match['name']}.rs")
+            test_only.add(module_dir / match["name"] / "mod.rs")
+
+    errors = []
+    for path in sources:
+        if path in test_only:
+            continue
+        source = path.read_text(encoding="utf-8")
+        inline_tests = INLINE_TEST_MODULE.search(source)
+        if inline_tests:
+            source = source[: inline_tests.start()]
+        code = LINE_COMMENT.sub("", source)
+        for match in FLOAT_USE.finditer(code):
+            line = code.count("\n", 0, match.start()) + 1
+            errors.append(
+                f"{path.relative_to(root)}:{line}: names floating point ({match.group(0)}); the shadow scorer "
+                "uses integer fixed-point arithmetic only so every host computes identical scores and bands "
+                "(decision-freeze-the-shadow-evidence-score-and-confidence-contract, section 7)"
+            )
+    return errors
+
+
 def validate(root: Path, metadata: dict, package_lister=None) -> list[str]:
     root = root.resolve()
     with (root / "Cargo.toml").open("rb") as handle:
@@ -564,6 +612,7 @@ def validate(root: Path, metadata: dict, package_lister=None) -> list[str]:
     errors.extend(check_core_public_api(root, metadata, policy))
     errors.extend(check_core_source_boundary(root, metadata, policy))
     errors.extend(check_no_public_score_surface(root, metadata, policy))
+    errors.extend(check_integer_only_scorer(root, metadata, policy))
     errors.extend(check_core_manifest(root, metadata, policy))
     if package_lister is not None:
         errors.extend(check_core_package_contents(policy, package_lister(policy["core-package"])))

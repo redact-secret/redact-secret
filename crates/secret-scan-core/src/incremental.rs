@@ -69,9 +69,13 @@ use crate::detectors::{
     has_open_heroku_legacy_context,
 };
 use crate::error::{FormatterFailure, PolicyFailure, SecretScanError, SecretScanErrorCode};
+#[cfg(test)]
 use crate::evidence::shadow::ShadowComparison;
 use crate::normalize::NormalizedInput;
+#[cfg(test)]
 use crate::pipeline::detect;
+#[cfg(not(test))]
+use crate::pipeline::run_detector_pipeline;
 use crate::policy::DefaultPolicy;
 use crate::redact::{default_placeholder_formatter, redact};
 use crate::registry::{DetectorRegistry, Profile};
@@ -363,6 +367,7 @@ pub struct IncrementalSanitizer {
     /// coordinates, when a maintainer-local caller asked for them (#771).
     /// Always `None` for a session built through the public API, so the
     /// scorer never runs on the public incremental path.
+    #[cfg(test)]
     shadow: Option<Vec<ShadowComparison>>,
 }
 
@@ -467,6 +472,7 @@ impl IncrementalSanitizer {
             private_key: PrivateKeyRetentionTracker::new(),
             multiline_open: false,
             multiline_detected: false,
+            #[cfg(test)]
             shadow: None,
         }
     }
@@ -588,9 +594,14 @@ impl IncrementalSanitizer {
     /// state) on success, or call [`fail_with`](Self::fail_with) on error.
     fn process_unit(&mut self) -> Result<IncrementalResult, SecretScanError> {
         let input_offset = self.finalized_bytes;
+        #[cfg(test)]
         let finding_offset = self.finding_count;
+        #[cfg(test)]
         let mut unit_shadow = self.shadow.as_ref().map(|_| Vec::new());
+        #[cfg(test)]
         let detected = detect(&self.retained, &self.registry, unit_shadow.as_mut())?;
+        #[cfg(not(test))]
+        let detected = run_detector_pipeline(&self.retained, &self.registry)?;
 
         let mut findings: Vec<Finding> = Vec::with_capacity(detected.len());
         for local in &detected {
@@ -659,6 +670,7 @@ impl IncrementalSanitizer {
             .filter(|finding| finding.action().replaces_text())
             .count();
 
+        #[cfg(test)]
         if let (Some(recorded), Some(unit_shadow)) = (self.shadow.as_mut(), unit_shadow) {
             for comparison in unit_shadow {
                 recorded.push(

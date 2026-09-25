@@ -159,6 +159,35 @@ jobs:
             exit 1
           fi
 
+      # Issue #772: the shadow evidence scorer's integer scores and bands for
+      # the conformance corpora and the hostile battery, from a release
+      # build on this host. `shadow-determinism` below requires every host's
+      # output to be byte-for-byte identical.
+      - name: Set up Node.js for the shadow determinism input set
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version: 22
+
+      - name: Record shadow evaluations on this host
+        shell: bash
+        run: |
+          mkdir -p target/shadow-determinism
+          node scripts/shadow-determinism.mjs inputs > target/shadow-determinism/inputs.jsonl
+          cargo build --release --locked -p redact-secret --example shadow_evaluation
+          for profile in full common; do
+            target/release/examples/shadow_evaluation --profile "$profile" \
+              < target/shadow-determinism/inputs.jsonl \
+              > "target/shadow-determinism/${{ matrix.os }}-$profile.jsonl"
+          done
+
+      - name: Upload the shadow evaluations
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: shadow-determinism-${{ matrix.os }}
+          path: target/shadow-determinism/${{ matrix.os }}-*.jsonl
+          if-no-files-found: error
+          retention-days: 30
+
   rust-msrv:
     name: Rust MSRV
     runs-on: ubuntu-latest
@@ -194,11 +223,11 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Set up stable Rust with the wasm32 target
+      - name: Set up stable Rust with the wasm32 targets
         uses: dtolnay/rust-toolchain@6c977a6ca4077a0ceb28ffbe03f59d46e9ac8772 # v1
         with:
           toolchain: stable
-          targets: wasm32-unknown-unknown
+          targets: wasm32-unknown-unknown, wasm32-wasip1
 
       - name: Cache Cargo artifacts
         uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
@@ -230,6 +259,101 @@ jobs:
           CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_RUNNER: wasm-bindgen-test-runner
           WASM_BINDGEN_TEST_ONLY_NODE: "1"
         run: cargo test -p redact-secret-wasm --no-default-features --target wasm32-unknown-unknown --locked
+
+      # Issue #772. The shadow scorer is crate-internal, so the shipped
+      # wasm32-unknown-unknown binding cannot reach it. The same core source
+      # compiled for wasm32-wasip1 can, and runs here on V8's WebAssembly
+      # engine through Node's built-in WASI host (scripts/wasi-run.mjs): the
+      # core's unit tests (the evidence golden vectors, the artifact drift
+      # test and the hostile-input tests among them), the canonical corpus,
+      # and the shadow evaluation `shadow-determinism` compares with the
+      # native hosts.
+      - name: Set up Node.js for the WASI runner
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version: 22
+
+      - name: Test the core for wasm32-wasip1 (via Node WASI)
+        env:
+          CARGO_TARGET_WASM32_WASIP1_RUNNER: node --no-warnings ${{ github.workspace }}/scripts/wasi-run.mjs
+        run: cargo test -p redact-secret --target wasm32-wasip1 --locked --lib --test canonical_corpus
+
+      - name: Record shadow evaluations on wasm32 (via Node WASI)
+        run: |
+          mkdir -p target/shadow-determinism
+          node scripts/shadow-determinism.mjs inputs > target/shadow-determinism/inputs.jsonl
+          cargo build --release --locked -p redact-secret --example shadow_evaluation --target wasm32-wasip1
+          for profile in full common; do
+            node --no-warnings scripts/wasi-run.mjs \
+              target/wasm32-wasip1/release/examples/shadow_evaluation.wasm --profile "$profile" \
+              < target/shadow-determinism/inputs.jsonl \
+              > "target/shadow-determinism/wasm32-wasip1-$profile.jsonl"
+          done
+
+      - name: Upload the wasm32 shadow evaluations
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: shadow-determinism-wasm32-wasip1
+          path: target/shadow-determinism/wasm32-wasip1-*.jsonl
+          if-no-files-found: error
+          retention-days: 30
+
+  shadow-determinism:
+    name: Shadow scorer cross-runtime determinism
+    needs: [rust-native, rust-wasm]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version: 22
+
+      - name: Download every host's shadow evaluations
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: shadow-determinism-*
+          merge-multiple: true
+          path: shadow-determinism
+
+      # Every host must produce identical integer scores and bands for the
+      # same inputs (decision-freeze-the-shadow-evidence-score-and-confidence-contract,
+      # section 7). The report holds counts and SHA-256s only, never a record.
+      - name: Require identical shadow evaluations on every host
+        shell: bash
+        run: |
+          status=0
+          echo "## Shadow scorer cross-runtime determinism" >> "$GITHUB_STEP_SUMMARY"
+          for profile in full common; do
+            report="shadow-determinism/report-$profile.json"
+            node scripts/shadow-determinism.mjs compare \
+              "ubuntu-latest=shadow-determinism/ubuntu-latest-$profile.jsonl" \
+              "macos-latest=shadow-determinism/macos-latest-$profile.jsonl" \
+              "windows-latest=shadow-determinism/windows-latest-$profile.jsonl" \
+              "wasm32-wasip1=shadow-determinism/wasm32-wasip1-$profile.jsonl" \
+              > "$report" || status=1
+            cat "$report"
+            node -e 'const r = require(process.argv[1]); const [first] = Object.values(r.outputs);
+              console.log(`- \`${process.argv[2]}\`: ${r.identical ? "identical" : "MISMATCH"} on ${Object.keys(r.outputs).join(", ")}; ${first.comparisons} comparisons, ${first.statistical} statistical; sha256 \`${first.sha256}\``)' \
+              "$PWD/$report" "$profile" >> "$GITHUB_STEP_SUMMARY"
+          done
+          exit "$status"
+
+      - name: Upload the determinism reports
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: shadow-determinism-report
+          path: shadow-determinism/report-*.json
+          if-no-files-found: ignore
+          retention-days: 30
 
   benchmark-pin-drift:
     name: Benchmark pin drift (commit ancestry, vendored manifest and schema)

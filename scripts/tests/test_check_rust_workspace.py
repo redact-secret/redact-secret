@@ -441,6 +441,37 @@ class RustWorkspaceCheckTests(unittest.TestCase):
 
         self.assertEqual(self.run_check(configure), [])
 
+    # -- integer-only scorer (#772) -----------------------------------------
+
+    def test_a_float_in_scorer_code_is_rejected(self) -> None:
+        def configure(workspace: Workspace) -> None:
+            workspace.write(
+                "crates/secret-scan-core/src/evidence/features.rs",
+                "pub(crate) fn entropy(bits: u32) -> u32 {\n    (f64::from(bits) * 0.5) as u32\n}\n",
+            )
+
+        errors = self.run_check(configure)
+        self.assertTrue(any("evidence/features.rs:2: names floating point (f64)" in error for error in errors), errors)
+        self.assertTrue(any("(0.5)" in error for error in errors), errors)
+
+    def test_floats_in_scorer_tests_and_comments_are_allowed(self) -> None:
+        def configure(workspace: Workspace) -> None:
+            workspace.write(
+                "crates/secret-scan-core/src/evidence/mod.rs",
+                "//! No `f64` here (see version 0.1.0).\npub(crate) mod fixed_point;\n#[cfg(test)]\nmod checks;\n",
+            )
+            workspace.write(
+                "crates/secret-scan-core/src/evidence/fixed_point.rs",
+                "pub(crate) fn log2_q16(x: u32) -> u32 { x } // never f32\n"
+                "#[cfg(test)]\nmod tests {\n    fn reference(x: u32) -> f64 { f64::from(x).log2() * 1.5 }\n}\n",
+            )
+            workspace.write(
+                "crates/secret-scan-core/src/evidence/checks.rs",
+                "fn exact() -> f32 { 2.0 }\n",
+            )
+
+        self.assertEqual(self.run_check(configure), [])
+
     def test_a_removed_export_is_rejected(self) -> None:
         def configure(workspace: Workspace) -> None:
             workspace.public_api.append("removed")
