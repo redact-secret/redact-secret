@@ -24,3 +24,15 @@ core remains the only authoritative implementation
   measurement provenance this contract was reviewed against. Moved here from
   the evidence archive by
   [#596](https://github.com/redact-secret/redact-secret/issues/596) (DS4).
+- [`scoring/shadow-scoring-artifact.json`](scoring/shadow-scoring-artifact.json)
+  and its schema
+  [`scoring/shadow-scoring-artifact.schema.json`](scoring/shadow-scoring-artifact.schema.json)
+  — the reviewed scoring artifact of the beta.9 shadow evidence scorer
+  (issue [#798](https://github.com/redact-secret/redact-secret/issues/798)):
+  feature schema, aggregation model, calibration and tuning provenance, and
+  review method. Read by `scripts/check-scoring-artifact.py` (`npm run
+  scoring-artifact:check`, part of `npm run ci`, and the pull-request job
+  `scoring-artifact-identity`), which fails when it and the compiled scorer
+  drift apart. Nothing loads it at runtime and no package ships it; it is
+  not public API. The rules are in
+  [`docs/specs/engine.md`, "Shadow scoring artifact"](../specs/engine.md#shadow-scoring-artifact).

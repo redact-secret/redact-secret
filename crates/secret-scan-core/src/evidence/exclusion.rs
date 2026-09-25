@@ -52,7 +52,7 @@ impl ExclusionGrammar {
 }
 
 /// Words a placeholder may be built from.
-const PLACEHOLDER_WORDS: [&str; 35] = [
+pub(crate) const PLACEHOLDER_WORDS: [&str; 35] = [
     "a",
     "access",
     "an",
@@ -91,7 +91,7 @@ const PLACEHOLDER_WORDS: [&str; 35] = [
 ];
 
 /// Words of which a placeholder needs at least one.
-const PLACEHOLDER_MARKERS: [&str; 18] = [
+pub(crate) const PLACEHOLDER_MARKERS: [&str; 18] = [
     "changeme",
     "dummy",
     "example",
@@ -113,10 +113,10 @@ const PLACEHOLDER_MARKERS: [&str; 18] = [
 ];
 
 /// Symbols a mask may repeat.
-const MASK_SYMBOLS: [char; 8] = ['*', 'x', 'X', '\u{2022}', '#', '.', '-', '0'];
+pub(crate) const MASK_SYMBOLS: [char; 8] = ['*', 'x', 'X', '\u{2022}', '#', '.', '-', '0'];
 
 /// The shortest mask.
-const MIN_MASK_LEN: usize = 3;
+pub(crate) const MIN_MASK_LEN: usize = 3;
 
 /// The exclusion grammar the whole of `value` matches, if any, checked in
 /// the benchmark's order.

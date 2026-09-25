@@ -31,6 +31,7 @@ Rules governing the shared Rust core's detection pipeline, plugin/profile contra
 | Scorer arithmetic from features to band is integer fixed-point with no floating point or `libm` calls, so every host produces identical scores and bands. Maintainer diagnostics carry signal and group identifiers and integer values only, never matched bytes or hashes of them. No public item, field or benchmark projection carries a score, probability, threshold, weight or contribution (`scripts/check-rust-workspace.py` check 10), and changing the scoring model's identity invalidates evidence keyed to the old one. | [Freeze the shadow evidence score and confidence contract](../decisions/2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md) |
 | The shadow scorer's `randomness` and `lexical` inputs are the integer statistical features of schema `evidence-features/v1`, defined exactly in the "Shadow evidence feature schema" section below. Extraction is not a detector: it reads at most 256 Unicode scalar values of one candidate value, allocates nothing, stores no part of the value, and changes no finding, `Confidence`, overlap weight or action. | [Freeze the shadow evidence score and confidence contract](../decisions/2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md) |
 | The shadow scorer aggregates evidence under the reviewed model `evidence-aggregation/v1`, defined in the "Shadow evidence aggregation" section below: five groups with fixed caps, the halving rule inside each group, a strict whole-value exclusion grammar as the only negative evidence, and integer band thresholds. `private-key`, `provider` and `structural` candidates are never scored; their shadow band is their legacy `Confidence`. The model enforces nothing in beta.9. | [Freeze the shadow evidence score and confidence contract](../decisions/2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md) |
+| The shadow scorer has one reviewed scoring artifact, `docs/contracts/scoring/shadow-scoring-artifact.json`, defined in the "Shadow scoring artifact" section below. It binds the feature schema, the aggregation model, calibration and tuning provenance, and the review method. CI fails when the artifact and the compiled scorer disagree in either direction, and when scorer values change under an unchanged model identity. It is a review and CI artifact: nothing loads it at runtime, no package ships it, and it is not public API. | [Freeze the shadow evidence score and confidence contract](../decisions/2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md) |
 
 ## Shadow evidence feature schema
 
@@ -178,8 +179,8 @@ merged in PR #297). Its method is stated in
 and its context and negative classes in
 [`docs/specs/candidate-features.md`](https://github.com/redact-secret/redact-secret-benchmarks/blob/101f674a5ee50aa551423ccd00d0a6a68ed4c875/docs/specs/candidate-features.md).
 The reviewed scoring artifact
-([#798](https://github.com/redact-secret/redact-secret/issues/798)) records
-these values with drift detection. Changing any of them is a new model
+([#798](https://github.com/redact-secret/redact-secret/issues/798), "Shadow
+scoring artifact" below) records these values with drift detection. Changing any of them is a new model
 identity, and evidence keyed to `v1` is stale under it.
 
 The values below are published on purpose. Redact Secret is open source,
@@ -330,3 +331,138 @@ measured these costs:
   credentials. The strict negative
   grammar gives up any benefit from fuzzy placeholder resemblance, so
   lookalike placeholders stay positive rather than becoming a bypass.
+
+## Shadow scoring artifact
+
+The reviewed scoring artifact of the shadow scorer (issue
+[#798](https://github.com/redact-secret/redact-secret/issues/798)) is
+`docs/contracts/scoring/shadow-scoring-artifact.json`, format
+`redact-secret/shadow-scoring-artifact/1`, validated against
+`docs/contracts/scoring/shadow-scoring-artifact.schema.json`.
+There is one artifact and it is the authoritative record of what the
+compiled scorer is. This section applies the existing contract
+([`decision-freeze-the-shadow-evidence-score-and-confidence-contract`](../decisions/2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md),
+sections 8 to 11). It is not a new decision.
+
+### What it binds
+
+| Field | Content |
+| --- | --- |
+| `artifact` | `redact-secret/shadow-scoring-artifact` and an integer `revision` |
+| `model.featureSchema` | the feature schema identity (`evidence-features/v1`), its bounds and fixed-point scale, the feature names in vector order, and the compiled feature vector of each golden input above |
+| `model.aggregation` | the model identity (`evidence-aggregation/v1`) and every group, direction, rule, cap, signal rule, context class, exclusion grammar and vocabulary word, and the band thresholds, as the compiled `SHADOW_MODEL` holds them |
+| `modelFingerprint` | SHA-256 of `model` as canonical JSON (keys sorted, no whitespace, UTF-8) |
+| `identityLedger` | every model identity the artifact has recorded, each with the one fingerprint it stands for; append-only |
+| `sources` | SHA-256 of the "Shadow evidence feature schema" and "Shadow evidence aggregation" sections of this page, and of `features.rs`, `fixed_point.rs`, `context.rs`, `exclusion.rs` and `aggregate.rs` under `crates/secret-scan-core/src/evidence/` |
+| `calibration` | the redact-secret-benchmarks#255 run it came from: repository, issue, pull request, 40-hex `develop` commit, method permalink, selected configuration, selection method and source hash, feature dataset (extractor version, extractor source hash, dataset hash, the core commit its features were pinned to) and scoring identity with its component hashes |
+| `corpora` | the benchmark pin manifest's hash and every tuning and evaluation corpus hash |
+| `tuningManifest` | the redact-secret-benchmarks#256 tuning manifest: `pending` with `hash: null` until it is bound, plus the deterministic identity of its draft |
+| `productRevision` | how a candidate's source commit is bound (below) |
+| `knownLimitations` | limits a reviewer must weigh before any change (below) |
+| `review` | how each part is generated, how the artifact is reviewed, and which checks enforce it |
+
+The artifact records identities and hashes of benchmark evidence only. The
+fitted per-configuration detail of the calibration run (curves, candidate
+rows, other configurations' values) stays maintainer-local in
+redact-secret-benchmarks and is never copied here or into the benchmark
+repository's committed files.
+
+### Not public API
+
+The `use` block is fixed by the schema: `shadowOnly: true`, `enforcing:
+false`, `publicApi: false`, no `findingFields`, `loadedAtRuntime: false`,
+`shippedInPackages: false`, `runtimeLearning: false`,
+`remoteCalibration: false`, `securityDependsOnSecrecy: false`. So:
+
+- raw scores, weights, thresholds, calibration curves and contributions are
+  not public API, and no finding gains a probability, score or contribution
+  field (contract sections 2 and 9, `scripts/check-rust-workspace.py` check
+  10);
+- the scorer enforces nothing. Provider, private-key and structural
+  evidence never reaches it (contract section 5), so reading the open
+  source scorer, or this artifact, gives an attacker no way to downgrade
+  that evidence;
+- there is no runtime learning, remote calibration, mutable model file or
+  user adaptation. The compiled constants are the model. Nothing reads this
+  file at runtime, and core source cannot (it may not name `std::fs` or
+  `include_str!`).
+
+The artifact is not secret, only not API. It lives under `docs/contracts/`
+as a live contract (CI reads it). No package ships it: the npm package's
+`files` is `dist`, `README.md` and `LICENSE`; the core crate's `include` is
+`src/**/*.rs` and `README.md`; the Python wheel and source distribution
+build from the crates and `bindings/python`. The drift check fails if a
+package file list would pick it up. The compiled constants and the test
+mirror below are Rust source, so they travel in the published crate source
+like every other `pub(crate)` item, and none of them is public API.
+
+### Drift detection
+
+Core source may not read files, so the check has two halves that meet at
+one literal, `REVIEWED_MODEL_JSON` in
+`crates/secret-scan-core/src/evidence/aggregate/artifact_drift.rs`:
+
+1. `cargo test` (`the_compiled_scorer_matches_the_reviewed_scoring_artifact`)
+   renders the compiled `SHADOW_MODEL`, the feature schema constants, the
+   golden feature vectors and the exclusion vocabulary, and requires the
+   rendering to equal that literal byte for byte. A constant changed in Rust
+   fails here, and the assertion prints the new rendering.
+2. `npm run scoring-artifact:check` (`scripts/check-scoring-artifact.py`, in
+   the offline `npm run ci`) validates the artifact against its schema and
+   requires `model` to equal the literal, `modelFingerprint` to match
+   `model`, the current model identity's ledger entry to carry that
+   fingerprint, and every `sources` hash to match the tree. A value changed
+   only in the artifact fails here.
+3. On a pull request, the `scoring-artifact-identity` CI job runs the same
+   check with `--base` set to the pull request's base commit. Any change to
+   the artifact needs a higher `artifact.revision`; a changed `model` needs
+   a new model identity; a changed `model.featureSchema` needs a new feature
+   schema identity; and ledger entries from the base may not change or
+   disappear.
+
+So a constant changed with an unchanged model identity is an error at every
+level: the test and the literal force the artifact to change, the ledger
+rejects a new fingerprint for an old identity, and the base comparison
+rejects rewriting that ledger entry.
+
+### Change semantics
+
+Any change to feature semantics, aggregation, groups, signals, weights,
+caps, thresholds or bands is a new model identity (`evidence-aggregation/vN`),
+and a change to feature semantics is also a new feature schema identity
+(`evidence-features/vN`) (contract section 10). Any change to the artifact
+at all, including a provenance update or a re-hashed source file, is a new
+`artifact.revision`. Either one is a new candidate identity: beta.9
+qualification, calibration and holdout evidence keyed to the old model
+identity or artifact revision is stale and is regenerated, never carried
+over. The benchmark side applies the same rule to tuning and holdout
+evidence (redact-secret-benchmarks `docs/specs/statistical-tuning.md`,
+section 4). An editorial change to a hashed source file changes no identity
+in the model but still needs a new revision, so the reviewer confirms in
+the pull request that it is editorial.
+
+### Product source revision
+
+The artifact cannot contain the commit that contains it. A candidate's
+product revision is the commit it was built from, and its scoring artifact
+is this file at that commit. The release manifest's `source_revision`
+(`scripts/release-manifest.py`), the #256 tuning manifest's
+`product.sourceRevision` and the beta.9 qualification record
+([redact-secret-benchmarks#282](https://github.com/redact-secret/redact-secret-benchmarks/issues/282))
+bind that commit. Evidence about a candidate records the commit together
+with `artifact.revision`, `modelFingerprint` and the SHA-256 of this file
+at the commit, and is stale for any candidate where one of them differs.
+
+### Known limitations
+
+- The `validation` group has no signal, and its cap of `40` is a
+  placeholder that calibration did not fit. Context (`40`) plus validation
+  (`40`) would reach `high` (`61`) without any randomness, so adding any
+  validation signal needs a refit and a new model identity.
+- The `lexical` group has no signal and a cap of `0`, because calibration
+  selected randomness-only statistics. Adding a lexical signal is a new
+  model identity.
+- The #256 tuning manifest is still a draft with `product: null`. The
+  artifact records the draft's deterministic identity (its file hash and its
+  `tuningManifestHash`), marks the binding `pending`, and records the final
+  hash in a new revision once a candidate carrying this artifact is bound.

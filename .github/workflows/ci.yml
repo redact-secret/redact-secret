@@ -367,6 +367,30 @@ jobs:
           PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           PR_LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
 
+  scoring-artifact-identity:
+    name: Scoring artifact identity (pull requests)
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      # scripts/check-scoring-artifact.py compares the reviewed shadow scoring
+      # artifact with the one at the pull request's base commit, so it needs
+      # full history rather than the default single-commit checkout.
+      - name: Check out repository with full history
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      # The base SHA is read through the environment, never interpolated into
+      # the shell snippet (see the changelog-coverage job above).
+      - name: A changed scorer needs a new model identity and a changed artifact a new revision
+        run: python3 -B scripts/check-scoring-artifact.py --base "${PR_BASE_SHA}"
+        env:
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+
   decision-permalinks:
     name: ADR permalink existence (full history)
     runs-on: ubuntu-latest

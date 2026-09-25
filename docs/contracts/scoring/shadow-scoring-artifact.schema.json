@@ -1,0 +1,439 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/redact-secret/redact-secret/blob/main/docs/contracts/scoring/shadow-scoring-artifact.schema.json",
+  "title": "Redact Secret shadow scoring artifact",
+  "description": "The reviewed, versioned record of the beta.9 shadow evidence scorer: its feature schema, aggregation model, calibration provenance and review method (issue #798). A review and CI artifact only: never loaded at runtime, never shipped in a package, never public API. scripts/check-scoring-artifact.py validates it against this schema and against the compiled scorer.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "format",
+    "artifact",
+    "status",
+    "contract",
+    "use",
+    "model",
+    "modelFingerprint",
+    "identityLedger",
+    "sources",
+    "calibration",
+    "corpora",
+    "tuningManifest",
+    "productRevision",
+    "knownLimitations",
+    "review"
+  ],
+  "properties": {
+    "$schema": { "const": "./shadow-scoring-artifact.schema.json" },
+    "format": { "const": "redact-secret/shadow-scoring-artifact/1" },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "revision"],
+      "properties": {
+        "id": { "const": "redact-secret/shadow-scoring-artifact" },
+        "revision": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "status": { "enum": ["reviewed", "superseded"] },
+    "contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["decision", "decisionPath", "spec"],
+      "properties": {
+        "decision": { "const": "decision-freeze-the-shadow-evidence-score-and-confidence-contract" },
+        "decisionPath": { "const": "docs/decisions/2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md" },
+        "spec": { "const": "docs/specs/engine.md#shadow-scoring-artifact" }
+      }
+    },
+    "use": {
+      "description": "The non-public shadow contract. Every value is fixed: an artifact that claims otherwise is invalid.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "shadowOnly",
+        "enforcing",
+        "publicApi",
+        "findingFields",
+        "loadedAtRuntime",
+        "shippedInPackages",
+        "runtimeLearning",
+        "remoteCalibration",
+        "securityDependsOnSecrecy"
+      ],
+      "properties": {
+        "shadowOnly": { "const": true },
+        "enforcing": { "const": false },
+        "publicApi": { "const": false },
+        "findingFields": { "type": "array", "maxItems": 0 },
+        "loadedAtRuntime": { "const": false },
+        "shippedInPackages": { "const": false },
+        "runtimeLearning": { "const": false },
+        "remoteCalibration": { "const": false },
+        "securityDependsOnSecrecy": { "const": false }
+      }
+    },
+    "model": {
+      "description": "The compiled scorer, exactly as crates/secret-scan-core/src/evidence/aggregate/artifact_drift.rs renders it.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["featureSchema", "aggregation"],
+      "properties": {
+        "featureSchema": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "maxAnalysedChars",
+            "maxAutocorrelationLag",
+            "fixedPointFractionBits",
+            "features",
+            "goldenVectors"
+          ],
+          "properties": {
+            "id": { "$ref": "#/$defs/featureSchemaId" },
+            "maxAnalysedChars": { "type": "integer", "minimum": 1 },
+            "maxAutocorrelationLag": { "type": "integer", "minimum": 1 },
+            "fixedPointFractionBits": { "type": "integer", "minimum": 1 },
+            "features": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/identifier" } },
+            "goldenVectors": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["input", "vector"],
+                "properties": {
+                  "input": { "type": "string" },
+                  "vector": { "type": "array", "items": { "$ref": "#/$defs/u32" } }
+                }
+              }
+            }
+          }
+        },
+        "aggregation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "featureSchema",
+            "maxGroupSignals",
+            "groups",
+            "bands",
+            "contextClasses",
+            "credentialNameSignals",
+            "exclusionGrammars",
+            "placeholderWords",
+            "placeholderMarkers",
+            "maskSymbols",
+            "minMaskLength"
+          ],
+          "properties": {
+            "id": { "$ref": "#/$defs/modelId" },
+            "featureSchema": { "$ref": "#/$defs/featureSchemaId" },
+            "maxGroupSignals": { "type": "integer", "minimum": 1 },
+            "groups": {
+              "type": "array",
+              "minItems": 5,
+              "maxItems": 5,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["group", "direction", "rule", "cap", "signals"],
+                "properties": {
+                  "group": { "enum": ["randomness", "lexical", "contextual", "validation", "negative"] },
+                  "direction": { "enum": ["positive", "negative"] },
+                  "rule": { "const": "halving-diminishing-returns" },
+                  "cap": { "$ref": "#/$defs/u32" },
+                  "signals": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": ["kind", "signal"],
+                      "properties": {
+                        "kind": { "enum": ["feature-ramp", "context", "strict-exclusion"] },
+                        "signal": { "$ref": "#/$defs/identifier" },
+                        "feature": { "type": "integer", "minimum": 0 },
+                        "lo": { "$ref": "#/$defs/u32" },
+                        "hi": { "$ref": "#/$defs/u32" },
+                        "max": { "$ref": "#/$defs/u32" },
+                        "classes": { "type": "array", "items": { "$ref": "#/$defs/identifier" } },
+                        "points": { "$ref": "#/$defs/u32" }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "bands": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["low", "medium", "high"],
+              "properties": {
+                "low": { "$ref": "#/$defs/u32" },
+                "medium": { "$ref": "#/$defs/u32" },
+                "high": { "$ref": "#/$defs/u32" }
+              }
+            },
+            "contextClasses": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/identifier" } },
+            "credentialNameSignals": { "type": "array", "items": { "$ref": "#/$defs/identifier" } },
+            "exclusionGrammars": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/identifier" } },
+            "placeholderWords": { "type": "array", "items": { "type": "string" } },
+            "placeholderMarkers": { "type": "array", "items": { "type": "string" } },
+            "maskSymbols": { "type": "array", "items": { "type": "string" } },
+            "minMaskLength": { "type": "integer", "minimum": 1 }
+          }
+        }
+      }
+    },
+    "modelFingerprint": { "$ref": "#/$defs/sha256" },
+    "identityLedger": {
+      "description": "Append-only: every model identity this artifact has ever recorded, with the one fingerprint it stands for. An identity is never reused for different values.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["model", "featureSchema", "modelFingerprint", "introducedInRevision"],
+        "properties": {
+          "model": { "$ref": "#/$defs/modelId" },
+          "featureSchema": { "$ref": "#/$defs/featureSchemaId" },
+          "modelFingerprint": { "$ref": "#/$defs/sha256" },
+          "introducedInRevision": { "type": "integer", "minimum": 1 }
+        }
+      }
+    },
+    "sources": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["spec", "code"],
+      "properties": {
+        "spec": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["path", "section", "sha256"],
+            "properties": {
+              "path": { "$ref": "#/$defs/repoPath" },
+              "section": { "type": "string", "minLength": 1 },
+              "sha256": { "$ref": "#/$defs/sha256" }
+            }
+          }
+        },
+        "code": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["path", "sha256"],
+            "properties": {
+              "path": { "$ref": "#/$defs/repoPath" },
+              "sha256": { "$ref": "#/$defs/sha256" }
+            }
+          }
+        }
+      }
+    },
+    "calibration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repository",
+        "issue",
+        "pullRequest",
+        "branch",
+        "commit",
+        "method",
+        "experimentVersion",
+        "selectedConfiguration",
+        "selection",
+        "featureDataset",
+        "scoring",
+        "holdoutAccess",
+        "reproduction",
+        "correspondence"
+      ],
+      "properties": {
+        "repository": { "const": "redact-secret/redact-secret-benchmarks" },
+        "issue": { "type": "integer", "minimum": 1 },
+        "pullRequest": { "type": "integer", "minimum": 1 },
+        "branch": { "const": "develop" },
+        "commit": { "$ref": "#/$defs/commit" },
+        "method": { "$ref": "#/$defs/permalink" },
+        "experimentVersion": { "type": "string", "minLength": 1 },
+        "selectedConfiguration": { "type": "string", "minLength": 1 },
+        "selection": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["method", "sourceHash", "seed"],
+          "properties": {
+            "method": { "type": "string", "minLength": 1 },
+            "sourceHash": { "$ref": "#/$defs/sha256" },
+            "seed": { "type": "string" }
+          }
+        },
+        "featureDataset": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["schemaVersion", "extractorVersion", "extractorSourceHash", "datasetHash", "featureSchema", "productFeatureSource"],
+          "properties": {
+            "schemaVersion": { "type": "integer", "minimum": 1 },
+            "extractorVersion": { "type": "string", "minLength": 1 },
+            "extractorSourceHash": { "$ref": "#/$defs/sha256" },
+            "datasetHash": { "$ref": "#/$defs/sha256" },
+            "featureSchema": { "$ref": "#/$defs/featureSchemaId" },
+            "productFeatureSource": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["repository", "commit", "pinnedBy"],
+              "properties": {
+                "repository": { "const": "redact-secret/redact-secret" },
+                "commit": { "$ref": "#/$defs/commit" },
+                "pinnedBy": { "$ref": "#/$defs/permalink" }
+              }
+            }
+          }
+        },
+        "scoring": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "contractDecision",
+            "featureSchemaVersion",
+            "featureSetHash",
+            "aggregationContractVersion",
+            "weightSetHash",
+            "thresholdSetHash",
+            "identity"
+          ],
+          "properties": {
+            "contractDecision": { "type": "string", "minLength": 1 },
+            "featureSchemaVersion": { "$ref": "#/$defs/featureSchemaId" },
+            "featureSetHash": { "$ref": "#/$defs/sha256" },
+            "aggregationContractVersion": { "type": "string", "minLength": 1 },
+            "weightSetHash": { "$ref": "#/$defs/sha256" },
+            "thresholdSetHash": { "$ref": "#/$defs/sha256" },
+            "identity": { "$ref": "#/$defs/sha256" }
+          }
+        },
+        "holdoutAccess": { "const": "none" },
+        "reproduction": { "type": "string", "minLength": 1 },
+        "correspondence": { "type": "string", "minLength": 1 }
+      }
+    },
+    "corpora": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pinManifest", "tuning", "evaluation"],
+      "properties": {
+        "pinManifest": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["path", "sha256"],
+          "properties": {
+            "path": { "$ref": "#/$defs/repoPath" },
+            "sha256": { "$ref": "#/$defs/sha256" }
+          }
+        },
+        "tuning": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["category", "corpusHash"],
+            "properties": {
+              "category": { "$ref": "#/$defs/identifier" },
+              "corpusHash": { "$ref": "#/$defs/sha256" }
+            }
+          }
+        },
+        "evaluation": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["source", "role", "corpusHash"],
+            "properties": {
+              "source": { "$ref": "#/$defs/identifier" },
+              "role": { "$ref": "#/$defs/identifier" },
+              "corpusHash": { "$ref": "#/$defs/sha256" }
+            }
+          }
+        }
+      }
+    },
+    "tuningManifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "hash", "reason", "draft"],
+      "properties": {
+        "status": { "enum": ["pending", "bound"] },
+        "hash": { "type": ["string", "null"], "pattern": "^[0-9a-f]{64}$" },
+        "reason": { "type": "string", "minLength": 1 },
+        "draft": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "status", "product", "generatedAt", "fileSha256", "canonicalHash", "deterministic"],
+          "properties": {
+            "id": { "type": "string", "minLength": 1 },
+            "status": { "type": "string", "minLength": 1 },
+            "product": { "type": "null" },
+            "generatedAt": { "$ref": "#/$defs/commit" },
+            "fileSha256": { "$ref": "#/$defs/sha256" },
+            "canonicalHash": { "$ref": "#/$defs/sha256" },
+            "deterministic": { "type": "string", "minLength": 1 }
+          }
+        }
+      }
+    },
+    "productRevision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["recordedHere", "boundBy", "semantics"],
+      "properties": {
+        "recordedHere": { "const": false },
+        "boundBy": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "semantics": { "type": "string", "minLength": 1 }
+      }
+    },
+    "knownLimitations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "statement"],
+        "properties": {
+          "id": { "$ref": "#/$defs/identifier" },
+          "statement": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["generation", "method", "reviewedIn", "check"],
+      "properties": {
+        "generation": { "type": "string", "minLength": 1 },
+        "method": { "type": "string", "minLength": 1 },
+        "reviewedIn": { "type": "string", "pattern": "^https://github\\.com/redact-secret/redact-secret/(issues|pull)/[0-9]+$" },
+        "check": { "type": "string", "minLength": 1 }
+      }
+    }
+  },
+  "$defs": {
+    "u32": { "type": "integer", "minimum": 0, "maximum": 4294967295 },
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "commit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "identifier": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]*$" },
+    "modelId": { "type": "string", "pattern": "^evidence-aggregation/v[1-9][0-9]*$" },
+    "featureSchemaId": { "type": "string", "pattern": "^evidence-features/v[1-9][0-9]*$" },
+    "repoPath": { "type": "string", "pattern": "^[A-Za-z0-9_.-]+(/[A-Za-z0-9_.-]+)*$" },
+    "permalink": { "type": "string", "pattern": "^https://github\\.com/redact-secret/[a-z0-9-]+/blob/[0-9a-f]{40}/[^ ]+$" }
+  }
+}
