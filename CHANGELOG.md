@@ -124,6 +124,11 @@ evidence is linked from each published version.
   `'$VAR'` reference inside shell quote juggling, an `env.NAME` lookup, the
   ` + expr + ` seam between concatenated string literals, and a whole AWS
   ARN such as `arn:aws:iam::aws:policy/ChangePassword` (#817).
+- Authorization headers: `Proxy-Authorization` is read like
+  `Authorization`; `generic-token` finds a `Basic` credential mid-line, for
+  example inside a quoted `curl -H '...'` argument; and `bearer-token`
+  accepts a 12 to 15 byte value when it follows an explicit
+  `Authorization:` header (a bare `Bearer <value>` still needs 16) (#818).
 
 ## 0.1.0-beta.8 — 2026-09-25
 

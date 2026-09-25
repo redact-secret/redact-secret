@@ -1,9 +1,10 @@
 //! Structural Bearer authorization detector.
 //!
 //! Requires the explicit `Bearer` scheme and a token of at least 16
-//! characters. This keeps arbitrary identifiers out of scope but
-//! intentionally misses short development tokens. Only the credential
-//! value, not the header, is selected.
+//! characters, or 12 after an explicit `Authorization:` or
+//! `Proxy-Authorization:` header name (issue #818). This keeps arbitrary
+//! identifiers out of scope but intentionally misses short development
+//! tokens. Only the credential value, not the header, is selected.
 //!
 //! A value that is classic redaction filler or built entirely from
 //! recognized placeholder vocabulary is excluded
@@ -22,6 +23,10 @@ use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
 
 const MIN_TOKEN_LEN: usize = 16;
+/// The floor after an explicit `Authorization:`/`Proxy-Authorization:`
+/// header, where the header name already rules out prose. Matches the
+/// `Basic`/`Token` floor in `generic-token` (issue #818).
+const MIN_HEADER_TOKEN_LEN: usize = 12;
 const MAX_TRAILING_EQUALS: usize = 2;
 
 /// Mirrors `generic_token::PLACEHOLDER_WORDS`: the same whole-value
@@ -81,12 +86,13 @@ fn is_space_or_tab(byte: u8) -> bool {
 
 /// Matches the optional `authorization\s*:\s*` prefix followed by the
 /// mandatory `bearer` keyword, anchored exactly at `pos`. Returns the offset
-/// right after the keyword.
+/// right after the keyword and whether the `authorization` header name was
+/// part of the match.
 ///
 /// The two alternatives never both start with the same literal text, so
 /// there is nothing to backtrack: text at `pos` either spells
 /// `authorization...bearer` or it spells `bearer` directly.
-fn match_scheme_at(input: &str, pos: usize) -> Option<usize> {
+fn match_scheme_at(input: &str, pos: usize) -> Option<(usize, bool)> {
     if starts_with_ci(input, pos, "authorization") {
         let mut cursor = super::text::skip_while_chars(
             input,
@@ -98,9 +104,19 @@ fn match_scheme_at(input: &str, pos: usize) -> Option<usize> {
         }
         cursor += 1;
         cursor = super::text::skip_while_chars(input, cursor, super::text::is_js_whitespace);
-        return starts_with_ci(input, cursor, "bearer").then(|| cursor + "bearer".len());
+        return starts_with_ci(input, cursor, "bearer").then(|| (cursor + "bearer".len(), true));
     }
-    starts_with_ci(input, pos, "bearer").then(|| pos + "bearer".len())
+    starts_with_ci(input, pos, "bearer").then(|| (pos + "bearer".len(), false))
+}
+
+/// `true` when `proxy-` (case-insensitive) sits directly before `pos` at an
+/// identifier boundary: the `authorization` match is the tail of a
+/// `Proxy-Authorization` header, not of a wider identifier (issue #818).
+fn preceded_by_proxy_prefix(bytes: &[u8], pos: usize) -> bool {
+    const PROXY: &[u8] = b"proxy-";
+    pos >= PROXY.len()
+        && bytes[pos - PROXY.len()..pos].eq_ignore_ascii_case(PROXY)
+        && (pos == PROXY.len() || !is_boundary_identifier_char(bytes[pos - PROXY.len() - 1]))
 }
 
 fn trim_end_js_whitespace(input: &str) -> &str {
@@ -156,7 +172,7 @@ impl Detector for BearerTokenDetector {
         let mut cursor = 0usize;
 
         while cursor < bytes.len() {
-            let Some(scheme_end) = match_scheme_at(input, cursor) else {
+            let Some((scheme_end, header)) = match_scheme_at(input, cursor) else {
                 cursor += super::text::char_at(input, cursor).map_or(1, char::len_utf8);
                 continue;
             };
@@ -169,7 +185,13 @@ impl Detector for BearerTokenDetector {
             let value_start = scheme_end + ws_len;
 
             let token_len = ascii_run_len(bytes, value_start, is_token_char);
-            if token_len < MIN_TOKEN_LEN {
+            if token_len
+                < if header {
+                    MIN_HEADER_TOKEN_LEN
+                } else {
+                    MIN_TOKEN_LEN
+                }
+            {
                 cursor += super::text::char_at(input, cursor).map_or(1, char::len_utf8);
                 continue;
             }
@@ -179,7 +201,9 @@ impl Detector for BearerTokenDetector {
                 .count();
             let value_end = token_end + trailing_equals;
 
-            let boundary_blocked = cursor > 0 && is_boundary_identifier_char(bytes[cursor - 1]);
+            let boundary_blocked = cursor > 0
+                && is_boundary_identifier_char(bytes[cursor - 1])
+                && !(header && preceded_by_proxy_prefix(bytes, cursor));
             let value = &input[value_start..token_end];
             if !boundary_blocked
                 && !is_non_secret_bearer_value(value)
@@ -239,6 +263,35 @@ mod tests {
     #[test]
     fn short_development_token_is_ignored() {
         assert!(detect("Bearer short-token").is_empty());
+    }
+
+    #[test]
+    fn an_explicit_authorization_header_lowers_the_floor_to_twelve() {
+        // Issue #818: 15- and 12-byte values after the header name.
+        for (input, value) in [
+            ("Authorization: Bearer SYNTH.q8v-N3xR7", "SYNTH.q8v-N3xR7"),
+            ("Proxy-Authorization: Bearer SYNTHq8vN3xR", "SYNTHq8vN3xR"),
+            (
+                "curl -H 'authorization: bearer SYNTH.q8v-N3xR7'",
+                "SYNTH.q8v-N3xR7",
+            ),
+        ] {
+            let candidates = detect(input);
+            let (start, end) = only_range(&candidates);
+            assert_eq!(&input[start..end], value, "{input}");
+        }
+        for input in [
+            // Without the header, the 16-byte floor stands.
+            "Bearer SYNTH.q8v-N3xR7",
+            "the Bearer SYNTH.q8v-N3xR7 value",
+            // 11 bytes after the header.
+            "Authorization: Bearer SYNTHq8vN3x",
+            "Authorization: Bearer YOUR_TOKEN_HERE",
+            // A wider identifier before `authorization`.
+            "reverse_proxy-authorization: Bearer SYNTH.q8v-N3xR7",
+        ] {
+            assert!(detect(input).is_empty(), "{input}");
+        }
     }
 
     #[test]

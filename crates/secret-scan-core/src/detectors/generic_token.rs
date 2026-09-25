@@ -1968,16 +1968,28 @@ struct AuthorizationMatch {
 fn parse_authorization_from(input: &str, start: usize) -> Option<AuthorizationMatch> {
     let bytes = input.as_bytes();
     let mut cursor = start + ascii_run_len(bytes, start, is_space_or_tab_byte);
+    // `Proxy-Authorization` carries the same credentials grammar
+    // (RFC 7235 section 4.4, issue #818).
+    if starts_with_ci(input, cursor, "proxy-authorization") {
+        cursor += "proxy-".len();
+    }
     if !starts_with_ci(input, cursor, "authorization") {
         return None;
     }
     cursor += "authorization".len();
+    // A quoted header-map key (`"authorization": "Basic ..."`, issue #818).
+    if matches!(bytes.get(cursor), Some(b'"' | b'\'')) {
+        cursor += 1;
+    }
     cursor += ascii_run_len(bytes, cursor, is_space_or_tab_byte);
     if bytes.get(cursor) != Some(&b':') {
         return None;
     }
     cursor += 1;
     cursor += ascii_run_len(bytes, cursor, is_space_or_tab_byte);
+    if matches!(bytes.get(cursor), Some(b'"' | b'\'')) {
+        cursor += 1;
+    }
 
     let scheme = if starts_with_ci(input, cursor, "basic") {
         cursor += "basic".len();
@@ -2014,6 +2026,22 @@ fn try_match_authorization_at(input: &str, pos: usize) -> Option<AuthorizationMa
     }
     match char_at(input, pos) {
         Some(ch @ ('\r' | '\n')) => parse_authorization_from(input, pos + ch.len_utf8()),
+        // Mid-line, after any byte that cannot continue a header name: a
+        // quoted `curl -H 'Authorization: Basic ...'` argument, a JSON
+        // string, a log prefix (issue #818). `bearer-token` already matches
+        // `Bearer` in the same positions. Only `Basic` is taken mid-line: a
+        // mid-line `Authorization: token ...` is the header provider
+        // detectors (`travisci-api-token`, `github-token`) key on, and an
+        // always-redact generic candidate would take the span from them.
+        Some(ch)
+            if matches!(ch, 'a' | 'A' | 'p' | 'P')
+                && prev_char(input, pos).is_some_and(|previous| {
+                    !previous.is_ascii_alphanumeric()
+                        && !matches!(previous, '_' | '-' | '\r' | '\n')
+                }) =>
+        {
+            parse_authorization_from(input, pos).filter(|m| m.scheme == "basic")
+        }
         _ => None,
     }
 }
@@ -3007,6 +3035,40 @@ mod tests {
     #[test]
     fn authorization_scheme_other_than_basic_or_token_is_ignored() {
         assert!(detect("Authorization: Digest SYNTHETIC_REVOKED_DIGEST_VALUE_1234").is_empty());
+    }
+
+    #[test]
+    fn proxy_authorization_and_mid_line_basic_headers_are_detected() {
+        // Issue #818. `U1lOVEhFVElDOmZpeHR1cmU=` is base64 of `SYNTHETIC:fixture`.
+        const BASIC: &str = "U1lOVEhFVElDOmZpeHR1cmU=";
+        for input in [
+            format!("Proxy-Authorization: Basic {BASIC}"),
+            format!("curl -H 'Authorization: Basic {BASIC}' https://api.example.test"),
+            format!("{{\"headers\":{{\"authorization\":\"Basic {BASIC}\"}}}}"),
+            format!("[req] authorization: basic {BASIC}"),
+        ] {
+            let candidates: Vec<Candidate> = detect(&input)
+                .into_iter()
+                .filter(|candidate| candidate.type_name() == "authorization_credential")
+                .collect();
+            let (start, end) = only_range(&candidates);
+            assert_eq!(&input[start..end], BASIC, "{input}");
+        }
+        // A wider header name or identifier does not open one.
+        for input in [
+            format!("notAuthorization: Basic {BASIC}"),
+            format!("X-Authorization: Basic {BASIC}"),
+            format!("reverse_proxy-authorization: Basic {BASIC}"),
+            // Mid-line `Token` stays with the provider detectors.
+            format!("curl -H \"Authorization: token {BASIC}\""),
+        ] {
+            assert!(
+                detect(&input)
+                    .iter()
+                    .all(|candidate| candidate.type_name() != "authorization_credential"),
+                "{input}"
+            );
+        }
     }
 
     // --- issue #263: a value fully delimited by `{{ ... }}` is a template
