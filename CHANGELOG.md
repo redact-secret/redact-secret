@@ -7,6 +7,31 @@ evidence is linked from each published version.
 
 ### Changed
 
+- `benchmarks/support-matrix.json` is regenerated in candidate mode from
+  redact-secret-benchmarks `main` 25e31c8 against product `main` 10263e5
+  (trufflehog 3.97.4, gitleaks 8.30.1): 73 stable (57 documented, 16
+  empirical), 17 provisional, 1 pending, 17 unsupported across 108
+  families. The previous pin was a published-mode run taken before the Beta.8
+  fixtures landed, with 0 stable, so the support-matrix drift gate reported
+  every beta.7 stable family as a regression. Against `v0.1.0-beta.7` the
+  gate now reports 0 regressions, 19 improvements and 15 new families.
+  `docs/support-matrix.md` and the README follow. Reason cells cover the
+  evaluator's newer gates: the corroborated empirical route,
+  unresolved contradictions, context-constrained minimums and fixture-profile
+  debt. An unknown `fixtureProfile` segment fails the check like an unknown
+  gate instead of reaching the docs as raw text.
+- The support-matrix validators (`scripts/check-support-matrix-drift.py`,
+  `scripts/generate-support-matrix-docs.py`) accept a T2 `empirical` stable
+  family whose evidence basis is `independently-corroborated`, as well as
+  `empirically-observed`. This follows redact-secret-benchmarks'
+  `decision-qualify-empirical-stable-by-corroboration`, which added the
+  corroborated route. Before, every corroborated empirical family in a
+  current matrix failed validation. `benchmarks/support-matrix-schema.json`
+  now pins benchmarks `25e31c8` (was `d5438c5`), the contract that adds the
+  corroboration counts and `profileCoverage`. `benchmarks/pin-manifest.json`
+  is resynced to benchmarks `main`, and the ten open ledger records that
+  cited the old `detector-coverage` corpus hash are re-pinned to the current
+  one.
 - `docs/support-matrix.md` explains why a family is not yet stable in plain
   language. Related evaluator gates are grouped into one sentence, for
   example "Not yet stable: needs broader positive test contexts and more

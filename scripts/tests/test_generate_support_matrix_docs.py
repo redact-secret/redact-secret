@@ -164,6 +164,40 @@ class ValidateMatrixTests(unittest.TestCase):
         self.assertEqual(GEN.validate_matrix(m, SCHEMA), [])
         self.assertEqual(m["families"][0]["evidenceTier"], "T2")
 
+    def test_accepts_t2_corroborated_empirical_stable(self) -> None:
+        # redact-secret-benchmarks' decision-qualify-empirical-stable-by-corroboration.
+        m = matrix(
+            [
+                family(
+                    "widget",
+                    "widget:token",
+                    "Widget token",
+                    "stable",
+                    tier="T2",
+                    basis="independently-corroborated",
+                    profile="empirical",
+                )
+            ]
+        )
+        self.assertEqual(GEN.validate_matrix(m, SCHEMA), [])
+
+    def test_rejects_empirical_qualification_on_a_non_empirical_basis(self) -> None:
+        m = matrix(
+            [
+                family(
+                    "widget",
+                    "widget:token",
+                    "Widget token",
+                    "stable",
+                    tier="T2",
+                    basis="project-policy",
+                    profile="empirical",
+                )
+            ]
+        )
+        errors = GEN.validate_matrix(m, SCHEMA)
+        self.assertTrue(any("must remain T2" in error for error in errors))
+
     def test_rejects_empirical_qualification_that_masquerades_as_t1(self) -> None:
         m = matrix(
             [
@@ -560,7 +594,7 @@ EMPIRICAL_REASON = (
     "empirical.minimumTwinPairs: 3 < 8 — Eight twin pairs. | "
     "empirical.mode: missing — choose shape or context-constrained qualification"
 )
-RAW_IDENTIFIERS = ("documented.", "empirical.", "qualificationProfile", "positiveContractTier", " < ")
+RAW_IDENTIFIERS = ("documented.", "empirical.", "fixtureProfile", "qualificationProfile", "positiveContractTier", " < ")
 
 
 class UserFacingReasonTests(unittest.TestCase):
@@ -614,6 +648,49 @@ class UserFacingReasonTests(unittest.TestCase):
     def test_an_unmapped_gate_identifier_fails_loudly(self) -> None:
         with self.assertRaisesRegex(ValueError, "unmapped support-matrix gate 'empirical.newGate'"):
             GEN.user_facing_reason("empirical.newGate: 0 < 1 — a gate added upstream")
+
+    def test_corroborated_route_gates_name_both_empirical_routes_once(self) -> None:
+        text = GEN.user_facing_reason(
+            "empirical.corroborated.minimumReferences: 0 < 3 — refs. (corroborated route) | "
+            "empirical.corroborated.minimumOwners: 0 < 3 — owners. (corroborated route) | "
+            "empirical.minimumObservations: 0 < 5 — obs. (observed route, optional)"
+        )
+        self.assertEqual(
+            text,
+            "Not yet stable: needs independent corroboration of its format "
+            "(several sources, or provider-issued keys).",
+        )
+        self.assert_plain(text)
+
+    def test_unresolved_contradictions_and_context_constrained_gates(self) -> None:
+        text = GEN.user_facing_reason(
+            "empirical.unresolvedContradictions: 4 > 0 — doubt. | "
+            "empirical.contextConstrained.minimumContextTwinPairs: 2 < 10 — twins. | "
+            "empirical.contextConstrained.minimumFixtures: 32 < 48 — fixtures."
+        )
+        self.assertEqual(
+            text,
+            "Not yet stable: needs its conflicting format evidence settled, more near-miss twin pairs "
+            "and more test fixtures overall.",
+        )
+        self.assert_plain(text)
+
+    def test_fixture_profile_debt_groups_by_cell(self) -> None:
+        text = GEN.user_facing_reason(
+            "fixtureProfile stable-empirical: 20 total fixtures < 40 (20 short) | "
+            "fixtureProfile stable-empirical: 5 positive/context cases < 8 (3 short) | "
+            "fixtureProfile stable-empirical: 3 twin pairs < 8 (5 short)"
+        )
+        self.assertEqual(
+            text,
+            "Not yet stable: needs broader positive test contexts, more near-miss twin pairs "
+            "and more test fixtures overall.",
+        )
+        self.assert_plain(text)
+
+    def test_an_unmapped_fixture_profile_segment_fails_loudly(self) -> None:
+        with self.assertRaisesRegex(ValueError, "unmapped support-matrix gate 'fixtureProfile stable-empirical'"):
+            GEN.user_facing_reason("fixtureProfile stable-empirical: requires T2 evidence, the contract is T1")
 
     def test_rendering_changes_only_the_reason_cell(self) -> None:
         fam = family("gadget", "gadget:token", "Gadget token", "provisional", reason=DOCUMENTED_REASON, tier="T1",
