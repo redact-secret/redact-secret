@@ -1616,7 +1616,7 @@
     {
       "detector": "bearer-token",
       "evidence": {
-        "fixtureCount": 39,
+        "fixtureCount": 44,
         "hostContextsExercised": [
           "dotenv",
           "http",
@@ -1624,6 +1624,7 @@
           "log",
           "markdown",
           "plain-text",
+          "toml",
           "yaml"
         ],
         "kindsWithSupportedEvidence": [
@@ -1652,7 +1653,10 @@
         "bearer-token-regression-base64url-value-still-detected",
         "bearer-token-regression-header-anchored-fifteen-byte-value",
         "bearer-token-regression-placeholder-lead-word-with-random-suffix",
-        "bearer-token-regression-proxy-authorization-header"
+        "bearer-token-regression-proxy-authorization-header",
+        "bearer-token-regression-secret-token-uri-folded-header",
+        "bearer-token-regression-secret-token-uri-uppercase-scheme",
+        "bearer-token-regression-secret-token-uri-whole"
       ],
       "policyClass": "always-redact",
       "schemeRows": "not-applicable",
