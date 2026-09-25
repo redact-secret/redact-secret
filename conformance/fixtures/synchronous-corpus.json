@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 2113,
+  "fixtureCount": 2117,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -30985,7 +30985,7 @@
       "id": "connection-negative-unsupported-scheme-https-with-credentials",
       "detector": "connection-string",
       "kind": "boundary",
-      "support": "intentionally-unsupported",
+      "support": "supported",
       "tier": "malformed",
       "contexts": [
         "plain-text"
@@ -30997,8 +30997,87 @@
         "ordinal": 0
       },
       "input": "https://fixtureuser:SyntheticHttpsPassw0rd9@host.example.com/path",
+      "expected": [
+        {
+          "detector": "connection-string",
+          "type": "connection_string_password",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 20,
+          "end": 43
+        }
+      ],
+      "note": "A generic https URL carrying userinfo. Until issue #820 this was an intentional scope boundary (only database and queue schemes were parsed); #820 added http, https, ftp and ftps to the bounded scheme set because a password in URL userinfo leaks the same way in clone URLs, proxy settings and request logs, so the password range is now reported. The id is kept for continuity."
+    },
+    {
+      "id": "connection-regression-https-userinfo-percent-encoded-password",
+      "detector": "connection-string",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "https://fixture:SYNTHETIC%20revoked@www.example.test/\n",
+      "expected": [
+        {
+          "detector": "connection-string",
+          "type": "connection_string_password",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 16,
+          "end": 35
+        }
+      ],
+      "note": "Issue #820: an https URL userinfo password is selected undecoded, like a database URL password."
+    },
+    {
+      "id": "connection-regression-http-proxy-userinfo-password",
+      "detector": "connection-string",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "HTTP_PROXY=http://fixture:SYNTHETIC_REVOKED_PROXY_VALUE@proxy.example.test:3128\n",
+      "expected": [
+        {
+          "detector": "connection-string",
+          "type": "connection_string_password",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 26,
+          "end": 55
+        }
+      ],
+      "note": "Issue #820: a proxy URL with a port keeps only the password selected."
+    },
+    {
+      "id": "connection-negative-https-user-without-password",
+      "detector": "connection-string",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "https://fixture@www.example.test/ and https://www.example.test:8443/\n",
       "expected": [],
-      "note": "A generic https URL carrying real-looking userinfo is outside this detector's bounded scheme set; treating arbitrary http(s) URLs as connection strings is an intentional scope boundary, not a parsing gap, the same as the existing unsupported-scheme Rust evidence."
+      "note": "Issue #820 control: userinfo without a password, and a host with a port, carry no credential."
+    },
+    {
+      "id": "connection-negative-https-placeholder-password",
+      "detector": "connection-string",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "https://fixture:<password>@www.example.test/\n",
+      "expected": [],
+      "note": "Issue #820 control: the existing placeholder exclusions apply to the new schemes."
     },
     {
       "id": "vault-positive-repeated-value",
