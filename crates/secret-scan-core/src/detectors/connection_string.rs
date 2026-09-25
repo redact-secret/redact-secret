@@ -34,7 +34,12 @@ use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, 
 /// backtracking regex alternation would: try the earlier alternative first,
 /// and fall through to the next only when it is not immediately followed by
 /// `://`.
-const SCHEMES: [&str; 10] = [
+///
+/// `http`/`https`/`ftp`/`ftps` (issue #820): RFC 3986 section 3.2.1
+/// deprecates a password in URL userinfo, but that is still how credentials
+/// leak in clone URLs, proxy settings and request logs, and the authority
+/// grammar is the same.
+const SCHEMES: [&str; 14] = [
     "postgresql",
     "postgres",
     "mysql",
@@ -45,6 +50,10 @@ const SCHEMES: [&str; 10] = [
     "rediss",
     "amqp",
     "amqps",
+    "https",
+    "http",
+    "ftps",
+    "ftp",
 ];
 
 const MAX_PASSWORD_LENGTH: usize = 4_096;
@@ -1098,9 +1107,46 @@ mod tests {
     #[test]
     fn unsupported_scheme_is_ignored() {
         assert_eq!(
-            detect("ftp://fixture:SYNTHETIC_REVOKED_DB_VALUE@localhost/db"),
+            detect("gopher://fixture:SYNTHETIC_REVOKED_DB_VALUE@localhost/db"),
             Vec::new()
         );
+    }
+
+    #[test]
+    fn web_and_ftp_url_userinfo_passwords_are_detected() {
+        // Issue #820.
+        for (input, value) in [
+            (
+                "https://fixture:SYNTHETIC%20revoked@www.example.test/",
+                "SYNTHETIC%20revoked",
+            ),
+            (
+                "remote = https://fixture:SYNTHETICq8vN3xR7tLm2@repo.example.test/repo.git",
+                "SYNTHETICq8vN3xR7tLm2",
+            ),
+            (
+                "HTTP_PROXY=http://fixture:SYNTHETIC_REVOKED_PROXY_VALUE@proxy.example.test:3128",
+                "SYNTHETIC_REVOKED_PROXY_VALUE",
+            ),
+            (
+                "ftp://fixture:SYNTHETIC_REVOKED_FTP_VALUE@ftp.example.test/pub",
+                "SYNTHETIC_REVOKED_FTP_VALUE",
+            ),
+        ] {
+            let candidates = detect(input);
+            assert_eq!(candidates.len(), 1, "{input}");
+            let range = candidates[0].range();
+            assert_eq!(&input[range.start()..range.end()], value, "{input}");
+        }
+        for input in [
+            "https://fixture@www.example.test/",
+            "https://www.example.test:8443/",
+            "mailto:fixture@example.test",
+            "https://fixture:<password>@www.example.test/",
+            "https://fixture:${PASSWORD}@www.example.test/",
+        ] {
+            assert!(detect(input).is_empty(), "{input}");
+        }
     }
 
     #[test]

@@ -134,6 +134,9 @@ evidence is linked from each published version.
   wherever it appears, including as the value of another assignment
   (`token = SECRET-TOKEN:...`). `generic-token` used to redact only the
   part after `secret-token:`, and missed the other forms (#819).
+- `connection-string` now reads the password in `https`, `http`, `ftps` and
+  `ftp` URL userinfo (`https://user:pass@host/`), with the same authority
+  rules as database URLs (#820).
 
 ## 0.1.0-beta.8 — 2026-09-25
 

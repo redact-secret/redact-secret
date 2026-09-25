@@ -4332,6 +4332,8 @@
             "connection-positive-redis-password-only",
             "connection-positive-rediss-fragment",
             "connection-positive-unclosed-command-substitution-still-detected",
+            "connection-regression-http-proxy-userinfo-password",
+            "connection-regression-https-userinfo-percent-encoded-password",
             "connection-regression-placeholder-embedded-in-password"
           ],
           "state": "supported"
@@ -4393,6 +4395,8 @@
             "connection-negative-docker-compose-env-var-password",
             "connection-negative-dotenv-example-braced-reference",
             "connection-negative-host-only",
+            "connection-negative-https-placeholder-password",
+            "connection-negative-https-user-without-password",
             "connection-negative-json-config-env-var-password",
             "connection-negative-malformed-percent",
             "connection-negative-mariadb-host-only",
@@ -4506,6 +4510,8 @@
             "connection-negative-docker-compose-env-var-password",
             "connection-negative-dotenv-example-braced-reference",
             "connection-negative-host-only",
+            "connection-negative-https-placeholder-password",
+            "connection-negative-https-user-without-password",
             "connection-negative-json-config-env-var-password",
             "connection-negative-malformed-percent",
             "connection-negative-mariadb-host-only",
@@ -4543,6 +4549,7 @@
             "connection-negative-redis-vendor-default-changeit",
             "connection-negative-rediss-host-only",
             "connection-negative-rediss-malformed-percent",
+            "connection-negative-unsupported-scheme-https-with-credentials",
             "connection-negative-user-only-authority",
             "connection-negative-vendor-default-appended-digit",
             "connection-overlap-context",
@@ -4569,6 +4576,8 @@
             "connection-positive-redis-password-only",
             "connection-positive-rediss-fragment",
             "connection-positive-unclosed-command-substitution-still-detected",
+            "connection-regression-http-proxy-userinfo-password",
+            "connection-regression-https-userinfo-percent-encoded-password",
             "connection-regression-placeholder-embedded-in-password",
             "invisible-connection-uri-password-zwsp",
             "regression-malformed-percent-authority"

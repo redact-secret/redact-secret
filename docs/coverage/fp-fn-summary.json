@@ -190,7 +190,7 @@
       "detector": "connection-string",
       "falseNegativeGuards": {
         "actualFalseNegatives": 0,
-        "count": 28,
+        "count": 30,
         "fixtureIds": [
           "connection-host-dotenv",
           "connection-host-javascript",
@@ -219,12 +219,14 @@
           "connection-positive-redis-password-only",
           "connection-positive-rediss-fragment",
           "connection-positive-unclosed-command-substitution-still-detected",
+          "connection-regression-http-proxy-userinfo-password",
+          "connection-regression-https-userinfo-percent-encoded-password",
           "connection-regression-placeholder-embedded-in-password"
         ]
       },
       "falsePositiveGuards": {
         "actualFalsePositives": 0,
-        "count": 49,
+        "count": 51,
         "fixtureIds": [
           "connection-negative-amqp-host-only",
           "connection-negative-amqp-malformed-percent",
@@ -236,6 +238,8 @@
           "connection-negative-docker-compose-env-var-password",
           "connection-negative-dotenv-example-braced-reference",
           "connection-negative-host-only",
+          "connection-negative-https-placeholder-password",
+          "connection-negative-https-user-without-password",
           "connection-negative-json-config-env-var-password",
           "connection-negative-malformed-percent",
           "connection-negative-mariadb-host-only",
