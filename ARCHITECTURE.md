@@ -203,6 +203,16 @@ miss truncated, new, malformed, or unsupported credential variants. Entropy is
 only a supporting signal and never sufficient by itself for aggressive
 classification.
 
+Beta.9 adds an explainable evidence scorer in shadow mode only
+(`decision-freeze-the-shadow-evidence-score-and-confidence-contract`). For a
+selected `contextual` or `entropy` candidate it computes, in integer
+fixed-point, a grouped and capped evidence score and a shadow band. The
+result is recorded for maintainer comparison and nothing else. It is not a
+probability, it is never public, and it never changes confidence, overlap
+resolution, or the resolved action. `private-key`, `provider`, and
+`structural` candidates are never scored, so statistical evidence cannot
+weaken them.
+
 Resolved-action severity is checked first and overrides that specificity
 ordering: a candidate that would resolve to a weaker action (by the crate's
 fixed default classification, `Block > Redact > Warn > Allow`) can never

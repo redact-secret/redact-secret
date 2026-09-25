@@ -40,6 +40,13 @@ Checks, in order:
 9. Package contents: every file ``cargo package`` would publish for the core
    matches ``core-package-globs``, and the files in
    ``core-package-required`` are all present.
+10. No public score surface: no plainly ``pub`` item or field in the core
+   crate or any ``bindings/*`` crate is named for a score, probability, or
+   calibration. The beta.9 evidence scorer is shadow-only and crate-internal
+   (``pub(crate)`` or narrower); a public name of that kind would begin the
+   public score API that
+   ``decision-freeze-the-shadow-evidence-score-and-confidence-contract``
+   rules out.
 
 Run ``--recheck-crate-name`` to also query crates.io for the preferred crate
 name; that is the only check that uses the network and it is off by default.
@@ -107,6 +114,18 @@ FORBIDDEN_SOURCE = {
     "println!": "standard output",
     "eprintln!": "standard error",
 }
+# A plainly `pub` Rust item or struct field (not `pub(crate)`/`pub(super)`),
+# and the words a public score/probability surface would be named with
+# (`decision-freeze-the-shadow-evidence-score-and-confidence-contract`, #768).
+PUBLIC_RUST_NAMES = (
+    re.compile(
+        r"\bpub\s+(?:(?:const|async|unsafe)\s+)*(?:mod|const|static|fn|struct|enum|trait|type|union)\s+"
+        r"(?P<name>[A-Za-z_][A-Za-z0-9_]*)"
+    ),
+    re.compile(r"^\s*pub\s+(?P<name>[A-Za-z_][A-Za-z0-9_]*)\s*:", re.M),
+    re.compile(r"\bpub\s+use\s+(?P<name>[^;]+);"),
+)
+PUBLIC_SCORE_WORD = re.compile(r"score|probabilit|calibrat", re.I)
 USER_AGENT = "redact-secret workspace check (https://github.com/redact-secret/redact-secret)"
 
 
@@ -425,6 +444,30 @@ def check_core_source_boundary(root: Path, metadata: dict, policy: dict) -> list
     return errors
 
 
+def check_no_public_score_surface(root: Path, metadata: dict, policy: dict) -> list[str]:
+    """No public core or binding name is a score, probability, or calibration."""
+    crate = core_root(metadata, policy)
+    source_dirs = [crate / "src"] if crate is not None else []
+    bindings_dir = root / "bindings"
+    if bindings_dir.is_dir():
+        source_dirs += sorted(path / "src" for path in bindings_dir.iterdir() if (path / "src").is_dir())
+
+    errors = []
+    for source_dir in source_dirs:
+        for source_path in sorted(source_dir.rglob("*.rs")):
+            source = source_path.read_text(encoding="utf-8")
+            relative = source_path.relative_to(root)
+            names = sorted({m.group("name").strip() for pattern in PUBLIC_RUST_NAMES for m in pattern.finditer(source)})
+            for name in names:
+                if PUBLIC_SCORE_WORD.search(name):
+                    errors.append(
+                        f"{relative}: public name {name!r} names a score, probability, or calibration; "
+                        "the beta.9 evidence scorer is shadow-only and crate-internal "
+                        "(decision-freeze-the-shadow-evidence-score-and-confidence-contract)"
+                    )
+    return errors
+
+
 def check_core_manifest(root: Path, metadata: dict, policy: dict) -> list[str]:
     """The core ships one shape: no features, no optional or target deps."""
     crate = core_root(metadata, policy)
@@ -520,6 +563,7 @@ def validate(root: Path, metadata: dict, package_lister=None) -> list[str]:
     errors.extend(check_msrv(root, metadata, root_manifest))
     errors.extend(check_core_public_api(root, metadata, policy))
     errors.extend(check_core_source_boundary(root, metadata, policy))
+    errors.extend(check_no_public_score_surface(root, metadata, policy))
     errors.extend(check_core_manifest(root, metadata, policy))
     if package_lister is not None:
         errors.extend(check_core_package_contents(policy, package_lister(policy["core-package"])))
