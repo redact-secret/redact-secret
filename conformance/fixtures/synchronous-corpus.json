@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 2108,
+  "fixtureCount": 2113,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -34574,6 +34574,98 @@
       "input": "Authorization: Bearer SYNTHq8vN3x\n",
       "expected": [],
       "note": "Issue #818 control: an 11-byte value after the header is below the header floor."
+    },
+    {
+      "id": "bearer-token-regression-secret-token-uri-whole",
+      "detector": "bearer-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "markdown"
+      ],
+      "input": "Given the URI:\n\nsecret-token:SYNTHETIC-7F3A-4C2B%20fixture\n\nkeep it out of logs.\n",
+      "expected": [
+        {
+          "detector": "bearer-token",
+          "type": "bearer_token",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 16,
+          "end": 58
+        }
+      ],
+      "note": "Issue #819: an RFC 8959 secret-token URI is a bearer secret as a whole; the finding covers the scheme and the body."
+    },
+    {
+      "id": "bearer-token-regression-secret-token-uri-uppercase-scheme",
+      "detector": "bearer-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "token = SECRET-TOKEN:SYNTHETIC-7F3A-4C2B%20fixture\n",
+      "expected": [
+        {
+          "detector": "bearer-token",
+          "type": "bearer_token",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 8,
+          "end": 50
+        }
+      ],
+      "note": "Issue #819: URI schemes are case-insensitive (RFC 3986 section 3.1); the URI is found as the value of a non-credential name too."
+    },
+    {
+      "id": "bearer-token-regression-secret-token-uri-folded-header",
+      "detector": "bearer-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "http"
+      ],
+      "input": "GET /stuff HTTP/1.1\nHost: www.example.test\nAuthorization: Bearer\n  secret-token:SYNTHETIC-7F3A-4C2B%20fixture\n",
+      "expected": [
+        {
+          "detector": "bearer-token",
+          "type": "bearer_token",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 67,
+          "end": 109
+        }
+      ],
+      "note": "Issue #819: a Bearer header folded before its secret-token URI still reports the whole URI on the continuation line."
+    },
+    {
+      "id": "bearer-token-negative-secret-token-scheme-without-body",
+      "detector": "bearer-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "toml"
+      ],
+      "input": "token_uri_prefix = \"secret-token:\"\n",
+      "expected": [],
+      "note": "Issue #819 control: the bare scheme with no body carries no secret."
+    },
+    {
+      "id": "bearer-token-negative-secret-token-placeholder-body",
+      "detector": "bearer-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "example: secret-token:placeholder\n",
+      "expected": [],
+      "note": "Issue #819 control: a body of placeholder vocabulary is excluded like a Bearer placeholder."
     },
     {
       "id": "generic-token-regression-proxy-authorization-basic",

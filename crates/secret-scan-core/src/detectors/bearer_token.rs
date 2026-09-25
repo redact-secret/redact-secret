@@ -155,6 +155,85 @@ pub(crate) fn has_open_bearer_authorization(input: &str) -> bool {
     }
 }
 
+/// The RFC 8959 scheme, matched case-insensitively (RFC 3986 section 3.1).
+const SECRET_TOKEN_SCHEME: &[u8] = b"secret-token:";
+
+/// The shortest `secret-token:` body reported. RFC 8959 allows one byte;
+/// documentation that names the scheme with a stub (`secret-token:abc`)
+/// is not a credential (issue #819).
+const MIN_SECRET_TOKEN_BODY_LEN: usize = 8;
+
+/// A `secret-token:` body byte: RFC 3986 `pchar` minus the sub-delimiters
+/// that close a value in running text or code (`'`, `(`, `)`, `,`, `;`).
+/// `%` is accepted here and its two hex digits are checked by the caller.
+fn is_secret_token_body_byte(byte: u8) -> bool {
+    byte.is_ascii_alphanumeric()
+        || matches!(
+            byte,
+            b'-' | b'.'
+                | b'_'
+                | b'~'
+                | b'%'
+                | b'!'
+                | b'$'
+                | b'&'
+                | b'*'
+                | b'+'
+                | b'='
+                | b':'
+                | b'@'
+        )
+}
+
+/// Every RFC 8959 `secret-token:` URI, scheme included (issue #819). The
+/// whole URI is the secret: RFC 8959 defines it as a bearer token whose
+/// scheme exists so it can be recognized and redacted. A `%` must start a
+/// valid percent-encoding, trailing `.`/`:` (sentence punctuation) are not
+/// part of the body, and a body of placeholder vocabulary or filler is
+/// excluded like a `Bearer` value.
+fn secret_token_uri_candidates(input: &str) -> Vec<Candidate> {
+    let bytes = input.as_bytes();
+    let mut candidates = Vec::new();
+    let mut cursor = 0usize;
+    while cursor + SECRET_TOKEN_SCHEME.len() <= bytes.len() {
+        if !bytes[cursor..cursor + SECRET_TOKEN_SCHEME.len()]
+            .eq_ignore_ascii_case(SECRET_TOKEN_SCHEME)
+            || (cursor > 0 && is_boundary_identifier_char(bytes[cursor - 1]))
+        {
+            cursor += 1;
+            continue;
+        }
+        let body_start = cursor + SECRET_TOKEN_SCHEME.len();
+        let mut end = body_start;
+        while end < bytes.len() && is_secret_token_body_byte(bytes[end]) {
+            if bytes[end] == b'%'
+                && !(end + 2 < bytes.len()
+                    && bytes[end + 1].is_ascii_hexdigit()
+                    && bytes[end + 2].is_ascii_hexdigit())
+            {
+                break;
+            }
+            end += if bytes[end] == b'%' { 3 } else { 1 };
+        }
+        while end > body_start && matches!(bytes[end - 1], b'.' | b':') {
+            end -= 1;
+        }
+        let body = &input[body_start..end];
+        if body.len() >= MIN_SECRET_TOKEN_BODY_LEN
+            && !is_non_secret_bearer_value(body)
+            && let Some(range) = ByteRange::new(cursor, end)
+        {
+            candidates.push(
+                Candidate::new("bearer_token", Confidence::High, range)
+                    .with_specificity(Specificity::Structural)
+                    .with_signals(["secret-token-uri"]),
+            );
+        }
+        cursor = end.max(body_start);
+    }
+    candidates
+}
+
 struct BearerTokenDetector;
 
 impl Detector for BearerTokenDetector {
@@ -221,6 +300,7 @@ impl Detector for BearerTokenDetector {
             cursor = value_end.max(cursor + 1);
         }
 
+        candidates.extend(secret_token_uri_candidates(input));
         Ok(candidates)
     }
 }
@@ -263,6 +343,41 @@ mod tests {
     #[test]
     fn short_development_token_is_ignored() {
         assert!(detect("Bearer short-token").is_empty());
+    }
+
+    #[test]
+    fn a_secret_token_uri_is_reported_whole_with_its_scheme() {
+        // Issue #819 (RFC 8959).
+        const URI: &str = "secret-token:SYNTHETIC-7F3A-4C2B%20fixture";
+        for (input, value) in [
+            (URI.to_owned(), URI),
+            (format!("token = {URI}"), URI),
+            (
+                "token = SECRET-TOKEN:SYNTHETIC-7F3A-4C2B%20fixture".to_owned(),
+                "SECRET-TOKEN:SYNTHETIC-7F3A-4C2B%20fixture",
+            ),
+            (format!("Authorization: Bearer\n  {URI}"), URI),
+            (format!("Use the URI {URI}."), URI),
+            // A broken percent-encoding ends the body.
+            (
+                "url = \"secret-token:SYNTHETIC-7F3A-4C2B%2\"".to_owned(),
+                "secret-token:SYNTHETIC-7F3A-4C2B",
+            ),
+        ] {
+            let candidates = detect(&input);
+            let (start, end) = only_range(&candidates);
+            assert_eq!(&input[start..end], value, "{input}");
+            assert_eq!(candidates[0].type_name(), "bearer_token");
+        }
+        for input in [
+            "token_uri_prefix = \"secret-token:\"",
+            "secret-token:abc",
+            "secret-token:placeholder",
+            "mysecret-token:SYNTHETIC-7F3A-4C2B%20fixture",
+            "x-secret-token:SYNTHETIC-7F3A-4C2B%20fixture",
+        ] {
+            assert!(detect(input).is_empty(), "{input}");
+        }
     }
 
     #[test]

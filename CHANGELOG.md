@@ -129,6 +129,11 @@ evidence is linked from each published version.
   example inside a quoted `curl -H '...'` argument; and `bearer-token`
   accepts a 12 to 15 byte value when it follows an explicit
   `Authorization:` header (a bare `Bearer <value>` still needs 16) (#818).
+- `bearer-token` reports an RFC 8959 `secret-token:` URI as one
+  `bearer_token` finding that includes the scheme, matched in any case and
+  wherever it appears, including as the value of another assignment
+  (`token = SECRET-TOKEN:...`). `generic-token` used to redact only the
+  part after `secret-token:`, and missed the other forms (#819).
 
 ## 0.1.0-beta.8 — 2026-09-25
 

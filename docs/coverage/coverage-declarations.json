@@ -4205,7 +4205,10 @@
             "bearer-token-regression-base64url-value-still-detected",
             "bearer-token-regression-header-anchored-fifteen-byte-value",
             "bearer-token-regression-placeholder-lead-word-with-random-suffix",
-            "bearer-token-regression-proxy-authorization-header"
+            "bearer-token-regression-proxy-authorization-header",
+            "bearer-token-regression-secret-token-uri-folded-header",
+            "bearer-token-regression-secret-token-uri-uppercase-scheme",
+            "bearer-token-regression-secret-token-uri-whole"
           ],
           "state": "supported"
         },
@@ -4250,6 +4253,8 @@
             "bearer-negative-repeated-character-filler-yaml",
             "bearer-token-negative-header-value-below-twelve-bytes",
             "bearer-token-negative-insert-access-token-placeholder",
+            "bearer-token-negative-secret-token-placeholder-body",
+            "bearer-token-negative-secret-token-scheme-without-body",
             "bearer-token-negative-short-value-without-header",
             "bearer-token-negative-your-oauth-token-placeholder"
           ],
