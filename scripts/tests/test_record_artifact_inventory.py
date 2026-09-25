@@ -340,6 +340,17 @@ class InventoryTests(unittest.TestCase):
             self.errors(configure), ["unrecognized artifact(s): something-else"]
         )
 
+    def test_shadow_determinism_records_are_not_unrecognized_artifacts(self) -> None:
+        def configure(artifacts: Artifacts) -> None:
+            for host in ("ubuntu-latest", "macos-latest", "windows-latest", "wasm32-wasip1"):
+                artifacts.files[f"shadow-determinism-{host}"] = [f"{host}-full.jsonl", f"{host}-common.jsonl"]
+            artifacts.files["shadow-determinism-report"] = ["report-full.json", "report-common.json"]
+
+        self.assertEqual(self.errors(configure), [])
+        self.assertFalse(
+            any(entry["artifact"].startswith("shadow-determinism-") for entry in self.collect(configure))
+        )
+
     def test_the_support_matrix_drift_record_is_not_an_unrecognized_artifact(self) -> None:
         def configure(artifacts: Artifacts) -> None:
             artifacts.files["support-matrix-drift"] = ["support-matrix-drift.json"]

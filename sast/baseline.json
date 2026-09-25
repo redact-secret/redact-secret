@@ -91,9 +91,9 @@
       "rationale": "The template string builds a `<SECRET_N>` / `<TYPE_N>` redaction placeholder label for test-fixture comparison or CLI output text; it is never assigned to `innerHTML`, rendered into a DOM, or otherwise interpreted as markup, so the XSS this rule guards against cannot occur here.",
       "rule_id": "sast.rules.javascript.lang.security.html-in-template-string"
     },
-    "947dc59960c0a832": {
+    "11d678ed06fc6c03": {
       "classification": "false_positive",
-      "line": 578,
+      "line": 627,
       "path": "scripts/check-rust-workspace.py",
       "rationale": "The URL is built from a fixed, hardcoded registry host (pypi.org, crates.io, or registry.npmjs.org) with only a package/crate name path-appended; the host is never attacker-influenced, so this cannot be redirected to an untrusted origin.",
       "rule_id": "sast.rules.python.lang.security.audit.dynamic-urllib-use-detected"

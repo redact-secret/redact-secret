@@ -15,4 +15,16 @@ pub(crate) mod context;
 pub(crate) mod exclusion;
 pub(crate) mod features;
 pub(crate) mod fixed_point;
+// `ShadowComparison::shifted` serves only the incremental session's
+// test-only recording (#772), so a non-test build sees no caller.
+#[cfg_attr(
+    not(test),
+    allow(
+        dead_code,
+        reason = "the incremental session records shadow comparisons only under cfg(test) (#772)"
+    )
+)]
 pub(crate) mod shadow;
+
+#[cfg(test)]
+mod qualification_tests;
