@@ -24,6 +24,27 @@ evidence is linked from each published version.
 
 ### Changed
 
+- The JavaScript side of the MCP golden path (`examples/mcp-redact`) now
+  runs on `@redact-secret/adapter-mcp` (redact-secret-adapters#13), which
+  implements the MCP boundary contract. The adapters pin
+  (`adapters/pin-source.json`) moves to adapters commit
+  `f014a996ebb9693fbe1c8cc14f144435f011c2b8` and adds that package.
+  `redactToolResult`, `redactArguments`, `redactStreamedToolResult`, and the
+  two wrappers now delegate to the adapter, which changes their behavior in
+  these ways:
+  - `_meta`, `resource_link` fields, and unknown fields are scanned.
+  - Image, audio, and blob content blocks the result unless the host passes
+    `binaryContent: "pass"`.
+  - JSON-in-text is scanned as text, not parsed.
+  - A key-context rescan runs after the leaf pass.
+  - `maxContentBlocks` is gone: traversal limits count from the result root.
+  - Arguments report under `tool-arguments`.
+  - A failing stream stops pulling from its producer.
+  - A throwing server handler, or a rejected client `callTool`, becomes the
+    fixed tool-error result, and a cancelled client call resolves to `null`.
+
+  The Python twins are unchanged and are not an MCP support claim (#810).
+
 - The JavaScript MCP / AI-context golden path (`examples/mcp-redact`:
   `buildSafeContext`, `redactToolResult`, `redactArguments`, and the two
   tool-call wrappers) now runs on `@redact-secret/adapter-ai-context`

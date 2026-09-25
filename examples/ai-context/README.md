@@ -17,7 +17,9 @@ composes two things that already exist:
 - the [`examples/mcp-redact`](../mcp-redact/README.md) golden path
   (`buildSafeContext`, `createGoldenPathBoundaryWith`, `redactToolResult`),
   which runs on `@redact-secret/adapter-ai-context`, the contract's
-  implementation, installed there from the publish-shaped tarball pinned in
+  implementation, with tool results sanitized by `@redact-secret/adapter-mcp`
+  (the [MCP boundary contract](../../docs/reference/mcp-boundary.md)), both
+  installed there from the publish-shaped tarballs pinned in
   [`adapters/pin-source.json`](../../adapters/README.md);
 - the released `@redact-secret/core@0.1.0-beta.8` from the npm registry,
   pinned exactly by [`package-lock.json`](./package-lock.json), initialized
@@ -25,8 +27,8 @@ composes two things that already exist:
 
 `npm run reference:ai-context` runs `npm run adapter-pins:install` first,
 which builds the pinned adapters, verifies their content digests, and
-installs them into `examples/mcp-redact`. `@redact-secret/adapter-ai-context`
-is not on npm yet; when it is, this reference moves to the registry version.
+installs them into `examples/mcp-redact`. Neither adapter is on npm yet; when
+they are, this reference moves to the registry versions.
 
 | File | Role |
 | --- | --- |
@@ -117,11 +119,12 @@ The details are in [`examples/mcp-redact`](../mcp-redact/README.md).
   is.
 - **Non-text content and encoded values.** Images, audio, blobs, base64,
   and percent-encoding are not decoded or scanned.
-- **The MCP transport and tool authorization.** The supported MCP boundary
-  is the [MCP redaction boundary contract](../../docs/reference/mcp-boundary.md)
-  (#612). The golden path this reference composes predates it and differs
-  from it where that contract lists: notably, binary content blocks,
-  `resource_link` fields, and `_meta` pass through unscanned here.
+- **The MCP transport and tool authorization.** Tool results follow the
+  [MCP redaction boundary contract](../../docs/reference/mcp-boundary.md)
+  (#612) through `@redact-secret/adapter-mcp`: the whole result is scanned,
+  `_meta` and `resource_link` fields included, and binary content blocks by
+  default. Authentication, authorization, prompt injection, and tool
+  permissions are its non-goals too.
 - **The process itself.** Plaintext exists in memory, and callbacks the
   host passes in are trusted code.
 
@@ -133,5 +136,5 @@ The details are in [`examples/mcp-redact`](../mcp-redact/README.md).
 - The contract's conformance fixture, replayed by the adapter on the real
   core, and the core range it is qualified against: the adapters
   repository's
-  [`compatibility.json`](https://github.com/redact-secret/redact-secret-adapters/blob/a7fbcc32b56ada3b5107e9fbddb9a019eeaf6d43/compatibility.json)
+  [`compatibility.json`](https://github.com/redact-secret/redact-secret-adapters/blob/f014a996ebb9693fbe1c8cc14f144435f011c2b8/compatibility.json)
   at the pinned commit.

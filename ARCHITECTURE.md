@@ -140,7 +140,8 @@ AI-context operation runs on which part of an MCP tool call, and which fixed
 `CallToolResult` a failure becomes. Its fixture,
 `conformance/fixtures/mcp-boundary.json`, is replayed on the same
 publish-shaped JavaScript lanes; `@redact-secret/adapter-mcp` lives in the
-adapters repository.
+adapters repository. The JavaScript side of `examples/mcp-redact/` runs on
+it, consumed as a pinned publish-shaped tarball.
 
 Detailed workspace dependency, lint, unsafe-code, MSRV, public-API,
 package-content, and registry-name policies live in

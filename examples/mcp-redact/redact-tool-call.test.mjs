@@ -21,9 +21,25 @@ function boundaryWithEvents(overrides = {}) {
 
 const { boundary } = boundaryWithEvents();
 
+/** A case with a base64 payload: the MCP contract blocks it by default and passes it only on opt-in. */
+function hasBinary(result) {
+  return (result.content ?? []).some(
+    (block) => block?.type === "image" || block?.type === "audio" || typeof block?.resource?.blob === "string",
+  );
+}
+
 test("shared fixture: result cases — text, JSON-in-text, multi-block, resource, structuredContent, unicode, block, core error", () => {
   for (const { name, input, expectedBlocked, expected } of resultCases) {
-    const outcome = redactToolResult(boundary, input);
+    if (hasBinary(input)) {
+      // The shared cases (also read by the Python example) predate the MCP
+      // contract, under which binary content blocks by default.
+      assert.deepEqual(
+        redactToolResult(boundary, input),
+        { outcome: "blocked", reason: "unsupported_value" },
+        `case: ${name} blocks by default`,
+      );
+    }
+    const outcome = redactToolResult(boundary, input, { binaryContent: hasBinary(input) ? "pass" : "block" });
     assert.equal(outcome.outcome, expectedBlocked ? "blocked" : "ok", `case: ${name}`);
     if (!expectedBlocked) {
       assert.deepEqual(outcome.value, expected, `case: ${name}`);
@@ -77,21 +93,49 @@ test("findings reach auditing through the boundary's telemetry, including on a b
   redactArguments(audited, { token: "SECRET_TOKEN_1" });
   assert.deepEqual(events, [
     { action: "block", boundary: "tool-result" },
-    { action: "redact", boundary: "context" },
+    { action: "redact", boundary: "tool-arguments" },
   ]);
 });
 
-test("non-text content blocks (image, audio, resource_link) pass through unchanged", () => {
+test("#612: image and audio block by default and pass unscanned only on opt-in; resource_link fields are scanned", () => {
   const input = {
     content: [
       { type: "image", data: "AAAA", mimeType: "image/png" },
       { type: "audio", data: "BBBB", mimeType: "audio/wav" },
-      { type: "resource_link", uri: "file:///x", name: "x" },
+      { type: "resource_link", uri: "file:///x?token=SECRET_TOKEN_1", name: "x" },
     ],
   };
-  const outcome = redactToolResult(boundary, input);
+  assert.deepEqual(redactToolResult(boundary, input), { outcome: "blocked", reason: "unsupported_value" });
+  const outcome = redactToolResult(boundary, input, { binaryContent: "pass" });
   assert.equal(outcome.outcome, "ok");
-  assert.deepEqual(outcome.value, input);
+  assert.deepEqual(outcome.value, {
+    content: [
+      { type: "image", data: "AAAA", mimeType: "image/png" },
+      { type: "audio", data: "BBBB", mimeType: "audio/wav" },
+      { type: "resource_link", uri: "file:///x?token=<SECRET_1>", name: "x" },
+    ],
+  });
+});
+
+test("#612: _meta and unknown fields are scanned with the rest of the result", () => {
+  const outcome = redactToolResult(boundary, {
+    content: [{ type: "text", text: "ok", _meta: { note: "SECRET_TOKEN_1" } }],
+    _meta: { trace: "SECRET_TOKEN_2" },
+    futureField: "SECRET_TOKEN_3",
+  });
+  assert.equal(outcome.outcome, "ok");
+  assert.deepEqual(outcome.value, {
+    content: [{ type: "text", text: "ok", _meta: { note: "<SECRET_1>" } }],
+    _meta: { trace: "<SECRET_1>" },
+    futureField: "<SECRET_1>",
+  });
+});
+
+test("#612: an unknown content block type blocks the whole result", () => {
+  assert.deepEqual(redactToolResult(boundary, { content: [{ type: "video", text: "x" }] }), {
+    outcome: "blocked",
+    reason: "unsupported_value",
+  });
 });
 
 test("#610: depth beyond traversalLimits.maxDepth blocks the whole call; nothing is marked and passed on", () => {
@@ -114,12 +158,11 @@ test("#610: more values than traversalLimits.maxNodes block the whole call", () 
   });
 });
 
-test("#610: content beyond maxContentBlocks blocks the whole result instead of being dropped", () => {
+test("#612: traversalLimits.maxNodes counts from the result root, content blocks included", () => {
+  const tight = createGoldenPathBoundaryWith(fakeCore, { traversalLimits: { maxDepth: 8, maxNodes: 8 } });
   const input = { content: [{ type: "text", text: "a" }, { type: "text", text: "b" }, { type: "text", text: "c" }] };
-  assert.deepEqual(redactToolResult(boundary, input, { maxContentBlocks: 2 }), {
-    outcome: "blocked",
-    reason: "limit_exceeded",
-  });
+  assert.deepEqual(redactToolResult(tight, input), { outcome: "blocked", reason: "limit_exceeded" });
+  assert.equal(redactToolResult(tight, { content: [{ type: "text", text: "a" }] }).outcome, "ok");
 });
 
 test("#610: a text leaf over wholeInputLimits.maxInputBytes blocks with the core's INPUT_LIMIT_EXCEEDED", () => {
@@ -133,10 +176,15 @@ test("#610: a text leaf over wholeInputLimits.maxInputBytes blocks with the core
 
 test("#610: object keys are scanned; a key that would be redacted blocks the value", () => {
   assert.deepEqual(redactArguments(boundary, { SECRET_TOKEN_1: "x" }), { outcome: "blocked", reason: "policy" });
-  assert.deepEqual(
-    redactToolResult(boundary, { content: [{ type: "text", text: '{"SECRET_TOKEN_1":"x"}' }] }),
-    { outcome: "blocked", reason: "policy" },
-  );
+  // #612: a text block is scanned as text, never parsed, so a secret in
+  // JSON-in-text is redacted in place rather than treated as a key.
+  assert.deepEqual(redactToolResult(boundary, { content: [{ type: "text", text: '{"SECRET_TOKEN_1":"x"}' }] }).value, {
+    content: [{ type: "text", text: '{"<SECRET_1>":"x"}' }],
+  });
+  assert.deepEqual(redactToolResult(boundary, { content: [], structuredContent: { SECRET_TOKEN_1: "x" } }), {
+    outcome: "blocked",
+    reason: "policy",
+  });
 });
 
 test("#610: a non-JSON value, a cycle, or a non-object result is unsupported_value", () => {

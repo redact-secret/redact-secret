@@ -81,7 +81,7 @@ test("the boundary reports safe finding metadata for arguments and results to on
   const wrapped = wrapServerToolHandler(handler, audited, { redactArguments: true });
   await wrapped({ in: "SECRET_TOKEN_2" }, {});
   assert.deepEqual(seen, [
-    { boundary: "context", action: "redact" },
+    { boundary: "tool-arguments", action: "redact" },
     { boundary: "tool-result", action: "redact" },
   ]);
 });
@@ -112,6 +112,29 @@ test("client wrapper blocks a result containing a block finding", async () => {
   const result = await wrapped({ name: "x" });
   assert.equal(result.isError, true);
   assert.deepEqual(result.content, [{ type: "text", text: BLOCKED_MESSAGE }]);
+});
+
+test("#612: a throwing handler becomes the fixed tool-error result; its message never reaches the SDK", async () => {
+  const wrapped = wrapServerToolHandler(async () => {
+    throw new Error("upstream failed near SECRET_TOKEN_1");
+  }, boundary);
+  const result = await wrapped({}, {});
+  assert.deepEqual(result, {
+    content: [{ type: "text", text: "This MCP tool call failed. No content, arguments, or error detail is included." }],
+    isError: true,
+  });
+});
+
+test("#612: a rejected client callTool is the fixed tool-error result, and a cancelled one delivers nothing", async () => {
+  const rejected = await wrapClientCallTool(async () => {
+    throw new Error("McpError near SECRET_TOKEN_1");
+  }, boundary)({ name: "x" });
+  assert.equal(rejected.isError, true);
+  assert.equal(JSON.stringify(rejected).includes("SECRET_TOKEN_1"), false);
+  const cancelled = await wrapClientCallTool(async () => ({ content: [] }), boundary)({ name: "x" }, {
+    signal: AbortSignal.abort(),
+  });
+  assert.equal(cancelled, null);
 });
 
 test("rejects a non-function handler/callTool, or a missing boundary", () => {

@@ -15,14 +15,16 @@ and verified against the pinned digest before anything installs them.
 | --- | --- | --- | --- |
 | `pin-source.json` | The exact 40-hex adapters `commit`, each pinned package's `name`, `version` and `contentDigest`, and the `consumers` that install them | `npm run adapter-pins:check` (offline, in `npm run ci`): the record is well formed and every consumer's `package.json` names exactly the pinned tarballs. `npm run adapter-pins:check:ancestry` (live, `adapter-pin-drift` CI job): the commit is on adapters `develop`. | `npm run adapter-pins:sync -- --ref <40-sha>` |
 
-Pinned today: `@redact-secret/adapter` and `@redact-secret/adapter-ai-context`
-at adapters commit
-[`a7fbcc3`](https://github.com/redact-secret/redact-secret-adapters/commit/a7fbcc32b56ada3b5107e9fbddb9a019eeaf6d43),
-the merge of redact-secret-adapters#23 (redact-secret-adapters#12). The
+Pinned today: `@redact-secret/adapter`, `@redact-secret/adapter-ai-context`
+and `@redact-secret/adapter-mcp` at adapters commit
+[`f014a99`](https://github.com/redact-secret/redact-secret-adapters/commit/f014a996ebb9693fbe1c8cc14f144435f011c2b8),
+the merge of redact-secret-adapters#25 (redact-secret-adapters#13). The
 consumer is [`examples/mcp-redact`](../examples/mcp-redact/README.md), the
-AI-context golden path. `@redact-secret/adapter` is pinned alongside because
-`adapter-ai-context` uses its `walkStrict`, which the published
-`@redact-secret/adapter@0.1.0` does not export.
+AI-context and MCP golden path. `@redact-secret/adapter` is pinned alongside
+because `adapter-ai-context` uses its `walkStrict`, which the published
+`@redact-secret/adapter@0.1.0` does not export, and `adapter-mcp` depends on
+`adapter-ai-context`. `adapter-mcp`'s MCP SDKs are optional peers and are not
+installed here: the example is duck-typed against them.
 
 ## How CI builds the artifacts
 

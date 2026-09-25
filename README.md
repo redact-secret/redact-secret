@@ -129,10 +129,12 @@ verified install commands are in
 [`docs/decisions/2026-09-19-graduate-adapters-to-a-separate-repository.md`](./docs/decisions/2026-09-19-graduate-adapters-to-a-separate-repository.md)
 for why they live apart, including why this repository's own release matrix
 is unaffected.
-Model context (MCP) and LangChain remain application use cases with no
-dedicated package: [`examples/mcp-redact/`](examples/mcp-redact/) is a
-tested, example-only integration — see its README for its stated support
-level — and no LangChain integration exists in this repository at all.
+Model context (MCP) is covered by `@redact-secret/adapter-mcp` in the
+adapters repository (unreleased), which implements the
+[MCP boundary contract](docs/reference/mcp-boundary.md);
+[`examples/mcp-redact/`](examples/mcp-redact/) composes it into a tested
+agent turn — see its README for its stated support level. LangChain remains
+an application use case with no integration in this repository at all.
 
 ## Architecture at a glance
 

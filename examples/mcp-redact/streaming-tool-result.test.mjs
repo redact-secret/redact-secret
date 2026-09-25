@@ -91,6 +91,17 @@ test("a limit failure mid-stream blocks the whole result and releases no staged 
   assert.deepEqual(outcome, { outcome: "blocked", reason: "limit_exceeded", code: "BUFFER_LIMIT_EXCEEDED" });
 });
 
+test("#612: an early failure stops pulling at once and closes the producer", async () => {
+  const { boundary } = setup({
+    incrementalLimits: { maxInputCodeUnits: 1000, maxBufferedCodeUnits: 16, maxTokenCodeUnits: 16, maxMultilineCodeUnits: 16 },
+  });
+  const { state, chunks } = producer(["safe chunk ", "and one that goes over the buffer", "never pulled", "nor this"]);
+  const outcome = await redactStreamedToolResult(boundary, chunks);
+  assert.deepEqual(outcome, { outcome: "blocked", reason: "limit_exceeded", code: "BUFFER_LIMIT_EXCEEDED" });
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.deepEqual(state, { pulled: 2, closed: true });
+});
+
 test("cancellation mid-stream stops pulling chunks, closes the producer, and discards staged text", async () => {
   const { boundary, events } = setup();
   const controller = new AbortController();

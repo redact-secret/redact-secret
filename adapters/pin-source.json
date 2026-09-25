@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "repository": "redact-secret/redact-secret-adapters",
-  "commit": "a7fbcc32b56ada3b5107e9fbddb9a019eeaf6d43",
+  "commit": "f014a996ebb9693fbe1c8cc14f144435f011c2b8",
   "packages": [
     {
       "name": "@redact-secret/adapter",
@@ -11,7 +11,12 @@
     {
       "name": "@redact-secret/adapter-ai-context",
       "version": "0.1.0",
-      "contentDigest": "sha256:2d3df0c6fdbe757a926b73b5e0230ab03c318320ec5198079007833e8ee6bf5f"
+      "contentDigest": "sha256:30fc06941818cdc8da977d92c8f842c995b673e6e9fea56cf09c2347d2c89d26"
+    },
+    {
+      "name": "@redact-secret/adapter-mcp",
+      "version": "0.1.0",
+      "contentDigest": "sha256:76326a37d6a802f62d7ff4a607460d51369da6d2b78f7dcd10fca6e7d69a0f38"
     }
   ],
   "consumers": [

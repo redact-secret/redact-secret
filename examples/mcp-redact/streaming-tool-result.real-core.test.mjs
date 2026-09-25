@@ -171,7 +171,13 @@ test("cancellation mid-secret aborts the real session, closes the producer, and 
   assert.deepEqual(result, { outcome: "aborted", stage: "tool" });
   assert.equal(closed, true, "the producer was not closed");
   assert.equal(sessions.length, 1);
-  assert.deepEqual(sessions[0].calls, ["append", "abort"], "a chunk was scanned after cancellation");
+  // The signal's listener aborts the session the moment it fires, and the
+  // MCP adapter aborts the stream again when it stops pulling; a second
+  // abort of a discarded session is a no-op. What matters is that nothing
+  // was appended after the first abort.
+  const calls = sessions[0].calls;
+  assert.deepEqual(calls.slice(0, 2), ["append", "abort"]);
+  assert.equal(calls.slice(calls.indexOf("abort")).includes("append"), false, "a chunk was scanned after cancellation");
   assertSessionDiscarded(sessions[0]);
   assert.deepEqual(events, []);
   assertNoPlaintext(result, "outcome");

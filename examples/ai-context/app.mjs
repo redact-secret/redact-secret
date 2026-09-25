@@ -8,8 +8,10 @@
  * - the MCP / AI-context golden path in `examples/mcp-redact`
  *   (`buildSafeContext`, `createGoldenPathBoundaryWith`), which runs on
  *   `@redact-secret/adapter-ai-context`, the #610 contract's
- *   implementation, installed there from the publish-shaped tarball pinned
- *   in `adapters/pin-source.json`.
+ *   implementation, with tool results sanitized by
+ *   `@redact-secret/adapter-mcp` (the #612 MCP boundary), both installed
+ *   there from the publish-shaped tarballs pinned in
+ *   `adapters/pin-source.json`.
  *
  * The core is injected rather than loaded by the adapter, so the
  * application and the boundary share one initialized core instance.

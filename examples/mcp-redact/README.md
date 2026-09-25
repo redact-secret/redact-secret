@@ -10,14 +10,17 @@ tool result -> scan -> context construction
 safe context -> model
 ```
 
-The JavaScript side runs on the framework-neutral
-[AI-context boundary contract](../../docs/reference/ai-context-boundary.md)
-(#610), through the installable `@redact-secret/adapter-ai-context`
-(redact-secret-adapters#12). It is consumed as a publish-shaped `npm pack`
-artifact built from a pinned adapters commit (see
+The JavaScript side runs on the supported
+[MCP redaction boundary contract](../../docs/reference/mcp-boundary.md)
+(#612), through the installable `@redact-secret/adapter-mcp`
+(redact-secret-adapters#13), which is a thin specialization of the
+framework-neutral [AI-context boundary contract](../../docs/reference/ai-context-boundary.md)
+(#610) and its `@redact-secret/adapter-ai-context` (redact-secret-adapters#12).
+Both are consumed as publish-shaped `npm pack` artifacts built from a pinned
+adapters commit (see
 [Installing the pinned adapter](#installing-the-pinned-adapter)). This
-directory adds only the MCP shape and the order of the turn. The boundary
-does every scan, every traversal, every limit, and every failure mapping.
+directory adds only the order of the turn. The adapters do every scan, every
+traversal, every MCP shape rule, every limit, and every failure mapping.
 The Python twins under [`python/`](./python) keep their beta.7 behavior; see
 [Python](#python).
 
@@ -31,32 +34,31 @@ prompts and tool calls the same way. A tool result that includes a leaked
 
 ## Support level
 
-**The MCP wiring is example-only.** The AI-context boundary underneath it is
-a package, `@redact-secret/adapter-ai-context`, owned by
+**The recipe is example-only; the boundary under it is not.** The MCP
+boundary is a package, `@redact-secret/adapter-mcp`, owned by
 [`redact-secret-adapters`](https://github.com/redact-secret/redact-secret-adapters).
-It implements the core's contract and qualifies by replaying the core's
-conformance fixture. The MCP-specific part here (which content blocks carry
-text, JSON-in-text, the fixed tool-error result, the two wrappers) is not a
-maintained package, and it predates the supported
-[MCP redaction boundary contract](../../docs/reference/mcp-boundary.md)
-(#612), whose adapter is redact-secret-adapters#13. The contract lists where
-this example differs from it
-([The golden path today](../../docs/reference/mcp-boundary.md#the-golden-path-today)):
-binary blocks, `resource_link` fields, and `_meta` pass through unscanned
-here, JSON-in-text is parsed, and there is no key-context check. Copy this
-code out to use it; from then on you own the copy. The MCP SDK versions it is verified against are in
-[SDK versions](#sdk-versions); nothing here claims any other version.
+It implements the core's [MCP boundary contract](../../docs/reference/mcp-boundary.md),
+replays the core's MCP conformance fixture, and is tested with real MCP SDK
+instances at both endpoints of every supported line, over stdio and
+Streamable HTTP. The JavaScript files here only compose it into an agent turn
+and two thin wrappers, so they follow the contract: the whole result is
+scanned (including `_meta` and resource links), text is scanned as text,
+binary content blocks unless the host opts in, and a key-context check runs
+after the leaf pass. Copy this code out to use it; from then on you own the
+copy. The Python twins under [`python/`](./python) predate the contract and
+are not an MCP support claim (see [Python](#python)). The supported SDK range
+is in [SDK versions](#sdk-versions).
 
 ## Files
 
 | File | Role |
 | --- | --- |
-| [`redact-tool-call.mjs`](./redact-tool-call.mjs) | The MCP shape over the boundary: `redactToolResult` sanitizes a `CallToolResult`'s text content blocks, embedded text resources, and `structuredContent`; `redactArguments` sanitizes a tool call's argument object. Both return the boundary's `ok` / `blocked` / `aborted` outcome. No `@modelcontextprotocol/sdk` import: `CallToolResult` is a duck-typed shape. |
-| [`wrap-tool-call.mjs`](./wrap-tool-call.mjs) | Server-side (`wrapServerToolHandler`) and client-side (`wrapClientCallTool`) wrappers built on the above, shaped to drop into a real `ToolCallback` / `callTool`. A non-`ok` outcome becomes the fixed `buildBlockedResult()` tool error. |
+| [`redact-tool-call.mjs`](./redact-tool-call.mjs) | `@redact-secret/adapter-mcp` over the host's AI-context boundary: `redactToolResult` is the adapter's `sanitizeToolResult` (the whole `CallToolResult` as one value, then the key-context check); `redactArguments` is its `sanitizeToolArguments` (label `tool-arguments`). Both return the MCP boundary's outcome. No `@modelcontextprotocol/sdk` import. |
+| [`wrap-tool-call.mjs`](./wrap-tool-call.mjs) | Server-side (`wrapServerToolHandler`, the adapter's `wrapToolHandler`) and client-side (`wrapClientCallTool`, its `sanitizeToolCall`) wrappers, shaped to drop into a real `ToolCallback` / `callTool`. A non-`ok` outcome becomes the contract's fixed `isError` result; a thrown handler or a rejected `callTool` becomes the fixed tool-error result; a cancelled call delivers nothing. |
 | [`agent-context.mjs`](./agent-context.mjs) | The AI-context golden path (`buildSafeContext`), `EXAMPLE_LIMITS`, and the boundary factories (`createGoldenPathBoundary` over the real core, `createGoldenPathBoundaryWith` over an injected one). See [below](#the-ai-context-golden-path). |
-| [`streaming-tool-result.mjs`](./streaming-tool-result.mjs) | `redactStreamedToolResult`: a tool result delivered as chunks, through the boundary's staged `openStream`, with cancellation and producer failure. `buildSafeContext`'s `streamTool` runs it. See [Streamed results](#streamed-or-progressive-results). |
+| [`streaming-tool-result.mjs`](./streaming-tool-result.mjs) | `redactStreamedToolResult`: a tool result delivered as chunks, through the adapter's `sanitizeStreamedToolResult` (one staged `openStream` that stops pulling once it fails), with cancellation and producer failure. `buildSafeContext`'s `streamTool` runs it. See [Streamed results](#streamed-or-progressive-results). |
 | [`demo.mjs`](./demo.mjs) | Runnable, side-by-side: the same synthetic tool result through block-all and through this middleware, on the real core. It prints only the two outputs, never the unscanned input. |
-| [`package.json`](./package.json) | This directory as a consumer project: its only dependencies are the pinned `file:` tarballs from `adapters/pin-source.json`. |
+| [`package.json`](./package.json) | This directory as a consumer project: its only dependencies are the pinned `file:` tarballs from `adapters/pin-source.json` (`@redact-secret/adapter`, `adapter-ai-context`, and `adapter-mcp`). |
 | [`fixtures/fake-core.mjs`](./fixtures/fake-core.mjs) | The two injected core operations, faked for the tests: `fake-scanner.mjs`'s rules plus the core's whole-input byte limit, and a core that behaves as if uninitialized. |
 | [`python/`](./python) | The Python twins of every file above, at their beta.7 behavior. |
 
@@ -151,15 +153,18 @@ reported), and `block` (the whole turn ends, at the input or the tool stage).
   continues.
 - **`warn`** and **`allow`**: the text passes through unchanged; a `warn`
   finding is still reported to telemetry.
-- **`block`**, on any finding anywhere in the call, and any other non-`ok`
-  outcome (a limit, an unsupported value, a key finding, a core failure, an
-  abort): the *whole* call becomes a fixed `CallToolResult` tool error
+- **`block`**, on any finding anywhere in the call, and any other `blocked`
+  outcome (a limit, an unsupported value, a key finding, a key-context
+  finding, a core failure): the *whole* call becomes a fixed `CallToolResult` tool error
   (`isError: true`, `content: [{ type: "text", text: BLOCKED_MESSAGE }]`),
   never a partial result, the matched value, or an input excerpt. MCP has a
   first-class "tool error" outcome, so blocking maps onto that instead of a
   leaf-level placeholder. The block *decision* stays with the injected
   policy (the default policy redacts high-confidence/known-type findings and
   warns on the rest, `crates/secret-scan-core/src/policy.rs`).
+
+An `aborted` outcome delivers nothing at all: a cancelled request gets no
+response, and a cancelled client call resolves to `null`.
 
 The first non-`ok` block or value ends the call; nothing after it is
 scanned. On the server side, a blocked *argument* (only checked when
@@ -172,10 +177,9 @@ fails closed.
 `onFinding(finding, { boundary })` is called for every finding, including in
 a call that ends up blocked. It gets exactly the contract's allowlisted
 fields (`id`, `type`, `detector`, `confidence`, `action`, `obfuscation`,
-`start`, `end`), never the input or a matched value. Tool arguments are
-labelled `context` here; the MCP boundary contract (#612) names them
-`tool-arguments`. A throwing
-callback is swallowed and never influences the outcome.
+`start`, `end`), never the input or a matched value. Results are labelled
+`tool-result` and arguments `tool-arguments`. A throwing callback is
+swallowed and never influences the outcome.
 
 ## Arguments: opt-in, not automatic
 
@@ -191,27 +195,32 @@ result redaction the same way, by not wrapping it, or with a policy that
 ## JSON-in-text results
 
 An MCP text block's `text` may itself be a JSON-serialized value (a
-stringified API response). `redactToolResult`/`redact_tool_result` detects
-this (`JSON.parse`/`json.loads` succeeds into an object or array), sends the
-parsed value through the boundary's `sanitizeValue` (every string and every
-key scanned), and re-serializes it. Scanning the raw JSON text as one opaque
-string risks placing a placeholder outside a quoted string and corrupting the
-JSON; walking the parsed structure cannot. JS's `JSON.stringify` and
-Python's `json.dumps(..., separators=(",", ":"))` use the same compact
-separators, so the two languages produce byte-identical re-serialized text.
+stringified API response). The MCP contract scans it **as text**, exactly as
+the model will see it, and never parses it: parsing would drop the key
+context that catches `"password":"..."` in text, and the core's contextual
+detectors read that context. A secret inside JSON-in-text is replaced inside
+its quoted string. `structuredContent`, which a tool is expected to return
+next to its text serialization, is scanned as a value, and then the
+key-context check serializes it and scans it again, so a value identified
+only by its key blocks the result instead of reaching context from the
+structured copy. The Python twin still parses JSON-in-text (its beta.7
+behavior, see [Python](#python)).
 
 ## Multi-block results and non-text content
 
-A `CallToolResult.content` array may mix block types. Only `text` blocks
-and embedded **text** resources (`{ type: "resource", resource: { text }
-}`) are scanned. `image`, `audio`, `resource_link`, and embedded **blob**
-resources (`resource.blob`, base64 binary) pass through unchanged. This is
-the documented false-negative boundary: the contract does not decode or scan
-non-text content. A content entry that is not an object, or a `content` that
-is not an array, blocks the call with `unsupported_value`. More than
-`maxContentBlocks` (default 200) blocks it with `limit_exceeded`.
-Top-level fields other than `content` and `structuredContent` (`isError`,
-`_meta`) are copied unchanged.
+A `CallToolResult` is scanned as one bounded value: every block, every
+field (`uri`, `name`, `title`, `description` of a `resource_link`, the
+`uri` and `mimeType` of an embedded resource), `_meta` on the result and on
+each block, `annotations`, and any field the contract does not name.
+Traversal limits count from the result root, so there is no separate block
+count. `image` and `audio` `data` and a `resource.blob` are base64 and never
+decoded: by default they block the whole result as `unsupported_value`.
+Passing `binaryContent: "pass"` (to `redactToolResult`, the wrappers, or
+`buildSafeContext`) passes a string payload unchanged and unscanned at its
+original position, while the rest of the block is still scanned. A block
+type outside `text`, `image`, `audio`, `resource_link` and `resource`, a
+content entry that is not an object, or a `content` that is not an array
+blocks the call with `unsupported_value`.
 
 ## Streamed or progressive results
 
@@ -253,8 +262,9 @@ What the stream guarantees, each tested:
   `CallToolResult`, `{ content: [{ type: "text", text }] }`, the same shape
   a `callTool` result joins the context in.
 - **Block and limits.** A `block` finding or a limit failure mid-stream
-  aborts the core session at once; later chunks are discarded unscanned and
-  the turn is `blocked` with no value and no findings.
+  aborts the core session at once, and no further chunk is pulled (see
+  **Early stop** below). The turn is `blocked` with no value and no
+  findings.
 - **Cancellation.** When `signal` fires, the boundary aborts the core
   session, which drops its retained plaintext, and discards the staged
   text. The loop stops pulling chunks and closes the iterator (`return()`),
@@ -272,12 +282,12 @@ What the stream guarantees, each tested:
 - **Unsupported chunks.** A non-string chunk (undecoded bytes), a bare
   string, or a value that is not iterable blocks as `unsupported_value`.
 
-Two limits of this design. A mid-stream `block` is only visible at
-`finalize`, so the producer is drained (its chunks discarded unscanned)
-rather than closed early: the boundary's stream exposes no failed state
-before then. And a producer that never yields again after the signal fires
-is not interrupted by this loop; it must honor the `signal` it is given.
-The core session is aborted the moment the signal fires either way.
+**Early stop.** After every chunk the adapter reads the stream's input-free
+`accepting` flag. Once it is `false` (a `block` finding, a limit, a core
+failure, or cancellation), it pulls no further chunk and closes the
+producer: `return()` on its iterator, and `destroy()` on a Node `Readable`.
+It does not wait on either, and a real `AbortSignal` also ends a producer
+that is still pending. So a failed stream no longer drains its producer.
 
 `streaming-tool-result.test.mjs` covers all of this over the fake core.
 `streaming-tool-result.real-core.test.mjs` covers it over the real core's
@@ -292,7 +302,8 @@ further input (`INVALID_STATE`).
   but it can still break a tool that needs an exact value it returned (a
   signed URL). Use the per-tool opt-out above, or a relaxed policy, for
   those tools.
-- **Non-text content is not scanned** (see above).
+- **Non-text content is never decoded** (see above). By default it blocks
+  the result; with `binaryContent: "pass"` it passes unscanned.
 - **Split secrets**: a secret split across separate content blocks,
   values, or keys is not joined; each is scanned on its own. A secret split
   across *chunks of one streamed result* is handled (see above); this is a
@@ -307,40 +318,32 @@ further input (`INVALID_STATE`).
 
 ## SDK versions
 
-Verified while resolving issue #327, directly against each package's
-published type declarations / source, not from memory:
+The JavaScript side makes no SDK claim of its own. It inherits
+`@redact-secret/adapter-mcp`'s, which is the contract's
+[supported range](../../docs/reference/mcp-boundary.md#supported-range):
+`@modelcontextprotocol/sdk` `>=1.13.0 <=1.30.1`, and
+`@modelcontextprotocol/client` / `@modelcontextprotocol/server`
+`>=2.0.0 <=2.1.0`. Protocol revisions 2025-06-18 and 2025-11-25, over stdio
+and Streamable HTTP, on Node.js 20, 22 and 24. The adapter's CI runs real
+clients and servers at both endpoints of each line
+([`compatibility.json`](https://github.com/redact-secret/redact-secret-adapters/blob/main/compatibility.json)).
+The wrappers here stay duck-typed: a tool handler is `(args, extra)` on 1.x
+and `(args, ctx)` with `ctx.mcpReq.signal` on 2.x, and the adapter reads
+either signal.
 
-- **TypeScript**: `@modelcontextprotocol/sdk@1.30.0`. `ToolCallback` —
-  `server/mcp.d.ts` — is `(args, extra) => CallToolResult |
-  Promise<CallToolResult>`; `Client#callTool` — `client/index.d.ts` — takes
-  `CallToolRequest['params']` and resolves to the same `CallToolResult`;
-  `CallToolResultSchema` — `types.d.ts` — is `{ content: ContentBlock[],
-  structuredContent?, isError? }` with `ContentBlock` a union of `text`,
-  `image`, `audio`, `resource_link`, and `resource` (embedded, `text` or
-  `blob`).
-- **Python**: the official SDK, `mcp@2.2.0` (chosen over the standalone
-  `fastmcp` package for the same reason the TS side targets
-  `@modelcontextprotocol/sdk` — both are the `modelcontextprotocol` org's
-  own SDK, keeping the two languages' pinned dependency on the same
-  publisher). `mcp.server.lowlevel.Server`'s `on_call_tool` constructor
-  callback — `mcp/server/lowlevel/server.py` — is `Callable[[ctx,
-  CallToolRequestParams], Awaitable[CallToolResult | InputRequiredResult]]`;
-  `mcp.client.session.ClientSession.call_tool` —
-  `mcp/client/session.py` — is `(name, arguments) -> CallToolResult`.
-  `CallToolResult`/content block shapes — `mcp_types` (a `mcp` dependency,
-  same version) — mirror the TS side field for field
-  (`is_error`/`isError`, `structured_content`/`structuredContent`).
+- **Python**: the official SDK, `mcp@2.2.0`, was the shape the Python twins
+  were written against (`mcp.server.lowlevel.Server`'s `on_call_tool`, and
+  `mcp.client.session.ClientSession.call_tool`). The Python `mcp` SDK is
+  **not supported** by the MCP contract, and no Python MCP adapter exists.
 
-Neither package is installed in this workspace: every wrapper here is
-duck-typed against these verified shapes, exactly like
-`@redact-secret/adapter-otel`'s `SpanProcessor` wrapper needs no OpenTelemetry
-import. A real integration installs the SDK itself; see the JSDoc/docstring
-usage example at the top of `wrap-tool-call.mjs`/`wrap_tool_call.py`.
+A real integration installs the SDK itself; see the JSDoc usage example at
+the top of `wrap-tool-call.mjs`.
 
 ## Installing the pinned adapter
 
-`@redact-secret/adapter-ai-context` is not on npm yet, so this directory
-consumes it the way an outside consumer would install it: an `npm pack`
+`@redact-secret/adapter-mcp` and `@redact-secret/adapter-ai-context` are not
+on npm yet, so this directory consumes them the way an outside consumer
+would install them: an `npm pack`
 tarball built from one immutable, 40-hex `redact-secret-adapters` commit,
 recorded in [`adapters/pin-source.json`](../../adapters/pin-source.json)
 with each package's content digest. [`package.json`](./package.json) names
@@ -367,11 +370,14 @@ These suites inject a fake core (`fixtures/fake-core.mjs`, built on
 `fake-scanner.mjs`, and a fake incremental session for streaming), so no
 built native addon or extension is required. `redact-tool-call.test.mjs`
 and `python/test_redact_tool_call.py` both read
-[`fixtures/mcp-redact-cases.json`](./fixtures/mcp-redact-cases.json), so
-text results, JSON-in-text results, arguments, and multi-block results
-produce identical redacted output in both languages by construction. The
-cases that differ by design (limits, keys, non-JSON values, findings on a
-blocked outcome) are tested in the JavaScript suite only.
+[`fixtures/mcp-redact-cases.json`](./fixtures/mcp-redact-cases.json). Text
+results, JSON-in-text results, and arguments produce the same redacted
+output in both languages. The two binary cases (an image, a blob resource)
+pass through in Python. In JavaScript they block by default under the MCP
+contract, and pass only with `binaryContent: "pass"`, which the JavaScript
+suite checks both ways. The cases that differ by design (limits, keys,
+non-JSON values, findings on a blocked outcome, `_meta`, resource links,
+unknown block types) are tested in the JavaScript suite only.
 
 `streaming-tool-result.real-core.test.mjs` runs the streamed golden path on
 the real core instead. It needs a built core resolvable from this directory
@@ -445,8 +451,16 @@ report whose `.node`, `.wasm`, or `.whl` digests are not ones it recorded.
 
 ## Python
 
+The Python twins predate the MCP boundary contract and are **not an MCP
+support claim**: the contract does not support the Python `mcp` SDK, and no
+Python MCP adapter exists. They still pass `image`, `audio`, `resource_link`
+and blob content through unscanned, copy `_meta` unchanged, parse
+JSON-in-text, scan `content` and `structuredContent` separately with no
+key-context check, and label arguments `context`. Aligning or retiring them
+is #810.
+
 The Python twins (`python/agent_context.py`, `redact_tool_call.py`,
-`wrap_tool_call.py`, `streaming_tool_result.py`) keep their beta.7 behavior:
+`wrap_tool_call.py`, `streaming_tool_result.py`) also keep their beta.7 behavior:
 a marker for a subtree past a limit, unscanned keys, findings on a blocked
 outcome, and a length check for oversized input. `streaming_tool_result.py`
 is also not composed into `agent_context.py` and has no cancellation: it is
