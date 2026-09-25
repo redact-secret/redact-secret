@@ -1087,6 +1087,269 @@
         }
       },
       "note": "heroku-api-key-legacy flagged the value of a HEROKU_APP_ID public identifier. The fix (PR #715) excludes identifier-named keys from the legacy UUID gate; one synchronous negative pins it. No incremental case was added. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded. The corpus hash was re-pinned from e4186d51... to the detector-coverage hash at the resynced benchmarks/pin-manifest.json (benchmarks revision 0bceccd5, main 25e31c8) while both gates were still pending with no evidence recorded, so no measurement was invalidated."
+    },
+    {
+      "id": "benchmark-gap-815",
+      "benchmarkRecordId": "product-815",
+      "benchmarkIssue": "https://github.com/redact-secret/redact-secret-benchmarks/issues/10",
+      "productIssue": "https://github.com/redact-secret/redact-secret/issues/815",
+      "benchmarkFixtureIds": [
+        "beta9-external-inputs--composed-json-string-in-json-log",
+        "beta9-external-inputs--ds-keyword-template-chars-in-secret",
+        "beta9-external-inputs--ds-keyword-go-short-assign",
+        "beta9-external-inputs--ds-objc-at-string"
+      ],
+      "corpusHashes": [
+        "25472f6cf07968d72a9f43eaf4ba63c1da1585644f99a05b65c964d1b21e1670"
+      ],
+      "fixingCommit": "6bbfba8860456688bfe52f85195007c323f06366",
+      "canonicalFixtures": {
+        "synchronous": [
+          "generic-token-regression-escaped-json-string-assignment",
+          "generic-token-negative-escaped-json-env-reference",
+          "generic-token-regression-go-short-assignment",
+          "generic-token-regression-objective-c-string-literal",
+          "generic-token-regression-quoted-value-with-braces-and-brackets",
+          "generic-token-regression-unquoted-value-with-balanced-braces",
+          "generic-token-negative-quoted-type-annotation"
+        ],
+        "incremental": []
+      },
+      "gates": {
+        "productConformance": {
+          "status": "pending",
+          "evidence": []
+        },
+        "benchmarkRevalidation": {
+          "status": "pending",
+          "evidence": []
+        }
+      },
+      "note": "beta9-external-inputs adversarial pack gap (redact-secret-benchmarks#140), fixed by PR #831. The benchmark fixture ids and the corpus hash are the pack's fixture ids and expectations digest, which the pin manifest has listed since redact-secret-benchmarks#310. On this fixing commit every listed pack fixture reports its expected range. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded."
+    },
+    {
+      "id": "benchmark-gap-816",
+      "benchmarkRecordId": "product-816",
+      "benchmarkIssue": "https://github.com/redact-secret/redact-secret-benchmarks/issues/10",
+      "productIssue": "https://github.com/redact-secret/redact-secret/issues/816",
+      "benchmarkFixtureIds": [
+        "beta9-external-inputs--rfc6750-query-access-token",
+        "beta9-external-inputs--rfc6750-get-request-line",
+        "beta9-external-inputs--rfc6749-implicit-fragment-display-break",
+        "beta9-external-inputs--rfc6749-authorization-code-location",
+        "beta9-external-inputs--rfc7636-code-verifier",
+        "beta9-external-inputs--rfc6749-refresh-request-body",
+        "beta9-external-inputs--rfc6749-token-request-basic-and-code"
+      ],
+      "corpusHashes": [
+        "25472f6cf07968d72a9f43eaf4ba63c1da1585644f99a05b65c964d1b21e1670"
+      ],
+      "fixingCommit": "855bf9698959af4cd8d475b477b23a32c2453cc2",
+      "canonicalFixtures": {
+        "synchronous": [
+          "generic-token-regression-url-query-access-token",
+          "generic-token-regression-url-fragment-access-token",
+          "generic-token-regression-form-body-parameters",
+          "generic-token-regression-pkce-code-verifier",
+          "generic-token-regression-query-authorization-code",
+          "generic-token-negative-query-code-and-challenge",
+          "generic-token-negative-code-outside-query",
+          "generic-token-negative-extended-token-parameter-names"
+        ],
+        "incremental": []
+      },
+      "gates": {
+        "productConformance": {
+          "status": "pending",
+          "evidence": []
+        },
+        "benchmarkRevalidation": {
+          "status": "pending",
+          "evidence": []
+        }
+      },
+      "note": "beta9-external-inputs adversarial pack gap (redact-secret-benchmarks#140), fixed by PR #832. The benchmark fixture ids and the corpus hash are the pack's fixture ids and expectations digest, which the pin manifest has listed since redact-secret-benchmarks#310. On this fixing commit every listed pack fixture reports its expected range. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded."
+    },
+    {
+      "id": "benchmark-gap-817",
+      "benchmarkRecordId": "product-817",
+      "benchmarkIssue": "https://github.com/redact-secret/redact-secret-benchmarks/issues/10",
+      "productIssue": "https://github.com/redact-secret/redact-secret/issues/817",
+      "benchmarkFixtureIds": [
+        "beta9-external-inputs--np-html-escaped-placeholder",
+        "beta9-external-inputs--np-echo-concatenated-reference",
+        "beta9-external-inputs--np-env-attribute-reference",
+        "beta9-external-inputs--np-java-getter-concatenation",
+        "beta9-external-inputs--np-iam-managed-policy-arn"
+      ],
+      "corpusHashes": [
+        "25472f6cf07968d72a9f43eaf4ba63c1da1585644f99a05b65c964d1b21e1670"
+      ],
+      "fixingCommit": "840266c3d8c46c9f308740719c3b0d8e54b5f6ba",
+      "canonicalFixtures": {
+        "synchronous": [
+          "generic-token-negative-html-escaped-angle-placeholder",
+          "generic-token-regression-html-escaped-pair-with-trailing-value",
+          "generic-token-negative-quote-juggled-env-reference",
+          "generic-token-regression-inner-quoted-literal",
+          "generic-token-negative-env-attribute-reference",
+          "generic-token-negative-string-concatenation-seam",
+          "generic-token-negative-aws-managed-policy-arn",
+          "generic-token-regression-arn-prefixed-literal"
+        ],
+        "incremental": []
+      },
+      "gates": {
+        "productConformance": {
+          "status": "pending",
+          "evidence": []
+        },
+        "benchmarkRevalidation": {
+          "status": "pending",
+          "evidence": []
+        }
+      },
+      "note": "beta9-external-inputs adversarial pack gap (redact-secret-benchmarks#140), fixed by PR #833. The benchmark fixture ids and the corpus hash are the pack's fixture ids and expectations digest, which the pin manifest has listed since redact-secret-benchmarks#310. On this fixing commit every listed pack fixture reports its expected range. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded."
+    },
+    {
+      "id": "benchmark-gap-818",
+      "benchmarkRecordId": "product-818",
+      "benchmarkIssue": "https://github.com/redact-secret/redact-secret-benchmarks/issues/10",
+      "productIssue": "https://github.com/redact-secret/redact-secret/issues/818",
+      "benchmarkFixtureIds": [
+        "beta9-external-inputs--rfc7617-basic-utf8-proxy",
+        "beta9-external-inputs--composed-curl-single-quoted-json",
+        "beta9-external-inputs--composed-zero-width-inside-bearer"
+      ],
+      "corpusHashes": [
+        "25472f6cf07968d72a9f43eaf4ba63c1da1585644f99a05b65c964d1b21e1670"
+      ],
+      "fixingCommit": "ebaff0af3c472384646afa80a25851d2c2959463",
+      "canonicalFixtures": {
+        "synchronous": [
+          "bearer-token-regression-header-anchored-fifteen-byte-value",
+          "bearer-token-regression-proxy-authorization-header",
+          "bearer-token-negative-short-value-without-header",
+          "bearer-token-negative-header-value-below-twelve-bytes",
+          "generic-token-regression-proxy-authorization-basic",
+          "generic-token-regression-mid-line-quoted-basic-header",
+          "generic-token-negative-wider-authorization-header-name"
+        ],
+        "incremental": []
+      },
+      "gates": {
+        "productConformance": {
+          "status": "pending",
+          "evidence": []
+        },
+        "benchmarkRevalidation": {
+          "status": "pending",
+          "evidence": []
+        }
+      },
+      "note": "beta9-external-inputs adversarial pack gap (redact-secret-benchmarks#140), fixed by PR #834. The benchmark fixture ids and the corpus hash are the pack's fixture ids and expectations digest, which the pin manifest has listed since redact-secret-benchmarks#310. On this fixing commit every listed pack fixture reports its expected range. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded."
+    },
+    {
+      "id": "benchmark-gap-819",
+      "benchmarkRecordId": "product-819",
+      "benchmarkIssue": "https://github.com/redact-secret/redact-secret-benchmarks/issues/10",
+      "productIssue": "https://github.com/redact-secret/redact-secret/issues/819",
+      "benchmarkFixtureIds": [
+        "beta9-external-inputs--rfc8959-secret-token-folded-bearer",
+        "beta9-external-inputs--rfc8959-secret-token-prose",
+        "beta9-external-inputs--composed-secret-token-uppercase-scheme"
+      ],
+      "corpusHashes": [
+        "25472f6cf07968d72a9f43eaf4ba63c1da1585644f99a05b65c964d1b21e1670"
+      ],
+      "fixingCommit": "56cd309dc569fa9d45fd8279c6d4863ab9ec57ad",
+      "canonicalFixtures": {
+        "synchronous": [
+          "bearer-token-regression-secret-token-uri-whole",
+          "bearer-token-regression-secret-token-uri-uppercase-scheme",
+          "bearer-token-regression-secret-token-uri-folded-header",
+          "bearer-token-negative-secret-token-scheme-without-body",
+          "bearer-token-negative-secret-token-placeholder-body"
+        ],
+        "incremental": []
+      },
+      "gates": {
+        "productConformance": {
+          "status": "pending",
+          "evidence": []
+        },
+        "benchmarkRevalidation": {
+          "status": "pending",
+          "evidence": []
+        }
+      },
+      "note": "beta9-external-inputs adversarial pack gap (redact-secret-benchmarks#140), fixed by PR #835. The benchmark fixture ids and the corpus hash are the pack's fixture ids and expectations digest, which the pin manifest has listed since redact-secret-benchmarks#310. On this fixing commit every listed pack fixture reports its expected range. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded."
+    },
+    {
+      "id": "benchmark-gap-820",
+      "benchmarkRecordId": "product-820",
+      "benchmarkIssue": "https://github.com/redact-secret/redact-secret-benchmarks/issues/10",
+      "productIssue": "https://github.com/redact-secret/redact-secret/issues/820",
+      "benchmarkFixtureIds": [
+        "beta9-external-inputs--composed-userinfo-password-url"
+      ],
+      "corpusHashes": [
+        "25472f6cf07968d72a9f43eaf4ba63c1da1585644f99a05b65c964d1b21e1670"
+      ],
+      "fixingCommit": "58089c3b0e843275f753f98bd19f876e1eb57c53",
+      "canonicalFixtures": {
+        "synchronous": [
+          "connection-regression-https-userinfo-percent-encoded-password",
+          "connection-regression-http-proxy-userinfo-password",
+          "connection-negative-https-user-without-password",
+          "connection-negative-https-placeholder-password"
+        ],
+        "incremental": []
+      },
+      "gates": {
+        "productConformance": {
+          "status": "pending",
+          "evidence": []
+        },
+        "benchmarkRevalidation": {
+          "status": "pending",
+          "evidence": []
+        }
+      },
+      "note": "beta9-external-inputs adversarial pack gap (redact-secret-benchmarks#140), fixed by PR #836. The benchmark fixture ids and the corpus hash are the pack's fixture ids and expectations digest, which the pin manifest has listed since redact-secret-benchmarks#310. On this fixing commit every listed pack fixture reports its expected range. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded."
+    },
+    {
+      "id": "benchmark-gap-821",
+      "benchmarkRecordId": "product-821",
+      "benchmarkIssue": "https://github.com/redact-secret/redact-secret-benchmarks/issues/10",
+      "productIssue": "https://github.com/redact-secret/redact-secret/issues/821",
+      "benchmarkFixtureIds": [
+        "beta9-external-inputs--composed-jwk-k-single-line"
+      ],
+      "corpusHashes": [
+        "25472f6cf07968d72a9f43eaf4ba63c1da1585644f99a05b65c964d1b21e1670"
+      ],
+      "fixingCommit": "bc52fb58a2625880c808de8aeab502c12a24ce50",
+      "canonicalFixtures": {
+        "synchronous": [
+          "generic-token-regression-jwk-symmetric-key-member",
+          "generic-token-regression-jwk-ec-private-member",
+          "generic-token-negative-jwk-public-rsa-key",
+          "generic-token-negative-one-letter-key-without-kty"
+        ],
+        "incremental": []
+      },
+      "gates": {
+        "productConformance": {
+          "status": "pending",
+          "evidence": []
+        },
+        "benchmarkRevalidation": {
+          "status": "pending",
+          "evidence": []
+        }
+      },
+      "note": "beta9-external-inputs adversarial pack gap (redact-secret-benchmarks#140), fixed by PR #837. The benchmark fixture ids and the corpus hash are the pack's fixture ids and expectations digest, which the pin manifest has listed since redact-secret-benchmarks#310. On this fixing commit every listed pack fixture reports its expected range. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded."
     }
   ]
 }
