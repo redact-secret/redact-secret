@@ -7,6 +7,20 @@ evidence is linked from each published version.
 
 ### Changed
 
+- The JavaScript MCP / AI-context golden path (`examples/mcp-redact`:
+  `buildSafeContext`, `redactToolResult`, `redactArguments`, and the two
+  tool-call wrappers) now runs on `@redact-secret/adapter-ai-context`
+  (redact-secret-adapters#12) under the #610 contract instead of its own
+  beta.7 walker. A traversal limit, a scanned object key that would be
+  redacted, a non-JSON value, or content past `maxContentBlocks` now blocks
+  the whole call where beta.7 substituted a marker or dropped the part; a
+  blocked outcome carries no findings (audit through the boundary's
+  `onFinding(finding, { boundary })`); every limit is explicit
+  (`EXAMPLE_LIMITS`). The unreleased package is consumed as an `npm pack`
+  tarball built from the 40-hex adapters commit in `adapters/pin-source.json`
+  (`npm run adapter-pins:install`; see `adapters/README.md`). The Python
+  twins keep their beta.7 behavior.
+
 - Benchmark inputs now pin an exact `redact-secret-benchmarks` commit instead
   of following its live `main`: development CI accepts a commit on
   benchmarks `develop`, while the Release workflow requires that same commit

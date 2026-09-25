@@ -5,20 +5,19 @@
  * run through block-all behavior (Docker MCP Gateway's default
  * `--block-secrets`: any match rejects the whole call,
  * `pkg/interceptors/block_secrets.go`) and through this middleware's
- * redact behavior.
+ * redact behavior, on the AI-context boundary.
  *
- * Uses the real, built `@redact-secret/core` (`npm run js:build` first),
- * not a fake — like `examples/safe-integration/server.mjs`, this file is
- * exercised against the real package rather than unit tested.
+ * Uses the real `@redact-secret/core`, not a fake, through the pinned
+ * `@redact-secret/adapter-ai-context` (see README § Running the demo for
+ * how to make both resolvable here).
  *
  * Run: `node examples/mcp-redact/demo.mjs`
  */
 
-import { initialize, scanAndRedact } from "@redact-secret/core";
-
+import { createGoldenPathBoundary } from "./agent-context.mjs";
 import { buildBlockedResult, redactToolResult } from "./redact-tool-call.mjs";
 
-await initialize();
+const boundary = await createGoldenPathBoundary();
 
 // AKIA + SYNTHETICEXAMPLE: this repo's synthetic AWS access key ID, also
 // used in `crates/secret-scan-core/src/detectors/aws.rs`'s own tests — not
@@ -40,14 +39,14 @@ const syntheticToolResult = {
 function blockAll(result) {
   // The behavior this issue is responding to: any finding anywhere rejects
   // the whole call, with no partial or sanitized result ever returned.
-  const probe = redactToolResult(scanAndRedact, result, {});
-  const hasFindings = probe.outcome === "blocked" || probe.findings.length > 0;
+  const probe = redactToolResult(boundary, result);
+  const hasFindings = probe.outcome !== "ok" || probe.findings.length > 0;
   return hasFindings ? { rejected: true, reason: "secret detected; call rejected outright" } : result;
 }
 
 function redact(result) {
-  const outcome = redactToolResult(scanAndRedact, result, {});
-  return outcome.outcome === "blocked" ? buildBlockedResult() : outcome.result;
+  const outcome = redactToolResult(boundary, result);
+  return outcome.outcome === "ok" ? outcome.value : buildBlockedResult();
 }
 
 // Never print the unscanned result: no example logs raw input before scanning
