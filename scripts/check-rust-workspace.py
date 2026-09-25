@@ -138,9 +138,9 @@ PUBLIC_SCORE_WORD = re.compile(r"score|probabilit|calibrat", re.I)
 FLOAT_USE = re.compile(r"\bf(?:32|64)\b|(?<![\w.])\d[\d_]*\.\d[\d_]*(?:[eE][+-]?\d+)?(?![\w.])")
 LINE_COMMENT = re.compile(r"//.*$", re.M)
 # `#[cfg(test)] mod name;` (a test-only module file) and `#[cfg(test)] mod
-# name {` (an inline test module), with any further attributes between.
-TEST_MODULE_FILE = re.compile(r"#\[cfg\(test\)\]\s*(?:#\[[^\]]*\]\s*)*mod\s+(?P<name>[A-Za-z_][A-Za-z0-9_]*)\s*;")
-INLINE_TEST_MODULE = re.compile(r"#\[cfg\(test\)\]\s*(?:#\[[^\]]*\]\s*)*mod\s+[A-Za-z_][A-Za-z0-9_]*\s*\{")
+# name {` (an inline test module).
+TEST_MODULE_FILE = re.compile(r"#\[cfg\(test\)\]\s+mod\s+(?P<name>[A-Za-z_][A-Za-z0-9_]*)\s*;")
+INLINE_TEST_MODULE = re.compile(r"#\[cfg\(test\)\]\s+mod\s+[A-Za-z_][A-Za-z0-9_]*\s*\{")
 USER_AGENT = "redact-secret workspace check (https://github.com/redact-secret/redact-secret)"
 
 

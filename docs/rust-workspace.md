@@ -327,10 +327,27 @@ cargo deny check
 npm run rust:check
 ```
 
+The shadow scorer's cross-runtime check (#772) also runs the core on
+`wasm32-wasip1` through Node's built-in WASI host, and compares the shadow
+evaluation of every host (`docs/specs/engine.md`, "Shadow scorer
+qualification"):
+
+```bash
+rustup target add wasm32-wasip1
+CARGO_TARGET_WASM32_WASIP1_RUNNER="node --no-warnings $PWD/scripts/wasi-run.mjs" \
+  cargo test -p redact-secret --target wasm32-wasip1 --locked --lib --test canonical_corpus
+node scripts/shadow-determinism.mjs inputs > inputs.jsonl
+cargo run --release --locked -p redact-secret --example shadow_evaluation < inputs.jsonl > native.jsonl
+cargo build --release --locked -p redact-secret --example shadow_evaluation --target wasm32-wasip1
+node --no-warnings scripts/wasi-run.mjs \
+  target/wasm32-wasip1/release/examples/shadow_evaluation.wasm < inputs.jsonl > wasm32.jsonl
+node scripts/shadow-determinism.mjs compare native=native.jsonl wasm32=wasm32.jsonl
+```
+
 Toolchain setup: `rustup toolchain install 1.88 --profile minimal`,
 `rustup target add wasm32-unknown-unknown`, and `cargo install cargo-deny`.
-The CI jobs `rust-policy`, `rust-native`, `rust-msrv`, and `rust-wasm` run
-the same commands. `cargo test --workspace` includes the doctests on the core
+The CI jobs `rust-policy`, `rust-native`, `rust-msrv`, `rust-wasm`, and
+`shadow-determinism` run the same commands. `cargo test --workspace` includes the doctests on the core
 crate's public API; `cargo doc` fails on a broken intra-doc link because the
 crate root denies `rustdoc::broken_intra_doc_links` and
 `rustdoc::private_intra_doc_links`, and `missing_docs` is denied there too.

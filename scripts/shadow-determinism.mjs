@@ -233,12 +233,12 @@ function main(argv) {
   }
   if (command === "compare") {
     if (rest.length < 2) {
-      console.error("compare needs at least two <label>=<file> arguments");
+      console.error("compare needs at least two LABEL=FILE arguments");
       return 2;
     }
     const outputs = rest.map((argument) => {
       const at = argument.indexOf("=");
-      if (at <= 0) throw new Error(`expected <label>=<file>, got ${argument}`);
+      if (at <= 0) throw new Error(`expected LABEL=FILE, got ${argument}`);
       return { label: argument.slice(0, at), text: readFileSync(argument.slice(at + 1), "utf8") };
     });
     const [reference, ...others] = outputs;

@@ -33,6 +33,7 @@ Rules governing the shared Rust core's detection pipeline, plugin/profile contra
 | The shadow scorer aggregates evidence under the reviewed model `evidence-aggregation/v1`, defined in the "Shadow evidence aggregation" section below: five groups with fixed caps, the halving rule inside each group, a strict whole-value exclusion grammar as the only negative evidence, and integer band thresholds. `private-key`, `provider` and `structural` candidates are never scored; their shadow band is their legacy `Confidence`. The model enforces nothing in beta.9. | [Freeze the shadow evidence score and confidence contract](../decisions/2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md) |
 | The shadow scorer has one reviewed scoring artifact, `docs/contracts/scoring/shadow-scoring-artifact.json`, defined in the "Shadow scoring artifact" section below. It binds the feature schema, the aggregation model, calibration and tuning provenance, and the review method. CI fails when the artifact and the compiled scorer disagree in either direction, and when scorer values change under an unchanged model identity. It is a review and CI artifact: nothing loads it at runtime, no package ships it, and it is not public API. | [Freeze the shadow evidence score and confidence contract](../decisions/2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md) |
 | The shadow scorer runs next to `generic-token`'s legacy decision without enforcing anything, defined in the "Maintainer-local shadow evaluation" section below. The pipeline evaluates the candidates that overlap resolution selects only when the maintainer-local evaluation path asks for it; every public entry point asks for nothing, so findings, `Confidence`, actions, overlap and every public API are unchanged and the scorer never runs on the public path. The path is an unpublished example that compiles the core's own source and writes JSON Lines holding identifiers and integers only, never matched bytes or hashes of them. | [Freeze the shadow evidence score and confidence contract](../decisions/2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md) |
+| No shipped artifact links the shadow scorer: outside tests the incremental session calls `run_detector_pipeline`, so only the evaluation example and tests compile it. Its integer scores and bands are byte-identical on Linux, macOS, Windows and `wasm32` for the conformance corpora and a hostile battery (CI job `shadow-determinism`), no scorer source outside tests names floating point (`scripts/check-rust-workspace.py` check 11), and its worst cases are bounded by the 4,096-byte contextual value and the 256-symbol analysis limit. Defined in the "Shadow scorer qualification" section below. | [Freeze the shadow evidence score and confidence contract](../decisions/2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md) |
 
 ## Shadow evidence feature schema
 
@@ -681,3 +682,64 @@ synthetic battery, that:
 The existing conformance-corpus tests of `run_detector_pipeline`, `scan`
 and the incremental session pin the legacy outputs, which now run through
 `detect` without a sink.
+
+## Shadow scorer qualification
+
+Issue [#772](https://github.com/redact-secret/redact-secret/issues/772)
+qualifies the beta.9 shadow scorer for cost, size and cross-runtime
+determinism. This section applies the existing contract
+([`decision-freeze-the-shadow-evidence-score-and-confidence-contract`](../decisions/2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md),
+sections 5 and 7) and is not a new decision. The measurements are in
+[`docs/audits/evidence/772/`](../audits/evidence/772/README.md) and, for
+performance and size budgets, in redact-secret-benchmarks
+([#143](https://github.com/redact-secret/redact-secret-benchmarks/issues/143)).
+
+### Not linked into shipped artifacts
+
+No shipped build contains the scorer. `run_detector_pipeline`, which every
+public entry point uses, passes no sink to `detect`, and the incremental
+session's recording field, its `detect` call with a sink and its recording
+block exist only under `cfg(test)`; outside tests the session calls
+`run_detector_pipeline`. The compiler therefore removes the scorer from the
+library, the bindings, the CLI and the WebAssembly artifact. Before this, the
+session's always-present `Option` kept the scorer reachable, and it added
+about 26 KB to the `full` WebAssembly module (8.2% gzip) with no public caller.
+The shadow evaluation example and the core's unit tests still compile it.
+
+### Cross-runtime determinism
+
+The scorer uses integer arithmetic only, and `scripts/check-rust-workspace.py`
+check 11 rejects a floating-point type or literal in non-test code under
+`src/evidence/`. CI proves the result, not just the rule:
+
+- the `rust-native` job builds `shadow_evaluation` in release mode on Linux,
+  macOS and Windows and runs it, for the `full` and `common` profiles, over
+  the input set `scripts/shadow-determinism.mjs inputs` writes: every fixture
+  of the synchronous, incremental and Unicode-conversion conformance corpora
+  and a generated battery of hostile maximum-length and periodic values;
+- the `rust-wasm` job compiles the same example for `wasm32-wasip1` and runs
+  it on V8's WebAssembly engine through Node's built-in WASI host
+  (`scripts/wasi-run.mjs`), after running the core's unit tests and the
+  canonical corpus test there;
+- the `shadow-determinism` job requires the four hosts' outputs to be byte
+  for byte identical and fails otherwise. Its report carries counts and
+  SHA-256s only.
+
+The shipped `wasm32-unknown-unknown` binding cannot reach the scorer. The
+`wasm32-wasip1` build compiles the same source with the same wasm32 code
+generator; the two differ only in the operating-system layer, which the
+scorer does not use.
+
+### Worst cases
+
+A contextual value is at most 4,096 bytes (`generic-token`'s
+`MAX_CONTEXT_VALUE_LENGTH`), and a longer one is not a candidate. Feature
+extraction reads at most 256 scalar values of it, with work bounded by
+`256²` comparisons; the exclusion grammar reads the whole value once.
+`src/evidence/qualification_tests.rs` pins the feature vectors of each
+feature function's worst case (period 32, period 33, a late period break, no
+repeated bigram, one repeated symbol, 256 distinct astral symbols, a random
+maximum-length value), checks that a 1 MiB value is described by its first
+256 symbols alone, and requires equal whole-input and incremental
+comparisons for those values in credential-bearing contexts at six chunk
+sizes.
