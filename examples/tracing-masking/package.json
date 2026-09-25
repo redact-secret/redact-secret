@@ -1,0 +1,16 @@
+{
+  "name": "redact-secret-reference-tracing",
+  "private": true,
+  "type": "module",
+  "description": "Reference architecture: OpenTelemetry tracing. Installs only released registry packages, pinned exactly by package-lock.json.",
+  "scripts": {
+    "smoke": "node smoke.mjs"
+  },
+  "dependencies": {
+    "@opentelemetry/api": "1.9.1",
+    "@opentelemetry/sdk-trace-base": "2.11.0",
+    "@redact-secret/adapter": "0.1.0",
+    "@redact-secret/adapter-otel": "0.1.0",
+    "@redact-secret/core": "0.1.0-beta.8"
+  }
+}

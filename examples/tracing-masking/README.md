@@ -1,136 +1,150 @@
-# Mask secrets in LLM tracing
+# Reference: redact secrets in OpenTelemetry traces
 
-Two integration points, in JavaScript and Python, for keeping secrets out of
-LLM tracing and observability storage (issue #326): a **masking callback**
-for host SDKs like Langfuse that hand you a value to mask, and an
-**OpenTelemetry `SpanProcessor`** for pipelines built directly on OTel spans
-(OpenInference, GenAI semantic-convention attributes). Both are examples, not
-package exports: no new dependency is added to `@redact-secret/core` or
-`redact-secret`, and every OpenTelemetry/Langfuse package used here is
-example-only.
-
-## Masking callback
-
-`maskSecretsWith`/`mask_secrets_with` recursively walks strings inside plain
-objects, arrays, and dicts/lists, redacting each with `scanAndRedact`/
-`scan_and_redact`. Keys, numbers, booleans, and non-plain objects (`Date`,
-class instances, tuples, ...) are left unchanged.
-
-| File | Role |
-| --- | --- |
-| [`mask-leaf.mjs`](./mask-leaf.mjs) / [`python/mask_leaf.py`](./python/mask_leaf.py) | The shared primitive: mask one leaf string, fail closed on any error, replace a `block` finding's whole leaf. |
-| [`mask-secrets.mjs`](./mask-secrets.mjs) / [`python/mask_secrets.py`](./python/mask_secrets.py) | Pure, dependency-injected recursive walker (`maskSecretsWith`/`mask_secrets_with`). No `@redact-secret/core` import, so it's testable without the built native addon — mirrors [`examples/safe-integration/integration.mjs`](../safe-integration/integration.mjs). |
-| [`langfuse-mask.mjs`](./langfuse-mask.mjs) / [`python/langfuse_mask.py`](./python/langfuse_mask.py) | The live wrapper: real `scanAndRedact`/`scan_and_redact`, shaped to drop into Langfuse's `mask` hook directly. |
-
-**Support level — example-only; not a maintained package.**
-`decision-graduate-adapters-to-a-separate-repository` graduated pino, Python
-`logging`, and OpenTelemetry `SpanProcessor` into the separate
-[`redact-secret-adapters`](https://github.com/redact-secret/redact-secret-adapters)
-repository; the Langfuse masking callback did not, because it needs no
-package — it is `mask-secrets.mjs`'s shared walker plus the one line of host
-code shown above, with no wiring subtle enough to justify a maintained
-dependency. Langfuse itself is not installed in this workspace (unlike
-pino or `opentelemetry-sdk`, both real, pinned `devDependencies` here), so
-there is no exact SDK version pinned against; `langfuse-mask.mjs`/
-`langfuse_mask.py` are confirmed against Langfuse's published masking docs
-(https://langfuse.com/docs/observability/features/masking) as of resolving
-issue #326, not against an installed, version-pinned package. Copy this file
-out of the repository to use it; from that point on, tracking Langfuse's own
-`mask` contract for drift is the integrator's responsibility, not this
-repository's.
-
-**Block findings.** `scanAndRedact` already substitutes `block` findings in
-place, like `redact` ones — but an inline placeholder still leaves the rest
-of the string visible. The masking callback goes further: a leaf with a
-`block` finding is replaced *entirely* with a fixed marker
-(`[REDACTED:BLOCKED]`), never a partial value. Findings otherwise pass
-through unmodified strings for `warn`/`allow`, as `scanAndRedact` already
-does.
-
-**Initialization (JS only).** `await initialize()` must resolve before
-`scanAndRedact` is called (`packages/javascript/src/index.ts`); Python's
-bindings have no such step (the native extension loads on `import
-redact_secret`). `createMaskSecrets()` enforces the order for JS. If a core
-call is ever made before `initialize()` anyway, or fails for any other
-reason, the affected leaf fails closed to `[REDACTED:ERROR]` rather than
-throwing the original text or the error's own message back to the host SDK.
-
-**Limits.** Every walk is bounded: `maxDepth` (nesting), `maxArrayLength` /
-`maxObjectKeys` (elements dropped beyond the limit, never passed through
-unmasked), `maxStringLength` (an oversized leaf is marked, not scanned), and
-`maxTotalLeaves` (a whole-call budget). A self-referencing object is
-detected and marked (`[REDACTED:CYCLE]`) rather than recursed into forever.
-See `DEFAULT_LIMITS` in `mask-leaf.mjs`/`mask_leaf.py`; override via the
-`limits` option.
-
-## OpenTelemetry `SpanProcessor`
-
-This integration graduated: `@redact-secret/adapter-otel` in the separate
-[`redact-secret-adapters`](https://github.com/redact-secret/redact-secret-adapters)
-repository builds on the same approach documented here
-(`decision-graduate-adapters-to-a-separate-repository`). That package is
-currently `private: true`, pending a real-span test confirming
-`ReadableSpan.attributes` mutability at both ends of its declared
-`@opentelemetry/sdk-trace-base ^2.0.0` range — see that repository for
-current status. This directory's example stays as the executable reference
-for the approach until that package is public.
-
-| File | Role |
-| --- | --- |
-| [`redact-span-attributes.mjs`](./redact-span-attributes.mjs) / [`python/redact_span_attributes.py`](./python/redact_span_attributes.py) | Pure `RedactingSpanProcessorWith`: wraps any duck-typed `SpanProcessor` and redacts string/string-array attributes on a span and its events before delegating. No OpenTelemetry import — `SpanProcessor` is a structural interface in both languages. |
-| [`otel-span-processor.mjs`](./otel-span-processor.mjs) / [`python/otel_span_processor.py`](./python/otel_span_processor.py) | The live factory: wires the real `scanAndRedact`/`scan_and_redact` in. |
-
-It redacts every string and string-array attribute value, which covers
-OpenInference (`llm.input_messages`, `input.value`, ...) and GenAI
-semantic-convention attributes (`gen_ai.prompt`, ...) without allowlisting
-either convention's attribute names.
-
-Pinned while resolving issue #326:
-
-- JS: `@opentelemetry/sdk-trace-base@2.11.0`. `SpanProcessor.onEnd(span:
-  ReadableSpan)`; `span.attributes` is typed `readonly` but is a plain,
-  mutable object at runtime, so `onEnd` mutates it in place.
-- Python: `opentelemetry-sdk==1.44.0`. `SpanProcessor.on_end(span:
-  ReadableSpan)`; `ReadableSpan.attributes` returns a read-only
-  `MappingProxyType` — there is no public mutation API before export, so
-  this reaches into the private `_attributes` field (and each event's
-  `_attributes`) instead, the accepted workaround absent a public API. If a
-  future SDK version removes that field, the exporter assertion in
-  `test_redact_span_attributes.py` fails loudly rather than silently letting
-  plaintext through.
-
-## False positives and false negatives
-
-- **False positives** corrupt observability data rather than blocking
-  anything, since trace payloads are mostly code, config, and IDs. The
-  default policy redacts high-confidence and known-type findings and warns
-  on the rest (`crates/secret-scan-core/src/policy.rs`); pass a custom
-  `policy` to relax redaction to `warn` for types you find too aggressive
-  here.
-- **False negatives**: a secret split across separate attributes or chat
-  messages is not joined across leaves — each leaf is scanned independently.
-  Encoded values (base64, URL-encoded JSON) are not decoded before
-  scanning, so an encoded secret is not detected.
-
-## Running the tests
+The OpenTelemetry tracing reference architecture (#611; index in
+[runtime-boundary reference architectures](../../docs/guides/reference-architectures.md)).
+A Node.js service traces LLM calls with the OpenTelemetry SDK, and the
+released [`@redact-secret/adapter-otel`](https://www.npmjs.com/package/@redact-secret/adapter-otel)
+redacts span and span-event attributes (OpenInference, GenAI semantic
+conventions, or anything else string-shaped) before the exporter sees them.
+The same directory shows the masking callback for a tracing SDK with its own
+`mask` hook, such as Langfuse, from the released
+[`@redact-secret/adapter`](https://www.npmjs.com/package/@redact-secret/adapter).
 
 ```bash
-npm run examples:test
+npm run reference:tracing   # from the repository root: npm ci here, then the smoke test
+```
+
+| File | Role |
+| --- | --- |
+| [`app.mjs`](./app.mjs) | The whole integration: `createAppTracerProvider` (the redacting `SpanProcessor` in front of the exporter's processor) and `createAppMaskCallback` (the masking callback). |
+| [`smoke.mjs`](./smoke.mjs) | The end-to-end smoke test, on the real OpenTelemetry SDK and the real core. |
+| [`package.json`](./package.json) / [`package-lock.json`](./package-lock.json) | This directory as a consumer project: `@redact-secret/adapter-otel@0.1.0`, `@redact-secret/adapter@0.1.0`, `@redact-secret/core@0.1.0-beta.8`, `@opentelemetry/sdk-trace-base@2.11.0`, and `@opentelemetry/api@1.9.1`, all from the npm registry, with every transitive version pinned by the lockfile. |
+| [`python/`](./python) | The Python `SpanProcessor` and Langfuse examples. They are not part of the reference; see [Python](#python). |
+
+This directory used to carry its own copy of the span processor, the
+masking walker, and their leaf primitive. That code graduated into
+`@redact-secret/adapter-otel` and `@redact-secret/adapter`
+(`decision-graduate-adapters-to-a-separate-repository`), whose real-span
+tests run in
+[`redact-secret-adapters`](https://github.com/redact-secret/redact-secret-adapters).
+This reference installs the released packages instead of keeping a second,
+divergent copy.
+
+```js
+import { BatchSpanProcessor, BasicTracerProvider } from "@opentelemetry/sdk-trace-base";
+import { createRedactingSpanProcessor } from "@redact-secret/adapter-otel";
+
+const provider = new BasicTracerProvider({
+  spanProcessors: [await createRedactingSpanProcessor(new BatchSpanProcessor(exporter))],
+});
+```
+
+```js
+import { Langfuse } from "langfuse";
+import { createMaskSecrets } from "@redact-secret/adapter";
+
+const maskSecrets = await createMaskSecrets();
+const langfuse = new Langfuse({ mask: ({ data }) => maskSecrets(data) });
+```
+
+## Trust zone
+
+Plaintext exists in the application process: in the code that sets
+attributes, in the SDK's in-memory span while it is open, and in every span
+processor that runs before the redacting one. Everything the wrapped
+processor hands on (the batch queue, the exporter, the collector, the
+tracing backend) sees only redacted attributes.
+
+For the masking callback, plaintext exists until the host SDK calls `mask`;
+what the SDK sends after that is masked.
+
+## Authoritative scan point
+
+The redacting processor's `onEnd`. It redacts the ended span's attributes,
+and each event's attributes, in place, and only then calls the wrapped
+processor. It must be the only path to an exporter: a processor registered
+beside it receives the same span before or without redaction.
+
+## Preventive versus authoritative scanning
+
+The span processor is the authoritative scan for what this process
+exports. Redacting a prompt before it is set as an attribute is preventive:
+it helps, but any attribute set elsewhere is still covered only by the
+processor. A collector-side redaction processor is defense in depth; by then
+the plaintext has left the process.
+
+## Failure and limit behavior
+
+Every case below is exercised by `smoke.mjs` against the real core.
+
+| Case | What the exporter receives |
+| --- | --- |
+| A `redact` finding | The attribute, with each finding's span replaced by `<SECRET_N>` |
+| A `block` finding (the host's policy) | The whole attribute value becomes `[REDACTED:BLOCKED]` |
+| A core or policy failure | The whole attribute value becomes `[REDACTED:ERROR]`; the span still ends and exports |
+| A string over `maxStringLength` | `[REDACTED:LIMIT_EXCEEDED]`, without scanning it |
+| Numbers, booleans, and their arrays | Unchanged; they carry no free text |
+
+The masking callback walks nested values under `DEFAULT_LIMITS` from
+`@redact-secret/adapter`: past a depth, array, key, or leaf budget, values
+are dropped or marked, never passed on unscanned, and a cycle becomes
+`[REDACTED:CYCLE]`.
+
+## Streaming behavior
+
+Not applicable. A span is scanned once, when it ends. A streamed LLM
+response is covered only once its text is set as an attribute or event on a
+span that ends.
+
+## What it does not protect
+
+`@redact-secret/adapter-otel@0.1.0` redacts span attributes and span-event
+attributes only. It does not scan:
+
+- the span name, the status message, link attributes, or resource
+  attributes;
+- a span seen by another processor, or exported by another provider;
+- baggage, propagated trace context headers, or metrics and logs signals.
+
+It also shares the general limits: a secret split across attributes is not
+joined, encoded values are not decoded, and a span with no finding is not
+proof that it held no secret ([detection and limits](../../docs/reference/detection.md)).
+
+## Evidence
+
+- Support: the [support matrix](../../docs/support-matrix.md).
+- Core cost per scan and per artifact: `redact-secret-benchmarks`'
+  [operational evidence](https://github.com/redact-secret/redact-secret-benchmarks/blob/main/docs/reports/2026-09-25-beta8-141-operational-evidence.md).
+- Which OpenTelemetry SDK and core versions the adapter is qualified
+  against, and which it refuses: the adapters repository's
+  [`compatibility.json`](https://github.com/redact-secret/redact-secret-adapters/blob/a7fbcc32b56ada3b5107e9fbddb9a019eeaf6d43/compatibility.json).
+
+## Python
+
+The Python files keep their own copy of the integration code and are tested
+with a fake scanner, standard library only:
+
+```bash
 python3 -B -m unittest discover -s examples/tracing-masking/python -p "test_*.py"
 ```
 
-Both suites use a fake `scanAndRedact`/`scan_and_redact` — no built native
-addon or extension is required. `mask-secrets.test.mjs` and
-`python/test_mask_secrets.py` both read
-[`fixtures/mask-secrets-cases.json`](./fixtures/mask-secrets-cases.json), so
-nested objects, arrays, chat-message arrays, tool-call arguments/results,
-and Unicode produce byte-identical masked output in both languages by
-construction, not by inspection.
+The supported Python path is the released
+[`redact-secret-adapters`](https://pypi.org/project/redact-secret-adapters/)
+distribution.
 
-## Upstream validation
+| File | Role |
+| --- | --- |
+| [`python/mask_secrets.py`](./python/mask_secrets.py) / [`python/langfuse_mask.py`](./python/langfuse_mask.py) | The masking walker and its Langfuse wrapper (`Langfuse(mask=mask_secrets)`). |
+| [`python/redact_span_attributes.py`](./python/redact_span_attributes.py) / [`python/otel_span_processor.py`](./python/otel_span_processor.py) | A duck-typed `SpanProcessor` and its live factory. |
 
-Acceptance criterion for issue #326: open an upstream docs/example PR or
-discussion with at least one tracing SDK to validate integrator demand, and
-link it from the issue. That is a real action against an external
-repository (Langfuse, Arize Phoenix, or another SDK's own repo) and is not
-performed by this change; it is tracked as follow-up.
+Pinned for `opentelemetry-sdk==1.44.0`: `ReadableSpan.attributes` returns a
+read-only `MappingProxyType`, and there is no public mutation API before
+export, so the processor writes the private `_attributes` field (and each
+event's `_attributes`). If a future SDK removes that field, the exporter
+assertion in `test_redact_span_attributes.py` fails loudly rather than
+letting plaintext through.
+
+Langfuse is not installed in this workspace. `langfuse_mask.py` follows
+Langfuse's published [masking documentation](https://langfuse.com/docs/observability/features/masking)
+and is example-only: once copied out, tracking Langfuse's `mask` contract is
+the integrator's responsibility.

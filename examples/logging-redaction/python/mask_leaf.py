@@ -2,8 +2,8 @@
 string with an injected ``scan_and_redact``, and never let a core failure
 or a ``block`` finding put text on the wire.
 
-Mirrors ``../mask-leaf.mjs`` line for line so the two languages make the
-same decision given the same finding.
+Mirrors ``maskLeafWith`` in the released ``@redact-secret/adapter`` so
+the two languages make the same decision given the same finding.
 """
 
 from __future__ import annotations

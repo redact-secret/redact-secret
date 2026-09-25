@@ -35,6 +35,10 @@
 # project they are installed into.
 /.cache/adapters/
 /examples/mcp-redact/node_modules/
+# The reference architectures' registry installs (`npm run references:smoke`).
+/examples/logging-redaction/node_modules/
+/examples/tracing-masking/node_modules/
+/examples/ai-context/node_modules/
 /sast/reports/ci-latest.json
 
 # Python

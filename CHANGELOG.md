@@ -32,6 +32,23 @@ evidence is linked from each published version.
   removed. `npm run examples:real-core:test` runs the streamed path on the
   real core's `IncrementalSanitizer`.
 
+- `examples/logging-redaction`, `examples/tracing-masking`, and the new
+  `examples/ai-context` are now executable runtime-boundary reference
+  architectures (#611), indexed in `docs/guides/reference-architectures.md`.
+  Each is its own consumer project that installs only released registry
+  packages pinned by a lockfile (`@redact-secret/adapter-pino`,
+  `@redact-secret/adapter-otel`, `@redact-secret/adapter`,
+  `@redact-secret/core@0.1.0-beta.8`) or, for the AI-context adapter, the
+  pinned publish-shaped tarball through the `examples/mcp-redact` golden
+  path. Each states its trust zone, authoritative scan point, failure and
+  limit behavior, and what it does not protect, and has one smoke command
+  (`npm run reference:logging`, `reference:tracing`, `reference:ai-context`;
+  all three: `references:smoke`) that CI runs. The JavaScript integration
+  code these examples used to copy (the pino hook and message formatter,
+  the span processor, the masking walker, and their fake-scanner tests) is
+  removed in favor of the released packages, along with the root `pino` and
+  `quick-format-unescaped` devDependencies. The Python halves are unchanged.
+
 - Benchmark inputs now pin an exact `redact-secret-benchmarks` commit instead
   of following its live `main`: development CI accepts a commit on
   benchmarks `develop`, while the Release workflow requires that same commit

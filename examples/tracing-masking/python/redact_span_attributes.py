@@ -21,7 +21,8 @@ This module does not import ``opentelemetry`` at all: ``SpanProcessor``'s
 ``on_start``/``on_end``/``shutdown``/``force_flush`` are plain (non-
 abstract) methods, so Python's duck typing means a class implementing the
 same four methods needs no base class, no import, and no dependency --
-matching ``redact-span-attributes.mjs``'s JS side. See
+matching ``RedactingSpanProcessorWith`` in the released
+``@redact-secret/adapter-otel``. See
 ``otel_span_processor.py`` for the live factory that wires this to the
 real ``redact_secret.scan_and_redact``.
 """

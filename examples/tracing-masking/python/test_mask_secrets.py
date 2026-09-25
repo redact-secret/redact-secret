@@ -28,9 +28,8 @@ FIXTURES_PATH = Path(__file__).resolve().parents[1] / "fixtures" / "mask-secrets
 
 
 class SharedFixtureTest(unittest.TestCase):
-    """The same fixture file `mask-secrets.test.mjs` reads, proving JS and
-    Python agree on nested objects, arrays, chat-message arrays, tool-call
-    arguments/results, and Unicode."""
+    """The shared fixture file: nested objects, arrays, chat-message
+    arrays, tool-call arguments/results, and Unicode."""
 
     def test_shared_cases(self) -> None:
         cases = json.loads(FIXTURES_PATH.read_text(encoding="utf-8"))["cases"]

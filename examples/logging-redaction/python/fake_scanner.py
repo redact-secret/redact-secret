@@ -5,10 +5,10 @@ the real ``ScanResult`` (``.text``, ``.findings``, each finding's
 directory stands on its own -- but implements the same four rules, by
 convention, so a reader who has seen one recognizes the other.
 
-Kept in sync by hand with ``../fixtures/fake-scanner.mjs``; both
-implement the same four rules so
-``../fixtures/logging-redaction-cases.json`` means the same thing in
-either language.
+The JavaScript side of this directory now runs the released
+``@redact-secret/adapter-pino`` on the real core (``../smoke.mjs``), so
+this fake and ``../fixtures/logging-redaction-cases.json`` serve the
+Python suite only.
 
 - text containing ``BOOM`` raises (a simulated core failure).
 - text containing ``BLOCK_ME`` gets a ``block`` finding.

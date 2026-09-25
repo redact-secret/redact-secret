@@ -25,7 +25,12 @@ destinations:
 - **Tool output**: results returned by tools, agents, and MCP servers
   ([MCP example](examples/mcp-redact/)).
 - **Model context**: prompts, retrieved documents, and anything else added to
-  a model's context window.
+  a model's context window ([AI-context example](examples/ai-context/)).
+
+The logging, tracing, and AI-context examples are executable
+[reference architectures](docs/guides/reference-architectures.md): each
+installs only released or pinned packages, states where plaintext exists and
+where the authoritative scan happens, and runs an end-to-end smoke test in CI.
 
 One side-effect-free Rust core owns built-in detection, overlap resolution,
 policy, redaction, and bounded incremental sanitization. JavaScript (Node.js
@@ -289,13 +294,16 @@ for its false-negative tradeoff and measured savings.
 ## Mask secrets in traces
 
 Wire the same detection into LLM tracing SDKs so prompts, tool calls, and
-spans never carry a secret into observability storage. See
-[`examples/tracing-masking/`](examples/tracing-masking/) for the masking
-callback, an OpenTelemetry `SpanProcessor`, and their tests.
+spans never carry a secret into observability storage, with the released
+[`@redact-secret/adapter-otel`](https://www.npmjs.com/package/@redact-secret/adapter-otel)
+`SpanProcessor` or the masking callback in
+[`@redact-secret/adapter`](https://www.npmjs.com/package/@redact-secret/adapter).
+See the [tracing reference](examples/tracing-masking/) for the trust zone,
+the failure behavior, and what it does not cover.
 
 ```ts
 import { Langfuse } from "langfuse";
-import { createMaskSecrets } from "./examples/tracing-masking/langfuse-mask.mjs";
+import { createMaskSecrets } from "@redact-secret/adapter";
 
 const maskSecrets = await createMaskSecrets();
 const langfuse = new Langfuse({ mask: ({ data }) => maskSecrets(data) });
@@ -312,13 +320,15 @@ langfuse = Langfuse(mask=mask_secrets)
 
 Wire the same detection into application logging, alongside pino's own
 path-based `redact` or Python's standard `logging`, so a secret in a
-message, a field, or an error's text never reaches a log destination. See
-[`examples/logging-redaction/`](examples/logging-redaction/) for both
-integrations, the API details they're pinned against, and their tests.
+message, a field, or an error's text never reaches a log destination, with
+the released [`@redact-secret/adapter-pino`](https://www.npmjs.com/package/@redact-secret/adapter-pino).
+See the [logging reference](examples/logging-redaction/) for the trust zone,
+the failure behavior, and what it does not cover, and for the Python
+`logging.Filter`.
 
 ```js
 import pino from "pino";
-import { createRedactingLogMethod } from "./examples/logging-redaction/pino-redact.mjs";
+import { createRedactingLogMethod } from "@redact-secret/adapter-pino";
 
 const logMethod = await createRedactingLogMethod();
 const logger = pino({ hooks: { logMethod } });

@@ -1,7 +1,7 @@
 """Unit tests for RedactSecretFilter and mask_log_value_with, run with
 plain unittest (no pytest dependency) so they need nothing beyond the
 standard library -- not even the built redact_secret extension, matching
-how examples/logging-redaction/pino-hook.test.mjs tests pure logic with a
+how examples/safe-integration/integration.test.mjs tests pure logic with a
 fake scanner instead of the real package.
 
 Run directly:
@@ -37,9 +37,9 @@ _SECRET = "SECRET_TOKEN" + "_1"
 
 
 class SharedFixtureTest(unittest.TestCase):
-    """The same fixture file `pino-hook.test.mjs` reads, proving JS and
-    Python agree on message strings, merging/extra fields, nesting,
-    arrays, and Unicode."""
+    """The shared fixture file: message strings, merging/extra fields,
+    nesting, arrays, and Unicode, each checked against the fake scanner
+    with the standard library only."""
 
     def test_shared_cases(self) -> None:
         cases = json.loads(FIXTURES_PATH.read_text(encoding="utf-8"))["cases"]
