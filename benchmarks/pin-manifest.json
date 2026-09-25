@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "revision": "ece69f14617a070c52388b0ae9b3c4af2a7fd28b",
+  "revision": "3fd1e545dc92747f118a8a024cd9364c06f36c40",
   "pins": {
-    "sourceRevision": "3144bb32c6ebf8f1eefa2cbbad7d431d1d6e8c4c",
-    "redactSecretRevision": "3144bb32c6ebf8f1eefa2cbbad7d431d1d6e8c4c",
+    "sourceRevision": "192c9649deb88e342abc8071fb78e7b1d84ec475",
+    "redactSecretRevision": "192c9649deb88e342abc8071fb78e7b1d84ec475",
     "redactSecretVersion": "0.1.0-beta.8",
     "packageVersion": "0.1.0-beta.8"
   },

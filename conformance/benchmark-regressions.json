@@ -1117,15 +1117,26 @@
       },
       "gates": {
         "productConformance": {
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275294887",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275294912",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275295028",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275294363",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275294139",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275294127",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275294160",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275294236",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275524271"
+          ]
         },
         "benchmarkRevalidation": {
           "status": "pending",
           "evidence": []
         }
       },
-      "note": "beta9-external-inputs adversarial pack gap (redact-secret-benchmarks#140), fixed by PR #831. The benchmark fixture ids and the corpus hash are the pack's fixture ids and expectations digest, which the pin manifest has listed since redact-secret-benchmarks#310. On this fixing commit every listed pack fixture reports its expected range. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded."
+      "note": "beta9-external-inputs adversarial pack gap (redact-secret-benchmarks#140), fixed by PR #831. The benchmark fixture ids and the corpus hash are the pack's fixture ids and expectations digest, which the pin manifest has listed since redact-secret-benchmarks#310. On this fixing commit every listed pack fixture reports its expected range. productConformance passed: the canonical fixtures pass in Artifact qualification run 36197068993 at main 192c964, a descendant of the fixing commit (Rust native host on ubuntu, macOS and Windows, the N-API addon, browser WebAssembly on Chromium, Firefox and WebKit, the CLI, and the Python wheel). The benchmark rerun of that exact candidate is recorded and the benchmark record is verified (redact-secret-benchmarks evidence/815, #317/#318), but benchmarkRevalidation stays pending: passing it needs a benchmarkCommit that is an ancestor of redact-secret-benchmarks main, and the evidence is on develop until develop is promoted."
     },
     {
       "id": "benchmark-gap-816",
@@ -1160,15 +1171,26 @@
       },
       "gates": {
         "productConformance": {
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275294887",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275294912",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275295028",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275294363",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275294139",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275294127",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275294160",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275294236",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275524271"
+          ]
         },
         "benchmarkRevalidation": {
           "status": "pending",
           "evidence": []
         }
       },
-      "note": "beta9-external-inputs adversarial pack gap (redact-secret-benchmarks#140), fixed by PR #832. The benchmark fixture ids and the corpus hash are the pack's fixture ids and expectations digest, which the pin manifest has listed since redact-secret-benchmarks#310. On this fixing commit every listed pack fixture reports its expected range. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded."
+      "note": "beta9-external-inputs adversarial pack gap (redact-secret-benchmarks#140), fixed by PR #832. The benchmark fixture ids and the corpus hash are the pack's fixture ids and expectations digest, which the pin manifest has listed since redact-secret-benchmarks#310. On this fixing commit every listed pack fixture reports its expected range. productConformance passed: the canonical fixtures pass in Artifact qualification run 36197068993 at main 192c964, a descendant of the fixing commit (Rust native host on ubuntu, macOS and Windows, the N-API addon, browser WebAssembly on Chromium, Firefox and WebKit, the CLI, and the Python wheel). The benchmark rerun of that exact candidate is recorded and the benchmark record is verified (redact-secret-benchmarks evidence/816, #317/#318), but benchmarkRevalidation stays pending: passing it needs a benchmarkCommit that is an ancestor of redact-secret-benchmarks main, and the evidence is on develop until develop is promoted."
     },
     {
       "id": "benchmark-gap-817",
@@ -1201,15 +1223,26 @@
       },
       "gates": {
         "productConformance": {
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275294887",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275294912",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275295028",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275294363",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275294139",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275294127",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275294160",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275294236",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275524271"
+          ]
         },
         "benchmarkRevalidation": {
           "status": "pending",
           "evidence": []
         }
       },
-      "note": "beta9-external-inputs adversarial pack gap (redact-secret-benchmarks#140), fixed by PR #833. The benchmark fixture ids and the corpus hash are the pack's fixture ids and expectations digest, which the pin manifest has listed since redact-secret-benchmarks#310. On this fixing commit every listed pack fixture reports its expected range. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded."
+      "note": "beta9-external-inputs adversarial pack gap (redact-secret-benchmarks#140), fixed by PR #833. The benchmark fixture ids and the corpus hash are the pack's fixture ids and expectations digest, which the pin manifest has listed since redact-secret-benchmarks#310. On this fixing commit every listed pack fixture reports its expected range. productConformance passed: the canonical fixtures pass in Artifact qualification run 36197068993 at main 192c964, a descendant of the fixing commit (Rust native host on ubuntu, macOS and Windows, the N-API addon, browser WebAssembly on Chromium, Firefox and WebKit, the CLI, and the Python wheel). The benchmark rerun of that exact candidate is recorded and the benchmark record is verified (redact-secret-benchmarks evidence/817, #317/#318), but benchmarkRevalidation stays pending: passing it needs a benchmarkCommit that is an ancestor of redact-secret-benchmarks main, and the evidence is on develop until develop is promoted."
     },
     {
       "id": "benchmark-gap-818",
@@ -1239,15 +1272,26 @@
       },
       "gates": {
         "productConformance": {
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275294887",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275294912",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275295028",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275294363",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275294139",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275294127",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275294160",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275294236",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275524271"
+          ]
         },
         "benchmarkRevalidation": {
           "status": "pending",
           "evidence": []
         }
       },
-      "note": "beta9-external-inputs adversarial pack gap (redact-secret-benchmarks#140), fixed by PR #834. The benchmark fixture ids and the corpus hash are the pack's fixture ids and expectations digest, which the pin manifest has listed since redact-secret-benchmarks#310. On this fixing commit every listed pack fixture reports its expected range. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded."
+      "note": "beta9-external-inputs adversarial pack gap (redact-secret-benchmarks#140), fixed by PR #834. The benchmark fixture ids and the corpus hash are the pack's fixture ids and expectations digest, which the pin manifest has listed since redact-secret-benchmarks#310. On this fixing commit every listed pack fixture reports its expected range. productConformance passed: the canonical fixtures pass in Artifact qualification run 36197068993 at main 192c964, a descendant of the fixing commit (Rust native host on ubuntu, macOS and Windows, the N-API addon, browser WebAssembly on Chromium, Firefox and WebKit, the CLI, and the Python wheel). The benchmark rerun of that exact candidate is recorded and the benchmark record is verified (redact-secret-benchmarks evidence/818, #317/#318), but benchmarkRevalidation stays pending: passing it needs a benchmarkCommit that is an ancestor of redact-secret-benchmarks main, and the evidence is on develop until develop is promoted."
     },
     {
       "id": "benchmark-gap-819",
@@ -1275,15 +1319,26 @@
       },
       "gates": {
         "productConformance": {
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275294887",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275294912",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275295028",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275294363",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275294139",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275294127",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275294160",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275294236",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275524271"
+          ]
         },
         "benchmarkRevalidation": {
           "status": "pending",
           "evidence": []
         }
       },
-      "note": "beta9-external-inputs adversarial pack gap (redact-secret-benchmarks#140), fixed by PR #835. The benchmark fixture ids and the corpus hash are the pack's fixture ids and expectations digest, which the pin manifest has listed since redact-secret-benchmarks#310. On this fixing commit every listed pack fixture reports its expected range. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded."
+      "note": "beta9-external-inputs adversarial pack gap (redact-secret-benchmarks#140), fixed by PR #835. The benchmark fixture ids and the corpus hash are the pack's fixture ids and expectations digest, which the pin manifest has listed since redact-secret-benchmarks#310. On this fixing commit every listed pack fixture reports its expected range. productConformance passed: the canonical fixtures pass in Artifact qualification run 36197068993 at main 192c964, a descendant of the fixing commit (Rust native host on ubuntu, macOS and Windows, the N-API addon, browser WebAssembly on Chromium, Firefox and WebKit, the CLI, and the Python wheel). The benchmark rerun of that exact candidate is recorded and the benchmark record is verified (redact-secret-benchmarks evidence/819, #317/#318), but benchmarkRevalidation stays pending: passing it needs a benchmarkCommit that is an ancestor of redact-secret-benchmarks main, and the evidence is on develop until develop is promoted."
     },
     {
       "id": "benchmark-gap-820",
@@ -1308,15 +1363,26 @@
       },
       "gates": {
         "productConformance": {
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275294887",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275294912",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275295028",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275294363",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275294139",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275294127",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275294160",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275294236",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275524271"
+          ]
         },
         "benchmarkRevalidation": {
           "status": "pending",
           "evidence": []
         }
       },
-      "note": "beta9-external-inputs adversarial pack gap (redact-secret-benchmarks#140), fixed by PR #836. The benchmark fixture ids and the corpus hash are the pack's fixture ids and expectations digest, which the pin manifest has listed since redact-secret-benchmarks#310. On this fixing commit every listed pack fixture reports its expected range. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded."
+      "note": "beta9-external-inputs adversarial pack gap (redact-secret-benchmarks#140), fixed by PR #836. The benchmark fixture ids and the corpus hash are the pack's fixture ids and expectations digest, which the pin manifest has listed since redact-secret-benchmarks#310. On this fixing commit every listed pack fixture reports its expected range. productConformance passed: the canonical fixtures pass in Artifact qualification run 36197068993 at main 192c964, a descendant of the fixing commit (Rust native host on ubuntu, macOS and Windows, the N-API addon, browser WebAssembly on Chromium, Firefox and WebKit, the CLI, and the Python wheel). The benchmark rerun of that exact candidate is recorded and the benchmark record is verified (redact-secret-benchmarks evidence/820, #317/#318), but benchmarkRevalidation stays pending: passing it needs a benchmarkCommit that is an ancestor of redact-secret-benchmarks main, and the evidence is on develop until develop is promoted."
     },
     {
       "id": "benchmark-gap-821",
@@ -1341,15 +1407,26 @@
       },
       "gates": {
         "productConformance": {
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275294887",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275294912",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275295028",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275294363",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275294139",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275294127",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275294160",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275294236",
+            "https://github.com/redact-secret/redact-secret/actions/runs/36197068993/job/108275524271"
+          ]
         },
         "benchmarkRevalidation": {
           "status": "pending",
           "evidence": []
         }
       },
-      "note": "beta9-external-inputs adversarial pack gap (redact-secret-benchmarks#140), fixed by PR #837. The benchmark fixture ids and the corpus hash are the pack's fixture ids and expectations digest, which the pin manifest has listed since redact-secret-benchmarks#310. On this fixing commit every listed pack fixture reports its expected range. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded."
+      "note": "beta9-external-inputs adversarial pack gap (redact-secret-benchmarks#140), fixed by PR #837. The benchmark fixture ids and the corpus hash are the pack's fixture ids and expectations digest, which the pin manifest has listed since redact-secret-benchmarks#310. On this fixing commit every listed pack fixture reports its expected range. productConformance passed: the canonical fixtures pass in Artifact qualification run 36197068993 at main 192c964, a descendant of the fixing commit (Rust native host on ubuntu, macOS and Windows, the N-API addon, browser WebAssembly on Chromium, Firefox and WebKit, the CLI, and the Python wheel). The benchmark rerun of that exact candidate is recorded and the benchmark record is verified (redact-secret-benchmarks evidence/821, #317/#318), but benchmarkRevalidation stays pending: passing it needs a benchmarkCommit that is an ancestor of redact-secret-benchmarks main, and the evidence is on develop until develop is promoted."
     }
   ]
 }
