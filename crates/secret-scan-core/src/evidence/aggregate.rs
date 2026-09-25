@@ -255,6 +255,11 @@ const PRODUCT_NEGATIVE: [SignalRule; 1] = [SignalRule::StrictExclusion { points:
 /// contributes `0` and was not fitted. None of these values is secret, and
 /// security does not depend on them being unknown
 /// (`docs/specs/engine.md`, "Shadow evidence aggregation").
+///
+/// The reviewed scoring artifact
+/// `docs/contracts/scoring/shadow-scoring-artifact.json` records every value
+/// here (#798). A test fails when the two disagree, and changing any value
+/// needs a new `id` (`docs/specs/engine.md`, "Shadow scoring artifact").
 pub(crate) const SHADOW_MODEL: AggregationModel = AggregationModel {
     id: "evidence-aggregation/v1",
     feature_schema: FEATURE_SCHEMA_VERSION,
@@ -642,5 +647,7 @@ pub(crate) fn shadow_evidence(
     }
 }
 
+#[cfg(test)]
+mod artifact_drift;
 #[cfg(test)]
 mod tests;

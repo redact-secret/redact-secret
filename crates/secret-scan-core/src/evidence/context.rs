@@ -53,7 +53,7 @@ impl ContextClass {
 /// carry one of these when the assignment name is in its credential-bearing
 /// vocabulary (built-in high-signal or ambiguous names, or a ruleset's
 /// declared names).
-const CREDENTIAL_NAME_SIGNALS: [&str; 2] = ["high-signal-name", "ambiguous-name"];
+pub(crate) const CREDENTIAL_NAME_SIGNALS: [&str; 2] = ["high-signal-name", "ambiguous-name"];
 
 /// Maps a candidate's detector evidence onto a [`ContextClass`].
 ///

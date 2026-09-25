@@ -1,0 +1,339 @@
+{
+  "$schema": "./shadow-scoring-artifact.schema.json",
+  "format": "redact-secret/shadow-scoring-artifact/1",
+  "artifact": {
+    "id": "redact-secret/shadow-scoring-artifact",
+    "revision": 1
+  },
+  "status": "reviewed",
+  "contract": {
+    "decision": "decision-freeze-the-shadow-evidence-score-and-confidence-contract",
+    "decisionPath": "docs/decisions/2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md",
+    "spec": "docs/specs/engine.md#shadow-scoring-artifact"
+  },
+  "use": {
+    "shadowOnly": true,
+    "enforcing": false,
+    "publicApi": false,
+    "findingFields": [],
+    "loadedAtRuntime": false,
+    "shippedInPackages": false,
+    "runtimeLearning": false,
+    "remoteCalibration": false,
+    "securityDependsOnSecrecy": false
+  },
+  "model": {
+    "featureSchema": {
+      "id": "evidence-features/v1",
+      "maxAnalysedChars": 256,
+      "maxAutocorrelationLag": 32,
+      "fixedPointFractionBits": 16,
+      "features": ["byte_len", "analysed_chars", "truncated", "distinct_symbols", "max_symbol_count", "shannon_entropy_q16", "min_entropy_q16", "information_bits_q16", "class_lower", "class_upper", "class_digit", "class_symbol", "class_space_control", "class_non_ascii", "class_count", "class_transitions", "class_alphabet_size", "entropy_efficiency_permille", "alphabet_efficiency_permille", "distinct_ratio_permille", "length_permille", "longest_run", "adjacent_repeat_permille", "repeated_bigram_permille", "smallest_period", "max_autocorrelation_permille", "max_autocorrelation_lag"],
+      "goldenVectors": [
+        {"input": "", "vector": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]},
+        {"input": "aaaaaaaaaaaaaaaa", "vector": [16, 16, 0, 1, 16, 0, 0, 0, 16, 0, 0, 0, 0, 0, 1, 0, 26, 0, 0, 62, 62, 16, 1000, 933, 1, 1000, 2]},
+        {"input": "abcabcabcabcabcabc", "vector": [18, 18, 0, 3, 6, 103872, 103872, 1869696, 18, 0, 0, 0, 0, 0, 1, 0, 26, 1000, 337, 166, 70, 1, 0, 823, 3, 1000, 3]},
+        {"input": "XXXX-XXXX-XXXX-XXXX", "vector": [19, 19, 0, 2, 16, 41239, 16248, 783541, 0, 16, 0, 3, 0, 0, 2, 6, 58, 629, 107, 105, 74, 4, 666, 833, 5, 1000, 5]},
+        {"input": "Q7vK2mZp9LxR4tWb8NcY3hJd6FsG1eUa", "vector": [32, 32, 0, 32, 1, 327680, 327680, 10485760, 12, 12, 8, 0, 0, 0, 3, 31, 62, 1000, 839, 1000, 125, 1, 0, 0, 0, 0, 0]},
+        {"input": "\ud83d\ude00a\ud83d\ude03b\ud83d\ude00a\ud83d\ude03b", "vector": [20, 8, 0, 4, 2, 131072, 131072, 1048576, 4, 0, 0, 0, 0, 4, 2, 7, 28, 1000, 416, 500, 31, 1, 0, 428, 4, 1000, 4]},
+        {"input": "ab", "vector": [2, 2, 0, 2, 1, 65536, 65536, 131072, 2, 0, 0, 0, 0, 0, 1, 0, 26, 1000, 212, 1000, 7, 1, 0, 0, 0, 0, 0]},
+        {"input": "aabc", "vector": [4, 4, 0, 3, 2, 98304, 65536, 393216, 4, 0, 0, 0, 0, 0, 1, 0, 26, 946, 319, 750, 15, 2, 333, 0, 0, 0, 0]}
+      ]
+    },
+    "aggregation": {
+      "id": "evidence-aggregation/v1",
+      "featureSchema": "evidence-features/v1",
+      "maxGroupSignals": 4,
+      "groups": [
+        {
+          "group": "randomness",
+          "direction": "positive",
+          "rule": "halving-diminishing-returns",
+          "cap": 60,
+          "signals": [
+            {"kind": "feature-ramp", "signal": "shannon_entropy_q16", "feature": 5, "lo": 254345, "hi": 313536, "max": 60}
+          ]
+        },
+        {
+          "group": "lexical",
+          "direction": "positive",
+          "rule": "halving-diminishing-returns",
+          "cap": 0,
+          "signals": []
+        },
+        {
+          "group": "contextual",
+          "direction": "positive",
+          "rule": "halving-diminishing-returns",
+          "cap": 40,
+          "signals": [
+            {"kind": "context", "signal": "credential-context", "classes": ["credential-name", "authorization-header", "url-userinfo"], "points": 40}
+          ]
+        },
+        {
+          "group": "validation",
+          "direction": "positive",
+          "rule": "halving-diminishing-returns",
+          "cap": 40,
+          "signals": []
+        },
+        {
+          "group": "negative",
+          "direction": "negative",
+          "rule": "halving-diminishing-returns",
+          "cap": 140,
+          "signals": [
+            {"kind": "strict-exclusion", "signal": "strict-exclusion", "points": 140}
+          ]
+        }
+      ],
+      "bands": {
+        "low": 7,
+        "medium": 43,
+        "high": 61
+      },
+      "contextClasses": ["url-userinfo", "authorization-header", "credential-name", "other-name", "bare"],
+      "credentialNameSignals": ["high-signal-name", "ambiguous-name"],
+      "exclusionGrammars": ["template-reference", "environment-reference", "command-substitution", "angle-placeholder", "mask", "placeholder-vocabulary"],
+      "placeholderWords": ["a", "access", "an", "api", "auth", "change", "changeme", "client", "dummy", "example", "fake", "goes", "here", "id", "insert", "key", "me", "my", "nil", "none", "null", "password", "placeholder", "redacted", "replace", "replaceme", "sample", "secret", "tbd", "the", "todo", "token", "undefined", "value", "your"],
+      "placeholderMarkers": ["changeme", "dummy", "example", "fake", "here", "insert", "nil", "none", "null", "placeholder", "redacted", "replace", "replaceme", "sample", "tbd", "todo", "undefined", "your"],
+      "maskSymbols": ["*", "x", "X", "\u2022", "#", ".", "-", "0"],
+      "minMaskLength": 3
+    }
+  },
+  "modelFingerprint": "bf2ed67db72dabe69b97d248e547aa1e942cf98991a6b712dc6285629662afa9",
+  "identityLedger": [
+    {
+      "model": "evidence-aggregation/v1",
+      "featureSchema": "evidence-features/v1",
+      "modelFingerprint": "bf2ed67db72dabe69b97d248e547aa1e942cf98991a6b712dc6285629662afa9",
+      "introducedInRevision": 1
+    }
+  ],
+  "sources": {
+    "spec": [
+      {
+        "path": "docs/specs/engine.md",
+        "section": "Shadow evidence feature schema",
+        "sha256": "7c0d2413531e9d5b29c92feaad49515af920ff39ece1e1a156c611ba692515b9"
+      },
+      {
+        "path": "docs/specs/engine.md",
+        "section": "Shadow evidence aggregation",
+        "sha256": "83351f5c56b4c41cf664f43764d1c0530854ba0b271d2996dfa3a5606f69cc04"
+      }
+    ],
+    "code": [
+      {
+        "path": "crates/secret-scan-core/src/evidence/features.rs",
+        "sha256": "1a9abfd0ff8c8fbddb23f5ecc81be533742a96dd7af999011e49f4bd247b5c02"
+      },
+      {
+        "path": "crates/secret-scan-core/src/evidence/fixed_point.rs",
+        "sha256": "27f0717227d4c99e97bfb141a69c843597c548cb6e374f38bd65eca11123a3bd"
+      },
+      {
+        "path": "crates/secret-scan-core/src/evidence/context.rs",
+        "sha256": "0586f5350436fb5050e18885d04c57d7498640885bb5433575e233368c42ec77"
+      },
+      {
+        "path": "crates/secret-scan-core/src/evidence/exclusion.rs",
+        "sha256": "9a5b43264407cc4957be3efb666f708127e9851eba10e96f1eb63ba16406c39c"
+      },
+      {
+        "path": "crates/secret-scan-core/src/evidence/aggregate.rs",
+        "sha256": "acb810c880f1e042ec0289282113dcce0d77db3f7b27dcab44fbc807c2ad22e1"
+      }
+    ]
+  },
+  "calibration": {
+    "repository": "redact-secret/redact-secret-benchmarks",
+    "issue": 255,
+    "pullRequest": 297,
+    "branch": "develop",
+    "commit": "101f674a5ee50aa551423ccd00d0a6a68ed4c875",
+    "method": "https://github.com/redact-secret/redact-secret-benchmarks/blob/101f674a5ee50aa551423ccd00d0a6a68ed4c875/docs/specs/calibration-experiments.md",
+    "experimentVersion": "calibration-experiments/1",
+    "selectedConfiguration": "halving-r1-l0-r60-l0-c40",
+    "selection": {
+      "method": "calibration-experiments/1:dev-balanced-error-within-tolerance,fewest-parameters,loco-stability",
+      "sourceHash": "37a0e41cbc973d53199004cade30dd307afb11c8837ee7352aae3cfd6dd4c13f",
+      "seed": "none"
+    },
+    "featureDataset": {
+      "schemaVersion": 1,
+      "extractorVersion": "candidate-features/2",
+      "extractorSourceHash": "d943c854b79eefdfb5573e30ace6d8fd67f5be9e1ebefc2b9ee9e9d73d05833f",
+      "datasetHash": "a2d875f05780aac329036b19ad9768010839448093bbebec5e710a0975dacf49",
+      "featureSchema": "evidence-features/v1",
+      "productFeatureSource": {
+        "repository": "redact-secret/redact-secret",
+        "commit": "d7733632bb05082710f71b6684ccf60c7a69377e",
+        "pinnedBy": "https://github.com/redact-secret/redact-secret-benchmarks/blob/101f674a5ee50aa551423ccd00d0a6a68ed4c875/benchmarks/lib/evidence-features.ts"
+      }
+    },
+    "scoring": {
+      "contractDecision": "decision-freeze-the-shadow-evidence-score-and-confidence-contract",
+      "featureSchemaVersion": "evidence-features/v1",
+      "featureSetHash": "55b1da0ebce3180e73e6ad075e8dd322cc075e886a3029db0cc26cc7b572cb68",
+      "aggregationContractVersion": "grouped-halving/1",
+      "weightSetHash": "efc58a6adf44a37fd7594aac1fab9de9b5ffc888960ee2af0fb50a48595a8096",
+      "thresholdSetHash": "03b999291b26d89915c25ec163558baee2e1e2f89a7db8fd0684072f41b86edd",
+      "identity": "d6a8325c6cce09f628f595f88c5252245f0fbb5c01abb8ebb0eb0b7ec2e8a789"
+    },
+    "holdoutAccess": "none",
+    "reproduction": "At the benchmark commit, from a clean tree: npm ci, npm run features:extract, npm run calibration:run (about 16 s). The run writes results-output/calibration/, which is ignored by version control and maintainer-local. It reproduces the dataset hash, the selection source hash and the scoring identity above. The fitted per-configuration detail stays there and is never copied into either repository.",
+    "correspondence": "The benchmark's scoring identity names the selected configuration by component hashes only. For #798 a maintainer reran the calibration at the benchmark commit and confirmed that the selected configuration's randomness ramp, caps, context signal, strict negative gate and band thresholds equal model.aggregation here, which is the compiled SHADOW_MODEL. grouped-halving/1 is the benchmark's name for the halving rule that the product implements as evidence-aggregation/v1."
+  },
+  "corpora": {
+    "pinManifest": {
+      "path": "benchmarks/pin-manifest.json",
+      "sha256": "7fbbbaab857b1e1b4af2dcc9526afb89164b227382ad47fd84e41df27805734e"
+    },
+    "tuning": [
+      {
+        "category": "accuracy",
+        "corpusHash": "33c2a504fe7c3c200f7458b903104844d695fea8296dc6977038273358f72e33"
+      },
+      {
+        "category": "beta8-207",
+        "corpusHash": "8b886af52072dcca835c672295e3d0daab273d3ed9421e41340f38720d3fc131"
+      },
+      {
+        "category": "beta8-208",
+        "corpusHash": "34da38437df4f13693c89236967fcac5ca7f45efe417511963de4097046a494b"
+      },
+      {
+        "category": "beta8-209",
+        "corpusHash": "35457096ead3ba8ecf719abd121532c8d77ac33ca113a8df8c73cb006211dc42"
+      },
+      {
+        "category": "beta8-210",
+        "corpusHash": "605e70510d2c2c7327dea6f76aa163dce60a693aedb0046081153d3d7a6da7ef"
+      },
+      {
+        "category": "beta8-211",
+        "corpusHash": "44fa2fce8383c01ac784b9d61edaaf51bc59eb36369f71a0935cf744150607d9"
+      },
+      {
+        "category": "beta8-212",
+        "corpusHash": "bbdcd601e1bd31a007db0a820f49bba376869e34ac7c9f606a2b60fcd4e3b399"
+      },
+      {
+        "category": "beta8-213a",
+        "corpusHash": "e93816b20a54ab8f2757962d95f49f271af53222716049a4a0452869aa8171ca"
+      },
+      {
+        "category": "beta8-213b",
+        "corpusHash": "e976fb045d30e6f3c34849e29f264f4d0cb3267eb2b97171dd41d2961d30e681"
+      },
+      {
+        "category": "beta8-213c",
+        "corpusHash": "d39630d42d62950f5c3ae2fb64d8ed767c6e737272f87536034cb0a234f0e638"
+      },
+      {
+        "category": "beta8-213d",
+        "corpusHash": "165039a8f594a04ab9a0903d8dc3834c01629545bcb830543d7aec8f7b63a2cc"
+      },
+      {
+        "category": "beta8-213e",
+        "corpusHash": "435c2c68cf12647acd62dcae3dca0d91c79c2b4813bc99d2c532e024daaaae40"
+      },
+      {
+        "category": "beta8-213f",
+        "corpusHash": "abe90d21dfa8e74ee5b2fa21ba27a4884dc6c1d1c89df91b980c8d92b5a7037f"
+      },
+      {
+        "category": "beta8-259",
+        "corpusHash": "0da5d62f8f385dafbe46a568105227458479b4e96391c02867a4dc9adfde9220"
+      },
+      {
+        "category": "beta8-263",
+        "corpusHash": "118ed8e978bc5857b2a15782efb7e83d711b0afa0f5adab75f30de1051f20843"
+      },
+      {
+        "category": "common-formats",
+        "corpusHash": "0094f4fc2576ae072f72b5f2f5f14541911e8ccbaa42f92b360de2925d5f7f2f"
+      },
+      {
+        "category": "context-edges",
+        "corpusHash": "091c79bc72557faa0657cafb79895e19e848a5b6dbd4f3c40d96d031f5f0e6ae"
+      },
+      {
+        "category": "credential-formats",
+        "corpusHash": "8a314552eea2e9db66ed49750294ad59a8b10bc4c33fcf471f2eaee059b8af4f"
+      },
+      {
+        "category": "detector-coverage",
+        "corpusHash": "249101e718a962ae37d8732b42f57febc85d7cb4d27de470b62621b8d888b71f"
+      },
+      {
+        "category": "negative-controls",
+        "corpusHash": "90cb2e615a5afa71f8d52ba70454d5d65cb9b206af78ac292f02cb0f9ee57a7b"
+      },
+      {
+        "category": "real-world-shapes",
+        "corpusHash": "8c0e2f60d87286f8acaa81664308ff291b36dc53474b30e344e43625697ffd0f"
+      },
+      {
+        "category": "reference-syntax",
+        "corpusHash": "0fe3363d4e0aec300b81bb823929f73928c7e06eb9e1d43064cf7b5b7f0d977e"
+      },
+      {
+        "category": "token-contexts",
+        "corpusHash": "1a38c702ee7fbf6febdfb4f856fccef65966812e23bfa751322c84242ec441ac"
+      }
+    ],
+    "evaluation": [
+      {
+        "source": "milestone-6-closed",
+        "role": "regression",
+        "corpusHash": "388b26e3703fc5a80b1ca0cd65232873e765a0a0b59148ba0e6998fd6c8ff766"
+      },
+      {
+        "source": "sendgrid-regressions",
+        "role": "regression",
+        "corpusHash": "bb556d9d91dda1a394c83be1cd3763e75ebf9230d5fbdb6ad5abd91368ab459d"
+      }
+    ]
+  },
+  "tuningManifest": {
+    "status": "pending",
+    "hash": null,
+    "reason": "The redact-secret-benchmarks#256 tuning manifest binds product, the frozen candidate that carries this scoring. No such candidate exists until one is built from a commit that contains this artifact, so the manifest is still a draft with product null and is not committed. Its final hash is recorded here, in a new artifact revision, once it is bound. Until then, evidence keyed to this artifact cites the draft identity below and the candidate that the qualification record binds.",
+    "draft": {
+      "id": "shadow-evidence-generic-token-v1",
+      "status": "draft",
+      "product": null,
+      "generatedAt": "101f674a5ee50aa551423ccd00d0a6a68ed4c875",
+      "fileSha256": "f6fa7e2bd61b46031720ee78e46e65fdb965dea4ac9cdd8a85b016f63ed64444",
+      "canonicalHash": "e61aa9d7fe516b106ced65c8959a27ae2189eeeedd70493e6e4fa9b67cae8d08",
+      "deterministic": "results-output/calibration/tuning-manifest-draft.json written by npm run calibration:run at generatedAt. Its createdAt is that commit's date and the dataset is byte-identical across runs, so two runs wrote the same bytes (fileSha256). canonicalHash is tuningManifestHash() in benchmarks/lib/tuning-manifest.ts, the SHA-256 of the canonical JSON that #256 evidence records. It changes once product is filled."
+    }
+  },
+  "productRevision": {
+    "recordedHere": false,
+    "boundBy": ["the release manifest's source_revision (scripts/release-manifest.py)", "the redact-secret-benchmarks#256 tuning manifest's product.sourceRevision", "the redact-secret-benchmarks#282 beta.9 qualification record"],
+    "semantics": "This file cannot contain the commit that contains it. A candidate's product revision is the commit it was built from, and its scoring artifact is this file at that commit. Evidence about a candidate records that commit together with artifact.revision, modelFingerprint and the SHA-256 of this file at the commit. It is stale for any candidate where one of them differs."
+  },
+  "knownLimitations": [
+    {
+      "id": "validation-cap-placeholder",
+      "statement": "The validation group has no signal. Its cap of 40 is a placeholder that calibration did not fit. Context (40) plus validation (40) would reach high (61) with no randomness at all, so adding any validation signal needs a refit and a new model identity."
+    },
+    {
+      "id": "lexical-group-empty",
+      "statement": "The lexical group has no signal and a cap of 0, because calibration selected randomness-only statistics. Adding a lexical signal is a new model identity."
+    },
+    {
+      "id": "tuning-manifest-pending",
+      "statement": "The #256 tuning manifest is not bound yet (tuningManifest.status is pending), so this artifact records the draft's identity rather than a final tuning manifest hash."
+    }
+  ],
+  "review": {
+    "generation": "model is rendered from the compiled core by crates/secret-scan-core/src/evidence/aggregate/artifact_drift.rs; its failing assertion prints the rendering. sources are SHA-256 hashes of the listed files and spec sections. calibration, corpora and tuningManifest are copied from the benchmark run's identities and hashes, never from its fitted detail.",
+    "method": "Reviewed in the pull request that changes this file. The reviewer confirms that a changed model carries a new model identity (and a changed featureSchema a new feature schema identity), that every change raises artifact.revision, and that no probability, score, weight or threshold reaches a public surface.",
+    "reviewedIn": "https://github.com/redact-secret/redact-secret/issues/798",
+    "check": "npm run scoring-artifact:check (offline, part of npm run ci); the cargo test the_compiled_scorer_matches_the_reviewed_scoring_artifact; and the pull-request CI job that runs the same check against the base branch's artifact."
+  }
+}
