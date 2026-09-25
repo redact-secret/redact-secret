@@ -117,6 +117,17 @@
 mod detectors;
 mod entropy;
 mod error;
+// Feature extraction (#769) lands ahead of the shadow scorer that consumes it
+// (#770, #771). Until then only its tests call it; the expectation stops
+// being fulfilled, and must be removed, as soon as a non-test caller exists.
+#[cfg_attr(
+    not(test),
+    expect(
+        dead_code,
+        reason = "consumed by the shadow evidence scorer in #770/#771"
+    )
+)]
+mod evidence;
 mod incremental;
 mod invisible_table;
 mod limits;
