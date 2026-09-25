@@ -122,6 +122,11 @@ def collect(artifacts: Path) -> list[dict]:
         name = directory.name
         if name.startswith(("installed-javascript-", "clean-install-", "golden-path-")):
             continue
+        if name.startswith("shadow-determinism-"):
+            # Issue #772: the CI workflow's per-host shadow evaluations and
+            # their comparison report, which the `shadow-determinism` job
+            # already judged. Qualification records, not shipped artifacts.
+            continue
         if name == "support-matrix-drift":
             # Issue #511: a release-decision record consumed by release.yml's
             # record-manifest job, not a per-target build artifact -- it has

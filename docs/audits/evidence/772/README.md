@@ -78,7 +78,7 @@ example evaluates it on each host, for the `full` and `common` profiles.
 | `wasm32-wasip1` on V8 (Node 24 WASI) | CI `rust-wasm`, release build | identical |
 | macOS arm64 workstation, and `wasm32-wasip1` on Node 22.16 | local | identical |
 
-CI job `shadow-determinism`: RUN_PLACEHOLDER. `full`: 3,834 comparisons, 1,217 of
+CI job `shadow-determinism` in [CI run 36187043511](https://github.com/redact-secret/redact-secret/actions/runs/36187043511) found the four hosts byte-identical for both profiles. `full`: 3,834 comparisons, 1,217 of
 them statistical, sha256
 `78b07b9a40721d63904a0e42eebb9595760b0e9dec32883f5c9e71866e748952`.
 `common`: 1,492 comparisons, 1,351 statistical, sha256
