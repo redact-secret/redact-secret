@@ -32,6 +32,7 @@ Rules governing the shared Rust core's detection pipeline, plugin/profile contra
 | The shadow scorer's `randomness` and `lexical` inputs are the integer statistical features of schema `evidence-features/v1`, defined exactly in the "Shadow evidence feature schema" section below. Extraction is not a detector: it reads at most 256 Unicode scalar values of one candidate value, allocates nothing, stores no part of the value, and changes no finding, `Confidence`, overlap weight or action. | [Freeze the shadow evidence score and confidence contract](../decisions/2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md) |
 | The shadow scorer aggregates evidence under the reviewed model `evidence-aggregation/v1`, defined in the "Shadow evidence aggregation" section below: five groups with fixed caps, the halving rule inside each group, a strict whole-value exclusion grammar as the only negative evidence, and integer band thresholds. `private-key`, `provider` and `structural` candidates are never scored; their shadow band is their legacy `Confidence`. The model enforces nothing in beta.9. | [Freeze the shadow evidence score and confidence contract](../decisions/2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md) |
 | The shadow scorer has one reviewed scoring artifact, `docs/contracts/scoring/shadow-scoring-artifact.json`, defined in the "Shadow scoring artifact" section below. It binds the feature schema, the aggregation model, calibration and tuning provenance, and the review method. CI fails when the artifact and the compiled scorer disagree in either direction, and when scorer values change under an unchanged model identity. It is a review and CI artifact: nothing loads it at runtime, no package ships it, and it is not public API. | [Freeze the shadow evidence score and confidence contract](../decisions/2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md) |
+| The shadow scorer runs next to `generic-token`'s legacy decision without enforcing anything, defined in the "Maintainer-local shadow evaluation" section below. The pipeline evaluates the candidates that overlap resolution selects only when the maintainer-local evaluation path asks for it; every public entry point asks for nothing, so findings, `Confidence`, actions, overlap and every public API are unchanged and the scorer never runs on the public path. The path is an unpublished example that compiles the core's own source and writes JSON Lines holding identifiers and integers only, never matched bytes or hashes of them. | [Freeze the shadow evidence score and confidence contract](../decisions/2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md) |
 
 ## Shadow evidence feature schema
 
@@ -312,12 +313,13 @@ a finding, error, log, placeholder or policy input.
 
 Aggregation reads the value once through feature extraction (bounded at
 256 scalar values, no allocation) and one bounded grammar check, then does
-a handful of integer operations. Until #771 lands it has no caller outside
-tests.
-[#771](https://github.com/redact-secret/redact-secret/issues/771) records it
-for `generic-token` candidates, and it enforces nothing: it changes no
-finding, `Confidence`, overlap weight or action, so it adds no false
-positive or false negative to shipped behavior.
+a handful of integer operations. It runs only when the maintainer-local
+evaluation path asks for it
+([#771](https://github.com/redact-secret/redact-secret/issues/771),
+"Maintainer-local shadow evaluation" below), never on a public entry point,
+and it enforces nothing: it changes no finding, `Confidence`, overlap weight
+or action, so it adds no false positive or false negative to shipped
+behavior.
 
 If a later release promoted the shadow band at `medium`, the calibration
 measured these costs:
@@ -353,7 +355,7 @@ sections 8 to 11). It is not a new decision.
 | `model.aggregation` | the model identity (`evidence-aggregation/v1`) and every group, direction, rule, cap, signal rule, context class, exclusion grammar and vocabulary word, and the band thresholds, as the compiled `SHADOW_MODEL` holds them |
 | `modelFingerprint` | SHA-256 of `model` as canonical JSON (keys sorted, no whitespace, UTF-8) |
 | `identityLedger` | every model identity the artifact has recorded, each with the one fingerprint it stands for; append-only |
-| `sources` | SHA-256 of the "Shadow evidence feature schema" and "Shadow evidence aggregation" sections of this page, and of `features.rs`, `fixed_point.rs`, `context.rs`, `exclusion.rs` and `aggregate.rs` under `crates/secret-scan-core/src/evidence/` |
+| `sources` | SHA-256 of the "Shadow evidence feature schema", "Shadow evidence aggregation" and "Maintainer-local shadow evaluation" sections of this page, and of `features.rs`, `fixed_point.rs`, `context.rs`, `exclusion.rs`, `aggregate.rs` and `shadow.rs` under `crates/secret-scan-core/src/evidence/` |
 | `calibration` | the redact-secret-benchmarks#255 run it came from: repository, issue, pull request, 40-hex `develop` commit, method permalink, selected configuration, selection method and source hash, feature dataset (extractor version, extractor source hash, dataset hash, the core commit its features were pinned to) and scoring identity with its component hashes |
 | `corpora` | the benchmark pin manifest's hash and every tuning and evaluation corpus hash |
 | `tuningManifest` | the redact-secret-benchmarks#256 tuning manifest: `pending` with `hash: null` until it is bound, plus the deterministic identity of its draft |
@@ -383,9 +385,11 @@ false`, `publicApi: false`, no `findingFields`, `loadedAtRuntime: false`,
   source scorer, or this artifact, gives an attacker no way to downgrade
   that evidence;
 - there is no runtime learning, remote calibration, mutable model file or
-  user adaptation. The compiled constants are the model. Nothing reads this
-  file at runtime, and core source cannot (it may not name `std::fs` or
-  `include_str!`).
+  user adaptation. The compiled constants are the model. No product code
+  reads this file at runtime, and core source cannot (it may not name
+  `std::fs` or `include_str!`). The maintainer-local evaluation example
+  (below) reads only its `revision`, `modelFingerprint` and identities, to
+  label its output and refuse a mismatched scorer.
 
 The artifact is not secret, only not API. It lives under `docs/contracts/`
 as a live contract (CI reads it). No package ships it: the npm package's
@@ -466,3 +470,214 @@ at the commit, and is stale for any candidate where one of them differs.
   artifact records the draft's deterministic identity (its file hash and its
   `tuningManifestHash`), marks the binding `pending`, and records the final
   hash in a new revision once a candidate carrying this artifact is bound.
+
+## Maintainer-local shadow evaluation
+
+Issue [#771](https://github.com/redact-secret/redact-secret/issues/771) runs
+the shadow scorer next to `generic-token`'s legacy decision and defines the
+one maintainer-local evaluation path the contract
+([`decision-freeze-the-shadow-evidence-score-and-confidence-contract`](../decisions/2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md),
+sections 2, 5, 8 and 9) allows. It applies that contract and is not a new
+decision. The benchmark consumes it, first in
+[redact-secret-benchmarks#289](https://github.com/redact-secret/redact-secret-benchmarks/issues/289)
+and then in later benchmark evidence.
+
+> **Qualification placeholder.** Adversarial evidence from
+> [redact-secret-benchmarks#289](https://github.com/redact-secret/redact-secret-benchmarks/issues/289)
+> must be linked before qualification.
+
+### Where the comparison is computed
+
+`detect` in `crates/secret-scan-core/src/pipeline.rs` runs detection and
+overlap resolution once. When its caller passes a sink, it then evaluates
+every selected candidate with `shadow_evidence` under `SHADOW_MODEL`, from
+the candidate and its matched text in the scan copy, and records a
+`ShadowComparison` (`crates/secret-scan-core/src/evidence/shadow.rs`).
+`run_detector_pipeline` passes no sink, and so do `scan`,
+`scan_and_redact`, every binding and the incremental session, which all go
+through it. So:
+
+- the scorer is lazy: it runs only when the evaluation path asks. On every
+  public path the added work is one `Option` check per call; the scorer
+  and the renderer are never reached and allocate nothing. Performance and
+  size are qualified in
+  [#772](https://github.com/redact-secret/redact-secret/issues/772);
+- findings, ids, ranges, `Confidence`, obfuscation, overlap resolution and
+  the resolved action are the same with or without a sink. A candidate that
+  loses overlap resolution is never evaluated;
+- no comparison reaches a `Finding`, an error, a placeholder, a policy
+  input or a log, and there is no telemetry.
+
+The incremental session records the same comparisons, shifted to session
+offsets and finding numbers, only under `cfg(test)`. Unit tests require
+them to equal the whole-input comparisons for every chunking. The
+evaluation path itself is whole-input.
+
+With the built-in registries only `generic-token` emits `contextual` or
+`entropy` candidates (its `contextual_secret` assignments and its bare
+`vendor_prefixed_credential` policy candidates), so every `statistical`
+record comes from `generic-token`. Every other finding gets a
+`deterministic` record: the scorer is not consulted and the band is the
+legacy `Confidence`.
+
+### Why an example that compiles the core source
+
+The scorer's items are `pub(crate)`, the core declares no Cargo features,
+and no public Rust, JavaScript, Python or CLI item may carry a score or
+band. The options were:
+
+- **An unpublished crate that links the core.** It cannot name a
+  `pub(crate)` item. Reaching the scorer would need a public item, and a
+  `doc(hidden)` item is still public API.
+- **A `cfg(test)` harness run with `cargo test -- --ignored`.** The core
+  source boundary (`scripts/check-rust-workspace.py`) bans `std::io`,
+  `std::env`, `std::fs` and `println!` in every file under `src/`, test
+  modules included, so such a harness could read no input and write no
+  output.
+- **A benchmark-side reimplementation checked against golden vectors.** It
+  would measure a copy, not the product. The context class comes from
+  internal candidate types and signal labels that public findings do not
+  carry, and the edge cases an evasion study probes (truncation at 256
+  scalar values, Unicode whitespace in the exclusion grammar) are where a
+  copy drifts.
+- **Chosen: `crates/secret-scan-core/examples/shadow_evaluation.rs`.** It
+  declares the modules of `src/lib.rs` with `#[path]` attributes, so it
+  compiles the library's own source files, at the same commit, as modules
+  of one executable, and can call `pub(crate)` items without any item
+  becoming public. It runs the product's normalization, detectors, overlap
+  resolution and scorer, not a copy. Like `assessment_adapter`, it is
+  outside the published package (`include` is `src/**/*.rs` and
+  `README.md`), it is the only part that does I/O, and it uses the existing
+  `serde_json` dev-dependency. `cargo clippy --workspace --all-targets` and
+  `cargo test --workspace` build it, so a core change that breaks it fails
+  CI.
+
+### Command
+
+From a clean checkout of the product commit under evaluation:
+
+```sh
+cargo run --release --locked -p redact-secret --example shadow_evaluation -- \
+  [--profile full|common] [--artifact <path>] < inputs.jsonl > shadow.jsonl
+```
+
+`--profile` selects the built-in registry (`full` by default, as
+`DetectorRegistry::with_built_in([])`). `--artifact` defaults to
+`docs/contracts/scoring/shadow-scoring-artifact.json` in the same checkout.
+The run exits with status `2` on an unreadable or mismatched artifact, an
+unknown argument or an invalid input line. The message names the line
+number, never its content.
+
+### Input
+
+JSON Lines on standard input, one object per line. Blank lines are skipped
+and other fields are ignored.
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `id` | string | the caller's record id, echoed as `input` |
+| `text` | string | the whole input, scanned as `scan` would scan it |
+
+A line that is not JSON in valid Unicode, for example one with a lone
+UTF-16 surrogate escape, is rejected, because the core scans Rust `&str`.
+
+### Output
+
+JSON Lines on standard output. Fields are always written in the order
+below, so the same product commit, artifact and input give the same bytes.
+The first line is the header:
+
+| Field | Value |
+| --- | --- |
+| `record` | `"shadow-evaluation"` |
+| `format` | `"redact-secret/shadow-evaluation/1"` |
+| `productVersion` | the core crate version |
+| `model` | `SHADOW_MODEL.id`, `"evidence-aggregation/v1"` |
+| `featureSchema` | `"evidence-features/v1"` |
+| `artifactRevision` | `artifact.revision` of the artifact read |
+| `modelFingerprint` | `modelFingerprint` of the artifact read |
+| `profile` | `"full"` or `"common"` |
+| `path` | `"whole-input"` |
+
+The run refuses to start when the artifact's model or feature schema
+identity differs from the compiled one. At a commit where CI passed, the
+compiled scorer also equals the artifact's `model` exactly ("Drift
+detection" above).
+
+Then, for each input in input order, the default whole-input limits are
+checked as `scan` checks them. On success there is one `shadow-comparison`
+line per finding, in finding order, and an input with no finding writes
+nothing. On failure there is one line
+`{"record":"shadow-error","input":<id>,"code":<code>}`, where `<code>` is
+the `SecretScanErrorCode` string, for example `"INPUT_LIMIT_EXCEEDED"`.
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `record` | string | `"shadow-comparison"` |
+| `input` | string | the input line's `id` |
+| `finding` | string | the id `scan` gives this finding for this input (`finding-1`, …) |
+| `start`, `end` | integer | the finding's range, in UTF-8 bytes of `text` |
+| `byteLength` | integer | `end - start` |
+| `detector` | string | the finding's detector id |
+| `type` | string | the finding's type |
+| `specificity` | string | the candidate's effective specificity |
+| `legacyConfidence` | string | the finding's `Confidence` |
+| `legacyAction` | string | `DefaultPolicy`'s action for the finding |
+| `authority` | string | `"deterministic"` or `"statistical"` |
+| `model`, `featureSchema` | string | as in the header |
+| `contextClass` | string or null | the context class; `null` when deterministic |
+| `exclusion` | string or null | the exclusion grammar the whole value matches, or `null` |
+| `groups` | object or null | each group's capped contribution, keys `randomness`, `lexical`, `contextual`, `validation`, `negative`; `null` when deterministic |
+| `signals` | array | every model signal as `{"group","signal","points"}`, in model order; empty when deterministic |
+| `positive`, `negative` | integer | only when statistical: the summed positive contributions and the negative contribution |
+| `score` | integer or null | the evidence score; `null` when deterministic |
+| `band` | string | `none`, `low`, `medium` or `high`; the legacy `Confidence` when deterministic |
+| `promotion` | string | `promote` (band above the legacy `Confidence`), `demote` (below it, `none` included) or `preserve` (equal, or deterministic) |
+| `reasons` | array | reason codes, a subset of the list below, in its order |
+
+The reason codes are a closed set: `deterministic-authority` (scorer not
+consulted); `credential-context` or `no-credential-context`;
+`randomness-capped` (randomness at its cap), `randomness-partial` or
+`randomness-none`; `strict-exclusion` (a whole-value exclusion grammar
+matched); `no-positive-evidence`; `band-none` (a promotion would drop the
+finding).
+
+No record holds the matched value, a substring, a class run, a feature
+vector or a hash of it (contract section 8), only the fields above. The
+test `diagnostics_carry_no_part_of_a_matched_value` checks the rendered
+lines and their `Debug` form against every six-character window of each
+matched value. Scores, contributions and signals are maintainer-local:
+public benchmark projection may report aggregate outcomes per stratum,
+never these per-candidate values (contract section 11).
+
+### Reproducibility
+
+Evidence produced this way records the product commit, the header's
+`artifactRevision` and `modelFingerprint`, and the SHA-256 of the artifact
+file at that commit ("Product source revision" above). The artifact's
+`sources` hash this section and `evidence/shadow.rs`, so any change to the
+record format or its reason codes needs a new artifact revision, and
+evidence keyed to the old revision is stale. A change to a field, its
+meaning or a reason code is also a new `format` identity.
+
+### Tests
+
+`crates/secret-scan-core/src/evidence/shadow/tests.rs` checks, over a
+synthetic battery, that:
+
+- recording changes no finding, and each comparison carries its finding's
+  legacy `Confidence` and `DefaultPolicy` action;
+- `generic-token` comparisons equal `aggregate` under `SHADOW_MODEL` for
+  their context class: a credential name with a random value is `high`, a
+  human-chosen password after a credential name is `low`, and a bare
+  vendor-prefixed value is at most `medium`;
+- provider, private-key and structural findings stay deterministic, with
+  the band equal to the legacy `Confidence`;
+- whole-input and incremental comparisons are equal for every chunking,
+  and invisible characters inside a value do not change its comparison;
+- the rendering is fixed and deterministic and escapes the record id;
+- no rendered or `Debug` output holds any part of a matched value.
+
+The existing conformance-corpus tests of `run_detector_pipeline`, `scan`
+and the incremental session pin the legacy outputs, which now run through
+`detect` without a sink.

@@ -69,8 +69,9 @@ use crate::detectors::{
     has_open_heroku_legacy_context,
 };
 use crate::error::{FormatterFailure, PolicyFailure, SecretScanError, SecretScanErrorCode};
+use crate::evidence::shadow::ShadowComparison;
 use crate::normalize::NormalizedInput;
-use crate::pipeline::run_detector_pipeline;
+use crate::pipeline::detect;
 use crate::policy::DefaultPolicy;
 use crate::redact::{default_placeholder_formatter, redact};
 use crate::registry::{DetectorRegistry, Profile};
@@ -358,6 +359,11 @@ pub struct IncrementalSanitizer {
     private_key: PrivateKeyRetentionTracker,
     multiline_open: bool,
     multiline_detected: bool,
+    /// Shadow comparisons of every finalized unit's findings, in session
+    /// coordinates, when a maintainer-local caller asked for them (#771).
+    /// Always `None` for a session built through the public API, so the
+    /// scorer never runs on the public incremental path.
+    shadow: Option<Vec<ShadowComparison>>,
 }
 
 impl std::fmt::Debug for IncrementalSanitizer {
@@ -461,7 +467,21 @@ impl IncrementalSanitizer {
             private_key: PrivateKeyRetentionTracker::new(),
             multiline_open: false,
             multiline_detected: false,
+            shadow: None,
         }
+    }
+
+    /// Starts recording the shadow comparison of every finding this session
+    /// finalizes from now on.
+    #[cfg(test)]
+    pub(crate) fn record_shadow(&mut self) {
+        self.shadow = Some(Vec::new());
+    }
+
+    /// The shadow comparisons recorded so far, in session coordinates.
+    #[cfg(test)]
+    pub(crate) fn take_shadow(&mut self) -> Vec<ShadowComparison> {
+        self.shadow.take().unwrap_or_default()
     }
 
     /// The session's current lifecycle state.
@@ -568,7 +588,9 @@ impl IncrementalSanitizer {
     /// state) on success, or call [`fail_with`](Self::fail_with) on error.
     fn process_unit(&mut self) -> Result<IncrementalResult, SecretScanError> {
         let input_offset = self.finalized_bytes;
-        let detected = run_detector_pipeline(&self.retained, &self.registry)?;
+        let finding_offset = self.finding_count;
+        let mut unit_shadow = self.shadow.as_ref().map(|_| Vec::new());
+        let detected = detect(&self.retained, &self.registry, unit_shadow.as_mut())?;
 
         let mut findings: Vec<Finding> = Vec::with_capacity(detected.len());
         for local in &detected {
@@ -636,6 +658,16 @@ impl IncrementalSanitizer {
             .iter()
             .filter(|finding| finding.action().replaces_text())
             .count();
+
+        if let (Some(recorded), Some(unit_shadow)) = (self.shadow.as_mut(), unit_shadow) {
+            for comparison in unit_shadow {
+                recorded.push(
+                    comparison
+                        .shifted(finding_offset, input_offset)
+                        .ok_or(SecretScanErrorCode::InvalidCandidate)?,
+                );
+            }
+        }
 
         Ok(IncrementalResult::new(text, findings))
     }
