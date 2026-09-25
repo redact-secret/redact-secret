@@ -6,7 +6,8 @@
  * `finalize` runs `fakeScanAndRedact` once over the whole buffered input and
  * returns the result. This is the opposite extreme from the real session
  * (which emits safe output as soon as a detection window closes), chosen
- * deliberately: it proves `streaming-tool-result.mjs` correctly depends on
+ * deliberately: it proves the streamed golden path (the boundary's
+ * `openStream`, driven by `streaming-tool-result.mjs`) correctly depends on
  * *whatever* the session decides to emit and when, rather than re-deriving
  * chunk boundaries itself — a secret split across two `append` calls is
  * only ever visible whole, at `finalize`, exactly like the real session's

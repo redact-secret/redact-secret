@@ -87,6 +87,7 @@
     "sast:scan": "python3 -B scripts/run-sast.py",
     "release:check": "npm run ci && npm run registry-preflight:check && npm pack --dry-run ./packages/javascript",
     "release": "npm publish --access public ./packages/javascript",
+    "examples:real-core:test": "python3 -B scripts/adapter-pins.py verify-installed && node --test examples/mcp-redact/streaming-tool-result.real-core.test.mjs",
     "examples:python": "python3 -B -m unittest discover -s examples/tracing-masking/python -p 'test_*.py' && python3 -B -m unittest discover -s examples/mcp-redact/python -p 'test_*.py' && python3 -B -m unittest discover -s examples/logging-redaction/python -p 'test_*.py'"
   },
   "devDependencies": {
