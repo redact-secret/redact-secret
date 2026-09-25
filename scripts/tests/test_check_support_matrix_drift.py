@@ -138,6 +138,37 @@ class ValidateMatrixTests(unittest.TestCase):
         )
         self.assertEqual(DRIFT.validate_matrix("candidate", candidate, SCHEMA), [])
 
+    def test_accepts_a_t2_corroborated_empirical_stable_family(self) -> None:
+        # redact-secret-benchmarks' decision-qualify-empirical-stable-by-corroboration:
+        # the corroborated route carries evidenceBasis independently-corroborated.
+        candidate = matrix(
+            [
+                family(
+                    "widget:token",
+                    "stable",
+                    tier="T2",
+                    basis="independently-corroborated",
+                    profile="empirical",
+                )
+            ]
+        )
+        self.assertEqual(DRIFT.validate_matrix("candidate", candidate, SCHEMA), [])
+
+    def test_rejects_empirical_qualification_on_a_non_empirical_basis(self) -> None:
+        candidate = matrix(
+            [
+                family(
+                    "widget:token",
+                    "stable",
+                    tier="T2",
+                    basis="provider-documented",
+                    profile="empirical",
+                )
+            ]
+        )
+        errors = DRIFT.validate_matrix("candidate", candidate, SCHEMA)
+        self.assertTrue(any("empirical qualification is not T2" in e for e in errors))
+
     def test_rejects_unknown_basis_and_profile(self) -> None:
         candidate = matrix([family("widget:token", "stable")])
         candidate["families"][0]["evidenceBasis"] = "marketing-claim"

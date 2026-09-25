@@ -7,6 +7,18 @@ evidence is linked from each published version.
 
 ### Changed
 
+- The support-matrix validators (`scripts/check-support-matrix-drift.py`,
+  `scripts/generate-support-matrix-docs.py`) accept a T2 `empirical` stable
+  family whose evidence basis is `independently-corroborated`, as well as
+  `empirically-observed`. This follows redact-secret-benchmarks'
+  `decision-qualify-empirical-stable-by-corroboration`, which added the
+  corroborated route. Before, every corroborated empirical family in a
+  current matrix failed validation. `benchmarks/support-matrix-schema.json`
+  now pins benchmarks `e074c71` (was `d5438c5`), the contract that adds the
+  corroboration counts and `profileCoverage`. `benchmarks/pin-manifest.json`
+  is resynced to benchmarks `main`, and the ten open ledger records that
+  cited the old `detector-coverage` corpus hash are re-pinned to the current
+  one.
 - `docs/support-matrix.md` explains why a family is not yet stable in plain
   language. Related evaluator gates are grouped into one sentence, for
   example "Not yet stable: needs broader positive test contexts and more

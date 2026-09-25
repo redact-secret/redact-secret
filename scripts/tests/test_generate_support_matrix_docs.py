@@ -164,6 +164,40 @@ class ValidateMatrixTests(unittest.TestCase):
         self.assertEqual(GEN.validate_matrix(m, SCHEMA), [])
         self.assertEqual(m["families"][0]["evidenceTier"], "T2")
 
+    def test_accepts_t2_corroborated_empirical_stable(self) -> None:
+        # redact-secret-benchmarks' decision-qualify-empirical-stable-by-corroboration.
+        m = matrix(
+            [
+                family(
+                    "widget",
+                    "widget:token",
+                    "Widget token",
+                    "stable",
+                    tier="T2",
+                    basis="independently-corroborated",
+                    profile="empirical",
+                )
+            ]
+        )
+        self.assertEqual(GEN.validate_matrix(m, SCHEMA), [])
+
+    def test_rejects_empirical_qualification_on_a_non_empirical_basis(self) -> None:
+        m = matrix(
+            [
+                family(
+                    "widget",
+                    "widget:token",
+                    "Widget token",
+                    "stable",
+                    tier="T2",
+                    basis="project-policy",
+                    profile="empirical",
+                )
+            ]
+        )
+        errors = GEN.validate_matrix(m, SCHEMA)
+        self.assertTrue(any("must remain T2" in error for error in errors))
+
     def test_rejects_empirical_qualification_that_masquerades_as_t1(self) -> None:
         m = matrix(
             [

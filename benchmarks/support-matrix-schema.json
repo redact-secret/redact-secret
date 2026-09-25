@@ -18,6 +18,16 @@
         "revision": { "type": "string" },
         "dirty": { "type": ["boolean", "null"] },
         "criteriaSchemaVersion": { "const": 1 },
+        "publishedPackage": {
+          "description": "Published mode only: the released package the pinned redact-secret entry loaded. Absent on a candidate run, which carries product instead.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["packageName", "version"],
+          "properties": {
+            "packageName": { "type": "string", "minLength": 1 },
+            "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?$" }
+          }
+        },
         "product": {
           "description": "Present only when the evidence run measured a redact-secret candidate build (eval:classify with --candidate-*) instead of the published package; absent means the published package.",
           "type": "object",
@@ -113,11 +123,12 @@
           },
           "empiricalEvidence": {
             "type": ["object", "null"], "additionalProperties": false,
-            "required": ["observations", "subjects", "issuanceDates", "corroborationClasses", "contradictions", "uncertainty", "supportedContexts", "mode", "supportsBareValues"],
+            "required": ["observations", "subjects", "issuanceDates", "corroborationReferences", "corroborationOwners", "corroborationClasses", "contradictions", "boundedContradictions", "uncertainty", "supportedContexts", "mode", "supportsBareValues"],
             "properties": {
               "observations": { "type": "integer", "minimum": 0 }, "subjects": { "type": "integer", "minimum": 0 },
               "issuanceDates": { "type": "integer", "minimum": 0 }, "corroborationClasses": { "type": "array", "items": { "type": "string" } },
-              "contradictions": { "type": "integer", "minimum": 0 }, "uncertainty": { "type": ["string", "null"] },
+              "corroborationReferences": { "type": "integer", "minimum": 0 }, "corroborationOwners": { "type": "integer", "minimum": 0 },
+              "contradictions": { "type": "integer", "minimum": 0 }, "boundedContradictions": { "type": "integer", "minimum": 0 }, "uncertainty": { "type": ["string", "null"] },
               "supportedContexts": { "type": "array", "items": { "type": "string" } }, "mode": { "enum": ["shape", "context-constrained", null] },
               "supportsBareValues": { "type": "boolean" }
             }
@@ -133,7 +144,53 @@
             }
           },
           "detectors": { "type": "array", "items": { "type": "string" } },
-          "reason": { "type": ["string", "null"] }
+          "reason": { "type": ["string", "null"] },
+          "profileCoverage": { "oneOf": [{ "$ref": "#/definitions/fixtureProfile" }, { "type": "null" }] }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "fixtureProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["profilesVersion", "claimed", "explicit", "target", "cellsMet", "cells", "debt"],
+      "properties": {
+        "profilesVersion": { "type": "integer", "minimum": 1 },
+        "claimed": { "enum": ["arrival-provisional", "stable-documented", "stable-empirical", "context-constrained-empirical", null] },
+        "explicit": { "type": "boolean" },
+        "target": { "enum": ["arrival-provisional", "stable-documented", "stable-empirical", "context-constrained-empirical"] },
+        "cellsMet": { "type": "array", "items": { "enum": ["arrival-provisional", "stable-documented", "stable-empirical", "context-constrained-empirical"] } },
+        "cells": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["totalFixtures", "positiveCases", "benignControls", "twinPairs", "positiveContextAxes", "controlAxes", "confusionAxes", "positiveContextAxisIds", "controlAxisIds", "confusionAxisIds"],
+          "properties": {
+            "totalFixtures": { "type": "integer", "minimum": 0 },
+            "positiveCases": { "type": "integer", "minimum": 0 },
+            "benignControls": { "type": "integer", "minimum": 0 },
+            "twinPairs": { "type": "integer", "minimum": 0 },
+            "positiveContextAxes": { "type": "integer", "minimum": 0 },
+            "controlAxes": { "type": "integer", "minimum": 0 },
+            "confusionAxes": { "type": "integer", "minimum": 0 },
+            "positiveContextAxisIds": { "type": "array", "items": { "type": "string" } },
+            "controlAxisIds": { "type": "array", "items": { "type": "string" } },
+            "confusionAxisIds": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "debt": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["cell", "actual", "required", "shortfall"],
+            "properties": {
+              "cell": { "enum": ["totalFixtures", "positiveCases", "benignControls", "twinPairs", "positiveContextAxes", "controlAxes", "confusionAxes"] },
+              "actual": { "type": "integer", "minimum": 0 },
+              "required": { "type": "integer", "minimum": 1 },
+              "shortfall": { "type": "integer", "minimum": 1 }
+            }
+          }
         }
       }
     }

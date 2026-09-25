@@ -68,6 +68,13 @@ STATUS_ORDER = ("stable", "provisional", "pending", "unsupported")
 EVIDENCE_TIER_ORDER = ("T1", "T2", "T3", "T0")
 QUALIFICATION_PROFILE_ORDER = ("documented", "empirical")
 
+# The evidence bases a T2 family may carry under the `empirical` qualification
+# profile. redact-secret-benchmarks' decision
+# `decision-qualify-empirical-stable-by-corroboration` (benchmarks e1ecb29)
+# added the corroborated route beside the provider-issued observation route;
+# the tier stays T2 either way.
+EMPIRICAL_EVIDENCE_BASES = ("independently-corroborated", "empirically-observed")
+
 EVIDENCE_BASIS_COPY = {
     "provider-documented": "Provider documentation",
     "independently-corroborated": "Independent tool/community corroboration",
@@ -239,8 +246,11 @@ def validate_matrix(matrix: dict, schema: dict) -> list[str]:
             errors.append(f"{name}: {status!r} carries qualification profile {profile!r}")
         if profile == "documented" and (tier != "T1" or basis != "provider-documented"):
             errors.append(f"{name}: documented qualification must remain T1 provider-documented evidence")
-        if profile == "empirical" and (tier != "T2" or basis != "empirically-observed"):
-            errors.append(f"{name}: empirical qualification must remain T2 empirically-observed evidence")
+        if profile == "empirical" and (tier != "T2" or basis not in EMPIRICAL_EVIDENCE_BASES):
+            errors.append(
+                f"{name}: empirical qualification must remain T2 independently-corroborated "
+                "or empirically-observed evidence"
+            )
 
     if matrix.get("familyCount") != len(families):
         errors.append(f"familyCount {matrix.get('familyCount')} != {len(families)} families present")

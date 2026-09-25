@@ -68,6 +68,13 @@ CANDIDATE_PATH = ROOT / "benchmarks" / "support-matrix.json"
 SCHEMA_PATH = ROOT / "benchmarks" / "support-matrix-schema.json"
 ACKNOWLEDGEMENTS_PATH = ROOT / "benchmarks" / "support-matrix-drift-acknowledgements.json"
 
+# The evidence bases a T2 family may carry under the `empirical` qualification
+# profile. redact-secret-benchmarks' decision
+# `decision-qualify-empirical-stable-by-corroboration` (benchmarks e1ecb29)
+# added the corroborated route beside the provider-issued observation route;
+# the tier stays T2 either way.
+EMPIRICAL_EVIDENCE_BASES = ("independently-corroborated", "empirically-observed")
+
 EVIDENCE_FIELDS = (
     "evidenceTier",
     "evidenceBasis",
@@ -131,8 +138,11 @@ def validate_matrix(label: str, matrix: dict, schema: dict) -> list[str]:
                 errors.append(f"{label}: {name}: {status!r} carries qualification profile {profile!r}")
             if profile == "documented" and (tier != "T1" or basis != "provider-documented"):
                 errors.append(f"{label}: {name}: documented qualification is not T1 provider-documented")
-            if profile == "empirical" and (tier != "T2" or basis != "empirically-observed"):
-                errors.append(f"{label}: {name}: empirical qualification is not T2 empirically-observed")
+            if profile == "empirical" and (tier != "T2" or basis not in EMPIRICAL_EVIDENCE_BASES):
+                errors.append(
+                    f"{label}: {name}: empirical qualification is not T2 "
+                    "independently-corroborated or empirically-observed"
+                )
 
     if "stableDistribution" in matrix:
         actual = {
