@@ -117,14 +117,15 @@
 mod detectors;
 mod entropy;
 mod error;
-// Feature extraction (#769) lands ahead of the shadow scorer that consumes it
-// (#770, #771). Until then only its tests call it; the expectation stops
-// being fulfilled, and must be removed, as soon as a non-test caller exists.
+// Feature extraction (#769) and grouped aggregation (#770) land ahead of the
+// pipeline hook that records shadow results for `generic-token` (#771).
+// Until then only their tests call them; the expectation stops being
+// fulfilled, and must be removed, as soon as #771 adds a non-test caller.
 #[cfg_attr(
     not(test),
     expect(
         dead_code,
-        reason = "consumed by the shadow evidence scorer in #770/#771"
+        reason = "the shadow evidence scorer is wired into generic-token by #771"
     )
 )]
 mod evidence;

@@ -237,6 +237,12 @@ versioned set of integer features (entropy, min-entropy, class distribution,
 repetition, periodicity), extracted from at most 256 characters of the
 candidate without allocation; the exact formulas are in
 [`docs/specs/engine.md`](docs/specs/engine.md#shadow-evidence-feature-schema).
+Features, detector context and a strict whole-value exclusion grammar are
+combined by one reviewed, integer aggregation model: signals of one group
+halve under a cap so correlated measurements cannot add up, randomness alone
+tops out at `medium`, and a lookalike placeholder never counts as negative
+evidence. Its groups, caps and bands are in
+[`docs/specs/engine.md`](docs/specs/engine.md#shadow-evidence-aggregation).
 
 Resolved-action severity is checked first and overrides that specificity
 ordering: a candidate that would resolve to a weaker action (by the crate's
