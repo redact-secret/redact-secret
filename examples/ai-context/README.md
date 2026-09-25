@@ -86,6 +86,7 @@ Every case below is exercised by `smoke.mjs` against the real core.
 | The tool call rejects | `tool_error`; the rejection's error, which may carry input, is never read |
 | An abort while the tool runs, or mid-stream | `aborted`; text already sanitized is discarded |
 | Every finding | Reported to `onFinding` as allowlisted metadata only, never the input or a matched value |
+| An MCP-shaped result (text, embedded text resource, nested `structuredContent`) | The model call, a host log line, and a conversation store receive only the sanitized turn, as fresh objects sharing no reference with the raw result |
 
 Limits are mandatory and explicit (`EXAMPLE_LIMITS` in
 `examples/mcp-redact/agent-context.mjs`). Nothing is truncated and passed
@@ -117,7 +118,10 @@ The details are in [`examples/mcp-redact`](../mcp-redact/README.md).
 - **Non-text content and encoded values.** Images, audio, blobs, base64,
   and percent-encoding are not decoded or scanned.
 - **The MCP transport and tool authorization.** The supported MCP boundary
-  is #612.
+  is the [MCP redaction boundary contract](../../docs/reference/mcp-boundary.md)
+  (#612). The golden path this reference composes predates it and differs
+  from it where that contract lists: notably, binary content blocks,
+  `resource_link` fields, and `_meta` pass through unscanned here.
 - **The process itself.** Plaintext exists in memory, and callbacks the
   host passes in are trusted code.
 

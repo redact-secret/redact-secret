@@ -195,3 +195,29 @@ test("the runner rejects a core that lets a secret through, naming only the case
     },
   );
 });
+
+test("a stream's accepting flag turns false on failure, abort, and finalize, and says nothing else", () => {
+  const blockingApi = fakeApi({ action: "block", extraFields: false });
+  blockingApi.createIncrementalSanitizer = () => ({
+    append: (chunk) => blockingApi.scanAndRedact(chunk),
+    finalize: () => ({ text: "", findings: [] }),
+    abort: () => {},
+  });
+  const failing = createAiContextBoundary(blockingApi, LIMITS).openStream({ boundary: "tool-result" });
+  assert.equal(failing.accepting, true);
+  failing.append("ordinary ");
+  assert.equal(failing.accepting, true);
+  failing.append(SYNTHETIC);
+  assert.equal(failing.accepting, false, "a block finding mid-stream stops accepting at once");
+  assert.deepEqual(failing.finalize(), { outcome: "blocked", reason: "policy" });
+
+  const boundary = createAiContextBoundary(fakeApi({ extraFields: false }), LIMITS);
+  const aborted = boundary.openStream({ boundary: "tool-result" });
+  aborted.abort();
+  assert.equal(aborted.accepting, false);
+  const finished = boundary.openStream({ boundary: "tool-result" });
+  finished.append("ordinary text");
+  finished.finalize();
+  assert.equal(finished.accepting, false);
+  assert.equal(boundary.openStream({ signal: { aborted: true } }).accepting, false);
+});

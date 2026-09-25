@@ -95,9 +95,17 @@ language:
 | `buildContext` | an ordered list of `{ role, text }` or `{ role, value }` parts | `sanitizeText` or `sanitizeValue` per part |
 | `openStream` | chunks of one logical text (`append`, then `finalize`, or `abort`) | one incremental session, staged |
 
-Each operation takes a boundary label (`user-input`, `tool-result`, or
-`context`) and an optional cancellation signal. The label goes only to
-telemetry and never changes the outcome.
+Each operation takes a boundary label (`user-input`, `tool-result`,
+`tool-arguments`, or `context`) and an optional cancellation signal. The
+label goes only to telemetry and never changes the outcome. `tool-arguments`
+was added by the [MCP boundary](mcp-boundary.md) (#612) for opted-in tool-call
+argument sanitation.
+
+A stream also exposes `accepting`, an input-free boolean: `true` while it
+still scans chunks, `false` once it has failed, been aborted, or been
+finalized. It never says why; the reason arrives at `finalize`. A host reads
+it after each `append` so it can stop pulling from, and cancel, a producer
+whose output would be discarded anyway (#612).
 
 ## Outcomes
 
@@ -242,8 +250,9 @@ Checked for every conformance case, on every runtime lane:
   handled.
 - Progressive release of stream output before `finalize`. It cannot be
   recalled after a later `block`, so it is outside this contract.
-- MCP transport, and OpenAI, Anthropic, LangChain, or LangGraph wrappers
-  (#612 and adapter follow-ups).
+- MCP specifics. The [MCP boundary contract](mcp-boundary.md) (#612)
+  specializes this one for tool calls. OpenAI, Anthropic, LangChain, or
+  LangGraph wrappers are adapter follow-ups.
 - Secret restoration, prompt-injection detection, and tool authorization.
 - Scanning model output. That is a different boundary; this contract covers
   what goes into context.

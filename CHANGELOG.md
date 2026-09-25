@@ -5,6 +5,23 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+### Added
+
+- The supported MCP redaction boundary contract (#612,
+  `docs/reference/mcp-boundary.md`), a thin specialization of the
+  AI-context contract for `tools/call`: a whole `CallToolResult` is scanned
+  as one value (including `_meta` and resource links), binary content blocks
+  by default, a key-context rescan blocks a structured secret identified
+  only by its key, opt-in argument sanitation reports under the new
+  `tool-arguments` label, a streamed result stops reading its producer when
+  the stream's new `accepting` property turns `false`, and every failure maps
+  to a fixed `isError` result. The supported range is
+  `@modelcontextprotocol/sdk` 1.13.0 to 1.30.1 and
+  `@modelcontextprotocol/client`/`server` 2.0.0 to 2.1.0 on protocol
+  revisions 2025-06-18 and 2025-11-25. `conformance/fixtures/mcp-boundary.json`
+  is replayed against every installed JavaScript lane. The package itself is
+  redact-secret-adapters#13; nothing in `@redact-secret/core` changes.
+
 ### Changed
 
 - The JavaScript MCP / AI-context golden path (`examples/mcp-redact`:

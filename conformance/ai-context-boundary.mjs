@@ -282,6 +282,17 @@ export function createAiContextBoundary(api, options) {
     }
 
     return {
+      /**
+       * Input-free early-failure signal (#612): `true` while the stream still
+       * scans chunks, `false` once it has failed, been aborted, or been
+       * finalized. It says only that later appends will be discarded, never
+       * why; the reason is reported by `finalize`. A host reads it after
+       * every `append` so it can stop pulling from, and cancel, a producer
+       * whose output would be discarded unscanned anyway.
+       */
+      get accepting() {
+        return !finalized && terminal === undefined;
+      },
       append(chunk) {
         if (finalized || terminal !== undefined) return;
         if (isAborted(signal)) return fail(ABORTED);

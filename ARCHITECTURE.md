@@ -133,6 +133,15 @@ every publish-shaped JavaScript and Python artifact this repository
 qualifies. The contract and its fixture live here; the installable adapter
 does not.
 
+The MCP boundary (`decision-define-the-supported-mcp-redaction-boundary`,
+[`docs/reference/mcp-boundary.md`](docs/reference/mcp-boundary.md)) is a thin
+specialization of that contract and widens nothing further: it decides which
+AI-context operation runs on which part of an MCP tool call, and which fixed
+`CallToolResult` a failure becomes. Its fixture,
+`conformance/fixtures/mcp-boundary.json`, is replayed on the same
+publish-shaped JavaScript lanes; `@redact-secret/adapter-mcp` lives in the
+adapters repository.
+
 Detailed workspace dependency, lint, unsafe-code, MSRV, public-API,
 package-content, and registry-name policies live in
 [docs/rust-workspace.md](./docs/rust-workspace.md). The CPython distribution's
