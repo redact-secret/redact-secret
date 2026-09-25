@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 2093,
+  "fixtureCount": 2101,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -35356,6 +35356,137 @@
       "input": "access_token_type=Bearer&refresh_token_expires_in=3600\n",
       "expected": [],
       "note": "Issue #816 control: parameter names that extend access_token and refresh_token hold a type and a lifetime."
+    },
+    {
+      "id": "generic-token-negative-html-escaped-angle-placeholder",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"password\": \"&lt;YOUR_PASSWORD&gt;\"}\n",
+      "expected": [],
+      "note": "Issue #817: an HTML-escaped <...> placeholder is excluded like the unescaped form; the whole value must be the escaped pair around a run without <, > or &."
+    },
+    {
+      "id": "generic-token-regression-html-escaped-pair-with-trailing-value",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"password\": \"&lt;x&gt;SYNTHETICq8vN3xR7tLm2Kp9Wd\"}\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 14,
+          "end": 49
+        }
+      ],
+      "note": "Issue #817 control: an escaped pair followed by more material is not a placeholder and stays detected."
+    },
+    {
+      "id": "generic-token-negative-quote-juggled-env-reference",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "github-actions"
+      ],
+      "input": "- echo 'export DB_PASSWORD=\"'$DEPLOY_PASSWORD'\"' >> .env\n",
+      "expected": [],
+      "note": "Issue #817: shell quote juggling leaves '$VAR' as the value; one matching pair of inner quotes around a reference is still a reference."
+    },
+    {
+      "id": "generic-token-regression-inner-quoted-literal",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "shell"
+      ],
+      "input": "DB_PASSWORD=\"'SYNTHETICq8vN3xR7tLm2Kp9Wd'\"\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 13,
+          "end": 41
+        }
+      ],
+      "note": "Issue #817 control: a literal inside the same inner quotes stays detected, quotes included."
+    },
+    {
+      "id": "generic-token-negative-env-attribute-reference",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "password = env.DEPLOY_TEST_PASSWORD\n",
+      "expected": [],
+      "note": "Issue #817: env. is a source-code reference root (Starlark, GitHub Actions, Nushell environment lookups)."
+    },
+    {
+      "id": "generic-token-negative-string-concatenation-seam",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sb.append(\"UserPassword: \" + getUserPassword() + \",\");\n",
+      "expected": [],
+      "note": "Issue #817: the quoted span between two string literals joined by + is a concatenation seam, not a value."
+    },
+    {
+      "id": "generic-token-negative-aws-managed-policy-arn",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "terraform"
+      ],
+      "input": "ChangePassword = \"arn:aws:iam::aws:policy/ChangePassword\"\n",
+      "expected": [],
+      "note": "Issue #817: a whole AWS ARN names a resource and never contains its secret."
+    },
+    {
+      "id": "generic-token-regression-arn-prefixed-literal",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "password = \"arn:SYNTHETICq8vN3xR7tLm2Kp9Wd\"\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 12,
+          "end": 42
+        }
+      ],
+      "note": "Issue #817 control: an arn: prefix without the ARN grammar stays detected."
     },
     {
       "id": "notion-token-positive-dotenv-secret",
