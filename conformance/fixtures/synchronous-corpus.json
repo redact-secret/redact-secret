@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 2078,
+  "fixtureCount": 2085,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -35061,6 +35061,144 @@
         }
       ],
       "note": "Issue #756 control: a random 38-byte value in the same `apiKey` assignment stays detected at its exact range."
+    },
+    {
+      "id": "generic-token-regression-escaped-json-string-assignment",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "log",
+        "json"
+      ],
+      "input": "{\"level\":\"debug\",\"body\":\"{\\\"access_token\\\":\\\"SYNTHETICq8vN3xR7tLm2Kp9Wd\\\",\\\"expires_in\\\":3600}\"}\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 45,
+          "end": 71
+        }
+      ],
+      "note": "Issue #815: a JSON document serialized into another JSON string escapes its quotes; the escaped name and value quotes are recognized and only the value is selected."
+    },
+    {
+      "id": "generic-token-negative-escaped-json-env-reference",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "log",
+        "json"
+      ],
+      "input": "{\"body\":\"{\\\"password\\\":\\\"${DB_PASSWORD}\\\"}\"}\n",
+      "expected": [],
+      "note": "Issue #815 control: every value exclusion still applies to an escaped-quote value; a whole ${...} reference stays clean."
+    },
+    {
+      "id": "generic-token-regression-go-short-assignment",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "apikey := \"SYNTHETICq8vN3xR7tLm2Kp9Wd\"\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 11,
+          "end": 37
+        }
+      ],
+      "note": "Issue #815: the Go/Pascal := operator is an assignment operator; the = is not part of the value."
+    },
+    {
+      "id": "generic-token-regression-objective-c-string-literal",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "password = @\"SYNTHETICq8vN3xR7tLm2Kp9Wd\";\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 13,
+          "end": 39
+        }
+      ],
+      "note": "Issue #815: an Objective-C / C# verbatim @\"...\" literal is a quoted value; the @ and quotes are not selected."
+    },
+    {
+      "id": "generic-token-regression-quoted-value-with-braces-and-brackets",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "apikey = \"SYN{{t}h)e${t]ic(al[value>-_$#x}}\"\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 10,
+          "end": 43
+        }
+      ],
+      "note": "Issue #815: an identifier byte before [ is type or subscript syntax only when the whole value uses type-expression bytes; a literal holding {, $, #, ( and - stays detected."
+    },
+    {
+      "id": "generic-token-regression-unquoted-value-with-balanced-braces",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "apikey = SYN{{t}h)e${t]ic(al[value>-_$#x}}\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 9,
+          "end": 42
+        }
+      ],
+      "note": "Issue #815: a } or ] that closes a brace the unquoted value itself opened does not end the value."
+    },
+    {
+      "id": "generic-token-negative-quoted-type-annotation",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "python"
+      ],
+      "input": "password: \"Optional[SecretStr]\" = None\n",
+      "expected": [],
+      "note": "Issue #815 control: a quoted forward-reference type annotation written only in type-expression bytes stays excluded as subscript syntax."
     },
     {
       "id": "notion-token-positive-dotenv-secret",

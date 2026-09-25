@@ -102,6 +102,17 @@ evidence is linked from each published version.
   qualification pushes on product `main` now notify staging
   with the exact source ref, source SHA, and qualification run ID.
 
+### Changed detection
+
+- `generic-token` now reads four more assignment forms: a JSON document
+  serialized into a JSON string (`{\"access_token\":\"...\"}`), Go/Pascal
+  `:=`, an Objective-C/C# `@"..."` literal, and a value that contains `{`,
+  `}`, `[` or `]` (`ab{{c}d$e]f`). An identifier byte before `[` or `<` is
+  treated as type or subscript syntax only when the whole value is written
+  in type-expression bytes, so `password: "Optional[SecretStr]"` stays
+  clean while a quoted literal holding `{`, `$` or `#` is reported. Found by
+  the beta9 external-inputs adversarial pack (#815).
+
 ## 0.1.0-beta.8 — 2026-09-25
 
 [Publication and qualification evidence](docs/releases/0.1.0-beta.8/README.md).
