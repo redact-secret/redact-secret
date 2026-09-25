@@ -3,7 +3,7 @@
   "corpus": "synchronous-corpus.json",
   "offsetUnit": "utf8-byte",
   "detectors": ["private-key","jwt","bearer-token","connection-string","otpauth-uri","generic-token"],
-  "fixtureCount": 2121,
+  "fixtureCount": 2123,
   "fixtures": [
     {"expected":[{"action":"warn","confidence":"medium","detector":"generic-token","end":48,"start":8,"type":"contextual_secret"}],"id":"host-dotenv-github"},
     {"expected":[{"action":"warn","confidence":"medium","detector":"generic-token","end":52,"start":12,"type":"contextual_secret"}],"id":"host-json-github"},
@@ -1532,6 +1532,8 @@
     {"expected":[{"action":"redact","confidence":"high","detector":"generic-token","end":144,"start":109,"type":"contextual_secret"}],"id":"generic-token-regression-jwk-ec-private-member"},
     {"expected":[],"id":"generic-token-negative-jwk-public-rsa-key"},
     {"expected":[],"id":"generic-token-negative-one-letter-key-without-kty"},
+    {"expected":[{"action":"redact","confidence":"high","detector":"generic-token","end":41,"start":10,"type":"contextual_secret"}],"id":"generic-token-regression-db-pass-name"},
+    {"expected":[],"id":"generic-token-negative-render-pass-name"},
     {"expected":[],"id":"notion-token-positive-dotenv-secret"},
     {"expected":[],"id":"notion-token-positive-dotenv-ntn"},
     {"expected":[{"action":"redact","confidence":"high","detector":"generic-token","end":62,"start":12,"type":"contextual_secret"}],"id":"notion-token-positive-json-secret"},

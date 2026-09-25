@@ -38,6 +38,13 @@ const HIGH_SIGNAL_NAMES: &[&str] = &[
     "code_verifier",
 ];
 
+/// High-signal names matched only as the whole normalized name, never as the
+/// suffix of a prefixed name: `pass` alone is an ordinary identifier segment
+/// (`render_pass`, `first_pass`, `second_pass`), but `db_pass` is the
+/// conventional database password variable (`DB_PASS`, `dbPass`). A
+/// further-prefixed `app_db_pass` is not matched (issue #823).
+const EXACT_HIGH_SIGNAL_NAMES: &[&str] = &["db_pass"];
+
 const AMBIGUOUS_NAMES: &[&str] = &[
     "auth",
     "auth_token",
@@ -182,7 +189,8 @@ fn has_prefixed_name(normalized: &str, names: &[&str]) -> bool {
     }) && prefix_is_generic(normalized)
 }
 
-/// `true` for a high-signal name: one of [`HIGH_SIGNAL_NAMES`], the same
+/// `true` for a high-signal name: one of [`HIGH_SIGNAL_NAMES`] or
+/// [`EXACT_HIGH_SIGNAL_NAMES`], the same
 /// name behind a generic prefix (`MYAPP_API_KEY`, `DB_PASSWORD`,
 /// `JWT_SECRET`), or a prefixed `_token` name outside
 /// [`NON_CREDENTIAL_TOKEN_NAMES`] (`CI_DEPLOY_TOKEN`). A prefix that names a
@@ -196,6 +204,7 @@ fn has_prefixed_name(normalized: &str, names: &[&str]) -> bool {
 /// masked-value exclusions still apply unchanged.
 pub(crate) fn is_high_signal_name(normalized: &str) -> bool {
     HIGH_SIGNAL_NAMES.contains(&normalized)
+        || EXACT_HIGH_SIGNAL_NAMES.contains(&normalized)
         || has_prefixed_name(normalized, HIGH_SIGNAL_NAMES)
         || (!AMBIGUOUS_NAMES.contains(&normalized)
             && has_prefixed_name(normalized, &["token"])
@@ -2820,6 +2829,41 @@ mod tests {
         let input = "aws_session_token=SYNTHETIC_REVOKED_AWS_CONTEXT_VALUE";
         let candidates = detect(input);
         assert_eq!(only_range(&candidates), (18, 53));
+    }
+
+    #[test]
+    fn db_pass_is_a_high_signal_name_only_as_the_whole_name() {
+        // Issue #823: `db_pass` is the conventional database password name.
+        for input in [
+            "db_pass: 'SYNTHETIC_REVOKED_DB_PASS_VALUE'",
+            "DB_PASS=SYNTHETIC_REVOKED_DB_PASS_VALUE",
+            "dbPass = \"SYNTHETIC_REVOKED_DB_PASS_VALUE\"",
+        ] {
+            let candidates = detect(input);
+            assert_eq!(candidates.len(), 1, "{input}");
+            assert_eq!(candidates[0].confidence(), Confidence::High, "{input}");
+        }
+        // The prefixed spellings were already covered through `password`/`passwd`.
+        assert_eq!(detect("db_passwd=SYNTHETIC_REVOKED_DB_PASS_VALUE").len(), 1);
+        assert_eq!(
+            detect("db_password=SYNTHETIC_REVOKED_DB_PASS_VALUE").len(),
+            1
+        );
+    }
+
+    #[test]
+    fn pass_is_not_a_name_token() {
+        // Issue #823: `pass` alone, or as a suffix, is an ordinary identifier.
+        for input in [
+            "pass=SYNTHETIC_REVOKED_DB_PASS_VALUE",
+            "render_pass = \"SYNTHETIC_REVOKED_DB_PASS_VALUE\"",
+            "first_pass: SYNTHETIC_REVOKED_DB_PASS_VALUE",
+            "second_pass=SYNTHETIC_REVOKED_DB_PASS_VALUE",
+            "shadowPass = 'SYNTHETIC_REVOKED_DB_PASS_VALUE'",
+            "app_db_pass=SYNTHETIC_REVOKED_DB_PASS_VALUE",
+        ] {
+            assert!(detect(input).is_empty(), "{input}");
+        }
     }
 
     #[test]
