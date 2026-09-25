@@ -59,7 +59,19 @@ after the fix.
 | strings naming `evidence` | 0 | present | 0 |
 | `redact-secret` CLI bytes | 762,560 | 798,144 | 762,464 |
 
-The budget verdicts for both commits, with the original `d4bab4e` breach
+The CI-built release artifacts agree. The inputs are artifact qualification
+run [36181706528](https://github.com/redact-secret/redact-secret/actions/runs/36181706528)
+for `d4bab4e` and run
+[36199829711](https://github.com/redact-secret/redact-secret/actions/runs/36199829711)
+for the fixed commit `ecf4db12f4daede7538b128f3504b8c9301eb7a6`. The
+`wasm-bindgen` output of the default `full` profile went from 408,447 bytes
+raw, 137,639 gzip and 108,880 brotli at beta.8, to 434,272 / 148,928 /
+118,242 at `d4bab4e`, and to 405,690 / 137,446 / 108,644 after the fix. The
+optional `common` profile went from 278,100 / 100,058 / 81,031 to
+304,156 / 111,677 / 90,466, and to 275,564 / 99,880 / 80,957. Every native
+addon, wheel and CLI binary is back within 0.1% of beta.8.
+
+The #143 budget verdicts for both commits, with the original `d4bab4e` breach
 kept, are in the benchmarks record.
 
 ## 2. Cross-runtime determinism
