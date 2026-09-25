@@ -231,7 +231,11 @@ result is recorded for maintainer comparison and nothing else. It is not a
 probability, it is never public, and it never changes confidence, overlap
 resolution, or the resolved action. `private-key`, `provider`, and
 `structural` candidates are never scored, so statistical evidence cannot
-weaken them.
+weaken them. The scorer's randomness and lexical inputs are a fixed,
+versioned set of integer features (entropy, min-entropy, class distribution,
+repetition, periodicity), extracted from at most 256 characters of the
+candidate without allocation; the exact formulas are in
+[`docs/specs/engine.md`](docs/specs/engine.md#shadow-evidence-feature-schema).
 
 Resolved-action severity is checked first and overrides that specificity
 ordering: a candidate that would resolve to a weaker action (by the crate's
