@@ -4203,7 +4203,9 @@
             "bearer-positive-tab-and-uppercase",
             "bearer-positive-yaml-real-token-still-detected",
             "bearer-token-regression-base64url-value-still-detected",
-            "bearer-token-regression-placeholder-lead-word-with-random-suffix"
+            "bearer-token-regression-header-anchored-fifteen-byte-value",
+            "bearer-token-regression-placeholder-lead-word-with-random-suffix",
+            "bearer-token-regression-proxy-authorization-header"
           ],
           "state": "supported"
         },
@@ -4246,7 +4248,9 @@
             "bearer-negative-repeated-character-filler-run-of-x",
             "bearer-negative-repeated-character-filler-run-of-zero",
             "bearer-negative-repeated-character-filler-yaml",
+            "bearer-token-negative-header-value-below-twelve-bytes",
             "bearer-token-negative-insert-access-token-placeholder",
+            "bearer-token-negative-short-value-without-header",
             "bearer-token-negative-your-oauth-token-placeholder"
           ],
           "state": "supported"
@@ -5023,7 +5027,9 @@
             "authorization-host-markdown",
             "authorization-host-shell",
             "authorization-positive-basic",
-            "authorization-positive-token-minimum"
+            "authorization-positive-token-minimum",
+            "generic-token-regression-mid-line-quoted-basic-header",
+            "generic-token-regression-proxy-authorization-basic"
           ],
           "state": "supported"
         },
@@ -5058,7 +5064,8 @@
             "authorization-negative-token-placeholder-whole-value",
             "authorization-negative-token-repeated-character-filler",
             "authorization-negative-unsupported-scheme",
-            "contextual-negative-unqualified-random-text"
+            "contextual-negative-unqualified-random-text",
+            "generic-token-negative-wider-authorization-header-name"
           ],
           "state": "supported"
         },
@@ -5085,7 +5092,10 @@
             "authorization-overlap-contextual-assignment",
             "authorization-positive-basic",
             "authorization-positive-token-minimum",
-            "contextual-negative-unqualified-random-text"
+            "contextual-negative-unqualified-random-text",
+            "generic-token-negative-wider-authorization-header-name",
+            "generic-token-regression-mid-line-quoted-basic-header",
+            "generic-token-regression-proxy-authorization-basic"
           ],
           "state": "supported"
         },

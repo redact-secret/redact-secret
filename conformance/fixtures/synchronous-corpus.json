@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 2101,
+  "fixtureCount": 2108,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -34504,6 +34504,133 @@
         }
       ],
       "note": "Issue #745 control: a value that starts like an instructional placeholder but carries a word outside the placeholder vocabulary stays detected."
+    },
+    {
+      "id": "bearer-token-regression-header-anchored-fifteen-byte-value",
+      "detector": "bearer-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "http"
+      ],
+      "input": "GET /resource HTTP/1.1\nAuthorization: Bearer SYNTH.q8v-N3xR7\n",
+      "expected": [
+        {
+          "detector": "bearer-token",
+          "type": "bearer_token",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 45,
+          "end": 60
+        }
+      ],
+      "note": "Issue #818: after an explicit Authorization header name the Bearer floor is 12 bytes, the Basic/Token floor; a 15-byte value is detected."
+    },
+    {
+      "id": "bearer-token-regression-proxy-authorization-header",
+      "detector": "bearer-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "http"
+      ],
+      "input": "Proxy-Authorization: Bearer SYNTHq8vN3xR\n",
+      "expected": [
+        {
+          "detector": "bearer-token",
+          "type": "bearer_token",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 28,
+          "end": 40
+        }
+      ],
+      "note": "Issue #818: Proxy-Authorization is a header name at an identifier boundary, so its 12-byte value takes the header floor."
+    },
+    {
+      "id": "bearer-token-negative-short-value-without-header",
+      "detector": "bearer-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "the Bearer SYNTH.q8v-N3xR7 value\n",
+      "expected": [],
+      "note": "Issue #818 control: without a header name the 16-byte floor stands."
+    },
+    {
+      "id": "bearer-token-negative-header-value-below-twelve-bytes",
+      "detector": "bearer-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer SYNTHq8vN3x\n",
+      "expected": [],
+      "note": "Issue #818 control: an 11-byte value after the header is below the header floor."
+    },
+    {
+      "id": "generic-token-regression-proxy-authorization-basic",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "http"
+      ],
+      "input": "Proxy-Authorization: Basic U1lOVEhFVElDOmZpeHR1cmU=\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "authorization_credential",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 27,
+          "end": 51
+        }
+      ],
+      "note": "Issue #818: Proxy-Authorization carries the same credentials grammar as Authorization (RFC 7235)."
+    },
+    {
+      "id": "generic-token-regression-mid-line-quoted-basic-header",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -H 'Authorization: Basic U1lOVEhFVElDOmZpeHR1cmU=' https://api.example.test/token\n",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "authorization_credential",
+          "confidence": "high",
+          "specificity": "structural",
+          "start": 30,
+          "end": 54
+        }
+      ],
+      "note": "Issue #818: a Basic header inside a quoted curl argument is matched mid-line after a non-identifier byte."
+    },
+    {
+      "id": "generic-token-negative-wider-authorization-header-name",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "http"
+      ],
+      "input": "X-Authorization: Basic U1lOVEhFVElDOmZpeHR1cmU=\n",
+      "expected": [],
+      "note": "Issue #818 control: a header name that only ends in authorization is not the Authorization header."
     },
     {
       "id": "jwt-negative-legacy-supabase-anon-dotenv",

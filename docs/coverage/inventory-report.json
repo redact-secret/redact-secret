@@ -1616,7 +1616,7 @@
     {
       "detector": "bearer-token",
       "evidence": {
-        "fixtureCount": 35,
+        "fixtureCount": 39,
         "hostContextsExercised": [
           "dotenv",
           "http",
@@ -1650,7 +1650,9 @@
         "bearer-positive-tab-and-uppercase",
         "bearer-positive-yaml-real-token-still-detected",
         "bearer-token-regression-base64url-value-still-detected",
-        "bearer-token-regression-placeholder-lead-word-with-random-suffix"
+        "bearer-token-regression-header-anchored-fifteen-byte-value",
+        "bearer-token-regression-placeholder-lead-word-with-random-suffix",
+        "bearer-token-regression-proxy-authorization-header"
       ],
       "policyClass": "always-redact",
       "schemeRows": "not-applicable",
@@ -1866,9 +1868,10 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 184,
+        "fixtureCount": 187,
         "hostContextsExercised": [
           "chat",
+          "curl",
           "dotenv",
           "github-actions",
           "http",
@@ -1971,9 +1974,10 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 184,
+        "fixtureCount": 187,
         "hostContextsExercised": [
           "chat",
+          "curl",
           "dotenv",
           "github-actions",
           "http",
@@ -2009,20 +2013,26 @@
         "authorization-host-markdown",
         "authorization-host-shell",
         "authorization-positive-basic",
-        "authorization-positive-token-minimum"
+        "authorization-positive-token-minimum",
+        "generic-token-regression-mid-line-quoted-basic-header",
+        "generic-token-regression-proxy-authorization-basic"
       ],
       "policyClass": "always-redact",
       "schemeRows": [
         {
           "evidenceFixtureIds": [
-            "authorization-positive-basic"
+            "authorization-positive-basic",
+            "generic-token-regression-mid-line-quoted-basic-header",
+            "generic-token-regression-proxy-authorization-basic"
           ],
           "scheme": "basic",
           "state": "supported"
         },
         {
           "evidenceFixtureIds": [
-            "authorization-positive-token-minimum"
+            "authorization-positive-token-minimum",
+            "generic-token-regression-mid-line-quoted-basic-header",
+            "generic-token-regression-proxy-authorization-basic"
           ],
           "scheme": "token",
           "state": "supported"
@@ -2034,9 +2044,10 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 184,
+        "fixtureCount": 187,
         "hostContextsExercised": [
           "chat",
+          "curl",
           "dotenv",
           "github-actions",
           "http",
