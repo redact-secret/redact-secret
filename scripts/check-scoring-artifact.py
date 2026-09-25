@@ -261,7 +261,8 @@ def check_not_packaged(root: Path) -> list[str]:
     errors = []
     js = json.loads((root / JS_PACKAGE).read_text(encoding="utf-8"))
     for entry in js.get("files", []):
-        if "docs" in Path(entry).parts or entry.endswith(".json") and "scoring" in entry:
+        broad = entry.strip("/") in {"", ".", "*", "**", "../..", "../../docs"}
+        if broad or "docs" in Path(entry).parts or (entry.endswith(".json") and "scoring" in entry):
             errors.append(f"{JS_PACKAGE}: files entry {entry!r} could ship the scoring artifact")
     manifest = (root / CORE_MANIFEST).read_text(encoding="utf-8")
     include = re.search(r"^include\s*=\s*\[(?P<items>[^\]]*)\]", manifest, re.M)
