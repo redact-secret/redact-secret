@@ -35,6 +35,7 @@ Normal path:
 
 ```
 merge the prepared version to main
+  → Performance evaluation (benchmarks)    -- paired same-job run of the frozen main SHA; must judge accepted
   → (optional) Package Release Rehearsal   -- npm dependency check only, publishes nothing
   → Artifact qualification + SAST + approval
   → Release                                -- the actual publish, run once
@@ -171,6 +172,23 @@ smallest fixtures that exercise the behavior; performance profiles measure
 resource use separately. A large performance workload is not needed to prove
 a lifecycle or packaging contract.
 
+Run the performance evaluation first. A timing, memory, or size budget breach
+means a code change and therefore a new candidate SHA, which would invalidate
+any rehearsal or qualification already run against the old one, and the
+evaluation is the longest of these runs. Dispatch it in
+`redact-secret-benchmarks` against the frozen SHA; it builds that candidate and
+the budgets' baseline commit in one job and judges their paired ratio
+(redact-secret-benchmarks#303):
+
+```bash
+gh workflow run performance-evaluation.yml -R redact-secret/redact-secret-benchmarks \
+  --ref develop -f candidate_revision="$RELEASE_SOURCE_SHA"
+```
+
+Continue only when its verdict is `accepted`. A `regression` is either fixed
+(new candidate SHA, start again) or carried by an accepted tradeoff in the
+benchmarks ledger; an `invalid-measurement` is rerun, not waived.
+
 Main pushes trigger qualification. Reuse a successful full run for the selected
 revision, or dispatch it explicitly when needed:
 
@@ -227,6 +245,8 @@ Before requesting final release approval, assemble a reviewable record of:
 
 - Approved version, full `main` source SHA, public API review, compatibility
   changes, changelog, and disposition of every release-blocking issue.
+- The performance evaluation run ID for the exact source SHA and its `accepted`
+  verdict (or the accepted-tradeoff ledger entry for each breach).
 - Exact-revision qualification, rehearsal, SAST, artifact inventory, and any
   applicable assessment evidence. Hashing an old review document does not make
   it a current API review.
