@@ -185,7 +185,7 @@ REASON_GROUP_COPY = (
 
 # A raw reason segment that names an evaluator gate: `profile.gate: ...`,
 # `qualificationProfile: ...` or `positiveContractTier T0 ...`.
-GATE_SEGMENT = re.compile(r"^(?:(?P<dotted>[a-z][A-Za-z]*(?:\.[A-Za-z]+)+):|(?P<bare>[a-z][A-Za-z]+)(?=[: ]))")
+GATE_SEGMENT = re.compile(r"^(?:(?P<dotted>[a-z][A-Za-z]*\.[A-Za-z.]+):|(?P<bare>[a-z][A-Za-z]+)(?=[: ]))")
 
 
 def user_facing_reason(reason: str) -> str:
