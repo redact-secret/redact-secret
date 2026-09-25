@@ -49,7 +49,7 @@ the copy. The MCP SDK versions it is verified against are in
 | [`redact-tool-call.mjs`](./redact-tool-call.mjs) | The MCP shape over the boundary: `redactToolResult` sanitizes a `CallToolResult`'s text content blocks, embedded text resources, and `structuredContent`; `redactArguments` sanitizes a tool call's argument object. Both return the boundary's `ok` / `blocked` / `aborted` outcome. No `@modelcontextprotocol/sdk` import: `CallToolResult` is a duck-typed shape. |
 | [`wrap-tool-call.mjs`](./wrap-tool-call.mjs) | Server-side (`wrapServerToolHandler`) and client-side (`wrapClientCallTool`) wrappers built on the above, shaped to drop into a real `ToolCallback` / `callTool`. A non-`ok` outcome becomes the fixed `buildBlockedResult()` tool error. |
 | [`agent-context.mjs`](./agent-context.mjs) | The AI-context golden path (`buildSafeContext`), `EXAMPLE_LIMITS`, and the boundary factories (`createGoldenPathBoundary` over the real core, `createGoldenPathBoundaryWith` over an injected one). See [below](#the-ai-context-golden-path). |
-| [`streaming-tool-result.mjs`](./streaming-tool-result.mjs) | Redaction for a tool result assembled progressively, built on `createIncrementalSanitizer`. It is not yet composed into the golden path or moved onto the boundary's `openStream`; that is #721. See [Streamed results](#streamed-or-progressive-results). |
+| [`streaming-tool-result.mjs`](./streaming-tool-result.mjs) | `redactStreamedToolResult`: a tool result delivered as chunks, through the boundary's staged `openStream`, with cancellation and producer failure. `buildSafeContext`'s `streamTool` runs it. See [Streamed results](#streamed-or-progressive-results). |
 | [`demo.mjs`](./demo.mjs) | Runnable, side-by-side: the same synthetic tool result through block-all and through this middleware, on the real core. It prints only the two outputs, never the unscanned input. |
 | [`package.json`](./package.json) | This directory as a consumer project: its only dependencies are the pinned `file:` tarballs from `adapters/pin-source.json`. |
 | [`fixtures/fake-core.mjs`](./fixtures/fake-core.mjs) | The two injected core operations, faked for the tests: `fake-scanner.mjs`'s rules plus the core's whole-input byte limit, and a core that behaves as if uninitialized. |
@@ -63,7 +63,7 @@ tool result -> scan -> context construction
 safe context -> model
 ```
 
-`buildSafeContext({ boundary, userInput, callTool?, buildToolRequest?, signal? })`
+`buildSafeContext({ boundary, userInput, callTool? | streamTool?, buildToolRequest?, signal? })`
 runs one agent turn and returns one of:
 
 - `{ outcome: "ok", value: [{ role, content }], findings }`, the same shape
@@ -72,10 +72,10 @@ runs one agent turn and returns one of:
 - The boundary's `{ outcome: "blocked", reason, code? }` or
   `{ outcome: "aborted" }`, plus `stage` (`"input"` or `"tool"`). There is no
   value, no findings, and nothing derived from input.
-- `{ outcome: "tool_error", stage: "tool" }` when `callTool` rejects. This is
-  the host's own outcome, outside the contract's set: dispatching a tool is
-  the host's job, and the rejection's error, which may carry input, is never
-  read.
+- `{ outcome: "tool_error", stage: "tool" }` when `callTool` rejects, or
+  `streamTool` throws or its chunks reject. This is the host's own outcome,
+  outside the contract's set: dispatching a tool is the host's job, and the
+  error, which may carry input, is never read.
 
 The steps:
 
@@ -86,7 +86,10 @@ The steps:
 2. **Tool result → scan → context construction.** `callTool` is dispatched
    from `buildToolRequest(safeInputText)`, the *sanitized* input, never the
    raw one. Its result goes through `redactToolResult` (label `tool-result`)
-   before it joins the context.
+   before it joins the context. A tool that streams its output is passed as
+   `streamTool` instead; its chunks go through one staged boundary stream
+   and join the context in the same `CallToolResult` shape (see
+   [Streamed results](#streamed-or-progressive-results)).
 3. **Safe context → model.** The returned `value` is the only thing this
    function produces that is safe to forward.
 
@@ -124,8 +127,9 @@ reported), and `block` (the whole turn ends, at the input or the tool stage).
 - **Cancellation.** An already-aborted `signal` ends the turn before any
   scan.
 - **Abort.** The signal is checked again before the tool is dispatched,
-  after it returns, and by every scan, so a signal firing mid-flight
-  discards everything, including text already sanitized.
+  after it returns, by every scan, and on every streamed chunk, so a signal
+  firing mid-flight discards everything, including text already sanitized
+  and a stream's staged text.
 
 **What changed from beta.7** (the contract's four fail-closed divergences):
 
@@ -208,30 +212,72 @@ Top-level fields other than `content` and `structuredContent` (`isError`,
 The base MCP protocol resolves one `CallToolResult` per call; there is no
 standard content-streaming primitive, and the SDK's chunked-delivery
 `experimental.tasks` API is marked unstable
-(`@modelcontextprotocol/sdk@1.30.0`: "may change without notice"). Instead,
-`streaming-tool-result.mjs`/`streaming_tool_result.py` targets the case a
-handler actually faces: assembling one result from chunks (piping a
-subprocess, file, or HTTP response) without ever holding the whole
-unredacted text in memory, and without a secret split across a chunk
-boundary slipping through. It drives the core's own bounded
-`IncrementalSanitizer` — the same session the byte-stream adapters use —
-and its limits are mandatory, matching that session's "no
-environment-derived or silent defaults" contract
-(`packages/javascript/src/types.ts`'s `IncrementalLimits`).
+(`@modelcontextprotocol/sdk@1.30.0`: "may change without notice"). So
+streaming here is the case a handler actually faces: one text result
+produced in chunks (a subprocess's stdout, a file, an HTTP body) that must
+be sanitized before it joins model context, without a secret split across
+two chunks slipping through.
 
-This file is unchanged by the move onto the AI-context boundary: composing
-streamed output into the golden path through the boundary's staged
-`openStream`, with cancel and abort, is #721.
+`streaming-tool-result.mjs`'s `redactStreamedToolResult(boundary, chunks,
+{ signal })` feeds the chunks (`AsyncIterable<string>` or
+`Iterable<string>`) through one `boundary.openStream({ boundary:
+"tool-result", signal })`, which is one core `IncrementalSanitizer`
+session under `EXAMPLE_LIMITS.incrementalLimits`. The golden path runs it
+when the tool is passed as `streamTool`:
 
-**Fails closed.** Any error the session raises — a declared limit
-exceeded — aborts the session and discards every chunk already
-accumulated, including text that was already safe. A partial result is not
-a safe result. `streaming-tool-result.test.mjs`/`test_streaming_tool_result.py`
-prove both properties with a fake session: a secret split across two
-`append()` calls is still redacted once the session resolves it (at
-`finalize()`, in the deliberately maximal-buffering fake — see
-`fixtures/fake-incremental-sanitizer.mjs`), and exceeding the declared
-buffer limit blocks the call and returns no text at all.
+```js
+const turn = await buildSafeContext({
+  boundary,
+  userInput,
+  buildToolRequest,
+  signal,
+  // Decode bytes with a streaming decoder (setEncoding, TextDecoderStream).
+  streamTool: (request, { signal }) => spawnTool(request, { signal }).stdout.setEncoding("utf8"),
+});
+```
+
+What the stream guarantees, each tested:
+
+- **Split secrets.** A secret split across chunks is detected as one
+  secret; finding offsets are absolute in the joined text. For text inside
+  both the whole-input and the incremental limits, the result equals a
+  whole-input scan of the joined text at every split.
+- **Staging.** Nothing is released before the stream finalizes, even text
+  the core has already sanitized. The released value is a one-block
+  `CallToolResult`, `{ content: [{ type: "text", text }] }`, the same shape
+  a `callTool` result joins the context in.
+- **Block and limits.** A `block` finding or a limit failure mid-stream
+  aborts the core session at once; later chunks are discarded unscanned and
+  the turn is `blocked` with no value and no findings.
+- **Cancellation.** When `signal` fires, the boundary aborts the core
+  session, which drops its retained plaintext, and discards the staged
+  text. The loop stops pulling chunks and closes the iterator (`return()`),
+  so the producer's `finally` runs and an upstream process or request can be
+  cancelled. `streamTool` also gets the signal itself. The turn is
+  `aborted`.
+- **Producer failure.** A producer that throws or rejects mid-stream is
+  aborted the same way and the turn is `tool_error`; its error, which may
+  quote the output, is never read.
+- **Single release.** `finalize` is called once. On the boundary's own
+  stream, a second `finalize` is `blocked` / `lifecycle` and releases
+  nothing, an `append` after `finalize` or `abort` is discarded unscanned,
+  and `abort` after a successful `finalize` does nothing
+  ([lifecycle rules](../../docs/reference/ai-context-boundary.md#lifecycle-rules)).
+- **Unsupported chunks.** A non-string chunk (undecoded bytes), a bare
+  string, or a value that is not iterable blocks as `unsupported_value`.
+
+Two limits of this design. A mid-stream `block` is only visible at
+`finalize`, so the producer is drained (its chunks discarded unscanned)
+rather than closed early: the boundary's stream exposes no failed state
+before then. And a producer that never yields again after the signal fires
+is not interrupted by this loop; it must honor the `signal` it is given.
+The core session is aborted the moment the signal fires either way.
+
+`streaming-tool-result.test.mjs` covers all of this over the fake core.
+`streaming-tool-result.real-core.test.mjs` covers it over the real core's
+`IncrementalSanitizer`, with a synthetic AWS key split mid-token, and checks
+that every cancelled, failed, or blocked session was aborted and refuses
+further input (`INVALID_STATE`).
 
 ## False positives and false negatives
 
@@ -243,8 +289,8 @@ buffer limit blocks the call and returns no text at all.
 - **Non-text content is not scanned** (see above).
 - **Split secrets**: a secret split across separate content blocks,
   values, or keys is not joined; each is scanned on its own. A secret split
-  across a *streaming chunk boundary within one leaf* is handled (see above);
-  this is a different case.
+  across *chunks of one streamed result* is handled (see above); this is a
+  different case.
 - **Encoded values** (base64, URL-encoded JSON) are not decoded before
   scanning, so an encoded secret is not detected.
 - **Stricter than beta.7, on purpose.** A nested value with one blocked
@@ -307,11 +353,11 @@ another consumer are in [`adapters/README.md`](../../adapters/README.md).
 
 ```bash
 npm run adapter-pins:install   # once
-node --test examples/mcp-redact/*.test.mjs
+npm run examples:test          # every example suite, both languages, over fake cores
 python3 -B -m unittest discover -s examples/mcp-redact/python -p "test_*.py"
 ```
 
-Both suites inject a fake core (`fixtures/fake-core.mjs`, built on
+These suites inject a fake core (`fixtures/fake-core.mjs`, built on
 `fake-scanner.mjs`, and a fake incremental session for streaming), so no
 built native addon or extension is required. `redact-tool-call.test.mjs`
 and `python/test_redact_tool_call.py` both read
@@ -320,6 +366,19 @@ text results, JSON-in-text results, arguments, and multi-block results
 produce identical redacted output in both languages by construction. The
 cases that differ by design (limits, keys, non-JSON values, findings on a
 blocked outcome) are tested in the JavaScript suite only.
+
+`streaming-tool-result.real-core.test.mjs` runs the streamed golden path on
+the real core instead. It needs a built core resolvable from this directory
+(linked as in [Running the demo](#running-the-demo), or an installed
+candidate package) and fails, never skips, without one:
+
+```bash
+npm run examples:real-core:test
+```
+
+It is not part of `npm run ci`, whose Node job builds no core. With a core
+linked, `agent-context.test.mjs`'s "core cannot be loaded" case fails by
+design, since it asserts this directory has no core.
 
 ## Running the demo
 
@@ -343,7 +402,13 @@ python3 examples/mcp-redact/python/demo.py   # requires a built redact_secret ex
 The Python twins (`python/agent_context.py`, `redact_tool_call.py`,
 `wrap_tool_call.py`, `streaming_tool_result.py`) keep their beta.7 behavior:
 a marker for a subtree past a limit, unscanned keys, findings on a blocked
-outcome, and a length check for oversized input. There is no Python
+outcome, and a length check for oversized input. `streaming_tool_result.py`
+is also not composed into `agent_context.py` and has no cancellation: it is
+the beta.7 standalone redactor over an injected session. Its JavaScript
+counterpart moved onto the boundary's `openStream` (#721); the Python one
+waits for a Python `open_stream`, because re-deriving the staging,
+cancellation, and single-release rules here would be a second, unqualified
+implementation of the contract. There is no Python
 AI-context adapter package yet. The core's Python binding already passes the
 contract's fixture (`bindings/python/tests/test_ai_context_boundary.py`),
 so a Python adapter can be pinned the same way once

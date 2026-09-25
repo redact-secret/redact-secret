@@ -21,6 +21,17 @@ evidence is linked from each published version.
   (`npm run adapter-pins:install`; see `adapters/README.md`). The Python
   twins keep their beta.7 behavior.
 
+- The golden path now takes a streamed tool result (#721):
+  `buildSafeContext({ streamTool })` feeds the chunks through the boundary's
+  staged `openStream` (`redactStreamedToolResult` in
+  `examples/mcp-redact/streaming-tool-result.mjs`). A secret split across
+  chunks is redacted as one secret; nothing is released before finalize; a
+  fired `signal` or a failing producer aborts the core session, closes the
+  producer, and returns `aborted` / `tool_error` with nothing derived from
+  input. The beta.7 standalone `createStreamingToolResultRedactor` is
+  removed. `npm run examples:real-core:test` runs the streamed path on the
+  real core's `IncrementalSanitizer`.
+
 - Benchmark inputs now pin an exact `redact-secret-benchmarks` commit instead
   of following its live `main`: development CI accepts a commit on
   benchmarks `develop`, while the Release workflow requires that same commit
