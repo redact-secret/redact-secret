@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 93,
+  "fixtureCount": 97,
   "fixtures": [
     {
       "id": "synthetic-regression-malformed-authority",
@@ -1454,6 +1454,70 @@
         }
       ],
       "note": "Issue #741: the `=` + 8-hex tail sits after a byte the body grammar treats as a terminator, so a chunk split between the body and `=`, or between `=` and the hex, must still resolve to the whole 192-byte token, the same as the whole-input scan."
+    },
+    {
+      "id": "replicate-api-token-incremental-exact-width-partitions",
+      "input": "REPLICATE_API_TOKEN=r8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-001\nr8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-00\n",
+      "text": "REPLICATE_API_TOKEN=<SECRET_1>\nr8_SYNTHETIC_REVOKED-REPLICATE-TOKEN-00\n",
+      "expected": [
+        {
+          "detector": "replicate-api-token",
+          "type": "replicate_api_token",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 20,
+          "end": 60
+        }
+      ],
+      "note": "Issue #727: the frozen `r8_` prefix plus exactly 37 `[A-Za-z0-9_-]` body bytes stays one whole finding at every UTF-8 byte and char partition, including splits inside the prefix and at the last body byte, while the one-byte-short twin on the next line never emits one, matching replicate-api-token-positive-dotenv and replicate-api-token-boundary-one-short."
+    },
+    {
+      "id": "groq-api-key-incremental-exact-width-partitions",
+      "input": "GROQ_API_KEY=gsk_SYNTHETICREVOKEDGROQAPIKEYVALUE000000000000000000001\ngsk_SYNTHETICREVOKEDGROQAPIKEYVALUE00000000000000000000\n",
+      "text": "GROQ_API_KEY=<SECRET_1>\ngsk_SYNTHETICREVOKEDGROQAPIKEYVALUE00000000000000000000\n",
+      "expected": [
+        {
+          "detector": "groq-api-key",
+          "type": "groq_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 69
+        }
+      ],
+      "note": "Issue #727: the frozen `gsk_` prefix plus exactly 52 alphanumeric body bytes stays one whole finding at every UTF-8 byte and char partition, including splits inside the prefix and at the last body byte, while the one-byte-short twin on the next line never emits one, matching groq-api-key-positive-dotenv and groq-api-key-boundary-one-short."
+    },
+    {
+      "id": "xai-api-key-incremental-exact-width-partitions",
+      "input": "XAI_API_KEY=xai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-00000000000000000000000000000000000000000001\nxai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-0000000000000000000000000000000000000000000\n",
+      "text": "XAI_API_KEY=<SECRET_1>\nxai-SYNTHETIC_REVOKED-XAI-API-KEY-VALUE-0000000000000000000000000000000000000000000\n",
+      "expected": [
+        {
+          "detector": "xai-api-key",
+          "type": "xai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 12,
+          "end": 96
+        }
+      ],
+      "note": "Issue #727: the frozen `xai-` prefix plus exactly 80 `[A-Za-z0-9_-]` body bytes stays one whole finding at every UTF-8 byte and char partition, including splits inside the prefix and at the last body byte, while the one-byte-short twin on the next line never emits one, matching xai-api-key-positive-dotenv and xai-api-key-boundary-one-short."
+    },
+    {
+      "id": "openrouter-api-key-incremental-exact-width-partitions",
+      "input": "OPENROUTER_API_KEY=sk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\nsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcde\n",
+      "text": "OPENROUTER_API_KEY=<SECRET_1>\nsk-or-v1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcde\n",
+      "expected": [
+        {
+          "detector": "openrouter-api-key",
+          "type": "openrouter_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 19,
+          "end": 92
+        }
+      ],
+      "note": "Issue #727: the frozen `sk-or-v1-` prefix (which shares `sk-` with the OpenAI families) plus exactly 64 lower-case hex body bytes stays one whole finding at every UTF-8 byte and char partition, including splits inside the prefix and at the last body byte, while the one-byte-short twin on the next line never emits one, matching openrouter-api-key-positive-dotenv and openrouter-api-key-boundary-one-short."
     }
   ]
 }
