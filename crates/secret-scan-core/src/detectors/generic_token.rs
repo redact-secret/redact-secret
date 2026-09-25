@@ -280,11 +280,19 @@ pub(crate) fn has_open_contextual_assignment(input: &str) -> bool {
         && (ch == '=' || ch == ':')
     {
         end -= ch.len_utf8();
+        // `:=` (issue #815).
+        if ch == '=' && prev_char(input, end) == Some(':') {
+            end -= 1;
+        }
         end = rskip_while_chars(input, end, is_js_whitespace);
     }
 
     if let Some(ch @ ('"' | '\'')) = prev_char(input, end) {
         end -= ch.len_utf8();
+        // An escaped closing quote (`\"access_token\":`, issue #815).
+        if prev_char(input, end) == Some('\\') {
+            end -= 1;
+        }
     }
 
     let name_end = end;
@@ -866,13 +874,38 @@ fn is_snake_case_attribute_chain(value: &str) -> bool {
 /// `[` anywhere in the value: `Identifier<...>` / `Identifier[...]`
 /// generic-type or subscript syntax (`Option<String>`, `Optional[str`,
 /// `&SecretBox<str>`), rather than a literal value.
+///
+/// The value must also be written only in bytes a type or subscript
+/// expression uses (identifier bytes, `.`, `:`, `<`, `>`, `[`, `]`, `,`,
+/// `&`, `'`, `*`, `?`, space): a passphrase that happens to contain `x[`
+/// next to `{`, `$`, `#`, `(` or `-` (`m{{h}o)p${e]nob(ody[...`) is literal
+/// material, not code (issue #815).
 fn contains_generic_or_subscript_syntax(value: &str) -> bool {
     let bytes = value.as_bytes();
-    bytes.iter().enumerate().any(|(index, &byte)| {
-        matches!(byte, b'<' | b'[')
-            && index > 0
-            && matches!(bytes[index - 1], b'0'..=b'9' | b'a'..=b'z' | b'A'..=b'Z' | b'_')
-    })
+    let type_expression_bytes_only = bytes.iter().all(|&byte| {
+        byte.is_ascii_alphanumeric()
+            || matches!(
+                byte,
+                b'_' | b'.'
+                    | b':'
+                    | b'<'
+                    | b'>'
+                    | b'['
+                    | b']'
+                    | b','
+                    | b'&'
+                    | b'\''
+                    | b'*'
+                    | b'?'
+                    | b' '
+            )
+    });
+    type_expression_bytes_only
+        && bytes.iter().enumerate().any(|(index, &byte)| {
+            matches!(byte, b'<' | b'[')
+                && index > 0
+                && matches!(bytes[index - 1], b'0'..=b'9' | b'a'..=b'z' | b'A'..=b'Z' | b'_')
+        })
 }
 
 /// `true` when the value ends with an unmatched `(` or `[` — a call or
@@ -1487,7 +1520,22 @@ fn unquoted_assignment_value(input: &str, start: usize) -> Option<(usize, usize)
         return None;
     }
     let mut cursor = start;
+    // `{`/`[` opened inside the value itself. While one is open, a `}`/`]`
+    // closes it instead of ending the value (issue #815): a passphrase such
+    // as `ab{{c}d$e]f` was otherwise cut at its first `}`, below the length
+    // floor. The flow-mapping guard above still returns no value for a value
+    // that *starts* with `{`/`[`.
+    let mut open_brackets: u32 = 0;
     while let Some(ch) = char_at(input, cursor) {
+        match ch {
+            '{' | '[' => open_brackets += 1,
+            '}' | ']' if open_brackets > 0 => {
+                open_brackets -= 1;
+                cursor += 1;
+                continue;
+            }
+            _ => {}
+        }
         // A backtick closes an inline-code span around the value, but one
         // *opening* the value with no closing partner (`delimited_reference_value`
         // has already declined it) is an unterminated template literal or
@@ -1503,10 +1551,52 @@ fn unquoted_assignment_value(input: &str, start: usize) -> Option<(usize, usize)
     (cursor > start).then_some((start, cursor))
 }
 
+/// Scans a value opened by an escaped quote (`\"...\"`), the form a JSON
+/// document takes once it is serialized into another JSON string
+/// (`{"body":"{\"access_token\":\"...\"}"}`, issue #815). The value ends at
+/// the first quote preceded by exactly one backslash; a deeper escape
+/// (`\\\"`) belongs to the inner string's own content. Like
+/// [`quoted_assignment_value`], it never crosses a line.
+fn escaped_quoted_assignment_value(input: &str, backslash: usize) -> Option<(usize, usize)> {
+    let quote = char_at(input, backslash + 1)?;
+    if quote != '"' && quote != '\'' {
+        return None;
+    }
+    let start = backslash + 1 + quote.len_utf8();
+    let mut cursor = start;
+    let mut backslash_run: u32 = 0;
+    while let Some(ch) = char_at(input, cursor) {
+        if ch == '\r' || ch == '\n' || cursor - start > MAX_CONTEXT_VALUE_LENGTH {
+            return None;
+        }
+        if ch == '\\' {
+            backslash_run += 1;
+            cursor += 1;
+            continue;
+        }
+        if ch == quote && backslash_run == 1 {
+            let after = char_at(input, cursor + ch.len_utf8());
+            return is_quoted_value_boundary(after).then_some((start, cursor - 1));
+        }
+        backslash_run = 0;
+        cursor += ch.len_utf8();
+    }
+    None
+}
+
 fn assignment_value(input: &str, start: usize) -> Option<(usize, usize, ValueForm)> {
     match char_at(input, start) {
         Some('"' | '\'') => quoted_assignment_value(input, start)
             .map(|(value_start, value_end)| (value_start, value_end, ValueForm::Quoted)),
+        // An Objective-C / C# verbatim string literal (`@"..."`, issue #815).
+        Some('@') if char_at(input, start + 1) == Some('"') => {
+            quoted_assignment_value(input, start + 1)
+                .map(|(value_start, value_end)| (value_start, value_end, ValueForm::Quoted))
+        }
+        Some('\\') if matches!(char_at(input, start + 1), Some('"' | '\'')) => {
+            escaped_quoted_assignment_value(input, start)
+                .map(|(value_start, value_end)| (value_start, value_end, ValueForm::Quoted))
+        }
         _ => unquoted_assignment_value(input, start)
             .map(|(value_start, value_end)| (value_start, value_end, ValueForm::Unquoted)),
     }
@@ -1575,10 +1665,24 @@ fn parse_name_and_operator(input: &str, start: usize) -> Option<(usize, usize, u
 
     if let Some(ch @ ('"' | '\'')) = char_at(input, cursor) {
         cursor += ch.len_utf8();
+    } else if char_at(input, cursor) == Some('\\')
+        && let Some(ch @ ('"' | '\'')) = char_at(input, cursor + 1)
+    {
+        // A JSON document serialized into another JSON string escapes its
+        // quotes (`{\"access_token\":\"...\"}`, issue #815).
+        cursor += 1 + ch.len_utf8();
     }
     cursor = skip_while_chars(input, cursor, is_js_whitespace);
     match char_at(input, cursor) {
-        Some('=' | ':') => cursor += 1,
+        Some('=') => cursor += 1,
+        Some(':') => {
+            cursor += 1;
+            // Go, Pascal and Makefile `:=` (issue #815): without this the
+            // `=` became the first byte of the value.
+            if char_at(input, cursor) == Some('=') {
+                cursor += 1;
+            }
+        }
         _ => return None,
     }
     cursor = skip_while_chars(input, cursor, is_horizontal_js_whitespace);
@@ -2214,6 +2318,65 @@ mod tests {
         let input = "api_key=\"SYNTHETIC_REVOKED_PLAIN_QUOTED_VALUE_1234\"";
         let candidates = detect(input);
         assert_eq!(only_range(&candidates), (9, input.len() - 1));
+    }
+
+    fn only_value(input: &str) -> &str {
+        let candidates = detect(input);
+        let (start, end) = only_range(&candidates);
+        &input[start..end]
+    }
+
+    #[test]
+    fn an_assignment_inside_an_escaped_json_string_is_detected() {
+        // Issue #815: a JSON document serialized into another JSON string.
+        let input = r#"{"level":"debug","body":"{\"access_token\":\"SYNTHETICq8vN3xR7tLm2Kp9Wd\",\"expires_in\":3600}"}"#;
+        assert_eq!(only_value(input), "SYNTHETICq8vN3xR7tLm2Kp9Wd");
+        // An inner escaped quote (`\\\"`) belongs to the value.
+        let nested = r#"{"body":"{\"password\":\"SYNTHETIC\\\"q8vN3xR7tLm2Kp9Wd\",\"x\":1}"}"#;
+        assert_eq!(only_value(nested), r#"SYNTHETIC\\\"q8vN3xR7tLm2Kp9Wd"#);
+        // A reference stays excluded in the escaped form too.
+        assert!(detect(r#"{"body":"{\"password\":\"${DB_PASSWORD}\"}"}"#).is_empty());
+    }
+
+    #[test]
+    fn go_short_assignment_and_objective_c_string_literals_are_detected() {
+        // Issue #815.
+        assert_eq!(
+            only_value("apikey := \"SYNTHETICq8vN3xR7tLm2Kp9Wd\""),
+            "SYNTHETICq8vN3xR7tLm2Kp9Wd"
+        );
+        assert_eq!(
+            only_value("password := SYNTHETICq8vN3xR7tLm2Kp9Wd"),
+            "SYNTHETICq8vN3xR7tLm2Kp9Wd"
+        );
+        assert_eq!(
+            only_value("password = @\"SYNTHETICq8vN3xR7tLm2Kp9Wd\";"),
+            "SYNTHETICq8vN3xR7tLm2Kp9Wd"
+        );
+        assert!(detect("password := os.Getenv(\"DB_PASSWORD\")").is_empty());
+    }
+
+    #[test]
+    fn a_value_containing_braces_and_brackets_is_literal_material() {
+        // Issue #815: `x[` next to `{`, `$`, `#` or `(` is not type syntax,
+        // and a `}`/`]` closing a brace the value opened does not end it.
+        let quoted = "apikey = \"SYN{{t}h)e${t]ic(al[value>-_$#x}}\"";
+        assert_eq!(only_value(quoted), "SYN{{t}h)e${t]ic(al[value>-_$#x}}");
+        let unquoted = "apikey = SYN{{t}h)e${t]ic(al[value>-_$#x}}";
+        assert_eq!(only_value(unquoted), "SYN{{t}h)e${t]ic(al[value>-_$#x}}");
+        // Type annotations, subscripts, flow mappings and templates stay clean.
+        for input in [
+            "password: Option<String>",
+            "password: \"Optional[SecretStr]\"",
+            "token: HashMap<String, Vec<u8>>",
+            "api_key: settings[API_KEY_NAME]",
+            "secret: {secretName: web-tls-cert}",
+            "password: {{ vault_db_password }}",
+            "password = ${DB_PASSWORD}",
+            "secret = request.headers[\"apikey\"]",
+        ] {
+            assert!(detect(input).is_empty(), "{input}");
+        }
     }
 
     #[test]
