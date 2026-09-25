@@ -1874,7 +1874,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 187,
+        "fixtureCount": 191,
         "hostContextsExercised": [
           "chat",
           "curl",
@@ -1953,6 +1953,8 @@
         "generic-token-regression-go-short-assignment",
         "generic-token-regression-html-escaped-pair-with-trailing-value",
         "generic-token-regression-inner-quoted-literal",
+        "generic-token-regression-jwk-ec-private-member",
+        "generic-token-regression-jwk-symmetric-key-member",
         "generic-token-regression-objective-c-string-literal",
         "generic-token-regression-pkce-code-verifier",
         "generic-token-regression-placeholder-lead-word-random-suffix",
@@ -1980,7 +1982,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 187,
+        "fixtureCount": 191,
         "hostContextsExercised": [
           "chat",
           "curl",
@@ -2050,7 +2052,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 187,
+        "fixtureCount": 191,
         "hostContextsExercised": [
           "chat",
           "curl",

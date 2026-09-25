@@ -137,6 +137,10 @@ evidence is linked from each published version.
 - `connection-string` now reads the password in `https`, `http`, `ftps` and
   `ftp` URL userinfo (`https://user:pass@host/`), with the same authority
   rules as database URLs (#820).
+- `generic-token` reports the secret members of a single-line JSON Web Key
+  (`"k"` of an `oct` key; `"d"`, `"p"`, `"q"`, `"dp"`, `"dq"`, `"qi"` of
+  an RSA, EC or OKP key) when the same line carries `"kty"`. Public members
+  are not reported (#821).
 
 ## 0.1.0-beta.8 — 2026-09-25
 
