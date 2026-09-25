@@ -690,7 +690,7 @@ qualifies the beta.9 shadow scorer for cost, size and cross-runtime
 determinism. This section applies the existing contract
 ([`decision-freeze-the-shadow-evidence-score-and-confidence-contract`](../decisions/2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md),
 sections 5 and 7) and is not a new decision. The measurements are in
-[`docs/audits/evidence/772/`](../audits/evidence/772/README.md) and, for
+[`docs/audits/evidence/772/`](https://github.com/redact-secret/redact-secret/blob/main/docs/audits/evidence/772/README.md) and, for
 performance and size budgets, in redact-secret-benchmarks
 ([#143](https://github.com/redact-secret/redact-secret-benchmarks/issues/143)).
 
