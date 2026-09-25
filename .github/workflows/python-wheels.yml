@@ -19,6 +19,9 @@ name: Python wheels
 
 on:
   pull_request:
+  push:
+    branches:
+      - "rc/*"
   workflow_dispatch:
   workflow_call:
     inputs:

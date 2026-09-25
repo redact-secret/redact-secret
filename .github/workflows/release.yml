@@ -65,11 +65,8 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # These call the qualification workflows as reusable workflows rather than
-  # duplicating their jobs, so every publish job below gates on the exact
-  # same commit this workflow is running for (`github.sha` is shared with
-  # the caller) instead of a separate, potentially-stale CI run on the same
-  # ref.
+  # Reuse qualification so publishers gate on this exact `github.sha`, not a
+  # separate, potentially stale run on the same ref.
   ci:
     name: CI
     uses: ./.github/workflows/ci.yml
