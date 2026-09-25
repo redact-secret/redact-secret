@@ -227,7 +227,7 @@ def require_installed_javascript_qualification(
         if not result.get("commands"):
             errors.append(f"{label}: records no commands")
         checks = result.get("results") or {}
-        for check in ("initialize", "scan", "incremental", "incrementalCorpus", "stream", "aiContextBoundary"):
+        for check in ("initialize", "scan", "incremental", "incrementalCorpus", "stream", "aiContextBoundary", "mcpBoundary"):
             if checks.get(check) != "passed":
                 errors.append(f"{label}: {check} did not pass")
         corpus = result.get("incrementalCorpus") or {}

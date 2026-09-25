@@ -171,5 +171,49 @@ await scenario(
   );
 }
 
+// An MCP-shaped result (#612): secrets in a text block, an embedded text
+// resource, and nested `structuredContent`. The host's own sinks, a log line
+// and a conversation store, receive only what `buildSafeContext` returned,
+// and the returned turn shares no object with the raw result, so nothing the
+// tool or SDK still holds can reach context, the log, or the store later.
+{
+  const mcpResult = {
+    content: [
+      { type: "text", text: `stdout: exported AWS_ACCESS_KEY_ID=${SYNTHETIC.awsKeyId}` },
+      { type: "resource", resource: { uri: "file:///synthetic/.env", mimeType: "text/plain", text: `API_KEY=${SYNTHETIC.apiKey}` } },
+    ],
+    structuredContent: { deploy: { steps: [{ env: [`Authorization: Bearer ${SYNTHETIC.bearer}`] }] } },
+  };
+  const rawObjects = new Set();
+  (function collect(node) {
+    if (node === null || typeof node !== "object") return;
+    rawObjects.add(node);
+    for (const child of Object.values(node)) collect(child);
+  })(mcpResult);
+  const log = [];
+  const store = [];
+  await scenario(
+    "MCP-shaped result reaches the model, the log, and the store only sanitized",
+    { turn: { userInput: "Deploy and report", callTool: async () => mcpResult } },
+    (result) => {
+      assert.equal(result.outcome, "ok");
+      log.push(`turn ${JSON.stringify(result.value)}`);
+      store.push(structuredClone(result.value));
+      assertNoSynthetic("log", log);
+      assertNoSynthetic("store", store);
+      const tool = result.value[1].content;
+      assert.equal(tool.content[0].text, "stdout: exported AWS_ACCESS_KEY_ID=<SECRET_1>");
+      assert.equal(tool.content[1].resource.text, "API_KEY=<SECRET_1>");
+      let shared = 0;
+      (function walk(node) {
+        if (node === null || typeof node !== "object") return;
+        if (rawObjects.has(node)) shared += 1;
+        for (const child of Object.values(node)) walk(child);
+      })(result.value);
+      assert.equal(shared, 0, "the sanitized turn shares no object with the raw tool result");
+    },
+  );
+}
+
 for (const { name, serialized } of checks) console.log(`ok - ${name}: ${serialized.slice(0, 160)}`);
 console.log(`\nAI-context reference: ${checks.length} scenarios passed, no synthetic secret crossed the boundary`);

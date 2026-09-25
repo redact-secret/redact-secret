@@ -35,12 +35,39 @@ export const AI_CONTEXT_BOUNDARY_FIXTURE = "conformance/fixtures/ai-context-boun
 const AI_CONTEXT_BOUNDARY_RUNNER = "conformance/ai-context-boundary.mjs";
 const AI_CONTEXT_BOUNDARY_STAGED = "ai-context-boundary.mjs";
 
+/**
+ * The supported MCP redaction boundary (issue #612), a thin specialization
+ * of the AI-context contract: its runner imports `./ai-context-boundary.mjs`,
+ * so both runners are staged side by side and the MCP fixture replays on the
+ * same installed package.
+ */
+export const MCP_BOUNDARY_FIXTURE = "conformance/fixtures/mcp-boundary.json";
+const MCP_BOUNDARY_RUNNER = "conformance/mcp-boundary.mjs";
+const MCP_BOUNDARY_STAGED = "mcp-boundary.mjs";
+
 function stageAiContextBoundary(consumerRoot) {
   copyFileSync(
     join(REPOSITORY_ROOT, AI_CONTEXT_BOUNDARY_RUNNER),
     join(consumerRoot, AI_CONTEXT_BOUNDARY_STAGED),
   );
   return JSON.parse(readFileSync(join(REPOSITORY_ROOT, AI_CONTEXT_BOUNDARY_FIXTURE), "utf8"));
+}
+
+function stageMcpBoundary(consumerRoot) {
+  copyFileSync(join(REPOSITORY_ROOT, MCP_BOUNDARY_RUNNER), join(consumerRoot, MCP_BOUNDARY_STAGED));
+  return JSON.parse(readFileSync(join(REPOSITORY_ROOT, MCP_BOUNDARY_FIXTURE), "utf8"));
+}
+
+function assertMcpBoundary(label, summary, fixture) {
+  const expected = { uninitialized: 0, initialized: 0 };
+  for (const testCase of fixture.cases) expected[testCase.phase ?? "initialized"] += 1;
+  if (
+    summary?.uninitialized?.cases !== expected.uninitialized ||
+    summary?.initialized?.cases !== expected.initialized ||
+    !(summary.initialized.pulledChunks > 0)
+  ) {
+    throw new Error(`${label}: MCP boundary contract replay was incomplete: ${JSON.stringify(summary)}`);
+  }
 }
 
 function assertAiContextBoundary(label, summary, fixture) {
@@ -245,11 +272,15 @@ export function qualifyNode(
     "const { createNodeStreamSanitizer } = await import('@redact-secret/core/node-stream');",
     "const { createServerHandler } = await import('./safe-integration/server.mjs');",
     `const { runAiContextBoundaryConformance } = await import('./${AI_CONTEXT_BOUNDARY_STAGED}');`,
+    `const { runMcpBoundaryConformance } = await import('./${MCP_BOUNDARY_STAGED}');`,
     INCREMENTAL_CORPUS_HELPERS,
     "const aiContextBoundaryFixture = JSON.parse(process.env.REDACT_SECRET_AI_CONTEXT_BOUNDARY);",
+    "const mcpBoundaryFixture = JSON.parse(process.env.REDACT_SECRET_MCP_BOUNDARY);",
     "const aiContextBoundaryUninitialized = runAiContextBoundaryConformance({ createIncrementalSanitizer, scanAndRedact }, aiContextBoundaryFixture, { phase: 'uninitialized' });",
+    "const mcpBoundaryUninitialized = await runMcpBoundaryConformance({ createIncrementalSanitizer, scanAndRedact }, mcpBoundaryFixture, { phase: 'uninitialized' });",
     "await initialize();",
     "const aiContextBoundaryInitialized = runAiContextBoundaryConformance({ createIncrementalSanitizer, scanAndRedact }, aiContextBoundaryFixture, { phase: 'initialized' });",
+    "const mcpBoundaryInitialized = await runMcpBoundaryConformance({ createIncrementalSanitizer, scanAndRedact }, mcpBoundaryFixture, { phase: 'initialized' });",
     "const fixtureInput = process.env.REDACT_SECRET_QUALIFICATION_INPUT;",
     "if (fixtureInput === undefined) throw new Error('qualification input is missing');",
     "const integrationFixtures = JSON.parse(process.env.REDACT_SECRET_INTEGRATION_FIXTURES);",
@@ -288,9 +319,10 @@ export function qualifyNode(
     "const eventText = JSON.stringify(events);",
     "const redactedMatch = integrationFixtures.redact.slice(redacted.findings[0].start, redacted.findings[0].end);",
     "const safeIntegration = { clean: clean.code === 'OK', redacted: redacted.code === 'OK' && forwarded[1] !== integrationFixtures.redact && !forwarded[1].includes(redactedMatch), warned: warned.code === 'SECRET_WARNING', blocked: blocked.code === 'SECRET_BLOCKED', failedClosed: failed.code === 'SCAN_FAILED', limited: limited.code === 'TRANSPORT_LIMIT_EXCEEDED', downstreamCalls: forwarded.length === 2, safeEvents: !Object.values(integrationFixtures).some((input) => eventText.includes(input)) };",
-    "console.log(JSON.stringify({ version: VERSION, artifact: artifact(), findings, incremental: incrementalText === expectedIncrementalText, incrementalCorpus: incrementalCorpusSummary, stream: streamText === scanAndRedact(streamInput).text, streamFindings: transform.findings.length, safeIntegration, aiContextBoundary: { uninitialized: aiContextBoundaryUninitialized, initialized: aiContextBoundaryInitialized } }));",
+    "console.log(JSON.stringify({ version: VERSION, artifact: artifact(), findings, incremental: incrementalText === expectedIncrementalText, incrementalCorpus: incrementalCorpusSummary, stream: streamText === scanAndRedact(streamInput).text, streamFindings: transform.findings.length, safeIntegration, aiContextBoundary: { uninitialized: aiContextBoundaryUninitialized, initialized: aiContextBoundaryInitialized }, mcpBoundary: { uninitialized: mcpBoundaryUninitialized, initialized: mcpBoundaryInitialized } }));",
   ].join("\n");
   const aiContextBoundaryFixture = stageAiContextBoundary(consumerRoot);
+  const mcpBoundaryFixture = stageMcpBoundary(consumerRoot);
   const output = execFileSync(
     process.execPath,
     ["--input-type=module", "--eval", source],
@@ -307,6 +339,7 @@ export function qualifyNode(
         ),
         REDACT_SECRET_INCREMENTAL_CORPUS: JSON.stringify(incrementalCorpus),
         REDACT_SECRET_AI_CONTEXT_BOUNDARY: JSON.stringify(aiContextBoundaryFixture),
+        REDACT_SECRET_MCP_BOUNDARY: JSON.stringify(mcpBoundaryFixture),
       },
     },
   );
@@ -347,6 +380,7 @@ export function qualifyNode(
     );
   }
   assertAiContextBoundary("Node lane", result.aiContextBoundary, aiContextBoundaryFixture);
+  assertMcpBoundary("Node lane", result.mcpBoundary, mcpBoundaryFixture);
   return {
     initialize: "passed",
     scan: "passed",
@@ -355,8 +389,10 @@ export function qualifyNode(
     stream: "passed",
     safeIntegration: "passed",
     aiContextBoundary: "passed",
+    mcpBoundary: "passed",
     incrementalCorpusSummary: result.incrementalCorpus,
     aiContextBoundarySummary: result.aiContextBoundary,
+    mcpBoundarySummary: result.mcpBoundary,
   };
 }
 
@@ -384,7 +420,8 @@ async function bundleForBrowser(consumerRoot) {
         `import { createWebStreamSanitizer } from "@redact-secret/core/web-stream";`,
         `import { prepareBrowserSubmission } from "./safe-integration/browser.mjs";`,
         `import { runAiContextBoundaryConformance } from "./${AI_CONTEXT_BOUNDARY_STAGED}";`,
-        "window.__secretScan = { createIncrementalSanitizer, createWebStreamSanitizer, initialize, prepareBrowserSubmission, runAiContextBoundaryConformance, scan, scanAndRedact, VERSION };",
+        `import { runMcpBoundaryConformance } from "./${MCP_BOUNDARY_STAGED}";`,
+        "window.__secretScan = { createIncrementalSanitizer, createWebStreamSanitizer, initialize, prepareBrowserSubmission, runAiContextBoundaryConformance, runMcpBoundaryConformance, scan, scanAndRedact, VERSION };",
       ].join("\n"),
       loader: "js",
       resolveDir: consumerRoot,
@@ -406,6 +443,7 @@ async function writeHarness(
   integrationFixtures,
   incrementalCorpus,
   aiContextBoundaryFixture,
+  mcpBoundaryFixture,
 ) {
   await writeFile(join(root, "bundle.js"), bundleText);
   await cp(installedWasmDir, join(root, "wasm"), { recursive: true });
@@ -419,9 +457,12 @@ async function writeHarness(
   (async () => {
     try {
       const aiContextBoundaryFixture = ${JSON.stringify(aiContextBoundaryFixture)};
+      const mcpBoundaryFixture = ${JSON.stringify(mcpBoundaryFixture)};
       const aiContextBoundaryUninitialized = window.__secretScan.runAiContextBoundaryConformance(window.__secretScan, aiContextBoundaryFixture, { phase: "uninitialized" });
+      const mcpBoundaryUninitialized = await window.__secretScan.runMcpBoundaryConformance(window.__secretScan, mcpBoundaryFixture, { phase: "uninitialized" });
       await window.__secretScan.initialize();
       const aiContextBoundaryInitialized = window.__secretScan.runAiContextBoundaryConformance(window.__secretScan, aiContextBoundaryFixture, { phase: "initialized" });
+      const mcpBoundaryInitialized = await window.__secretScan.runMcpBoundaryConformance(window.__secretScan, mcpBoundaryFixture, { phase: "initialized" });
       const findings = window.__secretScan.scan(${JSON.stringify(fixture.input)});
       const limits = ${JSON.stringify(LIMITS)};
       const incrementalCorpus = ${JSON.stringify(incrementalCorpus)};
@@ -496,6 +537,7 @@ async function writeHarness(
         streamFindings: transform.findings.length,
         safeIntegration,
         aiContextBoundary: { uninitialized: aiContextBoundaryUninitialized, initialized: aiContextBoundaryInitialized },
+        mcpBoundary: { uninitialized: mcpBoundaryUninitialized, initialized: mcpBoundaryInitialized },
       };
     } catch (error) {
       window.__qualifyResult = { ok: false, error: String((error && error.stack) || error) };
@@ -529,6 +571,7 @@ export async function qualifyBrowser(
   incrementalCorpus,
 ) {
   const aiContextBoundaryFixture = stageAiContextBoundary(consumerRoot);
+  const mcpBoundaryFixture = stageMcpBoundary(consumerRoot);
   const bundleText = await bundleForBrowser(consumerRoot);
   const harnessRoot = await mkdtemp(join(tmpdir(), "redact-secret-consumer-browser-"));
   const playwright = await import("playwright");
@@ -548,6 +591,7 @@ export async function qualifyBrowser(
       integrationFixtures,
       incrementalCorpus,
       aiContextBoundaryFixture,
+      mcpBoundaryFixture,
     );
 
     server = serveDirectory(harnessRoot);
@@ -601,6 +645,7 @@ export async function qualifyBrowser(
       );
     }
     assertAiContextBoundary(`Browser lane (${engine})`, result.aiContextBoundary, aiContextBoundaryFixture);
+    assertMcpBoundary(`Browser lane (${engine})`, result.mcpBoundary, mcpBoundaryFixture);
     return {
       initialize: "passed",
       scan: "passed",
@@ -609,8 +654,10 @@ export async function qualifyBrowser(
       stream: "passed",
       safeIntegration: "passed",
       aiContextBoundary: "passed",
+      mcpBoundary: "passed",
       incrementalCorpusSummary: result.incrementalCorpus,
       aiContextBoundarySummary: result.aiContextBoundary,
+      mcpBoundarySummary: result.mcpBoundary,
       engine,
       engineVersion: browser.version(),
     };

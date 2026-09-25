@@ -81,6 +81,17 @@ depend on `src/`.
   wheel; `ai-context-boundary.test.mjs` tests the runner itself against a
   fake core. Every input is synthetic and already present in
   `synchronous-corpus.json`.
+- [`fixtures/mcp-boundary.json`](./fixtures/mcp-boundary.json) — the
+  supported MCP redaction boundary's cases (issue #612,
+  [`docs/reference/mcp-boundary.md`](../docs/reference/mcp-boundary.md)), a
+  thin specialization of the AI-context fixture: `CallToolResult` traversal
+  (text, nested `structuredContent`, `_meta`, resources, binary content),
+  the key-context check, opt-in arguments, streamed results that stop
+  pulling on failure, cancellation, and the fixed MCP results every non-`ok`
+  outcome maps to. Replayed by [`mcp-boundary.mjs`](./mcp-boundary.mjs),
+  which composes `ai-context-boundary.mjs`, against the packed JavaScript
+  package (`scripts/consumer-harness.mjs`); `mcp-boundary.test.mjs` tests
+  it against a fake core.
 - [`fixtures/ruleset-reference.json`](./fixtures/ruleset-reference.json) —
   the reference declarative ruleset fixture (issue #495 and #484,
   `decision-define-declarative-detector-ruleset-contract`): a ruleset

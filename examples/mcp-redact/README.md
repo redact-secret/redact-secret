@@ -37,9 +37,14 @@ a package, `@redact-secret/adapter-ai-context`, owned by
 It implements the core's contract and qualifies by replaying the core's
 conformance fixture. The MCP-specific part here (which content blocks carry
 text, JSON-in-text, the fixed tool-error result, the two wrappers) is not a
-maintained package. The supported MCP boundary is #612, and its adapter is
-redact-secret-adapters#13. Copy this code out to use it; from then on you own
-the copy. The MCP SDK versions it is verified against are in
+maintained package, and it predates the supported
+[MCP redaction boundary contract](../../docs/reference/mcp-boundary.md)
+(#612), whose adapter is redact-secret-adapters#13. The contract lists where
+this example differs from it
+([The golden path today](../../docs/reference/mcp-boundary.md#the-golden-path-today)):
+binary blocks, `resource_link` fields, and `_meta` pass through unscanned
+here, JSON-in-text is parsed, and there is no key-context check. Copy this
+code out to use it; from then on you own the copy. The MCP SDK versions it is verified against are in
 [SDK versions](#sdk-versions); nothing here claims any other version.
 
 ## Files
@@ -168,7 +173,8 @@ fails closed.
 a call that ends up blocked. It gets exactly the contract's allowlisted
 fields (`id`, `type`, `detector`, `confidence`, `action`, `obfuscation`,
 `start`, `end`), never the input or a matched value. Tool arguments are
-labelled `context` until the MCP boundary (#612) names them. A throwing
+labelled `context` here; the MCP boundary contract (#612) names them
+`tool-arguments`. A throwing
 callback is swallowed and never influences the outcome.
 
 ## Arguments: opt-in, not automatic
