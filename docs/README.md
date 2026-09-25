@@ -29,6 +29,7 @@ the generated [support matrix](support-matrix.md).
 | What did the bounded reliability assessment observe? | [Detection reliability](reference/detection-reliability.md) |
 | Can I process a stream? | [Streaming](guides/streaming.md) |
 | What must an AI-context integration guarantee? | [AI-context boundary contract](reference/ai-context-boundary.md) |
+| Where does redaction belong in logging, tracing, or AI context? | [Reference architectures](guides/reference-architectures.md) |
 | How do I detect an in-house credential format? | [Declarative rulesets](guides/rulesets.md) |
 | Why did initialization or sanitization fail? | [Troubleshooting](troubleshooting.md) |
 | How do I report a false positive or missed detection safely? | [Reporting guide](guides/reporting-detection-issues.md) |

@@ -327,7 +327,7 @@ published type declarations / source, not from memory:
 
 Neither package is installed in this workspace: every wrapper here is
 duck-typed against these verified shapes, exactly like
-`examples/tracing-masking`'s `SpanProcessor` wrapper needs no OpenTelemetry
+`@redact-secret/adapter-otel`'s `SpanProcessor` wrapper needs no OpenTelemetry
 import. A real integration installs the SDK itself; see the JSDoc/docstring
 usage example at the top of `wrap-tool-call.mjs`/`wrap_tool_call.py`.
 

@@ -26,12 +26,12 @@ class RedactSecretFilter(logging.Filter):
     """Redacts a ``LogRecord`` in place and always returns ``True`` (never
     drops a record; a `block` finding replaces the affected text with a
     fixed marker instead, matching the JS `hooks.logMethod` integration's
-    ``BLOCK_MARKER`` behavior in ``../mask-leaf.mjs``).
+    ``BLOCK_MARKER`` behavior in ``@redact-secret/adapter-pino``).
 
     ``scan_and_redact`` is injected -- pass ``redact_secret.scan_and_redact``
     for the live integration, or a fake for tests (this module is
     testable without the built native extension, matching
-    ``../pino-hook.mjs``). ``extra_fields`` names attributes set via a log
+    ``createRedactingLogMethodWith`` in ``@redact-secret/adapter-pino``). ``extra_fields`` names attributes set via a log
     call's ``extra={...}`` kwarg to also redact if their value is a
     ``str``; unlisted attributes, and non-``str`` extras, are left
     untouched, since this filter never assumes a wire format wide enough

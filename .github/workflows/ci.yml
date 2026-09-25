@@ -284,6 +284,36 @@ jobs:
       - name: The pinned redact-secret-adapters commit must be on develop
         run: npm run adapter-pins:check:ancestry -- --adapters-branch develop
 
+  reference-architectures:
+    name: Reference architectures (registry and pinned installs)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    # The three commands docs/guides/reference-architectures.md documents,
+    # exactly as a reader runs them. Each installs from the npm registry (and
+    # the AI-context one also builds the pinned adapter tarballs), so they need
+    # the network and stay outside the offline `npm run ci`.
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version: 22
+
+      - name: Application logging (pino, released @redact-secret/adapter-pino)
+        run: npm run reference:logging
+
+      - name: OpenTelemetry tracing (released @redact-secret/adapter-otel)
+        run: npm run reference:tracing
+
+      - name: AI context construction (pinned @redact-secret/adapter-ai-context)
+        run: npm run reference:ai-context
+
   cross-repository-links:
     name: Cross-repository links (blob permalinks resolve)
     runs-on: ubuntu-latest

@@ -1,9 +1,10 @@
 """A deterministic stand-in for ``scan_and_redact``, shaped exactly like
 the real ``ScanResult`` (``.text``, ``.findings``, each finding's
-``.action``), keyed on magic substrings. Kept in sync by hand with
-``../fixtures/fake-scanner.mjs``; both implement the same four rules so
-``../fixtures/mask-secrets-cases.json`` means the same thing in either
-language.
+``.action``), keyed on magic substrings. The JavaScript side of this
+directory now runs the released ``@redact-secret/adapter-otel`` and
+``@redact-secret/adapter`` on the real core (``../smoke.mjs``), so this
+fake and ``../fixtures/mask-secrets-cases.json`` serve the Python suite
+only.
 
 - text containing ``BOOM`` raises (a simulated core failure).
 - text containing ``BLOCK_ME`` gets a ``block`` finding.

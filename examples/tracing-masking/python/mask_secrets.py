@@ -4,7 +4,8 @@ shaped exactly like Langfuse Python's legacy ``mask`` hook signature
 ``mask_secrets`` (see ``langfuse_mask.py``) is a drop-in
 ``Langfuse(mask=mask_secrets)``. This file never imports ``redact_secret``
 itself -- ``scan_and_redact`` is injected -- so it is testable without the
-built native extension, mirroring ``mask-secrets.mjs``.
+built native extension, mirroring ``maskSecretsWith`` in the released
+``@redact-secret/adapter``.
 """
 
 from __future__ import annotations

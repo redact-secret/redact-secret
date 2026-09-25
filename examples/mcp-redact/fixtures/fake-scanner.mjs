@@ -1,8 +1,8 @@
 /**
  * A deterministic stand-in for `scanAndRedact`, shaped exactly like the real
  * result (`{ text, findings }`, `finding.action`). Self-contained rather
- * than imported from `examples/tracing-masking/fixtures/fake-scanner.mjs` —
- * each example directory stands on its own — but implements the same four
+ * than imported from another example's fake scanner — each example
+ * directory stands on its own — but implements the same four
  * rules, by convention, so a reader who has seen one recognizes the other:
  *
  * - text containing `BOOM` throws (a simulated core failure).
