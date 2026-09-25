@@ -86,8 +86,9 @@ EVIDENCE_BASIS_COPY = {
 STATUS_COPY = {
     "stable": (
         "Officially supported. The family qualified in one of two ways: its format is "
-        "documented by the provider (`documented`), or it was checked against keys the "
-        "provider actually issued, with stricter test and behavior checks (`empirical`). "
+        "documented by the provider (`documented`), or several independent sources "
+        "corroborate it or it was checked against keys the provider actually issued, "
+        "with stricter test and behavior checks (`empirical`). "
         "An empirically qualified family is never described as provider-documented. You "
         "can rely on this family's detection and its precision behavior. Stable does not "
         "mean every historical or future variant of this credential is detected -- see "
@@ -122,6 +123,11 @@ REASON_GATE_GROUPS = {
     "empirical.minimumSubjects": "observations",
     "empirical.minimumIssuanceDates": "observations",
     "empirical.minimumCorroborationClasses": "observations",
+    "empirical.corroborated.minimumReferences": "corroboration",
+    "empirical.corroborated.minimumOwners": "corroboration",
+    "empirical.corroborated.minimumClasses": "corroboration",
+    "empirical.unresolvedContradictions": "contradictions",
+    "documented.providerSource": "source",
     "documented.minimumPositiveCases": "positives",
     "documented.minimumPositiveAxes": "positives",
     "empirical.minimumPositiveCases": "positives",
@@ -130,7 +136,12 @@ REASON_GATE_GROUPS = {
     "documented.minimumControlAxes": "controls",
     "empirical.minimumBenignCases": "controls",
     "empirical.minimumControlAxes": "controls",
+    "documented.minimumTwinPairs": "twins",
     "empirical.minimumTwinPairs": "twins",
+    "empirical.contextConstrained.minimumContextTwinPairs": "twins",
+    "empirical.contextConstrained.minimumConfusionAxes": "controls",
+    "empirical.contextConstrained.minimumFixtures": "fixtures",
+    "empirical.contextConstrained.supportsBareValues": "boundary",
     "empirical.supportedContexts": "boundary",
     "empirical.mode": "boundary",
     "empirical.uncertainty": "boundary",
@@ -138,18 +149,43 @@ REASON_GATE_GROUPS = {
     "positiveContractTier": "no-contract",
 }
 
-# The user-facing text for each group, in rendering order.
+# A `fixtureProfile <profile>: <actual> <cell> < <required> (<n> short)`
+# segment names fixture-profile debt (redact-secret-benchmarks'
+# `benchmarks/support/profiles.ts`); its cell label maps to a group here. Any
+# other `fixtureProfile` segment is unmapped and fails like an unknown gate.
+FIXTURE_PROFILE_DEBT = re.compile(
+    r"^fixtureProfile [a-z-]+: \d+ (?P<cell>[a-z/ -]+?) < \d+ \(\d+ short\)$"
+)
+FIXTURE_PROFILE_CELL_GROUPS = {
+    "total fixtures": "fixtures",
+    "positive/context cases": "positives",
+    "positive-context axes": "positives",
+    "non-twin benign controls": "controls",
+    "control axes": "controls",
+    "confusion axes": "controls",
+    "twin pairs": "twins",
+}
+
+# The user-facing text for each group, in rendering order. The corroborated
+# and observed empirical routes are alternatives (benchmarks
+# decision-qualify-empirical-stable-by-corroboration); when the corroborated
+# route is short, `user_facing_reason` names both routes in one phrase instead
+# of listing observations as a separate need.
 REASON_GROUP_COPY = (
+    ("corroboration", "independent corroboration of its format (several sources, or provider-issued keys)"),
     ("observations", "independent observations of provider-issued keys"),
+    ("source", "a provider-documented source"),
+    ("contradictions", "its conflicting format evidence settled"),
     ("positives", "broader positive test contexts"),
     ("controls", "more benign controls"),
     ("twins", "more near-miss twin pairs"),
+    ("fixtures", "more test fixtures overall"),
     ("boundary", "a defined supported-context boundary with its uncertainty stated"),
 )
 
 # A raw reason segment that names an evaluator gate: `profile.gate: ...`,
 # `qualificationProfile: ...` or `positiveContractTier T0 ...`.
-GATE_SEGMENT = re.compile(r"^(?:(?P<dotted>[a-z][A-Za-z]*\.[A-Za-z]+):|(?P<bare>[a-z][A-Za-z]+)(?=[: ]))")
+GATE_SEGMENT = re.compile(r"^(?:(?P<dotted>[a-z][A-Za-z]*(?:\.[A-Za-z]+)+):|(?P<bare>[a-z][A-Za-z]+)(?=[: ]))")
 
 
 def user_facing_reason(reason: str) -> str:
@@ -164,6 +200,17 @@ def user_facing_reason(reason: str) -> str:
     groups: list[str] = []
     free_text: list[str] = []
     for segment in (part.strip() for part in reason.split(" | ")):
+        if segment.startswith("fixtureProfile "):
+            debt = FIXTURE_PROFILE_DEBT.match(segment)
+            group = debt and FIXTURE_PROFILE_CELL_GROUPS.get(debt.group("cell"))
+            if not group:
+                raise ValueError(
+                    f"unmapped support-matrix gate {segment.split(':', 1)[0]!r}; add it to "
+                    "FIXTURE_PROFILE_CELL_GROUPS in scripts/generate-support-matrix-docs.py"
+                )
+            if group not in groups:
+                groups.append(group)
+            continue
         match = GATE_SEGMENT.match(segment)
         gate = match and (match.group("dotted") or match.group("bare"))
         if gate and ("." in gate or gate in REASON_GATE_GROUPS or segment.startswith(gate + ":")):
@@ -188,6 +235,8 @@ def user_facing_reason(reason: str) -> str:
             "Detected under project policy rather than a provider format, so it is not "
             "eligible for stable qualification."
         )
+    if "corroboration" in groups and "observations" in groups:
+        groups.remove("observations")
     needs = [copy for group, copy in REASON_GROUP_COPY if group in groups]
     if needs:
         listed = needs[0] if len(needs) == 1 else ", ".join(needs[:-1]) + " and " + needs[-1]

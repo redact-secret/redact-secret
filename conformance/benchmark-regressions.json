@@ -791,7 +791,7 @@
           "evidence": []
         }
       },
-      "note": "The benchmark reported the detector-coverage openai-token-shape-1/2/3 fixtures regressing from EXACT on published 0.1.0-beta.4 to a miss. Triage (PR #409, docs/audits/evidence/405/README.md) found no product defect: the miss is the intended, reviewed precision-contract narrowing from #367, already dispositioned under #402. The fixing commit changes no code and adds no conformance fixture, so canonicalFixtures is empty. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded. The corpus hash was re-pinned from e4186d51... to the detector-coverage hash at the resynced benchmarks/pin-manifest.json (benchmarks revision 0bceccd5, main e074c71) while both gates were still pending with no evidence recorded, so no measurement was invalidated."
+      "note": "The benchmark reported the detector-coverage openai-token-shape-1/2/3 fixtures regressing from EXACT on published 0.1.0-beta.4 to a miss. Triage (PR #409, docs/audits/evidence/405/README.md) found no product defect: the miss is the intended, reviewed precision-contract narrowing from #367, already dispositioned under #402. The fixing commit changes no code and adds no conformance fixture, so canonicalFixtures is empty. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded. The corpus hash was re-pinned from e4186d51... to the detector-coverage hash at the resynced benchmarks/pin-manifest.json (benchmarks revision 0bceccd5, main 25e31c8) while both gates were still pending with no evidence recorded, so no measurement was invalidated."
     },
     {
       "id": "benchmark-gap-406",
@@ -821,7 +821,7 @@
           "evidence": []
         }
       },
-      "note": "The benchmark reported the detector-coverage slack-token-shape-1 fixtures regressing from EXACT on published 0.1.0-beta.4 to a miss. Triage (PR #410, docs/audits/evidence/406/README.md) found no product defect: the miss is the intended, reviewed precision-contract narrowing from #367, already dispositioned under #402. The fixing commit changes no code and adds no conformance fixture, so canonicalFixtures is empty. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded. The corpus hash was re-pinned from e4186d51... to the detector-coverage hash at the resynced benchmarks/pin-manifest.json (benchmarks revision 0bceccd5, main e074c71) while both gates were still pending with no evidence recorded, so no measurement was invalidated."
+      "note": "The benchmark reported the detector-coverage slack-token-shape-1 fixtures regressing from EXACT on published 0.1.0-beta.4 to a miss. Triage (PR #410, docs/audits/evidence/406/README.md) found no product defect: the miss is the intended, reviewed precision-contract narrowing from #367, already dispositioned under #402. The fixing commit changes no code and adds no conformance fixture, so canonicalFixtures is empty. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded. The corpus hash was re-pinned from e4186d51... to the detector-coverage hash at the resynced benchmarks/pin-manifest.json (benchmarks revision 0bceccd5, main 25e31c8) while both gates were still pending with no evidence recorded, so no measurement was invalidated."
     },
     {
       "id": "benchmark-gap-407",
@@ -851,7 +851,7 @@
           "evidence": []
         }
       },
-      "note": "The benchmark reported the detector-coverage docker-token-shape-1 fixtures regressing from EXACT on published 0.1.0-beta.4 to a miss. Triage (PR #413, docs/audits/evidence/407/README.md) found no product defect: the miss is the intended, reviewed precision-contract narrowing from #367, already dispositioned under #402. The fixing commit changes no code and adds no conformance fixture, so canonicalFixtures is empty. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded. The corpus hash was re-pinned from e4186d51... to the detector-coverage hash at the resynced benchmarks/pin-manifest.json (benchmarks revision 0bceccd5, main e074c71) while both gates were still pending with no evidence recorded, so no measurement was invalidated."
+      "note": "The benchmark reported the detector-coverage docker-token-shape-1 fixtures regressing from EXACT on published 0.1.0-beta.4 to a miss. Triage (PR #413, docs/audits/evidence/407/README.md) found no product defect: the miss is the intended, reviewed precision-contract narrowing from #367, already dispositioned under #402. The fixing commit changes no code and adds no conformance fixture, so canonicalFixtures is empty. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded. The corpus hash was re-pinned from e4186d51... to the detector-coverage hash at the resynced benchmarks/pin-manifest.json (benchmarks revision 0bceccd5, main 25e31c8) while both gates were still pending with no evidence recorded, so no measurement was invalidated."
     },
     {
       "id": "benchmark-gap-408",
@@ -881,7 +881,7 @@
           "evidence": []
         }
       },
-      "note": "The benchmark reported the detector-coverage cloudflare-token-shape-1 fixtures regressing from EXACT on published 0.1.0-beta.4 to a miss. Triage (PR #412, docs/audits/evidence/408/README.md) found no product defect: the miss is the intended, reviewed precision-contract narrowing from #367, already dispositioned under #402. The fixing commit changes no code and adds no conformance fixture, so canonicalFixtures is empty. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded. The corpus hash was re-pinned from e4186d51... to the detector-coverage hash at the resynced benchmarks/pin-manifest.json (benchmarks revision 0bceccd5, main e074c71) while both gates were still pending with no evidence recorded, so no measurement was invalidated."
+      "note": "The benchmark reported the detector-coverage cloudflare-token-shape-1 fixtures regressing from EXACT on published 0.1.0-beta.4 to a miss. Triage (PR #412, docs/audits/evidence/408/README.md) found no product defect: the miss is the intended, reviewed precision-contract narrowing from #367, already dispositioned under #402. The fixing commit changes no code and adds no conformance fixture, so canonicalFixtures is empty. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded. The corpus hash was re-pinned from e4186d51... to the detector-coverage hash at the resynced benchmarks/pin-manifest.json (benchmarks revision 0bceccd5, main 25e31c8) while both gates were still pending with no evidence recorded, so no measurement was invalidated."
     },
     {
       "id": "benchmark-gap-551",
@@ -912,7 +912,7 @@
           "evidence": []
         }
       },
-      "note": "linear-token and slack-token matched an OAuth or rotation token shape embedded inside a wider identifier (trailing or dash-joined), one shared boundary root cause across several families. The fix (PR #562) makes the interim guards exact-length and adds embedding-rejection unit tests in the detector crates; it only adjusted existing slack and linear corpus fixtures to the new exact lengths and added no conformance fixture, so canonicalFixtures is empty. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded. The corpus hash was re-pinned from e4186d51... to the detector-coverage hash at the resynced benchmarks/pin-manifest.json (benchmarks revision 0bceccd5, main e074c71) while both gates were still pending with no evidence recorded, so no measurement was invalidated."
+      "note": "linear-token and slack-token matched an OAuth or rotation token shape embedded inside a wider identifier (trailing or dash-joined), one shared boundary root cause across several families. The fix (PR #562) makes the interim guards exact-length and adds embedding-rejection unit tests in the detector crates; it only adjusted existing slack and linear corpus fixtures to the new exact lengths and added no conformance fixture, so canonicalFixtures is empty. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded. The corpus hash was re-pinned from e4186d51... to the detector-coverage hash at the resynced benchmarks/pin-manifest.json (benchmarks revision 0bceccd5, main 25e31c8) while both gates were still pending with no evidence recorded, so no measurement was invalidated."
     },
     {
       "id": "benchmark-gap-552",
@@ -944,7 +944,7 @@
           "evidence": []
         }
       },
-      "note": "generic-token missed an api_key, password or client_secret assignment whose value sits inside markdown inline code. The fix (PR #561) repairs the inline-code assignment boundary; one synchronous regression case pins it. No incremental case was added. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded. The corpus hash was re-pinned from e4186d51... to the detector-coverage hash at the resynced benchmarks/pin-manifest.json (benchmarks revision 0bceccd5, main e074c71) while both gates were still pending with no evidence recorded, so no measurement was invalidated."
+      "note": "generic-token missed an api_key, password or client_secret assignment whose value sits inside markdown inline code. The fix (PR #561) repairs the inline-code assignment boundary; one synchronous regression case pins it. No incremental case was added. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded. The corpus hash was re-pinned from e4186d51... to the detector-coverage hash at the resynced benchmarks/pin-manifest.json (benchmarks revision 0bceccd5, main 25e31c8) while both gates were still pending with no evidence recorded, so no measurement was invalidated."
     },
     {
       "id": "benchmark-gap-670",
@@ -981,7 +981,7 @@
           "evidence": []
         }
       },
-      "note": "discord-bot-token missed the current three-segment bot token shapes (26/6/38 and 24/6/38). The fix (PR #676) accepts both; two positives pin the new-bot and reset-bot shapes and a negative keeps the 19-digit legacy id shape rejected. No incremental case was added. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded. The corpus hash was re-pinned from e4186d51... to the detector-coverage hash at the resynced benchmarks/pin-manifest.json (benchmarks revision 0bceccd5, main e074c71) while both gates were still pending with no evidence recorded, so no measurement was invalidated."
+      "note": "discord-bot-token missed the current three-segment bot token shapes (26/6/38 and 24/6/38). The fix (PR #676) accepts both; two positives pin the new-bot and reset-bot shapes and a negative keeps the 19-digit legacy id shape rejected. No incremental case was added. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded. The corpus hash was re-pinned from e4186d51... to the detector-coverage hash at the resynced benchmarks/pin-manifest.json (benchmarks revision 0bceccd5, main 25e31c8) while both gates were still pending with no evidence recorded, so no measurement was invalidated."
     },
     {
       "id": "benchmark-gap-671",
@@ -1026,7 +1026,7 @@
           "evidence": []
         }
       },
-      "note": "datadog-application-key missed current ddapp_-prefixed application keys. The fix (PR #679) adds the ddapp_ shape next to the keyword-gated legacy shape. The canonical cases are the 14 new ddapp_ positives, boundaries, negatives and adversarial cases the PR added; the PR's datadog-application-key-legacy-* cases are renamed or relocated pre-existing legacy fixtures and are not listed. No incremental case was added. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded. The corpus hash was re-pinned from e4186d51... to the detector-coverage hash at the resynced benchmarks/pin-manifest.json (benchmarks revision 0bceccd5, main e074c71) while both gates were still pending with no evidence recorded, so no measurement was invalidated."
+      "note": "datadog-application-key missed current ddapp_-prefixed application keys. The fix (PR #679) adds the ddapp_ shape next to the keyword-gated legacy shape. The canonical cases are the 14 new ddapp_ positives, boundaries, negatives and adversarial cases the PR added; the PR's datadog-application-key-legacy-* cases are renamed or relocated pre-existing legacy fixtures and are not listed. No incremental case was added. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded. The corpus hash was re-pinned from e4186d51... to the detector-coverage hash at the resynced benchmarks/pin-manifest.json (benchmarks revision 0bceccd5, main 25e31c8) while both gates were still pending with no evidence recorded, so no measurement was invalidated."
     },
     {
       "id": "benchmark-gap-672",
@@ -1056,7 +1056,7 @@
           "evidence": []
         }
       },
-      "note": "new-relic-license-key missed the current 32-hex FFFFNRAL license key shape and its EU-region variant. The fix (PR #682) adds the shape in crates/secret-scan-core/src/detectors/new_relic.rs with unit tests only; it added no conformance fixture, so canonicalFixtures is empty. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded. The corpus hash was re-pinned from e4186d51... to the detector-coverage hash at the resynced benchmarks/pin-manifest.json (benchmarks revision 0bceccd5, main e074c71) while both gates were still pending with no evidence recorded, so no measurement was invalidated."
+      "note": "new-relic-license-key missed the current 32-hex FFFFNRAL license key shape and its EU-region variant. The fix (PR #682) adds the shape in crates/secret-scan-core/src/detectors/new_relic.rs with unit tests only; it added no conformance fixture, so canonicalFixtures is empty. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded. The corpus hash was re-pinned from e4186d51... to the detector-coverage hash at the resynced benchmarks/pin-manifest.json (benchmarks revision 0bceccd5, main 25e31c8) while both gates were still pending with no evidence recorded, so no measurement was invalidated."
     },
     {
       "id": "benchmark-gap-714",
@@ -1086,7 +1086,7 @@
           "evidence": []
         }
       },
-      "note": "heroku-api-key-legacy flagged the value of a HEROKU_APP_ID public identifier. The fix (PR #715) excludes identifier-named keys from the legacy UUID gate; one synchronous negative pins it. No incremental case was added. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded. The corpus hash was re-pinned from e4186d51... to the detector-coverage hash at the resynced benchmarks/pin-manifest.json (benchmarks revision 0bceccd5, main e074c71) while both gates were still pending with no evidence recorded, so no measurement was invalidated."
+      "note": "heroku-api-key-legacy flagged the value of a HEROKU_APP_ID public identifier. The fix (PR #715) excludes identifier-named keys from the legacy UUID gate; one synchronous negative pins it. No incremental case was added. Both gates stay pending until supported-surface CI evidence and a fixed-candidate benchmark rerun are recorded. The corpus hash was re-pinned from e4186d51... to the detector-coverage hash at the resynced benchmarks/pin-manifest.json (benchmarks revision 0bceccd5, main 25e31c8) while both gates were still pending with no evidence recorded, so no measurement was invalidated."
     }
   ]
 }
