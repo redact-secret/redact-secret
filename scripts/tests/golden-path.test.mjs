@@ -14,6 +14,7 @@ import {
   USER_SECRET,
   importClosure,
   localImports,
+  realCoreTests,
   requireSanitized,
 } from "../qualify-golden-path.mjs";
 
@@ -118,4 +119,17 @@ test("the example README and the qualification guide document the same command",
   }
   const scripts = JSON.parse(await read("package.json")).scripts;
   assert.equal(scripts["golden-path:qualify"], "node scripts/qualify-golden-path.mjs");
+});
+
+test("the Node lane runs exactly the real-core tests the documented script names", async () => {
+  const scripts = JSON.parse(await read("package.json")).scripts;
+  const tests = realCoreTests(scripts);
+  assert.ok(tests.includes("streaming-tool-result.real-core.test.mjs"));
+  const closure = await importClosure(exampleRoot, tests[0]);
+  assert.ok(closure.has("agent-context.mjs") && closure.has("streaming-tool-result.mjs"));
+  assert.throws(() => realCoreTests({}), /names no examples\/mcp-redact test file/);
+  assert.throws(
+    () => realCoreTests({ "examples:real-core:test": "node --test examples/mcp-redact/sub/x.test.mjs" }),
+    /must sit in examples\/mcp-redact/,
+  );
 });

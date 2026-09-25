@@ -129,7 +129,11 @@ def golden_path_report(lane: str) -> dict:
         files = [_example_file(entry), _example_file("examples/mcp-redact/python/redact_tool_call.py")]
     else:
         entry = "examples/mcp-redact/agent-context.mjs"
-        files = [_example_file(entry), _example_file("examples/mcp-redact/redact-tool-call.mjs")]
+        files = [
+            _example_file(entry),
+            _example_file("examples/mcp-redact/redact-tool-call.mjs"),
+            _example_file("examples/mcp-redact/streaming-tool-result.real-core.test.mjs"),
+        ]
     report = clean_install_report(lane)
     return {
         "schemaVersion": 1,
@@ -151,6 +155,9 @@ def golden_path_report(lane: str) -> dict:
                 key=lambda p: p["name"],
             ),
         },
+        "realCoreTests": []
+        if lane == "python"
+        else ["examples/mcp-redact/streaming-tool-result.real-core.test.mjs"],
         "runtime": {"name": lane, "version": "1.0"},
         "loadedArtifact": RECORD.GOLDEN_PATH_ARTIFACT[lane],
         "binaries": report["binaries"],
@@ -505,6 +512,15 @@ class InventoryTests(unittest.TestCase):
         errors = self.golden_path_errors(stale)
         self.assertIn("golden path node: did not run this revision's examples/mcp-redact", errors)
         self.assertIn("golden path python: did not run this revision's examples/mcp-redact", errors)
+
+    def test_a_node_golden_path_without_the_real_core_tests_fails(self) -> None:
+        def skipped(artifacts: Artifacts) -> None:
+            artifacts.golden_path["node"]["realCoreTests"] = []
+
+        self.assertIn(
+            "golden path node: did not run this revision's real-core example tests",
+            self.golden_path_errors(skipped),
+        )
 
     def test_a_golden_path_on_unpinned_adapters_fails(self) -> None:
         def unpinned(artifacts: Artifacts) -> None:

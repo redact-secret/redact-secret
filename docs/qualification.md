@@ -513,7 +513,10 @@ not that the real engine keeps a credential out of the model's context. The
   packages (`adapters/pin-source.json`) from a local registry that serves
   only the candidate tarballs and the pinned adapter tarballs. Each adapter
   tarball must match its pinned content digest, and nothing comes from a
-  public registry. The installed core must load the addon.
+  public registry. The installed core must load the addon. The lane then
+  runs the example test files `npm run examples:real-core:test` names (the
+  streamed tool result on the real `IncrementalSanitizer`, #721) in the same
+  project against the same core.
 - `python` installs the candidate wheel into a fresh virtual environment
   with `PIP_NO_INDEX` and `PIP_FIND_LINKS`, and passes the installed
   `redact_secret.scan_and_redact` to the Python twin's `build_safe_context`.

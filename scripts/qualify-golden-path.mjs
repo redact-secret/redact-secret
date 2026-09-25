@@ -14,7 +14,11 @@
  *   candidate tarballs (`scripts/pack-npm-candidate.mjs`) and the pinned
  *   adapter tarballs (`adapters/pin-source.json`, verified against their
  *   content digests). Nothing comes from a public registry.
- *   `createGoldenPathBoundary()` then loads that installed core.
+ *   `createGoldenPathBoundary()` then loads that installed core. The lane
+ *   also runs the example's real-core tests -- the files
+ *   `npm run examples:real-core:test` names (#721, streamed tool output on the
+ *   real `IncrementalSanitizer`) -- in the same project, against the same
+ *   installed core.
  * - `--lane python` does the same for the Python twin
  *   (`python/agent_context.py` and its imports), installing the candidate
  *   wheel into a fresh virtual environment with `PIP_NO_INDEX` and
@@ -64,6 +68,20 @@ export const LANES = ["node", "python"];
 export const EXAMPLE_DIR = "examples/mcp-redact";
 export const ENTRY = { node: "agent-context.mjs", python: "python/agent_context.py" };
 const PIN_SOURCE = "adapters/pin-source.json";
+const REAL_CORE_SCRIPT = "examples:real-core:test";
+
+/**
+ * The example test files the `examples:real-core:test` script runs, relative
+ * to the example directory. Read from `package.json` so a real-core test
+ * added to that script runs here too, with no second list to keep in sync.
+ */
+export function realCoreTests(scripts) {
+  const command = String(scripts?.[REAL_CORE_SCRIPT] ?? "");
+  const tests = [...command.matchAll(/(?:^|\s)examples\/mcp-redact\/(\S+\.test\.mjs)(?=\s|$)/g)].map((match) => match[1]);
+  assert(tests.length > 0, `the ${REAL_CORE_SCRIPT} script names no ${EXAMPLE_DIR} test file`);
+  assert(tests.every((test) => !test.includes("/")), `the ${REAL_CORE_SCRIPT} tests must sit in ${EXAMPLE_DIR}`);
+  return tests;
+}
 
 // Synthetic values already used elsewhere in this repository: the
 // quickstart's revoked-context value and the AWS detector tests' example key
@@ -324,6 +342,9 @@ async function nodeLane(context) {
     await writeFile(join(project, "golden-path.mjs"), nodeDriver());
     const printed = await runDriver("node golden-path.mjs", project, env);
     requireSanitized(printed);
+    const tests = await runShell(`node --test ${context.realCoreTests.join(" ")}`, project, env);
+    if (tests.code !== 0) process.stderr.write(tests.stdout + tests.stderr);
+    assert(tests.code === 0, `the example's real-core tests (${context.realCoreTests.join(", ")}) failed on the installed core`);
     assert(
       fileURLToPath(printed.core).startsWith(join(project, "node_modules") + sep),
       "@redact-secret/core does not resolve inside the clean project",
@@ -335,6 +356,7 @@ async function nodeLane(context) {
       artifact: printed.artifact,
       files,
       adapters: adapters.record,
+      realCoreTests: context.realCoreTests.map((test) => `${EXAMPLE_DIR}/${test}`),
       packages: installed.packages,
       binaries: installed.binaries,
     };
@@ -390,6 +412,7 @@ async function pythonLane(context) {
     artifact: "native",
     files,
     adapters: null,
+    realCoreTests: [],
     packages: [{ name: "redact-secret", version: installed.version, file: installed.wheel, sha256: wheelSha256 }],
     binaries: [{ package: "redact-secret", file: installed.wheel, sha256: wheelSha256 }],
   };
@@ -399,12 +422,18 @@ async function main() {
   const options = parseArgs(process.argv.slice(2));
   if (process.platform === "win32") throw new Error(`${LABEL}: the driver runs POSIX shell commands`);
   const version = JSON.parse(await readFile(join(REPO_ROOT, "packages/javascript/package.json"), "utf8")).version;
-  const closure = await importClosure(join(REPO_ROOT, EXAMPLE_DIR), ENTRY[options.lane]);
+  const exampleRoot = join(REPO_ROOT, EXAMPLE_DIR);
+  const closure = await importClosure(exampleRoot, ENTRY[options.lane]);
+  const tests = [];
+  if (options.lane === "node") {
+    tests.push(...realCoreTests(JSON.parse(await readFile(join(REPO_ROOT, "package.json"), "utf8")).scripts));
+    for (const test of tests) for (const [path, bytes] of await importClosure(exampleRoot, test)) closure.set(path, bytes);
+  }
 
   const { parent, project } = await freshWorkspace(`redact-secret-golden-path-${options.lane}-`, LABEL);
   try {
     const lane = options.lane === "node" ? nodeLane : pythonLane;
-    const outcome = await lane({ project, parent, version, closure, candidateDir: options.candidateDir });
+    const outcome = await lane({ project, parent, version, closure, realCoreTests: tests, candidateDir: options.candidateDir });
     const report = {
       schemaVersion: 1,
       lane: options.lane,
@@ -413,12 +442,20 @@ async function main() {
       productVersion: version,
       example: { path: EXAMPLE_DIR, entry: `${EXAMPLE_DIR}/${ENTRY[options.lane]}`, files: outcome.files },
       adapters: outcome.adapters,
+      realCoreTests: outcome.realCoreTests,
       runtime: outcome.runtime,
       platform: `${process.platform}-${process.arch}`,
       loadedArtifact: outcome.artifact,
       packages: outcome.packages,
       binaries: outcome.binaries,
-      results: { install: "passed", contents: "passed", artifact: "passed", toolInput: "passed", sanitized: "passed" },
+      results: {
+        install: "passed",
+        contents: "passed",
+        artifact: "passed",
+        toolInput: "passed",
+        sanitized: "passed",
+        ...(options.lane === "node" ? { realCoreTests: "passed" } : {}),
+      },
     };
     if (options.report !== undefined) await writeFile(options.report, `${JSON.stringify(report, null, 2)}\n`);
     console.log(

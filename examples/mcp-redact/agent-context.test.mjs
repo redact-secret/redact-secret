@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { register } from "node:module";
 import test from "node:test";
 
 import { buildSafeContext, createGoldenPathBoundary, createGoldenPathBoundaryWith, EXAMPLE_LIMITS } from "./agent-context.mjs";
@@ -126,9 +127,22 @@ test("calling before initialize() fails closed with the core's own NOT_INITIALIZ
   assert.deepEqual(result, { outcome: "blocked", reason: "core_error", code: "NOT_INITIALIZED", stage: "input" });
 });
 
+// A resolve hook that fails `@redact-secret/core` the way a missing package
+// does, so the case below holds whether or not a core is resolvable from this
+// directory (a linked demo core, or the installed candidate the `golden-path`
+// qualification job runs these modules against).
+const UNLOADABLE_CORE = `data:text/javascript,${encodeURIComponent(`
+export async function resolve(specifier, context, nextResolve) {
+  if (specifier === "@redact-secret/core") {
+    throw Object.assign(new Error("Cannot find package '@redact-secret/core'"), { code: "ERR_MODULE_NOT_FOUND" });
+  }
+  return nextResolve(specifier, context);
+}
+`)}`;
+
 test("the live boundary fails closed when the core cannot be loaded, and never returns input", async () => {
-  // This example project installs no core (its tests inject one), so the
-  // live factory's core import fails: every operation is core_error.
+  // The live factory's core import fails, so every operation is core_error.
+  register(UNLOADABLE_CORE);
   const live = await createGoldenPathBoundary();
   const result = await buildSafeContext({ boundary: live, userInput: "SECRET_TOKEN_1" });
   assert.deepEqual(result, { outcome: "blocked", reason: "core_error", stage: "input" });

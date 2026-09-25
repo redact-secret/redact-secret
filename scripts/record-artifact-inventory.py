@@ -285,7 +285,7 @@ CLEAN_INSTALL_MAX_BUDGET_SECONDS = 300
 GOLDEN_PATH_EXAMPLE = Path("examples") / "mcp-redact"
 ADAPTER_PIN = Path("adapters") / "pin-source.json"
 GOLDEN_PATH_CHECKS = {
-    "node": ("install", "contents", "artifact", "toolInput", "sanitized"),
+    "node": ("install", "contents", "artifact", "toolInput", "sanitized", "realCoreTests"),
     "python": ("install", "contents", "artifact", "toolInput", "sanitized"),
 }
 GOLDEN_PATH_ARTIFACT = {"node": "addon", "python": "native"}
@@ -593,6 +593,9 @@ def require_golden_path_qualification(
         ]
         if record.get("path") != example or not files or record.get("entry") not in paths or stale:
             errors.append(f"{label}: did not run this revision's {example}")
+        real_core_tests = result.get("realCoreTests") or []
+        if lane == "node" and (not real_core_tests or not set(real_core_tests) <= set(paths)):
+            errors.append(f"{label}: did not run this revision's real-core example tests")
         if lane == "node" and result.get("adapters") != pinned_adapters:
             errors.append(f"{label}: did not install the adapters pinned in {ADAPTER_PIN.as_posix()}")
         if result.get("loadedArtifact") != GOLDEN_PATH_ARTIFACT[lane]:
