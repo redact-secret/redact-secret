@@ -849,6 +849,9 @@ fn is_colon_scope_identifier(separator: &str, value: &str) -> bool {
 /// unrelated identifier like `selfhosted`.
 const CODE_REFERENCE_ROOTS: &[&str] = &[
     "settings", "config", "cfg", "options", "self", "this", "var", "local", "data",
+    // Starlark, GitHub Actions and Nushell environment lookups
+    // (`env.DEPLOY_PASSWORD`, issue #817).
+    "env",
 ];
 
 fn starts_with_code_reference_root(value: &str) -> bool {
@@ -1107,6 +1110,72 @@ fn is_non_secret_reference(value: &str, form: ValueForm) -> bool {
         || is_vendor_prefixed_placeholder(value)
         || is_prefixed_filler(value)
         || starts_with_digest_label(value)
+        || is_html_escaped_angle_reference(value)
+        || is_aws_arn(value)
+        || (form == ValueForm::Quoted && is_string_concatenation_seam(value))
+        || is_quoted_reference(value, form)
+}
+
+/// `true` for an HTML-escaped `<...>` placeholder (`&lt;YOUR_PASSWORD&gt;`):
+/// the unescaped form is already excluded by [`starts_with_path_like`], and
+/// HTML-escaping is how that placeholder reaches a JSON or HTML document
+/// (issue #817). The whole value must be the escaped pair around a
+/// non-empty run without `<`, `>` or `&`.
+fn is_html_escaped_angle_reference(value: &str) -> bool {
+    value
+        .strip_prefix("&lt;")
+        .and_then(|rest| rest.strip_suffix("&gt;"))
+        .is_some_and(|inner| !inner.is_empty() && !inner.contains(['<', '>', '&']))
+}
+
+/// `true` for a whole AWS ARN,
+/// `arn:<aws|aws-cn|aws-us-gov>:<service>:<region?>:<account?>:<resource>`
+/// (`arn:aws:iam::aws:policy/IAMUserChangePassword`): an ARN names a
+/// resource and never contains its secret (issue #817). The Secrets Manager
+/// ARN rule above is the narrower case of the same fact.
+fn is_aws_arn(value: &str) -> bool {
+    let segments: Vec<&str> = value.splitn(6, ':').collect();
+    let [arn, partition, service, region, account, resource] = segments.as_slice() else {
+        return false;
+    };
+    *arn == "arn"
+        && is_aws_secretsmanager_partition(partition)
+        && !service.is_empty()
+        && service
+            .bytes()
+            .all(|byte| byte.is_ascii_lowercase() || byte.is_ascii_digit() || byte == b'-')
+        && (region.is_empty() || is_aws_region(region))
+        && (account.is_empty() || *account == "aws" || is_aws_account_id(account))
+        && !resource.is_empty()
+        && !resource.bytes().any(|byte| byte.is_ascii_whitespace())
+}
+
+/// `true` when a quoted "value" is the seam between two string literals
+/// joined by concatenation: the assignment's closing quote was really the
+/// end of one literal and the next quote opens another
+/// (`"Password: " + getPassword() + ","` yields ` + getPassword() + `,
+/// issue #817). The content must open and close with whitespace around a
+/// `+` or `.` operator.
+fn is_string_concatenation_seam(value: &str) -> bool {
+    let trimmed = value.trim_matches(|ch: char| ch == ' ' || ch == '\t');
+    trimmed.len() + 2 <= value.len()
+        && value.starts_with([' ', '\t'])
+        && value.ends_with([' ', '\t'])
+        && trimmed.len() >= 2
+        && trimmed.starts_with(['+', '.'])
+        && trimmed.ends_with(['+', '.'])
+}
+
+/// `true` when the value is one matching pair of `'`/`"` around a
+/// non-secret reference: shell quote juggling such as
+/// `DB_PASSWORD="'$DEPLOY_PASSWORD'"` leaves `'$DEPLOY_PASSWORD'` as the
+/// value (issue #817). A quoted literal inside the quotes stays detected.
+fn is_quoted_reference(value: &str, form: ValueForm) -> bool {
+    let bytes = value.as_bytes();
+    bytes.len() >= 3
+        && matches!(bytes[0], b'\'' | b'"')
+        && bytes[bytes.len() - 1] == bytes[0]
+        && is_non_secret_reference(&value[1..value.len() - 1], form)
 }
 
 /// The longest alphanumeric lead [`is_prefixed_filler`] allows before the
@@ -2525,6 +2594,36 @@ mod tests {
         // The deference ends with the URI's line.
         let input = "otpauth://totp/x?secret=SYNTHETICOTPAUTHSEEDVALUEQPWKYV\nhttps://api.example.test/r?access_token=SYNTHETICq8vN3xR7tLm2Kp9Wd";
         assert_eq!(only_value(input), "SYNTHETICq8vN3xR7tLm2Kp9Wd");
+    }
+
+    #[test]
+    fn escaped_placeholders_quoted_references_env_lookups_seams_and_arns_are_not_secrets() {
+        // Issue #817.
+        const V: &str = "SYNTHETICq8vN3xR7tLm2Kp9Wd";
+        for clean in [
+            "\"password\": \"&lt;YOUR_PASSWORD&gt;\"",
+            "- echo 'export DB_PASSWORD=\"'$DEPLOY_PASSWORD'\"' >> .env",
+            "password = env.DEPLOY_TEST_PASSWORD",
+            "sb.append(\"UserPassword: \" + getUserPassword() + \",\");",
+            "$msg = \"password: \" . $password . \"\\n\";",
+            "ChangePassword = \"arn:aws:iam::aws:policy/ChangePassword\"",
+            "secret_arn: arn:aws-us-gov:kms:us-gov-west-1:123456789012:key/SYNTHETIC-key-id",
+        ] {
+            assert!(detect(clean).is_empty(), "{clean}");
+        }
+        // Each exclusion needs the whole value in its shape.
+        for (input, value) in [
+            (
+                format!("\"password\": \"&lt;x&gt;{V}\""),
+                format!("&lt;x&gt;{V}"),
+            ),
+            (format!("DB_PASSWORD=\"'{V}'\""), format!("'{V}'")),
+            (format!("password = envx{V}"), format!("envx{V}")),
+            (format!("password = \"{V}+ x +\""), format!("{V}+ x +")),
+            (format!("password = \"arn:{V}\""), format!("arn:{V}")),
+        ] {
+            assert_eq!(only_value(&input), value, "{input}");
+        }
     }
 
     #[test]

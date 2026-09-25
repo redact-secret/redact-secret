@@ -1866,10 +1866,11 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 176,
+        "fixtureCount": 184,
         "hostContextsExercised": [
           "chat",
           "dotenv",
+          "github-actions",
           "http",
           "javascript",
           "json",
@@ -1937,9 +1938,12 @@
         "contextual-positive-template-prefix-only-still-detected",
         "contextual-positive-vals-scheme-prefix-still-detected",
         "generic-token-positive-unquoted-markdown-inline-code",
+        "generic-token-regression-arn-prefixed-literal",
         "generic-token-regression-escaped-json-string-assignment",
         "generic-token-regression-form-body-parameters",
         "generic-token-regression-go-short-assignment",
+        "generic-token-regression-html-escaped-pair-with-trailing-value",
+        "generic-token-regression-inner-quoted-literal",
         "generic-token-regression-objective-c-string-literal",
         "generic-token-regression-pkce-code-verifier",
         "generic-token-regression-placeholder-lead-word-random-suffix",
@@ -1967,10 +1971,11 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 176,
+        "fixtureCount": 184,
         "hostContextsExercised": [
           "chat",
           "dotenv",
+          "github-actions",
           "http",
           "javascript",
           "json",
@@ -2029,10 +2034,11 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 176,
+        "fixtureCount": 184,
         "hostContextsExercised": [
           "chat",
           "dotenv",
+          "github-actions",
           "http",
           "javascript",
           "json",

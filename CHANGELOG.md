@@ -119,6 +119,11 @@ evidence is linked from each published version.
   (warn) only as a query or form parameter. Parameters inside an
   `otpauth://` URI stay with `otpauth-uri`. A Firebase `?auth=` database
   secret, previously a documented gap, now warns (#816).
+- `generic-token` no longer redacts five non-secret values under
+  credential-like names: an HTML-escaped `&lt;...&gt;` placeholder, a
+  `'$VAR'` reference inside shell quote juggling, an `env.NAME` lookup, the
+  ` + expr + ` seam between concatenated string literals, and a whole AWS
+  ARN such as `arn:aws:iam::aws:policy/ChangePassword` (#817).
 
 ## 0.1.0-beta.8 — 2026-09-25
 
