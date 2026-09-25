@@ -36,9 +36,9 @@ on every push:
    identities rather than content digests, so this applies to every record.
 7. `pins.redactSecretVersion` is not older than this repository's own
    product version (package.json `version`). Reported as a non-blocking
-   warning, not an error: an `rc/{version}` branch bumps package.json before
-   publication, and redact-secret-benchmarks re-pins only after the version
-   is published, so blocking here would turn every release candidate red.
+   warning, not an error: a release-preparation change bumps package.json
+   before publication, and redact-secret-benchmarks re-pins only after the
+   version is published, so blocking here would turn every prepared release red.
    The blocking form of this rule is check 6 -- byte identity with the
    benchmarks copy carries whatever version that repository last pinned.
 
@@ -74,25 +74,27 @@ inside the fast, network-free `npm run ci` path (see the
    (`benchmarks/support-matrix-drift-schema.json` was a third vendored
    file; issue #605 (DS10) removed it instead of adding a check, since
    nothing in this repository ever read it.)
-6. `benchmarks/pin-manifest.json` itself (#637). Until this check existed,
+6. `benchmarks/pin-source.json` and `benchmarks/pin-manifest.json` (#637).
+   `pin-source.json` names the exact immutable benchmarks commit. Development
+   checks require it to be an ancestor of benchmarks `develop`; the
+   Release workflow requires it to be an ancestor of benchmarks `main`.
+   The vendored manifest must be byte-identical to the file at that commit.
+   Until this check existed,
    checks 1-5 never compared the vendored manifest with the benchmarks
    repository at all, so `benchmark-pins:check` stayed green while the copy
    was three pre-releases stale and named a revision (`f1d4fac`) at which
    the manifest did not even exist yet. Three facts are now required:
-   (a) the manifest's recorded `revision` is an ancestor of
-   redact-secret-benchmarks' main; (b) that revision contains
+   (a) the manifest's recorded `revision` is an ancestor of the pinned commit;
+   (b) that revision contains
    `benchmarks/pin-manifest.json`, i.e. the generator existed there; and
-   (c) the vendored content is byte-identical to the benchmarks copy on
-   BENCHMARKS_BRANCH, the same rule as check 5. The content is compared
-   against the branch head rather than against the file at `revision`
+   (c) the vendored content is byte-identical to the benchmarks copy at the
+   pinned commit, the same rule as check 5. The content is compared
+   against that exact later commit rather than against the file at `revision`
    because `generate-pin-manifest.mjs` records `git rev-parse HEAD` at
    generation time and the result is committed afterwards: the copy stored
-   *at* `revision` is always the previous generation, so "the file at
-   `revision`" can never equal the file that names it. Byte identity with
-   the branch head is the stricter and only well-defined form. It also
-   means a benchmarks corpus regeneration turns this job red until someone
-   runs `npm run benchmark-pins:sync` here; that is the intended cadence --
-   an unbounded lag is exactly what #637 found.
+   *at* `revision` is always the previous generation. Exact-commit identity
+   makes benchmark movement deliberate instead of coupling product CI to a
+   mutable branch head.
 
 Like `reconcile-guard.py`'s `is_ancestor` and the counterpart
 redact-secret-benchmarks#15 check (`benchmarks/lib/pin-drift.ts`), the
@@ -103,9 +105,8 @@ repository, no network needed) and the GitHub compare and contents APIs for
 checks 3, 5, and 6 (the other repository, where only a live query can
 answer).
 
-`--sync` rewrites both vendored files from their declared upstream refs before
-running the offline checks, so re-pinning is one command
-(`npm run benchmark-pins:sync`) rather than a hand-copy.
+`--sync --ref <40-sha>` rewrites the manifest from that exact commit, records
+the commit in `pin-source.json`, and refreshes the independently pinned schema.
 """
 
 from __future__ import annotations
@@ -121,12 +122,14 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 MANIFEST_PATH = Path("benchmarks") / "pin-manifest.json"
+PIN_SOURCE_PATH = Path("benchmarks") / "pin-source.json"
 LEDGER_PATH = Path("conformance") / "benchmark-regressions.json"
 SUPPORT_MATRIX_SCHEMA_PATH = Path("benchmarks") / "support-matrix-schema.json"
 PRODUCT_MANIFEST_PATH = Path("package.json")
 DETECTORS_PATH = "crates/secret-scan-core/src/detectors"
 BENCHMARKS_REPO = "redact-secret/redact-secret-benchmarks"
 BENCHMARKS_BRANCH = "main"
+BENCHMARKS_DEVELOP_BRANCH = "develop"
 # Where each vendored copy lives in redact-secret-benchmarks itself. The
 # manifest keeps its path; redact-secret-benchmarks#133 moved the schema out
 # of that repository's own `benchmarks/`.
@@ -141,8 +144,10 @@ BENCHMARKS_SUPPORT_MATRIX_SCHEMA_PATH = "schemas/support-matrix-v1.json"
 BENCHMARKS_SUPPORT_MATRIX_SCHEMA_REF = "cfaeac4d83a4c98cffd77328d3416eb920a7d25b"
 # (local vendored path, upstream path, upstream ref) for every file `--sync`
 # rewrites and checks 5 and 6 compare byte-for-byte.
-VENDORED_FILES: tuple[tuple[Path, str, str], ...] = (
-    (MANIFEST_PATH, BENCHMARKS_MANIFEST_PATH, BENCHMARKS_BRANCH),
+VENDORED_FILES: tuple[tuple[Path, str, str | None], ...] = (
+    # The manifest ref is the exact commit in PIN_SOURCE_PATH, supplied by
+    # sync_vendored_files. None deliberately means "never use a live branch".
+    (MANIFEST_PATH, BENCHMARKS_MANIFEST_PATH, None),
     (
         SUPPORT_MATRIX_SCHEMA_PATH,
         BENCHMARKS_SUPPORT_MATRIX_SCHEMA_PATH,
@@ -162,10 +167,21 @@ SEMVER = re.compile(
     r"^(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)"
     r"(?:-(?P<pre>[0-9A-Za-z.-]+))?(?:\+[0-9A-Za-z.-]+)?$"
 )
+COMMIT = re.compile(r"^[0-9a-f]{40}$")
 
 
 def load_json(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def benchmark_commit(pin_source: dict) -> str:
+    """Return the immutable benchmarks commit named by the local pin record."""
+    if set(pin_source) != {"schemaVersion", "benchmarkCommit"} or pin_source.get("schemaVersion") != 1:
+        raise ValueError(f"{PIN_SOURCE_PATH} must contain only schemaVersion 1 and benchmarkCommit")
+    commit = pin_source.get("benchmarkCommit")
+    if not isinstance(commit, str) or COMMIT.fullmatch(commit) is None:
+        raise ValueError(f"{PIN_SOURCE_PATH} benchmarkCommit must be a full 40-character lower-case hex commit id")
+    return commit
 
 
 def benchmark_revalidation_passed(record: dict) -> bool:
@@ -406,24 +422,33 @@ def check_schema_drift(local_content: str, live_content: str, *, live_source: st
 def check_manifest_provenance(
     manifest: dict,
     *,
+    pinned_commit: str,
+    benchmark_branch: str,
+    pinned_commit_is_ancestor: bool,
     revision_is_ancestor: bool,
     revision_has_manifest: bool,
     local_content: str,
     live_content: str,
     live_source: str,
 ) -> list[str]:
-    """Check 6: the vendored manifest names a real benchmarks revision that
-    already carried the manifest, and matches the benchmarks copy byte for
-    byte. Facts are supplied by the caller (see the module docstring);
+    """Check 6: the immutable benchmark commit is on the selected promotion
+    branch, the vendored manifest names an earlier real benchmarks revision
+    that already carried the manifest, and its bytes match the file at the
+    immutable commit. Facts are supplied by the caller (see the module docstring);
     `revision_has_manifest` is only meaningful -- and only reported -- when
     the revision is an ancestor, since a commit outside that history has no
     tree to look in."""
     errors: list[str] = []
     revision = manifest.get("revision", "<unknown>")
+    if not pinned_commit_is_ancestor:
+        errors.append(
+            f"{PIN_SOURCE_PATH} benchmarkCommit ({pinned_commit}) is not an ancestor of "
+            f"{BENCHMARKS_REPO}@{benchmark_branch}"
+        )
     if not revision_is_ancestor:
         errors.append(
             f"{MANIFEST_PATH} revision ({revision}) is not a recorded ancestor of "
-            f"{BENCHMARKS_REPO}@{BENCHMARKS_BRANCH}"
+            f"the pinned benchmark commit {pinned_commit}"
         )
     elif not revision_has_manifest:
         errors.append(
@@ -453,28 +478,47 @@ def resolve_ancestry_facts(root: Path, manifest: dict, ledger: dict) -> dict:
     }
 
 
-def resolve_manifest_provenance_facts(root: Path, manifest: dict) -> dict:
+def resolve_manifest_provenance_facts(
+    root: Path, manifest: dict, pinned_commit: str, benchmark_branch: str
+) -> dict:
     revision = manifest["revision"]
-    is_ancestor = gh_compare_is_ancestor(BENCHMARKS_REPO, revision, BENCHMARKS_BRANCH)
+    is_ancestor = gh_compare_is_ancestor(BENCHMARKS_REPO, revision, pinned_commit)
     has_manifest = (
         gh_path_exists(BENCHMARKS_REPO, revision, BENCHMARKS_MANIFEST_PATH) if is_ancestor else False
     )
     return {
+        "pinned_commit": pinned_commit,
+        "benchmark_branch": benchmark_branch,
+        "pinned_commit_is_ancestor": gh_compare_is_ancestor(
+            BENCHMARKS_REPO, pinned_commit, benchmark_branch
+        ),
         "revision_is_ancestor": is_ancestor,
         "revision_has_manifest": has_manifest,
         "local_content": (root / MANIFEST_PATH).read_text(encoding="utf-8"),
-        "live_content": gh_fetch_file(BENCHMARKS_REPO, BENCHMARKS_BRANCH, BENCHMARKS_MANIFEST_PATH),
-        "live_source": f"{BENCHMARKS_REPO}@{BENCHMARKS_BRANCH}:{BENCHMARKS_MANIFEST_PATH}",
+        "live_content": gh_fetch_file(BENCHMARKS_REPO, pinned_commit, BENCHMARKS_MANIFEST_PATH),
+        "live_source": f"{BENCHMARKS_REPO}@{pinned_commit}:{BENCHMARKS_MANIFEST_PATH}",
     }
 
 
 def sync_vendored_files(
-    root: Path, fetch: Callable[[str, str, str], str] = gh_fetch_file
+    root: Path,
+    pinned_commit: str,
+    fetch: Callable[[str, str, str], str] = gh_fetch_file,
 ) -> list[tuple[Path, str]]:
-    """Rewrite every vendored copy from its declared upstream ref."""
+    """Rewrite every vendored copy, using one exact commit for the manifest."""
+    if COMMIT.fullmatch(pinned_commit) is None:
+        raise ValueError("--ref must be a full 40-character lower-case hex commit id")
+    fetched: list[tuple[Path, str, str]] = []
+    for local_path, upstream_path, declared_ref in VENDORED_FILES:
+        upstream_ref = pinned_commit if declared_ref is None else declared_ref
+        fetched.append((local_path, upstream_ref, fetch(BENCHMARKS_REPO, upstream_ref, upstream_path)))
+
+    (root / PIN_SOURCE_PATH).write_text(
+        json.dumps({"schemaVersion": 1, "benchmarkCommit": pinned_commit}, indent=2) + "\n",
+        encoding="utf-8",
+    )
     written: list[tuple[Path, str]] = []
-    for local_path, upstream_path, upstream_ref in VENDORED_FILES:
-        content = fetch(BENCHMARKS_REPO, upstream_ref, upstream_path)
+    for local_path, upstream_ref, content in fetched:
         (root / local_path).write_text(content, encoding="utf-8")
         written.append((local_path, upstream_ref))
     return written
@@ -499,14 +543,30 @@ def main(argv: list[str] | None = None) -> int:
             "needs `gh api` access"
         ),
     )
+    parser.add_argument(
+        "--benchmark-branch",
+        choices=(BENCHMARKS_DEVELOP_BRANCH, BENCHMARKS_BRANCH),
+        default=BENCHMARKS_DEVELOP_BRANCH,
+        help="branch that must contain benchmarkCommit (develop for development; main only for release promotion)",
+    )
+    parser.add_argument(
+        "--ref",
+        help="exact 40-character redact-secret-benchmarks commit to store and sync; valid only with --sync",
+    )
     args = parser.parse_args(argv)
     root = args.root.resolve()
 
     if args.sync:
-        for path, upstream_ref in sync_vendored_files(root):
+        if args.ref is None:
+            parser.error("--sync requires --ref with an exact 40-character commit")
+        for path, upstream_ref in sync_vendored_files(root, args.ref):
             print(f"SYNCED {path} from {BENCHMARKS_REPO}@{upstream_ref}")
+        print(f"PINNED {PIN_SOURCE_PATH} to {args.ref}")
+    elif args.ref is not None:
+        parser.error("--ref is valid only with --sync")
 
     manifest = load_json(root / MANIFEST_PATH)
+    pinned_commit = benchmark_commit(load_json(root / PIN_SOURCE_PATH))
     ledger = load_json(root / LEDGER_PATH)
     product_version = load_json(root / PRODUCT_MANIFEST_PATH)["version"]
 
@@ -530,7 +590,12 @@ def main(argv: list[str] | None = None) -> int:
         )
         errors += check_schema_drift(local_schema, live_schema, live_source=live_source)
 
-        errors += check_manifest_provenance(manifest, **resolve_manifest_provenance_facts(root, manifest))
+        errors += check_manifest_provenance(
+            manifest,
+            **resolve_manifest_provenance_facts(
+                root, manifest, pinned_commit, args.benchmark_branch
+            ),
+        )
 
     for warning in warnings:
         print(f"WARNING {warning}")

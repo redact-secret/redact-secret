@@ -168,10 +168,12 @@ complete the delivery checks after a platform has been chosen.
 
 ## Branching strategy
 
-`main` is the integration branch. Merge normal development from working
-branches through pull requests. Release candidates live on `rc/<version>`
-branches; the [release runbook's branching model](docs/releasing.md#branching-model)
-defines how they are cut, fixed, published, reconciled, and merged back.
+`main` is the integration and release-source branch. Merge normal development,
+version preparation, and release fixes from working branches through pull
+requests. Qualify an exact merged commit, publish from `main`, and use the
+resulting annotated version tag's peeled commit as the immutable release
+identity. The [release runbook's branching model](docs/releasing.md#branching-model)
+defines qualification, publication, reconciliation, and closeout.
 
 ## Releases
 

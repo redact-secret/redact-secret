@@ -277,11 +277,14 @@ class SchemaDriftTests(unittest.TestCase):
 
 def provenance(**overrides) -> dict:
     facts = {
+        "pinned_commit": "p" * 40,
+        "benchmark_branch": "develop",
+        "pinned_commit_is_ancestor": True,
         "revision_is_ancestor": True,
         "revision_has_manifest": True,
         "local_content": '{"revision": "r"}\n',
         "live_content": '{"revision": "r"}\n',
-        "live_source": "redact-secret-benchmarks@main:benchmarks/pin-manifest.json",
+        "live_source": f"redact-secret-benchmarks@{'p' * 40}:benchmarks/pin-manifest.json",
     }
     facts.update(overrides)
     return facts
@@ -296,6 +299,14 @@ class ManifestProvenanceTests(unittest.TestCase):
         self.assertEqual(len(errors), 1)
         self.assertIn("r" * 40, errors[0])
         self.assertIn("not a recorded ancestor", errors[0])
+
+    def test_flags_a_pinned_commit_outside_the_selected_promotion_branch(self) -> None:
+        errors = CHECK.check_manifest_provenance(
+            MANIFEST, **provenance(pinned_commit_is_ancestor=False)
+        )
+        self.assertEqual(len(errors), 1)
+        self.assertIn(str(CHECK.PIN_SOURCE_PATH), errors[0])
+        self.assertIn("@develop", errors[0])
 
     def test_does_not_also_report_a_missing_file_for_a_revision_outside_the_history(self) -> None:
         """A commit outside main has no tree to look in; one error, not two."""
@@ -316,7 +327,7 @@ class ManifestProvenanceTests(unittest.TestCase):
         errors = CHECK.check_manifest_provenance(MANIFEST, **provenance(live_content='{"revision": "s"}\n'))
         self.assertEqual(len(errors), 1)
         self.assertIn(str(CHECK.MANIFEST_PATH), errors[0])
-        self.assertIn("redact-secret-benchmarks@main:benchmarks/pin-manifest.json", errors[0])
+        self.assertIn(f"redact-secret-benchmarks@{'p' * 40}:benchmarks/pin-manifest.json", errors[0])
         self.assertIn("benchmark-pins:sync", errors[0])
 
     def test_reports_provenance_and_drift_independently(self) -> None:
@@ -350,18 +361,19 @@ class SyncVendoredFilesTests(unittest.TestCase):
             requested.append((repo, ref, path))
             return f"fresh {path}\n"
 
-        written = CHECK.sync_vendored_files(root, fetch)
+        pinned = "a" * 40
+        written = CHECK.sync_vendored_files(root, pinned, fetch)
         self.assertEqual(
             written,
             [
-                (CHECK.MANIFEST_PATH, CHECK.BENCHMARKS_BRANCH),
+                (CHECK.MANIFEST_PATH, pinned),
                 (CHECK.SUPPORT_MATRIX_SCHEMA_PATH, CHECK.BENCHMARKS_SUPPORT_MATRIX_SCHEMA_REF),
             ],
         )
         self.assertEqual(
             requested,
             [
-                (CHECK.BENCHMARKS_REPO, CHECK.BENCHMARKS_BRANCH, CHECK.BENCHMARKS_MANIFEST_PATH),
+                (CHECK.BENCHMARKS_REPO, pinned, CHECK.BENCHMARKS_MANIFEST_PATH),
                 (
                     CHECK.BENCHMARKS_REPO,
                     CHECK.BENCHMARKS_SUPPORT_MATRIX_SCHEMA_REF,
@@ -371,9 +383,17 @@ class SyncVendoredFilesTests(unittest.TestCase):
         )
         self.assertEqual((root / CHECK.MANIFEST_PATH).read_text(encoding="utf-8"), "fresh benchmarks/pin-manifest.json\n")
         self.assertEqual(
+            CHECK.benchmark_commit(CHECK.load_json(root / CHECK.PIN_SOURCE_PATH)), pinned
+        )
+        self.assertEqual(
             (root / CHECK.SUPPORT_MATRIX_SCHEMA_PATH).read_text(encoding="utf-8"),
             "fresh schemas/support-matrix-v1.json\n",
         )
+
+    def test_rejects_a_moving_or_abbreviated_sync_ref_before_fetching(self) -> None:
+        for ref in ("main", "develop", "abc123"):
+            with self.assertRaisesRegex(ValueError, "full 40-character"):
+                CHECK.sync_vendored_files(Path("/unused"), ref, lambda *_: "unreachable")
 
 
 # -- local git ancestry helpers, against a real, deterministic history -----

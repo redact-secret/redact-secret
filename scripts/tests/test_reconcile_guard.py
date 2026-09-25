@@ -25,8 +25,8 @@ VERSION = "0.1.0-beta.1"
 class ReconcileGuardTests(unittest.TestCase):
     """Exercises the guard against a real, deterministic git history.
 
-    Main stops at base. The RC adds ancestor -> tip before being merged back.
-    A sibling RC carries a commit outside the candidate's recovery history.
+    Main contains ancestor -> tip. A sibling branch carries a commit outside
+    main's recovery history.
     No test creates a tag or publishes anything.
     """
 
@@ -38,12 +38,11 @@ class ReconcileGuardTests(unittest.TestCase):
         self._git("config", "user.email", "reconcile-guard-tests@example.invalid")
         self._git("config", "user.name", "reconcile-guard-tests")
         self.base = self._commit("base.txt", "base")
-        self._git("checkout", "-q", "-b", f"rc/{VERSION}")
         self.ancestor = self._commit("ancestor.txt", "ancestor")
         self.tip = self._commit("tip.txt", "tip")
-        self._git("checkout", "-q", "-b", "rc/9.9.9", self.base)
+        self._git("checkout", "-q", "-b", "off-main", self.base)
         self.off_candidate = self._commit("off.txt", "other candidate")
-        self._git("checkout", "-q", f"rc/{VERSION}")
+        self._git("checkout", "-q", "main")
 
     def _git(self, *args: str) -> None:
         subprocess.run(["git", "-C", str(self.repo), *args], check=True, capture_output=True)
@@ -78,7 +77,7 @@ class ReconcileGuardTests(unittest.TestCase):
         result = RECONCILE_GUARD.evaluate(
             RECONCILE_GUARD.load_manifest(manifest),
             repo=self.repo,
-            candidate_ref=f"refs/heads/rc/{VERSION}",
+            candidate_ref="refs/heads/main",
             version=VERSION,
         )
         self.assertTrue(result.ok)
@@ -92,7 +91,7 @@ class ReconcileGuardTests(unittest.TestCase):
         result = RECONCILE_GUARD.evaluate(
             RECONCILE_GUARD.load_manifest(manifest),
             repo=self.repo,
-            candidate_ref=f"refs/heads/rc/{VERSION}",
+            candidate_ref="refs/heads/main",
             version=VERSION,
         )
         self.assertTrue(result.ok)
@@ -105,7 +104,7 @@ class ReconcileGuardTests(unittest.TestCase):
         result = RECONCILE_GUARD.evaluate(
             RECONCILE_GUARD.load_manifest(manifest),
             repo=self.repo,
-            candidate_ref=f"refs/heads/rc/{VERSION}",
+            candidate_ref="refs/heads/main",
             version=VERSION,
         )
         self.assertFalse(result.ok)
@@ -120,7 +119,7 @@ class ReconcileGuardTests(unittest.TestCase):
         result = RECONCILE_GUARD.evaluate(
             RECONCILE_GUARD.load_manifest(missing),
             repo=self.repo,
-            candidate_ref=f"refs/heads/rc/{VERSION}",
+            candidate_ref="refs/heads/main",
             version=VERSION,
         )
         self.assertFalse(result.ok)
@@ -135,7 +134,7 @@ class ReconcileGuardTests(unittest.TestCase):
         result = RECONCILE_GUARD.evaluate(
             RECONCILE_GUARD.load_manifest(manifest),
             repo=self.repo,
-            candidate_ref=f"refs/heads/rc/{VERSION}",
+            candidate_ref="refs/heads/main",
             version=VERSION,
         )
         self.assertFalse(result.ok)
@@ -145,7 +144,7 @@ class ReconcileGuardTests(unittest.TestCase):
         result = RECONCILE_GUARD.evaluate(
             None,
             repo=self.repo,
-            candidate_ref=f"refs/heads/rc/{VERSION}",
+            candidate_ref="refs/heads/main",
             version=VERSION,
             source_commit_override=self.ancestor,
         )
@@ -157,7 +156,7 @@ class ReconcileGuardTests(unittest.TestCase):
         result = RECONCILE_GUARD.evaluate(
             None,
             repo=self.repo,
-            candidate_ref=f"refs/heads/rc/{VERSION}",
+            candidate_ref="refs/heads/main",
             version=VERSION,
             source_commit_override=self.off_candidate,
         )

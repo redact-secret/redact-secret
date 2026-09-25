@@ -15,8 +15,8 @@ sys.modules[SPEC.name] = CHECK
 SPEC.loader.exec_module(CHECK)
 
 GUARD_STEP = (
-    "      - name: Require a release candidate branch\n"
-    "        if: ${{ !startsWith(github.ref, 'refs/heads/rc/') }}\n"
+    "      - name: Require main as the release source\n"
+    "        if: ${{ github.ref != 'refs/heads/main' }}\n"
     "        run: exit 1\n"
     '      - run: python3 -B scripts/check-release-refs.py --candidate-ref "$GITHUB_REF"\n'
 )
@@ -93,7 +93,7 @@ class ValidateTests(unittest.TestCase):
 
         errors = self.run_validate(mutate)
         self.assertTrue(
-            any("publish" in error and "does not reject non-RC refs" in error for error in errors)
+            any("publish" in error and "does not require main" in error for error in errors)
         )
 
     def test_publish_crates_without_guard_fails(self) -> None:
@@ -102,7 +102,7 @@ class ValidateTests(unittest.TestCase):
 
         errors = self.run_validate(mutate)
         self.assertTrue(
-            any("publish-crates" in error and "does not reject non-RC refs" in error for error in errors)
+            any("publish-crates" in error and "does not require main" in error for error in errors)
         )
 
     def test_reconcile_without_guard_fails(self) -> None:
@@ -111,7 +111,7 @@ class ValidateTests(unittest.TestCase):
 
         errors = self.run_validate(mutate)
         self.assertTrue(
-            any("reconcile" in error and "does not reject non-RC refs" in error for error in errors)
+            any("reconcile" in error and "does not require main" in error for error in errors)
         )
 
     def test_missing_reconcile_job_fails(self) -> None:
@@ -132,7 +132,7 @@ class ValidateTests(unittest.TestCase):
         for job in CHECK.RELEASE_JOBS:
             with self.subTest(job=job):
                 errors = self.run_validate(lambda repo: repo.release_jobs.update({job: False}))
-                self.assertTrue(any(job in error and "non-RC refs" in error for error in errors))
+                self.assertTrue(any(job in error and "require main" in error for error in errors))
 
     def test_tag_must_wait_for_each_registry_and_install_check(self) -> None:
         for dependency in CHECK.TAG_NEEDS:
@@ -151,8 +151,8 @@ class ValidateTests(unittest.TestCase):
             path.write_text(path.read_text().replace(CHECK.CANDIDATE_CHECK, "echo skipped", 1))
             self.assertTrue(any("candidate version validation" in error for error in CHECK.validate(repo.root)))
 
-    def test_main_only_guard_is_rejected(self) -> None:
-        self.assertFalse(CHECK.rejects_non_rc("if: github.ref != 'refs/heads/main'"))
+    def test_rc_only_guard_is_rejected(self) -> None:
+        self.assertFalse(CHECK.requires_main("if: ${{ !startsWith(github.ref, 'refs/heads/rc/') }}"))
 
     def test_tag_creation_in_publish_job_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -163,19 +163,18 @@ class ValidateTests(unittest.TestCase):
             self.assertTrue(any("only be created by tag-release" in error for error in CHECK.validate(repo.root)))
 
 
-class CandidateIdentityTests(unittest.TestCase):
-    def test_stable_and_beta_candidates_match(self) -> None:
+class ReleaseSourceIdentityTests(unittest.TestCase):
+    def test_main_accepts_stable_and_beta_versions(self) -> None:
         for version in ("0.1.0-beta.1", "1.0.0"):
-            self.assertEqual(CHECK.validate_candidate_ref(f"refs/heads/rc/{version}", version), [])
+            self.assertEqual(CHECK.validate_candidate_ref("refs/heads/main", version), [])
 
     def test_wrong_refs_versions_and_channels_fail(self) -> None:
         for ref, version in (
-            ("refs/heads/main", "0.1.0-beta.1"),
+            ("refs/heads/rc/0.1.0-beta.1", "0.1.0-beta.1"),
             ("refs/tags/rc/0.1.0-beta.1", "0.1.0-beta.1"),
-            ("refs/heads/rc/0.1.0-beta.2", "0.1.0-beta.1"),
-            ("refs/heads/rc/0.1.0-beta.1/extra", "0.1.0-beta.1"),
-            ("refs/heads/rc/1.0.0-alpha.1", "1.0.0-alpha.1"),
-            ("refs/heads/rc/01.0.0", "01.0.0"),
+            ("refs/heads/feature/release", "1.0.0"),
+            ("refs/heads/main", "1.0.0-alpha.1"),
+            ("refs/heads/main", "01.0.0"),
         ):
             with self.subTest(ref=ref, version=version):
                 self.assertTrue(CHECK.validate_candidate_ref(ref, version))

@@ -5,6 +5,15 @@ evidence is linked from each published version.
 
 ## Unreleased
 
+### Changed
+
+- Benchmark inputs now pin an exact `redact-secret-benchmarks` commit instead
+  of following its live `main`: development CI accepts a commit on
+  benchmarks `develop`, while the Release workflow requires that same commit
+  to have been explicitly promoted to benchmarks `main`. Successful artifact
+  qualification pushes on product `main` now notify staging
+  with the exact source ref, source SHA, and qualification run ID.
+
 ## 0.1.0-beta.8 — 2026-09-25
 
 [Publication and qualification evidence](docs/releases/0.1.0-beta.8/README.md).
