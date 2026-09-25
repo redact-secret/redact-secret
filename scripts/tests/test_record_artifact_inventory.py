@@ -48,6 +48,7 @@ def installed_report(lane: str, target: str) -> dict:
             "incremental": "passed",
             "incrementalCorpus": "passed",
             "stream": "passed",
+            "aiContextBoundary": "passed",
         },
         "incrementalCorpus": {
             "path": "conformance/fixtures/incremental-corpus.json",

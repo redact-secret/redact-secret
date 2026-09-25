@@ -122,6 +122,17 @@ contract (`initialize()`, `scanAndRedact()`'s result shape, `finding.action`,
 protected by any declared host version range. It stays an example in this
 repository.
 
+The AI-context boundary is the one deliberate widening of that surface
+(`decision-define-the-framework-neutral-ai-context-boundary-contract`):
+an AI-context adapter in that repository may also depend on the whole-input
+`policy`/`limits` options, the incremental session, `SecretScanError.code`,
+and the full safe finding field set, because the framework-neutral contract
+in [`docs/reference/ai-context-boundary.md`](docs/reference/ai-context-boundary.md)
+is replayed from `conformance/fixtures/ai-context-boundary.json` against
+every publish-shaped JavaScript and Python artifact this repository
+qualifies. The contract and its fixture live here; the installable adapter
+does not.
+
 Detailed workspace dependency, lint, unsafe-code, MSRV, public-API,
 package-content, and registry-name policies live in
 [docs/rust-workspace.md](./docs/rust-workspace.md). The CPython distribution's

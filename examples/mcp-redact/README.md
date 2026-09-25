@@ -112,6 +112,13 @@ none of them retain plaintext:
   including text that was already safe — the same fail-closed property
   `streaming-tool-result.mjs` documents for a declared-limit failure.
 
+**Contract.** The semantics above are generalized, framework-neutrally, in
+the [AI-context boundary contract](../../docs/reference/ai-context-boundary.md)
+(issue #610). That contract diverges from this example in four
+fail-closed places (traversal limits, object keys, non-plain values, and
+findings on blocked outcomes); this example keeps its beta.7 behavior until
+it is migrated onto the adapter package (redact-secret-adapters#12).
+
 ## Policy mapping
 
 - **`redact`**: the finding's span is replaced with a placeholder; the call
