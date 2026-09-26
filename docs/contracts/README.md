@@ -36,3 +36,12 @@ core remains the only authoritative implementation
   drift apart. Nothing loads it at runtime and no package ships it; it is
   not public API. The rules are in
   [`docs/specs/engine.md`, "Shadow scoring artifact"](../specs/engine.md#shadow-scoring-artifact).
+- [`pii/pii-context-v1.json`](pii/pii-context-v1.json) and its schema
+  [`pii/pii-context-v1.schema.json`](pii/pii-context-v1.schema.json) — the
+  contract-only English/Korean PII context vocabulary for issue
+  [#793](https://github.com/redact-secret/redact-secret/issues/793), including
+  normalization, bounded candidate association, precedence, synthetic examples,
+  and benign ambiguity controls. `scripts/check-pii-context-contract.py`
+  validates it in `npm run pii-context:check`. Nothing loads it at runtime and
+  no package ships it; the governing rule is in
+  [`docs/specs/contextual-detection.md`](../specs/contextual-detection.md).

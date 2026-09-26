@@ -1,0 +1,260 @@
+{
+  "$schema": "./pii-context-v1.schema.json",
+  "format": "redact-secret/pii-context/v1",
+  "status": "contract-only",
+  "evidenceGroup": "contextual",
+  "use": {
+    "loadedAtRuntime": false,
+    "shippedInPackages": false,
+    "establishesIdentity": false,
+    "publicApi": false
+  },
+  "normalization": {
+    "unicode": "NFC",
+    "removeGovernedInvisible": true,
+    "englishCase": "ascii-lower",
+    "koreanCase": "none",
+    "tokenSeparators": ["whitespace", "underscore", "hyphen", "colon", "equals"]
+  },
+  "association": {
+    "unit": "normalized-unicode-scalar",
+    "sameLogicalLine": true,
+    "maxDistance": 64,
+    "stopAtAnotherCandidate": true,
+    "equidistant": "unassociated",
+    "fieldLabel": {
+      "direction": "before",
+      "maxDistance": 16,
+      "gap": "separators-and-quotes-only"
+    },
+    "naturalLanguageLabel": {
+      "direction": "either",
+      "maxDistance": 64
+    }
+  },
+  "precedence": [
+    "longest-token-span",
+    "high-signal-first",
+    "negative-positive-neutral",
+    "entry-id-bytewise"
+  ],
+  "languages": ["en", "ko"],
+  "entries": [
+    {
+      "id": "en-email-field",
+      "language": "en",
+      "kind": "field-label",
+      "class": "positive",
+      "strength": "high-signal",
+      "domains": ["email"],
+      "forms": ["email", "e-mail"],
+      "provenance": "synthetic-contract-example"
+    },
+    {
+      "id": "en-contact-label",
+      "language": "en",
+      "kind": "natural-language-label",
+      "class": "positive",
+      "strength": "ambiguous",
+      "domains": ["email", "phone"],
+      "forms": ["contact"],
+      "provenance": "synthetic-contract-example"
+    },
+    {
+      "id": "en-contact-details-label",
+      "language": "en",
+      "kind": "natural-language-label",
+      "class": "positive",
+      "strength": "high-signal",
+      "domains": ["email", "phone"],
+      "forms": ["contact details"],
+      "provenance": "synthetic-contract-example"
+    },
+    {
+      "id": "en-example-label",
+      "language": "en",
+      "kind": "natural-language-label",
+      "class": "negative",
+      "strength": "high-signal",
+      "domains": ["email", "payment-card", "network-address", "iban", "phone", "national-id"],
+      "forms": ["example", "documentation"],
+      "provenance": "synthetic-contract-example"
+    },
+    {
+      "id": "en-value-neutral",
+      "language": "en",
+      "kind": "field-label",
+      "class": "neutral",
+      "strength": "ambiguous",
+      "domains": ["email", "payment-card", "network-address", "iban", "phone", "national-id"],
+      "forms": ["value"],
+      "provenance": "synthetic-contract-example"
+    },
+    {
+      "id": "ko-email-field",
+      "language": "ko",
+      "kind": "field-label",
+      "class": "positive",
+      "strength": "high-signal",
+      "domains": ["email"],
+      "forms": ["이메일", "고객 이메일"],
+      "provenance": "synthetic-contract-example"
+    },
+    {
+      "id": "ko-contact-label",
+      "language": "ko",
+      "kind": "natural-language-label",
+      "class": "positive",
+      "strength": "ambiguous",
+      "domains": ["email", "phone"],
+      "forms": ["연락처"],
+      "provenance": "synthetic-contract-example"
+    },
+    {
+      "id": "ko-example-label",
+      "language": "ko",
+      "kind": "natural-language-label",
+      "class": "negative",
+      "strength": "high-signal",
+      "domains": ["email", "payment-card", "network-address", "iban", "phone", "national-id"],
+      "forms": ["예시"],
+      "provenance": "synthetic-contract-example"
+    },
+    {
+      "id": "ko-value-neutral",
+      "language": "ko",
+      "kind": "field-label",
+      "class": "neutral",
+      "strength": "ambiguous",
+      "domains": ["email", "payment-card", "network-address", "iban", "phone", "national-id"],
+      "forms": ["값"],
+      "provenance": "synthetic-contract-example"
+    }
+  ],
+  "fixtures": [
+    {
+      "id": "en-field-case-and-separator",
+      "language": "en",
+      "template": "\"EMAIL\" = {{candidate:a}}",
+      "candidates": [{"id": "a", "domain": "email", "identityEstablished": true}],
+      "expectedAssociations": [{"candidate": "a", "matches": ["en-email-field"], "effect": "positive-evidence"}]
+    },
+    {
+      "id": "en-ambiguous-word-without-identity",
+      "language": "en",
+      "template": "contact: {{candidate:a}}",
+      "candidates": [{"id": "a", "domain": "email", "identityEstablished": false}],
+      "expectedAssociations": [{"candidate": "a", "matches": ["en-contact-label"], "effect": "not-established-without-identity"}]
+    },
+    {
+      "id": "en-negative-documentation-context",
+      "language": "en",
+      "template": "documentation example {{candidate:a}}",
+      "candidates": [{"id": "a", "domain": "email", "identityEstablished": true}],
+      "expectedAssociations": [{"candidate": "a", "matches": ["en-example-label"], "effect": "negative-evidence"}]
+    },
+    {
+      "id": "en-neutral-field-context",
+      "language": "en",
+      "template": "value = {{candidate:a}}",
+      "candidates": [{"id": "a", "domain": "email", "identityEstablished": true}],
+      "expectedAssociations": [{"candidate": "a", "matches": ["en-value-neutral"], "effect": "neutral-evidence"}]
+    },
+    {
+      "id": "en-overlap-prefers-longest-form",
+      "language": "en",
+      "template": "contact details {{candidate:a}}",
+      "candidates": [{"id": "a", "domain": "email", "identityEstablished": true}],
+      "expectedAssociations": [{"candidate": "a", "matches": ["en-contact-details-label"], "effect": "positive-evidence"}]
+    },
+    {
+      "id": "entry-domain-must-cover-candidate",
+      "language": "en",
+      "template": "email: {{candidate:a}}",
+      "candidates": [{"id": "a", "domain": "payment-card", "identityEstablished": true}],
+      "expectedAssociations": [{"candidate": "a", "matches": [], "effect": "no-evidence"}]
+    },
+    {
+      "id": "ko-nfd-field-normalizes-to-nfc",
+      "language": "ko",
+      "template": "이메일: {{candidate:a}}",
+      "candidates": [{"id": "a", "domain": "email", "identityEstablished": true}],
+      "expectedAssociations": [{"candidate": "a", "matches": ["ko-email-field"], "effect": "positive-evidence"}]
+    },
+    {
+      "id": "ko-mixed-ascii-hangul-key",
+      "language": "ko",
+      "template": "customer_이메일 = {{candidate:a}}",
+      "candidates": [{"id": "a", "domain": "email", "identityEstablished": true}],
+      "expectedAssociations": [{"candidate": "a", "matches": ["ko-email-field"], "effect": "positive-evidence"}]
+    },
+    {
+      "id": "ko-governed-invisible-normalization",
+      "language": "ko",
+      "template": "이​메️일-{{candidate:a}}",
+      "candidates": [{"id": "a", "domain": "email", "identityEstablished": true}],
+      "expectedAssociations": [{"candidate": "a", "matches": ["ko-email-field"], "effect": "positive-evidence"}]
+    },
+    {
+      "id": "ko-ambiguous-word-without-identity",
+      "language": "ko",
+      "template": "{{candidate:a}} 연락처",
+      "candidates": [{"id": "a", "domain": "phone", "identityEstablished": false}],
+      "expectedAssociations": [{"candidate": "a", "matches": ["ko-contact-label"], "effect": "not-established-without-identity"}]
+    },
+    {
+      "id": "ko-negative-example-context",
+      "language": "ko",
+      "template": "예시 {{candidate:a}}",
+      "candidates": [{"id": "a", "domain": "national-id", "identityEstablished": true}],
+      "expectedAssociations": [{"candidate": "a", "matches": ["ko-example-label"], "effect": "negative-evidence"}]
+    },
+    {
+      "id": "ko-neutral-field-context",
+      "language": "ko",
+      "template": "값 = {{candidate:a}}",
+      "candidates": [{"id": "a", "domain": "iban", "identityEstablished": true}],
+      "expectedAssociations": [{"candidate": "a", "matches": ["ko-value-neutral"], "effect": "neutral-evidence"}]
+    },
+    {
+      "id": "field-label-outside-bounded-window",
+      "language": "en",
+      "template": "email xxxxxxxxxxxxxxxxx {{candidate:a}}",
+      "candidates": [{"id": "a", "domain": "email", "identityEstablished": true}],
+      "expectedAssociations": [{"candidate": "a", "matches": [], "effect": "no-evidence"}]
+    },
+    {
+      "id": "field-label-does-not-cross-line",
+      "language": "en",
+      "template": "email\n{{candidate:a}}",
+      "candidates": [{"id": "a", "domain": "email", "identityEstablished": true}],
+      "expectedAssociations": [{"candidate": "a", "matches": [], "effect": "no-evidence"}]
+    },
+    {
+      "id": "candidate-blocks-association-past-it",
+      "language": "en",
+      "template": "contact {{candidate:a}} {{candidate:b}}",
+      "candidates": [
+        {"id": "a", "domain": "payment-card", "identityEstablished": true},
+        {"id": "b", "domain": "email", "identityEstablished": true}
+      ],
+      "expectedAssociations": [
+        {"candidate": "a", "matches": [], "effect": "no-evidence"},
+        {"candidate": "b", "matches": [], "effect": "no-evidence"}
+      ]
+    },
+    {
+      "id": "equidistant-context-is-unassociated",
+      "language": "en",
+      "template": "{{candidate:a}} contact {{candidate:b}}",
+      "candidates": [
+        {"id": "a", "domain": "email", "identityEstablished": true},
+        {"id": "b", "domain": "email", "identityEstablished": true}
+      ],
+      "expectedAssociations": [
+        {"candidate": "a", "matches": [], "effect": "no-evidence"},
+        {"candidate": "b", "matches": [], "effect": "no-evidence"}
+      ]
+    }
+  ]
+}
