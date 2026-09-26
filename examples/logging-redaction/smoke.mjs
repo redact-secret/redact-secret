@@ -61,6 +61,9 @@ await scenario(
   (log) => log.info({ upstream: { header: `Authorization: Bearer ${SYNTHETIC.bearer}` } }, "proxied"),
   ["Authorization: Bearer <SECRET_1>"],
 );
+// `login failed: password=...` is detected from core #812 on; the pinned
+// released beta.8 predates it, so this keeps the `with` form until the core
+// pin moves past beta.8 (see README "Detection gaps").
 await scenario(
   "error",
   {},
