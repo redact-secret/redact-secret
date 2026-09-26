@@ -705,11 +705,17 @@ the deterministic core or create another authoritative detector implementation.
 Structured PII whose shape can be decided deterministically (email address,
 payment card, IPv4/IPv6 address, IBAN, US SSN, and phone number in constrained
 context) is not excluded. It is planned for beta.10 on the shared evidence
-foundation, once the PII evidence model is settled
+foundation under the accepted
+[`pii-v1` domain, scope, arbitration, and activation contract](./docs/decisions/2026-09-26-define-the-pii-domain-scope-arbitration-and-activation-contract.md)
 ([#578](https://github.com/redact-secret/redact-secret/issues/578),
 [#579](https://github.com/redact-secret/redact-secret/issues/579)). That model
-keeps type evidence separate from sensitivity. Beta.9 ships no PII detector and
-makes no PII support claim; the
+keeps type evidence separate from sensitivity, uses explicit global or
+jurisdictional scope, and makes PII activation orthogonal to the existing
+`full`/`common` credential profiles. Its English/Korean context input is the
+validated, non-runtime [`pii-context/v1` contract](./docs/contracts/pii/pii-context-v1.json),
+and support claims remain gated by the
+[`pii-v1` qualification contract](./docs/decisions/2026-09-26-define-pii-v1-qualification-and-national-id-arrival-gates.md).
+Beta.9 ships no PII detector and makes no PII support claim; the
 [PII-readiness study](https://github.com/redact-secret/redact-secret-benchmarks/blob/bdfe39b6a9c1e61ce6424e03ec4f9ee623aecaf6/docs/reports/2026-09-25-beta9-258-pii-readiness.md)
 records which beta.9 evidence groups transfer.
 

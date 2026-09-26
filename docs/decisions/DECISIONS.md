@@ -24,6 +24,7 @@ Current rules: `docs/specs/contextual-detection.md`.
 - [Exclude a value fully delimited by `{{` and `}}` as a template reference](2026-09-15-exclude-fully-delimited-template-references.md)
 - [Warn unconditionally on high-signal contextual-name assignments despite prose false positives](2026-09-20-warn-unconditionally-on-high-signal-contextual-names.md)
 - [Redact a value assigned to a provider-named credential name](2026-09-24-redact-provider-named-credential-assignments.md)
+- [Define the versioned English and Korean PII context vocabulary contract](2026-09-26-define-the-pii-context-vocabulary-contract.md)
 
 ## Engine
 
@@ -40,6 +41,7 @@ Current rules: `docs/specs/engine.md`.
 - [Select optimal disjoint candidates by total evidence weight](2026-09-19-select-optimal-disjoint-candidates-by-total-evidence-weight.md)
 - [Defer encoded-input decoding out of scope, with reasoning](2026-09-20-defer-encoded-input-decoding.md)
 - [Freeze the shadow evidence score and confidence contract](2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md)
+- [Define the PII domain, scope, arbitration, and activation contract](2026-09-26-define-the-pii-domain-scope-arbitration-and-activation-contract.md)
 
 ## Distribution
 
@@ -70,3 +72,4 @@ Current rules: `docs/specs/evidence-and-gates.md`.
 - [Gate release qualification on support-matrix drift, with recorded acknowledgement to override](2026-09-21-gate-releases-on-support-matrix-drift.md)
 - [Decide the artifact taxonomy, spec routing, and evidence placement](2026-09-22-decide-artifact-taxonomy-spec-routing-and-evidence-placement.md)
 - [Move performance results, criteria, and judgement to redact-secret-benchmarks](2026-09-22-move-performance-results-criteria-and-judgement-to-benchmarks.md)
+- [Define pii-v1 qualification and national-ID arrival gates](2026-09-26-define-pii-v1-qualification-and-national-id-arrival-gates.md)
