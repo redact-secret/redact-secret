@@ -3,7 +3,7 @@
   "format": "redact-secret/shadow-scoring-artifact/1",
   "artifact": {
     "id": "redact-secret/shadow-scoring-artifact",
-    "revision": 2
+    "revision": 3
   },
   "status": "reviewed",
   "contract": {
@@ -41,7 +41,7 @@
       ]
     },
     "aggregation": {
-      "id": "evidence-aggregation/v1",
+      "id": "evidence-aggregation/v2",
       "featureSchema": "evidence-features/v1",
       "maxGroupSignals": 4,
       "groups": [
@@ -49,9 +49,9 @@
           "group": "randomness",
           "direction": "positive",
           "rule": "halving-diminishing-returns",
-          "cap": 60,
+          "cap": 30,
           "signals": [
-            {"kind": "feature-ramp", "signal": "shannon_entropy_q16", "feature": 5, "lo": 254345, "hi": 313536, "max": 60}
+            {"kind": "feature-ramp", "signal": "shannon_entropy_q16", "feature": 5, "lo": 226998, "hi": 265935, "max": 30}
           ]
         },
         {
@@ -65,32 +65,32 @@
           "group": "contextual",
           "direction": "positive",
           "rule": "halving-diminishing-returns",
-          "cap": 40,
+          "cap": 50,
           "signals": [
-            {"kind": "context", "signal": "credential-context", "classes": ["credential-name", "authorization-header", "url-userinfo"], "points": 40}
+            {"kind": "context", "signal": "credential-context", "classes": ["credential-name", "authorization-header", "url-userinfo"], "points": 50}
           ]
         },
         {
           "group": "validation",
           "direction": "positive",
           "rule": "halving-diminishing-returns",
-          "cap": 40,
+          "cap": 50,
           "signals": []
         },
         {
           "group": "negative",
           "direction": "negative",
           "rule": "halving-diminishing-returns",
-          "cap": 140,
+          "cap": 130,
           "signals": [
-            {"kind": "strict-exclusion", "signal": "strict-exclusion", "points": 140}
+            {"kind": "strict-exclusion", "signal": "strict-exclusion", "points": 130}
           ]
         }
       ],
       "bands": {
-        "low": 7,
-        "medium": 43,
-        "high": 61
+        "low": 35,
+        "medium": 40,
+        "high": 51
       },
       "contextClasses": ["url-userinfo", "authorization-header", "credential-name", "other-name", "bare"],
       "credentialNameSignals": ["high-signal-name", "ambiguous-name"],
@@ -101,13 +101,19 @@
       "minMaskLength": 3
     }
   },
-  "modelFingerprint": "bf2ed67db72dabe69b97d248e547aa1e942cf98991a6b712dc6285629662afa9",
+  "modelFingerprint": "4104fb2c6f046169f63e991dd7594c099af5fcea01deecae7afe1c7015579975",
   "identityLedger": [
     {
       "model": "evidence-aggregation/v1",
       "featureSchema": "evidence-features/v1",
       "modelFingerprint": "bf2ed67db72dabe69b97d248e547aa1e942cf98991a6b712dc6285629662afa9",
       "introducedInRevision": 1
+    },
+    {
+      "model": "evidence-aggregation/v2",
+      "featureSchema": "evidence-features/v1",
+      "modelFingerprint": "4104fb2c6f046169f63e991dd7594c099af5fcea01deecae7afe1c7015579975",
+      "introducedInRevision": 3
     }
   ],
   "sources": {
@@ -120,12 +126,12 @@
       {
         "path": "docs/specs/engine.md",
         "section": "Shadow evidence aggregation",
-        "sha256": "fe88a17c5d0af6de3369386b151ecc0fd1f84d703ccde0f3b078e86f9f7625b8"
+        "sha256": "7a3887b23c4b05c8ac01dee3623a7864169745cb8d7ab13630324477c09f3bcc"
       },
       {
         "path": "docs/specs/engine.md",
         "section": "Maintainer-local shadow evaluation",
-        "sha256": "9d798596adbb40b7c73224b49701141663a223eb9e434dc0a6ceb493e064cfe2"
+        "sha256": "b433223617a6875fa90c11993aaef05e8dfa2e63828a68c6ffbaf9480add7473"
       }
     ],
     "code": [
@@ -147,7 +153,7 @@
       },
       {
         "path": "crates/secret-scan-core/src/evidence/aggregate.rs",
-        "sha256": "dce312f7672537b8b70b74e5eecf94630bb0bef35d49e9670530306d934306fe"
+        "sha256": "1560a14a2fa3d71db7766fe26e434bbee8c22d6d83f628ce26b0d10c8ed82657"
       },
       {
         "path": "crates/secret-scan-core/src/evidence/shadow.rs",
@@ -157,28 +163,28 @@
   },
   "calibration": {
     "repository": "redact-secret/redact-secret-benchmarks",
-    "issue": 255,
-    "pullRequest": 297,
+    "issue": 300,
+    "pullRequest": 330,
     "branch": "develop",
-    "commit": "101f674a5ee50aa551423ccd00d0a6a68ed4c875",
-    "method": "https://github.com/redact-secret/redact-secret-benchmarks/blob/101f674a5ee50aa551423ccd00d0a6a68ed4c875/docs/specs/calibration-experiments.md",
+    "commit": "e18efa2d0802c030925b9306a5dca33057185936",
+    "method": "https://github.com/redact-secret/redact-secret-benchmarks/blob/e18efa2d0802c030925b9306a5dca33057185936/docs/specs/calibration-experiments.md",
     "experimentVersion": "calibration-experiments/1",
-    "selectedConfiguration": "halving-r1-l0-r60-l0-c40",
+    "selectedConfiguration": "halving-r1-l0-r30-l0-c50",
     "selection": {
       "method": "calibration-experiments/1:dev-balanced-error-within-tolerance,fewest-parameters,loco-stability",
-      "sourceHash": "37a0e41cbc973d53199004cade30dd307afb11c8837ee7352aae3cfd6dd4c13f",
+      "sourceHash": "23683daf5738b9cf3de583ade589f06677cfb2bcf581bff38e889b1eddae9509",
       "seed": "none"
     },
     "featureDataset": {
       "schemaVersion": 1,
       "extractorVersion": "candidate-features/2",
       "extractorSourceHash": "d943c854b79eefdfb5573e30ace6d8fd67f5be9e1ebefc2b9ee9e9d73d05833f",
-      "datasetHash": "a2d875f05780aac329036b19ad9768010839448093bbebec5e710a0975dacf49",
+      "datasetHash": "4ea0a82f61b719b4611f8e7e2caafd01edda5b5dfa7c2691bffd6ac17d0e199c",
       "featureSchema": "evidence-features/v1",
       "productFeatureSource": {
         "repository": "redact-secret/redact-secret",
         "commit": "d7733632bb05082710f71b6684ccf60c7a69377e",
-        "pinnedBy": "https://github.com/redact-secret/redact-secret-benchmarks/blob/101f674a5ee50aa551423ccd00d0a6a68ed4c875/benchmarks/lib/evidence-features.ts"
+        "pinnedBy": "https://github.com/redact-secret/redact-secret-benchmarks/blob/e18efa2d0802c030925b9306a5dca33057185936/benchmarks/lib/evidence-features.ts"
       }
     },
     "scoring": {
@@ -186,18 +192,18 @@
       "featureSchemaVersion": "evidence-features/v1",
       "featureSetHash": "55b1da0ebce3180e73e6ad075e8dd322cc075e886a3029db0cc26cc7b572cb68",
       "aggregationContractVersion": "grouped-halving/1",
-      "weightSetHash": "efc58a6adf44a37fd7594aac1fab9de9b5ffc888960ee2af0fb50a48595a8096",
-      "thresholdSetHash": "03b999291b26d89915c25ec163558baee2e1e2f89a7db8fd0684072f41b86edd",
-      "identity": "d6a8325c6cce09f628f595f88c5252245f0fbb5c01abb8ebb0eb0b7ec2e8a789"
+      "weightSetHash": "6f37787cd0c770f45b763cc50539c3c19044182c828451022a3b6c3d5cb43b5a",
+      "thresholdSetHash": "abd9803cccb4bc48233e50d592a92cb48c7c8cd99b449a17d78ab616e8b7587f",
+      "identity": "838aa57db8e2331c8540a42da823ffda8802d681952f4dc7af20e6001c5693a2"
     },
     "holdoutAccess": "none",
-    "reproduction": "At the benchmark commit, from a clean tree: npm ci, npm run features:extract, npm run calibration:run (about 16 s). The run writes results-output/calibration/, which is ignored by version control and maintainer-local. It reproduces the dataset hash, the selection source hash and the scoring identity above. The fitted per-configuration detail stays there and is never copied into either repository.",
-    "correspondence": "The benchmark's scoring identity names the selected configuration by component hashes only. For #798 a maintainer reran the calibration at the benchmark commit and confirmed that the selected configuration's randomness ramp, caps, context signal, strict negative gate and band thresholds equal model.aggregation here, which is the compiled SHADOW_MODEL. grouped-halving/1 is the benchmark's name for the halving rule that the product implements as evidence-aggregation/v1."
+    "reproduction": "At benchmark commit e18efa2d0802c030925b9306a5dca33057185936, from a clean tree: npm ci, npm run features:extract, npm run calibration:run. The run writes results-output/calibration/, which is ignored by version control and maintainer-local. It reproduces the dataset hash, the selection source hash and the scoring identity above. The fitted per-configuration detail stays there and is never copied into either repository.",
+    "correspondence": "The benchmark's scoring identity names the selected configuration by component hashes only. For redact-secret-benchmarks#300 a maintainer reran the calibration at the merged benchmark commit and confirmed that the selected configuration's randomness ramp, caps, context signal, strict negative gate and band thresholds equal model.aggregation here, which is the compiled SHADOW_MODEL. grouped-halving/1 is the benchmark's name for the halving rule that the product implements as evidence-aggregation/v2."
   },
   "corpora": {
     "pinManifest": {
       "path": "benchmarks/pin-manifest.json",
-      "sha256": "7fbbbaab857b1e1b4af2dcc9526afb89164b227382ad47fd84e41df27805734e"
+      "sha256": "4ce4e3be36e78e4dd7111fda50cc006d3331f3ab9fc8f3fda4efc338eaab1a99"
     },
     "tuning": [
       {
@@ -205,88 +211,12 @@
         "corpusHash": "33c2a504fe7c3c200f7458b903104844d695fea8296dc6977038273358f72e33"
       },
       {
-        "category": "beta8-207",
-        "corpusHash": "8b886af52072dcca835c672295e3d0daab273d3ed9421e41340f38720d3fc131"
-      },
-      {
-        "category": "beta8-208",
-        "corpusHash": "34da38437df4f13693c89236967fcac5ca7f45efe417511963de4097046a494b"
-      },
-      {
-        "category": "beta8-209",
-        "corpusHash": "35457096ead3ba8ecf719abd121532c8d77ac33ca113a8df8c73cb006211dc42"
-      },
-      {
-        "category": "beta8-210",
-        "corpusHash": "605e70510d2c2c7327dea6f76aa163dce60a693aedb0046081153d3d7a6da7ef"
-      },
-      {
-        "category": "beta8-211",
-        "corpusHash": "44fa2fce8383c01ac784b9d61edaaf51bc59eb36369f71a0935cf744150607d9"
-      },
-      {
-        "category": "beta8-212",
-        "corpusHash": "bbdcd601e1bd31a007db0a820f49bba376869e34ac7c9f606a2b60fcd4e3b399"
-      },
-      {
-        "category": "beta8-213a",
-        "corpusHash": "e93816b20a54ab8f2757962d95f49f271af53222716049a4a0452869aa8171ca"
-      },
-      {
-        "category": "beta8-213b",
-        "corpusHash": "e976fb045d30e6f3c34849e29f264f4d0cb3267eb2b97171dd41d2961d30e681"
-      },
-      {
-        "category": "beta8-213c",
-        "corpusHash": "d39630d42d62950f5c3ae2fb64d8ed767c6e737272f87536034cb0a234f0e638"
-      },
-      {
-        "category": "beta8-213d",
-        "corpusHash": "165039a8f594a04ab9a0903d8dc3834c01629545bcb830543d7aec8f7b63a2cc"
-      },
-      {
-        "category": "beta8-213e",
-        "corpusHash": "435c2c68cf12647acd62dcae3dca0d91c79c2b4813bc99d2c532e024daaaae40"
-      },
-      {
-        "category": "beta8-213f",
-        "corpusHash": "abe90d21dfa8e74ee5b2fa21ba27a4884dc6c1d1c89df91b980c8d92b5a7037f"
-      },
-      {
-        "category": "beta8-259",
-        "corpusHash": "0da5d62f8f385dafbe46a568105227458479b4e96391c02867a4dc9adfde9220"
-      },
-      {
-        "category": "beta8-263",
-        "corpusHash": "118ed8e978bc5857b2a15782efb7e83d711b0afa0f5adab75f30de1051f20843"
-      },
-      {
-        "category": "common-formats",
-        "corpusHash": "0094f4fc2576ae072f72b5f2f5f14541911e8ccbaa42f92b360de2925d5f7f2f"
-      },
-      {
-        "category": "context-edges",
-        "corpusHash": "091c79bc72557faa0657cafb79895e19e848a5b6dbd4f3c40d96d031f5f0e6ae"
-      },
-      {
-        "category": "credential-formats",
-        "corpusHash": "8a314552eea2e9db66ed49750294ad59a8b10bc4c33fcf471f2eaee059b8af4f"
-      },
-      {
-        "category": "detector-coverage",
-        "corpusHash": "249101e718a962ae37d8732b42f57febc85d7cb4d27de470b62621b8d888b71f"
-      },
-      {
-        "category": "negative-controls",
-        "corpusHash": "90cb2e615a5afa71f8d52ba70454d5d65cb9b206af78ac292f02cb0f9ee57a7b"
-      },
-      {
         "category": "real-world-shapes",
         "corpusHash": "8c0e2f60d87286f8acaa81664308ff291b36dc53474b30e344e43625697ffd0f"
       },
       {
-        "category": "reference-syntax",
-        "corpusHash": "0fe3363d4e0aec300b81bb823929f73928c7e06eb9e1d43064cf7b5b7f0d977e"
+        "category": "shadow-scoring-authored",
+        "corpusHash": "088a65d2a513a852d448d19265c2b6105399fe5029508fff530d74e76a51e046"
       },
       {
         "category": "token-contexts",
@@ -294,11 +224,31 @@
       }
     ],
     "evaluation": [
+      {"source": "beta8-207", "role": "development-evaluation", "corpusHash": "8b886af52072dcca835c672295e3d0daab273d3ed9421e41340f38720d3fc131"},
+      {"source": "beta8-208", "role": "development-evaluation", "corpusHash": "34da38437df4f13693c89236967fcac5ca7f45efe417511963de4097046a494b"},
+      {"source": "beta8-209", "role": "development-evaluation", "corpusHash": "35457096ead3ba8ecf719abd121532c8d77ac33ca113a8df8c73cb006211dc42"},
+      {"source": "beta8-210", "role": "development-evaluation", "corpusHash": "605e70510d2c2c7327dea6f76aa163dce60a693aedb0046081153d3d7a6da7ef"},
+      {"source": "beta8-211", "role": "development-evaluation", "corpusHash": "44fa2fce8383c01ac784b9d61edaaf51bc59eb36369f71a0935cf744150607d9"},
+      {"source": "beta8-212", "role": "development-evaluation", "corpusHash": "bbdcd601e1bd31a007db0a820f49bba376869e34ac7c9f606a2b60fcd4e3b399"},
+      {"source": "beta8-213a", "role": "development-evaluation", "corpusHash": "e93816b20a54ab8f2757962d95f49f271af53222716049a4a0452869aa8171ca"},
+      {"source": "beta8-213b", "role": "development-evaluation", "corpusHash": "e976fb045d30e6f3c34849e29f264f4d0cb3267eb2b97171dd41d2961d30e681"},
+      {"source": "beta8-213c", "role": "development-evaluation", "corpusHash": "d39630d42d62950f5c3ae2fb64d8ed767c6e737272f87536034cb0a234f0e638"},
+      {"source": "beta8-213d", "role": "development-evaluation", "corpusHash": "165039a8f594a04ab9a0903d8dc3834c01629545bcb830543d7aec8f7b63a2cc"},
+      {"source": "beta8-213e", "role": "development-evaluation", "corpusHash": "435c2c68cf12647acd62dcae3dca0d91c79c2b4813bc99d2c532e024daaaae40"},
+      {"source": "beta8-213f", "role": "development-evaluation", "corpusHash": "abe90d21dfa8e74ee5b2fa21ba27a4884dc6c1d1c89df91b980c8d92b5a7037f"},
+      {"source": "beta8-259", "role": "development-evaluation", "corpusHash": "0da5d62f8f385dafbe46a568105227458479b4e96391c02867a4dc9adfde9220"},
+      {"source": "beta8-263", "role": "development-evaluation", "corpusHash": "118ed8e978bc5857b2a15782efb7e83d711b0afa0f5adab75f30de1051f20843"},
+      {"source": "common-formats", "role": "development-evaluation", "corpusHash": "0094f4fc2576ae072f72b5f2f5f14541911e8ccbaa42f92b360de2925d5f7f2f"},
+      {"source": "context-edges", "role": "development-evaluation", "corpusHash": "091c79bc72557faa0657cafb79895e19e848a5b6dbd4f3c40d96d031f5f0e6ae"},
+      {"source": "credential-formats", "role": "development-evaluation", "corpusHash": "8a314552eea2e9db66ed49750294ad59a8b10bc4c33fcf471f2eaee059b8af4f"},
+      {"source": "detector-coverage", "role": "development-evaluation", "corpusHash": "249101e718a962ae37d8732b42f57febc85d7cb4d27de470b62621b8d888b71f"},
       {
         "source": "milestone-6-closed",
         "role": "regression",
         "corpusHash": "388b26e3703fc5a80b1ca0cd65232873e765a0a0b59148ba0e6998fd6c8ff766"
       },
+      {"source": "negative-controls", "role": "development-evaluation", "corpusHash": "90cb2e615a5afa71f8d52ba70454d5d65cb9b206af78ac292f02cb0f9ee57a7b"},
+      {"source": "reference-syntax", "role": "development-evaluation", "corpusHash": "0fe3363d4e0aec300b81bb823929f73928c7e06eb9e1d43064cf7b5b7f0d977e"},
       {
         "source": "sendgrid-regressions",
         "role": "regression",
@@ -314,9 +264,9 @@
       "id": "shadow-evidence-generic-token-v1",
       "status": "draft",
       "product": null,
-      "generatedAt": "101f674a5ee50aa551423ccd00d0a6a68ed4c875",
-      "fileSha256": "f6fa7e2bd61b46031720ee78e46e65fdb965dea4ac9cdd8a85b016f63ed64444",
-      "canonicalHash": "e61aa9d7fe516b106ced65c8959a27ae2189eeeedd70493e6e4fa9b67cae8d08",
+      "generatedAt": "e18efa2d0802c030925b9306a5dca33057185936",
+      "fileSha256": "eaee83a15151f10f0b1c6b8ff44bf445dfe7234c5159c22e9286095943ed8fe7",
+      "canonicalHash": "6d815d17226e34c5c95b0959770b51630456fb6dd0f554078683f6207f330ec6",
       "deterministic": "results-output/calibration/tuning-manifest-draft.json written by npm run calibration:run at generatedAt. Its createdAt is that commit's date and the dataset is byte-identical across runs, so two runs wrote the same bytes (fileSha256). canonicalHash is tuningManifestHash() in benchmarks/lib/tuning-manifest.ts, the SHA-256 of the canonical JSON that #256 evidence records. It changes once product is filled."
     }
   },
@@ -328,7 +278,7 @@
   "knownLimitations": [
     {
       "id": "validation-cap-placeholder",
-      "statement": "The validation group has no signal. Its cap of 40 is a placeholder that calibration did not fit. Context (40) plus validation (40) would reach high (61) with no randomness at all, so adding any validation signal needs a refit and a new model identity."
+      "statement": "The validation group has no signal. Its cap of 50 is a placeholder that calibration did not fit. Context (50) plus validation (50) would reach high (51) with no randomness at all, so adding any validation signal needs a refit and a new model identity."
     },
     {
       "id": "lexical-group-empty",
@@ -341,6 +291,10 @@
     {
       "id": "adversarial-evidence-pending",
       "statement": "Adversarial evidence from redact-secret-benchmarks#289 must be linked before qualification. The maintainer-local evaluation path (docs/specs/engine.md, 'Maintainer-local shadow evaluation') is what that evidence is produced with."
+    },
+    {
+      "id": "poor-generalization",
+      "statement": "The #300 selection has development medium-band balanced error 0.055228960396039604 but evaluation balanced error 0.6228352283569377, a generalization gap of 0.5676062679608981; its worst leave-one-category-out balanced error is 0.6666666666666666. This scorer remains shadow-only, non-enforcing and outside the public API. These results are not promotion evidence."
     }
   ],
   "review": {

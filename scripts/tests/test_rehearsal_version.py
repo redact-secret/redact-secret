@@ -87,7 +87,10 @@ class ApplyTests(unittest.TestCase):
             *REHEARSAL.DOC_PINS,
         ):
             text = (self.root / relative).read_text(encoding="utf-8")
-            self.assertNotIn(self.old, text, relative)
+            self.assertIsNone(
+                re.search(re.escape(self.old) + r"(?!\d)", text),
+                relative,
+            )
         quickstart = (self.root / "docs/quickstart.md").read_text(encoding="utf-8")
         self.assertIn(f"redact-secret=={REHEARSAL.pep440(THROWAWAY)}", quickstart)
 

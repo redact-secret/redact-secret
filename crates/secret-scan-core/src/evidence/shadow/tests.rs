@@ -125,13 +125,13 @@ fn a_credential_name_assignment_is_scored_with_context_and_randomness() {
     assert_eq!(explanation.context, ContextClass::CredentialName);
     assert_eq!(
         explanation.groups[EvidenceGroup::Contextual as usize].contribution,
-        40
+        50
     );
     assert_eq!(
         explanation.groups[EvidenceGroup::Randomness as usize].contribution,
-        60
+        30
     );
-    assert_eq!(explanation.score, 100);
+    assert_eq!(explanation.score, 80);
     assert_eq!(comparison.shadow.band, ShadowBand::High);
     assert_eq!(
         comparison.promotion,
@@ -158,8 +158,8 @@ fn a_low_entropy_credential_name_assignment_has_context_only() {
         explanation.groups[EvidenceGroup::Randomness as usize].contribution,
         0
     );
-    // Context alone (40) is `low` under SHADOW_MODEL.
-    assert_eq!(comparison.shadow.band, ShadowBand::Low);
+    // Context alone (50) is `medium` under SHADOW_MODEL.
+    assert_eq!(comparison.shadow.band, ShadowBand::Medium);
     assert_eq!(
         comparison.reasons(),
         ["credential-context", "randomness-none"]
@@ -353,7 +353,7 @@ fn a_statistical_comparison_renders_to_one_fixed_line() {
     assert_eq!(
         shadow_evaluation_jsonl("case-1", &input, &registry()),
         format!(
-            "{{\"record\":\"shadow-comparison\",\"input\":\"case-1\",\"finding\":\"finding-1\",\"start\":8,\"end\":40,\"byteLength\":32,\"detector\":\"generic-token\",\"type\":\"contextual_secret\",\"specificity\":\"contextual\",\"legacyConfidence\":\"{confidence}\",\"legacyAction\":\"{action}\",\"authority\":\"statistical\",\"model\":\"evidence-aggregation/v1\",\"featureSchema\":\"evidence-features/v1\",\"contextClass\":\"credential-name\",\"exclusion\":null,\"groups\":{{\"randomness\":60,\"lexical\":0,\"contextual\":40,\"validation\":0,\"negative\":0}},\"signals\":[{{\"group\":\"randomness\",\"signal\":\"shannon_entropy_q16\",\"points\":60}},{{\"group\":\"contextual\",\"signal\":\"credential-context\",\"points\":40}},{{\"group\":\"negative\",\"signal\":\"strict-exclusion\",\"points\":0}}],\"positive\":100,\"negative\":0,\"score\":100,\"band\":\"high\",\"promotion\":\"{promotion}\",\"reasons\":[\"credential-context\",\"randomness-capped\"]}}\n"
+            "{{\"record\":\"shadow-comparison\",\"input\":\"case-1\",\"finding\":\"finding-1\",\"start\":8,\"end\":40,\"byteLength\":32,\"detector\":\"generic-token\",\"type\":\"contextual_secret\",\"specificity\":\"contextual\",\"legacyConfidence\":\"{confidence}\",\"legacyAction\":\"{action}\",\"authority\":\"statistical\",\"model\":\"evidence-aggregation/v2\",\"featureSchema\":\"evidence-features/v1\",\"contextClass\":\"credential-name\",\"exclusion\":null,\"groups\":{{\"randomness\":30,\"lexical\":0,\"contextual\":50,\"validation\":0,\"negative\":0}},\"signals\":[{{\"group\":\"randomness\",\"signal\":\"shannon_entropy_q16\",\"points\":30}},{{\"group\":\"contextual\",\"signal\":\"credential-context\",\"points\":50}},{{\"group\":\"negative\",\"signal\":\"strict-exclusion\",\"points\":0}}],\"positive\":80,\"negative\":0,\"score\":80,\"band\":\"high\",\"promotion\":\"{promotion}\",\"reasons\":[\"credential-context\",\"randomness-capped\"]}}\n"
         )
     );
 }
@@ -363,7 +363,7 @@ fn a_deterministic_comparison_renders_without_scorer_fields() {
     let input = format!("token={GITHUB_TOKEN}");
     assert_eq!(
         shadow_evaluation_jsonl("case-2", &input, &registry()),
-        "{\"record\":\"shadow-comparison\",\"input\":\"case-2\",\"finding\":\"finding-1\",\"start\":6,\"end\":46,\"byteLength\":40,\"detector\":\"github-token\",\"type\":\"github_token\",\"specificity\":\"provider\",\"legacyConfidence\":\"high\",\"legacyAction\":\"redact\",\"authority\":\"deterministic\",\"model\":\"evidence-aggregation/v1\",\"featureSchema\":\"evidence-features/v1\",\"contextClass\":null,\"exclusion\":null,\"groups\":null,\"signals\":[],\"score\":null,\"band\":\"high\",\"promotion\":\"preserve\",\"reasons\":[\"deterministic-authority\"]}\n"
+        "{\"record\":\"shadow-comparison\",\"input\":\"case-2\",\"finding\":\"finding-1\",\"start\":6,\"end\":46,\"byteLength\":40,\"detector\":\"github-token\",\"type\":\"github_token\",\"specificity\":\"provider\",\"legacyConfidence\":\"high\",\"legacyAction\":\"redact\",\"authority\":\"deterministic\",\"model\":\"evidence-aggregation/v2\",\"featureSchema\":\"evidence-features/v1\",\"contextClass\":null,\"exclusion\":null,\"groups\":null,\"signals\":[],\"score\":null,\"band\":\"high\",\"promotion\":\"preserve\",\"reasons\":[\"deterministic-authority\"]}\n"
     );
 }
 

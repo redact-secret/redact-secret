@@ -37,10 +37,10 @@ than relying on an unqualified install.
 Keep the selected version in your application's dependency lockfile.
 
 ```bash
-npm install @redact-secret/core@0.1.0-beta.8
-python -m pip install redact-secret==0.1.0b8
-cargo add redact-secret@0.1.0-beta.8
-cargo install redact-secret-cli --version 0.1.0-beta.8 --locked
+npm install @redact-secret/core@0.1.0-beta.9
+python -m pip install redact-secret==0.1.0b9
+cargo add redact-secret@0.1.0-beta.9
+cargo install redact-secret-cli --version 0.1.0-beta.9 --locked
 ```
 
 Run only the command for your runtime. For a complete, tested path from an
