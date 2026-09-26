@@ -34,9 +34,36 @@ Rules governing the shared Rust core's detection pipeline, plugin/profile contra
 | The shadow scorer has one reviewed scoring artifact, `docs/contracts/scoring/shadow-scoring-artifact.json`, defined in the "Shadow scoring artifact" section below. It binds the feature schema, the aggregation model, calibration and tuning provenance, and the review method. CI fails when the artifact and the compiled scorer disagree in either direction, and when scorer values change under an unchanged model identity. It is a review and CI artifact: nothing loads it at runtime, no package ships it, and it is not public API. | [Freeze the shadow evidence score and confidence contract](../decisions/2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md) |
 | The shadow scorer runs next to `generic-token`'s legacy decision without enforcing anything, defined in the "Maintainer-local shadow evaluation" section below. The pipeline evaluates the candidates that overlap resolution selects only when the maintainer-local evaluation path asks for it; every public entry point asks for nothing, so findings, `Confidence`, actions, overlap and every public API are unchanged and the scorer never runs on the public path. The path is an unpublished example that compiles the core's own source and writes JSON Lines holding identifiers and integers only, never matched bytes or hashes of them. | [Freeze the shadow evidence score and confidence contract](../decisions/2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md) |
 | No shipped artifact links the shadow scorer: outside tests the incremental session calls `run_detector_pipeline`, so only the evaluation example and tests compile it. Its integer scores and bands are byte-identical on Linux, macOS, Windows and `wasm32` for the conformance corpora and a hostile battery (CI job `shadow-determinism`), no scorer source outside tests names floating point (`scripts/check-rust-workspace.py` check 11), and its worst cases are bounded by the 4,096-byte contextual value and the 256-symbol analysis limit. Defined in the "Shadow scorer qualification" section below. | [Freeze the shadow evidence score and confidence contract](../decisions/2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md) |
-| Before any PII detector ships, its domain adapter must keep identity separate from sensitivity, enforce each context obligation and bounded negative transition, admit only sensitive outcomes to public overlap/policy, keep evidence alternatives internal, and represent a sensitive ambiguous identity as one safe domain finding rather than multiple jurisdiction findings. Internal colon-form family ids map to existing-grammar public types (`pii_email`, `pii_us_ssn`, `pii_ambiguous_national_id`); the core identifier grammar does not change. | [Define the PII domain, scope, arbitration, and activation contract](../decisions/2026-09-26-define-the-pii-domain-scope-arbitration-and-activation-contract.md) |
+| Before any PII detector ships, its domain adapter must keep identity separate from sensitivity, enforce each context obligation and bounded negative transition, admit only sensitive outcomes to public overlap/policy, keep evidence alternatives internal, and represent a sensitive ambiguous identity as one safe domain finding rather than multiple jurisdiction findings. Internal colon-form family ids map injectively to existing-grammar public types (`pii_global_email`, `pii_jurisdiction_us_ssn`, `pii_ambiguous_national_id`); the core identifier grammar does not change. | [Define the PII domain, scope, arbitration, and activation contract](../decisions/2026-09-26-define-the-pii-domain-scope-arbitration-and-activation-contract.md) |
 | Before ordinary overlap resolution, same-range PII identities in one identity domain must be reduced to one established or ambiguous internal candidate. Its confidence is the conservative minimum of identity and applicable sensitivity confidence, specificity is structural or contextual without claiming provider authority, obfuscation is the union of alternatives and normalization, and default severity/action still comes from `default_action_for(type, confidence)`. The aggregate then uses the existing ranked, optimal-disjoint overlap pipeline. | [Define the PII domain, scope, arbitration, and activation contract](../decisions/2026-09-26-define-the-pii-domain-scope-arbitration-and-activation-contract.md) |
 | PII activation may ship only with the accepted selector grammar, closure, registry composition, canonical activation identity, fixed safe errors, and equivalent target APIs across Rust, JavaScript, Python, and CLI. Credential `full`/`common` identity remains separate, PII defaults off, and unavailable selection fails closed. | [Define the PII domain, scope, arbitration, and activation contract](../decisions/2026-09-26-define-the-pii-domain-scope-arbitration-and-activation-contract.md) |
+| Structured PII type checks use a crate-private, compile-time registry of bounded, versioned built-in validators. Validators return type evidence only, expose no callback or ruleset extension, and never decide sensitivity or policy. | [Define the bounded built-in structured-validator registry](../decisions/2026-09-26-define-the-bounded-built-in-structured-validator-registry.md) |
+
+## Structured PII validator foundation
+
+The
+[bounded built-in structured-validator registry](../decisions/2026-09-26-define-the-bounded-built-in-structured-validator-registry.md)
+is a crate-private, compile-time foundation under the still-separate PII
+evidence policy. It does not add a detector or make a PII support claim.
+
+- A detector requests an exact validator `identity` and positive integer
+  `version`. Successful evidence records that pair, so evaluation provenance
+  cannot silently mix changed semantics under one identity.
+- The initial contracts are `luhn` version 1 and `iban-mod97` version 1. Both
+  use the same registry entry point. The registry is fixed at compile time:
+  there are no user callbacks, scripts, runtime registration, or declarative
+  ruleset v1 changes.
+- Lookup occurs before candidate inspection. Each registration declares a
+  byte limit (19 for Luhn, 34 for IBAN), oversized candidates fail before the
+  algorithm runs, and accepted candidates take one bounded integer-only pass.
+  The same Rust code is therefore used by native, Node, WebAssembly and Python
+  artifacts without a host-specific copy.
+- Failure is input-free and total: an unknown identity/version,
+  `candidate-too-long`, malformed lexical shape, and checksum mismatch are
+  distinct outcomes. No partial evidence is returned on failure.
+- Validator success is type/identity evidence only. Sensitivity and context
+  remain a later PII decision; checksum success alone never selects policy or
+  proves that an occurrence is sensitive.
 
 ## Shadow evidence feature schema
 

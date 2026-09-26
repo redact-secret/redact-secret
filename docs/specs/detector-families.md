@@ -100,6 +100,24 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `xai_api_key` | `xai-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 <!-- detector-families:end -->
 
+## Structured PII status
+
+The
+[bounded built-in structured-validator registry](../decisions/2026-09-26-define-the-bounded-built-in-structured-validator-registry.md)
+is shared core infrastructure, not a detector family. It currently supplies
+versioned Luhn and IBAN mod-97 type-validation primitives to future built-in
+PII detectors. Neither primitive scans input, emits a finding, decides
+sensitivity, or changes a policy action, and neither is available through
+declarative ruleset v1. Consequently this change adds no row to the generated
+finding-type inventory and makes no PII support claim.
+
+The false-positive boundary is deliberate: a checksum-valid value may be an
+identifier-shaped coincidence, so future detectors must evaluate the PII
+context contract independently. The false-negative boundary is also explicit:
+malformed, overlong, lower-case or separator-bearing candidates are rejected
+by these v1 primitives unless a future detector performs a separately specified
+normalization before validation.
+
 ## Evidence-backed family applications
 
 These rows apply the existing evidence-tier policy to individual provider
