@@ -93,6 +93,8 @@ jobs:
     steps:
       - name: Check out repository
         run: echo noop
+      - name: Install the example's registry adapter packages
+        run: npm run examples:install
       - name: Qualify release
         run: npm run release:check
       - name: Compute the wrapper package identity
@@ -444,6 +446,51 @@ class ReleaseGateTests(unittest.TestCase):
                 "'Compute the wrapper package identity' must follow 'Qualify release'" in error
                 for error in errors
             )
+        )
+
+    def test_missing_wrapper_registry_adapter_install_is_an_error(self) -> None:
+        install = (
+            "      - name: Install the example's registry adapter packages\n"
+            "        run: npm run examples:install\n"
+        )
+        broken = RELEASE_YML.replace(install, "")
+        self.assertNotEqual(broken, RELEASE_YML)
+        self._write("release.yml", broken)
+        errors = CHECK.validate(self.root)
+        self.assertTrue(
+            any(
+                "missing the 'Install the example's registry adapter packages' step" in error
+                for error in errors
+            )
+        )
+
+    def test_wrapper_registry_adapter_install_after_qualification_is_an_error(self) -> None:
+        install = (
+            "      - name: Install the example's registry adapter packages\n"
+            "        run: npm run examples:install\n"
+        )
+        qualify = "      - name: Qualify release\n        run: npm run release:check\n"
+        broken = RELEASE_YML.replace(install + qualify, qualify + install)
+        self.assertNotEqual(broken, RELEASE_YML)
+        self._write("release.yml", broken)
+        errors = CHECK.validate(self.root)
+        self.assertTrue(
+            any(
+                "'Install the example's registry adapter packages' must precede 'Qualify release'" in error
+                for error in errors
+            )
+        )
+
+    def test_wrapper_registry_adapter_install_uses_the_locked_install_command(self) -> None:
+        broken = RELEASE_YML.replace(
+            "        run: npm run examples:install\n",
+            "        run: npm install --prefix examples/mcp-redact\n",
+        )
+        self.assertNotEqual(broken, RELEASE_YML)
+        self._write("release.yml", broken)
+        errors = CHECK.validate(self.root)
+        self.assertTrue(
+            any("does not run npm run examples:install" in error for error in errors)
         )
 
     def test_wrapper_identity_without_build_is_an_error(self) -> None:

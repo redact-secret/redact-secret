@@ -63,6 +63,12 @@ failed the beta.6 manifest step. Job outputs must reach the script through
 `env:` and be read as "$VAR" -- also the standard script-injection
 mitigation.
 
+The wrapper qualification also runs the MCP example tests. Those examples
+import registry adapters installed from their own lockfile, so the `publish`
+job must run the same `examples:install` step as CI before `release:check`.
+Keeping that dependency explicit here prevents a clean release runner from
+reaching publication with an incomplete test environment.
+
 This intentionally parses the workflow YAML with plain text and regular
 expressions rather than a YAML library, matching
 `check-python-package.py`'s wheel-matrix check: no third-party dependency is
@@ -101,6 +107,8 @@ NPM_DEPENDENCY_GATES = ("publish-native-dependencies", "publish-wasm-dependency"
 # computed ahead of the build describes a tarball with no `dist/` and fails
 # verification against a correct publish, as beta.7's Release did.
 WRAPPER_JOB = "publish"
+WRAPPER_REGISTRY_INSTALL_STEP = "Install the example's registry adapter packages"
+WRAPPER_REGISTRY_INSTALL_COMMAND = "npm run examples:install"
 WRAPPER_BUILD_STEP = "Qualify release"
 WRAPPER_IDENTITY_STEP = "Compute the wrapper package identity"
 WRAPPER_PUBLISH_STEP = "Release package"
@@ -369,14 +377,44 @@ def validate(root: Path) -> list[str]:
         steps = extract_step_blocks(wrapper_job)
         found = {
             name: next((step for step in steps if step[1] == name), None)
-            for name in (WRAPPER_BUILD_STEP, WRAPPER_IDENTITY_STEP, WRAPPER_PUBLISH_STEP)
+            for name in (
+                WRAPPER_REGISTRY_INSTALL_STEP,
+                WRAPPER_BUILD_STEP,
+                WRAPPER_IDENTITY_STEP,
+                WRAPPER_PUBLISH_STEP,
+            )
         }
         for name, step in found.items():
             if step is None:
                 errors.append(
                     f"{RELEASE_WORKFLOW.as_posix()}: job '{WRAPPER_JOB}' is missing the '{name}' step"
                 )
-        build, identity, publish = (found[name] for name in (WRAPPER_BUILD_STEP, WRAPPER_IDENTITY_STEP, WRAPPER_PUBLISH_STEP))
+        registry_install, build, identity, publish = (
+            found[name]
+            for name in (
+                WRAPPER_REGISTRY_INSTALL_STEP,
+                WRAPPER_BUILD_STEP,
+                WRAPPER_IDENTITY_STEP,
+                WRAPPER_PUBLISH_STEP,
+            )
+        )
+        if (
+            registry_install is not None
+            and build is not None
+            and registry_install[0] > build[0]
+        ):
+            errors.append(
+                f"{RELEASE_WORKFLOW.as_posix()}: '{WRAPPER_REGISTRY_INSTALL_STEP}' must precede "
+                f"'{WRAPPER_BUILD_STEP}' in job '{WRAPPER_JOB}'"
+            )
+        if (
+            registry_install is not None
+            and WRAPPER_REGISTRY_INSTALL_COMMAND not in registry_install[2]
+        ):
+            errors.append(
+                f"{RELEASE_WORKFLOW.as_posix()}: '{WRAPPER_REGISTRY_INSTALL_STEP}' does not run "
+                f"{WRAPPER_REGISTRY_INSTALL_COMMAND}"
+            )
         if build is not None and identity is not None and identity[0] < build[0]:
             errors.append(
                 f"{RELEASE_WORKFLOW.as_posix()}: '{WRAPPER_IDENTITY_STEP}' must follow "
