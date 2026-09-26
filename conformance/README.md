@@ -93,6 +93,18 @@ depend on `src/`.
   which composes `ai-context-boundary.mjs`, against the packed JavaScript
   package (`scripts/consumer-harness.mjs`); `mcp-boundary.test.mjs` tests
   it against a fake core.
+- [`fixtures/mcp-resources-read.json`](./fixtures/mcp-resources-read.json) —
+  the supported MCP `resources/read` boundary's cases (issue #843,
+  [`docs/reference/mcp-resources-read.md`](../docs/reference/mcp-resources-read.md)),
+  a thin specialization of the MCP fixture: `ReadResourceResult` traversal
+  (text and JSON-in-text, `uri`, `mimeType`, `_meta`, several entries,
+  unknown fields, `blob` under both settings, malformed entries), key-identified
+  `_meta` leaves redacted in place, limits from the root, cancellation, a
+  failing read, and the fixed JSON-RPC errors every non-`ok` outcome maps
+  to. Replayed by [`mcp-resources-read.mjs`](./mcp-resources-read.mjs),
+  which composes `mcp-boundary.mjs`, against the packed JavaScript package
+  (`scripts/consumer-harness.mjs`); `mcp-resources-read.test.mjs` tests it
+  against a fake core.
 - [`fixtures/ruleset-reference.json`](./fixtures/ruleset-reference.json) —
   the reference declarative ruleset fixture (issue #495 and #484,
   `decision-define-declarative-detector-ruleset-contract`): a ruleset

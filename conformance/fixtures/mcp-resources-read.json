@@ -1,0 +1,1358 @@
+{
+  "schemaVersion": 1,
+  "contract": "docs/reference/mcp-resources-read.md",
+  "baseContract": "docs/reference/mcp-boundary.md",
+  "note": "Supported MCP resources/read boundary cases (issue #843), a thin specialization of the MCP boundary fixture (#612) and the AI-context boundary fixture (#610). Every value is synthetic and already used by mcp-boundary.json: the ghp_SYNTHETICREVOKED token and the private-key body come from synchronous-corpus.json; synthetic-not-a-secret is detected only by its key context, which the key-aware sanitizeValue (#842) redacts in place; 9f8e7d6c5b4a39281706f5e4d3c2b1a0 is detected only through a sibling key, which only the serialized backstop sees. A text of the form {repeat, count} is materialized by the runner. All inputs are ASCII. Runner: conformance/mcp-resources-read.mjs.",
+  "limits": {
+    "wholeInput": {
+      "maxInputBytes": 4096,
+      "maxFindings": 16
+    },
+    "incremental": {
+      "maxInputBytes": 4096,
+      "maxBufferedBytes": 2176,
+      "maxTokenBytes": 1024,
+      "maxMultilineBytes": 2048
+    },
+    "traversal": {
+      "maxDepth": 6,
+      "maxNodes": 64
+    }
+  },
+  "label": "resource",
+  "safeFindingFields": [
+    "id",
+    "type",
+    "detector",
+    "confidence",
+    "action",
+    "obfuscation",
+    "start",
+    "end"
+  ],
+  "fixedErrors": {
+    "blocked": {
+      "code": -32603,
+      "message": "This MCP resource read was blocked by secret-redaction policy. No content, URI, or error detail is included."
+    },
+    "readError": {
+      "code": -32603,
+      "message": "This MCP resource read failed. No content, URI, or error detail is included."
+    }
+  },
+  "cases": [
+    {
+      "id": "text-redacts-provider-token",
+      "operation": "resourceResult",
+      "result": {
+        "contents": [
+          {
+            "uri": "file:///synthetic/.env",
+            "mimeType": "text/plain",
+            "text": "REGION=eu-west-1\nAPI_KEY=ghp_SYNTHETICREVOKED00000000000000000000\n"
+          }
+        ]
+      },
+      "secrets": [
+        "ghp_SYNTHETICREVOKED00000000000000000000"
+      ],
+      "expected": {
+        "outcome": "ok",
+        "value": {
+          "contents": [
+            {
+              "uri": "file:///synthetic/.env",
+              "mimeType": "text/plain",
+              "text": "REGION=eu-west-1\nAPI_KEY=<SECRET_1>\n"
+            }
+          ]
+        },
+        "findings": [
+          {
+            "id": "finding-1",
+            "type": "github_token",
+            "detector": "github-token",
+            "confidence": "high",
+            "action": "redact",
+            "obfuscation": "none",
+            "start": 25,
+            "end": 65
+          }
+        ]
+      }
+    },
+    {
+      "id": "json-text-stays-text-and-keeps-key-context",
+      "operation": "resourceResult",
+      "result": {
+        "contents": [
+          {
+            "uri": "file:///synthetic/config.json",
+            "mimeType": "application/json",
+            "text": "{\"db\":{\"host\":\"db.internal\",\"password\":\"synthetic-not-a-secret\"},\"port\":5432}"
+          }
+        ]
+      },
+      "secrets": [
+        "synthetic-not-a-secret"
+      ],
+      "expected": {
+        "outcome": "ok",
+        "value": {
+          "contents": [
+            {
+              "uri": "file:///synthetic/config.json",
+              "mimeType": "application/json",
+              "text": "{\"db\":{\"host\":\"db.internal\",\"password\":\"<SECRET_1>\"},\"port\":5432}"
+            }
+          ]
+        },
+        "findings": [
+          {
+            "id": "finding-1",
+            "type": "contextual_secret",
+            "detector": "generic-token",
+            "confidence": "high",
+            "action": "redact",
+            "obfuscation": "none",
+            "start": 40,
+            "end": 62
+          }
+        ]
+      }
+    },
+    {
+      "id": "config-text-keeps-key-context",
+      "operation": "resourceResult",
+      "result": {
+        "contents": [
+          {
+            "uri": "file:///synthetic/settings.json",
+            "mimeType": "application/json",
+            "text": "{\"password\":\"synthetic-not-a-secret\"}"
+          }
+        ]
+      },
+      "secrets": [
+        "synthetic-not-a-secret"
+      ],
+      "expected": {
+        "outcome": "ok",
+        "value": {
+          "contents": [
+            {
+              "uri": "file:///synthetic/settings.json",
+              "mimeType": "application/json",
+              "text": "{\"password\":\"<SECRET_1>\"}"
+            }
+          ]
+        },
+        "findings": [
+          {
+            "id": "finding-1",
+            "type": "contextual_secret",
+            "detector": "generic-token",
+            "confidence": "high",
+            "action": "redact",
+            "obfuscation": "none",
+            "start": 13,
+            "end": 35
+          }
+        ]
+      }
+    },
+    {
+      "id": "meta-key-identified-leaf-redacts-in-place",
+      "operation": "resourceResult",
+      "result": {
+        "contents": [
+          {
+            "uri": "file:///synthetic/readme.txt",
+            "mimeType": "text/plain",
+            "text": "ordinary text"
+          }
+        ],
+        "_meta": {
+          "password": "synthetic-not-a-secret"
+        }
+      },
+      "secrets": [
+        "synthetic-not-a-secret"
+      ],
+      "expected": {
+        "outcome": "ok",
+        "value": {
+          "contents": [
+            {
+              "uri": "file:///synthetic/readme.txt",
+              "mimeType": "text/plain",
+              "text": "ordinary text"
+            }
+          ],
+          "_meta": {
+            "password": "<SECRET_1>"
+          }
+        },
+        "findings": [
+          {
+            "id": "finding-1",
+            "type": "contextual_secret",
+            "detector": "generic-token",
+            "confidence": "high",
+            "action": "redact",
+            "obfuscation": "none",
+            "start": 0,
+            "end": 22
+          }
+        ]
+      }
+    },
+    {
+      "id": "entry-meta-nested-key-identified-leaf-redacts-in-place",
+      "operation": "resourceResult",
+      "result": {
+        "contents": [
+          {
+            "uri": "file:///synthetic/readme.txt",
+            "mimeType": "text/plain",
+            "text": "ordinary text",
+            "_meta": {
+              "connections": [
+                {
+                  "name": "db",
+                  "user": "deploy-bot",
+                  "password": "synthetic-not-a-secret"
+                },
+                {
+                  "name": "cache",
+                  "port": 6379
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "secrets": [
+        "synthetic-not-a-secret"
+      ],
+      "expected": {
+        "outcome": "ok",
+        "value": {
+          "contents": [
+            {
+              "uri": "file:///synthetic/readme.txt",
+              "mimeType": "text/plain",
+              "text": "ordinary text",
+              "_meta": {
+                "connections": [
+                  {
+                    "name": "db",
+                    "user": "deploy-bot",
+                    "password": "<SECRET_1>"
+                  },
+                  {
+                    "name": "cache",
+                    "port": 6379
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "findings": [
+          {
+            "id": "finding-1",
+            "type": "contextual_secret",
+            "detector": "generic-token",
+            "confidence": "high",
+            "action": "redact",
+            "obfuscation": "none",
+            "start": 0,
+            "end": 22
+          }
+        ]
+      }
+    },
+    {
+      "id": "meta-sibling-context-backstop-blocks",
+      "operation": "resourceResult",
+      "policy": "block-all",
+      "result": {
+        "contents": [
+          {
+            "uri": "file:///synthetic/readme.txt",
+            "mimeType": "text/plain",
+            "text": "ordinary text"
+          }
+        ],
+        "_meta": {
+          "provider": "twilio",
+          "value": "9f8e7d6c5b4a39281706f5e4d3c2b1a0"
+        }
+      },
+      "secrets": [
+        "9f8e7d6c5b4a39281706f5e4d3c2b1a0"
+      ],
+      "expected": {
+        "outcome": "blocked",
+        "reason": "policy"
+      }
+    },
+    {
+      "id": "meta-sibling-context-warn-passes",
+      "operation": "resourceResult",
+      "result": {
+        "contents": [
+          {
+            "uri": "file:///synthetic/readme.txt",
+            "mimeType": "text/plain",
+            "text": "ordinary text"
+          }
+        ],
+        "_meta": {
+          "provider": "twilio",
+          "value": "9f8e7d6c5b4a39281706f5e4d3c2b1a0"
+        }
+      },
+      "secrets": [
+        "9f8e7d6c5b4a39281706f5e4d3c2b1a0"
+      ],
+      "valueMayContainSecrets": true,
+      "expectedLabels": [
+        "resource"
+      ],
+      "expected": {
+        "outcome": "ok",
+        "value": {
+          "contents": [
+            {
+              "uri": "file:///synthetic/readme.txt",
+              "mimeType": "text/plain",
+              "text": "ordinary text"
+            }
+          ],
+          "_meta": {
+            "provider": "twilio",
+            "value": "9f8e7d6c5b4a39281706f5e4d3c2b1a0"
+          }
+        },
+        "findings": []
+      }
+    },
+    {
+      "id": "uri-is-scanned",
+      "operation": "resourceResult",
+      "result": {
+        "contents": [
+          {
+            "uri": "https://example.test/export?token=ghp_SYNTHETICREVOKED00000000000000000000",
+            "mimeType": "text/plain",
+            "text": "ordinary text"
+          }
+        ]
+      },
+      "secrets": [
+        "ghp_SYNTHETICREVOKED00000000000000000000"
+      ],
+      "expected": {
+        "outcome": "ok",
+        "value": {
+          "contents": [
+            {
+              "uri": "https://example.test/export?token=<SECRET_1>",
+              "mimeType": "text/plain",
+              "text": "ordinary text"
+            }
+          ]
+        },
+        "findings": [
+          {
+            "id": "finding-1",
+            "type": "github_token",
+            "detector": "github-token",
+            "confidence": "high",
+            "action": "redact",
+            "obfuscation": "none",
+            "start": 34,
+            "end": 74
+          }
+        ]
+      }
+    },
+    {
+      "id": "mime-type-is-scanned",
+      "operation": "resourceResult",
+      "result": {
+        "contents": [
+          {
+            "uri": "file:///synthetic/readme.txt",
+            "mimeType": "text/plain; token=ghp_SYNTHETICREVOKED00000000000000000000",
+            "text": "ordinary text"
+          }
+        ]
+      },
+      "secrets": [
+        "ghp_SYNTHETICREVOKED00000000000000000000"
+      ],
+      "expected": {
+        "outcome": "ok",
+        "value": {
+          "contents": [
+            {
+              "uri": "file:///synthetic/readme.txt",
+              "mimeType": "text/plain; token=<SECRET_1>",
+              "text": "ordinary text"
+            }
+          ]
+        },
+        "findings": [
+          {
+            "id": "finding-1",
+            "type": "github_token",
+            "detector": "github-token",
+            "confidence": "high",
+            "action": "redact",
+            "obfuscation": "none",
+            "start": 18,
+            "end": 58
+          }
+        ]
+      }
+    },
+    {
+      "id": "result-meta-is-scanned",
+      "operation": "resourceResult",
+      "result": {
+        "contents": [
+          {
+            "uri": "file:///synthetic/readme.txt",
+            "mimeType": "text/plain",
+            "text": "ordinary text"
+          }
+        ],
+        "_meta": {
+          "trace": "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000"
+        }
+      },
+      "secrets": [
+        "ghp_SYNTHETICREVOKED00000000000000000000"
+      ],
+      "expected": {
+        "outcome": "ok",
+        "value": {
+          "contents": [
+            {
+              "uri": "file:///synthetic/readme.txt",
+              "mimeType": "text/plain",
+              "text": "ordinary text"
+            }
+          ],
+          "_meta": {
+            "trace": "API_KEY=<SECRET_1>"
+          }
+        },
+        "findings": [
+          {
+            "id": "finding-1",
+            "type": "github_token",
+            "detector": "github-token",
+            "confidence": "high",
+            "action": "redact",
+            "obfuscation": "none",
+            "start": 8,
+            "end": 48
+          }
+        ]
+      }
+    },
+    {
+      "id": "entry-meta-is-scanned",
+      "operation": "resourceResult",
+      "result": {
+        "contents": [
+          {
+            "uri": "file:///synthetic/readme.txt",
+            "mimeType": "text/plain",
+            "text": "ordinary text",
+            "_meta": {
+              "upstream": "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000"
+            }
+          }
+        ]
+      },
+      "secrets": [
+        "ghp_SYNTHETICREVOKED00000000000000000000"
+      ],
+      "expected": {
+        "outcome": "ok",
+        "value": {
+          "contents": [
+            {
+              "uri": "file:///synthetic/readme.txt",
+              "mimeType": "text/plain",
+              "text": "ordinary text",
+              "_meta": {
+                "upstream": "API_KEY=<SECRET_1>"
+              }
+            }
+          ]
+        },
+        "findings": [
+          {
+            "id": "finding-1",
+            "type": "github_token",
+            "detector": "github-token",
+            "confidence": "high",
+            "action": "redact",
+            "obfuscation": "none",
+            "start": 8,
+            "end": 48
+          }
+        ]
+      }
+    },
+    {
+      "id": "multiple-contents-mixed-siblings",
+      "operation": "resourceResult",
+      "result": {
+        "contents": [
+          {
+            "uri": "file:///synthetic/a.txt",
+            "mimeType": "text/plain",
+            "text": "ordinary text"
+          },
+          {
+            "uri": "file:///synthetic/b.env",
+            "mimeType": "text/plain",
+            "text": "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000"
+          },
+          {
+            "uri": "file:///synthetic/c.json",
+            "mimeType": "application/json",
+            "text": "{\"replicas\":3}"
+          }
+        ]
+      },
+      "secrets": [
+        "ghp_SYNTHETICREVOKED00000000000000000000"
+      ],
+      "expectedLabels": [
+        "resource"
+      ],
+      "expected": {
+        "outcome": "ok",
+        "value": {
+          "contents": [
+            {
+              "uri": "file:///synthetic/a.txt",
+              "mimeType": "text/plain",
+              "text": "ordinary text"
+            },
+            {
+              "uri": "file:///synthetic/b.env",
+              "mimeType": "text/plain",
+              "text": "API_KEY=<SECRET_1>"
+            },
+            {
+              "uri": "file:///synthetic/c.json",
+              "mimeType": "application/json",
+              "text": "{\"replicas\":3}"
+            }
+          ]
+        },
+        "findings": [
+          {
+            "id": "finding-1",
+            "type": "github_token",
+            "detector": "github-token",
+            "confidence": "high",
+            "action": "redact",
+            "obfuscation": "none",
+            "start": 8,
+            "end": 48
+          }
+        ]
+      }
+    },
+    {
+      "id": "unknown-fields-are-scanned",
+      "operation": "resourceResult",
+      "result": {
+        "contents": [
+          {
+            "uri": "file:///synthetic/readme.txt",
+            "mimeType": "text/plain",
+            "text": "ordinary text",
+            "annotations": {
+              "audience": [
+                "assistant"
+              ],
+              "priority": 0.5
+            },
+            "note": "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000"
+          }
+        ],
+        "nextHint": "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000"
+      },
+      "secrets": [
+        "ghp_SYNTHETICREVOKED00000000000000000000"
+      ],
+      "expected": {
+        "outcome": "ok",
+        "value": {
+          "contents": [
+            {
+              "uri": "file:///synthetic/readme.txt",
+              "mimeType": "text/plain",
+              "text": "ordinary text",
+              "annotations": {
+                "audience": [
+                  "assistant"
+                ],
+                "priority": 0.5
+              },
+              "note": "API_KEY=<SECRET_1>"
+            }
+          ],
+          "nextHint": "API_KEY=<SECRET_1>"
+        },
+        "findings": [
+          {
+            "id": "finding-1",
+            "type": "github_token",
+            "detector": "github-token",
+            "confidence": "high",
+            "action": "redact",
+            "obfuscation": "none",
+            "start": 8,
+            "end": 48
+          },
+          {
+            "id": "finding-1",
+            "type": "github_token",
+            "detector": "github-token",
+            "confidence": "high",
+            "action": "redact",
+            "obfuscation": "none",
+            "start": 8,
+            "end": 48
+          }
+        ]
+      }
+    },
+    {
+      "id": "empty-contents-is-ok",
+      "operation": "resourceResult",
+      "result": {
+        "contents": []
+      },
+      "secrets": [],
+      "expected": {
+        "outcome": "ok",
+        "value": {
+          "contents": []
+        },
+        "findings": []
+      }
+    },
+    {
+      "id": "blob-blocked-by-default",
+      "operation": "resourceResult",
+      "result": {
+        "contents": [
+          {
+            "uri": "file:///synthetic/readme.txt",
+            "mimeType": "text/plain",
+            "text": "ordinary text"
+          },
+          {
+            "uri": "file:///synthetic.bin",
+            "mimeType": "application/octet-stream",
+            "blob": "U1lOVEhFVElD"
+          }
+        ]
+      },
+      "secrets": [],
+      "expected": {
+        "outcome": "blocked",
+        "reason": "unsupported_value"
+      }
+    },
+    {
+      "id": "blob-passes-unscanned-only-on-opt-in",
+      "operation": "resourceResult",
+      "binaryContent": "pass",
+      "result": {
+        "contents": [
+          {
+            "uri": "https://example.test/image?token=ghp_SYNTHETICREVOKED00000000000000000000",
+            "blob": "U1lOVEhFVElD",
+            "mimeType": "image/png"
+          },
+          {
+            "uri": "file:///synthetic/.env",
+            "mimeType": "text/plain",
+            "text": "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000"
+          }
+        ]
+      },
+      "secrets": [
+        "ghp_SYNTHETICREVOKED00000000000000000000"
+      ],
+      "expected": {
+        "outcome": "ok",
+        "value": {
+          "contents": [
+            {
+              "uri": "https://example.test/image?token=<SECRET_1>",
+              "blob": "U1lOVEhFVElD",
+              "mimeType": "image/png"
+            },
+            {
+              "uri": "file:///synthetic/.env",
+              "mimeType": "text/plain",
+              "text": "API_KEY=<SECRET_1>"
+            }
+          ]
+        },
+        "findings": [
+          {
+            "id": "finding-1",
+            "type": "github_token",
+            "detector": "github-token",
+            "confidence": "high",
+            "action": "redact",
+            "obfuscation": "none",
+            "start": 33,
+            "end": 73
+          },
+          {
+            "id": "finding-1",
+            "type": "github_token",
+            "detector": "github-token",
+            "confidence": "high",
+            "action": "redact",
+            "obfuscation": "none",
+            "start": 8,
+            "end": 48
+          }
+        ]
+      }
+    },
+    {
+      "id": "blob-non-string-blocks-on-opt-in",
+      "operation": "resourceResult",
+      "binaryContent": "pass",
+      "result": {
+        "contents": [
+          {
+            "uri": "file:///synthetic.bin",
+            "blob": [
+              1,
+              2,
+              3
+            ]
+          }
+        ]
+      },
+      "secrets": [],
+      "expected": {
+        "outcome": "blocked",
+        "reason": "unsupported_value"
+      }
+    },
+    {
+      "id": "entry-with-text-and-blob-blocked",
+      "operation": "resourceResult",
+      "binaryContent": "pass",
+      "result": {
+        "contents": [
+          {
+            "uri": "file:///synthetic.bin",
+            "text": "ordinary text",
+            "blob": "U1lOVEhFVElD"
+          }
+        ]
+      },
+      "secrets": [],
+      "expected": {
+        "outcome": "blocked",
+        "reason": "unsupported_value"
+      }
+    },
+    {
+      "id": "entry-without-text-or-blob-blocked",
+      "operation": "resourceResult",
+      "result": {
+        "contents": [
+          {
+            "uri": "file:///synthetic/readme.txt",
+            "mimeType": "text/plain"
+          }
+        ]
+      },
+      "secrets": [],
+      "expected": {
+        "outcome": "blocked",
+        "reason": "unsupported_value"
+      }
+    },
+    {
+      "id": "entry-non-string-text-blocked",
+      "operation": "resourceResult",
+      "result": {
+        "contents": [
+          {
+            "uri": "file:///synthetic/config.json",
+            "text": {
+              "password": "synthetic-not-a-secret"
+            }
+          }
+        ]
+      },
+      "secrets": [
+        "synthetic-not-a-secret"
+      ],
+      "expected": {
+        "outcome": "blocked",
+        "reason": "unsupported_value"
+      }
+    },
+    {
+      "id": "entry-not-object-blocked",
+      "operation": "resourceResult",
+      "result": {
+        "contents": [
+          "ordinary text"
+        ]
+      },
+      "secrets": [],
+      "expected": {
+        "outcome": "blocked",
+        "reason": "unsupported_value"
+      }
+    },
+    {
+      "id": "contents-missing-blocked",
+      "operation": "resourceResult",
+      "result": {
+        "_meta": {
+          "trace": "ordinary text"
+        }
+      },
+      "secrets": [],
+      "expected": {
+        "outcome": "blocked",
+        "reason": "unsupported_value"
+      }
+    },
+    {
+      "id": "contents-not-array-blocked",
+      "operation": "resourceResult",
+      "result": {
+        "contents": {
+          "uri": "file:///synthetic/readme.txt",
+          "mimeType": "text/plain",
+          "text": "ordinary text"
+        }
+      },
+      "secrets": [],
+      "expected": {
+        "outcome": "blocked",
+        "reason": "unsupported_value"
+      }
+    },
+    {
+      "id": "result-not-object-blocked",
+      "operation": "resourceResult",
+      "result": "ordinary text",
+      "secrets": [],
+      "expected": {
+        "outcome": "blocked",
+        "reason": "unsupported_value"
+      }
+    },
+    {
+      "id": "text-block-finding-blocks",
+      "operation": "resourceResult",
+      "result": {
+        "contents": [
+          {
+            "uri": "file:///synthetic/id_rsa",
+            "mimeType": "text/plain",
+            "text": "-----BEGIN PRIVATE KEY-----\nU1lOVEhFVElDX1JFVk9LRURfQ09ORk9STUFOQ0U=\n-----END PRIVATE KEY-----"
+          }
+        ]
+      },
+      "secrets": [
+        "U1lOVEhFVElDX1JFVk9LRURfQ09ORk9STUFOQ0U="
+      ],
+      "expected": {
+        "outcome": "blocked",
+        "reason": "policy"
+      }
+    },
+    {
+      "id": "meta-key-finding-blocks",
+      "operation": "resourceResult",
+      "result": {
+        "contents": [
+          {
+            "uri": "file:///synthetic/readme.txt",
+            "mimeType": "text/plain",
+            "text": "ordinary text"
+          }
+        ],
+        "_meta": {
+          "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000": "ordinary text"
+        }
+      },
+      "secrets": [
+        "ghp_SYNTHETICREVOKED00000000000000000000"
+      ],
+      "expected": {
+        "outcome": "blocked",
+        "reason": "policy"
+      }
+    },
+    {
+      "id": "depth-counted-from-result-root",
+      "operation": "resourceResult",
+      "result": {
+        "contents": [
+          {
+            "uri": "file:///synthetic/readme.txt",
+            "mimeType": "text/plain",
+            "text": "ordinary text",
+            "_meta": {
+              "a": {
+                "b": {
+                  "c": {
+                    "d": "ordinary text"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "secrets": [],
+      "expected": {
+        "outcome": "blocked",
+        "reason": "limit_exceeded"
+      }
+    },
+    {
+      "id": "node-limit-covers-whole-result",
+      "operation": "resourceResult",
+      "result": {
+        "contents": [
+          {
+            "uri": "file:///synthetic/0.txt",
+            "mimeType": "text/plain",
+            "text": "ordinary text"
+          },
+          {
+            "uri": "file:///synthetic/1.txt",
+            "mimeType": "text/plain",
+            "text": "ordinary text"
+          },
+          {
+            "uri": "file:///synthetic/2.txt",
+            "mimeType": "text/plain",
+            "text": "ordinary text"
+          },
+          {
+            "uri": "file:///synthetic/3.txt",
+            "mimeType": "text/plain",
+            "text": "ordinary text"
+          },
+          {
+            "uri": "file:///synthetic/4.txt",
+            "mimeType": "text/plain",
+            "text": "ordinary text"
+          },
+          {
+            "uri": "file:///synthetic/5.txt",
+            "mimeType": "text/plain",
+            "text": "ordinary text"
+          },
+          {
+            "uri": "file:///synthetic/6.txt",
+            "mimeType": "text/plain",
+            "text": "ordinary text"
+          },
+          {
+            "uri": "file:///synthetic/7.txt",
+            "mimeType": "text/plain",
+            "text": "ordinary text"
+          },
+          {
+            "uri": "file:///synthetic/8.txt",
+            "mimeType": "text/plain",
+            "text": "ordinary text"
+          },
+          {
+            "uri": "file:///synthetic/9.txt",
+            "mimeType": "text/plain",
+            "text": "ordinary text"
+          },
+          {
+            "uri": "file:///synthetic/10.txt",
+            "mimeType": "text/plain",
+            "text": "ordinary text"
+          },
+          {
+            "uri": "file:///synthetic/11.txt",
+            "mimeType": "text/plain",
+            "text": "ordinary text"
+          },
+          {
+            "uri": "file:///synthetic/12.txt",
+            "mimeType": "text/plain",
+            "text": "ordinary text"
+          },
+          {
+            "uri": "file:///synthetic/13.txt",
+            "mimeType": "text/plain",
+            "text": "ordinary text"
+          },
+          {
+            "uri": "file:///synthetic/14.txt",
+            "mimeType": "text/plain",
+            "text": "ordinary text"
+          },
+          {
+            "uri": "file:///synthetic/15.txt",
+            "mimeType": "text/plain",
+            "text": "ordinary text"
+          }
+        ]
+      },
+      "secrets": [],
+      "expected": {
+        "outcome": "blocked",
+        "reason": "limit_exceeded"
+      }
+    },
+    {
+      "id": "large-benign-text-under-limit",
+      "operation": "resourceResult",
+      "result": {
+        "contents": [
+          {
+            "uri": "file:///synthetic/log.txt",
+            "mimeType": "text/plain",
+            "text": {
+              "repeat": "ordinary text\n",
+              "count": 290
+            }
+          }
+        ]
+      },
+      "secrets": [],
+      "expected": {
+        "outcome": "ok",
+        "value": {
+          "contents": [
+            {
+              "uri": "file:///synthetic/log.txt",
+              "mimeType": "text/plain",
+              "text": {
+                "repeat": "ordinary text\n",
+                "count": 290
+              }
+            }
+          ]
+        },
+        "findings": []
+      }
+    },
+    {
+      "id": "text-over-input-limit-blocked",
+      "operation": "resourceResult",
+      "result": {
+        "contents": [
+          {
+            "uri": "file:///synthetic/log.txt",
+            "mimeType": "text/plain",
+            "text": {
+              "repeat": "ordinary text\n",
+              "count": 300
+            }
+          }
+        ]
+      },
+      "secrets": [],
+      "expected": {
+        "outcome": "blocked",
+        "reason": "limit_exceeded",
+        "code": "INPUT_LIMIT_EXCEEDED"
+      }
+    },
+    {
+      "id": "secret-split-across-contents-is-not-joined",
+      "operation": "resourceResult",
+      "result": {
+        "contents": [
+          {
+            "uri": "file:///synthetic/a.txt",
+            "mimeType": "text/plain",
+            "text": "ghp_SYNTHETICREV"
+          },
+          {
+            "uri": "file:///synthetic/b.txt",
+            "mimeType": "text/plain",
+            "text": "OKED00000000000000000000"
+          }
+        ]
+      },
+      "secrets": [],
+      "expected": {
+        "outcome": "ok",
+        "value": {
+          "contents": [
+            {
+              "uri": "file:///synthetic/a.txt",
+              "mimeType": "text/plain",
+              "text": "ghp_SYNTHETICREV"
+            },
+            {
+              "uri": "file:///synthetic/b.txt",
+              "mimeType": "text/plain",
+              "text": "OKED00000000000000000000"
+            }
+          ]
+        },
+        "findings": []
+      }
+    },
+    {
+      "id": "block-all-policy-blocks",
+      "operation": "resourceResult",
+      "policy": "block-all",
+      "result": {
+        "contents": [
+          {
+            "uri": "file:///synthetic/.env",
+            "mimeType": "text/plain",
+            "text": "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000"
+          }
+        ]
+      },
+      "secrets": [
+        "ghp_SYNTHETICREVOKED00000000000000000000"
+      ],
+      "expected": {
+        "outcome": "blocked",
+        "reason": "policy"
+      }
+    },
+    {
+      "id": "throwing-policy-fails-closed",
+      "operation": "resourceResult",
+      "policy": "throwing",
+      "result": {
+        "contents": [
+          {
+            "uri": "file:///synthetic/.env",
+            "mimeType": "text/plain",
+            "text": "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000"
+          }
+        ]
+      },
+      "secrets": [
+        "ghp_SYNTHETICREVOKED00000000000000000000"
+      ],
+      "expected": {
+        "outcome": "blocked",
+        "reason": "core_error",
+        "code": "POLICY_FAILURE"
+      }
+    },
+    {
+      "id": "result-cancelled-before-scan",
+      "operation": "resourceResult",
+      "signal": "aborted-before",
+      "result": {
+        "contents": [
+          {
+            "uri": "file:///synthetic/.env",
+            "mimeType": "text/plain",
+            "text": "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000"
+          }
+        ]
+      },
+      "secrets": [
+        "ghp_SYNTHETICREVOKED00000000000000000000"
+      ],
+      "expected": {
+        "outcome": "aborted"
+      }
+    },
+    {
+      "id": "result-before-initialization-fails-closed",
+      "operation": "resourceResult",
+      "phase": "uninitialized",
+      "result": {
+        "contents": [
+          {
+            "uri": "file:///synthetic/.env",
+            "mimeType": "text/plain",
+            "text": "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000"
+          }
+        ]
+      },
+      "secrets": [
+        "ghp_SYNTHETICREVOKED00000000000000000000"
+      ],
+      "expected": {
+        "outcome": "blocked",
+        "reason": "core_error",
+        "code": "NOT_INITIALIZED"
+      }
+    },
+    {
+      "id": "read-result-is-sanitized",
+      "operation": "resourceRead",
+      "result": {
+        "contents": [
+          {
+            "uri": "file:///synthetic/.env",
+            "mimeType": "text/plain",
+            "text": "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000"
+          }
+        ]
+      },
+      "secrets": [
+        "ghp_SYNTHETICREVOKED00000000000000000000"
+      ],
+      "expectedLabels": [
+        "resource"
+      ],
+      "expectedReads": 1,
+      "expected": {
+        "outcome": "ok",
+        "value": {
+          "contents": [
+            {
+              "uri": "file:///synthetic/.env",
+              "mimeType": "text/plain",
+              "text": "API_KEY=<SECRET_1>"
+            }
+          ]
+        },
+        "findings": [
+          {
+            "id": "finding-1",
+            "type": "github_token",
+            "detector": "github-token",
+            "confidence": "high",
+            "action": "redact",
+            "obfuscation": "none",
+            "start": 8,
+            "end": 48
+          }
+        ]
+      }
+    },
+    {
+      "id": "read-blocked-maps-to-fixed-error",
+      "operation": "resourceRead",
+      "result": {
+        "contents": [
+          {
+            "uri": "file:///synthetic/id_rsa",
+            "mimeType": "text/plain",
+            "text": "-----BEGIN PRIVATE KEY-----\nU1lOVEhFVElDX1JFVk9LRURfQ09ORk9STUFOQ0U=\n-----END PRIVATE KEY-----"
+          }
+        ]
+      },
+      "secrets": [
+        "U1lOVEhFVElDX1JFVk9LRURfQ09ORk9STUFOQ0U="
+      ],
+      "expectedReads": 1,
+      "expected": {
+        "outcome": "blocked",
+        "reason": "policy"
+      }
+    },
+    {
+      "id": "read-failure-is-never-read",
+      "operation": "resourceRead",
+      "readThrows": true,
+      "secrets": [
+        "ghp_SYNTHETICREVOKED00000000000000000000"
+      ],
+      "expectedReads": 1,
+      "expected": {
+        "outcome": "read_error"
+      }
+    },
+    {
+      "id": "read-cancelled-before-invoke",
+      "operation": "resourceRead",
+      "signal": "aborted-before",
+      "result": {
+        "contents": [
+          {
+            "uri": "file:///synthetic/.env",
+            "mimeType": "text/plain",
+            "text": "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000"
+          }
+        ]
+      },
+      "secrets": [
+        "ghp_SYNTHETICREVOKED00000000000000000000"
+      ],
+      "expectedReads": 0,
+      "expected": {
+        "outcome": "aborted"
+      }
+    },
+    {
+      "id": "read-cancelled-during-read-delivers-nothing",
+      "operation": "resourceRead",
+      "signal": "aborted-during",
+      "result": {
+        "contents": [
+          {
+            "uri": "file:///synthetic/.env",
+            "mimeType": "text/plain",
+            "text": "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000"
+          }
+        ]
+      },
+      "secrets": [
+        "ghp_SYNTHETICREVOKED00000000000000000000"
+      ],
+      "expectedReads": 1,
+      "expected": {
+        "outcome": "aborted"
+      }
+    },
+    {
+      "id": "read-before-initialization-fails-closed",
+      "operation": "resourceRead",
+      "phase": "uninitialized",
+      "result": {
+        "contents": [
+          {
+            "uri": "file:///synthetic/.env",
+            "mimeType": "text/plain",
+            "text": "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000"
+          }
+        ]
+      },
+      "secrets": [
+        "ghp_SYNTHETICREVOKED00000000000000000000"
+      ],
+      "expectedReads": 1,
+      "expected": {
+        "outcome": "blocked",
+        "reason": "core_error",
+        "code": "NOT_INITIALIZED"
+      }
+    }
+  ]
+}

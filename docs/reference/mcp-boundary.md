@@ -72,10 +72,12 @@ These are non-goals. An integration must not claim them:
 
 It also does not cover:
 
-- **MCP messages other than `tools/call`.** `resources/read`, `prompts/get`,
+- **MCP messages other than `tools/call`.** `prompts/get`,
   `sampling/createMessage`, elicitation, completion, and the logging and
   progress notifications (whose `message` fields are free text) are not
-  scanned by this contract.
+  scanned by this contract. `resources/read` has its own contract,
+  [MCP `resources/read` boundary](mcp-resources-read.md) (#843), built on
+  this one.
 - **A secret split across two content blocks, two fields, or two tool
   calls.** Each is scanned on its own; they are not joined. Only a split
   across the chunks of one streamed output is handled.
@@ -292,7 +294,8 @@ Two things are safe to audit, and nothing else crosses the boundary:
   callback: exactly the eight allowlisted fields, with `boundary` set to
   `tool-result` or `tool-arguments`.
 - **One record per crossing**: `{ stage, outcome, reason?, code? }`, where
-  `stage` is `arguments` or `result`, `reason` is present only for
+  `stage` is `arguments` or `result` (and `resource` for
+  [`resources/read`](mcp-resources-read.md#audit-metadata)), `reason` is present only for
   `blocked`, and `code` only when the core raised a registered error. It
   holds no count, size, offset, or text derived from input.
 

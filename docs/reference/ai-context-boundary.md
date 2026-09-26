@@ -100,10 +100,12 @@ language:
 | `openStream` | chunks of one logical text (`append`, then `finalize`, or `abort`) | one incremental session, staged |
 
 Each operation takes a boundary label (`user-input`, `tool-result`,
-`tool-arguments`, or `context`) and an optional cancellation signal. The
-label goes only to telemetry and never changes the outcome. `tool-arguments`
-was added by the [MCP boundary](mcp-boundary.md) (#612) for opted-in tool-call
-argument sanitation.
+`tool-arguments`, `resource`, or `context`) and an optional cancellation
+signal. The label goes only to telemetry and never changes the outcome.
+`tool-arguments` was added by the [MCP boundary](mcp-boundary.md) (#612) for
+opted-in tool-call argument sanitation, and `resource` by the
+[MCP `resources/read` boundary](mcp-resources-read.md) (#843) for resource
+contents.
 
 A stream also exposes `accepting`, an input-free boolean: `true` while it
 still scans chunks, `false` once it has failed, been aborted, or been

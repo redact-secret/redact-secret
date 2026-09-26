@@ -50,6 +50,7 @@ def installed_report(lane: str, target: str) -> dict:
             "stream": "passed",
             "aiContextBoundary": "passed",
             "mcpBoundary": "passed",
+            "mcpResourcesRead": "passed",
         },
         "incrementalCorpus": {
             "path": "conformance/fixtures/incremental-corpus.json",
@@ -404,6 +405,19 @@ class InventoryTests(unittest.TestCase):
                 MATRIX, results, SOURCE_COMMIT, PRODUCT_VERSION
             )
         self.assertEqual(errors, ["installed JavaScript node 22: mcpBoundary did not pass"])
+
+    def test_missing_installed_mcp_resources_read_result_fails(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Artifacts(Path(directory)).build()
+            path = root / "installed-javascript-node-22" / "installed-javascript-node-22.json"
+            report = json.loads(path.read_text(encoding="utf-8"))
+            del report["results"]["mcpResourcesRead"]
+            path.write_text(json.dumps(report), encoding="utf-8")
+            results, errors = RECORD.collect_installed_javascript_qualification(root)
+            errors += RECORD.require_installed_javascript_qualification(
+                MATRIX, results, SOURCE_COMMIT, PRODUCT_VERSION
+            )
+        self.assertEqual(errors, ["installed JavaScript node 22: mcpResourcesRead did not pass"])
 
     def test_missing_installed_incremental_corpus_result_fails(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

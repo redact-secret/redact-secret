@@ -142,6 +142,11 @@ AI-context operation runs on which part of an MCP tool call, and which fixed
 publish-shaped JavaScript lanes; `@redact-secret/adapter-mcp` lives in the
 adapters repository. The JavaScript side of `examples/mcp-redact/` runs on
 it, consumed as a pinned publish-shaped tarball.
+The `resources/read` boundary (`decision-define-the-supported-mcp-resources-read-boundary`,
+[`docs/reference/mcp-resources-read.md`](docs/reference/mcp-resources-read.md))
+applies the same mapping to a `ReadResourceResult` and maps failures to fixed
+JSON-RPC errors, since that result has no `isError`. Its fixture,
+`conformance/fixtures/mcp-resources-read.json`, is replayed on the same lanes.
 
 Detailed workspace dependency, lint, unsafe-code, MSRV, public-API,
 package-content, and registry-name policies live in
