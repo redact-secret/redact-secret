@@ -105,9 +105,9 @@
 //! partitions it into chunks. See the module documentation for the full
 //! contract.
 //!
-//! Until the Rust core passes the shared conformance corpus, the
-//! TypeScript implementation in `src/` remains the behavioral oracle
-//! (`decision-govern-cross-language-conformance`).
+//! The Rust core and the top-level conformance corpus are the canonical source
+//! of behavior. Bindings translate host values and range units without
+//! reimplementing detection (`decision-govern-cross-language-conformance`).
 
 #![forbid(unsafe_code)]
 #![deny(clippy::print_stdout, clippy::print_stderr)]

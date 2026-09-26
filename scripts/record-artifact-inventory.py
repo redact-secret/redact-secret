@@ -67,7 +67,7 @@ CRATE = "redact-secret"
 CRATES = (CRATE, "redact-secret-cli")
 CRATE_PACKAGE_DIR = Path("target") / "package"
 PUBLIC_API_REVIEW = Path("docs/audits/candidate-public-contract-review.md")
-CURRENT_PUBLIC_API_REVIEW = Path("docs/audits/beta6-candidate-public-contract-review.md")
+CURRENT_PUBLIC_API_REVIEW = Path("docs/audits/beta9-candidate-public-contract-review.md")
 CHANGELOG = Path("CHANGELOG.md")
 RELEASE_WORKFLOW = Path(".github/workflows/release.yml")
 REGISTRY_INSTALL_VERIFIER = Path("scripts/verify-registry-install.mjs")
@@ -517,7 +517,7 @@ def incremental_corpus_fixture_count() -> int:
 def release_readiness_record() -> dict:
     """Record the non-artifact review and post-publication boundaries."""
     return {
-        "issue": 606,
+        "issue": 851,
         "publicApiAndChangelogReview": {
             "status": "required-before-release-approval",
             "currentPublicApiReview": {

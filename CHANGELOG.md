@@ -47,7 +47,7 @@ evidence is linked from each published version.
   0.667), so the artifact records poor generalization explicitly and the
   result is not promotion evidence. No finding, confidence, policy decision,
   public API, or enforcing path changes.
-- **AI-context contract change (beta.10, #842): `sanitizeValue` is
+- **AI-context contract change (#842): `sanitizeValue` is
   key-aware.** A string leaf under an object key that its own scan does not
   redact is scanned once more in its key-context view `{"<key>":"<leaf>"}`
   through the same `scanAndRedact`, and a finding there is redacted at that
@@ -88,41 +88,6 @@ evidence is linked from each published version.
   JSON-in-text, and key-identified `_meta` reach its sinks sanitized, while a
   blob under the default becomes the fixed JSON-RPC error.
 
-- The JavaScript side of the MCP golden path (`examples/mcp-redact`) now
-  runs on `@redact-secret/adapter-mcp` (redact-secret-adapters#13), which
-  implements the MCP boundary contract. The adapters pin
-  (`adapters/pin-source.json`) moves to adapters commit
-  `f014a996ebb9693fbe1c8cc14f144435f011c2b8` and adds that package.
-  `redactToolResult`, `redactArguments`, `redactStreamedToolResult`, and the
-  two wrappers now delegate to the adapter, which changes their behavior in
-  these ways:
-  - `_meta`, `resource_link` fields, and unknown fields are scanned.
-  - Image, audio, and blob content blocks the result unless the host passes
-    `binaryContent: "pass"`.
-  - JSON-in-text is scanned as text, not parsed.
-  - A key-context rescan runs after the leaf pass.
-  - `maxContentBlocks` is gone: traversal limits count from the result root.
-  - Arguments report under `tool-arguments`.
-  - A failing stream stops pulling from its producer.
-  - A throwing server handler, or a rejected client `callTool`, becomes the
-    fixed tool-error result, and a cancelled client call resolves to `null`.
-
-  The Python twins are unchanged and are not an MCP support claim (#810).
-
-- The JavaScript MCP / AI-context golden path (`examples/mcp-redact`:
-  `buildSafeContext`, `redactToolResult`, `redactArguments`, and the two
-  tool-call wrappers) now runs on `@redact-secret/adapter-ai-context`
-  (redact-secret-adapters#12) under the #610 contract instead of its own
-  beta.7 walker. A traversal limit, a scanned object key that would be
-  redacted, a non-JSON value, or content past `maxContentBlocks` now blocks
-  the whole call where beta.7 substituted a marker or dropped the part; a
-  blocked outcome carries no findings (audit through the boundary's
-  `onFinding(finding, { boundary })`); every limit is explicit
-  (`EXAMPLE_LIMITS`). The unreleased package is consumed as an `npm pack`
-  tarball built from the 40-hex adapters commit in `adapters/pin-source.json`
-  (`npm run adapter-pins:install`; see `adapters/README.md`). The Python
-  twins keep their beta.7 behavior.
-
 - The golden path now takes a streamed tool result (#721):
   `buildSafeContext({ streamTool })` feeds the chunks through the boundary's
   staged `openStream` (`redactStreamedToolResult` in
@@ -153,11 +118,12 @@ evidence is linked from each published version.
 
 - Artifact qualification now runs the MCP AI-context golden path end to end
   on the installed candidate (issue #720). The new `golden-path` job calls
-  `buildSafeContext` on this run's packed addon and wasm builds (Node, with
-  the pinned adapters) and on its wheel (the Python twin), and fails unless
-  the model-facing context is sanitized. The artifact inventory requires both
-  lanes and ties their binaries to its recorded digests. Reproduce a lane with
-  `npm run golden-path:qualify -- --lane <node|python> --candidate-dir <dir>`.
+  `buildSafeContext` on this run's packed Node candidate with the exact
+  registry adapters locked by `examples/mcp-redact/package-lock.json`, and
+  fails unless the model-facing context is sanitized. The artifact inventory
+  requires that Node lane and ties its addon and WebAssembly dependency to the
+  recorded digests. Reproduce it with
+  `npm run golden-path:qualify -- --lane node --candidate-dir <dir>`.
 
 - Benchmark inputs now pin an exact `redact-secret-benchmarks` commit instead
   of following its live `main`: development CI accepts a commit on
