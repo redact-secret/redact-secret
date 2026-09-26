@@ -10,8 +10,8 @@
  *   `@redact-secret/adapter-ai-context`, the #610 contract's
  *   implementation, with tool results sanitized by
  *   `@redact-secret/adapter-mcp` (the #612 MCP boundary), both installed
- *   there from the publish-shaped tarballs pinned in
- *   `adapters/pin-source.json`.
+ *   there from the npm registry at the exact versions
+ *   `examples/mcp-redact/package-lock.json` locks.
  *
  * The core is injected rather than loaded by the adapter, so the
  * application and the boundary share one initialized core instance.

@@ -2,7 +2,7 @@
   "name": "redact-secret-reference-ai-context",
   "private": true,
   "type": "module",
-  "description": "Reference architecture: AI context construction. The released @redact-secret/core from the registry, pinned exactly by package-lock.json; the AI-context adapter and the golden path come from examples/mcp-redact, installed from the pinned publish-shaped tarballs in adapters/pin-source.json.",
+  "description": "Reference architecture: AI context construction. The released @redact-secret/core from the registry, pinned exactly by package-lock.json; the AI-context and MCP adapters and the golden path come from examples/mcp-redact, installed there from the registry at the exact versions its package-lock.json locks.",
   "scripts": {
     "smoke": "node smoke.mjs"
   },

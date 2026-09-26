@@ -125,41 +125,34 @@ def _example_file(path: str) -> dict:
 
 
 def golden_path_report(lane: str) -> dict:
-    pin = json.loads((ROOT / "adapters" / "pin-source.json").read_text(encoding="utf-8"))
-    if lane == "python":
-        entry = "examples/mcp-redact/python/agent_context.py"
-        files = [_example_file(entry), _example_file("examples/mcp-redact/python/redact_tool_call.py")]
-    else:
-        entry = "examples/mcp-redact/agent-context.mjs"
-        files = [
-            _example_file(entry),
-            _example_file("examples/mcp-redact/redact-tool-call.mjs"),
-            _example_file("examples/mcp-redact/streaming-tool-result.real-core.test.mjs"),
-        ]
+    lock = json.loads((ROOT / "examples" / "mcp-redact" / "package-lock.json").read_text(encoding="utf-8"))
+    entry = "examples/mcp-redact/agent-context.mjs"
+    files = [
+        _example_file(entry),
+        _example_file("examples/mcp-redact/redact-tool-call.mjs"),
+        _example_file("examples/mcp-redact/streaming-tool-result.real-core.test.mjs"),
+    ]
     report = clean_install_report(lane)
     return {
-        "schemaVersion": 1,
+        "schemaVersion": 2,
         "lane": lane,
         "sourceCommit": SOURCE_COMMIT,
         "published": False,
         "productVersion": PRODUCT_VERSION,
         "example": {"path": "examples/mcp-redact", "entry": entry, "files": files},
-        "adapters": None
-        if lane == "python"
-        else {
-            "repository": pin["repository"],
-            "commit": pin["commit"],
+        "adapters": {
+            "source": "https://registry.npmjs.org/",
+            "lockfile": "examples/mcp-redact/package-lock.json",
             "packages": sorted(
                 (
-                    {"name": p["name"], "version": p["version"], "contentDigest": p["contentDigest"]}
-                    for p in pin["packages"]
+                    {"name": key.removeprefix("node_modules/"), "version": e["version"], "integrity": e["integrity"]}
+                    for key, e in lock["packages"].items()
+                    if key.startswith("node_modules/@redact-secret/")
                 ),
                 key=lambda p: p["name"],
             ),
         },
-        "realCoreTests": []
-        if lane == "python"
-        else ["examples/mcp-redact/streaming-tool-result.real-core.test.mjs"],
+        "realCoreTests": ["examples/mcp-redact/streaming-tool-result.real-core.test.mjs"],
         "runtime": {"name": lane, "version": "1.0"},
         "loadedArtifact": RECORD.GOLDEN_PATH_ARTIFACT[lane],
         "binaries": report["binaries"],
@@ -203,7 +196,6 @@ class Artifacts:
             "clean-install-python": ["clean-install-python.json"],
             "clean-install-browser": ["clean-install-browser.json"],
             "golden-path-node": ["golden-path-node.json"],
-            "golden-path-python": ["golden-path-python.json"],
         }
         self.clean_install = {
             lane: clean_install_report(lane) for lane in RECORD.CLEAN_INSTALL_CHECKS
@@ -521,36 +513,41 @@ class InventoryTests(unittest.TestCase):
     def test_golden_path_evidence_is_not_an_unrecognized_artifact(self) -> None:
         self.assertFalse(any(entry["artifact"].startswith("golden-path-") for entry in self.collect()))
 
-    def test_golden_path_qualification_covers_both_lanes(self) -> None:
+    def test_golden_path_qualification_covers_the_node_lane(self) -> None:
         self.assertEqual(self.golden_path_errors(), [])
 
     def test_a_missing_golden_path_lane_fails(self) -> None:
         def drop(artifacts: Artifacts) -> None:
-            del artifacts.files["golden-path-python"]
+            del artifacts.files["golden-path-node"]
 
-        self.assertIn("golden path python: no qualification", self.golden_path_errors(drop))
+        self.assertIn("golden path node: no qualification", self.golden_path_errors(drop))
+
+    def test_a_python_golden_path_lane_is_retired(self) -> None:
+        """#810 retired the Python MCP twins and their lane; a report for it
+        is not evidence of anything."""
+
+        def revive(artifacts: Artifacts) -> None:
+            artifacts.files["golden-path-python"] = ["golden-path-python.json"]
+            artifacts.golden_path["python"] = {**golden_path_report("node"), "lane": "python"}
+
+        self.assertIn("golden-path-python: invalid lane", self.golden_path_errors(revive))
 
     def test_a_golden_path_binary_this_run_did_not_build_fails(self) -> None:
         def swap(artifacts: Artifacts) -> None:
             artifacts.golden_path["node"]["binaries"][0]["sha256"] = "0" * 64
-            artifacts.golden_path["python"]["binaries"][0]["sha256"] = "0" * 64
 
-        errors = self.golden_path_errors(swap)
         self.assertIn(
-            "golden path node: redact-secret.darwin-arm64.node is not an artifact this run qualified", errors
-        )
-        self.assertIn(
-            "golden path python: package-cp310-abi3-macosx.whl is not an artifact this run qualified", errors
+            "golden path node: redact-secret.darwin-arm64.node is not an artifact this run qualified",
+            self.golden_path_errors(swap),
         )
 
     def test_a_golden_path_on_another_revision_of_the_example_fails(self) -> None:
         def stale(artifacts: Artifacts) -> None:
             artifacts.golden_path["node"]["example"]["files"][0]["sha256"] = "0" * 64
-            artifacts.golden_path["python"]["example"]["files"][0]["path"] = "examples/other/agent_context.py"
 
-        errors = self.golden_path_errors(stale)
-        self.assertIn("golden path node: did not run this revision's examples/mcp-redact", errors)
-        self.assertIn("golden path python: did not run this revision's examples/mcp-redact", errors)
+        self.assertIn(
+            "golden path node: did not run this revision's examples/mcp-redact", self.golden_path_errors(stale)
+        )
 
     def test_a_node_golden_path_without_the_real_core_tests_fails(self) -> None:
         def skipped(artifacts: Artifacts) -> None:
@@ -561,25 +558,31 @@ class InventoryTests(unittest.TestCase):
             self.golden_path_errors(skipped),
         )
 
-    def test_a_golden_path_on_unpinned_adapters_fails(self) -> None:
-        def unpinned(artifacts: Artifacts) -> None:
-            artifacts.golden_path["node"]["adapters"]["commit"] = "b" * 40
+    def test_a_golden_path_on_adapters_other_than_the_locked_ones_fails(self) -> None:
+        expected = "golden path node: did not install the registry adapters examples/mcp-redact/package-lock.json locks"
 
-        self.assertIn(
-            "golden path node: did not install the adapters pinned in adapters/pin-source.json",
-            self.golden_path_errors(unpinned),
-        )
+        def other_version(artifacts: Artifacts) -> None:
+            artifacts.golden_path["node"]["adapters"]["packages"][0]["version"] = "0.0.0"
+
+        def other_bytes(artifacts: Artifacts) -> None:
+            artifacts.golden_path["node"]["adapters"]["packages"][0]["integrity"] = "sha512-" + "A" * 86 + "=="
+
+        def old_pin(artifacts: Artifacts) -> None:
+            artifacts.golden_path["node"]["adapters"] = {"repository": "redact-secret/redact-secret-adapters", "commit": "b" * 40}
+
+        for configure in (other_version, other_bytes, old_pin):
+            self.assertIn(expected, self.golden_path_errors(configure))
 
     def test_a_published_unsanitized_or_wrong_artifact_golden_path_fails(self) -> None:
         def broken(artifacts: Artifacts) -> None:
             artifacts.golden_path["node"]["published"] = True
             artifacts.golden_path["node"]["loadedArtifact"] = "wasm"
-            artifacts.golden_path["python"]["results"]["sanitized"] = "failed"
+            artifacts.golden_path["node"]["results"]["sanitized"] = "failed"
 
         errors = self.golden_path_errors(broken)
         self.assertIn("golden path node: must qualify candidate artifacts (published=false)", errors)
         self.assertIn("golden path node: did not load the addon artifact", errors)
-        self.assertIn("golden path python: sanitized did not pass", errors)
+        self.assertIn("golden path node: sanitized did not pass", errors)
 
     def test_an_addon_without_a_compiled_library_fails(self) -> None:
         def configure(artifacts: Artifacts) -> None:

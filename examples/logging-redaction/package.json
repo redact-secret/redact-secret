@@ -7,7 +7,7 @@
     "smoke": "node smoke.mjs"
   },
   "dependencies": {
-    "@redact-secret/adapter-pino": "0.1.0",
+    "@redact-secret/adapter-pino": "0.1.1",
     "@redact-secret/core": "0.1.0-beta.8",
     "pino": "10.3.1"
   }

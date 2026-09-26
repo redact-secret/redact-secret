@@ -3,8 +3,8 @@
  * End-to-end smoke test for the AI-context reference (issue #611):
  * `npm run reference:ai-context` from the repository root.
  *
- * The released `@redact-secret/core` from the registry, the pinned
- * publish-shaped `@redact-secret/adapter-ai-context`, and the
+ * The released `@redact-secret/core` from the registry, the released
+ * `@redact-secret/adapter-ai-context` and `@redact-secret/adapter-mcp`, and the
  * `examples/mcp-redact` golden path, with no fake anywhere. Every value
  * below is synthetic. Everything that would reach the model, the tool, or
  * the audit callback is checked for every synthetic value before anything

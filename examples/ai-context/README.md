@@ -8,7 +8,7 @@ sends to a model. Every value crosses the framework-neutral
 (#610) before it joins that context.
 
 ```bash
-npm run reference:ai-context   # from the repository root: pinned adapter install, npm ci here, then the smoke test
+npm run reference:ai-context   # from the repository root: npm ci in examples/mcp-redact and here, then the smoke test
 ```
 
 This directory adds no redaction logic and no second golden path. It
@@ -19,16 +19,18 @@ composes two things that already exist:
   which runs on `@redact-secret/adapter-ai-context`, the contract's
   implementation, with tool results sanitized by `@redact-secret/adapter-mcp`
   (the [MCP boundary contract](../../docs/reference/mcp-boundary.md)), both
-  installed there from the publish-shaped tarballs pinned in
-  [`adapters/pin-source.json`](../../adapters/README.md);
+  installed there from the npm registry at `0.1.0-alpha` (dist-tag
+  `alpha`, with `@redact-secret/adapter@0.1.1` under them), pinned exactly by
+  [`examples/mcp-redact/package-lock.json`](../mcp-redact/package-lock.json);
 - the released `@redact-secret/core@0.1.0-beta.8` from the npm registry,
   pinned exactly by [`package-lock.json`](./package-lock.json), initialized
   once and injected into the boundary.
 
-`npm run reference:ai-context` runs `npm run adapter-pins:install` first,
-which builds the pinned adapters, verifies their content digests, and
-installs them into `examples/mcp-redact`. Neither adapter is on npm yet; when
-they are, this reference moves to the registry versions.
+`npm run reference:ai-context` runs `npm run examples:install` first, which
+installs the locked adapters into `examples/mcp-redact` with `npm ci`.
+There is no Python AI-context reference: Python MCP is not supported
+([decision](../../docs/decisions/2026-09-25-define-the-supported-mcp-redaction-boundary.md)),
+and the Python MCP golden-path twins were retired (#810).
 
 | File | Role |
 | --- | --- |
@@ -136,5 +138,5 @@ The details are in [`examples/mcp-redact`](../mcp-redact/README.md).
 - The contract's conformance fixture, replayed by the adapter on the real
   core, and the core range it is qualified against: the adapters
   repository's
-  [`compatibility.json`](https://github.com/redact-secret/redact-secret-adapters/blob/f014a996ebb9693fbe1c8cc14f144435f011c2b8/compatibility.json)
-  at the pinned commit.
+  [`compatibility.json`](https://github.com/redact-secret/redact-secret-adapters/blob/ea92c2abd451b66899722170344e73d8f34ef47e/compatibility.json)
+  at the `train/2026.09.25` commit that published these adapter versions.

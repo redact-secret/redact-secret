@@ -27,11 +27,12 @@ Four things are recorded, all tied to one source commit:
    ``docs/quickstart.md`` lane (Node, Python, browser bundler), each tied to
    that page's digest and to binaries that must be byte-identical to
    artifacts recorded in (1).
-6. **Golden-path qualification** (issue #720) - one result per
-   ``examples/mcp-redact`` lane (Node, Python): ``buildSafeContext`` run on
-   the installed candidate, tied to this revision's example files, the pinned
-   adapter packages, and binaries that must be byte-identical to artifacts
-   recorded in (1).
+6. **Golden-path qualification** (issue #720) - one result for the
+   ``examples/mcp-redact`` Node lane: ``buildSafeContext`` run on the
+   installed candidate, tied to this revision's example files, the registry
+   adapter packages its ``package-lock.json`` locks, and binaries that must be
+   byte-identical to artifacts recorded in (1). The Python lane was retired
+   with the Python MCP twins (#810).
 
     python3 -B scripts/record-artifact-inventory.py \\
         --artifacts qualification-artifacts --out artifact-inventory.json
@@ -288,12 +289,12 @@ CLEAN_INSTALL_ARTIFACT = {"node": "addon", "python": "native", "browser": "wasm"
 CLEAN_INSTALL_MAX_BUDGET_SECONDS = 300
 
 GOLDEN_PATH_EXAMPLE = Path("examples") / "mcp-redact"
-ADAPTER_PIN = Path("adapters") / "pin-source.json"
+GOLDEN_PATH_LOCKFILE = GOLDEN_PATH_EXAMPLE / "package-lock.json"
+GOLDEN_PATH_REGISTRY = "https://registry.npmjs.org/"
 GOLDEN_PATH_CHECKS = {
     "node": ("install", "contents", "artifact", "toolInput", "sanitized", "realCoreTests"),
-    "python": ("install", "contents", "artifact", "toolInput", "sanitized"),
 }
-GOLDEN_PATH_ARTIFACT = {"node": "addon", "python": "native"}
+GOLDEN_PATH_ARTIFACT = {"node": "addon"}
 
 
 def collect_lane_reports(artifacts: Path, prefix: str) -> tuple[list[dict], list[str]]:
@@ -550,20 +551,21 @@ def require_golden_path_qualification(
     expected_commit: str,
     expected_version: str,
 ) -> list[str]:
-    """Both golden-path lanes passed on this revision's example, the Node lane
-    on the pinned adapter packages, and every reported binary is an artifact
-    this run built (file name and SHA-256), which is what makes the installed
-    core the exact candidate the rest of this run qualified."""
+    """The golden-path Node lane passed on this revision's example, on the
+    registry adapter packages its lockfile locks, and every reported binary is
+    an artifact this run built (file name and SHA-256), which is what makes
+    the installed core the exact candidate the rest of this run qualified."""
     errors: list[str] = []
     built = {(Path(entry["file"]).name, entry["sha256"]) for entry in collected}
-    pin = json.loads((ROOT / ADAPTER_PIN).read_text(encoding="utf-8"))
-    pinned_adapters = {
-        "repository": pin["repository"],
-        "commit": pin["commit"],
+    lock = json.loads((ROOT / GOLDEN_PATH_LOCKFILE).read_text(encoding="utf-8"))
+    locked_adapters = {
+        "source": GOLDEN_PATH_REGISTRY,
+        "lockfile": GOLDEN_PATH_LOCKFILE.as_posix(),
         "packages": sorted(
             (
-                {"name": package["name"], "version": package["version"], "contentDigest": package["contentDigest"]}
-                for package in pin["packages"]
+                {"name": key.removeprefix("node_modules/"), "version": entry["version"], "integrity": entry["integrity"]}
+                for key, entry in (lock.get("packages") or {}).items()
+                if key.startswith("node_modules/@redact-secret/")
             ),
             key=lambda package: package["name"],
         ),
@@ -578,7 +580,7 @@ def require_golden_path_qualification(
             continue
         if result.get("artifact") != f"golden-path-{lane}":
             errors.append(f"{label}: artifact directory does not match its lane")
-        if result.get("schemaVersion") != 1:
+        if result.get("schemaVersion") != 2:
             errors.append(f"{label}: unsupported evidence schema")
         if result.get("sourceCommit") != expected_commit:
             errors.append(f"{label}: source revision does not match the inventory")
@@ -599,10 +601,12 @@ def require_golden_path_qualification(
         if record.get("path") != example or not files or record.get("entry") not in paths or stale:
             errors.append(f"{label}: did not run this revision's {example}")
         real_core_tests = result.get("realCoreTests") or []
-        if lane == "node" and (not real_core_tests or not set(real_core_tests) <= set(paths)):
+        if not real_core_tests or not set(real_core_tests) <= set(paths):
             errors.append(f"{label}: did not run this revision's real-core example tests")
-        if lane == "node" and result.get("adapters") != pinned_adapters:
-            errors.append(f"{label}: did not install the adapters pinned in {ADAPTER_PIN.as_posix()}")
+        if not locked_adapters["packages"] or result.get("adapters") != locked_adapters:
+            errors.append(
+                f"{label}: did not install the registry adapters {GOLDEN_PATH_LOCKFILE.as_posix()} locks"
+            )
         if result.get("loadedArtifact") != GOLDEN_PATH_ARTIFACT[lane]:
             errors.append(f"{label}: did not load the {GOLDEN_PATH_ARTIFACT[lane]} artifact")
         checks = result.get("results") or {}
@@ -611,7 +615,7 @@ def require_golden_path_qualification(
                 errors.append(f"{label}: {check} did not pass")
         binaries = result.get("binaries") or []
         suffixes = sorted(Path(str(binary.get("file", ""))).suffix for binary in binaries)
-        expected_suffixes = [".whl"] if lane == "python" else [".node", ".wasm", ".wasm"]
+        expected_suffixes = [".node", ".wasm", ".wasm"]
         if suffixes != expected_suffixes:
             errors.append(f"{label}: expected binaries {expected_suffixes}, reported {suffixes}")
         for binary in binaries:

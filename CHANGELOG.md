@@ -59,6 +59,24 @@ evidence is linked from each published version.
   `password`), measured by the new fixture cases, and one more scan per
   such leaf. The core API is unchanged; the adapter implementation is
   redact-secret-adapters#32.
+- Every example and reference now installs published adapter packages from
+  the npm registry at exact versions, locked by a committed
+  `package-lock.json`: `examples/mcp-redact` (and through it
+  `examples/ai-context`) uses `@redact-secret/adapter-ai-context@0.1.0-alpha`
+  and `@redact-secret/adapter-mcp@0.1.0-alpha` (dist-tag `alpha`, with
+  `@redact-secret/adapter@0.1.1`); `examples/logging-redaction` moves to
+  `@redact-secret/adapter-pino@0.1.1` and installs its new
+  `hooks.streamWrite` too, because `hooks.logMethod` alone let child-logger
+  bindings and `mixin()` output reach the destination in plaintext;
+  `examples/tracing-masking` moves to `@redact-secret/adapter-otel@0.1.1` and
+  `@redact-secret/adapter@0.1.1`, which also redact the span name, event
+  names, the status message, and link attributes. Both smoke tests gained
+  scenarios for those fields. The `golden-path` qualification job installs
+  the candidate core with the golden path's locked registry adapters,
+  verified against the lockfile's integrity (report schema 2).
+  These registry versions predate the key-aware `sanitizeValue` (#842) and
+  `resources/read` (#848) described above, so the examples do not show
+  either yet; they move to the next adapters release when it publishes.
 
 - The JavaScript side of the MCP golden path (`examples/mcp-redact`) now
   runs on `@redact-secret/adapter-mcp` (redact-secret-adapters#13), which
@@ -137,6 +155,21 @@ evidence is linked from each published version.
   to have been explicitly promoted to benchmarks `main`. Successful artifact
   qualification pushes on product `main` now notify staging
   with the exact source ref, source SHA, and qualification run ID.
+
+### Removed
+
+- The adapters tarball pin: `adapters/pin-source.json`, `adapters/README.md`,
+  `scripts/adapter-pins.py` and its tests, the `adapter-pins:*` scripts
+  (including `adapter-pins:check` in `npm run ci`), and the
+  `adapter-pin-drift` CI job. Nothing consumes an unreleased adapter any
+  more. `npm run examples:install` installs the golden path's locked
+  adapters.
+- The Python MCP golden-path twins (`examples/mcp-redact/python/`) and their
+  tests, and the `python` lane of the `golden-path` qualification job
+  (#810). They kept beta.7 behavior and read as a Python MCP support claim.
+  Python MCP is not supported: no Python AI-context or MCP adapter exists,
+  and the Python `mcp` SDK is outside the MCP boundary's supported range
+  (#612). The Python logging and tracing examples are unchanged.
 
 ### Changed detection
 

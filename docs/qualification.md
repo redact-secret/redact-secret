@@ -503,48 +503,57 @@ Only versions whose failure messages meet the actionable requirement (from
 
 ## Golden-path qualification
 
-Issue #720. The example's own tests (`examples/mcp-redact/*.test.mjs` and
-`python/test_*.py`) inject a fake core, so they prove the order of the turn,
-not that the real engine keeps a credential out of the model's context. The
-`golden-path` job runs `buildSafeContext` on the installed candidate with
-`scripts/qualify-golden-path.mjs`, in two lanes:
+Issue #720. The example's own tests (`examples/mcp-redact/*.test.mjs`)
+inject a fake core, so they prove the order of the turn, not that the real
+engine keeps a credential out of the model's context. The `golden-path` job
+runs `buildSafeContext` on the installed candidate with
+`scripts/qualify-golden-path.mjs`, in one lane, `node`:
 
-- `node` installs `@redact-secret/core` and the example's pinned adapter
-  packages (`adapters/pin-source.json`) from a local registry that serves
-  only the candidate tarballs and the pinned adapter tarballs. Each adapter
-  tarball must match its pinned content digest, and nothing comes from a
-  public registry. The installed core must load the addon. The lane then
-  runs the example test files `npm run examples:real-core:test` names (the
-  streamed tool result on the real `IncrementalSanitizer`, #721) in the same
-  project against the same core.
-- `python` installs the candidate wheel into a fresh virtual environment
-  with `PIP_NO_INDEX` and `PIP_FIND_LINKS`, and passes the installed
-  `redact_secret.scan_and_redact` to the Python twin's `build_safe_context`.
+- It installs the candidate `@redact-secret/core` and the example's adapter
+  packages from a local registry that serves only the candidate tarballs and
+  the adapter tarballs `examples/mcp-redact/package-lock.json` locks. Those
+  adapter tarballs are the published npm registry bytes, at exactly the
+  locked versions: the driver fetches each from its lockfile `resolved` URL
+  and refuses it unless it matches the lockfile's `integrity`. The lockfile
+  must lock every adapter at the top level, from `registry.npmjs.org`, at
+  exactly the version the example's `package.json` declares, and must not
+  lock `@redact-secret/core`. The installed core must load the addon. The
+  lane then runs the example test files `npm run examples:real-core:test`
+  names (the streamed tool result on the real `IncrementalSanitizer`, #721)
+  in the same project against the same core.
 
-Both lanes copy the example's entry module and every example module it
+The lane copies the example's entry module and every example module it
 imports, followed from the source, into an empty directory outside the
 checkout. One turn carries a synthetic credential in the user input and
 another in the tool result. The lane fails unless the turn is `ok`, the tool
 was dispatched with already-sanitized input, and the serialized model-facing
 value carries a placeholder and the surrounding text but neither credential.
 
-The job installs the same candidate `clean-install` does: the `node-addon`,
-`wasm-web`, and `wasm-web-common` artifacts packed by
-`scripts/pack-npm-candidate.mjs`, and the `python` job's wheel, downloaded
-from this run, never rebuilt. Each lane uploads a `golden-path-<lane>` report
-that records outcomes, versions, the example files' digests, the adapter pin,
-and the installed binaries' digests, never the model-facing value. The
-`inventory` job requires both lanes. It rejects a report produced from a
-different revision of the example or on adapters other than the pinned ones.
-It also rejects any report whose `.node`, `.wasm`, or `.whl` does not match,
-by file name and SHA-256, an artifact it recorded from the same run.
+There is no Python lane. #720 asked for Node and Python lanes; the Python
+lane ran the Python MCP twins in `examples/mcp-redact/python/`, which were
+retired with it (#810): no Python AI-context or MCP adapter exists, and the
+Python `mcp` SDK is not supported
+([decision](decisions/2026-09-25-define-the-supported-mcp-redaction-boundary.md)).
+The candidate wheel is still qualified against the AI-context contract by
+wheel qualification (`bindings/python/tests/test_ai_context_boundary.py`).
 
-To reproduce a lane locally, build the host candidate as in
-[clean-install qualification](#clean-install-qualification), then:
+The job installs the same npm candidate `clean-install` does: the
+`node-addon`, `wasm-web`, and `wasm-web-common` artifacts packed by
+`scripts/pack-npm-candidate.mjs`, downloaded from this run, never rebuilt.
+It uploads a `golden-path-node` report (schema 2) that records outcomes,
+versions, the example files' digests, the registry adapters (name, version,
+integrity), and the installed binaries' digests, never the model-facing
+value. The `inventory` job requires it. It rejects a report produced from a
+different revision of the example, or on adapters other than the ones the
+lockfile locks. It also rejects any report whose `.node` or `.wasm` does not
+match, by file name and SHA-256, an artifact it recorded from the same run.
+
+To reproduce the lane locally, build the host candidate as in
+[clean-install qualification](#clean-install-qualification), then (the
+driver fetches the adapter tarballs from the npm registry):
 
 ```bash
-npm run adapter-pins:install   # the Node lane's pinned adapter tarballs
-npm run golden-path:qualify -- --lane <node|python> --candidate-dir <dir>
+npm run golden-path:qualify -- --lane node --candidate-dir <dir>
 ```
 
 ## Running it locally

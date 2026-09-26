@@ -16,13 +16,13 @@ The JavaScript side runs on the supported
 (redact-secret-adapters#13), which is a thin specialization of the
 framework-neutral [AI-context boundary contract](../../docs/reference/ai-context-boundary.md)
 (#610) and its `@redact-secret/adapter-ai-context` (redact-secret-adapters#12).
-Both are consumed as publish-shaped `npm pack` artifacts built from a pinned
-adapters commit (see
-[Installing the pinned adapter](#installing-the-pinned-adapter)). This
+Both are installed from the npm registry at exact versions, pinned by
+[`package-lock.json`](./package-lock.json) (see
+[Installing the adapters](#installing-the-adapters)). This
 directory adds only the order of the turn. The adapters do every scan, every
 traversal, every MCP shape rule, every limit, and every failure mapping.
-The Python twins under [`python/`](./python) keep their beta.7 behavior; see
-[Python](#python).
+This example is JavaScript only: **Python MCP is not supported** (see
+[Python](#python)).
 
 [`agent-context.mjs`](./agent-context.mjs) is this flow, end to end; see
 [The AI-context golden path](#the-ai-context-golden-path).
@@ -45,9 +45,16 @@ and two thin wrappers, so they follow the contract: the whole result is
 scanned (including `_meta` and resource links), text is scanned as text,
 binary content blocks unless the host opts in, and a key-context check runs
 after the leaf pass. Copy this code out to use it; from then on you own the
-copy. The Python twins under [`python/`](./python) predate the contract and
-are not an MCP support claim (see [Python](#python)). The supported SDK range
-is in [SDK versions](#sdk-versions).
+copy. There is no Python recipe: the Python `mcp` SDK is not supported (see
+[Python](#python)). The supported SDK range is in [SDK versions](#sdk-versions).
+
+The locked `adapter-mcp@0.1.0-alpha` and `adapter-ai-context@0.1.0-alpha`
+implement the contract as beta.9 stated it. They predate two later additions
+on `main`: the key-aware `sanitizeValue` (#842), which redacts a leaf that
+only its own key identifies instead of blocking the result, and the
+[`resources/read` boundary](../../docs/reference/mcp-resources-read.md)
+(#843). This example shows neither yet. Both arrive with the next adapters
+release, when this lockfile moves to it.
 
 ## Files
 
@@ -58,9 +65,8 @@ is in [SDK versions](#sdk-versions).
 | [`agent-context.mjs`](./agent-context.mjs) | The AI-context golden path (`buildSafeContext`), `EXAMPLE_LIMITS`, and the boundary factories (`createGoldenPathBoundary` over the real core, `createGoldenPathBoundaryWith` over an injected one). See [below](#the-ai-context-golden-path). |
 | [`streaming-tool-result.mjs`](./streaming-tool-result.mjs) | `redactStreamedToolResult`: a tool result delivered as chunks, through the adapter's `sanitizeStreamedToolResult` (one staged `openStream` that stops pulling once it fails), with cancellation and producer failure. `buildSafeContext`'s `streamTool` runs it. See [Streamed results](#streamed-or-progressive-results). |
 | [`demo.mjs`](./demo.mjs) | Runnable, side-by-side: the same synthetic tool result through block-all and through this middleware, on the real core. It prints only the two outputs, never the unscanned input. |
-| [`package.json`](./package.json) | This directory as a consumer project: its only dependencies are the pinned `file:` tarballs from `adapters/pin-source.json` (`@redact-secret/adapter`, `adapter-ai-context`, and `adapter-mcp`). |
+| [`package.json`](./package.json), [`package-lock.json`](./package-lock.json), [`.npmrc`](./.npmrc) | This directory as a consumer project: its only dependencies are the published `@redact-secret/adapter-ai-context@0.1.0-alpha` and `@redact-secret/adapter-mcp@0.1.0-alpha` (dist-tag `alpha`), with `@redact-secret/adapter@0.1.1` under them, all locked exactly. `.npmrc` sets `legacy-peer-deps`, so the adapters' `@redact-secret/core` peer is not installed here: the tests inject their core. |
 | [`fixtures/fake-core.mjs`](./fixtures/fake-core.mjs) | The two injected core operations, faked for the tests: `fake-scanner.mjs`'s rules plus the core's whole-input byte limit, and a core that behaves as if uninitialized. |
-| [`python/`](./python) | The Python twins of every file above, at their beta.7 behavior. |
 
 ## The AI-context golden path
 
@@ -203,8 +209,10 @@ its quoted string. `structuredContent`, which a tool is expected to return
 next to its text serialization, is scanned as a value, and then the
 key-context check serializes it and scans it again, so a value identified
 only by its key blocks the result instead of reaching context from the
-structured copy. The Python twin still parses JSON-in-text (its beta.7
-behavior, see [Python](#python)).
+structured copy. (From the next adapters release, the key-aware
+`sanitizeValue` redacts such a leaf in place instead, and the check stays as
+a backstop for sibling and parent keys; see
+[Key-context backstop](../../docs/reference/mcp-boundary.md#key-context-backstop).)
 
 ## Multi-block results and non-text content
 
@@ -331,53 +339,43 @@ The wrappers here stay duck-typed: a tool handler is `(args, extra)` on 1.x
 and `(args, ctx)` with `ctx.mcpReq.signal` on 2.x, and the adapter reads
 either signal.
 
-- **Python**: the official SDK, `mcp@2.2.0`, was the shape the Python twins
-  were written against (`mcp.server.lowlevel.Server`'s `on_call_tool`, and
-  `mcp.client.session.ClientSession.call_tool`). The Python `mcp` SDK is
-  **not supported** by the MCP contract, and no Python MCP adapter exists.
+- **Python**: the Python `mcp` SDK is **not supported** by the MCP contract,
+  and no Python MCP adapter exists (see [Python](#python)).
 
 A real integration installs the SDK itself; see the JSDoc usage example at
 the top of `wrap-tool-call.mjs`.
 
-## Installing the pinned adapter
+## Installing the adapters
 
-`@redact-secret/adapter-mcp` and `@redact-secret/adapter-ai-context` are not
-on npm yet, so this directory consumes them the way an outside consumer
-would install them: an `npm pack`
-tarball built from one immutable, 40-hex `redact-secret-adapters` commit,
-recorded in [`adapters/pin-source.json`](../../adapters/pin-source.json)
-with each package's content digest. [`package.json`](./package.json) names
-those tarballs as `file:` dependencies. From the repository root:
+`@redact-secret/adapter-ai-context` and `@redact-secret/adapter-mcp` are
+published by the adapters train 2026.09.25 as `0.1.0-alpha` under the
+`alpha` dist-tag. [`package.json`](./package.json) names those exact
+versions, and [`package-lock.json`](./package-lock.json) locks them, and
+`@redact-secret/adapter@0.1.1` under them, with their registry integrity.
+From the repository root:
 
 ```bash
-npm run adapter-pins:install   # builds the pinned adapters once (network), verifies digests, installs here
+npm run examples:install   # npm ci here (network): exactly the locked registry packages
 ```
 
-The artifacts live in the gitignored `.cache/adapters/<commit>/`. CI runs the
-same command before `npm run ci`, and `npm run examples:test` refuses to run
-against a missing or stale install. Re-pinning, the checks, and how to add
-another consumer are in [`adapters/README.md`](../../adapters/README.md).
+CI runs the same command before `npm run ci`. Moving to a newer adapter
+release is an edit of `package.json` plus a regenerated lockfile
+(`npm install` here), reviewed like any other change.
 
 ## Running the tests
 
 ```bash
-npm run adapter-pins:install   # once
-npm run examples:test          # every example suite, both languages, over fake cores
-python3 -B -m unittest discover -s examples/mcp-redact/python -p "test_*.py"
+npm run examples:install   # once
+npm run examples:test      # every example suite, over fake cores
 ```
 
 These suites inject a fake core (`fixtures/fake-core.mjs`, built on
 `fake-scanner.mjs`, and a fake incremental session for streaming), so no
-built native addon or extension is required. `redact-tool-call.test.mjs`
-and `python/test_redact_tool_call.py` both read
-[`fixtures/mcp-redact-cases.json`](./fixtures/mcp-redact-cases.json). Text
-results, JSON-in-text results, and arguments produce the same redacted
-output in both languages. The two binary cases (an image, a blob resource)
-pass through in Python. In JavaScript they block by default under the MCP
-contract, and pass only with `binaryContent: "pass"`, which the JavaScript
-suite checks both ways. The cases that differ by design (limits, keys,
-non-JSON values, findings on a blocked outcome, `_meta`, resource links,
-unknown block types) are tested in the JavaScript suite only.
+built native addon is required. `redact-tool-call.test.mjs` reads
+[`fixtures/mcp-redact-cases.json`](./fixtures/mcp-redact-cases.json). The
+two binary cases (an image, a blob resource) block by default under the MCP
+contract, and pass only with `binaryContent: "pass"`, which the suite checks
+both ways.
 
 `streaming-tool-result.real-core.test.mjs` runs the streamed golden path on
 the real core instead. It needs a built core resolvable from this directory
@@ -404,12 +402,10 @@ link it into the installed tree:
 
 ```bash
 npm run js:build
-npm run adapter-pins:install
+npm run examples:install
 ln -s ../../../../packages/javascript examples/mcp-redact/node_modules/@redact-secret/core
 node examples/mcp-redact/demo.mjs
-# the next `npm run adapter-pins:install` removes the link
-
-python3 examples/mcp-redact/python/demo.py   # requires a built redact_secret extension on PYTHONPATH
+# the next `npm run examples:install` removes the link
 ```
 
 ## Running the golden path against the installed candidate
@@ -417,62 +413,57 @@ python3 examples/mcp-redact/python/demo.py   # requires a built redact_secret ex
 The suites above never touch the real engine. The `golden-path` job of
 [`artifact-qualification.yml`](../../.github/workflows/artifact-qualification.yml)
 does (issue #720): it runs `buildSafeContext` on an installed release
-candidate, once in Node.js and once through the Python twin, and fails unless
-the model-facing context is sanitized. It is one command, the same one CI
-runs:
+candidate in Node.js, and fails unless the model-facing context is
+sanitized. It is one command, the same one CI runs:
 
 ```bash
-npm run golden-path:qualify -- --lane <node|python> --candidate-dir <dir>
+npm run golden-path:qualify -- --lane node --candidate-dir <dir>
 ```
 
 `<dir>` holds the candidate: the npm tarballs
 `scripts/pack-npm-candidate.mjs` packs for this host (core, wasm, and the host
-addon) and/or the wheel. The Node lane also needs the pinned adapter
-tarballs, so run `npm run adapter-pins:install` first.
+addon). The driver fetches the adapter tarballs itself (network).
 [`docs/qualification.md`](../../docs/qualification.md#golden-path-qualification)
 shows how to build a candidate locally.
 
 [`scripts/qualify-golden-path.mjs`](../../scripts/qualify-golden-path.mjs)
-copies `agent-context.mjs` (or `python/agent_context.py`) and every example
-module it imports into an empty directory outside the checkout. The Node lane
-installs `@redact-secret/core` and this directory's pinned adapters from a
-local registry that serves only the candidate and pinned tarballs. The Python
-lane installs the candidate wheel into a fresh virtual environment with no
-index. One turn carries a synthetic credential in the user input and another
+copies `agent-context.mjs` and every example module it imports into an empty
+directory outside the checkout. It installs the candidate
+`@redact-secret/core` and this directory's adapters from a local registry
+that serves only the candidate tarballs and the adapter tarballs
+[`package-lock.json`](./package-lock.json) locks. Those are the published
+registry bytes, fetched from each entry's `resolved` URL and verified against
+its `integrity` before they are served, so the clean project runs the same
+adapter versions this directory does. One turn carries a synthetic credential in the user input and another
 in the tool result. The lane passes only if the turn is `ok`, the tool was
 called with already-sanitized input, and the model-facing value carries a
-placeholder instead of either credential. The Node lane then runs the test
+placeholder instead of either credential. The lane then runs the test
 files `npm run examples:real-core:test` names in the same project, so the
 streamed path runs on the installed candidate's `IncrementalSanitizer` too.
 The installed packages must match
 the candidate files byte for byte. In CI the candidate is this run's own
-qualified addon, wasm builds, and wheel, and the `inventory` job rejects a
-report whose `.node`, `.wasm`, or `.whl` digests are not ones it recorded.
+qualified addon and wasm builds, and the `inventory` job rejects a report
+whose `.node` or `.wasm` digests are not ones it recorded, or whose adapters
+are not the ones the lockfile locks.
 
 ## Python
 
-The Python twins predate the MCP boundary contract and are **not an MCP
-support claim**: the contract does not support the Python `mcp` SDK, and no
-Python MCP adapter exists. They still pass `image`, `audio`, `resource_link`
-and blob content through unscanned, copy `_meta` unchanged, parse
-JSON-in-text, scan `content` and `structuredContent` separately with no
-key-context check, and label arguments `context`. Aligning or retiring them
-is #810.
+**Python MCP is not supported.** The
+[supported MCP redaction boundary decision](../../docs/decisions/2026-09-25-define-the-supported-mcp-redaction-boundary.md)
+(#612) excludes the Python `mcp` SDK, and there is no Python AI-context or MCP
+adapter package. This directory therefore has no Python recipe. The Python
+twins that used to live under `python/` kept their beta.7 behavior (binary content and
+`_meta` passed through unscanned, JSON-in-text parsed, no key-context check,
+arguments labelled `context`, a streamed redactor with no early stop or
+cancellation). They read as a Python MCP support claim, so they were retired
+with their golden-path qualification lane (#810) instead of being aligned in
+place: a second, unqualified implementation of the contract is what the
+adapters exist to avoid.
 
-The Python twins (`python/agent_context.py`, `redact_tool_call.py`,
-`wrap_tool_call.py`, `streaming_tool_result.py`) also keep their beta.7 behavior:
-a marker for a subtree past a limit, unscanned keys, findings on a blocked
-outcome, and a length check for oversized input. `streaming_tool_result.py`
-is also not composed into `agent_context.py` and has no cancellation: it is
-the beta.7 standalone redactor over an injected session. Its JavaScript
-counterpart moved onto the boundary's `openStream` (#721); the Python one
-waits for a Python `open_stream`, because re-deriving the staging,
-cancellation, and single-release rules here would be a second, unqualified
-implementation of the contract. There is no Python
-AI-context adapter package yet. The core's Python binding already passes the
-contract's fixture (`bindings/python/tests/test_ai_context_boundary.py`),
-so a Python adapter can be pinned the same way once
-`redact-secret-adapters` ships one.
+The core's Python binding does pass the AI-context contract's fixture
+(`bindings/python/tests/test_ai_context_boundary.py`). A Python recipe returns
+only when `redact-secret-adapters` ships a Python AI-context and MCP adapter to
+build it on.
 
 ## Upstream validation
 

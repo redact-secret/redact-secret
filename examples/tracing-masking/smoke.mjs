@@ -37,8 +37,11 @@ const failingPolicy = Object.freeze({
 /** What the exporter received: only the fields the adapter protects. */
 function exported(exporter) {
   return exporter.getFinishedSpans().map((span) => ({
+    name: span.name,
+    status: { ...span.status },
     attributes: { ...span.attributes },
     events: span.events.map((event) => ({ name: event.name, attributes: { ...event.attributes } })),
+    links: span.links.map((link) => ({ attributes: { ...link.attributes } })),
   }));
 }
 
@@ -88,6 +91,27 @@ await scenario(
   (span) => {
     const event = span.events.find((e) => e.name === "exception");
     assert.equal(event.attributes["exception.message"], "tool failed with password=<SECRET_1>");
+  },
+);
+// Redacted since @redact-secret/adapter-otel@0.1.1; 0.1.0 passed these through.
+await scenario(
+  "span name, event name, status message, and link attributes",
+  {},
+  (tracer) => {
+    const parent = tracer.startSpan("parent");
+    const span = tracer.startSpan(`deploy with ${SYNTHETIC.awsKeyId}`, {
+      links: [{ context: parent.spanContext(), attributes: { note: `api_key=${SYNTHETIC.apiKey}` } }],
+    });
+    span.addEvent(`retry with Authorization: Bearer ${SYNTHETIC.bearer}`);
+    span.setStatus({ code: 2, message: `login failed with password=${SYNTHETIC.password}` });
+    span.end();
+    parent.end();
+  },
+  (span) => {
+    assert.equal(span.name, "deploy with <SECRET_1>");
+    assert.equal(span.events[0].name, "retry with Authorization: Bearer <SECRET_1>");
+    assert.equal(span.status.message, "login failed with password=<SECRET_1>");
+    assert.equal(span.links[0].attributes.note, "api_key=<SECRET_1>");
   },
 );
 await scenario(
