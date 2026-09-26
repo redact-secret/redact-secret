@@ -103,6 +103,17 @@ the result and before any of these:
 
 The host wraps its `readResource` call in `sanitizeResourceRead`, so the raw
 result exists only inside that call and a rejected read is never inspected.
+
+An SDK-side response cache sits before this boundary. The
+`@modelcontextprotocol/client` 2.x `Client` stores a `resources/read` result
+in its `responseCacheStore` when the server marks it cacheable (`ttlMs`), and
+serves later reads from it. The default store is in the client's memory,
+which is outside the claim like any plaintext in process memory, and every
+read it serves still passes through `sanitizeResourceRead`. A host that
+supplies a persistent or shared `responseCacheStore` would persist raw
+contents before the boundary. Such a host must read with
+`cacheMode: "bypass"`, or keep resource reads on a client whose store is
+not persistent.
 An MCP server may run the same boundary inside its resource read callbacks
 before it responds. That is preventive from the host's point of view: the
 host cannot verify it, so it applies the boundary again on every result it
