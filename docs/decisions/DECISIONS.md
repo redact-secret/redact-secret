@@ -42,6 +42,7 @@ Current rules: `docs/specs/engine.md`.
 - [Defer encoded-input decoding out of scope, with reasoning](2026-09-20-defer-encoded-input-decoding.md)
 - [Freeze the shadow evidence score and confidence contract](2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md)
 - [Define the PII domain, scope, arbitration, and activation contract](2026-09-26-define-the-pii-domain-scope-arbitration-and-activation-contract.md)
+- [Define the bounded built-in structured-validator registry](2026-09-26-define-the-bounded-built-in-structured-validator-registry.md)
 
 ## Distribution
 
