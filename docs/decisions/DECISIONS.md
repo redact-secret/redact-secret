@@ -53,6 +53,7 @@ Current rules: `docs/specs/distribution.md`.
 - [Verify @redact-secret/core on Cloudflare Workers and Vercel Edge](2026-09-19-verify-edge-runtimes.md)
 - [Define the framework-neutral AI-context boundary contract](2026-09-25-define-the-framework-neutral-ai-context-boundary-contract.md)
 - [Define the supported MCP redaction boundary](2026-09-25-define-the-supported-mcp-redaction-boundary.md)
+- [Redact key-identified leaves in place, make `resources/read` the next MCP boundary, and defer Python MCP](2026-09-25-rule-on-the-mcp-boundary-open-questions.md)
 
 ## Evidence and gates
 
