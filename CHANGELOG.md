@@ -7,6 +7,20 @@ evidence is linked from each published version.
 
 ### Added
 
+- The supported MCP `resources/read` boundary contract (#843,
+  `docs/reference/mcp-resources-read.md`), a thin specialization of the MCP
+  and AI-context contracts: a whole `ReadResourceResult` is scanned as one
+  key-aware value (every entry's `uri`, `mimeType`, `text`, and `_meta`),
+  resource text is scanned as text whatever its `mimeType`, a `blob` blocks
+  by default with the tool-result `binaryContent: "pass"` opt-in, findings
+  report under the new `resource` label, and every failure maps to a fixed,
+  input-free JSON-RPC error (`-32603`, no `data`) because
+  `ReadResourceResult` has no `isError`. `resources/list`, templates listing,
+  and subscription notifications stay excluded.
+  `conformance/fixtures/mcp-resources-read.json` is replayed against every
+  installed JavaScript lane, and the artifact inventory requires
+  `mcpResourcesRead: passed`. The package is redact-secret-adapters#33;
+  nothing in `@redact-secret/core` changes.
 - The supported MCP redaction boundary contract (#612,
   `docs/reference/mcp-boundary.md`), a thin specialization of the
   AI-context contract for `tools/call`: a whole `CallToolResult` is scanned

@@ -30,6 +30,7 @@ the generated [support matrix](support-matrix.md).
 | Can I process a stream? | [Streaming](guides/streaming.md) |
 | What must an AI-context integration guarantee? | [AI-context boundary contract](reference/ai-context-boundary.md) |
 | What may an MCP integration claim, and which tool-call points must it protect? | [MCP redaction boundary contract](reference/mcp-boundary.md) |
+| What may an MCP integration claim for resource contents it reads (`resources/read`)? | [MCP `resources/read` boundary contract](reference/mcp-resources-read.md) |
 | Where does redaction belong in logging, tracing, or AI context? | [Reference architectures](guides/reference-architectures.md) |
 | How do I detect an in-house credential format? | [Declarative rulesets](guides/rulesets.md) |
 | Why did initialization or sanitization fail? | [Troubleshooting](troubleshooting.md) |

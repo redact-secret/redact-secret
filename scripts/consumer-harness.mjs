@@ -58,6 +58,32 @@ function stageMcpBoundary(consumerRoot) {
   return JSON.parse(readFileSync(join(REPOSITORY_ROOT, MCP_BOUNDARY_FIXTURE), "utf8"));
 }
 
+/**
+ * The supported MCP `resources/read` boundary (issue #843): its runner
+ * imports `./mcp-boundary.mjs` and `./ai-context-boundary.mjs`, so it is
+ * staged beside both and replays on the same installed package.
+ */
+export const MCP_RESOURCES_READ_FIXTURE = "conformance/fixtures/mcp-resources-read.json";
+const MCP_RESOURCES_READ_RUNNER = "conformance/mcp-resources-read.mjs";
+const MCP_RESOURCES_READ_STAGED = "mcp-resources-read.mjs";
+
+function stageMcpResourcesRead(consumerRoot) {
+  copyFileSync(join(REPOSITORY_ROOT, MCP_RESOURCES_READ_RUNNER), join(consumerRoot, MCP_RESOURCES_READ_STAGED));
+  return JSON.parse(readFileSync(join(REPOSITORY_ROOT, MCP_RESOURCES_READ_FIXTURE), "utf8"));
+}
+
+function assertMcpResourcesRead(label, summary, fixture) {
+  const expected = { uninitialized: 0, initialized: 0 };
+  for (const testCase of fixture.cases) expected[testCase.phase ?? "initialized"] += 1;
+  if (
+    summary?.uninitialized?.cases !== expected.uninitialized ||
+    summary?.initialized?.cases !== expected.initialized ||
+    !(summary.initialized.reads > 0)
+  ) {
+    throw new Error(`${label}: MCP resources/read contract replay was incomplete: ${JSON.stringify(summary)}`);
+  }
+}
+
 function assertMcpBoundary(label, summary, fixture) {
   const expected = { uninitialized: 0, initialized: 0 };
   for (const testCase of fixture.cases) expected[testCase.phase ?? "initialized"] += 1;
@@ -273,14 +299,18 @@ export function qualifyNode(
     "const { createServerHandler } = await import('./safe-integration/server.mjs');",
     `const { runAiContextBoundaryConformance } = await import('./${AI_CONTEXT_BOUNDARY_STAGED}');`,
     `const { runMcpBoundaryConformance } = await import('./${MCP_BOUNDARY_STAGED}');`,
+    `const { runMcpResourcesReadConformance } = await import('./${MCP_RESOURCES_READ_STAGED}');`,
     INCREMENTAL_CORPUS_HELPERS,
     "const aiContextBoundaryFixture = JSON.parse(process.env.REDACT_SECRET_AI_CONTEXT_BOUNDARY);",
     "const mcpBoundaryFixture = JSON.parse(process.env.REDACT_SECRET_MCP_BOUNDARY);",
+    "const mcpResourcesReadFixture = JSON.parse(process.env.REDACT_SECRET_MCP_RESOURCES_READ);",
     "const aiContextBoundaryUninitialized = runAiContextBoundaryConformance({ createIncrementalSanitizer, scanAndRedact }, aiContextBoundaryFixture, { phase: 'uninitialized' });",
     "const mcpBoundaryUninitialized = await runMcpBoundaryConformance({ createIncrementalSanitizer, scanAndRedact }, mcpBoundaryFixture, { phase: 'uninitialized' });",
+    "const mcpResourcesReadUninitialized = await runMcpResourcesReadConformance({ createIncrementalSanitizer, scanAndRedact }, mcpResourcesReadFixture, { phase: 'uninitialized' });",
     "await initialize();",
     "const aiContextBoundaryInitialized = runAiContextBoundaryConformance({ createIncrementalSanitizer, scanAndRedact }, aiContextBoundaryFixture, { phase: 'initialized' });",
     "const mcpBoundaryInitialized = await runMcpBoundaryConformance({ createIncrementalSanitizer, scanAndRedact }, mcpBoundaryFixture, { phase: 'initialized' });",
+    "const mcpResourcesReadInitialized = await runMcpResourcesReadConformance({ createIncrementalSanitizer, scanAndRedact }, mcpResourcesReadFixture, { phase: 'initialized' });",
     "const fixtureInput = process.env.REDACT_SECRET_QUALIFICATION_INPUT;",
     "if (fixtureInput === undefined) throw new Error('qualification input is missing');",
     "const integrationFixtures = JSON.parse(process.env.REDACT_SECRET_INTEGRATION_FIXTURES);",
@@ -319,10 +349,11 @@ export function qualifyNode(
     "const eventText = JSON.stringify(events);",
     "const redactedMatch = integrationFixtures.redact.slice(redacted.findings[0].start, redacted.findings[0].end);",
     "const safeIntegration = { clean: clean.code === 'OK', redacted: redacted.code === 'OK' && forwarded[1] !== integrationFixtures.redact && !forwarded[1].includes(redactedMatch), warned: warned.code === 'SECRET_WARNING', blocked: blocked.code === 'SECRET_BLOCKED', failedClosed: failed.code === 'SCAN_FAILED', limited: limited.code === 'TRANSPORT_LIMIT_EXCEEDED', downstreamCalls: forwarded.length === 2, safeEvents: !Object.values(integrationFixtures).some((input) => eventText.includes(input)) };",
-    "console.log(JSON.stringify({ version: VERSION, artifact: artifact(), findings, incremental: incrementalText === expectedIncrementalText, incrementalCorpus: incrementalCorpusSummary, stream: streamText === scanAndRedact(streamInput).text, streamFindings: transform.findings.length, safeIntegration, aiContextBoundary: { uninitialized: aiContextBoundaryUninitialized, initialized: aiContextBoundaryInitialized }, mcpBoundary: { uninitialized: mcpBoundaryUninitialized, initialized: mcpBoundaryInitialized } }));",
+    "console.log(JSON.stringify({ version: VERSION, artifact: artifact(), findings, incremental: incrementalText === expectedIncrementalText, incrementalCorpus: incrementalCorpusSummary, stream: streamText === scanAndRedact(streamInput).text, streamFindings: transform.findings.length, safeIntegration, aiContextBoundary: { uninitialized: aiContextBoundaryUninitialized, initialized: aiContextBoundaryInitialized }, mcpBoundary: { uninitialized: mcpBoundaryUninitialized, initialized: mcpBoundaryInitialized }, mcpResourcesRead: { uninitialized: mcpResourcesReadUninitialized, initialized: mcpResourcesReadInitialized } }));",
   ].join("\n");
   const aiContextBoundaryFixture = stageAiContextBoundary(consumerRoot);
   const mcpBoundaryFixture = stageMcpBoundary(consumerRoot);
+  const mcpResourcesReadFixture = stageMcpResourcesRead(consumerRoot);
   const output = execFileSync(
     process.execPath,
     ["--input-type=module", "--eval", source],
@@ -340,6 +371,7 @@ export function qualifyNode(
         REDACT_SECRET_INCREMENTAL_CORPUS: JSON.stringify(incrementalCorpus),
         REDACT_SECRET_AI_CONTEXT_BOUNDARY: JSON.stringify(aiContextBoundaryFixture),
         REDACT_SECRET_MCP_BOUNDARY: JSON.stringify(mcpBoundaryFixture),
+        REDACT_SECRET_MCP_RESOURCES_READ: JSON.stringify(mcpResourcesReadFixture),
       },
     },
   );
@@ -381,6 +413,7 @@ export function qualifyNode(
   }
   assertAiContextBoundary("Node lane", result.aiContextBoundary, aiContextBoundaryFixture);
   assertMcpBoundary("Node lane", result.mcpBoundary, mcpBoundaryFixture);
+  assertMcpResourcesRead("Node lane", result.mcpResourcesRead, mcpResourcesReadFixture);
   return {
     initialize: "passed",
     scan: "passed",
@@ -390,9 +423,11 @@ export function qualifyNode(
     safeIntegration: "passed",
     aiContextBoundary: "passed",
     mcpBoundary: "passed",
+    mcpResourcesRead: "passed",
     incrementalCorpusSummary: result.incrementalCorpus,
     aiContextBoundarySummary: result.aiContextBoundary,
     mcpBoundarySummary: result.mcpBoundary,
+    mcpResourcesReadSummary: result.mcpResourcesRead,
   };
 }
 
@@ -421,7 +456,8 @@ async function bundleForBrowser(consumerRoot) {
         `import { prepareBrowserSubmission } from "./safe-integration/browser.mjs";`,
         `import { runAiContextBoundaryConformance } from "./${AI_CONTEXT_BOUNDARY_STAGED}";`,
         `import { runMcpBoundaryConformance } from "./${MCP_BOUNDARY_STAGED}";`,
-        "window.__secretScan = { createIncrementalSanitizer, createWebStreamSanitizer, initialize, prepareBrowserSubmission, runAiContextBoundaryConformance, runMcpBoundaryConformance, scan, scanAndRedact, VERSION };",
+        `import { runMcpResourcesReadConformance } from "./${MCP_RESOURCES_READ_STAGED}";`,
+        "window.__secretScan = { createIncrementalSanitizer, createWebStreamSanitizer, initialize, prepareBrowserSubmission, runAiContextBoundaryConformance, runMcpBoundaryConformance, runMcpResourcesReadConformance, scan, scanAndRedact, VERSION };",
       ].join("\n"),
       loader: "js",
       resolveDir: consumerRoot,
@@ -444,6 +480,7 @@ async function writeHarness(
   incrementalCorpus,
   aiContextBoundaryFixture,
   mcpBoundaryFixture,
+  mcpResourcesReadFixture,
 ) {
   await writeFile(join(root, "bundle.js"), bundleText);
   await cp(installedWasmDir, join(root, "wasm"), { recursive: true });
@@ -458,11 +495,14 @@ async function writeHarness(
     try {
       const aiContextBoundaryFixture = ${JSON.stringify(aiContextBoundaryFixture)};
       const mcpBoundaryFixture = ${JSON.stringify(mcpBoundaryFixture)};
+      const mcpResourcesReadFixture = ${JSON.stringify(mcpResourcesReadFixture)};
       const aiContextBoundaryUninitialized = window.__secretScan.runAiContextBoundaryConformance(window.__secretScan, aiContextBoundaryFixture, { phase: "uninitialized" });
       const mcpBoundaryUninitialized = await window.__secretScan.runMcpBoundaryConformance(window.__secretScan, mcpBoundaryFixture, { phase: "uninitialized" });
+      const mcpResourcesReadUninitialized = await window.__secretScan.runMcpResourcesReadConformance(window.__secretScan, mcpResourcesReadFixture, { phase: "uninitialized" });
       await window.__secretScan.initialize();
       const aiContextBoundaryInitialized = window.__secretScan.runAiContextBoundaryConformance(window.__secretScan, aiContextBoundaryFixture, { phase: "initialized" });
       const mcpBoundaryInitialized = await window.__secretScan.runMcpBoundaryConformance(window.__secretScan, mcpBoundaryFixture, { phase: "initialized" });
+      const mcpResourcesReadInitialized = await window.__secretScan.runMcpResourcesReadConformance(window.__secretScan, mcpResourcesReadFixture, { phase: "initialized" });
       const findings = window.__secretScan.scan(${JSON.stringify(fixture.input)});
       const limits = ${JSON.stringify(LIMITS)};
       const incrementalCorpus = ${JSON.stringify(incrementalCorpus)};
@@ -538,6 +578,7 @@ async function writeHarness(
         safeIntegration,
         aiContextBoundary: { uninitialized: aiContextBoundaryUninitialized, initialized: aiContextBoundaryInitialized },
         mcpBoundary: { uninitialized: mcpBoundaryUninitialized, initialized: mcpBoundaryInitialized },
+        mcpResourcesRead: { uninitialized: mcpResourcesReadUninitialized, initialized: mcpResourcesReadInitialized },
       };
     } catch (error) {
       window.__qualifyResult = { ok: false, error: String((error && error.stack) || error) };
@@ -572,6 +613,7 @@ export async function qualifyBrowser(
 ) {
   const aiContextBoundaryFixture = stageAiContextBoundary(consumerRoot);
   const mcpBoundaryFixture = stageMcpBoundary(consumerRoot);
+  const mcpResourcesReadFixture = stageMcpResourcesRead(consumerRoot);
   const bundleText = await bundleForBrowser(consumerRoot);
   const harnessRoot = await mkdtemp(join(tmpdir(), "redact-secret-consumer-browser-"));
   const playwright = await import("playwright");
@@ -592,6 +634,7 @@ export async function qualifyBrowser(
       incrementalCorpus,
       aiContextBoundaryFixture,
       mcpBoundaryFixture,
+      mcpResourcesReadFixture,
     );
 
     server = serveDirectory(harnessRoot);
@@ -646,6 +689,7 @@ export async function qualifyBrowser(
     }
     assertAiContextBoundary(`Browser lane (${engine})`, result.aiContextBoundary, aiContextBoundaryFixture);
     assertMcpBoundary(`Browser lane (${engine})`, result.mcpBoundary, mcpBoundaryFixture);
+    assertMcpResourcesRead(`Browser lane (${engine})`, result.mcpResourcesRead, mcpResourcesReadFixture);
     return {
       initialize: "passed",
       scan: "passed",
@@ -655,9 +699,11 @@ export async function qualifyBrowser(
       safeIntegration: "passed",
       aiContextBoundary: "passed",
       mcpBoundary: "passed",
+      mcpResourcesRead: "passed",
       incrementalCorpusSummary: result.incrementalCorpus,
       aiContextBoundarySummary: result.aiContextBoundary,
       mcpBoundarySummary: result.mcpBoundary,
+      mcpResourcesReadSummary: result.mcpResourcesRead,
       engine,
       engineVersion: browser.version(),
     };
