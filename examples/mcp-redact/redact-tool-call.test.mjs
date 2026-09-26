@@ -31,7 +31,7 @@ function hasBinary(result) {
 test("shared fixture: result cases — text, JSON-in-text, multi-block, resource, structuredContent, unicode, block, core error", () => {
   for (const { name, input, expectedBlocked, expected } of resultCases) {
     if (hasBinary(input)) {
-      // The shared cases (also read by the Python example) predate the MCP
+      // The shared cases predate the MCP
       // contract, under which binary content blocks by default.
       assert.deepEqual(
         redactToolResult(boundary, input),
