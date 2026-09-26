@@ -1,7 +1,7 @@
 {
   "name": "@redact-secret/node-win32-arm64-msvc",
   "description": "N-API native addon for @redact-secret/core (win32-arm64-msvc). Not intended for direct use; installed as an optional dependency of @redact-secret/core.",
-  "version": "0.1.0-beta.8",
+  "version": "0.1.0-beta.9",
   "os": ["win32"],
   "cpu": ["arm64"],
   "main": "redact-secret.win32-arm64-msvc.node",

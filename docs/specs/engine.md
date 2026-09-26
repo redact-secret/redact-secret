@@ -30,7 +30,7 @@ Rules governing the shared Rust core's detection pipeline, plugin/profile contra
 | Evidence signals belong to five groups (`randomness`, `lexical`, `contextual`, `validation`, `negative`). A group's signals combine with halving diminishing returns under a cap, no single group and not `randomness` plus `lexical` can reach `high`, and negative evidence applies only when the whole value matches a reviewed exclusion grammar. The scorer is monotone in its signals. | [Freeze the shadow evidence score and confidence contract](../decisions/2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md) |
 | Scorer arithmetic from features to band is integer fixed-point with no floating point or `libm` calls, so every host produces identical scores and bands. Maintainer diagnostics carry signal and group identifiers and integer values only, never matched bytes or hashes of them. No public item, field or benchmark projection carries a score, probability, threshold, weight or contribution (`scripts/check-rust-workspace.py` check 10), and changing the scoring model's identity invalidates evidence keyed to the old one. | [Freeze the shadow evidence score and confidence contract](../decisions/2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md) |
 | The shadow scorer's `randomness` and `lexical` inputs are the integer statistical features of schema `evidence-features/v1`, defined exactly in the "Shadow evidence feature schema" section below. Extraction is not a detector: it reads at most 256 Unicode scalar values of one candidate value, allocates nothing, stores no part of the value, and changes no finding, `Confidence`, overlap weight or action. | [Freeze the shadow evidence score and confidence contract](../decisions/2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md) |
-| The shadow scorer aggregates evidence under the reviewed model `evidence-aggregation/v1`, defined in the "Shadow evidence aggregation" section below: five groups with fixed caps, the halving rule inside each group, a strict whole-value exclusion grammar as the only negative evidence, and integer band thresholds. `private-key`, `provider` and `structural` candidates are never scored; their shadow band is their legacy `Confidence`. The model enforces nothing in beta.9. | [Freeze the shadow evidence score and confidence contract](../decisions/2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md) |
+| The shadow scorer aggregates evidence under the reviewed model `evidence-aggregation/v2`, defined in the "Shadow evidence aggregation" section below: five groups with fixed caps, the halving rule inside each group, a strict whole-value exclusion grammar as the only negative evidence, and integer band thresholds. `private-key`, `provider` and `structural` candidates are never scored; their shadow band is their legacy `Confidence`. The model enforces nothing in beta.9. | [Freeze the shadow evidence score and confidence contract](../decisions/2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md) |
 | The shadow scorer has one reviewed scoring artifact, `docs/contracts/scoring/shadow-scoring-artifact.json`, defined in the "Shadow scoring artifact" section below. It binds the feature schema, the aggregation model, calibration and tuning provenance, and the review method. CI fails when the artifact and the compiled scorer disagree in either direction, and when scorer values change under an unchanged model identity. It is a review and CI artifact: nothing loads it at runtime, no package ships it, and it is not public API. | [Freeze the shadow evidence score and confidence contract](../decisions/2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md) |
 | The shadow scorer runs next to `generic-token`'s legacy decision without enforcing anything, defined in the "Maintainer-local shadow evaluation" section below. The pipeline evaluates the candidates that overlap resolution selects only when the maintainer-local evaluation path asks for it; every public entry point asks for nothing, so findings, `Confidence`, actions, overlap and every public API are unchanged and the scorer never runs on the public path. The path is an unpublished example that compiles the core's own source and writes JSON Lines holding identifiers and integers only, never matched bytes or hashes of them. | [Freeze the shadow evidence score and confidence contract](../decisions/2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md) |
 | No shipped artifact links the shadow scorer: outside tests the incremental session calls `run_detector_pipeline`, so only the evaluation example and tests compile it. Its integer scores and bands are byte-identical on Linux, macOS, Windows and `wasm32` for the conformance corpora and a hostile battery (CI job `shadow-determinism`), no scorer source outside tests names floating point (`scripts/check-rust-workspace.py` check 11), and its worst cases are bounded by the 4,096-byte contextual value and the 256-symbol analysis limit. Defined in the "Shadow scorer qualification" section below. | [Freeze the shadow evidence score and confidence contract](../decisions/2026-09-25-freeze-the-shadow-evidence-score-and-confidence-contract.md) |
@@ -162,7 +162,7 @@ written from this page reproduces them. Values are synthetic.
 
 ## Shadow evidence aggregation
 
-Model identity **`evidence-aggregation/v1`** over feature schema
+Model identity **`evidence-aggregation/v2`** over feature schema
 `evidence-features/v1` (issue
 [#770](https://github.com/redact-secret/redact-secret/issues/770)). The Rust
 core is authoritative: `crates/secret-scan-core/src/evidence/aggregate.rs`
@@ -175,11 +175,11 @@ existing contract
 sections 2 to 6) to one reviewed configuration. It is not a new decision.
 
 The configuration is the one the benchmark calibration selected
-([redact-secret-benchmarks#255](https://github.com/redact-secret/redact-secret-benchmarks/issues/255),
-merged in PR #297). Its method is stated in
-[`docs/specs/calibration-experiments.md`](https://github.com/redact-secret/redact-secret-benchmarks/blob/101f674a5ee50aa551423ccd00d0a6a68ed4c875/docs/specs/calibration-experiments.md)
+([redact-secret-benchmarks#300](https://github.com/redact-secret/redact-secret-benchmarks/issues/300),
+merged in PR #330). Its method is stated in
+[`docs/specs/calibration-experiments.md`](https://github.com/redact-secret/redact-secret-benchmarks/blob/e18efa2d0802c030925b9306a5dca33057185936/docs/specs/calibration-experiments.md)
 and its context and negative classes in
-[`docs/specs/candidate-features.md`](https://github.com/redact-secret/redact-secret-benchmarks/blob/101f674a5ee50aa551423ccd00d0a6a68ed4c875/docs/specs/candidate-features.md).
+[`docs/specs/candidate-features.md`](https://github.com/redact-secret/redact-secret-benchmarks/blob/e18efa2d0802c030925b9306a5dca33057185936/docs/specs/candidate-features.md).
 The reviewed scoring artifact
 ([#798](https://github.com/redact-secret/redact-secret/issues/798), "Shadow
 scoring artifact" below) records these values with drift detection. Changing any of them is a new model
@@ -204,13 +204,13 @@ the decision boundary over its corpora, not these constants.
 
 | Group | Signal | Points | Cap |
 | --- | --- | --- | --- |
-| `randomness` | `shannon_entropy_q16` (feature 5) | ramp: `0` at or below `254345`, `60` at or above `313536`, otherwise `floor(60 * (H - 254345) / (313536 - 254345))` | 60 |
+| `randomness` | `shannon_entropy_q16` (feature 5) | ramp: `0` at or below `226998`, `30` at or above `265935`, otherwise `floor(30 * (H - 226998) / (265935 - 226998))` | 30 |
 | `lexical` | none | `0` | 0 |
-| `contextual` | `credential-context` | `40` when the context class is `credential-name`, `authorization-header` or `url-userinfo`, otherwise `0` | 40 |
-| `validation` | none yet | `0` | 40 (placeholder, not fitted) |
-| `negative` | `strict-exclusion` | `140` when the whole value matches the strict exclusion grammar, otherwise `0` | 140 |
+| `contextual` | `credential-context` | `50` when the context class is `credential-name`, `authorization-header` or `url-userinfo`, otherwise `0` | 50 |
+| `validation` | none yet | `0` | 50 (placeholder, not fitted) |
+| `negative` | `strict-exclusion` | `130` when the whole value matches the strict exclusion grammar, otherwise `0` | 130 |
 
-The ramp ends are Q16 bits per symbol, about 3.88 and 4.78 bits. Within
+The ramp ends are Q16 bits per symbol, about 3.46 and 4.06 bits. Within
 every group the contract's halving rule applies: signal points sorted in
 descending order, the `k`-th (from `0`) counts `points >> k`, the sum
 saturates and is then capped. A group with one signal is that signal's
@@ -220,13 +220,13 @@ later still cannot add up linearly.
 ### Combination and bands
 
 `score = max(0, randomness + lexical + contextual + validation - negative)`,
-in saturating `u32` arithmetic. The band is `none` below `7`, `low` from
-`7`, `medium` from `43` and `high` from `61`. So:
+in saturating `u32` arithmetic. The band is `none` below `35`, `low` from
+`35`, `medium` from `40` and `high` from `51`. So:
 
-- context alone (`40`) is `low`;
-- randomness alone (at most `60`) is at most `medium`;
-- `high` needs context plus randomness of at least `21`;
-- a strict exclusion match subtracts `140`, the sum of every positive cap,
+- context alone (`50`) is `medium`;
+- randomness alone (at most `30`) stays below `low`;
+- `high` needs context plus randomness of at least `1`;
+- a strict exclusion match subtracts `130`, the sum of every positive cap,
   so it always floors the score at `0` (`none`).
 
 These invariants are compile-time assertions on `SHADOW_MODEL`
@@ -322,18 +322,13 @@ and it enforces nothing: it changes no finding, `Confidence`, overlap weight
 or action, so it adds no false positive or false negative to shipped
 behavior.
 
-If a later release promoted the shadow band at `medium`, the calibration
-measured these costs:
-
-- **False negatives.** About 46.6% of `policy` spans holding short,
-  human-chosen passwords would leak, staying below `medium`. Their entropy is low and only
-  context supports them. Randomness alone also caps at `medium`, so a very
-  random bare value never reaches `high`.
-- **False positives.** About 37% of development controls would be flagged
-  at `medium`. Most of them are generated near-miss twins of real
-  credentials. The strict negative
-  grammar gives up any benefit from fuzzy placeholder resemblance, so
-  lookalike placeholders stay positive rather than becoming a bypass.
+The #300 selection generalizes poorly: its development medium-band balanced
+error is `0.055228960396039604`, while evaluation balanced error is
+`0.6228352283569377`, a gap of `0.5676062679608981`; the worst
+leave-one-category-out balanced error is `0.6666666666666666`. Those results
+are a limitation, not promotion evidence. The scorer therefore remains
+shadow-only, non-enforcing, absent from the public API, and incapable of
+changing a finding, confidence, overlap weight, policy decision, or action.
 
 ## Shadow scoring artifact
 
@@ -353,11 +348,11 @@ sections 8 to 11). It is not a new decision.
 | --- | --- |
 | `artifact` | `redact-secret/shadow-scoring-artifact` and an integer `revision` |
 | `model.featureSchema` | the feature schema identity (`evidence-features/v1`), its bounds and fixed-point scale, the feature names in vector order, and the compiled feature vector of each golden input above |
-| `model.aggregation` | the model identity (`evidence-aggregation/v1`) and every group, direction, rule, cap, signal rule, context class, exclusion grammar and vocabulary word, and the band thresholds, as the compiled `SHADOW_MODEL` holds them |
+| `model.aggregation` | the model identity (`evidence-aggregation/v2`) and every group, direction, rule, cap, signal rule, context class, exclusion grammar and vocabulary word, and the band thresholds, as the compiled `SHADOW_MODEL` holds them |
 | `modelFingerprint` | SHA-256 of `model` as canonical JSON (keys sorted, no whitespace, UTF-8) |
 | `identityLedger` | every model identity the artifact has recorded, each with the one fingerprint it stands for; append-only |
 | `sources` | SHA-256 of the "Shadow evidence feature schema", "Shadow evidence aggregation" and "Maintainer-local shadow evaluation" sections of this page, and of `features.rs`, `fixed_point.rs`, `context.rs`, `exclusion.rs`, `aggregate.rs` and `shadow.rs` under `crates/secret-scan-core/src/evidence/` |
-| `calibration` | the redact-secret-benchmarks#255 run it came from: repository, issue, pull request, 40-hex `develop` commit, method permalink, selected configuration, selection method and source hash, feature dataset (extractor version, extractor source hash, dataset hash, the core commit its features were pinned to) and scoring identity with its component hashes |
+| `calibration` | the redact-secret-benchmarks#300 run it came from: repository, issue, pull request, 40-hex `develop` commit, method permalink, selected configuration, selection method and source hash, feature dataset (extractor version, extractor source hash, dataset hash, the core commit its features were pinned to) and scoring identity with its component hashes |
 | `corpora` | the benchmark pin manifest's hash and every tuning and evaluation corpus hash |
 | `tuningManifest` | the redact-secret-benchmarks#256 tuning manifest: `pending` with `hash: null` until it is bound, plus the deterministic identity of its draft |
 | `productRevision` | how a candidate's source commit is bound (below) |
@@ -460,9 +455,9 @@ at the commit, and is stale for any candidate where one of them differs.
 
 ### Known limitations
 
-- The `validation` group has no signal, and its cap of `40` is a
-  placeholder that calibration did not fit. Context (`40`) plus validation
-  (`40`) would reach `high` (`61`) without any randomness, so adding any
+- The `validation` group has no signal, and its cap of `50` is a
+  placeholder that calibration did not fit. Context (`50`) plus validation
+  (`50`) would reach `high` (`51`) without any randomness, so adding any
   validation signal needs a refit and a new model identity.
 - The `lexical` group has no signal and a cap of `0`, because calibration
   selected randomness-only statistics. Adding a lexical signal is a new
@@ -593,7 +588,7 @@ The first line is the header:
 | `record` | `"shadow-evaluation"` |
 | `format` | `"redact-secret/shadow-evaluation/1"` |
 | `productVersion` | the core crate version |
-| `model` | `SHADOW_MODEL.id`, `"evidence-aggregation/v1"` |
+| `model` | `SHADOW_MODEL.id`, `"evidence-aggregation/v2"` |
 | `featureSchema` | `"evidence-features/v1"` |
 | `artifactRevision` | `artifact.revision` of the artifact read |
 | `modelFingerprint` | `modelFingerprint` of the artifact read |

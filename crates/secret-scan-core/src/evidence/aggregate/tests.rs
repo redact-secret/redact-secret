@@ -131,30 +131,31 @@ fn the_product_model_satisfies_the_contract_invariants() {
 
 #[test]
 fn the_product_model_is_the_calibrated_selection() {
-    // redact-secret-benchmarks#255 (PR #297, 101f674). Changing any value
+    // redact-secret-benchmarks#300 (PR #330,
+    // e18efa2d0802c030925b9306a5dca33057185936). Changing any value
     // here is a new model identity (ADR section 10).
     let model = SHADOW_MODEL;
-    assert_eq!(model.id, "evidence-aggregation/v1");
+    assert_eq!(model.id, "evidence-aggregation/v2");
     let caps = model
         .groups
         .map(|config| (config.group.as_str(), config.cap));
     assert_eq!(
         caps,
         [
-            ("randomness", 60),
+            ("randomness", 30),
             ("lexical", 0),
-            ("contextual", 40),
-            ("validation", 40),
-            ("negative", 140),
+            ("contextual", 50),
+            ("validation", 50),
+            ("negative", 130),
         ]
     );
     assert_eq!(
         model.groups[0].signals,
         [SignalRule::FeatureRamp {
             feature: SHANNON_ENTROPY_FEATURE,
-            lo: 254_345,
-            hi: 313_536,
-            max: 60,
+            lo: 226_998,
+            hi: 265_935,
+            max: 30,
         }]
     );
     assert_eq!(
@@ -165,21 +166,21 @@ fn the_product_model_is_the_calibrated_selection() {
                 ContextClass::AuthorizationHeader,
                 ContextClass::UrlUserinfo,
             ],
-            points: 40,
+            points: 50,
         }]
     );
     assert!(model.groups[1].signals.is_empty());
     assert!(model.groups[3].signals.is_empty());
     assert_eq!(
         model.groups[4].signals,
-        [SignalRule::StrictExclusion { points: 140 }]
+        [SignalRule::StrictExclusion { points: 130 }]
     );
     assert_eq!(
         model.bands,
         BandThresholds {
-            low: 7,
-            medium: 43,
-            high: 61
+            low: 35,
+            medium: 40,
+            high: 51
         }
     );
 }
@@ -192,7 +193,7 @@ fn models_that_break_an_invariant_are_rejected() {
         ("zero low", |m| m.bands.low = 0),
         ("cap at t_high", |m| m.groups[2].cap = m.bands.high),
         ("randomness plus lexical", |m| m.groups[1].cap = 1),
-        ("negative cap", |m| m.groups[4].cap = 139),
+        ("negative cap", |m| m.groups[4].cap = 129),
         ("group order", |m| m.groups.swap(0, 1)),
         ("exclusion outside negative", |m| {
             m.groups[0].signals = &[SignalRule::StrictExclusion { points: 1 }];
@@ -224,12 +225,12 @@ fn bands_follow_the_integer_thresholds() {
     let model = SHADOW_MODEL;
     for (total, band) in [
         (0, ShadowBand::None),
-        (6, ShadowBand::None),
-        (7, ShadowBand::Low),
-        (42, ShadowBand::Low),
-        (43, ShadowBand::Medium),
-        (60, ShadowBand::Medium),
-        (61, ShadowBand::High),
+        (34, ShadowBand::None),
+        (35, ShadowBand::Low),
+        (39, ShadowBand::Low),
+        (40, ShadowBand::Medium),
+        (50, ShadowBand::Medium),
+        (51, ShadowBand::High),
         (u32::MAX, ShadowBand::High),
     ] {
         assert_eq!(model.band(total), band, "{total}");
@@ -317,7 +318,7 @@ fn halving_is_monotone_in_each_signal_and_in_adding_a_signal() {
 fn correlated_randomness_signals_do_not_accumulate_linearly() {
     // Test-only model: four correlated randomness signals, each saturating
     // on a random-looking value, with a cap large enough to show the rule.
-    let uncapped = with_randomness(&CORRELATED_RANDOMNESS, 60);
+    let uncapped = with_randomness(&CORRELATED_RANDOMNESS, 50);
     let explanation = aggregate(&uncapped, &inputs(RANDOM_VALUE, ContextClass::Bare));
     let randomness = explanation.groups[EvidenceGroup::Randomness as usize];
     assert_eq!(
@@ -330,7 +331,7 @@ fn correlated_randomness_signals_do_not_accumulate_linearly() {
     );
     // 60 + 30 + 15 + 7 before the cap, not 4 * 60.
     assert_eq!(randomness.uncapped, 112);
-    assert_eq!(randomness.contribution, 60);
+    assert_eq!(randomness.contribution, 50);
     assert!(randomness.is_capped());
     assert_eq!(explanation.band, ShadowBand::Medium);
 }
@@ -339,10 +340,10 @@ fn correlated_randomness_signals_do_not_accumulate_linearly() {
 fn correlated_randomness_never_reaches_high_by_quantity_alone() {
     let models = [
         SHADOW_MODEL,
-        with_randomness(&CORRELATED_RANDOMNESS[..1], 60),
-        with_randomness(&CORRELATED_RANDOMNESS[..2], 60),
-        with_randomness(&CORRELATED_RANDOMNESS[..3], 60),
-        with_randomness(&CORRELATED_RANDOMNESS, 60),
+        with_randomness(&CORRELATED_RANDOMNESS[..1], 30),
+        with_randomness(&CORRELATED_RANDOMNESS[..2], 30),
+        with_randomness(&CORRELATED_RANDOMNESS[..3], 30),
+        with_randomness(&CORRELATED_RANDOMNESS, 30),
     ];
     for model in models {
         assert_eq!(model.violation(), None);
@@ -353,10 +354,10 @@ fn correlated_randomness_never_reaches_high_by_quantity_alone() {
             }
         }
     }
-    // The product randomness group alone reaches `medium` and stops there.
+    // The selected product randomness group alone stays below `low`.
     assert_eq!(
         statistical(RANDOM_VALUE, ContextClass::Bare).band,
-        ShadowBand::Medium
+        ShadowBand::None
     );
 }
 
@@ -378,7 +379,7 @@ fn adding_a_correlated_signal_never_lowers_the_score() {
 #[test]
 fn context_plus_randomness_strengthens_an_ambiguous_candidate() {
     let alone = statistical(AMBIGUOUS_VALUE, ContextClass::Bare);
-    assert_eq!(alone.band, ShadowBand::Low);
+    assert_eq!(alone.band, ShadowBand::None);
     assert_eq!(
         alone.contributing_groups().collect::<Vec<_>>(),
         [EvidenceGroup::Randomness]
@@ -390,16 +391,16 @@ fn context_plus_randomness_strengthens_an_ambiguous_candidate() {
     ] {
         let with_context = statistical(AMBIGUOUS_VALUE, context);
         assert_eq!(with_context.band, ShadowBand::High, "{context:?}");
-        assert_eq!(with_context.score, alone.score + 40);
+        assert_eq!(with_context.score, alone.score + 50);
         assert_eq!(
             with_context.contributing_groups().collect::<Vec<_>>(),
             [EvidenceGroup::Randomness, EvidenceGroup::Contextual]
         );
     }
-    // Context alone proposes `low`; `other-name` is not credential-bearing.
+    // Context alone proposes `medium`; `other-name` is not credential-bearing.
     assert_eq!(
         statistical("aaaaaaaaaaaaaaaa", ContextClass::CredentialName).band,
-        ShadowBand::Low
+        ShadowBand::Medium
     );
     assert_eq!(
         statistical(AMBIGUOUS_VALUE, ContextClass::OtherName).score,
@@ -426,7 +427,7 @@ fn a_real_contextual_candidate_is_strengthened_through_its_detector_signals() {
         .with_specificity(Specificity::Entropy);
     assert_eq!(
         shadow_evidence(&SHADOW_MODEL, &bare, value).band,
-        ShadowBand::Low
+        ShadowBand::None
     );
 }
 
@@ -444,7 +445,7 @@ fn a_full_exclusion_grammar_match_floors_the_score() {
     ] {
         let explanation = statistical(value, ContextClass::CredentialName);
         assert!(explanation.exclusion.is_some(), "{value}");
-        assert_eq!(explanation.negative, 140, "{value}");
+        assert_eq!(explanation.negative, 130, "{value}");
         assert_eq!(explanation.score, 0, "{value}");
         assert_eq!(explanation.band, ShadowBand::None, "{value}");
     }
@@ -638,7 +639,7 @@ fn every_band_is_explained_by_its_groups() {
             assert_eq!(explanation.band, SHADOW_MODEL.band(explanation.score));
             assert_eq!(explanation.model, SHADOW_MODEL.id);
             assert_eq!(explanation.context, context);
-            assert_eq!(explanation.band == ShadowBand::None, explanation.score < 7);
+            assert_eq!(explanation.band == ShadowBand::None, explanation.score < 35);
         }
     }
 }

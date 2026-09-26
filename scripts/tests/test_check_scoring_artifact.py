@@ -59,15 +59,36 @@ class RepositoryArtifact(unittest.TestCase):
 
     def test_the_manifest_binds_the_current_identities(self) -> None:
         model = ARTIFACT["model"]
-        self.assertEqual(model["aggregation"]["id"], "evidence-aggregation/v1")
+        self.assertEqual(model["aggregation"]["id"], "evidence-aggregation/v2")
         self.assertEqual(model["featureSchema"]["id"], "evidence-features/v1")
-        self.assertEqual(ARTIFACT["calibration"]["commit"], "101f674a5ee50aa551423ccd00d0a6a68ed4c875")
+        self.assertEqual(ARTIFACT["artifact"]["revision"], 3)
+        self.assertEqual(
+            ARTIFACT["modelFingerprint"],
+            "4104fb2c6f046169f63e991dd7594c099af5fcea01deecae7afe1c7015579975",
+        )
+        self.assertEqual(
+            ARTIFACT["calibration"]["featureDataset"]["datasetHash"],
+            "4ea0a82f61b719b4611f8e7e2caafd01edda5b5dfa7c2691bffd6ac17d0e199c",
+        )
+        self.assertEqual(
+            ARTIFACT["calibration"]["selection"]["sourceHash"],
+            "23683daf5738b9cf3de583ade589f06677cfb2bcf581bff38e889b1eddae9509",
+        )
+        self.assertEqual(
+            ARTIFACT["calibration"]["scoring"]["identity"],
+            "838aa57db8e2331c8540a42da823ffda8802d681952f4dc7af20e6001c5693a2",
+        )
+        self.assertEqual(
+            ARTIFACT["calibration"]["commit"],
+            "e18efa2d0802c030925b9306a5dca33057185936",
+        )
         self.assertEqual(ARTIFACT["tuningManifest"]["status"], "pending")
         self.assertIsNone(ARTIFACT["tuningManifest"]["hash"])
 
     def test_the_validation_cap_is_recorded_as_a_placeholder(self) -> None:
         ids = {item["id"] for item in ARTIFACT["knownLimitations"]}
         self.assertIn("validation-cap-placeholder", ids)
+        self.assertIn("poor-generalization", ids)
 
 
 class Schema(unittest.TestCase):
@@ -166,7 +187,7 @@ class BaseComparison(unittest.TestCase):
         self.assertTrue(any("append-only" in error for error in errors), errors)
 
     def test_a_changed_constant_with_a_new_model_identity_passes(self) -> None:
-        head = mutated_model(ARTIFACT, new_id="evidence-aggregation/v2")
+        head = mutated_model(ARTIFACT, new_id="evidence-aggregation/v3")
         self.assertEqual(check.check_ledger(head), [])
         self.assertEqual(check.compare_with_base(ARTIFACT, head), [])
 

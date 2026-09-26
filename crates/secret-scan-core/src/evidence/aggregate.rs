@@ -5,7 +5,7 @@
 //! An [`AggregationModel`] is plain data: five evidence groups, each with a
 //! list of [`SignalRule`]s, a [`GroupRule`] and a cap, plus integer band
 //! thresholds. [`SHADOW_MODEL`] is the reviewed shadow configuration the
-//! benchmark calibration selected (redact-secret-benchmarks#255). Its
+//! benchmark calibration selected (redact-secret-benchmarks#300). Its
 //! invariants are checked at compile time ([`AggregationModel::violation`]),
 //! so a model that breaks the contract does not build.
 //!
@@ -235,9 +235,9 @@ pub(crate) const SHANNON_ENTROPY_FEATURE: usize = 5;
 
 const PRODUCT_RANDOMNESS: [SignalRule; 1] = [SignalRule::FeatureRamp {
     feature: SHANNON_ENTROPY_FEATURE,
-    lo: 254_345,
-    hi: 313_536,
-    max: 60,
+    lo: 226_998,
+    hi: 265_935,
+    max: 30,
 }];
 
 const CREDENTIAL_CONTEXT_CLASSES: [ContextClass; 3] = [
@@ -248,13 +248,14 @@ const CREDENTIAL_CONTEXT_CLASSES: [ContextClass; 3] = [
 
 const PRODUCT_CONTEXTUAL: [SignalRule; 1] = [SignalRule::Context {
     classes: &CREDENTIAL_CONTEXT_CLASSES,
-    points: 40,
+    points: 50,
 }];
 
-const PRODUCT_NEGATIVE: [SignalRule; 1] = [SignalRule::StrictExclusion { points: 140 }];
+const PRODUCT_NEGATIVE: [SignalRule; 1] = [SignalRule::StrictExclusion { points: 130 }];
 
 /// The reviewed shadow configuration, as selected by the benchmark
-/// calibration (redact-secret-benchmarks#255, merged at `101f674`). The
+/// calibration (redact-secret-benchmarks#300, merged in benchmark PR #330 at
+/// `e18efa2d0802c030925b9306a5dca33057185936`). The
 /// `validation` cap is a placeholder: no validation signal exists yet, so it
 /// contributes `0` and was not fitted. None of these values is secret, and
 /// security does not depend on them being unknown
@@ -265,13 +266,13 @@ const PRODUCT_NEGATIVE: [SignalRule; 1] = [SignalRule::StrictExclusion { points:
 /// here (#798). A test fails when the two disagree, and changing any value
 /// needs a new `id` (`docs/specs/engine.md`, "Shadow scoring artifact").
 pub(crate) const SHADOW_MODEL: AggregationModel = AggregationModel {
-    id: "evidence-aggregation/v1",
+    id: "evidence-aggregation/v2",
     feature_schema: FEATURE_SCHEMA_VERSION,
     groups: [
         GroupConfig {
             group: EvidenceGroup::Randomness,
             rule: GroupRule::HalvingDiminishingReturns,
-            cap: 60,
+            cap: 30,
             signals: &PRODUCT_RANDOMNESS,
         },
         GroupConfig {
@@ -283,26 +284,26 @@ pub(crate) const SHADOW_MODEL: AggregationModel = AggregationModel {
         GroupConfig {
             group: EvidenceGroup::Contextual,
             rule: GroupRule::HalvingDiminishingReturns,
-            cap: 40,
+            cap: 50,
             signals: &PRODUCT_CONTEXTUAL,
         },
         GroupConfig {
             group: EvidenceGroup::Validation,
             rule: GroupRule::HalvingDiminishingReturns,
-            cap: 40,
+            cap: 50,
             signals: &[],
         },
         GroupConfig {
             group: EvidenceGroup::Negative,
             rule: GroupRule::HalvingDiminishingReturns,
-            cap: 140,
+            cap: 130,
             signals: &PRODUCT_NEGATIVE,
         },
     ],
     bands: BandThresholds {
-        low: 7,
-        medium: 43,
-        high: 61,
+        low: 35,
+        medium: 40,
+        high: 51,
     },
 };
 

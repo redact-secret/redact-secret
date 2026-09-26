@@ -3,7 +3,7 @@
 This file records the released product contract and notable changes. Release
 evidence is linked from each published version.
 
-## Unreleased
+## 0.1.0-beta.9 — 2026-09-26
 
 ### Added
 
@@ -38,6 +38,15 @@ evidence is linked from each published version.
 
 ### Changed
 
+- The non-public, non-enforcing shadow scorer moves to
+  `evidence-aggregation/v2` after redact-secret-benchmarks#300 replaced the
+  generated-share tuning override with authored development rows. Artifact
+  revision 3 binds the new dataset, selection, scoring identity, component
+  hashes, and model fingerprint. The measured development-to-evaluation
+  balanced-error gap is about 0.568 (worst leave-one-category-out error
+  0.667), so the artifact records poor generalization explicitly and the
+  result is not promotion evidence. No finding, confidence, policy decision,
+  public API, or enforcing path changes.
 - **AI-context contract change (beta.10, #842): `sanitizeValue` is
   key-aware.** A string leaf under an object key that its own scan does not
   redact is scanned once more in its key-context view `{"<key>":"<leaf>"}`

@@ -106,17 +106,17 @@ const REVIEWED_MODEL_JSON: &str = r##"{
     ]
   },
   "aggregation": {
-    "id": "evidence-aggregation/v1",
+    "id": "evidence-aggregation/v2",
     "featureSchema": "evidence-features/v1",
     "maxGroupSignals": 4,
     "groups": [
-      {"group": "randomness", "direction": "positive", "rule": "halving-diminishing-returns", "cap": 60, "signals": [{"kind": "feature-ramp", "signal": "shannon_entropy_q16", "feature": 5, "lo": 254345, "hi": 313536, "max": 60}]},
+      {"group": "randomness", "direction": "positive", "rule": "halving-diminishing-returns", "cap": 30, "signals": [{"kind": "feature-ramp", "signal": "shannon_entropy_q16", "feature": 5, "lo": 226998, "hi": 265935, "max": 30}]},
       {"group": "lexical", "direction": "positive", "rule": "halving-diminishing-returns", "cap": 0, "signals": []},
-      {"group": "contextual", "direction": "positive", "rule": "halving-diminishing-returns", "cap": 40, "signals": [{"kind": "context", "signal": "credential-context", "classes": ["credential-name", "authorization-header", "url-userinfo"], "points": 40}]},
-      {"group": "validation", "direction": "positive", "rule": "halving-diminishing-returns", "cap": 40, "signals": []},
-      {"group": "negative", "direction": "negative", "rule": "halving-diminishing-returns", "cap": 140, "signals": [{"kind": "strict-exclusion", "signal": "strict-exclusion", "points": 140}]}
+      {"group": "contextual", "direction": "positive", "rule": "halving-diminishing-returns", "cap": 50, "signals": [{"kind": "context", "signal": "credential-context", "classes": ["credential-name", "authorization-header", "url-userinfo"], "points": 50}]},
+      {"group": "validation", "direction": "positive", "rule": "halving-diminishing-returns", "cap": 50, "signals": []},
+      {"group": "negative", "direction": "negative", "rule": "halving-diminishing-returns", "cap": 130, "signals": [{"kind": "strict-exclusion", "signal": "strict-exclusion", "points": 130}]}
     ],
-    "bands": {"low": 7, "medium": 43, "high": 61},
+    "bands": {"low": 35, "medium": 40, "high": 51},
     "contextClasses": ["url-userinfo", "authorization-header", "credential-name", "other-name", "bare"],
     "credentialNameSignals": ["high-signal-name", "ambiguous-name"],
     "exclusionGrammars": ["template-reference", "environment-reference", "command-substitution", "angle-placeholder", "mask", "placeholder-vocabulary"],

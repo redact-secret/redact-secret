@@ -70,18 +70,18 @@
   "engines": {
     "node": "20.x || 22.x || 24.x"
   },
-  "version": "0.1.0-beta.8",
+  "version": "0.1.0-beta.9",
   "dependencies": {
-    "@redact-secret/wasm": "0.1.0-beta.8"
+    "@redact-secret/wasm": "0.1.0-beta.9"
   },
   "optionalDependencies": {
-    "@redact-secret/node-darwin-arm64": "0.1.0-beta.8",
-    "@redact-secret/node-darwin-x64": "0.1.0-beta.8",
-    "@redact-secret/node-linux-arm64-gnu": "0.1.0-beta.8",
-    "@redact-secret/node-linux-arm64-musl": "0.1.0-beta.8",
-    "@redact-secret/node-linux-x64-gnu": "0.1.0-beta.8",
-    "@redact-secret/node-linux-x64-musl": "0.1.0-beta.8",
-    "@redact-secret/node-win32-arm64-msvc": "0.1.0-beta.8",
-    "@redact-secret/node-win32-x64-msvc": "0.1.0-beta.8"
+    "@redact-secret/node-darwin-arm64": "0.1.0-beta.9",
+    "@redact-secret/node-darwin-x64": "0.1.0-beta.9",
+    "@redact-secret/node-linux-arm64-gnu": "0.1.0-beta.9",
+    "@redact-secret/node-linux-arm64-musl": "0.1.0-beta.9",
+    "@redact-secret/node-linux-x64-gnu": "0.1.0-beta.9",
+    "@redact-secret/node-linux-x64-musl": "0.1.0-beta.9",
+    "@redact-secret/node-win32-arm64-msvc": "0.1.0-beta.9",
+    "@redact-secret/node-win32-x64-msvc": "0.1.0-beta.9"
   }
 }
