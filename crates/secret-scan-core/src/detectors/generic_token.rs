@@ -2001,7 +2001,15 @@ fn assignment_candidates(input: &str, names: &NameSource) -> Vec<Candidate> {
             }
         }
 
-        cursor = prefix_end;
+        // Resume on the last whitespace byte the operator consumed, not after
+        // it: that byte is still the prefix boundary of whatever name opens
+        // the value. Resuming past it made an unquoted value that is itself
+        // an assignment unreachable, so `login failed: password=V` read only
+        // `failed: ...` and never evaluated `password=V` (issue #812). A
+        // quoted value was already reached through its opening quote.
+        cursor = prev_char(input, prefix_end)
+            .filter(|&ch| is_horizontal_js_whitespace(ch))
+            .map_or(prefix_end, |ch| prefix_end - ch.len_utf8());
     }
 
     candidates
@@ -2296,6 +2304,106 @@ mod tests {
         assert_eq!(candidates[1].confidence(), Confidence::High);
         assert_eq!(candidates[1].range(), ByteRange::new(55, 93).unwrap());
         assert!(candidates[0].range().overlaps(candidates[1].range()));
+    }
+
+    /// The #812 reproduction value: unmistakably synthetic.
+    const COLON_PREFIX_VALUE: &str = "Synthetic-EXAMPLE-pw-9f3k2";
+
+    fn assert_only_value(input: &str, value: &str) {
+        let start = input.rfind(value).unwrap();
+        assert_eq!(
+            only_range(&detect(input)),
+            (start, start + value.len()),
+            "{input:?}"
+        );
+    }
+
+    // issue #812: the whitespace after an operator is also the prefix
+    // boundary of a name that opens the value. The loop used to resume past
+    // it, so an unquoted value that is itself an assignment was never
+    // evaluated. Every reproduction row, the missed ones and the ones that
+    // were already detected, reports exactly the value.
+    #[test]
+    fn a_credential_assignment_after_a_colon_prefix_is_detected() {
+        for prefix in [
+            "",
+            "login failed with ",
+            "login failed; ",
+            "user=bob: ",
+            "login failed: ",
+            "error: ",
+            "request failed:\t",
+            "error:  ",
+            "error = ",
+            "msg := ",
+            "[auth] login failed: ",
+        ] {
+            let input = format!("{prefix}password={COLON_PREFIX_VALUE}");
+            assert_only_value(&input, COLON_PREFIX_VALUE);
+            let input = format!("{prefix}api_key: {COLON_PREFIX_VALUE}");
+            assert_only_value(&input, COLON_PREFIX_VALUE);
+        }
+    }
+
+    // issue #812: a credential name on both sides of the colon emits the
+    // outer and the nested candidate; the engine's overlap resolution keeps
+    // one finding (`tests/overlap_resolution.rs`).
+    #[test]
+    fn a_credential_assignment_nested_in_a_credential_colon_value_emits_both_candidates() {
+        let input = format!("secret: password={COLON_PREFIX_VALUE}");
+        let candidates = detect(&input);
+        assert_eq!(candidates.len(), 2, "{candidates:?}");
+        let inner = input.len() - COLON_PREFIX_VALUE.len();
+        assert_eq!(
+            candidates[0].range(),
+            ByteRange::new(8, input.len()).unwrap()
+        );
+        assert_eq!(
+            candidates[1].range(),
+            ByteRange::new(inner, input.len()).unwrap()
+        );
+    }
+
+    // issue #812: the fix only makes a nested name reachable; every existing
+    // name and value rule still judges it. Benign colon-prefixed text and
+    // URLs stay non-matches.
+    #[test]
+    fn benign_assignments_after_a_colon_prefix_stay_unmatched() {
+        for input in [
+            "note: value=hello",
+            "note: value=Synthetic-EXAMPLE-pw-9f3k2",
+            "status: ok=true",
+            "error: user=bob",
+            "error: token=Synthetic-EXAMPLE-pw-9f3k2",
+            "login failed: password=",
+            "login failed: password=********",
+            "login failed: password=${DB_PASSWORD}",
+            "login failed: password=<password>",
+            "url: https://example.test/callback?a=b",
+            "redirect: https://example.test/cb?state=abc&a=b",
+            "see https://example.test/?a=b&c=d",
+            "time: 12:30:45",
+            "scope: api-key:endpoint:chat",
+        ] {
+            let candidates = detect(input);
+            assert!(candidates.is_empty(), "{input:?}: {candidates:?}");
+        }
+    }
+
+    // issue #812: a name glued to the operator of the text before it, with no
+    // whitespace, still has no prefix boundary, as `x=password=V` never had.
+    // Widening the boundary set to `:`/`=` would split whole-input and
+    // incremental results for a name whose operator is on the next line,
+    // because `has_open_contextual_assignment` does not treat them as a
+    // boundary either.
+    #[test]
+    fn a_credential_name_glued_to_a_preceding_operator_stays_unmatched() {
+        for input in [
+            format!("error:password={COLON_PREFIX_VALUE}"),
+            format!("x=password={COLON_PREFIX_VALUE}"),
+        ] {
+            assert!(detect(&input).is_empty(), "{input:?}");
+        }
     }
 
     // issue #552: `redact-secret-benchmarks`' `context.markdown` metamorphic

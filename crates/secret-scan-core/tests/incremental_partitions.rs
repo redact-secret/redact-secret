@@ -602,3 +602,33 @@ fn the_default_policy_is_count_independent_so_it_partitions_safely() {
         assert_eq!(with_total, finding.action());
     }
 }
+
+// ---------------------------------------------------------------------------
+// issue #812: a `key=value` assignment after a `<text>: ` prefix
+// ---------------------------------------------------------------------------
+
+/// The nested assignment the #812 fix makes reachable is judged the same at
+/// every partition boundary as in one whole-input scan, including one-line
+/// and multi-line log shapes. Every value is synthetic.
+#[test]
+fn a_colon_prefixed_assignment_reproduces_the_whole_input_reference_at_every_boundary() {
+    for input in [
+        "login failed: password=Synthetic-EXAMPLE-pw-9f3k2\n",
+        "error: api_key: Synthetic-EXAMPLE-pw-9f3k2\nnote: value=hello\n",
+        "secret: password=Synthetic-EXAMPLE-pw-9f3k2",
+    ] {
+        let (text, findings) = whole_input(input);
+        assert_eq!(findings.len(), 1, "{input:?}: {findings:?}");
+        for (index, chunks) in char_boundary_partitions(input).iter().enumerate() {
+            let label = format!("{input:?} char boundary #{index}");
+            assert_matches_reference(&label, &run(chunks), &text, &findings);
+        }
+        let per_character = single_char_partition(input);
+        assert_matches_reference(
+            &format!("{input:?} one chunk per character"),
+            &run(&per_character),
+            &text,
+            &findings,
+        );
+    }
+}

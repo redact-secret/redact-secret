@@ -121,3 +121,67 @@ fn the_excluded_bearer_filler_value_is_still_excluded_when_it_follows_the_contex
         "contextual_secret",
     );
 }
+
+// ---------------------------------------------------------------------------
+// a `key=value` assignment after a `<text>: ` prefix (issue #812)
+// ---------------------------------------------------------------------------
+
+/// The #812 reproduction value: unmistakably synthetic.
+const COLON_PREFIX_VALUE: &str = "Synthetic-EXAMPLE-pw-9f3k2";
+
+/// Every #812 row, the missed ones and the ones already detected, through
+/// the real registry and default policy: each credential assignment yields
+/// exactly one finding, at the value's own range.
+#[test]
+fn a_credential_assignment_after_a_colon_prefix_yields_one_finding_at_its_value() {
+    for prefix in [
+        "",
+        "login failed with ",
+        "login failed; ",
+        "user=bob: ",
+        "login failed: ",
+        "error: ",
+        "request failed:\t",
+        "error:  ",
+    ] {
+        let input = format!("{prefix}password={COLON_PREFIX_VALUE}");
+        assert_only_live_survives(
+            &input,
+            COLON_PREFIX_VALUE,
+            "generic-token",
+            "contextual_secret",
+        );
+    }
+}
+
+/// A credential name on both sides of the colon: the outer value covers the
+/// inner assignment, and overlap resolution keeps one finding.
+#[test]
+fn a_credential_assignment_nested_in_a_credential_colon_value_yields_one_finding() {
+    for input in [
+        format!("secret: password={COLON_PREFIX_VALUE}"),
+        format!("api_key: password={COLON_PREFIX_VALUE}"),
+    ] {
+        let found = findings(&input);
+        assert_eq!(
+            found.len(),
+            1,
+            "{input:?}: expected one finding, got {found:?}"
+        );
+        assert_eq!(found[0].detector(), "generic-token", "{input:?}");
+    }
+}
+
+/// The bare `token` name is unmatched on its own (#702), so the colon prefix
+/// changes nothing for `login failed: token=...`.
+#[test]
+fn a_bare_token_name_stays_unmatched_with_or_without_a_colon_prefix() {
+    for prefix in ["", "login failed: "] {
+        let input = format!("{prefix}token={COLON_PREFIX_VALUE}");
+        let found = findings(&input);
+        assert!(
+            found.is_empty(),
+            "{input:?}: expected no finding, got {found:?}"
+        );
+    }
+}

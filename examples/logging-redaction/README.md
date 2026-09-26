@@ -102,10 +102,13 @@ before pino writes it. There is no state across calls.
 - **Detection gaps.** A line with no finding is not proof that it held no
   secret; see [detection and limits](../../docs/reference/detection.md) and
   the [support matrix](../../docs/support-matrix.md). One example seen while
-  building this reference, on `@redact-secret/core@0.1.0-beta.8`: the
-  assignment in `login failed: password=<value>` is not detected, while
-  `login failed with password=<value>` is. `smoke.mjs` uses the second
-  form.
+  building this reference: `@redact-secret/core@0.1.0-beta.8` does not
+  detect the assignment in `login failed: password=<value>`, while it does
+  detect `login failed with password=<value>`. The core fix
+  ([#812](https://github.com/redact-secret/redact-secret/issues/812)) is on
+  `main` and ships in the next core release. This reference installs the
+  released beta.8, so `smoke.mjs` keeps the second form until its core pin
+  moves past beta.8.
 - **The process itself.** Plaintext still exists in memory and in the
   caller's own variables.
 
