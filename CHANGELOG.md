@@ -24,6 +24,28 @@ evidence is linked from each published version.
 
 ### Changed
 
+- **AI-context contract change (beta.10, #842): `sanitizeValue` is
+  key-aware.** A string leaf under an object key that its own scan does not
+  redact is scanned once more in its key-context view `{"<key>":"<leaf>"}`
+  through the same `scanAndRedact`, and a finding there is redacted at that
+  leaf with leaf offsets (`docs/reference/ai-context-boundary.md`,
+  `decision-define-key-aware-sanitize-value`). Only the immediate key
+  counts: array elements, parent keys, and sibling keys give no context.
+  The MCP boundary's key-context check stays as a backstop for context the
+  leaf pass cannot see (a sibling or parent key), so it no longer blocks a
+  result that only a leaf's own key identifies.
+  **Migration:** under plain AI-context, a leaf that was delivered in
+  plaintext because only its key identified it (`{"password": "<value>"}`)
+  is now replaced by a placeholder and reported in `ok.findings` and
+  telemetry. Under MCP, a result or argument set that was `blocked` /
+  `policy` only through the key-context check is now `ok` with that leaf
+  redacted. Nothing previously redacted or blocked now passes. A host that
+  relied on the block should watch `onFinding`. The cost is false positives
+  the core's contextual rules already accept in text (prose under
+  `password`), measured by the new fixture cases, and one more scan per
+  such leaf. The core API is unchanged; the adapter implementation is
+  redact-secret-adapters#32.
+
 - The JavaScript side of the MCP golden path (`examples/mcp-redact`) now
   runs on `@redact-secret/adapter-mcp` (redact-secret-adapters#13), which
   implements the MCP boundary contract. The adapters pin

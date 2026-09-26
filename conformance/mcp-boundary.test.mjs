@@ -30,6 +30,9 @@ const fixture = JSON.parse(readFileSync(new URL("./fixtures/mcp-boundary.json", 
 const SYNTHETIC = "SYNTHETIC_MCP_BOUNDARY_VALUE_0000";
 /** The fake core's "key context" secret: detected only after `password":"`. */
 const CONTEXTUAL = "synthetic-contextual-0000";
+/** The fake core's "sibling context" secret: detected only after `"provider":"fake","value":"`. */
+const SIBLING = "synthetic-sibling-0000";
+const SIBLING_CONTEXT = '"provider":"fake","value":"';
 
 const LIMITS = {
   wholeInputLimits: { maxInputBytes: 4096, maxFindings: 16 },
@@ -69,6 +72,11 @@ function fakeApi() {
     if (index !== -1) {
       const start = index + 'password":"'.length;
       return { text: text.replace(CONTEXTUAL, "<SECRET_1>"), findings: [finding("redact", start, start + CONTEXTUAL.length)] };
+    }
+    index = text.indexOf(`${SIBLING_CONTEXT}${SIBLING}`);
+    if (index !== -1) {
+      const start = index + SIBLING_CONTEXT.length;
+      return { text: text.replace(SIBLING, "<SECRET_1>"), findings: [finding("redact", start, start + SIBLING.length)] };
     }
     return { text, findings: [] };
   }
@@ -179,15 +187,36 @@ test("a whole result is one value: content, structuredContent, and _meta are all
   for (const event of events) assert.deepEqual(Object.keys(event.finding), SAFE_FINDING_FIELDS);
 });
 
-test("the key-context check blocks a structured secret that only its key identifies", () => {
-  const { mcp } = setup();
+test("a structured secret that only its key identifies is redacted at its leaf, like its text copy (#842)", () => {
+  const { mcp, events } = setup();
   const text = JSON.stringify({ password: CONTEXTUAL });
-  // The text copy alone is redacted in place: its key context is in the text.
+  // The text copy is redacted in place: its key context is in the text.
   assert.equal(mcp.sanitizeToolResult({ content: [{ type: "text", text }] }).value.content[0].text, '{"password":"<SECRET_1>"}');
-  // The structured copy cannot be mapped back onto its leaf, so the result blocks.
+  // The structured copy is redacted at its leaf by the key-aware pass, so the
+  // backstop has nothing left to block and both copies agree.
   const outcome = mcp.sanitizeToolResult({ content: [{ type: "text", text }], structuredContent: { password: CONTEXTUAL } });
-  assert.deepEqual(outcome, { outcome: "blocked", reason: "policy" });
-  assert.deepEqual(mcp.sanitizeToolArguments({ password: CONTEXTUAL }), { outcome: "blocked", reason: "policy" });
+  assert.equal(outcome.outcome, "ok");
+  assert.deepEqual(outcome.value.structuredContent, { password: "<SECRET_1>" });
+  assert.deepEqual(
+    outcome.findings.map(({ start, end }) => [start, end]),
+    [
+      [13, 13 + CONTEXTUAL.length],
+      [0, CONTEXTUAL.length],
+    ],
+    "the structured finding carries leaf offsets",
+  );
+  assert.equal(JSON.stringify({ outcome, events }).includes(CONTEXTUAL), false);
+  const args = mcp.sanitizeToolArguments({ user: "deploy-bot", password: CONTEXTUAL });
+  assert.deepEqual(args.value, { user: "deploy-bot", password: "<SECRET_1>" });
+});
+
+test("the narrowed backstop still blocks context the leaf pass cannot see", () => {
+  const { mcp } = setup();
+  // Only a sibling key identifies SIBLING: the leaf pass sees `{"value":...}`
+  // and passes it; the serialized backstop sees the sibling and blocks.
+  const structuredContent = { provider: "fake", value: SIBLING };
+  assert.deepEqual(mcp.sanitizeToolResult({ content: [], structuredContent }), { outcome: "blocked", reason: "policy" });
+  assert.deepEqual(mcp.sanitizeToolArguments(structuredContent), { outcome: "blocked", reason: "policy" });
 });
 
 test("binary payloads block by default and pass unscanned, in place, only on opt-in", () => {

@@ -221,3 +221,112 @@ test("a stream's accepting flag turns false on failure, abort, and finalize, and
   assert.equal(finished.accepting, false);
   assert.equal(boundary.openStream({ signal: { aborted: true } }).accepting, false);
 });
+
+/**
+ * A fake core for the key-aware walker (#842). KEYED is detected only inside
+ * the key-context view `{"password":"KEYED"}`; WARNED warns alone and is
+ * redacted under `password`; a view whose key is `trap` gets a redact finding
+ * on the key itself, outside the leaf's span. Every call is recorded.
+ */
+function keyAwareApi() {
+  const KEYED = "synthetic-keyed-0000";
+  const WARNED = "synthetic-warned-0000";
+  const calls = [];
+  const make = (action, start, end) => ({
+    id: "finding-1",
+    type: "synthetic",
+    detector: "fake",
+    confidence: "high",
+    action,
+    obfuscation: "none",
+    start,
+    end,
+  });
+  function scanAndRedact(text) {
+    calls.push(text);
+    if (text.startsWith('{"trap":"')) return { text: `{"<SECRET_1>${text.slice(6)}`, findings: [make("redact", 2, 6)] };
+    for (const [secret, prefix] of [
+      [KEYED, '{"password":"'],
+      [WARNED, '{"password":"'],
+    ]) {
+      if (text.startsWith(prefix + secret)) {
+        const start = prefix.length;
+        return { text: text.replace(secret, "<SECRET_1>"), findings: [make("redact", start, start + secret.length)] };
+      }
+    }
+    if (text === WARNED) return { text, findings: [make("warn", 0, WARNED.length)] };
+    return { text, findings: [] };
+  }
+  return { KEYED, WARNED, calls, scanAndRedact, createIncrementalSanitizer: () => ({}) };
+}
+
+test("a leaf identified only by its immediate key is redacted in place, with leaf offsets", () => {
+  const api = keyAwareApi();
+  const events = [];
+  const boundary = createAiContextBoundary(api, { ...LIMITS, onFinding: (finding) => events.push(finding) });
+  const outcome = boundary.sanitizeValue({ user: "deploy-bot", password: api.KEYED }, { boundary: "tool-result" });
+  assert.equal(outcome.outcome, "ok");
+  assert.deepEqual(outcome.value, { user: "deploy-bot", password: "<SECRET_1>" });
+  assert.deepEqual(
+    outcome.findings.map(({ start, end }) => [start, end]),
+    [[0, api.KEYED.length]],
+  );
+  assert.deepEqual(Object.keys(outcome.findings[0]), SAFE_FINDING_FIELDS);
+  assert.deepEqual(events, outcome.findings, "telemetry sees the leaf finding, not the view's offsets");
+  assert.ok(api.calls.includes(`{"password":"${api.KEYED}"}`), "the view embeds key and leaf verbatim");
+});
+
+test("key context is the immediate object key only: array elements and parent keys give none", () => {
+  const api = keyAwareApi();
+  const boundary = createAiContextBoundary(api, LIMITS);
+  const value = { password: [api.KEYED], auth: { value: api.KEYED } };
+  const outcome = boundary.sanitizeValue(value, { boundary: "tool-result" });
+  assert.deepEqual(outcome, { outcome: "ok", value, findings: [] });
+  assert.equal(api.calls.includes(`{"password":"${api.KEYED}"}`), false, "an array element has no key context");
+  // A string root has no key either: one scan, alone.
+  api.calls.length = 0;
+  boundary.sanitizeValue(api.KEYED, { boundary: "tool-result" });
+  assert.deepEqual(api.calls, [api.KEYED]);
+});
+
+test("the leaf-alone result stands when it redacts, and yields to a key-context redaction when it only warns", () => {
+  const api = keyAwareApi();
+  const boundary = createAiContextBoundary(api, LIMITS);
+  // WARNED alone warns; under `password` the view redacts it, so the view wins.
+  const upgraded = boundary.sanitizeValue({ password: api.WARNED }, { boundary: "tool-result" });
+  assert.deepEqual(upgraded.value, { password: "<SECRET_1>" });
+  assert.deepEqual(upgraded.findings.map((finding) => finding.action), ["redact"]);
+  // Under a key the view does not recognize, the leaf-alone warning stands.
+  const kept = boundary.sanitizeValue({ note: api.WARNED }, { boundary: "tool-result" });
+  assert.deepEqual(kept.value, { note: api.WARNED });
+  assert.deepEqual(kept.findings.map((finding) => finding.action), ["warn"]);
+  // A leaf that redacts on its own is never rescanned in its view.
+  const redacting = createAiContextBoundary(fakeApi({ extraFields: false }), LIMITS);
+  const outcome = redacting.sanitizeValue({ password: SYNTHETIC }, { boundary: "tool-result" });
+  assert.deepEqual(outcome.value, { password: "<SECRET_1>" });
+  assert.equal(outcome.findings.length, 1);
+});
+
+test("a redacting finding outside the leaf's span blocks the value instead of rewriting the key", () => {
+  const api = keyAwareApi();
+  const boundary = createAiContextBoundary(api, LIMITS);
+  assert.deepEqual(boundary.sanitizeValue({ trap: "ordinary text" }, { boundary: "tool-result" }), {
+    outcome: "blocked",
+    reason: "policy",
+  });
+});
+
+test("the key-context view is bounded by the whole-input limits", () => {
+  const api = keyAwareApi();
+  api.scanAndRedact = (text) => {
+    if (text.length > 16) throw new FakeScanError("INPUT_LIMIT_EXCEEDED", `leaked ${text}`);
+    return { text, findings: [] };
+  };
+  const boundary = createAiContextBoundary(api, LIMITS);
+  assert.deepEqual(boundary.sanitizeValue({ password: "0123456789" }, { boundary: "tool-result" }), {
+    outcome: "blocked",
+    reason: "limit_exceeded",
+    code: "INPUT_LIMIT_EXCEEDED",
+  });
+  assert.deepEqual(boundary.sanitizeValue(["0123456789"], { boundary: "tool-result" }).outcome, "ok");
+});

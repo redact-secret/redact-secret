@@ -62,6 +62,10 @@ def _failure_from(error: BaseException) -> dict:
     return _blocked("core_error", code)
 
 
+def _redacts_or_blocks(findings: list[dict]) -> bool:
+    return any(finding["action"] in ("redact", "block") for finding in findings)
+
+
 def _safe_finding(finding: Any) -> dict:
     return {name: getattr(finding, name) for name in SAFE_FINDING_FIELDS}
 
@@ -97,6 +101,35 @@ class Boundary:
             return _failure_from(error), "", []
         return None, result.text, [_safe_finding(finding) for finding in result.findings]
 
+    def _scan_leaf(self, text: str, key: str | None) -> tuple[dict | None, str, list[dict]]:
+        """One string leaf, key-aware (#842); the twin of ``scanLeaf``.
+
+        The leaf is scanned alone. When that redacts or blocks nothing and the
+        leaf sits directly under an object key, it is scanned again inside its
+        key-context view ``{"<key>":"<leaf>"}`` (key and leaf verbatim). A
+        finding inside the leaf's span is shifted to leaf offsets; a
+        redacting or blocking finding outside it blocks as ``policy``. The
+        view's result replaces the leaf-alone one when it redacts or blocks,
+        or when the leaf alone reported nothing.
+        """
+        failure, value, alone = self._scan(text)
+        if failure is not None or key is None or _redacts_or_blocks(alone):
+            return failure, value, alone
+        prefix, suffix = '{"' + key + '":"', '"}'
+        failure, context_text, context = self._scan(prefix + text + suffix)
+        if failure is not None:
+            return failure, "", []
+        leaf_end = len(prefix) + len(text)
+        findings: list[dict] = []
+        for finding in context:
+            if finding["start"] >= len(prefix) and finding["end"] <= leaf_end:
+                findings.append({**finding, "start": finding["start"] - len(prefix), "end": finding["end"] - len(prefix)})
+            elif finding["action"] in ("redact", "block"):
+                return _blocked("policy"), "", []
+        if not _redacts_or_blocks(findings) and alone:
+            return None, value, alone
+        return None, context_text[len(prefix) : len(context_text) - len(suffix)], findings
+
     def sanitize_text(self, text: Any, boundary: str, signal: Signal) -> dict:
         if signal.aborted:
             return ABORTED
@@ -117,12 +150,14 @@ class Boundary:
         state = {"nodes": 0}
         seen: set[int] = set()
 
-        def walk(node: Any, depth: int) -> tuple[dict | None, Any]:
+        # ``key`` is the object key ``node`` sits directly under; an array
+        # element, and the root, have none.
+        def walk(node: Any, depth: int, key: str | None = None) -> tuple[dict | None, Any]:
             state["nodes"] += 1
             if state["nodes"] > self.traversal["maxNodes"]:
                 return _blocked("limit_exceeded"), None
             if isinstance(node, str):
-                failure, text, leaf = self._scan(node)
+                failure, text, leaf = self._scan_leaf(node, key)
                 if failure is not None:
                     return failure, None
                 self._emit(leaf, boundary)
@@ -158,7 +193,7 @@ class Boundary:
                     self._emit(key_findings, boundary)
                     if any(finding["action"] in ("block", "redact") for finding in key_findings):
                         return _blocked("policy"), None
-                    failure, child = walk(item, depth + 1)
+                    failure, child = walk(item, depth + 1, key)
                     if failure is not None:
                         return failure, None
                     out[key] = child
@@ -306,6 +341,8 @@ def _materialize_value(value: Any) -> Any:
             return [value["item"]] * value["count"]
         if construct == "non-plain-object":
             return {"when": _NonPlain()}
+        if construct == "string-under-key":
+            return {value["key"]: value["repeat"] * value["count"]}
         if construct == "cycle":
             node: dict = {"label": "ordinary text"}
             node["self"] = node

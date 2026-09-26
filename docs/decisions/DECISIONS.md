@@ -51,6 +51,7 @@ Current rules: `docs/specs/distribution.md`.
 - [Add a Node WebAssembly fallback when the native addon is unusable](2026-09-19-add-node-webassembly-fallback.md)
 - [Graduate logging and tracing adapters to a separate repository](2026-09-19-graduate-adapters-to-a-separate-repository.md)
 - [Verify @redact-secret/core on Cloudflare Workers and Vercel Edge](2026-09-19-verify-edge-runtimes.md)
+- [Scan a structured leaf with its immediate key through a key-context view](2026-09-25-define-key-aware-sanitize-value.md)
 - [Define the framework-neutral AI-context boundary contract](2026-09-25-define-the-framework-neutral-ai-context-boundary-contract.md)
 - [Define the supported MCP redaction boundary](2026-09-25-define-the-supported-mcp-redaction-boundary.md)
 - [Redact key-identified leaves in place, make `resources/read` the next MCP boundary, and defer Python MCP](2026-09-25-rule-on-the-mcp-boundary-open-questions.md)

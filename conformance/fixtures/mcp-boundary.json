@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "contract": "docs/reference/mcp-boundary.md",
   "baseContract": "docs/reference/ai-context-boundary.md",
-  "note": "Supported MCP redaction boundary cases (issue #612), a thin specialization of the AI-context boundary fixture (#610). Every value is synthetic: the ghp_SYNTHETICREVOKED token and the private-key body come from synchronous-corpus.json via ai-context-boundary.json; synthetic-not-a-secret is detected only by its key context. All inputs are ASCII. Runner: conformance/mcp-boundary.mjs.",
+  "note": "Supported MCP redaction boundary cases (issue #612), a thin specialization of the AI-context boundary fixture (#610). Every value is synthetic: the ghp_SYNTHETICREVOKED token and the private-key body come from synchronous-corpus.json via ai-context-boundary.json; synthetic-not-a-secret is detected only by its key context, which the key-aware sanitizeValue (issue #842) now redacts in place; 9f8e7d6c5b4a39281706f5e4d3c2b1a0 is detected only through a sibling key (twilio-auth-token keyword), which only the narrowed serialized backstop sees. All inputs are ASCII. Runner: conformance/mcp-boundary.mjs.",
   "limits": {
     "wholeInput": {
       "maxInputBytes": 4096,
@@ -184,7 +184,7 @@
       }
     },
     {
-      "id": "result-structured-content-key-context-blocks",
+      "id": "result-structured-content-key-context-redacts-in-place",
       "operation": "toolResult",
       "result": {
         "content": [
@@ -201,8 +201,142 @@
         "synthetic-not-a-secret"
       ],
       "expected": {
+        "outcome": "ok",
+        "value": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"password\":\"<SECRET_1>\"}"
+            }
+          ],
+          "structuredContent": {
+            "password": "<SECRET_1>"
+          }
+        },
+        "findings": [
+          {
+            "id": "finding-1",
+            "type": "contextual_secret",
+            "detector": "generic-token",
+            "confidence": "high",
+            "action": "redact",
+            "obfuscation": "none",
+            "start": 13,
+            "end": 35
+          },
+          {
+            "id": "finding-1",
+            "type": "contextual_secret",
+            "detector": "generic-token",
+            "confidence": "high",
+            "action": "redact",
+            "obfuscation": "none",
+            "start": 0,
+            "end": 22
+          }
+        ]
+      }
+    },
+    {
+      "id": "result-structured-content-nested-key-context-redacts-in-place",
+      "operation": "toolResult",
+      "result": {
+        "content": [],
+        "structuredContent": {
+          "services": [
+            {
+              "name": "db",
+              "user": "deploy-bot",
+              "password": "synthetic-not-a-secret"
+            },
+            {
+              "name": "cache",
+              "port": 6379
+            }
+          ]
+        }
+      },
+      "secrets": [
+        "synthetic-not-a-secret"
+      ],
+      "expected": {
+        "outcome": "ok",
+        "value": {
+          "content": [],
+          "structuredContent": {
+            "services": [
+              {
+                "name": "db",
+                "user": "deploy-bot",
+                "password": "<SECRET_1>"
+              },
+              {
+                "name": "cache",
+                "port": 6379
+              }
+            ]
+          }
+        },
+        "findings": [
+          {
+            "id": "finding-1",
+            "type": "contextual_secret",
+            "detector": "generic-token",
+            "confidence": "high",
+            "action": "redact",
+            "obfuscation": "none",
+            "start": 0,
+            "end": 22
+          }
+        ]
+      }
+    },
+    {
+      "id": "result-structured-content-sibling-context-backstop-blocks",
+      "operation": "toolResult",
+      "policy": "block-all",
+      "result": {
+        "content": [],
+        "structuredContent": {
+          "provider": "twilio",
+          "value": "9f8e7d6c5b4a39281706f5e4d3c2b1a0"
+        }
+      },
+      "secrets": [
+        "9f8e7d6c5b4a39281706f5e4d3c2b1a0"
+      ],
+      "expected": {
         "outcome": "blocked",
         "reason": "policy"
+      }
+    },
+    {
+      "id": "result-structured-content-sibling-context-warn-passes",
+      "operation": "toolResult",
+      "result": {
+        "content": [],
+        "structuredContent": {
+          "provider": "twilio",
+          "value": "9f8e7d6c5b4a39281706f5e4d3c2b1a0"
+        }
+      },
+      "secrets": [
+        "9f8e7d6c5b4a39281706f5e4d3c2b1a0"
+      ],
+      "valueMayContainSecrets": true,
+      "expectedLabels": [
+        "tool-result"
+      ],
+      "expected": {
+        "outcome": "ok",
+        "value": {
+          "content": [],
+          "structuredContent": {
+            "provider": "twilio",
+            "value": "9f8e7d6c5b4a39281706f5e4d3c2b1a0"
+          }
+        },
+        "findings": []
       }
     },
     {
@@ -957,7 +1091,7 @@
       }
     },
     {
-      "id": "arguments-key-context-blocks",
+      "id": "arguments-key-context-redacts-in-place",
       "operation": "toolArguments",
       "arguments": {
         "username": "deploy-bot",
@@ -967,8 +1101,23 @@
         "synthetic-not-a-secret"
       ],
       "expected": {
-        "outcome": "blocked",
-        "reason": "policy"
+        "outcome": "ok",
+        "value": {
+          "username": "deploy-bot",
+          "password": "<SECRET_1>"
+        },
+        "findings": [
+          {
+            "id": "finding-1",
+            "type": "contextual_secret",
+            "detector": "generic-token",
+            "confidence": "high",
+            "action": "redact",
+            "obfuscation": "none",
+            "start": 0,
+            "end": 22
+          }
+        ]
       }
     },
     {

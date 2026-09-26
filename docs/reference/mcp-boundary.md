@@ -22,11 +22,15 @@ behavior underneath it.
 
 Decided by
 [`decision-define-the-supported-mcp-redaction-boundary`](../decisions/2026-09-25-define-the-supported-mcp-redaction-boundary.md);
+rule 3 narrowed in beta.10 (#842) by
+[`decision-rule-on-the-mcp-boundary-open-questions`](../decisions/2026-09-25-rule-on-the-mcp-boundary-open-questions.md)
+and
+[`decision-define-key-aware-sanitize-value`](../decisions/2026-09-25-define-key-aware-sanitize-value.md);
 the current rule is in [distribution](../specs/distribution.md).
 
 ```text
-tool arguments (opt-in) -> AI-context sanitizeValue (tool-arguments) -> key-context check -> dispatch or fixed error
-tool result             -> AI-context sanitizeValue (tool-result)    -> key-context check -> context, log, store, or fixed error
+tool arguments (opt-in) -> AI-context sanitizeValue (tool-arguments, key-aware) -> key-context backstop -> dispatch or fixed error
+tool result             -> AI-context sanitizeValue (tool-result, key-aware)    -> key-context backstop -> context, log, store, or fixed error
 streamed tool output    -> AI-context openStream (tool-result)       -> stop pulling on failure -> one text block or fixed error
 ```
 
@@ -124,8 +128,8 @@ explicit limits, a policy, and optional telemetry.
 
 | Operation | Input | AI-context path |
 | --- | --- | --- |
-| `sanitizeToolResult` | one `CallToolResult` | one `sanitizeValue` of the whole result, label `tool-result`, then the key-context check |
-| `sanitizeToolArguments` | `CallToolRequest.params.arguments` (opt-in) | one `sanitizeValue`, label `tool-arguments`, then the key-context check |
+| `sanitizeToolResult` | one `CallToolResult` | one `sanitizeValue` of the whole result, label `tool-result`, then the key-context backstop |
+| `sanitizeToolArguments` | `CallToolRequest.params.arguments` (opt-in) | one `sanitizeValue`, label `tool-arguments`, then the key-context backstop |
 | `sanitizeToolCall` | the host's tool invocation (a client `callTool`, or a server handler) | run it; a throw or rejection is `tool_error`; otherwise `sanitizeToolResult` |
 | `sanitizeStreamedToolResult` | chunks of one logical text | one staged `openStream`, label `tool-result`, released as a one-block `CallToolResult` |
 
@@ -164,38 +168,54 @@ fails closed rather than passing through.
 | `image` / `audio` `data`, `resource.blob` | base64, never decoded. **Default: the whole result is `blocked` / `unsupported_value`.** A host may opt in (`binaryContent: "pass"`) to pass the payload through unchanged and unscanned, at its original position; every other field of the block is still scanned. A non-string payload always blocks. |
 | any other block `type` | `blocked` / `unsupported_value`: a type from a later protocol revision may carry content this contract cannot scan |
 | a block that is not a plain object; `content` that is not an array; a result that is not a plain object | `blocked` / `unsupported_value` |
-| `structuredContent` | scanned as a nested value (every leaf and key), then the key-context check |
+| `structuredContent` | scanned as a nested value (every leaf with its immediate key, and every key), then the key-context backstop |
 | `_meta` (on the result or on a block), `annotations` | scanned as values like any other field |
 | `isError` and other non-string scalars | passed unchanged |
 
 Object keys are scanned, and a key with a `redact` or `block` finding blocks
 the whole result, as the AI-context contract requires.
 
-### Key-context check
+### Key-context backstop
 
-A string leaf is scanned without the key it sits under. So `{"password":
-"<value>"}` in `structuredContent` would pass when `<value>` does not
-identify itself, even though the same pair inside a text block is caught.
-MCP makes this sharp: a tool that returns `structuredContent` is expected to
-return its JSON serialization as text too, and a leaf-only scan would redact
-the text copy and deliver the structured copy as it was.
+The AI-context `sanitizeValue` is key-aware since beta.10 (#842): each
+string leaf is scanned with the object key it sits directly under, and a
+finding there is redacted at that leaf, with leaf offsets
+([key-aware `sanitizeValue`](ai-context-boundary.md#key-aware-sanitizevalue)).
+So `{"password": "<value>"}` in `structuredContent` is redacted in place,
+exactly as the same pair is redacted in a text block, and the structured and
+text copies of a result agree. That replaces the beta.9 key-context check
+for the case it was built for, and the result is no longer blocked.
 
-So after the leaf-by-leaf pass, the integration serializes each value-shaped
-part of the **sanitized** result with `JSON.stringify` and scans it once more
-as text: the result without its `content` array (which covers
+What the leaf pass cannot see is context from anywhere but the immediate key:
+a sibling key (`{"provider": "twilio", "value": "<hex>"}`), a parent key, or
+a pair split across leaves. The backstop keeps that covered. After the
+leaf-by-leaf pass, the integration still serializes each value-shaped part
+of the **sanitized** result with `JSON.stringify` and scans it once more as
+text: the result without its `content` array (which covers
 `structuredContent`, `_meta`, and any other field), and each content block
 without its already-scanned `text`. Sanitized arguments get the same check.
 A `redact` or `block` finding there cannot be mapped back to one leaf, so it
 blocks the whole operation as `policy`. Placeholders written by the first
-pass are not detected again, and a `warn` finding passes, as `warn` always
-does. The check's findings reach telemetry (their offsets are into the
-serialization); `ok.findings` lists the leaf findings only. The serialization
-is bounded by the same whole-input limits, so a serialized part over
-`maxInputBytes` blocks as `limit_exceeded`.
+pass are not detected again, so a leaf the key-aware pass already redacted
+never trips the backstop, and a `warn` finding passes, as `warn` always
+does. The backstop's findings reach telemetry (their offsets are into the
+serialization); `ok.findings` lists the leaf findings only. The
+serialization is bounded by the same whole-input limits, so a serialized
+part over `maxInputBytes` blocks as `limit_exceeded`.
 
-The trade is availability for a structured result that names a secret only
-by its key: it is blocked, not redacted. A host that needs such results
-through can drop `structuredContent` and keep the (redacted) text copy.
+The remaining trade is availability for a structured result whose secret
+only a sibling or parent key identifies: it is still blocked, not redacted.
+A host that needs such results through can drop `structuredContent` and
+keep the (redacted) text copy.
+
+**Migration from beta.9.** A result or argument set that beta.9 blocked as
+`policy` only because its key-context check found a value identified by its
+own key (`result-structured-content-key-context-redacts-in-place`,
+`arguments-key-context-redacts-in-place` in the fixture) is now `ok`, with
+that leaf replaced by a placeholder and its finding in `ok.findings` and
+telemetry. Nothing that beta.9 delivered is delivered in more plaintext now.
+A host that relied on the block, for example to alert on it, should watch
+`onFinding` instead.
 
 ### Streamed tool output
 
@@ -320,8 +340,11 @@ is [#810](https://github.com/redact-secret/redact-secret/issues/810).
 - [`conformance/fixtures/mcp-boundary.json`](../../conformance/fixtures/mcp-boundary.json)
   holds the cases: text, JSON in text, nested `structuredContent`, `_meta`,
   embedded and linked resources, binary content under both settings, unknown
-  and malformed blocks, traversal limits counted from the root, the
-  key-context check, a split across blocks that is not joined, opt-in
+  and malformed blocks, traversal limits counted from the root, a
+  key-identified leaf redacted in place (top-level, nested in an array, and
+  in arguments), the key-context backstop on sibling context under a
+  `block-all` policy and its `warn` under the default one, a split across
+  blocks that is not joined, opt-in
   arguments, a failing tool, streaming splits, early failure that stops
   pulling, cancellation before and during a stream, blocked and core-error
   results, and the uninitialized core. It also pins the limits, the safe

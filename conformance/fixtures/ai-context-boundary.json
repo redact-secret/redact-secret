@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "contract": "docs/reference/ai-context-boundary.md",
-  "note": "Framework-neutral AI-context boundary contract cases (issue #610). Every input is synthetic and already present in synchronous-corpus.json (host-dotenv-github, contextual-positive-minimum-length-is-medium-confidence, private-key-positive). All inputs are ASCII, so JavaScript UTF-16 and Python code-point offsets are identical. Runners: conformance/ai-context-boundary.mjs (JavaScript) and bindings/python/tests/test_ai_context_boundary.py (Python).",
+  "note": "Framework-neutral AI-context boundary contract cases (issue #610). Every input is synthetic and already present in synchronous-corpus.json (host-dotenv-github, contextual-positive-minimum-length-is-medium-confidence, private-key-positive). The key-aware sanitizeValue cases (issue #842) add values detected only through their key context (synthetic-not-a-secret, from mcp-boundary.json) and non-secret values under credential-like and non-credential keys, which pin the false-positive and false-negative bounds of the key-context view. All inputs are ASCII, so JavaScript UTF-16 and Python code-point offsets are identical. Runners: conformance/ai-context-boundary.mjs (JavaScript) and bindings/python/tests/test_ai_context_boundary.py (Python).",
   "limits": {
     "wholeInput": { "maxInputBytes": 4096, "maxFindings": 16 },
     "incremental": {
@@ -184,6 +184,148 @@
       "value": { "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000": "ordinary text" },
       "secrets": ["ghp_SYNTHETICREVOKED00000000000000000000"],
       "expected": { "outcome": "blocked", "reason": "policy" }
+    },
+    {
+      "id": "text-json-pair-keeps-key-context",
+      "operation": "sanitizeText",
+      "boundary": "tool-result",
+      "input": "{\"password\":\"synthetic-not-a-secret\"}",
+      "secrets": ["synthetic-not-a-secret"],
+      "expected": {
+        "outcome": "ok",
+        "value": "{\"password\":\"<SECRET_1>\"}",
+        "findings": [
+          { "id": "finding-1", "type": "contextual_secret", "detector": "generic-token", "confidence": "high", "action": "redact", "obfuscation": "none", "start": 13, "end": 35 }
+        ]
+      }
+    },
+    {
+      "id": "value-key-identified-leaf-redacted-in-place",
+      "operation": "sanitizeValue",
+      "boundary": "tool-result",
+      "value": { "service": "deploy", "password": "synthetic-not-a-secret" },
+      "secrets": ["synthetic-not-a-secret"],
+      "expected": {
+        "outcome": "ok",
+        "value": { "service": "deploy", "password": "<SECRET_1>" },
+        "findings": [
+          { "id": "finding-1", "type": "contextual_secret", "detector": "generic-token", "confidence": "high", "action": "redact", "obfuscation": "none", "start": 0, "end": 22 }
+        ]
+      }
+    },
+    {
+      "id": "value-key-context-warn-passes-through",
+      "operation": "sanitizeValue",
+      "boundary": "tool-result",
+      "value": { "secret": "SECRET01" },
+      "secrets": ["SECRET01"],
+      "valueMayContainSecrets": true,
+      "expected": {
+        "outcome": "ok",
+        "value": { "secret": "SECRET01" },
+        "findings": [
+          { "id": "finding-1", "type": "contextual_secret", "detector": "generic-token", "confidence": "medium", "action": "warn", "obfuscation": "none", "start": 0, "end": 8 }
+        ]
+      }
+    },
+    {
+      "id": "value-key-context-block-all-policy-blocks",
+      "operation": "sanitizeValue",
+      "boundary": "tool-result",
+      "policy": "block-all",
+      "value": { "secret": "SECRET01" },
+      "secrets": ["SECRET01"],
+      "expected": { "outcome": "blocked", "reason": "policy" }
+    },
+    {
+      "id": "value-key-context-exclusions-stay-clean",
+      "operation": "sanitizeValue",
+      "boundary": "tool-result",
+      "value": { "api_key": "YOUR_API_KEY", "password": "{{ vault_password }}", "client_secret": "${CLIENT_SECRET}", "apiKey": "sk-****************abcd" },
+      "secrets": [],
+      "expected": { "outcome": "ok", "value": { "api_key": "YOUR_API_KEY", "password": "{{ vault_password }}", "client_secret": "${CLIENT_SECRET}", "apiKey": "sk-****************abcd" }, "findings": [] }
+    },
+    {
+      "id": "value-non-credential-keys-stay-clean",
+      "operation": "sanitizeValue",
+      "boundary": "tool-result",
+      "value": { "token_count": "4096", "password_policy": "min 12 chars, 1 digit", "secret_name": "prod-db-credentials", "token_type": "Bearer", "csrf_token": "synthetic-not-a-secret" },
+      "secrets": [],
+      "expected": { "outcome": "ok", "value": { "token_count": "4096", "password_policy": "min 12 chars, 1 digit", "secret_name": "prod-db-credentials", "token_type": "Bearer", "csrf_token": "synthetic-not-a-secret" }, "findings": [] }
+    },
+    {
+      "id": "value-key-context-nested-object-in-array",
+      "operation": "sanitizeValue",
+      "boundary": "tool-result",
+      "value": { "deploy": { "items": [{ "name": "api", "password": "synthetic-not-a-secret" }] } },
+      "secrets": ["synthetic-not-a-secret"],
+      "expected": {
+        "outcome": "ok",
+        "value": { "deploy": { "items": [{ "name": "api", "password": "<SECRET_1>" }] } },
+        "findings": [
+          { "id": "finding-1", "type": "contextual_secret", "detector": "generic-token", "confidence": "high", "action": "redact", "obfuscation": "none", "start": 0, "end": 22 }
+        ]
+      }
+    },
+    {
+      "id": "value-key-context-is-the-immediate-key-only",
+      "operation": "sanitizeValue",
+      "boundary": "tool-result",
+      "value": { "password": ["synthetic-not-a-secret"], "auth": { "value": "synthetic-not-a-secret" } },
+      "secrets": ["synthetic-not-a-secret"],
+      "valueMayContainSecrets": true,
+      "expected": { "outcome": "ok", "value": { "password": ["synthetic-not-a-secret"], "auth": { "value": "synthetic-not-a-secret" } }, "findings": [] }
+    },
+    {
+      "id": "value-key-context-mixed-siblings",
+      "operation": "sanitizeValue",
+      "boundary": "tool-result",
+      "value": { "user": "deploy-bot", "password": "synthetic-not-a-secret", "env": "API_KEY=ghp_SYNTHETICREVOKED00000000000000000000", "note": "ordinary text" },
+      "secrets": ["synthetic-not-a-secret", "ghp_SYNTHETICREVOKED00000000000000000000"],
+      "expected": {
+        "outcome": "ok",
+        "value": { "user": "deploy-bot", "password": "<SECRET_1>", "env": "API_KEY=<SECRET_1>", "note": "ordinary text" },
+        "findings": [
+          { "id": "finding-1", "type": "contextual_secret", "detector": "generic-token", "confidence": "high", "action": "redact", "obfuscation": "none", "start": 0, "end": 22 },
+          { "id": "finding-1", "type": "github_token", "detector": "github-token", "confidence": "high", "action": "redact", "obfuscation": "none", "start": 8, "end": 48 }
+        ]
+      }
+    },
+    {
+      "id": "value-key-context-placeholders-are-not-redetected",
+      "operation": "sanitizeValue",
+      "boundary": "tool-result",
+      "value": { "api_key": "ghp_SYNTHETICREVOKED00000000000000000000", "password": "<SECRET_1>" },
+      "secrets": ["ghp_SYNTHETICREVOKED00000000000000000000"],
+      "expected": {
+        "outcome": "ok",
+        "value": { "api_key": "<SECRET_1>", "password": "<SECRET_1>" },
+        "findings": [
+          { "id": "finding-1", "type": "github_token", "detector": "github-token", "confidence": "high", "action": "redact", "obfuscation": "none", "start": 0, "end": 40 }
+        ]
+      }
+    },
+    {
+      "id": "value-key-context-prose-under-credential-key-is-redacted",
+      "operation": "sanitizeValue",
+      "boundary": "tool-result",
+      "value": { "password": "Welcome to the password reset flow" },
+      "secrets": [],
+      "expected": {
+        "outcome": "ok",
+        "value": { "password": "<SECRET_1>" },
+        "findings": [
+          { "id": "finding-1", "type": "contextual_secret", "detector": "generic-token", "confidence": "high", "action": "redact", "obfuscation": "none", "start": 0, "end": 34 }
+        ]
+      }
+    },
+    {
+      "id": "value-key-context-scan-is-bounded-by-input-limit",
+      "operation": "sanitizeValue",
+      "boundary": "tool-result",
+      "value": { "construct": "string-under-key", "key": "password", "repeat": "ordinary text\n", "count": 292 },
+      "secrets": [],
+      "expected": { "outcome": "blocked", "reason": "limit_exceeded", "code": "INPUT_LIMIT_EXCEEDED" }
     },
     {
       "id": "value-depth-limit-fails-closed",
