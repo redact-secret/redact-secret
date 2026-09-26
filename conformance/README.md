@@ -72,21 +72,22 @@ depend on `src/`.
 - [`fixtures/ai-context-boundary.json`](./fixtures/ai-context-boundary.json) —
   the framework-neutral AI-context boundary contract's cases (issue #610,
   [`docs/reference/ai-context-boundary.md`](../docs/reference/ai-context-boundary.md)):
-  text, nested-value, context-construction, and staged-stream operations
-  with their `ok`/`blocked`/`aborted` outcomes, plus the limits, safe finding
+  text, nested-value (key-aware since #842), context-construction, and
+  staged-stream operations with their `ok`/`blocked`/`aborted` outcomes,
+  plus the limits, safe finding
   fields, and block reasons they run under. Replayed by
   [`ai-context-boundary.mjs`](./ai-context-boundary.mjs) against the packed
   JavaScript package (`scripts/consumer-harness.mjs`) and by
   `bindings/python/tests/test_ai_context_boundary.py` against the installed
   wheel; `ai-context-boundary.test.mjs` tests the runner itself against a
-  fake core. Every input is synthetic and already present in
-  `synchronous-corpus.json`.
+  fake core. Every input is synthetic.
 - [`fixtures/mcp-boundary.json`](./fixtures/mcp-boundary.json) — the
   supported MCP redaction boundary's cases (issue #612,
   [`docs/reference/mcp-boundary.md`](../docs/reference/mcp-boundary.md)), a
   thin specialization of the AI-context fixture: `CallToolResult` traversal
   (text, nested `structuredContent`, `_meta`, resources, binary content),
-  the key-context check, opt-in arguments, streamed results that stop
+  key-identified leaves redacted in place and the narrowed key-context
+  backstop (#842), opt-in arguments, streamed results that stop
   pulling on failure, cancellation, and the fixed MCP results every non-`ok`
   outcome maps to. Replayed by [`mcp-boundary.mjs`](./mcp-boundary.mjs),
   which composes `ai-context-boundary.mjs`, against the packed JavaScript

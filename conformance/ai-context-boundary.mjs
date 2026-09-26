@@ -18,6 +18,13 @@
  * `scripts/consumer-harness.mjs` (publish-shaped artifacts) and against a
  * fake core by `conformance/ai-context-boundary.test.mjs`.
  *
+ * `sanitizeValue` is key-aware (#842, beta.10): a string leaf that sits under
+ * an object key and that the leaf-alone scan does not redact is scanned once
+ * more inside its key-context view, `{"<key>":"<leaf>"}`, through the same
+ * `scanAndRedact`, and a finding inside the leaf's span is mapped back to leaf
+ * offsets. The core's contextual detection decides; the walker carries no key
+ * list of its own (#609).
+ *
  * Plain ESM, no Node.js import: the same file runs in the browser lane.
  * Failure messages name a case ID and a field only, never an input, a value,
  * or a matched secret.
@@ -153,6 +160,45 @@ export function createAiContextBoundary(api, options) {
     }
   }
 
+  function redactsOrBlocks(findings) {
+    return findings.some((finding) => finding.action === "redact" || finding.action === "block");
+  }
+
+  /**
+   * One string leaf, key-aware (#842). The leaf is scanned alone first. When
+   * that scan redacts or blocks nothing and the leaf sits directly under an
+   * object key, the leaf is scanned again inside its key-context view,
+   * `{"<key>":"<leaf>"}`, with key and leaf embedded verbatim. A finding
+   * contained in the leaf's span is shifted back to leaf offsets; one outside
+   * it belongs to the key (scanned on its own) and is not reported for the
+   * leaf, but if it would redact or block, the value is blocked as `policy`,
+   * because the key and the syntax around the leaf cannot be rewritten. The
+   * key-context result replaces the leaf-alone one when it redacts or blocks,
+   * or when the leaf alone reported nothing; otherwise the leaf-alone result
+   * stands. Either way only one core result is used, whole.
+   */
+  function scanLeaf(text, key) {
+    const alone = scanText(text);
+    if (alone.failure || key === undefined || redactsOrBlocks(alone.findings)) return alone;
+    const prefix = `{"${key}":"`;
+    const suffix = '"}';
+    const context = scanText(prefix + text + suffix);
+    if (context.failure) return context;
+    const leafEnd = prefix.length + text.length;
+    const findings = [];
+    for (const finding of context.findings) {
+      if (finding.start >= prefix.length && finding.end <= leafEnd) {
+        findings.push(
+          Object.freeze({ ...finding, start: finding.start - prefix.length, end: finding.end - prefix.length }),
+        );
+      } else if (finding.action === "redact" || finding.action === "block") {
+        return { failure: blocked("policy") };
+      }
+    }
+    if (!redactsOrBlocks(findings) && alone.findings.length > 0) return alone;
+    return { text: context.text.slice(prefix.length, context.text.length - suffix.length), findings };
+  }
+
   function sanitizeText(text, { boundary, signal } = {}) {
     if (isAborted(signal)) return ABORTED;
     const scanned = scanText(text);
@@ -169,12 +215,13 @@ export function createAiContextBoundary(api, options) {
     let nodes = 0;
     const seen = new Set();
 
-    // Returns { value } or { failure }.
-    function walk(node, depth) {
+    // Returns { value } or { failure }. `key` is the object key `node` sits
+    // directly under; an array element, and the root, have none.
+    function walk(node, depth, key) {
       nodes += 1;
       if (nodes > traversalLimits.maxNodes) return { failure: blocked("limit_exceeded") };
       if (typeof node === "string") {
-        const scanned = scanText(node);
+        const scanned = scanLeaf(node, key);
         if (scanned.failure) return scanned;
         emit(scanned.findings, boundary);
         findings.push(...scanned.findings);
@@ -209,7 +256,7 @@ export function createAiContextBoundary(api, options) {
           if (scannedKey.findings.some((finding) => finding.action === "block" || finding.action === "redact")) {
             return { failure: blocked("policy") };
           }
-          const child = walk(node[key], depth + 1);
+          const child = walk(node[key], depth + 1, key);
           if (child.failure) return child;
           Object.defineProperty(out, key, { value: child.value, enumerable: true, configurable: true, writable: true });
         }
@@ -344,6 +391,7 @@ function materializeValue(value) {
   if (isPlainObject(value) && typeof value.construct === "string") {
     if (value.construct === "array-of-strings") return Array.from({ length: value.count }, () => value.item);
     if (value.construct === "non-plain-object") return { when: new Date(0) };
+    if (value.construct === "string-under-key") return { [value.key]: value.repeat.repeat(value.count) };
     if (value.construct === "cycle") {
       const node = { label: "ordinary text" };
       node.self = node;

@@ -12,9 +12,11 @@
  * - which parts of a `CallToolResult` are scanned, which binary payloads are
  *   blocked (or, on explicit opt-in, passed unscanned), and which content
  *   block types exist;
- * - a key-context check: the sanitized structured parts are serialized and
- *   scanned once more as text, so a secret identified only by its key blocks
- *   the result instead of reaching context from `structuredContent`;
+ * - a key-context backstop: the sanitized structured parts are serialized
+ *   and scanned once more as text. Since beta.10 (#842) the AI-context
+ *   `sanitizeValue` is key-aware and redacts a leaf its own key identifies in
+ *   place, so the backstop blocks only on context the leaf pass cannot see:
+ *   a sibling or parent key, or a pair split across leaves;
  * - the `tool-arguments` label for opted-in argument sanitation;
  * - a streamed tool result that stops pulling from its producer as soon as
  *   the stream stops accepting chunks;
@@ -221,17 +223,19 @@ export function createMcpBoundary(boundary, { binaryContent = "block" } = {}) {
   }
 
   /**
-   * The key-context check. The per-leaf scan sees a string leaf without the
-   * key it sits under, so `{"password": "<value>"}` is missed when the value
-   * is not self-identifying, while the same pair in text is caught. MCP makes
-   * this acute: a tool that returns `structuredContent` should also return
-   * its serialization as text, so the text copy would be redacted and the
-   * structured copy delivered as is. After the per-leaf pass, each
-   * value-shaped part of the SANITIZED value is serialized with
-   * `JSON.stringify` and scanned once more as text. A `redact` or `block`
-   * finding there cannot be mapped back onto a leaf, so it blocks the whole
-   * operation as `policy`. Placeholders the first pass wrote are not
-   * detected again. Returns a non-`ok` outcome, or `undefined` to continue.
+   * The key-context backstop (narrowed in beta.10, #842). The key-aware
+   * per-leaf pass already scans each string leaf with the key it sits
+   * directly under, so `{"password": "<value>"}` is redacted at its leaf and
+   * the structured copy of a result agrees with its text copy. What the leaf
+   * pass cannot see is context from anywhere else in the value: a sibling key
+   * (`{"provider": "twilio", "value": "<hex>"}`), a parent key, or a pair
+   * split across leaves. So after the per-leaf pass, each value-shaped part
+   * of the SANITIZED value is still serialized with `JSON.stringify` and
+   * scanned once more as text. A `redact` or `block` finding there cannot be
+   * mapped back onto a leaf, so it blocks the whole operation as `policy`.
+   * Placeholders the first pass wrote are not detected again, so a leaf the
+   * key-aware pass redacted never trips it. Returns a non-`ok` outcome, or
+   * `undefined` to continue.
    */
   function checkKeyContext(parts, label, signal) {
     for (const part of parts) {

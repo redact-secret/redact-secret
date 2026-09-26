@@ -14,6 +14,10 @@ behavior underneath it.
 
 Decided by
 [`decision-define-the-framework-neutral-ai-context-boundary-contract`](../decisions/2026-09-25-define-the-framework-neutral-ai-context-boundary-contract.md);
+key-aware `sanitizeValue` (beta.10, #842) by
+[`decision-rule-on-the-mcp-boundary-open-questions`](../decisions/2026-09-25-rule-on-the-mcp-boundary-open-questions.md)
+and
+[`decision-define-key-aware-sanitize-value`](../decisions/2026-09-25-define-key-aware-sanitize-value.md);
 the current rule is in [distribution](../specs/distribution.md).
 
 ```text
@@ -74,7 +78,7 @@ Nothing else is needed:
 | Need | JavaScript (`@redact-secret/core`) | Python (`redact_secret`) |
 | --- | --- | --- |
 | Initialize | `initialize()` | not required |
-| Whole-input scan, policy, redact | `scanAndRedact(text, { policy, limits })` | `scan_and_redact(text, policy=, limits=WholeInputLimits(...))` |
+| Whole-input scan, policy, redact (also the [key-context view](#key-aware-sanitizevalue) of a leaf) | `scanAndRedact(text, { policy, limits })` | `scan_and_redact(text, policy=, limits=WholeInputLimits(...))` |
 | Incremental session | `createIncrementalSanitizer({ limits, policy })` with `append`, `finalize`, `abort` | `IncrementalSanitizer(IncrementalLimits(...), policy=)` with the same three calls |
 | Failure identity | `SecretScanError.code` | `SecretScanError.code` |
 | Finding metadata | `id`, `type`, `detector`, `confidence`, `action`, `obfuscation`, `start`, `end` | the same attributes |
@@ -91,7 +95,7 @@ language:
 | Operation | Input | Core path |
 | --- | --- | --- |
 | `sanitizeText` | one string (user input, one tool-result text, one context string) | one whole-input `scanAndRedact` |
-| `sanitizeValue` | a bounded JSON-shaped value (tool arguments, structured tool output) | one whole-input scan per string leaf and per object key |
+| `sanitizeValue` | a bounded JSON-shaped value (tool arguments, structured tool output) | one whole-input scan per string leaf and per object key, plus one [key-context](#key-aware-sanitizevalue) scan for a leaf under an object key that its own scan does not redact |
 | `buildContext` | an ordered list of `{ role, text }` or `{ role, value }` parts | `sanitizeText` or `sanitizeValue` per part |
 | `openStream` | chunks of one logical text (`append`, then `finalize`, or `abort`) | one incremental session, staged |
 
@@ -106,6 +110,108 @@ still scans chunks, `false` once it has failed, been aborted, or been
 finalized. It never says why; the reason arrives at `finalize`. A host reads
 it after each `append` so it can stop pulling from, and cancel, a producer
 whose output would be discarded anyway (#612).
+
+## Key-aware `sanitizeValue`
+
+Since beta.10 (#842), a string leaf is scanned with the object key it sits
+under, so a value that only its key identifies (`{"api_key": "<value>"}`,
+the usual shape of a config dump or an API response in tool output) is
+redacted at that leaf, exactly as the same pair is redacted when it arrives
+as text. Detection stays in the core. The walker carries no key regex,
+allowlist, or credential-name list: it hands the key and the leaf to the
+same documented `scanAndRedact`, and the core's contextual detection and
+policy decide.
+
+1. **The leaf alone first.** Every string leaf is scanned on its own, as
+   before. A `block` finding blocks the value as `policy`. If the leaf's own
+   scan redacts anything, that result is the leaf's result, and rule 2 is
+   skipped: a secret the leaf identifies by itself is redacted as it always
+   was.
+2. **Then the key-context view.** Otherwise, if the leaf is the value of an
+   object property, it is scanned once more inside its key-context view,
+   the text `{"<key>":"<leaf>"}`, with the key and the leaf embedded
+   verbatim (no escaping), through the same `scanAndRedact` call with the
+   same policy and limits. For a key and a leaf that need no JSON escaping,
+   the view is exactly `JSON.stringify({ [key]: leaf })`, so a pair in
+   `structuredContent` and the same pair serialized into a text block get
+   the same detection.
+3. **Which key.** Only the immediate key: the name of the object property
+   whose value is the leaf. An array element has no key context, even when
+   the array is itself under a credential-like key (`{"password": ["..."]}`),
+   and neither does the root. Parent keys (`{"auth": {"value": "..."}}`) and
+   sibling keys (`{"provider": "twilio", "value": "..."}`) are never
+   context. Numbers, booleans, and `null` are passed unchanged; no view is
+   built for them.
+4. **Leaf offsets.** A finding of the view whose `start` and `end` both lie
+   inside the leaf's span in the view is reported with `start` and `end`
+   reduced by the length of `{"<key>":"`, in the runtime's own unit (UTF-16
+   code units in JavaScript, code points in Python). The leaf's sanitized
+   text is the view's sanitized text without that prefix and without the
+   closing `"}`. A finding not contained in the leaf's span belongs to the
+   key, which has its own scan: it is not reported for the leaf, and if its
+   action is `redact` or `block`, the whole value is blocked as `policy`,
+   because the key and the syntax around the leaf cannot be rewritten.
+5. **One core result per leaf.** The view's result replaces the leaf-alone
+   result when the view redacts or blocks something, or when the leaf alone
+   reported nothing. Otherwise (the leaf alone only warned and the view
+   redacts nothing) the leaf-alone result stands. Findings from two scans
+   are never merged, so the walker does no overlap resolution. Placeholders
+   in a leaf are not detected again, so sanitizing a sanitized value changes
+   nothing.
+6. **Outcomes.** `ok.findings` and telemetry carry the chosen result's
+   findings, with leaf offsets, in walk order. A `block` in the view blocks
+   the value as `policy`; a `warn` passes, as `warn` always does. The view
+   is bounded by the same whole-input limits: a view over `maxInputBytes`
+   (the leaf plus its key plus seven bytes) blocks the value as
+   `limit_exceeded` / `INPUT_LIMIT_EXCEEDED`, even when the leaf alone would
+   fit. Traversal limits count values, not scans, so they are unchanged.
+7. **Keys are unchanged.** Object keys are still scanned on their own, and a
+   key with a `redact` or `block` finding still blocks the whole value.
+   Whether a secret-bearing key should instead be redacted and renamed is
+   still an open question of
+   [`decision-define-the-framework-neutral-ai-context-boundary-contract`](../decisions/2026-09-25-define-the-framework-neutral-ai-context-boundary-contract.md).
+
+`sanitizeText` and streams are unchanged: text keeps its own key context,
+and it is never parsed as JSON.
+
+### Migration from beta.9
+
+A leaf that beta.9 delivered in plaintext, because only its key identified
+it, is now redacted with a placeholder, and its finding appears in
+`ok.findings` and telemetry. A leaf under a warn-only contextual name
+(`{"secret": "SECRET01"}`) now reports a `warn` finding and passes. Nothing
+that beta.9 redacted or blocked passes now. Under the
+[MCP boundary](mcp-boundary.md#key-context-backstop), a result or argument
+set that beta.9 blocked as `policy` only through its key-context check is
+now `ok` with the leaf replaced. A host that relied on that block, for
+example to alert on it, should watch `onFinding` instead.
+
+### False positives and false negatives
+
+Measured on the fixture cases (`value-key-*`, `value-non-credential-keys-*`):
+
+- **Closed:** a value under a credential name the core's contextual rules
+  recognize (`password`, `api_key`, `apiKey`, `client_secret`,
+  `session_token`, `DB_PASSWORD`, ...) is redacted at its leaf.
+- **Opened:** a value that is not a secret but sits under such a name is
+  redacted too, as it would be in text: prose (`{"password": "Welcome to the
+  password reset flow"}`) is redacted, and a short word may warn
+  (`{"api_key": "disabled"}`). The bound is the core's existing
+  contextual-name rules and exclusions, which this contract does not widen:
+  non-credential names (`token_count`, `password_policy`, `secret_name`,
+  `token_type`, `csrf_token`) stay clean, and so do placeholders, masks,
+  secret-manager, template, and environment references (`<your-api-key>`,
+  `********`, `op://vault/item/field`, `{{ vault_password }}`,
+  `${CLIENT_SECRET}`). Later core exclusions narrow it further (beta.8 also
+  keeps `YOUR_API_KEY` and partially masked displays clean).
+- **Kept:** context above the immediate key or beside it (parent keys,
+  sibling keys, array elements), a key and a value in separate parts or
+  values, non-string scalars, and encoded values stay undetected. So does
+  the tail of a leaf after a `"` or a line terminator, where the view's
+  contextual value ends, as it ends in text. A leaf that its own scan only
+  warns about is not upgraded by its key unless the view redacts.
+- **Cost:** one more whole-input scan for each string leaf under an object
+  key that its own scan does not redact.
 
 ## Outcomes
 
@@ -247,7 +353,10 @@ Checked for every conformance case, on every runtime lane:
   ([`decision-defer-encoded-input-decoding`](../decisions/2026-09-20-defer-encoded-input-decoding.md)).
 - A secret split across separate values, object keys, or context parts.
   Each is scanned on its own. Only a split across chunks of one stream is
-  handled.
+  handled. The one exception is a leaf and the key it sits directly under,
+  scanned together in the [key-context view](#key-aware-sanitizevalue).
+- Key context from anywhere but the immediate key: parent keys, sibling
+  keys, and the key of an array that holds the leaf.
 - Progressive release of stream output before `finalize`. It cannot be
   recalled after a later `block`, so it is outside this contract.
 - MCP specifics. The [MCP boundary contract](mcp-boundary.md) (#612)
@@ -261,8 +370,12 @@ Checked for every conformance case, on every runtime lane:
 
 - [`conformance/fixtures/ai-context-boundary.json`](../../conformance/fixtures/ai-context-boundary.json)
   holds the cases, the limits they run under, the safe field set, and the
-  reason set. Every input is synthetic and already exists in the synchronous
-  corpus.
+  reason set. Every input is synthetic. The key-aware cases (#842) cover a
+  key-identified leaf redacted in place, a warn-only name, the core's
+  exclusions under credential names, non-credential names, an object inside
+  an array, the immediate-key-only reach, mixed siblings, placeholders that
+  are not detected again, a prose false positive, a `block-all` policy, and
+  a view over the input limit.
 - [`conformance/ai-context-boundary.mjs`](../../conformance/ai-context-boundary.mjs)
   is the JavaScript reference model and runner. It is plain ESM and takes
   the core API as an argument.
