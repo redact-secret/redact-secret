@@ -42,7 +42,8 @@ evidence is linked from each published version.
   `evidence-aggregation/v2` after redact-secret-benchmarks#300 replaced the
   generated-share tuning override with authored development rows. Artifact
   revision 3 binds the new dataset, selection, scoring identity, component
-  hashes, and model fingerprint. The measured development-to-evaluation
+  hashes, and model fingerprint; revision 4 keeps that model unchanged and
+  refreshes the provenance link after final qualification. The measured development-to-evaluation
   balanced-error gap is about 0.568 (worst leave-one-category-out error
   0.667), so the artifact records poor generalization explicitly and the
   result is not promotion evidence. No finding, confidence, policy decision,
@@ -103,18 +104,22 @@ evidence is linked from each published version.
   `examples/ai-context` are now executable runtime-boundary reference
   architectures (#611), indexed in `docs/guides/reference-architectures.md`.
   Each is its own consumer project that installs only released registry
-  packages pinned by a lockfile (`@redact-secret/adapter-pino`,
-  `@redact-secret/adapter-otel`, `@redact-secret/adapter`,
-  `@redact-secret/core@0.1.0-beta.8`) or, for the AI-context adapter, the
-  pinned publish-shaped tarball through the `examples/mcp-redact` golden
-  path. Each states its trust zone, authoritative scan point, failure and
-  limit behavior, and what it does not protect, and has one smoke command
+  packages pinned by a lockfile. The logging and tracing references use
+  `@redact-secret/adapter-pino`, `@redact-secret/adapter-otel`,
+  `@redact-secret/adapter`, and `@redact-secret/core@0.1.0-beta.8`; the
+  AI-context reference uses the published
+  `@redact-secret/adapter-ai-context@0.1.0-alpha.1` and
+  `@redact-secret/adapter-mcp@0.1.0-alpha.1` packages locked through
+  `examples/mcp-redact`. Each states its trust zone, authoritative scan
+  point, failure and limit behavior, and what it does not protect, and has
+  one smoke command
   (`npm run reference:logging`, `reference:tracing`, `reference:ai-context`;
   all three: `references:smoke`) that CI runs. The JavaScript integration
   code these examples used to copy (the pino hook and message formatter,
   the span processor, the masking walker, and their fake-scanner tests) is
   removed in favor of the released packages, along with the root `pino` and
-  `quick-format-unescaped` devDependencies. The Python halves are unchanged.
+  `quick-format-unescaped` devDependencies. The Python logging and tracing
+  halves are unchanged.
 
 - Artifact qualification now runs the MCP AI-context golden path end to end
   on the installed candidate (issue #720). The new `golden-path` job calls

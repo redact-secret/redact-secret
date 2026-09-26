@@ -7,16 +7,16 @@
 - Previous published source: `v0.1.0-beta.8`,
   `5639a0ea02e0eefbd1533bea23a05c749b529bef`.
 - Reviewed implementation baseline:
-  `93ddf510a31563d58c7d4c202363ef65c4d92d55`.
-- Status: public API and compatibility review complete for the baseline; release
-  approval and fresh evidence for the source-changing release-contract fix are
-  pending.
+  `09e1d7f85cd2ada9f387cc5c9beef3b29023d17d`.
+- Status: public API and compatibility review, exact-SHA qualification, SAST,
+  benchmark qualification, performance evaluation, and blind evaluation are
+  complete for the baseline. Explicit release approval remains pending.
 
 This review replaces the beta.6 document as the current review input to the
 artifact inventory. An inventory binds this document's digest and its own
-`sourceCommit` together. The final merged source revision is also recorded in
-the immutable #851 review comment before release approval; hashing an older
-review document alone is not a current API review.
+`sourceCommit` together. The immutable #851 review comments record the merged
+source revision, the fresh evidence, and the remaining release authority.
+Hashing this document alone is not a current API review.
 
 ## Public API and compatibility
 
@@ -59,28 +59,26 @@ and Node 20/22/24 lanes.
 
 ## Baseline evidence and invalidation
 
-The baseline passed:
+The reviewed baseline passed:
 
 - Artifact qualification
-  [36233877397](https://github.com/redact-secret/redact-secret/actions/runs/36233877397):
-  62 jobs completed with 58 successes and four intentional skips; the
-  inventory recorded 49 artifact files, three clean-install lanes, one Node
-  MCP golden-path lane, and `published: false`.
+  [36243644354](https://github.com/redact-secret/redact-secret/actions/runs/36243644354):
+  the inventory records beta.9 and the exact source revision.
 - SAST
-  [36233877258](https://github.com/redact-secret/redact-secret/actions/runs/36233877258):
-  the normalized OpenGrep report was enforced against the reviewed baseline.
-- Local review probes: `npm run rust:check`, the Rust `public_api` integration
-  test, JavaScript build/typecheck, changelog coverage, decision validation,
-  and `git diff --check` passed.
+  [36243644250](https://github.com/redact-secret/redact-secret/actions/runs/36243644250):
+  the normalized OpenGrep report was enforced against the same source.
+- The immutable
+  [final shadow/performance record](https://github.com/redact-secret/redact-secret-benchmarks/blob/3fb195818eb31c481aaebc0257384386d17b2d7c/evidence/767/09e1d7f8/README.md)
+  binds the exact candidate, scoring and calibration identities, performance
+  run, deterministic output, source-bound size acceptance, and fresh
+  `beta9-e2` blind run. It qualifies only the non-enforcing shadow foundation;
+  future-promotion Q4 fails.
 
-The #851 fix changes the source revision after the blind evaluation and those
-workflow runs. None of the evidence above qualifies the merged fix, and none
-may be cited as if it did. Before beta.9 release approval, the merged `main`
-SHA requires fresh exact-SHA Artifact qualification, SAST, benchmark
-qualification, and a new blind evaluation under the benchmark protocol. The
-new artifact inventory must name that SHA and pin this review's digest.
+Any source change after the reviewed baseline invalidates this exact-SHA
+evidence. Such a change requires fresh qualification and review before release
+approval; the evidence above must not be cited for a later source revision.
 
 No review document, successful workflow, issue closure, or manifest version
 authorizes a tag, release, publication, or deployment. Explicit release
 approval remains a separate step after the fresh evidence and final changelog
-review pass.
+review pass for the source being released.
