@@ -241,9 +241,9 @@
       "id": "value-key-context-exclusions-stay-clean",
       "operation": "sanitizeValue",
       "boundary": "tool-result",
-      "value": { "api_key": "YOUR_API_KEY", "password": "{{ vault_password }}", "client_secret": "${CLIENT_SECRET}", "apiKey": "sk-****************abcd" },
+      "value": { "api_key": "op://vault/item/field", "password": "{{ vault_password }}", "client_secret": "${CLIENT_SECRET}", "apiKey": "<your-api-key>", "db_password": "********" },
       "secrets": [],
-      "expected": { "outcome": "ok", "value": { "api_key": "YOUR_API_KEY", "password": "{{ vault_password }}", "client_secret": "${CLIENT_SECRET}", "apiKey": "sk-****************abcd" }, "findings": [] }
+      "expected": { "outcome": "ok", "value": { "api_key": "op://vault/item/field", "password": "{{ vault_password }}", "client_secret": "${CLIENT_SECRET}", "apiKey": "<your-api-key>", "db_password": "********" }, "findings": [] }
     },
     {
       "id": "value-non-credential-keys-stay-clean",

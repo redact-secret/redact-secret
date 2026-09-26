@@ -199,9 +199,11 @@ Measured on the fixture cases (`value-key-*`, `value-non-credential-keys-*`):
   (`{"api_key": "disabled"}`). The bound is the core's existing
   contextual-name rules and exclusions, which this contract does not widen:
   non-credential names (`token_count`, `password_policy`, `secret_name`,
-  `token_type`, `csrf_token`) stay clean, and so do placeholders, masked
-  displays, template and environment references (`YOUR_API_KEY`,
-  `sk-****************abcd`, `{{ vault_password }}`, `${CLIENT_SECRET}`).
+  `token_type`, `csrf_token`) stay clean, and so do placeholders, masks,
+  secret-manager, template, and environment references (`<your-api-key>`,
+  `********`, `op://vault/item/field`, `{{ vault_password }}`,
+  `${CLIENT_SECRET}`). Later core exclusions narrow it further (beta.8 also
+  keeps `YOUR_API_KEY` and partially masked displays clean).
 - **Kept:** context above the immediate key or beside it (parent keys,
   sibling keys, array elements), a key and a value in separate parts or
   values, non-string scalars, and encoded values stay undetected. So does
