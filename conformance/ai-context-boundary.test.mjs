@@ -244,7 +244,7 @@ function keyAwareApi() {
   });
   function scanAndRedact(text) {
     calls.push(text);
-    if (text.startsWith('{"trap":"')) return { text: `{"<SECRET_1>${text.slice(6)}`, findings: [make("redact", 2, 6)] };
+    if (text.startsWith('{"trap":"')) return { text: '{"<SECRET_1>' + text.slice(6), findings: [make("redact", 2, 6)] };
     for (const [secret, prefix] of [
       [KEYED, '{"password":"'],
       [WARNED, '{"password":"'],
