@@ -112,6 +112,11 @@ The details are in [`examples/mcp-redact`](../mcp-redact/README.md).
   and conversation history must also go through `buildContext`,
   `sanitizeText`, or `sanitizeValue`; the golden path covers only user input
   and one tool result, single or streamed.
+- **`resources/read` results.** The locked
+  `@redact-secret/adapter-mcp@0.1.0-alpha` predates the
+  [`resources/read` boundary](../../docs/reference/mcp-resources-read.md),
+  so this flow has no resource-read case. It is added with the next adapters
+  release ([#849](https://github.com/redact-secret/redact-secret/issues/849)).
 - **Model output.** Scanning what the model returns is a different
   boundary and is out of the contract's scope.
 - **A secret split across values or keys.** Each string leaf and key is

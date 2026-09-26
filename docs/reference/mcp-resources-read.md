@@ -104,6 +104,17 @@ the result and before any of these:
 The host wraps its `readResource` call in `sanitizeResourceRead`, so the raw
 result exists only inside that call and a rejected read is never inspected.
 
+No reference flow in this repository shows this placement yet.
+[`examples/ai-context`](../../examples/ai-context/README.md) and the
+[`examples/mcp-redact`](../../examples/mcp-redact/README.md) golden path lock
+the published `@redact-secret/adapter-mcp@0.1.0-alpha`, which predates
+`sanitizeResourceRead`. Until the next adapters release, the end-to-end proof
+is the adapter's own test with real SDKs
+([redact-secret-adapters#35](https://github.com/redact-secret/redact-secret-adapters/pull/35));
+the reference-flow case
+([#849](https://github.com/redact-secret/redact-secret/issues/849)) is added
+when the examples' lock moves to that release.
+
 An SDK-side response cache sits before this boundary. The
 `@modelcontextprotocol/client` 2.x `Client` stores a `resources/read` result
 in its `responseCacheStore` when the server marks it cacheable (`ttlMs`), and
