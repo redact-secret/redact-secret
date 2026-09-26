@@ -62,9 +62,9 @@ evidence is linked from each published version.
 - Every example and reference now installs published adapter packages from
   the npm registry at exact versions, locked by a committed
   `package-lock.json`: `examples/mcp-redact` (and through it
-  `examples/ai-context`) uses `@redact-secret/adapter-ai-context@0.1.0-alpha`
-  and `@redact-secret/adapter-mcp@0.1.0-alpha` (dist-tag `alpha`, with
-  `@redact-secret/adapter@0.1.1`); `examples/logging-redaction` moves to
+  `examples/ai-context`) uses `@redact-secret/adapter-ai-context@0.1.0-alpha.1`
+  and `@redact-secret/adapter-mcp@0.1.0-alpha.1` (dist-tag `alpha`, with
+  `@redact-secret/adapter@0.1.2`); `examples/logging-redaction` moves to
   `@redact-secret/adapter-pino@0.1.1` and installs its new
   `hooks.streamWrite` too, because `hooks.logMethod` alone let child-logger
   bindings and `mixin()` output reach the destination in plaintext;
@@ -74,9 +74,10 @@ evidence is linked from each published version.
   scenarios for those fields. The `golden-path` qualification job installs
   the candidate core with the golden path's locked registry adapters,
   verified against the lockfile's integrity (report schema 2).
-  These registry versions predate the key-aware `sanitizeValue` (#842) and
-  `resources/read` (#848) described above, so the examples do not show
-  either yet; they move to the next adapters release when it publishes.
+  The AI-context reference now exercises the key-aware `sanitizeValue`
+  (#842) and the `resources/read` host placement (#848/#849): text,
+  JSON-in-text, and key-identified `_meta` reach its sinks sanitized, while a
+  blob under the default becomes the fixed JSON-RPC error.
 
 - The JavaScript side of the MCP golden path (`examples/mcp-redact`) now
   runs on `@redact-secret/adapter-mcp` (redact-secret-adapters#13), which

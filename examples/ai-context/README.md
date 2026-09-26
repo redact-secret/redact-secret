@@ -19,8 +19,8 @@ composes two things that already exist:
   which runs on `@redact-secret/adapter-ai-context`, the contract's
   implementation, with tool results sanitized by `@redact-secret/adapter-mcp`
   (the [MCP boundary contract](../../docs/reference/mcp-boundary.md)), both
-  installed there from the npm registry at `0.1.0-alpha` (dist-tag
-  `alpha`, with `@redact-secret/adapter@0.1.1` under them), pinned exactly by
+  installed there from the npm registry at `0.1.0-alpha.1` (dist-tag
+  `alpha`, with `@redact-secret/adapter@0.1.2` under them), pinned exactly by
   [`examples/mcp-redact/package-lock.json`](../mcp-redact/package-lock.json);
 - the released `@redact-secret/core@0.1.0-beta.8` from the npm registry,
   pinned exactly by [`package-lock.json`](./package-lock.json), initialized
@@ -34,8 +34,8 @@ and the Python MCP golden-path twins were retired (#810).
 
 | File | Role |
 | --- | --- |
-| [`app.mjs`](./app.mjs) | `createAppBoundary`: initializes the registry core and builds the golden path's boundary over it. |
-| [`smoke.mjs`](./smoke.mjs) | The end-to-end smoke test: whole turns through `buildSafeContext`, with a single and a streamed tool result, on the real core. |
+| [`app.mjs`](./app.mjs) | `createAppBoundary` initializes the registry core and builds the golden path's boundary over it; `readSafeResource` wraps a host `readResource` and returns only the mapped safe response. |
+| [`smoke.mjs`](./smoke.mjs) | The end-to-end smoke test: whole turns through `buildSafeContext`, with a single and a streamed tool result, plus `resources/read`, on the real core. |
 | [`package.json`](./package.json) / [`package-lock.json`](./package-lock.json) | This directory as a consumer project. Its only dependency is the registry core. |
 
 ```js
@@ -62,6 +62,7 @@ The boundary's operations, in the order `buildSafeContext` calls them:
 user input -> sanitizeText (user-input)  -> application policy
 tool result -> redactToolResult (tool-result) -> context construction
 safe context -> model
+resource read -> sanitizeResourceRead -> mapped result or fixed JSON-RPC error -> model/log/store
 ```
 
 The tool is dispatched from the *sanitized* input, so a tool argument
@@ -91,6 +92,8 @@ Every case below is exercised by `smoke.mjs` against the real core.
 | An abort while the tool runs, or mid-stream | `aborted`; text already sanitized is discarded |
 | Every finding | Reported to `onFinding` as allowlisted metadata only, never the input or a matched value |
 | An MCP-shaped result (text, embedded text resource, nested `structuredContent`) | The model call, a host log line, and a conversation store receive only the sanitized turn, as fresh objects sharing no reference with the raw result |
+| A `resources/read` result (text, JSON-in-text, key-identified `_meta`) | The model call, log, and store receive only `{ result }`, with each supported value sanitized |
+| A `resources/read` result with a blob under the default | The model call, log, and store receive only the fixed input-free JSON-RPC `{ error }` |
 
 Limits are mandatory and explicit (`EXAMPLE_LIMITS` in
 `examples/mcp-redact/agent-context.mjs`). Nothing is truncated and passed
@@ -112,11 +115,6 @@ The details are in [`examples/mcp-redact`](../mcp-redact/README.md).
   and conversation history must also go through `buildContext`,
   `sanitizeText`, or `sanitizeValue`; the golden path covers only user input
   and one tool result, single or streamed.
-- **`resources/read` results.** The locked
-  `@redact-secret/adapter-mcp@0.1.0-alpha` predates the
-  [`resources/read` boundary](../../docs/reference/mcp-resources-read.md),
-  so this flow has no resource-read case. It is added with the next adapters
-  release ([#849](https://github.com/redact-secret/redact-secret/issues/849)).
 - **Model output.** Scanning what the model returns is a different
   boundary and is out of the contract's scope.
 - **A secret split across values or keys.** Each string leaf and key is

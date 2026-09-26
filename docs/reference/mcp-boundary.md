@@ -320,17 +320,13 @@ matrix plus an edit of the distribution spec row; it is not a new decision.
 
 ## The golden path today
 
-`examples/mcp-redact` runs on the published `@redact-secret/adapter-mcp@0.1.0-alpha`
-and `@redact-secret/adapter-ai-context@0.1.0-alpha` (npm dist-tag `alpha`),
+`examples/mcp-redact` runs on the published `@redact-secret/adapter-mcp@0.1.0-alpha.1`
+and `@redact-secret/adapter-ai-context@0.1.0-alpha.1` (npm dist-tag `alpha`),
 installed from the npm registry at those exact versions and locked by the
-example's `package-lock.json`, so it follows this contract as beta.9 stated
-it. Those published versions predate the beta.10 key-aware `sanitizeValue`
-([#842](https://github.com/redact-secret/redact-secret/issues/842)): the
-example still runs the beta.9 key-context check, so a structured result that
-only a leaf's own key identifies is blocked there rather than redacted in
-place. They also do not implement
-[`resources/read`](mcp-resources-read.md). Both arrive in the example with
-the next adapters release, when its lock moves to that version. Its
+example's `package-lock.json`. They include the key-aware `sanitizeValue`
+([#842](https://github.com/redact-secret/redact-secret/issues/842)) and
+[`resources/read`](mcp-resources-read.md), both exercised by the AI-context
+reference smoke. Its
 `redactToolResult`, `redactArguments`, `redactStreamedToolResult`, and
 wrappers are the adapter's `sanitizeToolResult`, `sanitizeToolArguments`,
 `sanitizeStreamedToolResult`, `wrapToolHandler`, and `sanitizeToolCall`

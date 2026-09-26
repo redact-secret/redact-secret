@@ -25,7 +25,14 @@
  * shape here, as it is in the adapter.
  */
 
-import { createMcpBoundaryWith, MCP_BLOCKED_TEXT, mcpBlockedResult } from "@redact-secret/adapter-mcp";
+import {
+  createMcpBoundaryWith,
+  MCP_BLOCKED_TEXT,
+  mcpBlockedResult,
+  toReadResourceResponse,
+} from "@redact-secret/adapter-mcp";
+
+export { toReadResourceResponse };
 
 /** The contract's fixed, input-free text for every blocked outcome. */
 export const BLOCKED_MESSAGE = MCP_BLOCKED_TEXT;

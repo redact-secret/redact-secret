@@ -149,9 +149,9 @@ The `resources/read` boundary (`decision-define-the-supported-mcp-resources-read
 applies the same mapping to a `ReadResourceResult` and maps failures to fixed
 JSON-RPC errors, since that result has no `isError`. Its fixture,
 `conformance/fixtures/mcp-resources-read.json`, is replayed on the same lanes.
-The registry `adapter-mcp@0.1.0-alpha` that `examples/mcp-redact/` locks
-predates both `resources/read` and the key-aware `sanitizeValue`; the
-example gains them with the next adapters release.
+The registry `adapter-mcp@0.1.0-alpha.1` that `examples/mcp-redact/` locks
+includes both `resources/read` and the key-aware `sanitizeValue`; the
+AI-context reference smoke exercises their authoritative host placement.
 
 Detailed workspace dependency, lint, unsafe-code, MSRV, public-API,
 package-content, and registry-name policies live in

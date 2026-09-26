@@ -48,24 +48,23 @@ after the leaf pass. Copy this code out to use it; from then on you own the
 copy. There is no Python recipe: the Python `mcp` SDK is not supported (see
 [Python](#python)). The supported SDK range is in [SDK versions](#sdk-versions).
 
-The locked `adapter-mcp@0.1.0-alpha` and `adapter-ai-context@0.1.0-alpha`
-implement the contract as beta.9 stated it. They predate two later additions
-on `main`: the key-aware `sanitizeValue` (#842), which redacts a leaf that
-only its own key identifies instead of blocking the result, and the
+The locked `adapter-mcp@0.1.0-alpha.1` and
+`adapter-ai-context@0.1.0-alpha.1` include the key-aware `sanitizeValue`
+(#842), which redacts a leaf that only its own key identifies, and the
 [`resources/read` boundary](../../docs/reference/mcp-resources-read.md)
-(#843). This example shows neither yet. Both arrive with the next adapters
-release, when this lockfile moves to it.
+(#843). The AI-context reference smoke exercises both through these exact
+registry packages.
 
 ## Files
 
 | File | Role |
 | --- | --- |
-| [`redact-tool-call.mjs`](./redact-tool-call.mjs) | `@redact-secret/adapter-mcp` over the host's AI-context boundary: `redactToolResult` is the adapter's `sanitizeToolResult` (the whole `CallToolResult` as one value, then the key-context check); `redactArguments` is its `sanitizeToolArguments` (label `tool-arguments`). Both return the MCP boundary's outcome. No `@modelcontextprotocol/sdk` import. |
+| [`redact-tool-call.mjs`](./redact-tool-call.mjs) | `@redact-secret/adapter-mcp` over the host's AI-context boundary: `redactToolResult` is the adapter's `sanitizeToolResult` (the whole `CallToolResult` as one value, then the key-context check); `redactArguments` is its `sanitizeToolArguments` (label `tool-arguments`). It also exposes the cached MCP boundary and `toReadResourceResponse` for the `resources/read` reference flow. No `@modelcontextprotocol/sdk` import. |
 | [`wrap-tool-call.mjs`](./wrap-tool-call.mjs) | Server-side (`wrapServerToolHandler`, the adapter's `wrapToolHandler`) and client-side (`wrapClientCallTool`, its `sanitizeToolCall`) wrappers, shaped to drop into a real `ToolCallback` / `callTool`. A non-`ok` outcome becomes the contract's fixed `isError` result; a thrown handler or a rejected `callTool` becomes the fixed tool-error result; a cancelled call delivers nothing. |
 | [`agent-context.mjs`](./agent-context.mjs) | The AI-context golden path (`buildSafeContext`), `EXAMPLE_LIMITS`, and the boundary factories (`createGoldenPathBoundary` over the real core, `createGoldenPathBoundaryWith` over an injected one). See [below](#the-ai-context-golden-path). |
 | [`streaming-tool-result.mjs`](./streaming-tool-result.mjs) | `redactStreamedToolResult`: a tool result delivered as chunks, through the adapter's `sanitizeStreamedToolResult` (one staged `openStream` that stops pulling once it fails), with cancellation and producer failure. `buildSafeContext`'s `streamTool` runs it. See [Streamed results](#streamed-or-progressive-results). |
 | [`demo.mjs`](./demo.mjs) | Runnable, side-by-side: the same synthetic tool result through block-all and through this middleware, on the real core. It prints only the two outputs, never the unscanned input. |
-| [`package.json`](./package.json), [`package-lock.json`](./package-lock.json), [`.npmrc`](./.npmrc) | This directory as a consumer project: its only dependencies are the published `@redact-secret/adapter-ai-context@0.1.0-alpha` and `@redact-secret/adapter-mcp@0.1.0-alpha` (dist-tag `alpha`), with `@redact-secret/adapter@0.1.1` under them, all locked exactly. `.npmrc` sets `legacy-peer-deps`, so the adapters' `@redact-secret/core` peer is not installed here: the tests inject their core. |
+| [`package.json`](./package.json), [`package-lock.json`](./package-lock.json), [`.npmrc`](./.npmrc) | This directory as a consumer project: its only dependencies are the published `@redact-secret/adapter-ai-context@0.1.0-alpha.1` and `@redact-secret/adapter-mcp@0.1.0-alpha.1` (dist-tag `alpha`), with `@redact-secret/adapter@0.1.2` under them, all locked exactly. `.npmrc` sets `legacy-peer-deps`, so the adapters' `@redact-secret/core` peer is not installed here: the tests inject their core. |
 | [`fixtures/fake-core.mjs`](./fixtures/fake-core.mjs) | The two injected core operations, faked for the tests: `fake-scanner.mjs`'s rules plus the core's whole-input byte limit, and a core that behaves as if uninitialized. |
 
 ## The AI-context golden path
@@ -206,13 +205,11 @@ the model will see it, and never parses it: parsing would drop the key
 context that catches `"password":"..."` in text, and the core's contextual
 detectors read that context. A secret inside JSON-in-text is replaced inside
 its quoted string. `structuredContent`, which a tool is expected to return
-next to its text serialization, is scanned as a value, and then the
-key-context check serializes it and scans it again, so a value identified
-only by its key blocks the result instead of reaching context from the
-structured copy. (From the next adapters release, the key-aware
-`sanitizeValue` redacts such a leaf in place instead, and the check stays as
-a backstop for sibling and parent keys; see
-[Key-context backstop](../../docs/reference/mcp-boundary.md#key-context-backstop).)
+next to its text serialization, is scanned as a value. The key-aware
+`sanitizeValue` redacts a leaf identified by its immediate key in place, and
+the serialized key-context check stays as a backstop for sibling and parent
+keys; see
+[Key-context backstop](../../docs/reference/mcp-boundary.md#key-context-backstop).
 
 ## Multi-block results and non-text content
 
@@ -348,10 +345,10 @@ the top of `wrap-tool-call.mjs`.
 ## Installing the adapters
 
 `@redact-secret/adapter-ai-context` and `@redact-secret/adapter-mcp` are
-published by the adapters train 2026.09.25 as `0.1.0-alpha` under the
+published by the adapters train 2026.09.26 as `0.1.0-alpha.1` under the
 `alpha` dist-tag. [`package.json`](./package.json) names those exact
 versions, and [`package-lock.json`](./package-lock.json) locks them, and
-`@redact-secret/adapter@0.1.1` under them, with their registry integrity.
+`@redact-secret/adapter@0.1.2` under them, with their registry integrity.
 From the repository root:
 
 ```bash

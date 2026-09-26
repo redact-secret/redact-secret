@@ -4,7 +4,7 @@
   "type": "module",
   "description": "The MCP / AI-context golden path. Its dependencies are the published @redact-secret/adapter-ai-context and @redact-secret/adapter-mcp, pinned exactly by package-lock.json. Install with `npm run examples:install` from the repository root; tests inject their core, so peers are not auto-installed (--legacy-peer-deps).",
   "dependencies": {
-    "@redact-secret/adapter-ai-context": "0.1.0-alpha",
-    "@redact-secret/adapter-mcp": "0.1.0-alpha"
+    "@redact-secret/adapter-ai-context": "0.1.0-alpha.1",
+    "@redact-secret/adapter-mcp": "0.1.0-alpha.1"
   }
 }
