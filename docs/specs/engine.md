@@ -462,10 +462,12 @@ at the commit, and is stale for any candidate where one of them differs.
 - The `lexical` group has no signal and a cap of `0`, because calibration
   selected randomness-only statistics. Adding a lexical signal is a new
   model identity.
-- The #256 tuning manifest is still a draft with `product: null`. The
-  artifact records the draft's deterministic identity (its file hash and its
-  `tuningManifestHash`), marks the binding `pending`, and records the final
-  hash in a new revision once a candidate carrying this artifact is bound.
+- The #256 tuning manifest remains unbound with `product: null`. The artifact
+  records the draft's deterministic identity and marks the binding `pending`;
+  the final beta.9 qualification record therefore carries
+  `tuningManifestHash: null`. This is an explicit provenance limitation, not
+  an indication that the candidate or its qualification is missing. Binding a
+  manifest later requires a new artifact revision and candidate identity.
 
 ## Maintainer-local shadow evaluation
 
@@ -478,9 +480,11 @@ decision. The benchmark consumes it, first in
 [redact-secret-benchmarks#289](https://github.com/redact-secret/redact-secret-benchmarks/issues/289)
 and then in later benchmark evidence.
 
-> **Qualification placeholder.** Adversarial evidence from
-> [redact-secret-benchmarks#289](https://github.com/redact-secret/redact-secret-benchmarks/issues/289)
-> must be linked before qualification.
+Final adversarial and release-candidate evidence is frozen in the
+[beta.9 qualification record](https://github.com/redact-secret/redact-secret-benchmarks/blob/3fb195818eb31c481aaebc0257384386d17b2d7c/evidence/767/09e1d7f8/README.md)
+for product source `09e1d7f85cd2ada9f387cc5c9beef3b29023d17d`. All four
+attacker-known invariants held, but the future-promotion Q4 gate failed, so
+the scorer remains shadow-only and non-enforcing.
 
 ### Where the comparison is computed
 

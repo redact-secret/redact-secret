@@ -3,7 +3,7 @@
   "format": "redact-secret/shadow-scoring-artifact/1",
   "artifact": {
     "id": "redact-secret/shadow-scoring-artifact",
-    "revision": 3
+    "revision": 4
   },
   "status": "reviewed",
   "contract": {
@@ -131,7 +131,7 @@
       {
         "path": "docs/specs/engine.md",
         "section": "Maintainer-local shadow evaluation",
-        "sha256": "b433223617a6875fa90c11993aaef05e8dfa2e63828a68c6ffbaf9480add7473"
+        "sha256": "b159017b0a0e662310507105e9c256a46982a1aaeb0604d6509793ab48037d0d"
       }
     ],
     "code": [
@@ -289,8 +289,8 @@
       "statement": "The #256 tuning manifest is not bound yet (tuningManifest.status is pending), so this artifact records the draft's identity rather than a final tuning manifest hash."
     },
     {
-      "id": "adversarial-evidence-pending",
-      "statement": "Adversarial evidence from redact-secret-benchmarks#289 must be linked before qualification. The maintainer-local evaluation path (docs/specs/engine.md, 'Maintainer-local shadow evaluation') is what that evidence is produced with."
+      "id": "adversarial-evidence-final",
+      "statement": "Final adversarial evidence is linked from docs/specs/engine.md, 'Maintainer-local shadow evaluation', to the immutable beta.9 qualification record for product source 09e1d7f85cd2ada9f387cc5c9beef3b29023d17d. All four attacker-known invariants held, while future-promotion Q4 failed."
     },
     {
       "id": "poor-generalization",

@@ -129,8 +129,9 @@ verified install commands are in
 [`docs/decisions/2026-09-19-graduate-adapters-to-a-separate-repository.md`](./docs/decisions/2026-09-19-graduate-adapters-to-a-separate-repository.md)
 for why they live apart, including why this repository's own release matrix
 is unaffected.
-Model context (MCP) is covered by `@redact-secret/adapter-mcp` in the
-adapters repository (unreleased), which implements the
+Model context (MCP) is covered by the published
+`@redact-secret/adapter-mcp@0.1.0-alpha.1` in the adapters repository
+(npm dist-tag `alpha`), which implements the
 [MCP boundary contract](docs/reference/mcp-boundary.md);
 [`examples/mcp-redact/`](examples/mcp-redact/) composes it into a tested
 agent turn — see its README for its stated support level. LangChain remains

@@ -61,7 +61,7 @@ class RepositoryArtifact(unittest.TestCase):
         model = ARTIFACT["model"]
         self.assertEqual(model["aggregation"]["id"], "evidence-aggregation/v2")
         self.assertEqual(model["featureSchema"]["id"], "evidence-features/v1")
-        self.assertEqual(ARTIFACT["artifact"]["revision"], 3)
+        self.assertEqual(ARTIFACT["artifact"]["revision"], 4)
         self.assertEqual(
             ARTIFACT["modelFingerprint"],
             "4104fb2c6f046169f63e991dd7594c099af5fcea01deecae7afe1c7015579975",
