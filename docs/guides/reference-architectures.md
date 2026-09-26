@@ -5,14 +5,15 @@
 Three small, executable references show where authoritative redaction
 belongs on the three adoption paths the project targets (#611, part of
 #609). Each one is a separate consumer project under `examples/`. Each
-installs only published or publish-shaped artifacts, and each has one
+installs only published registry packages at exact versions, locked by a
+committed `package-lock.json`, and each has one
 command that runs its end-to-end smoke test against the real core.
 
 | Path | Reference | Installs | Smoke test |
 | --- | --- | --- | --- |
-| Application logging | [`examples/logging-redaction`](../../examples/logging-redaction/README.md) | `@redact-secret/adapter-pino`, `@redact-secret/core`, and `pino` from npm, pinned exactly by its `package-lock.json` | `npm run reference:logging` |
-| OpenTelemetry tracing | [`examples/tracing-masking`](../../examples/tracing-masking/README.md) | `@redact-secret/adapter-otel`, `@redact-secret/adapter`, `@redact-secret/core`, and the OpenTelemetry SDK from npm, pinned exactly by its `package-lock.json` | `npm run reference:tracing` |
-| AI context construction | [`examples/ai-context`](../../examples/ai-context/README.md) | `@redact-secret/core` from npm, pinned exactly; `@redact-secret/adapter-ai-context` and `@redact-secret/adapter-mcp` as the publish-shaped tarballs pinned in [`adapters/pin-source.json`](../../adapters/README.md), through the [`examples/mcp-redact`](../../examples/mcp-redact/README.md) golden path | `npm run reference:ai-context` |
+| Application logging | [`examples/logging-redaction`](../../examples/logging-redaction/README.md) | `@redact-secret/adapter-pino@0.1.1` (with `@redact-secret/adapter@0.1.1`), `@redact-secret/core@0.1.0-beta.8`, and `pino@10.3.1` from npm, pinned exactly by its `package-lock.json` | `npm run reference:logging` |
+| OpenTelemetry tracing | [`examples/tracing-masking`](../../examples/tracing-masking/README.md) | `@redact-secret/adapter-otel@0.1.1`, `@redact-secret/adapter@0.1.1`, `@redact-secret/core@0.1.0-beta.8`, and the OpenTelemetry SDK (`@opentelemetry/api@1.9.1`, `@opentelemetry/sdk-trace-base@2.11.0`) from npm, pinned exactly by its `package-lock.json` | `npm run reference:tracing` |
+| AI context construction | [`examples/ai-context`](../../examples/ai-context/README.md) | `@redact-secret/core@0.1.0-beta.8` from npm, pinned exactly by its `package-lock.json`; `@redact-secret/adapter-ai-context@0.1.0-alpha.1` and `@redact-secret/adapter-mcp@0.1.0-alpha.1` (dist-tag `alpha`, with `@redact-secret/adapter@0.1.2`) from npm, pinned exactly by the [`examples/mcp-redact`](../../examples/mcp-redact/README.md) golden path's `package-lock.json` | `npm run reference:ai-context` |
 
 `npm run references:smoke` runs all three. The `Reference architectures`
 job in `.github/workflows/ci.yml` runs exactly these commands on every push
@@ -36,7 +37,7 @@ Each README answers the same questions, in the same order:
 
 ## What every smoke test guarantees
 
-- It runs the released or pinned packages over the released core. No
+- It runs the released packages over the released core. No
   fake scanner and no copied integration code.
 - Every sample value is unmistakably synthetic
   (`AKIASYNTHETICEXAMPLE`, `synthetic-example-value-0000`, and similar).
@@ -61,11 +62,11 @@ are:
   [beta.8 report](https://github.com/redact-secret/redact-secret-benchmarks/blob/main/docs/reports/2026-09-25-beta8-141-operational-evidence.md)
   (redact-secret-benchmarks#141).
 - **Adapter compatibility.** The adapters repository's
-  [`compatibility.json`](https://github.com/redact-secret/redact-secret-adapters/blob/f014a996ebb9693fbe1c8cc14f144435f011c2b8/compatibility.json)
-  at the pinned commit: which host and core ranges each package is
+  [`compatibility.json`](https://github.com/redact-secret/redact-secret-adapters/blob/ea92c2abd451b66899722170344e73d8f34ef47e/compatibility.json)
+  at the `train/2026.09.25` commit that published these adapter versions: which host and core ranges each package is
   qualified against, and which versions it refuses (redact-secret-adapters#11).
   Its overhead workloads are
-  [`scripts/measure-overhead.mjs`](https://github.com/redact-secret/redact-secret-adapters/blob/f014a996ebb9693fbe1c8cc14f144435f011c2b8/scripts/measure-overhead.mjs).
+  [`scripts/measure-overhead.mjs`](https://github.com/redact-secret/redact-secret-adapters/blob/ea92c2abd451b66899722170344e73d8f34ef47e/scripts/measure-overhead.mjs).
 
 ## Python
 
@@ -73,4 +74,8 @@ The Python halves of `examples/logging-redaction` and
 `examples/tracing-masking` are unchanged, stdlib-only examples with fake
 scanners (`npm run examples:python`). They are not references: they still
 carry their own copy of the integration code. The released
-`redact-secret-adapters` PyPI distribution is the supported Python path.
+`redact-secret-adapters` PyPI distribution is the supported Python path for
+logging and tracing. There is no Python AI-context reference: Python MCP is
+not supported
+([decision](../decisions/2026-09-25-define-the-supported-mcp-redaction-boundary.md)),
+and the Python MCP golden-path twins were retired (#810).

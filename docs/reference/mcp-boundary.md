@@ -320,23 +320,31 @@ matrix plus an edit of the distribution spec row; it is not a new decision.
 
 ## The golden path today
 
-The JavaScript side of `examples/mcp-redact` runs on
-`@redact-secret/adapter-mcp`, consumed as a publish-shaped tarball pinned in
-[`adapters/pin-source.json`](../../adapters/README.md), so it follows this
-contract. Its `redactToolResult`, `redactArguments`,
-`redactStreamedToolResult`, and wrappers are the adapter's
-`sanitizeToolResult`, `sanitizeToolArguments`,
+`examples/mcp-redact` runs on the published `@redact-secret/adapter-mcp@0.1.0-alpha.1`
+and `@redact-secret/adapter-ai-context@0.1.0-alpha.1` (npm dist-tag `alpha`),
+installed from the npm registry at those exact versions and locked by the
+example's `package-lock.json`. They include the key-aware `sanitizeValue`
+([#842](https://github.com/redact-secret/redact-secret/issues/842)) and
+[`resources/read`](mcp-resources-read.md), both exercised by the AI-context
+reference smoke. Its
+`redactToolResult`, `redactArguments`, `redactStreamedToolResult`, and
+wrappers are the adapter's `sanitizeToolResult`, `sanitizeToolArguments`,
 `sanitizeStreamedToolResult`, `wrapToolHandler`, and `sanitizeToolCall`
 over the host's AI-context boundary. The differences this section used to
 list (binary and `resource_link` passthrough, unscanned `_meta`, parsed
 JSON-in-text, separately scanned `content` and `structuredContent` with a
 block count, no key-context check, the `context` label for arguments, and a
-stream that kept pulling after failure) are gone from it.
+stream that kept pulling after failure) are gone from it. The `golden-path`
+job of `artifact-qualification.yml` runs it on the installed candidate core
+with those same registry adapter versions.
 
-The Python twins under `examples/mcp-redact/python/` still have those
-differences. They are not an MCP support claim: the Python `mcp` SDK is
-outside the [supported range](#supported-range). Aligning or retiring them
-is [#810](https://github.com/redact-secret/redact-secret/issues/810).
+The golden path is JavaScript only. **Python MCP is not supported**: the
+Python `mcp` SDK is outside the [supported range](#supported-range)
+([decision](../decisions/2026-09-25-define-the-supported-mcp-redaction-boundary.md)).
+The Python twins that used to live under `examples/mcp-redact/python/` kept
+the differences listed above and read as a Python support claim, so they
+were retired, with the golden path's Python qualification lane
+([#810](https://github.com/redact-secret/redact-secret/issues/810)).
 
 ## Conformance
 

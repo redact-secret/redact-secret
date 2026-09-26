@@ -140,13 +140,18 @@ AI-context operation runs on which part of an MCP tool call, and which fixed
 `CallToolResult` a failure becomes. Its fixture,
 `conformance/fixtures/mcp-boundary.json`, is replayed on the same
 publish-shaped JavaScript lanes; `@redact-secret/adapter-mcp` lives in the
-adapters repository. The JavaScript side of `examples/mcp-redact/` runs on
-it, consumed as a pinned publish-shaped tarball.
+adapters repository. `examples/mcp-redact/` runs on it, installed from the
+npm registry at the exact version its `package-lock.json` locks. There is
+no Python MCP example: the Python `mcp` SDK is not supported, and the
+Python twins were retired (#810).
 The `resources/read` boundary (`decision-define-the-supported-mcp-resources-read-boundary`,
 [`docs/reference/mcp-resources-read.md`](docs/reference/mcp-resources-read.md))
 applies the same mapping to a `ReadResourceResult` and maps failures to fixed
 JSON-RPC errors, since that result has no `isError`. Its fixture,
 `conformance/fixtures/mcp-resources-read.json`, is replayed on the same lanes.
+The registry `adapter-mcp@0.1.0-alpha.1` that `examples/mcp-redact/` locks
+includes both `resources/read` and the key-aware `sanitizeValue`; the
+AI-context reference smoke exercises their authoritative host placement.
 
 Detailed workspace dependency, lint, unsafe-code, MSRV, public-API,
 package-content, and registry-name policies live in

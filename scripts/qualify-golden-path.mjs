@@ -7,23 +7,24 @@
  * The example's own tests inject a fake core. This driver is the other half:
  * the real engine, installed the way an outside consumer installs it.
  *
- * - `--lane node` copies `agent-context.mjs` and every module it imports
- *   (followed from the file, not listed here) into an empty directory outside
- *   the checkout, and installs `@redact-secret/core` plus the example's
- *   pinned adapter packages from a local registry that serves only the
- *   candidate tarballs (`scripts/pack-npm-candidate.mjs`) and the pinned
- *   adapter tarballs (`adapters/pin-source.json`, verified against their
- *   content digests). Nothing comes from a public registry.
- *   `createGoldenPathBoundary()` then loads that installed core. The lane
- *   also runs the example's real-core tests -- the files
- *   `npm run examples:real-core:test` names (#721, streamed tool output on the
- *   real `IncrementalSanitizer`) -- in the same project, against the same
- *   installed core.
- * - `--lane python` does the same for the Python twin
- *   (`python/agent_context.py` and its imports), installing the candidate
- *   wheel into a fresh virtual environment with `PIP_NO_INDEX` and
- *   `PIP_FIND_LINKS`, and passes the installed `redact_secret.scan_and_redact`
- *   to `build_safe_context`.
+ * `--lane node` copies `agent-context.mjs` and every module it imports
+ * (followed from the file, not listed here) into an empty directory outside
+ * the checkout, and installs `@redact-secret/core` plus the example's
+ * adapter packages from a local registry that serves only the candidate
+ * tarballs (`scripts/pack-npm-candidate.mjs`) and the adapter tarballs the
+ * example's `package-lock.json` locks. Those adapter tarballs are the
+ * published npm registry bytes: fetched from the `resolved` URL the lockfile
+ * records and verified against its `integrity` before they are served, so
+ * the clean project installs exactly the versions the example does, next to
+ * the candidate core. `createGoldenPathBoundary()` then loads that installed
+ * core. The lane also runs the example's real-core tests -- the files
+ * `npm run examples:real-core:test` names (#721, streamed tool output on the
+ * real `IncrementalSanitizer`) -- in the same project, against the same
+ * installed core.
+ *
+ * There is no Python lane. The Python MCP golden-path twins were retired
+ * (#810): no Python AI-context or MCP adapter exists, and the MCP boundary
+ * does not support the Python `mcp` SDK (#612).
  *
  * One turn carries a synthetic credential in the user input and another in
  * the tool result. The lane passes only if the turn is `ok`, the tool was
@@ -38,15 +39,15 @@
  * The report records outcomes, versions, digests, and the example files'
  * digests -- never the model-facing value or any command output.
  *
- * Usage: node scripts/qualify-golden-path.mjs --lane node|python
+ * Usage: node scripts/qualify-golden-path.mjs --lane node
  *   --candidate-dir <dir> [--report <path>]
  */
 
+import { createHash } from "node:crypto";
 import { readFile, readdir, rm, writeFile } from "node:fs/promises";
-import { basename, join, posix, resolve, sep } from "node:path";
+import { join, posix, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { versionSpellings } from "./clean-install-doc.mjs";
 import {
   REPO_ROOT,
   cleanEnvironment,
@@ -59,15 +60,15 @@ import {
   sourceCommit,
   startCandidateRegistry,
   verifyNpmInstall,
-  wheelProbeSource,
 } from "./lib/candidate-install.mjs";
 
 const LABEL = "golden path";
 const assert = makeAssert(LABEL);
-export const LANES = ["node", "python"];
+export const LANES = ["node"];
 export const EXAMPLE_DIR = "examples/mcp-redact";
-export const ENTRY = { node: "agent-context.mjs", python: "python/agent_context.py" };
-const PIN_SOURCE = "adapters/pin-source.json";
+export const ENTRY = { node: "agent-context.mjs" };
+export const LOCKFILE = `${EXAMPLE_DIR}/package-lock.json`;
+export const NPM_REGISTRY = "https://registry.npmjs.org/";
 const REAL_CORE_SCRIPT = "examples:real-core:test";
 
 /**
@@ -102,38 +103,27 @@ function parseArgs(argv) {
     else throw new Error(`unknown argument ${key}`);
   }
   if (!LANES.includes(options.lane) || options.candidateDir === undefined) {
-    throw new Error("usage: qualify-golden-path.mjs --lane node|python --candidate-dir <dir> [--report <path>]");
+    throw new Error("usage: qualify-golden-path.mjs --lane node --candidate-dir <dir> [--report <path>]");
   }
   return options;
 }
 
 /**
  * The local modules `source` (at `path`, relative to the example directory)
- * imports: relative ESM specifiers, or Python modules that exist as a
- * sibling `.py` file. Anything else is a package the install must provide.
+ * imports: relative ESM specifiers. Anything else is a package the install
+ * must provide.
  */
-export function localImports(path, source, siblings) {
-  if (path.endsWith(".mjs")) {
-    const specifiers = [...source.matchAll(/^\s*(?:import|export)\s[^;]*?from\s+["'](\.{1,2}\/[^"']+)["']/gm)].map(
-      (match) => match[1],
-    );
-    specifiers.push(...[...source.matchAll(/^\s*import\s+["'](\.{1,2}\/[^"']+)["']/gm)].map((match) => match[1]));
-    return specifiers.map((specifier) => posix.normalize(posix.join(posix.dirname(path), specifier)));
-  }
-  const modules = [...source.matchAll(/^\s*(?:from\s+([A-Za-z_]\w*)\s+import|import\s+([A-Za-z_]\w*))/gm)].map(
-    (match) => match[1] ?? match[2],
+export function localImports(path, source) {
+  const specifiers = [...source.matchAll(/^\s*(?:import|export)\s[^;]*?from\s+["'](\.{1,2}\/[^"']+)["']/gm)].map(
+    (match) => match[1],
   );
-  return modules
-    .map((module) => posix.join(posix.dirname(path), `${module}.py`))
-    .filter((candidate) => siblings.has(candidate));
+  specifiers.push(...[...source.matchAll(/^\s*import\s+["'](\.{1,2}\/[^"']+)["']/gm)].map((match) => match[1]));
+  return specifiers.map((specifier) => posix.normalize(posix.join(posix.dirname(path), specifier)));
 }
 
 /** `entry` and every example module it transitively imports, each with its bytes. */
 export async function importClosure(exampleRoot, entry) {
-  const siblings = new Set();
-  for (const dir of ["", "python"]) {
-    for (const name of await readdir(join(exampleRoot, dir))) siblings.add(posix.join(dir, name));
-  }
+  const siblings = new Set(await readdir(exampleRoot));
   const files = new Map();
   const pending = [entry];
   while (pending.length > 0) {
@@ -142,7 +132,7 @@ export async function importClosure(exampleRoot, entry) {
     assert(!path.startsWith("..") && siblings.has(path), `${EXAMPLE_DIR}/${path} is imported but does not exist`);
     const bytes = await readFile(join(exampleRoot, path));
     files.set(path, bytes);
-    pending.push(...localImports(path, bytes.toString("utf8"), siblings));
+    pending.push(...localImports(path, bytes.toString("utf8")));
   }
   return files;
 }
@@ -161,52 +151,66 @@ async function copyClosure(project, closure, entry) {
 }
 
 /**
- * The content digest `scripts/adapter-pins.py` pins: SHA-256 over the sorted
- * `path NUL sha256 LF` lines of the tarball's regular files.
+ * The adapter packages `lock` (the example's `package-lock.json`) locks:
+ * every `@redact-secret/*` entry, each installed at the top level from the
+ * public registry with an integrity. `@redact-secret/core` must not be one of
+ * them -- the candidate supplies it -- and every direct dependency the
+ * example's `package.json` declares must be locked at exactly its spec.
  */
-function contentDigest(contents) {
-  const lines = [...contents].map(([file, digest]) => `package/${file}\0${digest}\n`).sort();
-  return `sha256:${sha256(Buffer.from(lines.join(""), "utf8"))}`;
+export function lockedAdapters(manifest, lock) {
+  const locked = [];
+  for (const [key, entry] of Object.entries(lock.packages ?? {})) {
+    if (!key.includes("node_modules/@redact-secret/")) continue;
+    const name = key.slice(key.lastIndexOf("node_modules/") + "node_modules/".length);
+    assert(key === `node_modules/${name}`, `${LOCKFILE} nests ${name}; every adapter must install at the top level`);
+    assert(name !== "@redact-secret/core", `${LOCKFILE} locks @redact-secret/core; the candidate supplies it`);
+    assert(entry.link !== true, `${LOCKFILE} links ${name} instead of locking a registry version`);
+    assert(
+      typeof entry.version === "string" && entry.resolved === `${NPM_REGISTRY}${name}/-/${name.split("/")[1]}-${entry.version}.tgz`,
+      `${LOCKFILE} does not resolve ${name} from ${NPM_REGISTRY}`,
+    );
+    assert(/^sha512-[A-Za-z0-9+/]+={0,2}$/.test(String(entry.integrity)), `${LOCKFILE} has no sha512 integrity for ${name}`);
+    locked.push({ name, version: entry.version, resolved: entry.resolved, integrity: entry.integrity });
+  }
+  assert(locked.length > 0, `${LOCKFILE} locks no @redact-secret adapter`);
+  const byName = new Map(locked.map((entry) => [entry.name, entry]));
+  for (const [name, spec] of Object.entries(manifest.dependencies ?? {})) {
+    assert(byName.get(name)?.version === spec, `${EXAMPLE_DIR} declares ${name} ${spec}, which ${LOCKFILE} does not lock exactly`);
+  }
+  return locked.sort((left, right) => (left.name < right.name ? -1 : left.name > right.name ? 1 : 0));
 }
 
 /**
- * The example's pinned adapter tarballs, loaded from the paths its
- * `package.json` names (which `npm run adapter-pins:check` requires to be
- * exactly the pinned ones) and each verified against the pin's digest.
+ * The example's adapter tarballs, fetched from the npm registry at exactly
+ * the versions its lockfile locks and each verified against the lockfile's
+ * integrity before anything serves it.
  */
-async function loadPinnedAdapters(scratch) {
-  const pin = JSON.parse(await readFile(join(REPO_ROOT, PIN_SOURCE), "utf8"));
+async function loadRegistryAdapters(scratch) {
   const manifest = JSON.parse(await readFile(join(REPO_ROOT, EXAMPLE_DIR, "package.json"), "utf8"));
-  const dependencies = Object.entries(manifest.dependencies ?? {});
-  const paths = dependencies.map(([name, spec]) => {
-    assert(String(spec).startsWith("file:"), `${EXAMPLE_DIR} depends on ${name} from outside the pin`);
-    return resolve(REPO_ROOT, EXAMPLE_DIR, spec.slice("file:".length));
-  });
-  let tarballs;
-  try {
-    tarballs = await loadNpmTarballs(paths, scratch, LABEL);
-  } catch (error) {
-    throw new Error(`${LABEL}: the pinned adapter tarballs are missing; run \`npm run adapter-pins:install\``, {
-      cause: error,
-    });
+  const lock = JSON.parse(await readFile(join(REPO_ROOT, LOCKFILE), "utf8"));
+  const locked = lockedAdapters(manifest, lock);
+  const paths = [];
+  for (const entry of locked) {
+    const response = await fetch(entry.resolved);
+    assert(response.ok, `fetching ${entry.name}@${entry.version} from ${NPM_REGISTRY} returned ${response.status}`);
+    const bytes = Buffer.from(await response.arrayBuffer());
+    const integrity = `sha512-${createHash("sha512").update(bytes).digest("base64")}`;
+    assert(integrity === entry.integrity, `${entry.name}@${entry.version} does not match its ${LOCKFILE} integrity`);
+    const path = join(scratch, `registry-${entry.name.split("/")[1]}-${entry.version}.tgz`);
+    await writeFile(path, bytes);
+    paths.push(path);
   }
-  const pinned = new Map(pin.packages.map((entry) => [entry.name, entry]));
-  for (const [name, entry] of tarballs) {
-    const record = pinned.get(name);
-    assert(record !== undefined, `${name} is not pinned in ${PIN_SOURCE}`);
-    assert(entry.manifest.version === record.version, `${name} is not the pinned ${record.version}`);
-    assert(contentDigest(entry.contents) === record.contentDigest, `${name} does not match its pinned content digest`);
+  const tarballs = await loadNpmTarballs(paths, scratch, LABEL);
+  for (const entry of locked) {
+    assert(tarballs.get(entry.name)?.manifest.version === entry.version, `${entry.name}'s tarball is not ${entry.version}`);
   }
   return {
     tarballs,
-    dependencies: Object.fromEntries([...tarballs].map(([name, entry]) => [name, entry.manifest.version])),
+    dependencies: Object.fromEntries(locked.map((entry) => [entry.name, entry.version])),
     record: {
-      repository: pin.repository,
-      commit: pin.commit,
-      packages: [...tarballs.keys()].sort().map((name) => {
-        const { version, contentDigest: digest } = pinned.get(name);
-        return { name, version, contentDigest: digest };
-      }),
+      source: NPM_REGISTRY,
+      lockfile: LOCKFILE,
+      packages: locked.map(({ name, version, integrity }) => ({ name, version, integrity })),
     },
   };
 }
@@ -261,47 +265,6 @@ console.log(JSON.stringify({
 }));
 `;
 
-const pythonDriver = () => `import asyncio
-import json
-import pathlib
-
-import redact_secret
-import redact_secret._native as native
-
-from agent_context import build_safe_context
-
-USER_SECRET = ${JSON.stringify(USER_SECRET)}
-
-
-async def main():
-    seen = {}
-
-    async def call_tool(request, **_kwargs):
-        seen["raw"] = USER_SECRET in json.dumps(request)
-        return {"content": [{"type": "text", "text": f"${TOOL_PREFIX} {request['query']}: leaked AWS_ACCESS_KEY_ID=${TOOL_SECRET}"}]}
-
-    result = await build_safe_context(
-        scan_and_redact=redact_secret.scan_and_redact,
-        user_input=${JSON.stringify(USER_INPUT)},
-        call_tool=call_tool,
-        build_tool_request=lambda safe_text: {"name": "lookup", "query": safe_text},
-    )
-    ok = result["outcome"] == "ok"
-    print(json.dumps({
-        "outcome": result["outcome"],
-        "stage": result.get("stage"),
-        "roles": [message["role"] for message in result["context"]["messages"]] if ok else [],
-        "findings": len(result["findings"]) if ok else None,
-        "toolSawRawInput": seen.get("raw"),
-        "modelFacing": json.dumps(result["context"]) if ok else "",
-        "module": str(pathlib.Path(redact_secret.__file__).resolve()),
-        "native": str(pathlib.Path(native.__file__).resolve()),
-    }))
-
-
-asyncio.run(main())
-`;
-
 async function nodeLane(context) {
   const { project, parent, version, candidateDir } = context;
   const scratch = join(parent, "tarballs");
@@ -309,7 +272,7 @@ async function nodeLane(context) {
   for (const entry of candidate.values()) {
     assert(entry.manifest.version === version, `${entry.file} is ${entry.manifest.version}, not ${version}`);
   }
-  const adapters = await loadPinnedAdapters(scratch);
+  const adapters = await loadRegistryAdapters(scratch);
   const served = new Map([...candidate, ...adapters.tarballs]);
   const registry = await startCandidateRegistry(served);
   try {
@@ -365,77 +328,22 @@ async function nodeLane(context) {
   }
 }
 
-async function pythonLane(context) {
-  const { project, parent, version, candidateDir } = context;
-  const wheels = (await readdir(candidateDir)).filter((name) => name.endsWith(".whl")).map((name) => join(candidateDir, name));
-  assert(wheels.length > 0, `${candidateDir} holds no wheel`);
-  const env = cleanEnvironment({
-    PIP_DISABLE_PIP_VERSION_CHECK: "1",
-    PIP_NO_CACHE_DIR: "1",
-    PIP_NO_INDEX: "1",
-    PIP_FIND_LINKS: candidateDir,
-  });
-  const pythonVersion = versionSpellings(version).python;
-  const setup = await runShell(
-    `python3 -m venv .venv\n.venv/bin/python -m pip install --only-binary=:all: redact-secret==${pythonVersion}`,
-    project,
-    env,
-  );
-  if (setup.code !== 0) process.stderr.write(setup.stdout + setup.stderr);
-  assert(setup.code === 0, `installing the candidate wheel exited ${setup.code}`);
-
-  const probe = await runShell(
-    `.venv/bin/python -c "$WHEEL_CHECK" ${wheels.map((wheel) => `'${wheel}'`).join(" ")}`,
-    project,
-    { ...env, WHEEL_CHECK: await wheelProbeSource() },
-  );
-  assert(probe.code === 0, "cannot inspect the installed distribution");
-  const installed = JSON.parse(probe.stdout);
-  assert(installed.version === pythonVersion, `installed redact-secret ${installed.version}`);
-  assert(installed.wheel !== null, "the installed wheel is not one of the candidate wheels");
-  assert(installed.files > 0 && installed.mismatched.length === 0, "installed files differ from the wheel");
-
-  const files = await copyClosure(project, context.closure, ENTRY.python);
-  await writeFile(join(project, "golden_path.py"), pythonDriver());
-  const printed = await runDriver(".venv/bin/python -B golden_path.py", project, env);
-  requireSanitized(printed);
-  const venv = join(project, ".venv") + sep;
-  assert(
-    printed.module.startsWith(venv) && printed.native.startsWith(venv) && printed.native === installed.native,
-    "redact_secret does not load from the clean virtual environment",
-  );
-
-  const wheelPath = wheels.find((wheel) => basename(wheel) === installed.wheel);
-  const wheelSha256 = sha256(await readFile(wheelPath));
-  return {
-    runtime: { name: "python", version: installed.python },
-    artifact: "native",
-    files,
-    adapters: null,
-    realCoreTests: [],
-    packages: [{ name: "redact-secret", version: installed.version, file: installed.wheel, sha256: wheelSha256 }],
-    binaries: [{ package: "redact-secret", file: installed.wheel, sha256: wheelSha256 }],
-  };
-}
-
 async function main() {
   const options = parseArgs(process.argv.slice(2));
   if (process.platform === "win32") throw new Error(`${LABEL}: the driver runs POSIX shell commands`);
   const version = JSON.parse(await readFile(join(REPO_ROOT, "packages/javascript/package.json"), "utf8")).version;
   const exampleRoot = join(REPO_ROOT, EXAMPLE_DIR);
   const closure = await importClosure(exampleRoot, ENTRY[options.lane]);
-  const tests = [];
-  if (options.lane === "node") {
-    tests.push(...realCoreTests(JSON.parse(await readFile(join(REPO_ROOT, "package.json"), "utf8")).scripts));
-    for (const test of tests) for (const [path, bytes] of await importClosure(exampleRoot, test)) closure.set(path, bytes);
-  }
+  const tests = realCoreTests(JSON.parse(await readFile(join(REPO_ROOT, "package.json"), "utf8")).scripts);
+  for (const test of tests) for (const [path, bytes] of await importClosure(exampleRoot, test)) closure.set(path, bytes);
 
   const { parent, project } = await freshWorkspace(`redact-secret-golden-path-${options.lane}-`, LABEL);
   try {
-    const lane = options.lane === "node" ? nodeLane : pythonLane;
-    const outcome = await lane({ project, parent, version, closure, realCoreTests: tests, candidateDir: options.candidateDir });
+    const outcome = await nodeLane({ project, parent, version, closure, realCoreTests: tests, candidateDir: options.candidateDir });
     const report = {
-      schemaVersion: 1,
+      // 2: `adapters` records the registry packages the example's lockfile
+      // locks (#810 retired the Python lane and the tarball pin).
+      schemaVersion: 2,
       lane: options.lane,
       sourceCommit: sourceCommit(),
       published: false,
@@ -454,7 +362,7 @@ async function main() {
         artifact: "passed",
         toolInput: "passed",
         sanitized: "passed",
-        ...(options.lane === "node" ? { realCoreTests: "passed" } : {}),
+        realCoreTests: "passed",
       },
     };
     if (options.report !== undefined) await writeFile(options.report, `${JSON.stringify(report, null, 2)}\n`);

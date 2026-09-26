@@ -104,6 +104,14 @@ the result and before any of these:
 The host wraps its `readResource` call in `sanitizeResourceRead`, so the raw
 result exists only inside that call and a rejected read is never inspected.
 
+[`examples/ai-context`](../../examples/ai-context/README.md) shows this
+placement through the published `@redact-secret/adapter-mcp@0.1.0-alpha.1`.
+Its smoke wraps a host read in `sanitizeResourceRead`, then checks that text,
+JSON-in-text, and key-identified `_meta` reach the model, log, and store only
+inside a sanitized `{ result }`; a blob under the default reaches those sinks
+only as the fixed JSON-RPC `{ error }`. The adapter's real-SDK end-to-end proof
+remains [redact-secret-adapters#35](https://github.com/redact-secret/redact-secret-adapters/pull/35).
+
 An SDK-side response cache sits before this boundary. The
 `@modelcontextprotocol/client` 2.x `Client` stores a `resources/read` result
 in its `responseCacheStore` when the server marks it cacheable (`ttlMs`), and

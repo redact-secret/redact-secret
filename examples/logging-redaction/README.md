@@ -5,7 +5,8 @@ The application-logging reference architecture (#611; index in
 A Node.js service logs through [pino](https://github.com/pinojs/pino), and
 the released [`@redact-secret/adapter-pino`](https://www.npmjs.com/package/@redact-secret/adapter-pino)
 redacts every message, merging-object field, and error before pino
-serializes or writes anything.
+serializes anything, and every string of the finished line (child-logger
+bindings and `mixin()` output included) before pino writes it.
 
 ```bash
 npm run reference:logging   # from the repository root: npm ci here, then the smoke test
@@ -13,9 +14,9 @@ npm run reference:logging   # from the repository root: npm ci here, then the sm
 
 | File | Role |
 | --- | --- |
-| [`app.mjs`](./app.mjs) | The whole integration: `createAppLogger`, a pino logger whose `hooks.logMethod` is the adapter's. |
+| [`app.mjs`](./app.mjs) | The whole integration: `createAppLogger`, a pino logger whose `hooks.logMethod` and `hooks.streamWrite` are the adapter's. |
 | [`smoke.mjs`](./smoke.mjs) | The end-to-end smoke test, on real pino and the real core. |
-| [`package.json`](./package.json) / [`package-lock.json`](./package-lock.json) | This directory as a consumer project: `@redact-secret/adapter-pino@0.1.0`, `@redact-secret/core@0.1.0-beta.8`, and `pino@10.3.1`, all from the npm registry, with every transitive version pinned by the lockfile. |
+| [`package.json`](./package.json) / [`package-lock.json`](./package-lock.json) | This directory as a consumer project: `@redact-secret/adapter-pino@0.1.1` (with `@redact-secret/adapter@0.1.1`), `@redact-secret/core@0.1.0-beta.8`, and `pino@10.3.1`, all from the npm registry, with every transitive version pinned by the lockfile. |
 | [`python/`](./python) | The Python `logging.Filter` example. It is not part of the reference; see [Python](#python). |
 
 This directory used to carry its own copy of the pino hook, its message
@@ -29,10 +30,13 @@ divergent copy.
 
 ```js
 import pino from "pino";
-import { createRedactingLogMethod } from "@redact-secret/adapter-pino";
+import { createRedactingLogMethod, createRedactingStreamWrite } from "@redact-secret/adapter-pino";
 
 const logger = pino({
-  hooks: { logMethod: await createRedactingLogMethod() },
+  hooks: {
+    logMethod: await createRedactingLogMethod(),
+    streamWrite: await createRedactingStreamWrite(), // bindings and mixin() output never pass logMethod
+  },
   redact: ["req.headers.authorization"], // pino's own path-based redact still applies, afterwards
 });
 
@@ -42,10 +46,11 @@ logger.info("api_key=%s", value); // the format string and its values are joined
 ## Trust zone
 
 Plaintext exists in the application process: in the caller's own variables,
-in the arguments of the `logger.info(...)` call, and inside the adapter
-while it scans them. Everything after the hook (pino's serializers, its
-`formatters`, the path-based `redact`, the destination, a transport's worker
-thread, and whatever collects the log stream) sees only redacted text.
+in the arguments of the `logger.info(...)` call, in child-logger bindings and
+`mixin()` output until `hooks.streamWrite` scans the finished line, and inside
+the adapter while it scans. Everything after `hooks.streamWrite` (the
+destination, a transport's worker thread, and whatever collects the log
+stream) sees only redacted text.
 
 ## Authoritative scan point
 
@@ -58,9 +63,18 @@ one string, scans every string field of a merging object, and replaces any
 pino the redacted arguments. The adapter's own documentation carries the
 pino source references behind each of these claims.
 
+`hooks.logMethod` never sees child-logger bindings (`logger.child({...})`,
+`setBindings()`), which pino serializes once when the child is created, or
+`mixin()` output, which pino merges after the hook returns. With
+`@redact-secret/adapter-pino@0.1.0` and `logMethod` alone, a secret in
+either reached the destination in plaintext. `hooks.streamWrite`, added in
+`0.1.1`, scans every string value of the finished JSON line just before it
+reaches the destination, so this reference installs both. The smoke test's
+`child-logger bindings` and `mixin output` scenarios fail without it.
+
 ## Preventive versus authoritative scanning
 
-The hook is the authoritative scan for this process's logs. pino's `redact`
+The two hooks are the authoritative scan for this process's logs. pino's `redact`
 option is preventive and path-based only: it censors known keys, such as an
 `authorization` header, but cannot find a secret inside a message string.
 Keep it for the fields you already know about. A log pipeline that also
@@ -91,9 +105,11 @@ before pino writes it. There is no state across calls.
 
 ## What it does not protect
 
-- **Anything that assembles new text after the hook.** A custom
-  serializer, `formatters.log`, `msgPrefix`, or a transport that builds a
-  string from redacted fields is not scanned again.
+- **Anything that assembles new text after `hooks.streamWrite`.** A
+  transport or destination that builds a string from the written line is
+  not scanned again. (Custom serializer, `formatters.log`, and `msgPrefix`
+  output is part of the line, so `streamWrite` scans its string values.)
+- **Object keys.** `hooks.streamWrite` scans string values, not keys.
 - **A secret split across log calls.** Each call is scanned independently.
 - **Other writers.** `console.log`, `process.stdout.write`, a second logger
   without the hook, and a child process's output bypass it.
@@ -119,7 +135,7 @@ before pino writes it. There is no state across calls.
   [operational evidence](https://github.com/redact-secret/redact-secret-benchmarks/blob/main/docs/reports/2026-09-25-beta8-141-operational-evidence.md).
 - Which pino and core versions the adapter is qualified against, and which
   it refuses: the adapters repository's
-  [`compatibility.json`](https://github.com/redact-secret/redact-secret-adapters/blob/a7fbcc32b56ada3b5107e9fbddb9a019eeaf6d43/compatibility.json).
+  [`compatibility.json`](https://github.com/redact-secret/redact-secret-adapters/blob/ea92c2abd451b66899722170344e73d8f34ef47e/compatibility.json).
 
 ## Python
 

@@ -10,8 +10,8 @@
  *   `@redact-secret/adapter-ai-context`, the #610 contract's
  *   implementation, with tool results sanitized by
  *   `@redact-secret/adapter-mcp` (the #612 MCP boundary), both installed
- *   there from the publish-shaped tarballs pinned in
- *   `adapters/pin-source.json`.
+ *   there from the npm registry at the exact versions
+ *   `examples/mcp-redact/package-lock.json` locks.
  *
  * The core is injected rather than loaded by the adapter, so the
  * application and the boundary share one initialized core instance.
@@ -20,6 +20,7 @@
 import * as core from "@redact-secret/core";
 
 import { buildSafeContext, createGoldenPathBoundaryWith } from "../mcp-redact/agent-context.mjs";
+import { mcpBoundaryFor, toReadResourceResponse } from "../mcp-redact/redact-tool-call.mjs";
 
 export { buildSafeContext };
 
@@ -36,4 +37,18 @@ export async function createAppBoundary(options = {}) {
     { scanAndRedact: core.scanAndRedact, createIncrementalSanitizer: core.createIncrementalSanitizer },
     options,
   );
+}
+
+/**
+ * Reads one MCP resource through the authoritative host boundary. The raw
+ * `ReadResourceResult` exists only inside `readResource`; callers receive
+ * `{ result }`, the fixed input-free `{ error }`, or `null` when aborted.
+ *
+ * @param {import("@redact-secret/adapter-ai-context").AiContextBoundary} boundary
+ * @param {(options: { signal?: AbortSignal }) => Promise<unknown>} readResource
+ * @param {{ signal?: AbortSignal, binaryContent?: "block" | "pass" }} [options]
+ */
+export async function readSafeResource(boundary, readResource, { signal, binaryContent } = {}) {
+  const outcome = await mcpBoundaryFor(boundary, { binaryContent }).sanitizeResourceRead(readResource, { signal });
+  return toReadResourceResponse(outcome);
 }

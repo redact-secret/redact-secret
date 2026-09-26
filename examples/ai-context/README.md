@@ -8,7 +8,7 @@ sends to a model. Every value crosses the framework-neutral
 (#610) before it joins that context.
 
 ```bash
-npm run reference:ai-context   # from the repository root: pinned adapter install, npm ci here, then the smoke test
+npm run reference:ai-context   # from the repository root: npm ci in examples/mcp-redact and here, then the smoke test
 ```
 
 This directory adds no redaction logic and no second golden path. It
@@ -19,21 +19,23 @@ composes two things that already exist:
   which runs on `@redact-secret/adapter-ai-context`, the contract's
   implementation, with tool results sanitized by `@redact-secret/adapter-mcp`
   (the [MCP boundary contract](../../docs/reference/mcp-boundary.md)), both
-  installed there from the publish-shaped tarballs pinned in
-  [`adapters/pin-source.json`](../../adapters/README.md);
+  installed there from the npm registry at `0.1.0-alpha.1` (dist-tag
+  `alpha`, with `@redact-secret/adapter@0.1.2` under them), pinned exactly by
+  [`examples/mcp-redact/package-lock.json`](../mcp-redact/package-lock.json);
 - the released `@redact-secret/core@0.1.0-beta.8` from the npm registry,
   pinned exactly by [`package-lock.json`](./package-lock.json), initialized
   once and injected into the boundary.
 
-`npm run reference:ai-context` runs `npm run adapter-pins:install` first,
-which builds the pinned adapters, verifies their content digests, and
-installs them into `examples/mcp-redact`. Neither adapter is on npm yet; when
-they are, this reference moves to the registry versions.
+`npm run reference:ai-context` runs `npm run examples:install` first, which
+installs the locked adapters into `examples/mcp-redact` with `npm ci`.
+There is no Python AI-context reference: Python MCP is not supported
+([decision](../../docs/decisions/2026-09-25-define-the-supported-mcp-redaction-boundary.md)),
+and the Python MCP golden-path twins were retired (#810).
 
 | File | Role |
 | --- | --- |
-| [`app.mjs`](./app.mjs) | `createAppBoundary`: initializes the registry core and builds the golden path's boundary over it. |
-| [`smoke.mjs`](./smoke.mjs) | The end-to-end smoke test: whole turns through `buildSafeContext`, with a single and a streamed tool result, on the real core. |
+| [`app.mjs`](./app.mjs) | `createAppBoundary` initializes the registry core and builds the golden path's boundary over it; `readSafeResource` wraps a host `readResource` and returns only the mapped safe response. |
+| [`smoke.mjs`](./smoke.mjs) | The end-to-end smoke test: whole turns through `buildSafeContext`, with a single and a streamed tool result, plus `resources/read`, on the real core. |
 | [`package.json`](./package.json) / [`package-lock.json`](./package-lock.json) | This directory as a consumer project. Its only dependency is the registry core. |
 
 ```js
@@ -60,6 +62,7 @@ The boundary's operations, in the order `buildSafeContext` calls them:
 user input -> sanitizeText (user-input)  -> application policy
 tool result -> redactToolResult (tool-result) -> context construction
 safe context -> model
+resource read -> sanitizeResourceRead -> mapped result or fixed JSON-RPC error -> model/log/store
 ```
 
 The tool is dispatched from the *sanitized* input, so a tool argument
@@ -89,6 +92,8 @@ Every case below is exercised by `smoke.mjs` against the real core.
 | An abort while the tool runs, or mid-stream | `aborted`; text already sanitized is discarded |
 | Every finding | Reported to `onFinding` as allowlisted metadata only, never the input or a matched value |
 | An MCP-shaped result (text, embedded text resource, nested `structuredContent`) | The model call, a host log line, and a conversation store receive only the sanitized turn, as fresh objects sharing no reference with the raw result |
+| A `resources/read` result (text, JSON-in-text, key-identified `_meta`) | The model call, log, and store receive only `{ result }`, with each supported value sanitized |
+| A `resources/read` result with a blob under the default | The model call, log, and store receive only the fixed input-free JSON-RPC `{ error }` |
 
 Limits are mandatory and explicit (`EXAMPLE_LIMITS` in
 `examples/mcp-redact/agent-context.mjs`). Nothing is truncated and passed
@@ -136,5 +141,5 @@ The details are in [`examples/mcp-redact`](../mcp-redact/README.md).
 - The contract's conformance fixture, replayed by the adapter on the real
   core, and the core range it is qualified against: the adapters
   repository's
-  [`compatibility.json`](https://github.com/redact-secret/redact-secret-adapters/blob/f014a996ebb9693fbe1c8cc14f144435f011c2b8/compatibility.json)
-  at the pinned commit.
+  [`compatibility.json`](https://github.com/redact-secret/redact-secret-adapters/blob/ea92c2abd451b66899722170344e73d8f34ef47e/compatibility.json)
+  at the `train/2026.09.25` commit that published these adapter versions.

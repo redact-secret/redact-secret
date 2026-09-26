@@ -3,8 +3,8 @@
  * End-to-end smoke test for the AI-context reference (issue #611):
  * `npm run reference:ai-context` from the repository root.
  *
- * The released `@redact-secret/core` from the registry, the pinned
- * publish-shaped `@redact-secret/adapter-ai-context`, and the
+ * The released `@redact-secret/core` from the registry, the released
+ * `@redact-secret/adapter-ai-context` and `@redact-secret/adapter-mcp`, and the
  * `examples/mcp-redact` golden path, with no fake anywhere. Every value
  * below is synthetic. Everything that would reach the model, the tool, or
  * the audit callback is checked for every synthetic value before anything
@@ -14,7 +14,7 @@
 
 import assert from "node:assert/strict";
 
-import { buildSafeContext, createAppBoundary } from "./app.mjs";
+import { buildSafeContext, createAppBoundary, readSafeResource } from "./app.mjs";
 
 // Unmistakably synthetic: AKIA + SYNTHETICEXAMPLE is this repository's
 // synthetic AWS access key ID; the others say what they are.
@@ -213,6 +213,57 @@ await scenario(
       assert.equal(shared, 0, "the sanitized turn shares no object with the raw tool result");
     },
   );
+}
+
+// `resources/read` has no `isError` result, so the same host boundary maps a
+// successful read to `{ result }` and a blocked read to one fixed JSON-RPC
+// `{ error }`. Only that mapped response may reach model context or a sink.
+{
+  const boundary = await createAppBoundary();
+  const model = [];
+  const log = [];
+  const store = [];
+  const deliver = (name, response) => {
+    model.push(response);
+    log.push(JSON.stringify(response));
+    store.push(structuredClone(response));
+    assertNoSynthetic(`${name} model`, model);
+    assertNoSynthetic(`${name} log`, log);
+    assertNoSynthetic(`${name} store`, store);
+  };
+
+  const safe = await readSafeResource(boundary, async () => ({
+    contents: [
+      {
+        uri: "file:///synthetic/deploy.log",
+        mimeType: "text/plain",
+        text: `exported AWS_ACCESS_KEY_ID=${SYNTHETIC.awsKeyId}`,
+      },
+      {
+        uri: "file:///synthetic/config.json",
+        mimeType: "application/json",
+        text: JSON.stringify({ password: SYNTHETIC.password, region: "eu-west-1" }),
+      },
+    ],
+    _meta: { password: SYNTHETIC.password },
+  }));
+  assert.ok(safe && "result" in safe);
+  assert.equal(safe.result.contents[0].text, "exported AWS_ACCESS_KEY_ID=<SECRET_1>");
+  assert.equal(safe.result.contents[1].text, JSON.stringify({ password: "<SECRET_1>", region: "eu-west-1" }));
+  assert.equal(safe.result._meta.password, "<SECRET_1>");
+  deliver("resources/read", safe);
+
+  const blocked = await readSafeResource(boundary, async () => ({
+    contents: [{ uri: "file:///synthetic/image.bin", blob: SYNTHETIC.bearer }],
+  }));
+  assert.deepEqual(blocked, {
+    error: {
+      code: -32603,
+      message: "This MCP resource read was blocked by secret-redaction policy. No content, URI, or error detail is included.",
+    },
+  });
+  deliver("resources/read blob", blocked);
+  checks.push({ name: "resources/read reaches model, log, and store only after the boundary", serialized: JSON.stringify({ safe, blocked }) });
 }
 
 for (const { name, serialized } of checks) console.log(`ok - ${name}: ${serialized.slice(0, 160)}`);

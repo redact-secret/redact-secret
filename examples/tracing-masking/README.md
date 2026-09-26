@@ -5,7 +5,8 @@ The OpenTelemetry tracing reference architecture (#611; index in
 A Node.js service traces LLM calls with the OpenTelemetry SDK, and the
 released [`@redact-secret/adapter-otel`](https://www.npmjs.com/package/@redact-secret/adapter-otel)
 redacts span and span-event attributes (OpenInference, GenAI semantic
-conventions, or anything else string-shaped) before the exporter sees them.
+conventions, or anything else string-shaped), the span and event names, the
+status message, and link attributes before the exporter sees them.
 The same directory shows the masking callback for a tracing SDK with its own
 `mask` hook, such as Langfuse, from the released
 [`@redact-secret/adapter`](https://www.npmjs.com/package/@redact-secret/adapter).
@@ -18,7 +19,7 @@ npm run reference:tracing   # from the repository root: npm ci here, then the sm
 | --- | --- |
 | [`app.mjs`](./app.mjs) | The whole integration: `createAppTracerProvider` (the redacting `SpanProcessor` in front of the exporter's processor) and `createAppMaskCallback` (the masking callback). |
 | [`smoke.mjs`](./smoke.mjs) | The end-to-end smoke test, on the real OpenTelemetry SDK and the real core. |
-| [`package.json`](./package.json) / [`package-lock.json`](./package-lock.json) | This directory as a consumer project: `@redact-secret/adapter-otel@0.1.0`, `@redact-secret/adapter@0.1.0`, `@redact-secret/core@0.1.0-beta.8`, `@opentelemetry/sdk-trace-base@2.11.0`, and `@opentelemetry/api@1.9.1`, all from the npm registry, with every transitive version pinned by the lockfile. |
+| [`package.json`](./package.json) / [`package-lock.json`](./package-lock.json) | This directory as a consumer project: `@redact-secret/adapter-otel@0.1.1`, `@redact-secret/adapter@0.1.1`, `@redact-secret/core@0.1.0-beta.8`, `@opentelemetry/sdk-trace-base@2.11.0`, and `@opentelemetry/api@1.9.1`, all from the npm registry, with every transitive version pinned by the lockfile. |
 | [`python/`](./python) | The Python `SpanProcessor` and Langfuse examples. They are not part of the reference; see [Python](#python). |
 
 This directory used to carry its own copy of the span processor, the
@@ -53,16 +54,19 @@ Plaintext exists in the application process: in the code that sets
 attributes, in the SDK's in-memory span while it is open, and in every span
 processor that runs before the redacting one. Everything the wrapped
 processor hands on (the batch queue, the exporter, the collector, the
-tracing backend) sees only redacted attributes.
+tracing backend) sees only redacted fields.
 
 For the masking callback, plaintext exists until the host SDK calls `mask`;
 what the SDK sends after that is masked.
 
 ## Authoritative scan point
 
-The redacting processor's `onEnd`. It redacts the ended span's attributes,
-and each event's attributes, in place, and only then calls the wrapped
-processor. It must be the only path to an exporter: a processor registered
+The redacting processor's `onEnd`. It redacts the ended span's name,
+attributes, status message, each event's name and attributes, and each
+link's attributes, and only then calls the wrapped processor. A span whose
+fields do not take the masked write (attributes frozen by an earlier
+processor, for example) is dropped, never exported unredacted. It must be
+the only path to an exporter: a processor registered
 beside it receives the same span before or without redaction.
 
 ## Preventive versus authoritative scanning
@@ -98,11 +102,13 @@ span that ends.
 
 ## What it does not protect
 
-`@redact-secret/adapter-otel@0.1.0` redacts span attributes and span-event
-attributes only. It does not scan:
+`@redact-secret/adapter-otel@0.1.1` redacts the span name, span attributes,
+the status message, event names and attributes, and link attributes. (0.1.0
+redacted span and event attributes only; the smoke test's `span name, event
+name, status message, and link attributes` scenario covers the rest.) It does
+not scan:
 
-- the span name, the status message, link attributes, or resource
-  attributes;
+- resource attributes;
 - a span seen by another processor, or exported by another provider;
 - baggage, propagated trace context headers, or metrics and logs signals.
 
@@ -117,7 +123,7 @@ proof that it held no secret ([detection and limits](../../docs/reference/detect
   [operational evidence](https://github.com/redact-secret/redact-secret-benchmarks/blob/main/docs/reports/2026-09-25-beta8-141-operational-evidence.md).
 - Which OpenTelemetry SDK and core versions the adapter is qualified
   against, and which it refuses: the adapters repository's
-  [`compatibility.json`](https://github.com/redact-secret/redact-secret-adapters/blob/a7fbcc32b56ada3b5107e9fbddb9a019eeaf6d43/compatibility.json).
+  [`compatibility.json`](https://github.com/redact-secret/redact-secret-adapters/blob/ea92c2abd451b66899722170344e73d8f34ef47e/compatibility.json).
 
 ## Python
 

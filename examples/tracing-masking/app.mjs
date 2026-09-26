@@ -8,8 +8,9 @@
  *
  * The redacting processor wraps the processor that feeds the exporter, so
  * its `onEnd` is the authoritative scan point for everything that exporter
- * sends: span and span-event attributes are redacted in place before the
- * wrapped processor, and therefore the exporter, sees the span.
+ * sends: the span name, attributes, and status message, each event's name
+ * and attributes, and each link's attributes are redacted before the wrapped
+ * processor, and therefore the exporter, sees the span.
  */
 
 import { BasicTracerProvider, SimpleSpanProcessor } from "@opentelemetry/sdk-trace-base";

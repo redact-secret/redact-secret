@@ -70,6 +70,19 @@ await scenario(
   (log) => log.error(new Error(`login failed with password=${SYNTHETIC.password}`)),
   ["login failed with password=<SECRET_1>"],
 );
+// `hooks.logMethod` never sees these two; `hooks.streamWrite` (0.1.1) does.
+await scenario(
+  "child-logger bindings",
+  {},
+  (log) => log.child({ upstream: `api_key=${SYNTHETIC.apiKey}` }).info("proxied"),
+  ['"upstream":"api_key=<SECRET_1>"'],
+);
+await scenario(
+  "mixin output",
+  { mixin: () => ({ session: `Authorization: Bearer ${SYNTHETIC.bearer}` }) },
+  (log) => log.info("request"),
+  ['"session":"Authorization: Bearer <SECRET_1>"'],
+);
 await scenario(
   "path redact still applies",
   {},
