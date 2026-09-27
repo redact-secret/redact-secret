@@ -7,6 +7,11 @@ evidence is linked from each published version.
 
 ### Added
 
+- Opt-in deterministic IPv4/IPv6 PII identity as the single
+  `pii:global:network-address` family (#875), with required English/Korean
+  network context, explicit reserved/documentation sensitivity treatment,
+  safe cross-surface conformance fixtures, and no runtime I/O. Qualification
+  remains pending exact-candidate benchmark evidence.
 - The opt-in PII domain runtime substrate (#874): canonical selectors and
   activation identity, one deterministic adapter slot and same-range domain
   arbitration, a generated `pii-context/v1` English/Korean table, fixed safe

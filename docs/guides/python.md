@@ -81,9 +81,9 @@ See the [binding README](../../bindings/python/README.md) for development detail
 Direct import and scanning remain credential-only. Call `initialize(pii=(...))`
 before constructing scans or incremental sessions to select PII explicitly,
 and use `pii_activation()` to record the canonical activation identity. The
-current artifact intentionally ships no production PII family; `("pii",)`
-therefore activates the adapter with an empty family closure and makes no PII
-support claim. Equivalent selection is idempotent and a different later
+artifact ships the opt-in `pii:global:network-address` family; availability
+does not itself make a support-status claim. Equivalent selection is
+idempotent and a different later
 selection raises the fixed, input-free `PiiActivationConflictError`.
 
 ```python
@@ -91,6 +91,6 @@ import redact_secret
 
 redact_secret.initialize(pii=("pii",))
 assert redact_secret.pii_activation() == (
-    "credentials=full;selectors=pii:global;families=;vocabulary=pii-context/v1"
+    "credentials=full;selectors=pii:global;families=pii:global:network-address;vocabulary=pii-context/v1"
 )
 ```

@@ -392,6 +392,25 @@ mod tests {
         );
     }
 
+    #[test]
+    fn compiled_wasm_profile_runs_the_network_address_family() {
+        let selection =
+            redact_secret::PiiSelection::parse(&["pii:family:global:network-address"]).unwrap();
+        let registry = DetectorRegistry::with_built_in_and_pii(&selection).unwrap();
+        let findings = run_scan(
+            "🔒 client_ip=10.0.0.8",
+            &registry,
+            None,
+            &WholeInputLimits::default(),
+        )
+        .unwrap();
+        let finding = findings
+            .iter()
+            .find(|finding| finding.type_name() == "pii_global_network_address")
+            .unwrap();
+        assert_eq!((finding.range().start(), finding.range().end()), (15, 23));
+    }
+
     /// Only meaningful for the `full` profile, which links the `provider`
     /// detector this input needs two disjoint findings from; `common` finds
     /// nothing here (the documented false-negative cost of `common`), so

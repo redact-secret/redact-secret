@@ -22,6 +22,21 @@ def test_pii_runtime_fixture() -> None:
         else:
             raise AssertionError(case["id"])
 
+    network_fixture = load_corpus("pii-network-address-v1.json")
+    for case in network_fixture["cases"]:
+        findings = [
+            finding
+            for finding in redact_secret.scan(case["input"])
+            if finding.type == "pii_global_network_address"
+        ]
+        assert len(findings) == len(case["expected"]), case["id"]
+        for finding, expected in zip(findings, case["expected"], strict=True):
+            byte_start = len(case["input"][: finding.start].encode())
+            byte_end = len(case["input"][: finding.end].encode())
+            assert (byte_start, byte_end) == (expected["start"], expected["end"])
+            assert finding.detector == "pii-domain"
+            assert finding.action == "redact"
+
 
 def test_different_selection_conflicts_without_echoing_input() -> None:
     marker = "SYNTHETIC_SELECTOR_MARKER"

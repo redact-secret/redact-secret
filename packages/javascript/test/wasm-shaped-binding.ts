@@ -84,7 +84,10 @@ export function createWasmShapedBinding(
     initialize: (pii) => {
       calls.push("initialize");
       const selectors = [...new Set(pii.map((value) => value === "pii" ? "pii:global" : value))].sort();
-      activation = `credentials=${options.profile ?? "full"};selectors=${selectors.length === 0 ? "off" : selectors.join(",")};families=;vocabulary=pii-context/v1`;
+      const families = selectors.some((value) => value === "pii:global" || value === "pii:family:global:network-address")
+        ? "pii:global:network-address"
+        : "";
+      activation = `credentials=${options.profile ?? "full"};selectors=${selectors.length === 0 ? "off" : selectors.join(",")};families=${families};vocabulary=pii-context/v1`;
     },
     scan: (input, policy) => {
       calls.push(`scan:${input}:${policy === undefined ? "builtin" : "custom"}`);

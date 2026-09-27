@@ -73,6 +73,11 @@ depend on `src/`.
   cross-surface PII selector canonicalization, activation identity, and fixed
   input-free error contract. It deliberately activates no production family;
   the Rust consumer is `crates/secret-scan-core/tests/pii_runtime_conformance.rs`.
+- [`fixtures/pii-network-address-v1.json`](./fixtures/pii-network-address-v1.json) —
+  the network-address family contract v1: official reserved/private/local
+  IPv4 and IPv6 controls, context sensitivity, offsets, collisions, and zone-id
+  exclusion. Rust whole-input and every-partition consumers live in
+  `crates/secret-scan-core/tests/pii_network_address_conformance.rs`.
 - [`fixtures/ai-context-boundary.json`](./fixtures/ai-context-boundary.json) —
   the framework-neutral AI-context boundary contract's cases (issue #610,
   [`docs/reference/ai-context-boundary.md`](../docs/reference/ai-context-boundary.md)):

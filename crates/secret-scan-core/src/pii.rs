@@ -1,8 +1,7 @@
 //! Internal `pii-v1` activation, arbitration, and context substrate.
 //!
-//! No production PII family is registered here. The adapter and matcher are
-//! exercised with test-only synthetic families until family-specific issues
-//! add qualified implementations.
+//! Production PII families are registered here only after their family
+//! contract has been reviewed. The adapter remains the single detector slot.
 
 use std::collections::{BTreeMap, BTreeSet};
 
@@ -16,6 +15,7 @@ use crate::types::{
 
 const ADAPTER_ID: &str = "pii-domain";
 const KNOWN_JURISDICTIONS: &[&str] = &["us"];
+const AVAILABLE_FAMILIES: &[&str] = &["pii:global:network-address"];
 const KNOWN_FAMILIES: &[&str] = &[
     "pii:global:ambiguous-national-id",
     "pii:global:email",
@@ -29,9 +29,7 @@ const KNOWN_FAMILIES: &[&str] = &[
 
 /// A canonical, closed PII selector set for the loaded artifact.
 ///
-/// The current artifact intentionally exposes no production PII families.
-/// Parsing still validates the accepted selector grammar and distinguishes
-/// invalid, unsupported, and known-but-unavailable requests.
+/// The available family closure is fixed by this artifact.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct PiiSelection {
     selectors: Vec<String>,
@@ -48,7 +46,7 @@ impl PiiSelection {
     /// Returns one of the fixed `PII_SELECTOR_*` errors. No error contains a
     /// selector or any caller input.
     pub fn parse(selectors: &[&str]) -> Result<Self, SecretScanError> {
-        Self::parse_with_catalog(selectors, KNOWN_FAMILIES, &[])
+        Self::parse_with_catalog(selectors, KNOWN_FAMILIES, AVAILABLE_FAMILIES)
     }
 
     fn parse_with_catalog(
@@ -181,8 +179,14 @@ pub(crate) fn is_reserved_detector_id(id: &str) -> bool {
 }
 
 pub(crate) fn adapter(selection: &PiiSelection) -> Box<dyn Detector> {
-    Box::new(PiiDomain::new(selection.clone(), Vec::new()))
+    Box::new(PiiDomain::new(
+        selection.clone(),
+        vec![network_address::family()],
+    ))
 }
+
+#[path = "pii_network_address.rs"]
+mod network_address;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 enum IdentityDomain {
@@ -953,7 +957,7 @@ mod tests {
         let active = PiiSelection::parse(&["pii", "pii:global"]).unwrap();
         assert_eq!(
             active.activation_identity(crate::Profile::Common),
-            "credentials=common;selectors=pii:global;families=;vocabulary=pii-context/v1"
+            "credentials=common;selectors=pii:global;families=pii:global:network-address;vocabulary=pii-context/v1"
         );
     }
 
