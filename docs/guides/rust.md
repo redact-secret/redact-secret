@@ -110,10 +110,12 @@ lists the full surface. Generate local rustdoc with
 `with_common_built_in_and_pii` capture that selection and expose its canonical
 identity through `activation_identity()`. Empty selection preserves the
 legacy credential-only registry byte for byte. `pii` or `pii:global` activates
-`pii:global:email`, `pii:global:iban`, and `pii:global:network-address`; each
-exact `pii:family:global:*` selector activates only its family. All share one
+`pii:global:email`, `pii:global:iban`, `pii:global:network-address`, and
+`pii:global:payment-card`; each exact `pii:family:global:*` selector activates
+only its family. They share one
 `pii-domain` adapter, require reviewed high-signal context, and remain
 `pending` until exact-artifact benchmark evidence is reviewed. Known
 unavailable families or jurisdictions fail closed; see the
 [email contract](../contracts/pii/email-v1.md) and
-[IBAN contract](../contracts/pii/iban-v1.md).
+[IBAN contract](../contracts/pii/iban-v1.md), and
+[payment-card contract](../contracts/pii/payment-card-v1.md).

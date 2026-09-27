@@ -2,6 +2,10 @@
 
 from __future__ import annotations
 
+import json
+import subprocess
+import sys
+
 import redact_secret
 
 from .conftest import (
@@ -46,10 +50,13 @@ def test_pii_runtime_fixture() -> None:
             assert [_observable(finding) for finding in redact_secret.scan(input_text)] == expected
 
             whole = redact_secret.scan_and_redact(input_text)
-            for chunks in code_point_partitions(input_text):
+            for partition, chunks in enumerate(code_point_partitions(input_text)):
                 text, findings = run_session(chunks)
-                assert text == whole.text, (case["id"], chunks)
-                assert [_observable(finding) for finding in findings] == expected
+                assert text == whole.text, (case["id"], partition)
+                assert [_observable(finding) for finding in findings] == expected, (
+                    case["id"],
+                    partition,
+                )
 
     for case in fixture["errorCases"]:
         try:
@@ -74,6 +81,72 @@ def test_pii_runtime_fixture() -> None:
             assert (byte_start, byte_end) == (expected["start"], expected["end"])
             assert finding.detector == "pii-domain"
             assert finding.action == "redact"
+
+    payment_fixture = load_corpus("pii-payment-card-v1.json")
+    for case in payment_fixture["cases"]:
+        input_text = case["input"]
+        expected = []
+        for finding in case["expected"]:
+            converted = dict(finding)
+            converted["start"] = byte_offset_to_char_offset_reference(
+                input_text, finding["start"]
+            )
+            converted["end"] = byte_offset_to_char_offset_reference(
+                input_text, finding["end"]
+            )
+            expected.append(converted)
+        assert [_observable(finding) for finding in redact_secret.scan(input_text)] == expected
+
+        whole = redact_secret.scan_and_redact(input_text)
+        for partition, chunks in enumerate(code_point_partitions(input_text)):
+            text, findings = run_session(chunks)
+            assert text == whole.text, (case["id"], partition)
+            assert [_observable(finding) for finding in findings] == expected, (
+                case["id"],
+                partition,
+            )
+
+
+def test_payment_card_exact_and_global_selectors_in_fresh_installed_processes() -> None:
+    child = """
+import json
+import sys
+import redact_secret
+
+redact_secret.initialize(pii=[sys.argv[1]])
+findings = redact_secret.scan("card_number=4000008770000003")
+print(json.dumps({
+    "activation": redact_secret.pii_activation(),
+    "types": [finding.type for finding in findings],
+    "actions": [finding.action for finding in findings],
+}))
+"""
+    cases = [
+        (
+            "pii:family:global:payment-card",
+            "credentials=full;selectors=pii:family:global:payment-card;families="
+            "pii:global:payment-card;vocabulary=pii-context/v1",
+        ),
+        (
+            "pii:global",
+            "credentials=full;selectors=pii:global;families=pii:global:email,"
+            "pii:global:iban,pii:global:network-address,pii:global:payment-card;"
+            "vocabulary=pii-context/v1",
+        ),
+    ]
+    for ordinal, (selector, activation) in enumerate(cases):
+        completed = subprocess.run(
+            [sys.executable, "-c", child, selector],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        actual = json.loads(completed.stdout)
+        assert actual == {
+            "activation": activation,
+            "types": ["pii_global_payment_card"],
+            "actions": ["redact"],
+        }, ordinal
 
 
 def test_different_selection_conflicts_without_echoing_input() -> None:
