@@ -27,8 +27,8 @@ usage: redact-secret [--json] [--pii <selector>]... [--] [<path>...]
 
 PII selectors are opt-in and repeatable. The activation-print form exits
 without opening input. `pii` closes over the context-required
-`pii:global:email`, `pii:global:iban`, `pii:global:network-address`, and
-`pii:global:payment-card` families; each can be selected exactly. They remain
+`pii:global:email`, `pii:global:iban`, `pii:global:network-address`,
+`pii:global:payment-card`, and `pii:global:phone` families; each can be selected exactly. They remain
 `pending` until exact-artifact benchmark evidence
 is reviewed. `pii:us` closes over those globals plus `pii:us:ssn`, while
 `pii:family:us:ssn` selects only the SSN family.

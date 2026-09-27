@@ -313,6 +313,10 @@ function runSmokeTest() {
     "pii-payment-card-v1.json",
     "payment-card-sensitive-compact-exact-selector",
   );
+  const phone = representative(
+    "pii-phone-v1.json",
+    "phone-sensitive-national-hyphen-exact-selector",
+  );
   const usSsn = representative(
     "pii-us-ssn-v1.json",
     "us-ssn-sensitive-compact-exact-selector",
@@ -325,6 +329,8 @@ function runSmokeTest() {
       type: "pii_global_payment_card",
     },
     { selector: "pii:global", input: paymentCard, type: "pii_global_payment_card" },
+    { selector: "pii:family:global:phone", input: phone, type: "pii_global_phone" },
+    { selector: "pii:global", input: phone, type: "pii_global_phone" },
     { selector: "pii:family:us:ssn", input: usSsn, type: "pii_jurisdiction_us_ssn" },
     { selector: "pii:us", input: usSsn, type: "pii_jurisdiction_us_ssn" },
   ]) {

@@ -82,7 +82,8 @@ Direct import and scanning remain credential-only. Call `initialize(pii=(...))`
 before constructing scans or incremental sessions to select PII explicitly,
 and use `pii_activation()` to record the canonical activation identity.
 `("pii",)` closes over `pii:global:email`, `pii:global:iban`,
-`pii:global:network-address`, and `pii:global:payment-card`; each can be
+`pii:global:network-address`, `pii:global:payment-card`, and
+`pii:global:phone`; each can be
 selected exactly with its `pii:family:global:*` selector. `("pii:us",)` closes
 over those global families plus `pii:us:ssn`; `("pii:family:us:ssn",)` selects
 only SSNs. They require reviewed high-signal context and
@@ -95,6 +96,6 @@ import redact_secret
 
 redact_secret.initialize(pii=("pii",))
 assert redact_secret.pii_activation() == (
-    "credentials=full;selectors=pii:global;families=pii:global:email,pii:global:iban,pii:global:network-address,pii:global:payment-card;vocabulary=pii-context/v1"
+    "credentials=full;selectors=pii:global;families=pii:global:email,pii:global:iban,pii:global:network-address,pii:global:payment-card,pii:global:phone;vocabulary=pii-context/v1"
 )
 ```

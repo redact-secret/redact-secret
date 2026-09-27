@@ -16,8 +16,9 @@ redact-secret -- --leading-dash.txt   # stop option parsing
 PII defaults off. Repeat `--pii <selector>` to request a canonical selector
 set, or use `--print-pii-activation` to print its activation identity and exit
 without opening standard input or any file. `--pii pii` closes over the
-available `pii:global:email`, `pii:global:iban`, `pii:global:network-address`, and
-`pii:global:payment-card` families; use a `pii:family:global:*` selector for
+available `pii:global:email`, `pii:global:iban`, `pii:global:network-address`,
+`pii:global:payment-card`, and `pii:global:phone` families; use a
+`pii:family:global:*` selector for
 exact selection. `--pii pii:us` closes over those global families plus
 `pii:us:ssn`; `--pii pii:family:us:ssn` selects only SSNs. They require reviewed
 high-signal context and remain `pending` until exact-artifact benchmark
@@ -26,7 +27,7 @@ selections use fixed input-free diagnostics.
 
 ```bash
 redact-secret --pii pii --print-pii-activation
-# credentials=full;selectors=pii:global;families=pii:global:email,pii:global:iban,pii:global:network-address,pii:global:payment-card;vocabulary=pii-context/v1
+# credentials=full;selectors=pii:global;families=pii:global:email,pii:global:iban,pii:global:network-address,pii:global:payment-card,pii:global:phone;vocabulary=pii-context/v1
 ```
 
 With no paths, the CLI reads standard input. With paths, check mode reads each

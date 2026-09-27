@@ -394,7 +394,7 @@ mod tests {
         let printed = invoke(&["--print-pii-activation", "--pii", "pii"], "UNREAD INPUT");
         assert_eq!(
             printed.stdout,
-            "credentials=full;selectors=pii:global;families=pii:global:email,pii:global:iban,pii:global:network-address,pii:global:payment-card;vocabulary=pii-context/v1\n"
+            "credentials=full;selectors=pii:global;families=pii:global:email,pii:global:iban,pii:global:network-address,pii:global:payment-card,pii:global:phone;vocabulary=pii-context/v1\n"
         );
         assert!(printed.stderr.is_empty());
         let rejected = invoke(&["--print-pii-activation", "--pii", "PII"], "UNREAD INPUT");

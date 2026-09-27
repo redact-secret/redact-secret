@@ -21,8 +21,9 @@ console.log(result.findings.length); // 1
 PII activation is explicit and defaults off. Pass `pii: ["pii"]` to activate
 the global selector, then inspect the canonical identity with
 `piiActivation()`. The selector closes over the available
-`pii:global:email`, `pii:global:iban`, `pii:global:network-address`, and
-`pii:global:payment-card` families; use a `pii:family:global:*` selector for
+`pii:global:email`, `pii:global:iban`, `pii:global:network-address`,
+`pii:global:payment-card`, and `pii:global:phone` families; use a
+`pii:family:global:*` selector for
 exact selection. The `pii:us` selector closes over those global families plus
 `pii:us:ssn`; `pii:family:us:ssn` selects only SSNs. They need reviewed
 high-signal context and remain `pending` until exact-artifact benchmark
@@ -36,7 +37,7 @@ import { initialize, piiActivation } from "@redact-secret/core";
 
 await initialize({ pii: ["pii", "pii:global"] });
 console.log(piiActivation());
-// credentials=full;selectors=pii:global;families=pii:global:email,pii:global:iban,pii:global:network-address,pii:global:payment-card;vocabulary=pii-context/v1
+// credentials=full;selectors=pii:global;families=pii:global:email,pii:global:iban,pii:global:network-address,pii:global:payment-card,pii:global:phone;vocabulary=pii-context/v1
 ```
 
 `scan(input)` returns findings. `redact(input, findings)` uses findings from

@@ -100,7 +100,7 @@ export function createFakeBinding(
         ? ["PII_SELECTOR_INVALID", "PII selector is invalid."]
         : pii.includes("pii:kr")
           ? ["PII_SELECTOR_UNSUPPORTED", "PII jurisdiction or family is unsupported."]
-          : pii.includes("pii:family:global:phone")
+          : pii.includes("pii:family:global:ambiguous-national-id")
             ? ["PII_SELECTOR_UNAVAILABLE", "PII selection is unavailable in this artifact."]
             : undefined;
       if (rejected !== undefined) {
@@ -114,6 +114,7 @@ export function createFakeBinding(
         ...(global || selectors.includes("pii:family:global:iban") ? ["pii:global:iban"] : []),
         ...(global || selectors.includes("pii:family:global:network-address") ? ["pii:global:network-address"] : []),
         ...(global || selectors.includes("pii:family:global:payment-card") ? ["pii:global:payment-card"] : []),
+        ...(global || selectors.includes("pii:family:global:phone") ? ["pii:global:phone"] : []),
         ...(jurisdiction || selectors.includes("pii:family:us:ssn") ? ["pii:us:ssn"] : []),
       ].join(",");
       const next = `credentials=${options.profile ?? "full"};selectors=${selectors.length === 0 ? "off" : selectors.join(",")};families=${families};vocabulary=pii-context/v1`;

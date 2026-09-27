@@ -1105,7 +1105,7 @@ validator: none\n";
         initialize_pii(vec!["pii".to_owned(), "pii:global".to_owned()]).unwrap();
         assert_eq!(
             pii_activation().unwrap(),
-            "credentials=full;selectors=pii:global;families=pii:global:email,pii:global:iban,pii:global:network-address,pii:global:payment-card;vocabulary=pii-context/v1"
+            "credentials=full;selectors=pii:global;families=pii:global:email,pii:global:iban,pii:global:network-address,pii:global:payment-card,pii:global:phone;vocabulary=pii-context/v1"
         );
         let findings = scan("🔒 client_ip=10.0.0.8".to_owned(), None, None, None).unwrap();
         let finding = findings
@@ -1123,6 +1123,7 @@ validator: none\n";
         for corpus in [
             include_str!("../../../conformance/fixtures/pii-email-v1.json"),
             include_str!("../../../conformance/fixtures/pii-iban-v1.json"),
+            include_str!("../../../conformance/fixtures/pii-phone-v1.json"),
             include_str!("../../../conformance/fixtures/pii-us-ssn-v1.json"),
         ] {
             let document: serde_json::Value = serde_json::from_str(corpus).unwrap();

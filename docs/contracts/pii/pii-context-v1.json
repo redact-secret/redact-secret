@@ -81,6 +81,16 @@
       "provenance": "synthetic-contract-example"
     },
     {
+      "id": "en-phone-field",
+      "language": "en",
+      "kind": "field-label",
+      "class": "positive",
+      "strength": "high-signal",
+      "domains": ["phone"],
+      "forms": ["phone", "phone number", "telephone", "telephone number"],
+      "provenance": "synthetic-contract-example"
+    },
+    {
       "id": "en-us-ssn-field",
       "language": "en",
       "kind": "field-label",
@@ -181,6 +191,16 @@
       "provenance": "synthetic-contract-example"
     },
     {
+      "id": "ko-phone-field",
+      "language": "ko",
+      "kind": "field-label",
+      "class": "positive",
+      "strength": "high-signal",
+      "domains": ["phone"],
+      "forms": ["전화번호", "휴대전화번호"],
+      "provenance": "synthetic-contract-example"
+    },
+    {
       "id": "ko-us-ssn-field",
       "language": "ko",
       "kind": "field-label",
@@ -261,6 +281,13 @@
       "expectedAssociations": [{"candidate": "a", "matches": ["en-payment-card-field"], "effect": "positive-evidence"}]
     },
     {
+      "id": "en-phone-field-contract",
+      "language": "en",
+      "template": "phone_number = {{candidate:a}}",
+      "candidates": [{"id": "a", "domain": "phone", "identityEstablished": true}],
+      "expectedAssociations": [{"candidate": "a", "matches": ["en-phone-field"], "effect": "positive-evidence"}]
+    },
+    {
       "id": "en-us-ssn-field-contract",
       "language": "en",
       "template": "ssn = {{candidate:a}}",
@@ -336,6 +363,13 @@
       "template": "카드_번호 = {{candidate:a}}",
       "candidates": [{"id": "a", "domain": "payment-card", "identityEstablished": true}],
       "expectedAssociations": [{"candidate": "a", "matches": ["ko-payment-card-field"], "effect": "positive-evidence"}]
+    },
+    {
+      "id": "ko-phone-field-contract",
+      "language": "ko",
+      "template": "전화번호 = {{candidate:a}}",
+      "candidates": [{"id": "a", "domain": "phone", "identityEstablished": true}],
+      "expectedAssociations": [{"candidate": "a", "matches": ["ko-phone-field"], "effect": "positive-evidence"}]
     },
     {
       "id": "ko-us-ssn-field-contract",

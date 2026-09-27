@@ -56,7 +56,7 @@ check("repeated initialization is idempotent", () => {
 
 if (PII_INPUT !== undefined) {
   check("PII selection and PII-off scan through the installed addon", () => {
-    const globals = "pii:global:email,pii:global:iban,pii:global:network-address,pii:global:payment-card";
+    const globals = "pii:global:email,pii:global:iban,pii:global:network-address,pii:global:payment-card,pii:global:phone";
     const expected = PII_SELECTOR === undefined
       ? "credentials=full;selectors=off;families=;vocabulary=pii-context/v1"
       : PII_SELECTOR === "pii:global"
@@ -65,7 +65,7 @@ if (PII_INPUT !== undefined) {
         ? `credentials=full;selectors=pii:us;families=${globals},pii:us:ssn;vocabulary=pii-context/v1`
         : PII_SELECTOR === "pii:family:us:ssn"
           ? "credentials=full;selectors=pii:family:us:ssn;families=pii:us:ssn;vocabulary=pii-context/v1"
-          : "credentials=full;selectors=pii:family:global:payment-card;families=pii:global:payment-card;vocabulary=pii-context/v1";
+          : `credentials=full;selectors=${PII_SELECTOR};families=${PII_SELECTOR.replace("pii:family:", "pii:")};vocabulary=pii-context/v1`;
     assert.equal(piiActivation(), expected);
     assert.equal(typeof PII_INPUT, "string");
     assert.equal(typeof PII_TYPE, "string");

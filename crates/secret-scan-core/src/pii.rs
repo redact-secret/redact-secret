@@ -20,6 +20,7 @@ const AVAILABLE_FAMILIES: &[&str] = &[
     "pii:global:iban",
     "pii:global:network-address",
     "pii:global:payment-card",
+    "pii:global:phone",
     "pii:us:ssn",
 ];
 const KNOWN_FAMILIES: &[&str] = &[
@@ -38,6 +39,8 @@ mod pii_email;
 mod pii_iban;
 #[path = "pii/pii_payment_card.rs"]
 mod pii_payment_card;
+#[path = "pii/pii_phone.rs"]
+mod pii_phone;
 #[path = "pii/pii_us_ssn.rs"]
 mod pii_us_ssn;
 
@@ -202,6 +205,7 @@ pub(crate) fn adapter(selection: &PiiSelection) -> Box<dyn Detector> {
             Box::new(pii_iban::IbanFamily),
             network_address::family(),
             Box::new(pii_payment_card::PaymentCardFamily),
+            Box::new(pii_phone::PhoneFamily),
             Box::new(pii_us_ssn::UsSsnFamily),
         ],
     ))
@@ -993,7 +997,7 @@ mod tests {
         let active = PiiSelection::parse(&["pii", "pii:global"]).unwrap();
         assert_eq!(
             active.activation_identity(crate::Profile::Common),
-            "credentials=common;selectors=pii:global;families=pii:global:email,pii:global:iban,pii:global:network-address,pii:global:payment-card;vocabulary=pii-context/v1"
+            "credentials=common;selectors=pii:global;families=pii:global:email,pii:global:iban,pii:global:network-address,pii:global:payment-card,pii:global:phone;vocabulary=pii-context/v1"
         );
     }
 

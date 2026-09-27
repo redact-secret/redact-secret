@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 1,
+  "family": "pii:global:phone",
+  "familyContractVersion": 1,
+  "selector": "pii:family:global:phone",
+  "publicType": "pii_global_phone",
+  "contextRequirement": "required-for-sensitive-classification",
+  "fixtureGenerator": {
+    "id": "phone-v1-fixed-synthetic",
+    "seed": "redact-secret-phone-v1-fixture-880",
+    "provenance": "deterministic-syntactically-valid-no-real-world-provenance"
+  },
+  "cases": [
+    {
+      "id": "phone-sensitive-national-hyphen-exact-selector",
+      "input": "phone_number=555-234-5678",
+      "expected": [{"detector":"pii-domain","type":"pii_global_phone","confidence":"high","action":"redact","start":13,"end":25}]
+    },
+    {
+      "id": "phone-sensitive-plus-one-compact",
+      "input": "telephone=+15552345678",
+      "expected": [{"detector":"pii-domain","type":"pii_global_phone","confidence":"high","action":"redact","start":10,"end":22}]
+    },
+    {
+      "id": "phone-sensitive-korean-context",
+      "input": "전화번호 = 555-234-5678",
+      "expected": [{"detector":"pii-domain","type":"pii_global_phone","confidence":"high","action":"redact","start":15,"end":27}]
+    },
+    {
+      "id": "phone-sensitive-korean-context-nfd",
+      "input": "전화번호 = 555-234-5678",
+      "expected": [{"detector":"pii-domain","type":"pii_global_phone","confidence":"high","action":"redact","start":33,"end":45}]
+    },
+    {
+      "id": "phone-sensitive-korean-context-governed-invisibles",
+      "input": "전​화️번호 = 555-234-5678",
+      "expected": [{"detector":"pii-domain","type":"pii_global_phone","confidence":"high","action":"redact","start":21,"end":33}]
+    },
+    {
+      "id": "phone-sensitive-extension-one-digit-boundary",
+      "input": "phone=212-555-2345 ext 7",
+      "expected": [{"detector":"pii-domain","type":"pii_global_phone","confidence":"high","action":"redact","start":6,"end":24}]
+    },
+    {
+      "id": "phone-sensitive-extension-six-digit-boundary",
+      "input": "phone_number=555-234-5678 ext. 123456",
+      "expected": [{"detector":"pii-domain","type":"pii_global_phone","confidence":"high","action":"redact","start":13,"end":37}]
+    },
+    {
+      "id": "phone-sensitive-local-separated-medium-confidence",
+      "input": "telephone=555-2345",
+      "expected": [{"detector":"pii-domain","type":"pii_global_phone","confidence":"medium","action":"warn","start":10,"end":18}]
+    },
+    {
+      "id": "phone-shared-contact-details-context",
+      "input": "contact details 555-234-5678",
+      "expected": [{"detector":"pii-domain","type":"pii_global_phone","confidence":"high","action":"redact","start":16,"end":28}]
+    },
+    {
+      "id": "phone-unicode-prefix-offset",
+      "input": "🔒 phone=555-234-5678",
+      "expected": [{"detector":"pii-domain","type":"pii_global_phone","confidence":"high","action":"redact","start":11,"end":23}]
+    },
+    {"id":"phone-identity-without-context","input":"555-234-5678","expected":[]},
+    {"id":"phone-ambiguous-english-contact","input":"contact=555-234-5678","expected":[]},
+    {"id":"phone-ambiguous-korean-contact","input":"연락처=555-234-5678","expected":[]},
+    {"id":"phone-neutral-context","input":"value=555-234-5678","expected":[]},
+    {"id":"phone-negative-context-wins","input":"phone documentation 555-234-5678","expected":[]},
+    {"id":"phone-reserved-555-control-lower","input":"phone=212-555-0100","expected":[]},
+    {"id":"phone-reserved-555-control-upper-with-extension","input":"phone=212-555-0199 ext 123","expected":[]},
+    {"id":"phone-reserved-substring-has-no-authority","input":"phone=555-234-0102","expected":[{"detector":"pii-domain","type":"pii_global_phone","confidence":"high","action":"redact","start":6,"end":18}]},
+    {"id":"phone-n11-area-code-excluded","input":"phone=211-234-5678","expected":[]},
+    {"id":"phone-n11-central-office-excluded","input":"phone=555-911-2345","expected":[]},
+    {"id":"phone-988-is-not-n11","input":"phone=988-988-2345","expected":[{"detector":"pii-domain","type":"pii_global_phone","confidence":"high","action":"redact","start":6,"end":18}]},
+    {"id":"phone-version-collision","input":"version=212-555-2345","expected":[]},
+    {"id":"phone-order-reference-collision","input":"order_reference=555-234-5678","expected":[]},
+    {"id":"phone-ipv4-collision","input":"phone=212.55.52.345","expected":[]},
+    {"id":"phone-date-collision","input":"phone=212/555/2345","expected":[]},
+    {"id":"phone-mixed-separators","input":"phone=555 234-5678","expected":[]},
+    {"id":"phone-unsupported-country-code","input":"전화번호=+82 2 1234 5678","expected":[]},
+    {"id":"phone-unsupported-tel-uri","input":"contact details tel:+15552345678","expected":[]},
+    {"id":"phone-unsupported-vanity","input":"phone=1-800-SYNTHETIC","expected":[]},
+    {"id":"phone-unsupported-x-extension","input":"phone=555-234-5678 x7","expected":[]},
+    {"id":"phone-extension-zero-digits","input":"phone=555-234-5678 ext ","expected":[]},
+    {"id":"phone-extension-seven-digits","input":"phone=555-234-5678 ext 1234567","expected":[]},
+    {"id":"phone-extension-line-break","input":"phone=555-234-5678 ext\n123","expected":[]},
+    {"id":"phone-repeated-extension-not-recovered","input":"phone=555-234-5678 ext 123 ext 4","expected":[]},
+    {"id":"phone-repeated-extension-spaced-seam-not-recovered","input":"phone=555-234-5678 ext 123  ext 4","expected":[]},
+    {"id":"phone-second-x-extension-not-recovered","input":"phone=555-234-5678 ext 123 x7","expected":[]},
+    {"id":"phone-second-hash-extension-not-recovered","input":"phone=555-234-5678 ext 123 #4","expected":[]},
+    {"id":"phone-second-rfc3966-extension-not-recovered","input":"phone=555-234-5678 ext 123;ext=4","expected":[]},
+    {"id":"phone-ordinary-extra-suffix-keeps-candidate","input":"phone=555-234-5678 extra details","expected":[{"detector":"pii-domain","type":"pii_global_phone","confidence":"high","action":"redact","start":6,"end":18}]},
+    {"id":"phone-ordinary-xylophone-suffix-keeps-candidate","input":"phone=555-234-5678 xylophone notes","expected":[{"detector":"pii-domain","type":"pii_global_phone","confidence":"high","action":"redact","start":6,"end":18}]},
+    {"id":"phone-adjacent-identifier-prefix","input":"phone=x555-234-5678","expected":[]},
+    {"id":"phone-adjacent-identifier-suffix","input":"phone=555-234-5678x","expected":[]},
+    {"id":"phone-adjacent-underscore","input":"phone=_555-234-5678_suffix","expected":[]},
+    {"id":"phone-adjacent-percent","input":"phone=%555-234-5678%32","expected":[]},
+    {"id":"phone-governed-invisible-interior","input":"phone=555-234‍-5678","expected":[]},
+    {"id":"phone-equidistant-contact-details","input":"555-234-5678 contact details 555-234-5678","expected":[]},
+    {
+      "id":"phone-context-stops-at-another-candidate",
+      "input":"contact details 555-234-5678 555-234-5678",
+      "expected":[{"detector":"pii-domain","type":"pii_global_phone","confidence":"high","action":"redact","start":16,"end":28}]
+    }
+  ]
+}
