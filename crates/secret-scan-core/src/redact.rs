@@ -57,9 +57,13 @@ pub fn typed_placeholder_formatter(
 /// byte length so a formatter output can be checked in one pass over its
 /// substrings.
 ///
-/// Only `redact`/`block` findings whose matched text is no longer than
-/// [`MAX_PLACEHOLDER_LENGTH`] are eligible: a longer matched value can never
-/// fit inside a valid placeholder, so indexing it would be wasted work.
+/// Every finding in the call contributes its matched text, regardless of its
+/// own action: a `warn`/`allow` finding's value must not reappear inside a
+/// sibling `redact`/`block` finding's placeholder any more than a
+/// `redact`/`block` finding's own value may. Only findings whose matched
+/// text is no longer than [`MAX_PLACEHOLDER_LENGTH`] are eligible: a longer
+/// matched value can never fit inside a valid placeholder, so indexing it
+/// would be wasted work.
 struct ForbiddenMatchedText {
     by_length: BTreeMap<usize, BTreeSet<String>>,
 }
@@ -68,9 +72,6 @@ impl ForbiddenMatchedText {
     fn build(input: &str, findings: &[&Finding]) -> Self {
         let mut by_length: BTreeMap<usize, BTreeSet<String>> = BTreeMap::new();
         for finding in findings {
-            if !finding.action().replaces_text() {
-                continue;
-            }
             let range = finding.range();
             if range.len() > MAX_PLACEHOLDER_LENGTH {
                 continue;
@@ -177,7 +178,8 @@ fn ordered_and_disjoint<'a>(
 /// - [`SecretScanErrorCode::InvalidPlaceholder`] when `formatter` returns an
 ///   empty placeholder, a placeholder longer than
 ///   [`MAX_PLACEHOLDER_LENGTH`], or a placeholder that reproduces any
-///   eligible matched value.
+///   finding's matched value in `findings` (including a `warn`/`allow`
+///   finding's), not only the finding the placeholder is for.
 ///
 /// No error carries `input`, a matched value, or a placeholder. See
 /// [`redact_with_limits`] to use a different limit set.
@@ -374,6 +376,24 @@ mod tests {
                 format!("<REMOVED_{}>", context.placeholder_index())
             })
         };
+        assert_eq!(
+            redact(input, &findings, &formatter).unwrap_err().code(),
+            SecretScanErrorCode::InvalidPlaceholder
+        );
+    }
+
+    /// Regression for issue #887: `ForbiddenMatchedText` used to index only
+    /// `redact`/`block` findings, so a formatter could embed a sibling
+    /// `warn`/`allow` finding's matched value into an unrelated `redact`
+    /// finding's placeholder without `redact()` rejecting it.
+    #[test]
+    fn rejects_a_placeholder_reproducing_a_warn_or_allow_findings_value() {
+        let input = "SYNTHETIC_ONE|SYNTHETIC_TWO";
+        let findings = [
+            finding("finding-1", 0, 13, Action::Redact),
+            finding("finding-2", 14, input.len(), Action::Warn),
+        ];
+        let formatter = |_: &Finding, _: &PlaceholderContext| Ok("<SYNTHETIC_TWO>".to_string());
         assert_eq!(
             redact(input, &findings, &formatter).unwrap_err().code(),
             SecretScanErrorCode::InvalidPlaceholder
