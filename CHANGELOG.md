@@ -22,6 +22,10 @@ evidence is linked from each published version.
   reconciled with the shipped `sk-admin-` detection (#863).
 - `generic-token` now redacts a secret passed as an SDK call argument, for
   example `Client(api_key="...")` (#866).
+- The instructional-placeholder exclusion now covers provider-named forms
+  (`YOUR_DEEPGRAM_API_KEY`, `your-mistral-api-key`,
+  `replace-with-your-cohere-key`) and `bearer-token` applies the vendor-prefixed
+  placeholder rule, so `Authorization: Bearer tvly-YOUR_API_KEY` is benign (#774).
 
 ## 0.1.0-beta.9 — 2026-09-26
 
