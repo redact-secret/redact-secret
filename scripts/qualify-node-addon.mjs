@@ -358,9 +358,9 @@ function runSmokeTest() {
  * `provider` detector would report a finding under an id outside that list.
  */
 function conformAddon(fixtures, detectorProfile, commonExpectations) {
-  const exports = DETECTOR_PROFILES[detectorProfile];
   const addon = createRequire(join(ADDON_DIR, "index.js"))("./index.js");
-  addon[exports.initialize]();
+  if (detectorProfile === "common") addon.initializeCommon();
+  else addon.initialize();
 
   const expectationsById =
     commonExpectations === undefined
@@ -380,7 +380,9 @@ function conformAddon(fixtures, detectorProfile, commonExpectations) {
         `${COMMON_EXPECTATIONS_FILE}: no entry for ${fixture.id}`,
       );
     }
-    const actual = addon[exports.scan](fixture.input).map((finding) => [
+    const findings =
+      detectorProfile === "common" ? addon.scanCommon(fixture.input) : addon.scan(fixture.input);
+    const actual = findings.map((finding) => [
       finding.detector,
       finding.type,
       finding.confidence,
