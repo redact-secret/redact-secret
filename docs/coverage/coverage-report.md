@@ -15,11 +15,11 @@ These counts describe finding-type inventory rows with corpus evidence, not dete
 
 | Row state | Count |
 | --- | --- |
-| supported | 83 |
+| supported | 85 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 94.
+Coverage declarations: 96.
 
 ## Coverage by detector
 
@@ -28,6 +28,8 @@ Coverage declarations: 94.
 | anthropic-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | atlassian-api-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | aws-access-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| aws-bedrock-long-term-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| aws-bedrock-short-term-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | azure-devops-personal-access-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | bearer-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | cloudflare-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -107,6 +109,8 @@ Coverage declarations: 94.
 | atlassian_api_token | atlassian-api-token | provider | supported | not-applicable | none |
 | authorization_credential | generic-token | contextual | supported | supported | none |
 | aws_access_key_id | aws-access-key | provider | supported | not-applicable | none |
+| aws_bedrock_long_term_api_key | aws-bedrock-long-term-api-key | provider | supported | not-applicable | none |
+| aws_bedrock_short_term_api_key | aws-bedrock-short-term-api-key | provider | supported | not-applicable | none |
 | azure_devops_personal_access_token | azure-devops-personal-access-token | provider | supported | not-applicable | none |
 | bearer_token | bearer-token | structural | supported | not-applicable | none |
 | cloudflare_api_token | cloudflare-token | provider | supported | not-applicable | none |
@@ -211,15 +215,15 @@ Coverage declarations: 94.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 94 | 0 | 0 |
-| boundary | 83 | 0 | 0 |
-| host-context | 83 | 0 | 0 |
+| adversarial | 96 | 0 | 0 |
+| boundary | 85 | 0 | 0 |
+| host-context | 85 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 94 | 0 | 0 |
-| near-miss-negative | 83 | 0 | 0 |
-| overlap | 83 | 0 | 0 |
-| positive | 83 | 0 | 0 |
-| range | 94 | 0 | 0 |
+| malformed | 96 | 0 | 0 |
+| near-miss-negative | 85 | 0 | 0 |
+| overlap | 85 | 0 | 0 |
+| positive | 85 | 0 | 0 |
+| range | 96 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

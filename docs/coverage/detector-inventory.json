@@ -27,6 +27,20 @@
       "schemes": null
     },
     {
+      "type": "aws_bedrock_long_term_api_key",
+      "detector": "aws-bedrock-long-term-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT",
+      "schemes": null
+    },
+    {
+      "type": "aws_bedrock_short_term_api_key",
+      "detector": "aws-bedrock-short-term-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "bedrock-api-key-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZA",
+      "schemes": null
+    },
+    {
       "type": "github_token",
       "detector": "github-token",
       "policyClass": "always-redact",

@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 2220,
+  "fixtureCount": 2260,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -53693,6 +53693,1340 @@
       "input": "sk_0123456789abcdef0123456789abcdef0123456789abcdef_residency_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa_x",
       "expected": [],
       "note": "Issue #865: ElevenLabs API key, `sk_` + exactly 48 lowercase hex; the prefix and the `_residency_<[a-z0-9]+>` suffix rest on provider SDK code (T1 by maintainer ruling), the 48-hex body is T2 (tools plus measured fragments). A very long region followed by a glued byte is rejected whole in linear time."
+    },
+    {
+      "id": "aws-bedrock-long-term-api-key-positive-bare",
+      "detector": "aws-bedrock-long-term-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT\n",
+      "expected": [
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 136
+        }
+      ],
+      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1 candidate, maintainer ruling pending) with a 109 to 269 byte body band (T2). A bare key on its own line."
+    },
+    {
+      "id": "aws-bedrock-long-term-api-key-positive-dotenv",
+      "detector": "aws-bedrock-long-term-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "AWS_BEARER_TOKEN_BEDROCK=\u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT\n",
+      "expected": [
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 161
+        }
+      ],
+      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1 candidate, maintainer ruling pending) with a 109 to 269 byte body band (T2). The documented `AWS_BEARER_TOKEN_BEDROCK` dotenv assignment."
+    },
+    {
+      "id": "aws-bedrock-long-term-api-key-positive-export-quoted",
+      "detector": "aws-bedrock-long-term-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export AWS_BEARER_TOKEN_BEDROCK=\"\u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT\"\n",
+      "expected": [
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 33,
+          "end": 169
+        }
+      ],
+      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1 candidate, maintainer ruling pending) with a 109 to 269 byte body band (T2). A quoted `export`; the quotes stay outside the span."
+    },
+    {
+      "id": "aws-bedrock-long-term-api-key-positive-yaml",
+      "detector": "aws-bedrock-long-term-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "AWS_BEARER_TOKEN_BEDROCK: \u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT\n",
+      "expected": [
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 26,
+          "end": 162
+        }
+      ],
+      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1 candidate, maintainer ruling pending) with a 109 to 269 byte body band (T2). A YAML value."
+    },
+    {
+      "id": "aws-bedrock-long-term-api-key-positive-json",
+      "detector": "aws-bedrock-long-term-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"AWS_BEARER_TOKEN_BEDROCK\": \"\u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT\"}",
+      "expected": [
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 30,
+          "end": 166
+        }
+      ],
+      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1 candidate, maintainer ruling pending) with a 109 to 269 byte body band (T2). A quoted JSON value."
+    },
+    {
+      "id": "aws-bedrock-long-term-api-key-overlap-bearer",
+      "detector": "aws-bedrock-long-term-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "curl -H \"Authorization: Bearer \u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT\" https://example.invalid/\n",
+      "expected": [
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 31,
+          "end": 167
+        }
+      ],
+      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1 candidate, maintainer ruling pending) with a 109 to 269 byte body band (T2). A `Bearer` header; the provider-specific finding wins overlap with `bearer-token`."
+    },
+    {
+      "id": "aws-bedrock-long-term-api-key-positive-sdk-call",
+      "detector": "aws-bedrock-long-term-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = BedrockClient(api_key=\"\u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT\")\n",
+      "expected": [
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 32,
+          "end": 168
+        }
+      ],
+      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1 candidate, maintainer ruling pending) with a 109 to 269 byte body band (T2). An SDK call argument."
+    },
+    {
+      "id": "aws-bedrock-long-term-api-key-positive-tool-call",
+      "detector": "aws-bedrock-long-term-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"tool\":\"set_env\",\"arguments\":{\"name\":\"AWS_BEARER_TOKEN_BEDROCK\",\"value\":\"\u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT\"}}",
+      "expected": [
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 74,
+          "end": 210
+        }
+      ],
+      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1 candidate, maintainer ruling pending) with a 109 to 269 byte body band (T2). An agent tool-call argument."
+    },
+    {
+      "id": "aws-bedrock-long-term-api-key-positive-padding",
+      "detector": "aws-bedrock-long-term-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT==\n",
+      "expected": [
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 138
+        }
+      ],
+      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1 candidate, maintainer ruling pending) with a 109 to 269 byte body band (T2). Two `=` of padding are part of the span."
+    },
+    {
+      "id": "aws-bedrock-long-term-api-key-negative-env-reference",
+      "detector": "aws-bedrock-long-term-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export AWS_BEARER_TOKEN_BEDROCK=${AWS_BEARER_TOKEN_BEDROCK}\n",
+      "expected": [],
+      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1 candidate, maintainer ruling pending) with a 109 to 269 byte body band (T2). An environment reference is not a key."
+    },
+    {
+      "id": "aws-bedrock-long-term-api-key-negative-empty-assignment",
+      "detector": "aws-bedrock-long-term-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "AWS_BEARER_TOKEN_BEDROCK=\n",
+      "expected": [],
+      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1 candidate, maintainer ruling pending) with a 109 to 269 byte body band (T2). An empty assignment."
+    },
+    {
+      "id": "aws-bedrock-long-term-api-key-negative-public-alias",
+      "detector": "aws-bedrock-long-term-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "user BedrockAPIKey-abcd-at-000000000000 arn:aws:iam::000000000000:user/BedrockAPIKey-abcd\n",
+      "expected": [],
+      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1 candidate, maintainer ruling pending) with a 109 to 269 byte body band (T2). The decoded public alias and an IAM ARN are not the key."
+    },
+    {
+      "id": "aws-bedrock-long-term-api-key-boundary-three-padding",
+      "detector": "aws-bedrock-long-term-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "AWS_BEARER_TOKEN_BEDROCK=\u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT===\n",
+      "expected": [],
+      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1 candidate, maintainer ruling pending) with a 109 to 269 byte body band (T2). Three `=` are not valid padding."
+    },
+    {
+      "id": "aws-bedrock-long-term-api-key-boundary-url-safe",
+      "detector": "aws-bedrock-long-term-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "AWS_BEARER_TOKEN_BEDROCK=\u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREV-KEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT\n",
+      "expected": [],
+      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1 candidate, maintainer ruling pending) with a 109 to 269 byte body band (T2). A URL-safe `-` inside the body is not standard Base64."
+    },
+    {
+      "id": "aws-bedrock-long-term-api-key-adversarial-dense-findings",
+      "detector": "aws-bedrock-long-term-api-key",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT \u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT \u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT \u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT \u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT \u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT \u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT \u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT \u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT \u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT \u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT \u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT \u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT \u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT \u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT \u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT \u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT \u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT \u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT \u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT \u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT \u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT \u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT \u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT \u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT \u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT \u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT \u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT \u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT \u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT \u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT \u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT \u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT \u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT \u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT \u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT \u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT \u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT \u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT \u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT \u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT \u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT \u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT \u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT \u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT \u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT \u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT \u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT \u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT \u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT",
+      "expected": [
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 136
+        },
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 137,
+          "end": 273
+        },
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 274,
+          "end": 410
+        },
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 411,
+          "end": 547
+        },
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 548,
+          "end": 684
+        },
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 685,
+          "end": 821
+        },
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 822,
+          "end": 958
+        },
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 959,
+          "end": 1095
+        },
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1096,
+          "end": 1232
+        },
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1233,
+          "end": 1369
+        },
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1370,
+          "end": 1506
+        },
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1507,
+          "end": 1643
+        },
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1644,
+          "end": 1780
+        },
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1781,
+          "end": 1917
+        },
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1918,
+          "end": 2054
+        },
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2055,
+          "end": 2191
+        },
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2192,
+          "end": 2328
+        },
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2329,
+          "end": 2465
+        },
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2466,
+          "end": 2602
+        },
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2603,
+          "end": 2739
+        },
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2740,
+          "end": 2876
+        },
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2877,
+          "end": 3013
+        },
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3014,
+          "end": 3150
+        },
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3151,
+          "end": 3287
+        },
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3288,
+          "end": 3424
+        },
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3425,
+          "end": 3561
+        },
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3562,
+          "end": 3698
+        },
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3699,
+          "end": 3835
+        },
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3836,
+          "end": 3972
+        },
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3973,
+          "end": 4109
+        },
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4110,
+          "end": 4246
+        },
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4247,
+          "end": 4383
+        },
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4384,
+          "end": 4520
+        },
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4521,
+          "end": 4657
+        },
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4658,
+          "end": 4794
+        },
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4795,
+          "end": 4931
+        },
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4932,
+          "end": 5068
+        },
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5069,
+          "end": 5205
+        },
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5206,
+          "end": 5342
+        },
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5343,
+          "end": 5479
+        },
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5480,
+          "end": 5616
+        },
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5617,
+          "end": 5753
+        },
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5754,
+          "end": 5890
+        },
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5891,
+          "end": 6027
+        },
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 6028,
+          "end": 6164
+        },
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 6165,
+          "end": 6301
+        },
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 6302,
+          "end": 6438
+        },
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 6439,
+          "end": 6575
+        },
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 6576,
+          "end": 6712
+        },
+        {
+          "detector": "aws-bedrock-long-term-api-key",
+          "type": "aws_bedrock_long_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 6713,
+          "end": 6849
+        }
+      ],
+      "resource": {
+        "maxInputBytes": 6949,
+        "maxFindings": 50,
+        "maxRuntimeMs": 250
+      },
+      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1 candidate, maintainer ruling pending) with a 109 to 269 byte body band (T2). 50 space-separated keys on one line are each reported once at their own range, within the declared resource bounds."
+    },
+    {
+      "id": "aws-bedrock-long-term-api-key-negative-placeholder",
+      "detector": "aws-bedrock-long-term-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "AWS_BEARER_TOKEN_BEDROCK=ABSK...\n",
+      "expected": [],
+      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1 candidate, maintainer ruling pending) with a 109 to 269 byte body band (T2). A documentation placeholder is not a key."
+    },
+    {
+      "id": "aws-bedrock-long-term-api-key-boundary-body-one-short",
+      "detector": "aws-bedrock-long-term-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "AWS_BEARER_TOKEN_BEDROCK=\u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREV\n",
+      "expected": [],
+      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1 candidate, maintainer ruling pending) with a 109 to 269 byte body band (T2). A 108-byte body, one below the band, is missed, not truncated."
+    },
+    {
+      "id": "aws-bedrock-long-term-api-key-boundary-body-above-band",
+      "detector": "aws-bedrock-long-term-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "AWS_BEARER_TOKEN_BEDROCK=\u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOK\n",
+      "expected": [],
+      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1 candidate, maintainer ruling pending) with a 109 to 269 byte body band (T2). A 270-byte body, one above the band, is missed, not truncated."
+    },
+    {
+      "id": "aws-bedrock-long-term-api-key-boundary-wrong-prefix",
+      "detector": "aws-bedrock-long-term-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "AWS_BEARER_TOKEN_BEDROCK=ABSXSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT\n",
+      "expected": [],
+      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1 candidate, maintainer ruling pending) with a 109 to 269 byte body band (T2). A wrong prefix (`ABSX`)."
+    },
+    {
+      "id": "aws-bedrock-long-term-api-key-boundary-embedded-in-base64",
+      "detector": "aws-bedrock-long-term-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Q\u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT\n",
+      "expected": [],
+      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1 candidate, maintainer ruling pending) with a 109 to 269 byte body band (T2). A Base64 byte glued before the prefix makes it part of a wider run."
+    },
+    {
+      "id": "aws-bedrock-short-term-api-key-positive-bare",
+      "detector": "aws-bedrock-short-term-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "bedrock-api-key-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZA\n",
+      "expected": [
+        {
+          "detector": "aws-bedrock-short-term-api-key",
+          "type": "aws_bedrock_short_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 237
+        }
+      ],
+      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1 candidate, maintainer ruling pending), tail floor T2. A bare key on its own line."
+    },
+    {
+      "id": "aws-bedrock-short-term-api-key-positive-dotenv",
+      "detector": "aws-bedrock-short-term-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "AWS_BEARER_TOKEN_BEDROCK=bedrock-api-key-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZA\n",
+      "expected": [
+        {
+          "detector": "aws-bedrock-short-term-api-key",
+          "type": "aws_bedrock_short_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 262
+        }
+      ],
+      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1 candidate, maintainer ruling pending), tail floor T2. The documented `AWS_BEARER_TOKEN_BEDROCK` dotenv assignment."
+    },
+    {
+      "id": "aws-bedrock-short-term-api-key-positive-export-quoted",
+      "detector": "aws-bedrock-short-term-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export AWS_BEARER_TOKEN_BEDROCK=\"bedrock-api-key-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZA\"\n",
+      "expected": [
+        {
+          "detector": "aws-bedrock-short-term-api-key",
+          "type": "aws_bedrock_short_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 33,
+          "end": 270
+        }
+      ],
+      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1 candidate, maintainer ruling pending), tail floor T2. A quoted `export`; the quotes stay outside the span."
+    },
+    {
+      "id": "aws-bedrock-short-term-api-key-positive-yaml",
+      "detector": "aws-bedrock-short-term-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "AWS_BEARER_TOKEN_BEDROCK: bedrock-api-key-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZA\n",
+      "expected": [
+        {
+          "detector": "aws-bedrock-short-term-api-key",
+          "type": "aws_bedrock_short_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 26,
+          "end": 263
+        }
+      ],
+      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1 candidate, maintainer ruling pending), tail floor T2. A YAML value."
+    },
+    {
+      "id": "aws-bedrock-short-term-api-key-positive-json",
+      "detector": "aws-bedrock-short-term-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"AWS_BEARER_TOKEN_BEDROCK\": \"bedrock-api-key-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZA\"}",
+      "expected": [
+        {
+          "detector": "aws-bedrock-short-term-api-key",
+          "type": "aws_bedrock_short_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 30,
+          "end": 267
+        }
+      ],
+      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1 candidate, maintainer ruling pending), tail floor T2. A quoted JSON value."
+    },
+    {
+      "id": "aws-bedrock-short-term-api-key-overlap-bearer",
+      "detector": "aws-bedrock-short-term-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "curl -H \"Authorization: Bearer bedrock-api-key-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZA\" https://example.invalid/\n",
+      "expected": [
+        {
+          "detector": "aws-bedrock-short-term-api-key",
+          "type": "aws_bedrock_short_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 31,
+          "end": 268
+        }
+      ],
+      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1 candidate, maintainer ruling pending), tail floor T2. A `Bearer` header; the provider-specific finding wins overlap with `bearer-token`."
+    },
+    {
+      "id": "aws-bedrock-short-term-api-key-positive-sdk-call",
+      "detector": "aws-bedrock-short-term-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = BedrockClient(api_key=\"bedrock-api-key-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZA\")\n",
+      "expected": [
+        {
+          "detector": "aws-bedrock-short-term-api-key",
+          "type": "aws_bedrock_short_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 32,
+          "end": 269
+        }
+      ],
+      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1 candidate, maintainer ruling pending), tail floor T2. An SDK call argument."
+    },
+    {
+      "id": "aws-bedrock-short-term-api-key-positive-tool-call",
+      "detector": "aws-bedrock-short-term-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"tool\":\"set_env\",\"arguments\":{\"name\":\"AWS_BEARER_TOKEN_BEDROCK\",\"value\":\"bedrock-api-key-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZA\"}}",
+      "expected": [
+        {
+          "detector": "aws-bedrock-short-term-api-key",
+          "type": "aws_bedrock_short_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 74,
+          "end": 311
+        }
+      ],
+      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1 candidate, maintainer ruling pending), tail floor T2. An agent tool-call argument."
+    },
+    {
+      "id": "aws-bedrock-short-term-api-key-positive-padding",
+      "detector": "aws-bedrock-short-term-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "bedrock-api-key-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZA==\n",
+      "expected": [
+        {
+          "detector": "aws-bedrock-short-term-api-key",
+          "type": "aws_bedrock_short_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 239
+        }
+      ],
+      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1 candidate, maintainer ruling pending), tail floor T2. Two `=` of padding are part of the span."
+    },
+    {
+      "id": "aws-bedrock-short-term-api-key-negative-env-reference",
+      "detector": "aws-bedrock-short-term-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export AWS_BEARER_TOKEN_BEDROCK=${AWS_BEARER_TOKEN_BEDROCK}\n",
+      "expected": [],
+      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1 candidate, maintainer ruling pending), tail floor T2. An environment reference is not a key."
+    },
+    {
+      "id": "aws-bedrock-short-term-api-key-negative-empty-assignment",
+      "detector": "aws-bedrock-short-term-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "AWS_BEARER_TOKEN_BEDROCK=\n",
+      "expected": [],
+      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1 candidate, maintainer ruling pending), tail floor T2. An empty assignment."
+    },
+    {
+      "id": "aws-bedrock-short-term-api-key-negative-public-alias",
+      "detector": "aws-bedrock-short-term-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "user BedrockAPIKey-abcd-at-000000000000 arn:aws:iam::000000000000:user/BedrockAPIKey-abcd\n",
+      "expected": [],
+      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1 candidate, maintainer ruling pending), tail floor T2. The decoded public alias and an IAM ARN are not the key."
+    },
+    {
+      "id": "aws-bedrock-short-term-api-key-boundary-three-padding",
+      "detector": "aws-bedrock-short-term-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "AWS_BEARER_TOKEN_BEDROCK=bedrock-api-key-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZA===\n",
+      "expected": [],
+      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1 candidate, maintainer ruling pending), tail floor T2. Three `=` are not valid padding."
+    },
+    {
+      "id": "aws-bedrock-short-term-api-key-boundary-url-safe",
+      "detector": "aws-bedrock-short-term-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "AWS_BEARER_TOKEN_BEDROCK=bedrock-api-key-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3lu-GhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZA\n",
+      "expected": [],
+      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1 candidate, maintainer ruling pending), tail floor T2. A URL-safe `-` inside the body is not standard Base64."
+    },
+    {
+      "id": "aws-bedrock-short-term-api-key-adversarial-dense-findings",
+      "detector": "aws-bedrock-short-term-api-key",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "bedrock-api-key-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZA bedrock-api-key-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZA bedrock-api-key-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZA bedrock-api-key-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZA bedrock-api-key-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZA bedrock-api-key-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZA bedrock-api-key-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZA bedrock-api-key-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZA bedrock-api-key-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZA bedrock-api-key-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZA bedrock-api-key-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZA bedrock-api-key-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZA bedrock-api-key-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZA bedrock-api-key-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZA bedrock-api-key-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZA bedrock-api-key-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZA bedrock-api-key-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZA bedrock-api-key-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZA bedrock-api-key-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZA bedrock-api-key-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZA bedrock-api-key-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZA bedrock-api-key-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZA bedrock-api-key-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZA bedrock-api-key-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZA bedrock-api-key-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZA bedrock-api-key-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZA bedrock-api-key-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZA bedrock-api-key-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZA bedrock-api-key-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZA bedrock-api-key-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZA",
+      "expected": [
+        {
+          "detector": "aws-bedrock-short-term-api-key",
+          "type": "aws_bedrock_short_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 237
+        },
+        {
+          "detector": "aws-bedrock-short-term-api-key",
+          "type": "aws_bedrock_short_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 238,
+          "end": 475
+        },
+        {
+          "detector": "aws-bedrock-short-term-api-key",
+          "type": "aws_bedrock_short_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 476,
+          "end": 713
+        },
+        {
+          "detector": "aws-bedrock-short-term-api-key",
+          "type": "aws_bedrock_short_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 714,
+          "end": 951
+        },
+        {
+          "detector": "aws-bedrock-short-term-api-key",
+          "type": "aws_bedrock_short_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 952,
+          "end": 1189
+        },
+        {
+          "detector": "aws-bedrock-short-term-api-key",
+          "type": "aws_bedrock_short_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1190,
+          "end": 1427
+        },
+        {
+          "detector": "aws-bedrock-short-term-api-key",
+          "type": "aws_bedrock_short_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1428,
+          "end": 1665
+        },
+        {
+          "detector": "aws-bedrock-short-term-api-key",
+          "type": "aws_bedrock_short_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1666,
+          "end": 1903
+        },
+        {
+          "detector": "aws-bedrock-short-term-api-key",
+          "type": "aws_bedrock_short_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1904,
+          "end": 2141
+        },
+        {
+          "detector": "aws-bedrock-short-term-api-key",
+          "type": "aws_bedrock_short_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2142,
+          "end": 2379
+        },
+        {
+          "detector": "aws-bedrock-short-term-api-key",
+          "type": "aws_bedrock_short_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2380,
+          "end": 2617
+        },
+        {
+          "detector": "aws-bedrock-short-term-api-key",
+          "type": "aws_bedrock_short_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2618,
+          "end": 2855
+        },
+        {
+          "detector": "aws-bedrock-short-term-api-key",
+          "type": "aws_bedrock_short_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 2856,
+          "end": 3093
+        },
+        {
+          "detector": "aws-bedrock-short-term-api-key",
+          "type": "aws_bedrock_short_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3094,
+          "end": 3331
+        },
+        {
+          "detector": "aws-bedrock-short-term-api-key",
+          "type": "aws_bedrock_short_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3332,
+          "end": 3569
+        },
+        {
+          "detector": "aws-bedrock-short-term-api-key",
+          "type": "aws_bedrock_short_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3570,
+          "end": 3807
+        },
+        {
+          "detector": "aws-bedrock-short-term-api-key",
+          "type": "aws_bedrock_short_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 3808,
+          "end": 4045
+        },
+        {
+          "detector": "aws-bedrock-short-term-api-key",
+          "type": "aws_bedrock_short_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4046,
+          "end": 4283
+        },
+        {
+          "detector": "aws-bedrock-short-term-api-key",
+          "type": "aws_bedrock_short_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4284,
+          "end": 4521
+        },
+        {
+          "detector": "aws-bedrock-short-term-api-key",
+          "type": "aws_bedrock_short_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4522,
+          "end": 4759
+        },
+        {
+          "detector": "aws-bedrock-short-term-api-key",
+          "type": "aws_bedrock_short_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4760,
+          "end": 4997
+        },
+        {
+          "detector": "aws-bedrock-short-term-api-key",
+          "type": "aws_bedrock_short_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 4998,
+          "end": 5235
+        },
+        {
+          "detector": "aws-bedrock-short-term-api-key",
+          "type": "aws_bedrock_short_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5236,
+          "end": 5473
+        },
+        {
+          "detector": "aws-bedrock-short-term-api-key",
+          "type": "aws_bedrock_short_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5474,
+          "end": 5711
+        },
+        {
+          "detector": "aws-bedrock-short-term-api-key",
+          "type": "aws_bedrock_short_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5712,
+          "end": 5949
+        },
+        {
+          "detector": "aws-bedrock-short-term-api-key",
+          "type": "aws_bedrock_short_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 5950,
+          "end": 6187
+        },
+        {
+          "detector": "aws-bedrock-short-term-api-key",
+          "type": "aws_bedrock_short_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 6188,
+          "end": 6425
+        },
+        {
+          "detector": "aws-bedrock-short-term-api-key",
+          "type": "aws_bedrock_short_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 6426,
+          "end": 6663
+        },
+        {
+          "detector": "aws-bedrock-short-term-api-key",
+          "type": "aws_bedrock_short_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 6664,
+          "end": 6901
+        },
+        {
+          "detector": "aws-bedrock-short-term-api-key",
+          "type": "aws_bedrock_short_term_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 6902,
+          "end": 7139
+        }
+      ],
+      "resource": {
+        "maxInputBytes": 7239,
+        "maxFindings": 30,
+        "maxRuntimeMs": 250
+      },
+      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1 candidate, maintainer ruling pending), tail floor T2. 30 space-separated keys on one line are each reported once at their own range, within the declared resource bounds."
+    },
+    {
+      "id": "aws-bedrock-short-term-api-key-negative-prefix-only",
+      "detector": "aws-bedrock-short-term-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "the prefix bedrock-api-key- alone\n",
+      "expected": [],
+      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1 candidate, maintainer ruling pending), tail floor T2. The prefix alone is not a key."
+    },
+    {
+      "id": "aws-bedrock-short-term-api-key-negative-head-only",
+      "detector": "aws-bedrock-short-term-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "bedrock-api-key-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsP\n",
+      "expected": [],
+      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1 candidate, maintainer ruling pending), tail floor T2. The fixed head with no tail is a constant, not a key."
+    },
+    {
+      "id": "aws-bedrock-short-term-api-key-boundary-truncated-head",
+      "detector": "aws-bedrock-short-term-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "AWS_BEARER_TOKEN_BEDROCK=bedrock-api-key-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZA\n",
+      "expected": [],
+      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1 candidate, maintainer ruling pending), tail floor T2. A head truncated to 100 bytes is missed."
+    },
+    {
+      "id": "aws-bedrock-short-term-api-key-boundary-head-one-off",
+      "detector": "aws-bedrock-short-term-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "AWS_BEARER_TOKEN_BEDROCK=bedrock-api-key-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Z2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZA\n",
+      "expected": [],
+      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1 candidate, maintainer ruling pending), tail floor T2. A head one byte off is missed."
+    },
+    {
+      "id": "aws-bedrock-short-term-api-key-boundary-wrong-prefix",
+      "detector": "aws-bedrock-short-term-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "AWS_BEARER_TOKEN_BEDROCK=bedrock-api-token-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZA\n",
+      "expected": [],
+      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1 candidate, maintainer ruling pending), tail floor T2. A wrong prefix."
     }
   ]
 }

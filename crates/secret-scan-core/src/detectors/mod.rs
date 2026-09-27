@@ -13,6 +13,7 @@ mod ai_inference;
 mod anthropic;
 mod atlassian;
 mod aws;
+mod aws_bedrock;
 mod azure_devops;
 mod bearer_token;
 mod cloudflare;
@@ -79,6 +80,8 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
     vec![
         Box::new(PrivateKeyDetector),
         Box::new(aws::AwsAccessKeyDetector),
+        Box::new(aws_bedrock::AwsBedrockLongTermApiKeyDetector),
+        Box::new(aws_bedrock::AwsBedrockShortTermApiKeyDetector),
         Box::new(github::GitHubTokenDetector),
         Box::new(gitlab::GitlabTokenDetector),
         Box::new(openai::OpenAiTokenDetector),
@@ -197,6 +200,8 @@ pub(crate) enum Pack {
 pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("private-key", Pack::Common),
     ("aws-access-key", Pack::Provider),
+    ("aws-bedrock-long-term-api-key", Pack::Provider),
+    ("aws-bedrock-short-term-api-key", Pack::Provider),
     ("github-token", Pack::Provider),
     ("gitlab-token", Pack::Provider),
     ("openai-token", Pack::Provider),
@@ -304,6 +309,8 @@ mod tests {
             vec![
                 "private-key",
                 "aws-access-key",
+                "aws-bedrock-long-term-api-key",
+                "aws-bedrock-short-term-api-key",
                 "github-token",
                 "gitlab-token",
                 "openai-token",
@@ -550,8 +557,22 @@ mod tests {
         let discord_input = "MDAwMDAwMDAwMDAwMDAwMDAw.REVOKE.SYNTHETICREVOKEDBOTTOKENFIX";
         let confluent_legacy_input =
             "confluent SYNTHETIC0REVOKED0LegacyBareSecretValue0NoPrefix0ABCDEFGHIJKLMNO";
+        let aws_bedrock_long_term_input = format!("ABSK{}", "U3ludGhldGljUmV2b2tlZA".repeat(6));
+        let aws_bedrock_short_term_input = format!(
+            "bedrock-api-key-{}{}",
+            "YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsP",
+            "U3ludGhldGljUmV2b2tlZA".repeat(4)
+        );
         let cases = [
             ("aws-access-key", "AKIASYNTHETICEXAMPLE"),
+            (
+                "aws-bedrock-long-term-api-key",
+                aws_bedrock_long_term_input.as_str(),
+            ),
+            (
+                "aws-bedrock-short-term-api-key",
+                aws_bedrock_short_term_input.as_str(),
+            ),
             (
                 "github-token",
                 &"ghp_SYNTHETICREVOKEDVALUE0000000000000000"[..40],

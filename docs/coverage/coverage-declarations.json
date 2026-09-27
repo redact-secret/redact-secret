@@ -169,7 +169,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -192,6 +192,208 @@
       ],
       "note": "Coverage declaration for aws_access_key_id (aws-access-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
       "type": "aws_access_key_id"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "aws-bedrock-long-term-api-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "aws-bedrock-long-term-api-key-positive-bare",
+            "aws-bedrock-long-term-api-key-positive-dotenv",
+            "aws-bedrock-long-term-api-key-positive-export-quoted",
+            "aws-bedrock-long-term-api-key-positive-json",
+            "aws-bedrock-long-term-api-key-positive-padding",
+            "aws-bedrock-long-term-api-key-positive-sdk-call",
+            "aws-bedrock-long-term-api-key-positive-tool-call",
+            "aws-bedrock-long-term-api-key-positive-yaml"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "aws-bedrock-long-term-api-key-overlap-bearer"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "aws-bedrock-long-term-api-key-adversarial-dense-findings"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "aws-bedrock-long-term-api-key-boundary-body-above-band",
+            "aws-bedrock-long-term-api-key-boundary-body-one-short",
+            "aws-bedrock-long-term-api-key-boundary-embedded-in-base64",
+            "aws-bedrock-long-term-api-key-boundary-three-padding",
+            "aws-bedrock-long-term-api-key-boundary-url-safe",
+            "aws-bedrock-long-term-api-key-boundary-wrong-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "aws-bedrock-long-term-api-key-negative-empty-assignment",
+            "aws-bedrock-long-term-api-key-negative-env-reference",
+            "aws-bedrock-long-term-api-key-negative-placeholder",
+            "aws-bedrock-long-term-api-key-negative-public-alias"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "aws-bedrock-long-term-api-key-boundary-body-above-band",
+            "aws-bedrock-long-term-api-key-boundary-body-one-short",
+            "aws-bedrock-long-term-api-key-boundary-embedded-in-base64",
+            "aws-bedrock-long-term-api-key-boundary-three-padding",
+            "aws-bedrock-long-term-api-key-boundary-url-safe",
+            "aws-bedrock-long-term-api-key-boundary-wrong-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [
+            "aws-bedrock-long-term-api-key-adversarial-dense-findings",
+            "aws-bedrock-long-term-api-key-negative-empty-assignment",
+            "aws-bedrock-long-term-api-key-negative-env-reference",
+            "aws-bedrock-long-term-api-key-negative-placeholder",
+            "aws-bedrock-long-term-api-key-negative-public-alias",
+            "aws-bedrock-long-term-api-key-overlap-bearer",
+            "aws-bedrock-long-term-api-key-positive-bare",
+            "aws-bedrock-long-term-api-key-positive-dotenv",
+            "aws-bedrock-long-term-api-key-positive-export-quoted",
+            "aws-bedrock-long-term-api-key-positive-json",
+            "aws-bedrock-long-term-api-key-positive-padding",
+            "aws-bedrock-long-term-api-key-positive-sdk-call",
+            "aws-bedrock-long-term-api-key-positive-tool-call",
+            "aws-bedrock-long-term-api-key-positive-yaml"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for aws_bedrock_long_term_api_key (aws-bedrock-long-term-api-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "aws_bedrock_long_term_api_key"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "aws-bedrock-short-term-api-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "aws-bedrock-short-term-api-key-positive-bare",
+            "aws-bedrock-short-term-api-key-positive-dotenv",
+            "aws-bedrock-short-term-api-key-positive-export-quoted",
+            "aws-bedrock-short-term-api-key-positive-json",
+            "aws-bedrock-short-term-api-key-positive-padding",
+            "aws-bedrock-short-term-api-key-positive-sdk-call",
+            "aws-bedrock-short-term-api-key-positive-tool-call",
+            "aws-bedrock-short-term-api-key-positive-yaml"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "aws-bedrock-short-term-api-key-overlap-bearer"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "aws-bedrock-short-term-api-key-adversarial-dense-findings"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "aws-bedrock-short-term-api-key-boundary-head-one-off",
+            "aws-bedrock-short-term-api-key-boundary-three-padding",
+            "aws-bedrock-short-term-api-key-boundary-truncated-head",
+            "aws-bedrock-short-term-api-key-boundary-url-safe",
+            "aws-bedrock-short-term-api-key-boundary-wrong-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "aws-bedrock-short-term-api-key-negative-empty-assignment",
+            "aws-bedrock-short-term-api-key-negative-env-reference",
+            "aws-bedrock-short-term-api-key-negative-head-only",
+            "aws-bedrock-short-term-api-key-negative-prefix-only",
+            "aws-bedrock-short-term-api-key-negative-public-alias"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "aws-bedrock-short-term-api-key-boundary-head-one-off",
+            "aws-bedrock-short-term-api-key-boundary-three-padding",
+            "aws-bedrock-short-term-api-key-boundary-truncated-head",
+            "aws-bedrock-short-term-api-key-boundary-url-safe",
+            "aws-bedrock-short-term-api-key-boundary-wrong-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for aws_bedrock_short_term_api_key (aws-bedrock-short-term-api-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "aws_bedrock_short_term_api_key"
     },
     {
       "behaviorClass": "provider",
@@ -306,50 +508,11 @@
         {
           "classLevel": true,
           "dimension": "host-context",
-          "evidenceFixtureIds": [
-            "github-adversarial-long-suffix",
-            "github-negative-commit-hash",
-            "github-negative-fine-grained-variable-identifier",
-            "github-negative-gh-cli-masked-token",
-            "github-negative-oauth-url-query",
-            "github-negative-test-id",
-            "github-negative-undocumented-classic-family-prefix",
-            "github-overlap-context",
-            "github-positive-classic",
-            "host-chat-github",
-            "host-curl-github",
-            "host-docker-compose-github",
-            "host-dotenv-github",
-            "host-github-actions-github",
-            "host-http-github",
-            "host-javascript-github",
-            "host-json-github",
-            "host-kubernetes-github",
-            "host-log-github",
-            "host-markdown-github",
-            "host-powershell-github",
-            "host-python-github",
-            "host-shell-github",
-            "host-shell-heredoc-github",
-            "host-stack-trace-github",
-            "host-terminal-github",
-            "host-terraform-github",
-            "host-toml-github",
-            "host-typescript-github",
-            "host-xml-github",
-            "host-yaml-github",
-            "invisible-adversarial-dense-seams",
-            "invisible-class-bidi-override",
-            "invisible-class-hangul-filler",
-            "invisible-class-soft-hyphen-run",
-            "invisible-class-tag-block",
-            "invisible-class-variation-selector",
-            "invisible-provider-grammar-zwnj",
-            "mutation-github-00-identity",
-            "mutation-github-06-punctuation-boundary",
-            "mutation-github-07-quoted",
-            "mutation-github-09-host-embedding"
-          ],
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
           "state": "supported"
         },
         {
@@ -456,7 +619,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -564,7 +727,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -672,7 +835,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -780,7 +943,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -888,7 +1051,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -989,7 +1152,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -1170,7 +1333,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -1270,7 +1433,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -1370,7 +1533,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -1469,7 +1632,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -1577,7 +1740,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -1687,7 +1850,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -1862,7 +2025,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -2046,7 +2209,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -2230,7 +2393,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -2324,7 +2487,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -2454,7 +2617,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -2593,7 +2756,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -2727,7 +2890,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -2870,7 +3033,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -2997,7 +3160,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -3100,7 +3263,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -3193,7 +3356,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -3293,7 +3456,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -3387,7 +3550,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -3492,7 +3655,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -3594,7 +3757,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -3684,7 +3847,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -3773,7 +3936,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -3870,7 +4033,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -3964,7 +4127,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -4056,7 +4219,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -5204,7 +5367,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -5298,7 +5461,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -5383,7 +5546,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -5465,7 +5628,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -5552,7 +5715,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -5640,7 +5803,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -5725,7 +5888,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -5813,7 +5976,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -5898,7 +6061,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -5984,7 +6147,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -6077,7 +6240,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -6159,7 +6322,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -6247,7 +6410,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -6344,7 +6507,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -6444,7 +6607,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -6536,7 +6699,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -6620,7 +6783,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -6712,7 +6875,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -6810,7 +6973,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -6907,7 +7070,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -7004,7 +7167,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -7101,7 +7264,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -7198,7 +7361,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -7295,7 +7458,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -7394,7 +7557,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -7512,7 +7675,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -7616,7 +7779,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -7724,7 +7887,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -7835,7 +7998,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -7937,7 +8100,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -8049,7 +8212,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -8144,7 +8307,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -8226,7 +8389,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -8328,7 +8491,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -8420,7 +8583,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -8529,7 +8692,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -8635,7 +8798,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -8734,7 +8897,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -8820,7 +8983,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -8921,7 +9084,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -9009,7 +9172,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -9101,7 +9264,7 @@
           "evidenceFixtureIds": [],
           "exception": {
             "code": "owned-elsewhere",
-            "ownedBy": "github_token:host-context"
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
           },
           "state": "supported"
         },
@@ -9263,6 +9426,8 @@
             "anthropic-adversarial-long-suffix",
             "atlassian-api-token-adversarial-long-padding",
             "aws-adversarial-long-suffix",
+            "aws-bedrock-long-term-api-key-adversarial-dense-findings",
+            "aws-bedrock-short-term-api-key-adversarial-dense-findings",
             "azdo-pat-adversarial-long-padding",
             "bearer-adversarial-punctuation",
             "cloudflare-adversarial-long-suffix",
@@ -9694,6 +9859,8 @@
             "anthropic-adversarial-long-suffix",
             "atlassian-api-token-adversarial-long-padding",
             "aws-adversarial-long-suffix",
+            "aws-bedrock-long-term-api-key-adversarial-dense-findings",
+            "aws-bedrock-short-term-api-key-adversarial-dense-findings",
             "azdo-pat-adversarial-long-padding",
             "bearer-adversarial-punctuation",
             "cloudflare-adversarial-long-suffix",

@@ -63,7 +63,7 @@ const MOD_RS = join(REPO_ROOT, "crates", "secret-scan-core", "src", "detectors",
  * of silently mismatching.
  */
 export const CANONICAL_IDS = [
-  "private-key", "aws-access-key", "github-token", "gitlab-token", "openai-token",
+  "private-key", "aws-access-key", "aws-bedrock-long-term-api-key", "aws-bedrock-short-term-api-key", "github-token", "gitlab-token", "openai-token",
   "anthropic-token", "shopify-token", "vault-token", "stripe-token", "slack-token",
   "pypi-token", "huggingface-token", "docker-token", "cloudflare-token", "digitalocean-token",
   "linear-token", "supabase-token", "supabase-management-token", "vercel-token", "npm-token", "google-api-key",
@@ -95,7 +95,7 @@ export const GROUPS = {
     "langfuse-secret-key",
   ],
   cloud: [
-    "aws-access-key", "vault-token", "cloudflare-token", "digitalocean-token", "supabase-token",
+    "aws-access-key", "aws-bedrock-long-term-api-key", "aws-bedrock-short-term-api-key", "vault-token", "cloudflare-token", "digitalocean-token", "supabase-token",
     "supabase-management-token", "vercel-token", "google-api-key", "microsoft-entra-client-secret", "datadog-api-key",
     "datadog-application-key", "datadog-application-key-legacy", "grafana-service-account-token", "grafana-cloud-access-policy-token",
     "new-relic-user-api-key", "new-relic-license-key", "firebase-server-key", "terraform-cloud-token",

@@ -136,6 +136,84 @@
       "type": "aws_access_key_id"
     },
     {
+      "detector": "aws-bedrock-long-term-api-key",
+      "evidence": {
+        "fixtureCount": 20,
+        "hostContextsExercised": [
+          "dotenv",
+          "http",
+          "json",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "aws-bedrock-long-term-api-key-positive-bare",
+        "aws-bedrock-long-term-api-key-positive-dotenv",
+        "aws-bedrock-long-term-api-key-positive-export-quoted",
+        "aws-bedrock-long-term-api-key-positive-json",
+        "aws-bedrock-long-term-api-key-positive-padding",
+        "aws-bedrock-long-term-api-key-positive-sdk-call",
+        "aws-bedrock-long-term-api-key-positive-tool-call",
+        "aws-bedrock-long-term-api-key-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "aws_bedrock_long_term_api_key"
+    },
+    {
+      "detector": "aws-bedrock-short-term-api-key",
+      "evidence": {
+        "fixtureCount": 20,
+        "hostContextsExercised": [
+          "dotenv",
+          "http",
+          "json",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "aws-bedrock-short-term-api-key-positive-bare",
+        "aws-bedrock-short-term-api-key-positive-dotenv",
+        "aws-bedrock-short-term-api-key-positive-export-quoted",
+        "aws-bedrock-short-term-api-key-positive-json",
+        "aws-bedrock-short-term-api-key-positive-padding",
+        "aws-bedrock-short-term-api-key-positive-sdk-call",
+        "aws-bedrock-short-term-api-key-positive-tool-call",
+        "aws-bedrock-short-term-api-key-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "aws_bedrock_short_term_api_key"
+    },
+    {
       "detector": "github-token",
       "evidence": {
         "fixtureCount": 71,
@@ -3725,7 +3803,7 @@
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 83,
+    "supported": 85,
     "unresolved": 0
   }
 }
