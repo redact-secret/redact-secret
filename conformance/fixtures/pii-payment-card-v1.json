@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "family": "pii:global:payment-card",
+  "familyContractVersion": 1,
+  "selector": "pii:family:global:payment-card",
+  "publicType": "pii_global_payment_card",
+  "contextRequirement": "required-for-sensitive-classification",
+  "fixtureGenerator": {
+    "id": "payment-card-v1-fixed-synthetic",
+    "seed": "redact-secret-payment-card-v1-fixture-877",
+    "provenance": "deterministic-no-real-world-provenance"
+  },
+  "cases": [
+    {
+      "id": "payment-card-sensitive-compact-exact-selector",
+      "input": "card_number=4000008770000003",
+      "expected": [{"detector":"pii-domain","type":"pii_global_payment_card","confidence":"high","action":"redact","start":12,"end":28}]
+    },
+    {
+      "id": "payment-card-sensitive-separated-korean-context",
+      "input": "카드_번호 = 4000 0087 7000 0003",
+      "expected": [{"detector":"pii-domain","type":"pii_global_payment_card","confidence":"high","action":"redact","start":16,"end":35}]
+    },
+    {
+      "id": "payment-card-amex-supported-layout",
+      "input": "card_number=3487 700000 00009",
+      "expected": [{"detector":"pii-domain","type":"pii_global_payment_card","confidence":"high","action":"redact","start":12,"end":29}]
+    },
+    {
+      "id": "payment-card-jcb-representative",
+      "input": "card_number=3528877000000008",
+      "expected": [{"detector":"pii-domain","type":"pii_global_payment_card","confidence":"high","action":"redact","start":12,"end":28}]
+    },
+    {
+      "id": "payment-card-discover-singleton-representative",
+      "input": "card_number=6011748770000006",
+      "expected": [{"detector":"pii-domain","type":"pii_global_payment_card","confidence":"high","action":"redact","start":12,"end":28}]
+    },
+    {
+      "id": "payment-card-unicode-prefix-offset",
+      "input": "🔒 card_number=4000008770000003",
+      "expected": [{"detector":"pii-domain","type":"pii_global_payment_card","confidence":"high","action":"redact","start":17,"end":33}]
+    },
+    {
+      "id": "payment-card-minimum-pan-length",
+      "input": "pan=4000008773",
+      "expected": [{"detector":"pii-domain","type":"pii_global_payment_card","confidence":"high","action":"redact","start":4,"end":14}]
+    },
+    {
+      "id": "payment-card-maximum-pan-length",
+      "input": "payment_card=4000008770000000006",
+      "expected": [{"detector":"pii-domain","type":"pii_global_payment_card","confidence":"high","action":"redact","start":13,"end":32}]
+    },
+    {
+      "id": "payment-card-mastercard-lower-iin-boundary",
+      "input": "credit_card_number=2221008770000000",
+      "expected": [{"detector":"pii-domain","type":"pii_global_payment_card","confidence":"high","action":"redact","start":19,"end":35}]
+    },
+    {
+      "id": "payment-card-mastercard-upper-iin-boundary",
+      "input": "debit_card_number=2720998770000008",
+      "expected": [{"detector":"pii-domain","type":"pii_global_payment_card","confidence":"high","action":"redact","start":18,"end":34}]
+    },
+    {"id":"payment-card-outside-frozen-iin-boundary","input":"card_number=2220998770000003","expected":[]},
+    {"id":"payment-card-luhn-failure-neighbor","input":"card_number=4000008770000004","expected":[]},
+    {"id":"payment-card-official-test-whole-value-negative","input":"card_number=4111111111111111","expected":[]},
+    {"id":"payment-card-official-test-separated-whole-value-negative","input":"card_number=4111-1111-1111-1111","expected":[]},
+    {
+      "id": "payment-card-test-value-resemblance-does-not-suppress",
+      "input": "card_number=4111111111111129",
+      "expected": [{"detector":"pii-domain","type":"pii_global_payment_card","confidence":"high","action":"redact","start":12,"end":28}]
+    },
+    {"id":"payment-card-identity-without-context","input":"4000008770000003","expected":[]},
+    {"id":"payment-card-generic-card-is-not-high-signal","input":"card 4000008770000003","expected":[]},
+    {"id":"payment-card-order-reference-collision","input":"order_reference=4000008770000003","expected":[]},
+    {"id":"payment-card-account-number-collision","input":"account_number=4000008770000003","expected":[]},
+    {"id":"payment-card-named-negative-context-wins","input":"card_number documentation 4000008770000003","expected":[]},
+    {"id":"payment-card-mixed-display-separators","input":"card_number=4000 0087-7000 0003","expected":[]},
+    {"id":"payment-card-unsupported-display-grouping","input":"card_number=4000 0087 7000 0003 006","expected":[]},
+    {"id":"payment-card-adjacent-identifier-prefix","input":"card_number=x4000008770000003","expected":[]},
+    {"id":"payment-card-adjacent-identifier-suffix","input":"card_number=4000008770000003suffix","expected":[]},
+    {"id":"payment-card-adjacent-underscore-prefix","input":"card_number=_4000008770000003","expected":[]},
+    {"id":"payment-card-adjacent-underscore-suffix","input":"card_number=4000008770000003_suffix","expected":[]},
+    {"id":"payment-card-adjacent-percent-prefix","input":"card_number=%4000008770000003","expected":[]},
+    {"id":"payment-card-adjacent-percent-suffix","input":"card_number=4000008770000003%32","expected":[]},
+    {"id":"payment-card-adjacent-unicode-mark-suffix","input":"card_number=4000008770000003⃝","expected":[]},
+    {"id":"payment-card-adjacent-unicode-mark-prefix","input":"card_number=⃝4000008770000003","expected":[]},
+    {"id":"payment-card-governed-invisible-interior-rejected","input":"card_number=40000087‍70000003","expected":[]},
+    {"id":"payment-card-governed-invisible-prefix-rejected","input":"card_number=‍4000008770000003","expected":[]},
+    {"id":"payment-card-governed-invisible-touching-rejected","input":"card_number=4000008770000003‍","expected":[]},
+    {"id":"payment-card-phone-like-luhn-collision","input":"phone=4000008773","expected":[]},
+    {"id":"payment-card-random-number-collision","input":"random_number=4000008770000003","expected":[]},
+    {"id":"payment-card-cooking-pan-prose-collision","input":"Put the pan beside object number 4000008770000003.","expected":[]},
+    {"id":"payment-card-url-query-collision","input":"https://synthetic.invalid/pay?card_number=4000008770000003","expected":[]}
+  ]
+}

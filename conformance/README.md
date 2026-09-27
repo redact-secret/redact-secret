@@ -72,8 +72,8 @@ depend on `src/`.
 - [`fixtures/pii-runtime-v1.json`](./fixtures/pii-runtime-v1.json) — the
   cross-surface PII selector canonicalization, activation identity, and fixed
   input-free error contract. Its global and exact-family closure includes the
-  available email and network-address families; the Rust consumer is
-  `crates/secret-scan-core/tests/pii_runtime_conformance.rs`.
+  available email, IBAN, network-address, and payment-card families; the Rust
+  consumer is `crates/secret-scan-core/tests/pii_runtime_conformance.rs`.
 - [`fixtures/pii-network-address-v1.json`](./fixtures/pii-network-address-v1.json) —
   the network-address family contract v1: official reserved/private/local
   IPv4 and IPv6 controls, context sensitivity, offsets, collisions, and zone-id
@@ -87,6 +87,18 @@ depend on `src/`.
   negatives, Unicode offsets, selector closure, and incremental partitions.
   Expected findings contain safe metadata only; consumers convert canonical
   UTF-8 byte ranges to their public range units.
+- [`fixtures/pii-iban-v1.json`](./fixtures/pii-iban-v1.json) — the IBAN
+  family-contract v1 safe corpus: deterministic synthetic BBAN material,
+  SWIFT Registry Release 103 country lengths, `iban-mod97` v1 provenance,
+  compact/print exact ranges, context and reference negatives, collision and
+  wrong-length states, Unicode boundaries, and incremental partitions.
+- [`fixtures/pii-payment-card-v1.json`](./fixtures/pii-payment-card-v1.json) —
+  the payment-card family-contract v1 safe corpus: frozen brand/IIN and length
+  boundaries, Luhn correctness, exact whole official test-value negatives,
+  display normalization, semantic collisions, context, Unicode boundaries,
+  selector closure, and every incremental partition. Sensitive fixtures come
+  from a recorded deterministic seed with no cardholder or real-world
+  provenance.
 - [`fixtures/ai-context-boundary.json`](./fixtures/ai-context-boundary.json) —
   the framework-neutral AI-context boundary contract's cases (issue #610,
   [`docs/reference/ai-context-boundary.md`](../docs/reference/ai-context-boundary.md)):

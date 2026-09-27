@@ -15,7 +15,7 @@ Built-in Rust detection covers these kinds of structure:
 | Context | Credential assignments, such as an `api_key` or `password` setting, including AWS secret-access-key and session-token names |
 | Connections | Credential-bearing URLs for the supported database, queue, HTTP(S), and FTP(S) schemes |
 | One-time password provisioning | `otpauth://totp` and `otpauth://hotp` with base32 shared secrets |
-| Opt-in structured PII | Context-required email and canonical IPv4/IPv6 identities through `pii:global:email` and `pii:global:network-address`; PII defaults off and both share one `pii-domain` slot |
+| Opt-in structured PII | Context-required email, IBAN, canonical IPv4/IPv6, and payment-card identities through `pii:global:email`, `pii:global:iban`, `pii:global:network-address`, and `pii:global:payment-card`; PII defaults off and all families share one `pii-domain` slot |
 
 Per-family support status is stated only in the generated
 [support matrix](../support-matrix.md). Each provider family's exact frozen
@@ -47,6 +47,19 @@ local parts, comments, folding, domain literals, ordinary single-label domains,
 or deliverability checks. Exact RFC 6761 single-label names are admitted only
 as non-sensitive controls. The family is `pending` until exact-artifact
 `pii-v1` benchmark evidence is reviewed.
+
+### Opt-in payment-card PII
+
+The global or exact payment-card selector recognizes a deliberately bounded
+ISO/IEC 7812 PAN subset: 10–19 ASCII digits in frozen Visa, Mastercard,
+American Express, Discover, or JCB ranges, with a Luhn v1 pass and reviewed
+payment-card field context. Compact values are supported; displayed values are
+limited to one separator kind in `4-4-4-4` or `4-6-5` layout. Exact published
+Visa Acceptance test-service numbers are whole-value non-sensitive controls.
+The [payment-card family contract](../contracts/pii/payment-card-v1.md) freezes
+the full ranges, context, exact spans, exclusions, and accepted false-positive
+and false-negative costs. The family is `pending` until exact-artifact `pii-v1`
+benchmark evidence is reviewed.
 
 ### Policy-qualified generic credentials
 

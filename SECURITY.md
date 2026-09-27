@@ -54,9 +54,11 @@ untrusted request content.
 Findings supplied directly to `redact` are trusted caller assertions. The
 library validates their metadata and ranges but does not verify that they came
 from `scan` or that the selected action matches server policy. A placeholder is
-rejected if it contains any replaced matched range that can fit within the
+rejected if it contains any finding's matched range that can fit within the
 256-UTF-8-byte placeholder bound, including ranges shorter than four native
-range units.
+range units — this covers `warn`/`allow` findings' ranges as well as
+`redact`/`block` ones, since a placeholder must not reproduce a value the
+call has no license to reveal regardless of which finding it belongs to.
 `warn` and `allow` findings deliberately leave the original text unchanged.
 
 ## Authoritative server limits

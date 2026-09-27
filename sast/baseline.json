@@ -63,9 +63,9 @@
       "rationale": "The process arguments are collected only to serialize the assessment invocation as JSON provenance. They are never interpreted as a command, passed to a shell, or used to launch another process, so the command-argument injection class reported by this generic rule is absent.",
       "rule_id": "sast.rules.rust.lang.security.args"
     },
-    "7700c21cb9293a2e": {
+    "a16e6e837f3c79dc": {
       "classification": "false_positive",
-      "line": 139,
+      "line": 141,
       "path": "crates/secret-scan-core/examples/shadow_evaluation.rs",
       "rationale": "The maintainer-local shadow evaluation example reads only two options from its arguments: a --profile name matched against the closed set full/common, and an --artifact path read as JSON. They are never interpreted as a command, passed to a shell, or used to launch another process, and the example is outside every published package, so the command-argument injection class reported by this generic rule is absent.",
       "rule_id": "sast.rules.rust.lang.security.args"
@@ -385,10 +385,10 @@
       "rule_id": "sast.rules.javascript.lang.security.html-in-template-string",
       "rationale": "The template string builds a `<SECRET_N>` / `<TYPE_N>` redaction placeholder label for test-fixture comparison or CLI output text; it is never assigned to `innerHTML`, rendered into a DOM, or otherwise interpreted as markup, so the XSS this rule guards against cannot occur here."
     },
-    "5365d750d14aca76": {
+    "baa37c334cf1a1d2": {
       "classification": "false_positive",
       "path": "scripts/qualify-node-addon.mjs",
-      "line": 328,
+      "line": 337,
       "rule_id": "sast.rules.javascript.lang.security.audit.unsafe-dynamic-method",
       "rationale": "The dynamic member access selects a method name from the hardcoded `DETECTOR_PROFILES` map, whose two entries (`full`/`common`) are literal object keys in this file; `detectorProfile` is validated against `Object.hasOwn(DETECTOR_PROFILES, ...)` before this call, so the invoked name is always one of the two fixed literal strings `initialize` / `initializeCommon`, never attacker- or externally-controlled input. This is a local build-qualification script, not a network-facing service."
     },

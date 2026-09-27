@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "family": "pii:global:iban",
+  "familyContractVersion": 1,
+  "selector": "pii:family:global:iban",
+  "fixtureGenerator": {
+    "id": "iban-v1-uppercase-bban-check-digits",
+    "seed": "redact-secret-iban-v1-fixture-878",
+    "algorithm": "iso13616-mod97-check-digits-v1",
+    "provenance": "deterministic-no-real-world-account-provenance",
+    "inputs": [
+      {
+        "id": "gb-synx-zero-account",
+        "country": "GB",
+        "bban": "SYNX00000000000000",
+        "expectedElectronic": "GB18SYNX00000000000000"
+      }
+    ]
+  },
+  "cases": [
+    {
+      "id": "iban-sensitive-compact-exact-selector",
+      "input": "iban: GB18SYNX00000000000000",
+      "expected": [{"detector":"pii-domain","type":"pii_global_iban","confidence":"high","action":"redact","start":6,"end":28}]
+    },
+    {
+      "id": "iban-sensitive-print-form-korean-astral-offset",
+      "input": "🔒 국제_계좌번호 = GB18 SYNX 0000 0000 0000 00",
+      "expected": [{"detector":"pii-domain","type":"pii_global_iban","confidence":"high","action":"redact","start":27,"end":54}]
+    },
+    {"id":"iban-checksum-valid-without-context-is-identity-only","input":"GB18SYNX00000000000000","expected":[]},
+    {"id":"iban-checksum-valid-wrong-country-length-is-unmatched","input":"iban: GB18SYNX0000000000000","expected":[]},
+    {"id":"iban-checksum-mismatch","input":"iban: GB00SYNX00000000000000","expected":[]},
+    {"id":"iban-unknown-country","input":"iban: ZZ75SYNTHETIC878X4Z9Q7","expected":[]},
+    {"id":"iban-named-documentation-context-wins","input":"documentation iban: GB18SYNX00000000000000","expected":[]},
+    {"id":"iban-named-korean-example-context-wins","input":"예시 iban: GB18SYNX00000000000000","expected":[]},
+    {"id":"iban-template-reference","input":"iban: {{GB18SYNX00000000000000}}","expected":[]},
+    {"id":"iban-environment-reference","input":"iban: ${GB18SYNX00000000000000}","expected":[]},
+    {"id":"iban-angle-placeholder","input":"iban: <GB18SYNX00000000000000>","expected":[]},
+    {"id":"iban-lowercase-unsupported","input":"iban: gb18synx00000000000000","expected":[]},
+    {"id":"iban-hyphen-separator-unsupported","input":"iban: GB18-SYNX-0000-0000-0000-00","expected":[]},
+    {"id":"iban-repeated-space-unsupported","input":"iban: GB18  SYNX 0000 0000 0000 00","expected":[]},
+    {"id":"iban-tab-separator-unsupported","input":"iban: GB18\tSYNX00000000000000","expected":[]},
+    {"id":"iban-alnum-left-adjacency","input":"iban: AGB18SYNX00000000000000","expected":[]},
+    {"id":"iban-underscore-right-adjacency","input":"iban: GB18SYNX00000000000000_suffix","expected":[]},
+    {"id":"iban-percent-right-adjacency","input":"iban: GB18SYNX00000000000000%32","expected":[]},
+    {"id":"iban-unicode-mark-right-adjacency","input":"iban: GB18SYNX00000000000000⃝","expected":[]},
+    {"id":"iban-governed-invisible-inside","input":"iban: GB18SYNX‍00000000000000","expected":[]},
+    {"id":"iban-governed-invisible-right-adjacency","input":"iban: GB18SYNX00000000000000‍","expected":[]}
+  ]
+}
+

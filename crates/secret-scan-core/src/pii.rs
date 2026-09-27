@@ -15,7 +15,12 @@ use crate::types::{
 
 const ADAPTER_ID: &str = "pii-domain";
 const KNOWN_JURISDICTIONS: &[&str] = &["us"];
-const AVAILABLE_FAMILIES: &[&str] = &["pii:global:email", "pii:global:network-address"];
+const AVAILABLE_FAMILIES: &[&str] = &[
+    "pii:global:email",
+    "pii:global:iban",
+    "pii:global:network-address",
+    "pii:global:payment-card",
+];
 const KNOWN_FAMILIES: &[&str] = &[
     "pii:global:ambiguous-national-id",
     "pii:global:email",
@@ -28,6 +33,10 @@ const KNOWN_FAMILIES: &[&str] = &[
 ];
 #[path = "pii/pii_email.rs"]
 mod pii_email;
+#[path = "pii/pii_iban.rs"]
+mod pii_iban;
+#[path = "pii/pii_payment_card.rs"]
+mod pii_payment_card;
 
 /// A canonical, closed PII selector set for the loaded artifact.
 ///
@@ -185,7 +194,12 @@ pub(crate) fn is_reserved_detector_id(id: &str) -> bool {
 pub(crate) fn adapter(selection: &PiiSelection) -> Box<dyn Detector> {
     Box::new(PiiDomain::new(
         selection.clone(),
-        vec![Box::new(pii_email::EmailFamily), network_address::family()],
+        vec![
+            Box::new(pii_email::EmailFamily),
+            Box::new(pii_iban::IbanFamily),
+            network_address::family(),
+            Box::new(pii_payment_card::PaymentCardFamily),
+        ],
     ))
 }
 
@@ -973,7 +987,7 @@ mod tests {
         let active = PiiSelection::parse(&["pii", "pii:global"]).unwrap();
         assert_eq!(
             active.activation_identity(crate::Profile::Common),
-            "credentials=common;selectors=pii:global;families=pii:global:email,pii:global:network-address;vocabulary=pii-context/v1"
+            "credentials=common;selectors=pii:global;families=pii:global:email,pii:global:iban,pii:global:network-address,pii:global:payment-card;vocabulary=pii-context/v1"
         );
     }
 

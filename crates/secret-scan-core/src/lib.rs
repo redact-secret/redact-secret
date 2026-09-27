@@ -135,16 +135,6 @@ mod policy;
 mod redact;
 mod registry;
 mod ruleset;
-// This crate-private foundation intentionally lands before its first PII
-// detector. Keeping it compiled now prevents future detectors from inventing
-// host-specific validators while avoiding a premature public extension API.
-#[cfg_attr(
-    not(test),
-    expect(
-        dead_code,
-        reason = "PII detectors consume this registry in later issues"
-    )
-)]
 mod structured_validators;
 mod types;
 

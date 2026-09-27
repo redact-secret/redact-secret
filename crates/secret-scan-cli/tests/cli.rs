@@ -870,9 +870,44 @@ fn findings_ignoring_source(stdout: &str) -> serde_json::Value {
 }
 
 #[test]
-fn email_family_fixture_matches_cli_utf8_metadata_for_exact_selection() {
+fn pii_family_fixtures_match_cli_utf8_metadata_for_exact_selection() {
+    for corpus in [
+        include_str!("../../../conformance/fixtures/pii-email-v1.json"),
+        include_str!("../../../conformance/fixtures/pii-iban-v1.json"),
+    ] {
+        let fixture: serde_json::Value = serde_json::from_str(corpus).unwrap();
+        let selector = fixture["selector"].as_str().unwrap();
+        for case in fixture["cases"].as_array().unwrap() {
+            let input = case["input"].as_str().unwrap();
+            let run = run_args(&["--json", "--pii", selector], input.as_bytes());
+            let expected = case["expected"].as_array().unwrap();
+            assert_eq!(run.code, i32::from(!expected.is_empty()), "{}", case["id"]);
+            let report: serde_json::Value = serde_json::from_str(&run.stdout).unwrap();
+            let actual: Vec<serde_json::Value> = report["sources"][0]["findings"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|finding| {
+                    serde_json::json!({
+                        "detector": finding["detector"],
+                        "type": finding["type"],
+                        "confidence": finding["confidence"],
+                        "action": finding["action"],
+                        "start": finding["start"],
+                        "end": finding["end"],
+                    })
+                })
+                .collect();
+            assert_eq!(&actual, expected, "{}", case["id"]);
+            run.leaks_nothing();
+        }
+    }
+}
+
+#[test]
+fn payment_card_family_fixture_matches_cli_utf8_metadata_for_exact_selection() {
     let fixture: serde_json::Value = serde_json::from_str(include_str!(
-        "../../../conformance/fixtures/pii-email-v1.json"
+        "../../../conformance/fixtures/pii-payment-card-v1.json"
     ))
     .unwrap();
     let selector = fixture["selector"].as_str().unwrap();

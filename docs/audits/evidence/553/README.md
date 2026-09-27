@@ -122,7 +122,7 @@ boundary.
 Reproduced input:
 
 ```
-Authorization: Bearer SG.XJoGU7DRtetMBE4IX2dfaC.8lpqpUqs3xrxCAXo5aBbE9Ql2pb37jrK7SwQ8YNRpE
+Authorization: Bearer SG.SYNTHETICREVOKEDSYNTHE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICR
 ```
 
 (a SendGrid-shaped value with a 42-byte final segment, one byte short of the
@@ -168,7 +168,7 @@ bug — is `redact-secret-benchmarks` work, tracked via
 Reproduced input:
 
 ```
-api_key=SG.XJoGU7DRtetMBE4IX2dfaC.8lpqpUqs3xrxCAXo5aBbE9Ql2pb37jrK7SwQ8YNRpE
+api_key=SG.SYNTHETICREVOKEDSYNTHE.SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICR
 ```
 
 Actual scan result:

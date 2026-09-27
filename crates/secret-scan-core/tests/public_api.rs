@@ -717,7 +717,7 @@ fn common_profile_registers_its_declared_membership_in_canonical_order() {
 }
 
 #[test]
-fn pii_activation_is_public_with_the_network_address_family() {
+fn pii_activation_is_public_with_the_available_global_families() {
     let selection = PiiSelection::parse(&["pii"]).unwrap();
     let registry = DetectorRegistry::with_built_in_and_pii(&selection).unwrap();
     assert_eq!(
@@ -726,7 +726,7 @@ fn pii_activation_is_public_with_the_network_address_family() {
     );
     assert_eq!(
         registry.activation_identity(),
-        "credentials=full;selectors=pii:global;families=pii:global:email,pii:global:network-address;vocabulary=pii-context/v1"
+        "credentials=full;selectors=pii:global;families=pii:global:email,pii:global:iban,pii:global:network-address,pii:global:payment-card;vocabulary=pii-context/v1"
     );
 }
 
