@@ -382,7 +382,18 @@ fn may_have_provider_context(text: &str, spec: &Spec) -> bool {
 
 fn detect_spec(input: &str, spec: &Spec) -> Vec<Candidate> {
     let mut candidates = Vec::new();
-    if !may_have_provider_context(input, spec) {
+    // The incremental sanitizer's per-unit `detect` call almost always
+    // supplies exactly one logical line (no `\n`): it closes and scans one
+    // line at a time, and this detector's adjacency contract is defined on
+    // that one line (see the module doc). For that single-line input,
+    // `lines(input)` below yields exactly that one line, so the per-line
+    // check inside the loop already is this same check; running it again
+    // here first would scan the identical bytes twice for the same answer.
+    // Gating this whole-input check on `input` actually holding more than
+    // one line keeps its short-circuit for a multi-line, whole-buffer scan
+    // (the non-incremental `scan` path) while dropping the duplicate work an
+    // incremental caller was paying on every closed line.
+    if input.contains('\n') && !may_have_provider_context(input, spec) {
         return candidates;
     }
     for (line_start, line_end) in lines(input) {
