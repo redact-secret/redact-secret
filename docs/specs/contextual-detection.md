@@ -11,6 +11,26 @@ Rules governing how a contextual assignment (`name = value`) is parsed, scoped, 
 > one more instance is a row here plus its supporting evidence, not a new
 > ADR.
 
+## Bounded T3 credential claims
+
+The four beta.10 policy-based credential claims are frozen in the
+[detector-families spec](detector-families.md#policy-based-credential-contracts).
+For contextual detection, that means:
+
+| Family | Context boundary | Policy boundary |
+| --- | --- | --- |
+| Bearer credential | Only the `Bearer` carrier and the bounded explicit-header/free-text contexts are claimed; the carrier is context for the value, not evidence that the value has a provider-specific format. | `bearer_token` defaults to `redact`; no `block` claim. |
+| Connection-string password | Only the supported URI-userinfo schemes and Redis/Rediss password-only form are claimed. Azure Storage `AccountKey` and query/property passwords are separate or out of scope. | `connection_string_password` defaults to `redact`; no `block` claim. |
+| OTP seed | Only the supported `otpauth` TOTP/HOTP envelope and its first exact `secret` parameter are claimed; a bare Base32 seed is not. | `otpauth_secret` defaults to `redact`; no `block` claim. |
+| Assignment literal | Only a direct literal under the built-in high-signal/ambiguous name vocabulary and supported operators is claimed. References, placeholders, expressions, provider-owned names, and arbitrary assignments are not. | High-confidence high-signal values default to `redact`; other accepted high-signal values and every accepted ambiguous-name value default to `warn`; no `block` claim. |
+
+These are T3 / `project-policy` claims even if benchmark evidence later
+qualifies one as stable. Policy qualification tests whether the bounded
+context, exact value span, and resolved action hold; it does not turn context
+into provider-format evidence. The canonical exact-span, action, benign, and
+cross-runtime evidence is mapped in the detector-families table rather than
+duplicated here.
+
 ## Rules
 
 The contextual-exclusion rules below all route to one representative ADR;
