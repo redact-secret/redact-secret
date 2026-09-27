@@ -190,11 +190,12 @@ policies, limits, profiles, and browser loading.
 
 PII activation is opt-in and defaults off across Rust, JavaScript, Python, and
 the CLI. The shared `pii-domain` adapter registers the context-qualified
-`pii:global:email` and `pii:global:network-address` families. Both suppress
-their reviewed reserved/documentation classes and remain `pending` until
+`pii:global:email`, `pii:global:iban`, and `pii:global:network-address`
+families. They suppress only their reviewed negative classes and remain `pending` until
 exact-artifact `pii-v1` benchmark evidence is reviewed; availability alone is
 not a support claim. See the [email family contract](docs/contracts/pii/email-v1.md)
-and each language guide for activation identity and limits.
+and [IBAN family contract](docs/contracts/pii/iban-v1.md), and each language
+guide for activation identity and limits.
 
 ## Core operations
 

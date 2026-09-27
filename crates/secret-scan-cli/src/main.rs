@@ -394,7 +394,7 @@ mod tests {
         let printed = invoke(&["--print-pii-activation", "--pii", "pii"], "UNREAD INPUT");
         assert_eq!(
             printed.stdout,
-            "credentials=full;selectors=pii:global;families=pii:global:email,pii:global:network-address;vocabulary=pii-context/v1\n"
+            "credentials=full;selectors=pii:global;families=pii:global:email,pii:global:iban,pii:global:network-address;vocabulary=pii-context/v1\n"
         );
         assert!(printed.stderr.is_empty());
         let rejected = invoke(&["--print-pii-activation", "--pii", "PII"], "UNREAD INPUT");
@@ -419,5 +419,16 @@ mod tests {
         );
         assert_eq!(selected.outcome, Ok(Outcome::Clean));
         assert_eq!(selected.stdout, "client_ip=<SECRET_1>\n");
+    }
+
+    #[test]
+    fn pii_iban_redacts_only_when_selected() {
+        let input = "iban=GB18SYNX00000000000000\n";
+        let off = invoke(&["--redact"], input);
+        assert_eq!(off.stdout, input);
+
+        let selected = invoke(&["--redact", "--pii", "pii:family:global:iban"], input);
+        assert_eq!(selected.outcome, Ok(Outcome::Clean));
+        assert_eq!(selected.stdout, "iban=<SECRET_1>\n");
     }
 }

@@ -15,7 +15,7 @@ Built-in Rust detection covers these kinds of structure:
 | Context | Credential assignments, such as an `api_key` or `password` setting, including AWS secret-access-key and session-token names |
 | Connections | Credential-bearing URLs for the supported database, queue, HTTP(S), and FTP(S) schemes |
 | One-time password provisioning | `otpauth://totp` and `otpauth://hotp` with base32 shared secrets |
-| Opt-in structured PII | Context-required email and canonical IPv4/IPv6 identities through `pii:global:email` and `pii:global:network-address`; PII defaults off and both share one `pii-domain` slot |
+| Opt-in structured PII | Context-required email, IBAN, and canonical IPv4/IPv6 identities through `pii:global:email`, `pii:global:iban`, and `pii:global:network-address`; PII defaults off and all share one `pii-domain` slot |
 
 Per-family support status is stated only in the generated
 [support matrix](../support-matrix.md). Each provider family's exact frozen
