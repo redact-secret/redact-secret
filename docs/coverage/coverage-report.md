@@ -15,11 +15,11 @@ These counts describe finding-type inventory rows with corpus evidence, not dete
 
 | Row state | Count |
 | --- | --- |
-| supported | 80 |
+| supported | 81 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 91.
+Coverage declarations: 92.
 
 ## Coverage by detector
 
@@ -41,6 +41,7 @@ Coverage declarations: 91.
 | digitalocean-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | discord-bot-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | docker-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| elevenlabs-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | firebase-server-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | fireworks-ai-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | generic-token | 3 | supported: 3, intentionally-unsupported: 0, unresolved: 0 |
@@ -118,6 +119,7 @@ Coverage declarations: 91.
 | digitalocean_token | digitalocean-token | provider | supported | not-applicable | none |
 | discord_bot_token | discord-bot-token | provider | supported | not-applicable | none |
 | docker_token | docker-token | provider | supported | not-applicable | none |
+| elevenlabs_api_key | elevenlabs-api-key | provider | supported | not-applicable | none |
 | firebase_server_key | firebase-server-key | provider | supported | not-applicable | none |
 | fireworks_ai_api_key | fireworks-ai-api-key | provider | supported | not-applicable | none |
 | github_app_installation_token | github-token | provider | supported | not-applicable | none |
@@ -205,15 +207,15 @@ Coverage declarations: 91.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 91 | 0 | 0 |
-| boundary | 80 | 0 | 0 |
-| host-context | 80 | 0 | 0 |
+| adversarial | 92 | 0 | 0 |
+| boundary | 81 | 0 | 0 |
+| host-context | 81 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 91 | 0 | 0 |
-| near-miss-negative | 80 | 0 | 0 |
-| overlap | 80 | 0 | 0 |
-| positive | 80 | 0 | 0 |
-| range | 91 | 0 | 0 |
+| malformed | 92 | 0 | 0 |
+| near-miss-negative | 81 | 0 | 0 |
+| overlap | 81 | 0 | 0 |
+| positive | 81 | 0 | 0 |
+| range | 92 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

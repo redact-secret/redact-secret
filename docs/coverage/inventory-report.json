@@ -2993,6 +2993,56 @@
       "type": "fireworks_ai_api_key"
     },
     {
+      "detector": "elevenlabs-api-key",
+      "evidence": {
+        "fixtureCount": 41,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "typescript",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "elevenlabs-api-key-positive-bare",
+        "elevenlabs-api-key-positive-curl-header",
+        "elevenlabs-api-key-positive-dotenv",
+        "elevenlabs-api-key-positive-json",
+        "elevenlabs-api-key-positive-log",
+        "elevenlabs-api-key-positive-punctuation-adjacent",
+        "elevenlabs-api-key-positive-python-sdk-call",
+        "elevenlabs-api-key-positive-repeated-value",
+        "elevenlabs-api-key-positive-residency-bare",
+        "elevenlabs-api-key-positive-residency-dotenv",
+        "elevenlabs-api-key-positive-residency-sdk-call",
+        "elevenlabs-api-key-positive-shell-export",
+        "elevenlabs-api-key-positive-tool-call",
+        "elevenlabs-api-key-positive-typescript-sdk-call",
+        "elevenlabs-api-key-positive-yaml",
+        "elevenlabs-api-key-regression-crlf-and-unicode-prefix"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "elevenlabs_api_key"
+    },
+    {
       "detector": "pinecone-api-key",
       "evidence": {
         "fixtureCount": 34,
@@ -3581,7 +3631,7 @@
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 80,
+    "supported": 81,
     "unresolved": 0
   }
 }

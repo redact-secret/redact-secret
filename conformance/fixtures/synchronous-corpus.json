@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 2123,
+  "fixtureCount": 2164,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -51132,6 +51132,1552 @@
       "input": "mailgun 0123456789abcdef0123456789abcde--01234567-89abcdef",
       "expected": [],
       "note": "Issue #701: the prefix-less 32-8-8 lowercase-hex triplet that three sources describe as Mailgun's newer private API key, gated on a same-line mailgun keyword (recorded uncertainty; no issued key observed). The dashes of the synthetic triplet are JSON-escaped (\\u002d) so the committed text does not trip GitHub push protection; the decoded input is unchanged. A dash at the wrong offset is not the triplet."
+    },
+    {
+      "id": "elevenlabs-api-key-positive-bare",
+      "detector": "elevenlabs-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk_0123456789abcdef0123456789abcdef0123456789abcdef",
+      "expected": [
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 51,
+          "specificity": "provider",
+          "start": 0,
+          "type": "elevenlabs_api_key"
+        }
+      ],
+      "note": "Issue #865: ElevenLabs API key, `sk_` + exactly 48 lowercase hex; the prefix and the `_residency_<[a-z0-9]+>` suffix rest on provider SDK code (T1 by maintainer ruling), the 48-hex body is T2 (tools plus measured fragments). A bare key."
+    },
+    {
+      "id": "elevenlabs-api-key-positive-dotenv",
+      "detector": "elevenlabs-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "ELEVENLABS_API_KEY=sk_0123456789abcdef0123456789abcdef0123456789abcdef\n",
+      "expected": [
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 70,
+          "specificity": "provider",
+          "start": 19,
+          "type": "elevenlabs_api_key"
+        }
+      ],
+      "note": "Issue #865: ElevenLabs API key, `sk_` + exactly 48 lowercase hex; the prefix and the `_residency_<[a-z0-9]+>` suffix rest on provider SDK code (T1 by maintainer ruling), the 48-hex body is T2 (tools plus measured fragments). A dotenv assignment."
+    },
+    {
+      "id": "elevenlabs-api-key-positive-shell-export",
+      "detector": "elevenlabs-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export XI_API_KEY=\"sk_0123456789abcdef0123456789abcdef0123456789abcdef\"\n",
+      "expected": [
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 70,
+          "specificity": "provider",
+          "start": 19,
+          "type": "elevenlabs_api_key"
+        }
+      ],
+      "note": "Issue #865: ElevenLabs API key, `sk_` + exactly 48 lowercase hex; the prefix and the `_residency_<[a-z0-9]+>` suffix rest on provider SDK code (T1 by maintainer ruling), the 48-hex body is T2 (tools plus measured fragments). A quoted shell export."
+    },
+    {
+      "id": "elevenlabs-api-key-positive-yaml",
+      "detector": "elevenlabs-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "elevenlabs:\n  api_key: sk_0123456789abcdef0123456789abcdef0123456789abcdef\n",
+      "expected": [
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 74,
+          "specificity": "provider",
+          "start": 23,
+          "type": "elevenlabs_api_key"
+        }
+      ],
+      "note": "Issue #865: ElevenLabs API key, `sk_` + exactly 48 lowercase hex; the prefix and the `_residency_<[a-z0-9]+>` suffix rest on provider SDK code (T1 by maintainer ruling), the 48-hex body is T2 (tools plus measured fragments). A YAML value."
+    },
+    {
+      "id": "elevenlabs-api-key-positive-json",
+      "detector": "elevenlabs-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"xi-api-key\": \"sk_0123456789abcdef0123456789abcdef0123456789abcdef\"}",
+      "expected": [
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 67,
+          "specificity": "provider",
+          "start": 16,
+          "type": "elevenlabs_api_key"
+        }
+      ],
+      "note": "Issue #865: ElevenLabs API key, `sk_` + exactly 48 lowercase hex; the prefix and the `_residency_<[a-z0-9]+>` suffix rest on provider SDK code (T1 by maintainer ruling), the 48-hex body is T2 (tools plus measured fragments). A quoted JSON value under the provider header name."
+    },
+    {
+      "id": "elevenlabs-api-key-positive-python-sdk-call",
+      "detector": "elevenlabs-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = ElevenLabs(api_key=\"sk_0123456789abcdef0123456789abcdef0123456789abcdef\")\n",
+      "expected": [
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 80,
+          "specificity": "provider",
+          "start": 29,
+          "type": "elevenlabs_api_key"
+        }
+      ],
+      "note": "Issue #865: ElevenLabs API key, `sk_` + exactly 48 lowercase hex; the prefix and the `_residency_<[a-z0-9]+>` suffix rest on provider SDK code (T1 by maintainer ruling), the 48-hex body is T2 (tools plus measured fragments). A single-line SDK call, a shape marker-context detection did not reach before this family."
+    },
+    {
+      "id": "elevenlabs-api-key-positive-typescript-sdk-call",
+      "detector": "elevenlabs-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "typescript"
+      ],
+      "input": "const client = new ElevenLabsClient({ apiKey: \"sk_0123456789abcdef0123456789abcdef0123456789abcdef\" });\n",
+      "expected": [
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 98,
+          "specificity": "provider",
+          "start": 47,
+          "type": "elevenlabs_api_key"
+        }
+      ],
+      "note": "Issue #865: ElevenLabs API key, `sk_` + exactly 48 lowercase hex; the prefix and the `_residency_<[a-z0-9]+>` suffix rest on provider SDK code (T1 by maintainer ruling), the 48-hex body is T2 (tools plus measured fragments). A JS SDK constructor argument."
+    },
+    {
+      "id": "elevenlabs-api-key-positive-curl-header",
+      "detector": "elevenlabs-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -H \"xi-api-key: sk_0123456789abcdef0123456789abcdef0123456789abcdef\" https://api.elevenlabs.io/v1/user\n",
+      "expected": [
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 72,
+          "specificity": "provider",
+          "start": 21,
+          "type": "elevenlabs_api_key"
+        }
+      ],
+      "note": "Issue #865: ElevenLabs API key, `sk_` + exactly 48 lowercase hex; the prefix and the `_residency_<[a-z0-9]+>` suffix rest on provider SDK code (T1 by maintainer ruling), the 48-hex body is T2 (tools plus measured fragments). A curl header."
+    },
+    {
+      "id": "elevenlabs-api-key-positive-log",
+      "detector": "elevenlabs-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-27T10:00:00Z INFO tts request sent key=sk_0123456789abcdef0123456789abcdef0123456789abcdef status=200\n",
+      "expected": [
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 98,
+          "specificity": "provider",
+          "start": 47,
+          "type": "elevenlabs_api_key"
+        }
+      ],
+      "note": "Issue #865: ElevenLabs API key, `sk_` + exactly 48 lowercase hex; the prefix and the `_residency_<[a-z0-9]+>` suffix rest on provider SDK code (T1 by maintainer ruling), the 48-hex body is T2 (tools plus measured fragments). A log line."
+    },
+    {
+      "id": "elevenlabs-api-key-positive-tool-call",
+      "detector": "elevenlabs-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"name\":\"http_request\",\"arguments\":{\"url\":\"https://api.elevenlabs.io/v1/voices\",\"headers\":{\"xi-api-key\":\"sk_0123456789abcdef0123456789abcdef0123456789abcdef\"}}}\n",
+      "expected": [
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 156,
+          "specificity": "provider",
+          "start": 105,
+          "type": "elevenlabs_api_key"
+        }
+      ],
+      "note": "Issue #865: ElevenLabs API key, `sk_` + exactly 48 lowercase hex; the prefix and the `_residency_<[a-z0-9]+>` suffix rest on provider SDK code (T1 by maintainer ruling), the 48-hex body is T2 (tools plus measured fragments). An agent tool-call payload."
+    },
+    {
+      "id": "elevenlabs-api-key-positive-residency-dotenv",
+      "detector": "elevenlabs-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "XI_API_KEY=sk_0123456789abcdef0123456789abcdef0123456789abcdef_residency_eu\n",
+      "expected": [
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 75,
+          "specificity": "provider",
+          "start": 11,
+          "type": "elevenlabs_api_key"
+        }
+      ],
+      "note": "Issue #865: ElevenLabs API key, `sk_` + exactly 48 lowercase hex; the prefix and the `_residency_<[a-z0-9]+>` suffix rest on provider SDK code (T1 by maintainer ruling), the 48-hex body is T2 (tools plus measured fragments). A residency key: the `_residency_eu` suffix is inside the finding span, so no key fragment is left behind."
+    },
+    {
+      "id": "elevenlabs-api-key-positive-residency-sdk-call",
+      "detector": "elevenlabs-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "python"
+      ],
+      "input": "server = SpeechEngineServer(port=3001, api_key=\"sk_fedcba9876543210fedcba9876543210fedcba9876543210_residency_in\")\n",
+      "expected": [
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 112,
+          "specificity": "provider",
+          "start": 48,
+          "type": "elevenlabs_api_key"
+        }
+      ],
+      "note": "Issue #865: ElevenLabs API key, `sk_` + exactly 48 lowercase hex; the prefix and the `_residency_<[a-z0-9]+>` suffix rest on provider SDK code (T1 by maintainer ruling), the 48-hex body is T2 (tools plus measured fragments). A residency key as an SDK argument; the suffix is inside the span."
+    },
+    {
+      "id": "elevenlabs-api-key-positive-residency-bare",
+      "detector": "elevenlabs-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk_0123456789abcdef0123456789abcdef0123456789abcdef_residency_sg",
+      "expected": [
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 64,
+          "specificity": "provider",
+          "start": 0,
+          "type": "elevenlabs_api_key"
+        }
+      ],
+      "note": "Issue #865: ElevenLabs API key, `sk_` + exactly 48 lowercase hex; the prefix and the `_residency_<[a-z0-9]+>` suffix rest on provider SDK code (T1 by maintainer ruling), the 48-hex body is T2 (tools plus measured fragments). A bare residency key; the region code `sg` is inferred, not shown, in provider code."
+    },
+    {
+      "id": "elevenlabs-api-key-positive-punctuation-adjacent",
+      "detector": "elevenlabs-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "\"sk_0123456789abcdef0123456789abcdef0123456789abcdef\".",
+      "expected": [
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 52,
+          "specificity": "provider",
+          "start": 1,
+          "type": "elevenlabs_api_key"
+        }
+      ],
+      "note": "Issue #865: ElevenLabs API key, `sk_` + exactly 48 lowercase hex; the prefix and the `_residency_<[a-z0-9]+>` suffix rest on provider SDK code (T1 by maintainer ruling), the 48-hex body is T2 (tools plus measured fragments). Quotes and a full stop delimit the key."
+    },
+    {
+      "id": "elevenlabs-api-key-positive-repeated-value",
+      "detector": "elevenlabs-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_fedcba9876543210fedcba9876543210fedcba9876543210_residency_in",
+      "expected": [
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 51,
+          "specificity": "provider",
+          "start": 0,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 116,
+          "specificity": "provider",
+          "start": 52,
+          "type": "elevenlabs_api_key"
+        }
+      ],
+      "note": "Issue #865: ElevenLabs API key, `sk_` + exactly 48 lowercase hex; the prefix and the `_residency_<[a-z0-9]+>` suffix rest on provider SDK code (T1 by maintainer ruling), the 48-hex body is T2 (tools plus measured fragments). One finding per occurrence, each with its own span."
+    },
+    {
+      "id": "elevenlabs-api-key-regression-crlf-and-unicode-prefix",
+      "detector": "elevenlabs-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "regression",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# 🔑 café\r\nsk_0123456789abcdef0123456789abcdef0123456789abcdef_residency_eu\r\n",
+      "expected": [
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 78,
+          "specificity": "provider",
+          "start": 14,
+          "type": "elevenlabs_api_key"
+        }
+      ],
+      "note": "Issue #865: ElevenLabs API key, `sk_` + exactly 48 lowercase hex; the prefix and the `_residency_<[a-z0-9]+>` suffix rest on provider SDK code (T1 by maintainer ruling), the 48-hex body is T2 (tools plus measured fragments). Byte offsets stay exact after a multi-byte prefix line and across CRLF."
+    },
+    {
+      "id": "elevenlabs-api-key-boundary-one-short",
+      "detector": "elevenlabs-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk_0123456789abcdef0123456789abcdef0123456789abcde",
+      "expected": [],
+      "note": "Issue #865: ElevenLabs API key, `sk_` + exactly 48 lowercase hex; the prefix and the `_residency_<[a-z0-9]+>` suffix rest on provider SDK code (T1 by maintainer ruling), the 48-hex body is T2 (tools plus measured fragments). A 47-hex body is an intentional false negative."
+    },
+    {
+      "id": "elevenlabs-api-key-boundary-one-long",
+      "detector": "elevenlabs-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk_0123456789abcdef0123456789abcdef0123456789abcdef0",
+      "expected": [],
+      "note": "Issue #865: ElevenLabs API key, `sk_` + exactly 48 lowercase hex; the prefix and the `_residency_<[a-z0-9]+>` suffix rest on provider SDK code (T1 by maintainer ruling), the 48-hex body is T2 (tools plus measured fragments). A 49-hex body is an intentional false negative."
+    },
+    {
+      "id": "elevenlabs-api-key-boundary-uppercase-hex",
+      "detector": "elevenlabs-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk_0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF",
+      "expected": [],
+      "note": "Issue #865: ElevenLabs API key, `sk_` + exactly 48 lowercase hex; the prefix and the `_residency_<[a-z0-9]+>` suffix rest on provider SDK code (T1 by maintainer ruling), the 48-hex body is T2 (tools plus measured fragments). Uppercase hex is outside the reviewed lowercase alphabet."
+    },
+    {
+      "id": "elevenlabs-api-key-boundary-non-hex-last-char",
+      "detector": "elevenlabs-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk_0123456789abcdef0123456789abcdef0123456789abcdeg",
+      "expected": [],
+      "note": "Issue #865: ElevenLabs API key, `sk_` + exactly 48 lowercase hex; the prefix and the `_residency_<[a-z0-9]+>` suffix rest on provider SDK code (T1 by maintainer ruling), the 48-hex body is T2 (tools plus measured fragments). One non-hex byte in the body rejects the whole value."
+    },
+    {
+      "id": "elevenlabs-api-key-boundary-embedded-in-identifier",
+      "detector": "elevenlabs-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "xsk_0123456789abcdef0123456789abcdef0123456789abcdef",
+      "expected": [],
+      "note": "Issue #865: ElevenLabs API key, `sk_` + exactly 48 lowercase hex; the prefix and the `_residency_<[a-z0-9]+>` suffix rest on provider SDK code (T1 by maintainer ruling), the 48-hex body is T2 (tools plus measured fragments). A key glued to a preceding identifier byte is not claimed."
+    },
+    {
+      "id": "elevenlabs-api-key-boundary-glued-suffix",
+      "detector": "elevenlabs-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk_0123456789abcdef0123456789abcdef0123456789abcdef_backup",
+      "expected": [],
+      "note": "Issue #865: ElevenLabs API key, `sk_` + exactly 48 lowercase hex; the prefix and the `_residency_<[a-z0-9]+>` suffix rest on provider SDK code (T1 by maintainer ruling), the 48-hex body is T2 (tools plus measured fragments). An `_` suffix that is not exactly `_residency_<region>` rejects the whole value."
+    },
+    {
+      "id": "elevenlabs-api-key-boundary-empty-residency-region",
+      "detector": "elevenlabs-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk_0123456789abcdef0123456789abcdef0123456789abcdef_residency_",
+      "expected": [],
+      "note": "Issue #865: ElevenLabs API key, `sk_` + exactly 48 lowercase hex; the prefix and the `_residency_<[a-z0-9]+>` suffix rest on provider SDK code (T1 by maintainer ruling), the 48-hex body is T2 (tools plus measured fragments). A residency marker with no region is rejected whole."
+    },
+    {
+      "id": "elevenlabs-api-key-boundary-uppercase-residency-region",
+      "detector": "elevenlabs-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk_0123456789abcdef0123456789abcdef0123456789abcdef_residency_IN",
+      "expected": [],
+      "note": "Issue #865: ElevenLabs API key, `sk_` + exactly 48 lowercase hex; the prefix and the `_residency_<[a-z0-9]+>` suffix rest on provider SDK code (T1 by maintainer ruling), the 48-hex body is T2 (tools plus measured fragments). The region alphabet is lowercase `[a-z0-9]`; an uppercase region rejects the whole value."
+    },
+    {
+      "id": "elevenlabs-api-key-boundary-residency-region-glued",
+      "detector": "elevenlabs-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk_0123456789abcdef0123456789abcdef0123456789abcdef_residency_in_backup",
+      "expected": [],
+      "note": "Issue #865: ElevenLabs API key, `sk_` + exactly 48 lowercase hex; the prefix and the `_residency_<[a-z0-9]+>` suffix rest on provider SDK code (T1 by maintainer ruling), the 48-hex body is T2 (tools plus measured fragments). A region followed by more token bytes rejects the whole value."
+    },
+    {
+      "id": "elevenlabs-api-key-negative-pollinations-32-shape",
+      "detector": "elevenlabs-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk_0123456789abcdef0123456789abcdef",
+      "expected": [],
+      "note": "Issue #865: ElevenLabs API key, `sk_` + exactly 48 lowercase hex; the prefix and the `_residency_<[a-z0-9]+>` suffix rest on provider SDK code (T1 by maintainer ruling), the 48-hex body is T2 (tools plus measured fragments). The `sk_` + 32 shape planned by another issuer is not claimed."
+    },
+    {
+      "id": "elevenlabs-api-key-negative-wrong-prefix",
+      "detector": "elevenlabs-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "pk_0123456789abcdef0123456789abcdef0123456789abcdef ak_fedcba9876543210fedcba9876543210fedcba9876543210",
+      "expected": [],
+      "note": "Issue #865: ElevenLabs API key, `sk_` + exactly 48 lowercase hex; the prefix and the `_residency_<[a-z0-9]+>` suffix rest on provider SDK code (T1 by maintainer ruling), the 48-hex body is T2 (tools plus measured fragments). `pk_` and `ak_` prefixes are other credential kinds."
+    },
+    {
+      "id": "elevenlabs-api-key-negative-placeholder",
+      "detector": "elevenlabs-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk_your_api_key_here sk_...",
+      "expected": [],
+      "note": "Issue #865: ElevenLabs API key, `sk_` + exactly 48 lowercase hex; the prefix and the `_residency_<[a-z0-9]+>` suffix rest on provider SDK code (T1 by maintainer ruling), the 48-hex body is T2 (tools plus measured fragments). Documentation placeholders."
+    },
+    {
+      "id": "elevenlabs-api-key-negative-masked-hint",
+      "detector": "elevenlabs-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"hint\": \"sk_****1234\", \"masked\": \"sk_************************************************\"}",
+      "expected": [],
+      "note": "Issue #865: ElevenLabs API key, `sk_` + exactly 48 lowercase hex; the prefix and the `_residency_<[a-z0-9]+>` suffix rest on provider SDK code (T1 by maintainer ruling), the 48-hex body is T2 (tools plus measured fragments). Masked values and the list endpoint's `hint`."
+    },
+    {
+      "id": "elevenlabs-api-key-negative-filler",
+      "detector": "elevenlabs-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk_000000000000000000000000000000000000000000000000",
+      "expected": [],
+      "note": "Issue #865: ElevenLabs API key, `sk_` + exactly 48 lowercase hex; the prefix and the `_residency_<[a-z0-9]+>` suffix rest on provider SDK code (T1 by maintainer ruling), the 48-hex body is T2 (tools plus measured fragments). A body of one repeated byte is a documentation filler."
+    },
+    {
+      "id": "elevenlabs-api-key-negative-non-secret-identifiers",
+      "detector": "elevenlabs-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"key_id\": \"0123456789abcdef0123456789abcdef\", \"hashed_xi_api_key\": \"0123456789abcdef0123456789abcdef0123456789abcdeffedcba9876543210\", \"voice_id\": \"21m00Tcm4TlvDq8ikWAM\"}",
+      "expected": [],
+      "note": "Issue #865: ElevenLabs API key, `sk_` + exactly 48 lowercase hex; the prefix and the `_residency_<[a-z0-9]+>` suffix rest on provider SDK code (T1 by maintainer ruling), the 48-hex body is T2 (tools plus measured fragments). `key_id`, `hashed_xi_api_key` and voice ids are non-secret identifiers."
+    },
+    {
+      "id": "elevenlabs-api-key-negative-region-hostname",
+      "detector": "elevenlabs-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "base_url: https://api.eu.residency.elevenlabs.io\n",
+      "expected": [],
+      "note": "Issue #865: ElevenLabs API key, `sk_` + exactly 48 lowercase hex; the prefix and the `_residency_<[a-z0-9]+>` suffix rest on provider SDK code (T1 by maintainer ruling), the 48-hex body is T2 (tools plus measured fragments). Region hostnames are non-secret neighbours."
+    },
+    {
+      "id": "elevenlabs-api-key-negative-hash-after-unrelated-name",
+      "detector": "elevenlabs-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk_hash = \"0123456789abcdef0123456789abcdef0123456789abcdef\"",
+      "expected": [],
+      "note": "Issue #865: ElevenLabs API key, `sk_` + exactly 48 lowercase hex; the prefix and the `_residency_<[a-z0-9]+>` suffix rest on provider SDK code (T1 by maintainer ruling), the 48-hex body is T2 (tools plus measured fragments). A 48-hex value after an unrelated `sk_`-named variable is not a key."
+    },
+    {
+      "id": "elevenlabs-api-key-overlap-bearer",
+      "detector": "elevenlabs-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer sk_0123456789abcdef0123456789abcdef0123456789abcdef\n",
+      "expected": [
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 73,
+          "specificity": "provider",
+          "start": 22,
+          "type": "elevenlabs_api_key"
+        }
+      ],
+      "note": "Issue #865: ElevenLabs API key, `sk_` + exactly 48 lowercase hex; the prefix and the `_residency_<[a-z0-9]+>` suffix rest on provider SDK code (T1 by maintainer ruling), the 48-hex body is T2 (tools plus measured fragments). bearer-token proposes the same span; the provider candidate wins on specificity."
+    },
+    {
+      "id": "elevenlabs-api-key-overlap-xi-api-key-header",
+      "detector": "elevenlabs-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "xi-api-key: sk_0123456789abcdef0123456789abcdef0123456789abcdef\n",
+      "expected": [
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 63,
+          "specificity": "provider",
+          "start": 12,
+          "type": "elevenlabs_api_key"
+        }
+      ],
+      "note": "Issue #865: ElevenLabs API key, `sk_` + exactly 48 lowercase hex; the prefix and the `_residency_<[a-z0-9]+>` suffix rest on provider SDK code (T1 by maintainer ruling), the 48-hex body is T2 (tools plus measured fragments). The contextual generic-token candidate loses to the provider candidate."
+    },
+    {
+      "id": "elevenlabs-api-key-overlap-residency-under-env-marker",
+      "detector": "elevenlabs-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "ELEVENLABS_API_KEY=sk_0123456789abcdef0123456789abcdef0123456789abcdef_residency_in\n",
+      "expected": [
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 83,
+          "specificity": "provider",
+          "start": 19,
+          "type": "elevenlabs_api_key"
+        }
+      ],
+      "note": "Issue #865: ElevenLabs API key, `sk_` + exactly 48 lowercase hex; the prefix and the `_residency_<[a-z0-9]+>` suffix rest on provider SDK code (T1 by maintainer ruling), the 48-hex body is T2 (tools plus measured fragments). generic-token would span the suffix too; the provider candidate carries the same span and wins."
+    },
+    {
+      "id": "elevenlabs-api-key-overlap-stripe-live-shape",
+      "detector": "elevenlabs-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk\u005flive_SYNTHETICREVOKEDSYNTHETI",
+      "expected": [
+        {
+          "confidence": "high",
+          "detector": "stripe-token",
+          "end": 32,
+          "specificity": "provider",
+          "start": 0,
+          "type": "stripe_credential"
+        }
+      ],
+      "note": "Issue #865: ElevenLabs API key, `sk_` + exactly 48 lowercase hex; the prefix and the `_residency_<[a-z0-9]+>` suffix rest on provider SDK code (T1 by maintainer ruling), the 48-hex body is T2 (tools plus measured fragments). A Stripe-shaped `sk_live_` value belongs to stripe-token; this detector does not claim it."
+    },
+    {
+      "id": "elevenlabs-api-key-overlap-stripe-test-shape",
+      "detector": "elevenlabs-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "STRIPE_SECRET_KEY=sk\u005ftest_SYNTHETICREVOKEDSYNTHETI\n",
+      "expected": [
+        {
+          "confidence": "high",
+          "detector": "stripe-token",
+          "end": 50,
+          "specificity": "provider",
+          "start": 18,
+          "type": "stripe_credential"
+        }
+      ],
+      "note": "Issue #865: ElevenLabs API key, `sk_` + exactly 48 lowercase hex; the prefix and the `_residency_<[a-z0-9]+>` suffix rest on provider SDK code (T1 by maintainer ruling), the 48-hex body is T2 (tools plus measured fragments). A Stripe-shaped `sk_test_` value belongs to stripe-token."
+    },
+    {
+      "id": "elevenlabs-api-key-adversarial-dense-findings",
+      "detector": "elevenlabs-api-key",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 5300,
+        "maxFindings": 100,
+        "maxRuntimeMs": 250
+      },
+      "input": "sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef sk_0123456789abcdef0123456789abcdef0123456789abcdef ",
+      "expected": [
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 51,
+          "specificity": "provider",
+          "start": 0,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 103,
+          "specificity": "provider",
+          "start": 52,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 155,
+          "specificity": "provider",
+          "start": 104,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 207,
+          "specificity": "provider",
+          "start": 156,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 259,
+          "specificity": "provider",
+          "start": 208,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 311,
+          "specificity": "provider",
+          "start": 260,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 363,
+          "specificity": "provider",
+          "start": 312,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 415,
+          "specificity": "provider",
+          "start": 364,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 467,
+          "specificity": "provider",
+          "start": 416,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 519,
+          "specificity": "provider",
+          "start": 468,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 571,
+          "specificity": "provider",
+          "start": 520,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 623,
+          "specificity": "provider",
+          "start": 572,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 675,
+          "specificity": "provider",
+          "start": 624,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 727,
+          "specificity": "provider",
+          "start": 676,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 779,
+          "specificity": "provider",
+          "start": 728,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 831,
+          "specificity": "provider",
+          "start": 780,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 883,
+          "specificity": "provider",
+          "start": 832,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 935,
+          "specificity": "provider",
+          "start": 884,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 987,
+          "specificity": "provider",
+          "start": 936,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 1039,
+          "specificity": "provider",
+          "start": 988,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 1091,
+          "specificity": "provider",
+          "start": 1040,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 1143,
+          "specificity": "provider",
+          "start": 1092,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 1195,
+          "specificity": "provider",
+          "start": 1144,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 1247,
+          "specificity": "provider",
+          "start": 1196,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 1299,
+          "specificity": "provider",
+          "start": 1248,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 1351,
+          "specificity": "provider",
+          "start": 1300,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 1403,
+          "specificity": "provider",
+          "start": 1352,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 1455,
+          "specificity": "provider",
+          "start": 1404,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 1507,
+          "specificity": "provider",
+          "start": 1456,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 1559,
+          "specificity": "provider",
+          "start": 1508,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 1611,
+          "specificity": "provider",
+          "start": 1560,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 1663,
+          "specificity": "provider",
+          "start": 1612,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 1715,
+          "specificity": "provider",
+          "start": 1664,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 1767,
+          "specificity": "provider",
+          "start": 1716,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 1819,
+          "specificity": "provider",
+          "start": 1768,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 1871,
+          "specificity": "provider",
+          "start": 1820,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 1923,
+          "specificity": "provider",
+          "start": 1872,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 1975,
+          "specificity": "provider",
+          "start": 1924,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 2027,
+          "specificity": "provider",
+          "start": 1976,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 2079,
+          "specificity": "provider",
+          "start": 2028,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 2131,
+          "specificity": "provider",
+          "start": 2080,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 2183,
+          "specificity": "provider",
+          "start": 2132,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 2235,
+          "specificity": "provider",
+          "start": 2184,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 2287,
+          "specificity": "provider",
+          "start": 2236,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 2339,
+          "specificity": "provider",
+          "start": 2288,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 2391,
+          "specificity": "provider",
+          "start": 2340,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 2443,
+          "specificity": "provider",
+          "start": 2392,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 2495,
+          "specificity": "provider",
+          "start": 2444,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 2547,
+          "specificity": "provider",
+          "start": 2496,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 2599,
+          "specificity": "provider",
+          "start": 2548,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 2651,
+          "specificity": "provider",
+          "start": 2600,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 2703,
+          "specificity": "provider",
+          "start": 2652,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 2755,
+          "specificity": "provider",
+          "start": 2704,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 2807,
+          "specificity": "provider",
+          "start": 2756,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 2859,
+          "specificity": "provider",
+          "start": 2808,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 2911,
+          "specificity": "provider",
+          "start": 2860,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 2963,
+          "specificity": "provider",
+          "start": 2912,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 3015,
+          "specificity": "provider",
+          "start": 2964,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 3067,
+          "specificity": "provider",
+          "start": 3016,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 3119,
+          "specificity": "provider",
+          "start": 3068,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 3171,
+          "specificity": "provider",
+          "start": 3120,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 3223,
+          "specificity": "provider",
+          "start": 3172,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 3275,
+          "specificity": "provider",
+          "start": 3224,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 3327,
+          "specificity": "provider",
+          "start": 3276,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 3379,
+          "specificity": "provider",
+          "start": 3328,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 3431,
+          "specificity": "provider",
+          "start": 3380,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 3483,
+          "specificity": "provider",
+          "start": 3432,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 3535,
+          "specificity": "provider",
+          "start": 3484,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 3587,
+          "specificity": "provider",
+          "start": 3536,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 3639,
+          "specificity": "provider",
+          "start": 3588,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 3691,
+          "specificity": "provider",
+          "start": 3640,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 3743,
+          "specificity": "provider",
+          "start": 3692,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 3795,
+          "specificity": "provider",
+          "start": 3744,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 3847,
+          "specificity": "provider",
+          "start": 3796,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 3899,
+          "specificity": "provider",
+          "start": 3848,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 3951,
+          "specificity": "provider",
+          "start": 3900,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 4003,
+          "specificity": "provider",
+          "start": 3952,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 4055,
+          "specificity": "provider",
+          "start": 4004,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 4107,
+          "specificity": "provider",
+          "start": 4056,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 4159,
+          "specificity": "provider",
+          "start": 4108,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 4211,
+          "specificity": "provider",
+          "start": 4160,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 4263,
+          "specificity": "provider",
+          "start": 4212,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 4315,
+          "specificity": "provider",
+          "start": 4264,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 4367,
+          "specificity": "provider",
+          "start": 4316,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 4419,
+          "specificity": "provider",
+          "start": 4368,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 4471,
+          "specificity": "provider",
+          "start": 4420,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 4523,
+          "specificity": "provider",
+          "start": 4472,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 4575,
+          "specificity": "provider",
+          "start": 4524,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 4627,
+          "specificity": "provider",
+          "start": 4576,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 4679,
+          "specificity": "provider",
+          "start": 4628,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 4731,
+          "specificity": "provider",
+          "start": 4680,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 4783,
+          "specificity": "provider",
+          "start": 4732,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 4835,
+          "specificity": "provider",
+          "start": 4784,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 4887,
+          "specificity": "provider",
+          "start": 4836,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 4939,
+          "specificity": "provider",
+          "start": 4888,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 4991,
+          "specificity": "provider",
+          "start": 4940,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 5043,
+          "specificity": "provider",
+          "start": 4992,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 5095,
+          "specificity": "provider",
+          "start": 5044,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 5147,
+          "specificity": "provider",
+          "start": 5096,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 5199,
+          "specificity": "provider",
+          "start": 5148,
+          "type": "elevenlabs_api_key"
+        }
+      ],
+      "note": "Issue #865: ElevenLabs API key, `sk_` + exactly 48 lowercase hex; the prefix and the `_residency_<[a-z0-9]+>` suffix rest on provider SDK code (T1 by maintainer ruling), the 48-hex body is T2 (tools plus measured fragments). One hundred adjacent keys stay one finding each."
+    },
+    {
+      "id": "elevenlabs-api-key-adversarial-repeated-prefix",
+      "detector": "elevenlabs-api-key",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 12000,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      },
+      "input": "sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_sk_",
+      "expected": [],
+      "note": "Issue #865: ElevenLabs API key, `sk_` + exactly 48 lowercase hex; the prefix and the `_residency_<[a-z0-9]+>` suffix rest on provider SDK code (T1 by maintainer ruling), the 48-hex body is T2 (tools plus measured fragments). A dense run of bare prefixes yields nothing and stays linear."
+    },
+    {
+      "id": "elevenlabs-api-key-adversarial-long-glued-region",
+      "detector": "elevenlabs-api-key",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 8100,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      },
+      "input": "sk_0123456789abcdef0123456789abcdef0123456789abcdef_residency_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa_x",
+      "expected": [],
+      "note": "Issue #865: ElevenLabs API key, `sk_` + exactly 48 lowercase hex; the prefix and the `_residency_<[a-z0-9]+>` suffix rest on provider SDK code (T1 by maintainer ruling), the 48-hex body is T2 (tools plus measured fragments). A very long region followed by a glued byte is rejected whole in linear time."
     }
   ]
 }

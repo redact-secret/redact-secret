@@ -493,6 +493,13 @@
       "schemes": null
     },
     {
+      "type": "elevenlabs_api_key",
+      "detector": "elevenlabs-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "sk_0123456789abcdef0123456789abcdef0123456789abcdef",
+      "schemes": null
+    },
+    {
       "type": "pinecone_api_key",
       "detector": "pinecone-api-key",
       "policyClass": "always-redact",

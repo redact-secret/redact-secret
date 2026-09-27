@@ -7420,6 +7420,124 @@
     },
     {
       "behaviorClass": "provider",
+      "detector": "elevenlabs-api-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "elevenlabs-api-key-positive-bare",
+            "elevenlabs-api-key-positive-curl-header",
+            "elevenlabs-api-key-positive-dotenv",
+            "elevenlabs-api-key-positive-json",
+            "elevenlabs-api-key-positive-log",
+            "elevenlabs-api-key-positive-punctuation-adjacent",
+            "elevenlabs-api-key-positive-python-sdk-call",
+            "elevenlabs-api-key-positive-repeated-value",
+            "elevenlabs-api-key-positive-residency-bare",
+            "elevenlabs-api-key-positive-residency-dotenv",
+            "elevenlabs-api-key-positive-residency-sdk-call",
+            "elevenlabs-api-key-positive-shell-export",
+            "elevenlabs-api-key-positive-tool-call",
+            "elevenlabs-api-key-positive-typescript-sdk-call",
+            "elevenlabs-api-key-positive-yaml",
+            "elevenlabs-api-key-regression-crlf-and-unicode-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "elevenlabs-api-key-overlap-bearer",
+            "elevenlabs-api-key-overlap-residency-under-env-marker",
+            "elevenlabs-api-key-overlap-xi-api-key-header"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "elevenlabs-api-key-adversarial-dense-findings",
+            "elevenlabs-api-key-adversarial-long-glued-region",
+            "elevenlabs-api-key-adversarial-repeated-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "elevenlabs-api-key-boundary-embedded-in-identifier",
+            "elevenlabs-api-key-boundary-empty-residency-region",
+            "elevenlabs-api-key-boundary-glued-suffix",
+            "elevenlabs-api-key-boundary-non-hex-last-char",
+            "elevenlabs-api-key-boundary-one-long",
+            "elevenlabs-api-key-boundary-one-short",
+            "elevenlabs-api-key-boundary-residency-region-glued",
+            "elevenlabs-api-key-boundary-uppercase-hex",
+            "elevenlabs-api-key-boundary-uppercase-residency-region"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "elevenlabs-api-key-negative-filler",
+            "elevenlabs-api-key-negative-hash-after-unrelated-name",
+            "elevenlabs-api-key-negative-masked-hint",
+            "elevenlabs-api-key-negative-non-secret-identifiers",
+            "elevenlabs-api-key-negative-placeholder",
+            "elevenlabs-api-key-negative-pollinations-32-shape",
+            "elevenlabs-api-key-negative-region-hostname",
+            "elevenlabs-api-key-negative-wrong-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "elevenlabs-api-key-boundary-embedded-in-identifier",
+            "elevenlabs-api-key-boundary-empty-residency-region",
+            "elevenlabs-api-key-boundary-glued-suffix",
+            "elevenlabs-api-key-boundary-non-hex-last-char",
+            "elevenlabs-api-key-boundary-one-long",
+            "elevenlabs-api-key-boundary-one-short",
+            "elevenlabs-api-key-boundary-residency-region-glued",
+            "elevenlabs-api-key-boundary-uppercase-hex",
+            "elevenlabs-api-key-boundary-uppercase-residency-region"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for elevenlabs_api_key (elevenlabs-api-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "elevenlabs_api_key"
+    },
+    {
+      "behaviorClass": "provider",
       "detector": "pinecone-api-key",
       "dimensions": [
         {
@@ -8858,6 +8976,7 @@
             "digitalocean-separator-boundary-discriminating-boundary",
             "docker-embedded-identifier-discriminating-boundary",
             "docker-pat-oat-exact-length-partitions",
+            "elevenlabs-api-key-incremental-residency-partitions",
             "encoded-connection",
             "fixed-width-unicode",
             "github-installation-stateless",
@@ -8949,6 +9068,9 @@
             "digitalocean-adversarial-long-suffix",
             "discord-bot-token-adversarial-long-padding",
             "docker-adversarial-long-suffix",
+            "elevenlabs-api-key-adversarial-dense-findings",
+            "elevenlabs-api-key-adversarial-long-glued-region",
+            "elevenlabs-api-key-adversarial-repeated-prefix",
             "firebase-server-key-adversarial-near-miss-body",
             "fireworks-ai-api-key-adversarial-long-suffix",
             "github-adversarial-long-suffix",
@@ -9222,6 +9344,7 @@
             "digitalocean-separator-boundary-discriminating-boundary",
             "docker-embedded-identifier-discriminating-boundary",
             "docker-pat-oat-exact-length-partitions",
+            "elevenlabs-api-key-incremental-residency-partitions",
             "encoded-connection",
             "fixed-width-unicode",
             "github-installation-stateless",
@@ -9374,6 +9497,9 @@
             "digitalocean-adversarial-long-suffix",
             "discord-bot-token-adversarial-long-padding",
             "docker-adversarial-long-suffix",
+            "elevenlabs-api-key-adversarial-dense-findings",
+            "elevenlabs-api-key-adversarial-long-glued-region",
+            "elevenlabs-api-key-adversarial-repeated-prefix",
             "firebase-server-key-adversarial-near-miss-body",
             "fireworks-ai-api-key-adversarial-long-suffix",
             "github-adversarial-long-suffix",
@@ -9708,6 +9834,7 @@
             "digitalocean-separator-boundary-discriminating-boundary",
             "docker-embedded-identifier-discriminating-boundary",
             "docker-pat-oat-exact-length-partitions",
+            "elevenlabs-api-key-incremental-residency-partitions",
             "encoded-connection",
             "fixed-width-unicode",
             "github-installation-stateless",
