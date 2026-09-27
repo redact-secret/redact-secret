@@ -1,5 +1,10 @@
 # Issue #516 — Vercel credential taxonomy audit (`vcp_`, `vci_`, `vca_`, `vcr_`, `vck_`)
 
+> **Superseded by [issue #858](../858/README.md) (2026-09-26).** This file is
+> retained as the historical #516 review. Its complete-`vci_`, conservative
+> suffix-floor, and resolved-unprefixed-surface conclusions are not the live
+> product contract.
+
 [Audit archive](../../README.md) ·
 [Precision-contract freeze (#367)](../../../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) ·
 [Precision contracts: `vercel-token` family](../../../contracts/precision/precision-contracts.json) ·
