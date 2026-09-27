@@ -21,21 +21,28 @@
 //! either prefix, and a short-term key hides its embedded `ASIA` id inside
 //! Base64.
 //!
-//! ## Evidence and tier (maintainer T1 ruling pending)
+//! ## Evidence and tier (maintainer ruling 2026-09-27, #778, #779)
 //!
-//! - **Prefix and alphabet, T1 candidate.** The AWS Security Blog
-//!   ("Securing Amazon Bedrock API keys", 2025-10-17) prints a scan pattern
-//!   for each type: `ABSK…[A-Za-z0-9+\/]+={0,2}` and
-//!   `bedrock-api-key-<fixed head>[…]+={0,2}`. AWS-authored generators
-//!   (`aws-bedrock-token-generator-python`, `-js`, `-java`) fix
-//!   `AUTH_PREFIX = "bedrock-api-key-"` and Base64-encode (standard,
-//!   padded) a presigned `CallWithBearerToken` URL. The blog's short-term
-//!   body class is printed malformed (`[A-Za-Z0-9\\]`); the generators'
-//!   standard Base64 is the intended class. Whether a provider blog counts
-//!   as T1 is a maintainer ruling, recorded in the evidence record
-//!   `docs/audits/evidence/864/README.md`; until it lands the tier stays
-//!   "T1 candidate".
-//! - **Short-term 133-byte head, T1 candidate.** The 99 bytes
+//! - **Long-term prefix and alphabet, T1.** Accepted on the AWS Security
+//!   Blog ("Securing Amazon Bedrock API keys", 2025-10-17), a
+//!   provider-authored scan pattern: `ABSK` and the standard-Base64
+//!   alphabet with `={0,2}` padding. Total length and IAM user-name
+//!   variants other than `BedrockAPIKey-` stay T2/unspecified; the blog is
+//!   accepted as provider evidence for the prefix and alphabet only, not a
+//!   format specification. See `docs/audits/evidence/864/README.md`.
+//! - **Short-term prefix, head and alphabet, T1.** Accepted on the
+//!   AWS-authored token generators `aws-bedrock-token-generator-python`
+//!   (`token_generator.py`: `AUTH_PREFIX = "bedrock-api-key-"`,
+//!   `TOKEN_VERSION = "&Version=1"`, Base64 of a SigV4-presigned
+//!   `https://bedrock.amazonaws.com/?Action=CallWithBearerToken` URL), the
+//!   JS (`src/token.ts`) and Java (`BedrockTokenGenerator.java`)
+//!   generators, plus the AWS Security Blog pattern (whose printed body
+//!   class is malformed; the intended class is `[A-Za-z0-9+/]`): the
+//!   `bedrock-api-key-` prefix, the fixed 133-character Base64 head, and
+//!   the standard padded-Base64 alphabet. Total length (not documented;
+//!   "over 1000 characters" is vendor-blog only) and the session-token part
+//!   of the body stay T2/unspecified.
+//! - **Short-term 133-byte head.** The 99 bytes
 //!   `bedrock.amazonaws.com/?Action=CallWithBearerToken&X-Amz-Algorithm=`
 //!   `AWS4-HMAC-SHA256&X-Amz-Credential` encode to 132 stable Base64
 //!   characters, and the 133rd is fixed by the following `=`
