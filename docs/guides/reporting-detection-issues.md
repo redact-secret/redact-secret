@@ -1,21 +1,29 @@
-# Reporting a false positive or missed detection
+# Reporting detection issues and other feedback
 
 [Documentation home](../README.md) · [Troubleshooting](../troubleshooting.md)
 
-Use this guide, then one of the two issue forms, when the scanner flagged a
-value it should not have (a **false positive**) or missed a value it should
-have caught (a **missed detection**). For a suspected vulnerability, use the
-private process in [SECURITY.md](../../SECURITY.md) instead — never a public
-issue.
+Choose the form that best matches your feedback. English or Korean is welcome.
+제보는 영어와 한국어 모두 가능합니다. If you are unsure of a detector family,
+leave it blank. For a suspected security vulnerability, use the private process
+in [SECURITY.md](../../SECURITY.md) — never a public issue.
 
-- [False positive report](https://github.com/redact-secret/redact-secret/issues/new?template=false-positive.yml)
-- [Missed detection report](https://github.com/redact-secret/redact-secret/issues/new?template=missed-detection.yml)
+| What you noticed | Form |
+| --- | --- |
+| A harmless value was flagged or redacted | [False positive report](https://github.com/redact-secret/redact-secret/issues/new?template=false-positive.yml) |
+| A supported credential was missed or given the wrong action | [Missed detection report](https://github.com/redact-secret/redact-secret/issues/new?template=missed-detection.yml) |
+| A provider credential or PII entity should be supported | [Request a detector](https://github.com/redact-secret/redact-secret/issues/new?template=request-detector.yml) |
+| Installation, adapter behavior, or a guide was confusing | [Integration or docs feedback](https://github.com/redact-secret/redact-secret/issues/new?template=integration-docs.yml) |
+
+The reproduction steps below apply to false positives and missed detections.
+For a detector request, a public format link and a short use case are enough.
+For integration or documentation feedback, a brief description is enough to start;
+the maintainer can ask for versions or a safe reproduction afterward.
 
 ## Never submit a real credential
 
-Do not paste a live, revoked-but-real, or real-derived credential into either
-form, an attached file, or a comment — not even truncated, masked, or a
-partial fragment. "Real-derived" includes taking a real value and editing a
+Do not paste a live, revoked-but-real, or real-derived credential or real
+personal data into any public form, attached file, or comment — not even a
+truncated, masked, or partial fragment of a credential. "Real-derived" includes taking a real value and editing a
 few characters: the grammar and provider fingerprint usually survive that
 edit. Instead, build an **independently authored synthetic equivalent**:
 
@@ -95,8 +103,10 @@ only detector ids, confidence, action, and offsets — no text from your file.
 
 ## What happens after you file
 
-Filing either form does **not** by itself change any conformance fixture or
-expected result, and does not by itself open a confirmed product defect.
+Filing a false positive or missed detection report does **not** by itself
+change any conformance fixture or expected result, and does not by itself open
+a confirmed product defect. A detector request also does not imply that a
+family will be implemented or qualified.
 Benchmark-originated and reporter-originated findings share one governed
 lifecycle, owned by
 [`redact-secret-benchmarks`](https://github.com/redact-secret/redact-secret-benchmarks)
