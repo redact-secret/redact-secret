@@ -92,12 +92,12 @@ fn marker_bearing_keys_are_detected_at_every_documented_shape() {
 }
 
 #[test]
-fn the_admin_finding_is_the_shared_openai_finding_at_provider_specificity() {
+fn the_admin_finding_is_its_own_openai_finding_type_at_provider_specificity() {
     let key = admin_key(58, 58);
     let findings = scan(&key, &registry(), &DefaultPolicy).unwrap();
     assert_eq!(findings.len(), 1);
     assert_eq!(findings[0].detector(), "openai-token");
-    assert_eq!(findings[0].type_name(), "openai_api_key");
+    assert_eq!(findings[0].type_name(), "openai_admin_api_key");
     assert_eq!(findings[0].confidence(), Confidence::High);
     assert_eq!(findings[0].range(), ByteRange::new(0, key.len()).unwrap());
     assert!(findings[0].action().replaces_text());

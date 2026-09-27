@@ -4,9 +4,11 @@
       "detector": "anthropic-token",
       "falseNegativeGuards": {
         "actualFalseNegatives": 0,
-        "count": 11,
+        "count": 13,
         "fixtureIds": [
+          "anthropic-positive-admin",
           "anthropic-positive-doc-style-placeholder",
+          "anthropic-positive-enterprise",
           "anthropic-positive-json",
           "anthropic-positive-log",
           "anthropic-positive-min-length",

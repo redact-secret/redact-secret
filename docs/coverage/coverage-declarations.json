@@ -1189,7 +1189,6 @@
             "openai-positive-368-proj-unicode-crlf",
             "openai-positive-368-svcacct-plain",
             "openai-positive-368-svcacct-unicode-crlf",
-            "openai-positive-admin-marker",
             "openai-positive-legacy-marker",
             "openai-positive-marker-all-variants",
             "openai-positive-marker-doc-style-placeholder",
@@ -1359,6 +1358,163 @@
     },
     {
       "behaviorClass": "provider",
+      "detector": "openai-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "openai-positive-admin-marker",
+            "openai-positive-marker-all-variants"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "openai-overlap-admin-marker-client-secret"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "openai-adversarial-long-suffix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "openai-boundary-admin-left-73",
+            "openai-boundary-admin-right-57",
+            "openai-boundary-admin-right-59",
+            "openai-boundary-below-min",
+            "openai-boundary-case-sensitivity",
+            "openai-boundary-delimiter",
+            "openai-boundary-invalid-alphabet",
+            "openai-boundary-legacy-left-19",
+            "openai-boundary-legacy-left-21",
+            "openai-boundary-legacy-right-19",
+            "openai-boundary-legacy-right-21",
+            "openai-boundary-marker-uppercase-prefix",
+            "openai-boundary-project-left-57",
+            "openai-boundary-project-left-59",
+            "openai-boundary-project-left-75",
+            "openai-boundary-project-right-73",
+            "openai-boundary-project-right-75",
+            "openai-boundary-service-namespace-unsupported",
+            "openai-boundary-short",
+            "openai-boundary-svcacct-left-75",
+            "openai-boundary-svcacct-right-57",
+            "openai-boundary-svcacct-right-59",
+            "openai-positive-all-prefixes",
+            "openai-positive-doc-style-placeholder",
+            "openai-positive-log",
+            "openai-positive-min-length",
+            "openai-positive-namespace-separation-all-variants",
+            "openai-positive-project",
+            "openai-positive-punctuation-adjacent",
+            "openai-positive-repeated-value",
+            "openai-positive-shell-quoted",
+            "openai-positive-yaml",
+            "openai-positive-yaml-crlf"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "openai-negative-368-proj-plain-twin",
+            "openai-negative-368-proj-unicode-crlf-twin",
+            "openai-negative-368-svcacct-plain-twin",
+            "openai-negative-368-svcacct-unicode-crlf-twin",
+            "openai-negative-embedded-in-wider-identifier",
+            "openai-negative-legacy-underscore-segment",
+            "openai-negative-lookalike",
+            "openai-negative-marker-embedded-leading",
+            "openai-negative-marker-embedded-trailing",
+            "openai-negative-marker-log",
+            "openai-negative-marker-lowercase",
+            "openai-negative-marker-markdown",
+            "openai-negative-marker-near-prefix-underscore",
+            "openai-negative-marker-shell-quoted",
+            "openai-negative-model-name",
+            "openai-negative-near-prefix-underscore",
+            "openai-negative-placeholder"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "openai-boundary-admin-left-73",
+            "openai-boundary-admin-right-57",
+            "openai-boundary-admin-right-59",
+            "openai-boundary-below-min",
+            "openai-boundary-case-sensitivity",
+            "openai-boundary-delimiter",
+            "openai-boundary-invalid-alphabet",
+            "openai-boundary-legacy-left-19",
+            "openai-boundary-legacy-left-21",
+            "openai-boundary-legacy-right-19",
+            "openai-boundary-legacy-right-21",
+            "openai-boundary-marker-uppercase-prefix",
+            "openai-boundary-project-left-57",
+            "openai-boundary-project-left-59",
+            "openai-boundary-project-left-75",
+            "openai-boundary-project-right-73",
+            "openai-boundary-project-right-75",
+            "openai-boundary-service-namespace-unsupported",
+            "openai-boundary-short",
+            "openai-boundary-svcacct-left-75",
+            "openai-boundary-svcacct-right-57",
+            "openai-boundary-svcacct-right-59",
+            "openai-positive-all-prefixes",
+            "openai-positive-doc-style-placeholder",
+            "openai-positive-log",
+            "openai-positive-min-length",
+            "openai-positive-namespace-separation-all-variants",
+            "openai-positive-project",
+            "openai-positive-punctuation-adjacent",
+            "openai-positive-repeated-value",
+            "openai-positive-shell-quoted",
+            "openai-positive-yaml",
+            "openai-positive-yaml-crlf"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for openai_admin_api_key (openai-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "openai_admin_api_key"
+    },
+    {
+      "behaviorClass": "provider",
       "detector": "anthropic-token",
       "dimensions": [
         {
@@ -1456,6 +1612,190 @@
       ],
       "note": "Coverage declaration for anthropic_api_key (anthropic-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
       "type": "anthropic_api_key"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "anthropic-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "anthropic-positive-enterprise"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "anthropic-overlap-enterprise-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "single-detector-family",
+            "sharedWith": "anthropic_api_key"
+          },
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "anthropic-boundary-below-min",
+            "anthropic-boundary-case-sensitivity",
+            "anthropic-boundary-delimiter",
+            "anthropic-boundary-future-version",
+            "anthropic-boundary-invalid-alphabet",
+            "anthropic-boundary-version"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "anthropic-negative-embedded-in-wider-identifier",
+            "anthropic-negative-legacy-unversioned-tradeoff",
+            "anthropic-negative-near-prefix-underscore",
+            "anthropic-negative-placeholder",
+            "anthropic-negative-unrelated-id"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "anthropic-boundary-below-min",
+            "anthropic-boundary-case-sensitivity",
+            "anthropic-boundary-delimiter",
+            "anthropic-boundary-future-version",
+            "anthropic-boundary-invalid-alphabet",
+            "anthropic-boundary-version"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for anthropic_enterprise_api_key (anthropic-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "anthropic_enterprise_api_key"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "anthropic-token",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "anthropic-positive-admin"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "anthropic-overlap-admin-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "single-detector-family",
+            "sharedWith": "anthropic_api_key"
+          },
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "anthropic-boundary-below-min",
+            "anthropic-boundary-case-sensitivity",
+            "anthropic-boundary-delimiter",
+            "anthropic-boundary-future-version",
+            "anthropic-boundary-invalid-alphabet",
+            "anthropic-boundary-version"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "anthropic-negative-embedded-in-wider-identifier",
+            "anthropic-negative-legacy-unversioned-tradeoff",
+            "anthropic-negative-near-prefix-underscore",
+            "anthropic-negative-placeholder",
+            "anthropic-negative-unrelated-id"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "anthropic-boundary-below-min",
+            "anthropic-boundary-case-sensitivity",
+            "anthropic-boundary-delimiter",
+            "anthropic-boundary-future-version",
+            "anthropic-boundary-invalid-alphabet",
+            "anthropic-boundary-version"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "aws_bedrock_long_term_api_key:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for anthropic_admin_api_key (anthropic-token), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "anthropic_admin_api_key"
     },
     {
       "behaviorClass": "provider",

@@ -407,6 +407,8 @@
           "id": "admin",
           "support": "supported",
           "tier": "T2",
+          "findingType": "openai_admin_api_key",
+          "findingTypeNote": "Issue #774 split this variant onto its own finding type, `openai_admin_api_key`, distinct from the family-level `findingType` above (`openai_api_key`, still reported by the legacy/proj/svcacct variants). The grammar, tier and every other field on this variant are unchanged.",
           "grammar": "sk-admin-(?:[A-Za-z0-9_-]{74}|[A-Za-z0-9_-]{58})T3BlbkFJ(?:[A-Za-z0-9_-]{74}|[A-Za-z0-9_-]{58})",
           "segments": [
             {"name": "prefix", "literal": "sk-admin-", "basis": "single-tool (gitleaks); prefix also named by provider code in openai/codex, which sets no width or alphabet"},

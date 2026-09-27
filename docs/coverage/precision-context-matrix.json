@@ -934,7 +934,7 @@
     "issue": "https://github.com/redact-secret/redact-secret/issues/375",
     "synchronousCorpus": "conformance/fixtures/synchronous-corpus.json"
   },
-  "rowCount": 471,
+  "rowCount": 472,
   "rows": [
     {
       "contexts": [],
@@ -6154,7 +6154,7 @@
       "findingCount": 1,
       "fixtureId": "openai-admin-length-twin-discriminating-boundary",
       "kind": null,
-      "note": "issue #375: admin-namespace incremental parity, mirroring issue #368's project/svcacct coverage \u2014 the positive and its twin differ in one structural property (73-byte left segment vs the contracted 74), so every UTF-8 byte and char partition must resolve the same single finding as the whole-input scan, including splits inside the `T3BlbkFJ` marker and at the 73/74-byte segment boundary.",
+      "note": "issue #375: admin-namespace incremental parity, mirroring issue #368's project/svcacct coverage \u2014 the positive and its twin differ in one structural property (73-byte left segment vs the contracted 74), so every UTF-8 byte and char partition must resolve the same single finding as the whole-input scan, including splits inside the `T3BlbkFJ` marker and at the 73/74-byte segment boundary. Issue #774 split `sk-admin-` onto its own `openai_admin_api_key` finding type; the grammar, span, and redacted `text` are unchanged.",
       "result": "flagged",
       "runtimeConsumers": [
         "rust-core",
@@ -7096,6 +7096,25 @@
       "detector": "openai-token",
       "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
       "findingCount": 1,
+      "fixtureId": "openai-overlap-admin-marker-client-secret",
+      "kind": "overlap",
+      "note": "`openai_admin_api_key` provider evidence wins over a client-secret assignment that generic-token also proposes, the same way `openai_api_key` already does (see `openai-overlap-marker-client-secret`).",
+      "result": "flagged",
+      "runtimeConsumers": [
+        "rust-core",
+        "python-binding"
+      ],
+      "scanMode": "synchronous",
+      "support": "supported"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractTier": "contextual",
+      "detector": "openai-token",
+      "enforcedBy": "crates/secret-scan-core/tests/canonical_corpus.rs::scan_matches_the_canonical_synchronous_corpus",
+      "findingCount": 1,
       "fixtureId": "openai-overlap-context",
       "kind": "overlap",
       "note": "Reclassified by issue #368: openai-token no longer claims the marker-less value, so the `client_secret=` assignment falls to generic-token at contextual specificity instead of provider specificity. See openai-overlap-marker-client-secret for the contracted counterpart.",
@@ -7326,7 +7345,7 @@
       "findingCount": 1,
       "fixtureId": "openai-positive-admin-marker",
       "kind": "positive",
-      "note": "Reviewed contract (issue #368): `sk-` + 20 [A-Za-z0-9] + `T3BlbkFJ` + 20 [A-Za-z0-9] (legacy), or `sk-proj-`/`sk-svcacct-`/`sk-admin-` + 74|58 [A-Za-z0-9_-] + `T3BlbkFJ` + 74|58 [A-Za-z0-9_-]; the marker is the base64 encoding of `OpenAI`. The `sk-admin-` namespace shares the segmented grammar (gitleaks 8.30.1 lists it; trufflehog 3.97.4 skips it only because its live verifier cannot check admin keys). beta.4 already flagged it through the old bare branch; keeping it avoids a regression on a secret-bearing form.",
+      "note": "Reviewed contract (issue #368): `sk-` + 20 [A-Za-z0-9] + `T3BlbkFJ` + 20 [A-Za-z0-9] (legacy), or `sk-proj-`/`sk-svcacct-`/`sk-admin-` + 74|58 [A-Za-z0-9_-] + `T3BlbkFJ` + 74|58 [A-Za-z0-9_-]; the marker is the base64 encoding of `OpenAI`. The `sk-admin-` namespace shares the segmented grammar (gitleaks 8.30.1 lists it; trufflehog 3.97.4 skips it only because its live verifier cannot check admin keys). beta.4 already flagged it through the old bare branch; keeping it avoids a regression on a secret-bearing form. Issue #774 split `sk-admin-` onto its own `openai_admin_api_key` finding type; the grammar and span are unchanged.",
       "result": "flagged",
       "runtimeConsumers": [
         "rust-core",
@@ -7440,7 +7459,7 @@
       "findingCount": 4,
       "fixtureId": "openai-positive-marker-all-variants",
       "kind": "positive",
-      "note": "The legacy, project, service-account, and admin variants are each validated independently in the same input without one suppressing another.",
+      "note": "The legacy, project, service-account, and admin variants are each validated independently in the same input without one suppressing another. The admin variant reports `openai_admin_api_key` (issue #774); the other three keep `openai_api_key`.",
       "result": "flagged",
       "runtimeConsumers": [
         "rust-core",
