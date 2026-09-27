@@ -112,10 +112,12 @@ identity through `activation_identity()`. Empty selection preserves the
 legacy credential-only registry byte for byte. `pii` or `pii:global` activates
 `pii:global:email`, `pii:global:iban`, `pii:global:network-address`, and
 `pii:global:payment-card`; each exact `pii:family:global:*` selector activates
-only its family. They share one
+only its family. `pii:us` closes over those global families plus `pii:us:ssn`,
+while `pii:family:us:ssn` selects only SSNs. They share one
 `pii-domain` adapter, require reviewed high-signal context, and remain
 `pending` until exact-artifact benchmark evidence is reviewed. Known
 unavailable families or jurisdictions fail closed; see the
 [email contract](../contracts/pii/email-v1.md) and
 [IBAN contract](../contracts/pii/iban-v1.md), and
-[payment-card contract](../contracts/pii/payment-card-v1.md).
+[payment-card contract](../contracts/pii/payment-card-v1.md), and the
+[US SSN contract](../contracts/pii/us-ssn-v1.md).

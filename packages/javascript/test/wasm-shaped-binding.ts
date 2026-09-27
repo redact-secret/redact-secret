@@ -89,16 +89,18 @@ export function createWasmShapedBinding(
       if (pii.includes("pii:kr")) {
         throw Object.assign(new Error("PII jurisdiction or family is unsupported."), { code: "PII_SELECTOR_UNSUPPORTED" });
       }
-      if (pii.includes("pii:family:global:phone") || pii.includes("pii:us")) {
+      if (pii.includes("pii:family:global:phone")) {
         throw Object.assign(new Error("PII selection is unavailable in this artifact."), { code: "PII_SELECTOR_UNAVAILABLE" });
       }
       const selectors = [...new Set(pii.map((value) => value === "pii" ? "pii:global" : value))].sort();
-      const global = selectors.includes("pii:global");
+      const jurisdiction = selectors.includes("pii:us");
+      const global = selectors.includes("pii:global") || jurisdiction;
       const families = [
         ...(global || selectors.includes("pii:family:global:email") ? ["pii:global:email"] : []),
         ...(global || selectors.includes("pii:family:global:iban") ? ["pii:global:iban"] : []),
         ...(global || selectors.includes("pii:family:global:network-address") ? ["pii:global:network-address"] : []),
         ...(global || selectors.includes("pii:family:global:payment-card") ? ["pii:global:payment-card"] : []),
+        ...(jurisdiction || selectors.includes("pii:family:us:ssn") ? ["pii:us:ssn"] : []),
       ].join(",");
       activation = `credentials=${options.profile ?? "full"};selectors=${selectors.length === 0 ? "off" : selectors.join(",")};families=${families};vocabulary=pii-context/v1`;
     },

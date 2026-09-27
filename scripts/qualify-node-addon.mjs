@@ -303,13 +303,39 @@ function inspectAddon(target) {
 }
 
 function runSmokeTest() {
-  for (const selector of [
-    undefined,
-    "pii:family:global:payment-card",
-    "pii:global",
+  const representative = (name, id) => {
+    const document = JSON.parse(readFileSync(join(FIXTURES_DIR, name), "utf8"));
+    const fixture = document.cases.find((entry) => entry.id === id);
+    assert(fixture !== undefined, `${name}: ${id} is missing`);
+    return fixture.input;
+  };
+  const paymentCard = representative(
+    "pii-payment-card-v1.json",
+    "payment-card-sensitive-compact-exact-selector",
+  );
+  const usSsn = representative(
+    "pii-us-ssn-v1.json",
+    "us-ssn-sensitive-compact-exact-selector",
+  );
+  for (const row of [
+    { input: usSsn, type: "pii_jurisdiction_us_ssn" },
+    {
+      selector: "pii:family:global:payment-card",
+      input: paymentCard,
+      type: "pii_global_payment_card",
+    },
+    { selector: "pii:global", input: paymentCard, type: "pii_global_payment_card" },
+    { selector: "pii:family:us:ssn", input: usSsn, type: "pii_jurisdiction_us_ssn" },
+    { selector: "pii:us", input: usSsn, type: "pii_jurisdiction_us_ssn" },
   ]) {
     const env = { ...process.env };
-    if (selector !== undefined) env.REDACT_SECRET_PAYMENT_CARD_SELECTOR = selector;
+    env.REDACT_SECRET_PII_INPUT = row.input;
+    env.REDACT_SECRET_PII_TYPE = row.type;
+    if (row.selector !== undefined) {
+      env.REDACT_SECRET_PII_SELECTOR = row.selector;
+    } else {
+      delete env.REDACT_SECRET_PII_SELECTOR;
+    }
     execFileSync(process.execPath, ["smoke-test.mjs"], {
       cwd: ADDON_DIR,
       env,
@@ -332,9 +358,9 @@ function runSmokeTest() {
  * `provider` detector would report a finding under an id outside that list.
  */
 function conformAddon(fixtures, detectorProfile, commonExpectations) {
-  const exports = DETECTOR_PROFILES[detectorProfile];
   const addon = createRequire(join(ADDON_DIR, "index.js"))("./index.js");
-  addon[exports.initialize]();
+  if (detectorProfile === "common") addon.initializeCommon();
+  else addon.initialize();
 
   const expectationsById =
     commonExpectations === undefined
@@ -354,7 +380,9 @@ function conformAddon(fixtures, detectorProfile, commonExpectations) {
         `${COMMON_EXPECTATIONS_FILE}: no entry for ${fixture.id}`,
       );
     }
-    const actual = addon[exports.scan](fixture.input).map((finding) => [
+    const findings =
+      detectorProfile === "common" ? addon.scanCommon(fixture.input) : addon.scan(fixture.input);
+    const actual = findings.map((finding) => [
       finding.detector,
       finding.type,
       finding.confidence,

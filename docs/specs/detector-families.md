@@ -144,10 +144,11 @@ qualification evidence stay in `redact-secret-benchmarks`.
 The
 [bounded built-in structured-validator registry](../decisions/2026-09-26-define-the-bounded-built-in-structured-validator-registry.md)
 is shared core infrastructure, not a detector family. It supplies versioned
-Luhn and IBAN mod-97 type-validation primitives to built-in PII detectors. The
-IBAN family calls `iban-mod97` v1 after its own bounded display normalization;
-the primitive itself still does not scan input, emit a finding, decide
-sensitivity, or change a policy action. Neither primitive is available through
+Luhn, IBAN mod-97, and US SSN allocation type-validation primitives to built-in
+PII detectors. The IBAN family calls `iban-mod97` v1 after its own bounded
+display normalization; US SSN calls `us-ssn-allocation` v1 on nine normalized
+ASCII digits. A primitive itself still does not scan input, emit a finding,
+decide sensitivity, or change a policy action. None is available through
 declarative ruleset v1, and the detector inventory continues to expose the
 single `pii-domain` adapter.
 
@@ -192,6 +193,20 @@ normalization, and collision costs are frozen in the
 [payment-card family contract](../contracts/pii/payment-card-v1.md). This row
 applies existing policy and creates no ADR. Its support state remains `pending`
 until the exact merged artifact's benchmark evidence is reviewed.
+
+`pii:us:ssn` applies the same policy through `pii-domain`. Its exact selector
+is `pii:family:us:ssn`, public type is `pii_jurisdiction_us_ssn`,
+family-contract version is `1`, and `contextRequirement` is
+`required-for-sensitive-classification`. It accepts nine ASCII digits in
+compact or exact ASCII-hyphenated `3-2-4` form. `us-ssn-allocation` v1 rejects
+only SSA-published current structural exclusions: area `000`, `666`, and
+`900`–`999`, group `00`, and serial `0000`. Issuance, pre-2011 allocation,
+geography, and identity are not inferred. The
+[US SSN family contract](../contracts/pii/us-ssn-v1.md) freezes sources,
+boundaries, field context, safe generation, and tradeoffs. This applies
+existing PII policy and creates no ADR. Its support state remains `pending`
+until counterpart #392 qualifies the exact merged artifact; it does not yet
+complete the `pii-v1` arrival gate.
 
 ## Evidence-backed family applications
 
@@ -379,6 +394,7 @@ the research comments); it is a benchmark-side qualification, not a code change.
 | `pii:global:iban` contract v1 is exposed through `pii-domain` as `pii_global_iban`. It accepts an uppercase electronic form or exact four-character ASCII-space print grouping, requires a Release 103 country/length row and `iban-mod97` v1, and requires high-signal IBAN context for sensitivity. Checksum-valid collisions without context stay identity-only; unknown or wrong country lengths stay unmatched. Frozen contract: `docs/contracts/pii/iban-v1.md`. | no dedicated ADR; applies the existing PII domain and `pii-v1` policies to one family in issue #878 |
 | `pii:global:network-address` contract v1 is one family for IPv4 and IPv6, exposed only through `pii-domain` as `pii_global_network_address`. It accepts canonical dotted IPv4 and full/compressed/IPv4-embedded IPv6, rejects zone ids and leading-zero IPv4 octets, and requires high-signal network-address context for sensitivity. Only the frozen documentation/test/benchmark ranges and named non-endpoint constants/classes are non-sensitive; IANA special-purpose status alone is not negative sensitivity evidence. Frozen contract: `docs/audits/evidence/875/README.md`. | no dedicated ADR; applies the existing PII domain and `pii-v1` policies to one family in issue #875 |
 | `pii:global:payment-card` contract v1 is exposed only through `pii-domain` as `pii_global_payment_card`. It accepts the frozen 10–19-digit payment-brand subset after bounded display normalization and a Luhn v1 pass, requires a reviewed English or Korean payment-card field label for sensitivity, and excludes exact whole Visa Acceptance test-service PANs. `pan` is a label only through the shared bounded field-label grammar, never free prose. Frozen contract and evidence: `docs/contracts/pii/payment-card-v1.md` and `docs/audits/evidence/877/README.md`. | no dedicated ADR; applies the existing PII domain and `pii-v1` policies to one family in issue #877 |
+| `pii:us:ssn` contract v1 is exposed only through `pii-domain` as `pii_jurisdiction_us_ssn`. It accepts nine ASCII digits in compact or exact ASCII-hyphenated `3-2-4` form, requires `us-ssn-allocation` v1 and a reviewed English or Korean SSN field label, and rejects only the current SSA structural exclusions. `ssn` is a label only through the bounded field-label grammar. No issuance, identity, geography, or pre-2011 allocation claim is made. Frozen contract and evidence: `docs/contracts/pii/us-ssn-v1.md` and `docs/audits/evidence/879/README.md`. | no dedicated ADR; applies the existing PII domain and `pii-v1` policies to one family in issue #879 |
 | Together AI `tgp_v1_` + 43 `[A-Za-z0-9_-]` (T2) and Tavily `tvly-` + optional `dev-` + 32 alphanumeric (prefix T1, body T2) are each reported as their own finding type at provider specificity, bare or in any context; `tvly-prod-`, Together legacy keys and other widths stay unclaimed ([#867](https://github.com/redact-secret/redact-secret/issues/867), section above). | generic policy default, no dedicated ADR; applies the existing exact-length prefixed policy to two more families |
 | The Atlassian Cloud API token grammar is frozen as a minimum-length `ATAT`-prefixed body. A directly following `=` plus exactly 8 uppercase hex characters is part of the token and of its span ([#741](https://github.com/redact-secret/redact-secret/issues/741)). | [Freeze the Atlassian Cloud API token grammar as a minimum-length ATAT-prefixed body](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | The Azure DevOps personal access token grammar is frozen as the documented 84-byte `AZDO`-signature shape. | [Freeze the Azure DevOps personal access token grammar as the documented 84-byte AZDO-signature shape](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |

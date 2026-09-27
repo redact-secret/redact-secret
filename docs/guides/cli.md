@@ -18,7 +18,8 @@ set, or use `--print-pii-activation` to print its activation identity and exit
 without opening standard input or any file. `--pii pii` closes over the
 available `pii:global:email`, `pii:global:iban`, `pii:global:network-address`, and
 `pii:global:payment-card` families; use a `pii:family:global:*` selector for
-exact selection. They require reviewed
+exact selection. `--pii pii:us` closes over those global families plus
+`pii:us:ssn`; `--pii pii:family:us:ssn` selects only SSNs. They require reviewed
 high-signal context and remain `pending` until exact-artifact benchmark
 evidence is reviewed. Invalid, unsupported, unavailable, and conflicting
 selections use fixed input-free diagnostics.

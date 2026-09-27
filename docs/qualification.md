@@ -185,10 +185,12 @@ which exports, expectations, and fixture each pass uses.
 `wasm32-unknown-unknown` cdylib and generates the `web`-target glue with a
 `wasm-bindgen` CLI whose version must match the crate's exactly. The qualifier
 serves that directory over HTTP — with `application/wasm` on the binary, which
-streaming instantiation requires — and loads four fresh pages in each engine
+streaming instantiation requires — and loads seven fresh pages in each engine
 against that one artifact. Two default pages qualify the raw artifact and
-published package; two more activate the exact payment-card selector and its
-global closure in isolated module instances.
+published package; two activate the exact payment-card selector and its global
+closure; two activate the exact US SSN selector and its `pii:us` jurisdiction
+closure; one proves the SSN input stays clean with PII off. Every activation
+runs in an isolated module instance.
 
 The first, `scripts/browser-harness.mjs`, drives the artifact through its own
 exports:

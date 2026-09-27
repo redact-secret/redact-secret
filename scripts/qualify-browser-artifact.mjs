@@ -3,7 +3,7 @@
  *
  * The artifact is served over HTTP from a temporary directory — with
  * `application/wasm` on the binary, which streaming instantiation requires —
- * and four fresh pages run in each engine against that one artifact. Nothing is
+ * and seven fresh pages run in each engine against that one artifact. Nothing is
  * stubbed; the engine fetches and instantiates the same `.wasm` a consumer
  * would.
  *
@@ -104,8 +104,8 @@ const CONTENT_TYPES = {
 
 /**
  * Each page drives a fresh module instance through the one-time initialization
- * gate: the artifact and package defaults, then exact and global payment-card
- * activation through the artifact's own exports.
+ * gate: the artifact and package defaults, then payment-card global/exact and
+ * US SSN jurisdiction/exact activation through the artifact's own exports.
  */
 const PAGES = [
   { name: "artifact", file: "artifact.html", module: "./browser-harness.mjs" },
@@ -121,6 +121,24 @@ const PAGES = [
     file: "payment-card-global.html",
     module: "./browser-pii-harness.mjs",
     selector: "pii:global",
+  },
+  {
+    name: "us-ssn-exact",
+    file: "us-ssn-exact.html",
+    module: "./browser-pii-harness.mjs",
+    selector: "pii:family:us:ssn",
+  },
+  {
+    name: "us-ssn-jurisdiction",
+    file: "us-ssn-jurisdiction.html",
+    module: "./browser-pii-harness.mjs",
+    selector: "pii:us",
+  },
+  {
+    name: "us-ssn-pii-off",
+    file: "us-ssn-pii-off.html",
+    module: "./browser-pii-harness.mjs",
+    selector: null,
   },
 ];
 
@@ -232,6 +250,13 @@ function buildFixtures(detectorProfile) {
   if (paymentCardPositive === undefined) {
     fail("pii-payment-card-v1.json: representative positive is missing");
   }
+  const usSsn = loadCorpus("pii-us-ssn-v1.json");
+  const usSsnPositive = usSsn.cases.find(
+    ({ id }) => id === "us-ssn-sensitive-compact-exact-selector",
+  );
+  if (usSsnPositive === undefined) {
+    fail("pii-us-ssn-v1.json: representative positive is missing");
+  }
 
   return {
     version: JSON.parse(
@@ -241,6 +266,7 @@ function buildFixtures(detectorProfile) {
     detectors,
     synchronous: fixtures,
     paymentCardPositive,
+    usSsnPositive,
   };
 }
 

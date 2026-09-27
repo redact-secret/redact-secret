@@ -23,7 +23,8 @@ the global selector, then inspect the canonical identity with
 `piiActivation()`. The selector closes over the available
 `pii:global:email`, `pii:global:iban`, `pii:global:network-address`, and
 `pii:global:payment-card` families; use a `pii:family:global:*` selector for
-exact selection. They need reviewed
+exact selection. The `pii:us` selector closes over those global families plus
+`pii:us:ssn`; `pii:family:us:ssn` selects only SSNs. They need reviewed
 high-signal context and remain `pending` until exact-artifact benchmark
 evidence is reviewed. Reordered or duplicate equivalent selectors are
 idempotent; a later different selection fails with the fixed,

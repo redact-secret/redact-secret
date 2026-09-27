@@ -1123,6 +1123,7 @@ validator: none\n";
         for corpus in [
             include_str!("../../../conformance/fixtures/pii-email-v1.json"),
             include_str!("../../../conformance/fixtures/pii-iban-v1.json"),
+            include_str!("../../../conformance/fixtures/pii-us-ssn-v1.json"),
         ] {
             let document: serde_json::Value = serde_json::from_str(corpus).unwrap();
             let selector = document["selector"].as_str().unwrap();

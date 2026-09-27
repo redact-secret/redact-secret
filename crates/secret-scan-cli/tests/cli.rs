@@ -874,33 +874,79 @@ fn pii_family_fixtures_match_cli_utf8_metadata_for_exact_selection() {
     for corpus in [
         include_str!("../../../conformance/fixtures/pii-email-v1.json"),
         include_str!("../../../conformance/fixtures/pii-iban-v1.json"),
+        include_str!("../../../conformance/fixtures/pii-us-ssn-v1.json"),
     ] {
         let fixture: serde_json::Value = serde_json::from_str(corpus).unwrap();
         let selector = fixture["selector"].as_str().unwrap();
+        let scratch = Scratch::new();
         for case in fixture["cases"].as_array().unwrap() {
             let input = case["input"].as_str().unwrap();
-            let run = run_args(&["--json", "--pii", selector], input.as_bytes());
             let expected = case["expected"].as_array().unwrap();
-            assert_eq!(run.code, i32::from(!expected.is_empty()), "{}", case["id"]);
-            let report: serde_json::Value = serde_json::from_str(&run.stdout).unwrap();
-            let actual: Vec<serde_json::Value> = report["sources"][0]["findings"]
+            let path = scratch.write(case["id"].as_str().unwrap(), input);
+            let runs = [
+                run_args(&["--json", "--pii", selector], input.as_bytes()),
+                run(
+                    &[
+                        Path::new("--json"),
+                        Path::new("--pii"),
+                        Path::new(selector),
+                        &path,
+                    ],
+                    b"",
+                ),
+            ];
+            for result in runs {
+                assert_eq!(
+                    result.code,
+                    i32::from(!expected.is_empty()),
+                    "{}",
+                    case["id"]
+                );
+                let report: serde_json::Value = serde_json::from_str(&result.stdout).unwrap();
+                let actual: Vec<serde_json::Value> = report["sources"][0]["findings"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .map(|finding| {
+                        serde_json::json!({
+                            "detector": finding["detector"],
+                            "type": finding["type"],
+                            "confidence": finding["confidence"],
+                            "action": finding["action"],
+                            "start": finding["start"],
+                            "end": finding["end"],
+                        })
+                    })
+                    .collect();
+                assert_eq!(&actual, expected, "{}", case["id"]);
+                result.leaks_nothing();
+            }
+        }
+    }
+}
+
+#[test]
+fn pii_off_keeps_ssn_clean_on_streamed_and_whole_file_paths() {
+    let fixture: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../conformance/fixtures/pii-us-ssn-v1.json"
+    ))
+    .unwrap();
+    let input = fixture["cases"][0]["input"].as_str().unwrap();
+    let scratch = Scratch::new();
+    let path = scratch.write("pii-off-ssn.txt", input);
+    for result in [
+        run_args(&["--json"], input.as_bytes()),
+        run(&[Path::new("--json"), &path], b""),
+    ] {
+        assert_eq!(result.code, 0);
+        let report: serde_json::Value = serde_json::from_str(&result.stdout).unwrap();
+        assert!(
+            report["sources"][0]["findings"]
                 .as_array()
                 .unwrap()
-                .iter()
-                .map(|finding| {
-                    serde_json::json!({
-                        "detector": finding["detector"],
-                        "type": finding["type"],
-                        "confidence": finding["confidence"],
-                        "action": finding["action"],
-                        "start": finding["start"],
-                        "end": finding["end"],
-                    })
-                })
-                .collect();
-            assert_eq!(&actual, expected, "{}", case["id"]);
-            run.leaks_nothing();
-        }
+                .is_empty()
+        );
+        result.leaks_nothing();
     }
 }
 

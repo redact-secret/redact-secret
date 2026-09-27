@@ -72,8 +72,9 @@ depend on `src/`.
 - [`fixtures/pii-runtime-v1.json`](./fixtures/pii-runtime-v1.json) — the
   cross-surface PII selector canonicalization, activation identity, and fixed
   input-free error contract. Its global and exact-family closure includes the
-  available email, IBAN, network-address, and payment-card families; the Rust
-  consumer is `crates/secret-scan-core/tests/pii_runtime_conformance.rs`.
+  available email, IBAN, network-address, and payment-card families, plus the
+  `pii:us` jurisdiction closure over those globals and US SSN; the Rust consumer
+  is `crates/secret-scan-core/tests/pii_runtime_conformance.rs`.
 - [`fixtures/pii-network-address-v1.json`](./fixtures/pii-network-address-v1.json) —
   the network-address family contract v1: official reserved/private/local
   IPv4 and IPv6 controls, context sensitivity, offsets, collisions, and zone-id
@@ -99,6 +100,13 @@ depend on `src/`.
   selector closure, and every incremental partition. Sensitive fixtures come
   from a recorded deterministic seed with no cardholder or real-world
   provenance.
+- [`fixtures/pii-us-ssn-v1.json`](./fixtures/pii-us-ssn-v1.json) — the US SSN
+  family-contract v1 safe corpus: deterministic generated positive material
+  with no issuance, person, or lookup provenance; SSA-published current
+  structural exclusions; compact and ASCII-hyphen forms; reviewed English and
+  Korean field labels; collisions, Unicode boundaries, exact ranges, selector
+  closure, and partition-equivalence inputs. Raw generated values are confined
+  to this fixture; expected findings contain metadata only.
 - [`fixtures/ai-context-boundary.json`](./fixtures/ai-context-boundary.json) —
   the framework-neutral AI-context boundary contract's cases (issue #610,
   [`docs/reference/ai-context-boundary.md`](../docs/reference/ai-context-boundary.md)):

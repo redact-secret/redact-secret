@@ -50,8 +50,12 @@ const IBAN_MOD97_V1: ValidatorProvenance = ValidatorProvenance {
     identity: "iban-mod97",
     version: 1,
 };
+const US_SSN_ALLOCATION_V1: ValidatorProvenance = ValidatorProvenance {
+    identity: "us-ssn-allocation",
+    version: 1,
+};
 
-const REGISTRATIONS: [Registration; 2] = [
+const REGISTRATIONS: [Registration; 3] = [
     Registration {
         provenance: LUHN_V1,
         max_candidate_bytes: 19,
@@ -61,6 +65,11 @@ const REGISTRATIONS: [Registration; 2] = [
         provenance: IBAN_MOD97_V1,
         max_candidate_bytes: 34,
         validate: validate_iban_mod97_v1,
+    },
+    Registration {
+        provenance: US_SSN_ALLOCATION_V1,
+        max_candidate_bytes: 9,
+        validate: validate_us_ssn_allocation_v1,
     },
 ];
 
@@ -146,6 +155,28 @@ fn validate_iban_mod97_v1(candidate: &str) -> Result<(), ValidationFailure> {
     }
 }
 
+fn validate_us_ssn_allocation_v1(candidate: &str) -> Result<(), ValidationFailure> {
+    let bytes = candidate.as_bytes();
+    if bytes.len() != 9 || !bytes.iter().all(u8::is_ascii_digit) {
+        return Err(ValidationFailure::Malformed);
+    }
+
+    let area = u16::from(bytes[0] - b'0') * 100
+        + u16::from(bytes[1] - b'0') * 10
+        + u16::from(bytes[2] - b'0');
+    let group = u16::from(bytes[3] - b'0') * 10 + u16::from(bytes[4] - b'0');
+    let serial = u16::from(bytes[5] - b'0') * 1_000
+        + u16::from(bytes[6] - b'0') * 100
+        + u16::from(bytes[7] - b'0') * 10
+        + u16::from(bytes[8] - b'0');
+
+    if area == 0 || area == 666 || area >= 900 || group == 0 || serial == 0 {
+        Err(ValidationFailure::Malformed)
+    } else {
+        Ok(())
+    }
+}
+
 const fn push_decimal_digit(remainder: u16, digit: u8) -> u16 {
     (remainder * 10 + digit as u16) % 97
 }
@@ -153,7 +184,8 @@ const fn push_decimal_digit(remainder: u16, digit: u8) -> u16 {
 #[cfg(test)]
 mod tests {
     use super::{
-        IBAN_MOD97_V1, LUHN_V1, StructuredValidatorRegistry, ValidationFailure, ValidatorProvenance,
+        IBAN_MOD97_V1, LUHN_V1, StructuredValidatorRegistry, US_SSN_ALLOCATION_V1,
+        ValidationFailure, ValidatorProvenance,
     };
 
     fn validate(
@@ -162,6 +194,21 @@ mod tests {
     ) -> Result<ValidatorProvenance, ValidationFailure> {
         StructuredValidatorRegistry::validate(provenance.identity, provenance.version, candidate)
             .map(|evidence| evidence.provenance)
+    }
+
+    fn synthetic_us_ssn() -> String {
+        let mut hash = 0x811c_9dc5_u32;
+        for byte in b"redact-secret-us-ssn-v1-fixture-879" {
+            hash ^= u32::from(*byte);
+            hash = hash.wrapping_mul(0x0100_0193);
+        }
+        let mut area = 1 + hash % 898;
+        if area >= 666 {
+            area += 1;
+        }
+        let group = 1 + (hash / 898) % 99;
+        let serial = 1 + (hash / (898 * 99)) % 9_999;
+        format!("{area:03}{group:02}{serial:04}")
     }
 
     #[test]
@@ -173,6 +220,31 @@ mod tests {
             validate(IBAN_MOD97_V1, "ZZ50SYNTHETIC000000"),
             Ok(IBAN_MOD97_V1)
         );
+        assert_eq!(
+            validate(US_SSN_ALLOCATION_V1, &synthetic_us_ssn()),
+            Ok(US_SSN_ALLOCATION_V1)
+        );
+    }
+
+    #[test]
+    fn us_ssn_v1_enforces_only_current_ssa_structural_exclusions() {
+        assert_eq!(
+            validate(US_SSN_ALLOCATION_V1, &synthetic_us_ssn()),
+            Ok(US_SSN_ALLOCATION_V1)
+        );
+        for excluded in [
+            "000010001",
+            "666010001",
+            "900010001",
+            "999010001",
+            "001000001",
+            "001010000",
+        ] {
+            assert_eq!(
+                validate(US_SSN_ALLOCATION_V1, excluded),
+                Err(ValidationFailure::Malformed)
+            );
+        }
     }
 
     #[test]
@@ -217,6 +289,14 @@ mod tests {
                 candidate.len()
             );
         }
+        for candidate in ["", "00000000", "00000000x"] {
+            assert_eq!(
+                validate(US_SSN_ALLOCATION_V1, candidate),
+                Err(ValidationFailure::Malformed),
+                "candidate length {}",
+                candidate.len()
+            );
+        }
     }
 
     #[test]
@@ -246,6 +326,16 @@ mod tests {
             validate(IBAN_MOD97_V1, format!("{max_iban}0").as_str()),
             Err(ValidationFailure::CandidateTooLong)
         );
+        assert_eq!(
+            validate(US_SSN_ALLOCATION_V1, "0000000000"),
+            Err(ValidationFailure::CandidateTooLong)
+        );
+        for display_or_unicode in ["000-00-0000", "０００００００００"] {
+            assert_eq!(
+                validate(US_SSN_ALLOCATION_V1, display_or_unicode),
+                Err(ValidationFailure::CandidateTooLong)
+            );
+        }
     }
 
     #[test]
@@ -263,15 +353,22 @@ mod tests {
             StructuredValidatorRegistry::validate("luhn", 2, "0000000000000000"),
             Err(ValidationFailure::UnknownValidator)
         );
+        assert_eq!(
+            StructuredValidatorRegistry::validate("us-ssn-allocation", 2, &synthetic_us_ssn(),),
+            Err(ValidationFailure::UnknownValidator)
+        );
     }
 
     #[test]
     fn repeated_runs_are_byte_for_byte_deterministic() {
+        let synthetic_ssn = synthetic_us_ssn();
         let cases = [
             (LUHN_V1, "0000000000000000"),
             (LUHN_V1, "0000000000000001"),
             (IBAN_MOD97_V1, "ZZ50SYNTHETIC000000"),
             (IBAN_MOD97_V1, "ZZ51SYNTHETIC000000"),
+            (US_SSN_ALLOCATION_V1, synthetic_ssn.as_str()),
+            (US_SSN_ALLOCATION_V1, "900626879"),
         ];
         for (provenance, candidate) in cases {
             let first = validate(provenance, candidate);
