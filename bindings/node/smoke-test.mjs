@@ -9,6 +9,8 @@ import assert from "node:assert/strict";
 import {
   createIncrementalSanitizer,
   initialize,
+  initializePii,
+  piiActivation,
   redact,
   scan,
   scanAndRedact,
@@ -18,6 +20,13 @@ import {
 const SYNTHETIC_TOKEN =
   "Authorization: Bearer sk-syntheticRevokedExampleToken00000000000000000000";
 const ASTRAL_PREFIXED = `\u{1F511} ${SYNTHETIC_TOKEN}`;
+const PAYMENT_CARD_SELECTOR = process.env.REDACT_SECRET_PAYMENT_CARD_SELECTOR;
+const SYNTHETIC_PAYMENT_CARD = "card_number=4000008770000003";
+
+function initializeSelected() {
+  if (PAYMENT_CARD_SELECTOR === undefined) initialize();
+  else initializePii([PAYMENT_CARD_SELECTOR]);
+}
 
 const INCREMENTAL_LIMITS = {
   maxInputCodeUnits: 32_768,
@@ -39,10 +48,24 @@ function check(name, fn) {
 
 // Repeated initialization: idempotent, callable any number of times.
 check("repeated initialization is idempotent", () => {
-  initialize();
-  initialize();
-  initialize();
+  initializeSelected();
+  initializeSelected();
+  initializeSelected();
 });
+
+if (PAYMENT_CARD_SELECTOR !== undefined) {
+  check("payment-card selector activates and scans through the installed addon", () => {
+    const expected = PAYMENT_CARD_SELECTOR === "pii:global"
+      ? "credentials=full;selectors=pii:global;families=pii:global:email,pii:global:iban,pii:global:network-address,pii:global:payment-card;vocabulary=pii-context/v1"
+      : "credentials=full;selectors=pii:family:global:payment-card;families=pii:global:payment-card;vocabulary=pii-context/v1";
+    assert.equal(piiActivation(), expected);
+    const findings = scan(SYNTHETIC_PAYMENT_CARD);
+    assert.deepEqual(
+      findings.map((finding) => [finding.detector, finding.type, finding.action]),
+      [["pii-domain", "pii_global_payment_card", "redact"]],
+    );
+  });
+}
 
 // Canonical synchronous conformance smoke case, with an astral character
 // ahead of the match to exercise the UTF-16 offset conversion at its most

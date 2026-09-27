@@ -3,7 +3,7 @@
  *
  * The artifact is served over HTTP from a temporary directory — with
  * `application/wasm` on the binary, which streaming instantiation requires —
- * and two pages run in each engine against that one artifact. Nothing is
+ * and four fresh pages run in each engine against that one artifact. Nothing is
  * stubbed; the engine fetches and instantiates the same `.wasm` a consumer
  * would.
  *
@@ -103,17 +103,28 @@ const CONTENT_TYPES = {
 };
 
 /**
- * The two pages each engine loads, in order: the artifact through its own
- * exports, then the published package on top of the same artifact. They run
- * in separate pages because each drives a fresh module instance through the
- * same one-time initialization gate.
+ * Each page drives a fresh module instance through the one-time initialization
+ * gate: the artifact and package defaults, then exact and global payment-card
+ * activation through the artifact's own exports.
  */
 const PAGES = [
   { name: "artifact", file: "artifact.html", module: "./browser-harness.mjs" },
   { name: "package", file: "package.html", module: "./package-harness.js" },
+  {
+    name: "payment-card-exact",
+    file: "payment-card-exact.html",
+    module: "./browser-pii-harness.mjs",
+    selector: "pii:family:global:payment-card",
+  },
+  {
+    name: "payment-card-global",
+    file: "payment-card-global.html",
+    module: "./browser-pii-harness.mjs",
+    selector: "pii:global",
+  },
 ];
 
-function renderPage(module) {
+function renderPage(module, selector) {
   return `<!doctype html>
 <meta charset="utf-8">
 <title>redact-secret browser qualification</title>
@@ -121,7 +132,7 @@ function renderPage(module) {
   import { qualify } from "${module}";
   const fixtures = await (await fetch("./fixtures.json")).json();
   try {
-    globalThis.__qualification = await qualify(fixtures);
+    globalThis.__qualification = await qualify(fixtures, ${JSON.stringify(selector)});
   } catch (error) {
     globalThis.__qualification = {
       ok: false,
@@ -214,6 +225,14 @@ function buildFixtures(detectorProfile) {
     detectors = common.detectors;
   }
 
+  const paymentCard = loadCorpus("pii-payment-card-v1.json");
+  const paymentCardPositive = paymentCard.cases.find(
+    ({ id }) => id === "payment-card-sensitive-compact-exact-selector",
+  );
+  if (paymentCardPositive === undefined) {
+    fail("pii-payment-card-v1.json: representative positive is missing");
+  }
+
   return {
     version: JSON.parse(
       readFileSync(join(REPO_ROOT, "packages/javascript/package.json"), "utf8"),
@@ -221,6 +240,7 @@ function buildFixtures(detectorProfile) {
     profile: detectorProfile,
     detectors,
     synchronous: fixtures,
+    paymentCardPositive,
   };
 }
 
@@ -308,13 +328,17 @@ async function stageServeDirectory(artifactDir, detectorProfile, pages) {
     join(SCRIPTS_DIR, "browser-harness.mjs"),
     join(directory, "browser-harness.mjs"),
   );
+  copyFileSync(
+    join(SCRIPTS_DIR, "browser-pii-harness.mjs"),
+    join(directory, "browser-pii-harness.mjs"),
+  );
   await bundlePackageHarness(
     artifactDir,
     join(directory, "package-harness.js"),
     detectorProfile,
   );
-  for (const { file, module } of pages) {
-    writeFileSync(join(directory, file), renderPage(module));
+  for (const { file, module, selector } of pages) {
+    writeFileSync(join(directory, file), renderPage(module, selector));
   }
   writeFileSync(
     join(directory, "fixtures.json"),

@@ -648,6 +648,51 @@ validator: none\n";
         }
     }
 
+    #[test]
+    fn payment_card_family_fixture_uses_wasm_utf16_metadata() {
+        let document: serde_json::Value = serde_json::from_str(include_str!(
+            "../../../conformance/fixtures/pii-payment-card-v1.json"
+        ))
+        .unwrap();
+        let selector = document["selector"].as_str().unwrap();
+        let selection = redact_secret::PiiSelection::parse(&[selector]).unwrap();
+        let registry = DetectorRegistry::with_built_in_and_pii(&selection).unwrap();
+        for case in document["cases"].as_array().unwrap() {
+            let input = case["input"].as_str().unwrap();
+            let findings = run_scan(input, &registry, None, &WholeInputLimits::default()).unwrap();
+            let actual: Vec<serde_json::Value> = findings
+                .into_iter()
+                .map(|finding| FindingJs::new(input, finding))
+                .map(|finding| {
+                    let range = finding.range();
+                    serde_json::json!({
+                        "detector": finding.detector(),
+                        "type": finding.type_name(),
+                        "confidence": finding.confidence(),
+                        "action": finding.action(),
+                        "start": range.start(),
+                        "end": range.end(),
+                    })
+                })
+                .collect();
+            let expected: Vec<serde_json::Value> = case["expected"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|finding| {
+                    let byte_start = usize::try_from(finding["start"].as_u64().unwrap()).unwrap();
+                    let byte_end = usize::try_from(finding["end"].as_u64().unwrap()).unwrap();
+                    let mut converted = finding.clone();
+                    converted["start"] =
+                        serde_json::json!(input[..byte_start].encode_utf16().count());
+                    converted["end"] = serde_json::json!(input[..byte_end].encode_utf16().count());
+                    converted
+                })
+                .collect();
+            assert_eq!(actual, expected, "{}", case["id"].as_str().unwrap());
+        }
+    }
+
     /// A call made before `initialize()` succeeds fails deterministically,
     /// through `lifecycle::ensure_initialized`/`with_registry`, before ever
     /// reaching the detector pipeline or touching `input`

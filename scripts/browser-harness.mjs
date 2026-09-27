@@ -141,9 +141,9 @@ export async function qualify(fixtures) {
   });
 
   check("initialize is idempotent", () => {
-    initialize();
-    initialize();
-    initialize();
+    initialize([]);
+    initialize([]);
+    initialize([]);
   });
 
   check("version reports the shared product version", () => {
