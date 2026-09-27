@@ -189,11 +189,12 @@ in JavaScript), never the matched plaintext. The
 policies, limits, profiles, and browser loading.
 
 PII activation is opt-in and defaults off across Rust, JavaScript, Python, and
-the CLI. The `pii:global:network-address` family recognizes context-qualified
-IPv4 and IPv6 while suppressing reviewed reserved/documentation classes. Its
-support status stays pending until exact-candidate `pii-v1` benchmark evidence
-is linked; detector availability alone is not a support claim. See each
-language guide for activation identity and fixed failure behavior.
+the CLI. The shared `pii-domain` adapter registers the context-qualified
+`pii:global:email` and `pii:global:network-address` families. Both suppress
+their reviewed reserved/documentation classes and remain `pending` until
+exact-artifact `pii-v1` benchmark evidence is reviewed; availability alone is
+not a support claim. See the [email family contract](docs/contracts/pii/email-v1.md)
+and each language guide for activation identity and limits.
 
 ## Core operations
 

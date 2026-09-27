@@ -1105,7 +1105,7 @@ validator: none\n";
         initialize_pii(vec!["pii".to_owned(), "pii:global".to_owned()]).unwrap();
         assert_eq!(
             pii_activation().unwrap(),
-            "credentials=full;selectors=pii:global;families=pii:global:network-address;vocabulary=pii-context/v1"
+            "credentials=full;selectors=pii:global;families=pii:global:email,pii:global:network-address;vocabulary=pii-context/v1"
         );
         let findings = scan("🔒 client_ip=10.0.0.8".to_owned(), None, None, None).unwrap();
         let finding = findings
@@ -1116,5 +1116,49 @@ validator: none\n";
         assert_eq!(finding.detector, "pii-domain");
         initialize_pii(vec!["pii:global".to_owned()]).unwrap();
         assert_err_status(initialize(), "PII_ACTIVATION_CONFLICT");
+    }
+
+    #[test]
+    fn email_family_fixture_uses_node_utf16_metadata() {
+        let document: serde_json::Value = serde_json::from_str(include_str!(
+            "../../../conformance/fixtures/pii-email-v1.json"
+        ))
+        .unwrap();
+        let selector = document["selector"].as_str().unwrap();
+        let selection = PiiSelection::parse(&[selector]).unwrap();
+        let registry = DetectorRegistry::with_built_in_and_pii(&selection).unwrap();
+        for case in document["cases"].as_array().unwrap() {
+            let input = case["input"].as_str().unwrap();
+            let findings = run_scan(input, &registry, None, &WholeInputLimits::default()).unwrap();
+            let actual: Vec<serde_json::Value> = findings
+                .into_iter()
+                .map(|finding| to_js_finding(input, &finding))
+                .map(|finding| {
+                    serde_json::json!({
+                        "detector": finding.detector,
+                        "type": finding.r#type,
+                        "confidence": finding.confidence,
+                        "action": finding.action,
+                        "start": finding.start,
+                        "end": finding.end,
+                    })
+                })
+                .collect();
+            let expected: Vec<serde_json::Value> = case["expected"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|finding| {
+                    let byte_start = usize::try_from(finding["start"].as_u64().unwrap()).unwrap();
+                    let byte_end = usize::try_from(finding["end"].as_u64().unwrap()).unwrap();
+                    let mut converted = finding.clone();
+                    converted["start"] =
+                        serde_json::json!(input[..byte_start].encode_utf16().count());
+                    converted["end"] = serde_json::json!(input[..byte_end].encode_utf16().count());
+                    converted
+                })
+                .collect();
+            assert_eq!(actual, expected, "{}", case["id"].as_str().unwrap());
+        }
     }
 }

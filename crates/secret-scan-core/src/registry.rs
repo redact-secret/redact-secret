@@ -574,7 +574,7 @@ mod tests {
         assert_eq!(full.profile(), Some(Profile::Full));
         assert_eq!(
             full.activation_identity(),
-            "credentials=full;selectors=pii:global;families=pii:global:network-address;vocabulary=pii-context/v1"
+            "credentials=full;selectors=pii:global;families=pii:global:email,pii:global:network-address;vocabulary=pii-context/v1"
         );
         assert_eq!(
             full.register(Box::new(Named("pii-domain")))

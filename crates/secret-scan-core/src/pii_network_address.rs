@@ -105,6 +105,7 @@ fn alternative(start: usize, end: usize, potentially_sensitive: bool) -> Option<
         sensitivity_confidence: Confidence::High,
         sensitivity_specificity: Specificity::Structural,
         obfuscation: Obfuscation::None,
+        reject_invisible_normalization: false,
     })
 }
 

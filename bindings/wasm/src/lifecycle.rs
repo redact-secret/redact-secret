@@ -243,7 +243,7 @@ mod tests {
         assert_eq!(
             pii_activation().unwrap(),
             format!(
-                "credentials={};selectors=pii:global;families=pii:global:network-address;vocabulary=pii-context/v1",
+                "credentials={};selectors=pii:global;families=pii:global:email,pii:global:network-address;vocabulary=pii-context/v1",
                 PROFILE.as_str()
             )
         );

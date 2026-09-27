@@ -103,16 +103,16 @@ The [core API inventory](../../crates/secret-scan-core/README.md#public-api)
 lists the full surface. Generate local rustdoc with
 `cargo doc -p redact-secret --no-deps --locked`.
 
-## PII activation substrate
+## PII activation
 
 `PiiSelection::parse` validates and canonicalizes selectors.
 `DetectorRegistry::with_built_in_and_pii` and
 `with_common_built_in_and_pii` capture that selection and expose its canonical
 identity through `activation_identity()`. Empty selection preserves the
-legacy credential-only registry byte for byte. The crate registers
-`pii:global:network-address` in both profiles. Select it with
-`pii`/`pii:global` or exactly with
-`pii:family:global:network-address`. It requires a reviewed high-signal
-network-address field label and never flags documentation/reserved controls;
-availability alone is not a support-status claim. Known unavailable families
-or jurisdictions fail closed.
+legacy credential-only registry byte for byte. `pii` or `pii:global` activates
+`pii:global:email` and `pii:global:network-address`; either exact
+`pii:family:global:*` selector activates only its family. Both share one
+`pii-domain` adapter, require reviewed high-signal context, and remain
+`pending` until exact-artifact benchmark evidence is reviewed. Known
+unavailable families or jurisdictions fail closed; see the
+[email contract](../contracts/pii/email-v1.md).

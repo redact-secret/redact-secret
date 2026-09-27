@@ -157,6 +157,17 @@ malformed, overlong, lower-case or separator-bearing candidates are rejected
 by these v1 primitives unless a future detector performs a separately specified
 normalization before validation.
 
+`pii:global:email` applies the existing PII policy through the one
+`pii-domain` adapter. Its exact selector is `pii:family:global:email`, public
+type is `pii_global_email`, family-contract version is `1`, and
+`contextRequirement` is `required-for-sensitive-classification`. The supported
+RFC 5322 / RFC 6531 subset, Unicode and byte bounds, whole-domain RFC 2606/6761
+negative grammars, safe-fixture split, and false-positive/false-negative costs
+are frozen in the [email family contract](../contracts/pii/email-v1.md). This
+row applies the accepted cross-family PII policy to one family and therefore
+does not create a new ADR. Its support state remains `pending` until the exact
+merged artifact's benchmark evidence is reviewed.
+
 ## Evidence-backed family applications
 
 These rows apply the existing evidence-tier policy to individual provider

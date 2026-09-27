@@ -317,6 +317,7 @@ pub struct Candidate {
     range: ByteRange,
     signals: Vec<String>,
     obfuscation: Obfuscation,
+    reject_invisible_normalization: bool,
 }
 
 impl Candidate {
@@ -331,6 +332,7 @@ impl Candidate {
             range,
             signals: Vec::new(),
             obfuscation: Obfuscation::None,
+            reject_invisible_normalization: false,
         }
     }
 
@@ -347,6 +349,14 @@ impl Candidate {
     #[must_use]
     pub const fn with_obfuscation(mut self, obfuscation: Obfuscation) -> Self {
         self.obfuscation = obfuscation;
+        self
+    }
+
+    /// Rejects this candidate when a governed invisible run lies inside or
+    /// directly touches its range in the detector's normalized scan view.
+    #[must_use]
+    pub(crate) const fn reject_invisible_normalization(mut self) -> Self {
+        self.reject_invisible_normalization = true;
         self
     }
 
@@ -403,6 +413,10 @@ impl Candidate {
     #[must_use]
     pub const fn obfuscation(&self) -> Obfuscation {
         self.obfuscation
+    }
+
+    pub(crate) const fn rejects_invisible_normalization(&self) -> bool {
+        self.reject_invisible_normalization
     }
 }
 
