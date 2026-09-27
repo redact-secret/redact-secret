@@ -63,7 +63,7 @@ const MOD_RS = join(REPO_ROOT, "crates", "secret-scan-core", "src", "detectors",
  * of silently mismatching.
  */
 export const CANONICAL_IDS = [
-  "private-key", "aws-access-key", "github-token", "gitlab-token", "openai-token",
+  "private-key", "aws-access-key", "aws-bedrock-long-term-api-key", "aws-bedrock-short-term-api-key", "github-token", "gitlab-token", "openai-token",
   "anthropic-token", "shopify-token", "vault-token", "stripe-token", "slack-token",
   "pypi-token", "huggingface-token", "docker-token", "cloudflare-token", "digitalocean-token",
   "linear-token", "supabase-token", "supabase-management-token", "vercel-token", "npm-token", "google-api-key",
@@ -73,9 +73,10 @@ export const CANONICAL_IDS = [
   "datadog-api-key", "datadog-application-key", "datadog-application-key-legacy", "grafana-service-account-token",
   "grafana-cloud-access-policy-token", "new-relic-user-api-key", "new-relic-license-key",
   "mailchimp-api-key", "mailgun-api-key", "okta-api-token",
-  "firebase-server-key", "terraform-cloud-token", "pulumi-access-token", "replicate-api-token", "groq-api-key", "xai-api-key", "openrouter-api-key", "perplexity-api-key", "fireworks-ai-api-key", "pinecone-api-key", "gitlab-runner-authentication-token", "databricks-personal-access-token",
+  "firebase-server-key", "terraform-cloud-token", "pulumi-access-token", "replicate-api-token", "groq-api-key", "xai-api-key", "openrouter-api-key", "perplexity-api-key", "fireworks-ai-api-key", "elevenlabs-api-key", "together-ai-api-key", "tavily-api-key", "pinecone-api-key", "gitlab-runner-authentication-token", "databricks-personal-access-token",
   "confluent-cloud-api-secret", "confluent-cloud-api-secret-legacy", "netlify-token", "neon-api-key", "langsmith-api-key", "langfuse-secret-key",
   "postman-api-key", "postman-collection-access-key", "heroku-api-key", "heroku-api-key-legacy", "travisci-api-token",
+  "mistral-api-key", "cohere-api-key", "ai21-api-key", "deepgram-api-key",
   "jwt", "bearer-token", "connection-string", "otpauth-uri", "generic-token",
 ];
 
@@ -91,11 +92,11 @@ export const STRUCTURAL_IDS = [
 export const GROUPS = {
   ai: [
     "openai-token", "anthropic-token", "huggingface-token", "replicate-api-token", "groq-api-key",
-    "xai-api-key", "openrouter-api-key", "perplexity-api-key", "fireworks-ai-api-key", "langsmith-api-key",
-    "langfuse-secret-key",
+    "xai-api-key", "openrouter-api-key", "perplexity-api-key", "fireworks-ai-api-key", "elevenlabs-api-key", "together-ai-api-key", "tavily-api-key", "langsmith-api-key",
+    "langfuse-secret-key", "mistral-api-key", "cohere-api-key", "ai21-api-key", "deepgram-api-key",
   ],
   cloud: [
-    "aws-access-key", "vault-token", "cloudflare-token", "digitalocean-token", "supabase-token",
+    "aws-access-key", "aws-bedrock-long-term-api-key", "aws-bedrock-short-term-api-key", "vault-token", "cloudflare-token", "digitalocean-token", "supabase-token",
     "supabase-management-token", "vercel-token", "google-api-key", "microsoft-entra-client-secret", "datadog-api-key",
     "datadog-application-key", "datadog-application-key-legacy", "grafana-service-account-token", "grafana-cloud-access-policy-token",
     "new-relic-user-api-key", "new-relic-license-key", "firebase-server-key", "terraform-cloud-token",

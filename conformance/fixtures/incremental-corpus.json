@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 97,
+  "fixtureCount": 98,
   "fixtures": [
     {
       "id": "synthetic-regression-malformed-authority",
@@ -1518,6 +1518,30 @@
         }
       ],
       "note": "Issue #727: the frozen `sk-or-v1-` prefix (which shares `sk-` with the OpenAI families) plus exactly 64 lower-case hex body bytes stays one whole finding at every UTF-8 byte and char partition, including splits inside the prefix and at the last body byte, while the one-byte-short twin on the next line never emits one, matching openrouter-api-key-positive-dotenv and openrouter-api-key-boundary-one-short."
+    },
+    {
+      "id": "elevenlabs-api-key-incremental-residency-partitions",
+      "input": "XI_API_KEY=sk_0123456789abcdef0123456789abcdef0123456789abcdef_residency_eu\nsk_fedcba9876543210fedcba9876543210fedcba987654321_residency_eu\nELEVENLABS_API_KEY=sk_fedcba9876543210fedcba9876543210fedcba9876543210\n",
+      "text": "XI_API_KEY=<SECRET_1>\nsk_fedcba9876543210fedcba9876543210fedcba987654321_residency_eu\nELEVENLABS_API_KEY=<SECRET_2>\n",
+      "expected": [
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 75,
+          "specificity": "provider",
+          "start": 11,
+          "type": "elevenlabs_api_key"
+        },
+        {
+          "confidence": "high",
+          "detector": "elevenlabs-api-key",
+          "end": 210,
+          "specificity": "provider",
+          "start": 159,
+          "type": "elevenlabs_api_key"
+        }
+      ],
+      "note": "Issue #865: a `sk_` + 48 lowercase hex key with its `_residency_eu` suffix stays one whole finding, suffix included, at every UTF-8 byte and char partition, including splits inside the prefix, the hex body and the suffix; the residency twin one hex byte short on the next line never emits one, and a bare-marker key on the last line stays one finding, matching elevenlabs-api-key-positive-residency-dotenv and elevenlabs-api-key-boundary-one-short."
     }
   ]
 }

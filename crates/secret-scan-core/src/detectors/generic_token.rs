@@ -261,7 +261,9 @@ pub(crate) fn normalize_name(name: &str) -> String {
 fn is_open_assignment_boundary_char(ch: char) -> bool {
     // `?`, `&` and `#` open a URL query, fragment or form parameter
     // (issue #816).
-    is_js_whitespace(ch) || matches!(ch, '{' | ',' | ';' | '?' | '&' | '#')
+    // `(` opens a single-line call whose keyword argument is the assignment
+    // (`Client(api_key="...")`, issue #866).
+    is_js_whitespace(ch) || matches!(ch, '{' | '(' | ',' | ';' | '?' | '&' | '#')
 }
 
 /// `true` when `normalized` (already passed through [`normalize_name`]) is
@@ -1233,7 +1235,7 @@ const MAX_VENDOR_PLACEHOLDER_PREFIX_LEN: usize = 12;
 /// prefix in front of the placeholder. A real token's body is random
 /// material, which fails all three checks, so the prefix alone never
 /// excludes a value.
-fn is_vendor_prefixed_placeholder(value: &str) -> bool {
+pub(super) fn is_vendor_prefixed_placeholder(value: &str) -> bool {
     value
         .char_indices()
         .take_while(|&(index, _)| index <= MAX_VENDOR_PLACEHOLDER_PREFIX_LEN)
@@ -1382,6 +1384,11 @@ fn is_quoted_value_boundary(ch: Option<char>) -> bool {
                 | ';'
                 | '}'
                 | ']'
+                // The closing parenthesis of a single-line call whose last
+                // argument is the quoted literal (`Client(api_key="...")`,
+                // issue #866). Only a quoted value accepts it: an unquoted
+                // value keeps `)` inside the value.
+                | ')'
                 | '"'
                 | '\''
                 | '`'
@@ -1901,6 +1908,9 @@ struct AssignmentPrefix {
     name_end: usize,
     prefix_end: usize,
     query: bool,
+    /// The name directly follows a `(`: a keyword argument opening a
+    /// single-line call. Only a quoted literal value qualifies (issue #866).
+    call_open: bool,
 }
 
 /// Tries the `(?:^|[\s{,;])` prefix alternative at `pos` (line start first,
@@ -1912,6 +1922,7 @@ fn try_match_assignment_prefix(input: &str, pos: usize) -> Option<AssignmentPref
         name_end,
         prefix_end,
         query: false,
+        call_open: false,
     };
     if is_line_start(input, pos)
         && let Some(m) = parse_name_and_operator(input, pos)
@@ -1922,6 +1933,17 @@ fn try_match_assignment_prefix(input: &str, pos: usize) -> Option<AssignmentPref
     if is_prefix_boundary_char(ch) {
         return parse_name_and_operator(input, pos + ch.len_utf8()).map(plain);
     }
+    if ch == '(' {
+        return parse_name_and_operator(input, pos + 1).map(
+            |(name_start, name_end, prefix_end)| AssignmentPrefix {
+                name_start,
+                name_end,
+                prefix_end,
+                query: false,
+                call_open: true,
+            },
+        );
+    }
     if matches!(ch, '?' | '&' | '#') {
         return parse_query_parameter(input, pos + 1).map(|(name_start, name_end, prefix_end)| {
             AssignmentPrefix {
@@ -1929,6 +1951,7 @@ fn try_match_assignment_prefix(input: &str, pos: usize) -> Option<AssignmentPref
                 name_end,
                 prefix_end,
                 query: true,
+                call_open: false,
             }
         });
     }
@@ -1947,6 +1970,7 @@ fn assignment_candidates(input: &str, names: &NameSource) -> Vec<Candidate> {
             name_end,
             prefix_end,
             query,
+            call_open,
         }) = try_match_assignment_prefix(input, cursor).filter(|prefix| {
             // The spans are sorted and disjoint: only the last one that
             // starts before `cursor` can contain it.
@@ -1967,7 +1991,9 @@ fn assignment_candidates(input: &str, names: &NameSource) -> Vec<Candidate> {
         } else {
             assignment_value(input, prefix_end)
         };
-        if let Some((value_start, value_end, form)) = value_span {
+        if let Some((value_start, value_end, form)) = value_span
+            && (!call_open || form == ValueForm::Quoted)
+        {
             let value = &input[value_start..value_end];
             let mut normalized = normalize_name(&input[name_start..name_end]);
             if matches!(names, NameSource::BuiltIn)
@@ -2012,6 +2038,82 @@ fn assignment_candidates(input: &str, names: &NameSource) -> Vec<Candidate> {
             .map_or(prefix_end, |ch| prefix_end - ch.len_utf8());
     }
 
+    candidates
+}
+
+// --- single-line call with one positional literal (issue #866) ---------------
+
+/// Candidates for `callee("literal")` where the callee's own name is a
+/// high-signal credential name (`api_key("...")`, `client.setApiKey("...")`,
+/// `WithAPIKey("...")`) and the quoted literal is the call's only argument.
+///
+/// The callee is the name-vocabulary evidence, so a constructor with no
+/// secret-bearing name (`new Client("...")`, `Exa("...")`) is deliberately not
+/// matched here; provider-named constructors belong to their provider
+/// detectors. Because a positional literal has no `name =` operator to
+/// vouch for it, the value must clear the stricter of the existing floors:
+/// the high-confidence length and entropy floors, no whitespace, and at least
+/// one ASCII letter and one ASCII digit, and a value containing `-`, `_` or
+/// `.` must mix letter cases. That keeps prompt and label strings
+/// (`password("Enter your password")`) and identifier-like names
+/// (`secret("aws-credentials-prod")`) silent. Ambiguous names (`auth`,
+/// `credential`) never qualify.
+fn call_argument_candidates(input: &str) -> Vec<Candidate> {
+    let bytes = input.as_bytes();
+    let mut candidates = Vec::new();
+    for (open, _) in input.match_indices('(') {
+        let mut callee_start = open;
+        while callee_start > 0 && is_identifier_byte(bytes[callee_start - 1]) {
+            callee_start -= 1;
+        }
+        if callee_start == open || !bytes[callee_start].is_ascii_alphabetic() {
+            continue;
+        }
+        let normalized = normalize_name(&input[callee_start..open]);
+        if !is_high_signal_name(&normalized) {
+            continue;
+        }
+        let quote_pos = skip_while_chars(input, open + 1, is_horizontal_js_whitespace);
+        let Some((value_start, value_end)) = quoted_assignment_value(input, quote_pos) else {
+            continue;
+        };
+        // The closing quote must be followed, past spaces, by the call's own
+        // closing parenthesis: the literal is the whole argument list.
+        let after_quote = skip_while_chars(input, value_end + 1, is_horizontal_js_whitespace);
+        if char_at(input, after_quote) != Some(')') {
+            continue;
+        }
+        let value = &input[value_start..value_end];
+        let separated = value.bytes().any(|byte| matches!(byte, b'-' | b'_' | b'.'));
+        if !value.bytes().all(|byte| byte.is_ascii_graphic())
+            || !value.bytes().any(|byte| byte.is_ascii_alphabetic())
+            || !value.bytes().any(|byte| byte.is_ascii_digit())
+            // A separated value in one letter case is a slug or an
+            // environment-variable name, not a token.
+            || (separated
+                && !(value.bytes().any(|byte| byte.is_ascii_uppercase())
+                    && value.bytes().any(|byte| byte.is_ascii_lowercase())))
+        {
+            continue;
+        }
+        if assignment_confidence(
+            &normalized,
+            value,
+            ValueForm::Quoted,
+            &NameSource::BuiltIn,
+            false,
+        ) != Some(Confidence::High)
+        {
+            continue;
+        }
+        if let Some(range) = ByteRange::new(value_start, value_end) {
+            candidates.push(
+                Candidate::new("contextual_secret", Confidence::High, range)
+                    .with_specificity(Specificity::Contextual)
+                    .with_signals(["high-signal-name", "bounded-entropy", "sdk-call-argument"]),
+            );
+        }
+    }
     candidates
 }
 
@@ -2235,6 +2337,7 @@ impl Detector for GenericTokenDetector {
         if matches!(self.names, NameSource::BuiltIn) {
             candidates.extend(authorization_candidates(input));
             candidates.extend(bare_vendor_prefix_candidates(input));
+            candidates.extend(call_argument_candidates(input));
         }
         Ok(candidates)
     }
@@ -3884,6 +3987,7 @@ mod tests {
             "\"api_key\"=",
             "'api_key' = ",
             "{api_key=",
+            "Client(api_key=",
             "line one\napi_key:",
             "AWS_SECRET_ACCESS_KEY=",
             "auth",

@@ -14,6 +14,7 @@
 //! (`YOUR_ACCESS_TOKEN`, `INSERT_ACCESS_TOKEN`) is excluded as well
 //! ([`is_instructional_token_placeholder`], issue #745).
 
+use super::generic_token::is_vendor_prefixed_placeholder;
 use super::text::{
     ascii_run_len, ends_with_ci, is_instructional_token_placeholder, is_js_whitespace,
     is_repeated_character_filler, matches_placeholder_vocabulary, prev_char, rskip_while_chars,
@@ -67,6 +68,7 @@ fn is_non_secret_bearer_value(value: &str) -> bool {
     is_repeated_character_filler(value)
         || matches_placeholder_vocabulary(value, PLACEHOLDER_WORDS, DIGIT_SUFFIX_PLACEHOLDER_WORDS)
         || is_instructional_token_placeholder(value)
+        || is_vendor_prefixed_placeholder(value)
 }
 
 /// `true` for the token alphabet: `[A-Za-z0-9._~+/-]`.

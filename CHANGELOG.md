@@ -3,6 +3,93 @@
 This file records the released product contract and notable changes. Release
 evidence is linked from each published version.
 
+## Unreleased
+
+### Added
+
+- New provider detectors: `elevenlabs-api-key` (#865), `together-ai-api-key` and
+  `tavily-api-key` (#867), `aws-bedrock-long-term-api-key` and
+  `aws-bedrock-short-term-api-key` (#864), and the keyword-gated
+  `mistral-api-key`, `cohere-api-key`, `ai21-api-key` and
+  `deepgram-api-key` (#868), which claim a value only under an adjacent
+  provider key name, SDK constructor argument or, for Deepgram, an
+  `Authorization: Token` header. Exa stays with `generic-token`.
+
+### Changed
+
+- `anthropic-token` now recognizes the `sk-ant-api01-` and
+  `sk-ant-admin01-` prefixes (#862), and the OpenAI admin-key contract is
+  reconciled with the shipped `sk-admin-` detection (#863).
+- `generic-token` now redacts a secret passed as an SDK call argument, for
+  example `Client(api_key="...")` (#866).
+- The instructional-placeholder exclusion now covers provider-named forms
+  (`YOUR_DEEPGRAM_API_KEY`, `your-mistral-api-key`,
+  `replace-with-your-cohere-key`) and `bearer-token` applies the vendor-prefixed
+  placeholder rule, so `Authorization: Bearer tvly-YOUR_API_KEY` is benign (#774).
+
+### Performance
+
+- The keyword-gated `mistral-api-key`, `cohere-api-key`, `ai21-api-key` and
+  `deepgram-api-key` detectors (#868) now skip their per-line scan entirely
+  when the whole input carries none of a detector's provider keywords,
+  instead of building a run-length table for every line regardless. This
+  cuts the beta.10 `scale-logs` scan latency regression roughly in half with
+  no change to any finding; the rest is the inherent cost of seven more
+  detectors running (`sk-ant-api01-`/`sk-ant-admin01-` prefix matching, AWS
+  Bedrock base64-body scanning, ElevenLabs/Together/Tavily prefix scanning,
+  the OpenAI admin-key reconciliation, and `generic-token`'s SDK-call-argument
+  path).
+- Round 2 (#774): the same four detectors' `may_have_provider_context` gate
+  now finds its keyword (or, for `cohere-api-key`, its `co`/`api`/`key` name
+  segments) with a straight-line scan for the needle's first byte, verifying
+  the full match only at each candidate position, instead of a
+  Boyer-Moore-Horspool shift-table scan. A skip-based scan's average skip is
+  bounded by the needle length, so for these short (3-8 byte) keywords the
+  branchy, data-dependent shift-table lookup was doing more work than a scan
+  a vectorizing compiler already accelerates well; measured on
+  `scale-logs-small-whole`, this is 1.3-3x faster per gate check (most on
+  `cohere-api-key`, whose extra name-segment check was the single largest
+  contributor to the remainder) and reduces the round 1 in-process
+  `scale-logs` regression from roughly 5.5% to roughly 3.7% median, with no
+  change to any finding. It does not measurably move the
+  `scale-logs-medium-fixed4096` (chunked/incremental) profile, where
+  per-call fixed overhead dominates more than the scan itself; the
+  remainder there, and whatever fraction of the CI-pinned budget comparison
+  it still costs, is the inherent cost of the seven new detectors above
+  plus this gate's now-minimal residual scan cost.
+- Round 3 (#774): the `cli` surface alone was still over the 10% regression
+  budget on both `scale-logs` profiles while `rust-core`, `node` and `python`
+  cleared it. Instrumenting the CLI's stdin path (`Instant` timers, removed
+  before this commit) refutes detector-registry or session construction as
+  the cause: building the registry and an `IncrementalSanitizer` over it
+  costs on the order of 20 microseconds, well under 1% of one `scale-logs`
+  invocation, and grew by under a microsecond from the seven added
+  detectors. The actual CLI-specific delta is that the CLI's stdin path
+  always scans through the incremental, one-logical-line-at-a-time pipeline
+  (needed so a credential can straddle a chunk boundary), while every other
+  surface's `scale-logs-small-whole` measurement calls the non-incremental
+  `scan` once over the whole buffer; `scale-logs-small-whole` closes on the
+  order of a thousand lines, so any fixed per-detector cost the incremental
+  path pays is paid roughly a thousand times more often than in the
+  one-shot benchmark it is compared against. Within that path,
+  `keyword_gated_keys::detect_spec` ran its whole-input
+  `may_have_provider_context` keyword check and then, for the single-line
+  input the incremental sanitizer almost always hands it, ran the identical
+  check again inside its one-line loop — the same bytes scanned twice for
+  the same answer, on every closed line, for all four keyword-gated
+  detectors. It now skips the outer check when the input holds only one
+  line, since the loop already performs it; a genuinely multi-line input
+  (the non-incremental `scan` path) is unaffected and keeps its whole-input
+  short-circuit. No finding changes. The remaining gap is the inherent,
+  already twice-minimized per-line cost of running seven more detectors
+  through a path every other surface's `scale-logs-small-whole` number
+  does not exercise; closing it further would mean either changing what a
+  streamed unit is scanned as (a detection-semantics change this round does
+  not make) or accepting the CLI's stdin measurement as structurally
+  incomparable to the other surfaces' one-shot `scale-logs-small-whole`
+  number, the way it is already documented as incomparable on `processing`
+  including process-startup cost.
+
 ## 0.1.0-beta.9 — 2026-09-26
 
 ### Added

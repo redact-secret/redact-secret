@@ -1,0 +1,71 @@
+name: Request a detector / 탐지기 요청
+description: Suggest a provider credential format or a future PII entity.
+title: "[detector request] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Request a provider credential format or PII entity for future support.
+        새로운 프로바이더 형식 또는 PII 엔티티 지원을 제안할 수 있습니다.
+
+        Link to public format documentation when possible. Do not paste any real,
+        revoked-but-real, or real-derived credentials, personal data, customer logs,
+        screenshots, or prompt exports. A format description is enough to start.
+        If this is a suspected exploitable bypass, report it privately through
+        [Security advisories](https://github.com/redact-secret/redact-secret/security/advisories/new).
+        A request does not imply a commitment or stable classification.
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: What would you like detected?
+      options:
+        - Provider-issued credential
+        - Contextual or generic credential
+        - PII entity (beta.10 or later)
+        - Other / unsure
+    validations:
+      required: true
+
+  - type: input
+    id: provider-or-entity
+    attributes:
+      label: Provider or entity name
+      description: A public name is enough; do not include an actual value.
+      placeholder: "Example Provider API token"
+    validations:
+      required: true
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Where does it appear?
+      description: Describe the use case, such as a prompt, tool result, log, trace, or user input. No production data.
+      placeholder: "Users paste configuration into an assistant, and tokens may enter model context."
+    validations:
+      required: true
+
+  - type: input
+    id: public-docs
+    attributes:
+      label: Public format or specification link (if available)
+      description: Prefer official documentation. Leave blank if you cannot find a public source.
+      placeholder: "https://provider.example/docs/tokens"
+    validations:
+      required: false
+
+  - type: textarea
+    id: relevant-details
+    attributes:
+      label: Relevant format or context (optional)
+      description: Describe only publicly documented structure, distinguishing context, or benign lookalikes. No actual values or bypass recipe.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Before submitting
+      options:
+        - label: I have not included real credentials, real-derived credentials, personal data, or unsanitized customer material.
+          required: true
