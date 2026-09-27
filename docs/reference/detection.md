@@ -15,7 +15,7 @@ Built-in Rust detection covers these kinds of structure:
 | Context | Credential assignments, such as an `api_key` or `password` setting, including AWS secret-access-key and session-token names |
 | Connections | Credential-bearing URLs for the supported database, queue, HTTP(S), and FTP(S) schemes |
 | One-time password provisioning | `otpauth://totp` and `otpauth://hotp` with base32 shared secrets |
-| Opt-in PII | One context-qualified `pii:global:network-address` family for canonical IPv4 and IPv6; PII defaults off and the adapter remains one `pii-domain` slot |
+| Opt-in structured PII | Context-required email and canonical IPv4/IPv6 identities through `pii:global:email` and `pii:global:network-address`; PII defaults off and both share one `pii-domain` slot |
 
 Per-family support status is stated only in the generated
 [support matrix](../support-matrix.md). Each provider family's exact frozen
@@ -33,6 +33,20 @@ issues. Exact supported grammars and evidence are recorded in the
 [detection reliability assessment](detection-reliability.md) publishes its
 denominators, results, and limitations without turning them into a universal
 accuracy claim.
+
+### Opt-in email PII
+
+PII is off by default. The global or exact email selector registers one
+`pii-domain` adapter, not one top-level detector per family. Its email family
+recognizes the conservative dot-atom RFC 5322 / RFC 6531 subset frozen in the
+[email family contract](../contracts/pii/email-v1.md). Structure establishes
+identity only; high-signal email context establishes sensitivity, while a
+whole RFC-reserved/documentation domain or a named example/documentation
+context makes the occurrence non-sensitive. It does not implement quoted
+local parts, comments, folding, domain literals, ordinary single-label domains,
+or deliverability checks. Exact RFC 6761 single-label names are admitted only
+as non-sensitive controls. The family is `pending` until exact-artifact
+`pii-v1` benchmark evidence is reviewed.
 
 ### Policy-qualified generic credentials
 

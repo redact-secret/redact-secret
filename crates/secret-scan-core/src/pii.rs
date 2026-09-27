@@ -15,7 +15,7 @@ use crate::types::{
 
 const ADAPTER_ID: &str = "pii-domain";
 const KNOWN_JURISDICTIONS: &[&str] = &["us"];
-const AVAILABLE_FAMILIES: &[&str] = &["pii:global:network-address"];
+const AVAILABLE_FAMILIES: &[&str] = &["pii:global:email", "pii:global:network-address"];
 const KNOWN_FAMILIES: &[&str] = &[
     "pii:global:ambiguous-national-id",
     "pii:global:email",
@@ -26,10 +26,14 @@ const KNOWN_FAMILIES: &[&str] = &[
     "pii:global:us-ssn",
     "pii:us:ssn",
 ];
+#[path = "pii/pii_email.rs"]
+mod pii_email;
 
 /// A canonical, closed PII selector set for the loaded artifact.
 ///
-/// The available family closure is fixed by this artifact.
+/// Parsing validates the accepted selector grammar against the production PII
+/// families compiled into this artifact and distinguishes invalid,
+/// unsupported, and known-but-unavailable requests.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct PiiSelection {
     selectors: Vec<String>,
@@ -181,7 +185,7 @@ pub(crate) fn is_reserved_detector_id(id: &str) -> bool {
 pub(crate) fn adapter(selection: &PiiSelection) -> Box<dyn Detector> {
     Box::new(PiiDomain::new(
         selection.clone(),
-        vec![network_address::family()],
+        vec![Box::new(pii_email::EmailFamily), network_address::family()],
     ))
 }
 
@@ -245,6 +249,7 @@ struct Alternative {
     sensitivity_confidence: Confidence,
     sensitivity_specificity: Specificity,
     obfuscation: Obfuscation,
+    reject_invisible_normalization: bool,
 }
 
 trait PiiFamily {
@@ -253,6 +258,9 @@ trait PiiFamily {
     fn occurrence_exclusions(&self) -> &'static [&'static str];
     fn reinforced_sensitivity_confidence(&self) -> Option<Confidence> {
         None
+    }
+    fn reject_invisible_normalization(&self) -> bool {
+        false
     }
     fn detect(&self, input: &str) -> Vec<Alternative>;
 }
@@ -305,6 +313,8 @@ impl Detector for PiiDomain {
                 // The registry owns family identity. A family implementation
                 // cannot impersonate another selected alternative.
                 alternative.family_id = family.id();
+                alternative.reject_invisible_normalization =
+                    family.reject_invisible_normalization();
                 detected.push(FamilyAlternative {
                     alternative,
                     context_requirement: family.context_requirement(),
@@ -418,12 +428,16 @@ impl Detector for PiiDomain {
             } else {
                 Obfuscation::None
             };
-            output.push((
-                domain,
-                Candidate::new(type_name, confidence, range)
-                    .with_specificity(specificity)
-                    .with_obfuscation(obfuscation),
-            ));
+            let mut candidate = Candidate::new(type_name, confidence, range)
+                .with_specificity(specificity)
+                .with_obfuscation(obfuscation);
+            if alternatives
+                .iter()
+                .any(|alternative| alternative.reject_invisible_normalization)
+            {
+                candidate = candidate.reject_invisible_normalization();
+            }
+            output.push((domain, candidate));
         }
         output.sort_by(|(left_domain, left), (right_domain, right)| {
             (
@@ -876,6 +890,7 @@ mod tests {
                     sensitivity_confidence: Confidence::High,
                     sensitivity_specificity: Specificity::Structural,
                     obfuscation: Obfuscation::None,
+                    reject_invisible_normalization: false,
                 })
                 .collect()
         }
@@ -921,6 +936,7 @@ mod tests {
             sensitivity_confidence,
             sensitivity_specificity: Specificity::Contextual,
             obfuscation: Obfuscation::None,
+            reject_invisible_normalization: false,
         }
     }
 
@@ -957,7 +973,7 @@ mod tests {
         let active = PiiSelection::parse(&["pii", "pii:global"]).unwrap();
         assert_eq!(
             active.activation_identity(crate::Profile::Common),
-            "credentials=common;selectors=pii:global;families=pii:global:network-address;vocabulary=pii-context/v1"
+            "credentials=common;selectors=pii:global;families=pii:global:email,pii:global:network-address;vocabulary=pii-context/v1"
         );
     }
 
@@ -1048,6 +1064,7 @@ mod tests {
                     sensitivity_confidence: Confidence::High,
                     sensitivity_specificity: Specificity::Structural,
                     obfuscation: Obfuscation::None,
+                    reject_invisible_normalization: false,
                 }],
             )]
         };
@@ -1081,6 +1098,7 @@ mod tests {
                 sensitivity_confidence: Confidence::High,
                 sensitivity_specificity: Specificity::Structural,
                 obfuscation: Obfuscation::None,
+                reject_invisible_normalization: false,
             }];
             PiiDomain::new(
                 selected(&["pii:global:email"]),

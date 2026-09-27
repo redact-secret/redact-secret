@@ -12,6 +12,13 @@ evidence is linked from each published version.
   network context, explicit reserved/documentation sensitivity treatment,
   safe cross-surface conformance fixtures, and no runtime I/O. Qualification
   remains pending exact-candidate benchmark evidence.
+- Opt-in global email PII detection (#876) through the shared `pii-domain`
+  adapter, with exact/global selector closure, a conservative documented RFC
+  5322 / RFC 6531 subset, context-required sensitivity, whole-domain RFC
+  2606/6761 negative evidence, safe cross-surface conformance fixtures, and
+  incremental partition equivalence. The family remains `pending` until its
+  exact merged artifact is qualified in the benchmark counterpart; stable
+  promotion is not part of this change.
 - The opt-in PII domain runtime substrate (#874): canonical selectors and
   activation identity, one deterministic adapter slot and same-range domain
   arbitration, a generated `pii-context/v1` English/Korean table, fixed safe

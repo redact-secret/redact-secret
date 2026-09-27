@@ -4,7 +4,23 @@ from __future__ import annotations
 
 import redact_secret
 
-from .conftest import load_corpus
+from .conftest import (
+    byte_offset_to_char_offset_reference,
+    code_point_partitions,
+    load_corpus,
+    run_session,
+)
+
+
+def _observable(finding: object) -> dict[str, object]:
+    return {
+        "detector": finding.detector,
+        "type": finding.type,
+        "confidence": finding.confidence,
+        "action": finding.action,
+        "start": finding.start,
+        "end": finding.end,
+    }
 
 
 def test_pii_runtime_fixture() -> None:
@@ -12,6 +28,27 @@ def test_pii_runtime_fixture() -> None:
     first = fixture["activationCases"][1]
     redact_secret.initialize(pii=first["selectors"])
     assert redact_secret.pii_activation() == first["expected"]
+
+    email = load_corpus("pii-email-v1.json")
+    for case in email["cases"]:
+        input_text = case["input"]
+        expected = []
+        for finding in case["expected"]:
+            converted = dict(finding)
+            converted["start"] = byte_offset_to_char_offset_reference(
+                input_text, finding["start"]
+            )
+            converted["end"] = byte_offset_to_char_offset_reference(
+                input_text, finding["end"]
+            )
+            expected.append(converted)
+        assert [_observable(finding) for finding in redact_secret.scan(input_text)] == expected
+
+        whole = redact_secret.scan_and_redact(input_text)
+        for chunks in code_point_partitions(input_text):
+            text, findings = run_session(chunks)
+            assert text == whole.text, (case["id"], chunks)
+            assert [_observable(finding) for finding in findings] == expected
 
     for case in fixture["errorCases"]:
         try:

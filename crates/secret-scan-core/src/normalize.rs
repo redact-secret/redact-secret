@@ -169,6 +169,21 @@ impl<'a> NormalizedInput<'a> {
             .partition_point(|seam| seam.normalized < range.end());
         before_end > through_start
     }
+
+    /// Whether a removed run lies inside `range` or immediately touches
+    /// either normalized boundary.
+    pub(crate) fn touches_removed_run(&self, range: ByteRange) -> bool {
+        if self.seams.is_empty() {
+            return false;
+        }
+        let before_start = self
+            .seams
+            .partition_point(|seam| seam.normalized < range.start());
+        let through_end = self
+            .seams
+            .partition_point(|seam| seam.normalized <= range.end());
+        through_end > before_start
+    }
 }
 
 #[cfg(test)]
@@ -324,6 +339,16 @@ mod tests {
 
         let view = NormalizedInput::new("plain");
         assert!(!view.contains_removed_run(range(1, 4)));
+    }
+
+    #[test]
+    fn touches_removed_run_includes_both_boundaries() {
+        let input = format!("x={ZWSP}abcd{ZWSP};");
+        let view = NormalizedInput::new(&input);
+        assert!(view.touches_removed_run(range(2, 6)));
+        assert!(view.touches_removed_run(range(0, 2)));
+        assert!(view.touches_removed_run(range(6, 7)));
+        assert!(!view.touches_removed_run(range(0, 1)));
     }
 
     #[test]
