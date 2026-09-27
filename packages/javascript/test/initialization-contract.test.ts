@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
 
 import { SecretScanError } from "../src/errors.js";
 import { createRedactSecretRuntime } from "../src/runtime.js";
@@ -10,6 +11,16 @@ const LIMITS = {
   maxBufferedCodeUnits: 384,
   maxTokenCodeUnits: 128,
   maxMultilineCodeUnits: 256,
+};
+
+const PII_FIXTURE = JSON.parse(
+  readFileSync(
+    new URL("../../../conformance/fixtures/pii-runtime-v1.json", import.meta.url),
+    "utf8",
+  ),
+) as {
+  activationCases: Array<{ selectors: string[]; expected: string }>;
+  errorCases: Array<{ selectors: string[]; code: string; message: string }>;
 };
 
 describe("initialization contract", () => {
@@ -58,6 +69,69 @@ describe("initialization contract", () => {
 
     expect(loads).toBe(1);
     expect(binding.calls).toEqual(["initialize"]);
+  });
+
+  it("canonicalizes equivalent PII initialization and rejects a different selection", async () => {
+    const binding = createFakeBinding();
+    const runtime = createRedactSecretRuntime(async () => binding, "full");
+    await Promise.all([
+      runtime.initialize({ pii: ["pii", "pii:global"] }),
+      runtime.initialize({ pii: ["pii:global"] }),
+    ]);
+    expect(runtime.piiActivation()).toBe(
+      "credentials=full;selectors=pii:global;families=;vocabulary=pii-context/v1",
+    );
+    await expect(runtime.initialize()).rejects.toMatchObject({
+      code: "PII_ACTIVATION_CONFLICT",
+      message: "PII activation is already initialized differently.",
+    });
+  });
+
+  it("rejects malformed initialization options with one fixed input-free error", async () => {
+    const malformed: unknown[] = [
+      null,
+      [],
+      { unexpected: true },
+      { pii: "pii" },
+      { pii: Array(1) },
+      Object.create({ pii: [] }),
+    ];
+    for (const options of malformed) {
+      const runtime = createRedactSecretRuntime(async () => createFakeBinding(), "full");
+      await expect(
+        runtime.initialize(options as never),
+      ).rejects.toMatchObject({
+        code: "INVALID_OPTIONS",
+        message: "Secret scan options are invalid.",
+      });
+    }
+
+    const throwing = Object.defineProperty({}, "pii", {
+      enumerable: true,
+      get: () => {
+        throw new Error("caller-controlled detail");
+      },
+    });
+    const runtime = createRedactSecretRuntime(async () => createFakeBinding(), "full");
+    await expect(runtime.initialize(throwing as never)).rejects.toMatchObject({
+      code: "INVALID_OPTIONS",
+      message: "Secret scan options are invalid.",
+    });
+  });
+
+  it("replays the shared PII activation fixture", async () => {
+    for (const testCase of PII_FIXTURE.activationCases) {
+      const runtime = createRedactSecretRuntime(async () => createFakeBinding(), "full");
+      await runtime.initialize({ pii: testCase.selectors });
+      expect(runtime.piiActivation()).toBe(testCase.expected);
+    }
+    for (const testCase of PII_FIXTURE.errorCases) {
+      const runtime = createRedactSecretRuntime(async () => createFakeBinding(), "full");
+      await expect(runtime.initialize({ pii: testCase.selectors })).rejects.toMatchObject({
+        code: testCase.code,
+        message: testCase.message,
+      });
+    }
   });
 
   it("does not cache a failed attempt, so a caller may retry", async () => {

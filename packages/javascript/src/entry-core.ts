@@ -24,6 +24,7 @@ export type {
   ArtifactKind,
   DetectedSecretFinding,
   IncrementalLimits,
+  InitializeOptions,
   IncrementalPolicyContext,
   IncrementalSanitizer,
   IncrementalSanitizerOptions,

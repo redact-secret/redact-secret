@@ -84,8 +84,23 @@ pub fn profile() -> String {
 /// Returns a fixed, input-free `INITIALIZATION_FAILED` error when the
 /// registry cannot be built.
 #[wasm_bindgen]
-pub fn initialize() -> Result<(), JsValue> {
-    lifecycle::initialize().map_err(to_js_error)
+#[allow(
+    clippy::needless_pass_by_value,
+    reason = "wasm-bindgen owns vector arguments"
+)]
+pub fn initialize(pii: Vec<String>) -> Result<(), JsValue> {
+    lifecycle::initialize(&pii).map_err(to_js_error)
+}
+
+/// Returns the canonical credentials/PII activation identity.
+#[wasm_bindgen(js_name = piiActivation)]
+/// Returns the canonical PII activation identity.
+///
+/// # Errors
+///
+/// Returns a fixed initialization error before successful initialization.
+pub fn pii_activation() -> Result<String, JsValue> {
+    lifecycle::pii_activation().map_err(to_js_error)
 }
 
 /// Resolves the two optional whole-input bound arguments every exported
@@ -365,7 +380,7 @@ mod tests {
 
     #[test]
     fn run_scan_rejects_input_over_an_explicit_byte_limit() {
-        initialize().unwrap();
+        initialize(Vec::new()).unwrap();
         let limits = WholeInputLimits::new(5, 50).unwrap();
         let error =
             lifecycle::with_registry(|registry| run_scan("abcdef", registry, None, &limits))
@@ -386,7 +401,7 @@ mod tests {
         if !cfg!(feature = "full") {
             return;
         }
-        initialize().unwrap();
+        initialize(Vec::new()).unwrap();
         let input = format!(
             "prefix AKIA{} middle AKIA{} suffix",
             "SYNTHETICEXAMPLE", "SYNTHETICEXAMPL2"
@@ -430,7 +445,7 @@ mod tests {
     /// `scanAndRedact` call.
     #[test]
     fn scan_and_redact_agree_on_a_canonical_synthetic_finding() {
-        initialize().unwrap();
+        initialize(Vec::new()).unwrap();
         let input = synthetic_input();
 
         let findings = scan(&input, None, None, None, None).unwrap();
@@ -457,7 +472,7 @@ mod tests {
     /// artifact detects the same input.
     #[test]
     fn a_bare_provider_token_is_detected_only_by_the_full_profile() {
-        initialize().unwrap();
+        initialize(Vec::new()).unwrap();
         let input = format!("prefix \u{1F511} AKIA{} suffix", "SYNTHETICEXAMPLE");
         let findings = scan(&input, None, None, None, None).unwrap();
         if cfg!(feature = "full") {
@@ -489,7 +504,7 @@ validator: none\n";
 
     #[test]
     fn scan_accepts_a_ruleset_and_registers_it_after_the_compiled_profiles_built_ins() {
-        initialize().unwrap();
+        initialize(Vec::new()).unwrap();
         let value = "a".repeat(20);
         let input = format!("ACME_{value}");
 
@@ -507,7 +522,7 @@ validator: none\n";
 
     #[test]
     fn scan_and_redact_thread_the_ruleset_through_to_the_scan_step() {
-        initialize().unwrap();
+        initialize(Vec::new()).unwrap();
         let value = "a".repeat(20);
         let input = format!("ACME_{value}");
 
@@ -533,6 +548,7 @@ validator: none\n";
     /// delegates to does not.
     #[test]
     fn registry_with_ruleset_builds_a_registry_over_the_compiled_profile() {
+        initialize(Vec::new()).unwrap();
         let registry = lifecycle::registry_with_ruleset(RULESET_FIXTURE).unwrap();
         assert!(registry.contains("acme-internal-token"));
         assert_eq!(registry.profile(), Some(lifecycle::PROFILE));
@@ -552,7 +568,7 @@ validator: none\n";
     /// the match.
     #[test]
     fn finding_range_uses_utf16_offsets_end_to_end() {
-        initialize().unwrap();
+        initialize(Vec::new()).unwrap();
         let input = synthetic_input();
         let findings = scan(&input, None, None, None, None).unwrap();
         let range = findings[0].range();
@@ -589,7 +605,7 @@ validator: none\n";
     /// builds a real JavaScript function.
     #[wasm_bindgen_test::wasm_bindgen_test]
     fn scan_and_redact_accept_custom_policy_and_formatter_callbacks() {
-        initialize().unwrap();
+        initialize(Vec::new()).unwrap();
         let input = synthetic_input();
 
         let policy = Function::new_with_args("finding, context", "return 'block';");

@@ -52,6 +52,7 @@ export function createFakeBinding(
   const redacted = options.redacted ?? "<SECRET_1>";
   let lastLimits: NativeWholeInputLimits | undefined;
   let lastRuleset: Uint8Array | undefined;
+  let activation = "credentials=full;selectors=off;families=;vocabulary=pii-context/v1";
 
   function session(): NativeIncrementalSanitizer {
     let state: IncrementalSanitizerState = "accepting";
@@ -90,12 +91,29 @@ export function createFakeBinding(
     version: () => options.version ?? VERSION,
     profile: () => options.profile ?? "full",
     artifact: () => "addon",
-    initialize: () => {
+    initialize: (pii = []) => {
       calls.push("initialize");
       if (options.throwOnInitialize !== undefined) {
         throw options.throwOnInitialize;
       }
+      const rejected = pii.includes("PII")
+        ? ["PII_SELECTOR_INVALID", "PII selector is invalid."]
+        : pii.includes("pii:kr")
+          ? ["PII_SELECTOR_UNSUPPORTED", "PII jurisdiction or family is unsupported."]
+          : pii.includes("pii:us")
+            ? ["PII_SELECTOR_UNAVAILABLE", "PII selection is unavailable in this artifact."]
+            : undefined;
+      if (rejected !== undefined) {
+        throw Object.assign(new Error(rejected[1]), { code: rejected[0] });
+      }
+      const selectors = [...new Set(pii.map((value) => value === "pii" ? "pii:global" : value))].sort();
+      const next = `credentials=${options.profile ?? "full"};selectors=${selectors.length === 0 ? "off" : selectors.join(",")};families=;vocabulary=pii-context/v1`;
+      if (activation !== next && calls.filter((call) => call === "initialize").length > 1) {
+        throw Object.assign(new Error("conflict"), { code: "PII_ACTIVATION_CONFLICT" });
+      }
+      activation = next;
     },
+    piiActivation: () => activation,
     scan: (input, policy, limits, ruleset) => {
       lastLimits = limits;
       lastRuleset = ruleset;

@@ -50,12 +50,17 @@ pub fn load_ruleset_file(path: &Path) -> Result<Vec<u8>, Failure> {
 
 /// Builds a registry over the built-in detectors, plus every detector
 /// `ruleset` declares when given.
-fn registry_for(ruleset: Option<&[u8]>) -> Result<DetectorRegistry, Failure> {
+fn registry_for(
+    ruleset: Option<&[u8]>,
+    selection: &redact_secret::PiiSelection,
+) -> Result<DetectorRegistry, Failure> {
     let custom = match ruleset {
         Some(bytes) => load_ruleset(bytes).map_err(Failure::from)?,
         None => Vec::new(),
     };
-    Ok(DetectorRegistry::with_built_in(custom)?)
+    Ok(DetectorRegistry::with_built_in_and_pii_custom(
+        selection, custom,
+    )?)
 }
 
 /// Scans every source and returns the safe report for the whole run.
@@ -63,11 +68,16 @@ fn registry_for(ruleset: Option<&[u8]>) -> Result<DetectorRegistry, Failure> {
 /// A source that fails is recorded as a failure and the remaining sources are
 /// still scanned: a caller that passed a directory of files learns about all
 /// of them, and the run still exits as a failure.
-pub fn check(sources: &[Source], stdin: &mut dyn Read, ruleset: Option<&[u8]>) -> Report {
+pub fn check(
+    sources: &[Source],
+    stdin: &mut dyn Read,
+    ruleset: Option<&[u8]>,
+    selection: &redact_secret::PiiSelection,
+) -> Report {
     let mut report = Report::new();
     for source in sources {
         let identity = source.identity();
-        match check_source(source, stdin, ruleset) {
+        match check_source(source, stdin, ruleset, selection) {
             Ok(findings) => report.push_source(identity, findings),
             Err(failure) => report.push_failure(identity, failure),
         }
@@ -79,23 +89,29 @@ fn check_source(
     source: &Source,
     stdin: &mut dyn Read,
     ruleset: Option<&[u8]>,
+    selection: &redact_secret::PiiSelection,
 ) -> Result<Vec<SafeFinding>, Failure> {
     match source {
         // `args::parse` refuses `--ruleset` combined with standard input
         // (its incremental session accepts no custom detector), so `ruleset`
         // is always `None` on this path; nothing here needs to branch on it.
         Source::Stdin => {
-            let mut session = IncrementalSanitizer::new(incremental_limits()?)?;
+            let mut session =
+                IncrementalSanitizer::with_built_in_and_pii(incremental_limits()?, selection)?;
             // Check mode never emits text. The sanitized text each closed
             // unit produces is dropped with the result that carried it.
             stream(stdin, &mut session, &mut |_sanitized| Ok(()))
         }
-        Source::File(path) => check_file(path, ruleset),
+        Source::File(path) => check_file(path, ruleset, selection),
     }
 }
 
-fn check_file(path: &Path, ruleset: Option<&[u8]>) -> Result<Vec<SafeFinding>, Failure> {
-    let registry = registry_for(ruleset)?;
+fn check_file(
+    path: &Path,
+    ruleset: Option<&[u8]>,
+    selection: &redact_secret::PiiSelection,
+) -> Result<Vec<SafeFinding>, Failure> {
+    let registry = registry_for(ruleset, selection)?;
     let text = read_file_text(path)?;
     let findings = scan(&text, &registry, &DefaultPolicy)?;
     drop(text);
@@ -123,19 +139,21 @@ pub fn redact(
     stdin: &mut dyn Read,
     out: &mut dyn Write,
     ruleset: Option<&[u8]>,
+    selection: &redact_secret::PiiSelection,
 ) -> Result<(), Failure> {
     match source {
         // `args::parse` refuses `--ruleset` combined with standard input;
         // see `check_source`'s identical note.
         Source::Stdin => {
-            let mut session = IncrementalSanitizer::new(incremental_limits()?)?;
+            let mut session =
+                IncrementalSanitizer::with_built_in_and_pii(incremental_limits()?, selection)?;
             stream(stdin, &mut session, &mut |sanitized| {
                 write_text(out, sanitized)
             })?;
             Ok(())
         }
         Source::File(path) => {
-            let registry = registry_for(ruleset)?;
+            let registry = registry_for(ruleset, selection)?;
             let text = read_file_text(path)?;
             let result: ScanResult = scan_and_redact(
                 &text,

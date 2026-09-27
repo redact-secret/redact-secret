@@ -69,6 +69,10 @@ depend on `src/`.
   cross-language error-code registry (`fixtures/error-codes.source.ts`):
   every stable code the incremental sanitizer and its stream adapters can
   raise, paired with its fixed, input-free message.
+- [`fixtures/pii-runtime-v1.json`](./fixtures/pii-runtime-v1.json) — the
+  cross-surface PII selector canonicalization, activation identity, and fixed
+  input-free error contract. It deliberately activates no production family;
+  the Rust consumer is `crates/secret-scan-core/tests/pii_runtime_conformance.rs`.
 - [`fixtures/ai-context-boundary.json`](./fixtures/ai-context-boundary.json) —
   the framework-neutral AI-context boundary contract's cases (issue #610,
   [`docs/reference/ai-context-boundary.md`](../docs/reference/ai-context-boundary.md)):

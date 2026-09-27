@@ -13,10 +13,9 @@
  * const { text, findings } = scanAndRedact(input);
  * ```
  *
- * `await initialize()` must succeed exactly once before any synchronous
- * operation; calling it again is free. Node's own loading has nothing to
- * await, but the call stays part of the contract so the usage model does not
- * vary by runtime.
+ * `await initialize()` must succeed before any synchronous operation.
+ * Equivalent PII selections are idempotent; a different later or concurrent
+ * selection rejects with `PII_ACTIVATION_CONFLICT`.
  *
  * Every range this module reports is a `[start, end)` pair of UTF-16
  * code-unit offsets ({@link RANGE_UNIT}), and every finding it returns is
@@ -43,12 +42,14 @@ import { runtime } from "./session.js";
 /**
  * Loads this runtime's binding and prepares it for use.
  *
- * Idempotent: the artifact is loaded at most once no matter how many callers
- * await it. A rejected attempt is not cached, so a caller may retry. Rejects
- * with `INITIALIZATION_FAILED` when the artifact is missing, unusable, or
- * built from a different product version than this package.
+ * Equivalent calls share one load. A rejected attempt is not cached, so a
+ * caller may retry. Invalid or unavailable selectors and conflicting
+ * activation use their fixed PII error codes; artifact failures use
+ * `INITIALIZATION_FAILED`.
  */
 export const initialize = runtime.initialize;
+/** Returns the canonical credentials/PII activation identity. */
+export const piiActivation = runtime.piiActivation;
 
 /**
  * Which artifact `initialize()` loaded: `"addon"` (the native N-API addon)

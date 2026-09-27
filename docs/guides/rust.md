@@ -102,3 +102,14 @@ for the false-negative tradeoff.
 The [core API inventory](../../crates/secret-scan-core/README.md#public-api)
 lists the full surface. Generate local rustdoc with
 `cargo doc -p redact-secret --no-deps --locked`.
+
+## PII activation substrate
+
+`PiiSelection::parse` validates and canonicalizes selectors.
+`DetectorRegistry::with_built_in_and_pii` and
+`with_common_built_in_and_pii` capture that selection and expose its canonical
+identity through `activation_identity()`. Empty selection preserves the
+legacy credential-only registry byte for byte. The current crate intentionally
+registers no production PII family, so `pii` activates an empty adapter slot
+without claiming PII detection support; known unavailable family or
+jurisdiction selectors fail closed.

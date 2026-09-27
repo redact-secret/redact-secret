@@ -1,7 +1,7 @@
 {
   "$schema": "./pii-context-v1.schema.json",
   "format": "redact-secret/pii-context/v1",
-  "status": "contract-only",
+  "status": "runtime-compiled",
   "evidenceGroup": "contextual",
   "use": {
     "loadedAtRuntime": false,

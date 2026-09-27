@@ -33,7 +33,7 @@ use napi_derive::napi;
 use redact_secret::{
     Action, ByteRange, DefaultPolicy, DetectedFinding, Finding, FormatterFailure,
     IncrementalLimits, IncrementalPolicy, IncrementalPolicyContext, IncrementalResult,
-    IncrementalSanitizer, PlaceholderContext, PlaceholderFormatter, PolicyFailure,
+    IncrementalSanitizer, PlaceholderContext, PlaceholderFormatter, PolicyFailure, Profile,
     SecretScanError as CoreError, SecretScanErrorCode, SessionState,
     default_placeholder_formatter as core_default_formatter,
 };
@@ -608,7 +608,12 @@ fn build(
 pub fn create_incremental_sanitizer(
     options: JsIncrementalOptions<'_>,
 ) -> napi::Result<JsIncrementalSanitizer, String> {
-    build(options, IncrementalSanitizer::with_policy_and_formatter)
+    let selection = crate::pii_selection(Profile::Full);
+    build(options, move |limits, policy, formatter| {
+        IncrementalSanitizer::with_built_in_and_pii_policy_and_formatter(
+            limits, &selection, policy, formatter,
+        )
+    })
 }
 
 /// The `common`-profile analogue of [`create_incremental_sanitizer`]
@@ -625,10 +630,12 @@ pub fn create_incremental_sanitizer(
 pub fn create_incremental_sanitizer_common(
     options: JsIncrementalOptions<'_>,
 ) -> napi::Result<JsIncrementalSanitizer, String> {
-    build(
-        options,
-        IncrementalSanitizer::with_common_built_in_policy_and_formatter,
-    )
+    let selection = crate::pii_selection(Profile::Common);
+    build(options, move |limits, policy, formatter| {
+        IncrementalSanitizer::with_common_built_in_and_pii_policy_and_formatter(
+            limits, &selection, policy, formatter,
+        )
+    })
 }
 
 #[cfg(test)]

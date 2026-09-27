@@ -18,6 +18,7 @@ const PUBLIC_RUNTIME_EXPORTS = [
   "createIncrementalSanitizer",
   "defaultPlaceholderFormatter",
   "initialize",
+  "piiActivation",
   "redact",
   "scan",
   "scanAndRedact",

@@ -66,7 +66,7 @@ unimplemented = "deny"
 [workspace.metadata.redact-secret]
 core-package = "redact-secret"
 product-name = "Redact Secret"
-allowed-dependencies = []
+allowed-dependencies = ["tinyvec", "unicode-normalization"]
 # Crates a binding needs to speak to its host. The core is binding-neutral:
 # none of these may appear in its dependency graph, its manifest, or its
 # sources. They are not in `forbidden-dependencies` because the bindings
@@ -121,6 +121,7 @@ core-public-api = [
   "Policy",
   "PolicyContext",
   "PolicyFailure",
+  "PiiSelection",
   "Profile",
   "RANGE_UNIT",
   "RegisteredDetector",

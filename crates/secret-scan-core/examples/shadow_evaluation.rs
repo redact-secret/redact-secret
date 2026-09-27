@@ -65,6 +65,8 @@ mod invisible_table;
 mod limits;
 #[path = "../src/normalize.rs"]
 mod normalize;
+#[path = "../src/pii.rs"]
+mod pii;
 #[path = "../src/pipeline.rs"]
 mod pipeline;
 #[path = "../src/policy.rs"]

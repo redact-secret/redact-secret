@@ -33,6 +33,10 @@ def test_exception_hierarchy_is_importable_and_rooted() -> None:
         redact_secret.PlaceholderFailureError,
         redact_secret.InvalidPlaceholderError,
         redact_secret.InvalidRulesetError,
+        redact_secret.PiiSelectorInvalidError,
+        redact_secret.PiiSelectorUnsupportedError,
+        redact_secret.PiiSelectorUnavailableError,
+        redact_secret.PiiActivationConflictError,
     ]
     for exc_type in subclasses:
         assert issubclass(exc_type, redact_secret.SecretScanError)

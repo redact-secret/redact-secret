@@ -188,6 +188,12 @@ in JavaScript), never the matched plaintext. The
 [JavaScript guide](docs/guides/javascript.md) covers runtime selection,
 policies, limits, profiles, and browser loading.
 
+PII activation is opt-in and defaults off across Rust, JavaScript, Python, and
+the CLI. The shared selector, arbitration, and English/Korean context substrate
+is present, but this release intentionally registers no production PII family
+and therefore makes no PII detection support claim. See each language guide
+for activation identity and fixed failure behavior.
+
 ## Core operations
 
 Every supported language surface provides equivalent whole-input behavior:

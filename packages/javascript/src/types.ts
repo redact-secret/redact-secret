@@ -37,6 +37,11 @@ export type SecretAction = "redact" | "block" | "warn" | "allow";
  */
 export type SecretObfuscation = "none" | "invisible-characters";
 
+/** Options accepted by `initialize`. PII stays off when omitted or empty. */
+export interface InitializeOptions {
+  readonly pii?: readonly string[];
+}
+
 /**
  * A finding before policy evaluation: the safe metadata a policy callback
  * receives. It never carries the input or the matched value.

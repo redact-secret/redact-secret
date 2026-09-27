@@ -24,8 +24,9 @@ The live `pii-context/v1` contract is
 validated against its adjacent schema by
 `scripts/check-pii-context-contract.py`. It contains the initial synthetic
 English and Korean vocabulary, normalization and association fixtures, and
-benign ambiguity controls. It is contract/evaluation input only; no runtime
-detector loads it yet.
+benign ambiguity controls. Issue #874 compiles this reviewed data into the
+core and checks generated-table drift; the runtime never reads this JSON or
+performs filesystem, environment, or network I/O.
 
 Every entry declares language (`en` or `ko`), kind (`field-label` or
 `natural-language-label`), semantic class (`positive`, `neutral`, or

@@ -116,7 +116,8 @@ export interface NativeBinding {
   /** Which artifact this binding was built from. */
   artifact(): ArtifactKind;
   /** Idempotent native setup. May be a no-op, as it is on Node. */
-  initialize(): void;
+  initialize(pii?: readonly string[]): void;
+  piiActivation?(): string;
   scan(
     input: string,
     policy: NativePolicyCallback | undefined,
