@@ -15,6 +15,13 @@
 //! sk-admin-<74|58 [A-Za-z0-9_-]>T3BlbkFJ<74|58 [A-Za-z0-9_-]>    admin
 //! ```
 //!
+//! The `admin` row is a T2 (tool-corroborated, not provider-documented)
+//! contract, issue #863: gitleaks vectors measure the 58/58 shape, and the
+//! marker is the family-wide watermark. A marker-less `sk-admin-` body is out
+//! of this detector's contract (no source shows one; admitting it would need
+//! its own `sk-ant-`/`sk-or-` reject list), so it is a recorded false
+//! negative here; only the generic layers can still claim it from context.
+//!
 //! Each variant is validated on its own: an explicit `proj-`/`svcacct-`/
 //! `admin-` namespace owns the value outright, so a malformed namespaced
 //! body is rejected rather than re-read as a legacy key. Anthropic's

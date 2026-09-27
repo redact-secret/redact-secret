@@ -18,13 +18,17 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 
 | Type | Detector | Policy class | Governing ADR |
 | --- | --- | --- | --- |
-| `anthropic_api_key` | `anthropic-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 provider source recorded in [#642 evidence](../audits/evidence/642/README.md) |
+| `ai21_api_key` | `ai21-api-key` | `confidence-gated` | no dedicated ADR in this repository; contextual, unqualified claim stated under Keyword-gated provider keys below, per issue #868 |
+| `anthropic_api_key` | `anthropic-token` | `always-redact` | generic policy default, no dedicated ADR in this repository; T1 provider source recorded in [#642 evidence](../audits/evidence/642/README.md); issue #862 extends the prefix set from `sk-ant-api03-` to also `sk-ant-api01-` (Claude Enterprise organization key for any scope set, not only compliance) and `sk-ant-admin01-` (Console Admin API key), all under this one type and detector, grammar in `detectors::anthropic`'s module doc. The prefixes are T1 (provider documentation); the body is the unchanged `>= 20` byte `[A-Za-z0-9_-]` run with a left boundary, a deliberate superset of the T2 scanner shape of 93 bytes plus `AA` (no length or tail is asserted, and none is evidenced for `api01`). False-negative tradeoff: `admin02`, unversioned `sk-ant-admin-`, `sk-ant-oat01-`/`sk-ant-ort01-` and Base64-encoded copies stay unmatched until evidenced. False-positive tradeoff: a doc placeholder of 20 or more valid body bytes (for example a long `x` run) matches, as it already does for `api03`. Sharing `anthropic_api_key` means policy cannot treat an admin key differently from an API key; a distinct type is a separate decision |
 | `atlassian_api_token` | `atlassian-api-token` | `always-redact` | [Freeze the Atlassian Cloud API token grammar as a minimum-length ATAT-prefixed body](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `authorization_credential` | `generic-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `aws_access_key_id` | `aws-access-key` | `always-redact` | generic policy default, no dedicated ADR in this repository |
+| `aws_bedrock_long_term_api_key` | `aws-bedrock-long-term-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; grammar in `detectors::aws_bedrock`'s module doc, `ABSK` + standard Base64 (T1 candidate, maintainer ruling pending), 109-269 body bytes (T2), recorded in [#864 evidence](../audits/evidence/864/README.md) |
+| `aws_bedrock_short_term_api_key` | `aws-bedrock-short-term-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; two families rather than one (client-minted presigned URL vs issued credential), `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1 candidate, maintainer ruling pending), tail floor T2, recorded in [#864 evidence](../audits/evidence/864/README.md) |
 | `azure_devops_personal_access_token` | `azure-devops-personal-access-token` | `always-redact` | [Freeze the Azure DevOps personal access token grammar as the documented 84-byte AZDO-signature shape](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md); T1 provider source recorded in [#642 evidence](../audits/evidence/642/README.md) |
 | `bearer_token` | `bearer-token` | `always-redact` | [Accept a truncated or nested-provider Bearer value under bearer-token's length-and-alphabet grammar](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `cloudflare_api_token` | `cloudflare-token` | `always-redact` | [Adopt the Cloudflare account-token prefix under the frozen cfut_ contract](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
+| `cohere_api_key` | `cohere-api-key` | `confidence-gated` | no dedicated ADR in this repository; contextual, unqualified claim stated under Keyword-gated provider keys below, per issue #868 |
 | `confluent_cloud_api_secret` | `confluent-cloud-api-secret` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `confluent_cloud_api_secret_legacy` | `confluent-cloud-api-secret-legacy` | `confidence-gated` | generic policy default, no dedicated ADR in this repository |
 | `connection_string_password` | `connection-string` | `always-redact` | [Exclude a value fully delimited by `{{` and `}}` as a template reference](../decisions/2026-09-15-exclude-fully-delimited-template-references.md#folded-records) (folded: `decision-connection-string-and-jwt-need-no-retention-hint`) |
@@ -33,9 +37,11 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `datadog_api_key` | `datadog-api-key` | `confidence-gated` | [Freeze the Datadog API Key and Application Key grammar as marker-gated lowercase-hex values](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `datadog_application_key` | `datadog-application-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; current `ddapp_`-prefixed shape added by issue #671, applying the existing `confluent_cloud_api_secret` / `heroku_api_key` current/legacy split policy to this family |
 | `datadog_application_key_legacy` | `datadog-application-key-legacy` | `confidence-gated` | [Freeze the Datadog API Key and Application Key grammar as marker-gated lowercase-hex values](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
+| `deepgram_api_key` | `deepgram-api-key` | `confidence-gated` | no dedicated ADR in this repository; contextual, unqualified claim stated under Keyword-gated provider keys below, per issue #868 |
 | `digitalocean_token` | `digitalocean-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `discord_bot_token` | `discord-bot-token` | `always-redact` | [Freeze the Discord bot token grammar as a three-segment digit-decoding snowflake token](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `docker_token` | `docker-token` | `always-redact` | [Freeze the Docker Hub access token grammar as two separately-sized exact-length prefixed shapes](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
+| `elevenlabs_api_key` | `elevenlabs-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `firebase_server_key` | `firebase-server-key` | `always-redact` | [Add Firebase FCM legacy server key detection, and discriminate the public Web SDK client config from google-api-key](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `fireworks_ai_api_key` | `fireworks-ai-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `github_app_installation_token` | `github-token` | `always-redact` | [Map GitHub's six token families onto six independent finding types under one detector](../decisions/2026-09-20-map-github-token-families-onto-independent-finding-types.md) |
@@ -60,6 +66,7 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `mailchimp_api_key` | `mailchimp-api-key` | `confidence-gated` | no dedicated ADR in this repository; grammar frozen in `detectors::mailchimp`'s own module doc, per issue #313 |
 | `mailgun_api_key` | `mailgun-api-key` | `confidence-gated` | no dedicated ADR in this repository; grammar frozen in `detectors::mailgun`'s own module doc, per issue #314 |
 | `microsoft_entra_client_secret` | `microsoft-entra-client-secret` | `always-redact` | [Freeze the Microsoft Entra application client-secret grammar as an unprefixed digit-Q-tilde marker](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
+| `mistral_api_key` | `mistral-api-key` | `confidence-gated` | no dedicated ADR in this repository; contextual, unqualified claim stated under Keyword-gated provider keys below, per issue #868 |
 | `neon_api_key` | `neon-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `netlify_personal_access_token` | `netlify-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `new_relic_license_key` | `new-relic-license-key` | `confidence-gated` | [Freeze the New Relic User API Key and License Key grammar as an exact-length prefixed shape and a keyword-gated bare hex shape](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
@@ -89,8 +96,10 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `stripe_webhook_signing_secret` | `stripe-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `supabase_personal_access_token` | `supabase-management-token` | `always-redact` | [Separate the Supabase management-token credential class from the secret-key class, and keep each class's evidence independent](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `supabase_secret_key` | `supabase-token` | `always-redact` | [Separate the Supabase management-token credential class from the secret-key class, and keep each class's evidence independent](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
+| `tavily_api_key` | `tavily-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; `tvly-` prefix T1 (Tavily docs), body T2, grammar and trade-offs in [Together AI and Tavily (#867)](#together-ai-and-tavily-867) |
 | `telegram_bot_token` | `telegram-bot-token` | `always-redact` | [Freeze the Telegram Bot API token grammar as a minimum-length digit-colon-secret shape](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `terraform_cloud_token` | `terraform-cloud-token` | `always-redact` | [Add Terraform Cloud/Enterprise API token detection](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
+| `together_ai_api_key` | `together-ai-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; T2 (no provider source states the shape), grammar and trade-offs in [Together AI and Tavily (#867)](#together-ai-and-tavily-867) |
 | `travisci_api_token` | `travisci-api-token` | `confidence-gated` | generic policy default, no dedicated ADR in this repository |
 | `twilio_api_key_secret` | `twilio-api-key-secret` | `confidence-gated` | [Freeze the Twilio Auth Token and API Key Secret grammar as context-gated 32-byte values](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `twilio_auth_token` | `twilio-auth-token` | `confidence-gated` | [Freeze the Twilio Auth Token and API Key Secret grammar as context-gated 32-byte values](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
@@ -160,6 +169,7 @@ generated finding-type inventory above.
 | `microsoft-entra:application-client-secret` | T1 on the provider-domain SDK example: 3 characters, then `8Q~`, then 34, for 40 in total, by maintainer ruling. The leading run accepts `-` (#707). | [#655](../audits/evidence/655/README.md), [#575](../audits/evidence/575/README.md) |
 | `confluent:cloud-api-secret` | T1 on the provider-stated `cflt` prefix, 60-byte `[A-Za-z0-9+/]` body and checksum: the final 6 body bytes must equal the first 6 standard-Base64 characters of the little-endian IEEE CRC-32 of the 54 body bytes after `cflt` (prefix excluded), the recipe Confluent's own detection example uses. A value with any other checksum is rejected (#738). The unprefixed legacy shape has no documented checksum and stays keyword-gated. | [redact-secret-benchmarks#234](https://github.com/redact-secret/redact-secret-benchmarks/issues/234), [#738](https://github.com/redact-secret/redact-secret/issues/738) |
 | `docker:personal-access-token`, `docker:oauth-access-token` | T1 on the provider-stated `dckr_pat_` / `dckr_oat_` prefixes; the OAT body is exactly 27 (the provider example) or 32 bytes (#708). | [#647](../audits/evidence/647/README.md), [#648](../audits/evidence/648/README.md), [#575](../audits/evidence/575/README.md) |
+| `elevenlabs:api-key` | `sk_` + exactly 48 lowercase hex, with an optional `_residency_<[a-z0-9]+>` suffix inside the finding span so a residency key is redacted whole. T1 on the `sk_` prefix and the suffix only by maintainer ruling on provider SDK code (`elevenlabs-python` `speech_engine/server.py` and `resource.py`, `elevenlabs-js` `SpeechEngineResource.ts`; the provider documents neither), the `huggingface:api-token` precedent; the 48-hex body is T2 (trufflehog v2, betterleaks, measured public fragments) until that ruling. Stripe `sk_live_`/`sk_test_`/`sk_org_`, Pollinations `sk_` + 32, 47/49-hex, uppercase and filler bodies and any other `_` suffix stay unclaimed; the legacy bare 32-hex form stays marker-gated under `generic-token` (`elevenlabs` is deliberately not a dedicated-provider segment). | [#865](https://github.com/redact-secret/redact-secret/issues/865), [#788](https://github.com/redact-secret/redact-secret/issues/788), [redact-secret-benchmarks#384](https://github.com/redact-secret/redact-secret-benchmarks/issues/384) |
 | `supabase:secret-key` | T1 on the provider-documented `sb_secret_` + 22 + `_` + 8 base64url layout (self-hosted auth-keys page, which states hosted keys share the format, and the provider key script); the `_` is checked by position, and the checksum value is not validated because the hosted input is undocumented (#742). | [#742](https://github.com/redact-secret/redact-secret/issues/742), [redact-secret-benchmarks#231](https://github.com/redact-secret/redact-secret-benchmarks/issues/231) |
 
 ## Beta.8 arrival contracts
@@ -235,10 +245,97 @@ UUID stays unclaimed. Each family keeps
 its frozen qualification route; a documented or empirical route is a target,
 not a support-status promotion.
 
+### Together AI and Tavily (#867)
+
+Issue [#867](https://github.com/redact-secret/redact-secret/issues/867)
+implements the two families researched in
+[#783](https://github.com/redact-secret/redact-secret/issues/783) and
+[#786](https://github.com/redact-secret/redact-secret/issues/786). Each gets
+its own detector and finding type on the shared exact-length prefixed
+detector, at provider specificity and high confidence, bare or in any
+context. The boundary is `[A-Za-z0-9_-]`: a value that is a slice of a longer
+run of those bytes is not claimed.
+
+| Family | Contract | Tier | Evidence basis |
+| --- | --- | --- | --- |
+| `together-ai:api-key` | `tgp_v1_` + exactly 43 from `[A-Za-z0-9_-]` (50 total) | T2 empirical | no provider source states prefix, length or alphabet; one scanner rule (betterleaks, which Kingfisher only aliases), one community post and four code-search samples; hands-on issuance pending |
+| `tavily:api-key` | `tvly-` + optional `dev-` + exactly 32 from `[A-Za-z0-9]` | prefix T1, body T2 | Tavily documents `tvly-` and shows `tvly-dev-` sample keys; the 32-byte alphanumeric body rests on one scanner rule (noseyparker, which predates `dev-`) and three observed samples |
+
+False-positive trade-offs: both prefixes are distinctive and their exact
+widths keep prose, model names, `TOGETHER_BASE_URL`, the `tvly` CLI, key names
+and `YOUR_API_KEY`-style placeholders unclaimed. A placeholder padded to the
+exact width with alphabet bytes (for example 32 `x` after `tvly-dev-`) is
+claimed, because no length-preserving placeholder exclusion is evidenced.
+Because a Tavily body is alphanumeric, `tvly-dev-` + 32 does not also match
+the bare `tvly-` shape, so one key gives one finding.
+
+False-negative trade-offs, each an intentional gap rather than a negative
+rule: Together legacy keys (format undocumented; they stay on the generic
+paths), any `tgp_v2_` or other version, and 26/31-byte bodies seen in the code
+search; `tvly-prod-` (not evidenced anywhere; Vellum documents production keys
+as plain `tvly-`), other Tavily body widths, a body containing `-` or `_`, and
+the enterprise expiring-key body width (unshown). A lengthened or reshaped key
+from either provider is missed until new evidence widens the contract.
+Together's betterleaks entropy floor (3.0) is not applied, so a low-entropy
+exact-shape value is still claimed. Cost is one anchored literal per family;
+no incremental or WASM concern beyond the other prefixed detectors.
+
+## Keyword-gated provider keys (#868)
+
+Issue [#868](https://github.com/redact-secret/redact-secret/issues/868) covers
+five unprefixed providers whose research (#781, #782, #784, #787, #789)
+concluded that generic coverage was enough. **No provider has T1 evidence**:
+no provider document, staff statement or SDK states a prefix, length or
+alphabet, and none of the SDKs validates one. Each landed row is therefore a
+*contextual, unqualified, T2-at-best* claim resting on scanner rules and
+maintainer observation, in the Twilio mold: a value is a finding only when
+provider context is adjacent on the same line, never as a bare 32/40-byte run.
+
+| Family | Shape (scanner-inferred, not issuer-backed) | Context that qualifies the value | Status |
+| --- | --- | --- | --- |
+| `mistral:studio-api-key` | exactly 32 `[A-Za-z0-9]` | key name carrying `mistral`; `Mistral(...)` call argument; `mistral` then a credential key within 32 bytes | landed, `mistral-api-key` |
+| `cohere:api-key` | exactly 40 `[A-Za-z0-9]` | key name carrying `cohere` or exactly `CO_API_KEY`; `cohere.ClientV2(...)` / `CohereClient(...)` argument (`api_key`, `token`) or sole positional | landed, `cohere-api-key` |
+| `ai21:api-key` | exactly 32 `[A-Za-z0-9]` | key name carrying `ai21`; `AI21Client(...)` argument | landed, `ai21-api-key` |
+| `deepgram:api-key` | exactly 40 `[0-9a-z]` (the wider of trufflehog `[0-9a-z]` and betterleaks hex; the docs example, 32 hex, is read as a placeholder) | key name carrying `deepgram`; `DeepgramClient(...)` argument or sole positional; `Authorization: Token <v>` on a line naming `deepgram` | landed, `deepgram-api-key` |
+| `exa:api-key` | none: no source states any shape (only the key *id* is documented, as a UUID) | none | **not landed**; stays with `generic-token` (env, JSON, YAML, `x-api-key`, `Bearer`), its SDK-call keyword-argument form is read by `generic-token` since #866; a positional `Exa("...")` stays out (no credential name) |
+
+Confidence: a named assignment (`MISTRAL_API_KEY=`, `"deepgramApiKey":`) or an
+SDK constructor argument is `high` (redacted by default); a credential key
+within 32 bytes after the keyword (`# Mistral API key: <v>`) or the Deepgram
+`Token` header is `medium` (warned). The types are not in the always-redact
+list, like `twilio_auth_token`.
+
+Excluded on purpose: a key ending in an identifier or location segment
+(`MISTRAL_KEY_ID`, `DEEPGRAM_PROJECT_ID`, `COHERE_ORG_ID`, `AI21_TEAM_ID`), a
+non-credential argument (`Mistral(model="...")`), placeholders and
+repeated-character filler, a value behind a hash label (`md5:`), a run of any
+other length or alphabet (31/33 bytes, `_`/`-` inside, uppercase Deepgram), and
+context on another line (a multi-line constructor keeps `api_key=` on a line
+that names nothing; that stays a false negative, as does any provider key under
+a keyword-free name such as `API_KEY=`). The bare `Bearer` header is
+`bearer-token`'s and is not repeated here.
+
+Trade-offs. False negatives: keys that differ from the inferred shape, and the
+same-line rule above; under a provider-named assignment `generic-token` still
+redacts a wrong-length value, so the landed rows add the typed, exact-length,
+constructor-aware claim and no new silent gap. False positives: a 32/40-byte
+hash or id assigned to a keyword-named credential key. Overlap: the rows are
+`Provider` specificity, so overlap resolution reports one finding per span, not
+one from the provider and one from `generic-token`; `generic-token` keeps its
+name-driven verdicts and the provider names are deliberately *not* added to its
+dedicated-provider deferral list, because deferring would silence a real key of
+an unevidenced shape. Deepgram's `Authorization: Token` header was already
+redacted by `generic-token` as `authorization_credential`; the row only adds the
+provider type. Detection, exact spans and incremental parity are pinned by
+`detectors::keyword_gated_keys` and `tests/keyword_gated_provider_keys.rs`. A
+T1 promotion needs a provider document or an issuance check (the checklists in
+the research comments); it is a benchmark-side qualification, not a code change.
+
 ## Rules
 
 | Rule | Governing ADR |
 | --- | --- |
+| Together AI `tgp_v1_` + 43 `[A-Za-z0-9_-]` (T2) and Tavily `tvly-` + optional `dev-` + 32 alphanumeric (prefix T1, body T2) are each reported as their own finding type at provider specificity, bare or in any context; `tvly-prod-`, Together legacy keys and other widths stay unclaimed ([#867](https://github.com/redact-secret/redact-secret/issues/867), section above). | generic policy default, no dedicated ADR; applies the existing exact-length prefixed policy to two more families |
 | The Atlassian Cloud API token grammar is frozen as a minimum-length `ATAT`-prefixed body. A directly following `=` plus exactly 8 uppercase hex characters is part of the token and of its span ([#741](https://github.com/redact-secret/redact-secret/issues/741)). | [Freeze the Atlassian Cloud API token grammar as a minimum-length ATAT-prefixed body](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | The Azure DevOps personal access token grammar is frozen as the documented 84-byte `AZDO`-signature shape. | [Freeze the Azure DevOps personal access token grammar as the documented 84-byte AZDO-signature shape](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | The Datadog API Key and Application Key grammar is frozen as marker-gated lowercase-hex values. | [Freeze the Datadog API Key and Application Key grammar as marker-gated lowercase-hex values](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
@@ -252,6 +349,7 @@ not a support-status promotion.
 | The Twilio Auth Token and API Key Secret grammar is frozen as context-gated 32-byte values. | [Freeze the Twilio Auth Token and API Key Secret grammar as context-gated 32-byte values](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | The Docker Hub access token grammar is frozen as separately-sized exact-length prefixed shapes: `dckr_pat_` takes exactly 27 bytes, and `dckr_oat_` takes exactly 27 bytes (the width in Docker's own API reference example) or exactly 32 ([#708](https://github.com/redact-secret/redact-secret/issues/708)). | [Freeze the Docker Hub access token grammar as two separately-sized exact-length prefixed shapes](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | The OpenAI API key grammar is frozen as a marker-gated shape with exact segment lengths. | [Freeze the OpenAI API key grammar as a marker-gated shape with exact segment lengths](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
+| The OpenAI `sk-admin-` prefix is contracted at T2 under the same marker-gated 58/74-byte grammar as `sk-proj-` and `sk-svcacct-` ([#863](https://github.com/redact-secret/redact-secret/issues/863)). A marker-less `sk-admin-` body of any length is out of `openai-token`'s contract: no source shows such a key, and admitting one would need an `sk-ant-`/`sk-or-` reject list. False negative accepted: a real marker-less key is missed when bare or in unquoted env, YAML or tool-call text (Bearer and quoted credential-named assignments still redact via generic layers). False positives avoided: placeholders, prefix prose and key ids. Evidence: `docs/audits/evidence/863/README.md`. | [Freeze the OpenAI API key grammar as a marker-gated shape with exact segment lengths](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | Reviewed precision contracts are frozen for seven provider families, refining their default rules in place; a value matching a supported prefix but not the contracted shape stops producing a provider finding. | [Freeze reviewed precision contracts for seven provider families and refine their default rules in place](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | The Slack bot token grammar is frozen as a three-section dash-separated shape. | [Freeze the Slack bot token grammar as a three-section dash-separated shape](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | Firebase FCM legacy server key detection is added. The client-config discrimination this record also added was reversed by #749 (next row). | [Add Firebase FCM legacy server key detection, and discriminate the public Web SDK client config from google-api-key](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |

@@ -603,7 +603,7 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/incremental",
       "detector": "openai-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
           "end": 165,
@@ -612,14 +612,13 @@
       ],
       "id": "openai-admin-length-twin-discriminating-boundary",
       "kind": null,
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
           "end": 165,
           "start": 0
         }
       ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
       "support": null,
       "tier": null
     },
@@ -8124,7 +8123,7 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "openai-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
           "end": 165,
@@ -8133,14 +8132,13 @@
       ],
       "id": "openai-positive-admin-marker",
       "kind": "positive",
-      "lostRanges": [
+      "lostRanges": [],
+      "retainedRanges": [
         {
           "end": 165,
           "start": 0
         }
       ],
-      "policyOutcomes": [],
-      "retainedRanges": [],
       "support": "supported",
       "tier": "canonical"
     },
@@ -8241,7 +8239,7 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "openai-token",
-      "disposition": "broad-shape",
+      "disposition": "retained",
       "expectedRanges": [
         {
           "end": 51,
@@ -8262,13 +8260,7 @@
       ],
       "id": "openai-positive-marker-all-variants",
       "kind": "positive",
-      "lostRanges": [
-        {
-          "end": 550,
-          "start": 385
-        }
-      ],
-      "policyOutcomes": [],
+      "lostRanges": [],
       "retainedRanges": [
         {
           "end": 51,
@@ -8281,6 +8273,10 @@
         {
           "end": 384,
           "start": 217
+        },
+        {
+          "end": 550,
+          "start": 385
         }
       ],
       "support": "supported",
@@ -11080,8 +11076,8 @@
       "silent": 10
     },
     "openai-token": {
-      "broad-shape": 3,
-      "retained": 33,
+      "broad-shape": 0,
+      "retained": 36,
       "review": 0,
       "silent": 62
     },

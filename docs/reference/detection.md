@@ -63,12 +63,14 @@ for your host. An organization-specific format that is not listed here can be ad
 as a [declarative ruleset](../guides/rulesets.md).
 
 <!-- detector-inventory:start -->
-70 built-in detectors emit 80 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
+79 built-in detectors emit 89 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
 
 | Detector | Finding types | Default policy class | Schemes |
 | --- | --- | --- | --- |
 | `private-key` | `private_key` | `block` | — |
 | `aws-access-key` | `aws_access_key_id` | `always-redact` | — |
+| `aws-bedrock-long-term-api-key` | `aws_bedrock_long_term_api_key` | `always-redact` | — |
+| `aws-bedrock-short-term-api-key` | `aws_bedrock_short_term_api_key` | `always-redact` | — |
 | `github-token` | `github_token`, `github_oauth_token`, `github_app_user_to_server_token`, `github_app_installation_token`, `github_app_refresh_token`, `github_fine_grained_personal_access_token` | `always-redact` | — |
 | `gitlab-token` | `gitlab_token` | `always-redact` | — |
 | `openai-token` | `openai_api_key` | `always-redact` | — |
@@ -123,6 +125,9 @@ as a [declarative ruleset](../guides/rulesets.md).
 | `openrouter-api-key` | `openrouter_api_key` | `always-redact` | — |
 | `perplexity-api-key` | `perplexity_api_key` | `always-redact` | — |
 | `fireworks-ai-api-key` | `fireworks_ai_api_key` | `always-redact` | — |
+| `elevenlabs-api-key` | `elevenlabs_api_key` | `always-redact` | — |
+| `together-ai-api-key` | `together_ai_api_key` | `always-redact` | — |
+| `tavily-api-key` | `tavily_api_key` | `always-redact` | — |
 | `pinecone-api-key` | `pinecone_api_key` | `always-redact` | — |
 | `gitlab-runner-authentication-token` | `gitlab_runner_authentication_token` | `always-redact` | — |
 | `databricks-personal-access-token` | `databricks_personal_access_token` | `always-redact` | — |
@@ -137,6 +142,10 @@ as a [declarative ruleset](../guides/rulesets.md).
 | `heroku-api-key` | `heroku_api_key` | `always-redact` | — |
 | `heroku-api-key-legacy` | `heroku_api_key_legacy` | `confidence-gated` | — |
 | `travisci-api-token` | `travisci_api_token` | `confidence-gated` | — |
+| `mistral-api-key` | `mistral_api_key` | `confidence-gated` | — |
+| `cohere-api-key` | `cohere_api_key` | `confidence-gated` | — |
+| `ai21-api-key` | `ai21_api_key` | `confidence-gated` | — |
+| `deepgram-api-key` | `deepgram_api_key` | `confidence-gated` | — |
 <!-- detector-inventory:end -->
 
 ## Detector profiles

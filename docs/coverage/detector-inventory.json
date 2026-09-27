@@ -27,6 +27,20 @@
       "schemes": null
     },
     {
+      "type": "aws_bedrock_long_term_api_key",
+      "detector": "aws-bedrock-long-term-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "\u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT",
+      "schemes": null
+    },
+    {
+      "type": "aws_bedrock_short_term_api_key",
+      "detector": "aws-bedrock-short-term-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "bedrock-api-key-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZA",
+      "schemes": null
+    },
+    {
       "type": "github_token",
       "detector": "github-token",
       "policyClass": "always-redact",
@@ -493,6 +507,27 @@
       "schemes": null
     },
     {
+      "type": "elevenlabs_api_key",
+      "detector": "elevenlabs-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "sk_0123456789abcdef0123456789abcdef0123456789abcdef",
+      "schemes": null
+    },
+    {
+      "type": "together_ai_api_key",
+      "detector": "together-ai-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2",
+      "schemes": null
+    },
+    {
+      "type": "tavily_api_key",
+      "detector": "tavily-api-key",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "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",
+      "schemes": null
+    },
+    {
       "type": "pinecone_api_key",
       "detector": "pinecone-api-key",
       "policyClass": "always-redact",
@@ -588,6 +623,34 @@
       "detector": "travisci-api-token",
       "policyClass": "confidence-gated",
       "reconciliationTrigger": "travis Syn7hRevok3dTrvCi0Tok1",
+      "schemes": null
+    },
+    {
+      "type": "mistral_api_key",
+      "detector": "mistral-api-key",
+      "policyClass": "confidence-gated",
+      "reconciliationTrigger": "MISTRAL_API_KEY=SyntheticRevokedSyntheticRevoked",
+      "schemes": null
+    },
+    {
+      "type": "cohere_api_key",
+      "detector": "cohere-api-key",
+      "policyClass": "confidence-gated",
+      "reconciliationTrigger": "co = cohere.ClientV2(api_key=\"SyntheticRevokedSyntheticRevokedSyntheti\")",
+      "schemes": null
+    },
+    {
+      "type": "ai21_api_key",
+      "detector": "ai21-api-key",
+      "policyClass": "confidence-gated",
+      "reconciliationTrigger": "AI21Client(api_key='SyntheticRevokedSyntheticRevoked')",
+      "schemes": null
+    },
+    {
+      "type": "deepgram_api_key",
+      "detector": "deepgram-api-key",
+      "policyClass": "confidence-gated",
+      "reconciliationTrigger": "DEEPGRAM_API_KEY=syntheticrevokedsyntheticrevokedsyntheti",
       "schemes": null
     }
   ],

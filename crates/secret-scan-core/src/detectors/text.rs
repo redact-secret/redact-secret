@@ -396,7 +396,7 @@ fn is_assignment_key_byte(byte: u8) -> bool {
 /// The key a value starting at `value_start` of `line` is assigned to: the
 /// run of [`is_assignment_key_byte`] bytes left of a gap of spaces, tabs,
 /// quotes and at least one `=` or `:`. `None` when no operator joins them.
-fn assignment_key(line: &[u8], value_start: usize) -> Option<&[u8]> {
+pub(super) fn assignment_key(line: &[u8], value_start: usize) -> Option<&[u8]> {
     let mut end = value_start.min(line.len());
     let mut has_operator = false;
     while end > 0 && matches!(line[end - 1], b' ' | b'\t' | b'"' | b'\'' | b'=' | b':') {
