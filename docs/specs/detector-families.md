@@ -266,6 +266,7 @@ widths keep prose, model names, `TOGETHER_BASE_URL`, the `tvly` CLI, key names
 and `YOUR_API_KEY`-style placeholders unclaimed. A placeholder padded to the
 exact width with alphabet bytes (for example 32 `x` after `tvly-dev-`) is
 claimed, because no length-preserving placeholder exclusion is evidenced.
+`Bearer tvly-YOUR_API_KEY` is not a Tavily finding (wrong width); it was a `bearer-token` false alarm fixed by [#774](https://github.com/redact-secret/redact-secret/issues/774) (see `contextual-detection.md`).
 Because a Tavily body is alphanumeric, `tvly-dev-` + 32 does not also match
 the bare `tvly-` shape, so one key gives one finding.
 

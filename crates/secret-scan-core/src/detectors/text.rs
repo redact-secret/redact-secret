@@ -187,13 +187,41 @@ pub(super) fn is_repeated_character_filler(value: &str) -> bool {
 
 /// Words that open a documentation placeholder asking the reader to supply
 /// their own credential (`YOUR_ACCESS_TOKEN`, `INSERT_API_KEY`).
-const PLACEHOLDER_LEAD_WORDS: &[&str] = &["your", "insert", "enter", "paste"];
+const PLACEHOLDER_LEAD_WORDS: &[&str] = &["your", "insert", "enter", "paste", "replace"];
 
 /// Words that name the kind of credential a placeholder stands for. Every
 /// word after the lead word must come from this list.
 const PLACEHOLDER_CREDENTIAL_WORDS: &[&str] = &[
     "access", "api", "app", "auth", "bearer", "client", "id", "jwt", "key", "oauth", "oauth2",
-    "personal", "refresh", "secret", "service", "session", "token", "user", "here",
+    "personal", "refresh", "secret", "service", "session", "token", "user", "here", "with",
+];
+
+/// Provider names a documentation placeholder may carry between its lead word
+/// and the credential words (`YOUR_DEEPGRAM_API_KEY`,
+/// `replace-with-your-mistral-key`). A closed list of the AI-inference and
+/// developer-credential providers the built-in detectors name, not a
+/// vocabulary: a provider outside it (`YOUR_MAILCHIMP_API_KEY`) is one word
+/// off the lists and stays detected. Issue #774.
+const PLACEHOLDER_PROVIDER_WORDS: &[&str] = &[
+    "ai",
+    "ai21",
+    "anthropic",
+    "cohere",
+    "deepgram",
+    "deepseek",
+    "elevenlabs",
+    "fireworks",
+    "gemini",
+    "groq",
+    "huggingface",
+    "mistral",
+    "openai",
+    "openrouter",
+    "perplexity",
+    "replicate",
+    "tavily",
+    "together",
+    "xai",
 ];
 
 /// Credential nouns a placeholder must name at least once, so a lead word
@@ -204,8 +232,8 @@ const PLACEHOLDER_CREDENTIAL_NOUNS: &[&str] = &["jwt", "key", "secret", "token"]
 /// `INSERT_ACCESS_TOKEN`, `YOUR_API_KEY`, or `your-oauth-token-here`: the
 /// value splits on `_`, `-`, and `.` into two or more words, the first is a
 /// [`PLACEHOLDER_LEAD_WORDS`] entry, every later word is a
-/// [`PLACEHOLDER_CREDENTIAL_WORDS`] or lead-word entry
-/// (`ENTER_YOUR_ACCESS_TOKEN_HERE`), and at least one later word is a
+/// [`PLACEHOLDER_CREDENTIAL_WORDS`], [`PLACEHOLDER_PROVIDER_WORDS`] or
+/// lead-word entry (`ENTER_YOUR_ACCESS_TOKEN_HERE`), and at least one later word is a
 /// [`PLACEHOLDER_CREDENTIAL_NOUNS`] entry, all matched case-insensitively.
 ///
 /// Shared by `bearer-token` (issue #745) and `generic-token` (issue #756,
@@ -229,6 +257,7 @@ pub(super) fn is_instructional_token_placeholder(value: &str) -> bool {
     for word in words {
         if !is_listed(word, PLACEHOLDER_CREDENTIAL_WORDS)
             && !is_listed(word, PLACEHOLDER_LEAD_WORDS)
+            && !is_listed(word, PLACEHOLDER_PROVIDER_WORDS)
         {
             return false;
         }
