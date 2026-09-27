@@ -25,6 +25,11 @@ pub const RULESET_REPEATED: &str = "--ruleset may be given at most once";
 /// explicit file path.
 pub const RULESET_REQUIRES_FILE: &str =
     "--ruleset requires an explicit path; standard input does not accept a ruleset";
+/// `--pii` requires one selector value.
+pub const PII_MISSING_SELECTOR: &str = "--pii requires a selector argument";
+/// Activation printing performs no scan and accepts only selector flags.
+pub const PRINT_PII_STANDALONE: &str =
+    "--print-pii-activation accepts only repeatable --pii selectors";
 
 /// A failure the CLI reports to its host.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]

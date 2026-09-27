@@ -7,6 +7,11 @@ evidence is linked from each published version.
 
 ### Added
 
+- The opt-in PII domain runtime substrate (#874): canonical selectors and
+  activation identity, one deterministic adapter slot and same-range domain
+  arbitration, a generated `pii-context/v1` English/Korean table, fixed safe
+  errors, and equivalent Rust, JavaScript, Python, and CLI activation APIs.
+  No production PII family is registered or claimed by this change.
 - New provider detectors: `elevenlabs-api-key` (#865), `together-ai-api-key` and
   `tavily-api-key` (#867), `aws-bedrock-long-term-api-key` and
   `aws-bedrock-short-term-api-key` (#864), and the keyword-gated

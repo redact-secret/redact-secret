@@ -45,8 +45,9 @@ use limits::{MAX_BUFFERED_BYTES, MAX_INPUT_BYTES, MAX_MULTILINE_BYTES, MAX_TOKEN
 
 /// The short usage block printed with a rejected command line.
 const USAGE: &str = "\
-usage: redact-secret [--json] [--ruleset <path>] [--] [<path>...]
-       redact-secret --redact [--ruleset <path>] [--] [<path>]
+usage: redact-secret [--json] [--ruleset <path>] [--pii <selector>]... [--] [<path>...]
+       redact-secret --redact [--ruleset <path>] [--pii <selector>]... [--] [<path>]
+       redact-secret --print-pii-activation [--pii <selector>]...
        redact-secret --version | -V
        redact-secret --help | -h";
 
@@ -113,16 +114,28 @@ where
             write_line(stdout, &format!("redact-secret {VERSION}"))?;
             Ok(Outcome::Clean)
         }
+        Command::PiiActivation { selectors } => {
+            let borrowed: Vec<&str> = selectors.iter().map(String::as_str).collect();
+            let selection = redact_secret::PiiSelection::parse(&borrowed)?;
+            write_line(
+                stdout,
+                &selection.activation_identity(redact_secret::Profile::Full),
+            )?;
+            Ok(Outcome::Clean)
+        }
         Command::Check {
             sources,
             format,
             ruleset,
+            selectors,
         } => {
+            let borrowed: Vec<&str> = selectors.iter().map(String::as_str).collect();
+            let selection = redact_secret::PiiSelection::parse(&borrowed)?;
             let ruleset = ruleset
                 .as_deref()
                 .map(modes::load_ruleset_file)
                 .transpose()?;
-            let report = modes::check(&sources, stdin, ruleset.as_deref());
+            let report = modes::check(&sources, stdin, ruleset.as_deref(), &selection);
             let written = match format {
                 Format::Text => report.write_text(stdout, stderr),
                 Format::Json => report.write_json(stdout),
@@ -142,12 +155,18 @@ where
                 Ok(Outcome::Clean)
             }
         }
-        Command::Redact { source, ruleset } => {
+        Command::Redact {
+            source,
+            ruleset,
+            selectors,
+        } => {
+            let borrowed: Vec<&str> = selectors.iter().map(String::as_str).collect();
+            let selection = redact_secret::PiiSelection::parse(&borrowed)?;
             let ruleset = ruleset
                 .as_deref()
                 .map(modes::load_ruleset_file)
                 .transpose()?;
-            modes::redact(&source, stdin, stdout, ruleset.as_deref())?;
+            modes::redact(&source, stdin, stdout, ruleset.as_deref(), &selection)?;
             Ok(Outcome::Clean)
         }
     }
@@ -368,5 +387,23 @@ mod tests {
         let stderr = String::from_utf8(stderr).unwrap();
         assert!(stderr.contains("USAGE: unrecognized option"));
         assert!(stderr.contains("redact-secret --redact"));
+    }
+
+    #[test]
+    fn pii_activation_prints_without_reading_input_and_errors_are_fixed() {
+        let printed = invoke(&["--print-pii-activation", "--pii", "pii"], "UNREAD INPUT");
+        assert_eq!(
+            printed.stdout,
+            "credentials=full;selectors=pii:global;families=;vocabulary=pii-context/v1\n"
+        );
+        assert!(printed.stderr.is_empty());
+        let rejected = invoke(&["--print-pii-activation", "--pii", "PII"], "UNREAD INPUT");
+        assert_eq!(
+            rejected.outcome,
+            Err(Failure::Core(
+                redact_secret::SecretScanErrorCode::PiiSelectorInvalid
+            ))
+        );
+        assert!(rejected.stderr.is_empty());
     }
 }

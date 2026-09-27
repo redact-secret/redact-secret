@@ -48,6 +48,56 @@ describe("Node addon binding: artifact", () => {
   });
 });
 
+describe("Node addon binding: PII initialization", () => {
+  it("does not fall through to legacy initialization when the PII export returns undefined", () => {
+    const calls: string[] = [];
+    const binding = createBindingFromAddon({
+      version: () => "0.0.0-test",
+      profile: () => "full",
+      initialize: () => calls.push("legacy"),
+      initializePii: (pii) => {
+        calls.push(`pii:${pii.join(",")}`);
+      },
+      scan: () => [],
+      redact: (input) => input,
+      scanAndRedact: (input) => ({ findings: [], redacted: input }),
+      createIncrementalSanitizer: () => ({
+        state: "accepting",
+        append: (chunk) => ({ text: chunk, findings: [] }),
+        finalize: () => ({ text: "", findings: [] }),
+        abort: () => {},
+      }),
+    });
+
+    binding.initialize(["pii"]);
+    expect(calls).toEqual(["pii:pii"]);
+  });
+
+  it("does not fall through to legacy common initialization", () => {
+    const calls: string[] = [];
+    const binding = createBindingFromCommonAddon({
+      version: () => "0.0.0-test",
+      profileCommon: () => "common",
+      initializeCommon: () => calls.push("legacy"),
+      initializeCommonPii: (pii) => {
+        calls.push(`pii:${pii.join(",")}`);
+      },
+      scanCommon: () => [],
+      redact: (input) => input,
+      scanAndRedactCommon: (input) => ({ findings: [], redacted: input }),
+      createIncrementalSanitizerCommon: () => ({
+        state: "accepting",
+        append: (chunk) => ({ text: chunk, findings: [] }),
+        finalize: () => ({ text: "", findings: [] }),
+        abort: () => {},
+      }),
+    });
+
+    binding.initialize(["pii"]);
+    expect(calls).toEqual(["pii:pii"]);
+  });
+});
+
 describe("Node addon binding: createIncrementalSanitizer", () => {
   it("delegates to the required addon's own export", () => {
     const calls: string[] = [];

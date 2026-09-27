@@ -140,6 +140,25 @@ pub(crate) fn default_action_for(type_name: &str, confidence: Confidence) -> Act
     }
 }
 
+#[cfg(test)]
+mod pii_policy_tests {
+    use super::*;
+
+    #[test]
+    fn pii_types_remain_confidence_gated() {
+        assert_eq!(
+            default_action_for("pii_global_synthetic_identity", Confidence::High),
+            Action::Redact
+        );
+        for confidence in [Confidence::Medium, Confidence::Low] {
+            assert_eq!(
+                default_action_for("pii_global_synthetic_identity", confidence),
+                Action::Warn
+            );
+        }
+    }
+}
+
 /// Chooses the default action for `finding`. See [`default_action_for`].
 #[must_use]
 fn default_action(finding: &DetectedFinding) -> Action {

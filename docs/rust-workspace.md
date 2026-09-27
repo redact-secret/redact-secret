@@ -12,7 +12,7 @@ behavioral contract is now the fixture corpus under `conformance/fixtures/`
 
 | Path | Cargo package | Role | May depend on | Publishes as |
 | --- | --- | --- | --- | --- |
-| `crates/secret-scan-core` | `redact-secret` (lib `redact_secret`) | Canonical detection, overlap resolution, policy, redaction, incremental sanitization. UTF-8 byte offsets. | `std` and the allowlist in `[workspace.metadata.redact-secret]` (currently empty) | crates.io `redact-secret` |
+| `crates/secret-scan-core` | `redact-secret` (lib `redact_secret`) | Canonical detection, overlap resolution, policy, redaction, incremental sanitization. UTF-8 byte offsets. | `std` and the pure Unicode normalization crates in `[workspace.metadata.redact-secret]` | crates.io `redact-secret` |
 | `crates/secret-scan-cli` | `redact-secret-cli` (bin `redact-secret`) | Host adapter for process arguments, standard streams, exit codes, and files. | core, host crates | CLI artifact of the same version |
 | `bindings/node` | `redact-secret-node` (cdylib) | N-API addon; UTF-16 code unit ranges. | core, `napi`, `napi-derive`, `napi-build` | Consumed by `packages/javascript`; never on its own |
 | `bindings/wasm` | `redact-secret-wasm` (cdylib) | `wasm-bindgen` browser build; UTF-16 code unit ranges. | core, `wasm-bindgen` | Consumed by `packages/javascript`; never on its own |

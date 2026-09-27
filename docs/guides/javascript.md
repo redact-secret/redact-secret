@@ -18,6 +18,23 @@ console.log(result.text); // API_KEY=<SECRET_1>
 console.log(result.findings.length); // 1
 ```
 
+PII activation is explicit and defaults off. Pass `pii: ["pii"]` to activate
+the global selector, then inspect the canonical identity with
+`piiActivation()`. The current artifact intentionally contains no production
+PII family, so this selector closes to an empty family list and does not make
+a PII detection claim. Reordered or duplicate equivalent selectors are
+idempotent; a later different selection fails with the fixed,
+input-free `PII_ACTIVATION_CONFLICT` error. The `./common` entry point follows
+the same contract while retaining `credentials=common` in its identity.
+
+```ts
+import { initialize, piiActivation } from "@redact-secret/core";
+
+await initialize({ pii: ["pii", "pii:global"] });
+console.log(piiActivation());
+// credentials=full;selectors=pii:global;families=;vocabulary=pii-context/v1
+```
+
 `scan(input)` returns findings. `redact(input, findings)` uses findings from
 that same original input. Prefer `scanAndRedact` when you need both. Findings
 and result metadata are frozen and contain no matched plaintext. Their

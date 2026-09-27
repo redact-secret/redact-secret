@@ -6,6 +6,7 @@
 
 use crate::detectors::{built_in_detectors, built_in_ids, common_built_in_detectors};
 use crate::error::{SecretScanError, SecretScanErrorCode};
+use crate::pii::{PiiSelection, adapter, is_reserved_detector_id};
 use crate::types::{Detector, is_identifier};
 
 /// A named, reviewed built-in detector composition
@@ -85,9 +86,22 @@ impl std::fmt::Debug for RegisteredDetector {
 pub struct DetectorRegistry {
     detectors: Vec<RegisteredDetector>,
     profile: Option<Profile>,
+    activation_identity: String,
 }
 
 impl DetectorRegistry {
+    #[cfg(test)]
+    pub(crate) fn with_internal_test_detector(detector: Box<dyn Detector>) -> Self {
+        Self {
+            detectors: vec![RegisteredDetector {
+                id: detector.id().to_owned(),
+                detector,
+            }],
+            profile: None,
+            activation_identity: String::new(),
+        }
+    }
+
     /// Creates an empty registry.
     ///
     /// The low-level path: registering built-ins and custom detectors this
@@ -97,6 +111,7 @@ impl DetectorRegistry {
         Self {
             detectors: Vec::new(),
             profile: None,
+            activation_identity: String::new(),
         }
     }
 
@@ -141,6 +156,7 @@ impl DetectorRegistry {
             registry.push_validated(detector, false)?;
         }
         registry.profile = Some(Profile::Full);
+        registry.activation_identity = PiiSelection::default().activation_identity(Profile::Full);
         Ok(registry)
     }
 
@@ -174,6 +190,85 @@ impl DetectorRegistry {
             registry.push_validated(detector, true)?;
         }
         registry.profile = Some(Profile::Common);
+        registry.activation_identity = PiiSelection::default().activation_identity(Profile::Common);
+        Ok(registry)
+    }
+
+    /// Creates the `full` credential profile plus the selected PII-domain
+    /// adapter in its fixed slot after credentials.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`SecretScanErrorCode::InvalidDetector`] if registration fails.
+    pub fn with_built_in_and_pii(selection: &PiiSelection) -> Result<Self, SecretScanError> {
+        Self::with_profile_and_pii(Profile::Full, selection, std::iter::empty())
+    }
+
+    /// Creates the `common` credential profile plus the selected PII-domain
+    /// adapter in its fixed slot after credentials.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`SecretScanErrorCode::InvalidDetector`] if registration fails.
+    pub fn with_common_built_in_and_pii(selection: &PiiSelection) -> Result<Self, SecretScanError> {
+        Self::with_profile_and_pii(Profile::Common, selection, std::iter::empty())
+    }
+
+    /// Creates `full` + PII + custom detectors, preserving profile identity.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`SecretScanErrorCode::InvalidDetector`] for a malformed,
+    /// duplicate, built-in, adapter, or internal family id.
+    pub fn with_built_in_and_pii_custom<I>(
+        selection: &PiiSelection,
+        custom: I,
+    ) -> Result<Self, SecretScanError>
+    where
+        I: IntoIterator<Item = Box<dyn Detector>>,
+    {
+        Self::with_profile_and_pii(Profile::Full, selection, custom)
+    }
+
+    /// Creates `common` + PII + custom detectors, preserving profile identity.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`SecretScanErrorCode::InvalidDetector`] for a malformed,
+    /// duplicate, built-in, adapter, or internal family id.
+    pub fn with_common_built_in_and_pii_custom<I>(
+        selection: &PiiSelection,
+        custom: I,
+    ) -> Result<Self, SecretScanError>
+    where
+        I: IntoIterator<Item = Box<dyn Detector>>,
+    {
+        Self::with_profile_and_pii(Profile::Common, selection, custom)
+    }
+
+    fn with_profile_and_pii<I>(
+        profile: Profile,
+        selection: &PiiSelection,
+        custom: I,
+    ) -> Result<Self, SecretScanError>
+    where
+        I: IntoIterator<Item = Box<dyn Detector>>,
+    {
+        let mut registry = match profile {
+            Profile::Full => Self::with_built_in([])?,
+            Profile::Common => Self::with_common_built_in([])?,
+        };
+        if !selection.is_off() {
+            registry.detectors.push(RegisteredDetector {
+                id: "pii-domain".to_owned(),
+                detector: adapter(selection),
+            });
+        }
+        for detector in custom {
+            registry.push_validated(detector, true)?;
+        }
+        registry.profile = Some(profile);
+        registry.activation_identity = selection.activation_identity(profile);
         Ok(registry)
     }
 
@@ -186,6 +281,12 @@ impl DetectorRegistry {
     #[must_use]
     pub const fn profile(&self) -> Option<Profile> {
         self.profile
+    }
+
+    /// Canonical credentials/PII activation identity.
+    #[must_use]
+    pub fn activation_identity(&self) -> &str {
+        &self.activation_identity
     }
 
     /// Appends `detector`. This path applies no profile's reserved-id rule,
@@ -211,6 +312,7 @@ impl DetectorRegistry {
     ) -> Result<(), SecretScanError> {
         let id = detector.id();
         if !is_identifier(id)
+            || is_reserved_detector_id(id)
             || self.contains(id)
             || (reject_built_in_ids && built_in_ids().any(|reserved| reserved == id))
         {
@@ -462,5 +564,34 @@ mod tests {
         let rendered = format!("{registry:?}");
         assert!(rendered.contains("only"));
         assert!(rendered.contains(".."));
+    }
+
+    #[test]
+    fn pii_adapter_has_one_fixed_slot_and_reserved_identity() {
+        let selection = PiiSelection::parse(&["pii"]).unwrap();
+        let mut full = DetectorRegistry::with_built_in_and_pii(&selection).unwrap();
+        assert_eq!(full.ids().collect::<Vec<_>>().last(), Some(&"pii-domain"));
+        assert_eq!(full.profile(), Some(Profile::Full));
+        assert_eq!(
+            full.activation_identity(),
+            "credentials=full;selectors=pii:global;families=;vocabulary=pii-context/v1"
+        );
+        assert_eq!(
+            full.register(Box::new(Named("pii-domain")))
+                .unwrap_err()
+                .code(),
+            SecretScanErrorCode::InvalidDetector
+        );
+        assert_eq!(full.profile(), Some(Profile::Full));
+    }
+
+    #[test]
+    fn legacy_profile_constructors_remain_pii_off() {
+        let full = DetectorRegistry::with_built_in([]).unwrap();
+        assert!(!full.contains("pii-domain"));
+        assert_eq!(
+            full.activation_identity(),
+            "credentials=full;selectors=off;families=;vocabulary=pii-context/v1"
+        );
     }
 }

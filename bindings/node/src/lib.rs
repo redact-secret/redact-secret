@@ -18,9 +18,10 @@ use napi::bindgen_prelude::{Buffer, FnArgs, Function};
 use napi_derive::napi;
 use redact_secret::{
     Action, ByteRange, Confidence, DefaultPolicy, DetectedFinding, DetectorRegistry, Finding,
-    FormatterFailure, Obfuscation, PlaceholderContext, PlaceholderFormatter, Policy, PolicyContext,
-    Profile, SecretScanError, SecretScanErrorCode, WholeInputLimits, default_placeholder_formatter,
-    load_ruleset, redact_with_limits as core_redact_with_limits, run_detector_pipeline,
+    FormatterFailure, Obfuscation, PiiSelection, PlaceholderContext, PlaceholderFormatter, Policy,
+    PolicyContext, Profile, SecretScanError, SecretScanErrorCode, WholeInputLimits,
+    default_placeholder_formatter, load_ruleset, redact_with_limits as core_redact_with_limits,
+    run_detector_pipeline,
 };
 
 use crate::error::{JsError, to_js_error, to_js_ruleset_error};
@@ -160,6 +161,19 @@ thread_local! {
     /// ever calls the `common` exports never builds the `full` registry, and
     /// vice versa.
     static REGISTRY_COMMON: OnceCell<Result<DetectorRegistry, SecretScanError>> = const { OnceCell::new() };
+    static PII_SELECTION: OnceCell<PiiSelection> = const { OnceCell::new() };
+    static PII_SELECTION_COMMON: OnceCell<PiiSelection> = const { OnceCell::new() };
+}
+
+fn selection_cell<T>(profile: Profile, f: impl FnOnce(&OnceCell<PiiSelection>) -> T) -> T {
+    match profile {
+        Profile::Full => PII_SELECTION.with(f),
+        Profile::Common => PII_SELECTION_COMMON.with(f),
+    }
+}
+
+pub(crate) fn pii_selection(profile: Profile) -> PiiSelection {
+    selection_cell(profile, |cell| cell.get().cloned().unwrap_or_default())
 }
 
 /// Runs `f` against the shared built-in registry for `profile`, building it
@@ -219,7 +233,7 @@ pub fn profile_common() -> String {
 /// happen.
 #[napi]
 pub fn initialize() -> napi::Result<(), String> {
-    with_profile_registry(Profile::Full, |_| Ok(())).map_err(to_js_error)
+    initialize_profile(Profile::Full, &[])
 }
 
 /// The `common`-profile analogue of [`initialize`]
@@ -234,7 +248,132 @@ pub fn initialize() -> napi::Result<(), String> {
 /// proves cannot happen.
 #[napi]
 pub fn initialize_common() -> napi::Result<(), String> {
-    with_profile_registry(Profile::Common, |_| Ok(())).map_err(to_js_error)
+    initialize_profile(Profile::Common, &[])
+}
+
+fn initialize_profile(profile: Profile, pii: &[String]) -> napi::Result<(), String> {
+    let borrowed: Vec<&str> = pii.iter().map(String::as_str).collect();
+    let selection = PiiSelection::parse(&borrowed).map_err(to_js_error)?;
+    let identity = selection.activation_identity(profile);
+    let existing = with_profile_registry(profile, |registry| {
+        Ok(registry.activation_identity().to_owned())
+    })
+    .map_err(to_js_error)?;
+    if existing != identity {
+        return Err(to_js_error(
+            SecretScanErrorCode::PiiActivationConflict.into(),
+        ));
+    }
+    selection_cell(profile, |cell| {
+        if let Some(active) = cell.get() {
+            if active != &selection {
+                return Err(to_js_error(
+                    SecretScanErrorCode::PiiActivationConflict.into(),
+                ));
+            }
+        } else {
+            let _ = cell.set(selection);
+        }
+        Ok(())
+    })
+}
+
+/// Initializes the full profile with a PII selector list.
+///
+/// # Errors
+///
+/// Returns a fixed selector, activation-conflict, or registry error.
+#[napi(js_name = "initializePii")]
+#[allow(clippy::needless_pass_by_value, reason = "N-API owns vector arguments")]
+pub fn initialize_pii(pii: Vec<String>) -> napi::Result<(), String> {
+    // A non-off selection must construct the selected registry before the
+    // lazy legacy registry can lock the profile to `off`.
+    initialize_profile_with_selection(Profile::Full, &pii)
+}
+
+/// Initializes the common profile with a PII selector list.
+///
+/// # Errors
+///
+/// Returns a fixed selector, activation-conflict, or registry error.
+#[napi(js_name = "initializeCommonPii")]
+#[allow(clippy::needless_pass_by_value, reason = "N-API owns vector arguments")]
+pub fn initialize_common_pii(pii: Vec<String>) -> napi::Result<(), String> {
+    initialize_profile_with_selection(Profile::Common, &pii)
+}
+
+fn initialize_profile_with_selection(profile: Profile, pii: &[String]) -> napi::Result<(), String> {
+    let borrowed: Vec<&str> = pii.iter().map(String::as_str).collect();
+    let selection = PiiSelection::parse(&borrowed).map_err(to_js_error)?;
+    let identity = selection.activation_identity(profile);
+    let result = match profile {
+        Profile::Full => {
+            REGISTRY.with(|cell| initialize_registry_cell(cell, profile, &selection, &identity))
+        }
+        Profile::Common => REGISTRY_COMMON
+            .with(|cell| initialize_registry_cell(cell, profile, &selection, &identity)),
+    };
+    result.map_err(to_js_error)?;
+    selection_cell(profile, |cell| {
+        if let Some(active) = cell.get() {
+            if active != &selection {
+                return Err(to_js_error(
+                    SecretScanErrorCode::PiiActivationConflict.into(),
+                ));
+            }
+        } else {
+            let _ = cell.set(selection);
+        }
+        Ok(())
+    })
+}
+
+fn initialize_registry_cell(
+    cell: &OnceCell<Result<DetectorRegistry, SecretScanError>>,
+    profile: Profile,
+    selection: &PiiSelection,
+    identity: &str,
+) -> Result<(), SecretScanError> {
+    if let Some(existing) = cell.get() {
+        return match existing {
+            Ok(registry) if registry.activation_identity() == identity => Ok(()),
+            Ok(_) => Err(SecretScanErrorCode::PiiActivationConflict.into()),
+            Err(error) => Err(*error),
+        };
+    }
+    let registry = match profile {
+        Profile::Full => DetectorRegistry::with_built_in_and_pii(selection),
+        Profile::Common => DetectorRegistry::with_common_built_in_and_pii(selection),
+    };
+    let outcome = registry.as_ref().map(|_| ()).map_err(|error| *error);
+    let _ = cell.set(registry);
+    outcome
+}
+
+/// Canonical full-profile PII activation identity.
+///
+/// # Errors
+///
+/// Returns the cached fixed registry error if initialization failed.
+#[napi]
+pub fn pii_activation() -> napi::Result<String, String> {
+    with_profile_registry(Profile::Full, |registry| {
+        Ok(registry.activation_identity().to_owned())
+    })
+    .map_err(to_js_error)
+}
+
+/// Canonical common-profile PII activation identity.
+///
+/// # Errors
+///
+/// Returns the cached fixed registry error if initialization failed.
+#[napi]
+pub fn pii_activation_common() -> napi::Result<String, String> {
+    with_profile_registry(Profile::Common, |registry| {
+        Ok(registry.activation_identity().to_owned())
+    })
+    .map_err(to_js_error)
 }
 
 fn to_js_detected_finding(input: &str, finding: &DetectedFinding) -> JsDetectedFinding {
@@ -379,9 +518,12 @@ fn run_redact(
 /// every time.
 fn registry_with_ruleset(profile: Profile, ruleset: &[u8]) -> Result<DetectorRegistry, JsError> {
     let detectors = load_ruleset(ruleset).map_err(to_js_ruleset_error)?;
+    let selection = pii_selection(profile);
     match profile {
-        Profile::Full => DetectorRegistry::with_built_in(detectors),
-        Profile::Common => DetectorRegistry::with_common_built_in(detectors),
+        Profile::Full => DetectorRegistry::with_built_in_and_pii_custom(&selection, detectors),
+        Profile::Common => {
+            DetectorRegistry::with_common_built_in_and_pii_custom(&selection, detectors)
+        }
     }
     .map_err(to_js_error)
 }
@@ -956,5 +1098,16 @@ validator: none\n";
             scan_and_redact(input, None, None, Some(tight_limits()), None),
             "INPUT_LIMIT_EXCEEDED",
         );
+    }
+
+    #[test]
+    fn pii_activation_is_canonical_idempotent_and_conflict_checked() {
+        initialize_pii(vec!["pii".to_owned(), "pii:global".to_owned()]).unwrap();
+        assert_eq!(
+            pii_activation().unwrap(),
+            "credentials=full;selectors=pii:global;families=;vocabulary=pii-context/v1"
+        );
+        initialize_pii(vec!["pii:global".to_owned()]).unwrap();
+        assert_err_status(initialize(), "PII_ACTIVATION_CONFLICT");
     }
 }

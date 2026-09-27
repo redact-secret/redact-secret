@@ -58,6 +58,8 @@ def test_functions_carry_introspectable_signatures() -> None:
         "default_placeholder_formatter": {"finding", "context"},
         "typed_placeholder_formatter": {"finding", "context"},
         "default_incremental_policy": {"finding", "context"},
+        "initialize": {"pii"},
+        "pii_activation": set(),
     }
     for name, params in expected.items():
         signature = inspect.signature(getattr(redact_secret, name))

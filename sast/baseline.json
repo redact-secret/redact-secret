@@ -63,9 +63,9 @@
       "rationale": "The process arguments are collected only to serialize the assessment invocation as JSON provenance. They are never interpreted as a command, passed to a shell, or used to launch another process, so the command-argument injection class reported by this generic rule is absent.",
       "rule_id": "sast.rules.rust.lang.security.args"
     },
-    "ed99fa6c17e46509": {
+    "7700c21cb9293a2e": {
       "classification": "false_positive",
-      "line": 137,
+      "line": 139,
       "path": "crates/secret-scan-core/examples/shadow_evaluation.rs",
       "rationale": "The maintainer-local shadow evaluation example reads only two options from its arguments: a --profile name matched against the closed set full/common, and an --artifact path read as JSON. They are never interpreted as a command, passed to a shell, or used to launch another process, and the example is outside every published package, so the command-argument injection class reported by this generic rule is absent.",
       "rule_id": "sast.rules.rust.lang.security.args"
@@ -273,9 +273,9 @@
       "rationale": "The matched pattern is one of this file's three module-level constant regexes (CASE_ID_PATTERN, IDENTIFIER_PATTERN, ERROR_CODE_PATTERN), each a linear-time character-class repetition with no nested or overlapping quantifiers -- the rule's generic backtracking heuristic cannot see that '-' / '.' / '_' separators are disjoint from the surrounding [a-z0-9] class, so there is no ambiguous split point for the engine to backtrack over. Inputs are also schema-validated fixture/case identifiers, not attacker-controlled request data.",
       "rule_id": "sast.rules.javascript.lang.security.audit.detect-redos"
     },
-    "fc19e3365b5260b7": {
+    "f11d443d3b444244": {
       "classification": "false_positive",
-      "line": 70,
+      "line": 71,
       "path": "crates/secret-scan-cli/src/main.rs",
       "rationale": "The flagged call is `env::args_os().skip(1)`: argv[0] is explicitly discarded before the remaining arguments are used as scan-target paths, so the exact property this audit rule warns about (relying on argv[0] for a security decision) does not apply.",
       "rule_id": "sast.rules.rust.lang.security.args-os"

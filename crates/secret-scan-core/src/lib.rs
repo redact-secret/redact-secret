@@ -59,7 +59,7 @@
 //! | Sanitized error | [`SecretScanError`], [`SecretScanErrorCode`], [`DetectorFailure`], [`PolicyFailure`], [`FormatterFailure`] |
 //! | Custom detectors | [`Detector`], [`Candidate`], [`DetectorContext`], [`DetectorRegistry`], [`RegisteredDetector`] |
 //! | Declarative rulesets | [`load_ruleset`], [`RulesetError`], [`RulesetErrorClass`] |
-//! | Profiles | [`Profile`] |
+//! | Profiles and PII activation | [`Profile`], [`PiiSelection`] |
 //! | Identifiers and units | [`is_identifier`], [`MAX_IDENTIFIER_LENGTH`], [`RANGE_UNIT`], [`VERSION`] |
 //! | Detector building blocks | [`shannon_entropy`] |
 //!
@@ -122,6 +122,14 @@ mod incremental;
 mod invisible_table;
 mod limits;
 mod normalize;
+#[cfg_attr(
+    not(test),
+    expect(
+        dead_code,
+        reason = "PII families consume this substrate in later issues"
+    )
+)]
+mod pii;
 mod pipeline;
 mod policy;
 mod redact;
@@ -149,6 +157,7 @@ pub use incremental::{
     IncrementalSanitizer, SessionState,
 };
 pub use limits::{DEFAULT_MAX_FINDINGS, DEFAULT_MAX_INPUT_BYTES, WholeInputLimits};
+pub use pii::PiiSelection;
 pub use pipeline::{
     run_detector_pipeline, scan, scan_and_redact, scan_and_redact_with_limits, scan_with_limits,
 };

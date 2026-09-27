@@ -3,7 +3,7 @@
  *
  * Every code and message below is fixed and input-free: no error carries the
  * scanned input, a matched value, a placeholder, or a failing callback's own
- * message (`decision-define-runtime-bindings`). Seventeen codes come from the
+ * message (`decision-define-runtime-bindings`). Twenty-two codes come from the
  * Rust core — including `FINDING_LIMIT_EXCEEDED` and the broadened
  * `INPUT_LIMIT_EXCEEDED`/`INVALID_LIMITS`, shared between incremental
  * sessions and whole-input `scan`/`redact`/`scanAndRedact`
@@ -45,6 +45,10 @@ export type SecretScanErrorCode =
   | "MULTILINE_LIMIT_EXCEEDED"
   | "INVALID_STATE"
   | "INVALID_RULESET"
+  | "PII_SELECTOR_INVALID"
+  | "PII_SELECTOR_UNSUPPORTED"
+  | "PII_SELECTOR_UNAVAILABLE"
+  | "PII_ACTIVATION_CONFLICT"
   | "NOT_INITIALIZED"
   | "INITIALIZATION_FAILED"
   | "INVALID_CHUNK"
@@ -76,6 +80,10 @@ const ERROR_MESSAGES: Readonly<Record<SecretScanErrorCode, string>> = {
   // invariant every other code already has, rather than special-casing this
   // one code to carry variable content.
   INVALID_RULESET: "The supplied ruleset is invalid.",
+  PII_SELECTOR_INVALID: "PII selector is invalid.",
+  PII_SELECTOR_UNSUPPORTED: "PII jurisdiction or family is unsupported.",
+  PII_SELECTOR_UNAVAILABLE: "PII selection is unavailable in this artifact.",
+  PII_ACTIVATION_CONFLICT: "PII activation is already initialized differently.",
   NOT_INITIALIZED:
     "redact-secret is not initialized; await initialize() before this call.",
   // Fixed and input-free like every other message, but also actionable

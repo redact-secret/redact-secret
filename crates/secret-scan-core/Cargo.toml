@@ -28,8 +28,9 @@ publish = true
 name = "redact_secret"
 
 [dependencies]
-# Intentionally empty. Additions must pass scripts/check-rust-workspace.py,
-# which enforces [workspace.metadata.redact-secret] in the root Cargo.toml.
+# Pure, table-driven Unicode NFC. It performs no I/O and keeps context
+# normalization identical across native and WebAssembly artifacts.
+unicode-normalization = "=0.1.25"
 
 [dev-dependencies]
 # Test-only. Dev-dependencies are outside the core boundary because they never

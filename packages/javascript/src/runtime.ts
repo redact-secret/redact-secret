@@ -34,6 +34,7 @@ import type {
   IncrementalSanitizer,
   IncrementalSanitizerOptions,
   IncrementalSanitizerResult,
+  InitializeOptions,
   PlaceholderFormatter,
   RedactOptions,
   ScanAndRedactOptions,
@@ -248,7 +249,8 @@ function toNativeIncrementalOptions(
 }
 
 export interface RedactSecretRuntime {
-  initialize(): Promise<void>;
+  initialize(options?: InitializeOptions): Promise<void>;
+  piiActivation(): string;
   artifact(): ArtifactKind;
   scan(input: string, options?: ScanOptions): readonly SecretFinding[];
   redact(
@@ -279,8 +281,39 @@ export function createRedactSecretRuntime(
 ): RedactSecretRuntime {
   let binding: NativeBinding | undefined;
   let pending: Promise<void> | undefined;
+  let pendingKey: string | undefined;
+  let activeKey: string | undefined;
 
-  async function load(): Promise<void> {
+  function selectors(options?: InitializeOptions): readonly string[] {
+    if (options === undefined) return [];
+    if (
+      typeof options !== "object" ||
+      options === null ||
+      Array.isArray(options) ||
+      (Object.getPrototypeOf(options) !== Object.prototype &&
+        Object.getPrototypeOf(options) !== null) ||
+      Object.keys(options).some((key) => key !== "pii")
+    ) {
+      throw new SecretScanError("INVALID_OPTIONS");
+    }
+    const pii = options.pii;
+    if (pii === undefined) return [];
+    if (!Array.isArray(pii)) throw new SecretScanError("INVALID_OPTIONS");
+    for (let index = 0; index < pii.length; index += 1) {
+      if (!Object.hasOwn(pii, index) || typeof pii[index] !== "string") {
+        throw new SecretScanError("INVALID_OPTIONS");
+      }
+    }
+    return [...pii];
+  }
+
+  function selectorKey(pii: readonly string[]): string {
+    return [...new Set(pii.map((value) => value === "pii" ? "pii:global" : value))]
+      .sort()
+      .join(",");
+  }
+
+  async function load(pii: readonly string[]): Promise<void> {
     let loaded: NativeBinding;
     try {
       loaded = await loadNativeBinding();
@@ -290,17 +323,39 @@ export function createRedactSecretRuntime(
       if (loaded.profile() !== expectedProfile) {
         throw new SecretScanError("INITIALIZATION_FAILED");
       }
-      loaded.initialize();
+      loaded.initialize(pii);
     } catch (thrown) {
       throw toSecretScanError(thrown, "INITIALIZATION_FAILED");
     }
     binding = loaded;
+    activeKey = selectorKey(pii);
   }
 
-  function initialize(): Promise<void> {
-    if (binding !== undefined) return Promise.resolve();
-    pending ??= load().finally(() => {
+  function initialize(options?: InitializeOptions): Promise<void> {
+    let pii: readonly string[];
+    try {
+      pii = selectors(options);
+    } catch (thrown) {
+      return Promise.reject(toSecretScanError(thrown, "INVALID_OPTIONS"));
+    }
+    const key = selectorKey(pii);
+    if (binding !== undefined) {
+      if (activeKey === key) return Promise.resolve();
+      try {
+        binding.initialize(pii);
+        activeKey = key;
+        return Promise.resolve();
+      } catch (thrown) {
+        return Promise.reject(toSecretScanError(thrown, "INITIALIZATION_FAILED"));
+      }
+    }
+    if (pending !== undefined) {
+      return pendingKey === key ? pending : pending.then(() => initialize(options));
+    }
+    pendingKey = key;
+    pending = load(pii).finally(() => {
       pending = undefined;
+      pendingKey = undefined;
     });
     return pending;
   }
@@ -313,6 +368,11 @@ export function createRedactSecretRuntime(
   /** Which artifact `initialize()` loaded. Requires initialization, like every other operation here. */
   function artifact(): ArtifactKind {
     return active().artifact();
+  }
+
+  function piiActivation(): string {
+    const native = active();
+    return native.piiActivation?.() ?? `credentials=${expectedProfile};selectors=off;families=;vocabulary=pii-context/v1`;
   }
 
   function scan(
@@ -454,6 +514,7 @@ export function createRedactSecretRuntime(
 
   return {
     initialize,
+    piiActivation,
     artifact,
     scan,
     redact,
