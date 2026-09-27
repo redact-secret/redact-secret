@@ -5,4 +5,4 @@ contact_links:
     about: Report a suspected vulnerability privately. Do not use a public issue.
   - name: Reporting guide
     url: https://github.com/redact-secret/redact-secret/blob/main/docs/guides/reporting-detection-issues.md
-    about: Read before filing a false positive or missed detection report.
+    about: Choose a safe form for detector requests, detection results, or integration feedback.
