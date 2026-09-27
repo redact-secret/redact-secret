@@ -69,6 +69,24 @@ depend on `src/`.
   cross-language error-code registry (`fixtures/error-codes.source.ts`):
   every stable code the incremental sanitizer and its stream adapters can
   raise, paired with its fixed, input-free message.
+- [`fixtures/pii-runtime-v1.json`](./fixtures/pii-runtime-v1.json) — the
+  cross-surface PII selector canonicalization, activation identity, and fixed
+  input-free error contract. Its global and exact-family closure includes the
+  available email and network-address families; the Rust consumer is
+  `crates/secret-scan-core/tests/pii_runtime_conformance.rs`.
+- [`fixtures/pii-network-address-v1.json`](./fixtures/pii-network-address-v1.json) —
+  the network-address family contract v1: official reserved/private/local
+  IPv4 and IPv6 controls, context sensitivity, offsets, collisions, and zone-id
+  exclusion. Rust whole-input and every-partition consumers live in
+  `crates/secret-scan-core/tests/pii_network_address_conformance.rs`.
+- [`fixtures/pii-email-v1.json`](./fixtures/pii-email-v1.json) — the email
+  family-contract v1 safe corpus: sensitive public findings use a recorded
+  deterministic no-real-world-provenance seed, while reserved/documentation
+  addresses remain identity-only controls. It covers malformed and boundary
+  cases, placeholders, prose/URL/credential collisions, named context
+  negatives, Unicode offsets, selector closure, and incremental partitions.
+  Expected findings contain safe metadata only; consumers convert canonical
+  UTF-8 byte ranges to their public range units.
 - [`fixtures/ai-context-boundary.json`](./fixtures/ai-context-boundary.json) —
   the framework-neutral AI-context boundary contract's cases (issue #610,
   [`docs/reference/ai-context-boundary.md`](../docs/reference/ai-context-boundary.md)):

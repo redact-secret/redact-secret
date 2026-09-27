@@ -114,6 +114,7 @@ use crate::detectors::{
     is_reserved_name, normalize_name,
 };
 use crate::error::SecretScanErrorCode;
+use crate::pii::is_reserved_detector_id;
 use crate::types::{Detector, Specificity, is_identifier};
 
 /// The one supported `ruleset-revision` value. Any other value is rejected
@@ -659,11 +660,14 @@ fn flush_block(
     fields: &[(&str, &str)],
     specs: &mut Vec<RulesetDetectorSpec>,
 ) -> Result<(), RulesetLoadError> {
+    if built_in_ids().any(|reserved| reserved == id)
+        || id == RULESET_NAMES_DETECTOR_ID
+        || is_reserved_detector_id(id)
+    {
+        return Err(RulesetLoadError::ReservedDetectorId);
+    }
     if !is_identifier(id) {
         return Err(RulesetLoadError::UnsupportedConstruct);
-    }
-    if built_in_ids().any(|reserved| reserved == id) || id == RULESET_NAMES_DETECTOR_ID {
-        return Err(RulesetLoadError::ReservedDetectorId);
     }
     if specs.iter().any(|existing| existing.id == id) {
         return Err(RulesetLoadError::DuplicateDetectorId);
@@ -1187,6 +1191,18 @@ validator: none\n";
             parse_ruleset(text.as_bytes()),
             Err(RulesetLoadError::ReservedDetectorId)
         );
+    }
+
+    #[test]
+    fn rejects_pii_adapter_and_internal_family_ids() {
+        for reserved in ["pii-domain", "pii:global:synthetic-family"] {
+            let text = replace_once(VALID, "acme-internal-token", reserved);
+            assert_eq!(
+                parse_ruleset(text.as_bytes()),
+                Err(RulesetLoadError::ReservedDetectorId),
+                "{reserved:?}"
+            );
+        }
     }
 
     #[test]

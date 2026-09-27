@@ -15,18 +15,18 @@ These counts describe finding-type inventory rows with corpus evidence, not dete
 
 | Row state | Count |
 | --- | --- |
-| supported | 89 |
+| supported | 92 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 100.
+Coverage declarations: 103.
 
 ## Coverage by detector
 
 | Detector | Declared types | Row states |
 | --- | --- | --- |
 | ai21-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
-| anthropic-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| anthropic-token | 3 | supported: 3, intentionally-unsupported: 0, unresolved: 0 |
 | atlassian-api-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | aws-access-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | aws-bedrock-long-term-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -75,7 +75,7 @@ Coverage declarations: 100.
 | notion-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | npm-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | okta-api-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
-| openai-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| openai-token | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
 | openrouter-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | otpauth-uri | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | perplexity-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -110,7 +110,9 @@ Coverage declarations: 100.
 | Type | Detector | Behavior class | State | Scheme states | Pending dimensions |
 | --- | --- | --- | --- | --- | --- |
 | ai21_api_key | ai21-api-key | provider | supported | not-applicable | none |
+| anthropic_admin_api_key | anthropic-token | provider | supported | not-applicable | none |
 | anthropic_api_key | anthropic-token | provider | supported | not-applicable | none |
+| anthropic_enterprise_api_key | anthropic-token | provider | supported | not-applicable | none |
 | atlassian_api_token | atlassian-api-token | provider | supported | not-applicable | none |
 | authorization_credential | generic-token | contextual | supported | supported | none |
 | aws_access_key_id | aws-access-key | provider | supported | not-applicable | none |
@@ -165,6 +167,7 @@ Coverage declarations: 100.
 | notion_integration_token | notion-token | provider | supported | not-applicable | none |
 | npm_access_token | npm-token | provider | supported | not-applicable | none |
 | okta_api_token | okta-api-token | provider | supported | not-applicable | none |
+| openai_admin_api_key | openai-token | provider | supported | not-applicable | none |
 | openai_api_key | openai-token | provider | supported | not-applicable | none |
 | openrouter_api_key | openrouter-api-key | provider | supported | not-applicable | none |
 | otpauth_secret | otpauth-uri | structural | supported | supported | none |
@@ -223,15 +226,15 @@ Coverage declarations: 100.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 100 | 0 | 0 |
-| boundary | 89 | 0 | 0 |
-| host-context | 89 | 0 | 0 |
+| adversarial | 103 | 0 | 0 |
+| boundary | 92 | 0 | 0 |
+| host-context | 92 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 100 | 0 | 0 |
-| near-miss-negative | 89 | 0 | 0 |
-| overlap | 89 | 0 | 0 |
-| positive | 89 | 0 | 0 |
-| range | 100 | 0 | 0 |
+| malformed | 103 | 0 | 0 |
+| near-miss-negative | 92 | 0 | 0 |
+| overlap | 92 | 0 | 0 |
+| positive | 92 | 0 | 0 |
+| range | 103 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

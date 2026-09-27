@@ -19,6 +19,8 @@
 
 mod incremental;
 
+use std::sync::{Mutex, OnceLock};
+
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use pyo3::types::PyString;
@@ -26,8 +28,8 @@ use pyo3::{create_exception, wrap_pyfunction};
 
 use redact_secret::{
     Action, ByteRange, Confidence, DefaultPolicy, DetectedFinding, DetectorRegistry,
-    Finding as CoreFinding, Obfuscation, PlaceholderContext, PlaceholderFormatter, Policy,
-    PolicyContext, RulesetError, SecretScanError as CoreError, SecretScanErrorCode,
+    Finding as CoreFinding, Obfuscation, PiiSelection, PlaceholderContext, PlaceholderFormatter,
+    Policy, PolicyContext, RulesetError, SecretScanError as CoreError, SecretScanErrorCode,
     WholeInputLimits, default_placeholder_formatter as core_default_formatter, load_ruleset,
     redact_with_limits as core_redact, run_detector_pipeline,
     typed_placeholder_formatter as core_typed_formatter,
@@ -35,6 +37,17 @@ use redact_secret::{
 
 /// The Unicode string-index unit every range this module reports uses.
 const RANGE_UNIT: &str = "unicode-code-points";
+static PII_SELECTION: OnceLock<Mutex<Option<PiiSelection>>> = OnceLock::new();
+
+pub(crate) fn active_pii_selection() -> PiiSelection {
+    PII_SELECTION
+        .get_or_init(|| Mutex::new(None))
+        .lock()
+        .map_or_else(
+            |_| PiiSelection::default(),
+            |guard| guard.clone().unwrap_or_default(),
+        )
+}
 
 // ---------------------------------------------------------------------
 // Sanitized exceptions
@@ -50,6 +63,30 @@ create_exception!(
     SecretScanError,
     pyo3::exceptions::PyException,
     "Base class for every sanitized redact-secret error.\n\nEach subclass carries a fixed, input-free `code` class attribute matching\nthe core's `SecretScanErrorCode` wire name."
+);
+create_exception!(
+    redact_secret._native,
+    PiiSelectorInvalidError,
+    SecretScanError,
+    "A PII selector is invalid."
+);
+create_exception!(
+    redact_secret._native,
+    PiiSelectorUnsupportedError,
+    SecretScanError,
+    "A PII selector is unsupported."
+);
+create_exception!(
+    redact_secret._native,
+    PiiSelectorUnavailableError,
+    SecretScanError,
+    "A PII selector is unavailable."
+);
+create_exception!(
+    redact_secret._native,
+    PiiActivationConflictError,
+    SecretScanError,
+    "PII activation conflicts with prior initialization."
 );
 create_exception!(
     redact_secret._native,
@@ -211,6 +248,18 @@ pub(crate) fn map_error_code(code: SecretScanErrorCode) -> PyErr {
         // directly; every real rejection instead goes through
         // `map_ruleset_error`, which also folds in the fixed class.
         SecretScanErrorCode::InvalidRuleset => PyErr::new::<InvalidRulesetError, _>(message),
+        SecretScanErrorCode::PiiSelectorInvalid => {
+            PyErr::new::<PiiSelectorInvalidError, _>(message)
+        }
+        SecretScanErrorCode::PiiSelectorUnsupported => {
+            PyErr::new::<PiiSelectorUnsupportedError, _>(message)
+        }
+        SecretScanErrorCode::PiiSelectorUnavailable => {
+            PyErr::new::<PiiSelectorUnavailableError, _>(message)
+        }
+        SecretScanErrorCode::PiiActivationConflict => {
+            PyErr::new::<PiiActivationConflictError, _>(message)
+        }
     }
 }
 
@@ -233,6 +282,10 @@ pub(crate) fn map_ruleset_error(error: RulesetError) -> PyErr {
 }
 
 /// Registers every exception type and sets its fixed `code` class attribute.
+#[allow(
+    clippy::too_many_lines,
+    reason = "every fixed public exception is registered together"
+)]
 fn register_exceptions(module: &Bound<'_, PyModule>) -> PyResult<()> {
     let py = module.py();
 
@@ -333,6 +386,26 @@ fn register_exceptions(module: &Bound<'_, PyModule>) -> PyResult<()> {
         "InvalidRulesetError",
         InvalidRulesetError,
         SecretScanErrorCode::InvalidRuleset
+    );
+    register!(
+        "PiiSelectorInvalidError",
+        PiiSelectorInvalidError,
+        SecretScanErrorCode::PiiSelectorInvalid
+    );
+    register!(
+        "PiiSelectorUnsupportedError",
+        PiiSelectorUnsupportedError,
+        SecretScanErrorCode::PiiSelectorUnsupported
+    );
+    register!(
+        "PiiSelectorUnavailableError",
+        PiiSelectorUnavailableError,
+        SecretScanErrorCode::PiiSelectorUnavailable
+    );
+    register!(
+        "PiiActivationConflictError",
+        PiiActivationConflictError,
+        SecretScanErrorCode::PiiActivationConflict
     );
 
     Ok(())
@@ -701,14 +774,14 @@ impl PyWholeInputLimits {
 /// `InvalidOptionsError` when `ruleset` is neither `bytes`/`bytearray` nor
 /// `str`, and `InvalidRulesetError` when it does not parse.
 fn registry_with_ruleset(ruleset: Option<&Bound<'_, PyAny>>) -> PyResult<DetectorRegistry> {
-    match ruleset {
-        None => DetectorRegistry::with_built_in([]).map_err(map_core_error),
-        Some(value) => {
-            let bytes = extract_ruleset_bytes(value)?;
-            let detectors = load_ruleset(&bytes).map_err(map_ruleset_error)?;
-            DetectorRegistry::with_built_in(detectors).map_err(map_core_error)
-        }
-    }
+    let selection = active_pii_selection();
+    let custom = if let Some(value) = ruleset {
+        let bytes = extract_ruleset_bytes(value)?;
+        load_ruleset(&bytes).map_err(map_ruleset_error)?
+    } else {
+        Vec::new()
+    };
+    DetectorRegistry::with_built_in_and_pii_custom(&selection, custom).map_err(map_core_error)
 }
 
 /// Extracts ruleset bytes from a `bytes`/`bytearray` or `str` argument
@@ -1065,6 +1138,33 @@ fn typed_placeholder_formatter(
         .map_err(|_| map_error_code(SecretScanErrorCode::PlaceholderFailure))
 }
 
+/// Initializes the process-wide PII selection. Omitted/empty means off.
+#[pyfunction]
+#[pyo3(signature = (pii=Vec::new()))]
+#[allow(clippy::needless_pass_by_value, reason = "PyO3 owns vector arguments")]
+fn initialize(pii: Vec<String>) -> PyResult<()> {
+    let borrowed: Vec<&str> = pii.iter().map(String::as_str).collect();
+    let selection = PiiSelection::parse(&borrowed).map_err(map_core_error)?;
+    let state = PII_SELECTION.get_or_init(|| Mutex::new(None));
+    let mut guard = state
+        .lock()
+        .map_err(|_| map_error_code(SecretScanErrorCode::PiiActivationConflict))?;
+    if let Some(active) = guard.as_ref() {
+        if active != &selection {
+            return Err(map_error_code(SecretScanErrorCode::PiiActivationConflict));
+        }
+    } else {
+        *guard = Some(selection);
+    }
+    Ok(())
+}
+
+/// Returns the canonical full-profile PII activation identity.
+#[pyfunction]
+fn pii_activation() -> String {
+    active_pii_selection().activation_identity(redact_secret::Profile::Full)
+}
+
 /// Returns the shared product version.
 #[pyfunction]
 fn version() -> &'static str {
@@ -1085,6 +1185,8 @@ fn _native(module: &Bound<'_, PyModule>) -> PyResult<()> {
     module.add_function(wrap_pyfunction!(default_policy, module)?)?;
     module.add_function(wrap_pyfunction!(default_placeholder_formatter, module)?)?;
     module.add_function(wrap_pyfunction!(typed_placeholder_formatter, module)?)?;
+    module.add_function(wrap_pyfunction!(initialize, module)?)?;
+    module.add_function(wrap_pyfunction!(pii_activation, module)?)?;
 
     module.add_class::<PyDetectedFinding>()?;
     module.add_class::<PyFinding>()?;

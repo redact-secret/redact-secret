@@ -84,8 +84,23 @@ pub fn profile() -> String {
 /// Returns a fixed, input-free `INITIALIZATION_FAILED` error when the
 /// registry cannot be built.
 #[wasm_bindgen]
-pub fn initialize() -> Result<(), JsValue> {
-    lifecycle::initialize().map_err(to_js_error)
+#[allow(
+    clippy::needless_pass_by_value,
+    reason = "wasm-bindgen owns vector arguments"
+)]
+pub fn initialize(pii: Vec<String>) -> Result<(), JsValue> {
+    lifecycle::initialize(&pii).map_err(to_js_error)
+}
+
+/// Returns the canonical credentials/PII activation identity.
+#[wasm_bindgen(js_name = piiActivation)]
+/// Returns the canonical PII activation identity.
+///
+/// # Errors
+///
+/// Returns a fixed initialization error before successful initialization.
+pub fn pii_activation() -> Result<String, JsValue> {
+    lifecycle::pii_activation().map_err(to_js_error)
 }
 
 /// Resolves the two optional whole-input bound arguments every exported
@@ -365,7 +380,7 @@ mod tests {
 
     #[test]
     fn run_scan_rejects_input_over_an_explicit_byte_limit() {
-        initialize().unwrap();
+        initialize(Vec::new()).unwrap();
         let limits = WholeInputLimits::new(5, 50).unwrap();
         let error =
             lifecycle::with_registry(|registry| run_scan("abcdef", registry, None, &limits))
@@ -377,6 +392,25 @@ mod tests {
         );
     }
 
+    #[test]
+    fn compiled_wasm_profile_runs_the_network_address_family() {
+        let selection =
+            redact_secret::PiiSelection::parse(&["pii:family:global:network-address"]).unwrap();
+        let registry = DetectorRegistry::with_built_in_and_pii(&selection).unwrap();
+        let findings = run_scan(
+            "🔒 client_ip=10.0.0.8",
+            &registry,
+            None,
+            &WholeInputLimits::default(),
+        )
+        .unwrap();
+        let finding = findings
+            .iter()
+            .find(|finding| finding.type_name() == "pii_global_network_address")
+            .unwrap();
+        assert_eq!((finding.range().start(), finding.range().end()), (15, 23));
+    }
+
     /// Only meaningful for the `full` profile, which links the `provider`
     /// detector this input needs two disjoint findings from; `common` finds
     /// nothing here (the documented false-negative cost of `common`), so
@@ -386,7 +420,7 @@ mod tests {
         if !cfg!(feature = "full") {
             return;
         }
-        initialize().unwrap();
+        initialize(Vec::new()).unwrap();
         let input = format!(
             "prefix AKIA{} middle AKIA{} suffix",
             "SYNTHETICEXAMPLE", "SYNTHETICEXAMPL2"
@@ -430,7 +464,7 @@ mod tests {
     /// `scanAndRedact` call.
     #[test]
     fn scan_and_redact_agree_on_a_canonical_synthetic_finding() {
-        initialize().unwrap();
+        initialize(Vec::new()).unwrap();
         let input = synthetic_input();
 
         let findings = scan(&input, None, None, None, None).unwrap();
@@ -457,7 +491,7 @@ mod tests {
     /// artifact detects the same input.
     #[test]
     fn a_bare_provider_token_is_detected_only_by_the_full_profile() {
-        initialize().unwrap();
+        initialize(Vec::new()).unwrap();
         let input = format!("prefix \u{1F511} AKIA{} suffix", "SYNTHETICEXAMPLE");
         let findings = scan(&input, None, None, None, None).unwrap();
         if cfg!(feature = "full") {
@@ -489,7 +523,7 @@ validator: none\n";
 
     #[test]
     fn scan_accepts_a_ruleset_and_registers_it_after_the_compiled_profiles_built_ins() {
-        initialize().unwrap();
+        initialize(Vec::new()).unwrap();
         let value = "a".repeat(20);
         let input = format!("ACME_{value}");
 
@@ -507,7 +541,7 @@ validator: none\n";
 
     #[test]
     fn scan_and_redact_thread_the_ruleset_through_to_the_scan_step() {
-        initialize().unwrap();
+        initialize(Vec::new()).unwrap();
         let value = "a".repeat(20);
         let input = format!("ACME_{value}");
 
@@ -533,6 +567,7 @@ validator: none\n";
     /// delegates to does not.
     #[test]
     fn registry_with_ruleset_builds_a_registry_over_the_compiled_profile() {
+        initialize(Vec::new()).unwrap();
         let registry = lifecycle::registry_with_ruleset(RULESET_FIXTURE).unwrap();
         assert!(registry.contains("acme-internal-token"));
         assert_eq!(registry.profile(), Some(lifecycle::PROFILE));
@@ -552,7 +587,7 @@ validator: none\n";
     /// the match.
     #[test]
     fn finding_range_uses_utf16_offsets_end_to_end() {
-        initialize().unwrap();
+        initialize(Vec::new()).unwrap();
         let input = synthetic_input();
         let findings = scan(&input, None, None, None, None).unwrap();
         let range = findings[0].range();
@@ -561,6 +596,51 @@ validator: none\n";
         let matched =
             String::from_utf16(&utf16[range.start() as usize..range.end() as usize]).unwrap();
         assert_eq!(matched, synthetic::secret().matched);
+    }
+
+    #[test]
+    fn email_family_fixture_uses_wasm_utf16_metadata() {
+        let document: serde_json::Value = serde_json::from_str(include_str!(
+            "../../../conformance/fixtures/pii-email-v1.json"
+        ))
+        .unwrap();
+        let selector = document["selector"].as_str().unwrap();
+        let selection = redact_secret::PiiSelection::parse(&[selector]).unwrap();
+        let registry = DetectorRegistry::with_built_in_and_pii(&selection).unwrap();
+        for case in document["cases"].as_array().unwrap() {
+            let input = case["input"].as_str().unwrap();
+            let findings = run_scan(input, &registry, None, &WholeInputLimits::default()).unwrap();
+            let actual: Vec<serde_json::Value> = findings
+                .into_iter()
+                .map(|finding| FindingJs::new(input, finding))
+                .map(|finding| {
+                    let range = finding.range();
+                    serde_json::json!({
+                        "detector": finding.detector(),
+                        "type": finding.type_name(),
+                        "confidence": finding.confidence(),
+                        "action": finding.action(),
+                        "start": range.start(),
+                        "end": range.end(),
+                    })
+                })
+                .collect();
+            let expected: Vec<serde_json::Value> = case["expected"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|finding| {
+                    let byte_start = usize::try_from(finding["start"].as_u64().unwrap()).unwrap();
+                    let byte_end = usize::try_from(finding["end"].as_u64().unwrap()).unwrap();
+                    let mut converted = finding.clone();
+                    converted["start"] =
+                        serde_json::json!(input[..byte_start].encode_utf16().count());
+                    converted["end"] = serde_json::json!(input[..byte_end].encode_utf16().count());
+                    converted
+                })
+                .collect();
+            assert_eq!(actual, expected, "{}", case["id"].as_str().unwrap());
+        }
     }
 
     /// A call made before `initialize()` succeeds fails deterministically,
@@ -589,7 +669,7 @@ validator: none\n";
     /// builds a real JavaScript function.
     #[wasm_bindgen_test::wasm_bindgen_test]
     fn scan_and_redact_accept_custom_policy_and_formatter_callbacks() {
-        initialize().unwrap();
+        initialize(Vec::new()).unwrap();
         let input = synthetic_input();
 
         let policy = Function::new_with_args("finding, context", "return 'block';");

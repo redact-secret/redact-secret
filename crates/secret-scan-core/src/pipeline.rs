@@ -416,6 +416,10 @@ pub(crate) fn detect(
     {
         for (candidate_order, candidate) in candidates.iter().enumerate() {
             let range = candidate.range();
+            if candidate.rejects_invisible_normalization() && normalized.touches_removed_run(range)
+            {
+                continue;
+            }
             if range.is_char_aligned_in(scanned)
                 && is_known_vendor_placeholder_literal(&scanned[range.start()..range.end()])
             {

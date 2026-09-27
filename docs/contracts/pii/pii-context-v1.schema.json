@@ -8,7 +8,7 @@
   "properties": {
     "$schema": { "const": "./pii-context-v1.schema.json" },
     "format": { "const": "redact-secret/pii-context/v1" },
-    "status": { "const": "contract-only" },
+    "status": { "const": "runtime-compiled" },
     "evidenceGroup": { "const": "contextual" },
     "use": {
       "type": "object",

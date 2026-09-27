@@ -26,6 +26,11 @@ class RepositoryContract(unittest.TestCase):
     def test_the_committed_contract_and_fixtures_pass(self) -> None:
         self.assertEqual(CHECK.validate(ROOT), [])
 
+    def test_compiled_runtime_table_is_generated_from_the_reviewed_contract(self) -> None:
+        contract = json.loads((ROOT / CHECK.ARTIFACT).read_text(encoding="utf-8"))
+        expected = CHECK._TABLE_SUPPORT.render(contract)
+        self.assertEqual((ROOT / CHECK._TABLE_SUPPORT.OUTPUT).read_text(encoding="utf-8"), expected)
+
     def test_english_case_separator_and_korean_nfc_normalize_together(self) -> None:
         self.assertEqual(CHECK.normalize("EMAIL_KEY", "en"), "email key")
         self.assertEqual(CHECK.normalize("이메일", "ko"), "이메일")
@@ -83,7 +88,29 @@ class RepositoryContract(unittest.TestCase):
 
 
 class SchemaAndSemantics(unittest.TestCase):
-    def test_unknown_fields_and_runtime_claims_are_rejected(self) -> None:
+    def test_mixed_domain_equidistant_candidates_associate_with_neither(self) -> None:
+        occurrence = {
+            "start": 5,
+            "end": 12,
+            "entry": {
+                "kind": "natural-language-label",
+                "domains": ["email"],
+            },
+        }
+        candidates = {
+            "email": {"domain": "email"},
+            "card": {"domain": "payment-card"},
+        }
+        self.assertIsNone(
+            CHECK.associate_occurrence(
+                occurrence,
+                "TEST contact TEST",
+                {"email": 0, "card": 17},
+                candidates,
+            )
+        )
+
+    def test_unknown_fields_and_runtime_status_drift_are_rejected(self) -> None:
         changed = copy.deepcopy(CONTRACT)
         changed["runtimeVocabulary"] = True
         self.assertTrue(CHECK._SCHEMA_SUPPORT.validate_schema(changed, SCHEMA, SCHEMA))

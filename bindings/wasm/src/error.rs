@@ -18,6 +18,10 @@ pub(crate) enum WasmErrorCode {
     /// A synchronous operation was called before `initialize()` succeeded.
     NotInitialized,
     /// `initialize()` itself failed.
+    #[allow(
+        dead_code,
+        reason = "kept as the binding-level loader failure contract"
+    )]
     InitializationFailed,
     /// A code produced by the core pipeline.
     Core(SecretScanErrorCode),

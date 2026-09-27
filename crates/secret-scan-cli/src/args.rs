@@ -8,8 +8,8 @@ use std::ffi::OsString;
 use std::path::PathBuf;
 
 use crate::failure::{
-    Failure, JSON_WITH_REDACT, REDACT_ONE_PATH, RULESET_MISSING_PATH, RULESET_REPEATED,
-    RULESET_REQUIRES_FILE, SOLE_OPTION, UNKNOWN_OPTION,
+    Failure, JSON_WITH_REDACT, PII_MISSING_SELECTOR, PRINT_PII_STANDALONE, REDACT_ONE_PATH,
+    RULESET_MISSING_PATH, RULESET_REPEATED, RULESET_REQUIRES_FILE, SOLE_OPTION, UNKNOWN_OPTION,
 };
 
 /// The identity standard input reports as in a check report.
@@ -54,6 +54,8 @@ pub enum Command {
     Help,
     /// Print the product version and exit cleanly.
     Version,
+    /// Print canonical activation and exit without reading input.
+    PiiActivation { selectors: Vec<String> },
     /// Scan every source and report safe finding metadata.
     Check {
         /// The sources to scan, in the order they were given.
@@ -62,6 +64,8 @@ pub enum Command {
         format: Format,
         /// The path `--ruleset` named, if any.
         ruleset: Option<PathBuf>,
+        /// Repeatable PII selectors.
+        selectors: Vec<String>,
     },
     /// Write the sanitized form of one source to standard output.
     Redact {
@@ -69,6 +73,8 @@ pub enum Command {
         source: Source,
         /// The path `--ruleset` named, if any.
         ruleset: Option<PathBuf>,
+        /// Repeatable PII selectors.
+        selectors: Vec<String>,
     },
 }
 
@@ -98,6 +104,8 @@ where
     let mut json = false;
     let mut paths_only = false;
     let mut ruleset: Option<PathBuf> = None;
+    let mut selectors = Vec::new();
+    let mut print_pii_activation = false;
     let mut paths: Vec<PathBuf> = Vec::new();
 
     let mut args = args.into_iter();
@@ -110,6 +118,13 @@ where
             Some("--") => paths_only = true,
             Some("--redact") => redact = true,
             Some("--json") => json = true,
+            Some("--print-pii-activation") => print_pii_activation = true,
+            Some("--pii") => {
+                let selector = args.next().ok_or(Failure::Usage(PII_MISSING_SELECTOR))?;
+                selectors.push(selector.into_string().map_err(|_| {
+                    Failure::Core(redact_secret::SecretScanErrorCode::PiiSelectorInvalid)
+                })?);
+            }
             Some("--ruleset") => {
                 let path = args.next().ok_or(Failure::Usage(RULESET_MISSING_PATH))?;
                 if ruleset.replace(PathBuf::from(path)).is_some() {
@@ -123,6 +138,13 @@ where
         }
     }
 
+    if print_pii_activation {
+        if redact || json || ruleset.is_some() || !paths.is_empty() {
+            return Err(Failure::Usage(PRINT_PII_STANDALONE));
+        }
+        return Ok(Command::PiiActivation { selectors });
+    }
+
     if redact {
         if json {
             return Err(Failure::Usage(JSON_WITH_REDACT));
@@ -134,7 +156,11 @@ where
             (Some(path), None) => Source::File(path),
             (Some(_), Some(_)) => return Err(Failure::Usage(REDACT_ONE_PATH)),
         };
-        return Ok(Command::Redact { source, ruleset });
+        return Ok(Command::Redact {
+            source,
+            ruleset,
+            selectors,
+        });
     }
 
     let sources = if paths.is_empty() {
@@ -150,6 +176,7 @@ where
         sources,
         format,
         ruleset,
+        selectors,
     })
 }
 
@@ -173,6 +200,7 @@ mod tests {
                 sources: vec![Source::Stdin],
                 format: Format::Text,
                 ruleset: None,
+                selectors: Vec::new(),
             }
         );
     }
@@ -185,6 +213,7 @@ mod tests {
                 sources: vec![file("b.txt"), file("a.txt")],
                 format: Format::Text,
                 ruleset: None,
+                selectors: Vec::new(),
             }
         );
     }
@@ -197,6 +226,7 @@ mod tests {
                 sources: vec![file("a.txt")],
                 format: Format::Json,
                 ruleset: None,
+                selectors: Vec::new(),
             }
         );
     }
@@ -208,6 +238,7 @@ mod tests {
             Command::Redact {
                 source: Source::Stdin,
                 ruleset: None,
+                selectors: Vec::new(),
             }
         );
         assert_eq!(
@@ -215,6 +246,7 @@ mod tests {
             Command::Redact {
                 source: file("a.txt"),
                 ruleset: None,
+                selectors: Vec::new(),
             }
         );
     }
@@ -227,6 +259,7 @@ mod tests {
                 sources: vec![file("--json")],
                 format: Format::Text,
                 ruleset: None,
+                selectors: Vec::new(),
             }
         );
     }
@@ -239,6 +272,7 @@ mod tests {
                 sources: vec![file("a.txt")],
                 format: Format::Text,
                 ruleset: Some(PathBuf::from("rules.txt")),
+                selectors: Vec::new(),
             }
         );
         assert_eq!(
@@ -246,6 +280,7 @@ mod tests {
             Command::Redact {
                 source: file("a.txt"),
                 ruleset: Some(PathBuf::from("rules.txt")),
+                selectors: Vec::new(),
             }
         );
     }
@@ -317,5 +352,30 @@ mod tests {
     fn standard_input_identity_is_not_a_path() {
         assert_eq!(Source::Stdin.identity(), STDIN_IDENTITY);
         assert_eq!(file("dir/a.txt").identity(), "dir/a.txt");
+    }
+
+    #[test]
+    fn pii_selectors_are_repeatable_and_activation_printing_is_input_free() {
+        assert_eq!(
+            parse_args(&[
+                "--print-pii-activation",
+                "--pii",
+                "pii",
+                "--pii",
+                "pii:global"
+            ])
+            .unwrap(),
+            Command::PiiActivation {
+                selectors: vec!["pii".to_owned(), "pii:global".to_owned()]
+            }
+        );
+        assert_eq!(
+            parse_args(&["--pii"]),
+            Err(Failure::Usage(PII_MISSING_SELECTOR))
+        );
+        assert_eq!(
+            parse_args(&["--print-pii-activation", "file"]),
+            Err(Failure::Usage(PRINT_PII_STANDALONE))
+        );
     }
 }

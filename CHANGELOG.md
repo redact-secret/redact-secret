@@ -7,6 +7,23 @@ evidence is linked from each published version.
 
 ### Added
 
+- Opt-in deterministic IPv4/IPv6 PII identity as the single
+  `pii:global:network-address` family (#875), with required English/Korean
+  network context, explicit reserved/documentation sensitivity treatment,
+  safe cross-surface conformance fixtures, and no runtime I/O. Qualification
+  remains pending exact-candidate benchmark evidence.
+- Opt-in global email PII detection (#876) through the shared `pii-domain`
+  adapter, with exact/global selector closure, a conservative documented RFC
+  5322 / RFC 6531 subset, context-required sensitivity, whole-domain RFC
+  2606/6761 negative evidence, safe cross-surface conformance fixtures, and
+  incremental partition equivalence. The family remains `pending` until its
+  exact merged artifact is qualified in the benchmark counterpart; stable
+  promotion is not part of this change.
+- The opt-in PII domain runtime substrate (#874): canonical selectors and
+  activation identity, one deterministic adapter slot and same-range domain
+  arbitration, a generated `pii-context/v1` English/Korean table, fixed safe
+  errors, and equivalent Rust, JavaScript, Python, and CLI activation APIs.
+  No production PII family is registered or claimed by this change.
 - New provider detectors: `elevenlabs-api-key` (#865), `together-ai-api-key` and
   `tavily-api-key` (#867), `aws-bedrock-long-term-api-key` and
   `aws-bedrock-short-term-api-key` (#864), and the keyword-gated
@@ -20,6 +37,20 @@ evidence is linked from each published version.
 - `anthropic-token` now recognizes the `sk-ant-api01-` and
   `sk-ant-admin01-` prefixes (#862), and the OpenAI admin-key contract is
   reconciled with the shipped `sk-admin-` detection (#863).
+- **Not yet released.** `anthropic-token` and `openai-token` now report a
+  distinct finding type per privilege class instead of collapsing them into
+  the plain API-key type (#774, research #775/#776/#777): `sk-ant-admin01-`
+  (Console Admin API key) reports `anthropic_admin_api_key`; `sk-ant-api01-`
+  (Claude Enterprise organization key for any scope set — user management,
+  Compliance, Analytics, Spend Limits — not compliance-specific) reports
+  `anthropic_enterprise_api_key`; `sk-admin-` (OpenAI organization Admin API
+  key) reports `openai_admin_api_key`. `anthropic_api_key` now covers only
+  `sk-ant-api03-`, and `openai_api_key` now covers only the legacy, `proj-`
+  and `svcacct-` shapes. No prefix, body grammar, span, confidence or policy
+  action changes — every affected value still redacts by default — only the
+  reported `type` string for these three prefixes. No release has shipped
+  these types under their old names, so this is not a breaking change for
+  any released consumer.
 - `generic-token` now redacts a secret passed as an SDK call argument, for
   example `Client(api_key="...")` (#866).
 - The instructional-placeholder exclusion now covers provider-named forms

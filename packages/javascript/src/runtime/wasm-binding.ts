@@ -123,7 +123,8 @@ export interface WasmModule {
   }): Promise<unknown>;
   version(): string;
   profile(): string;
-  initialize(): void;
+  initialize(pii: readonly string[]): void;
+  piiActivation(): string;
   scan(
     input: string,
     policy?: WasmPolicyCallback,
@@ -295,9 +296,10 @@ export function createBindingFromWasmModule(wasm: WasmModule): NativeBinding {
     version: () => wasm.version(),
     profile: () => wasm.profile(),
     artifact: () => "wasm",
-    initialize: () => {
-      wasm.initialize();
+    initialize: (pii = []) => {
+      wasm.initialize(pii);
     },
+    piiActivation: () => wasm.piiActivation(),
     scan: (input, policy, limits, ruleset) =>
       wasm
         .scan(

@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "family": "pii:global:email",
+  "familyContractVersion": 1,
+  "selector": "pii:family:global:email",
+  "fixtureGenerator": {
+    "id": "email-v1-fixed-synthetic",
+    "seed": "redact-secret-email-v1-fixture-876",
+    "provenance": "deterministic-no-real-world-provenance"
+  },
+  "cases": [
+    {
+      "id": "email-sensitive-ascii-exact-selector",
+      "input": "email: fixture876-q7m9@x4z8v2n6.synthetic",
+      "expected": [{"detector":"pii-domain","type":"pii_global_email","confidence":"high","action":"redact","start":7,"end":41}]
+    },
+    {
+      "id": "email-sensitive-smtputf8-unicode-offset",
+      "input": "이메일: 고객876@x4z8v2n6.synthetic",
+      "expected": [{"detector":"pii-domain","type":"pii_global_email","confidence":"high","action":"redact","start":11,"end":39}]
+    },
+    {"id":"email-reserved-documentation-identity-only","input":"email: identity@example.com","expected":[]},
+    {"id":"email-reserved-special-use-subdomain","input":"email: identity@nested.invalid","expected":[]},
+    {"id":"email-reserved-single-label-control","input":"email: identity@test","expected":[]},
+    {"id":"email-structure-without-context-is-identity-only","input":"fixture876-q7m9@x4z8v2n6.synthetic","expected":[]},
+    {"id":"email-ambiguous-contact-does-not-establish-sensitivity","input":"contact fixture876-q7m9@x4z8v2n6.synthetic","expected":[]},
+    {"id":"email-named-negative-context-wins","input":"email documentation fixture876-q7m9@x4z8v2n6.synthetic","expected":[]},
+    {"id":"email-placeholder-reserved-control","input":"email: YOUR_EMAIL@example.com","expected":[]},
+    {"id":"email-prose-collision","input":"The token fixture876-q7m9@x4z8v2n6.synthetic appears in prose.","expected":[]},
+    {"id":"email-url-userinfo-collision","input":"email: https://fixture876-q7m9@x4z8v2n6.synthetic/path","expected":[]},
+    {"id":"email-earlier-uri-does-not-suppress-later-candidate","input":"https://host/path, email: fixture876-q7m9@x4z8v2n6.synthetic","expected":[{"detector":"pii-domain","type":"pii_global_email","confidence":"high","action":"redact","start":26,"end":60}]},
+    {"id":"email-credential-url-collision","input":"email: postgres://user:pass@x4z8v2n6.synthetic/database","expected":[{"detector":"connection-string","type":"connection_string_password","confidence":"medium","action":"redact","start":23,"end":27}]},
+    {"id":"email-malformed-double-dot","input":"email: fixture..876@x4z8v2n6.synthetic","expected":[]},
+    {"id":"email-malformed-domain-label","input":"email: fixture876@-x4z8v2n6.synthetic","expected":[]},
+    {"id":"email-unsupported-quoted-local","input":"email: \"fixture876\"@x4z8v2n6.synthetic","expected":[]},
+    {"id":"email-unsupported-domain-literal","input":"email: fixture876@[192.0.2.1]","expected":[]},
+    {"id":"email-unsupported-display-name-mailbox","input":"email: Fixture <fixture876@x4z8v2n6.synthetic>","expected":[]},
+    {"id":"email-unsupported-comment","input":"email: (fixture)fixture876@x4z8v2n6.synthetic","expected":[]},
+    {"id":"email-unsupported-source-route","input":"email: @route.synthetic:fixture876@x4z8v2n6.synthetic","expected":[]},
+    {"id":"email-unsupported-single-label-domain","input":"email: fixture876@synthetic","expected":[]},
+    {"id":"email-adjacent-at-does-not-match-suffix","input":"email: a@fixture876-q7m9@x4z8v2n6.synthetic","expected":[]},
+    {"id":"email-governed-invisible-does-not-split-local","input":"email: abc‍fixture876@x4z8v2n6.synthetic","expected":[]},
+    {"id":"email-governed-invisible-does-not-split-domain","input":"email: fixture876@x4z8v2n6.synthetic‍suffix","expected":[]},
+    {"id":"email-unicode-domain-suffix-does-not-match-ascii-prefix","input":"email: fixture876@x4z8v2n6.synthetic한글","expected":[]},
+    {"id":"email-latin-unicode-domain-suffix-does-not-match-ascii-prefix","input":"email: fixture876@x4z8v2n6.syntheticé","expected":[]},
+    {"id":"email-ccc-zero-combining-mark-does-not-match-ascii-prefix","input":"email: fixture876@x4z8v2n6.synthetic⃝","expected":[]},
+    {"id":"email-variation-selector-does-not-match-ascii-prefix","input":"email: fixture876@x4z8v2n6.synthetic︀","expected":[]},
+    {"id":"email-whole-domain-resemblance-does-not-suppress","input":"email: fixture876-q7m9@notexample.com","expected":[{"detector":"pii-domain","type":"pii_global_email","confidence":"high","action":"redact","start":7,"end":37}]}
+  ]
+}

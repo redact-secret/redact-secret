@@ -29,6 +29,7 @@ def load_module(name: str, path: Path):
 
 _SCHEMA_SUPPORT = load_module("pii_context_schema_support", Path(__file__).with_name("check-scoring-artifact.py"))
 _INVISIBLE_SUPPORT = load_module("pii_context_invisible_support", Path(__file__).with_name("generate-invisible-table.py"))
+_TABLE_SUPPORT = load_module("pii_context_table_support", Path(__file__).with_name("generate-pii-context-table.py"))
 
 
 def load(path: Path) -> dict:
@@ -147,6 +148,8 @@ def associate_occurrence(occurrence: dict, view: str, positions: dict[str, int],
     if not eligible:
         return None
     nearest = min(distance for distance, _ in eligible)
+    if sum(occurrence_distance(occurrence, position) == nearest for position in positions.values()) > 1:
+        return None
     winners = [candidate_id for distance, candidate_id in eligible if distance == nearest]
     return winners[0] if len(winners) == 1 else None
 
@@ -230,6 +233,10 @@ def validate(root: Path = ROOT) -> list[str]:
     expected_table = _INVISIBLE_SUPPORT.render_table(ranges, _INVISIBLE_SUPPORT.UCD_VERSION)
     if (root / INVISIBLE_TABLE).read_text(encoding="utf-8") != expected_table:
         errors.append(f"{INVISIBLE_TABLE}: differs from the pinned governed invisible set")
+    expected_compiled = _TABLE_SUPPORT.render(contract)
+    compiled_path = root / _TABLE_SUPPORT.OUTPUT
+    if not compiled_path.is_file() or compiled_path.read_text(encoding="utf-8") != expected_compiled:
+        errors.append(f"{_TABLE_SUPPORT.OUTPUT}: differs from the reviewed PII context contract")
     if not errors:
         errors.extend(check_contract(contract, ranges))
     return errors

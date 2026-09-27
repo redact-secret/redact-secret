@@ -18,11 +18,18 @@ published in the generated
 [support matrix](https://github.com/redact-secret/redact-secret/blob/main/docs/support-matrix.md).
 
 ```text
-usage: redact-secret [--json] [--] [<path>...]
-       redact-secret --redact [--] [<path>]
+usage: redact-secret [--json] [--pii <selector>]... [--] [<path>...]
+       redact-secret --redact [--pii <selector>]... [--] [<path>]
+       redact-secret --print-pii-activation [--pii <selector>]...
        redact-secret --version | -V
        redact-secret --help | -h
 ```
+
+PII selectors are opt-in and repeatable. The activation-print form exits
+without opening input. `pii` closes over the context-required
+`pii:global:email` and `pii:global:network-address` families; either can be
+selected exactly. Both remain `pending` until exact-artifact benchmark evidence
+is reviewed.
 
 ## Check mode
 

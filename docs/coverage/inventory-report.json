@@ -568,7 +568,7 @@
     {
       "detector": "openai-token",
       "evidence": {
-        "fixtureCount": 89,
+        "fixtureCount": 90,
         "hostContextsExercised": [
           "dotenv",
           "http",
@@ -598,7 +598,6 @@
         "openai-positive-368-proj-unicode-crlf",
         "openai-positive-368-svcacct-plain",
         "openai-positive-368-svcacct-unicode-crlf",
-        "openai-positive-admin-marker",
         "openai-positive-legacy-marker",
         "openai-positive-marker-all-variants",
         "openai-positive-marker-doc-style-placeholder",
@@ -623,9 +622,44 @@
       "type": "openai_api_key"
     },
     {
+      "detector": "openai-token",
+      "evidence": {
+        "fixtureCount": 90,
+        "hostContextsExercised": [
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "markdown",
+          "plain-text",
+          "shell",
+          "toml",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "openai-positive-admin-marker",
+        "openai-positive-marker-all-variants"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "openai_admin_api_key"
+    },
+    {
       "detector": "anthropic-token",
       "evidence": {
-        "fixtureCount": 24,
+        "fixtureCount": 28,
         "hostContextsExercised": [
           "json",
           "log",
@@ -661,6 +695,66 @@
       "schemeRows": "not-applicable",
       "state": "supported",
       "type": "anthropic_api_key"
+    },
+    {
+      "detector": "anthropic-token",
+      "evidence": {
+        "fixtureCount": 28,
+        "hostContextsExercised": [
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "anthropic-positive-enterprise"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "anthropic_enterprise_api_key"
+    },
+    {
+      "detector": "anthropic-token",
+      "evidence": {
+        "fixtureCount": 28,
+        "hostContextsExercised": [
+          "json",
+          "log",
+          "plain-text",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "anthropic-positive-admin"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "anthropic_admin_api_key"
     },
     {
       "detector": "shopify-token",
@@ -3973,7 +4067,7 @@
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 89,
+    "supported": 92,
     "unresolved": 0
   }
 }

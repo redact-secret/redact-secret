@@ -17,8 +17,8 @@
 use std::cell::OnceCell;
 
 use redact_secret::{
-    DetectorRegistry, IncrementalLimits, IncrementalPolicy, IncrementalSanitizer,
-    PlaceholderFormatter, Profile, SecretScanError,
+    DetectorRegistry, IncrementalLimits, IncrementalPolicy, IncrementalSanitizer, PiiSelection,
+    PlaceholderFormatter, Profile, SecretScanError, SecretScanErrorCode,
 };
 
 use crate::error::WasmErrorCode;
@@ -44,14 +44,14 @@ pub(crate) const PROFILE: Profile = Profile::Common;
 /// failure (today, never observed: the built-in detectors always register
 /// cleanly) is fixed and input-free by construction.
 #[cfg(feature = "full")]
-fn build_registry() -> Result<DetectorRegistry, WasmErrorCode> {
-    DetectorRegistry::with_built_in([]).map_err(|_| WasmErrorCode::InitializationFailed)
+fn build_registry(selection: &PiiSelection) -> Result<DetectorRegistry, WasmErrorCode> {
+    DetectorRegistry::with_built_in_and_pii(selection).map_err(WasmErrorCode::from)
 }
 
 /// See the `full` variant above.
 #[cfg(not(feature = "full"))]
-fn build_registry() -> Result<DetectorRegistry, WasmErrorCode> {
-    DetectorRegistry::with_common_built_in([]).map_err(|_| WasmErrorCode::InitializationFailed)
+fn build_registry(selection: &PiiSelection) -> Result<DetectorRegistry, WasmErrorCode> {
+    DetectorRegistry::with_common_built_in_and_pii(selection).map_err(WasmErrorCode::from)
 }
 
 /// Builds a registry over this artifact's compiled profile's built-ins,
@@ -72,15 +72,20 @@ fn build_registry() -> Result<DetectorRegistry, WasmErrorCode> {
 #[cfg(feature = "full")]
 pub(crate) fn registry_with_ruleset(ruleset: &[u8]) -> Result<DetectorRegistry, WasmErrorCode> {
     let detectors = redact_secret::load_ruleset(ruleset)?;
-    DetectorRegistry::with_built_in(detectors).map_err(|_| WasmErrorCode::InitializationFailed)
+    let selection = active_selection()?;
+    Ok(DetectorRegistry::with_built_in_and_pii_custom(
+        &selection, detectors,
+    )?)
 }
 
 /// See the `full` variant above.
 #[cfg(not(feature = "full"))]
 pub(crate) fn registry_with_ruleset(ruleset: &[u8]) -> Result<DetectorRegistry, WasmErrorCode> {
     let detectors = redact_secret::load_ruleset(ruleset)?;
-    DetectorRegistry::with_common_built_in(detectors)
-        .map_err(|_| WasmErrorCode::InitializationFailed)
+    let selection = active_selection()?;
+    Ok(DetectorRegistry::with_common_built_in_and_pii_custom(
+        &selection, detectors,
+    )?)
 }
 
 /// Creates an incremental session over this artifact's profile's built-in
@@ -98,7 +103,13 @@ pub(crate) fn new_incremental_session(
     policy: Box<dyn IncrementalPolicy>,
     formatter: Box<dyn PlaceholderFormatter>,
 ) -> Result<IncrementalSanitizer, SecretScanError> {
-    IncrementalSanitizer::with_policy_and_formatter(limits, policy, formatter)
+    let selection = active_selection().map_err(|code| match code {
+        WasmErrorCode::Core(core) => SecretScanError::from(core),
+        _ => SecretScanErrorCode::InvalidState.into(),
+    })?;
+    IncrementalSanitizer::with_built_in_and_pii_policy_and_formatter(
+        limits, &selection, policy, formatter,
+    )
 }
 
 /// See the `full` variant above.
@@ -108,11 +119,18 @@ pub(crate) fn new_incremental_session(
     policy: Box<dyn IncrementalPolicy>,
     formatter: Box<dyn PlaceholderFormatter>,
 ) -> Result<IncrementalSanitizer, SecretScanError> {
-    IncrementalSanitizer::with_common_built_in_policy_and_formatter(limits, policy, formatter)
+    let selection = active_selection().map_err(|code| match code {
+        WasmErrorCode::Core(core) => SecretScanError::from(core),
+        _ => SecretScanErrorCode::InvalidState.into(),
+    })?;
+    IncrementalSanitizer::with_common_built_in_and_pii_policy_and_formatter(
+        limits, &selection, policy, formatter,
+    )
 }
 
 thread_local! {
     static REGISTRY: OnceCell<Result<DetectorRegistry, WasmErrorCode>> = const { OnceCell::new() };
+    static SELECTION: OnceCell<PiiSelection> = const { OnceCell::new() };
 }
 
 /// Idempotently initializes the module: the first call builds and caches the
@@ -124,11 +142,36 @@ thread_local! {
 /// Returns [`WasmErrorCode::InitializationFailed`] when the registry cannot
 /// be built. The failure is fixed and does not depend on any input, and it is
 /// reported identically on every subsequent call.
-pub(crate) fn initialize() -> Result<(), WasmErrorCode> {
-    REGISTRY.with(|cell| match cell.get_or_init(build_registry) {
-        Ok(_) => Ok(()),
-        Err(code) => Err(*code),
+pub(crate) fn initialize(selectors: &[String]) -> Result<(), WasmErrorCode> {
+    let borrowed: Vec<&str> = selectors.iter().map(String::as_str).collect();
+    let selection = PiiSelection::parse(&borrowed)?;
+    let identity = selection.activation_identity(PROFILE);
+    REGISTRY.with(|cell| {
+        if let Some(existing) = cell.get() {
+            return match existing {
+                Ok(registry) if registry.activation_identity() == identity => Ok(()),
+                Ok(_) => Err(SecretScanErrorCode::PiiActivationConflict.into()),
+                Err(code) => Err(*code),
+            };
+        }
+        let registry = build_registry(&selection);
+        let outcome = registry.as_ref().map(|_| ()).map_err(|code| *code);
+        let _ = cell.set(registry);
+        if outcome.is_ok() {
+            SELECTION.with(|slot| {
+                let _ = slot.set(selection);
+            });
+        }
+        outcome
     })
+}
+
+fn active_selection() -> Result<PiiSelection, WasmErrorCode> {
+    SELECTION.with(|cell| cell.get().cloned().ok_or(WasmErrorCode::NotInitialized))
+}
+
+pub(crate) fn pii_activation() -> Result<String, WasmErrorCode> {
+    with_registry(|registry| registry.activation_identity().to_owned())
 }
 
 /// Fails with [`WasmErrorCode::NotInitialized`] when [`initialize`] has not
@@ -182,9 +225,9 @@ mod tests {
 
     #[test]
     fn initialize_is_idempotent_and_gates_registry_access() {
-        assert_eq!(initialize(), Ok(()));
+        assert_eq!(initialize(&[]), Ok(()));
         let first = with_registry(DetectorRegistry::len).unwrap();
-        assert_eq!(initialize(), Ok(()));
+        assert_eq!(initialize(&[]), Ok(()));
         let second = with_registry(DetectorRegistry::len).unwrap();
         assert_eq!(first, second);
         assert!(first > 0);
@@ -192,8 +235,27 @@ mod tests {
     }
 
     #[test]
+    fn pii_activation_is_canonical_and_conflict_checked() {
+        assert_eq!(
+            initialize(&["pii".to_owned(), "pii:global".to_owned()]),
+            Ok(())
+        );
+        assert_eq!(
+            pii_activation().unwrap(),
+            format!(
+                "credentials={};selectors=pii:global;families=pii:global:email,pii:global:network-address;vocabulary=pii-context/v1",
+                PROFILE.as_str()
+            )
+        );
+        assert_eq!(
+            initialize(&[]).unwrap_err(),
+            WasmErrorCode::Core(redact_secret::SecretScanErrorCode::PiiActivationConflict)
+        );
+    }
+
+    #[test]
     fn the_cached_registry_is_the_compiled_profile() {
-        assert_eq!(initialize(), Ok(()));
+        assert_eq!(initialize(&[]), Ok(()));
         assert_eq!(
             with_registry(DetectorRegistry::profile).unwrap(),
             Some(PROFILE)

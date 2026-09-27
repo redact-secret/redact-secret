@@ -7851,6 +7851,32 @@
       "contractOnlyMatches": [],
       "corpus": "conformance/synchronous",
       "detector": "openai-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
+          "end": 179,
+          "start": 14
+        }
+      ],
+      "id": "openai-overlap-admin-marker-client-secret",
+      "kind": "overlap",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 179,
+          "start": 14
+        }
+      ],
+      "support": "supported",
+      "tier": "contextual"
+    },
+    {
+      "contexts": [
+        "plain-text"
+      ],
+      "contractOnlyMatches": [],
+      "corpus": "conformance/synchronous",
+      "detector": "openai-token",
       "disposition": "silent",
       "expectedRanges": [],
       "id": "openai-overlap-context",
@@ -10942,6 +10968,30 @@
       "disposition": "retained",
       "expectedRanges": [
         {
+          "end": 165,
+          "start": 0
+        }
+      ],
+      "id": "openai_admin_api_key",
+      "kind": "reconciliation-trigger",
+      "lostRanges": [],
+      "retainedRanges": [
+        {
+          "end": 165,
+          "start": 0
+        }
+      ],
+      "support": null,
+      "tier": null
+    },
+    {
+      "contexts": [],
+      "contractOnlyMatches": [],
+      "corpus": "docs/coverage/detector-inventory.json#reconciliationTrigger",
+      "detector": "openai-token",
+      "disposition": "retained",
+      "expectedRanges": [
+        {
           "end": 164,
           "start": 0
         }
@@ -11077,7 +11127,7 @@
     },
     "openai-token": {
       "broad-shape": 0,
-      "retained": 36,
+      "retained": 38,
       "review": 0,
       "silent": 62
     },

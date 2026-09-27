@@ -27,12 +27,12 @@ use redact_secret::{
     DefaultPolicy, DetectedFinding, Detector, DetectorContext, DetectorFailure, DetectorRegistry,
     Finding, FormatterFailure, IncrementalLimits, IncrementalPolicy, IncrementalPolicyContext,
     IncrementalResult, IncrementalSanitizer, MAX_IDENTIFIER_LENGTH, MAX_PLACEHOLDER_LENGTH,
-    Obfuscation, PlaceholderContext, PlaceholderFormatter, Policy, PolicyContext, PolicyFailure,
-    Profile, RANGE_UNIT, RegisteredDetector, RulesetError, RulesetErrorClass, ScanResult,
-    SecretScanError, SecretScanErrorCode, SessionState, Specificity, VERSION, WholeInputLimits,
-    default_placeholder_formatter, is_identifier, load_ruleset, redact, redact_with_limits,
-    run_detector_pipeline, scan, scan_and_redact, scan_and_redact_with_limits, scan_with_limits,
-    shannon_entropy, typed_placeholder_formatter,
+    Obfuscation, PiiSelection, PlaceholderContext, PlaceholderFormatter, Policy, PolicyContext,
+    PolicyFailure, Profile, RANGE_UNIT, RegisteredDetector, RulesetError, RulesetErrorClass,
+    ScanResult, SecretScanError, SecretScanErrorCode, SessionState, Specificity, VERSION,
+    WholeInputLimits, default_placeholder_formatter, is_identifier, load_ruleset, redact,
+    redact_with_limits, run_detector_pipeline, scan, scan_and_redact, scan_and_redact_with_limits,
+    scan_with_limits, shannon_entropy, typed_placeholder_formatter,
 };
 
 /// The canonical corpus fixture used wherever one detected value is enough.
@@ -714,6 +714,20 @@ fn common_profile_registers_its_declared_membership_in_canonical_order() {
     for id in COMMON_IDS {
         assert!(full.contains(id));
     }
+}
+
+#[test]
+fn pii_activation_is_public_with_the_network_address_family() {
+    let selection = PiiSelection::parse(&["pii"]).unwrap();
+    let registry = DetectorRegistry::with_built_in_and_pii(&selection).unwrap();
+    assert_eq!(
+        registry.ids().collect::<Vec<_>>().last(),
+        Some(&"pii-domain")
+    );
+    assert_eq!(
+        registry.activation_identity(),
+        "credentials=full;selectors=pii:global;families=pii:global:email,pii:global:network-address;vocabulary=pii-context/v1"
+    );
 }
 
 fn registry_full() -> DetectorRegistry {

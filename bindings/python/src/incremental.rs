@@ -537,8 +537,10 @@ impl PyIncrementalSanitizer {
             }),
         };
 
-        let session = IncrementalSanitizer::with_policy_and_formatter(
+        let selection = crate::active_pii_selection();
+        let session = IncrementalSanitizer::with_built_in_and_pii_policy_and_formatter(
             limits.inner,
+            &selection,
             core_policy,
             core_formatter,
         )

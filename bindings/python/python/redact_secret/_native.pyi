@@ -7,6 +7,7 @@ are re-exported there.
 from __future__ import annotations
 
 from types import TracebackType
+from collections.abc import Sequence
 from typing import Callable
 
 # ---------------------------------------------------------------------
@@ -82,6 +83,15 @@ class InvalidRulesetError(SecretScanError):
     """A `ruleset` argument to scan()/scan_and_redact() was rejected while
     loading. The message carries the fixed rejection class in parentheses."""
 
+    code: str
+
+class PiiSelectorInvalidError(SecretScanError):
+    code: str
+class PiiSelectorUnsupportedError(SecretScanError):
+    code: str
+class PiiSelectorUnavailableError(SecretScanError):
+    code: str
+class PiiActivationConflictError(SecretScanError):
     code: str
 
 # ---------------------------------------------------------------------
@@ -227,6 +237,8 @@ class IncrementalSanitizer:
 # ---------------------------------------------------------------------
 
 def version() -> str: ...
+def initialize(pii: Sequence[str] = ()) -> None: ...
+def pii_activation() -> str: ...
 def byte_offset_to_char_offset(text: str, byte_offset: int) -> int: ...
 def scan(
     text: str,

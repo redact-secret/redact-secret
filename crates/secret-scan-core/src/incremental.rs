@@ -72,6 +72,7 @@ use crate::error::{FormatterFailure, PolicyFailure, SecretScanError, SecretScanE
 #[cfg(test)]
 use crate::evidence::shadow::ShadowComparison;
 use crate::normalize::NormalizedInput;
+use crate::pii::PiiSelection;
 #[cfg(test)]
 use crate::pipeline::detect;
 #[cfg(not(test))]
@@ -452,7 +453,54 @@ impl IncrementalSanitizer {
         Ok(Self::from_registry(registry, limits, policy, formatter))
     }
 
-    fn from_registry(
+    /// Creates a `full` session that captures `selection` at construction.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`SecretScanErrorCode::InvalidDetector`] if registration fails.
+    pub fn with_built_in_and_pii(
+        limits: IncrementalLimits,
+        selection: &PiiSelection,
+    ) -> Result<Self, SecretScanError> {
+        Self::with_built_in_and_pii_policy_and_formatter(
+            limits,
+            selection,
+            Box::new(DefaultPolicy),
+            Box::new(default_placeholder_formatter),
+        )
+    }
+
+    /// Creates a `full` PII-aware session with explicit callbacks.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`SecretScanErrorCode::InvalidDetector`] if registration fails.
+    pub fn with_built_in_and_pii_policy_and_formatter(
+        limits: IncrementalLimits,
+        selection: &PiiSelection,
+        policy: Box<dyn IncrementalPolicy>,
+        formatter: Box<dyn PlaceholderFormatter>,
+    ) -> Result<Self, SecretScanError> {
+        let registry = DetectorRegistry::with_built_in_and_pii(selection)?;
+        Ok(Self::from_registry(registry, limits, policy, formatter))
+    }
+
+    /// Creates a `common` session that captures `selection` at construction.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`SecretScanErrorCode::InvalidDetector`] if registration fails.
+    pub fn with_common_built_in_and_pii_policy_and_formatter(
+        limits: IncrementalLimits,
+        selection: &PiiSelection,
+        policy: Box<dyn IncrementalPolicy>,
+        formatter: Box<dyn PlaceholderFormatter>,
+    ) -> Result<Self, SecretScanError> {
+        let registry = DetectorRegistry::with_common_built_in_and_pii(selection)?;
+        Ok(Self::from_registry(registry, limits, policy, formatter))
+    }
+
+    pub(crate) fn from_registry(
         registry: DetectorRegistry,
         limits: IncrementalLimits,
         policy: Box<dyn IncrementalPolicy>,
@@ -500,6 +548,12 @@ impl IncrementalSanitizer {
     #[must_use]
     pub const fn profile(&self) -> Option<Profile> {
         self.registry.profile()
+    }
+
+    /// Canonical activation captured when this session was constructed.
+    #[must_use]
+    pub fn activation_identity(&self) -> &str {
+        self.registry.activation_identity()
     }
 
     fn require_accepting(&self) -> Result<(), SecretScanError> {

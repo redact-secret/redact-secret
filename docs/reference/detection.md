@@ -15,6 +15,7 @@ Built-in Rust detection covers these kinds of structure:
 | Context | Credential assignments, such as an `api_key` or `password` setting, including AWS secret-access-key and session-token names |
 | Connections | Credential-bearing URLs for the supported database, queue, HTTP(S), and FTP(S) schemes |
 | One-time password provisioning | `otpauth://totp` and `otpauth://hotp` with base32 shared secrets |
+| Opt-in structured PII | Context-required email and canonical IPv4/IPv6 identities through `pii:global:email` and `pii:global:network-address`; PII defaults off and both share one `pii-domain` slot |
 
 Per-family support status is stated only in the generated
 [support matrix](../support-matrix.md). Each provider family's exact frozen
@@ -32,6 +33,20 @@ issues. Exact supported grammars and evidence are recorded in the
 [detection reliability assessment](detection-reliability.md) publishes its
 denominators, results, and limitations without turning them into a universal
 accuracy claim.
+
+### Opt-in email PII
+
+PII is off by default. The global or exact email selector registers one
+`pii-domain` adapter, not one top-level detector per family. Its email family
+recognizes the conservative dot-atom RFC 5322 / RFC 6531 subset frozen in the
+[email family contract](../contracts/pii/email-v1.md). Structure establishes
+identity only; high-signal email context establishes sensitivity, while a
+whole RFC-reserved/documentation domain or a named example/documentation
+context makes the occurrence non-sensitive. It does not implement quoted
+local parts, comments, folding, domain literals, ordinary single-label domains,
+or deliverability checks. Exact RFC 6761 single-label names are admitted only
+as non-sensitive controls. The family is `pending` until exact-artifact
+`pii-v1` benchmark evidence is reviewed.
 
 ### Policy-qualified generic credentials
 
@@ -63,7 +78,7 @@ for your host. An organization-specific format that is not listed here can be ad
 as a [declarative ruleset](../guides/rulesets.md).
 
 <!-- detector-inventory:start -->
-79 built-in detectors emit 89 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
+79 built-in detectors emit 92 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
 
 | Detector | Finding types | Default policy class | Schemes |
 | --- | --- | --- | --- |
@@ -73,8 +88,8 @@ as a [declarative ruleset](../guides/rulesets.md).
 | `aws-bedrock-short-term-api-key` | `aws_bedrock_short_term_api_key` | `always-redact` | — |
 | `github-token` | `github_token`, `github_oauth_token`, `github_app_user_to_server_token`, `github_app_installation_token`, `github_app_refresh_token`, `github_fine_grained_personal_access_token` | `always-redact` | — |
 | `gitlab-token` | `gitlab_token` | `always-redact` | — |
-| `openai-token` | `openai_api_key` | `always-redact` | — |
-| `anthropic-token` | `anthropic_api_key` | `always-redact` | — |
+| `openai-token` | `openai_api_key`, `openai_admin_api_key` | `always-redact` | — |
+| `anthropic-token` | `anthropic_api_key`, `anthropic_enterprise_api_key`, `anthropic_admin_api_key` | `always-redact` | — |
 | `shopify-token` | `shopify_access_token` | `always-redact` | — |
 | `vault-token` | `vault_token` | `always-redact` | — |
 | `stripe-token` | `stripe_webhook_signing_secret`, `stripe_credential` | `always-redact` | — |

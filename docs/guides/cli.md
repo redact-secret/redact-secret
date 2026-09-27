@@ -13,6 +13,20 @@ redact-secret --redact input.txt > sanitized.txt
 redact-secret -- --leading-dash.txt   # stop option parsing
 ```
 
+PII defaults off. Repeat `--pii <selector>` to request a canonical selector
+set, or use `--print-pii-activation` to print its activation identity and exit
+without opening standard input or any file. `--pii pii` closes over the
+available `pii:global:email` and `pii:global:network-address` families; use a
+`pii:family:global:*` selector for exact selection. Both require reviewed
+high-signal context and remain `pending` until exact-artifact benchmark
+evidence is reviewed. Invalid, unsupported, unavailable, and conflicting
+selections use fixed input-free diagnostics.
+
+```bash
+redact-secret --pii pii --print-pii-activation
+# credentials=full;selectors=pii:global;families=pii:global:email,pii:global:network-address;vocabulary=pii-context/v1
+```
+
 With no paths, the CLI reads standard input. With paths, check mode reads each
 file; redaction accepts exactly one. It does not recursively walk directories
 or modify files in place. Use different input and output paths: shell redirection

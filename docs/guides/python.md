@@ -75,3 +75,24 @@ build requirements are documented in [Python packaging](../python-packaging.md).
 To require a prebuilt wheel instead of a source build, use
 `python -m pip install --only-binary=:all: redact-secret`.
 See the [binding README](../../bindings/python/README.md) for development details.
+
+## PII activation
+
+Direct import and scanning remain credential-only. Call `initialize(pii=(...))`
+before constructing scans or incremental sessions to select PII explicitly,
+and use `pii_activation()` to record the canonical activation identity.
+`("pii",)` closes over `pii:global:email` and
+`pii:global:network-address`; either can be selected exactly with its
+`pii:family:global:*` selector. Both require reviewed high-signal context and
+remain `pending` until exact-artifact benchmark evidence is reviewed.
+Equivalent selection is idempotent; a different later selection raises the
+fixed, input-free `PiiActivationConflictError`.
+
+```python
+import redact_secret
+
+redact_secret.initialize(pii=("pii",))
+assert redact_secret.pii_activation() == (
+    "credentials=full;selectors=pii:global;families=pii:global:email,pii:global:network-address;vocabulary=pii-context/v1"
+)
+```

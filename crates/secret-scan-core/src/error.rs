@@ -72,11 +72,19 @@ pub enum SecretScanErrorCode {
     /// [`RulesetError::class`](crate::RulesetError::class), never by this
     /// code alone.
     InvalidRuleset,
+    /// A PII selector does not match the accepted lowercase grammar.
+    PiiSelectorInvalid,
+    /// A valid PII selector names no supported jurisdiction or family.
+    PiiSelectorUnsupported,
+    /// A known PII jurisdiction or family is absent from this artifact.
+    PiiSelectorUnavailable,
+    /// PII initialization conflicts with the already active selection.
+    PiiActivationConflict,
 }
 
 impl SecretScanErrorCode {
     /// Every code, in declaration order.
-    pub const ALL: [Self; 18] = [
+    pub const ALL: [Self; 22] = [
         Self::InvalidInput,
         Self::InvalidOptions,
         Self::InvalidDetector,
@@ -95,6 +103,10 @@ impl SecretScanErrorCode {
         Self::FindingLimitExceeded,
         Self::InvalidState,
         Self::InvalidRuleset,
+        Self::PiiSelectorInvalid,
+        Self::PiiSelectorUnsupported,
+        Self::PiiSelectorUnavailable,
+        Self::PiiActivationConflict,
     ];
 
     /// The stable `SCREAMING_SNAKE_CASE` code string.
@@ -119,6 +131,10 @@ impl SecretScanErrorCode {
             Self::FindingLimitExceeded => "FINDING_LIMIT_EXCEEDED",
             Self::InvalidState => "INVALID_STATE",
             Self::InvalidRuleset => "INVALID_RULESET",
+            Self::PiiSelectorInvalid => "PII_SELECTOR_INVALID",
+            Self::PiiSelectorUnsupported => "PII_SELECTOR_UNSUPPORTED",
+            Self::PiiSelectorUnavailable => "PII_SELECTOR_UNAVAILABLE",
+            Self::PiiActivationConflict => "PII_ACTIVATION_CONFLICT",
         }
     }
 
@@ -144,6 +160,10 @@ impl SecretScanErrorCode {
             Self::FindingLimitExceeded => "Secret scan finding limit exceeded.",
             Self::InvalidState => "The incremental sanitizer is no longer accepting input.",
             Self::InvalidRuleset => "The supplied ruleset is invalid.",
+            Self::PiiSelectorInvalid => "PII selector is invalid.",
+            Self::PiiSelectorUnsupported => "PII jurisdiction or family is unsupported.",
+            Self::PiiSelectorUnavailable => "PII selection is unavailable in this artifact.",
+            Self::PiiActivationConflict => "PII activation is already initialized differently.",
         }
     }
 }
@@ -286,7 +306,21 @@ mod tests {
                 "The incremental sanitizer is no longer accepting input.",
             ),
             ("INVALID_RULESET", "The supplied ruleset is invalid."),
+            ("PII_SELECTOR_INVALID", "PII selector is invalid."),
+            (
+                "PII_SELECTOR_UNSUPPORTED",
+                "PII jurisdiction or family is unsupported.",
+            ),
+            (
+                "PII_SELECTOR_UNAVAILABLE",
+                "PII selection is unavailable in this artifact.",
+            ),
+            (
+                "PII_ACTIVATION_CONFLICT",
+                "PII activation is already initialized differently.",
+            ),
         ];
+        assert_eq!(SecretScanErrorCode::ALL.len(), expected.len());
         for (code, (name, message)) in SecretScanErrorCode::ALL.into_iter().zip(expected) {
             assert_eq!(code.as_str(), name);
             assert_eq!(code.message(), message);

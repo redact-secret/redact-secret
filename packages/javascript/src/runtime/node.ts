@@ -48,6 +48,8 @@ interface NodeAddon {
   version(): string;
   profile(): string;
   initialize(): void;
+  initializePii?(pii: readonly string[]): void;
+  piiActivation?(): string;
   scan(
     input: string,
     policy?: NativePolicyCallback,
@@ -83,6 +85,8 @@ interface NodeAddon {
 interface CommonNodeAddon {
   version(): string;
   initializeCommon(): void;
+  initializeCommonPii?(pii: readonly string[]): void;
+  piiActivationCommon?(): string;
   scanCommon(
     input: string,
     policy?: NativePolicyCallback,
@@ -236,6 +240,8 @@ function loadAddon(): NodeAddon {
     "version",
     "profile",
     "initialize",
+    "initializePii",
+    "piiActivation",
     "scan",
     "redact",
     "scanAndRedact",
@@ -252,6 +258,8 @@ export function loadCommonAddon(): CommonNodeAddon {
   return requireExports<CommonNodeAddon>(requireAddon(), [
     "version",
     "initializeCommon",
+    "initializeCommonPii",
+    "piiActivationCommon",
     "scanCommon",
     "redact",
     "scanAndRedactCommon",
@@ -267,7 +275,8 @@ export function loadCommonAddon(): CommonNodeAddon {
  */
 interface ProfiledAddonMethods {
   profile(): string;
-  initialize(): void;
+  initialize(pii: readonly string[]): void;
+  piiActivation(): string;
   scan(
     input: string,
     policy?: NativePolicyCallback,
@@ -300,9 +309,10 @@ function buildBinding(
     version: () => addon.version(),
     profile: () => methods.profile(),
     artifact: () => "addon",
-    initialize: () => {
-      methods.initialize();
+    initialize: (pii = []) => {
+      methods.initialize(pii);
     },
+    piiActivation: () => methods.piiActivation(),
     scan: (input, policy, limits, ruleset) =>
       methods.scan(input, policy, limits, ruleset),
     redact: (input, findings, formatter, limits) =>
@@ -338,7 +348,11 @@ function buildBinding(
 export function createBindingFromAddon(addon: NodeAddon): NativeBinding {
   return buildBinding(addon, {
     profile: () => addon.profile(),
-    initialize: () => addon.initialize(),
+    initialize: (pii) => {
+      if (addon.initializePii !== undefined) addon.initializePii(pii);
+      else addon.initialize();
+    },
+    piiActivation: () => addon.piiActivation?.() ?? "credentials=full;selectors=off;families=;vocabulary=pii-context/v1",
     scan: (input, policy, limits, ruleset) =>
       addon.scan(input, policy, limits, ruleset),
     scanAndRedact: (input, policy, formatter, limits, ruleset) =>
@@ -362,7 +376,11 @@ export function createBindingFromCommonAddon(
 ): NativeBinding {
   return buildBinding(addon, {
     profile: () => addon.profileCommon(),
-    initialize: () => addon.initializeCommon(),
+    initialize: (pii) => {
+      if (addon.initializeCommonPii !== undefined) addon.initializeCommonPii(pii);
+      else addon.initializeCommon();
+    },
+    piiActivation: () => addon.piiActivationCommon?.() ?? "credentials=common;selectors=off;families=;vocabulary=pii-context/v1",
     scan: (input, policy, limits, ruleset) =>
       addon.scanCommon(input, policy, limits, ruleset),
     scanAndRedact: (input, policy, formatter, limits, ruleset) =>
