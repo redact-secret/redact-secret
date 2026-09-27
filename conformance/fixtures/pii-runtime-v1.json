@@ -4,17 +4,18 @@
   "profile": "full",
   "activationCases": [
     {"id": "absent-is-off", "selectors": [], "expected": "credentials=full;selectors=off;families=;vocabulary=pii-context/v1"},
-    {"id": "alias-deduplicates-and-sorts", "selectors": ["pii:global", "pii", "pii:global"], "expected": "credentials=full;selectors=pii:global;families=pii:global:email,pii:global:iban,pii:global:network-address,pii:global:payment-card;vocabulary=pii-context/v1"},
+    {"id": "alias-deduplicates-and-sorts", "selectors": ["pii:global", "pii", "pii:global"], "expected": "credentials=full;selectors=pii:global;families=pii:global:email,pii:global:iban,pii:global:network-address,pii:global:payment-card,pii:global:phone;vocabulary=pii-context/v1"},
     {"id": "exact-email-family", "selectors": ["pii:family:global:email"], "expected": "credentials=full;selectors=pii:family:global:email;families=pii:global:email;vocabulary=pii-context/v1"},
     {"id": "exact-iban-family", "selectors": ["pii:family:global:iban"], "expected": "credentials=full;selectors=pii:family:global:iban;families=pii:global:iban;vocabulary=pii-context/v1"},
     {"id": "exact-network-address-family", "selectors": ["pii:family:global:network-address"], "expected": "credentials=full;selectors=pii:family:global:network-address;families=pii:global:network-address;vocabulary=pii-context/v1"},
     {"id": "exact-payment-card-family", "selectors": ["pii:family:global:payment-card"], "expected": "credentials=full;selectors=pii:family:global:payment-card;families=pii:global:payment-card;vocabulary=pii-context/v1"},
+    {"id": "exact-phone-family", "selectors": ["pii:family:global:phone"], "expected": "credentials=full;selectors=pii:family:global:phone;families=pii:global:phone;vocabulary=pii-context/v1"},
     {"id": "exact-us-ssn-family", "selectors": ["pii:family:us:ssn"], "expected": "credentials=full;selectors=pii:family:us:ssn;families=pii:us:ssn;vocabulary=pii-context/v1"},
-    {"id": "us-jurisdiction-closes-over-global", "selectors": ["pii:us"], "expected": "credentials=full;selectors=pii:us;families=pii:global:email,pii:global:iban,pii:global:network-address,pii:global:payment-card,pii:us:ssn;vocabulary=pii-context/v1"}
+    {"id": "us-jurisdiction-closes-over-global", "selectors": ["pii:us"], "expected": "credentials=full;selectors=pii:us;families=pii:global:email,pii:global:iban,pii:global:network-address,pii:global:payment-card,pii:global:phone,pii:us:ssn;vocabulary=pii-context/v1"}
   ],
   "errorCases": [
     {"id": "invalid-uppercase", "selectors": ["PII"], "code": "PII_SELECTOR_INVALID", "message": "PII selector is invalid."},
     {"id": "unsupported-jurisdiction", "selectors": ["pii:kr"], "code": "PII_SELECTOR_UNSUPPORTED", "message": "PII jurisdiction or family is unsupported."},
-    {"id": "known-unavailable-family", "selectors": ["pii:family:global:phone"], "code": "PII_SELECTOR_UNAVAILABLE", "message": "PII selection is unavailable in this artifact."}
+    {"id": "known-unavailable-family", "selectors": ["pii:family:global:ambiguous-national-id"], "code": "PII_SELECTOR_UNAVAILABLE", "message": "PII selection is unavailable in this artifact."}
   ]
 }

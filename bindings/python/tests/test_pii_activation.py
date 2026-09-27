@@ -36,6 +36,7 @@ def test_pii_runtime_fixture() -> None:
     for family_fixture in (
         "pii-email-v1.json",
         "pii-iban-v1.json",
+        "pii-phone-v1.json",
         "pii-us-ssn-v1.json",
     ):
         family = load_corpus(family_fixture)
@@ -134,7 +135,8 @@ print(json.dumps({
         (
             "pii:global",
             "credentials=full;selectors=pii:global;families=pii:global:email,"
-            "pii:global:iban,pii:global:network-address,pii:global:payment-card;"
+            "pii:global:iban,pii:global:network-address,pii:global:payment-card,"
+            "pii:global:phone;"
             "vocabulary=pii-context/v1",
         ),
     ]
@@ -200,6 +202,77 @@ print(json.dumps({
     )
     assert actual["wholeTypes"] == []
     assert all(row == {"textEqual": True, "types": []} for row in actual["partitions"])
+
+
+def test_phone_exact_global_and_off_in_fresh_processes_with_every_partition() -> None:
+    child = """
+import json
+import sys
+import redact_secret
+
+selector = sys.argv[1]
+value = "phone_number=555-234-5678"
+redact_secret.initialize(pii=[] if selector == "off" else [selector])
+whole = redact_secret.scan_and_redact(value)
+partitions = []
+for split in range(len(value) + 1):
+    session = redact_secret.IncrementalSanitizer(redact_secret.IncrementalLimits(
+        max_input_bytes=1_000_000,
+        max_buffered_bytes=16_512,
+        max_token_bytes=8_192,
+        max_multiline_bytes=16_384,
+    ))
+    text = ""
+    findings = []
+    for chunk in (value[:split], value[split:]):
+        result = session.append(chunk)
+        text += result.text
+        findings.extend(result.findings)
+    result = session.finalize()
+    text += result.text
+    findings.extend(result.findings)
+    partitions.append({
+        "textEqual": text == whole.text,
+        "types": [finding.type for finding in findings],
+    })
+print(json.dumps({
+    "activation": redact_secret.pii_activation(),
+    "types": [finding.type for finding in whole.findings],
+    "actions": [finding.action for finding in whole.findings],
+    "partitions": partitions,
+}))
+"""
+    cases = [
+        (
+            "pii:family:global:phone",
+            "credentials=full;selectors=pii:family:global:phone;families="
+            "pii:global:phone;vocabulary=pii-context/v1",
+            ["pii_global_phone"],
+        ),
+        (
+            "pii:global",
+            "credentials=full;selectors=pii:global;families=pii:global:email,"
+            "pii:global:iban,pii:global:network-address,pii:global:payment-card,"
+            "pii:global:phone;vocabulary=pii-context/v1",
+            ["pii_global_phone"],
+        ),
+        ("off", "credentials=full;selectors=off;families=;vocabulary=pii-context/v1", []),
+    ]
+    for selector, activation, types in cases:
+        completed = subprocess.run(
+            [sys.executable, "-c", child, selector],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        actual = json.loads(completed.stdout)
+        assert actual["activation"] == activation
+        assert actual["types"] == types
+        assert actual["actions"] == (["redact"] if types else [])
+        assert all(
+            row == {"textEqual": True, "types": types}
+            for row in actual["partitions"]
+        )
 
 
 def test_different_selection_conflicts_without_echoing_input() -> None:

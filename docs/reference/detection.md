@@ -15,7 +15,7 @@ Built-in Rust detection covers these kinds of structure:
 | Context | Credential assignments, such as an `api_key` or `password` setting, including AWS secret-access-key and session-token names |
 | Connections | Credential-bearing URLs for the supported database, queue, HTTP(S), and FTP(S) schemes |
 | One-time password provisioning | `otpauth://totp` and `otpauth://hotp` with base32 shared secrets |
-| Opt-in structured PII | Context-required email, IBAN, canonical IPv4/IPv6, payment-card, and US SSN identities. Global families use `pii:global:*`; SSN uses `pii:us:ssn`. PII defaults off and all families share one `pii-domain` slot |
+| Opt-in structured PII | Context-required email, IBAN, canonical IPv4/IPv6, payment-card, phone, and US SSN identities. Global families use `pii:global:*`; SSN uses `pii:us:ssn`. PII defaults off and all families share one `pii-domain` slot |
 
 Per-family support status is stated only in the generated
 [support matrix](../support-matrix.md). Each provider family's exact frozen
@@ -59,6 +59,20 @@ Visa Acceptance test-service numbers are whole-value non-sensitive controls.
 The [payment-card family contract](../contracts/pii/payment-card-v1.md) freezes
 the full ranges, context, exact spans, exclusions, and accepted false-positive
 and false-negative costs. The family is `pending` until exact-artifact `pii-v1`
+benchmark evidence is reviewed.
+
+### Opt-in phone PII
+
+The global or exact phone selector recognizes only the frozen `+1` / NANP
+subset, exact display layouts, and narrow 1–6 digit extension syntax in the
+[phone family contract](../contracts/pii/phone-v1.md). Structure establishes
+identity, while a reviewed English or Korean phone field (or associated shared
+`contact details` phrase) is required for sensitivity. Bare values and
+ambiguous `contact` / `연락처` labels do not produce findings. Exact
+whole-candidate `555-0100` through `555-0199` exchange/line controls are
+non-sensitive. Other country codes, including `+82`, URI/vanity forms, broad
+separator variants, allocation and activity checks, and locale guessing are
+unsupported. The family remains `pending` until exact-artifact `pii-v1`
 benchmark evidence is reviewed.
 
 ### Opt-in US SSN PII

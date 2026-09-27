@@ -185,11 +185,12 @@ which exports, expectations, and fixture each pass uses.
 `wasm32-unknown-unknown` cdylib and generates the `web`-target glue with a
 `wasm-bindgen` CLI whose version must match the crate's exactly. The qualifier
 serves that directory over HTTP — with `application/wasm` on the binary, which
-streaming instantiation requires — and loads seven fresh pages in each engine
+streaming instantiation requires — and loads nine fresh pages in each engine
 against that one artifact. Two default pages qualify the raw artifact and
 published package; two activate the exact payment-card selector and its global
-closure; two activate the exact US SSN selector and its `pii:us` jurisdiction
-closure; one proves the SSN input stays clean with PII off. Every activation
+closure; two activate the exact phone selector and its global closure; two
+activate the exact US SSN selector and its `pii:us` jurisdiction closure; one
+proves the SSN input stays clean with PII off. Every activation
 runs in an isolated module instance.
 
 The first, `scripts/browser-harness.mjs`, drives the artifact through its own
@@ -337,9 +338,12 @@ loader resolves, deliberately without linking any addon, then drives the
 published package's public API — `initialize()`, `artifact()`, a
 synchronous scan, an incremental session, and the Node `Transform` stream
 adapter — and asserts every one of them matches the same artifact's
-whole-input result. The artifact-qualification workflow's
-`package-consumer-wasm-runtimes` job runs it on every full qualification
-run, for both detector profiles, against the `browser` job's own builds;
+whole-input result. For the full profile it also loads the phone corpus in
+fresh forced-fallback processes and checks exact, global, and PII-off
+activation at every valid UTF-16 partition. The artifact-qualification
+workflow's `package-consumer-wasm-runtimes` job runs it on every full
+qualification run, for both detector profiles, against the `browser` job's
+own builds;
 it downloads no addon, so Node has to take the fallback. It runs on one
 Linux host rather than across the native fan-out, since no host in that
 matrix is missing an addon by design. Run it locally after

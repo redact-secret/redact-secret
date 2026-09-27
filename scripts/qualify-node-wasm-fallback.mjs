@@ -40,6 +40,7 @@
 
 import { cp, mkdir, readFile, rm } from "node:fs/promises";
 import { existsSync, mkdirSync, rmSync, symlinkSync } from "node:fs";
+import { spawnSync } from "node:child_process";
 import { Readable } from "node:stream";
 import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -79,7 +80,7 @@ function assertEqual(actual, expected, message) {
 }
 
 function parseArguments(argv) {
-  const options = { wasmDir: undefined, detectorProfile: "full" };
+  const options = { wasmDir: undefined, detectorProfile: "full", phoneSelector: undefined };
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index];
     if (argument === "--wasm-dir") {
@@ -88,6 +89,9 @@ function parseArguments(argv) {
     } else if (argument === "--detector-profile") {
       index += 1;
       options.detectorProfile = argv[index];
+    } else if (argument === "--phone-selector") {
+      index += 1;
+      options.phoneSelector = argv[index];
     } else {
       throw new Error(`unknown argument: ${argument}`);
     }
@@ -100,7 +104,84 @@ function parseArguments(argv) {
   if (options.detectorProfile !== "full" && options.detectorProfile !== "common") {
     throw new Error("--detector-profile must be full or common");
   }
+  if (
+    options.phoneSelector !== undefined
+    && !["exact", "global", "off"].includes(options.phoneSelector)
+  ) {
+    throw new Error("--phone-selector must be exact, global, or off");
+  }
   return options;
+}
+
+function utf16OffsetFromUtf8(input, byteOffset) {
+  return Buffer.from(input, "utf8").subarray(0, byteOffset).toString("utf8").length;
+}
+
+function observable(finding) {
+  return {
+    detector: finding.detector,
+    type: finding.type,
+    confidence: finding.confidence,
+    action: finding.action,
+    start: finding.start,
+    end: finding.end,
+  };
+}
+
+async function qualifyPhone(api, selectorKind) {
+  const fixture = JSON.parse(
+    await readFile(join(REPO_ROOT_PATH, "conformance", "fixtures", "pii-phone-v1.json"), "utf8"),
+  );
+  const selectors = selectorKind === "exact"
+    ? [fixture.selector]
+    : selectorKind === "global"
+      ? ["pii:global"]
+      : [];
+  await api.initialize({ pii: selectors });
+  assertEqual(api.artifact(), "wasm", `${selectorKind} phone artifact`);
+  const globals = "pii:global:email,pii:global:iban,pii:global:network-address,pii:global:payment-card,pii:global:phone";
+  const activation = selectorKind === "exact"
+    ? "credentials=full;selectors=pii:family:global:phone;families=pii:global:phone;vocabulary=pii-context/v1"
+    : selectorKind === "global"
+      ? `credentials=full;selectors=pii:global;families=${globals};vocabulary=pii-context/v1`
+      : "credentials=full;selectors=off;families=;vocabulary=pii-context/v1";
+  assertEqual(api.piiActivation(), activation, `${selectorKind} phone activation`);
+
+  for (const testCase of fixture.cases) {
+    const expected = selectorKind === "off"
+      ? []
+      : testCase.expected.map((finding) => ({
+          ...finding,
+          start: utf16OffsetFromUtf8(testCase.input, finding.start),
+          end: utf16OffsetFromUtf8(testCase.input, finding.end),
+        }));
+    const whole = api.scanAndRedact(testCase.input);
+    assertEqual(
+      JSON.stringify(whole.findings.map(observable)),
+      JSON.stringify(expected),
+      `${selectorKind} phone ${testCase.id} whole findings`,
+    );
+    for (let split = 0; split <= testCase.input.length; split += 1) {
+      const unit = testCase.input.charCodeAt(split);
+      if (unit >= 0xdc00 && unit <= 0xdfff) continue;
+      const session = api.createIncrementalSanitizer({ limits: GENEROUS_LIMITS });
+      const results = [
+        session.append(testCase.input.slice(0, split)),
+        session.append(testCase.input.slice(split)),
+        session.finalize(),
+      ];
+      assertEqual(
+        results.map((result) => result.text).join(""),
+        whole.text,
+        `${selectorKind} phone ${testCase.id} partition ${split} text`,
+      );
+      assertEqual(
+        JSON.stringify(results.flatMap((result) => result.findings).map(observable)),
+        JSON.stringify(expected),
+        `${selectorKind} phone ${testCase.id} partition ${split} findings`,
+      );
+    }
+  }
 }
 
 /**
@@ -135,7 +216,7 @@ async function linkWasmFallback(wasmDir) {
 }
 
 async function main() {
-  const { wasmDir, detectorProfile } = parseArguments(process.argv.slice(2));
+  const { wasmDir, detectorProfile, phoneSelector } = parseArguments(process.argv.slice(2));
   const packageEntry = join(
     JS_PACKAGE_DIR,
     "dist",
@@ -160,6 +241,12 @@ async function main() {
   try {
     const api = await import(pathToFileURL(packageEntry).href);
     const { NodeStreamSanitizer } = await import(pathToFileURL(streamEntry).href);
+
+    if (phoneSelector !== undefined) {
+      await qualifyPhone(api, phoneSelector);
+      console.log(`qualified Node WebAssembly fallback phone matrix: ${phoneSelector}`);
+      return;
+    }
 
     await api.initialize();
     assertEqual(api.artifact(), "wasm", "the fallback's reported artifact");
@@ -225,6 +312,17 @@ async function main() {
     );
   } finally {
     await rm(link, { recursive: true, force: true });
+  }
+
+  if (detectorProfile === "full") {
+    for (const selector of ["exact", "global", "off"]) {
+      const child = spawnSync(
+        process.execPath,
+        [process.argv[1], "--wasm-dir", wasmDir, "--phone-selector", selector],
+        { stdio: "inherit" },
+      );
+      assertEqual(child.status, 0, `phone ${selector} fallback child exit`);
+    }
   }
 }
 

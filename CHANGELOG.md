@@ -13,6 +13,13 @@ evidence is linked from each published version.
   reviewed English/Korean field context, and deterministic no-provenance safe
   fixtures. The family remains `pending`; no benchmark or `pii-v1` promotion
   is claimed until the exact merged artifact is qualified by counterpart #392.
+- Opt-in constrained-context phone PII detection (#880) through the shared
+  `pii-domain` adapter, limited to a frozen `+1` / NANP display and extension
+  subset, with required English/Korean high-signal context, exact whole
+  `555-01xx` controls, bounded scanning, and safe cross-surface/incremental
+  conformance. Other country codes, allocation/activity inference, broad
+  separators, URI/vanity forms, and locale guessing are not supported; the
+  family remains `pending` until exact-artifact benchmark qualification.
 - Opt-in global IBAN PII detection (#878) through the shared `pii-domain`
   adapter, with a SWIFT Registry Release 103 country-length table, bounded
   compact/print normalization, `iban-mod97` v1 provenance, required

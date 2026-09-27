@@ -874,6 +874,7 @@ fn pii_family_fixtures_match_cli_utf8_metadata_for_exact_selection() {
     for corpus in [
         include_str!("../../../conformance/fixtures/pii-email-v1.json"),
         include_str!("../../../conformance/fixtures/pii-iban-v1.json"),
+        include_str!("../../../conformance/fixtures/pii-phone-v1.json"),
         include_str!("../../../conformance/fixtures/pii-us-ssn-v1.json"),
     ] {
         let fixture: serde_json::Value = serde_json::from_str(corpus).unwrap();
@@ -922,6 +923,82 @@ fn pii_family_fixtures_match_cli_utf8_metadata_for_exact_selection() {
                 result.leaks_nothing();
             }
         }
+    }
+}
+
+#[test]
+fn phone_family_fixture_matches_cli_for_global_streamed_and_file_paths() {
+    let fixture: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../conformance/fixtures/pii-phone-v1.json"
+    ))
+    .unwrap();
+    let scratch = Scratch::new();
+    for case in fixture["cases"].as_array().unwrap() {
+        let input = case["input"].as_str().unwrap();
+        let expected = case["expected"].as_array().unwrap();
+        let path = scratch.write(case["id"].as_str().unwrap(), input);
+        for result in [
+            run_args(&["--json", "--pii", "pii:global"], input.as_bytes()),
+            run(
+                &[
+                    Path::new("--json"),
+                    Path::new("--pii"),
+                    Path::new("pii:global"),
+                    &path,
+                ],
+                b"",
+            ),
+        ] {
+            assert_eq!(
+                result.code,
+                i32::from(!expected.is_empty()),
+                "{}",
+                case["id"]
+            );
+            let report: serde_json::Value = serde_json::from_str(&result.stdout).unwrap();
+            let actual: Vec<serde_json::Value> = report["sources"][0]["findings"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|finding| {
+                    serde_json::json!({
+                        "detector": finding["detector"],
+                        "type": finding["type"],
+                        "confidence": finding["confidence"],
+                        "action": finding["action"],
+                        "start": finding["start"],
+                        "end": finding["end"],
+                    })
+                })
+                .collect();
+            assert_eq!(&actual, expected, "{}", case["id"]);
+            result.leaks_nothing();
+        }
+    }
+}
+
+#[test]
+fn pii_off_keeps_phone_clean_on_streamed_and_whole_file_paths() {
+    let fixture: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../conformance/fixtures/pii-phone-v1.json"
+    ))
+    .unwrap();
+    let input = fixture["cases"][0]["input"].as_str().unwrap();
+    let scratch = Scratch::new();
+    let path = scratch.write("pii-off-phone.txt", input);
+    for result in [
+        run_args(&["--json"], input.as_bytes()),
+        run(&[Path::new("--json"), &path], b""),
+    ] {
+        assert_eq!(result.code, 0);
+        let report: serde_json::Value = serde_json::from_str(&result.stdout).unwrap();
+        assert!(
+            report["sources"][0]["findings"]
+                .as_array()
+                .unwrap()
+                .is_empty()
+        );
+        result.leaks_nothing();
     }
 }
 

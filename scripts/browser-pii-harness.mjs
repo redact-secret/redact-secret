@@ -18,7 +18,7 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
-export async function qualify(fixtures, selector) {
+export async function qualify(fixtures, selector, fixtureKey) {
   const checks = [];
   let failures = 0;
   const check = (name, run) => {
@@ -38,12 +38,11 @@ export async function qualify(fixtures, selector) {
   await init();
   initialize(selector === null ? [] : [selector]);
 
-  const usSsn =
-    selector === null || selector === "pii:family:us:ssn" || selector === "pii:us";
-  const positive = usSsn ? fixtures.usSsnPositive : fixtures.paymentCardPositive;
+  const fixture = fixtures[fixtureKey];
+  const positive = fixture.positive;
 
   check("PII selector has the canonical activation identity", () => {
-    const globals = "pii:global:email,pii:global:iban,pii:global:network-address,pii:global:payment-card";
+    const globals = "pii:global:email,pii:global:iban,pii:global:network-address,pii:global:payment-card,pii:global:phone";
     const expected = selector === null
       ? `credentials=${fixtures.profile};selectors=off;families=;vocabulary=pii-context/v1`
       : selector === "pii:global"
@@ -52,7 +51,7 @@ export async function qualify(fixtures, selector) {
         ? `credentials=${fixtures.profile};selectors=pii:us;families=${globals},pii:us:ssn;vocabulary=pii-context/v1`
         : selector === "pii:family:us:ssn"
           ? `credentials=${fixtures.profile};selectors=pii:family:us:ssn;families=pii:us:ssn;vocabulary=pii-context/v1`
-          : `credentials=${fixtures.profile};selectors=pii:family:global:payment-card;families=pii:global:payment-card;vocabulary=pii-context/v1`;
+          : `credentials=${fixtures.profile};selectors=${selector};families=${fixture.family};vocabulary=pii-context/v1`;
     assert(piiActivation() === expected, "activation identity disagreed");
   });
 

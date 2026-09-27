@@ -104,8 +104,9 @@ const CONTENT_TYPES = {
 
 /**
  * Each page drives a fresh module instance through the one-time initialization
- * gate: the artifact and package defaults, then payment-card global/exact and
- * US SSN jurisdiction/exact activation through the artifact's own exports.
+ * gate: the artifact and package defaults, then payment-card and phone
+ * global/exact plus US SSN jurisdiction/exact activation through the
+ * artifact's own exports.
  */
 const PAGES = [
   { name: "artifact", file: "artifact.html", module: "./browser-harness.mjs" },
@@ -115,34 +116,53 @@ const PAGES = [
     file: "payment-card-exact.html",
     module: "./browser-pii-harness.mjs",
     selector: "pii:family:global:payment-card",
+    fixtureKey: "paymentCard",
   },
   {
     name: "payment-card-global",
     file: "payment-card-global.html",
     module: "./browser-pii-harness.mjs",
     selector: "pii:global",
+    fixtureKey: "paymentCard",
+  },
+  {
+    name: "phone-exact",
+    file: "phone-exact.html",
+    module: "./browser-pii-harness.mjs",
+    selector: "pii:family:global:phone",
+    fixtureKey: "phone",
+  },
+  {
+    name: "phone-global",
+    file: "phone-global.html",
+    module: "./browser-pii-harness.mjs",
+    selector: "pii:global",
+    fixtureKey: "phone",
   },
   {
     name: "us-ssn-exact",
     file: "us-ssn-exact.html",
     module: "./browser-pii-harness.mjs",
     selector: "pii:family:us:ssn",
+    fixtureKey: "usSsn",
   },
   {
     name: "us-ssn-jurisdiction",
     file: "us-ssn-jurisdiction.html",
     module: "./browser-pii-harness.mjs",
     selector: "pii:us",
+    fixtureKey: "usSsn",
   },
   {
     name: "us-ssn-pii-off",
     file: "us-ssn-pii-off.html",
     module: "./browser-pii-harness.mjs",
     selector: null,
+    fixtureKey: "usSsn",
   },
 ];
 
-function renderPage(module, selector) {
+function renderPage(module, selector, fixtureKey) {
   return `<!doctype html>
 <meta charset="utf-8">
 <title>redact-secret browser qualification</title>
@@ -150,7 +170,7 @@ function renderPage(module, selector) {
   import { qualify } from "${module}";
   const fixtures = await (await fetch("./fixtures.json")).json();
   try {
-    globalThis.__qualification = await qualify(fixtures, ${JSON.stringify(selector)});
+    globalThis.__qualification = await qualify(fixtures, ${JSON.stringify(selector)}, ${JSON.stringify(fixtureKey)});
   } catch (error) {
     globalThis.__qualification = {
       ok: false,
@@ -250,6 +270,13 @@ function buildFixtures(detectorProfile) {
   if (paymentCardPositive === undefined) {
     fail("pii-payment-card-v1.json: representative positive is missing");
   }
+  const phone = loadCorpus("pii-phone-v1.json");
+  const phonePositive = phone.cases.find(
+    ({ id }) => id === "phone-sensitive-national-hyphen-exact-selector",
+  );
+  if (phonePositive === undefined) {
+    fail("pii-phone-v1.json: representative positive is missing");
+  }
   const usSsn = loadCorpus("pii-us-ssn-v1.json");
   const usSsnPositive = usSsn.cases.find(
     ({ id }) => id === "us-ssn-sensitive-compact-exact-selector",
@@ -265,8 +292,18 @@ function buildFixtures(detectorProfile) {
     profile: detectorProfile,
     detectors,
     synchronous: fixtures,
-    paymentCardPositive,
-    usSsnPositive,
+    paymentCard: {
+      family: paymentCard.family,
+      positive: paymentCardPositive,
+    },
+    phone: {
+      family: phone.family,
+      positive: phonePositive,
+    },
+    usSsn: {
+      family: usSsn.family,
+      positive: usSsnPositive,
+    },
   };
 }
 
@@ -363,8 +400,8 @@ async function stageServeDirectory(artifactDir, detectorProfile, pages) {
     join(directory, "package-harness.js"),
     detectorProfile,
   );
-  for (const { file, module, selector } of pages) {
-    writeFileSync(join(directory, file), renderPage(module, selector));
+  for (const { file, module, selector, fixtureKey } of pages) {
+    writeFileSync(join(directory, file), renderPage(module, selector, fixtureKey));
   }
   writeFileSync(
     join(directory, "fixtures.json"),
