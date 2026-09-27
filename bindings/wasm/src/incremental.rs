@@ -666,10 +666,17 @@ mod tests {
             .unwrap()
     }
 
+    fn wasm_session(
+        policy: Option<Function>,
+        formatter: Option<Function>,
+    ) -> IncrementalSanitizerJs {
+        crate::initialize(Vec::new()).unwrap();
+        create_incremental_sanitizer(1 << 20, 16_512, 8_192, 16_384, policy, formatter).unwrap()
+    }
+
     #[wasm_bindgen_test::wasm_bindgen_test]
     fn a_session_split_across_chunks_matches_the_whole_input_result_through_wasm_bindgen() {
-        let mut session =
-            create_incremental_sanitizer(1 << 20, 16_512, 8_192, 16_384, None, None).unwrap();
+        let mut session = wasm_session(None, None);
         assert_eq!(session.state(), "accepting");
 
         let mut output = String::new();
@@ -696,8 +703,7 @@ mod tests {
             if !input.is_char_boundary(split) {
                 continue;
             }
-            let mut session =
-                create_incremental_sanitizer(1 << 20, 16_512, 8_192, 16_384, None, None).unwrap();
+            let mut session = wasm_session(None, None);
             let mut output = String::new();
             output.push_str(&session.append(&input[..split]).unwrap().text());
             output.push_str(&session.append(&input[split..]).unwrap().text());
@@ -721,8 +727,7 @@ mod tests {
         let value = secret.matched;
         let (chunk_a, chunk_b) = whole.split_at(finding_start + 4);
 
-        let mut session =
-            create_incremental_sanitizer(1 << 20, 16_512, 8_192, 16_384, None, None).unwrap();
+        let mut session = wasm_session(None, None);
         session.append(chunk_a).unwrap();
         let result = session.append(chunk_b).unwrap();
         let finalized = session.finalize().unwrap();
@@ -753,9 +758,7 @@ mod tests {
              if (context.findingIndex !== 0) { throw new Error('bad index'); }
              return 'block';",
         );
-        let mut session =
-            create_incremental_sanitizer(1 << 20, 16_512, 8_192, 16_384, Some(policy), None)
-                .unwrap();
+        let mut session = wasm_session(Some(policy), None);
         let mut findings = Vec::new();
         findings.extend(
             session
@@ -773,9 +776,7 @@ mod tests {
     #[wasm_bindgen_test::wasm_bindgen_test]
     fn a_throwing_policy_callback_fails_the_session_and_discards_retained_plaintext() {
         let policy = Function::new_no_args("throw new Error('boom');");
-        let mut session =
-            create_incremental_sanitizer(1 << 20, 16_512, 8_192, 16_384, Some(policy), None)
-                .unwrap();
+        let mut session = wasm_session(Some(policy), None);
 
         let error = session.append(&format!("api_key={MARKER}\n")).unwrap_err();
         assert_eq!(js_error_code(&error), "POLICY_FAILURE");
@@ -793,9 +794,7 @@ mod tests {
             "if (Object.prototype.hasOwnProperty.call(finding, 'input')) { throw new Error('leak'); }
              return '[' + finding.action + ':' + context.placeholderIndex + ']';",
         );
-        let mut session =
-            create_incremental_sanitizer(1 << 20, 16_512, 8_192, 16_384, None, Some(formatter))
-                .unwrap();
+        let mut session = wasm_session(None, Some(formatter));
         let mut output = String::new();
         output.push_str(
             &session
@@ -811,8 +810,7 @@ mod tests {
     /// fixed code rather than silently accepted or panicking.
     #[wasm_bindgen_test::wasm_bindgen_test]
     fn append_after_finalize_is_rejected() {
-        let mut session =
-            create_incremental_sanitizer(1 << 20, 16_512, 8_192, 16_384, None, None).unwrap();
+        let mut session = wasm_session(None, None);
         session.finalize().unwrap();
         let error = session.append("ignored").unwrap_err();
         assert_eq!(js_error_code(&error), "INVALID_STATE");
@@ -822,8 +820,7 @@ mod tests {
     /// that rejects every further operation.
     #[wasm_bindgen_test::wasm_bindgen_test]
     fn abort_releases_retained_plaintext_and_rejects_further_calls() {
-        let mut session =
-            create_incremental_sanitizer(1 << 20, 16_512, 8_192, 16_384, None, None).unwrap();
+        let mut session = wasm_session(None, None);
         session.append(&format!("api_key={MARKER}")).unwrap();
         session.abort().unwrap();
         assert_eq!(session.state(), "aborted");
@@ -839,6 +836,7 @@ mod tests {
     /// plaintext it was still holding.
     #[wasm_bindgen_test::wasm_bindgen_test]
     fn a_token_limit_failure_discards_retained_plaintext() {
+        crate::initialize(Vec::new()).unwrap();
         let (token, multiline): (usize, usize) = (32, 64);
         let buffered = IncrementalLimits::minimum_buffered_bytes(token, multiline);
         let mut session = create_incremental_sanitizer(
