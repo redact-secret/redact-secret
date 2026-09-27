@@ -53,6 +53,9 @@ list is not proof that input contains no secrets.
   [contextual detection](specs/contextual-detection.md),
   [engine](specs/engine.md), [distribution](specs/distribution.md), and
   [evidence and gates](specs/evidence-and-gates.md)
+- [Threat model](specs/threat-model.md): assets, attackers, data flow, and
+  trust boundary for the deterministic core — not a rule-bearing spec;
+  complements `ARCHITECTURE.md`'s security-boundaries section and `SECURITY.md`
 - [Rust workspace](rust-workspace.md), [Python packaging](python-packaging.md),
   and [artifact qualification](qualification.md)
 - [Detection coverage evidence](coverage/README.md)
