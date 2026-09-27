@@ -7538,6 +7538,218 @@
     },
     {
       "behaviorClass": "provider",
+      "detector": "together-ai-api-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "together-ai-api-key-positive-bare",
+            "together-ai-api-key-positive-bearer-header",
+            "together-ai-api-key-positive-crlf-unicode-prefix",
+            "together-ai-api-key-positive-curl-bearer",
+            "together-ai-api-key-positive-dotenv",
+            "together-ai-api-key-positive-json-config",
+            "together-ai-api-key-positive-log",
+            "together-ai-api-key-positive-punctuation-adjacent",
+            "together-ai-api-key-positive-python-sdk-call",
+            "together-ai-api-key-positive-repeated-value",
+            "together-ai-api-key-positive-shell-export",
+            "together-ai-api-key-positive-tool-call-arguments",
+            "together-ai-api-key-positive-yaml"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "together-ai-api-key-overlap-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "together-ai-api-key-adversarial-long-suffix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "together-ai-api-key-boundary-glued-suffix",
+            "together-ai-api-key-boundary-long-body",
+            "together-ai-api-key-boundary-short-body",
+            "together-ai-api-key-boundary-wrong-alphabet",
+            "together-ai-api-key-boundary-wrong-case-prefix",
+            "together-ai-api-key-boundary-wrong-separator-prefix",
+            "together-ai-api-key-boundary-wrong-version-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "together-ai-api-key-negative-base-url-and-model-name",
+            "together-ai-api-key-negative-embedded-in-wider-identifier",
+            "together-ai-api-key-negative-masked",
+            "together-ai-api-key-negative-placeholder",
+            "together-ai-api-key-negative-prefix-in-prose"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "together-ai-api-key-boundary-glued-suffix",
+            "together-ai-api-key-boundary-long-body",
+            "together-ai-api-key-boundary-short-body",
+            "together-ai-api-key-boundary-wrong-alphabet",
+            "together-ai-api-key-boundary-wrong-case-prefix",
+            "together-ai-api-key-boundary-wrong-separator-prefix",
+            "together-ai-api-key-boundary-wrong-version-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for together_ai_api_key (together-ai-api-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "together_ai_api_key"
+    },
+    {
+      "behaviorClass": "provider",
+      "detector": "tavily-api-key",
+      "dimensions": [
+        {
+          "dimension": "positive",
+          "evidenceFixtureIds": [
+            "tavily-api-key-positive-bare",
+            "tavily-api-key-positive-bare-prefix-form",
+            "tavily-api-key-positive-bearer-header",
+            "tavily-api-key-positive-crlf-unicode-prefix",
+            "tavily-api-key-positive-curl-bearer",
+            "tavily-api-key-positive-dotenv",
+            "tavily-api-key-positive-json-config",
+            "tavily-api-key-positive-log",
+            "tavily-api-key-positive-punctuation-adjacent",
+            "tavily-api-key-positive-python-sdk-call",
+            "tavily-api-key-positive-repeated-value",
+            "tavily-api-key-positive-shell-export",
+            "tavily-api-key-positive-tool-call-arguments",
+            "tavily-api-key-positive-yaml"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "overlap",
+          "evidenceFixtureIds": [
+            "tavily-api-key-overlap-context"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "adversarial",
+          "evidenceFixtureIds": [
+            "tavily-api-key-adversarial-long-suffix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "boundary",
+          "evidenceFixtureIds": [
+            "tavily-api-key-boundary-dash-inside-body",
+            "tavily-api-key-boundary-glued-suffix",
+            "tavily-api-key-boundary-long-body",
+            "tavily-api-key-boundary-prod-prefix",
+            "tavily-api-key-boundary-short-body",
+            "tavily-api-key-boundary-short-body-bare-prefix",
+            "tavily-api-key-boundary-underscore-prefix",
+            "tavily-api-key-boundary-wrong-alphabet",
+            "tavily-api-key-boundary-wrong-case-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "near-miss-negative",
+          "evidenceFixtureIds": [
+            "tavily-api-key-negative-cli-and-key-name",
+            "tavily-api-key-negative-embedded-in-wider-identifier",
+            "tavily-api-key-negative-masked",
+            "tavily-api-key-negative-placeholder"
+          ],
+          "state": "supported"
+        },
+        {
+          "dimension": "malformed",
+          "evidenceFixtureIds": [
+            "tavily-api-key-boundary-dash-inside-body",
+            "tavily-api-key-boundary-glued-suffix",
+            "tavily-api-key-boundary-long-body",
+            "tavily-api-key-boundary-prod-prefix",
+            "tavily-api-key-boundary-short-body",
+            "tavily-api-key-boundary-short-body-bare-prefix",
+            "tavily-api-key-boundary-underscore-prefix",
+            "tavily-api-key-boundary-wrong-alphabet",
+            "tavily-api-key-boundary-wrong-case-prefix"
+          ],
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "host-context",
+          "evidenceFixtureIds": [],
+          "exception": {
+            "code": "owned-elsewhere",
+            "ownedBy": "github_token:host-context"
+          },
+          "state": "supported"
+        },
+        {
+          "classLevel": true,
+          "dimension": "range",
+          "evidenceFixtureIds": [
+            "unicode-conversion-adjacent-punctuation",
+            "unicode-conversion-astral-after",
+            "unicode-conversion-astral-before",
+            "unicode-conversion-astral-within",
+            "unicode-conversion-combining-before",
+            "unicode-conversion-invisible-astral-within",
+            "unicode-conversion-invisible-within-bmp",
+            "unicode-conversion-invisible-within-removed-run",
+            "unicode-conversion-multibyte-bmp-before"
+          ],
+          "state": "supported"
+        }
+      ],
+      "note": "Coverage declaration for tavily_api_key (tavily-api-key), derived from synchronous-corpus.json per evidence-requirements.md's requirement matrix.",
+      "type": "tavily_api_key"
+    },
+    {
+      "behaviorClass": "provider",
       "detector": "pinecone-api-key",
       "dimensions": [
         {
@@ -9131,8 +9343,10 @@
             "stripe-adversarial-long-suffix",
             "supabase-adversarial-long-suffix",
             "supabase-management-adversarial-long-suffix",
+            "tavily-api-key-adversarial-long-suffix",
             "telegram-bot-token-adversarial-long-padding",
             "terraform-cloud-token-adversarial-near-miss-suffix",
+            "together-ai-api-key-adversarial-long-suffix",
             "travisci-api-token-adversarial-dense-findings",
             "twilio-api-key-secret-adversarial-dense-findings",
             "twilio-auth-token-adversarial-dense-findings",
@@ -9560,8 +9774,10 @@
             "stripe-adversarial-long-suffix",
             "supabase-adversarial-long-suffix",
             "supabase-management-adversarial-long-suffix",
+            "tavily-api-key-adversarial-long-suffix",
             "telegram-bot-token-adversarial-long-padding",
             "terraform-cloud-token-adversarial-near-miss-suffix",
+            "together-ai-api-key-adversarial-long-suffix",
             "travisci-api-token-adversarial-dense-findings",
             "twilio-api-key-secret-adversarial-dense-findings",
             "twilio-auth-token-adversarial-dense-findings",

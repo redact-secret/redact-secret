@@ -90,8 +90,10 @@ Generated from [`docs/coverage/detector-inventory.json`](../coverage/detector-in
 | `stripe_webhook_signing_secret` | `stripe-token` | `always-redact` | generic policy default, no dedicated ADR in this repository |
 | `supabase_personal_access_token` | `supabase-management-token` | `always-redact` | [Separate the Supabase management-token credential class from the secret-key class, and keep each class's evidence independent](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `supabase_secret_key` | `supabase-token` | `always-redact` | [Separate the Supabase management-token credential class from the secret-key class, and keep each class's evidence independent](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
+| `tavily_api_key` | `tavily-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; `tvly-` prefix T1 (Tavily docs), body T2, grammar and trade-offs in [Together AI and Tavily (#867)](#together-ai-and-tavily-867) |
 | `telegram_bot_token` | `telegram-bot-token` | `always-redact` | [Freeze the Telegram Bot API token grammar as a minimum-length digit-colon-secret shape](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `terraform_cloud_token` | `terraform-cloud-token` | `always-redact` | [Add Terraform Cloud/Enterprise API token detection](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
+| `together_ai_api_key` | `together-ai-api-key` | `always-redact` | generic policy default, no dedicated ADR in this repository; T2 (no provider source states the shape), grammar and trade-offs in [Together AI and Tavily (#867)](#together-ai-and-tavily-867) |
 | `travisci_api_token` | `travisci-api-token` | `confidence-gated` | generic policy default, no dedicated ADR in this repository |
 | `twilio_api_key_secret` | `twilio-api-key-secret` | `confidence-gated` | [Freeze the Twilio Auth Token and API Key Secret grammar as context-gated 32-byte values](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | `twilio_auth_token` | `twilio-auth-token` | `confidence-gated` | [Freeze the Twilio Auth Token and API Key Secret grammar as context-gated 32-byte values](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
@@ -237,10 +239,46 @@ UUID stays unclaimed. Each family keeps
 its frozen qualification route; a documented or empirical route is a target,
 not a support-status promotion.
 
+### Together AI and Tavily (#867)
+
+Issue [#867](https://github.com/redact-secret/redact-secret/issues/867)
+implements the two families researched in
+[#783](https://github.com/redact-secret/redact-secret/issues/783) and
+[#786](https://github.com/redact-secret/redact-secret/issues/786). Each gets
+its own detector and finding type on the shared exact-length prefixed
+detector, at provider specificity and high confidence, bare or in any
+context. The boundary is `[A-Za-z0-9_-]`: a value that is a slice of a longer
+run of those bytes is not claimed.
+
+| Family | Contract | Tier | Evidence basis |
+| --- | --- | --- | --- |
+| `together-ai:api-key` | `tgp_v1_` + exactly 43 from `[A-Za-z0-9_-]` (50 total) | T2 empirical | no provider source states prefix, length or alphabet; one scanner rule (betterleaks, which Kingfisher only aliases), one community post and four code-search samples; hands-on issuance pending |
+| `tavily:api-key` | `tvly-` + optional `dev-` + exactly 32 from `[A-Za-z0-9]` | prefix T1, body T2 | Tavily documents `tvly-` and shows `tvly-dev-` sample keys; the 32-byte alphanumeric body rests on one scanner rule (noseyparker, which predates `dev-`) and three observed samples |
+
+False-positive trade-offs: both prefixes are distinctive and their exact
+widths keep prose, model names, `TOGETHER_BASE_URL`, the `tvly` CLI, key names
+and `YOUR_API_KEY`-style placeholders unclaimed. A placeholder padded to the
+exact width with alphabet bytes (for example 32 `x` after `tvly-dev-`) is
+claimed, because no length-preserving placeholder exclusion is evidenced.
+Because a Tavily body is alphanumeric, `tvly-dev-` + 32 does not also match
+the bare `tvly-` shape, so one key gives one finding.
+
+False-negative trade-offs, each an intentional gap rather than a negative
+rule: Together legacy keys (format undocumented; they stay on the generic
+paths), any `tgp_v2_` or other version, and 26/31-byte bodies seen in the code
+search; `tvly-prod-` (not evidenced anywhere; Vellum documents production keys
+as plain `tvly-`), other Tavily body widths, a body containing `-` or `_`, and
+the enterprise expiring-key body width (unshown). A lengthened or reshaped key
+from either provider is missed until new evidence widens the contract.
+Together's betterleaks entropy floor (3.0) is not applied, so a low-entropy
+exact-shape value is still claimed. Cost is one anchored literal per family;
+no incremental or WASM concern beyond the other prefixed detectors.
+
 ## Rules
 
 | Rule | Governing ADR |
 | --- | --- |
+| Together AI `tgp_v1_` + 43 `[A-Za-z0-9_-]` (T2) and Tavily `tvly-` + optional `dev-` + 32 alphanumeric (prefix T1, body T2) are each reported as their own finding type at provider specificity, bare or in any context; `tvly-prod-`, Together legacy keys and other widths stay unclaimed ([#867](https://github.com/redact-secret/redact-secret/issues/867), section above). | generic policy default, no dedicated ADR; applies the existing exact-length prefixed policy to two more families |
 | The Atlassian Cloud API token grammar is frozen as a minimum-length `ATAT`-prefixed body. A directly following `=` plus exactly 8 uppercase hex characters is part of the token and of its span ([#741](https://github.com/redact-secret/redact-secret/issues/741)). | [Freeze the Atlassian Cloud API token grammar as a minimum-length ATAT-prefixed body](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | The Azure DevOps personal access token grammar is frozen as the documented 84-byte `AZDO`-signature shape. | [Freeze the Azure DevOps personal access token grammar as the documented 84-byte AZDO-signature shape](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |
 | The Datadog API Key and Application Key grammar is frozen as marker-gated lowercase-hex values. | [Freeze the Datadog API Key and Application Key grammar as marker-gated lowercase-hex values](../decisions/2026-09-17-freeze-precision-contracts-for-seven-provider-families.md) |

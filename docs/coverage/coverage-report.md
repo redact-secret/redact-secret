@@ -15,11 +15,11 @@ These counts describe finding-type inventory rows with corpus evidence, not dete
 
 | Row state | Count |
 | --- | --- |
-| supported | 81 |
+| supported | 83 |
 | intentionally-unsupported | 0 |
 | unresolved | 0 |
 
-Coverage declarations: 92.
+Coverage declarations: 94.
 
 ## Coverage by detector
 
@@ -88,8 +88,10 @@ Coverage declarations: 92.
 | stripe-token | 2 | supported: 2, intentionally-unsupported: 0, unresolved: 0 |
 | supabase-management-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | supabase-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| tavily-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | telegram-bot-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | terraform-cloud-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
+| together-ai-api-key | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | travisci-api-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | twilio-api-key-secret | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
 | twilio-auth-token | 1 | supported: 1, intentionally-unsupported: 0, unresolved: 0 |
@@ -173,8 +175,10 @@ Coverage declarations: 92.
 | stripe_webhook_signing_secret | stripe-token | provider | supported | not-applicable | none |
 | supabase_personal_access_token | supabase-management-token | provider | supported | not-applicable | none |
 | supabase_secret_key | supabase-token | provider | supported | not-applicable | none |
+| tavily_api_key | tavily-api-key | provider | supported | not-applicable | none |
 | telegram_bot_token | telegram-bot-token | provider | supported | not-applicable | none |
 | terraform_cloud_token | terraform-cloud-token | provider | supported | not-applicable | none |
+| together_ai_api_key | together-ai-api-key | provider | supported | not-applicable | none |
 | travisci_api_token | travisci-api-token | provider | supported | not-applicable | none |
 | twilio_api_key_secret | twilio-api-key-secret | provider | supported | not-applicable | none |
 | twilio_auth_token | twilio-auth-token | provider | supported | not-applicable | none |
@@ -207,15 +211,15 @@ Coverage declarations: 92.
 
 | Dimension | Supported | Not applicable | Pending |
 | --- | --- | --- | --- |
-| adversarial | 92 | 0 | 0 |
-| boundary | 81 | 0 | 0 |
-| host-context | 81 | 0 | 0 |
+| adversarial | 94 | 0 | 0 |
+| boundary | 83 | 0 | 0 |
+| host-context | 83 | 0 | 0 |
 | incremental | 3 | 8 | 0 |
-| malformed | 92 | 0 | 0 |
-| near-miss-negative | 81 | 0 | 0 |
-| overlap | 81 | 0 | 0 |
-| positive | 81 | 0 | 0 |
-| range | 92 | 0 | 0 |
+| malformed | 94 | 0 | 0 |
+| near-miss-negative | 83 | 0 | 0 |
+| overlap | 83 | 0 | 0 |
+| positive | 83 | 0 | 0 |
+| range | 94 | 0 | 0 |
 
 ## Unresolved and pending coverage
 

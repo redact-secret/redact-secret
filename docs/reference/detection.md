@@ -63,7 +63,7 @@ for your host. An organization-specific format that is not listed here can be ad
 as a [declarative ruleset](../guides/rulesets.md).
 
 <!-- detector-inventory:start -->
-71 built-in detectors emit 81 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
+73 built-in detectors emit 83 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
 
 | Detector | Finding types | Default policy class | Schemes |
 | --- | --- | --- | --- |
@@ -124,6 +124,8 @@ as a [declarative ruleset](../guides/rulesets.md).
 | `perplexity-api-key` | `perplexity_api_key` | `always-redact` | — |
 | `fireworks-ai-api-key` | `fireworks_ai_api_key` | `always-redact` | — |
 | `elevenlabs-api-key` | `elevenlabs_api_key` | `always-redact` | — |
+| `together-ai-api-key` | `together_ai_api_key` | `always-redact` | — |
+| `tavily-api-key` | `tavily_api_key` | `always-redact` | — |
 | `pinecone-api-key` | `pinecone_api_key` | `always-redact` | — |
 | `gitlab-runner-authentication-token` | `gitlab_runner_authentication_token` | `always-redact` | — |
 | `databricks-personal-access-token` | `databricks_personal_access_token` | `always-redact` | — |

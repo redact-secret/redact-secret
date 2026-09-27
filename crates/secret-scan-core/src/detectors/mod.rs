@@ -55,6 +55,7 @@ mod stripe;
 mod telegram;
 mod terraform;
 mod text;
+mod together_tavily;
 mod travisci;
 mod twilio;
 mod vault;
@@ -128,6 +129,8 @@ pub(crate) fn built_in_detectors() -> Vec<Box<dyn Detector>> {
         Box::new(ai_inference::PERPLEXITY),
         Box::new(ai_inference::FIREWORKS),
         Box::new(elevenlabs::ElevenLabsApiKeyDetector),
+        Box::new(together_tavily::TOGETHER_AI),
+        Box::new(together_tavily::TAVILY),
         Box::new(pinecone::PineconeApiKeyDetector),
         Box::new(gitlab::GitlabRunnerAuthenticationTokenDetector),
         Box::new(databricks::DATABRICKS),
@@ -244,6 +247,8 @@ pub(crate) const BUILT_IN_PACKS: &[(&str, Pack)] = &[
     ("perplexity-api-key", Pack::Provider),
     ("fireworks-ai-api-key", Pack::Provider),
     ("elevenlabs-api-key", Pack::Provider),
+    ("together-ai-api-key", Pack::Provider),
+    ("tavily-api-key", Pack::Provider),
     ("pinecone-api-key", Pack::Provider),
     ("gitlab-runner-authentication-token", Pack::Provider),
     ("databricks-personal-access-token", Pack::Provider),
@@ -349,6 +354,8 @@ mod tests {
                 "perplexity-api-key",
                 "fireworks-ai-api-key",
                 "elevenlabs-api-key",
+                "together-ai-api-key",
+                "tavily-api-key",
                 "pinecone-api-key",
                 "gitlab-runner-authentication-token",
                 "databricks-personal-access-token",
@@ -679,6 +686,9 @@ mod tests {
         let perplexity_api_key_input = format!("pplx-{}", "0123456789".repeat(4) + "abcdefgh");
         let fireworks_ai_api_key_input = format!("fw_{}", "SyntheticRevokedFwKey1");
         let elevenlabs_api_key_input = format!("sk_{}", "0123456789abcdef".repeat(3));
+        let together_ai_api_key_input =
+            format!("tgp_v1_{}", "Synth-Revoked_Together0Fixture9Body-Zq7_Kd2");
+        let tavily_api_key_input = format!("tvly-dev-{}", "SyntheticRevokedTavilyFixture014");
         let pinecone_api_key_input = format!(
             "pcsk_SynTh_{}",
             "0123456789abcdef".repeat(4)[..63].to_owned()
@@ -719,6 +729,8 @@ mod tests {
             ("perplexity-api-key", perplexity_api_key_input.as_str()),
             ("fireworks-ai-api-key", fireworks_ai_api_key_input.as_str()),
             ("elevenlabs-api-key", elevenlabs_api_key_input.as_str()),
+            ("together-ai-api-key", together_ai_api_key_input.as_str()),
+            ("tavily-api-key", tavily_api_key_input.as_str()),
             ("pinecone-api-key", pinecone_api_key_input.as_str()),
             ("gitlab-runner-authentication-token", gitlab_runner_input),
             (

@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 2164,
+  "fixtureCount": 2220,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -46034,6 +46034,1021 @@
         "maxRuntimeMs": 250
       },
       "input": "fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1fw_SyntheticRevokedFwKey1",
+      "expected": [],
+      "note": "A long run built from the value repeated is a wider identifier, not a token: the scan never carves a valid-looking substring out of it and stays linear and bounded."
+    },
+    {
+      "id": "together-ai-api-key-positive-bare",
+      "detector": "together-ai-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2",
+      "expected": [
+        {
+          "detector": "together-ai-api-key",
+          "type": "together_ai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 50
+        }
+      ],
+      "note": "The reviewed prefix plus exact-width body is sufficient on its own; no surrounding context is required."
+    },
+    {
+      "id": "together-ai-api-key-positive-dotenv",
+      "detector": "together-ai-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "API_KEY=tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2",
+      "expected": [
+        {
+          "detector": "together-ai-api-key",
+          "type": "together_ai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 8,
+          "end": 58
+        }
+      ],
+      "note": "A dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "together-ai-api-key-positive-shell-export",
+      "detector": "together-ai-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export API_KEY=\"tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2\"\n",
+      "expected": [
+        {
+          "detector": "together-ai-api-key",
+          "type": "together_ai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 16,
+          "end": 66
+        }
+      ],
+      "note": "A quoted shell export excludes the quotes from the span."
+    },
+    {
+      "id": "together-ai-api-key-positive-yaml",
+      "detector": "together-ai-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "provider:\n  api_key: tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2\n",
+      "expected": [
+        {
+          "detector": "together-ai-api-key",
+          "type": "together_ai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 21,
+          "end": 71
+        }
+      ],
+      "note": "A YAML scalar value is reported at exactly the value."
+    },
+    {
+      "id": "together-ai-api-key-positive-json-config",
+      "detector": "together-ai-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\n  \"api_key\": \"tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2\"\n}\n",
+      "expected": [
+        {
+          "detector": "together-ai-api-key",
+          "type": "together_ai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 16,
+          "end": 66
+        }
+      ],
+      "note": "A JSON configuration value is reported at exactly the value."
+    },
+    {
+      "id": "together-ai-api-key-positive-python-sdk-call",
+      "detector": "together-ai-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = Client(api_key=\"tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2\")\n",
+      "expected": [
+        {
+          "detector": "together-ai-api-key",
+          "type": "together_ai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 75
+        }
+      ],
+      "note": "An SDK constructor argument is reported at exactly the value."
+    },
+    {
+      "id": "together-ai-api-key-positive-bearer-header",
+      "detector": "together-ai-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2\n",
+      "expected": [
+        {
+          "detector": "together-ai-api-key",
+          "type": "together_ai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 72
+        }
+      ],
+      "note": "A Bearer header value is reported once, as the provider finding, at exactly the value."
+    },
+    {
+      "id": "together-ai-api-key-positive-curl-bearer",
+      "detector": "together-ai-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -H \"Authorization: Bearer tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2\" https://example.invalid/v1\n",
+      "expected": [
+        {
+          "detector": "together-ai-api-key",
+          "type": "together_ai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 31,
+          "end": 81
+        }
+      ],
+      "note": "A curl header value is reported at exactly the value."
+    },
+    {
+      "id": "together-ai-api-key-positive-tool-call-arguments",
+      "detector": "together-ai-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"name\":\"search\",\"arguments\":{\"api_key\":\"tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2\"}}",
+      "expected": [
+        {
+          "detector": "together-ai-api-key",
+          "type": "together_ai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 41,
+          "end": 91
+        }
+      ],
+      "note": "A tool-call argument object is reported at exactly the value."
+    },
+    {
+      "id": "together-ai-api-key-positive-log",
+      "detector": "together-ai-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-27T12:00:00Z INFO  calling API with credential tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2 for request\n",
+      "expected": [
+        {
+          "detector": "together-ai-api-key",
+          "type": "together_ai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 55,
+          "end": 105
+        }
+      ],
+      "note": "A log line embedding the value is reported at exactly the value."
+    },
+    {
+      "id": "together-ai-api-key-positive-punctuation-adjacent",
+      "detector": "together-ai-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "(tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2).",
+      "expected": [
+        {
+          "detector": "together-ai-api-key",
+          "type": "together_ai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1,
+          "end": 51
+        }
+      ],
+      "note": "Adjacent punctuation stays outside the span."
+    },
+    {
+      "id": "together-ai-api-key-positive-crlf-unicode-prefix",
+      "detector": "together-ai-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# \ud83d\udd11 reviewed format\r\ntgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2\n\r\n",
+      "expected": [
+        {
+          "detector": "together-ai-api-key",
+          "type": "together_ai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 24,
+          "end": 74
+        }
+      ],
+      "note": "CRLF and astral characters before the value keep the byte range exact."
+    },
+    {
+      "id": "together-ai-api-key-positive-repeated-value",
+      "detector": "together-ai-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2 tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2",
+      "expected": [
+        {
+          "detector": "together-ai-api-key",
+          "type": "together_ai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 50
+        },
+        {
+          "detector": "together-ai-api-key",
+          "type": "together_ai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 51,
+          "end": 101
+        }
+      ],
+      "note": "Each independent occurrence of a repeated value is reported at its own span."
+    },
+    {
+      "id": "together-ai-api-key-boundary-short-body",
+      "detector": "together-ai-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd",
+      "expected": [],
+      "note": "A body one byte short of the exact width is not the reviewed shape."
+    },
+    {
+      "id": "together-ai-api-key-boundary-long-body",
+      "detector": "together-ai-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd20",
+      "expected": [],
+      "note": "A body one byte over the exact width is a wider run, not a token."
+    },
+    {
+      "id": "together-ai-api-key-boundary-wrong-alphabet",
+      "detector": "together-ai-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "tgp_v1_Synth-Revo+ed_Together0Fixture9Body-Zq7_Kd2",
+      "expected": [],
+      "note": "A byte outside the body alphabet breaks the run, so nothing is reported."
+    },
+    {
+      "id": "together-ai-api-key-boundary-wrong-case-prefix",
+      "detector": "together-ai-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "TGP_V1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2",
+      "expected": [],
+      "note": "The prefix is case-sensitive lowercase."
+    },
+    {
+      "id": "together-ai-api-key-boundary-glued-suffix",
+      "detector": "together-ai-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2_backup",
+      "expected": [],
+      "note": "A value glued to a wider identifier is not boundary-delimited."
+    },
+    {
+      "id": "together-ai-api-key-negative-embedded-in-wider-identifier",
+      "detector": "together-ai-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "legacytgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2",
+      "expected": [],
+      "note": "The prefix embedded inside a wider identifier is not boundary-delimited."
+    },
+    {
+      "id": "together-ai-api-key-negative-masked",
+      "detector": "together-ai-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "tgp_v1_*******************************************",
+      "expected": [],
+      "note": "A masked value carries no valid body bytes."
+    },
+    {
+      "id": "together-ai-api-key-boundary-wrong-version-prefix",
+      "detector": "together-ai-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "tgp_v2_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2",
+      "expected": [],
+      "note": "A different version segment is not the reviewed prefix."
+    },
+    {
+      "id": "together-ai-api-key-boundary-wrong-separator-prefix",
+      "detector": "together-ai-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "tgp-v1-Synth-Revoked_Together0Fixture9Body-Zq7_Kd2",
+      "expected": [],
+      "note": "A different separator in the prefix is not the reviewed prefix."
+    },
+    {
+      "id": "together-ai-api-key-negative-placeholder",
+      "detector": "together-ai-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "TOGETHER_API_KEY=tgp_v1_your_api_key_here\n",
+      "expected": [],
+      "note": "A placeholder with words in the body never reaches the exact width."
+    },
+    {
+      "id": "together-ai-api-key-negative-prefix-in-prose",
+      "detector": "together-ai-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "markdown"
+      ],
+      "input": "Together keys look like tgp_v1_... followed by an opaque value.\n",
+      "expected": [],
+      "note": "A prose mention of the prefix has no key-width body."
+    },
+    {
+      "id": "together-ai-api-key-negative-base-url-and-model-name",
+      "detector": "together-ai-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "TOGETHER_BASE_URL=https://api.together.xyz/v1\nMODEL=meta-llama/Llama-3.3-70B-Instruct-Turbo\n",
+      "expected": [],
+      "note": "The public endpoint and model names carry no key-width prefixed run."
+    },
+    {
+      "id": "together-ai-api-key-overlap-context",
+      "detector": "together-ai-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "access_token=tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2",
+      "expected": [
+        {
+          "detector": "together-ai-api-key",
+          "type": "together_ai_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 63
+        }
+      ],
+      "note": "Qualified provider evidence wins over a contextual assignment."
+    },
+    {
+      "id": "together-ai-api-key-adversarial-long-suffix",
+      "detector": "together-ai-api-key",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 12000,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      },
+      "input": "tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2tgp_v1_Synth-Revoked_Together0Fixture9Body-Zq7_Kd2",
+      "expected": [],
+      "note": "A long run built from the value repeated is a wider identifier, not a token: the scan never carves a valid-looking substring out of it and stays linear and bounded."
+    },
+    {
+      "id": "tavily-api-key-positive-bare",
+      "detector": "tavily-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "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",
+      "expected": [
+        {
+          "detector": "tavily-api-key",
+          "type": "tavily_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 41
+        }
+      ],
+      "note": "The reviewed prefix plus exact-width body is sufficient on its own; no surrounding context is required."
+    },
+    {
+      "id": "tavily-api-key-positive-dotenv",
+      "detector": "tavily-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "API_KEY=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",
+      "expected": [
+        {
+          "detector": "tavily-api-key",
+          "type": "tavily_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 8,
+          "end": 49
+        }
+      ],
+      "note": "A dotenv assignment is reported at exactly the value."
+    },
+    {
+      "id": "tavily-api-key-positive-shell-export",
+      "detector": "tavily-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "shell"
+      ],
+      "input": "export API_KEY=\"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\"\n",
+      "expected": [
+        {
+          "detector": "tavily-api-key",
+          "type": "tavily_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 16,
+          "end": 57
+        }
+      ],
+      "note": "A quoted shell export excludes the quotes from the span."
+    },
+    {
+      "id": "tavily-api-key-positive-yaml",
+      "detector": "tavily-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "yaml"
+      ],
+      "input": "provider:\n  api_key: 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\n",
+      "expected": [
+        {
+          "detector": "tavily-api-key",
+          "type": "tavily_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 21,
+          "end": 62
+        }
+      ],
+      "note": "A YAML scalar value is reported at exactly the value."
+    },
+    {
+      "id": "tavily-api-key-positive-json-config",
+      "detector": "tavily-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\n  \"api_key\": \"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\"\n}\n",
+      "expected": [
+        {
+          "detector": "tavily-api-key",
+          "type": "tavily_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 16,
+          "end": 57
+        }
+      ],
+      "note": "A JSON configuration value is reported at exactly the value."
+    },
+    {
+      "id": "tavily-api-key-positive-python-sdk-call",
+      "detector": "tavily-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = Client(api_key=\"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\")\n",
+      "expected": [
+        {
+          "detector": "tavily-api-key",
+          "type": "tavily_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 25,
+          "end": 66
+        }
+      ],
+      "note": "An SDK constructor argument is reported at exactly the value."
+    },
+    {
+      "id": "tavily-api-key-positive-bearer-header",
+      "detector": "tavily-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "http"
+      ],
+      "input": "Authorization: Bearer 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\n",
+      "expected": [
+        {
+          "detector": "tavily-api-key",
+          "type": "tavily_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 22,
+          "end": 63
+        }
+      ],
+      "note": "A Bearer header value is reported once, as the provider finding, at exactly the value."
+    },
+    {
+      "id": "tavily-api-key-positive-curl-bearer",
+      "detector": "tavily-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "curl"
+      ],
+      "input": "curl -H \"Authorization: Bearer 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\" https://example.invalid/v1\n",
+      "expected": [
+        {
+          "detector": "tavily-api-key",
+          "type": "tavily_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 31,
+          "end": 72
+        }
+      ],
+      "note": "A curl header value is reported at exactly the value."
+    },
+    {
+      "id": "tavily-api-key-positive-tool-call-arguments",
+      "detector": "tavily-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "json"
+      ],
+      "input": "{\"name\":\"search\",\"arguments\":{\"api_key\":\"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\"}}",
+      "expected": [
+        {
+          "detector": "tavily-api-key",
+          "type": "tavily_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 41,
+          "end": 82
+        }
+      ],
+      "note": "A tool-call argument object is reported at exactly the value."
+    },
+    {
+      "id": "tavily-api-key-positive-log",
+      "detector": "tavily-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "log"
+      ],
+      "input": "2026-09-27T12:00:00Z INFO  calling API with credential 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 for request\n",
+      "expected": [
+        {
+          "detector": "tavily-api-key",
+          "type": "tavily_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 55,
+          "end": 96
+        }
+      ],
+      "note": "A log line embedding the value is reported at exactly the value."
+    },
+    {
+      "id": "tavily-api-key-positive-punctuation-adjacent",
+      "detector": "tavily-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "(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).",
+      "expected": [
+        {
+          "detector": "tavily-api-key",
+          "type": "tavily_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 1,
+          "end": 42
+        }
+      ],
+      "note": "Adjacent punctuation stays outside the span."
+    },
+    {
+      "id": "tavily-api-key-positive-crlf-unicode-prefix",
+      "detector": "tavily-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "# \ud83d\udd11 reviewed format\r\n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\n\r\n",
+      "expected": [
+        {
+          "detector": "tavily-api-key",
+          "type": "tavily_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 24,
+          "end": 65
+        }
+      ],
+      "note": "CRLF and astral characters before the value keep the byte range exact."
+    },
+    {
+      "id": "tavily-api-key-positive-repeated-value",
+      "detector": "tavily-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "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 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",
+      "expected": [
+        {
+          "detector": "tavily-api-key",
+          "type": "tavily_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 41
+        },
+        {
+          "detector": "tavily-api-key",
+          "type": "tavily_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 42,
+          "end": 83
+        }
+      ],
+      "note": "Each independent occurrence of a repeated value is reported at its own span."
+    },
+    {
+      "id": "tavily-api-key-positive-bare-prefix-form",
+      "detector": "tavily-api-key",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "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",
+      "expected": [
+        {
+          "detector": "tavily-api-key",
+          "type": "tavily_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 37
+        }
+      ],
+      "note": "The pre-2025 bare tvly- prefix with the same 32-byte body is a positive of the same grammar."
+    },
+    {
+      "id": "tavily-api-key-boundary-short-body",
+      "detector": "tavily-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "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",
+      "expected": [],
+      "note": "A body one byte short of the exact width is not the reviewed shape."
+    },
+    {
+      "id": "tavily-api-key-boundary-long-body",
+      "detector": "tavily-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "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",
+      "expected": [],
+      "note": "A body one byte over the exact width is a wider run, not a token."
+    },
+    {
+      "id": "tavily-api-key-boundary-wrong-alphabet",
+      "detector": "tavily-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "tvly-dev-SyntheticR+vokedTavilyFixture014",
+      "expected": [],
+      "note": "A byte outside the body alphabet breaks the run, so nothing is reported."
+    },
+    {
+      "id": "tavily-api-key-boundary-wrong-case-prefix",
+      "detector": "tavily-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "TVLY-DEV-SyntheticRevokedTavilyFixture014",
+      "expected": [],
+      "note": "The prefix is case-sensitive lowercase."
+    },
+    {
+      "id": "tavily-api-key-boundary-glued-suffix",
+      "detector": "tavily-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "tvly-dev-SyntheticRevokedTavilyFixture014_backup",
+      "expected": [],
+      "note": "A value glued to a wider identifier is not boundary-delimited."
+    },
+    {
+      "id": "tavily-api-key-negative-embedded-in-wider-identifier",
+      "detector": "tavily-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "legacytvly-dev-SyntheticRevokedTavilyFixture014",
+      "expected": [],
+      "note": "The prefix embedded inside a wider identifier is not boundary-delimited."
+    },
+    {
+      "id": "tavily-api-key-negative-masked",
+      "detector": "tavily-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "tvly-dev-********************************",
+      "expected": [],
+      "note": "A masked value carries no valid body bytes."
+    },
+    {
+      "id": "tavily-api-key-boundary-short-body-bare-prefix",
+      "detector": "tavily-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "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",
+      "expected": [],
+      "note": "A bare-prefix body one byte short is not the reviewed shape."
+    },
+    {
+      "id": "tavily-api-key-boundary-dash-inside-body",
+      "detector": "tavily-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "tvly-dev-SyntheticR-vokedTavilyFixture014",
+      "expected": [],
+      "note": "The Tavily body alphabet is alphanumeric; a dash inside it breaks the run."
+    },
+    {
+      "id": "tavily-api-key-boundary-prod-prefix",
+      "detector": "tavily-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "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",
+      "expected": [],
+      "note": "A tvly-prod- key is not evidenced, so the prefix is not claimed."
+    },
+    {
+      "id": "tavily-api-key-boundary-underscore-prefix",
+      "detector": "tavily-api-key",
+      "kind": "boundary",
+      "support": "intentionally-unsupported",
+      "tier": "malformed",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "tvly_SyntheticRevokedTavilyFixture014",
+      "expected": [],
+      "note": "A different separator in the prefix is not the reviewed prefix."
+    },
+    {
+      "id": "tavily-api-key-negative-placeholder",
+      "detector": "tavily-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "dotenv"
+      ],
+      "input": "TAVILY_API_KEY=tvly-YOUR_API_KEY\nTAVILY_DEV=tvly-dev-xxxxxxxxxxxxxxxxxxxxxxxx\n",
+      "expected": [],
+      "note": "Documentation placeholders never reach the exact width."
+    },
+    {
+      "id": "tavily-api-key-negative-cli-and-key-name",
+      "detector": "tavily-api-key",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "shell"
+      ],
+      "input": "tvly search \"query\"\n# key name: development-never-#1\n",
+      "expected": [],
+      "note": "The tvly CLI name and a key-name field carry no prefixed key-width run."
+    },
+    {
+      "id": "tavily-api-key-overlap-context",
+      "detector": "tavily-api-key",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "access_token=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",
+      "expected": [
+        {
+          "detector": "tavily-api-key",
+          "type": "tavily_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 13,
+          "end": 54
+        }
+      ],
+      "note": "Qualified provider evidence wins over a contextual assignment."
+    },
+    {
+      "id": "tavily-api-key-adversarial-long-suffix",
+      "detector": "tavily-api-key",
+      "kind": "adversarial",
+      "support": "supported",
+      "tier": "adversarial",
+      "contexts": [
+        "plain-text"
+      ],
+      "resource": {
+        "maxInputBytes": 12000,
+        "maxFindings": 0,
+        "maxRuntimeMs": 250
+      },
+      "input": "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-dev-SyntheticRevokedTavilyFixture014tvly-dev-SyntheticRevokedTavilyFixture014tvly-dev-SyntheticRevokedTavilyFixture014tvly-dev-SyntheticRevokedTavilyFixture014tvly-dev-SyntheticRevokedTavilyFixture014tvly-dev-SyntheticRevokedTavilyFixture014tvly-dev-SyntheticRevokedTavilyFixture014tvly-dev-SyntheticRevokedTavilyFixture014tvly-dev-SyntheticRevokedTavilyFixture014tvly-dev-SyntheticRevokedTavilyFixture014tvly-dev-SyntheticRevokedTavilyFixture014tvly-dev-SyntheticRevokedTavilyFixture014tvly-dev-SyntheticRevokedTavilyFixture014tvly-dev-SyntheticRevokedTavilyFixture014tvly-dev-SyntheticRevokedTavilyFixture014tvly-dev-SyntheticRevokedTavilyFixture014tvly-dev-SyntheticRevokedTavilyFixture014tvly-dev-SyntheticRevokedTavilyFixture014tvly-dev-SyntheticRevokedTavilyFixture014tvly-dev-SyntheticRevokedTavilyFixture014tvly-dev-SyntheticRevokedTavilyFixture014tvly-dev-SyntheticRevokedTavilyFixture014tvly-dev-SyntheticRevokedTavilyFixture014tvly-dev-SyntheticRevokedTavilyFixture014tvly-dev-SyntheticRevokedTavilyFixture014tvly-dev-SyntheticRevokedTavilyFixture014tvly-dev-SyntheticRevokedTavilyFixture014tvly-dev-SyntheticRevokedTavilyFixture014tvly-dev-SyntheticRevokedTavilyFixture014tvly-dev-SyntheticRevokedTavilyFixture014tvly-dev-SyntheticRevokedTavilyFixture014tvly-dev-SyntheticRevokedTavilyFixture014tvly-dev-SyntheticRevokedTavilyFixture014tvly-dev-SyntheticRevokedTavilyFixture014tvly-dev-SyntheticRevokedTavilyFixture014tvly-dev-SyntheticRevokedTavilyFixture014tvly-dev-SyntheticRevokedTavilyFixture014tvly-dev-SyntheticRevokedTavilyFixture014tvly-dev-SyntheticRevokedTavilyFixture014",
       "expected": [],
       "note": "A long run built from the value repeated is a wider identifier, not a token: the scan never carves a valid-looking substring out of it and stays linear and bounded."
     },

@@ -3043,6 +3043,100 @@
       "type": "elevenlabs_api_key"
     },
     {
+      "detector": "together-ai-api-key",
+      "evidence": {
+        "fixtureCount": 27,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "markdown",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "together-ai-api-key-positive-bare",
+        "together-ai-api-key-positive-bearer-header",
+        "together-ai-api-key-positive-crlf-unicode-prefix",
+        "together-ai-api-key-positive-curl-bearer",
+        "together-ai-api-key-positive-dotenv",
+        "together-ai-api-key-positive-json-config",
+        "together-ai-api-key-positive-log",
+        "together-ai-api-key-positive-punctuation-adjacent",
+        "together-ai-api-key-positive-python-sdk-call",
+        "together-ai-api-key-positive-repeated-value",
+        "together-ai-api-key-positive-shell-export",
+        "together-ai-api-key-positive-tool-call-arguments",
+        "together-ai-api-key-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "together_ai_api_key"
+    },
+    {
+      "detector": "tavily-api-key",
+      "evidence": {
+        "fixtureCount": 29,
+        "hostContextsExercised": [
+          "curl",
+          "dotenv",
+          "http",
+          "json",
+          "log",
+          "plain-text",
+          "python",
+          "shell",
+          "yaml"
+        ],
+        "kindsWithSupportedEvidence": [
+          "adversarial",
+          "negative",
+          "overlap",
+          "positive"
+        ],
+        "supportStatesPresent": [
+          "intentionally-unsupported",
+          "supported"
+        ]
+      },
+      "evidenceFixtureIds": [
+        "tavily-api-key-positive-bare",
+        "tavily-api-key-positive-bare-prefix-form",
+        "tavily-api-key-positive-bearer-header",
+        "tavily-api-key-positive-crlf-unicode-prefix",
+        "tavily-api-key-positive-curl-bearer",
+        "tavily-api-key-positive-dotenv",
+        "tavily-api-key-positive-json-config",
+        "tavily-api-key-positive-log",
+        "tavily-api-key-positive-punctuation-adjacent",
+        "tavily-api-key-positive-python-sdk-call",
+        "tavily-api-key-positive-repeated-value",
+        "tavily-api-key-positive-shell-export",
+        "tavily-api-key-positive-tool-call-arguments",
+        "tavily-api-key-positive-yaml"
+      ],
+      "policyClass": "always-redact",
+      "schemeRows": "not-applicable",
+      "state": "supported",
+      "type": "tavily_api_key"
+    },
+    {
       "detector": "pinecone-api-key",
       "evidence": {
         "fixtureCount": 34,
@@ -3631,7 +3725,7 @@
   "summary": {
     "intentionally-unsupported": 0,
     "not-applicable": 0,
-    "supported": 81,
+    "supported": 83,
     "unresolved": 0
   }
 }
