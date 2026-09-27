@@ -57,6 +57,38 @@ evidence is linked from each published version.
   remainder there, and whatever fraction of the CI-pinned budget comparison
   it still costs, is the inherent cost of the seven new detectors above
   plus this gate's now-minimal residual scan cost.
+- Round 3 (#774): the `cli` surface alone was still over the 10% regression
+  budget on both `scale-logs` profiles while `rust-core`, `node` and `python`
+  cleared it. Instrumenting the CLI's stdin path (`Instant` timers, removed
+  before this commit) refutes detector-registry or session construction as
+  the cause: building the registry and an `IncrementalSanitizer` over it
+  costs on the order of 20 microseconds, well under 1% of one `scale-logs`
+  invocation, and grew by under a microsecond from the seven added
+  detectors. The actual CLI-specific delta is that the CLI's stdin path
+  always scans through the incremental, one-logical-line-at-a-time pipeline
+  (needed so a credential can straddle a chunk boundary), while every other
+  surface's `scale-logs-small-whole` measurement calls the non-incremental
+  `scan` once over the whole buffer; `scale-logs-small-whole` closes on the
+  order of a thousand lines, so any fixed per-detector cost the incremental
+  path pays is paid roughly a thousand times more often than in the
+  one-shot benchmark it is compared against. Within that path,
+  `keyword_gated_keys::detect_spec` ran its whole-input
+  `may_have_provider_context` keyword check and then, for the single-line
+  input the incremental sanitizer almost always hands it, ran the identical
+  check again inside its one-line loop — the same bytes scanned twice for
+  the same answer, on every closed line, for all four keyword-gated
+  detectors. It now skips the outer check when the input holds only one
+  line, since the loop already performs it; a genuinely multi-line input
+  (the non-incremental `scan` path) is unaffected and keeps its whole-input
+  short-circuit. No finding changes. The remaining gap is the inherent,
+  already twice-minimized per-line cost of running seven more detectors
+  through a path every other surface's `scale-logs-small-whole` number
+  does not exercise; closing it further would mean either changing what a
+  streamed unit is scanned as (a detection-semantics change this round does
+  not make) or accepting the CLI's stdin measurement as structurally
+  incomparable to the other surfaces' one-shot `scale-logs-small-whole`
+  number, the way it is already documented as incomparable on `processing`
+  including process-startup cost.
 
 ## 0.1.0-beta.9 — 2026-09-26
 
