@@ -7,6 +7,12 @@ evidence is linked from each published version.
 
 ### Added
 
+- Opt-in global IBAN PII detection (#878) through the shared `pii-domain`
+  adapter, with a SWIFT Registry Release 103 country-length table, bounded
+  compact/print normalization, `iban-mod97` v1 provenance, required
+  English/Korean context, deterministic synthetic conformance data, and exact
+  cross-runtime ranges. The family remains `pending` until its exact merged
+  artifact is qualified in the benchmark counterpart.
 - Opt-in deterministic IPv4/IPv6 PII identity as the single
   `pii:global:network-address` family (#875), with required English/Korean
   network context, explicit reserved/documentation sensitivity treatment,

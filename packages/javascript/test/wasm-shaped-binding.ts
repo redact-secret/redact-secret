@@ -83,10 +83,20 @@ export function createWasmShapedBinding(
     profile: () => options.profile ?? "full",
     initialize: (pii) => {
       calls.push("initialize");
+      if (pii.includes("PII")) {
+        throw Object.assign(new Error("PII selector is invalid."), { code: "PII_SELECTOR_INVALID" });
+      }
+      if (pii.includes("pii:kr")) {
+        throw Object.assign(new Error("PII jurisdiction or family is unsupported."), { code: "PII_SELECTOR_UNSUPPORTED" });
+      }
+      if (pii.includes("pii:family:global:payment-card") || pii.includes("pii:us")) {
+        throw Object.assign(new Error("PII selection is unavailable in this artifact."), { code: "PII_SELECTOR_UNAVAILABLE" });
+      }
       const selectors = [...new Set(pii.map((value) => value === "pii" ? "pii:global" : value))].sort();
       const global = selectors.includes("pii:global");
       const families = [
         ...(global || selectors.includes("pii:family:global:email") ? ["pii:global:email"] : []),
+        ...(global || selectors.includes("pii:family:global:iban") ? ["pii:global:iban"] : []),
         ...(global || selectors.includes("pii:family:global:network-address") ? ["pii:global:network-address"] : []),
       ].join(",");
       activation = `credentials=${options.profile ?? "full"};selectors=${selectors.length === 0 ? "off" : selectors.join(",")};families=${families};vocabulary=pii-context/v1`;

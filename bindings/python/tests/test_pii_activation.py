@@ -29,26 +29,27 @@ def test_pii_runtime_fixture() -> None:
     redact_secret.initialize(pii=first["selectors"])
     assert redact_secret.pii_activation() == first["expected"]
 
-    email = load_corpus("pii-email-v1.json")
-    for case in email["cases"]:
-        input_text = case["input"]
-        expected = []
-        for finding in case["expected"]:
-            converted = dict(finding)
-            converted["start"] = byte_offset_to_char_offset_reference(
-                input_text, finding["start"]
-            )
-            converted["end"] = byte_offset_to_char_offset_reference(
-                input_text, finding["end"]
-            )
-            expected.append(converted)
-        assert [_observable(finding) for finding in redact_secret.scan(input_text)] == expected
+    for family_fixture in ("pii-email-v1.json", "pii-iban-v1.json"):
+        family = load_corpus(family_fixture)
+        for case in family["cases"]:
+            input_text = case["input"]
+            expected = []
+            for finding in case["expected"]:
+                converted = dict(finding)
+                converted["start"] = byte_offset_to_char_offset_reference(
+                    input_text, finding["start"]
+                )
+                converted["end"] = byte_offset_to_char_offset_reference(
+                    input_text, finding["end"]
+                )
+                expected.append(converted)
+            assert [_observable(finding) for finding in redact_secret.scan(input_text)] == expected
 
-        whole = redact_secret.scan_and_redact(input_text)
-        for chunks in code_point_partitions(input_text):
-            text, findings = run_session(chunks)
-            assert text == whole.text, (case["id"], chunks)
-            assert [_observable(finding) for finding in findings] == expected
+            whole = redact_secret.scan_and_redact(input_text)
+            for chunks in code_point_partitions(input_text):
+                text, findings = run_session(chunks)
+                assert text == whole.text, (case["id"], chunks)
+                assert [_observable(finding) for finding in findings] == expected
 
     for case in fixture["errorCases"]:
         try:

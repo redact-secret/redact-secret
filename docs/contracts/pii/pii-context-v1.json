@@ -61,6 +61,16 @@
       "provenance": "synthetic-contract-example"
     },
     {
+      "id": "en-iban-field",
+      "language": "en",
+      "kind": "field-label",
+      "class": "positive",
+      "strength": "high-signal",
+      "domains": ["iban"],
+      "forms": ["iban", "international bank account number"],
+      "provenance": "synthetic-contract-example"
+    },
+    {
       "id": "en-contact-label",
       "language": "en",
       "kind": "natural-language-label",
@@ -121,6 +131,16 @@
       "provenance": "synthetic-contract-example"
     },
     {
+      "id": "ko-iban-field",
+      "language": "ko",
+      "kind": "field-label",
+      "class": "positive",
+      "strength": "high-signal",
+      "domains": ["iban"],
+      "forms": ["iban", "국제 계좌번호"],
+      "provenance": "synthetic-contract-example"
+    },
+    {
       "id": "ko-contact-label",
       "language": "ko",
       "kind": "natural-language-label",
@@ -165,6 +185,13 @@
       "template": "client_ip = {{candidate:a}}",
       "candidates": [{"id": "a", "domain": "network-address", "identityEstablished": true}],
       "expectedAssociations": [{"candidate": "a", "matches": ["en-network-address-field"], "effect": "positive-evidence"}]
+    },
+    {
+      "id": "en-iban-field-contract",
+      "language": "en",
+      "template": "iban = {{candidate:a}}",
+      "candidates": [{"id": "a", "domain": "iban", "identityEstablished": true}],
+      "expectedAssociations": [{"candidate": "a", "matches": ["en-iban-field"], "effect": "positive-evidence"}]
     },
     {
       "id": "en-ambiguous-word-without-identity",
@@ -214,6 +241,13 @@
       "template": "클라이언트_ip = {{candidate:a}}",
       "candidates": [{"id": "a", "domain": "network-address", "identityEstablished": true}],
       "expectedAssociations": [{"candidate": "a", "matches": ["ko-network-address-field"], "effect": "positive-evidence"}]
+    },
+    {
+      "id": "ko-iban-field-contract",
+      "language": "ko",
+      "template": "국제_계좌번호 = {{candidate:a}}",
+      "candidates": [{"id": "a", "domain": "iban", "identityEstablished": true}],
+      "expectedAssociations": [{"candidate": "a", "matches": ["ko-iban-field"], "effect": "positive-evidence"}]
     },
     {
       "id": "ko-mixed-ascii-hangul-key",

@@ -77,6 +77,8 @@ mod redact;
 mod registry;
 #[path = "../src/ruleset.rs"]
 mod ruleset;
+#[path = "../src/structured_validators.rs"]
+mod structured_validators;
 #[path = "../src/types.rs"]
 mod types;
 
