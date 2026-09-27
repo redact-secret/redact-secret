@@ -1952,7 +1952,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 193,
+        "fixtureCount": 221,
         "hostContextsExercised": [
           "chat",
           "curl",
@@ -2046,6 +2046,17 @@
         "generic-token-regression-url-fragment-access-token",
         "generic-token-regression-url-query-access-token",
         "generic-token-regression-windows-env-lookalike-still-detected",
+        "generic-token-sdk-call-positive-go-option-positional",
+        "generic-token-sdk-call-positive-go-struct-literal",
+        "generic-token-sdk-call-positive-java-setter-positional",
+        "generic-token-sdk-call-positive-javascript-object-argument",
+        "generic-token-sdk-call-positive-python-default-parameter",
+        "generic-token-sdk-call-positive-python-kwarg-double-quoted",
+        "generic-token-sdk-call-positive-python-kwarg-middle-argument",
+        "generic-token-sdk-call-positive-python-kwarg-single-quoted",
+        "generic-token-sdk-call-positive-python-kwarg-spaced",
+        "generic-token-sdk-call-positive-rust-builder-positional",
+        "generic-token-sdk-call-positive-typescript-named-argument",
         "regression-generic-token-markdown-inline-code-boundary",
         "regression-nested-credential-under-parent-key",
         "regression-placeholder-embedded-in-high-entropy-value",
@@ -2061,7 +2072,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 193,
+        "fixtureCount": 221,
         "hostContextsExercised": [
           "chat",
           "curl",
@@ -2131,7 +2142,7 @@
     {
       "detector": "generic-token",
       "evidence": {
-        "fixtureCount": 193,
+        "fixtureCount": 221,
         "hostContextsExercised": [
           "chat",
           "curl",

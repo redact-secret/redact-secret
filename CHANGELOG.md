@@ -3,6 +3,26 @@
 This file records the released product contract and notable changes. Release
 evidence is linked from each published version.
 
+## Unreleased
+
+### Added
+
+- New provider detectors: `elevenlabs-api-key` (#865), `together-ai-api-key` and
+  `tavily-api-key` (#867), `aws-bedrock-long-term-api-key` and
+  `aws-bedrock-short-term-api-key` (#864), and the keyword-gated
+  `mistral-api-key`, `cohere-api-key`, `ai21-api-key` and
+  `deepgram-api-key` (#868), which claim a value only under an adjacent
+  provider key name, SDK constructor argument or, for Deepgram, an
+  `Authorization: Token` header. Exa stays with `generic-token`.
+
+### Changed
+
+- `anthropic-token` now recognizes the `sk-ant-api01-` and
+  `sk-ant-admin01-` prefixes (#862), and the OpenAI admin-key contract is
+  reconciled with the shipped `sk-admin-` detection (#863).
+- `generic-token` now redacts a secret passed as an SDK call argument, for
+  example `Client(api_key="...")` (#866).
+
 ## 0.1.0-beta.9 — 2026-09-26
 
 ### Added

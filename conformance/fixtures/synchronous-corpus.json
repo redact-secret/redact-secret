@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 2342,
+  "fixtureCount": 2370,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -55136,7 +55136,7 @@
           "end": 58
         }
       ],
-      "note": "Issue #868: Mistral studio API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). The SDK constructor call argument, which the generic path misses, is provider context."
+      "note": "Issue #868: Mistral studio API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). The SDK constructor call argument is provider context; since #866 generic-token also reads it, and the provider detector wins the span."
     },
     {
       "id": "mistral-api-key-positive-log-named",
@@ -55304,9 +55304,9 @@
       "contexts": [
         "python"
       ],
-      "input": "client = Mistral(api_key=\"SyntheticRevokedSyntheticRevoke\")",
+      "input": "client = Mistral(\"SyntheticRevokedSyntheticRevoke\")",
       "expected": [],
-      "note": "Issue #868: Mistral studio API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). One byte short: rejected, not extended."
+      "note": "Issue #868: Mistral studio API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). One byte short: rejected, not extended. Since #866 the credential-named keyword form is also read by generic-token, so this boundary is exercised through the sole positional argument, which only a provider-named constructor can claim."
     },
     {
       "id": "mistral-api-key-boundary-one-long",
@@ -55317,9 +55317,9 @@
       "contexts": [
         "python"
       ],
-      "input": "client = Mistral(api_key=\"SyntheticRevokedSyntheticRevoked9\")",
+      "input": "client = Mistral(\"SyntheticRevokedSyntheticRevoked9\")",
       "expected": [],
-      "note": "Issue #868: Mistral studio API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). One byte long: rejected, not truncated."
+      "note": "Issue #868: Mistral studio API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). One byte long: rejected, not truncated. Since #866 the credential-named keyword form is also read by generic-token, so this boundary is exercised through the sole positional argument, which only a provider-named constructor can claim."
     },
     {
       "id": "mistral-api-key-boundary-underscore-embedded",
@@ -55330,9 +55330,9 @@
       "contexts": [
         "python"
       ],
-      "input": "client = Mistral(api_key=\"SyntheticR_vokedSyntheticRevoked\")",
+      "input": "client = Mistral(\"SyntheticR_vokedSyntheticRevoked\")",
       "expected": [],
-      "note": "Issue #868: Mistral studio API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A run joined by an underscore is not a key."
+      "note": "Issue #868: Mistral studio API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A run joined by an underscore is not a key. Since #866 the credential-named keyword form is also read by generic-token, so this boundary is exercised through the sole positional argument, which only a provider-named constructor can claim."
     },
     {
       "id": "mistral-api-key-overlap-generic-named-assignment",
@@ -56283,7 +56283,7 @@
           "end": 74
         }
       ],
-      "note": "Issue #868: Cohere API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). The SDK constructor call argument, which the generic path misses, is provider context."
+      "note": "Issue #868: Cohere API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). The SDK constructor call argument is provider context; since #866 generic-token also reads it, and the provider detector wins the span."
     },
     {
       "id": "cohere-api-key-positive-log-named",
@@ -56451,9 +56451,9 @@
       "contexts": [
         "python"
       ],
-      "input": "client = cohere.ClientV2(api_key=\"SyntheticRevokedSyntheticRevokedSynthet\")",
+      "input": "client = cohere.ClientV2(\"SyntheticRevokedSyntheticRevokedSynthet\")",
       "expected": [],
-      "note": "Issue #868: Cohere API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). One byte short: rejected, not extended."
+      "note": "Issue #868: Cohere API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). One byte short: rejected, not extended. Since #866 the credential-named keyword form is also read by generic-token, so this boundary is exercised through the sole positional argument, which only a provider-named constructor can claim."
     },
     {
       "id": "cohere-api-key-boundary-one-long",
@@ -56464,9 +56464,9 @@
       "contexts": [
         "python"
       ],
-      "input": "client = cohere.ClientV2(api_key=\"SyntheticRevokedSyntheticRevokedSyntheti9\")",
+      "input": "client = cohere.ClientV2(\"SyntheticRevokedSyntheticRevokedSyntheti9\")",
       "expected": [],
-      "note": "Issue #868: Cohere API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). One byte long: rejected, not truncated."
+      "note": "Issue #868: Cohere API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). One byte long: rejected, not truncated. Since #866 the credential-named keyword form is also read by generic-token, so this boundary is exercised through the sole positional argument, which only a provider-named constructor can claim."
     },
     {
       "id": "cohere-api-key-boundary-underscore-embedded",
@@ -56477,9 +56477,9 @@
       "contexts": [
         "python"
       ],
-      "input": "client = cohere.ClientV2(api_key=\"SyntheticR_vokedSyntheticRevokedSyntheti\")",
+      "input": "client = cohere.ClientV2(\"SyntheticR_vokedSyntheticRevokedSyntheti\")",
       "expected": [],
-      "note": "Issue #868: Cohere API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A run joined by an underscore is not a key."
+      "note": "Issue #868: Cohere API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A run joined by an underscore is not a key. Since #866 the credential-named keyword form is also read by generic-token, so this boundary is exercised through the sole positional argument, which only a provider-named constructor can claim."
     },
     {
       "id": "cohere-api-key-overlap-generic-named-assignment",
@@ -57430,7 +57430,7 @@
           "end": 61
         }
       ],
-      "note": "Issue #868: AI21 API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). The SDK constructor call argument, which the generic path misses, is provider context."
+      "note": "Issue #868: AI21 API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). The SDK constructor call argument is provider context; since #866 generic-token also reads it, and the provider detector wins the span."
     },
     {
       "id": "ai21-api-key-positive-log-named",
@@ -57598,9 +57598,9 @@
       "contexts": [
         "python"
       ],
-      "input": "client = AI21Client(api_key=\"SyntheticRevokedSyntheticRevoke\")",
+      "input": "client = AI21Client(\"SyntheticRevokedSyntheticRevoke\")",
       "expected": [],
-      "note": "Issue #868: AI21 API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). One byte short: rejected, not extended."
+      "note": "Issue #868: AI21 API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). One byte short: rejected, not extended. Since #866 the credential-named keyword form is also read by generic-token, so this boundary is exercised through the sole positional argument, which only a provider-named constructor can claim."
     },
     {
       "id": "ai21-api-key-boundary-one-long",
@@ -57611,9 +57611,9 @@
       "contexts": [
         "python"
       ],
-      "input": "client = AI21Client(api_key=\"SyntheticRevokedSyntheticRevoked9\")",
+      "input": "client = AI21Client(\"SyntheticRevokedSyntheticRevoked9\")",
       "expected": [],
-      "note": "Issue #868: AI21 API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). One byte long: rejected, not truncated."
+      "note": "Issue #868: AI21 API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). One byte long: rejected, not truncated. Since #866 the credential-named keyword form is also read by generic-token, so this boundary is exercised through the sole positional argument, which only a provider-named constructor can claim."
     },
     {
       "id": "ai21-api-key-boundary-underscore-embedded",
@@ -57624,9 +57624,9 @@
       "contexts": [
         "python"
       ],
-      "input": "client = AI21Client(api_key=\"SyntheticR_vokedSyntheticRevoked\")",
+      "input": "client = AI21Client(\"SyntheticR_vokedSyntheticRevoked\")",
       "expected": [],
-      "note": "Issue #868: AI21 API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A run joined by an underscore is not a key."
+      "note": "Issue #868: AI21 API key, exactly 32 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A run joined by an underscore is not a key. Since #866 the credential-named keyword form is also read by generic-token, so this boundary is exercised through the sole positional argument, which only a provider-named constructor can claim."
     },
     {
       "id": "ai21-api-key-overlap-generic-named-assignment",
@@ -58577,7 +58577,7 @@
           "end": 73
         }
       ],
-      "note": "Issue #868: Deepgram API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). The SDK constructor call argument, which the generic path misses, is provider context."
+      "note": "Issue #868: Deepgram API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). The SDK constructor call argument is provider context; since #866 generic-token also reads it, and the provider detector wins the span."
     },
     {
       "id": "deepgram-api-key-positive-log-named",
@@ -58768,9 +58768,9 @@
       "contexts": [
         "python"
       ],
-      "input": "client = DeepgramClient(api_key=\"syntheticrevokedsyntheticrevokedsynthet\")",
+      "input": "client = DeepgramClient(\"syntheticrevokedsyntheticrevokedsynthet\")",
       "expected": [],
-      "note": "Issue #868: Deepgram API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). One byte short: rejected, not extended."
+      "note": "Issue #868: Deepgram API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). One byte short: rejected, not extended. Since #866 the credential-named keyword form is also read by generic-token, so this boundary is exercised through the sole positional argument, which only a provider-named constructor can claim."
     },
     {
       "id": "deepgram-api-key-boundary-one-long",
@@ -58781,9 +58781,9 @@
       "contexts": [
         "python"
       ],
-      "input": "client = DeepgramClient(api_key=\"syntheticrevokedsyntheticrevokedsyntheti9\")",
+      "input": "client = DeepgramClient(\"syntheticrevokedsyntheticrevokedsyntheti9\")",
       "expected": [],
-      "note": "Issue #868: Deepgram API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). One byte long: rejected, not truncated."
+      "note": "Issue #868: Deepgram API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). One byte long: rejected, not truncated. Since #866 the credential-named keyword form is also read by generic-token, so this boundary is exercised through the sole positional argument, which only a provider-named constructor can claim."
     },
     {
       "id": "deepgram-api-key-boundary-underscore-embedded",
@@ -58794,9 +58794,9 @@
       "contexts": [
         "python"
       ],
-      "input": "client = DeepgramClient(api_key=\"syntheticr_vokedsyntheticrevokedsyntheti\")",
+      "input": "client = DeepgramClient(\"syntheticr_vokedsyntheticrevokedsyntheti\")",
       "expected": [],
-      "note": "Issue #868: Deepgram API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A run joined by an underscore is not a key."
+      "note": "Issue #868: Deepgram API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). A run joined by an underscore is not a key. Since #866 the credential-named keyword form is also read by generic-token, so this boundary is exercised through the sole positional argument, which only a provider-named constructor can claim."
     },
     {
       "id": "deepgram-api-key-boundary-uppercase-body",
@@ -58807,9 +58807,9 @@
       "contexts": [
         "python"
       ],
-      "input": "client = DeepgramClient(api_key=\"SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETI\")",
+      "input": "client = DeepgramClient(\"SYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETI\")",
       "expected": [],
-      "note": "Issue #868: Deepgram API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). The inferred alphabet is lowercase alphanumeric; an uppercase body is rejected."
+      "note": "Issue #868: Deepgram API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). The inferred alphabet is lowercase alphanumeric; an uppercase body is rejected. Since #866 the credential-named keyword form is also read by generic-token, so this boundary is exercised through the sole positional argument, which only a provider-named constructor can claim."
     },
     {
       "id": "deepgram-api-key-overlap-generic-named-assignment",
@@ -59651,6 +59651,469 @@
         }
       ],
       "note": "Issue #868: Deepgram API key, exactly 40 inferred bytes, keyword-gated (contextual, unqualified, T2 at best; no provider documents the shape). 100 named assignments on one line are each reported once at their own range, within the declared resource bounds."
+    },
+    {
+      "id": "generic-token-sdk-call-positive-python-kwarg-double-quoted",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = Client(api_key=\"SyntheticSdkArg9Kq2Lm4Xv8Zt3\")",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 25,
+          "end": 53
+        }
+      ],
+      "note": "Issue #866: Python keyword argument in a double-quoted literal. Synthetic value, never issued."
+    },
+    {
+      "id": "generic-token-sdk-call-positive-python-kwarg-single-quoted",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = Client(api_key='SyntheticSdkArg9Kq2Lm4Xv8Zt3')",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 25,
+          "end": 53
+        }
+      ],
+      "note": "Issue #866: Python keyword argument in a single-quoted literal. Synthetic value, never issued."
+    },
+    {
+      "id": "generic-token-sdk-call-positive-python-kwarg-middle-argument",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = Client(timeout=5, secret=\"SyntheticSdkArg9Kq2Lm4Xv8Zt3\", retries=2)",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 35,
+          "end": 63
+        }
+      ],
+      "note": "Issue #866: A secret-named keyword argument between other arguments. Synthetic value, never issued."
+    },
+    {
+      "id": "generic-token-sdk-call-positive-python-kwarg-spaced",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = Client( password = \"SyntheticSdkArg9Kq2Lm4Xv8Zt3\" )",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 29,
+          "end": 57
+        }
+      ],
+      "note": "Issue #866: Spaces around the operator and inside the parentheses. Synthetic value, never issued."
+    },
+    {
+      "id": "generic-token-sdk-call-positive-python-default-parameter",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "python"
+      ],
+      "input": "def connect(api_key=\"SyntheticSdkArg9Kq2Lm4Xv8Zt3\"):",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 21,
+          "end": 49
+        }
+      ],
+      "note": "Issue #866: A default parameter literal is the same keyword-argument form. Synthetic value, never issued."
+    },
+    {
+      "id": "generic-token-sdk-call-positive-javascript-object-argument",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "javascript"
+      ],
+      "input": "const client = new Client({ apiKey: \"SyntheticSdkArg9Kq2Lm4Xv8Zt3\" });",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 37,
+          "end": 65
+        }
+      ],
+      "note": "Issue #866: Object-literal property, already claimed before #866; pinned so it stays. Synthetic value, never issued."
+    },
+    {
+      "id": "generic-token-sdk-call-positive-typescript-named-argument",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "typescript"
+      ],
+      "input": "const client = createClient(apiKey: \"SyntheticSdkArg9Kq2Lm4Xv8Zt3\");",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 37,
+          "end": 65
+        }
+      ],
+      "note": "Issue #866: A colon-separated named argument opening a call. Synthetic value, never issued."
+    },
+    {
+      "id": "generic-token-sdk-call-positive-java-setter-positional",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Client client = new Client().setApiKey(\"SyntheticSdkArg9Kq2Lm4Xv8Zt3\");",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 40,
+          "end": 68
+        }
+      ],
+      "note": "Issue #866: The callee name setApiKey is the credential vocabulary; the literal is the sole argument. Synthetic value, never issued."
+    },
+    {
+      "id": "generic-token-sdk-call-positive-rust-builder-positional",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "let client = Client::builder().api_key(\"SyntheticSdkArg9Kq2Lm4Xv8Zt3\").build();",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 40,
+          "end": 68
+        }
+      ],
+      "note": "Issue #866: Rust builder method named for the credential, sole literal argument. Synthetic value, never issued."
+    },
+    {
+      "id": "generic-token-sdk-call-positive-go-option-positional",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "c := NewClient(WithAPIKey(\"SyntheticSdkArg9Kq2Lm4Xv8Zt3\"))",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 27,
+          "end": 55
+        }
+      ],
+      "note": "Issue #866: Go functional option named for the credential, sole literal argument. Synthetic value, never issued."
+    },
+    {
+      "id": "generic-token-sdk-call-positive-go-struct-literal",
+      "detector": "generic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "cfg := Config{APIKey: \"SyntheticSdkArg9Kq2Lm4Xv8Zt3\"}",
+      "expected": [
+        {
+          "detector": "generic-token",
+          "type": "contextual_secret",
+          "confidence": "high",
+          "specificity": "contextual",
+          "start": 23,
+          "end": 51
+        }
+      ],
+      "note": "Issue #866: Go struct literal field, already claimed before #866; pinned so it stays. Synthetic value, never issued."
+    },
+    {
+      "id": "generic-token-sdk-call-negative-placeholder-words",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = Client(api_key=\"your_api_key_here\")",
+      "expected": [],
+      "note": "Issue #866: A placeholder keyword argument keeps its existing exclusion."
+    },
+    {
+      "id": "generic-token-sdk-call-negative-angle-placeholder",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = Client(api_key=\"<token>\")",
+      "expected": [],
+      "note": "Issue #866: An angle-bracket placeholder stays excluded."
+    },
+    {
+      "id": "generic-token-sdk-call-negative-interpolation-reference",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "javascript"
+      ],
+      "input": "const client = new Client({ apiKey: \"${API_KEY}\" });",
+      "expected": [],
+      "note": "Issue #866: A ${VAR} reference stays excluded."
+    },
+    {
+      "id": "generic-token-sdk-call-negative-below-length-floor",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = Client(api_key=\"short1\")",
+      "expected": [],
+      "note": "Issue #866: A value below the generic-token minimum stays unreported."
+    },
+    {
+      "id": "generic-token-sdk-call-negative-environment-read",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = Client(api_key=os.environ[\"API_KEY\"])",
+      "expected": [],
+      "note": "Issue #866: An os.environ read is a reference, not a literal."
+    },
+    {
+      "id": "generic-token-sdk-call-negative-getenv-read",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = Client(api_key=os.getenv(\"API_KEY\"))",
+      "expected": [],
+      "note": "Issue #866: A getenv call is a reference, not a literal."
+    },
+    {
+      "id": "generic-token-sdk-call-negative-variable-reference",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = Client(api_key=api_key)",
+      "expected": [],
+      "note": "Issue #866: A variable reference is not a literal."
+    },
+    {
+      "id": "generic-token-sdk-call-negative-unquoted-literal",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = Client(api_key=SyntheticSdkArg9Kq2Lm4Xv8Zt3)",
+      "expected": [],
+      "note": "Issue #866: An unquoted call argument is not claimed."
+    },
+    {
+      "id": "generic-token-sdk-call-negative-multi-line-value",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = Client(\n    api_key=\n\"SyntheticSdkArg9Kq2Lm4Xv8Zt3\")",
+      "expected": [],
+      "note": "Issue #866: A value on the line after the operator is out of scope."
+    },
+    {
+      "id": "generic-token-sdk-call-negative-bare-token-name",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = Client(token=\"SyntheticSdkArg9Kq2Lm4Xv8Zt3\")",
+      "expected": [],
+      "note": "Issue #866: The bare token name stays unmatched (#702), as a call argument too."
+    },
+    {
+      "id": "generic-token-sdk-call-negative-non-credential-name",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = Client(model=\"SyntheticSdkArg9Kq2Lm4Xv8Zt3\")",
+      "expected": [],
+      "note": "Issue #866: A non-credential keyword argument is not context."
+    },
+    {
+      "id": "generic-token-sdk-call-negative-no-credential-constructor",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "python"
+      ],
+      "input": "client = Client(\"SyntheticSdkArg9Kq2Lm4Xv8Zt3\")",
+      "expected": [],
+      "note": "Issue #866: A positional literal to a constructor whose name carries no credential vocabulary."
+    },
+    {
+      "id": "generic-token-sdk-call-negative-prompt-label-callee",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "javascript"
+      ],
+      "input": "field.password(\"Enter your password\")",
+      "expected": [],
+      "note": "Issue #866: A credential-named callee with a prompt string stays silent."
+    },
+    {
+      "id": "generic-token-sdk-call-negative-slug-callee",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "javascript"
+      ],
+      "input": "secret(\"aws-credentials-prod-eu-1\")",
+      "expected": [],
+      "note": "Issue #866: A one-case separated value is a slug, not a token."
+    },
+    {
+      "id": "generic-token-sdk-call-negative-non-sole-argument",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "javascript"
+      ],
+      "input": "api_key(\"SyntheticSdkArg9Kq2Lm4Xv8Zt3\", extra)",
+      "expected": [],
+      "note": "Issue #866: Only a sole literal argument is a positional credential."
+    },
+    {
+      "id": "generic-token-sdk-call-negative-ambiguous-callee",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "javascript"
+      ],
+      "input": "auth(\"SyntheticSdkArg9Kq2Lm4Xv8Zt3\")",
+      "expected": [],
+      "note": "Issue #866: An ambiguous callee name never qualifies for the positional form."
+    },
+    {
+      "id": "generic-token-sdk-call-negative-prose-mention",
+      "detector": "generic-token",
+      "kind": "negative",
+      "support": "supported",
+      "tier": "negative",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "Pass your key as Client(api_key=...) when constructing it.",
+      "expected": [],
+      "note": "Issue #866: A prose mention has no literal value."
     }
   ]
 }
