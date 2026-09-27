@@ -1,0 +1,74 @@
+name: Integration or docs feedback / 통합·문서 피드백
+description: Report an installation problem, adapter behavior, unclear guide, or missing example.
+title: "[integration/docs] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Tell us where you got stuck. 어디에서 막혔는지 간단히 알려주세요.
+        A short description is welcome; the maintainer can ask for details later.
+        Do not attach raw logs, traces, prompts, screenshots, or tool payloads
+        containing real credentials or PII. For a suspected security vulnerability,
+        use the [private security advisory form](https://github.com/redact-secret/redact-secret/security/advisories/new).
+
+  - type: dropdown
+    id: topic
+    attributes:
+      label: What kind of feedback is this?
+      options:
+        - Installation or packaging
+        - Adapter or host integration
+        - Documentation or example
+        - Other / unsure
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened, and what were you trying to do?
+      description: A brief description is enough to open a report. Use synthetic values only.
+      placeholder: "I followed the Pino guide and got stuck at ..."
+    validations:
+      required: true
+
+  - type: input
+    id: package-version
+    attributes:
+      label: Package version (if known)
+      placeholder: "@redact-secret/core@... and @redact-secret/adapter-pino@..."
+    validations:
+      required: false
+
+  - type: input
+    id: runtime
+    attributes:
+      label: Language, host, and runtime (if relevant)
+      placeholder: "Node 22, Pino 10, macOS"
+    validations:
+      required: false
+
+  - type: input
+    id: guide
+    attributes:
+      label: Guide or example link (if relevant)
+      placeholder: "https://github.com/redact-secret/redact-secret/blob/main/docs/..."
+    validations:
+      required: false
+
+  - type: textarea
+    id: safe-reproduction
+    attributes:
+      label: Safe reproduction or error metadata (optional)
+      description: Include a minimal synthetic example if available. Review every line for secrets and PII before pasting.
+      render: text
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Before submitting
+      options:
+        - label: I have not included real credentials, personal data, or unsanitized customer material.
+          required: true
