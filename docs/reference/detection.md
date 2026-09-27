@@ -15,7 +15,7 @@ Built-in Rust detection covers these kinds of structure:
 | Context | Credential assignments, such as an `api_key` or `password` setting, including AWS secret-access-key and session-token names |
 | Connections | Credential-bearing URLs for the supported database, queue, HTTP(S), and FTP(S) schemes |
 | One-time password provisioning | `otpauth://totp` and `otpauth://hotp` with base32 shared secrets |
-| Opt-in structured PII | Context-required email, IBAN, canonical IPv4/IPv6, and payment-card identities through `pii:global:email`, `pii:global:iban`, `pii:global:network-address`, and `pii:global:payment-card`; PII defaults off and all families share one `pii-domain` slot |
+| Opt-in structured PII | Context-required email, IBAN, canonical IPv4/IPv6, payment-card, and US SSN identities. Global families use `pii:global:*`; SSN uses `pii:us:ssn`. PII defaults off and all families share one `pii-domain` slot |
 
 Per-family support status is stated only in the generated
 [support matrix](../support-matrix.md). Each provider family's exact frozen
@@ -60,6 +60,19 @@ The [payment-card family contract](../contracts/pii/payment-card-v1.md) freezes
 the full ranges, context, exact spans, exclusions, and accepted false-positive
 and false-negative costs. The family is `pending` until exact-artifact `pii-v1`
 benchmark evidence is reviewed.
+
+### Opt-in US SSN PII
+
+The exact `pii:family:us:ssn` selector recognizes nine ASCII digits in compact
+or exact ASCII `3-2-4` hyphenated form. `pii:us` closes over this family and all
+available global families. The `us-ssn-allocation` v1 validator applies only
+SSA-published current structural exclusions: area `000`, `666`, and `900`–`999`,
+group `00`, and serial `0000`. It does not infer issuance, pre-2011 geography,
+high-group allocation, or identity. Reviewed English or Korean SSN field
+context is required for sensitivity; generic identifier and number labels do
+not qualify. The [US SSN family contract](../contracts/pii/us-ssn-v1.md)
+freezes grammar, boundaries, sources, safe fixtures, and tradeoffs. The family
+remains `pending` until counterpart #392 qualifies the exact merged artifact.
 
 ### Policy-qualified generic credentials
 

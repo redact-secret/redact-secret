@@ -20,12 +20,13 @@ import {
 const SYNTHETIC_TOKEN =
   "Authorization: Bearer sk-syntheticRevokedExampleToken00000000000000000000";
 const ASTRAL_PREFIXED = `\u{1F511} ${SYNTHETIC_TOKEN}`;
-const PAYMENT_CARD_SELECTOR = process.env.REDACT_SECRET_PAYMENT_CARD_SELECTOR;
-const SYNTHETIC_PAYMENT_CARD = "card_number=4000008770000003";
+const PII_SELECTOR = process.env.REDACT_SECRET_PII_SELECTOR;
+const PII_INPUT = process.env.REDACT_SECRET_PII_INPUT;
+const PII_TYPE = process.env.REDACT_SECRET_PII_TYPE;
 
 function initializeSelected() {
-  if (PAYMENT_CARD_SELECTOR === undefined) initialize();
-  else initializePii([PAYMENT_CARD_SELECTOR]);
+  if (PII_SELECTOR === undefined) initialize();
+  else initializePii([PII_SELECTOR]);
 }
 
 const INCREMENTAL_LIMITS = {
@@ -53,17 +54,60 @@ check("repeated initialization is idempotent", () => {
   initializeSelected();
 });
 
-if (PAYMENT_CARD_SELECTOR !== undefined) {
-  check("payment-card selector activates and scans through the installed addon", () => {
-    const expected = PAYMENT_CARD_SELECTOR === "pii:global"
-      ? "credentials=full;selectors=pii:global;families=pii:global:email,pii:global:iban,pii:global:network-address,pii:global:payment-card;vocabulary=pii-context/v1"
-      : "credentials=full;selectors=pii:family:global:payment-card;families=pii:global:payment-card;vocabulary=pii-context/v1";
+if (PII_INPUT !== undefined) {
+  check("PII selection and PII-off scan through the installed addon", () => {
+    const globals = "pii:global:email,pii:global:iban,pii:global:network-address,pii:global:payment-card";
+    const expected = PII_SELECTOR === undefined
+      ? "credentials=full;selectors=off;families=;vocabulary=pii-context/v1"
+      : PII_SELECTOR === "pii:global"
+      ? `credentials=full;selectors=pii:global;families=${globals};vocabulary=pii-context/v1`
+      : PII_SELECTOR === "pii:us"
+        ? `credentials=full;selectors=pii:us;families=${globals},pii:us:ssn;vocabulary=pii-context/v1`
+        : PII_SELECTOR === "pii:family:us:ssn"
+          ? "credentials=full;selectors=pii:family:us:ssn;families=pii:us:ssn;vocabulary=pii-context/v1"
+          : "credentials=full;selectors=pii:family:global:payment-card;families=pii:global:payment-card;vocabulary=pii-context/v1";
     assert.equal(piiActivation(), expected);
-    const findings = scan(SYNTHETIC_PAYMENT_CARD);
+    assert.equal(typeof PII_INPUT, "string");
+    assert.equal(typeof PII_TYPE, "string");
+    const findings = scan(PII_INPUT);
+    const expectedFindings = PII_SELECTOR === undefined
+      ? []
+      : [["pii-domain", PII_TYPE, "redact"]];
     assert.deepEqual(
       findings.map((finding) => [finding.detector, finding.type, finding.action]),
-      [["pii-domain", "pii_global_payment_card", "redact"]],
+      expectedFindings,
     );
+  });
+
+  check("PII selection and PII-off match incrementally at every UTF-16 partition", () => {
+    const wholeResult = scanAndRedact(PII_INPUT);
+    const whole = wholeResult.findings.map((finding) => [
+      finding.detector,
+      finding.type,
+      finding.action,
+      finding.start,
+      finding.end,
+    ]);
+    for (let split = 0; split <= PII_INPUT.length; split += 1) {
+      const unit = PII_INPUT.charCodeAt(split);
+      if (unit >= 0xdc00 && unit <= 0xdfff) continue;
+      const session = createIncrementalSanitizer({ limits: INCREMENTAL_LIMITS });
+      const results = [
+        session.append(PII_INPUT.slice(0, split)),
+        session.append(PII_INPUT.slice(split)),
+        session.finalize(),
+      ];
+      const incremental = results.flatMap((result) => result.findings).map((finding) => [
+        finding.detector,
+        finding.type,
+        finding.action,
+        finding.start,
+        finding.end,
+      ]);
+      const redacted = results.map((result) => result.text).join("");
+      assert.equal(redacted, wholeResult.redacted, `partition ${split} text`);
+      assert.deepEqual(incremental, whole, `partition ${split}`);
+    }
   });
 }
 

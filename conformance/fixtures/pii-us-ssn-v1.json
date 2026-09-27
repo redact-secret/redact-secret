@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "family": "pii:us:ssn",
+  "familyContractVersion": 1,
+  "selector": "pii:family:us:ssn",
+  "jurisdictionSelector": "pii:us",
+  "publicType": "pii_jurisdiction_us_ssn",
+  "contextRequirement": "required-for-sensitive-classification",
+  "validator": {"identity":"us-ssn-allocation","version":1},
+  "fixtureGenerator": {
+    "id": "us-ssn-v1-fnv1a32-components",
+    "seed": "redact-secret-us-ssn-v1-fixture-879",
+    "provenance": "deterministic-no-real-world-provenance",
+    "realWorldLookup": false
+  },
+  "cases": [
+    {
+      "id": "us-ssn-sensitive-compact-exact-selector",
+      "input": "ssn=890626879",
+      "expected": [{"detector":"pii-domain","type":"pii_jurisdiction_us_ssn","confidence":"high","action":"redact","start":4,"end":13}]
+    },
+    {
+      "id": "us-ssn-sensitive-display-korean-context",
+      "input": "사회보장번호 = 890-62-6879",
+      "expected": [{"detector":"pii-domain","type":"pii_jurisdiction_us_ssn","confidence":"high","action":"redact","start":21,"end":32}]
+    },
+    {
+      "id": "us-ssn-sensitive-long-english-field",
+      "input": "social_security_number=890-62-6879",
+      "expected": [{"detector":"pii-domain","type":"pii_jurisdiction_us_ssn","confidence":"high","action":"redact","start":23,"end":34}]
+    },
+    {
+      "id": "us-ssn-sensitive-ascii-tab-delimiter",
+      "input": "ssn=\t890-62-6879",
+      "expected": [{"detector":"pii-domain","type":"pii_jurisdiction_us_ssn","confidence":"high","action":"redact","start":5,"end":16}]
+    },
+    {
+      "id": "us-ssn-unicode-prefix-offset",
+      "input": "🔒 ssn=890-62-6879",
+      "expected": [{"detector":"pii-domain","type":"pii_jurisdiction_us_ssn","confidence":"high","action":"redact","start":9,"end":20}]
+    },
+    {"id":"us-ssn-identity-without-context","input":"890-62-6879","expected":[]},
+    {"id":"us-ssn-tax-id-is-not-high-signal","input":"tax_id=890-62-6879","expected":[]},
+    {"id":"us-ssn-generic-national-id-is-not-high-signal","input":"national_id=890-62-6879","expected":[]},
+    {"id":"us-ssn-order-reference-collision","input":"order_reference=890626879","expected":[]},
+    {"id":"us-ssn-invoice-number-collision","input":"invoice_number=890626879","expected":[]},
+    {"id":"us-ssn-payment-card-field-collision","input":"card_number=890626879","expected":[]},
+    {"id":"us-ssn-named-example-negative-wins","input":"ssn example=890-62-6879","expected":[]},
+    {"id":"us-ssn-named-documentation-negative-wins","input":"ssn documentation=890626879","expected":[]},
+    {"id":"us-ssn-english-negation-negative-wins","input":"not_ssn=890-62-6879","expected":[]},
+    {"id":"us-ssn-korean-negation-negative-wins","input":"사회보장번호_아님=890626879","expected":[]},
+    {"id":"us-ssn-ssa-display-control-unmatched","input":"ssn=000-00-0000","expected":[]},
+    {"id":"us-ssn-invalid-area-zero","input":"ssn=000-62-6879","expected":[]},
+    {"id":"us-ssn-invalid-area-666","input":"ssn=666-62-6879","expected":[]},
+    {"id":"us-ssn-invalid-area-900","input":"ssn=900-62-6879","expected":[]},
+    {"id":"us-ssn-invalid-area-999","input":"ssn=999-62-6879","expected":[]},
+    {"id":"us-ssn-invalid-group-zero","input":"ssn=890-00-6879","expected":[]},
+    {"id":"us-ssn-invalid-serial-zero","input":"ssn=890-62-0000","expected":[]},
+    {"id":"us-ssn-short-placeholder","input":"ssn=123-45-678","expected":[]},
+    {"id":"us-ssn-spaced-form-unsupported","input":"ssn=890 62 6879","expected":[]},
+    {"id":"us-ssn-unicode-dash-form-unsupported","input":"ssn=890‐62‐6879","expected":[]},
+    {"id":"us-ssn-unicode-space-form-unsupported","input":"ssn=890 62 6879","expected":[]},
+    {"id":"us-ssn-adjacent-unicode-space-prefix","input":"ssn= 890-62-6879","expected":[]},
+    {"id":"us-ssn-adjacent-unicode-space-suffix","input":"ssn=890-62-6879 ","expected":[]},
+    {"id":"us-ssn-adjacent-unicode-dash-prefix","input":"ssn=‐890-62-6879","expected":[]},
+    {"id":"us-ssn-adjacent-unicode-dash-suffix","input":"ssn=890-62-6879‐","expected":[]},
+    {"id":"us-ssn-adjacent-identifier-prefix","input":"ssn=x890-62-6879","expected":[]},
+    {"id":"us-ssn-adjacent-identifier-suffix","input":"ssn=890-62-6879x","expected":[]},
+    {"id":"us-ssn-adjacent-underscore-prefix","input":"ssn=_890-62-6879","expected":[]},
+    {"id":"us-ssn-adjacent-underscore-suffix","input":"ssn=890-62-6879_suffix","expected":[]},
+    {"id":"us-ssn-adjacent-percent-prefix","input":"ssn=%890-62-6879","expected":[]},
+    {"id":"us-ssn-adjacent-percent-suffix","input":"ssn=890-62-6879%20","expected":[]},
+    {"id":"us-ssn-adjacent-unicode-mark-prefix","input":"ssn=⃝890-62-6879","expected":[]},
+    {"id":"us-ssn-adjacent-unicode-mark-suffix","input":"ssn=890-62-6879⃝","expected":[]},
+    {"id":"us-ssn-governed-invisible-interior-rejected","input":"ssn=890-62-‍6879","expected":[]},
+    {"id":"us-ssn-governed-invisible-prefix-rejected","input":"ssn=‍890-62-6879","expected":[]},
+    {"id":"us-ssn-governed-invisible-suffix-rejected","input":"ssn=890-62-6879‍","expected":[]},
+    {"id":"us-ssn-template-reference-unmatched","input":"ssn={{890-62-6879}}","expected":[]},
+    {"id":"us-ssn-extra-leading-digit-unmatched","input":"ssn=1890-62-6879","expected":[]},
+    {"id":"us-ssn-extra-trailing-digit-unmatched","input":"ssn=890-62-68790","expected":[]},
+    {"id":"us-ssn-repeated-hyphen-unmatched","input":"ssn=890--62-6879","expected":[]}
+  ]
+}

@@ -7,6 +7,12 @@ evidence is linked from each published version.
 
 ### Added
 
+- Opt-in US Social Security number PII detection (#879) through the shared
+  `pii-domain` adapter, with exact and `pii:us` selector closure, SSA-published
+  current structural exclusions, bounded compact and hyphenated forms,
+  reviewed English/Korean field context, and deterministic no-provenance safe
+  fixtures. The family remains `pending`; no benchmark or `pii-v1` promotion
+  is claimed until the exact merged artifact is qualified by counterpart #392.
 - Opt-in global IBAN PII detection (#878) through the shared `pii-domain`
   adapter, with a SWIFT Registry Release 103 country-length table, bounded
   compact/print normalization, `iban-mod97` v1 provenance, required

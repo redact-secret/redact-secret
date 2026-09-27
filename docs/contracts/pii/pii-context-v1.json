@@ -81,6 +81,26 @@
       "provenance": "synthetic-contract-example"
     },
     {
+      "id": "en-us-ssn-field",
+      "language": "en",
+      "kind": "field-label",
+      "class": "positive",
+      "strength": "high-signal",
+      "domains": ["national-id"],
+      "forms": ["ssn", "social security number"],
+      "provenance": "synthetic-contract-example"
+    },
+    {
+      "id": "en-us-ssn-negation",
+      "language": "en",
+      "kind": "natural-language-label",
+      "class": "negative",
+      "strength": "high-signal",
+      "domains": ["national-id"],
+      "forms": ["not ssn", "not social security number"],
+      "provenance": "synthetic-contract-example"
+    },
+    {
       "id": "en-contact-label",
       "language": "en",
       "kind": "natural-language-label",
@@ -161,6 +181,26 @@
       "provenance": "synthetic-contract-example"
     },
     {
+      "id": "ko-us-ssn-field",
+      "language": "ko",
+      "kind": "field-label",
+      "class": "positive",
+      "strength": "high-signal",
+      "domains": ["national-id"],
+      "forms": ["사회보장번호", "사회 보장 번호", "미국 사회보장번호"],
+      "provenance": "synthetic-contract-example"
+    },
+    {
+      "id": "ko-us-ssn-negation",
+      "language": "ko",
+      "kind": "natural-language-label",
+      "class": "negative",
+      "strength": "high-signal",
+      "domains": ["national-id"],
+      "forms": ["사회보장번호 아님", "사회 보장 번호 아님"],
+      "provenance": "synthetic-contract-example"
+    },
+    {
       "id": "ko-contact-label",
       "language": "ko",
       "kind": "natural-language-label",
@@ -219,6 +259,20 @@
       "template": "card_number = {{candidate:a}}",
       "candidates": [{"id": "a", "domain": "payment-card", "identityEstablished": true}],
       "expectedAssociations": [{"candidate": "a", "matches": ["en-payment-card-field"], "effect": "positive-evidence"}]
+    },
+    {
+      "id": "en-us-ssn-field-contract",
+      "language": "en",
+      "template": "ssn = {{candidate:a}}",
+      "candidates": [{"id": "a", "domain": "national-id", "identityEstablished": true}],
+      "expectedAssociations": [{"candidate": "a", "matches": ["en-us-ssn-field"], "effect": "positive-evidence"}]
+    },
+    {
+      "id": "en-us-ssn-negation-wins",
+      "language": "en",
+      "template": "not_ssn = {{candidate:a}}",
+      "candidates": [{"id": "a", "domain": "national-id", "identityEstablished": true}],
+      "expectedAssociations": [{"candidate": "a", "matches": ["en-us-ssn-negation"], "effect": "negative-evidence"}]
     },
     {
       "id": "en-ambiguous-word-without-identity",
@@ -282,6 +336,20 @@
       "template": "카드_번호 = {{candidate:a}}",
       "candidates": [{"id": "a", "domain": "payment-card", "identityEstablished": true}],
       "expectedAssociations": [{"candidate": "a", "matches": ["ko-payment-card-field"], "effect": "positive-evidence"}]
+    },
+    {
+      "id": "ko-us-ssn-field-contract",
+      "language": "ko",
+      "template": "사회보장번호 = {{candidate:a}}",
+      "candidates": [{"id": "a", "domain": "national-id", "identityEstablished": true}],
+      "expectedAssociations": [{"candidate": "a", "matches": ["ko-us-ssn-field"], "effect": "positive-evidence"}]
+    },
+    {
+      "id": "ko-us-ssn-negation-wins",
+      "language": "ko",
+      "template": "사회보장번호_아님 = {{candidate:a}}",
+      "candidates": [{"id": "a", "domain": "national-id", "identityEstablished": true}],
+      "expectedAssociations": [{"candidate": "a", "matches": ["ko-us-ssn-negation"], "effect": "negative-evidence"}]
     },
     {
       "id": "ko-mixed-ascii-hangul-key",

@@ -29,11 +29,15 @@ def _observable(finding: object) -> dict[str, object]:
 
 def test_pii_runtime_fixture() -> None:
     fixture = load_corpus("pii-runtime-v1.json")
-    first = fixture["activationCases"][1]
+    first = fixture["activationCases"][-1]
     redact_secret.initialize(pii=first["selectors"])
     assert redact_secret.pii_activation() == first["expected"]
 
-    for family_fixture in ("pii-email-v1.json", "pii-iban-v1.json"):
+    for family_fixture in (
+        "pii-email-v1.json",
+        "pii-iban-v1.json",
+        "pii-us-ssn-v1.json",
+    ):
         family = load_corpus(family_fixture)
         for case in family["cases"]:
             input_text = case["input"]
@@ -147,6 +151,55 @@ print(json.dumps({
             "types": ["pii_global_payment_card"],
             "actions": ["redact"],
         }, ordinal
+
+
+def test_pii_off_stays_off_for_ssn_whole_and_every_incremental_partition() -> None:
+    ssn_fixture = load_corpus("pii-us-ssn-v1.json")
+    input_text = ssn_fixture["cases"][0]["input"]
+    child = """
+import json
+import sys
+import redact_secret
+
+value = sys.argv[1]
+redact_secret.initialize(pii=[])
+whole = redact_secret.scan(value)
+partitions = []
+for split in range(len(value) + 1):
+    session = redact_secret.IncrementalSanitizer(redact_secret.IncrementalLimits(
+        max_input_bytes=1_000_000,
+        max_buffered_bytes=16_512,
+        max_token_bytes=8_192,
+        max_multiline_bytes=16_384,
+    ))
+    text = ""
+    findings = []
+    for chunk in (value[:split], value[split:]):
+        result = session.append(chunk)
+        text += result.text
+        findings.extend(result.findings)
+    result = session.finalize()
+    text += result.text
+    findings.extend(result.findings)
+    partitions.append({"textEqual": text == value, "types": [item.type for item in findings]})
+print(json.dumps({
+    "activation": redact_secret.pii_activation(),
+    "wholeTypes": [item.type for item in whole],
+    "partitions": partitions,
+}))
+"""
+    completed = subprocess.run(
+        [sys.executable, "-c", child, input_text],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    actual = json.loads(completed.stdout)
+    assert actual["activation"] == (
+        "credentials=full;selectors=off;families=;vocabulary=pii-context/v1"
+    )
+    assert actual["wholeTypes"] == []
+    assert all(row == {"textEqual": True, "types": []} for row in actual["partitions"])
 
 
 def test_different_selection_conflicts_without_echoing_input() -> None:

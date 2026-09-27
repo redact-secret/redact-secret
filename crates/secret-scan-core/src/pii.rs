@@ -20,6 +20,7 @@ const AVAILABLE_FAMILIES: &[&str] = &[
     "pii:global:iban",
     "pii:global:network-address",
     "pii:global:payment-card",
+    "pii:us:ssn",
 ];
 const KNOWN_FAMILIES: &[&str] = &[
     "pii:global:ambiguous-national-id",
@@ -37,6 +38,8 @@ mod pii_email;
 mod pii_iban;
 #[path = "pii/pii_payment_card.rs"]
 mod pii_payment_card;
+#[path = "pii/pii_us_ssn.rs"]
+mod pii_us_ssn;
 
 /// A canonical, closed PII selector set for the loaded artifact.
 ///
@@ -199,6 +202,7 @@ pub(crate) fn adapter(selection: &PiiSelection) -> Box<dyn Detector> {
             Box::new(pii_iban::IbanFamily),
             network_address::family(),
             Box::new(pii_payment_card::PaymentCardFamily),
+            Box::new(pii_us_ssn::UsSsnFamily),
         ],
     ))
 }
@@ -973,7 +977,9 @@ mod tests {
             SecretScanErrorCode::PiiSelectorUnsupported
         );
         assert_eq!(
-            PiiSelection::parse(&["pii:us"]).unwrap_err().code(),
+            PiiSelection::parse_with_catalog(&["pii:us"], KNOWN_FAMILIES, &["pii:global:email"],)
+                .unwrap_err()
+                .code(),
             SecretScanErrorCode::PiiSelectorUnavailable
         );
     }

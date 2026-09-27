@@ -83,7 +83,9 @@ before constructing scans or incremental sessions to select PII explicitly,
 and use `pii_activation()` to record the canonical activation identity.
 `("pii",)` closes over `pii:global:email`, `pii:global:iban`,
 `pii:global:network-address`, and `pii:global:payment-card`; each can be
-selected exactly with its `pii:family:global:*` selector. They require reviewed high-signal context and
+selected exactly with its `pii:family:global:*` selector. `("pii:us",)` closes
+over those global families plus `pii:us:ssn`; `("pii:family:us:ssn",)` selects
+only SSNs. They require reviewed high-signal context and
 remain `pending` until exact-artifact benchmark evidence is reviewed.
 Equivalent selection is idempotent; a different later selection raises the
 fixed, input-free `PiiActivationConflictError`.

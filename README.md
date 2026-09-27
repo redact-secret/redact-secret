@@ -194,9 +194,13 @@ the CLI. The shared `pii-domain` adapter registers the context-qualified
 `pii:global:payment-card` families. They suppress only their reviewed named
 negative classes and remain `pending` until
 exact-artifact `pii-v1` benchmark evidence is reviewed; availability alone is
-not a support claim. See the [email family contract](docs/contracts/pii/email-v1.md)
+not a support claim. The jurisdictional `pii:us` selector closes over those
+global families plus `pii:us:ssn`; `pii:family:us:ssn` selects only SSNs. The
+SSN family uses SSA-published structural exclusions and reviewed field labels,
+not issuance or identity lookup. See the [email family contract](docs/contracts/pii/email-v1.md),
 the [IBAN family contract](docs/contracts/pii/iban-v1.md), and the
-[payment-card family contract](docs/contracts/pii/payment-card-v1.md), plus each
+[payment-card family contract](docs/contracts/pii/payment-card-v1.md), the
+[US SSN family contract](docs/contracts/pii/us-ssn-v1.md), plus each
 language guide, for activation identity and limits.
 
 ## Core operations
