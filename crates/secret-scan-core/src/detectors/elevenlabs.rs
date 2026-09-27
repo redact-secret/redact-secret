@@ -4,22 +4,23 @@
 //! optionally followed by the data-residency suffix `_residency_<region>`
 //! where `<region>` is one or more `[a-z0-9]` bytes.
 //!
-//! ## Evidence and tier, stated honestly
+//! ## Evidence and tier (maintainer ruling 2026-09-27, #788)
 //!
 //! `ElevenLabs` documentation never states a prefix, length or alphabet for
 //! the key (observed 2026-09-26). Two parts of the grammar therefore rest on
 //! different evidence:
 //!
-//! - **Prefix `sk_` and the `_residency_<[a-z0-9]+>` suffix: provider code.**
-//!   The `elevenlabs-python` `speech_engine/server.py` docstring shows
-//!   `api_key="sk_..."`, and both `elevenlabs-python`
+//! - **Prefix `sk_` and the `_residency_<[a-z0-9]+>` suffix: T1, on provider
+//!   code.** The `elevenlabs-python` `speech_engine/server.py` docstring
+//!   shows `api_key="sk_..."`, and both `elevenlabs-python`
 //!   (`speech_engine/resource.py`, `_RESIDENCY_KEY_SUFFIX =
 //!   re.compile(r"_residency_[a-z0-9]+$")`) and `elevenlabs-js`
 //!   (`SpeechEngineResource.ts`) strip that suffix from a data-residency key
-//!   before hashing it. This is the same class of evidence as
-//!   `huggingface:api-token` (provider SDK code). Reading it as T1 is a
-//!   maintainer ruling, not something the provider documents; until that
-//!   ruling lands the whole family is T2.
+//!   before hashing it. Accepted following the `huggingface:api-token`
+//!   precedent (provider SDK code counts as T1). No provider document or
+//!   staff statement states prefix, length or alphabet, so the `sk_`
+//!   prefix's collision with Stripe and Pollinations is unchanged and the
+//!   detector's exclusion of those shapes stays in place.
 //! - **Body: exactly 48 lowercase hex bytes, T2 (empirical).** Only tools
 //!   (trufflehog v2 `\b((?:sk)_[a-f0-9]{48})\b`, betterleaks) and roughly 35
 //!   measured public code fragments state or show the width and alphabet.

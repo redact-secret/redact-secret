@@ -53714,7 +53714,7 @@
           "end": 136
         }
       ],
-      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1 candidate, maintainer ruling pending) with a 109 to 269 byte body band (T2). A bare key on its own line."
+      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1, maintainer ruling accepted 2026-09-27, #778) with a 109 to 269 byte body band (T2). A bare key on its own line."
     },
     {
       "id": "aws-bedrock-long-term-api-key-positive-dotenv",
@@ -53736,7 +53736,7 @@
           "end": 161
         }
       ],
-      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1 candidate, maintainer ruling pending) with a 109 to 269 byte body band (T2). The documented `AWS_BEARER_TOKEN_BEDROCK` dotenv assignment."
+      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1, maintainer ruling accepted 2026-09-27, #778) with a 109 to 269 byte body band (T2). The documented `AWS_BEARER_TOKEN_BEDROCK` dotenv assignment."
     },
     {
       "id": "aws-bedrock-long-term-api-key-positive-export-quoted",
@@ -53758,7 +53758,7 @@
           "end": 169
         }
       ],
-      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1 candidate, maintainer ruling pending) with a 109 to 269 byte body band (T2). A quoted `export`; the quotes stay outside the span."
+      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1, maintainer ruling accepted 2026-09-27, #778) with a 109 to 269 byte body band (T2). A quoted `export`; the quotes stay outside the span."
     },
     {
       "id": "aws-bedrock-long-term-api-key-positive-yaml",
@@ -53780,7 +53780,7 @@
           "end": 162
         }
       ],
-      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1 candidate, maintainer ruling pending) with a 109 to 269 byte body band (T2). A YAML value."
+      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1, maintainer ruling accepted 2026-09-27, #778) with a 109 to 269 byte body band (T2). A YAML value."
     },
     {
       "id": "aws-bedrock-long-term-api-key-positive-json",
@@ -53802,7 +53802,7 @@
           "end": 166
         }
       ],
-      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1 candidate, maintainer ruling pending) with a 109 to 269 byte body band (T2). A quoted JSON value."
+      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1, maintainer ruling accepted 2026-09-27, #778) with a 109 to 269 byte body band (T2). A quoted JSON value."
     },
     {
       "id": "aws-bedrock-long-term-api-key-overlap-bearer",
@@ -53824,7 +53824,7 @@
           "end": 167
         }
       ],
-      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1 candidate, maintainer ruling pending) with a 109 to 269 byte body band (T2). A `Bearer` header; the provider-specific finding wins overlap with `bearer-token`."
+      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1, maintainer ruling accepted 2026-09-27, #778) with a 109 to 269 byte body band (T2). A `Bearer` header; the provider-specific finding wins overlap with `bearer-token`."
     },
     {
       "id": "aws-bedrock-long-term-api-key-positive-sdk-call",
@@ -53846,7 +53846,7 @@
           "end": 168
         }
       ],
-      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1 candidate, maintainer ruling pending) with a 109 to 269 byte body band (T2). An SDK call argument."
+      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1, maintainer ruling accepted 2026-09-27, #778) with a 109 to 269 byte body band (T2). An SDK call argument."
     },
     {
       "id": "aws-bedrock-long-term-api-key-positive-tool-call",
@@ -53868,7 +53868,7 @@
           "end": 210
         }
       ],
-      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1 candidate, maintainer ruling pending) with a 109 to 269 byte body band (T2). An agent tool-call argument."
+      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1, maintainer ruling accepted 2026-09-27, #778) with a 109 to 269 byte body band (T2). An agent tool-call argument."
     },
     {
       "id": "aws-bedrock-long-term-api-key-positive-padding",
@@ -53890,7 +53890,7 @@
           "end": 138
         }
       ],
-      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1 candidate, maintainer ruling pending) with a 109 to 269 byte body band (T2). Two `=` of padding are part of the span."
+      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1, maintainer ruling accepted 2026-09-27, #778) with a 109 to 269 byte body band (T2). Two `=` of padding are part of the span."
     },
     {
       "id": "aws-bedrock-long-term-api-key-negative-env-reference",
@@ -53903,7 +53903,7 @@
       ],
       "input": "export AWS_BEARER_TOKEN_BEDROCK=${AWS_BEARER_TOKEN_BEDROCK}\n",
       "expected": [],
-      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1 candidate, maintainer ruling pending) with a 109 to 269 byte body band (T2). An environment reference is not a key."
+      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1, maintainer ruling accepted 2026-09-27, #778) with a 109 to 269 byte body band (T2). An environment reference is not a key."
     },
     {
       "id": "aws-bedrock-long-term-api-key-negative-empty-assignment",
@@ -53916,7 +53916,7 @@
       ],
       "input": "AWS_BEARER_TOKEN_BEDROCK=\n",
       "expected": [],
-      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1 candidate, maintainer ruling pending) with a 109 to 269 byte body band (T2). An empty assignment."
+      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1, maintainer ruling accepted 2026-09-27, #778) with a 109 to 269 byte body band (T2). An empty assignment."
     },
     {
       "id": "aws-bedrock-long-term-api-key-negative-public-alias",
@@ -53929,7 +53929,7 @@
       ],
       "input": "user BedrockAPIKey-abcd-at-000000000000 arn:aws:iam::000000000000:user/BedrockAPIKey-abcd\n",
       "expected": [],
-      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1 candidate, maintainer ruling pending) with a 109 to 269 byte body band (T2). The decoded public alias and an IAM ARN are not the key."
+      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1, maintainer ruling accepted 2026-09-27, #778) with a 109 to 269 byte body band (T2). The decoded public alias and an IAM ARN are not the key."
     },
     {
       "id": "aws-bedrock-long-term-api-key-boundary-three-padding",
@@ -53942,7 +53942,7 @@
       ],
       "input": "AWS_BEARER_TOKEN_BEDROCK=\u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT===\n",
       "expected": [],
-      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1 candidate, maintainer ruling pending) with a 109 to 269 byte body band (T2). Three `=` are not valid padding."
+      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1, maintainer ruling accepted 2026-09-27, #778) with a 109 to 269 byte body band (T2). Three `=` are not valid padding."
     },
     {
       "id": "aws-bedrock-long-term-api-key-boundary-url-safe",
@@ -53955,7 +53955,7 @@
       ],
       "input": "AWS_BEARER_TOKEN_BEDROCK=\u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREV-KEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT\n",
       "expected": [],
-      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1 candidate, maintainer ruling pending) with a 109 to 269 byte body band (T2). A URL-safe `-` inside the body is not standard Base64."
+      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1, maintainer ruling accepted 2026-09-27, #778) with a 109 to 269 byte body band (T2). A URL-safe `-` inside the body is not standard Base64."
     },
     {
       "id": "aws-bedrock-long-term-api-key-adversarial-dense-findings",
@@ -54374,7 +54374,7 @@
         "maxFindings": 50,
         "maxRuntimeMs": 250
       },
-      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1 candidate, maintainer ruling pending) with a 109 to 269 byte body band (T2). 50 space-separated keys on one line are each reported once at their own range, within the declared resource bounds."
+      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1, maintainer ruling accepted 2026-09-27, #778) with a 109 to 269 byte body band (T2). 50 space-separated keys on one line are each reported once at their own range, within the declared resource bounds."
     },
     {
       "id": "aws-bedrock-long-term-api-key-negative-placeholder",
@@ -54387,7 +54387,7 @@
       ],
       "input": "AWS_BEARER_TOKEN_BEDROCK=ABSK...\n",
       "expected": [],
-      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1 candidate, maintainer ruling pending) with a 109 to 269 byte body band (T2). A documentation placeholder is not a key."
+      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1, maintainer ruling accepted 2026-09-27, #778) with a 109 to 269 byte body band (T2). A documentation placeholder is not a key."
     },
     {
       "id": "aws-bedrock-long-term-api-key-boundary-body-one-short",
@@ -54400,7 +54400,7 @@
       ],
       "input": "AWS_BEARER_TOKEN_BEDROCK=\u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREV\n",
       "expected": [],
-      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1 candidate, maintainer ruling pending) with a 109 to 269 byte body band (T2). A 108-byte body, one below the band, is missed, not truncated."
+      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1, maintainer ruling accepted 2026-09-27, #778) with a 109 to 269 byte body band (T2). A 108-byte body, one below the band, is missed, not truncated."
     },
     {
       "id": "aws-bedrock-long-term-api-key-boundary-body-above-band",
@@ -54413,7 +54413,7 @@
       ],
       "input": "AWS_BEARER_TOKEN_BEDROCK=\u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOK\n",
       "expected": [],
-      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1 candidate, maintainer ruling pending) with a 109 to 269 byte body band (T2). A 270-byte body, one above the band, is missed, not truncated."
+      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1, maintainer ruling accepted 2026-09-27, #778) with a 109 to 269 byte body band (T2). A 270-byte body, one above the band, is missed, not truncated."
     },
     {
       "id": "aws-bedrock-long-term-api-key-boundary-wrong-prefix",
@@ -54426,7 +54426,7 @@
       ],
       "input": "AWS_BEARER_TOKEN_BEDROCK=ABSXSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT\n",
       "expected": [],
-      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1 candidate, maintainer ruling pending) with a 109 to 269 byte body band (T2). A wrong prefix (`ABSX`)."
+      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1, maintainer ruling accepted 2026-09-27, #778) with a 109 to 269 byte body band (T2). A wrong prefix (`ABSX`)."
     },
     {
       "id": "aws-bedrock-long-term-api-key-boundary-embedded-in-base64",
@@ -54439,7 +54439,7 @@
       ],
       "input": "Q\u0041BSKSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNTHETICREVOKEDSYNT\n",
       "expected": [],
-      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1 candidate, maintainer ruling pending) with a 109 to 269 byte body band (T2). A Base64 byte glued before the prefix makes it part of a wider run."
+      "note": "Issue #864: long-term Amazon Bedrock API key, `ABSK` + standard Base64 (T1, maintainer ruling accepted 2026-09-27, #778) with a 109 to 269 byte body band (T2). A Base64 byte glued before the prefix makes it part of a wider run."
     },
     {
       "id": "aws-bedrock-short-term-api-key-positive-bare",
@@ -54461,7 +54461,7 @@
           "end": 237
         }
       ],
-      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1 candidate, maintainer ruling pending), tail floor T2. A bare key on its own line."
+      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1, maintainer ruling accepted 2026-09-27, #779), tail floor T2. A bare key on its own line."
     },
     {
       "id": "aws-bedrock-short-term-api-key-positive-dotenv",
@@ -54483,7 +54483,7 @@
           "end": 262
         }
       ],
-      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1 candidate, maintainer ruling pending), tail floor T2. The documented `AWS_BEARER_TOKEN_BEDROCK` dotenv assignment."
+      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1, maintainer ruling accepted 2026-09-27, #779), tail floor T2. The documented `AWS_BEARER_TOKEN_BEDROCK` dotenv assignment."
     },
     {
       "id": "aws-bedrock-short-term-api-key-positive-export-quoted",
@@ -54505,7 +54505,7 @@
           "end": 270
         }
       ],
-      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1 candidate, maintainer ruling pending), tail floor T2. A quoted `export`; the quotes stay outside the span."
+      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1, maintainer ruling accepted 2026-09-27, #779), tail floor T2. A quoted `export`; the quotes stay outside the span."
     },
     {
       "id": "aws-bedrock-short-term-api-key-positive-yaml",
@@ -54527,7 +54527,7 @@
           "end": 263
         }
       ],
-      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1 candidate, maintainer ruling pending), tail floor T2. A YAML value."
+      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1, maintainer ruling accepted 2026-09-27, #779), tail floor T2. A YAML value."
     },
     {
       "id": "aws-bedrock-short-term-api-key-positive-json",
@@ -54549,7 +54549,7 @@
           "end": 267
         }
       ],
-      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1 candidate, maintainer ruling pending), tail floor T2. A quoted JSON value."
+      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1, maintainer ruling accepted 2026-09-27, #779), tail floor T2. A quoted JSON value."
     },
     {
       "id": "aws-bedrock-short-term-api-key-overlap-bearer",
@@ -54571,7 +54571,7 @@
           "end": 268
         }
       ],
-      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1 candidate, maintainer ruling pending), tail floor T2. A `Bearer` header; the provider-specific finding wins overlap with `bearer-token`."
+      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1, maintainer ruling accepted 2026-09-27, #779), tail floor T2. A `Bearer` header; the provider-specific finding wins overlap with `bearer-token`."
     },
     {
       "id": "aws-bedrock-short-term-api-key-positive-sdk-call",
@@ -54593,7 +54593,7 @@
           "end": 269
         }
       ],
-      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1 candidate, maintainer ruling pending), tail floor T2. An SDK call argument."
+      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1, maintainer ruling accepted 2026-09-27, #779), tail floor T2. An SDK call argument."
     },
     {
       "id": "aws-bedrock-short-term-api-key-positive-tool-call",
@@ -54615,7 +54615,7 @@
           "end": 311
         }
       ],
-      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1 candidate, maintainer ruling pending), tail floor T2. An agent tool-call argument."
+      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1, maintainer ruling accepted 2026-09-27, #779), tail floor T2. An agent tool-call argument."
     },
     {
       "id": "aws-bedrock-short-term-api-key-positive-padding",
@@ -54637,7 +54637,7 @@
           "end": 239
         }
       ],
-      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1 candidate, maintainer ruling pending), tail floor T2. Two `=` of padding are part of the span."
+      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1, maintainer ruling accepted 2026-09-27, #779), tail floor T2. Two `=` of padding are part of the span."
     },
     {
       "id": "aws-bedrock-short-term-api-key-negative-env-reference",
@@ -54650,7 +54650,7 @@
       ],
       "input": "export AWS_BEARER_TOKEN_BEDROCK=${AWS_BEARER_TOKEN_BEDROCK}\n",
       "expected": [],
-      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1 candidate, maintainer ruling pending), tail floor T2. An environment reference is not a key."
+      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1, maintainer ruling accepted 2026-09-27, #779), tail floor T2. An environment reference is not a key."
     },
     {
       "id": "aws-bedrock-short-term-api-key-negative-empty-assignment",
@@ -54663,7 +54663,7 @@
       ],
       "input": "AWS_BEARER_TOKEN_BEDROCK=\n",
       "expected": [],
-      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1 candidate, maintainer ruling pending), tail floor T2. An empty assignment."
+      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1, maintainer ruling accepted 2026-09-27, #779), tail floor T2. An empty assignment."
     },
     {
       "id": "aws-bedrock-short-term-api-key-negative-public-alias",
@@ -54676,7 +54676,7 @@
       ],
       "input": "user BedrockAPIKey-abcd-at-000000000000 arn:aws:iam::000000000000:user/BedrockAPIKey-abcd\n",
       "expected": [],
-      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1 candidate, maintainer ruling pending), tail floor T2. The decoded public alias and an IAM ARN are not the key."
+      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1, maintainer ruling accepted 2026-09-27, #779), tail floor T2. The decoded public alias and an IAM ARN are not the key."
     },
     {
       "id": "aws-bedrock-short-term-api-key-boundary-three-padding",
@@ -54689,7 +54689,7 @@
       ],
       "input": "AWS_BEARER_TOKEN_BEDROCK=bedrock-api-key-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZA===\n",
       "expected": [],
-      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1 candidate, maintainer ruling pending), tail floor T2. Three `=` are not valid padding."
+      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1, maintainer ruling accepted 2026-09-27, #779), tail floor T2. Three `=` are not valid padding."
     },
     {
       "id": "aws-bedrock-short-term-api-key-boundary-url-safe",
@@ -54702,7 +54702,7 @@
       ],
       "input": "AWS_BEARER_TOKEN_BEDROCK=bedrock-api-key-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3lu-GhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZA\n",
       "expected": [],
-      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1 candidate, maintainer ruling pending), tail floor T2. A URL-safe `-` inside the body is not standard Base64."
+      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1, maintainer ruling accepted 2026-09-27, #779), tail floor T2. A URL-safe `-` inside the body is not standard Base64."
     },
     {
       "id": "aws-bedrock-short-term-api-key-adversarial-dense-findings",
@@ -54961,7 +54961,7 @@
         "maxFindings": 30,
         "maxRuntimeMs": 250
       },
-      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1 candidate, maintainer ruling pending), tail floor T2. 30 space-separated keys on one line are each reported once at their own range, within the declared resource bounds."
+      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1, maintainer ruling accepted 2026-09-27, #779), tail floor T2. 30 space-separated keys on one line are each reported once at their own range, within the declared resource bounds."
     },
     {
       "id": "aws-bedrock-short-term-api-key-negative-prefix-only",
@@ -54974,7 +54974,7 @@
       ],
       "input": "the prefix bedrock-api-key- alone\n",
       "expected": [],
-      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1 candidate, maintainer ruling pending), tail floor T2. The prefix alone is not a key."
+      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1, maintainer ruling accepted 2026-09-27, #779), tail floor T2. The prefix alone is not a key."
     },
     {
       "id": "aws-bedrock-short-term-api-key-negative-head-only",
@@ -54987,7 +54987,7 @@
       ],
       "input": "bedrock-api-key-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsP\n",
       "expected": [],
-      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1 candidate, maintainer ruling pending), tail floor T2. The fixed head with no tail is a constant, not a key."
+      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1, maintainer ruling accepted 2026-09-27, #779), tail floor T2. The fixed head with no tail is a constant, not a key."
     },
     {
       "id": "aws-bedrock-short-term-api-key-boundary-truncated-head",
@@ -55000,7 +55000,7 @@
       ],
       "input": "AWS_BEARER_TOKEN_BEDROCK=bedrock-api-key-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZA\n",
       "expected": [],
-      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1 candidate, maintainer ruling pending), tail floor T2. A head truncated to 100 bytes is missed."
+      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1, maintainer ruling accepted 2026-09-27, #779), tail floor T2. A head truncated to 100 bytes is missed."
     },
     {
       "id": "aws-bedrock-short-term-api-key-boundary-head-one-off",
@@ -55013,7 +55013,7 @@
       ],
       "input": "AWS_BEARER_TOKEN_BEDROCK=bedrock-api-key-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Z2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZA\n",
       "expected": [],
-      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1 candidate, maintainer ruling pending), tail floor T2. A head one byte off is missed."
+      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1, maintainer ruling accepted 2026-09-27, #779), tail floor T2. A head one byte off is missed."
     },
     {
       "id": "aws-bedrock-short-term-api-key-boundary-wrong-prefix",
@@ -55026,7 +55026,7 @@
       ],
       "input": "AWS_BEARER_TOKEN_BEDROCK=bedrock-api-token-YmVkcm9jay5hbWF6b25hd3MuY29tLz9BY3Rpb249Q2FsbFdpdGhCZWFyZXJUb2tlbiZYLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZAU3ludGhldGljUmV2b2tlZA\n",
       "expected": [],
-      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1 candidate, maintainer ruling pending), tail floor T2. A wrong prefix."
+      "note": "Issue #864: short-term Amazon Bedrock API key, `bedrock-api-key-` + fixed 133-byte Base64 head + standard Base64 (T1, maintainer ruling accepted 2026-09-27, #779), tail floor T2. A wrong prefix."
     },
     {
       "id": "mistral-api-key-positive-dotenv-named",

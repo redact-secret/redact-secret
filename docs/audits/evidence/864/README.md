@@ -15,30 +15,43 @@ Two families, one module (`detectors::aws_bedrock`):
 
 | detector | type | grammar | tier |
 | --- | --- | --- | --- |
-| `aws-bedrock-long-term-api-key` | `aws_bedrock_long_term_api_key` | `ABSK`, 109 to 269 standard-Base64 bytes, up to two `=` | prefix and alphabet: T1 candidate; band: T2 |
-| `aws-bedrock-short-term-api-key` | `aws_bedrock_short_term_api_key` | `bedrock-api-key-`, the exact 133-byte Base64 head, at least 64 more standard-Base64 bytes, up to two `=` | prefix, head and alphabet: T1 candidate; tail floor: T2 |
+| `aws-bedrock-long-term-api-key` | `aws_bedrock_long_term_api_key` | `ABSK`, 109 to 269 standard-Base64 bytes, up to two `=` | prefix and alphabet: T1; band: T2 |
+| `aws-bedrock-short-term-api-key` | `aws_bedrock_short_term_api_key` | `bedrock-api-key-`, the exact 133-byte Base64 head, at least 64 more standard-Base64 bytes, up to two `=` | prefix, head and alphabet: T1; tail floor: T2 |
 
 Both are provider pack, always redacted, high confidence, provider
 specificity.
 
-## Maintainer ruling dependency (T1)
+## Maintainer ruling (T1, 2026-09-27)
 
-The T1 label is a candidate until the maintainer rules on the claim set. The
-sources are provider-authored but a scan pattern is not a format
-specification:
+The maintainer accepted T1 for both families on 2026-09-27, recorded on
+#778 and #779. A scan pattern is not itself a format specification, so each
+ruling is scoped narrowly:
 
-- AWS Security Blog, "Securing Amazon Bedrock API keys" (2025-10-17), which
-  prints a `Pattern:` for each type;
-- AWS-authored token generators (`aws-bedrock-token-generator-python`,
-  `-js`, `-java`): `AUTH_PREFIX = "bedrock-api-key-"` and standard padded
-  Base64 of a presigned `CallWithBearerToken` URL (short-term only);
-- the IAM `ServiceSpecificCredential` reference for the public alias versus
-  secret split (long-term).
+- **`aws-bedrock-long-term-api-key`:** T1 for the `ABSK` prefix and the
+  standard-Base64 alphabet with `={0,2}` padding, on the AWS Security Blog,
+  "Securing Amazon Bedrock API keys" (2025-10-17), which prints a `Pattern:`
+  for the type — accepted as provider evidence for the prefix and alphabet
+  only, not a format specification. Total length (132, or 136 for a `+1`
+  secondary key) and IAM user-name variants other than `BedrockAPIKey-` stay
+  T2/unspecified.
+- **`aws-bedrock-short-term-api-key`:** T1 for the `bedrock-api-key-`
+  prefix, the fixed 133-character Base64 head, and the standard
+  padded-Base64 alphabet, on the AWS-authored token generators
+  (`aws-bedrock-token-generator-python`'s `token_generator.py`:
+  `AUTH_PREFIX = "bedrock-api-key-"`, `TOKEN_VERSION = "&Version=1"`, Base64
+  of a SigV4-presigned `https://bedrock.amazonaws.com/?Action=CallWithBearerToken`
+  URL; the JS `src/token.ts` and Java `BedrockTokenGenerator.java`
+  generators), plus the AWS Security Blog pattern (whose printed body class
+  is malformed; the intended class is `[A-Za-z0-9+/]`). Total length (not
+  documented; "over 1000 characters" is vendor-blog only) and the
+  session-token part of the body stay T2/unspecified.
 
-Until the ruling, the code, spec rows and any support-matrix entry must not
-be described as T1-qualified. The benchmarks counterpart
+The IAM `ServiceSpecificCredential` reference (public alias versus secret
+split, long-term) remains supporting context, not part of the T1 scope.
+The benchmarks counterpart
 ([redact-secret-benchmarks#384](https://github.com/redact-secret/redact-secret-benchmarks/issues/384))
-owns fixtures and the qualification run.
+owns fixtures and the qualification run, and moves its `providerSource` from
+"T1 candidate" to T1 through its own reviewed change, not a hand edit.
 
 ## Research
 

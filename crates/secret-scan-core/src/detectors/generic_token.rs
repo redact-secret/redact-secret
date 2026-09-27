@@ -1235,7 +1235,7 @@ const MAX_VENDOR_PLACEHOLDER_PREFIX_LEN: usize = 12;
 /// prefix in front of the placeholder. A real token's body is random
 /// material, which fails all three checks, so the prefix alone never
 /// excludes a value.
-fn is_vendor_prefixed_placeholder(value: &str) -> bool {
+pub(super) fn is_vendor_prefixed_placeholder(value: &str) -> bool {
     value
         .char_indices()
         .take_while(|&(index, _)| index <= MAX_VENDOR_PLACEHOLDER_PREFIX_LEN)
