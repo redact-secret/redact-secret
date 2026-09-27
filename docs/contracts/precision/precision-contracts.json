@@ -402,10 +402,28 @@
             {"name": "right", "alphabet": "[A-Za-z0-9_-]", "length": [58, 74], "basis": "single-tool; adopted as support-policy"}
           ],
           "sources": ["gitleaks-8.30.1", "trufflehog-3.97.4"]
+        },
+        {
+          "id": "admin",
+          "support": "supported",
+          "tier": "T2",
+          "grammar": "sk-admin-(?:[A-Za-z0-9_-]{74}|[A-Za-z0-9_-]{58})T3BlbkFJ(?:[A-Za-z0-9_-]{74}|[A-Za-z0-9_-]{58})",
+          "segments": [
+            {"name": "prefix", "literal": "sk-admin-", "basis": "single-tool (gitleaks); prefix also named by provider code in openai/codex, which sets no width or alphabet"},
+            {"name": "left", "alphabet": "[A-Za-z0-9_-]", "length": [58, 74], "basis": "single-tool (gitleaks vectors are all 58/58); adopted as support-policy, sharing the proj/svcacct widths"},
+            {"name": "marker", "literal": "T3BlbkFJ", "basis": "single-tool (gitleaks requires it on admin); the marker is a family-wide watermark in provider code"},
+            {"name": "right", "alphabet": "[A-Za-z0-9_-]", "length": [58, 74], "basis": "single-tool; adopted as support-policy"}
+          ],
+          "sources": ["gitleaks-8.30.1"],
+          "evidenceGaps": [
+            "no provider documentation states an admin-key prefix grammar, length or alphabet (#657, #777); tier T2, not T1",
+            "trufflehog-3.97.4 explicitly excludes admin keys; trufflehog#4698 (a feature request, no source) asks for a 124-byte body, numerically equal to 58 + marker + 58, and does not mention the marker",
+            "no source shows a marker-less admin key, and none measures a 74/74 admin key",
+            "intentionally unsupported: a marker-less `sk-admin-` body of any length (a recorded false negative for `openai-token`, admitted only if issuance shows such keys exist). Admitting a free `sk-admin-` body would also need an `sk-ant-`/`sk-or-` reject list and would widen false positives on prose and identifiers for a family with very low leak prevalence. The generic layers can still claim the value from context (Bearer, quoted credential-named assignment); the unquoted bare, env, YAML and tool-call shapes stay silent (#863)"
+          ]
         }
       ],
       "pending": [
-        {"id": "admin", "prefix": "sk-admin-", "tier": "T0", "reason": "gitleaks registers it with the proj/svcacct widths; trufflehog explicitly excludes admin keys; no provider documentation. Unresolved tool disagreement; not supported by the default rule until a second independent source establishes the shape. Under beta.4 this prefix fell through to the bare branch and matched as a legacy key; under the contract it is a recorded false negative."},
         {"id": "service", "prefix": "sk-service-", "tier": "T0", "reason": "trufflehog alone registers `service-` as a service-account spelling; gitleaks does not; no provider documentation. Not supported until independently established."}
       ],
       "excluded": [
@@ -414,7 +432,7 @@
       ],
       "conflicts": [
         {"property": "segment lengths", "positions": {"gitleaks-8.30.1": "exactly 74 or 58 per segment (proj/svcacct/admin); exactly 20/20 (legacy)", "trufflehog-3.97.4": "one or more bytes per segment"}, "resolution": "Adopt gitleaks's enumerated widths as an explicit support-policy choice, because it is the only source that states a width and the measured twin differs only in width (73 vs 74). This is not converted into a provider claim: a provider-issued key with another width is a recorded intentionally-unsupported form, and the ADR flags it for revisiting if provider documentation appears. The marker requirement, on which both tools agree, is the evidence-backed part of the rule."},
-        {"property": "prefix set", "positions": {"gitleaks-8.30.1": "proj, svcacct, admin", "trufflehog-3.97.4": "proj, svcacct, service; explicitly not admin"}, "resolution": "Support the intersection (proj, svcacct) plus legacy; record admin and service as pending."}
+        {"property": "prefix set", "positions": {"gitleaks-8.30.1": "proj, svcacct, admin", "trufflehog-3.97.4": "proj, svcacct, service; explicitly not admin"}, "resolution": "Support proj and svcacct plus legacy at their tool-agreed shapes. Admin is supported at T2 (#863) with the shared marker-gated grammar because the only source that names it (gitleaks) gives the same widths and marker and the shipped detector already accepts it; trufflehog's exclusion is recorded as an evidence gap, not resolved. `service` stays pending."}
       ],
       "mutations": [
         {"mutationKind": "boundary", "mutation": "internal marker: T3BlbkFK vs contracted T3BlbkFJ", "fixtureIds": ["openai-token-legacy-plain-twin", "openai-token-legacy-unicode-crlf-twin"], "distinguishingProperty": "marker literal", "basis": "tool-agreement", "disposition": "retained", "reason": "Both tool sources require the literal marker; silence follows from construction."},
