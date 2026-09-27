@@ -1,5 +1,5 @@
 name: Request a detector / 탐지기 요청
-description: Suggest a documented provider credential or a supported PII entity.
+description: Suggest a provider credential format or a future PII entity.
 title: "[detector request] "
 body:
   - type: markdown
