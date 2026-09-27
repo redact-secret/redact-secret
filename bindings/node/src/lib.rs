@@ -1105,8 +1105,15 @@ validator: none\n";
         initialize_pii(vec!["pii".to_owned(), "pii:global".to_owned()]).unwrap();
         assert_eq!(
             pii_activation().unwrap(),
-            "credentials=full;selectors=pii:global;families=;vocabulary=pii-context/v1"
+            "credentials=full;selectors=pii:global;families=pii:global:network-address;vocabulary=pii-context/v1"
         );
+        let findings = scan("🔒 client_ip=10.0.0.8".to_owned(), None, None, None).unwrap();
+        let finding = findings
+            .iter()
+            .find(|finding| finding.r#type == "pii_global_network_address")
+            .unwrap();
+        assert_eq!((finding.start, finding.end), (13, 21));
+        assert_eq!(finding.detector, "pii-domain");
         initialize_pii(vec!["pii:global".to_owned()]).unwrap();
         assert_err_status(initialize(), "PII_ACTIVATION_CONFLICT");
     }

@@ -20,9 +20,9 @@ console.log(result.findings.length); // 1
 
 PII activation is explicit and defaults off. Pass `pii: ["pii"]` to activate
 the global selector, then inspect the canonical identity with
-`piiActivation()`. The current artifact intentionally contains no production
-PII family, so this selector closes to an empty family list and does not make
-a PII detection claim. Reordered or duplicate equivalent selectors are
+`piiActivation()`. The artifact contains the opt-in
+`pii:global:network-address` family; availability does not itself make a
+support-status claim. Reordered or duplicate equivalent selectors are
 idempotent; a later different selection fails with the fixed,
 input-free `PII_ACTIVATION_CONFLICT` error. The `./common` entry point follows
 the same contract while retaining `credentials=common` in its identity.
@@ -32,7 +32,7 @@ import { initialize, piiActivation } from "@redact-secret/core";
 
 await initialize({ pii: ["pii", "pii:global"] });
 console.log(piiActivation());
-// credentials=full;selectors=pii:global;families=;vocabulary=pii-context/v1
+// credentials=full;selectors=pii:global;families=pii:global:network-address;vocabulary=pii-context/v1
 ```
 
 `scan(input)` returns findings. `redact(input, findings)` uses findings from

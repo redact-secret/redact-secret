@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "family": "pii:global:network-address",
+  "familyContractVersion": 1,
+  "selector": "pii:family:global:network-address",
+  "publicType": "pii_global_network_address",
+  "contextRequirement": "required-for-sensitive-classification",
+  "cases": [
+    {
+      "id": "network-address-ipv4-private-context",
+      "input": "client_ip = 192.168.1.7",
+      "expected": [{"start": 12, "end": 23}]
+    },
+    {
+      "id": "network-address-ipv6-ula-korean-context",
+      "input": "원격_ip = fd00::1",
+      "expected": [{"start": 12, "end": 19}]
+    },
+    {
+      "id": "network-address-mapped-ipv4-context",
+      "input": "source_ip=::ffff:192.168.1.7",
+      "expected": [{"start": 10, "end": 28}]
+    },
+    {
+      "id": "network-address-link-local-ipv4-context",
+      "input": "source_ip=169.254.1.7",
+      "expected": [{"start": 10, "end": 21}]
+    },
+    {
+      "id": "network-address-link-local-ipv6-context",
+      "input": "client_ip=fe80::1",
+      "expected": [{"start": 10, "end": 17}]
+    },
+    {
+      "id": "network-address-unicode-prefix",
+      "input": "🔒 client_ip=10.0.0.8",
+      "expected": [{"start": 15, "end": 23}]
+    },
+    {
+      "id": "network-address-documentation-controls",
+      "input": "client_ip=192.0.2.7 source_ip=2001:db8::7",
+      "expected": []
+    },
+    {
+      "id": "network-address-url-hosts-need-context",
+      "input": "https://192.168.1.7/a http://[fd00::1]/b client_ip=http://192.168.1.7/c",
+      "expected": []
+    },
+    {
+      "id": "network-address-version-and-number-collisions",
+      "input": "release v192.168.1.7; value=10.0.0.8; number 1.2.3.4",
+      "expected": []
+    },
+    {
+      "id": "network-address-zone-id-excluded",
+      "input": "client_ip=fe80::1%eth0",
+      "expected": []
+    },
+    {
+      "id": "network-address-governed-invisible-inside",
+      "input": "client_ip=192.168.1.​7",
+      "expected": [{"start": 10, "end": 24, "obfuscation": "invisible-characters"}]
+    },
+    {
+      "id": "network-address-governed-invisible-does-not-create-boundary",
+      "input": "client_ip=192.168.1.7​suffix",
+      "expected": []
+    }
+  ]
+}

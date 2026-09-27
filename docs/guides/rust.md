@@ -109,7 +109,10 @@ lists the full surface. Generate local rustdoc with
 `DetectorRegistry::with_built_in_and_pii` and
 `with_common_built_in_and_pii` capture that selection and expose its canonical
 identity through `activation_identity()`. Empty selection preserves the
-legacy credential-only registry byte for byte. The current crate intentionally
-registers no production PII family, so `pii` activates an empty adapter slot
-without claiming PII detection support; known unavailable family or
-jurisdiction selectors fail closed.
+legacy credential-only registry byte for byte. The crate registers
+`pii:global:network-address` in both profiles. Select it with
+`pii`/`pii:global` or exactly with
+`pii:family:global:network-address`. It requires a reviewed high-signal
+network-address field label and never flags documentation/reserved controls;
+availability alone is not a support-status claim. Known unavailable families
+or jurisdictions fail closed.

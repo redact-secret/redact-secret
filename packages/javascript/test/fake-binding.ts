@@ -102,12 +102,17 @@ export function createFakeBinding(
           ? ["PII_SELECTOR_UNSUPPORTED", "PII jurisdiction or family is unsupported."]
           : pii.includes("pii:us")
             ? ["PII_SELECTOR_UNAVAILABLE", "PII selection is unavailable in this artifact."]
+            : pii.includes("pii:family:global:email")
+              ? ["PII_SELECTOR_UNAVAILABLE", "PII selection is unavailable in this artifact."]
             : undefined;
       if (rejected !== undefined) {
         throw Object.assign(new Error(rejected[1]), { code: rejected[0] });
       }
       const selectors = [...new Set(pii.map((value) => value === "pii" ? "pii:global" : value))].sort();
-      const next = `credentials=${options.profile ?? "full"};selectors=${selectors.length === 0 ? "off" : selectors.join(",")};families=;vocabulary=pii-context/v1`;
+      const families = selectors.some((value) => value === "pii:global" || value === "pii:family:global:network-address")
+        ? "pii:global:network-address"
+        : "";
+      const next = `credentials=${options.profile ?? "full"};selectors=${selectors.length === 0 ? "off" : selectors.join(",")};families=${families};vocabulary=pii-context/v1`;
       if (activation !== next && calls.filter((call) => call === "initialize").length > 1) {
         throw Object.assign(new Error("conflict"), { code: "PII_ACTIVATION_CONFLICT" });
       }

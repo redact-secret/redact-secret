@@ -79,7 +79,7 @@ describe("initialization contract", () => {
       runtime.initialize({ pii: ["pii:global"] }),
     ]);
     expect(runtime.piiActivation()).toBe(
-      "credentials=full;selectors=pii:global;families=;vocabulary=pii-context/v1",
+      "credentials=full;selectors=pii:global;families=pii:global:network-address;vocabulary=pii-context/v1",
     );
     await expect(runtime.initialize()).rejects.toMatchObject({
       code: "PII_ACTIVATION_CONFLICT",

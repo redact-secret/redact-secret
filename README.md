@@ -189,10 +189,11 @@ in JavaScript), never the matched plaintext. The
 policies, limits, profiles, and browser loading.
 
 PII activation is opt-in and defaults off across Rust, JavaScript, Python, and
-the CLI. The shared selector, arbitration, and English/Korean context substrate
-is present, but this release intentionally registers no production PII family
-and therefore makes no PII detection support claim. See each language guide
-for activation identity and fixed failure behavior.
+the CLI. The `pii:global:network-address` family recognizes context-qualified
+IPv4 and IPv6 while suppressing reviewed reserved/documentation classes. Its
+support status stays pending until exact-candidate `pii-v1` benchmark evidence
+is linked; detector availability alone is not a support claim. See each
+language guide for activation identity and fixed failure behavior.
 
 ## Core operations
 

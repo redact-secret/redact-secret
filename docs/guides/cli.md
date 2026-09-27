@@ -15,14 +15,14 @@ redact-secret -- --leading-dash.txt   # stop option parsing
 
 PII defaults off. Repeat `--pii <selector>` to request a canonical selector
 set, or use `--print-pii-activation` to print its activation identity and exit
-without opening standard input or any file. The current binary intentionally
-contains no production PII family: `--pii pii` activates an empty adapter
-closure and makes no PII support claim. Invalid, unsupported, unavailable, and
-conflicting selections use fixed input-free diagnostics.
+without opening standard input or any file. `--pii pii` activates the
+`pii:global:network-address` family; availability does not itself make a
+support-status claim. Invalid, unsupported, unavailable, and conflicting
+selections use fixed input-free diagnostics.
 
 ```bash
 redact-secret --pii pii --print-pii-activation
-# credentials=full;selectors=pii:global;families=;vocabulary=pii-context/v1
+# credentials=full;selectors=pii:global;families=pii:global:network-address;vocabulary=pii-context/v1
 ```
 
 With no paths, the CLI reads standard input. With paths, check mode reads each

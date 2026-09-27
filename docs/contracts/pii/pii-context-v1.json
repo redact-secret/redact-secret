@@ -51,6 +51,16 @@
       "provenance": "synthetic-contract-example"
     },
     {
+      "id": "en-network-address-field",
+      "language": "en",
+      "kind": "field-label",
+      "class": "positive",
+      "strength": "high-signal",
+      "domains": ["network-address"],
+      "forms": ["ip", "ip address", "client ip", "source ip", "remote address"],
+      "provenance": "synthetic-contract-example"
+    },
+    {
       "id": "en-contact-label",
       "language": "en",
       "kind": "natural-language-label",
@@ -101,6 +111,16 @@
       "provenance": "synthetic-contract-example"
     },
     {
+      "id": "ko-network-address-field",
+      "language": "ko",
+      "kind": "field-label",
+      "class": "positive",
+      "strength": "high-signal",
+      "domains": ["network-address"],
+      "forms": ["ip", "ip 주소", "클라이언트 ip", "원격 주소"],
+      "provenance": "synthetic-contract-example"
+    },
+    {
       "id": "ko-contact-label",
       "language": "ko",
       "kind": "natural-language-label",
@@ -138,6 +158,13 @@
       "template": "\"EMAIL\" = {{candidate:a}}",
       "candidates": [{"id": "a", "domain": "email", "identityEstablished": true}],
       "expectedAssociations": [{"candidate": "a", "matches": ["en-email-field"], "effect": "positive-evidence"}]
+    },
+    {
+      "id": "en-network-address-field-contract",
+      "language": "en",
+      "template": "client_ip = {{candidate:a}}",
+      "candidates": [{"id": "a", "domain": "network-address", "identityEstablished": true}],
+      "expectedAssociations": [{"candidate": "a", "matches": ["en-network-address-field"], "effect": "positive-evidence"}]
     },
     {
       "id": "en-ambiguous-word-without-identity",
@@ -180,6 +207,13 @@
       "template": "이메일: {{candidate:a}}",
       "candidates": [{"id": "a", "domain": "email", "identityEstablished": true}],
       "expectedAssociations": [{"candidate": "a", "matches": ["ko-email-field"], "effect": "positive-evidence"}]
+    },
+    {
+      "id": "ko-network-address-field-contract",
+      "language": "ko",
+      "template": "클라이언트_ip = {{candidate:a}}",
+      "candidates": [{"id": "a", "domain": "network-address", "identityEstablished": true}],
+      "expectedAssociations": [{"candidate": "a", "matches": ["ko-network-address-field"], "effect": "positive-evidence"}]
     },
     {
       "id": "ko-mixed-ascii-hangul-key",

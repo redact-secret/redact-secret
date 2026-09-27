@@ -26,8 +26,9 @@ usage: redact-secret [--json] [--pii <selector>]... [--] [<path>...]
 ```
 
 PII selectors are opt-in and repeatable. The activation-print form exits
-without opening input. This artifact currently registers no production PII
-family, so activation makes no PII support claim.
+without opening input. This artifact registers the context-qualified
+`pii:global:network-address` family; availability makes no support-status
+claim by itself.
 
 ## Check mode
 
