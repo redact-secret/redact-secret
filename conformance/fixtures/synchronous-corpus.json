@@ -1,6 +1,6 @@
 {
   "offsetUnit": "utf8-byte",
-  "fixtureCount": 2370,
+  "fixtureCount": 2375,
   "fixtures": [
     {
       "id": "host-dotenv-github",
@@ -10850,14 +10850,14 @@
       "expected": [
         {
           "detector": "openai-token",
-          "type": "openai_api_key",
+          "type": "openai_admin_api_key",
           "confidence": "high",
           "specificity": "provider",
           "start": 0,
           "end": 165
         }
       ],
-      "note": "Reviewed contract (issue #368): `sk-` + 20 [A-Za-z0-9] + `T3BlbkFJ` + 20 [A-Za-z0-9] (legacy), or `sk-proj-`/`sk-svcacct-`/`sk-admin-` + 74|58 [A-Za-z0-9_-] + `T3BlbkFJ` + 74|58 [A-Za-z0-9_-]; the marker is the base64 encoding of `OpenAI`. The `sk-admin-` namespace shares the segmented grammar (gitleaks 8.30.1 lists it; trufflehog 3.97.4 skips it only because its live verifier cannot check admin keys). beta.4 already flagged it through the old bare branch; keeping it avoids a regression on a secret-bearing form."
+      "note": "Reviewed contract (issue #368): `sk-` + 20 [A-Za-z0-9] + `T3BlbkFJ` + 20 [A-Za-z0-9] (legacy), or `sk-proj-`/`sk-svcacct-`/`sk-admin-` + 74|58 [A-Za-z0-9_-] + `T3BlbkFJ` + 74|58 [A-Za-z0-9_-]; the marker is the base64 encoding of `OpenAI`. The `sk-admin-` namespace shares the segmented grammar (gitleaks 8.30.1 lists it; trufflehog 3.97.4 skips it only because its live verifier cannot check admin keys). beta.4 already flagged it through the old bare branch; keeping it avoids a regression on a secret-bearing form. Issue #774 split `sk-admin-` onto its own `openai_admin_api_key` finding type; the grammar and span are unchanged."
     },
     {
       "id": "openai-positive-project-58-byte-segments",
@@ -10948,14 +10948,14 @@
         },
         {
           "detector": "openai-token",
-          "type": "openai_api_key",
+          "type": "openai_admin_api_key",
           "confidence": "high",
           "specificity": "provider",
           "start": 385,
           "end": 550
         }
       ],
-      "note": "The legacy, project, service-account, and admin variants are each validated independently in the same input without one suppressing another."
+      "note": "The legacy, project, service-account, and admin variants are each validated independently in the same input without one suppressing another. The admin variant reports `openai_admin_api_key` (issue #774); the other three keep `openai_api_key`."
     },
     {
       "id": "openai-positive-marker-doc-style-placeholder",
@@ -11714,6 +11714,28 @@
       "note": "Provider evidence wins over a client-secret assignment that generic-token also proposes."
     },
     {
+      "id": "openai-overlap-admin-marker-client-secret",
+      "detector": "openai-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "client_secret=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",
+      "expected": [
+        {
+          "detector": "openai-token",
+          "type": "openai_admin_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 14,
+          "end": 179
+        }
+      ],
+      "note": "`openai_admin_api_key` provider evidence wins over a client-secret assignment that generic-token also proposes, the same way `openai_api_key` already does (see `openai-overlap-marker-client-secret`)."
+    },
+    {
       "id": "openai-overlap-twin-under-api-key",
       "detector": "openai-token",
       "kind": "overlap",
@@ -11805,6 +11827,94 @@
         }
       ],
       "note": "The versioned Anthropic namespace is owned by the Anthropic detector."
+    },
+    {
+      "id": "anthropic-positive-enterprise",
+      "detector": "anthropic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk-ant-api01-SYNTHETIC_REVOKED_CONFORMANCE_KEY",
+      "expected": [
+        {
+          "detector": "anthropic-token",
+          "type": "anthropic_enterprise_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 46
+        }
+      ],
+      "note": "Issue #774 splits `sk-ant-api01-` (Claude Enterprise organization key for any scope set selected at creation, not compliance-specific; #776) onto its own finding type, `anthropic_enterprise_api_key`, distinct from `anthropic_api_key` (`sk-ant-api03-`)."
+    },
+    {
+      "id": "anthropic-positive-admin",
+      "detector": "anthropic-token",
+      "kind": "positive",
+      "support": "supported",
+      "tier": "canonical",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "sk-ant-admin01-SYNTHETIC_REVOKED_CONFORMANCE_KEY",
+      "expected": [
+        {
+          "detector": "anthropic-token",
+          "type": "anthropic_admin_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 0,
+          "end": 48
+        }
+      ],
+      "note": "Issue #774 splits `sk-ant-admin01-` (Console Admin API key, full access to every Admin-API endpoint; #775) onto its own finding type, `anthropic_admin_api_key`, distinct from `anthropic_api_key` (`sk-ant-api03-`)."
+    },
+    {
+      "id": "anthropic-overlap-enterprise-context",
+      "detector": "anthropic-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "api_key=sk-ant-api01-SYNTHETIC_REVOKED_CONFORMANCE_KEY",
+      "expected": [
+        {
+          "detector": "anthropic-token",
+          "type": "anthropic_enterprise_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 8,
+          "end": 54
+        }
+      ],
+      "note": "`anthropic_enterprise_api_key` provider evidence wins over the contextual assignment, the same way `anthropic_api_key` already does (see `anthropic-overlap-context`)."
+    },
+    {
+      "id": "anthropic-overlap-admin-context",
+      "detector": "anthropic-token",
+      "kind": "overlap",
+      "support": "supported",
+      "tier": "contextual",
+      "contexts": [
+        "plain-text"
+      ],
+      "input": "api_key=sk-ant-admin01-SYNTHETIC_REVOKED_CONFORMANCE_KEY",
+      "expected": [
+        {
+          "detector": "anthropic-token",
+          "type": "anthropic_admin_api_key",
+          "confidence": "high",
+          "specificity": "provider",
+          "start": 8,
+          "end": 56
+        }
+      ],
+      "note": "`anthropic_admin_api_key` provider evidence wins over the contextual assignment, the same way `anthropic_api_key` already does (see `anthropic-overlap-context`)."
     },
     {
       "id": "anthropic-negative-unrelated-id",

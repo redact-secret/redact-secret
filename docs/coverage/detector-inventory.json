@@ -97,10 +97,31 @@
       "schemes": null
     },
     {
+      "type": "openai_admin_api_key",
+      "detector": "openai-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "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",
+      "schemes": null
+    },
+    {
       "type": "anthropic_api_key",
       "detector": "anthropic-token",
       "policyClass": "always-redact",
       "reconciliationTrigger": "sk-ant-api03-SYNTHETIC_REVOKED_ANTHROPIC_KEY",
+      "schemes": null
+    },
+    {
+      "type": "anthropic_enterprise_api_key",
+      "detector": "anthropic-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "sk-ant-api01-SYNTHETIC_REVOKED_ANTHROPIC_ENTERPRISE_KEY",
+      "schemes": null
+    },
+    {
+      "type": "anthropic_admin_api_key",
+      "detector": "anthropic-token",
+      "policyClass": "always-redact",
+      "reconciliationTrigger": "sk-ant-admin01-SYNTHETIC_REVOKED_ANTHROPIC_ADMIN_KEY",
       "schemes": null
     },
     {

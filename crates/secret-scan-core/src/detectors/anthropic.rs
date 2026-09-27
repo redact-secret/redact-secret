@@ -6,24 +6,38 @@ use crate::detectors::pattern::{self, RunLength};
 use crate::error::DetectorFailure;
 use crate::types::{ByteRange, Candidate, Confidence, Detector, DetectorContext, Specificity};
 
-const PREFIXES: [&str; 3] = ["sk-ant-api03-", "sk-ant-api01-", "sk-ant-admin01-"];
+/// `(prefix, finding type)`. `sk-ant-api03-` keeps the pre-existing
+/// `anthropic_api_key` type name: it is the only one of the three with
+/// prior, independently evidenced fixtures, so splitting the other two
+/// prefixes into their own types does not rename it too (the same rationale
+/// `decision-map-github-token-families-onto-independent-finding-types` uses
+/// for `ghp_`/`github_token`).
+const PREFIXES: [(&str, &str); 3] = [
+    ("sk-ant-api03-", "anthropic_api_key"),
+    ("sk-ant-api01-", "anthropic_enterprise_api_key"),
+    ("sk-ant-admin01-", "anthropic_admin_api_key"),
+];
 
 /// Requires one of three provider-documented versioned Anthropic key prefixes
 /// and a substantial suffix. This prioritizes precision; older, shortened, or
 /// newly versioned formats are intentionally false negatives until their exact
 /// shape is supported.
 ///
-/// - `sk-ant-api03-`: Claude API key.
+/// - `sk-ant-api03-`: Claude API key. Finding type `anthropic_api_key`.
 /// - `sk-ant-api01-`: Claude Enterprise organization key for any scope set
-///   (Compliance Access Key is one use); the finding type does not claim a
-///   scope.
-/// - `sk-ant-admin01-`: Console Admin API key.
+///   selected at creation (user management, Compliance, Analytics, Spend
+///   Limits — Compliance Access Key is one such scope, not the whole type);
+///   the finding type names the general Enterprise class, not one scope.
+///   Finding type `anthropic_enterprise_api_key`.
+/// - `sk-ant-admin01-`: Console Admin API key, full access to every
+///   Admin-API endpoint. Finding type `anthropic_admin_api_key`.
 ///
 /// The prefixes are provider documented (T1). The body grammar is not: the
 /// `>= 20` byte `[A-Za-z0-9_-]` floor is a deliberate superset of the
 /// scanner-corroborated 93 bytes plus `AA` (T2), applied identically to all
-/// three prefixes, and no length or `AA` tail is asserted. All three share the
-/// `anthropic_api_key` type, so policy cannot distinguish the admin class.
+/// three prefixes, and no length or `AA` tail is asserted. Each prefix maps
+/// to its own finding type (issues #775, #776, #862) so policy can treat the
+/// admin and enterprise classes differently from the plain API key.
 pub(super) struct AnthropicTokenDetector;
 
 impl Detector for AnthropicTokenDetector {
@@ -37,21 +51,34 @@ impl Detector for AnthropicTokenDetector {
         _context: &DetectorContext,
     ) -> Result<Vec<Candidate>, DetectorFailure> {
         let mut candidates = Vec::new();
-        for (start, end) in pattern::scan_prefixed_runs(
+        let prefixes: Vec<&str> = PREFIXES.iter().map(|(prefix, _)| *prefix).collect();
+        let ranges = pattern::scan_prefixed_runs(
             input,
-            &PREFIXES,
+            &prefixes,
             RunLength::AtLeast(20),
             pattern::is_alnum_dash,
             pattern::is_alnum_dash,
-        ) {
+        );
+        let bytes = input.as_bytes();
+        for (start, end) in ranges {
             let Some(range) = ByteRange::new(start, end) else {
                 continue;
             };
-            candidates.push(
-                Candidate::new("anthropic_api_key", Confidence::High, range)
-                    .with_specificity(Specificity::Provider)
-                    .with_signals(["anthropic-versioned-prefix", "opaque-suffix"]),
-            );
+            // `scan_prefixed_runs` only ever returns a match starting with
+            // one of the prefixes it was given, so exactly one arm always
+            // applies; a range matching none falls through to the loop's
+            // next iteration rather than panicking on an assumption that
+            // should always hold.
+            for (prefix, type_name) in PREFIXES {
+                if bytes[start..].starts_with(prefix.as_bytes()) {
+                    candidates.push(
+                        Candidate::new(type_name, Confidence::High, range)
+                            .with_specificity(Specificity::Provider)
+                            .with_signals(["anthropic-versioned-prefix", "opaque-suffix"]),
+                    );
+                    break;
+                }
+            }
         }
         Ok(candidates)
     }
@@ -175,12 +202,17 @@ mod tests {
         body
     }
 
-    const NEW_PREFIXES: [&str; 2] = ["sk-ant-api01-", "sk-ant-admin01-"];
+    /// `(prefix, finding type)`, the two prefixes split from the shared
+    /// `anthropic_api_key` type (issues #775, #776).
+    const NEW_PREFIXES: [(&str, &str); 2] = [
+        ("sk-ant-api01-", "anthropic_enterprise_api_key"),
+        ("sk-ant-admin01-", "anthropic_admin_api_key"),
+    ];
 
-    fn assert_single_exact(input: &str, token: &str) {
+    fn assert_single_exact_typed(input: &str, token: &str, expected_type: &str) {
         let candidates = detect(input);
         assert_eq!(candidates.len(), 1, "input: {input}");
-        assert_eq!(candidates[0].type_name(), "anthropic_api_key");
+        assert_eq!(candidates[0].type_name(), expected_type);
         let start = input.find(token).unwrap();
         assert_eq!(
             candidates[0].range(),
@@ -188,9 +220,13 @@ mod tests {
         );
     }
 
+    fn assert_single_exact(input: &str, token: &str) {
+        assert_single_exact_typed(input, token, "anthropic_api_key");
+    }
+
     #[test]
     fn detects_each_new_prefix_in_every_context_with_exact_spans() {
-        for prefix in NEW_PREFIXES {
+        for (prefix, expected_type) in NEW_PREFIXES {
             let token = format!("{prefix}{}", synthetic_body());
             let contexts = [
                 token.clone(),
@@ -208,14 +244,14 @@ mod tests {
                 format!("({token})"),
             ];
             for input in &contexts {
-                assert_single_exact(input, &token);
+                assert_single_exact_typed(input, &token, expected_type);
             }
         }
     }
 
     #[test]
     fn new_prefixes_accept_the_same_twenty_byte_floor_as_api03() {
-        for prefix in NEW_PREFIXES {
+        for (prefix, _) in NEW_PREFIXES {
             assert_eq!(detect(&format!("{prefix}{}", "A".repeat(20))).len(), 1);
             assert_eq!(detect(&format!("{prefix}{}", "A".repeat(19))).len(), 0);
         }
@@ -223,7 +259,7 @@ mod tests {
 
     #[test]
     fn new_prefixes_reject_a_short_body_placeholders_and_prose() {
-        for prefix in NEW_PREFIXES {
+        for (prefix, _) in NEW_PREFIXES {
             assert_eq!(detect(&format!("{prefix}short")).len(), 0);
             assert_eq!(detect(&format!("{prefix}...")).len(), 0);
             assert_eq!(detect(&format!("{prefix}<YOUR_KEY>")).len(), 0);
@@ -252,7 +288,7 @@ mod tests {
     #[test]
     fn new_prefixes_reject_embedding_in_a_longer_token() {
         let body = synthetic_body();
-        for prefix in NEW_PREFIXES {
+        for (prefix, _) in NEW_PREFIXES {
             assert_eq!(detect(&format!("my{prefix}{body}")).len(), 0);
             assert_eq!(detect(&format!("x-{prefix}{body}")).len(), 0);
         }
@@ -260,21 +296,21 @@ mod tests {
 
     #[test]
     fn a_trailing_alphabet_run_stays_part_of_the_span_and_a_delimiter_ends_it() {
-        for prefix in NEW_PREFIXES {
+        for (prefix, expected_type) in NEW_PREFIXES {
             let token = format!("{prefix}{}", synthetic_body());
             let longer = format!("{token}extra");
-            assert_single_exact(&longer, &longer);
+            assert_single_exact_typed(&longer, &longer, expected_type);
             let delimited = format!("{token}.tail");
-            assert_single_exact(&delimited, &token);
+            assert_single_exact_typed(&delimited, &token, expected_type);
         }
     }
 
     #[test]
     fn a_body_with_a_character_outside_the_alphabet_ends_the_span_there() {
-        for prefix in NEW_PREFIXES {
+        for (prefix, expected_type) in NEW_PREFIXES {
             let head = "A".repeat(25);
             let input = format!("{prefix}{head}!{}", "B".repeat(25));
-            assert_single_exact(&input, &format!("{prefix}{head}"));
+            assert_single_exact_typed(&input, &format!("{prefix}{head}"), expected_type);
         }
     }
 
@@ -288,7 +324,15 @@ mod tests {
         let candidates = detect(&input);
         assert_eq!(candidates.len(), 3);
         let mut start = 0;
-        for (candidate, token) in candidates.iter().zip([&a, &b, &c]) {
+        let expected_types = [
+            "anthropic_api_key",
+            "anthropic_enterprise_api_key",
+            "anthropic_admin_api_key",
+        ];
+        for ((candidate, token), expected_type) in
+            candidates.iter().zip([&a, &b, &c]).zip(expected_types)
+        {
+            assert_eq!(candidate.type_name(), expected_type);
             assert_eq!(
                 candidate.range(),
                 ByteRange::new(start, start + token.len()).unwrap()

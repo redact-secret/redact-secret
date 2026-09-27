@@ -22,6 +22,15 @@
 //! its own `sk-ant-`/`sk-or-` reject list), so it is a recorded false
 //! negative here; only the generic layers can still claim it from context.
 //!
+//! `sk-admin-` reports its own finding type, `openai_admin_api_key`
+//! (issue #774), rather than the shared `openai_api_key`: an organization
+//! Admin API key has a materially different blast radius than a project or
+//! service-account key, so policy should be able to tell them apart. Every
+//! other recognized shape (legacy, `proj-`, `svcacct-`) keeps
+//! `openai_api_key` unchanged; the marker-bearing/marker-less T2 contract
+//! above is untouched by this split — only the reported type name for
+//! `sk-admin-` changes.
+//!
 //! Each variant is validated on its own: an explicit `proj-`/`svcacct-`/
 //! `admin-` namespace owns the value outright, so a malformed namespaced
 //! body is rejected rather than re-read as a legacy key. Anthropic's
@@ -40,6 +49,11 @@ const MARKER: &str = "T3BlbkFJ";
 const ANTHROPIC_PREFIX: &str = "ant-";
 /// Namespaces that share the 74/58-byte segmented body grammar.
 const NAMESPACED_PREFIXES: [&str; 3] = ["proj-", "svcacct-", "admin-"];
+/// The one namespace reported under its own finding type; every other
+/// recognized shape (legacy and the remaining namespaces) keeps
+/// `openai_api_key`.
+const ADMIN_NAMESPACE: &str = "admin-";
+const ADMIN_TYPE: &str = "openai_admin_api_key";
 const LEGACY_SEGMENT_LENS: [usize; 1] = [20];
 /// Tried in this order, the same order the reference rule lists them.
 const NAMESPACED_SEGMENT_LENS: [usize; 2] = [74, 58];
@@ -67,17 +81,31 @@ impl Detector for OpenAiTokenDetector {
         _context: &DetectorContext,
     ) -> Result<Vec<Candidate>, DetectorFailure> {
         let mut candidates = Vec::new();
+        let bytes = input.as_bytes();
         for (start, end) in scan(input) {
             let Some(range) = ByteRange::new(start, end) else {
                 continue;
             };
+            let type_name = finding_type(bytes, start);
             candidates.push(
-                Candidate::new("openai_api_key", Confidence::High, range)
+                Candidate::new(type_name, Confidence::High, range)
                     .with_specificity(Specificity::Provider)
                     .with_signals(["openai-prefix", "openai-marker"]),
             );
         }
         Ok(candidates)
+    }
+}
+
+/// The finding type for a match starting at `start`: `sk-admin-` bodies
+/// report `openai_admin_api_key`, every other recognized shape (legacy,
+/// `proj-`, `svcacct-`) keeps `openai_api_key`.
+fn finding_type(bytes: &[u8], start: usize) -> &'static str {
+    let body_start = start + PREFIX.len();
+    if bytes[body_start..].starts_with(ADMIN_NAMESPACE.as_bytes()) {
+        ADMIN_TYPE
+    } else {
+        "openai_api_key"
     }
 }
 
@@ -248,6 +276,26 @@ mod tests {
         for key in [PROJECT_KEY, SERVICE_ACCOUNT_KEY, ADMIN_KEY] {
             assert_eq!(ranges(key), vec![(0, key.len())], "{key}");
         }
+    }
+
+    /// `sk-admin-` reports its own type; `proj-`/`svcacct-`/legacy keep the
+    /// shared `openai_api_key` type (issue #774).
+    #[test]
+    fn only_the_admin_namespace_reports_its_own_finding_type() {
+        for key in [LEGACY_KEY, PROJECT_KEY, SERVICE_ACCOUNT_KEY] {
+            let candidates = detect(key);
+            assert_eq!(candidates.len(), 1, "{key}");
+            assert_eq!(candidates[0].type_name(), "openai_api_key", "{key}");
+        }
+        let candidates = detect(ADMIN_KEY);
+        assert_eq!(candidates.len(), 1);
+        assert_eq!(candidates[0].type_name(), "openai_admin_api_key");
+        assert_eq!(candidates[0].confidence(), Confidence::High);
+        assert_eq!(candidates[0].effective_specificity(), Specificity::Provider);
+        assert_eq!(
+            candidates[0].range(),
+            ByteRange::new(0, ADMIN_KEY.len()).unwrap()
+        );
     }
 
     #[test]

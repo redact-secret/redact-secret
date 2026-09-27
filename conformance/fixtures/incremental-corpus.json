@@ -1123,14 +1123,14 @@
       "expected": [
         {
           "detector": "openai-token",
-          "type": "openai_api_key",
+          "type": "openai_admin_api_key",
           "confidence": "high",
           "specificity": "provider",
           "start": 0,
           "end": 165
         }
       ],
-      "note": "issue #375: admin-namespace incremental parity, mirroring issue #368's project/svcacct coverage — the positive and its twin differ in one structural property (73-byte left segment vs the contracted 74), so every UTF-8 byte and char partition must resolve the same single finding as the whole-input scan, including splits inside the `T3BlbkFJ` marker and at the 73/74-byte segment boundary."
+      "note": "issue #375: admin-namespace incremental parity, mirroring issue #368's project/svcacct coverage — the positive and its twin differ in one structural property (73-byte left segment vs the contracted 74), so every UTF-8 byte and char partition must resolve the same single finding as the whole-input scan, including splits inside the `T3BlbkFJ` marker and at the 73/74-byte segment boundary. Issue #774 split `sk-admin-` onto its own `openai_admin_api_key` finding type; the grammar, span, and redacted `text` are unchanged."
     },
     {
       "id": "digitalocean-separator-boundary-discriminating-boundary",

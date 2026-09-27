@@ -20,6 +20,20 @@ evidence is linked from each published version.
 - `anthropic-token` now recognizes the `sk-ant-api01-` and
   `sk-ant-admin01-` prefixes (#862), and the OpenAI admin-key contract is
   reconciled with the shipped `sk-admin-` detection (#863).
+- **Not yet released.** `anthropic-token` and `openai-token` now report a
+  distinct finding type per privilege class instead of collapsing them into
+  the plain API-key type (#774, research #775/#776/#777): `sk-ant-admin01-`
+  (Console Admin API key) reports `anthropic_admin_api_key`; `sk-ant-api01-`
+  (Claude Enterprise organization key for any scope set — user management,
+  Compliance, Analytics, Spend Limits — not compliance-specific) reports
+  `anthropic_enterprise_api_key`; `sk-admin-` (OpenAI organization Admin API
+  key) reports `openai_admin_api_key`. `anthropic_api_key` now covers only
+  `sk-ant-api03-`, and `openai_api_key` now covers only the legacy, `proj-`
+  and `svcacct-` shapes. No prefix, body grammar, span, confidence or policy
+  action changes — every affected value still redacts by default — only the
+  reported `type` string for these three prefixes. No release has shipped
+  these types under their old names, so this is not a breaking change for
+  any released consumer.
 - `generic-token` now redacts a secret passed as an SDK call argument, for
   example `Client(api_key="...")` (#866).
 - The instructional-placeholder exclusion now covers provider-named forms

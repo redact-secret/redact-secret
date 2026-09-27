@@ -63,7 +63,7 @@ for your host. An organization-specific format that is not listed here can be ad
 as a [declarative ruleset](../guides/rulesets.md).
 
 <!-- detector-inventory:start -->
-79 built-in detectors emit 89 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
+79 built-in detectors emit 92 finding types. Generated from [`detector-inventory.json`](../coverage/detector-inventory.json) by `python3 -B scripts/generate-detector-inventory-docs.py`; do not edit by hand.
 
 | Detector | Finding types | Default policy class | Schemes |
 | --- | --- | --- | --- |
@@ -73,8 +73,8 @@ as a [declarative ruleset](../guides/rulesets.md).
 | `aws-bedrock-short-term-api-key` | `aws_bedrock_short_term_api_key` | `always-redact` | — |
 | `github-token` | `github_token`, `github_oauth_token`, `github_app_user_to_server_token`, `github_app_installation_token`, `github_app_refresh_token`, `github_fine_grained_personal_access_token` | `always-redact` | — |
 | `gitlab-token` | `gitlab_token` | `always-redact` | — |
-| `openai-token` | `openai_api_key` | `always-redact` | — |
-| `anthropic-token` | `anthropic_api_key` | `always-redact` | — |
+| `openai-token` | `openai_api_key`, `openai_admin_api_key` | `always-redact` | — |
+| `anthropic-token` | `anthropic_api_key`, `anthropic_enterprise_api_key`, `anthropic_admin_api_key` | `always-redact` | — |
 | `shopify-token` | `shopify_access_token` | `always-redact` | — |
 | `vault-token` | `vault_token` | `always-redact` | — |
 | `stripe-token` | `stripe_webhook_signing_secret`, `stripe_credential` | `always-redact` | — |
